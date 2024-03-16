@@ -1,0 +1,6 @@
+.vs/
+obj/
+bin/
+Level.sav.json
+
+character*.json

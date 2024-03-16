@@ -1,0 +1,74 @@
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PalCalc.model
+{
+    internal class PalDB
+    {
+        public Dictionary<PalId, Pal> PalsById { get; set; }
+        public IEnumerable<Pal> Pals => PalsById.Values;
+        public List<BreedingResult> Breeding { get; set; }
+
+        public List<Trait> Traits { get; set; }
+
+        // Map[Parent1, Map[Parent2, Child]]
+        public Dictionary<Pal, Dictionary<Pal, Pal>> BreedingByParent { get; set; }
+
+        // Map[Child, Map[Parent1, List<Parent2>]]
+        public Dictionary<Pal, Dictionary<Pal, List<Pal>>> BreedingByChild { get; set; }
+
+        private class Serialized
+        {
+            public List<Pal> Pals { get; set; }
+            public List<BreedingResult.Serialized> Breeding { get; set; }
+            public List<Trait> Traits { get; set; }
+        }
+
+        public static PalDB FromJson(string json)
+        {
+            var deserialized = JsonConvert.DeserializeObject<Serialized>(json);
+
+            var result = new PalDB();
+            result.PalsById = deserialized.Pals.ToDictionary(p => p.Id);
+            result.Traits = deserialized.Traits;
+
+            result.Breeding = deserialized.Breeding.Select(s => new BreedingResult
+            {
+                Parent1 = result.PalsById[s.Parent1ID],
+                Parent2 = result.PalsById[s.Parent2ID],
+                Child = result.PalsById[s.Child1ID]
+            }).ToList();
+
+            result.BreedingByParent = result.Breeding
+                .SelectMany(breed => breed.Parents.Select(parent1 => (parent1, breed))) // List<(parent, breeding)>
+                .GroupBy(p => p.parent1)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Distinct().ToDictionary(p => p.breed.OtherParent(g.Key), p => p.breed.Child)
+                );
+
+            result.BreedingByChild = result.Breeding
+                .GroupBy(b => b.Child)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.SelectMany(b => b.Parents.Select(p1 => (p1, b))).GroupBy(p => p.p1).ToDictionary(
+                        g => g.Key,
+                        g => g.Select(p => p.b.OtherParent(g.Key)).Distinct().ToList()
+                    )
+                );
+
+            return result;
+        }
+
+        public string ToJson() => JsonConvert.SerializeObject(new Serialized
+        {
+            Pals = Pals.ToList(),
+            Breeding = Breeding.Select(b => new BreedingResult.Serialized { Parent1ID = b.Parent1.Id, Parent2ID = b.Parent2.Id, Child1ID = b.Child.Id }).ToList(),
+            Traits = Traits
+        });
+    }
+}

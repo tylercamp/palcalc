@@ -1,0 +1,27 @@
+﻿slot 0: 5 entries
+slot 1: 480 entries
+slot 2: 20 entries
+slot 3: 20 entries
+slot 4: 20 entries
+slot 5: 20 entries
+slot 6: 20 entries
+slots 7-18: 5 entries
+
+
+
+
+slot 0: 5 valid entries
+slot 1: 380 valid entries
+slot 2: 20 valid entries (1st base)
+slot 3: 16 valid entries (2nd base)
+slot 4: 20 valid entries (3rd base)
+slot 5: 19 valid entries (4th base)
+slot 6: 12 valid entries (5th base)
+slots 9-10: 0 valid entries
+slots 11-12: 1 valid entry (doesn't show in `characterSaveParameterMap`) (shows in unrecognized no-name org with 6 character IDs, org ID has no references)
+slots 13-18: 0 valid entries
+
+
+
+
+(no way to get map coordinates of a base without knowing the world map transform)
