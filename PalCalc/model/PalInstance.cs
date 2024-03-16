@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.model
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     enum PalGender
     {
         MALE = 0b01,
@@ -20,6 +22,8 @@ namespace PalCalc.model
         public PalLocation Location { get; set; }
         public PalGender Gender { get; set; }
         public List<Trait> Traits { get; set; }
+
+        public override string ToString() => $"{Gender} {Pal} at {Location} with traits ({string.Join(", ", Traits)})";
 
         public Serialized AsSerialized => new Serialized { PalId = Pal.Id, Location = Location, Gender = Gender, TraitInternalNames = Traits.Select(t => t.InternalName).ToList() };
 

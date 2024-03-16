@@ -20,5 +20,7 @@ namespace PalCalc.model
     {
         public LocationType Type { get; set; }
         public int Index { get; set; }
+
+        public override string ToString() => $"{Type} (Slot #{Index})";
     }
 }

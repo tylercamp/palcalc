@@ -10,5 +10,7 @@ namespace PalCalc.model
     {
         public string Name { get; set; }
         public string InternalName { get; set; }
+
+        public override string ToString() => Name;
     }
 }
