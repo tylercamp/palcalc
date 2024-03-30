@@ -24,11 +24,12 @@ namespace PalCalc.model
 
 
 
+        public Dictionary<Pal, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
+
 
 
         public List<Trait> Traits { get; set; }
         public Dictionary<string, Trait> TraitsByName { get; set; }
-
 
 
 
@@ -37,6 +38,7 @@ namespace PalCalc.model
             public List<Pal> Pals { get; set; }
             public List<BreedingResult.Serialized> Breeding { get; set; }
             public List<Trait> Traits { get; set; }
+            public Dictionary<String, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
         }
 
         public static PalDB FromJson(string json)
@@ -46,6 +48,10 @@ namespace PalCalc.model
             var result = new PalDB();
             result.PalsById = deserialized.Pals.ToDictionary(p => p.Id);
             result.Traits = deserialized.Traits;
+            result.BreedingGenderProbability = deserialized.BreedingGenderProbability.ToDictionary(
+                kvp => deserialized.Pals.Single(p => p.Name == kvp.Key),
+                kvp => kvp.Value
+            );
 
             result.TraitsByName = result.Traits.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
 
@@ -81,7 +87,8 @@ namespace PalCalc.model
         {
             Pals = Pals.ToList(),
             Breeding = Breeding.Select(b => new BreedingResult.Serialized { Parent1ID = b.Parent1.Id, Parent2ID = b.Parent2.Id, Child1ID = b.Child.Id }).ToList(),
-            Traits = Traits
+            Traits = Traits,
+            BreedingGenderProbability = BreedingGenderProbability.ToDictionary(kvp => kvp.Key.Name, kvp => kvp.Value),
         });
     }
 }

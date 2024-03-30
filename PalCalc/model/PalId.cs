@@ -8,7 +8,7 @@ namespace PalCalc.model
 {
     internal class PalId
     {
-        public int Id { get; set; }
+        public int PalDexNo { get; set; }
         public bool IsVariant { get; set; }
 
         public static bool operator==(PalId a, PalId b)
@@ -22,10 +22,10 @@ namespace PalCalc.model
             return !(a == b);
         }
 
-        public override int GetHashCode() => IsVariant ? -Id : Id;
+        public override int GetHashCode() => IsVariant ? -PalDexNo : PalDexNo;
 
         public override bool Equals(object obj) => (obj as PalId)?.GetHashCode() == GetHashCode();
 
-        public override string ToString() => Id.ToString() + (IsVariant ? ".1" : "");
+        public override string ToString() => PalDexNo.ToString() + (IsVariant ? ".1" : "");
     }
 }

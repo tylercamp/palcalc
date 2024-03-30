@@ -35,9 +35,31 @@ namespace PalCalc
             ("Vanwyrm", "Anubis", "Faleris"),
             ("Mossanda", "Rayhound", "Grizzbolt"),
             ("Grizzbolt", "Relaxaurus", "Orserk"),
-            ("Kitsun", "Astegon", "Shadowbeak")
+            ("Kitsun", "Astegon", "Shadowbeak"),
+
+            // these pals can only be produced by breeding two of the same parents of the same pal
+            ("Frostallion", "Frostallion", "Frostallion"),
+            ("Jetragon", "Jetragon", "Jetragon"),
+            ("Paladius", "Paladius", "Paladius"),
+            ("Necromus", "Necromus", "Necromus"),
+            ("Jormuntide Ignis", "Jormuntide Ignis", "Jormuntide Ignis"),
         };
 
+
+        // Special-case probabilities of breeding a given pal as a male
+        static List<(String, float)> SpecialMaleProbabilities = new List<(string, float)>()
+        {
+            ("Kingpaca", 0.9f),
+            ("Kingpaca Cryst", 0.9f),
+            ("Warsect", 0.85f),
+            ("Lovander", 0.3f),
+            ("Lyleen", 0.3f),
+            ("Lyleen Noct", 0.3f),
+            ("Dazzi", 0.2f),
+            ("Mozzarina", 0.2f),
+            ("Elizabee", 0.1f),
+            ("Beegarde", 0.1f),
+        };
         
 
         class PalCsvRow
@@ -113,7 +135,7 @@ namespace PalCalc
                 {
                     Id = new PalId
                     {
-                        Id = row.Id,
+                        PalDexNo = row.Id,
                         IsVariant = row.IsVariant
                     },
                     Name = row.Name,
@@ -142,8 +164,11 @@ namespace PalCalc
                 }
 
                 int childPower = (int)Math.Floor((parent1.BreedingPower + parent2.BreedingPower + 1) / 2.0f);
-                // pals produced by a special combo can _only_ be produced by that combo
-                return pals.Where(p => !SpecialCombos.Any(c => p.Name == c.Item3)).OrderBy(p => Math.Abs(p.BreedingPower - childPower)).ThenBy(p => p.InternalIndex).First();
+                return pals
+                    .Where(p => !SpecialCombos.Any(c => p.Name == c.Item3)) // pals produced by a special combo can _only_ be produced by that combo
+                    .OrderBy(p => Math.Abs(p.BreedingPower - childPower))
+                    .ThenBy(p => p.InternalIndex)
+                    .First();
             }
 
             var db = new PalDB
@@ -158,19 +183,33 @@ namespace PalCalc
                         Parent2 = p.Item2,
                         Child = Child(p.Item1, p.Item2)
                     })
-                    .Select(r =>
-                    {
-                        var specialCase = SpecialCombos.Where(t => r.Parents.Any(p => p.Name == t.Item1) && r.Parents.Any(p => p.Name == t.Item2)).ToList();
-                        if (specialCase.Count > 0)
-                        {
-                            r.Child = pals.Single(p => p.Name == specialCase.Single().Item3);
-                        }
-                        return r;
-                    })
                     .ToList(),
 
                 PalsById = pals.ToDictionary(p => p.Id),
-                Traits = traits
+                Traits = traits,
+                BreedingGenderProbability = pals.ToDictionary(
+                    p => p,
+                    p =>
+                    {
+                        if (SpecialMaleProbabilities.Any(s => s.Item1 == p.Name))
+                        {
+                            var maleProbability = SpecialMaleProbabilities.Single(s => s.Item1 == p.Name).Item2;
+                            return new Dictionary<PalGender, float>()
+                            {
+                                { PalGender.MALE, maleProbability },
+                                { PalGender.FEMALE, 1 - maleProbability },
+                            };
+                        }
+                        else
+                        {
+                            return new Dictionary<PalGender, float>()
+                            {
+                                { PalGender.MALE, 0.5f },
+                                { PalGender.FEMALE, 0.5f },
+                            };
+                        }
+                    }
+                ),
             };
 
             File.WriteAllText("db.json", db.ToJson());
