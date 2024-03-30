@@ -39,8 +39,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="solver\" />
-  </ItemGroup>
-
 </Project>
