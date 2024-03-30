@@ -11,15 +11,26 @@ namespace PalCalc.model
     {
         public Dictionary<PalId, Pal> PalsById { get; set; }
         public IEnumerable<Pal> Pals => PalsById.Values;
+
+
+
         public List<BreedingResult> Breeding { get; set; }
 
-        public List<Trait> Traits { get; set; }
-
-        // Map[Parent1, Map[Parent2, Child]]
-        public Dictionary<Pal, Dictionary<Pal, Pal>> BreedingByParent { get; set; }
+        // Map[Parent1, Map[Parent2, BreedingResult]]
+        public Dictionary<Pal, Dictionary<Pal, BreedingResult>> BreedingByParent { get; set; }
 
         // Map[Child, Map[Parent1, List<Parent2>]]
         public Dictionary<Pal, Dictionary<Pal, List<Pal>>> BreedingByChild { get; set; }
+
+
+
+
+
+        public List<Trait> Traits { get; set; }
+        public Dictionary<string, Trait> TraitsByName { get; set; }
+
+
+
 
         private class Serialized
         {
@@ -36,6 +47,8 @@ namespace PalCalc.model
             result.PalsById = deserialized.Pals.ToDictionary(p => p.Id);
             result.Traits = deserialized.Traits;
 
+            result.TraitsByName = result.Traits.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
+
             result.Breeding = deserialized.Breeding.Select(s => new BreedingResult
             {
                 Parent1 = result.PalsById[s.Parent1ID],
@@ -48,7 +61,7 @@ namespace PalCalc.model
                 .GroupBy(p => p.parent1)
                 .ToDictionary(
                     g => g.Key,
-                    g => g.Distinct().ToDictionary(p => p.breed.OtherParent(g.Key), p => p.breed.Child)
+                    g => g.Distinct().ToDictionary(p => p.breed.OtherParent(g.Key), p => p.breed)
                 );
 
             result.BreedingByChild = result.Breeding

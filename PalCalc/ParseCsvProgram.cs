@@ -91,7 +91,7 @@ namespace PalCalc
         {
             List<Trait> traits = File
                 // google sheets "Palworld: Breeding Combinations and Calculator (v1.3-014)"; "SkillData" tab (hidden)
-                .ReadAllLines("traits.csv")
+                .ReadAllLines("ref/traits.csv")
                 .Skip(1)
                 .Select(l => l.Split(","))
                 .Select(cols => new TraitCsvRow(cols))
@@ -105,7 +105,7 @@ namespace PalCalc
             List<Pal> pals = File
                 // google sheets "Palworld: Breeding Combinations and Calculator (v1.3-014)"; "PalData" tab (hidden)
                 // (required fixing some names / "variant" flags)
-                .ReadAllLines("fulldata.csv")
+                .ReadAllLines("ref/fulldata.csv")
                 .Skip(1)
                 .Select(l => l.Split(','))
                 .Select(cols => new PalCsvRow(cols))
@@ -131,8 +131,19 @@ namespace PalCalc
             {
                 if (parent1 == parent2) return parent1;
 
+                var specialCombo = SpecialCombos.Where(c =>
+                    (parent1.Name == c.Item1 && parent2.Name == c.Item2) ||
+                    (parent2.Name == c.Item1 && parent1.Name == c.Item2)
+                );
+
+                if (specialCombo.Any())
+                {
+                    return pals.Single(p => p.Name == specialCombo.Single().Item3);
+                }
+
                 int childPower = (int)Math.Floor((parent1.BreedingPower + parent2.BreedingPower + 1) / 2.0f);
-                return pals.OrderBy(p => Math.Abs(p.BreedingPower - childPower)).ThenBy(p => p.InternalIndex).First();
+                // pals produced by a special combo can _only_ be produced by that combo
+                return pals.Where(p => !SpecialCombos.Any(c => p.Name == c.Item3)).OrderBy(p => Math.Abs(p.BreedingPower - childPower)).ThenBy(p => p.InternalIndex).First();
             }
 
             var db = new PalDB
