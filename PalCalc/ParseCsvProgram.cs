@@ -210,7 +210,12 @@ namespace PalCalc
                         }
                     }
                 ),
+                MinBreedingSteps = new Dictionary<Pal, Dictionary<Pal, int>>(), // will be filled later
             };
+
+
+            var initializedDb = PalDB.FromJson(db.ToJson());
+            db.MinBreedingSteps = PalCalcUtils.CalcMinDistances(initializedDb);
 
             File.WriteAllText("db.json", db.ToJson());
         }

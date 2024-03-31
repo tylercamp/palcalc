@@ -104,9 +104,25 @@ namespace PalCalc
              * 
              *   2.1. For each combination of pal instances, calc. the child + traits and store as new set of available instances (added after
              *        going through all combinations)
+             *        
              *   2.2. Filter by whether either parent can reach the target pal without exceeding the max num. breeding steps
-             *   2.3. 
+             *        (big performance gains)
+             *        
+             *   2.3. Filter by number of wild pal participants (if needed)
+             *   
+             *   2.4. Calculate the probability of a child with the desired traits within the given MAX_IRRELEVANT_TRAITS
+             *   
+             *   2.5. Reduce the set of new options by deduplicating and taking the result with the lowest effort
+             *        (modest performance gains)
+             *        
+             *   2.6. Update the working set of available pals
+             *        (big performance gains)
+             *      2.6.1. Insert if there's no existing available instance like it
+             *      2.6.2. Skip if there's an existing similar instance with less effort
+             *      2.6.3. Replace the old existing instance if it takes more effort than the discovered instance
              * 
+             * 3. The "available instances" now consists of all useful instances, including breeding results. Filter for the desired
+             *    pal and traits to get the available options
              */
 
             var relevantPals = PalCalcUtils
@@ -135,8 +151,13 @@ namespace PalCalc
             HashSet<IPalReference> availablePalInstances = new HashSet<IPalReference>(relevantPals.Where(pi => WithinBreedingSteps(pi.Pal, MAX_BREEDING_STEPS)).Select(i => new OwnedPalReference(i)));
             if (MAX_WILD_PALS > 0)
             {
-                foreach (var pal in db.Pals.Where(p => !relevantPals.Any(i => i.Pal == p)).Where(p => WithinBreedingSteps(p, MAX_BREEDING_STEPS)))
-                    availablePalInstances.Add(new WildcardPalReference(pal));
+                foreach (
+                    var wildRef in db.Pals
+                        .Where(p => !relevantPals.Any(i => i.Pal == p))
+                        .Where(p => WithinBreedingSteps(p, MAX_BREEDING_STEPS))
+                        .Select(p => new WildcardPalReference(p))
+                        .Where(pi => pi.BreedingEffort <= MAX_EFFORT)
+                ) availablePalInstances.Add(wildRef);
             }
 
             Console.WriteLine("Using {0} pals for graph search:\n- {1}", availablePalInstances.Count, string.Join("\n- ", availablePalInstances));
@@ -170,11 +191,17 @@ namespace PalCalc
 #endif
                     .SelectMany(parent1 =>
                 {
+                    // TODO - the `EnsureOppositeGender` is handed-biased, e.g. may return wildcard or definite gender
+                    //        depending on whether the wildcard is the operand
+                    //
+                    //        since we calc for (p1, p2) and (p2, p1), we'll always end up with a result whose effort
+                    //        is based on an incomplete calc (excluding the guaranteed-gender effort). we deduplicate
+                    //        based on least effort, meaning we'll end up throwing away the (accurate) version with
+                    //        higher effort in favor of the (inaccurate) version with lower effort
                     var res = availablePalInstances
                         .Where(p2 => parent1 != p2)
                         .Select(i => i.EnsureOppositeGender(db, parent1.Gender))
                         .Where(i => i != null)
-                        .Where(i => i.BreedingEffort < MAX_EFFORT)
                         .Select(parent2 =>
                         {
                             if (NumWildPalParticipants(parent1) + NumWildPalParticipants(parent2) > MAX_WILD_PALS) return null;
@@ -247,10 +274,14 @@ namespace PalCalc
                                     }
                                     else
                                     {
-                                        // (available traits except desired) choose (required num irrelevant)
+                                        // (available traits except desired)
+                                        // choose
+                                        // (required num irrelevant)
                                         var numCombinationsWithIrrelevantTrait = (float)Choose(parentTraits.Count - desiredParentTraits.Count, numIrrelevantFromParent);
 
-                                        // (all available traits) choose (actual num inherited from parent)
+                                        // (all available traits)
+                                        // choose
+                                        // (actual num inherited from parent)
                                         var numCombinationsWithAnyTraits = (float)Choose(parentTraits.Count, actualNumInheritedFromParent);
 
                                         // probability of those traits containing the desired traits
@@ -265,10 +296,7 @@ namespace PalCalc
 
                                     if (probabilityGotRequiredFromParent > 1) Debugger.Break();
 
-                                    // consider probability of actually getting `numInheritedFromParent` direct-inherited traits
-
                                     var probabilityGotExactRequiredRandom = GameConfig.TraitRandomAddedProbability[numIrrelevantFromRandom];
-
                                     matchedTraitsProbability += probabilityGotRequiredFromParent * probabilityGotExactRequiredRandom;
                                 }
                             }
@@ -305,8 +333,8 @@ namespace PalCalc
 
                 Console.WriteLine("Within {0} new instances, reduced to {1} instances by removing duplicates and taking the lowest-effort option", newInstances.Count, bestNewInstances.Count);
 
-                foreach (var newInst in newInstances)
-                //foreach (var newInst in bestNewInstances)
+                //foreach (var newInst in newInstances)
+                foreach (var newInst in bestNewInstances)
                 {
                     var existingInstances = availablePalInstances.Where(pi =>
                         pi.Pal == newInst.Pal &&
