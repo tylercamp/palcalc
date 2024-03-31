@@ -66,7 +66,7 @@ namespace PalCalc
             var MAX_BREEDING_STEPS = 10;
 
             // max num. irrelevant traits from any parents or children involved in the final breeding steps (including target pal)
-            // (the optimal path will still be returned regardless of this, but lower values can make it run faster)
+            // (lower value runs faster, but considers fewer possibilities)
             var MAX_IRRELEVANT_TRAITS = 3;
 
             /* effort in estimated time to get the desired pal w/ traits
@@ -117,7 +117,7 @@ namespace PalCalc
              *        (modest performance gains)
              *        
              *   2.6. Update the working set of available pals
-             *        (big performance gains)
+             *        (big performance gains with below filters)
              *      2.6.1. Insert if there's no existing available instance like it
              *      2.6.2. Skip if there's an existing similar instance with less effort
              *      2.6.3. Replace the old existing instance if it takes more effort than the discovered instance
@@ -156,7 +156,7 @@ namespace PalCalc
                     var wildRef in db.Pals
                         .Where(p => !relevantPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, MAX_BREEDING_STEPS))
-                        .Select(p => new WildcardPalReference(p))
+                        .SelectMany(p => Enumerable.Range(1, MAX_IRRELEVANT_TRAITS + 1).Select(numTraits => new WildcardPalReference(p, numTraits)))
                         .Where(pi => pi.BreedingEffort <= MAX_EFFORT)
                 ) availablePalInstances.Add(wildRef);
             }
@@ -206,6 +206,9 @@ namespace PalCalc
                                 // the wildcard parent remains unresolved (since the least-effort ordering at the end
                                 // would consider the unresolved parent pair to be "more optimal" than the more accurate
                                 // and higher-effort parent ordering)
+                                //
+                                // if the effort calc is inaccurate, that'll cause the logic for the "pick the
+                                // least-effort option" optimization to be incorrect
                                 // 
                                 // since we know we'll revisit this (px, py) again, and we need `p1` to be a definite
                                 // gender (for p2 WILDCARD to resolve), we'll skip this iteration unless `p1` is
@@ -344,6 +347,7 @@ namespace PalCalc
                 Console.WriteLine("Within {0} new instances, reduced to {1} instances by removing duplicates and taking the lowest-effort option", newInstances.Count, bestNewInstances.Count);
 
                 //foreach (var newInst in newInstances)
+                var numChanged = 0;
                 foreach (var newInst in bestNewInstances)
                 {
                     var existingInstances = availablePalInstances.Where(pi =>
@@ -361,12 +365,20 @@ namespace PalCalc
                         {
                             availablePalInstances.Remove(existingInst);
                             availablePalInstances.Add(newInst);
+                            numChanged++;
                         }
                     }
                     else
                     {
                         availablePalInstances.Add(newInst);
+                        numChanged++;
                     }
+                }
+
+                if (numChanged == 0)
+                {
+                    Console.WriteLine("Last pass found no new useful options, stopping iteration early");
+                    break;
                 }
             }
 

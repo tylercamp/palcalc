@@ -12,5 +12,7 @@ namespace PalCalc.model
         public string InternalName { get; set; }
 
         public override string ToString() => Name;
+
+        public static Trait Random => new Trait() { Name = "(Random)", InternalName = "__VIRT_RAND__" };
     }
 }

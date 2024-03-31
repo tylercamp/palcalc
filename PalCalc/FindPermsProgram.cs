@@ -72,7 +72,7 @@ namespace PalCalc
             
             List<IPalReference> availablePalsInstances = new List<IPalReference>(relevantPals.Select(i => new OwnedPalReference(i)));
             if (MAX_WILD_PALS > 0) {
-                availablePalsInstances.AddRange(db.Pals.Where(p => !relevantPals.Any(i => i.Pal == p)).Select(p => new WildcardPalReference(p)));
+                availablePalsInstances.AddRange(db.Pals.Where(p => !relevantPals.Any(i => i.Pal == p)).Select(p => new WildcardPalReference(p, 0)));
             }
 
             Console.WriteLine("Using {0} pals for graph search:\n- {1}", availablePalsInstances.Count, string.Join("\n- ", availablePalsInstances));
