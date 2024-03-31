@@ -24,6 +24,11 @@ namespace PalCalc.model
 
 
 
+        // Map[ParentPal, Map[ChildPal, NumSteps]]
+        public Dictionary<Pal, Dictionary<Pal, int>> MinBreedingSteps { get; set; }
+
+
+
         public Dictionary<Pal, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
 
 
@@ -38,7 +43,8 @@ namespace PalCalc.model
             public List<Pal> Pals { get; set; }
             public List<BreedingResult.Serialized> Breeding { get; set; }
             public List<Trait> Traits { get; set; }
-            public Dictionary<String, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
+            public Dictionary<string, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
+            public Dictionary<string, Dictionary<string, int>> MinBreedingSteps { get; set; }
         }
 
         public static PalDB FromJson(string json)
@@ -51,6 +57,13 @@ namespace PalCalc.model
             result.BreedingGenderProbability = deserialized.BreedingGenderProbability.ToDictionary(
                 kvp => deserialized.Pals.Single(p => p.Name == kvp.Key),
                 kvp => kvp.Value
+            );
+            result.MinBreedingSteps = deserialized.MinBreedingSteps.ToDictionary(
+                kvp => kvp.Key.ToPal(result),
+                kvp => kvp.Value.ToDictionary(
+                    ikvp => ikvp.Key.ToPal(result),
+                    ikvp => ikvp.Value
+                )
             );
 
             result.TraitsByName = result.Traits.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
@@ -89,6 +102,13 @@ namespace PalCalc.model
             Breeding = Breeding.Select(b => new BreedingResult.Serialized { Parent1ID = b.Parent1.Id, Parent2ID = b.Parent2.Id, Child1ID = b.Child.Id }).ToList(),
             Traits = Traits,
             BreedingGenderProbability = BreedingGenderProbability.ToDictionary(kvp => kvp.Key.Name, kvp => kvp.Value),
+            MinBreedingSteps = MinBreedingSteps.ToDictionary(
+                kvp => kvp.Key.Name,
+                kvp => kvp.Value.ToDictionary(
+                    ikvp => ikvp.Key.Name,
+                    ikvp => ikvp.Value
+                )
+            )
         });
     }
 }

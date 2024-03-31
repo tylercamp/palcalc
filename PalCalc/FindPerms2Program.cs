@@ -109,7 +109,6 @@ namespace PalCalc
              * 
              */
 
-            var palDistances = PalCalcUtils.CalcMinDistances(db);
             var relevantPals = PalCalcUtils
                 .RelevantInstancesForTraits(db, savedInstances, targetInstance.Traits)
                 .Where(p => p.Traits.Except(targetInstance.Traits).Count() <= MAX_IRRELEVANT_TRAITS)
@@ -131,7 +130,7 @@ namespace PalCalc
             // may be included if they have different genders and/or different matching subsets of
             // the desired traits
 
-            bool WithinBreedingSteps(Pal pal, int maxSteps) => palDistances[pal][targetInstance.Pal] <= maxSteps;
+            bool WithinBreedingSteps(Pal pal, int maxSteps) => db.MinBreedingSteps[pal][targetInstance.Pal] <= maxSteps;
 
             HashSet<IPalReference> availablePalInstances = new HashSet<IPalReference>(relevantPals.Where(pi => WithinBreedingSteps(pi.Pal, MAX_BREEDING_STEPS)).Select(i => new OwnedPalReference(i)));
             if (MAX_WILD_PALS > 0)
@@ -181,7 +180,7 @@ namespace PalCalc
                             if (NumWildPalParticipants(parent1) + NumWildPalParticipants(parent2) > MAX_WILD_PALS) return null;
 
                             var childPal = db.BreedingByParent[parent1.Pal][parent2.Pal].Child;
-                            if (palDistances[childPal][targetInstance.Pal] > MAX_BREEDING_STEPS - s - 1)
+                            if (db.MinBreedingSteps[childPal][targetInstance.Pal] > MAX_BREEDING_STEPS - s - 1)
                             {
                                 return null;
                             }

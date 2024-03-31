@@ -65,7 +65,7 @@ namespace PalCalc
 
                     if (!didUpdate)
                     {
-                        // the remaining (src,target) pairs are impossible (?)
+                        // the remaining (src,target) pairs are impossible
                         foreach (var p in unresolved)
                         {
                             palDistances[p.Item1].Add(p.Item2, 10000);

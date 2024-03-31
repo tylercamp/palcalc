@@ -36,7 +36,7 @@ namespace PalCalc
             var db = PalDB.FromJson(File.ReadAllText("db.json"));
 
             // https://github.com/cheahjs/palworld-save-tools
-            var json = JsonConvert.DeserializeObject<JObject>(File.ReadAllText("Level.sav.json"));
+            var json = JsonConvert.DeserializeObject<JObject>(File.ReadAllText("ref/Level.sav.json"));
             Console.WriteLine("Loaded JSON");
 
             var containers = json["properties"]["worldSaveData"]["value"]["CharacterContainerSaveData"]["value"]
