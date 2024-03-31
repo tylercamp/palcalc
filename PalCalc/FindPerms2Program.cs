@@ -62,11 +62,12 @@ namespace PalCalc
             
             
             // !!! CONFIG !!!
-            var MAX_WILD_PALS = 1;
-            var MAX_BREEDING_STEPS = 5;
+            var MAX_WILD_PALS = 2;
+            var MAX_BREEDING_STEPS = 10;
 
             // max num. irrelevant traits from any parents or children involved in the final breeding steps (including target pal)
-            var MAX_IRRELEVANT_TRAITS = 1;
+            // (the optimal path will still be returned regardless of this, but lower values can make it run faster)
+            var MAX_IRRELEVANT_TRAITS = 3;
 
             /* effort in estimated time to get the desired pal w/ traits
              * 
@@ -74,7 +75,7 @@ namespace PalCalc
              * - ignores hatching time
              * - roughly estimates time to catch wild pals with increasing time based on paldex number
             */
-            var MAX_EFFORT = TimeSpan.FromHours(10);
+            var MAX_EFFORT = TimeSpan.FromHours(20);
             // !!! !!!
 
 
@@ -191,19 +192,28 @@ namespace PalCalc
 #endif
                     .SelectMany(parent1 =>
                 {
-                    // TODO - the `EnsureOppositeGender` is handed-biased, e.g. may return wildcard or definite gender
-                    //        depending on whether the wildcard is the operand
-                    //
-                    //        since we calc for (p1, p2) and (p2, p1), we'll always end up with a result whose effort
-                    //        is based on an incomplete calc (excluding the guaranteed-gender effort). we deduplicate
-                    //        based on least effort, meaning we'll end up throwing away the (accurate) version with
-                    //        higher effort in favor of the (inaccurate) version with lower effort
                     var res = availablePalInstances
                         .Where(p2 => parent1 != p2)
                         .Select(i => i.EnsureOppositeGender(db, parent1.Gender))
                         .Where(i => i != null)
                         .Select(parent2 =>
                         {
+                            if ((parent1.Gender == PalGender.WILDCARD) != (parent2.Gender == PalGender.WILDCARD))
+                            {
+                                // one parent is a wildcard, the other is not. we'll end up making two passes for this
+                                // (px,py) pair, with a child with the same traits, but the effort calculation (requiring
+                                // the wildcard to resolve to the opposite gender) will bias in favor of the pair where
+                                // the wildcard parent remains unresolved (since the least-effort ordering at the end
+                                // would consider the unresolved parent pair to be "more optimal" than the more accurate
+                                // and higher-effort parent ordering)
+                                // 
+                                // since we know we'll revisit this (px, py) again, and we need `p1` to be a definite
+                                // gender (for p2 WILDCARD to resolve), we'll skip this iteration unless `p1` is
+                                // a definite gender
+
+                                if (parent1.Gender == PalGender.WILDCARD) return null;
+                            }
+
                             if (NumWildPalParticipants(parent1) + NumWildPalParticipants(parent2) > MAX_WILD_PALS) return null;
 
                             var childPal = db.BreedingByParent[parent1.Pal][parent2.Pal].Child;
