@@ -5,7 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <StartupObject>PalCalc.FindPermsProgram</StartupObject>
+    <StartupObject>PalCalc.FindPerms2Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

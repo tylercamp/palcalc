@@ -30,6 +30,8 @@ namespace PalCalc.model
 
 
         public Dictionary<Pal, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
+        public Dictionary<Pal, PalGender> BreedingMostLikelyGender { get; set; }
+        public Dictionary<Pal, PalGender> BreedingLeastLikelyGender { get; set; }
 
 
 
@@ -92,6 +94,30 @@ namespace PalCalc.model
                         g => g.Select(p => p.b.OtherParent(g.Key)).Distinct().ToList()
                     )
                 );
+
+            result.BreedingMostLikelyGender = deserialized.Pals.ToDictionary(
+                p => p,
+                p =>
+                {
+                    var genderProbability = result.BreedingGenderProbability[p];
+                    var maleProbability = genderProbability[PalGender.MALE];
+                    var femaleProbability = genderProbability[PalGender.FEMALE];
+
+                    if (maleProbability > femaleProbability) return PalGender.MALE;
+                    else if (femaleProbability > maleProbability) return PalGender.FEMALE;
+                    else return PalGender.WILDCARD;
+                }
+            );
+
+            result.BreedingLeastLikelyGender = result.BreedingMostLikelyGender.ToDictionary(
+                kvp => kvp.Key,
+                kvp =>
+                {
+                    if (kvp.Value == PalGender.WILDCARD) return PalGender.WILDCARD;
+                    else if (kvp.Value == PalGender.MALE) return PalGender.FEMALE;
+                    else return PalGender.MALE;
+                }
+            );
 
             return result;
         }

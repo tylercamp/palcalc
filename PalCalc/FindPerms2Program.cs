@@ -16,6 +16,11 @@ namespace PalCalc
         // N choose K -> look up column K at row N of pascal's triangle
         class PascalsTriangle
         {
+            public PascalsTriangle(int numRows)
+            {
+                AddRows(numRows);
+            }
+
             private List<int[]> rows = new List<int[]> { new int[] { 1 }, new int[] { 1, 1 } };
 
             private void AddRows(int count)
@@ -43,7 +48,7 @@ namespace PalCalc
                 }
             }
 
-            public static PascalsTriangle Instance = new PascalsTriangle();
+            public static PascalsTriangle Instance = new PascalsTriangle(20);
         }
 
         // returns number of ways you can choose k combinations from a list of n
@@ -186,143 +191,155 @@ namespace PalCalc
             for (int s = 0; s < MAX_BREEDING_STEPS; s++)
             {
                 Console.WriteLine($"Starting search step #{s+1} with {availablePalInstances.Count} relevant pals");
-                var newInstances = availablePalInstances
-#if RELEASE
+                var newInstances = Enumerable.Zip(availablePalInstances, Enumerable.Range(0, availablePalInstances.Count))
                     .AsParallel()
-#endif
-                    .SelectMany(parent1 =>
-                {
-                    var res = availablePalInstances
-                        .Where(p2 => parent1 != p2)
-                        .Select(i => i.EnsureOppositeGender(db, parent1.Gender))
-                        .Where(i => i != null)
-                        .Select(parent2 =>
-                        {
-                            if ((parent1.Gender == PalGender.WILDCARD) != (parent2.Gender == PalGender.WILDCARD))
+                    .SelectMany(pair =>
+                    {
+                        var parent1 = pair.First;
+                        var idx = pair.Second;
+
+                        var res = availablePalInstances
+                            .Skip(idx + 1) // only search (p1,p2) pairs, not (p1,p2) and (p2,p1)
+                            .Where(i => i.IsCompatibleGender(parent1.Gender))
+                            .Where(i => i != null)
+                            .Where(parent2 => NumWildPalParticipants(parent1) + NumWildPalParticipants(parent2) <= MAX_WILD_PALS)
+                            .Where(parent2 =>
                             {
-                                // one parent is a wildcard, the other is not. we'll end up making two passes for this
-                                // (px,py) pair, with a child with the same traits, but the effort calculation (requiring
-                                // the wildcard to resolve to the opposite gender) will bias in favor of the pair where
-                                // the wildcard parent remains unresolved (since the least-effort ordering at the end
-                                // would consider the unresolved parent pair to be "more optimal" than the more accurate
-                                // and higher-effort parent ordering)
-                                //
-                                // if the effort calc is inaccurate, that'll cause the logic for the "pick the
-                                // least-effort option" optimization to be incorrect
-                                // 
-                                // since we know we'll revisit this (px, py) again, and we need `p1` to be a definite
-                                // gender (for p2 WILDCARD to resolve), we'll skip this iteration unless `p1` is
-                                // a definite gender
-
-                                if (parent1.Gender == PalGender.WILDCARD) return null;
-                            }
-
-                            if (NumWildPalParticipants(parent1) + NumWildPalParticipants(parent2) > MAX_WILD_PALS) return null;
-
-                            var childPal = db.BreedingByParent[parent1.Pal][parent2.Pal].Child;
-                            if (db.MinBreedingSteps[childPal][targetInstance.Pal] > MAX_BREEDING_STEPS - s - 1)
+                                var childPal = db.BreedingByParent[parent1.Pal][parent2.Pal].Child;
+                                return db.MinBreedingSteps[childPal][targetInstance.Pal] <= MAX_BREEDING_STEPS - s - 1;
+                            })
+                            .Where(parent2 => NumBredPalParticipants(parent1) + NumBredPalParticipants(parent2) < MAX_BREEDING_STEPS)
+                            .Select(parent2 =>
                             {
-                                return null;
-                            }
+                                var parentTraits = parent1.Traits.Concat(parent2.Traits).Distinct().ToList();
+                                var desiredParentTraits = targetInstance.Traits.Intersect(parentTraits).ToList();
 
-                            if (NumBredPalParticipants(parent1) + NumBredPalParticipants(parent2) >= MAX_BREEDING_STEPS)
-                            {
-                                return null;
-                            }
+                                var matchedTraitsProbability = 0.0f;
 
-                            var parentTraits = parent1.Traits.Concat(parent2.Traits).Distinct().ToList();
-                            var desiredParentTraits = targetInstance.Traits.Intersect(parentTraits).ToList();
-
-                            var matchedTraitsProbability = 0.0f;
-
-                            // go through each potential final number of traits, accumulate the probability of any of these exact options
-                            // leading to the desired traits within MAX_IRRELEVANT_TRAITS
-                            for (int numFinalTraits = 0; numFinalTraits <= GameConfig.MaxTotalTraits; numFinalTraits++)
-                            {
-                                // only looking for probability of getting all desired parent traits, which means we need at least Count(desired)
-                                // total traits
-                                if (numFinalTraits < desiredParentTraits.Count) continue;
-
-                                // exceeding Count(desiredTraits) + MAX_IRRELEVANT_TRAITS means we've exceeded the max irrelevant traits allowed
-                                if (numFinalTraits > desiredParentTraits.Count + MAX_IRRELEVANT_TRAITS) break;
-
-                                for (int numInheritedFromParent = desiredParentTraits.Count; numInheritedFromParent <= numFinalTraits; numInheritedFromParent++)
+                                // go through each potential final number of traits, accumulate the probability of any of these exact options
+                                // leading to the desired traits within MAX_IRRELEVANT_TRAITS
+                                for (int numFinalTraits = 0; numFinalTraits <= GameConfig.MaxTotalTraits; numFinalTraits++)
                                 {
-                                    // we may inherit more traits from the parents than the parents actually have (e.g. inherit 4 traits from parents with
-                                    // 2 total traits), in which case we'd still inherit just two
-                                    //
-                                    // this doesn't affect probabilities of getting `numInherited`, but it affects the number of random traits which must
-                                    // be added to each `numFinalTraits` and the number of combinations of parent traits that we check
-                                    var actualNumInheritedFromParent = Math.Min(numInheritedFromParent, parentTraits.Count);
+                                    // only looking for probability of getting all desired parent traits, which means we need at least Count(desired)
+                                    // total traits
+                                    if (numFinalTraits < desiredParentTraits.Count) continue;
+
+                                    // exceeding Count(desiredTraits) + MAX_IRRELEVANT_TRAITS means we've exceeded the max irrelevant traits allowed
+                                    if (numFinalTraits > desiredParentTraits.Count + MAX_IRRELEVANT_TRAITS) break;
+
+                                    for (int numInheritedFromParent = desiredParentTraits.Count; numInheritedFromParent <= numFinalTraits; numInheritedFromParent++)
+                                    {
+                                        // we may inherit more traits from the parents than the parents actually have (e.g. inherit 4 traits from parents with
+                                        // 2 total traits), in which case we'd still inherit just two
+                                        //
+                                        // this doesn't affect probabilities of getting `numInherited`, but it affects the number of random traits which must
+                                        // be added to each `numFinalTraits` and the number of combinations of parent traits that we check
+                                        var actualNumInheritedFromParent = Math.Min(numInheritedFromParent, parentTraits.Count);
                                     
-                                    var numIrrelevantFromParent = actualNumInheritedFromParent - desiredParentTraits.Count;
-                                    var numIrrelevantFromRandom = numFinalTraits - numIrrelevantFromParent;
+                                        var numIrrelevantFromParent = actualNumInheritedFromParent - desiredParentTraits.Count;
+                                        var numIrrelevantFromRandom = numFinalTraits - numIrrelevantFromParent;
 
-                                    // can inherit at most 3 random traits; if this `if` is `true` then we've hit a case which would never actually happen
-                                    // (e.g. 4 target final traits, 0 from parents, 4 from random)
-                                    if (numIrrelevantFromRandom > 3) continue;
+                                        // can inherit at most 3 random traits; if this `if` is `true` then we've hit a case which would never actually happen
+                                        // (e.g. 4 target final traits, 0 from parents, 4 from random)
+                                        if (numIrrelevantFromRandom > 3) continue;
 
-                                    float probabilityGotRequiredFromParent;
-                                    if (numInheritedFromParent == 0)
-                                    {
-                                        // would only happen if neither parent has a desired trait
+                                        float probabilityGotRequiredFromParent;
+                                        if (numInheritedFromParent == 0)
+                                        {
+                                            // would only happen if neither parent has a desired trait
 
-                                        // the only way we could get zero inherited traits is if neither parent actually has any traits, otherwise
-                                        // it (seems to) be impossible to get zero direct inherited traits (unconfirmed from reddit thread)
-                                        if (parentTraits.Count > 0) continue;
+                                            // the only way we could get zero inherited traits is if neither parent actually has any traits, otherwise
+                                            // it (seems to) be impossible to get zero direct inherited traits (unconfirmed from reddit thread)
+                                            if (parentTraits.Count > 0) continue;
 
-                                        // if neither parent has any traits, we'll always get 0 inherited traits, so we'll always get the "required"
-                                        // traits regardless of the roll for `TraitProbabilityDirect`
-                                        probabilityGotRequiredFromParent = 1.0f;
+                                            // if neither parent has any traits, we'll always get 0 inherited traits, so we'll always get the "required"
+                                            // traits regardless of the roll for `TraitProbabilityDirect`
+                                            probabilityGotRequiredFromParent = 1.0f;
+                                        }
+                                        else if (!desiredParentTraits.Any())
+                                        {
+                                            // just the chance of getting this number of traits from parents
+                                            probabilityGotRequiredFromParent = GameConfig.TraitProbabilityDirect[numInheritedFromParent];
+                                        }
+                                        else if (numIrrelevantFromParent == 0)
+                                        {
+                                            // chance of getting exactly the required traits
+                                            probabilityGotRequiredFromParent = GameConfig.TraitProbabilityDirect[numInheritedFromParent] / Choose(parentTraits.Count, desiredParentTraits.Count);
+                                        }
+                                        else
+                                        {
+                                            // (available traits except desired)
+                                            // choose
+                                            // (required num irrelevant)
+                                            var numCombinationsWithIrrelevantTrait = (float)Choose(parentTraits.Count - desiredParentTraits.Count, numIrrelevantFromParent);
+
+                                            // (all available traits)
+                                            // choose
+                                            // (actual num inherited from parent)
+                                            var numCombinationsWithAnyTraits = (float)Choose(parentTraits.Count, actualNumInheritedFromParent);
+
+                                            // probability of those traits containing the desired traits
+                                            // (doesn't affect anything if we don't actually want any of these traits)
+                                            // (TODO - is this right? got this simple division from chatgpt)
+                                            var probabilityCombinationWithDesiredTraits = desiredParentTraits.Count == 0 ? 1 : (
+                                                numCombinationsWithIrrelevantTrait / numCombinationsWithAnyTraits
+                                            );
+
+                                            probabilityGotRequiredFromParent = probabilityCombinationWithDesiredTraits * GameConfig.TraitProbabilityDirect[numInheritedFromParent];
+                                        }
+
+                                        if (probabilityGotRequiredFromParent > 1) Debugger.Break();
+
+                                        var probabilityGotExactRequiredRandom = GameConfig.TraitRandomAddedProbability[numIrrelevantFromRandom];
+                                        matchedTraitsProbability += probabilityGotRequiredFromParent * probabilityGotExactRequiredRandom;
                                     }
-                                    else if (!desiredParentTraits.Any())
+                                }
+
+                                // we have two parents but don't necessarily have definite genders for them, figure out which parent should have which
+                                // gender (if they're wild/bred pals) for the least overall effort (different pals have different gender probabilities)
+                                List<IPalReference> ParentOptions(IPalReference parent) => parent.Gender == PalGender.WILDCARD
+                                    ? new List<IPalReference>() { parent.WithGuaranteedGender(db, PalGender.MALE), parent.WithGuaranteedGender(db, PalGender.FEMALE) }
+                                    : new List<IPalReference>() { parent };
+
+                                (IPalReference, IPalReference) PreferredParentsGenders()
+                                {
+                                    var optionsParent1 = ParentOptions(parent1);
+                                    var optionsParent2 = ParentOptions(parent2);
+
+                                    var parentPairOptions = optionsParent1.SelectMany(p1v => optionsParent2.Where(p2v => p2v.IsCompatibleGender(p1v.Gender)).Select(p2v => (p1v, p2v))).ToList();
+                                    var optimalTime = parentPairOptions.Min(pair => pair.p1v.BreedingEffort + pair.p2v.BreedingEffort);
+
+                                    parentPairOptions = parentPairOptions.Where(pair => pair.p1v.BreedingEffort + pair.p2v.BreedingEffort == optimalTime).ToList();
+                                    if (parentPairOptions.Select(pair => pair.p1v.BreedingEffort + pair.p2v.BreedingEffort).Distinct().Count() == 1)
                                     {
-                                        // just the chance of getting this number of traits from parents
-                                        probabilityGotRequiredFromParent = GameConfig.TraitProbabilityDirect[numInheritedFromParent];
-                                    }
-                                    else if (numIrrelevantFromParent == 0)
-                                    {
-                                        // chance of getting exactly the required traits
-                                        probabilityGotRequiredFromParent = GameConfig.TraitProbabilityDirect[numInheritedFromParent] / Choose(parentTraits.Count, desiredParentTraits.Count);
+                                        // either there is no preference or at least 1 parent already has a specific gender
+                                        if (parent2.Gender == PalGender.WILDCARD) return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender()));
+                                        if (parent1.Gender == PalGender.WILDCARD) return (parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender()), parent2);
+
+                                        // neither parents are wildcards
+                                        return (parent1, parent2);
                                     }
                                     else
                                     {
-                                        // (available traits except desired)
-                                        // choose
-                                        // (required num irrelevant)
-                                        var numCombinationsWithIrrelevantTrait = (float)Choose(parentTraits.Count - desiredParentTraits.Count, numIrrelevantFromParent);
-
-                                        // (all available traits)
-                                        // choose
-                                        // (actual num inherited from parent)
-                                        var numCombinationsWithAnyTraits = (float)Choose(parentTraits.Count, actualNumInheritedFromParent);
-
-                                        // probability of those traits containing the desired traits
-                                        // (doesn't affect anything if we don't actually want any of these traits)
-                                        // (TODO - is this right? got this simple division from chatgpt)
-                                        var probabilityCombinationWithDesiredTraits = desiredParentTraits.Count == 0 ? 1 : (
-                                            numCombinationsWithIrrelevantTrait / numCombinationsWithAnyTraits
-                                        );
-
-                                        probabilityGotRequiredFromParent = probabilityCombinationWithDesiredTraits * GameConfig.TraitProbabilityDirect[numInheritedFromParent];
+                                        return parentPairOptions.OrderBy(p => p.p1v.BreedingEffort + p.p2v.BreedingEffort).First();
                                     }
-
-                                    if (probabilityGotRequiredFromParent > 1) Debugger.Break();
-
-                                    var probabilityGotExactRequiredRandom = GameConfig.TraitRandomAddedProbability[numIrrelevantFromRandom];
-                                    matchedTraitsProbability += probabilityGotRequiredFromParent * probabilityGotExactRequiredRandom;
                                 }
-                            }
 
-                            var result = new BredPalReference(childPal, parent1, parent2, desiredParentTraits, matchedTraitsProbability);
+                                var (preferredParent1, preferredParent2) = PreferredParentsGenders();
+                                return new BredPalReference(
+                                    db.BreedingByParent[parent1.Pal][parent2.Pal].Child,
+                                    preferredParent1,
+                                    preferredParent2,
+                                    desiredParentTraits,
+                                    matchedTraitsProbability
+                                );
+                            })
+                            .Where(result => result.BreedingEffort <= MAX_EFFORT)
+                            .ToList();
 
-                            return result.BreedingEffort < MAX_EFFORT ? result : null;
-                        })
-                        .Where(v => v != null)
-                        .ToList();
-
-                    return res;
-                }).ToList();
+                        return res;
+                    })
+                    .ToList();
 
                 Console.WriteLine("Filtering {0} potential new instances", newInstances.Count);
 

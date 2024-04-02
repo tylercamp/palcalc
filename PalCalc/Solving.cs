@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,7 +41,9 @@ namespace PalCalc
         public TimeSpan BreedingEffort { get; }
         public TimeSpan SelfBreedingEffort { get; }
 
-        IPalReference EnsureOppositeGender(PalDB db, PalGender gender);
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender);
+
+        bool IsCompatibleGender(PalGender otherGender) => Gender == PalGender.WILDCARD || Gender != otherGender;
     }
 
     class OwnedPalReference : IPalReference
@@ -60,10 +63,14 @@ namespace PalCalc
 
         public IPalLocation Location => new OwnedPalLocation() { Location = instance.Location };
 
-        public IPalReference EnsureOppositeGender(PalDB db, PalGender gender) => gender != instance.Gender ? this : null;
-
         public TimeSpan BreedingEffort => TimeSpan.Zero;
         public TimeSpan SelfBreedingEffort => TimeSpan.Zero;
+
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        {
+            if (gender != this.Gender) throw new Exception("Cannot force a gender change for owned pals");
+            return this;
+        }
 
         public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({string.Join(", ", Traits)}) in {Location}";
     }
@@ -73,8 +80,9 @@ namespace PalCalc
         public WildcardPalReference(Pal pal, int numTraits)
         {
             Pal = pal;
-            BreedingEffort = GameConfig.TimeToCatch(pal) / GameConfig.TraitWildAtMostN[numTraits];
+            SelfBreedingEffort = GameConfig.TimeToCatch(pal) / GameConfig.TraitWildAtMostN[numTraits];
             Traits = Enumerable.Range(0, numTraits).Select(i => Trait.Random).ToList();
+            Gender = PalGender.WILDCARD;
         }
 
         private WildcardPalReference(Pal pal)
@@ -86,46 +94,37 @@ namespace PalCalc
 
         public List<Trait> Traits { get; private set; }
 
-        public PalGender Gender { get; private set; } = PalGender.WILDCARD;
+        public PalGender Gender { get; private set; }
 
         public IPalLocation Location { get; } = new CapturedPal();
 
-        public IPalReference EnsureOppositeGender(PalDB db, PalGender gender)
+        public TimeSpan BreedingEffort => SelfBreedingEffort * CapturesRequiredForGender;
+
+        // est. number of captured pals required to get a pal of the given gender (assuming you caught every
+        // wild pal without checking for gender, not realistic but good enough)
+        public int CapturesRequiredForGender
         {
-            // seems like wild pals just have a flat 50/50 chance on gender, rather than following breeding probability
-
-            if (gender == PalGender.WILDCARD)
-            {
-                // this method is meant to update the effort for getting a pal of opposing gender, but:
-                // - for two wildcard pals, the effort calc should only happen on one of the instances, which we can't ensure here
-                // - for a wildcard + definite-gender, the effort on this instance has already been applied, so we'll need to undo
-                //   the original offset on this so the effort calc can be ensured-applied-once outside this method
-
-                if (this.Gender == PalGender.WILDCARD) return this;
-                else return new WildcardPalReference(Pal) { Traits = Traits };
-            }
-            else if (this.Gender == PalGender.WILDCARD)
-            {
-                var newGender = gender == PalGender.MALE ? PalGender.FEMALE : PalGender.MALE;
-                return new WildcardPalReference(Pal)
-                {
-                    Gender = newGender,
-                    // assume 50/50 chance of wild pal having a given gender, so on avg. we'd need to catch two
-                    // TODO - is this right?
-                    BreedingEffort = this.BreedingEffort * 2,
-                    Traits = Traits,
-                };
-            }
-            else
-            {
-                // incompatible (only wildcards can be resolved to new genders)
-                return this.Gender != gender ? this : null;
-            }
+            // assuming 50/50 chance of a wild instance of this pal to have either gender, in which case
+            // you'd need on avg. two captures to get the target gender
+            get => Gender == PalGender.WILDCARD ? 1 : 2;
         }
 
-        public TimeSpan BreedingEffort { get; private set; }
+        // used as the effort required to catch one
+        public TimeSpan SelfBreedingEffort { get; private set; }
 
-        public TimeSpan SelfBreedingEffort => BreedingEffort;
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        {
+            if (Gender != PalGender.WILDCARD) throw new Exception("Wild pal has already been given a guaranteed gender");
+
+            if (gender == PalGender.WILDCARD) return this;
+
+            return new WildcardPalReference(Pal)
+            {
+                SelfBreedingEffort = SelfBreedingEffort,
+                Gender = gender,
+                Traits = Traits
+            };
+        }
 
         public override string ToString() => $"Captured {Gender} {Pal} w/ up to {Traits.Count} random traits";
     }
@@ -168,48 +167,49 @@ namespace PalCalc
 
         public IPalLocation Location => BredPal.Instance;
 
-        public IPalReference EnsureOppositeGender(PalDB db, PalGender gender)
-        {
-            if (gender == PalGender.WILDCARD)
-            {
-                if (this.Gender != PalGender.WILDCARD) return this;
-                else
-                {
-                    // this pal and the other pal can have any gender, but we're asking for a specific
-                    // gender on THIS pal. be optimistic and choose the gender that is most likely as a
-                    // breeding result
-                    var bestProbability = db.BreedingGenderProbability[Pal].MaxBy(kvp => kvp.Value);
-                    return new BredPalReference(Pal, Parent1, Parent2, Traits)
-                    {
-                        Gender = bestProbability.Key,
-                        // breeding effort for this specific gender is effort for this pal with traits, times the est. no. of
-                        // breeding attempts for that gender
-                        SelfBreedingEffort = this.SelfBreedingEffort * Math.Ceiling(1.0f / bestProbability.Value),
-                    };
-                }
-            }
-            else
-            {
-                if (this.Gender != PalGender.WILDCARD) return this.Gender != gender ? this : null;
-                else
-                {
-                    // we need a specific gender that's opposite the given non-wildcard gender, calc. the probability
-                    // of breeding this pal with the opposite gender
-                    var requiredGender = gender == PalGender.MALE ? PalGender.FEMALE : PalGender.MALE;
-                    var genderProbability = db.BreedingGenderProbability[Pal][requiredGender];
-                    return new BredPalReference(Pal, Parent1, Parent2, Traits)
-                    {
-                        Gender = requiredGender,
-                        SelfBreedingEffort = this.SelfBreedingEffort * Math.Ceiling(1.0f / genderProbability),
-                    };
-                }
-            }
-        }
-
         public TimeSpan SelfBreedingEffort { get; private set; }
         public TimeSpan BreedingEffort => Parent1.BreedingEffort + Parent2.BreedingEffort + SelfBreedingEffort;
 
         public List<Trait> Traits { get; }
+
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        {
+            if (this.Gender != PalGender.WILDCARD) throw new Exception("Cannot change gender of bred pal with an already-guaranteed gender");
+
+            if (gender == PalGender.WILDCARD)
+            {
+                return this;
+            }
+            else if (gender == PalGender.OPPOSITE_WILDCARD)
+            {
+                // should only happen if the other parent has the same gender probabilities as this parent
+                if (db.BreedingMostLikelyGender[Pal] != PalGender.WILDCARD)
+                {
+                    // assume that the other parent has the more likely gender
+                    return new BredPalReference(Pal, Parent1, Parent2, Traits)
+                    {
+                        SelfBreedingEffort = SelfBreedingEffort / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]],
+                        Gender = gender
+                    };
+                }
+
+                // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
+                return new BredPalReference(Pal, Parent1, Parent2, Traits)
+                {
+                    SelfBreedingEffort = SelfBreedingEffort * 2,
+                    Gender = gender
+                };
+            }
+            else
+            {
+                var genderProbability = db.BreedingGenderProbability[Pal][gender];
+                return new BredPalReference(Pal, Parent1, Parent2, Traits)
+                {
+                    SelfBreedingEffort = SelfBreedingEffort / genderProbability,
+                    Gender = gender
+                };
+            }
+        }
 
         public override string ToString() => $"Bred {Gender} {Pal} w/ ({string.Join(", ", Traits)})";
 

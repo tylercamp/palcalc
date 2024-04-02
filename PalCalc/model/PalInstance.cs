@@ -11,9 +11,12 @@ namespace PalCalc.model
     [JsonConverter(typeof(StringEnumConverter))]
     enum PalGender
     {
-        MALE = 0b01,
-        FEMALE = 0b10,
-        WILDCARD = 0b11
+        // note: pal world is not P.C., so it only has two genders
+        MALE = 0b001,
+        FEMALE = 0b010,
+        // (but this program is P.C., and has four genders)
+        WILDCARD = 0b011,
+        OPPOSITE_WILDCARD = 0b100, // contextual - pals of this gender should be paired with pals of WILDCARD gender
     }
 
     internal class PalInstance
