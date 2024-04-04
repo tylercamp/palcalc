@@ -11,6 +11,171 @@ using System.Threading.Tasks;
 
 namespace PalCalc
 {
+    interface IBreedingTreeNode
+    {
+        IPalReference PalRef { get; }
+        IEnumerable<IBreedingTreeNode> Children { get; }
+
+        IEnumerable<(IBreedingTreeNode, int)> TraversedTopDown(int currentDepth);
+
+        IEnumerable<string> DescriptionLines { get; }
+    }
+
+    class DirectPalNode : IBreedingTreeNode
+    {
+        public DirectPalNode(IPalReference pref)
+        {
+            PalRef = pref;
+        }
+
+        public IPalReference PalRef { get; }
+        public IEnumerable<IBreedingTreeNode> Children { get; } = Enumerable.Empty<IBreedingTreeNode>();
+
+        public IEnumerable<(IBreedingTreeNode, int)> TraversedTopDown(int currentDepth)
+        {
+            yield return (this, currentDepth);
+        }
+
+        public IEnumerable<String> DescriptionLines
+        {
+            get
+            {
+                switch (PalRef)
+                {
+                    case WildcardPalReference wild:
+                        yield return $"Wild {wild.Pal.Name}";
+                        yield return $"{wild.Gender} gender w/ up to {wild.Traits.Count} random traits";
+                        break;
+
+                    case OwnedPalReference owned:
+                        yield return $"Owned {owned.Pal.Name}";
+                        yield return $"in {owned.Location}";
+                        yield return $"{owned.Gender} w/ {owned.Traits.TraitsListToString()}";
+                        break;
+
+                    default: throw new NotImplementedException();
+                }
+            }
+        }
+    }
+
+    class BredPalNode : IBreedingTreeNode
+    {
+        public BredPalNode(BredPalReference bpr, IBreedingTreeNode parentNode1, IBreedingTreeNode parentNode2)
+        {
+            PalRef = bpr;
+            Children = new List<IBreedingTreeNode>() { parentNode1, parentNode2 };
+
+            ParentNode1 = parentNode1;
+            ParentNode2 = parentNode2;
+        }
+
+        public IBreedingTreeNode ParentNode1 { get; }
+        public IBreedingTreeNode ParentNode2 { get; }
+
+        public IPalReference PalRef { get; }
+
+        public IEnumerable<IBreedingTreeNode> Children { get; }
+
+        public IEnumerable<(IBreedingTreeNode, int)> TraversedTopDown(int currentDepth)
+        {
+            foreach (var n in ParentNode1.TraversedTopDown(currentDepth + 1))
+                yield return n;
+
+            yield return (this, currentDepth);
+
+            foreach (var n in ParentNode2.TraversedTopDown(currentDepth + 1))
+                yield return n;
+        }
+
+        public IEnumerable<string> DescriptionLines
+        {
+            get
+            {
+                var asBred = PalRef as BredPalReference;
+                yield return $"Bred {asBred.Pal.Name}";
+                yield return $"{asBred.Gender} gender w/ {asBred.Traits.TraitsListToString()}";
+                yield return $"takes ~{asBred.SelfBreedingEffort} for {asBred.AvgRequiredBreedings} breed attempts";
+            }
+        }
+    }
+
+    class BreedingTree
+    {
+        IBreedingTreeNode BuildNode(IPalReference pref)
+        {
+            switch (pref)
+            {
+                case BredPalReference bpr:
+                    return new BredPalNode(bpr, BuildNode(bpr.Parent1), BuildNode(bpr.Parent2));
+
+                case WildcardPalReference:
+                case OwnedPalReference:
+                    return new DirectPalNode(pref);
+
+                default: throw new NotImplementedException();
+            }
+        }
+
+        public BreedingTree(IPalReference finalPal)
+        {
+            Root = BuildNode(finalPal);
+        }
+
+        public IBreedingTreeNode Root { get; }
+
+        public IEnumerable<(IBreedingTreeNode, int)> AllNodes => Root.TraversedTopDown(0);
+
+        public void Print()
+        {
+            /*
+             * Node
+             * Description
+             *       \
+             *              Node
+             *              Description
+             *       /
+             * Node
+             * Description
+             */
+
+            var maxDescriptionLengthByDepth = AllNodes.GroupBy(n => n.Item2).ToDictionary(g => g.Key, g => g.Max(p => p.Item1.DescriptionLines.Max(l => l.Length)));
+            var maxDepth = maxDescriptionLengthByDepth.Keys.Max();
+
+            var indentationByDepth = Enumerable
+                .Range(0, maxDepth + 1)
+                .ToDictionary(
+                    depth => depth,
+                    depth =>
+                    {
+                        if (depth == maxDepth) return 0;
+
+                        var priorDepthsLengths = Enumerable.Range(1, maxDepth - depth).Select(depthOffset => 1 + maxDescriptionLengthByDepth[depth + depthOffset]).ToList();
+                        return priorDepthsLengths.Sum();
+                    }
+                );
+
+            int? prevDepth = null;
+            foreach (var (node, depth) in AllNodes)
+            {
+                var indentation = new string(' ', indentationByDepth[depth]);
+
+                if (prevDepth != null)
+                {
+                    if (prevDepth > depth)
+                        Console.WriteLine("{0}\\", indentation);
+                    else if (prevDepth < depth)
+                        Console.WriteLine("{0}/", new string(' ', indentationByDepth[prevDepth.Value]));
+                }
+
+                foreach (var line in node.DescriptionLines)
+                    Console.WriteLine("{0} {1}", indentation, line);
+
+                prevDepth = depth;
+            }
+        }
+    }
+
     internal class FindPerms2Program
     {
         // N choose K -> look up column K at row N of pascal's triangle
@@ -67,12 +232,12 @@ namespace PalCalc
             
             
             // !!! CONFIG !!!
-            var MAX_WILD_PALS = 2;
-            var MAX_BREEDING_STEPS = 10;
+            var MAX_WILD_PALS = 1;
+            var MAX_BREEDING_STEPS = 20;
 
             // max num. irrelevant traits from any parents or children involved in the final breeding steps (including target pal)
             // (lower value runs faster, but considers fewer possibilities)
-            var MAX_IRRELEVANT_TRAITS = 3;
+            var MAX_IRRELEVANT_TRAITS = 0;
 
             /* effort in estimated time to get the desired pal w/ traits
              * 
@@ -80,14 +245,17 @@ namespace PalCalc
              * - ignores hatching time
              * - roughly estimates time to catch wild pals with increasing time based on paldex number
             */
-            var MAX_EFFORT = TimeSpan.FromHours(20);
+            var MAX_EFFORT = TimeSpan.FromDays(7);
             // !!! !!!
 
 
+            // TODO - Consider use of multiple pal farms
+            // TODO - Emit separate bred pal for each possible num. irrelevant traits, currently not properly considering
+            //        the set of random traits introduced to bred pals
 
             var targetInstance = new PalInstance
             {
-                Pal = "Suzaku".ToPal(db),
+                Pal = "Ragnahawk".ToPal(db),
                 Gender = PalGender.WILDCARD,
                 Traits = new List<Trait> { "Swift".ToTrait(db), "Runner".ToTrait(db), "Nimble".ToTrait(db) },
                 Location = null
@@ -130,6 +298,8 @@ namespace PalCalc
              * 3. The "available instances" now consists of all useful instances, including breeding results. Filter for the desired
              *    pal and traits to get the available options
              */
+
+            if (MAX_IRRELEVANT_TRAITS > 3) MAX_IRRELEVANT_TRAITS = 3;
 
             var relevantPals = PalCalcUtils
                 .RelevantInstancesForTraits(db, savedInstances, targetInstance.Traits)
@@ -209,6 +379,24 @@ namespace PalCalc
                                 return db.MinBreedingSteps[childPal][targetInstance.Pal] <= MAX_BREEDING_STEPS - s - 1;
                             })
                             .Where(parent2 => NumBredPalParticipants(parent1) + NumBredPalParticipants(parent2) < MAX_BREEDING_STEPS)
+                            .Where(parent2 =>
+                            {
+                                // if we disallow any irrelevant traits, neither parents have a useful trait, and at least 1 parent
+                                // has an irrelevant trait, then it's impossible to breed a child with zero total traits
+                                //
+                                // (child would need to have zero since there's nothing useful to inherit and we disallow irrelevant traits,
+                                //  impossible to have zero since a child always inherits at least 1 direct trait if possible)
+                                if (MAX_IRRELEVANT_TRAITS > 0) return true;
+
+                                var combinedTraits = parent1.Traits.Concat(parent2.Traits);
+
+
+                                var anyRelevantFromParents = targetInstance.Traits.Intersect(combinedTraits).Any();
+                                var anyIrrelevantFromParents = combinedTraits.Except(targetInstance.Traits).Any();
+
+                                return anyRelevantFromParents || !anyIrrelevantFromParents;
+
+                            })
                             .Select(parent2 =>
                             {
                                 var parentTraits = parent1.Traits.Concat(parent2.Traits).Distinct().ToList();
@@ -325,12 +513,23 @@ namespace PalCalc
                                     }
                                 }
 
+                                if (matchedTraitsProbability <= 0 || matchedTraitsProbability > 1)
+                                    Debugger.Break();
+
+                                // (not entirely correct, since some irrelevant traits may be specific and inherited by parents. if we know a child
+                                //  may have some specific trait, it may be efficient to breed that child with another parent which also has that
+                                //  irrelevant trait, which would increase the overall likelyhood of a desired trait being inherited)
+                                var maxNumFinalTraits = Math.Min(GameConfig.MaxTotalTraits, desiredParentTraits.Count + MAX_IRRELEVANT_TRAITS);
+                                var potentialIrrelevantTraits = Enumerable
+                                    .Range(0, Math.Max(0, maxNumFinalTraits - desiredParentTraits.Count))
+                                    .Select(i => new RandomTrait());
+
                                 var (preferredParent1, preferredParent2) = PreferredParentsGenders();
                                 return new BredPalReference(
                                     db.BreedingByParent[parent1.Pal][parent2.Pal].Child,
                                     preferredParent1,
                                     preferredParent2,
-                                    desiredParentTraits,
+                                    desiredParentTraits.Concat(potentialIrrelevantTraits).ToList(),
                                     matchedTraitsProbability
                                 );
                             })
@@ -370,8 +569,7 @@ namespace PalCalc
                     var existingInstances = availablePalInstances.Where(pi =>
                         pi.Pal == newInst.Pal &&
                         pi.Gender == newInst.Gender &&
-                        pi.Traits.Count == newInst.Traits.Count &&
-                        !pi.Traits.Except(newInst.Traits).Any()
+                        pi.Traits.EqualsTraits(newInst.Traits)
                     ).ToList();
 
                     var existingInst = existingInstances.SingleOrDefault();
@@ -401,55 +599,12 @@ namespace PalCalc
 
             Console.WriteLine("Took {0}", TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds));
 
-            // returns (stepIndex, participant), where higher stepIndex means it's used earlier in the chain
-            // (stepIndex=0 means it's used in the current step)
-            IEnumerable<(int, IPalReference)> ParticipantsFor(IPalReference pref)
-            {
-                switch (pref)
-                {
-                    case BredPalReference bpr:
-                        yield return (0, bpr);
-                        foreach (var p in ParticipantsFor(bpr.Parent1))
-                            yield return (p.Item1 + 1, p.Item2);
-                        foreach (var p in ParticipantsFor(bpr.Parent2))
-                            yield return (p.Item1 + 1, p.Item2);
-                        break;
-
-                    default:
-                        yield return (0, pref);
-                        break;
-                    
-                }
-            }
-
             Console.WriteLine("\n\nRESULTS:");
             var matches = availablePalInstances.Where(pref => pref.Pal == targetInstance.Pal && !targetInstance.Traits.Except(pref.Traits).Any()).ToList();
             foreach (var match in matches)
             {
-                var participants = ParticipantsFor(match).ToList();
-                var numConcurrentSteps = participants.Max(p => p.Item1);
-
-                for (int i = 0; i < numConcurrentSteps; i++)
-                {
-                    var indentation = new string('\t', i);
-                    Console.WriteLine("{0}Phase {1}", indentation, i + 1);
-
-                    var stepIndex = numConcurrentSteps - i;
-                    foreach (var part in participants.Where(part => part.Item1 == stepIndex))
-                        Console.WriteLine("{0}- Using {1}", indentation, part.Item2);
-
-                    Console.WriteLine("{0}Breed:", indentation);
-                    var nextStepIndex = stepIndex - 1;
-                    foreach (var result in participants.Where(part => part.Item1 == nextStepIndex && part.Item2 is BredPalReference).Select(part => part.Item2).Cast<BredPalReference>())
-                    {
-                        Console.WriteLine("{0}- {1}", indentation, result);
-                        Console.WriteLine("{0}  from {1} + {2}", indentation, result.Parent1, result.Parent2);
-                        Console.WriteLine("{0}  (takes ~{1})", indentation, result.SelfBreedingEffort);
-                    }
-
-                    Console.WriteLine();
-                }
-
+                var tree = new BreedingTree(match);
+                tree.Print();
                 Console.WriteLine("Should take: {0}", match.BreedingEffort);
             }
         }

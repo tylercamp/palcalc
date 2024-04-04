@@ -72,7 +72,7 @@ namespace PalCalc
             return this;
         }
 
-        public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({string.Join(", ", Traits)}) in {Location}";
+        public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({Traits.TraitsListToString()}) in {Location}";
     }
 
     class WildcardPalReference : IPalReference
@@ -81,7 +81,7 @@ namespace PalCalc
         {
             Pal = pal;
             SelfBreedingEffort = GameConfig.TimeToCatch(pal) / GameConfig.TraitWildAtMostN[numTraits];
-            Traits = Enumerable.Range(0, numTraits).Select(i => Trait.Random).ToList();
+            Traits = Enumerable.Range(0, numTraits).Select(i => new RandomTrait()).ToList<Trait>();
             Gender = PalGender.WILDCARD;
         }
 
@@ -154,9 +154,8 @@ namespace PalCalc
         public BredPalReference(Pal pal, IPalReference parent1, IPalReference parent2, List<Trait> traits, float traitsProbability) : this(pal, parent1, parent2, traits)
         {
             Gender = PalGender.WILDCARD;
-
-            var estBreedAttempts = (int)Math.Ceiling(1.0f / traitsProbability);
-            SelfBreedingEffort = GameConfig.BreedingTime * estBreedAttempts;
+            if (traitsProbability <= 0) AvgRequiredBreedings = int.MaxValue;
+            else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / traitsProbability);
         }
 
         public Pal Pal { get; private set; }
@@ -167,8 +166,16 @@ namespace PalCalc
 
         public IPalLocation Location => BredPal.Instance;
 
-        public TimeSpan SelfBreedingEffort { get; private set; }
-        public TimeSpan BreedingEffort => Parent1.BreedingEffort + Parent2.BreedingEffort + SelfBreedingEffort;
+        public int AvgRequiredBreedings { get; private set; }
+        public TimeSpan SelfBreedingEffort => AvgRequiredBreedings * GameConfig.AvgBreedingTime;
+        public TimeSpan BreedingEffort => SelfBreedingEffort + (
+            GameConfig.MultipleBreedingFarms
+                ? Parent1.BreedingEffort > Parent2.BreedingEffort
+                    ? Parent1.BreedingEffort
+                    : Parent2.BreedingEffort
+                : Parent1.BreedingEffort + Parent2.BreedingEffort
+
+        );
 
         public List<Trait> Traits { get; }
 
@@ -188,7 +195,7 @@ namespace PalCalc
                     // assume that the other parent has the more likely gender
                     return new BredPalReference(Pal, Parent1, Parent2, Traits)
                     {
-                        SelfBreedingEffort = SelfBreedingEffort / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]],
+                        AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings/ db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
                         Gender = gender
                     };
                 }
@@ -196,7 +203,7 @@ namespace PalCalc
                 // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
                 return new BredPalReference(Pal, Parent1, Parent2, Traits)
                 {
-                    SelfBreedingEffort = SelfBreedingEffort * 2,
+                    AvgRequiredBreedings = AvgRequiredBreedings * 2,
                     Gender = gender
                 };
             }
@@ -205,13 +212,13 @@ namespace PalCalc
                 var genderProbability = db.BreedingGenderProbability[Pal][gender];
                 return new BredPalReference(Pal, Parent1, Parent2, Traits)
                 {
-                    SelfBreedingEffort = SelfBreedingEffort / genderProbability,
+                    AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / genderProbability),
                     Gender = gender
                 };
             }
         }
 
-        public override string ToString() => $"Bred {Gender} {Pal} w/ ({string.Join(", ", Traits)})";
+        public override string ToString() => $"Bred {Gender} {Pal} w/ ({Traits.TraitsListToString()})";
 
         public override bool Equals(object obj)
         {
@@ -224,7 +231,7 @@ namespace PalCalc
                 asBred.Parent2.Equals(Parent2) &&
                 asBred.SelfBreedingEffort == SelfBreedingEffort &&
                 asBred.Gender == Gender &&
-                asBred.Traits.SequenceEqual(asBred.Traits)
+                asBred.Traits.EqualsTraits(asBred.Traits)
             );
         }
 

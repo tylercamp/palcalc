@@ -117,11 +117,7 @@ namespace PalCalc
                 .Skip(1)
                 .Select(l => l.Split(","))
                 .Select(cols => new TraitCsvRow(cols))
-                .Select(row => new Trait
-                {
-                    Name = row.Name,
-                    InternalName = row.InternalName
-                })
+                .Select(row => new Trait(row.Name, row.InternalName))
                 .ToList();
 
             List<Pal> pals = File

@@ -8,11 +8,22 @@ namespace PalCalc.model
 {
     internal class Trait
     {
-        public string Name { get; set; }
-        public string InternalName { get; set; }
+        public Trait(string name, string internalName)
+        {
+            Name = name;
+            InternalName = internalName;
+        }
+
+        public string Name { get; }
+        public string InternalName { get; }
 
         public override string ToString() => Name;
 
-        public static Trait Random => new Trait() { Name = "(Random)", InternalName = "__VIRT_RAND__" };
+        public override bool Equals(object obj) => ReferenceEquals(this, obj);
+    }
+
+    internal class RandomTrait : Trait
+    {
+        public RandomTrait() : base("(Random)", "__VIRT_RAND__") { }
     }
 }

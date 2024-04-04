@@ -19,7 +19,19 @@ namespace PalCalc
          */
 
         public static readonly int MaxTotalTraits = 4;
-        public static readonly TimeSpan BreedingTime = TimeSpan.FromMinutes(5); // TODO - double-check
+
+        // supposedly breeding time is a constant 5 minutes
+        public static readonly TimeSpan BreedingTime = TimeSpan.FromMinutes(5);
+
+        // actual breeding time can be extended if the parents are idle and not actually at
+        // the breeding farm. assume parents are never idle except for sleep/night time, and
+        // assume equal time for day+night, meaning the parents are actively breeding for
+        // half the time of each day and the number of total eggs produced is cut in half
+        //
+        // (i.e., average effective breeding time is doubled)
+        public static readonly TimeSpan AvgBreedingTime = BreedingTime * 2;
+
+        public static readonly bool MultipleBreedingFarms = true;
 
         // roughly estimate time to catch a given pal based on paldex num. and whether it's a pal variant rather than base pal
         public static TimeSpan TimeToCatch(Pal pal)
