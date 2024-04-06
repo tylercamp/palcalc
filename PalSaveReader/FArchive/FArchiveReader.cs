@@ -340,7 +340,7 @@ namespace PalSaveReader.FArchive
                                 return r;
                             }).ToArray();
 
-                            foreach (var v in newVisitors) v.Exit();
+                            foreach (var v in extraVisitors) v.Exit();
                             foreach (var v in pathVisitors) v.VisitArrayPropertyEnd(path, meta);
 
                             return new ArrayProperty
