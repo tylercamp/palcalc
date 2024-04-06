@@ -69,5 +69,11 @@ namespace PalSaveReader.GVAS
 
             return result;
         }
+
+        public static void VisitFromFArchive(FArchiveReader reader, Action<string, object> onValue)
+        {
+            GvasHeader.Read(reader);
+
+        }
     }
 }

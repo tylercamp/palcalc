@@ -6,54 +6,76 @@ using System.Threading.Tasks;
 
 namespace PalSaveReader.FArchive
 {
-    internal struct LiteralProperty
+    interface IProperty
     {
-        public Guid? Id;
-        public object Value;
+        string Path { get; set; }
+        Guid? Id { get; set; }
     }
 
-    struct EnumProperty
+    internal class LiteralProperty : IProperty
     {
-        public Guid? Id;
-        public string EnumType;
-        public string EnumValue;
-    }
-
-    struct StructProperty
-    {
-        public Guid? Id;
-
-        public string StructType;
-        public Guid StructTypeId;
+        public string Path { get; set; }
+        public Guid? Id { get; set; }
 
         public object Value;
+
+        public override string ToString() => Value.ToString();
     }
 
-    struct ArrayProperty
+    class EnumProperty : IProperty
     {
-        public Guid? Id;
-        public string ArrayType;
-        public object Value;
+        public string Path { get; set; }
+        public Guid? Id { get; set; }
+
+        public string EnumType { get; set; }
+        public string EnumValue { get; set; }
+
+        public override string ToString() => $"({EnumType}){EnumValue}";
     }
 
-    struct ArrayStructProperty
+    class StructProperty : IProperty
     {
-        public Guid? Id;
-        public string PropName;
-        public string PropType;
-        public string TypeName;
+        public string Path { get; set; }
+        public Guid? Id { get; set; }
 
-        public object[] Values;
+        public string StructType { get; set; }
+        public Guid StructTypeId { get; set; }
+
+        public object Value { get; set; }
+
+        public override string ToString() => $"({StructType}){Value}";
     }
 
-    struct MapProperty
+    class ArrayProperty : IProperty
     {
-        public Guid? Id;
-        public string KeyType;
-        public string ValueType;
-        public string KeyStructType;
-        public string ValueStructType;
+        public string Path { get; set; }
+        public Guid? Id { get; set; }
 
-        public object Value;
+        public string ArrayType { get; set; }
+        public object Value { get; set; }
+    }
+
+    class ArrayStructProperty : IProperty
+    {
+        public string Path { get; set; }
+
+        public Guid? Id { get; set; }
+        public string PropName { get; set; }
+        public string PropType { get; set; }
+        public string TypeName { get; set; }
+
+        public object[] Values { get; set; }
+    }
+
+    class MapProperty : IProperty
+    {
+        public string Path { get; set; }
+        public Guid? Id { get; set; }
+        public string KeyType { get; set; }
+        public string ValueType { get; set; }
+        public string KeyStructType { get; set; }
+        public string ValueStructType { get; set; }
+
+        public Dictionary<object, object> Value { get; set; }
     }
 }
