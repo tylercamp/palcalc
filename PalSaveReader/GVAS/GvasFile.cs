@@ -60,12 +60,12 @@ namespace PalSaveReader.GVAS
         public GvasHeader Header { get; set; }
         public Dictionary<string, object> Properties { get; set; }
 
-        public static GvasFile FromFArchive(FArchiveReader reader)
+        public static GvasFile FromFArchive(FArchiveReader reader, IEnumerable<IVisitor> visitors)
         {
             var result = new GvasFile();
             result.Header = GvasHeader.Read(reader);
 
-            result.Properties = reader.ReadPropertiesUntilEnd();
+            result.Properties = reader.ReadPropertiesUntilEnd("", visitors);
 
             return result;
         }
