@@ -77,10 +77,13 @@ namespace PalSaveReader.FArchive
             var structType = ReadString();
             return new StructProperty
             {
-                Path = path,
-                StructTypeId = ReadGuid(),
-                Id = ReadOptionalGuid(),
-                StructType = structType,
+                TypedMeta = new StructPropertyMeta
+                {
+                    Path = path,
+                    StructTypeId = ReadGuid(),
+                    Id = ReadOptionalGuid(),
+                    StructType = structType,
+                },
                 Value = ReadStructValue(structType, path)
             };
         }
@@ -139,59 +142,6 @@ namespace PalSaveReader.FArchive
             }
         }
 
-        object ReadArrayValue(string arrayType, uint count, ulong size, string path)
-        {
-            var iteration = Enumerable.Range(0, (int)count);
-            switch (arrayType)
-            {
-                case "NameProperty":
-                case "EnumProperty": return iteration.Select(_ => ReadString()).ToArray();
-
-                case "Guid": return iteration.Select(_ => ReadGuid()).ToArray();
-                case "ByteProperty":
-                    if (count != size) throw new Exception("Labelled ByteProperty not implemented"); // sic
-
-                    return ReadBytes((int)count);
-
-                default:
-                    throw new Exception("Unknown array type: " + arrayType + " at " + path);
-            }
-        }
-
-        object ReadArrayProperty(string arrayType, ulong size, string path)
-        {
-            var count = ReadUInt32();
-            if (arrayType == "StructProperty")
-            {
-                var propertyName = ReadString();
-                var propertyType = ReadString();
-
-                ReadUInt64(); // ?
-
-                var typeName = ReadString();
-
-                var valueId = ReadGuid();
-
-                ReadBytes(1); // ?
-
-                var values = Enumerable.Range(0, (int)count).Select(_ => ReadStructValue(typeName, $"{path}.{propertyName}")).ToArray();
-
-                return new ArrayStructProperty
-                {
-                    Path = path,
-                    Id = valueId,
-                    PropName = propertyName,
-                    PropType = propertyType,
-                    TypeName = typeName,
-                    Values = values
-                };
-            }
-            else
-            {
-                return ReadArrayValue(arrayType, count, size, path);
-            }
-        }
-
         public IProperty ReadProperty(string typeName, ulong size, string path, string nestedCallerPath = "")
         {
             // TODO - custom types
@@ -201,22 +151,20 @@ namespace PalSaveReader.FArchive
 
             switch (typeName)
             {
-                case "IntProperty": return new LiteralProperty { Path = path, Id = ReadOptionalGuid(), Value = ReadInt32() };
-                case "Int64Property": return new LiteralProperty { Path = path, Id = ReadOptionalGuid(), Value = ReadInt64() };
-                case "FixedPoint64Property": return new LiteralProperty { Path = path, Id = ReadOptionalGuid(), Value = ReadInt32() }; // ?????????????
-                case "FloatProperty": return new LiteralProperty { Path = path, Id = ReadOptionalGuid(), Value = ReadFloat() };
-                case "StrProperty": return new LiteralProperty { Path = path, Id = ReadOptionalGuid(), Value = ReadString() };
-                case "NameProperty": return new LiteralProperty { Path = path, Id = ReadOptionalGuid(), Value = ReadString() };
+                case "IntProperty": return LiteralProperty.Create(path, ReadOptionalGuid(), ReadInt32());
+                case "Int64Property": return LiteralProperty.Create(path, ReadOptionalGuid(), ReadInt64());
+                case "FixedPoint64Property": return LiteralProperty.Create(path, ReadOptionalGuid(), ReadInt32()); // ?????????????
+                case "FloatProperty": return LiteralProperty.Create(path, ReadOptionalGuid(), ReadFloat());
+                case "StrProperty": return LiteralProperty.Create(path, ReadOptionalGuid(), ReadString());
+                case "NameProperty": return LiteralProperty.Create(path, ReadOptionalGuid(), ReadString());
 
                 // init order is reversed?
-                case "BoolProperty": return new LiteralProperty { Path = path, Value = ReadBool(), Id = ReadOptionalGuid() };
+                case "BoolProperty": return LiteralProperty.Create(path, ReadBool(), ReadOptionalGuid());
 
                 case "EnumProperty":
                     return new EnumProperty
                     {
-                        Path = path,
-                        EnumType = ReadString(),
-                        Id = ReadOptionalGuid(),
+                        TypedMeta = new EnumPropertyMeta { Path = path, EnumType = ReadString(), Id = ReadOptionalGuid() },
                         EnumValue = ReadString(),
                     };
 
@@ -224,49 +172,112 @@ namespace PalSaveReader.FArchive
                     return ReadStruct(path);
 
                 case "ArrayProperty":
-                    var arrayType = ReadString();
-                    return new ArrayProperty
                     {
-                        Path = path,
-                        ArrayType = arrayType,
-                        Id = ReadOptionalGuid(),
-                        Value = ReadArrayProperty(arrayType, size - 4, path)
-                    };
+                        var arrayType = ReadString();
+                        var id = ReadOptionalGuid();
+
+                        var count = ReadUInt32();
+                        if (arrayType == "StructProperty")
+                        {
+                            var propertyName = ReadString();
+                            var propertyType = ReadString();
+
+                            ReadUInt64(); // ?
+
+                            var arrayTypeName = ReadString();
+
+                            var valueId = ReadGuid();
+
+                            ReadBytes(1); // ?
+
+                            var values = Enumerable.Range(0, (int)count).Select(_ => ReadStructValue(arrayTypeName, $"{path}.{propertyName}")).ToArray();
+
+                            return new ArrayProperty
+                            {
+                                TypedMeta = new ArrayPropertyMeta
+                                {
+                                    Path = path,
+                                    Id = valueId,
+                                    PropName = propertyName,
+                                    PropType = propertyType,
+                                    TypeName = arrayTypeName,
+                                    ContentId = valueId,
+                                },
+                                Value = values
+                            };
+                        }
+                        else
+                        {
+                            object content;
+                            var iteration = Enumerable.Range(0, (int)count);
+                            switch (arrayType)
+                            {
+                                case "NameProperty":
+                                case "EnumProperty":
+                                    content = iteration.Select(_ => ReadString()).ToArray();
+                                    break;
+
+                                case "Guid":
+                                    content = iteration.Select(_ => ReadGuid()).ToArray();
+                                    break;
+
+                                case "ByteProperty":
+                                    if (count != size - 4) throw new Exception("Labelled ByteProperty not implemented"); // sic
+
+                                    content = ReadBytes((int)count).ToArray();
+                                    break;
+
+                                default:
+                                    throw new Exception("Unknown array type: " + arrayType + " at " + path);
+                            }
+
+                            return new ArrayProperty
+                            {
+                                TypedMeta = new ArrayPropertyMeta { Path = path, ArrayType = arrayType, Id = id },
+                                Value = content
+                            };
+                        }
+                    }
 
                 case "MapProperty":
-                    var keyType = ReadString();
-                    var valueType = ReadString();
-                    var valueId = ReadOptionalGuid();
-
-                    ReadUInt32(); // ?
-
-                    var count = ReadUInt32();
-
-                    var keyPath = path + ".Key";
-                    var valuePath = path + ".Value";
-
-                    var keyStructType = keyType == "StructProperty" ? GetTypeOr(keyPath, "Guid") : null;
-                    var valueStructType = valueType == "StructProperty" ? GetTypeOr(valuePath, "StructProperty") : null;
-
-                    var values = Enumerable.Range(0, (int)count).Select(_ =>
                     {
-                        var key = ReadPropValue(keyType, keyStructType, keyPath);
-                        var value = ReadPropValue(valueType, valueStructType, valuePath);
-                        return (key, value);
-                    }).ToDictionary(p => p.key, p => p.value);
+                        var keyType = ReadString();
+                        var valueType = ReadString();
+                        var valueId = ReadOptionalGuid();
 
-                    return new MapProperty
-                    {
-                        Path = path,
+                        ReadUInt32(); // ?
 
-                        Id = valueId,
-                        KeyType = keyType,
-                        ValueType = valueType,
-                        KeyStructType = keyStructType,
-                        ValueStructType = valueStructType,
+                        var count = ReadUInt32();
 
-                        Value = values
-                    };
+                        var keyPath = path + ".Key";
+                        var valuePath = path + ".Value";
+
+                        var keyStructType = keyType == "StructProperty" ? GetTypeOr(keyPath, "Guid") : null;
+                        var valueStructType = valueType == "StructProperty" ? GetTypeOr(valuePath, "StructProperty") : null;
+
+                        var values = Enumerable.Range(0, (int)count).Select(_ =>
+                        {
+                            var key = ReadPropValue(keyType, keyStructType, keyPath);
+                            var value = ReadPropValue(valueType, valueStructType, valuePath);
+                            return (key, value);
+                        }).ToDictionary(p => p.key, p => p.value);
+
+                        return new MapProperty
+                        {
+                            TypedMeta = new MapPropertyMeta
+                            {
+                                Path = path,
+
+                                Id = valueId,
+                                KeyType = keyType,
+                                ValueType = valueType,
+                                KeyStructType = keyStructType,
+                                ValueStructType = valueStructType,
+                            },
+
+                            Value = values
+                        };
+                    }
 
                 default: throw new Exception("Unrecognized type name: " + typeName);
             }
@@ -285,14 +296,14 @@ namespace PalSaveReader.FArchive
             if (size < 0)
             {
                 size = -size * 2;
-                bytes = ReadBytes(size); // TODO - [:-2]?
+                bytes = ReadBytes(size);
                 encoding = Encoding.Unicode; // utf-16-le
 
                 size -= 2;
             }
             else
             {
-                bytes = ReadBytes(size); // TODO - [:-1]?
+                bytes = ReadBytes(size);
                 encoding = Encoding.ASCII;
 
                 size -= 1;

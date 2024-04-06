@@ -13,52 +13,20 @@ namespace PalSaveReader.FArchive
 
         public static List<ICustomReader> All = new List<ICustomReader>()
         {
-            new CharacterContainerReader(),
             new CharacterReader()
         };
     }
 
-    class CharacterContainerDataProperty : IProperty
+    class CharacterDataPropertyMeta : BasicPropertyMeta
     {
-        public string Path { get; set; }
-
-        public Guid? Id { get; set; }
-
-        public Guid? InstanceId => Id;
-
-        public Guid PlayerId;
-        public byte PermissionTribeId;
-    }
-
-    class CharacterContainerReader : ICustomReader
-    {
-        public override string MatchedPath => ".worldSaveData.CharacterContainerSaveData.Value.Slots.Slots.RawData";
-        public override IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path)
-        {
-            var arrayProp = (ArrayProperty)reader.ReadProperty(typeName, size, path, path);
-            
-            using (var byteStream = new MemoryStream(arrayProp.Value as byte[]))
-            using (var subReader = reader.Derived(byteStream, path))
-            {
-                return new CharacterContainerDataProperty
-                {
-                    Path = path,
-                    PlayerId = subReader.ReadGuid(),
-                    Id = subReader.ReadGuid(),
-                    PermissionTribeId = subReader.ReadByte()
-                };
-            }
-        }
+        public Guid? GroupId => Id;
     }
 
     class CharacterDataProperty : IProperty
     {
-        public string Path { get; set; }
+        public IPropertyMeta Meta { get; set; }
 
-        public Guid? Id { get; set; }
-        public Guid? GroupId => Id;
-
-        public object Data;
+        public object Data { get; set; }
     }
 
     class CharacterReader : ICustomReader
@@ -68,7 +36,7 @@ namespace PalSaveReader.FArchive
         {
             var arrayProp = (ArrayProperty)reader.ReadProperty(typeName, size, path, path);
 
-            using (var byteStream = new MemoryStream(arrayProp.Value as byte[]))
+            using (var byteStream = new MemoryStream(arrayProp.ByteValues))
             using (var subReader = reader.Derived(byteStream, path))
             {
                 var data = subReader.ReadPropertiesUntilEnd();
@@ -76,9 +44,8 @@ namespace PalSaveReader.FArchive
 
                 return new CharacterDataProperty
                 {
-                    Path = path,
+                    Meta = new CharacterDataPropertyMeta { Path = path, Id = subReader.ReadGuid() },
                     Data = data,
-                    Id = subReader.ReadGuid()
                 };
             }
         }
