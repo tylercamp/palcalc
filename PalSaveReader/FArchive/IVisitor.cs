@@ -142,6 +142,8 @@ namespace PalSaveReader.FArchive
         public event Action<string, object> OnValue;
         public event Action OnExit;
 
+        public override bool Matches(string path) => path.StartsWith(MatchedBasePath);
+
         private void VisitValue(string path, object value)
         {
             var propPart = path.Substring(MatchedBasePath.Length);
