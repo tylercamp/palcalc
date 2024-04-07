@@ -49,6 +49,8 @@ namespace PalCalc.Model
             public Dictionary<string, Dictionary<string, int>> MinBreedingSteps { get; set; }
         }
 
+        public static PalDB LoadFromCommon() => FromJson(File.ReadAllText("db.json"));
+
         public static PalDB FromJson(string json)
         {
             var deserialized = JsonConvert.DeserializeObject<Serialized>(json);
