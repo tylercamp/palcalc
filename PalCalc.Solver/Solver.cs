@@ -48,6 +48,35 @@ namespace PalCalc.Solver
             this.maxEffort = maxEffort;
         }
 
+        // for each available (pal, gender) pair, and for each set of instance traits as a subset of the desired traits (e.g. all male lamballs with "runner",
+        // all with "runner and swift", etc.), pick the instance with the fewest total traits
+        //
+        // (includes pals without any relevant traits, picks the instance with the fewest total traits)
+        static List<PalInstance> RelevantInstancesForTraits(PalDB db, List<PalInstance> availableInstances, List<Trait> targetTraits)
+        {
+            List<PalInstance> relevantInstances = new List<PalInstance>();
+
+            var traitPermutations = targetTraits.Combinations(targetTraits.Count).Select(l => l.ToList()).ToList();
+            Console.WriteLine("Looking for pals with traits:\n- {0}", string.Join("\n- ", traitPermutations.Select(p => $"({string.Join(',', p)})")));
+
+            foreach (var pal in db.Pals)
+                foreach (var gender in new List<PalGender>() { PalGender.MALE, PalGender.FEMALE })
+                {
+                    var instances = availableInstances.Where(i => i.Pal == pal && i.Gender == gender).ToList();
+                    var instancesByPermutation = traitPermutations.ToDictionary(p => p, p => new List<PalInstance>());
+
+                    foreach (var instance in instances)
+                    {
+                        var matchingPermutation = traitPermutations.OrderByDescending(p => p.Count).ThenBy(p => p.Except(instance.Traits).Count()).First(p => !p.Except(instance.Traits).Any());
+                        instancesByPermutation[matchingPermutation].Add(instance);
+                    }
+
+                    relevantInstances.AddRange(instancesByPermutation.Values.Where(instances => instances.Any()).Select(instances => instances.OrderBy(i => i.Traits.Count).First()));
+                }
+
+            return relevantInstances;
+        }
+
         int NumWildPalParticipants(IPalReference pref)
         {
             switch (pref)
@@ -75,8 +104,7 @@ namespace PalCalc.Solver
                 throw new Exception("Target trait count cannot exceed max number of traits for a single pal");
             }
 
-            var relevantPals = PalCalcUtils
-               .RelevantInstancesForTraits(db, ownedPals, targetInstance.Traits)
+            var relevantPals = RelevantInstancesForTraits(db, ownedPals, targetInstance.Traits)
                .Where(p => p.Traits.Except(targetInstance.Traits).Count() <= maxIrrelevantTraits)
                .ToList();
 

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PalCalc.GenDB": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}
