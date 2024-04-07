@@ -38,5 +38,7 @@ namespace PalCalc.SaveReader
         public LevelMetaSaveFile LevelMeta { get; }
         public LocalDataSaveFile LocalData { get; }
         public WorldOptionSaveFile WorldOption { get; }
+
+        public override string ToString() => FolderName;
     }
 }
