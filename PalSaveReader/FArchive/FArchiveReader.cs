@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -61,7 +62,9 @@ namespace PalSaveReader.FArchive
 
         public Dictionary<string, object> ReadPropertiesUntilEnd(string path, IEnumerable<IVisitor> visitors)
         {
+#if ARCHIVE_PRESERVE
             var result = new Dictionary<string, object>();
+#endif
             while (true)
             {
                 var name = ReadString();
@@ -71,9 +74,16 @@ namespace PalSaveReader.FArchive
                 var size = ReadUInt64();
                 var value = ReadProperty(typeName, size, $"{path}.{name}", "", visitors);
 
+#if ARCHIVE_PRESERVE
                 result.Add(name, value);
+#endif
             }
+
+#if ARCHIVE_PRESERVE
             return result;
+#else
+            return null;
+#endif
         }
 
         private IProperty ReadStruct(string path, IEnumerable<IVisitor> visitors)
@@ -96,11 +106,15 @@ namespace PalSaveReader.FArchive
             foreach (var v in extraVisitors) v.Exit();
             foreach (var v in pathVisitors) v.VisitStructPropertyEnd(path, meta);
 
+#if ARCHIVE_PRESERVE
             return new StructProperty
             {
                 TypedMeta = meta,
                 Value = value
             };
+#else
+            return null;
+#endif
         }
 
         private object ReadStructValue(string structType, string path, IEnumerable<IVisitor> visitors)
@@ -275,21 +289,25 @@ namespace PalSaveReader.FArchive
                         var extraVisitors = pathVisitors.SelectMany(v => v.VisitEnumPropertyBegin(path, meta)).ToList();
                         var newVisitors = visitors.Concat(extraVisitors);
 
-                        var result = new EnumProperty
-                        {
-                            TypedMeta = meta,
-                            EnumValue = ReadString(),
-                        };
+                        var enumValue = ReadString();
 
                         foreach (var v in newVisitors.Where(v => v.Matches(path)))
                         {
-                            v.VisitString(path, result.EnumValue);
+                            v.VisitString(path, enumValue);
                         }
 
                         foreach (var v in pathVisitors)
                             v.VisitEnumPropertyEnd(path, meta);
 
-                        return result;
+#if ARCHIVE_PRESERVE
+                        return new EnumProperty
+                        {
+                            TypedMeta = meta,
+                            EnumValue = enumValue,
+                        };
+#else
+                        return null;
+#endif
                     }
 
                 case "StructProperty":
@@ -324,7 +342,7 @@ namespace PalSaveReader.FArchive
                                 ContentId = valueId,
                             };
 
-                            var extraVisitors = pathVisitors.SelectMany(v => v.VisitArrayPropertyBegin(path, meta)).ToList();
+                            var extraVisitors = pathVisitors.SelectMany(v => v.VisitArrayPropertyBegin(path, meta)).ToArray();
                             var newVisitors = visitors.Concat(extraVisitors);
 
                             var values = Enumerable.Range(0, (int)count).Select(i =>
@@ -343,11 +361,15 @@ namespace PalSaveReader.FArchive
                             foreach (var v in extraVisitors) v.Exit();
                             foreach (var v in pathVisitors) v.VisitArrayPropertyEnd(path, meta);
 
+#if ARCHIVE_PRESERVE
                             return new ArrayProperty
                             {
                                 TypedMeta = meta,
                                 Value = values
                             };
+#else
+                            return null;
+#endif
                         }
                         else
                         {
@@ -441,32 +463,39 @@ namespace PalSaveReader.FArchive
                         var extraVisitors = pathVisitors.SelectMany(v => v.VisitMapPropertyBegin(path, meta)).ToList();
                         var newVisitors = visitors.Concat(extraVisitors);
 
-                        var values = Enumerable.Range(0, (int)count).Select(index =>
+#if ARCHIVE_PRESERVE
+                        var values = new Dictionary<object, object>();
+#endif
+
+                        for (int i = 0; i < count; i++)
                         {
-                            var extraEntryVisitors = newVisitors.Where(v => v.Matches(path)).SelectMany(v => v.VisitMapEntryBegin(path, index, meta)).ToList();
+                            var extraEntryVisitors = newVisitors.Where(v => v.Matches(path)).SelectMany(v => v.VisitMapEntryBegin(path, i, meta)).ToList();
                             var newEntryVisitors = newVisitors.Concat(extraEntryVisitors);
 
                             var key = ReadPropValue(keyType, keyStructType, keyPath, newEntryVisitors);
                             var value = ReadPropValue(valueType, valueStructType, valuePath, newEntryVisitors);
 
                             foreach (var v in extraEntryVisitors) v.Exit();
-                            foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitMapEntryEnd(path, index, meta);
+                            foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitMapEntryEnd(path, i, meta);
 
-                            return (key, value);
-                        }).ToDictionary(p => p.key, p => p.value);
-
-                        var result = new MapProperty
-                        {
-                            TypedMeta = meta,
-
-                            Value = values
-                        };
+#if ARCHIVE_PRESERVE
+                            values.Add(key, value);
+#endif
+                        }
 
                         foreach (var v in extraVisitors) v.Exit();
                         foreach (var v in pathVisitors)
                             v.VisitMapPropertyEnd(path, meta);
 
-                        return result;
+#if ARCHIVE_PRESERVE
+                        return new MapProperty
+                        {
+                            TypedMeta = meta,
+                            Value = values
+                        };
+#else
+                        return null;
+#endif
                     }
 
                 default: throw new Exception("Unrecognized type name: " + typeName);
