@@ -11,16 +11,18 @@ namespace PalCalc.SaveReader.FArchive
     // generic visitor
     public abstract class IVisitor
     {
-        public IVisitor(string matchedPath)
+        public IVisitor(string matchedPath) : this(matchedPath, null)
         {
-            MatchedBasePath = matchedPath;
-            MatchedSubPath = null;
         }
 
         public IVisitor(string basePath, string subPath)
         {
             MatchedBasePath = basePath;
             MatchedSubPath = subPath;
+
+            MatchedPath = subPath == null
+                ? MatchedBasePath
+                : MatchedBasePath + "." + MatchedSubPath;
         }
 
         // must be non-null
@@ -29,18 +31,14 @@ namespace PalCalc.SaveReader.FArchive
         // may be null
         public virtual string MatchedSubPath { get; protected set; }
 
-        public string MatchedPath
-        {
-            get
-            {
-                if (MatchedSubPath == null) return MatchedBasePath;
-                else return MatchedBasePath + "." + MatchedSubPath;
-            }
-        }
+        public string MatchedPath { get; }
 
         public virtual bool Matches(string path) => MatchedPath == path;
 
-        // Called when the Visitor has reached the end of its matched scope
+        public virtual bool IsDone => false;
+
+        // Called when the Visitor has reached the end of its matched scope and will no longer be tracked
+        // in the list of visitors (only for visitors returned as results of another `Visit` call)
         public virtual void Exit()
         {
 
@@ -79,6 +77,43 @@ namespace PalCalc.SaveReader.FArchive
 
         public virtual void VisitArrayEntryEnd(string path, int index, ArrayPropertyMeta meta) { }
         public virtual void VisitMapEntryEnd(string path, int index, MapPropertyMeta meta) { }
+    }
+
+    // a visitor that implements `IsDone` if the requested path has been visited at least once and the most recent path does not
+    // start with the requested path
+    // 
+    // NOTE: not worth it atm due to performance hit in `Matches` hot path
+    public abstract class IScopedVisitor : IVisitor
+    {
+        public IScopedVisitor(string matchedPath) : base(matchedPath)
+        {
+            didStartReading = false;
+            didStopReading = false;
+        }
+
+        bool didStartReading;
+        bool didStopReading;
+
+        public override bool IsDone => didStopReading;
+
+        public override bool Matches(string path)
+        {
+            if (didStartReading)
+            {
+                if (!didStopReading)
+                {
+                    didStopReading = !path.StartsWith(MatchedPath);
+                    if (didStopReading) Console.WriteLine("{0} stopped reading", GetType().Name);
+                }
+            }
+            else
+            {
+                didStartReading = path.StartsWith(MatchedPath);
+                if (didStartReading) Console.WriteLine("{0} started reading", GetType().Name);
+            }
+
+            return base.Matches(path);
+        }
     }
 
     public class ValueCollectingVisitor : IVisitor

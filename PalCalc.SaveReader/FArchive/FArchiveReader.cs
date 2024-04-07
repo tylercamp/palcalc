@@ -13,6 +13,17 @@ namespace PalCalc.SaveReader.FArchive
         BinaryReader reader;
         Dictionary<string, string> typeHints;
 
+        private static bool ShouldExit(IEnumerable<IVisitor> visitors)
+        {
+#if ARCHIVE_PRESERVE
+            return false;
+#else
+            //if (!visitors.Any()) return false;
+            //else return visitors.All(v => v.IsDone);
+            return false;
+#endif
+        }
+
         public FArchiveReader(Stream stream, Dictionary<string, string> typeHints)
         {
             reader = new BinaryReader(stream);
@@ -65,7 +76,7 @@ namespace PalCalc.SaveReader.FArchive
 #if ARCHIVE_PRESERVE
             var result = new Dictionary<string, object>();
 #endif
-            while (true)
+            while (!ShouldExit(visitors))
             {
                 var name = ReadString();
                 if (name == "None") break;
@@ -196,7 +207,6 @@ namespace PalCalc.SaveReader.FArchive
 
         public IProperty ReadProperty(string typeName, ulong size, string path, string nestedCallerPath, IEnumerable<IVisitor> visitors)
         {
-            // TODO - custom types
             var customReader = ICustomReader.All.SingleOrDefault(r => r.MatchedPath == path);
             if (customReader != null && (path != nestedCallerPath || nestedCallerPath == ""))
                 return customReader.Decode(this, typeName, size, path, visitors);
@@ -467,7 +477,7 @@ namespace PalCalc.SaveReader.FArchive
                         var values = new Dictionary<object, object>();
 #endif
 
-                        for (int i = 0; i < count; i++)
+                        for (int i = 0; i < count && !ShouldExit(newVisitors); i++)
                         {
                             var extraEntryVisitors = newVisitors.Where(v => v.Matches(path)).SelectMany(v => v.VisitMapEntryBegin(path, i, meta)).ToList();
                             var newEntryVisitors = newVisitors.Concat(extraEntryVisitors);
@@ -507,6 +517,7 @@ namespace PalCalc.SaveReader.FArchive
             var size = ReadInt32();
             if (size == 0) return "";
 
+            // haven't seen a string larger than 100 chars yet, if we see it there's likely a bug
             if (Math.Abs(size) > 100) Debugger.Break();
 
             Encoding encoding;
