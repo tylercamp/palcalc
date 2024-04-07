@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.model
+namespace PalCalc.Model
 {
-    internal class BreedingResult
+    public class BreedingResult
     {
         public Pal Parent1, Parent2, Child;
 

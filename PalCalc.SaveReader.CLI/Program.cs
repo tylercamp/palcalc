@@ -1,7 +1,7 @@
 ﻿
-using PalSaveReader;
-using PalSaveReader.FArchive;
-using PalSaveReader.GVAS;
+using PalCalc.SaveReader;
+using PalCalc.SaveReader.FArchive;
+using PalCalc.SaveReader.GVAS;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 

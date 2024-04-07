@@ -1,4 +1,4 @@
-﻿using PalCalc.model;
+﻿using PalCalc.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc
+namespace PalCalc.Solver
 {
     /*
      * Encode breeding paths as [p1, p2] [a, b, c, ...] [r]

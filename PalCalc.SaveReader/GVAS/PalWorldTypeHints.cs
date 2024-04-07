@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalSaveReader.GVAS
+namespace PalCalc.SaveReader.GVAS
 {
     public class PalWorldTypeHints
     {

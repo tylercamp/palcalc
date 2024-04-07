@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.model
+namespace PalCalc.Model
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    enum MountType
+    public enum MountType
     {
         None,
         Ground,
@@ -18,7 +18,7 @@ namespace PalCalc.model
         FlyLand,
     }
 
-    internal class Pal
+    public class Pal
     {
         public PalId Id { get; set; }
         public string Name { get; set; }

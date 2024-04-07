@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.model
+namespace PalCalc.Model
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    enum PalGender
+    public enum PalGender
     {
         // note: pal world is not P.C., so it only has two genders
         MALE = 0b001,
@@ -19,7 +19,7 @@ namespace PalCalc.model
         OPPOSITE_WILDCARD = 0b100, // contextual - pals of this gender should be paired with pals of WILDCARD gender
     }
 
-    internal class PalInstance
+    public class PalInstance
     {
         public Pal Pal { get; set; }
         public PalLocation Location { get; set; }

@@ -1,13 +1,12 @@
-﻿using PalCalc.model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc
+namespace PalCalc.Model
 {
-    internal class PalCalcUtils
+    public class PalCalcUtils
     {
         // min. number of times you need to breed Key1 to get a Key2 (to prune out path checks between pals which would exceed the max breeding steps)
         public static Dictionary<Pal, Dictionary<Pal, int>> CalcMinDistances(PalDB db)

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.model
+namespace PalCalc.Model
 {
-    internal class PalDB
+    public class PalDB
     {
         public Dictionary<PalId, Pal> PalsById { get; set; }
         public IEnumerable<Pal> Pals => PalsById.Values;

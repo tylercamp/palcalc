@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalSaveReader.FArchive
+namespace PalCalc.SaveReader.FArchive
 {
     public interface IProperty
     {

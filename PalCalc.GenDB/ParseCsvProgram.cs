@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using PalCalc.model;
+using PalCalc.Model;
 
-namespace PalCalc
+namespace PalCalc.GenDB
 {
     internal class ParseCsvProgram
     {

@@ -1,13 +1,12 @@
-﻿using PalCalc.model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc
+namespace PalCalc.Model
 {
-    internal class GameConfig
+    public class GameConfig
     {
         /*
          * Outstanding questions:

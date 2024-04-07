@@ -4,20 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.model
+namespace PalCalc.Model
 {
-    internal class PalId
+    public class PalId
     {
         public int PalDexNo { get; set; }
         public bool IsVariant { get; set; }
 
-        public static bool operator==(PalId a, PalId b)
+        public static bool operator ==(PalId a, PalId b)
         {
             if (ReferenceEquals(a, null) != ReferenceEquals(b, null)) return false;
             return a?.Equals(b) ?? true;
         }
 
-        public static bool operator!=(PalId a, PalId b)
+        public static bool operator !=(PalId a, PalId b)
         {
             return !(a == b);
         }

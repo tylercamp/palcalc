@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.model
+namespace PalCalc.Model
 {
-    internal class Trait
+    public class Trait
     {
         public Trait(string name, string internalName)
         {
@@ -22,7 +22,7 @@ namespace PalCalc.model
         public override bool Equals(object obj) => ReferenceEquals(this, obj);
     }
 
-    internal class RandomTrait : Trait
+    public class RandomTrait : Trait
     {
         public RandomTrait() : base("(Random)", "__VIRT_RAND__") { }
     }

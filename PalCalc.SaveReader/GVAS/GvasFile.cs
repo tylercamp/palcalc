@@ -1,4 +1,4 @@
-﻿using PalSaveReader.FArchive;
+﻿using PalCalc.SaveReader.FArchive;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 // gvas.py
-namespace PalSaveReader.GVAS
+namespace PalCalc.SaveReader.GVAS
 {
     public struct GvasHeader
     {
@@ -55,7 +55,7 @@ namespace PalSaveReader.GVAS
         }
     }
 
-    internal class GvasFile
+    public class GvasFile
     {
         public GvasHeader Header { get; set; }
         public Dictionary<string, object> Properties { get; set; }

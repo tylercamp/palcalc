@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalSaveReader.FArchive
+namespace PalCalc.SaveReader.FArchive
 {
     public class FArchiveReader : IDisposable
     {

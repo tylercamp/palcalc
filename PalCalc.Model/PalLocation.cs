@@ -6,17 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.model
+namespace PalCalc.Model
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    enum LocationType
+    public enum LocationType
     {
         PlayerParty,
         Palbox,
         Base
     }
 
-    internal class PalLocation
+    public class PalLocation
     {
         public LocationType Type { get; set; }
         public int Index { get; set; }
@@ -33,14 +33,14 @@ namespace PalCalc.model
 
                 var idx = Index - 1;
 
-                var tab = (idx - (idx % palsPerTab)) / palsPerTab;
+                var tab = (idx - idx % palsPerTab) / palsPerTab;
                 idx -= tab * palsPerTab;
 
-                var row = (idx - (idx % numCols)) / numCols;
+                var row = (idx - idx % numCols) / numCols;
                 idx -= row * numCols;
                 var col = idx;
 
-                indexStr = $"tab #{tab+1} at ({col + 1}, {row + 1})";
+                indexStr = $"tab #{tab + 1} at ({col + 1}, {row + 1})";
             }
             else
             {

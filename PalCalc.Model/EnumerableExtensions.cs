@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc
+namespace PalCalc.Model
 {
-    static class EnumerableExtensions
+    public static class EnumerableExtensions
     {
         // thanks chatgpt
         // Returns the list of combinations of elements in the given list, where combinations are order-independent
