@@ -14,32 +14,28 @@ namespace PalCalc.Solver
         // TODO - is this the right way to use pascal's triangle??
         static int Choose(int n, int k) => PascalsTriangle.Instance[n - 1][k - 1];
 
+        GameSettings gameSettings;
         PalDB db;
         List<PalInstance> ownedPals;
 
         int maxBreedingSteps, maxWildPals, maxIrrelevantTraits;
         TimeSpan maxEffort;
 
-        /**
-         * TODO - how to make this show with intellisense?
-         * 
-         * Parameters:
-         *  maxBreedingSteps: 
-         *  
-         *  maxWildPals: 
-         *  
-         *  maxIrrelevantTraits:
-         *    max num. irrelevant traits from any parents or children involved in the final breeding steps (including target pal)
-         *    (lower value runs faster, but considers fewer possibilities)
-         *    
-         *  maxEffort:
-         *    effort in estimated time to get the desired pal w/ traits
-         *    - goes by constant breeding time
-         *    - ignores hatching time
-         *    - roughly estimates time to catch wild pals with increasing time based on paldex number
-         */
-        public Solver(PalDB db, List<PalInstance> ownedPals, int maxBreedingSteps, int maxWildPals, int maxIrrelevantTraits, TimeSpan maxEffort)
+        /// <param name="db"></param>
+        /// <param name="ownedPals"></param>
+        /// <param name="maxBreedingSteps"></param>
+        /// <param name="maxWildPals"></param>
+        /// <param name="maxIrrelevantTraits">
+        ///     Max number of irrelevant traits from any parents or children involved in the final breeding steps (including target pal)
+        ///     (Lower value runs faster, but considers fewer possibilities)
+        /// </param>
+        /// <param name="maxEffort">
+        ///     Effort in estimated time to get the desired pal with the given traits. Goes by constant breeding time, ignores hatching
+        ///     time, and roughly estimates time to catch wild pals (with increasing time based on paldex number).
+        /// </param>
+        public Solver(GameSettings gameSettings, PalDB db, List<PalInstance> ownedPals, int maxBreedingSteps, int maxWildPals, int maxIrrelevantTraits, TimeSpan maxEffort)
         {
+            this.gameSettings = gameSettings;
             this.db = db;
             this.ownedPals = ownedPals;
             this.maxBreedingSteps = maxBreedingSteps;
@@ -60,6 +56,7 @@ namespace PalCalc.Solver
             Console.WriteLine("Looking for pals with traits:\n- {0}", string.Join("\n- ", traitPermutations.Select(p => $"({string.Join(',', p)})")));
 
             foreach (var pal in db.Pals)
+            {
                 foreach (var gender in new List<PalGender>() { PalGender.MALE, PalGender.FEMALE })
                 {
                     var instances = availableInstances.Where(i => i.Pal == pal && i.Gender == gender).ToList();
@@ -73,6 +70,7 @@ namespace PalCalc.Solver
 
                     relevantInstances.AddRange(instancesByPermutation.Values.Where(instances => instances.Any()).Select(instances => instances.OrderBy(i => i.Traits.Count).First()));
                 }
+            }
 
             return relevantInstances;
         }
@@ -183,12 +181,12 @@ namespace PalCalc.Solver
                 else if (!desiredParentTraits.Any())
                 {
                     // just the chance of getting this number of traits from parents
-                    probabilityGotRequiredFromParent = GameConfig.TraitProbabilityDirect[numInheritedFromParent];
+                    probabilityGotRequiredFromParent = GameConstants.TraitProbabilityDirect[numInheritedFromParent];
                 }
                 else if (numIrrelevantFromParent == 0)
                 {
                     // chance of getting exactly the required traits
-                    probabilityGotRequiredFromParent = GameConfig.TraitProbabilityDirect[numInheritedFromParent] / Choose(parentTraits.Count, desiredParentTraits.Count);
+                    probabilityGotRequiredFromParent = GameConstants.TraitProbabilityDirect[numInheritedFromParent] / Choose(parentTraits.Count, desiredParentTraits.Count);
                 }
                 else
                 {
@@ -209,14 +207,14 @@ namespace PalCalc.Solver
                         numCombinationsWithIrrelevantTrait / numCombinationsWithAnyTraits
                     );
 
-                    probabilityGotRequiredFromParent = probabilityCombinationWithDesiredTraits * GameConfig.TraitProbabilityDirect[numInheritedFromParent];
+                    probabilityGotRequiredFromParent = probabilityCombinationWithDesiredTraits * GameConstants.TraitProbabilityDirect[numInheritedFromParent];
                 }
 
 #if DEBUG
                 if (probabilityGotRequiredFromParent > 1) Debugger.Break();
 #endif
 
-                var probabilityGotExactRequiredRandom = GameConfig.TraitRandomAddedProbability[numIrrelevantFromRandom];
+                var probabilityGotExactRequiredRandom = GameConstants.TraitRandomAddedProbability[numIrrelevantFromRandom];
                 probabilityForNumTraits += probabilityGotRequiredFromParent * probabilityGotExactRequiredRandom;
             }
 
@@ -225,7 +223,7 @@ namespace PalCalc.Solver
 
         public List<IPalReference> SolveFor(PalInstance targetInstance)
         {
-            if (targetInstance.Traits.Count > GameConfig.MaxTotalTraits)
+            if (targetInstance.Traits.Count > GameConstants.MaxTotalTraits)
             {
                 throw new Exception("Target trait count cannot exceed max number of traits for a single pal");
             }
@@ -320,7 +318,7 @@ namespace PalCalc.Solver
                                 //
                                 // we'll generate an option for each possible outcome of up to the max possible number of traits, where each
                                 // option represents the likelyhood of getting all desired traits + up to some number of irrelevant traits
-                                for (int numFinalTraits = desiredParentTraits.Count; numFinalTraits <= Math.Min(GameConfig.MaxTotalTraits, desiredParentTraits.Count + maxIrrelevantTraits); numFinalTraits++)
+                                for (int numFinalTraits = desiredParentTraits.Count; numFinalTraits <= Math.Min(GameConstants.MaxTotalTraits, desiredParentTraits.Count + maxIrrelevantTraits); numFinalTraits++)
                                 {
 #if DEBUG
                                     float initialProbability = probabilityForUpToNumTraits;
@@ -342,6 +340,7 @@ namespace PalCalc.Solver
                                         .Select(i => new RandomTrait());
 
                                     possibleResults.Add(new BredPalReference(
+                                        gameSettings,
                                         db.BreedingByParent[parent1.Pal][parent2.Pal].Child,
                                         preferredParent1,
                                         preferredParent2,
