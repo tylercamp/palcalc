@@ -8,35 +8,13 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver
 {
-    interface IPalLocation { }
-    class OwnedPalLocation : IPalLocation
-    {
-        public PalLocation Location { get; set; }
-
-        public override string ToString() => Location.ToString();
-    }
-
-    class CapturedPal : IPalLocation
-    {
-        public override string ToString() => "(Wild)";
-
-        public static IPalLocation Instance { get; } = new CapturedPal();
-    }
-
-    class BredPal : IPalLocation
-    {
-        public override string ToString() => "(Bred)";
-
-        public static IPalLocation Instance { get; } = new BredPal();
-    }
-
-    interface IPalReference
+    public interface IPalReference
     {
         Pal Pal { get; }
         List<Trait> Traits { get; }
         PalGender Gender { get; }
 
-        IPalLocation Location { get; }
+        IPalRefLocation Location { get; }
 
         public TimeSpan BreedingEffort { get; }
         public TimeSpan SelfBreedingEffort { get; }
@@ -46,7 +24,7 @@ namespace PalCalc.Solver
         bool IsCompatibleGender(PalGender otherGender) => Gender == PalGender.WILDCARD || Gender != otherGender;
     }
 
-    class OwnedPalReference : IPalReference
+    public class OwnedPalReference : IPalReference
     {
         PalInstance instance;
 
@@ -61,7 +39,7 @@ namespace PalCalc.Solver
 
         public PalGender Gender => instance.Gender;
 
-        public IPalLocation Location => new OwnedPalLocation() { Location = instance.Location };
+        public IPalRefLocation Location => new OwnedRefLocation() { Location = instance.Location };
 
         public TimeSpan BreedingEffort => TimeSpan.Zero;
         public TimeSpan SelfBreedingEffort => TimeSpan.Zero;
@@ -75,7 +53,7 @@ namespace PalCalc.Solver
         public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({Traits.TraitsListToString()}) in {Location}";
     }
 
-    class WildcardPalReference : IPalReference
+    public class WildcardPalReference : IPalReference
     {
         public WildcardPalReference(Pal pal, int numTraits)
         {
@@ -96,7 +74,7 @@ namespace PalCalc.Solver
 
         public PalGender Gender { get; private set; }
 
-        public IPalLocation Location { get; } = new CapturedPal();
+        public IPalRefLocation Location { get; } = new CapturedRefLocation();
 
         public TimeSpan BreedingEffort => SelfBreedingEffort * CapturesRequiredForGender;
 
@@ -129,7 +107,7 @@ namespace PalCalc.Solver
         public override string ToString() => $"Captured {Gender} {Pal} w/ up to {Traits.Count} random traits";
     }
 
-    class BredPalReference : IPalReference
+    public class BredPalReference : IPalReference
     {
         private BredPalReference(Pal pal, IPalReference parent1, IPalReference parent2, List<Trait> traits)
         {
@@ -164,7 +142,7 @@ namespace PalCalc.Solver
 
         public PalGender Gender { get; private set; } = PalGender.WILDCARD;
 
-        public IPalLocation Location => BredPal.Instance;
+        public IPalRefLocation Location => BredRefLocation.Instance;
 
         public int AvgRequiredBreedings { get; private set; }
         public TimeSpan SelfBreedingEffort => AvgRequiredBreedings * GameConfig.AvgBreedingTime;

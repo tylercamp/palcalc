@@ -17,8 +17,8 @@ namespace PalCalc.SaveReader
         public string FolderPath { get; }
         public string FolderName => Path.GetFileName(FolderPath);
 
-        public IEnumerable<SaveGame> SaveFiles => Directory.EnumerateDirectories(FolderPath).Select(d => new SaveGame(d));
-        public IEnumerable<SaveGame> ValidSaveFolders => SaveFiles.Where(g => g.IsValid);
+        public IEnumerable<SaveGame> SaveFolders => Directory.EnumerateDirectories(FolderPath).Select(d => new SaveGame(d));
+        public IEnumerable<SaveGame> ValidSaveFolders => SaveFolders.Where(g => g.IsValid);
 
 
         private static List<SavesLocation> FindAllForWindows()

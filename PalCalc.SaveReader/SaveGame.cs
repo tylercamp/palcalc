@@ -23,6 +23,14 @@ namespace PalCalc.SaveReader
 
         public string BasePath { get; }
         public string FolderName => Path.GetFileName(BasePath);
+        public DateTime LastModified => new List<DateTime>()
+        {
+            Directory.GetLastWriteTime(BasePath),
+            Level.LastModified,
+            LevelMeta.LastModified,
+            LocalData.LastModified,
+            WorldOption.LastModified,
+        }.Max();
 
         public bool IsValid => Level.Exists && LevelMeta.Exists && LocalData.Exists && WorldOption.Exists;
 

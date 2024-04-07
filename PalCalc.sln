@@ -7,11 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc.Model", "PalCalc.Mo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc.SaveReader", "PalCalc.SaveReader\PalCalc.SaveReader.csproj", "{92892830-FC2F-40E6-8CD1-021E692F2A1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalCalc.GenDB", "PalCalc.GenDB\PalCalc.GenDB.csproj", "{FB5FDDEC-6ADA-404F-AFE3-42CA5DEB10A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc.GenDB", "PalCalc.GenDB\PalCalc.GenDB.csproj", "{FB5FDDEC-6ADA-404F-AFE3-42CA5DEB10A8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc.Solver", "PalCalc.Solver\PalCalc.Solver.csproj", "{567FFDAB-38EE-49E6-85C8-7EEAC91AFBE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalCalc.SaveReader.CLI", "PalCalc.SaveReader.CLI\PalCalc.SaveReader.CLI.csproj", "{193E2B11-E76E-4202-A70A-FA48301FE0B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc.SaveReader.CLI", "PalCalc.SaveReader.CLI\PalCalc.SaveReader.CLI.csproj", "{193E2B11-E76E-4202-A70A-FA48301FE0B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalCalc.Solver.CLI", "PalCalc.Solver.CLI\PalCalc.Solver.CLI.csproj", "{33E48844-DC73-4187-9BFF-49E1BA371489}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{193E2B11-E76E-4202-A70A-FA48301FE0B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{193E2B11-E76E-4202-A70A-FA48301FE0B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{193E2B11-E76E-4202-A70A-FA48301FE0B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33E48844-DC73-4187-9BFF-49E1BA371489}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33E48844-DC73-4187-9BFF-49E1BA371489}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33E48844-DC73-4187-9BFF-49E1BA371489}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33E48844-DC73-4187-9BFF-49E1BA371489}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
