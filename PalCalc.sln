@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc", "PalCalc\PalCalc.csproj", "{378F5690-2B20-46AC-8557-F8CFF6B16F0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc.Model", "PalCalc.Model\PalCalc.Model.csproj", "{378F5690-2B20-46AC-8557-F8CFF6B16F0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalSaveReader", "PalSaveReader\PalSaveReader.csproj", "{92892830-FC2F-40E6-8CD1-021E692F2A1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalCalc.SaveReader", "PalCalc.SaveReader\PalCalc.SaveReader.csproj", "{92892830-FC2F-40E6-8CD1-021E692F2A1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
