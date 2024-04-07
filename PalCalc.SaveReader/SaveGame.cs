@@ -9,28 +9,6 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader
 {
-    //public class SaveFile
-    //{
-    //    public SaveFile(string basePath, string fileName)
-    //    {
-    //        FullPath = $"{basePath}/{fileName}";
-    //    }
-
-    //    public bool Exists => File.Exists(FullPath);
-
-    //    public string FullPath { get; }
-    //    public GvasFile ParsedGvas(IEnumerable<IVisitor> visitors)
-    //    {
-    //        GvasFile result = null;
-    //        CompressedSAV.WithDecompressedSave(FullPath, stream =>
-    //        {
-    //            using (var archiveReader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
-    //                result = GvasFile.FromFArchive(archiveReader, visitors);
-    //        });
-    //        return result;
-    //    }
-    //}
-
     public class SaveGame
     {
         public SaveGame(string basePath)
@@ -44,6 +22,7 @@ namespace PalCalc.SaveReader
         }
 
         public string BasePath { get; }
+        public string FolderName => Path.GetFileName(BasePath);
 
         public bool IsValid => Level.Exists && LevelMeta.Exists && LocalData.Exists && WorldOption.Exists;
 

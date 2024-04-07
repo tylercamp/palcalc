@@ -6,32 +6,30 @@ using PalCalc.SaveReader.GVAS;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 
-var baseFolder = @"C:\Users\algor\AppData\Local\Pal\Saved\SaveGames\76561198963790804";
 var db = PalDB.LoadFromCommon();
 
-foreach (var folder in Directory.EnumerateDirectories(baseFolder))
+foreach (var gameFolder in SavesLocation.FindAll())
 {
-    var sw = Stopwatch.StartNew();
-    Console.Write(folder + " - ");
-    var saveGame = new SaveGame(folder);
+    Console.WriteLine("Checking game folder {0}", gameFolder.FolderName);
 
-    if (!saveGame.IsValid)
+    foreach (var save in gameFolder.ValidSaveFolders)
     {
-        Console.WriteLine("Invalid");
-        continue;
+        var sw = Stopwatch.StartNew();
+        Console.WriteLine("Checking save folder {0}", save.FolderName);
+
+        var meta = save.LevelMeta.ReadGameOptions();
+        var pals = save.Level.ReadPalInstances(db);
+
+        Console.WriteLine(meta);
+        Console.WriteLine("{0} owned pals", pals.Count);
+
+        var palsByLocation = pals.GroupBy(p => p.Location.Type).ToDictionary(g => g.Key, g => g.ToList());
+
+        Console.WriteLine("- {0} in party", palsByLocation.GetValueOrDefault(LocationType.PlayerParty)?.Count ?? 0);
+        Console.WriteLine("- {0} in pal box", palsByLocation.GetValueOrDefault(LocationType.Palbox)?.Count ?? 0);
+        Console.WriteLine("- {0} in bases", palsByLocation.GetValueOrDefault(LocationType.Base)?.Count ?? 0);
+        Console.WriteLine("(took {0}ms)", sw.ElapsedMilliseconds);
     }
-
-    var level = saveGame.Level.ParseGvas();
-    var levelMeta = saveGame.LevelMeta.ParseGvas();
-    var localData = saveGame.LocalData.ParseGvas();
-    var worldOption = saveGame.WorldOption.ParseGvas();
-
-    var palInstances = saveGame.Level.ReadPalInstances(db);
-    var worldMeta = saveGame.LevelMeta.ReadGameOptions();
-
-    Console.WriteLine("Valid (in {0}ms)", sw.ElapsedMilliseconds);
-
-    //if (Path.GetFileName(folder).StartsWith("F0")) Debugger.Break();
 }
 
 Console.ReadLine();
