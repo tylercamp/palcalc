@@ -6,24 +6,24 @@ using System.Threading.Tasks;
 
 namespace PalSaveReader.FArchive
 {
-    interface IProperty
+    public interface IProperty
     {
         IPropertyMeta Meta { get; }
     }
 
-    interface IPropertyMeta
+    public interface IPropertyMeta
     {
         string Path { get; set; }
         Guid? Id { get; set; }
     }
 
-    class BasicPropertyMeta : IPropertyMeta
+    public class BasicPropertyMeta : IPropertyMeta
     {
         public string Path { get; set; }
         public Guid? Id { get; set; }
     }
 
-    internal class LiteralProperty : IProperty
+    public class LiteralProperty : IProperty
     {
         public IPropertyMeta Meta => TypedMeta;
         public BasicPropertyMeta TypedMeta { get; set; }
@@ -45,12 +45,12 @@ namespace PalSaveReader.FArchive
             Create(path, guid, value);
     }
 
-    class EnumPropertyMeta : BasicPropertyMeta
+    public class EnumPropertyMeta : BasicPropertyMeta
     {
         public string EnumType { get; set; }
     }
 
-    class EnumProperty : IProperty
+    public class EnumProperty : IProperty
     {
         public IPropertyMeta Meta => TypedMeta;
         public EnumPropertyMeta TypedMeta { get; set; }
@@ -60,13 +60,13 @@ namespace PalSaveReader.FArchive
         public override string ToString() => $"({TypedMeta.EnumType}){EnumValue}";
     }
 
-    class StructPropertyMeta : BasicPropertyMeta
+    public class StructPropertyMeta : BasicPropertyMeta
     {
         public string StructType { get; set; }
         public Guid StructTypeId { get; set; }
     }
 
-    class StructProperty : IProperty
+    public class StructProperty : IProperty
     {
         public IPropertyMeta Meta => TypedMeta;
         public StructPropertyMeta TypedMeta { get; set; }
@@ -76,7 +76,7 @@ namespace PalSaveReader.FArchive
         public override string ToString() => $"({TypedMeta.StructType}){Value}";
     }
 
-    class ArrayPropertyMeta : BasicPropertyMeta
+    public class ArrayPropertyMeta : BasicPropertyMeta
     {
         public string ArrayType { get; set; }
 
@@ -89,7 +89,7 @@ namespace PalSaveReader.FArchive
         public bool IsArrayStruct => TypeName != null;
     }
 
-    class ArrayProperty : IProperty
+    public class ArrayProperty : IProperty
     {
         public IPropertyMeta Meta => TypedMeta;
         public ArrayPropertyMeta TypedMeta { get; set; }
@@ -121,7 +121,7 @@ namespace PalSaveReader.FArchive
         }
     }
 
-    class MapPropertyMeta : BasicPropertyMeta
+    public class MapPropertyMeta : BasicPropertyMeta
     {
         public string KeyType { get; set; }
         public string ValueType { get; set; }
@@ -129,7 +129,7 @@ namespace PalSaveReader.FArchive
         public string ValueStructType { get; set; }
     }
 
-    class MapProperty : IProperty
+    public class MapProperty : IProperty
     {
         public IPropertyMeta Meta => TypedMeta;
         public MapPropertyMeta TypedMeta { get; set; }

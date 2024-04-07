@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 // palsav.py
 namespace PalSaveReader
 {
-    internal class CompressedSAV
+    public class CompressedSAV
     {
         private static void AssertZLibHeader(Stream stream)
         {

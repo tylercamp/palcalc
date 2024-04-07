@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace PalSaveReader.FArchive
 {
-    internal struct LinearColorLiteral
+    public struct LinearColorLiteral
     {
         public float r, g, b, a;
     }
 
-    struct QuaternionLiteral
+    public struct QuaternionLiteral
     {
         public double x, y, z, w;
     }
 
-    struct VectorLiteral
+    public struct VectorLiteral
     {
         public double x, y, z;
     }

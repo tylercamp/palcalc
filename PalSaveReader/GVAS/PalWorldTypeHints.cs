@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PalSaveReader.GVAS
 {
-    internal class PalWorldTypeHints
+    public class PalWorldTypeHints
     {
         public static Dictionary<string, string> Hints = new Dictionary<string, string>()
         {

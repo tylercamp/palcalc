@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace PalSaveReader.FArchive
 {
     // generic visitor
-    internal abstract class IVisitor
+    public abstract class IVisitor
     {
         public IVisitor(string matchedPath)
         {
@@ -81,7 +81,7 @@ namespace PalSaveReader.FArchive
         public virtual void VisitMapEntryEnd(string path, int index, MapPropertyMeta meta) { }
     }
 
-    class ValueCollectingVisitor : IVisitor
+    public class ValueCollectingVisitor : IVisitor
     {
         string[] propertiesToCollect;
         Dictionary<string, object> collectedValues = new Dictionary<string, object>();
@@ -126,7 +126,7 @@ namespace PalSaveReader.FArchive
         }
     }
 
-    class ValueEmittingVisitor : IVisitor
+    public class ValueEmittingVisitor : IVisitor
     {
         string[] propertiesToEmit;
 
@@ -167,9 +167,4 @@ namespace PalSaveReader.FArchive
             OnValue = null;
         }
     }
-
-    //class VisitorCollectingVisitor : IVisitor
-    //{
-
-    //}
 }

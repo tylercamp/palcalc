@@ -37,7 +37,7 @@ foreach (var folder in Directory.EnumerateDirectories(baseFolder))
 
     Console.WriteLine("Valid (in {0}ms)", sw.ElapsedMilliseconds);
 
-    if (Path.GetFileName(folder).StartsWith("F0")) Debugger.Break();
+    //if (Path.GetFileName(folder).StartsWith("F0")) Debugger.Break();
 }
 
 Console.ReadLine();

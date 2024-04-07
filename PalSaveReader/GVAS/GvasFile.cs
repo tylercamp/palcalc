@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 // gvas.py
 namespace PalSaveReader.GVAS
 {
-    struct GvasHeader
+    public struct GvasHeader
     {
         public int
             Magic,

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PalSaveReader.FArchive
 {
-    internal class FArchiveReader : IDisposable
+    public class FArchiveReader : IDisposable
     {
         BinaryReader reader;
         Dictionary<string, string> typeHints;

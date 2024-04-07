@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PalSaveReader.FArchive
 {
-    internal abstract class ICustomReader
+    public abstract class ICustomReader
     {
         public abstract string MatchedPath { get; }
         public abstract IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path, IEnumerable<IVisitor> visitors);
@@ -18,13 +18,13 @@ namespace PalSaveReader.FArchive
         };
     }
 
-    class CharacterContainerDataPropertyMeta : BasicPropertyMeta
+    public class CharacterContainerDataPropertyMeta : BasicPropertyMeta
     {
         public Guid? InstanceId => Id;
         public Guid PlayerId { get; set; }
     }
 
-    class CharacterContainerDataProperty : IProperty
+    public class CharacterContainerDataProperty : IProperty
     {
         public IPropertyMeta Meta => TypedMeta;
         public CharacterContainerDataPropertyMeta TypedMeta { get; set; }
@@ -32,7 +32,7 @@ namespace PalSaveReader.FArchive
         public byte PermissionTribeId;
     }
 
-    class CharacterContainerReader : ICustomReader
+    public class CharacterContainerReader : ICustomReader
     {
         public override string MatchedPath => ".worldSaveData.CharacterContainerSaveData.Value.Slots.Slots.RawData";
         public override IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path, IEnumerable<IVisitor> visitors)
@@ -66,19 +66,19 @@ namespace PalSaveReader.FArchive
         }
     }
 
-    class CharacterDataPropertyMeta : BasicPropertyMeta
+    public class CharacterDataPropertyMeta : BasicPropertyMeta
     {
         public Guid? GroupId => Id;
     }
 
-    class CharacterDataProperty : IProperty
+    public class CharacterDataProperty : IProperty
     {
         public IPropertyMeta Meta { get; set; }
 
         public Dictionary<string, object> Data { get; set; }
     }
 
-    class CharacterReader : ICustomReader
+    public class CharacterReader : ICustomReader
     {
         public override string MatchedPath => ".worldSaveData.CharacterSaveParameterMap.Value.RawData";
         public override IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path, IEnumerable<IVisitor> visitors)
