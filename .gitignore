@@ -1,6 +1,7 @@
 .vs/
 obj/
 bin/
+cache/
 Level.sav.json
 
 character*.json
