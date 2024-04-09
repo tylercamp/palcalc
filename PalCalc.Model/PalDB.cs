@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Model
 {
+    [JsonConverter(typeof(PalDBJsonConverter))]
     public class PalDB
     {
         internal PalDB() { }
@@ -158,9 +159,9 @@ namespace PalCalc.Model
                 return FromJson(streamReader.ReadToEnd());
         }
 
-        public static PalDB FromJson(string json) => JsonConvert.DeserializeObject<PalDB>(json, new PalDBJsonConverter());
+        public static PalDB FromJson(string json) => JsonConvert.DeserializeObject<PalDB>(json);
 
-        public string ToJson() => JsonConvert.SerializeObject(this, new PalDBJsonConverter());
+        public string ToJson() => JsonConvert.SerializeObject(this);
 
         // should only be used when constructing a DB for serialization
         public static PalDB MakeEmptyUnsafe() => new PalDB();

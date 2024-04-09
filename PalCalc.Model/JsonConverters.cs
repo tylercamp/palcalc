@@ -9,6 +9,38 @@ using static PalCalc.Model.BreedingResult;
 
 namespace PalCalc.Model
 {
+    public class PalInstanceJsonConverter : JsonConverter<PalInstance>
+    {
+        private PalDB db;
+        public PalInstanceJsonConverter(PalDB db)
+        {
+            this.db = db;
+        }
+
+        public override PalInstance ReadJson(JsonReader reader, Type objectType, PalInstance existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var token = JToken.ReadFrom(reader);
+            return new PalInstance()
+            {
+                Pal = token["Id"].ToObject<PalId>().ToPal(db),
+                Location = token["Location"].ToObject<PalLocation>(),
+                Gender = token["Gender"].ToObject<PalGender>(),
+                Traits = token["Traits"].ToObject<List<string>>().Select(s => s.ToTrait(db)).ToList()
+            };
+        }
+
+        public override void WriteJson(JsonWriter writer, PalInstance value, JsonSerializer serializer)
+        {
+            JToken.FromObject(new
+            {
+                Id = value.Pal.Id,
+                Location = value.Location,
+                Gender = value.Gender,
+                Traits = value.Traits.Select(t => t.Name),
+            }).WriteTo(writer);
+        }
+    }
+
     public class BreedingResultJsonConverter : JsonConverter<BreedingResult>
     {
         private IEnumerable<Pal> pals;

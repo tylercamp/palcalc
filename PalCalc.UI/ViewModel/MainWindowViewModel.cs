@@ -68,10 +68,12 @@ namespace PalCalc.UI.ViewModel
         public MainWindowViewModel()
         {
             var latest = SavesLocation.AllLocal.SelectMany(loc => loc.ValidSaveGames).MaxBy(game => game.LastModified);
+            var saveGame = Storage.LoadSave(latest, db);
+
             var solver = new Solver.Solver(
                 gameSettings: new GameSettings(),
                 db: db,
-                ownedPals: latest.Level.ReadPalInstances(db),
+                ownedPals: saveGame.OwnedPals,
                 maxBreedingSteps: 3,
                 maxWildPals: 0,
                 maxIrrelevantTraits: 0,
