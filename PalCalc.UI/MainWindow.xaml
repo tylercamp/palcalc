@@ -15,7 +15,7 @@
     <Window.Resources>
         <DataTemplate x:Key="DemoTemplate" DataType="{x:Type sm:IBreedingTreeNode}">
             <StackPanel Orientation="Horizontal" Margin="5">
-                <TextBlock Text="{Binding PalRef.Pal.Name}" Foreground="White" />
+                <TextBlock Text="{Binding Description}" Foreground="White" />
             </StackPanel>
         </DataTemplate>
 

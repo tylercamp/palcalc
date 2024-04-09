@@ -8,11 +8,11 @@ using System.Net.Http.Headers;
 
 var db = PalDB.LoadEmbedded();
 
-foreach (var gameFolder in SavesLocation.FindAll())
+foreach (var gameFolder in SavesLocation.AllLocal)
 {
     Console.WriteLine("Checking game folder {0}", gameFolder.FolderName);
 
-    foreach (var save in gameFolder.ValidSaveFolders)
+    foreach (var save in gameFolder.ValidSaveGames)
     {
         var sw = Stopwatch.StartNew();
         Console.WriteLine("Checking save folder {0}", save.FolderName);

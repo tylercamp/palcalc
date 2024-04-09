@@ -9,6 +9,8 @@
   <ItemGroup>
     <ProjectReference Include="..\GraphSharp.Controls\GraphSharp.Controls.csproj" />
     <ProjectReference Include="..\GraphSharp\GraphSharp.csproj" />
+    <ProjectReference Include="..\PalCalc.Model\PalCalc.Model.csproj" />
+    <ProjectReference Include="..\PalCalc.SaveReader\PalCalc.SaveReader.csproj" />
     <ProjectReference Include="..\PalCalc.Solver\PalCalc.Solver.csproj" />
   </ItemGroup>
 

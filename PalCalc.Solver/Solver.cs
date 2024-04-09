@@ -75,26 +75,6 @@ namespace PalCalc.Solver
             return relevantInstances;
         }
 
-        static int NumWildPalParticipants(IPalReference pref)
-        {
-            switch (pref)
-            {
-                case BredPalReference bpr: return NumWildPalParticipants(bpr.Parent1) + NumWildPalParticipants(bpr.Parent2);
-                case OwnedPalReference opr: return 0;
-                case WildcardPalReference wpr: return 1;
-                default: throw new Exception($"Unhandled pal reference type {pref.GetType()}");
-            }
-        }
-
-        static int NumBredPalParticipants(IPalReference pref)
-        {
-            switch (pref)
-            {
-                case BredPalReference bpr: return 1 + NumBredPalParticipants(bpr.Parent1) + NumBredPalParticipants(bpr.Parent2);
-                default: return 0;
-            }
-        }
-
         // we have two parents but don't necessarily have definite genders for them, figure out which parent should have which
         // gender (if they're wild/bred pals) for the least overall effort (different pals have different gender probabilities)
         (IPalReference, IPalReference) PreferredParentsGenders(IPalReference parent1, IPalReference parent2)
@@ -292,13 +272,13 @@ namespace PalCalc.Solver
                             .Skip(idx + 1) // only search (p1,p2) pairs, not (p1,p2) and (p2,p1)
                             .Where(i => i.IsCompatibleGender(parent1.Gender))
                             .Where(i => i != null)
-                            .Where(parent2 => NumWildPalParticipants(parent1) + NumWildPalParticipants(parent2) <= maxWildPals)
+                            .Where(parent2 => parent1.NumWildPalParticipants() + parent2.NumWildPalParticipants() <= maxWildPals)
                             .Where(parent2 =>
                             {
                                 var childPal = db.BreedingByParent[parent1.Pal][parent2.Pal].Child;
                                 return db.MinBreedingSteps[childPal][targetInstance.Pal] <= maxBreedingSteps - s - 1;
                             })
-                            .Where(parent2 => NumBredPalParticipants(parent1) + NumBredPalParticipants(parent2) < maxBreedingSteps)
+                            .Where(parent2 => parent1.NumBredPalParticipants() + parent2.NumBredPalParticipants() < maxBreedingSteps)
                             .Where(parent2 =>
                             {
                                 // if we disallow any irrelevant traits, neither parents have a useful trait, and at least 1 parent

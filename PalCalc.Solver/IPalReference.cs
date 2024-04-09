@@ -14,6 +14,8 @@ namespace PalCalc.Solver
         List<Trait> Traits { get; }
         PalGender Gender { get; }
 
+        string TraitsString => Traits.TraitsListToString();
+
         IPalRefLocation Location { get; }
 
         public TimeSpan BreedingEffort { get; }

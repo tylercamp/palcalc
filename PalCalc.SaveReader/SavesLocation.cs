@@ -17,8 +17,8 @@ namespace PalCalc.SaveReader
         public string FolderPath { get; }
         public string FolderName => Path.GetFileName(FolderPath);
 
-        public IEnumerable<SaveGame> SaveFolders => Directory.EnumerateDirectories(FolderPath).Select(d => new SaveGame(d));
-        public IEnumerable<SaveGame> ValidSaveFolders => SaveFolders.Where(g => g.IsValid);
+        public IEnumerable<SaveGame> AllSaveGames => Directory.EnumerateDirectories(FolderPath).Select(d => new SaveGame(d));
+        public IEnumerable<SaveGame> ValidSaveGames => AllSaveGames.Where(g => g.IsValid);
 
 
         private static List<SavesLocation> FindAllForWindows()
@@ -39,13 +39,16 @@ namespace PalCalc.SaveReader
             }
         }
 
-        public static List<SavesLocation> FindAll()
+        public static List<SavesLocation> AllLocal
         {
-            if (OperatingSystem.IsWindows()) return FindAllForWindows();
-            else
+            get
             {
-                Console.WriteLine("Unsupported platform");
-                return new List<SavesLocation>();
+                if (OperatingSystem.IsWindows()) return FindAllForWindows();
+                else
+                {
+                    Console.WriteLine("Unsupported platform");
+                    return new List<SavesLocation>();
+                }
             }
         }
     }

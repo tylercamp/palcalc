@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
+using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.UI.Model;
 using System;
@@ -13,15 +14,15 @@ namespace PalCalc.UI.ViewModel
 {
     internal partial class MainWindowViewModel : ObservableObject
     {
+        private static PalDB db = PalDB.LoadEmbedded();
+
         [ObservableProperty]
         private BreedingGraph breedingGraph;
 
-        [ObservableProperty]
-        private string layoutAlgorithmType = "Tree";
-
-        public MainWindowViewModel()
+        // design-time model
+        public MainWindowViewModel(int x)
         {
-            var dummyId = new PalId() { PalDexNo = 100, IsVariant = false };
+            var dummyId = new PalId() { PalDexNo = 123 };
             BreedingGraph = BreedingGraph.FromPalReference(
                     new BredPalReference(
                         gameSettings: new GameSettings(),
@@ -61,6 +62,36 @@ namespace PalCalc.UI.ViewModel
                         )
                     )
                 );
+        }
+
+        // main app model
+        public MainWindowViewModel()
+        {
+            var latest = SavesLocation.AllLocal.SelectMany(loc => loc.ValidSaveGames).MaxBy(game => game.LastModified);
+            var solver = new Solver.Solver(
+                gameSettings: new GameSettings(),
+                db: db,
+                ownedPals: latest.Level.ReadPalInstances(db),
+                maxBreedingSteps: 3,
+                maxWildPals: 0,
+                maxIrrelevantTraits: 0,
+                maxEffort: TimeSpan.FromHours(8)
+            );
+
+            var targetInstance = new PalInstance
+            {
+                Pal = "Galeclaw".ToPal(db),
+                Gender = PalGender.WILDCARD,
+                Traits = new List<Trait> {
+                    "Swift".ToTrait(db),
+                    "Runner".ToTrait(db),
+                    "Nimble".ToTrait(db)
+                },
+                Location = null
+            };
+
+            var output = solver.SolveFor(targetInstance).MaxBy(r => r.NumBredPalParticipants());
+            BreedingGraph = BreedingGraph.FromPalReference(output);
         }
     }
 }

@@ -15,6 +15,7 @@ namespace PalCalc.Solver
         IEnumerable<(IBreedingTreeNode, int)> TraversedTopDown(int currentDepth);
 
         IEnumerable<string> DescriptionLines { get; }
+        string Description { get; }
     }
 
     public class DirectPalNode : IBreedingTreeNode
@@ -23,6 +24,8 @@ namespace PalCalc.Solver
         {
             PalRef = pref;
         }
+
+        public string Description => string.Join('\n', DescriptionLines);
 
         public IPalReference PalRef { get; }
         public IEnumerable<IBreedingTreeNode> Children { get; } = Enumerable.Empty<IBreedingTreeNode>();
@@ -65,6 +68,8 @@ namespace PalCalc.Solver
             ParentNode1 = parentNode1;
             ParentNode2 = parentNode2;
         }
+
+        public string Description => string.Join('\n', DescriptionLines);
 
         public IBreedingTreeNode ParentNode1 { get; }
         public IBreedingTreeNode ParentNode2 { get; }
