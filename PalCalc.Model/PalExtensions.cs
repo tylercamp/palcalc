@@ -9,8 +9,10 @@ namespace PalCalc.Model
     public static class PalExtensions
     {
         public static Pal ToPal(this string s, PalDB db) => db.Pals.Single(p => p.Name == s);
+        public static Pal ToPal(this string s, IEnumerable<Pal> pals) => pals.Single(p => p.Name == s);
         public static Pal InternalToPal(this string s, PalDB db) => db.Pals.Single(p => p.InternalName == s);
         public static Pal ToPal(this PalId id, PalDB db) => db.PalsById[id];
+        public static Pal ToPal(this PalId id, IEnumerable<Pal> pals) => pals.Single(p => p.Id == id);
 
         public static Trait ToTrait(this string s, PalDB db) => db.TraitsByName[s];
         public static Trait InternalToTrait(this string s, PalDB db) => db.Traits.Single(t => t.InternalName == s);

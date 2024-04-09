@@ -232,9 +232,8 @@ namespace PalCalc.GenDB
                     .First();
             }
 
-            var db = new PalDB
-            {
-                Breeding = pals
+            var db = PalDB.MakeEmptyUnsafe();
+            db.Breeding = pals
                     .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
                     .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))
                     .Distinct()
@@ -244,39 +243,37 @@ namespace PalCalc.GenDB
                         Parent2 = p.Item2,
                         Child = Child(p.Item1, p.Item2)
                     })
-                    .ToList(),
+                    .ToList();
 
-                PalsById = pals.ToDictionary(p => p.Id),
-                Traits = traits,
-                BreedingGenderProbability = pals.ToDictionary(
-                    p => p,
-                    p =>
+            db.PalsById = pals.ToDictionary(p => p.Id);
+
+            db.Traits = traits;
+
+            db.BreedingGenderProbability = pals.ToDictionary(
+                p => p,
+                p =>
+                {
+                    if (SpecialMaleProbabilities.Any(s => s.Item1 == p.Name))
                     {
-                        if (SpecialMaleProbabilities.Any(s => s.Item1 == p.Name))
+                        var maleProbability = SpecialMaleProbabilities.Single(s => s.Item1 == p.Name).Item2;
+                        return new Dictionary<PalGender, float>()
                         {
-                            var maleProbability = SpecialMaleProbabilities.Single(s => s.Item1 == p.Name).Item2;
-                            return new Dictionary<PalGender, float>()
-                            {
-                                { PalGender.MALE, maleProbability },
-                                { PalGender.FEMALE, 1 - maleProbability },
-                            };
-                        }
-                        else
-                        {
-                            return new Dictionary<PalGender, float>()
-                            {
-                                { PalGender.MALE, 0.5f },
-                                { PalGender.FEMALE, 0.5f },
-                            };
-                        }
+                            { PalGender.MALE, maleProbability },
+                            { PalGender.FEMALE, 1 - maleProbability },
+                        };
                     }
-                ),
-                MinBreedingSteps = new Dictionary<Pal, Dictionary<Pal, int>>(), // will be filled later
-            };
+                    else
+                    {
+                        return new Dictionary<PalGender, float>()
+                        {
+                            { PalGender.MALE, 0.5f },
+                            { PalGender.FEMALE, 0.5f },
+                        };
+                    }
+                }
+            );
 
-
-            var initializedDb = PalDB.FromJson(db.ToJson());
-            db.MinBreedingSteps = CalcMinDistances(initializedDb);
+            db.MinBreedingSteps = CalcMinDistances(db);
 
             File.WriteAllText("../PalCalc.Model/db.json", db.ToJson());
         }
