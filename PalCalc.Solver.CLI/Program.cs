@@ -10,7 +10,7 @@ internal class Program
     {
         var sw = Stopwatch.StartNew();
 
-        var db = PalDB.LoadFromCommon();
+        var db = PalDB.LoadEmbedded();
         Console.WriteLine("Loaded Pal DB");
 
         var saveGame = SavesLocation.FindAll().SelectMany(l => l.ValidSaveFolders).MaxBy(g => g.LastModified);
@@ -20,6 +20,7 @@ internal class Program
         Console.WriteLine("Loaded save game");
 
         var solver = new Solver(
+            gameSettings: new GameSettings(),
             db: db,
             ownedPals: savedInstances,
             maxBreedingSteps: 20,

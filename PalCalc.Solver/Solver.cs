@@ -125,9 +125,24 @@ namespace PalCalc.Solver
             }
         }
 
-        // calculates the probability of a child pal with `numFinalTraits` traits having the all desired traits from
-        // the list of possible parent traits
-        float ProbabilityInheritedTargetTraits(int numFinalTraits, List<Trait> parentTraits, List<Trait> desiredParentTraits)
+        /// <summary>
+        /// Calculates the probability of a child pal with `numFinalTraits` traits having the all desired traits from
+        /// the list of possible parent traits.
+        /// </summary>
+        /// 
+        /// <param name="parentTraits">The the full set of traits from the parents (deduplicated)</param>
+        /// <param name="desiredParentTraits">The list of traits you want to be inherited</param>
+        /// <param name="numFinalTraits">The exact amount of final traits to calculate for</param>
+        /// <returns></returns>
+        /// 
+        /// <remarks>
+        /// e.g. "if we decide the child pal has N traits, what's the probability of containing all of the traits we want"
+        /// </remarks>
+        /// <remarks>
+        /// Should be used repeatedly to calculate probabilities for all possible counts of traits (max 4)
+        /// </remarks>
+        /// 
+        float ProbabilityInheritedTargetTraits(List<Trait> parentTraits, List<Trait> desiredParentTraits, int numFinalTraits)
         {
             // we know we need at least `desiredParentTraits.Count` to be inherited from the parents, but the overall number
             // of traits must be `numFinalTraits`. consider N, N+1, ..., traits inherited from parents, and an inverse amount
@@ -141,7 +156,7 @@ namespace PalCalc.Solver
             //
             // ... each of these has a separate probability of getting exactly that outcome.
             //
-            // the final probability for these params is the sum
+            // the final probability for these params (fn args) is the sum
 
             float probabilityForNumTraits = 0.0f;
 
@@ -324,7 +339,7 @@ namespace PalCalc.Solver
                                     float initialProbability = probabilityForUpToNumTraits;
 #endif
 
-                                    probabilityForUpToNumTraits += ProbabilityInheritedTargetTraits(numFinalTraits, parentTraits, desiredParentTraits);
+                                    probabilityForUpToNumTraits += ProbabilityInheritedTargetTraits(parentTraits, desiredParentTraits, numFinalTraits);
 
                                     if (probabilityForUpToNumTraits <= 0) continue;
 

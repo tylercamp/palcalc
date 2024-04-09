@@ -13,7 +13,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc.Solver", "PalCalc.S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc.SaveReader.CLI", "PalCalc.SaveReader.CLI\PalCalc.SaveReader.CLI.csproj", "{193E2B11-E76E-4202-A70A-FA48301FE0B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalCalc.Solver.CLI", "PalCalc.Solver.CLI\PalCalc.Solver.CLI.csproj", "{33E48844-DC73-4187-9BFF-49E1BA371489}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc.Solver.CLI", "PalCalc.Solver.CLI\PalCalc.Solver.CLI.csproj", "{33E48844-DC73-4187-9BFF-49E1BA371489}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc.UI", "PalCalc.UI\PalCalc.UI.csproj", "{2CB34AD8-2E22-45D6-AC9C-FDB2CC802363}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AF4D61ED-ADDA-405E-BC05-82579D17926F}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphSharp", "GraphSharp\GraphSharp.csproj", "{916C2435-CB2F-4A53-87F7-FBF77E881F30}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphSharp.Controls", "GraphSharp.Controls\GraphSharp.Controls.csproj", "{4DF77F25-504A-4D48-8D05-09990BB6B85A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GraphSharp", "GraphSharp", "{B98DEFA3-C254-4B6D-B845-3535E2E049DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,9 +58,25 @@ Global
 		{33E48844-DC73-4187-9BFF-49E1BA371489}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33E48844-DC73-4187-9BFF-49E1BA371489}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33E48844-DC73-4187-9BFF-49E1BA371489}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CB34AD8-2E22-45D6-AC9C-FDB2CC802363}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CB34AD8-2E22-45D6-AC9C-FDB2CC802363}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CB34AD8-2E22-45D6-AC9C-FDB2CC802363}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CB34AD8-2E22-45D6-AC9C-FDB2CC802363}.Release|Any CPU.Build.0 = Release|Any CPU
+		{916C2435-CB2F-4A53-87F7-FBF77E881F30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{916C2435-CB2F-4A53-87F7-FBF77E881F30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{916C2435-CB2F-4A53-87F7-FBF77E881F30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{916C2435-CB2F-4A53-87F7-FBF77E881F30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DF77F25-504A-4D48-8D05-09990BB6B85A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DF77F25-504A-4D48-8D05-09990BB6B85A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DF77F25-504A-4D48-8D05-09990BB6B85A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DF77F25-504A-4D48-8D05-09990BB6B85A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{916C2435-CB2F-4A53-87F7-FBF77E881F30} = {B98DEFA3-C254-4B6D-B845-3535E2E049DA}
+		{4DF77F25-504A-4D48-8D05-09990BB6B85A} = {B98DEFA3-C254-4B6D-B845-3535E2E049DA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0171AB8C-D344-4A9B-BE99-146E847BFEFB}

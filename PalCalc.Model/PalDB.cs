@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,7 +50,17 @@ namespace PalCalc.Model
             public Dictionary<string, Dictionary<string, int>> MinBreedingSteps { get; set; }
         }
 
-        public static PalDB LoadFromCommon() => FromJson(File.ReadAllText("db.json"));
+        public static PalDB LoadEmbedded()
+        {
+            var info = Assembly.GetExecutingAssembly().GetName();
+            var name = info.Name;
+            using var stream = Assembly
+                .GetExecutingAssembly()
+                .GetManifestResourceStream($"{name}.db.json")!;
+
+            using var streamReader = new StreamReader(stream, Encoding.UTF8);
+                return FromJson(streamReader.ReadToEnd());
+        }
 
         public static PalDB FromJson(string json)
         {
