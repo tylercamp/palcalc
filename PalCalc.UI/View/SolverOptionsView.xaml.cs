@@ -1,5 +1,4 @@
-﻿using PalCalc.UI.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,22 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PalCalc.UI
+namespace PalCalc.UI.View
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for SolverOptionsView.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class SolverOptionsView : UserControl
     {
-        public MainWindow()
+        public SolverOptionsView()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
-        }
-
-        private void SolveButton_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

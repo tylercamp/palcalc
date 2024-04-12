@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.0" />
   </ItemGroup>
 
 </Project>

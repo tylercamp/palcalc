@@ -25,6 +25,8 @@ namespace PalCalc.UI.Model
             didInit = true;
         }
 
+        private static Dictionary<string, CachedSaveGame> InMemorySaves = new Dictionary<string, CachedSaveGame>();
+
         public static CachedSaveGame LoadSave(SaveGame save, PalDB db)
         {
             Init();
@@ -32,6 +34,8 @@ namespace PalCalc.UI.Model
             if (!save.IsValid) return null;
 
             var identifier = CachedSaveGame.IdentifierFor(save);
+            if (InMemorySaves.ContainsKey(identifier)) return InMemorySaves[identifier];
+
             var path = $"{SaveCachePath}/{identifier}.json";
             if (File.Exists(path))
             {
@@ -48,12 +52,14 @@ namespace PalCalc.UI.Model
                     return LoadSave(save, db);
                 }
 
+                InMemorySaves.Add(identifier, res);
                 return res;
             }
             else
             {
                 var res = CachedSaveGame.FromSaveGame(save, db);
                 File.WriteAllText(path, res.ToJson(db));
+                InMemorySaves.Add(identifier, res);
                 return res;
             }
         }

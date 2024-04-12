@@ -1,6 +1,8 @@
-﻿using GraphSharp.Algorithms.Layout.Simple.Tree;
+﻿using GraphSharp.Algorithms.Layout;
+using GraphSharp.Algorithms.Layout.Simple.Tree;
 using GraphSharp.Controls;
 using PalCalc.Solver;
+using PalCalc.UI.Model.GraphSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,7 @@ namespace PalCalc.UI.Model
             LayoutAlgorithmType = "Tree";
             LayoutParameters = new SimpleTreeLayoutParameters()
             {
-                Direction = GraphSharp.Algorithms.Layout.LayoutDirection.TopToBottom,
+                Direction = LayoutDirection.TopToBottom,
                 SpanningTreeGeneration = SpanningTreeGeneration.DFS,
                 WidthPerHeight = 100
             };

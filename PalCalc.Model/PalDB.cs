@@ -147,16 +147,21 @@ namespace PalCalc.Model
             public Dictionary<string, Dictionary<string, int>> MinBreedingSteps { get; set; }
         }
 
+        private static PalDB embedded = null;
         public static PalDB LoadEmbedded()
         {
+            if (embedded != null) return embedded;
+
             var info = Assembly.GetExecutingAssembly().GetName();
             var name = info.Name;
             using var stream = Assembly
                 .GetExecutingAssembly()
                 .GetManifestResourceStream($"{name}.db.json")!;
 
-            using var streamReader = new StreamReader(stream, Encoding.UTF8);
-                return FromJson(streamReader.ReadToEnd());
+            using (var streamReader = new StreamReader(stream, Encoding.UTF8))
+                embedded = FromJson(streamReader.ReadToEnd());
+
+            return embedded;
         }
 
         public static PalDB FromJson(string json) => JsonConvert.DeserializeObject<PalDB>(json);

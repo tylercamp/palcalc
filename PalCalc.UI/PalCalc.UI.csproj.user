@@ -7,7 +7,27 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="View\BreedingResultView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\SaveSelectorView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\SolverOptionsView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="MainWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="View\BreedingResultView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="View\SaveSelectorView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="View\SolverOptionsView.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

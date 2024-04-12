@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.Model
 {
-    class BreedingEdge : TypedEdge<IBreedingTreeNode>
+    public class BreedingEdge : TypedEdge<IBreedingTreeNode>
     {
         public BreedingEdge(IBreedingTreeNode parent, IBreedingTreeNode child) : base(parent, child, EdgeTypes.Hierarchical) { }
 
         public override string ToString() => "";
     }
 
-    internal class BreedingGraph : HierarchicalGraph<IBreedingTreeNode, BreedingEdge>
+    public class BreedingGraph : HierarchicalGraph<IBreedingTreeNode, BreedingEdge>
     {
         public BreedingGraph(BreedingTree tree)
         {

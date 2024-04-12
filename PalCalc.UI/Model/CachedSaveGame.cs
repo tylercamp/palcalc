@@ -25,6 +25,8 @@ namespace PalCalc.UI.Model
 
         public bool IsOutdated => LastModified != UnderlyingSave.LastModified;
 
+        public string StateId => $"{IdentifierFor(UnderlyingSave)}-{LastModified.Ticks}";
+
         public static string IdentifierFor(SaveGame game)
         {
             var userFolderName = Path.GetFileName(Path.GetDirectoryName(game.BasePath));

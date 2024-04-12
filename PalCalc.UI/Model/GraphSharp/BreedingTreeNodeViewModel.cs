@@ -18,7 +18,5 @@ namespace PalCalc.UI.Model
 
         [ObservableProperty]
         private ObservableCollection<Trait> traits = new ObservableCollection<Trait>();
-
-
     }
 }

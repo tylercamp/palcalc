@@ -1,4 +1,8 @@
-﻿using PalCalc.UI.ViewModel;
+﻿using PalCalc.Model;
+using PalCalc.SaveReader;
+using PalCalc.Solver;
+using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,22 +18,18 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PalCalc.UI
+namespace PalCalc.UI.View
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for BreedingResultView.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class BreedingResultView : UserControl
     {
-        public MainWindow()
+        public BreedingResultView()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
         }
 
-        private void SolveButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
+        public BreedingResultViewModel ViewModel => DataContext as BreedingResultViewModel;
     }
 }

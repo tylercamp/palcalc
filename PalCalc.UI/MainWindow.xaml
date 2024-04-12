@@ -4,55 +4,36 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PalCalc.UI"
+        xmlns:v="clr-namespace:PalCalc.UI.View"
         xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
         xmlns:m="clr-namespace:PalCalc.UI.Model"
         xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="Pal Calc" Height="450" Width="800"
         xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
         xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Window.Resources>
-        <DataTemplate x:Key="DemoTemplate" DataType="{x:Type sm:IBreedingTreeNode}">
-            <StackPanel Orientation="Horizontal" Margin="5">
-                <TextBlock Text="{Binding Description}" Foreground="White" />
-            </StackPanel>
-        </DataTemplate>
 
-        <Style TargetType="{x:Type graphSharp:VertexControl}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type graphSharp:VertexControl}">
-                        <Border BorderBrush="White" 
-                                    Background="Black"
-                                    BorderThickness="2"
-                                    CornerRadius="10,10,10,10"
-                                    Padding="{TemplateBinding Padding}">
-                            <ContentPresenter Content="{TemplateBinding Vertex}" 
-                                                  ContentTemplate="{StaticResource DemoTemplate}"/>
-
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="2" Color="LightGray" 
-                                                      Opacity="0.3" Direction="315"/>
-                            </Border.Effect>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="{x:Type graphSharp:EdgeControl}">
-            
-        </Style>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <zoom:ZoomControl Grid.Column="1" Background="Gray" Zoom="2">
-            <m:BreedingGraphLayout
-                Graph="{Binding BreedingGraph}"
-                HighlightAlgorithmType="Simple"
-                
-                />
-        </zoom:ZoomControl>
+        <Grid Grid.Column="0">
+            <v:SaveSelectorView DataContext="{Binding SaveSelection}" VerticalAlignment="Top" Margin="10,0,10,0" />
+            <ComboBox ItemsSource="{Binding DB.Pals}" IsEditable="True" Margin="10,161,10,0" VerticalAlignment="Top"/>
+            <Label Content="Target Pal" HorizontalAlignment="Right" Margin="0,135,10,0" VerticalAlignment="Top" Width="230"/>
+            <Label Content="Traits" Margin="10,188,10,0" VerticalAlignment="Top"/>
+            <ComboBox ItemsSource="{Binding DB.Traits}" IsEditable="True" HorizontalAlignment="Right" Margin="0,219,10,0" VerticalAlignment="Top" Width="230"/>
+            <ComboBox ItemsSource="{Binding DB.Traits}" IsEditable="True" HorizontalAlignment="Right" Margin="0,246,10,0" VerticalAlignment="Top" Width="230"/>
+            <ComboBox ItemsSource="{Binding DB.Traits}" IsEditable="True" HorizontalAlignment="Right" Margin="0,273,10,0" VerticalAlignment="Top" Width="230"/>
+            <ComboBox ItemsSource="{Binding DB.Traits}" IsEditable="True" HorizontalAlignment="Right" Margin="0,300,10,0" VerticalAlignment="Top" Width="230"/>
+            <Button Content="Solve" Margin="195,404,15,10" Click="SolveButton_Click"/>
+
+        </Grid>
+
+        <v:BreedingResultView Margin="5,5,5,5" Grid.Column="1" DataContext="{Binding DisplayedResultVM}" />
     </Grid>
 </Window>
