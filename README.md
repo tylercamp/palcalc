@@ -21,3 +21,36 @@ A Windows program for calculating the optimal steps to breed a specific pal with
   - Distributes path-solving work across all available CPU cores
 
 This can all probably be ported into a webpage, but I've put in enough effort with this first version. It would be great if someone else could work on that.
+
+## Main TODOs
+
+- Add progress bar when solving is running, don't freeze the window during solving
+- Save solver results
+- Allow loading from save files from custom locations
+- Associate solver results with save file and save-last-modified, show icon if save file was updated
+- Show total time required
+- Disallow changes to list boxes + input fields while solving is running
+- Game settings (breeding time, multiple breeding farms)
+	- Save game settings + associate with save file
+- Proper packaging + release
+- Logging + error handling
+	- Any exceptions
+	- Ignore + log any unrecognized pals + traits
+	- Errors when reading save files
+	- Corrupted cached save data
+	- Corrupted solver data
+
+## Eventual TODOs
+- Add "About" window for licenses + references
+- Fix tree layout algorithm
+- Option to delete entries from list of target pals
+- Allow solving for multiple pals at once
+- Show preview of involved pals, num wild pals, etc. in solver results list
+- Performance options (max threads)
+- Separate list of "Required traits" and "Optional traits" for target pal
+- General UI/UX improvements
+
+## Maybe TODOs
+- Automatically detect changes to save file + reload
+- Option to auto-recalc all target pals when changes are detected
+- Allow specifying custom db.json
