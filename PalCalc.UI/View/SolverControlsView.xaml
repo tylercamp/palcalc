@@ -22,5 +22,5 @@
     <xctk:IntegerUpDown Value="{Binding MaxWildPals}" />
     <Label Content="Max Irrelevant Traits:" />
     <xctk:IntegerUpDown Value="{Binding MaxIrrelevantTraits}" />
-    <Button Content="Run" />
+    <Button Content="Run" Click="Run_Click" />
 </StackPanel>

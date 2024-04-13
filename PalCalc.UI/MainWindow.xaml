@@ -29,13 +29,18 @@
             </GroupBox>
         </DockPanel>
 
-        <StackPanel Grid.Column="1">
-            <v:SolverControlsView DataContext="{Binding SolverControls}" />
-            <v:BreedingResultView DataContext="{Binding DisplayedResultVM}" />
-        </StackPanel>
+        <DockPanel Grid.Column="1">
+            <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" OnRun="SolverControlsView_OnRun" />
+            
+            <!-- a breeding view without any content will cause it to extend infinitely, set a
+                 large max-height for XAML preview
+            -->
+            <v:BreedingResultView DataContext="{Binding BreedingResults.SelectedResult}" />
+        </DockPanel>
 
-        <StackPanel Grid.Column="2">
-            <v:PalTargetView DataContext="{Binding PalTarget}" />
-        </StackPanel>
+        <DockPanel Grid.Column="2">
+            <v:PalTargetView DataContext="{Binding PalTarget}" DockPanel.Dock="Top" />
+            <v:BreedingResultListView DataContext="{Binding BreedingResults}" />
+        </DockPanel>
     </Grid>
 </Window>

@@ -27,9 +27,11 @@ namespace PalCalc.UI
             DataContext = new MainWindowViewModel();
         }
 
-        private void SolveButton_Click(object sender, RoutedEventArgs e)
-        {
+        private MainWindowViewModel ViewModel => DataContext as MainWindowViewModel;
 
+        private void SolverControlsView_OnRun()
+        {
+            ViewModel.RunSolver();
         }
     }
 }

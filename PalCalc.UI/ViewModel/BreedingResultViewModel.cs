@@ -50,6 +50,8 @@ namespace PalCalc.UI.ViewModel
 
         public BreedingGraph Graph { get; private set; }
 
+        public string Label => DisplayedResult?.ToString() ?? "Unknown";
+
         public bool HasValue => Graph != null;
 
         private IPalReference displayedResult = null;

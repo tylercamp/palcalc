@@ -2,6 +2,7 @@
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
+using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,6 +51,7 @@ namespace PalCalc.UI.ViewModel
         public DateTime LastModified => Value.LastModified;
 
         public SaveGame Value { get; }
+        public CachedSaveGame CachedValue => Storage.LoadSave(Value, PalDB.LoadEmbedded());
         public string Label { get; }
     }
 
@@ -63,8 +65,6 @@ namespace PalCalc.UI.ViewModel
         public Pal ModelObject { get; }
 
         public string Label => ModelObject == null ? "" : $"{ModelObject.Name} (#{ModelObject.Id})";
-
-        public static readonly PalViewModel None = new PalViewModel(null);
 
         public override bool Equals(object obj) => (obj as PalViewModel)?.Label == Label;
         public override int GetHashCode() => Label.GetHashCode();
@@ -81,8 +81,6 @@ namespace PalCalc.UI.ViewModel
 
         public string Name => ModelObject?.Name ?? "None";
 
-        public static readonly TraitViewModel None = new TraitViewModel(null);
-
         public override bool Equals(object obj) => (obj as TraitViewModel)?.Name == Name;
         public override int GetHashCode() => Name.GetHashCode();
     }
@@ -97,11 +95,11 @@ namespace PalCalc.UI.ViewModel
 
             if (underlyingSpec == null)
             {
-                TargetPal = PalViewModel.None;
-                Trait1 = TraitViewModel.None;
-                Trait2 = TraitViewModel.None;
-                Trait3 = TraitViewModel.None;
-                Trait4 = TraitViewModel.None;
+                TargetPal = null;
+                Trait1 = null;
+                Trait2 = null;
+                Trait3 = null;
+                Trait4 = null;
             }
             else
             {
@@ -109,7 +107,7 @@ namespace PalCalc.UI.ViewModel
 
                 var traitVms = underlyingSpec.Traits
                     .Select(t => new TraitViewModel(t))
-                    .Concat(Enumerable.Repeat(TraitViewModel.None, GameConstants.MaxTotalTraits - underlyingSpec.Traits.Count))
+                    .Concat(Enumerable.Repeat<TraitViewModel>(null, GameConstants.MaxTotalTraits - underlyingSpec.Traits.Count))
                     .ToArray();
 
                 Trait1 = traitVms[0];
@@ -136,8 +134,8 @@ namespace PalCalc.UI.ViewModel
         public bool IsReadOnly { get; }
 
         private List<Trait> TraitModelObjects => new List<TraitViewModel>() { Trait1, Trait2, Trait3, Trait4 }
+            .Where(t => t != null)
             .Select(t => t.ModelObject)
-            .Where(mo => mo != null)
             .OrderBy(mo => mo.Name)
             .ToList();
 

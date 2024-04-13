@@ -11,6 +11,13 @@ namespace PalCalc.UI.ViewModel
 {
     public partial class SolverControlsViewModel : ObservableObject
     {
+        public SolverControlsViewModel()
+        {
+            MaxBreedingSteps = 10;
+            MaxWildPals = 1;
+            MaxIrrelevantTraits = 1;
+        }
+
         private int maxBreedingSteps;
         public int MaxBreedingSteps
         {

@@ -16,17 +16,13 @@ using System.Windows.Shapes;
 namespace PalCalc.UI.View
 {
     /// <summary>
-    /// Interaction logic for SolverSettingsView.xaml
+    /// Interaction logic for BreedingResultListView.xaml
     /// </summary>
-    public partial class SolverControlsView : StackPanel
+    public partial class BreedingResultListView : ListBox
     {
-        public SolverControlsView()
+        public BreedingResultListView()
         {
             InitializeComponent();
         }
-
-        public event Action OnRun;
-
-        private void Run_Click(object sender, RoutedEventArgs e) => OnRun?.Invoke();
     }
 }
