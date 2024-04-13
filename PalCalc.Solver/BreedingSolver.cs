@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver
 {
-    public class Solver
+    public class BreedingSolver
     {
         // returns number of ways you can choose k combinations from a list of n
         // TODO - is this the right way to use pascal's triangle??
@@ -33,7 +33,7 @@ namespace PalCalc.Solver
         ///     Effort in estimated time to get the desired pal with the given traits. Goes by constant breeding time, ignores hatching
         ///     time, and roughly estimates time to catch wild pals (with increasing time based on paldex number).
         /// </param>
-        public Solver(GameSettings gameSettings, PalDB db, List<PalInstance> ownedPals, int maxBreedingSteps, int maxWildPals, int maxIrrelevantTraits, TimeSpan maxEffort)
+        public BreedingSolver(GameSettings gameSettings, PalDB db, List<PalInstance> ownedPals, int maxBreedingSteps, int maxWildPals, int maxIrrelevantTraits, TimeSpan maxEffort)
         {
             this.gameSettings = gameSettings;
             this.db = db;
@@ -216,15 +216,15 @@ namespace PalCalc.Solver
             return probabilityForNumTraits;
         }
 
-        public List<IPalReference> SolveFor(PalInstance targetInstance)
+        public List<IPalReference> SolveFor(PalSpecifier spec)
         {
-            if (targetInstance.Traits.Count > GameConstants.MaxTotalTraits)
+            if (spec.Traits.Count > GameConstants.MaxTotalTraits)
             {
                 throw new Exception("Target trait count cannot exceed max number of traits for a single pal");
             }
 
-            var relevantPals = RelevantInstancesForTraits(db, ownedPals, targetInstance.Traits)
-               .Where(p => p.Traits.Except(targetInstance.Traits).Count() <= maxIrrelevantTraits)
+            var relevantPals = RelevantInstancesForTraits(db, ownedPals, spec.Traits)
+               .Where(p => p.Traits.Except(spec.Traits).Count() <= maxIrrelevantTraits)
                .ToList();
 
             Console.WriteLine(
@@ -243,7 +243,7 @@ namespace PalCalc.Solver
             // may be included if they have different genders and/or different matching subsets of
             // the desired traits
 
-            bool WithinBreedingSteps(Pal pal, int maxSteps) => db.MinBreedingSteps[pal][targetInstance.Pal] <= maxSteps;
+            bool WithinBreedingSteps(Pal pal, int maxSteps) => db.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
 
             var workingSet = new WorkingSet(relevantPals.Where(pi => WithinBreedingSteps(pi.Pal, maxBreedingSteps)).Select(i => new OwnedPalReference(i)));
             if (maxWildPals > 0)
@@ -276,7 +276,7 @@ namespace PalCalc.Solver
                             .Where(parent2 =>
                             {
                                 var childPal = db.BreedingByParent[parent1.Pal][parent2.Pal].Child;
-                                return db.MinBreedingSteps[childPal][targetInstance.Pal] <= maxBreedingSteps - s - 1;
+                                return db.MinBreedingSteps[childPal][spec.Pal] <= maxBreedingSteps - s - 1;
                             })
                             .Where(parent2 => parent1.NumBredPalParticipants() + parent2.NumBredPalParticipants() < maxBreedingSteps)
                             .Where(parent2 =>
@@ -291,8 +291,8 @@ namespace PalCalc.Solver
                                 var combinedTraits = parent1.Traits.Concat(parent2.Traits);
 
 
-                                var anyRelevantFromParents = targetInstance.Traits.Intersect(combinedTraits).Any();
-                                var anyIrrelevantFromParents = combinedTraits.Except(targetInstance.Traits).Any();
+                                var anyRelevantFromParents = spec.Traits.Intersect(combinedTraits).Any();
+                                var anyIrrelevantFromParents = combinedTraits.Except(spec.Traits).Any();
 
                                 return anyRelevantFromParents || !anyIrrelevantFromParents;
 
@@ -302,7 +302,7 @@ namespace PalCalc.Solver
                                 var (preferredParent1, preferredParent2) = PreferredParentsGenders(parent1, parent2);
 
                                 var parentTraits = parent1.Traits.Concat(parent2.Traits).Distinct().ToList();
-                                var desiredParentTraits = targetInstance.Traits.Intersect(parentTraits).ToList();
+                                var desiredParentTraits = spec.Traits.Intersect(parentTraits).ToList();
 
                                 var possibleResults = new List<IPalReference>();
 
@@ -364,7 +364,7 @@ namespace PalCalc.Solver
                 }
             }
 
-            return workingSet.Content.Where(pref => pref.Pal == targetInstance.Pal && !targetInstance.Traits.Except(pref.Traits).Any()).ToList();
+            return workingSet.Content.Where(pref => pref.Pal == spec.Pal && !spec.Traits.Except(pref.Traits).Any()).ToList();
         }
     }
 }

@@ -9,49 +9,6 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel
 {
-    internal partial class SavesLocationViewModel
-    {
-        public SavesLocationViewModel(SavesLocation sl)
-        {
-            Value = sl;
-
-            Label = $"{sl.ValidSaveGames.Count()} valid saves ({sl.FolderName})";
-            SaveGames = sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sg)).ToList();
-            LastModified = SaveGames.OrderByDescending(sg => sg.LastModified).FirstOrDefault()?.LastModified;
-        }
-
-        public DateTime? LastModified { get; }
-
-        public List<SaveGameViewModel> SaveGames { get; }
-
-        public SavesLocation Value { get; }
-        public string Label { get; }
-    }
-
-    internal partial class SaveGameViewModel
-    {
-        public SaveGameViewModel(SaveGame value)
-        {
-            Value = value;
-
-            try
-            {
-                var meta = value.LevelMeta.ReadGameOptions();
-                Label = $"{meta.PlayerName} lv. {meta.PlayerLevel} in {meta.WorldName}";
-            }
-            catch (Exception ex)
-            {
-                // TODO - log exception
-                Label = $"{value.FolderName} (Unable to read metadata)";
-            }
-        }
-
-        public DateTime LastModified => Value.LastModified;
-
-        public SaveGame Value { get; }
-        public string Label { get; }
-    }
-
     internal partial class SaveSelectorViewModel : ObservableObject
     {
         [ObservableProperty]

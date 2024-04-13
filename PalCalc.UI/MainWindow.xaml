@@ -9,31 +9,33 @@
         xmlns:m="clr-namespace:PalCalc.UI.Model"
         xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
         mc:Ignorable="d"
-        Title="Pal Calc" Height="450" Width="800"
+        Title="Pal Calc" Height="450" Width="900"
         xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
         xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
-    <Window.Resources>
-
-    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="232*"/>
+            <ColumnDefinition Width="43*"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0">
-            <v:SaveSelectorView DataContext="{Binding SaveSelection}" VerticalAlignment="Top" Margin="10,0,10,0" />
-            <ComboBox ItemsSource="{Binding DB.Pals}" IsEditable="True" Margin="10,161,10,0" VerticalAlignment="Top"/>
-            <Label Content="Target Pal" HorizontalAlignment="Right" Margin="0,135,10,0" VerticalAlignment="Top" Width="230"/>
-            <Label Content="Traits" Margin="10,188,10,0" VerticalAlignment="Top"/>
-            <ComboBox ItemsSource="{Binding DB.Traits}" IsEditable="True" HorizontalAlignment="Right" Margin="0,219,10,0" VerticalAlignment="Top" Width="230"/>
-            <ComboBox ItemsSource="{Binding DB.Traits}" IsEditable="True" HorizontalAlignment="Right" Margin="0,246,10,0" VerticalAlignment="Top" Width="230"/>
-            <ComboBox ItemsSource="{Binding DB.Traits}" IsEditable="True" HorizontalAlignment="Right" Margin="0,273,10,0" VerticalAlignment="Top" Width="230"/>
-            <ComboBox ItemsSource="{Binding DB.Traits}" IsEditable="True" HorizontalAlignment="Right" Margin="0,300,10,0" VerticalAlignment="Top" Width="230"/>
-            <Button Content="Solve" Margin="195,404,15,10" Click="SolveButton_Click"/>
+        <DockPanel Grid.Column="0" Margin="10,10,10,10">
+            <GroupBox Header="Save File" DockPanel.Dock="Top">
+                <v:SaveSelectorView DataContext="{Binding SaveSelection}" />
+            </GroupBox>
 
-        </Grid>
+            <GroupBox Header="Target Pals">
+                <v:PalTargetListView DataContext="{Binding PalTargetList}" />
+            </GroupBox>
+        </DockPanel>
 
-        <v:BreedingResultView Margin="5,5,5,5" Grid.Column="1" DataContext="{Binding DisplayedResultVM}" />
+        <StackPanel Grid.Column="1">
+            <v:SolverControlsView DataContext="{Binding SolverControls}" />
+            <v:BreedingResultView DataContext="{Binding DisplayedResultVM}" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="2">
+            <v:PalTargetView DataContext="{Binding PalTarget}" />
+        </StackPanel>
     </Grid>
 </Window>

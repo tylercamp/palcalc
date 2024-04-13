@@ -1,0 +1,26 @@
+﻿<StackPanel x:Class="PalCalc.UI.View.SolverControlsView"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+            xmlns:local="clr-namespace:PalCalc.UI.View"
+            xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+            mc:Ignorable="d" 
+            xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+            Orientation="Horizontal"
+            d:DataContext="{d:DesignInstance vm:SolverControlsViewModel, IsDesignTimeCreatable=True}"
+            d:Background="White"
+            d:DesignWidth="800">
+    <StackPanel.Resources>
+        <Style TargetType="{x:Type xctk:IntegerUpDown}">
+            <Setter Property="Margin" Value="0,0,20,0"/>
+        </Style>
+    </StackPanel.Resources>
+    <Label Content="Max Breeding Steps:" />
+    <xctk:IntegerUpDown Value="{Binding MaxBreedingSteps}" />
+    <Label Content="Max Wild Pals:" />
+    <xctk:IntegerUpDown Value="{Binding MaxWildPals}" />
+    <Label Content="Max Irrelevant Traits:" />
+    <xctk:IntegerUpDown Value="{Binding MaxIrrelevantTraits}" />
+    <Button Content="Run" />
+</StackPanel>

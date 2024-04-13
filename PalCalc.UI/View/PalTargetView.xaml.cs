@@ -16,13 +16,18 @@ using System.Windows.Shapes;
 namespace PalCalc.UI.View
 {
     /// <summary>
-    /// Interaction logic for SolverOptionsView.xaml
+    /// Interaction logic for PalTargetView.xaml
     /// </summary>
-    public partial class SolverOptionsView : UserControl
+    public partial class PalTargetView : StackPanel
     {
-        public SolverOptionsView()
+        public PalTargetView()
         {
             InitializeComponent();
+        }
+
+        private void AutoCompleteComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }

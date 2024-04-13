@@ -28,6 +28,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphSharp.Controls", "Grap
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GraphSharp", "GraphSharp", "{B98DEFA3-C254-4B6D-B845-3535E2E049DA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetKit.Wpf.AutoCompleteComboBox", "DotNetKit.Wpf.AutoCompleteComboBox\DotNetKit.Wpf.AutoCompleteComboBox\DotNetKit.Wpf.AutoCompleteComboBox.csproj", "{B76DA379-784F-40FD-B531-BAE2A15C7C37}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{6632E8CF-5B76-4E86-B394-E33E91C916EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +74,10 @@ Global
 		{4DF77F25-504A-4D48-8D05-09990BB6B85A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DF77F25-504A-4D48-8D05-09990BB6B85A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DF77F25-504A-4D48-8D05-09990BB6B85A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B76DA379-784F-40FD-B531-BAE2A15C7C37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B76DA379-784F-40FD-B531-BAE2A15C7C37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B76DA379-784F-40FD-B531-BAE2A15C7C37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B76DA379-784F-40FD-B531-BAE2A15C7C37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,6 +85,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{916C2435-CB2F-4A53-87F7-FBF77E881F30} = {B98DEFA3-C254-4B6D-B845-3535E2E049DA}
 		{4DF77F25-504A-4D48-8D05-09990BB6B85A} = {B98DEFA3-C254-4B6D-B845-3535E2E049DA}
+		{B98DEFA3-C254-4B6D-B845-3535E2E049DA} = {6632E8CF-5B76-4E86-B394-E33E91C916EE}
+		{B76DA379-784F-40FD-B531-BAE2A15C7C37} = {6632E8CF-5B76-4E86-B394-E33E91C916EE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0171AB8C-D344-4A9B-BE99-146E847BFEFB}

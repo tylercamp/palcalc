@@ -20,7 +20,7 @@ namespace PalCalc.UI.ViewModel
             var latest = SavesLocation.AllLocal.SelectMany(loc => loc.ValidSaveGames).MaxBy(game => game.LastModified);
             var saveGame = Storage.LoadSave(latest, db);
 
-            var solver = new Solver.Solver(
+            var solver = new Solver.BreedingSolver(
                 gameSettings: new GameSettings(),
                 db: db,
                 ownedPals: saveGame.OwnedPals,
@@ -30,16 +30,14 @@ namespace PalCalc.UI.ViewModel
                 maxEffort: TimeSpan.FromHours(8)
             );
 
-            var targetInstance = new PalInstance
+            var targetInstance = new PalSpecifier
             {
                 Pal = "Galeclaw".ToPal(db),
-                Gender = PalGender.WILDCARD,
                 Traits = new List<Trait> {
                     "Swift".ToTrait(db),
                     "Runner".ToTrait(db),
                     "Nimble".ToTrait(db)
                 },
-                Location = null
             };
 
             DisplayedResult = solver.SolveFor(targetInstance).MaxBy(r => r.NumBredPalParticipants());

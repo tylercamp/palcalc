@@ -10,10 +10,16 @@
     <Compile Update="View\BreedingResultView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="View\PalTargetListView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\PalTargetView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\SaveSelectorView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="View\SolverOptionsView.xaml.cs">
+    <Compile Update="View\SolverControlsView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -24,10 +30,16 @@
     <Page Update="View\BreedingResultView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="View\PalTargetListView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="View\PalTargetView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="View\SaveSelectorView.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\SolverOptionsView.xaml">
+    <Page Update="View\SolverControlsView.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

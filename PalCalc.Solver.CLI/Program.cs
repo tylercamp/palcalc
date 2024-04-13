@@ -19,7 +19,7 @@ internal class Program
         var savedInstances = saveGame.Level.ReadPalInstances(db);
         Console.WriteLine("Loaded save game");
 
-        var solver = new Solver(
+        var solver = new BreedingSolver(
             gameSettings: new GameSettings(),
             db: db,
             ownedPals: savedInstances,
@@ -29,12 +29,10 @@ internal class Program
             maxEffort: TimeSpan.FromDays(7)
         );
 
-        var targetInstance = new PalInstance
+        var targetInstance = new PalSpecifier
         {
             Pal = "Ragnahawk".ToPal(db),
-            Gender = PalGender.WILDCARD,
             Traits = new List<Trait> { "Swift".ToTrait(db), "Runner".ToTrait(db), "Nimble".ToTrait(db) },
-            Location = null
         };
 
         var matches = solver.SolveFor(targetInstance);

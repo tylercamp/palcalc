@@ -49,6 +49,7 @@
         <m:BreedingGraphLayout
                 Graph="{Binding Graph}"
                 HighlightAlgorithmType="Simple"
+            
                 
                 />
     </zoom:ZoomControl>
