@@ -172,6 +172,7 @@ namespace PalCalc.GenDB
 
             public string Name => cols[0];
             public string InternalName => cols[1];
+            public bool IsPassiveTrait => cols[2] == "TRUE";
         }
 
         static void Main(string[] args)
@@ -182,6 +183,7 @@ namespace PalCalc.GenDB
                 .Skip(1)
                 .Select(l => l.Split(","))
                 .Select(cols => new TraitCsvRow(cols))
+                .Where(row => row.IsPassiveTrait)
                 .Select(row => new Trait(row.Name, row.InternalName))
                 .ToList();
 
