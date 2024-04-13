@@ -35,12 +35,12 @@
             <!-- a breeding view without any content will cause it to extend infinitely, set a
                  large max-height for XAML preview
             -->
-            <v:BreedingResultView DataContext="{Binding BreedingResults.SelectedResult}" />
+            <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
         </DockPanel>
 
         <DockPanel Grid.Column="2">
             <v:PalTargetView DataContext="{Binding PalTarget}" DockPanel.Dock="Top" />
-            <v:BreedingResultListView DataContext="{Binding BreedingResults}" />
+            <v:BreedingResultListView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
         </DockPanel>
     </Grid>
 </Window>

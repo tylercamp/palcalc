@@ -26,8 +26,11 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        public PalSpecifierViewModel InitialPalSpecifier { get; }
-        public PalSpecifierViewModel CurrentPalSpecifier { get; }
+        [ObservableProperty]
+        private PalSpecifierViewModel initialPalSpecifier;
+
+        [ObservableProperty]
+        private PalSpecifierViewModel currentPalSpecifier;
 
         public List<PalViewModel> AvailablePals => AllPals;
         public List<TraitViewModel> AvailableTraits => AllTraits;

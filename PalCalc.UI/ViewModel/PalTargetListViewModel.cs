@@ -21,6 +21,7 @@ namespace PalCalc.UI.ViewModel
             };
 
             Targets = new ReadOnlyObservableCollection<PalSpecifierViewModel>(targets);
+            SelectedTarget = PalSpecifierViewModel.New;
         }
 
         public PalTargetListViewModel(IEnumerable<PalSpecifierViewModel> existingSpecs)
@@ -34,12 +35,14 @@ namespace PalCalc.UI.ViewModel
                 targets.Add(spec);
 
             Targets = new ReadOnlyObservableCollection<PalSpecifierViewModel>(targets);
+            SelectedTarget = PalSpecifierViewModel.New;
         }
 
         private ObservableCollection<PalSpecifierViewModel> targets;
         public ReadOnlyObservableCollection<PalSpecifierViewModel> Targets { get; }
 
-        public PalSpecifierViewModel SelectedTarget { get; set; } = null;
+        [ObservableProperty]
+        private PalSpecifierViewModel selectedTarget;
 
         public void Add(PalSpecifierViewModel value) => targets.Insert(1, value);
     }

@@ -47,10 +47,9 @@
     </UserControl.Resources>
     <zoom:ZoomControl Grid.Column="1" Background="Gray" Zoom="2">
         <m:BreedingGraphLayout
-                Graph="{Binding Graph}"
-                HighlightAlgorithmType="Simple"
-            
-                
-                />
+            Graph="{Binding Graph}"
+            AnimationLength="0"
+            IsAnimationEnabled="False"
+        />
     </zoom:ZoomControl>
 </UserControl>

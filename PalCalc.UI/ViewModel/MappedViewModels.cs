@@ -143,17 +143,28 @@ namespace PalCalc.UI.ViewModel
             ? new PalSpecifier() { Pal = TargetPal.ModelObject, Traits = TraitModelObjects }
             : null;
 
+        [NotifyPropertyChangedFor(nameof(Label))]
         [ObservableProperty]
         private PalViewModel targetPal;
 
+        [NotifyPropertyChangedFor(nameof(Label))]
         [ObservableProperty]
         private TraitViewModel trait1;
+
+        [NotifyPropertyChangedFor(nameof(Label))]
         [ObservableProperty]
         private TraitViewModel trait2;
+
+        [NotifyPropertyChangedFor(nameof(Label))]
         [ObservableProperty]
         private TraitViewModel trait3;
+
+        [NotifyPropertyChangedFor(nameof(Label))]
         [ObservableProperty]
         private TraitViewModel trait4;
+
+        [ObservableProperty]
+        private BreedingResultListViewModel currentResults;
 
         public string Label
         {
@@ -164,7 +175,34 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(new PalSpecifier() { Pal = TargetPal.ModelObject, Traits = TraitModelObjects });
+        public override bool Equals(object obj)
+        {
+            var psvm = obj as PalSpecifierViewModel;
+            if (psvm == null) return false;
+
+            return psvm.TargetPal == TargetPal && psvm.Trait1 == Trait1 && psvm.Trait2 == Trait2 && psvm.Trait3 == Trait3 && psvm.Trait4 == Trait4;
+        }
+
+        public override int GetHashCode() => HashCode.Combine(
+            TargetPal,
+            Trait1,
+            Trait2,
+            Trait3,
+            Trait4
+        );
+
+        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(new PalSpecifier() { Pal = TargetPal.ModelObject, Traits = TraitModelObjects }) { CurrentResults = CurrentResults };
+        public void CopyFrom(PalSpecifierViewModel other)
+        {
+            if (IsReadOnly) throw new Exception();
+
+            TargetPal = other.TargetPal;
+            Trait1 = other.Trait1;
+            Trait2 = other.Trait2;
+            Trait3 = other.Trait3;
+            Trait4 = other.Trait4;
+            CurrentResults = other.CurrentResults;
+        }
 
         public static readonly PalSpecifierViewModel New = new PalSpecifierViewModel(null, true);
     }

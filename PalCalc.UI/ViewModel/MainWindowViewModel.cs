@@ -24,8 +24,19 @@ namespace PalCalc.UI.ViewModel
             SaveSelection = new SaveSelectorViewModel(SavesLocation.AllLocal);
             SolverControls = new SolverControlsViewModel();
             PalTargetList = new PalTargetListViewModel();
-            PalTarget = new PalTargetViewModel();
-            BreedingResults = new BreedingResultListViewModel();
+
+            PalTargetList.PropertyChanged += PalTargetList_PropertyChanged;
+            UpdatePalTarget();
+        }
+
+        private void UpdatePalTarget() => PalTarget = new PalTargetViewModel(PalTargetList.SelectedTarget);
+
+        private void PalTargetList_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PalTargetList.SelectedTarget))
+            {
+                UpdatePalTarget();
+            }
         }
 
         public void RunSolver()
@@ -36,14 +47,26 @@ namespace PalCalc.UI.ViewModel
             var solver = SolverControls.ConfiguredSolver(SaveSelection.SelectedGame.CachedValue.OwnedPals);
             var results = solver.SolveFor(currentSpec);
 
-            BreedingResults.Results = results.Select(r => new BreedingResultViewModel(r)).ToList();
+            PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(r)).ToList() };
+            if (PalTarget.InitialPalSpecifier == null)
+            {
+                PalTargetList.Add(PalTarget.CurrentPalSpecifier);
+                PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
+
+                PalTarget.InitialPalSpecifier = PalTarget.CurrentPalSpecifier;
+            }
+            else
+            {
+                PalTarget.InitialPalSpecifier.CopyFrom(PalTarget.CurrentPalSpecifier);
+            }
         }
 
         public SaveSelectorViewModel SaveSelection { get; private set; }
         public SolverControlsViewModel SolverControls { get; private set; }
         public PalTargetListViewModel PalTargetList { get; private set; }
-        public PalTargetViewModel PalTarget { get; private set; }
-        public BreedingResultListViewModel BreedingResults { get; private set; }
+
+        [ObservableProperty]
+        private PalTargetViewModel palTarget;
 
         public PalDB DB => db;
     }
