@@ -45,5 +45,11 @@ namespace PalCalc.UI.ViewModel
         private PalSpecifierViewModel selectedTarget;
 
         public void Add(PalSpecifierViewModel value) => targets.Insert(1, value);
+
+        public void Replace(PalSpecifierViewModel oldValue, PalSpecifierViewModel newValue)
+        {
+            var oldIndex = targets.IndexOf(oldValue);
+            targets[oldIndex] = newValue;
+        }
     }
 }

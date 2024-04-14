@@ -69,7 +69,11 @@ namespace PalCalc.UI.ViewModel
             UpdatePalTarget();
         }
 
-        private void UpdatePalTarget() => PalTarget = new PalTargetViewModel(PalTargetList.SelectedTarget);
+        private void UpdatePalTarget()
+        {
+            if (PalTargetList.SelectedTarget !=  null)
+                PalTarget = new PalTargetViewModel(PalTargetList.SelectedTarget);
+        }
 
         private void SaveSelection_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -103,7 +107,8 @@ namespace PalCalc.UI.ViewModel
             }
             else
             {
-                PalTarget.InitialPalSpecifier.CopyFrom(PalTarget.CurrentPalSpecifier);
+                PalTargetList.Replace(PalTarget.InitialPalSpecifier, PalTarget.CurrentPalSpecifier);
+                PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
             }
 
             var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
