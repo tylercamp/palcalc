@@ -24,11 +24,11 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 
 ## Main TODOs
 
-- Add progress bar when solving is running, don't freeze the window during solving
 - Save solver results
-- Allow loading from save files from custom locations
-- Associate solver results with save file and save-last-modified, show icon if save file was updated
 - Show total time required
+- Associate solver results with save file and save-last-modified, show icon if save file was updated
+- Add progress bar when solving is running, don't freeze the window during solving
+- Allow loading from save files from custom locations
 - Disallow changes to list boxes + input fields while solving is running
 - Game settings (breeding time, multiple breeding farms)
 	- Save game settings + associate with save file
@@ -42,6 +42,8 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 
 ## Eventual TODOs
 - Add "About" window for licenses + references
+- Gracefully handle missing references to pals, traits, and pal instances
+- Notify when a pal involved in a breeding path is no longer available in the source save
 - Fix tree layout algorithm
 - Option to delete entries from list of target pals
 - Allow solving for multiple pals at once

@@ -5,7 +5,7 @@
          xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
          xmlns:local="clr-namespace:PalCalc.UI.View"
          xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
-         ItemsSource="{Binding Targets}" SelectedValue="{Binding SelectedTarget}"
+         ItemsSource="{Binding Targets}" SelectedValue="{Binding SelectedTarget, Mode=TwoWay}"
          mc:Ignorable="d" 
          d:DataContext="{d:DesignInstance vm:PalTargetListViewModel, IsDesignTimeCreatable=True}"
          d:Background="White"

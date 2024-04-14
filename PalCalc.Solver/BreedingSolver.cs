@@ -252,7 +252,7 @@ namespace PalCalc.Solver
                     db.Pals
                         .Where(p => !relevantPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, maxBreedingSteps))
-                        .SelectMany(p => Enumerable.Range(0, maxIrrelevantTraits).Select(numTraits => new WildcardPalReference(p, numTraits)))
+                        .SelectMany(p => Enumerable.Range(0, maxIrrelevantTraits).Select(numTraits => new WildPalReference(p, numTraits)))
                         .Where(pi => pi.BreedingEffort <= maxEffort)
                 );
             }

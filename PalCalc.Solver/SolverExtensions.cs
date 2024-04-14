@@ -16,7 +16,7 @@ namespace PalCalc.Solver
             {
                 case BredPalReference bpr: return NumWildPalParticipants(bpr.Parent1) + NumWildPalParticipants(bpr.Parent2);
                 case OwnedPalReference opr: return 0;
-                case WildcardPalReference wpr: return 1;
+                case WildPalReference wpr: return 1;
                 default: throw new Exception($"Unhandled pal reference type {pref.GetType()}");
             }
         }

@@ -35,6 +35,8 @@ namespace PalCalc.Solver
             this.instance = instance;
         }
 
+        public PalInstance UnderlyingInstance => instance;
+
         public Pal Pal => instance.Pal;
 
         public List<Trait> Traits => instance.Traits;
@@ -55,9 +57,9 @@ namespace PalCalc.Solver
         public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({Traits.TraitsListToString()}) in {Location}";
     }
 
-    public class WildcardPalReference : IPalReference
+    public class WildPalReference : IPalReference
     {
-        public WildcardPalReference(Pal pal, int numTraits)
+        public WildPalReference(Pal pal, int numTraits)
         {
             Pal = pal;
             SelfBreedingEffort = GameConstants.TimeToCatch(pal) / GameConstants.TraitWildAtMostN[numTraits];
@@ -65,7 +67,7 @@ namespace PalCalc.Solver
             Gender = PalGender.WILDCARD;
         }
 
-        private WildcardPalReference(Pal pal)
+        private WildPalReference(Pal pal)
         {
             Pal = pal;
         }
@@ -98,7 +100,7 @@ namespace PalCalc.Solver
 
             if (gender == PalGender.WILDCARD) return this;
 
-            return new WildcardPalReference(Pal)
+            return new WildPalReference(Pal)
             {
                 SelfBreedingEffort = SelfBreedingEffort,
                 Gender = gender,
@@ -136,7 +138,11 @@ namespace PalCalc.Solver
             Gender = PalGender.WILDCARD;
             if (traitsProbability <= 0) AvgRequiredBreedings = int.MaxValue;
             else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / traitsProbability);
+
+            TraitsProbability = traitsProbability;
         }
+
+        public float TraitsProbability { get; private set; }
 
         public Pal Pal { get; private set; }
         public IPalReference Parent1 { get; private set; }
@@ -176,7 +182,8 @@ namespace PalCalc.Solver
                     return new BredPalReference(gameSettings, Pal, Parent1, Parent2, Traits)
                     {
                         AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings/ db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
-                        Gender = gender
+                        Gender = gender,
+                        TraitsProbability = TraitsProbability,
                     };
                 }
 
@@ -184,7 +191,8 @@ namespace PalCalc.Solver
                 return new BredPalReference(gameSettings, Pal, Parent1, Parent2, Traits)
                 {
                     AvgRequiredBreedings = AvgRequiredBreedings * 2,
-                    Gender = gender
+                    Gender = gender,
+                    TraitsProbability = TraitsProbability,
                 };
             }
             else
@@ -193,7 +201,8 @@ namespace PalCalc.Solver
                 return new BredPalReference(gameSettings, Pal, Parent1, Parent2, Traits)
                 {
                     AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / genderProbability),
-                    Gender = gender
+                    Gender = gender,
+                    TraitsProbability = TraitsProbability,
                 };
             }
         }

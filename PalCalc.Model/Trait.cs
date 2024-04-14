@@ -19,7 +19,8 @@ namespace PalCalc.Model
 
         public override string ToString() => Name;
 
-        public override bool Equals(object obj) => ReferenceEquals(this, obj);
+        public override bool Equals(object obj) => (obj as Trait)?.InternalName == InternalName;
+        public override int GetHashCode() => InternalName.GetHashCode();
     }
 
     public class RandomTrait : Trait

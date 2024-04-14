@@ -41,7 +41,7 @@ namespace PalCalc.Solver
             {
                 switch (PalRef)
                 {
-                    case WildcardPalReference wild:
+                    case WildPalReference wild:
                         yield return $"Wild {wild.Pal.Name}";
                         yield return $"{wild.Gender} gender w/ up to {wild.Traits.Count} random traits";
                         break;
@@ -110,7 +110,7 @@ namespace PalCalc.Solver
                 case BredPalReference bpr:
                     return new BredPalNode(bpr, BuildNode(bpr.Parent1), BuildNode(bpr.Parent2));
 
-                case WildcardPalReference:
+                case WildPalReference:
                 case OwnedPalReference:
                     return new DirectPalNode(pref);
 

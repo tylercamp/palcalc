@@ -66,8 +66,8 @@ namespace PalCalc.UI.ViewModel
 
         public string Label => ModelObject == null ? "" : $"{ModelObject.Name} (#{ModelObject.Id})";
 
-        public override bool Equals(object obj) => (obj as PalViewModel)?.Label == Label;
-        public override int GetHashCode() => Label.GetHashCode();
+        public override bool Equals(object obj) => ModelObject.Equals((obj as PalViewModel)?.ModelObject);
+        public override int GetHashCode() => ModelObject.GetHashCode();
     }
 
     public class TraitViewModel
@@ -81,8 +81,8 @@ namespace PalCalc.UI.ViewModel
 
         public string Name => ModelObject?.Name ?? "None";
 
-        public override bool Equals(object obj) => (obj as TraitViewModel)?.Name == Name;
-        public override int GetHashCode() => Name.GetHashCode();
+        public override bool Equals(object obj) => ModelObject.Equals((obj as TraitViewModel)?.ModelObject);
+        public override int GetHashCode() => ModelObject.GetHashCode();
     }
 
     public partial class PalSpecifierViewModel : ObservableObject

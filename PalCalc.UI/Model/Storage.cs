@@ -13,6 +13,7 @@ namespace PalCalc.UI.Model
     {
         public static string CachePath => "cache";
         public static string SaveCachePath => $"{CachePath}/saves";
+        public static string SaveFileDataPath(SaveGame forSaveFile) => $"data/results/{CachedSaveGame.IdentifierFor(forSaveFile)}";
 
         private static bool didInit = false;
         private static void Init()
@@ -26,6 +27,8 @@ namespace PalCalc.UI.Model
         }
 
         private static Dictionary<string, CachedSaveGame> InMemorySaves = new Dictionary<string, CachedSaveGame>();
+
+
 
         public static CachedSaveGame LoadSave(SaveGame save, PalDB db)
         {

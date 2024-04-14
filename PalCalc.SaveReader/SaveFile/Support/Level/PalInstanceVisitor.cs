@@ -49,7 +49,13 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
                 var characterId = vals[".CharacterID"] as string;
 
-                if (characterId.StartsWith("Hunter_") || characterId.StartsWith("SalesPerson_"))
+                if (
+                    characterId.StartsWith("Hunter_") ||
+                    characterId.StartsWith("SalesPerson_") ||
+                    !vals.ContainsKey(".Gender") ||
+                    !vals.ContainsKey(".SlotID.ContainerId.ID") ||
+                    !vals.ContainsKey(".SlotID.SlotIndex")
+                )
                 {
                     pendingInstance = null;
                     return;

@@ -14,8 +14,9 @@ namespace PalCalc.Model
         public static Pal ToPal(this PalId id, PalDB db) => db.PalsById[id];
         public static Pal ToPal(this PalId id, IEnumerable<Pal> pals) => pals.Single(p => p.Id == id);
 
-        public static Trait ToTrait(this string s, PalDB db) => db.TraitsByName[s];
-        public static Trait InternalToTrait(this string s, PalDB db) => db.Traits.Single(t => t.InternalName == s);
+        private static Trait RAND_REF = new RandomTrait();
+        public static Trait ToTrait(this string s, PalDB db) => s == RAND_REF.Name ? new RandomTrait() : db.TraitsByName[s];
+        public static Trait InternalToTrait(this string s, PalDB db) => s == RAND_REF.InternalName ? new RandomTrait() : db.Traits.Single(t => t.InternalName == s);
 
         public static PalGender OppositeGender(this PalGender gender)
         {
