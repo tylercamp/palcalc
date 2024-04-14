@@ -1,9 +1,4 @@
 ﻿using PalCalc.SaveReader.FArchive;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile
 {
@@ -26,13 +21,25 @@ namespace PalCalc.SaveReader.SaveFile
         {
             var valuesVisitor = new ValueCollectingVisitor(".SaveData", ".WorldName", ".HostPlayerName", ".HostPlayerLevel");
             VisitGvas(valuesVisitor);
-
-            return new GameMeta
+            try
             {
-                WorldName = (string)valuesVisitor.Result[".WorldName"],
-                PlayerName = (string)valuesVisitor.Result[".HostPlayerName"],
-                PlayerLevel = (int)valuesVisitor.Result[".HostPlayerLevel"],
-            };
+                return new GameMeta{
+                    WorldName = (string)valuesVisitor.Result[".WorldName"],
+                    PlayerName = (string)valuesVisitor.Result[".HostPlayerName"],
+                    PlayerLevel = (int)valuesVisitor.Result[".HostPlayerLevel"]
+                };
+            }
+            catch (Exception)
+            {
+                return new GameMeta
+                {
+                    WorldName = "Multiplayer Game",
+                    PlayerName = "All Players",
+                    PlayerLevel = 50
+                };
+            }
+
+
         }
     }
 }
