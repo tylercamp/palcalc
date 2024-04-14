@@ -23,7 +23,14 @@ namespace PalCalc.Model
         public override int GetHashCode() => InternalName.GetHashCode();
     }
 
-    public class RandomTrait : Trait
+    public interface IUnknownTrait { }
+
+    public class UnrecognizedTrait : Trait, IUnknownTrait
+    {
+        public UnrecognizedTrait(string internalName) : base($"'{internalName}' (unrecognized)", internalName) { }
+    }
+
+    public class RandomTrait : Trait, IUnknownTrait
     {
         public RandomTrait() : base("(Random)", "__VIRT_RAND__") { }
     }

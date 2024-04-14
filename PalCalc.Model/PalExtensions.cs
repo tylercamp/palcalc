@@ -15,8 +15,17 @@ namespace PalCalc.Model
         public static Pal ToPal(this PalId id, IEnumerable<Pal> pals) => pals.Single(p => p.Id == id);
 
         private static Trait RAND_REF = new RandomTrait();
-        public static Trait ToTrait(this string s, PalDB db) => s == RAND_REF.Name ? new RandomTrait() : db.TraitsByName[s];
-        public static Trait InternalToTrait(this string s, PalDB db) => s == RAND_REF.InternalName ? new RandomTrait() : db.Traits.Single(t => t.InternalName == s);
+        public static Trait ToTrait(this string s, PalDB db)
+        {
+            if (s == RAND_REF.Name) return new RandomTrait();
+            else if (db.TraitsByName.ContainsKey(s)) return db.TraitsByName[s];
+            else return new UnrecognizedTrait(s);
+        }
+        public static Trait InternalToTrait(this string s, PalDB db)
+        {
+            if (s == RAND_REF.InternalName) return new RandomTrait();
+            else return db.Traits.SingleOrDefault(t => t.InternalName == s) ?? new UnrecognizedTrait(s);
+        }
 
         public static PalGender OppositeGender(this PalGender gender)
         {
@@ -36,26 +45,32 @@ namespace PalCalc.Model
 
             if (thisTraits.Count != otherTraits.Count) return false;
 
-            var thisNonRandom = thisTraits.Where(t => t is not RandomTrait);
-            var otherNonRandom = otherTraits.Where(t => t is not RandomTrait);
+            var thisDefinite = thisTraits.Where(t => t is not IUnknownTrait);
+            var otherDefinite = otherTraits.Where(t => t is not IUnknownTrait);
 
-            var thisRandomCount = thisTraits.Count(t => t is RandomTrait);
-            var otherRandomCount = otherTraits.Count(t => t is RandomTrait);
+            var thisRandom = thisTraits.Where(t => t is RandomTrait);
+            var otherRandom = otherTraits.Where(t => t is RandomTrait);
 
-            return thisRandomCount == otherRandomCount && !thisNonRandom.Except(otherNonRandom).Any();
+            var thisUnrecognized = thisTraits.Where(t => t is UnrecognizedTrait);
+            var otherUnrecognized = otherTraits.Where(t => t is UnrecognizedTrait);
+
+            return thisRandom.Count() == otherRandom.Count() && thisUnrecognized.Count() == otherUnrecognized.Count() && !thisDefinite.Except(otherDefinite).Any();
         }
 
         public static string TraitsListToString(this IEnumerable<Trait> traits)
         {
             if (!traits.Any()) return "no traits";
 
-            var nonRandom = traits.Where(t => t is not RandomTrait);
-            var randomCount = traits.Count(t => t is RandomTrait);
+            var definite = traits.Where(t => t is not IUnknownTrait);
+            var random = traits.Where(t => t is RandomTrait);
+            var unrecognized = traits.Where(t => t is UnrecognizedTrait);
 
-            var nonRandomString = string.Join(", ", nonRandom);
-            if (randomCount == 0) return nonRandomString;
-            
-            return $"{nonRandomString}, {randomCount} random";
+            var parts = new List<string>();
+            if (definite.Any()) parts.Add(string.Join(", ", definite));
+            if (random.Any()) parts.Add($"{random.Count()} random");
+            if (unrecognized.Any()) parts.Add($"{unrecognized.Count()} unrecognized");
+
+            return string.Join(", ", parts);
         }
     }
 }
