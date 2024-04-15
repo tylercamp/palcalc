@@ -24,6 +24,7 @@ namespace PalCalc.UI.ViewModel
         private Dictionary<SaveGame, PalTargetListViewModel> targetsBySaveFile;
         private LoadingSaveFileModal loadingSaveModal = null;
         private Dispatcher dispatcher;
+        private CancellationTokenSource solverTokenSource;
 
         // https://stackoverflow.com/a/73181682
         private static void AllowUIToUpdate()
@@ -152,33 +153,46 @@ namespace PalCalc.UI.ViewModel
             {
                 dispatcher.Invoke(() => IsEditable = false);
 
-                var results = solver.SolveFor(currentSpec);
+                solverTokenSource = new CancellationTokenSource();
+                var results = solver.SolveFor(currentSpec, solverTokenSource.Token);
 
                 dispatcher.Invoke(() =>
                 {
-                    PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(r)).ToList() };
-                    if (PalTarget.InitialPalSpecifier == null)
+                    if (!solverTokenSource.IsCancellationRequested)
                     {
-                        PalTargetList.Add(PalTarget.CurrentPalSpecifier);
-                        PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
+                        PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(r)).ToList() };
+                        if (PalTarget.InitialPalSpecifier == null)
+                        {
+                            PalTargetList.Add(PalTarget.CurrentPalSpecifier);
+                            PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
+                        }
+                        else
+                        {
+                            PalTargetList.Replace(PalTarget.InitialPalSpecifier, PalTarget.CurrentPalSpecifier);
+                            PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
+                        }   
+
+                        var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
+                        if (!Directory.Exists(outputFolder))
+                            Directory.CreateDirectory(outputFolder);
+
+                        var outputFile = Path.Join(outputFolder, "pal-targets.json");
+                        var converter = new PalTargetListViewModelConverter(db, new GameSettings());
+                        File.WriteAllText(outputFile, JsonConvert.SerializeObject(PalTargetList, converter));
                     }
-                    else
-                    {
-                        PalTargetList.Replace(PalTarget.InitialPalSpecifier, PalTarget.CurrentPalSpecifier);
-                        PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
-                    }
 
-                    var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
-                    if (!Directory.Exists(outputFolder))
-                        Directory.CreateDirectory(outputFolder);
-
-                    var outputFile = Path.Join(outputFolder, "pal-targets.json");
-                    var converter = new PalTargetListViewModelConverter(db, new GameSettings());
-                    File.WriteAllText(outputFile, JsonConvert.SerializeObject(PalTargetList, converter));
-
+                    solverTokenSource = null;
                     IsEditable = true;
                 });
             });
+        }
+
+        public void CancelSolver()
+        {
+            if (solverTokenSource != null)
+            {
+                solverTokenSource.Cancel();
+            }
         }
 
         private void Solver_SolverStateUpdated(SolverStatus obj)
@@ -231,9 +245,19 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private string solverStatusMsg;
 
-        [NotifyPropertyChangedFor(nameof(ProgressBarVisibility))]
-        [ObservableProperty]
         private bool isEditable = true;
+        public bool IsEditable
+        {
+            get => isEditable;
+            set
+            {
+                if (SetProperty(ref isEditable, value))
+                {
+                    OnPropertyChanged(nameof(ProgressBarVisibility));
+                    SolverControls.CanRunSolver = value;
+                }
+            }
+        }
 
         public Visibility ProgressBarVisibility => IsEditable ? Visibility.Collapsed : Visibility.Visible;
 

@@ -13,7 +13,7 @@
         xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
         xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
-    <Grid IsEnabled="{Binding IsEditable}">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="Auto"/>
@@ -21,7 +21,7 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="43*"/>
         </Grid.ColumnDefinitions>
-        <DockPanel Grid.Column="0" Margin="10,10,10,10">
+        <DockPanel Grid.Column="0" Margin="10,10,10,10" IsEnabled="{Binding IsEditable}">
             <GroupBox Header="Save File" DockPanel.Dock="Top">
                 <v:SaveSelectorView DataContext="{Binding SaveSelection}" />
             </GroupBox>
@@ -34,7 +34,7 @@
         <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
         <DockPanel Grid.Column="2">
-            <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" OnRun="SolverControlsView_OnRun" />
+            <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" OnRun="SolverControlsView_OnRun" OnCancel="SolverControlsView_OnCancel" />
 
             <Grid DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
                 <ProgressBar Value="{Binding SolverProgress}" />
@@ -44,12 +44,12 @@
             <!-- a breeding view without any content will cause it to extend infinitely, set a
                  large max-height for XAML preview
             -->
-            <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
+            <v:BreedingResultView IsEnabled="{Binding IsEditable}" DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
         </DockPanel>
 
         <GridSplitter Grid.Column="3" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
-        <DockPanel Grid.Column="4">
+        <DockPanel Grid.Column="4" IsEnabled="{Binding IsEditable}">
             <v:PalTargetView DataContext="{Binding PalTarget}" DockPanel.Dock="Top" />
             <v:BreedingResultListView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
         </DockPanel>

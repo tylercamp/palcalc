@@ -22,11 +22,11 @@ namespace PalCalc.Solver
         public WorkingSet(IEnumerable<IPalReference> initialContent)
         {
             content = new HashSet<IPalReference>();
-            AddFrom(initialContent);
+            AddFrom(initialContent, CancellationToken.None);
         }
 
         // returns the number of entries added/updated
-        public int AddFrom(IEnumerable<IPalReference> newRefs)
+        public int AddFrom(IEnumerable<IPalReference> newRefs, CancellationToken token)
         {
             // since we know the breeding effort of each potential instance, we can ignore new instances
             // with higher effort than existing known instances
@@ -35,11 +35,16 @@ namespace PalCalc.Solver
             var numChanged = 0;
             foreach (var newInst in PruneCollection(newRefs))
             {
-                var existingInstances = content.Where(pi =>
-                    pi.Pal == newInst.Pal &&
-                    pi.Gender == newInst.Gender &&
-                    pi.Traits.EqualsTraits(newInst.Traits)
-                ).ToList();
+                var existingInstances = content
+                    .TakeWhile(_ => !token.IsCancellationRequested)
+                    .Where(pi =>
+                        pi.Pal == newInst.Pal &&
+                        pi.Gender == newInst.Gender &&
+                        pi.Traits.EqualsTraits(newInst.Traits)
+                    )
+                    .ToList();
+
+                if (token.IsCancellationRequested) return numChanged;
 
                 var existingInst = existingInstances.SingleOrDefault();
 
@@ -62,7 +67,7 @@ namespace PalCalc.Solver
             return numChanged;
         }
 
-        public int AddFrom(WorkingSet ws) => AddFrom(ws.Content);
+        public int AddFrom(WorkingSet ws, CancellationToken token) => AddFrom(ws.Content, token);
 
         // gives a new, reduced collection which only includes the "most optimal" / lowest-effort
         // reference for each instance spec (gender, traits, etc.)

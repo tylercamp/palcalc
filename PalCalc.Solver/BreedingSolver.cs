@@ -14,6 +14,7 @@ namespace PalCalc.Solver
         Breeding,
         Simplifying,
         Finished,
+        Canceled,
     }
 
     public class SolverStatus
@@ -233,7 +234,7 @@ namespace PalCalc.Solver
             return probabilityForNumTraits;
         }
 
-        public List<IPalReference> SolveFor(PalSpecifier spec)
+        public List<IPalReference> SolveFor(PalSpecifier spec, CancellationToken token)
         {
             if (spec.Traits.Count > GameConstants.MaxTotalTraits)
             {
@@ -273,7 +274,8 @@ namespace PalCalc.Solver
                         .Where(p => !relevantPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, maxBreedingSteps))
                         .SelectMany(p => Enumerable.Range(0, maxIrrelevantTraits).Select(numTraits => new WildPalReference(p, numTraits)))
-                        .Where(pi => pi.BreedingEffort <= maxEffort)
+                        .Where(pi => pi.BreedingEffort <= maxEffort),
+                    token
                 );
             }
 
@@ -281,12 +283,15 @@ namespace PalCalc.Solver
 
             for (int s = 0; s < maxBreedingSteps; s++)
             {
+                if (token.IsCancellationRequested) break;
+
                 statusMsg.CurrentPhase = SolverPhase.Breeding;
                 statusMsg.CurrentStepIndex = s;
                 SolverStateUpdated?.Invoke(statusMsg);
 
                 Console.WriteLine($"Starting search step #{s + 1} with {workingSet.Content.Count} relevant pals");
                 var newInstances = Enumerable.Zip(workingSet.Content, Enumerable.Range(0, workingSet.Content.Count))
+                    .TakeWhile(_ => !token.IsCancellationRequested)
                     .AsParallel()
                     .SelectMany(pair =>
                     {
@@ -294,6 +299,7 @@ namespace PalCalc.Solver
 
                         var res = workingSet.Content
                             .Skip(idx + 1) // only search (p1,p2) pairs, not (p1,p2) and (p2,p1)
+                            .TakeWhile(_ => !token.IsCancellationRequested)
                             .Where(i => i.IsCompatibleGender(parent1.Gender))
                             .Where(i => i != null)
                             .Where(parent2 => parent1.NumWildPalParticipants() + parent2.NumWildPalParticipants() <= maxWildPals)
@@ -379,10 +385,11 @@ namespace PalCalc.Solver
 
                 Console.WriteLine("Filtering {0} potential new instances", newInstances.Count);
 
+                if (token.IsCancellationRequested) break;
                 statusMsg.CurrentPhase = SolverPhase.Simplifying;
                 SolverStateUpdated?.Invoke(statusMsg);
 
-                var numChanged = workingSet.AddFrom(newInstances);
+                var numChanged = workingSet.AddFrom(newInstances, token);
 
                 if (numChanged == 0)
                 {

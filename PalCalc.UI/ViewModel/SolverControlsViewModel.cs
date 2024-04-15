@@ -39,6 +39,12 @@ namespace PalCalc.UI.ViewModel
             set => SetProperty(ref maxIrrelevantTraits, Math.Clamp(value, 0, GameConstants.MaxTotalTraits));
         }
 
+        [NotifyPropertyChangedFor(nameof(CanCancelSolver))]
+        [ObservableProperty]
+        private bool canRunSolver = true;
+
+        public bool CanCancelSolver => !CanRunSolver;
+
         public BreedingSolver ConfiguredSolver(List<PalInstance> pals) => new BreedingSolver(
             new GameSettings(),
             PalDB.LoadEmbedded(),

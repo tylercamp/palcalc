@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel
@@ -40,7 +41,7 @@ namespace PalCalc.UI.ViewModel
                 },
             };
 
-            DisplayedResult = solver.SolveFor(targetInstance).MaxBy(r => r.NumBredPalParticipants());
+            DisplayedResult = solver.SolveFor(targetInstance, CancellationToken.None).MaxBy(r => r.NumBredPalParticipants());
         }
 
         public BreedingResultViewModel(IPalReference displayedResult)

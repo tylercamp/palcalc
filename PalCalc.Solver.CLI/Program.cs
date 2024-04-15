@@ -35,7 +35,7 @@ internal class Program
             Traits = new List<Trait> { "Swift".ToTrait(db), "Runner".ToTrait(db), "Nimble".ToTrait(db) },
         };
 
-        var matches = solver.SolveFor(targetInstance);
+        var matches = solver.SolveFor(targetInstance, CancellationToken.None);
 
         Console.WriteLine("Took {0}", TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds));
 

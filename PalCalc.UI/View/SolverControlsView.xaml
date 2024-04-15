@@ -16,10 +16,14 @@
         </Style>
     </WrapPanel.Resources>
     <Label Content="Max Breeding Steps:" />
-    <xctk:IntegerUpDown Value="{Binding MaxBreedingSteps}" />
+    <xctk:IntegerUpDown Value="{Binding MaxBreedingSteps}" IsEnabled="{Binding CanRunSolver}" />
     <Label Content="Max Wild Pals:" />
-    <xctk:IntegerUpDown Value="{Binding MaxWildPals}" />
+    <xctk:IntegerUpDown Value="{Binding MaxWildPals}" IsEnabled="{Binding CanRunSolver}" />
     <Label Content="Max Irrelevant Traits:" />
-    <xctk:IntegerUpDown Value="{Binding MaxIrrelevantTraits}" />
-    <Button Content="Run" Height="20" Click="Run_Click" />
+    <xctk:IntegerUpDown Value="{Binding MaxIrrelevantTraits}" IsEnabled="{Binding CanRunSolver}" />
+
+    <StackPanel Orientation="Horizontal">
+        <Button Content="Run" Height="20" Click="Run_Click" Margin="0,0,20,0" IsEnabled="{Binding CanRunSolver}" />
+        <Button Content="Cancel" Height="20" Click="Cancel_Click" IsEnabled="{Binding CanCancelSolver}" />
+    </StackPanel>
 </WrapPanel>

@@ -1,6 +1,7 @@
 ﻿using PalCalc.UI.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +33,18 @@ namespace PalCalc.UI
         private void SolverControlsView_OnRun()
         {
             ViewModel.RunSolver();
+        }
+
+        private void SolverControlsView_OnCancel()
+        {
+            ViewModel.CancelSolver();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            ViewModel.CancelSolver();
         }
     }
 }
