@@ -24,12 +24,9 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 
 ## Main TODOs
 
-- ~~Save solver results~~
 - Show total time required
 - Associate solver results with save file and save-last-modified, show icon if save file was updated
-- ~~Add progress bar when solving is running, don't freeze the window during solving~~
-- Allow loading from save files from custom locations
-- ~~Disallow changes to list boxes + input fields while solving is running~~
+- Allow loading from save files in custom locations
 - Game settings (breeding time, multiple breeding farms)
 	- Save game settings + associate with save file
 - Proper packaging + release
@@ -39,6 +36,9 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 	- Errors when reading save files
 	- Corrupted cached save data
 	- Corrupted solver data
+- ~~Disallow changes to list boxes + input fields while solving is running~~
+- ~~Add progress bar when solving is running, don't freeze the window during solving~~
+- ~~Save solver results~~
 
 ## Eventual TODOs
 - Add "About" window for licenses + references
