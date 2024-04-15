@@ -28,8 +28,6 @@ namespace PalCalc.UI.Model
 
         private static Dictionary<string, CachedSaveGame> InMemorySaves = new Dictionary<string, CachedSaveGame>();
 
-
-
         public static CachedSaveGame LoadSave(SaveGame save, PalDB db)
         {
             Init();

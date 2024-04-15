@@ -11,8 +11,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel
 {
@@ -20,10 +22,35 @@ namespace PalCalc.UI.ViewModel
     {
         private static PalDB db = PalDB.LoadEmbedded();
         private Dictionary<SaveGame, PalTargetListViewModel> targetsBySaveFile;
+        private LoadingSaveFileModal loadingSaveModal = null;
+        private Dispatcher dispatcher;
+
+        // https://stackoverflow.com/a/73181682
+        private static void AllowUIToUpdate()
+        {
+            DispatcherFrame frame = new();
+            // DispatcherPriority set to Input, the highest priority
+            Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate (object parameter)
+            {
+                frame.Continue = false;
+                Thread.Sleep(20); // Stop all processes to make sure the UI update is perform
+                return null;
+            }), null);
+            Dispatcher.PushFrame(frame);
+            // DispatcherPriority set to Input, the highest priority
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Input, new Action(delegate { }));
+        }
+
+        public MainWindowViewModel() : this(null) { }
 
         // main app model
-        public MainWindowViewModel()
+        public MainWindowViewModel(Dispatcher dispatcher)
         {
+            this.dispatcher = dispatcher;
+
+            CachedSaveGame.SaveFileLoadStart += CachedSaveGame_SaveFileLoadStart;
+            CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
+
             SaveSelection = new SaveSelectorViewModel(SavesLocation.AllLocal);
             SolverControls = new SolverControlsViewModel();
             PalTargetList = new PalTargetListViewModel();
@@ -51,6 +78,28 @@ namespace PalCalc.UI.ViewModel
             SaveSelection.PropertyChanged += SaveSelection_PropertyChanged;
 
             UpdateTargetsList();
+        }
+
+        private void CachedSaveGame_SaveFileLoadStart(SaveGame obj)
+        {
+            if (loadingSaveModal == null)
+            {
+                loadingSaveModal = new LoadingSaveFileModal();
+                loadingSaveModal.Owner = Application.Current.MainWindow;
+                loadingSaveModal.DataContext = "Save file was not yet cached or cache is outdated, reading content...";
+                loadingSaveModal.Show();
+                AllowUIToUpdate();
+            }
+        }
+
+        private void CachedSaveGame_SaveFileLoadEnd(SaveGame obj)
+        {
+            if (loadingSaveModal != null)
+            {
+                loadingSaveModal.Close();
+                loadingSaveModal = null;
+                AllowUIToUpdate();
+            }
         }
 
         private void UpdateTargetsList()
@@ -97,27 +146,73 @@ namespace PalCalc.UI.ViewModel
             if (currentSpec == null) return;
 
             var solver = SolverControls.ConfiguredSolver(SaveSelection.SelectedGame.CachedValue.OwnedPals);
-            var results = solver.SolveFor(currentSpec);
+            solver.SolverStateUpdated += Solver_SolverStateUpdated;
 
-            PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(r)).ToList() };
-            if (PalTarget.InitialPalSpecifier == null)
+            Task.Factory.StartNew(() =>
             {
-                PalTargetList.Add(PalTarget.CurrentPalSpecifier);
-                PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
-            }
-            else
+                dispatcher.Invoke(() => IsEditable = false);
+
+                var results = solver.SolveFor(currentSpec);
+
+                dispatcher.Invoke(() =>
+                {
+                    PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(r)).ToList() };
+                    if (PalTarget.InitialPalSpecifier == null)
+                    {
+                        PalTargetList.Add(PalTarget.CurrentPalSpecifier);
+                        PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
+                    }
+                    else
+                    {
+                        PalTargetList.Replace(PalTarget.InitialPalSpecifier, PalTarget.CurrentPalSpecifier);
+                        PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
+                    }
+
+                    var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
+                    if (!Directory.Exists(outputFolder))
+                        Directory.CreateDirectory(outputFolder);
+
+                    var outputFile = Path.Join(outputFolder, "pal-targets.json");
+                    var converter = new PalTargetListViewModelConverter(db, new GameSettings());
+                    File.WriteAllText(outputFile, JsonConvert.SerializeObject(PalTargetList, converter));
+
+                    IsEditable = true;
+                });
+            });
+        }
+
+        private void Solver_SolverStateUpdated(SolverStatus obj)
+        {
+            dispatcher.BeginInvoke(() =>
             {
-                PalTargetList.Replace(PalTarget.InitialPalSpecifier, PalTarget.CurrentPalSpecifier);
-                PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
-            }
+                var numTotalSteps = (double)(1 + obj.TargetSteps * 2);
+                int overallStep = 0;
+                switch (obj.CurrentPhase)
+                {
+                    case SolverPhase.Initializing:
+                        SolverStatusMsg = "Initializing";
+                        overallStep = 0;
+                        break;
 
-            var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
-            if (!Directory.Exists(outputFolder))
-                Directory.CreateDirectory(outputFolder);
+                    case SolverPhase.Breeding:
+                        SolverStatusMsg = $"Breeding step {obj.CurrentStepIndex + 1}, calculating child pals and probabilities";
+                        overallStep = 1 + obj.CurrentStepIndex * 2;
+                        
+                        break;
 
-            var outputFile = Path.Join(outputFolder, "pal-targets.json");
-            var converter = new PalTargetListViewModelConverter(db, new GameSettings());
-            File.WriteAllText(outputFile, JsonConvert.SerializeObject(PalTargetList, converter));
+                    case SolverPhase.Simplifying:
+                        SolverStatusMsg = $"Breeding step {obj.CurrentStepIndex + 1}, simplifying results";
+                        overallStep = 1 + obj.CurrentStepIndex * 2 + 1;
+                        break;
+
+                    case SolverPhase.Finished:
+                        SolverStatusMsg = "Finished";
+                        overallStep = (int)numTotalSteps;
+                        break;
+                }
+
+                SolverProgress = 100 * overallStep / numTotalSteps;
+            });
         }
 
         [ObservableProperty]
@@ -129,6 +224,18 @@ namespace PalCalc.UI.ViewModel
 
         [ObservableProperty]
         private PalTargetViewModel palTarget;
+
+        [ObservableProperty]
+        private double solverProgress;
+
+        [ObservableProperty]
+        private string solverStatusMsg;
+
+        [NotifyPropertyChangedFor(nameof(ProgressBarVisibility))]
+        [ObservableProperty]
+        private bool isEditable = true;
+
+        public Visibility ProgressBarVisibility => IsEditable ? Visibility.Collapsed : Visibility.Visible;
 
         public PalDB DB => db;
     }

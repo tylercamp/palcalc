@@ -8,6 +8,21 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver
 {
+    public enum SolverPhase
+    {
+        Initializing,
+        Breeding,
+        Simplifying,
+        Finished,
+    }
+
+    public class SolverStatus
+    {
+        public SolverPhase CurrentPhase { get; set; }
+        public int CurrentStepIndex { get; set; }
+        public int TargetSteps { get; set; }
+    }
+
     public class BreedingSolver
     {
         // returns number of ways you can choose k combinations from a list of n
@@ -43,6 +58,8 @@ namespace PalCalc.Solver
             this.maxIrrelevantTraits = Math.Min(3, maxIrrelevantTraits);
             this.maxEffort = maxEffort;
         }
+
+        public event Action<SolverStatus> SolverStateUpdated;
 
         // for each available (pal, gender) pair, and for each set of instance traits as a subset of the desired traits (e.g. all male lamballs with "runner",
         // all with "runner and swift", etc.), pick the instance with the fewest total traits
@@ -223,6 +240,9 @@ namespace PalCalc.Solver
                 throw new Exception("Target trait count cannot exceed max number of traits for a single pal");
             }
 
+            var statusMsg = new SolverStatus() { CurrentPhase = SolverPhase.Initializing, CurrentStepIndex = 0, TargetSteps = maxBreedingSteps };
+            SolverStateUpdated?.Invoke(statusMsg);
+
             var relevantPals = RelevantInstancesForTraits(db, ownedPals, spec.Traits)
                .Where(p => p.Traits.Except(spec.Traits).Count() <= maxIrrelevantTraits)
                .ToList();
@@ -261,6 +281,10 @@ namespace PalCalc.Solver
 
             for (int s = 0; s < maxBreedingSteps; s++)
             {
+                statusMsg.CurrentPhase = SolverPhase.Breeding;
+                statusMsg.CurrentStepIndex = s;
+                SolverStateUpdated?.Invoke(statusMsg);
+
                 Console.WriteLine($"Starting search step #{s + 1} with {workingSet.Content.Count} relevant pals");
                 var newInstances = Enumerable.Zip(workingSet.Content, Enumerable.Range(0, workingSet.Content.Count))
                     .AsParallel()
@@ -355,6 +379,9 @@ namespace PalCalc.Solver
 
                 Console.WriteLine("Filtering {0} potential new instances", newInstances.Count);
 
+                statusMsg.CurrentPhase = SolverPhase.Simplifying;
+                SolverStateUpdated?.Invoke(statusMsg);
+
                 var numChanged = workingSet.AddFrom(newInstances);
 
                 if (numChanged == 0)
@@ -363,6 +390,9 @@ namespace PalCalc.Solver
                     break;
                 }
             }
+
+            statusMsg.CurrentPhase = SolverPhase.Finished;
+            SolverStateUpdated?.Invoke(statusMsg);
 
             return workingSet.Content.Where(pref => pref.Pal == spec.Pal && !spec.Traits.Except(pref.Traits).Any()).ToList();
         }

@@ -50,9 +50,13 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 - Show preview of involved pals, num wild pals, etc. in solver results list
 - Performance options (max threads)
 - Separate list of "Required traits" and "Optional traits" for target pal
+- Solver optimizations
+- Update PalDB reference data for recent game updates
 - General UI/UX improvements
 
 ## Maybe TODOs
 - Automatically detect changes to save file + reload
 - Option to auto-recalc all target pals when changes are detected
 - Allow specifying custom db.json
+- Support Xbox saves ([sample ref](https://github.com/Tom60chat/Xbox-Live-Save-Exporter/tree/main))
+- Figure out how the data miners do their thing and read Pal DB info straight from game files?

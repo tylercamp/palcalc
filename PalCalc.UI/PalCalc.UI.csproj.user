@@ -13,6 +13,9 @@
     <Compile Update="View\BreedingResultView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="View\LoadingSaveFileModal.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\PalTargetListView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -34,6 +37,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="View\BreedingResultView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="View\LoadingSaveFileModal.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="View\PalTargetListView.xaml">

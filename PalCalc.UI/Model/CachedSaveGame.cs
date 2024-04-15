@@ -27,6 +27,9 @@ namespace PalCalc.UI.Model
 
         public string StateId => $"{IdentifierFor(UnderlyingSave)}-{LastModified.Ticks}";
 
+        public static event Action<SaveGame> SaveFileLoadStart;
+        public static event Action<SaveGame> SaveFileLoadEnd;
+
         public static string IdentifierFor(SaveGame game)
         {
             var userFolderName = Path.GetFileName(Path.GetDirectoryName(game.BasePath));
@@ -37,8 +40,10 @@ namespace PalCalc.UI.Model
 
         public static CachedSaveGame FromSaveGame(SaveGame game, PalDB db)
         {
+            SaveFileLoadStart?.Invoke(game);
+
             var meta = game.LevelMeta.ReadGameOptions();
-            return new CachedSaveGame()
+            var result = new CachedSaveGame()
             {
                 LastModified = game.LastModified,
                 FolderPath = game.BasePath,
@@ -47,6 +52,10 @@ namespace PalCalc.UI.Model
                 PlayerName = meta.PlayerName,
                 WorldName = meta.WorldName,
             };
+
+            SaveFileLoadEnd?.Invoke(game);
+
+            return result;
         }
 
         public string ToJson(PalDB db) => JsonConvert.SerializeObject(this, new PalInstanceJsonConverter(db));

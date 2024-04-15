@@ -13,7 +13,7 @@
         xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
         xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
-    <Grid>
+    <Grid IsEnabled="{Binding IsEditable}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="232*"/>
@@ -31,7 +31,12 @@
 
         <DockPanel Grid.Column="1">
             <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" OnRun="SolverControlsView_OnRun" />
-            
+
+            <Grid DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
+                <ProgressBar Value="{Binding SolverProgress}" />
+                <TextBlock Text="{Binding SolverStatusMsg}" Margin="10,5,0,5" />
+            </Grid>
+
             <!-- a breeding view without any content will cause it to extend infinitely, set a
                  large max-height for XAML preview
             -->

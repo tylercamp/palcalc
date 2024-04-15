@@ -24,7 +24,7 @@ namespace PalCalc.UI
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
+            DataContext = new MainWindowViewModel(Dispatcher);
         }
 
         private MainWindowViewModel ViewModel => DataContext as MainWindowViewModel;
