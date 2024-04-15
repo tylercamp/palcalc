@@ -83,6 +83,10 @@ namespace PalCalc.Solver
                             .OrderBy(t => t)
                     )
                 ))
-                .Select(g => g.MinBy(pref => pref.BreedingEffort));
+                .Select(g => g
+                    .OrderBy(pref => pref.BreedingEffort)
+                    .ThenBy(pref => pref.NumBredPalParticipants())
+                    .First()
+                );
     }
 }

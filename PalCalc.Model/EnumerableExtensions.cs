@@ -38,36 +38,5 @@ namespace PalCalc.Model
                 }
             }
         }
-
-
-
-
-
-        public static IEnumerable<IEnumerable<T>> PermutationsUpToN<T>(this List<T> elements, int maxResultListSize)
-        {
-            return GeneratePermutationsWithRepetitionInternal(elements, new List<T>(), maxResultListSize);
-        }
-
-        private static IEnumerable<IEnumerable<T>> GeneratePermutationsWithRepetitionInternal<T>(List<T> elements, List<T> current, int maxResultListSize)
-        {
-            if (current.Count > 0)
-            {
-                yield return current;
-            }
-
-            if (current.Count == maxResultListSize)
-            {
-                yield break;
-            }
-
-            foreach (T element in elements)
-            {
-                var newList = new List<T>(current) { element };
-                foreach (var permutation in GeneratePermutationsWithRepetitionInternal(elements, newList, maxResultListSize))
-                {
-                    yield return permutation;
-                }
-            }
-        }
     }
 }

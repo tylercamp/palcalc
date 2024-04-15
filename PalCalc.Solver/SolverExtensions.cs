@@ -8,8 +8,6 @@ namespace PalCalc.Solver
 {
     public static class SolverExtensions
     {
-
-
         public static int NumWildPalParticipants(this IPalReference pref)
         {
             switch (pref)
