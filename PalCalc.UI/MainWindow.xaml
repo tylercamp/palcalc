@@ -16,7 +16,9 @@
     <Grid IsEnabled="{Binding IsEditable}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="232*"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="43*"/>
         </Grid.ColumnDefinitions>
         <DockPanel Grid.Column="0" Margin="10,10,10,10">
@@ -29,7 +31,9 @@
             </GroupBox>
         </DockPanel>
 
-        <DockPanel Grid.Column="1">
+        <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+
+        <DockPanel Grid.Column="2">
             <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" OnRun="SolverControlsView_OnRun" />
 
             <Grid DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
@@ -43,7 +47,9 @@
             <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
         </DockPanel>
 
-        <DockPanel Grid.Column="2">
+        <GridSplitter Grid.Column="3" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+
+        <DockPanel Grid.Column="4">
             <v:PalTargetView DataContext="{Binding PalTarget}" DockPanel.Dock="Top" />
             <v:BreedingResultListView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
         </DockPanel>

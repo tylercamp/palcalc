@@ -18,7 +18,7 @@ namespace PalCalc.UI.View
     /// <summary>
     /// Interaction logic for SolverSettingsView.xaml
     /// </summary>
-    public partial class SolverControlsView : StackPanel
+    public partial class SolverControlsView : WrapPanel
     {
         public SolverControlsView()
         {
