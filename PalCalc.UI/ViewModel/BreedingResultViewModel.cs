@@ -51,7 +51,8 @@ namespace PalCalc.UI.ViewModel
 
         public BreedingGraph Graph { get; private set; }
 
-        public string Label => DisplayedResult?.ToString() ?? "Unknown";
+        public TimeSpan? TimeEstimate => DisplayedResult?.BreedingEffort ?? TimeSpan.Zero;
+        public string Label => $"{DisplayedResult?.ToString() ?? "Unknown"}, takes ~{TimeEstimate}";
 
         public bool HasValue => Graph != null;
 
