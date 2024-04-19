@@ -24,7 +24,6 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 
 ## Main TODOs
 
-- Show total time required
 - Associate solver results with save file and save-last-modified, show icon if save file was updated
 - Allow loading from save files in custom locations
 - Game settings (breeding time, multiple breeding farms)
@@ -39,11 +38,11 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 - ~~Disallow changes to list boxes + input fields while solving is running~~
 - ~~Add progress bar when solving is running, don't freeze the window during solving~~
 - ~~Save solver results~~
+- ~~Show total time required~~
 
 ## Eventual TODOs
 - Add "About" window for licenses + references
 - Gracefully handle missing references to pals, traits, and pal instances
-- Notify when a pal involved in a breeding path is no longer available in the source save
 - Fix tree layout algorithm
 - Option to delete entries from list of target pals
 - Allow solving for multiple pals at once
@@ -53,6 +52,7 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 - Solver optimizations
 - Update PalDB reference data for recent game updates
 - General UI/UX improvements
+- ~~Notify when a pal involved in a breeding path is no longer available in the source save~~ (WONTFIX - too annoying)
 
 ## Maybe TODOs
 - Automatically detect changes to save file + reload

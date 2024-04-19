@@ -308,7 +308,7 @@ namespace PalCalc.Solver
                                 var childPal = db.BreedingByParent[parent1.Pal][parent2.Pal].Child;
                                 return db.MinBreedingSteps[childPal][spec.Pal] <= maxBreedingSteps - s - 1;
                             })
-                            .Where(parent2 => parent1.NumBredPalParticipants() + parent2.NumBredPalParticipants() < maxBreedingSteps)
+                            .Where(parent2 => parent1.NumTotalBreedingSteps + parent2.NumTotalBreedingSteps < maxBreedingSteps)
                             .Where(parent2 =>
                             {
                                 // if we disallow any irrelevant traits, neither parents have a useful trait, and at least 1 parent

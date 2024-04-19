@@ -14,14 +14,16 @@ namespace PalCalc.Solver
         List<Trait> Traits { get; }
         PalGender Gender { get; }
 
+        int NumTotalBreedingSteps { get; }
+
         string TraitsString => Traits.TraitsListToString();
 
         IPalRefLocation Location { get; }
 
-        public TimeSpan BreedingEffort { get; }
-        public TimeSpan SelfBreedingEffort { get; }
+        TimeSpan BreedingEffort { get; }
+        TimeSpan SelfBreedingEffort { get; }
 
-        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender);
+        IPalReference WithGuaranteedGender(PalDB db, PalGender gender);
 
         bool IsCompatibleGender(PalGender otherGender) => Gender == PalGender.WILDCARD || Gender != otherGender;
     }
@@ -47,6 +49,8 @@ namespace PalCalc.Solver
 
         public TimeSpan BreedingEffort => TimeSpan.Zero;
         public TimeSpan SelfBreedingEffort => TimeSpan.Zero;
+
+        public int NumTotalBreedingSteps => 0;
 
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
@@ -93,6 +97,8 @@ namespace PalCalc.Solver
 
         // used as the effort required to catch one
         public TimeSpan SelfBreedingEffort { get; private set; }
+
+        public int NumTotalBreedingSteps => 0;
 
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
@@ -162,6 +168,18 @@ namespace PalCalc.Solver
                 : Parent1.BreedingEffort + Parent2.BreedingEffort
 
         );
+
+        private int numTotalBreedingSteps = -1;
+        public int NumTotalBreedingSteps
+        {
+            get
+            {
+                if (numTotalBreedingSteps < 0)
+                    numTotalBreedingSteps = 1 + Parent1.NumTotalBreedingSteps + Parent2.NumTotalBreedingSteps;
+
+                return numTotalBreedingSteps;
+            }
+        }
 
         public List<Trait> Traits { get; }
 

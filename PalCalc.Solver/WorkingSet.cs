@@ -32,8 +32,16 @@ namespace PalCalc.Solver
             // with higher effort than existing known instances
             //
             // (this is the main optimization that lets the solver complete in less than a week)
+
+            // `PruneCollection` is fairly heavy and single-threaded, perform pruning of multiple batches of the
+            // main set of references before pruning the final combined collection
+            var prePruned = newRefs.ToList().Batched(100000)
+                .AsParallel()
+                .SelectMany(batch => PruneCollection(batch).ToList())
+                .ToList();
+
             var numChanged = 0;
-            foreach (var newInst in PruneCollection(newRefs))
+            foreach (var newInst in PruneCollection(prePruned))
             {
                 var existingInstances = content
                     .TakeWhile(_ => !token.IsCancellationRequested)
@@ -85,7 +93,7 @@ namespace PalCalc.Solver
                 ))
                 .Select(g => g
                     .OrderBy(pref => pref.BreedingEffort)
-                    .ThenBy(pref => pref.NumBredPalParticipants())
+                    .ThenBy(pref => pref.NumTotalBreedingSteps)
                     .First()
                 );
     }

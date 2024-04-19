@@ -18,14 +18,5 @@ namespace PalCalc.Solver
                 default: throw new Exception($"Unhandled pal reference type {pref.GetType()}");
             }
         }
-
-        public static int NumBredPalParticipants(this IPalReference pref)
-        {
-            switch (pref)
-            {
-                case BredPalReference bpr: return 1 + NumBredPalParticipants(bpr.Parent1) + NumBredPalParticipants(bpr.Parent2);
-                default: return 0;
-            }
-        }
     }
 }

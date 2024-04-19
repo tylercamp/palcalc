@@ -41,7 +41,7 @@ namespace PalCalc.UI.ViewModel
                 },
             };
 
-            DisplayedResult = solver.SolveFor(targetInstance, CancellationToken.None).MaxBy(r => r.NumBredPalParticipants());
+            DisplayedResult = solver.SolveFor(targetInstance, CancellationToken.None).MaxBy(r => r.NumTotalBreedingSteps);
         }
 
         public BreedingResultViewModel(IPalReference displayedResult)

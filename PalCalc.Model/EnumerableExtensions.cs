@@ -38,5 +38,13 @@ namespace PalCalc.Model
                 }
             }
         }
+
+        public static IEnumerable<IEnumerable<T>> Batched<T>(this List<T> elements, int batchSize)
+        {
+            for (int i = 0; i < elements.Count / batchSize + 1 && elements.Count > 0; i++)
+            {
+                yield return elements.Skip(i * batchSize).Take(batchSize);
+            }
+        }
     }
 }
