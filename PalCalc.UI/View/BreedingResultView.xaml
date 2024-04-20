@@ -16,9 +16,22 @@
     <UserControl.Resources>
         <DataTemplate x:Key="DemoTemplate" DataType="{x:Type m:BreedingTreeNodeViewModel}">
             <StackPanel Orientation="Horizontal" Margin="5">
-                <Image Source="{Binding Pal.Icon}" />
-                
-                <TextBlock Text="{Binding Value.Description}" Foreground="White" />
+                <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="White" Margin="0,0,5,0">
+                    <Border.Background>
+                        <ImageBrush Stretch="Fill" ImageSource="{Binding Pal.Icon}" />
+                    </Border.Background>
+                </Border>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{Binding Gender}" Foreground="White" />
+                    <TextBlock Text="{Binding Location.Description}" Foreground="White" />
+                    <ItemsControl ItemsSource="{Binding Traits}" Background="Black" Foreground="Black" BorderThickness="0" Margin="0,0,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:TraitViewModel">
+                                <local:TraitView DataContext="{Binding}" MinWidth="100" Margin="0,2,0,0" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
             </StackPanel>
         </DataTemplate>
 

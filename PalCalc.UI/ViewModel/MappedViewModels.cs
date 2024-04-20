@@ -98,6 +98,12 @@ namespace PalCalc.UI.ViewModel
             { 3, new Color() { R = 255, G = 221, B = 0, A = 255 } },
         };
 
+        // for XAML designer view
+        public TraitViewModel()
+        {
+            ModelObject = new Trait("Runner", "runner", 2);
+        }
+
         public TraitViewModel(Trait trait)
         {
             ModelObject = trait;
