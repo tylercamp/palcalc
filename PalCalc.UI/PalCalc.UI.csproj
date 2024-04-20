@@ -148,6 +148,12 @@
     <None Remove="Resources\Pals\Woolipop.png" />
     <None Remove="Resources\Pals\Wumpo Botan.png" />
     <None Remove="Resources\Pals\Wumpo.png" />
+    <None Remove="Resources\TraitRank\Passive_Negative_1_icon.png" />
+    <None Remove="Resources\TraitRank\Passive_Negative_2_icon.png" />
+    <None Remove="Resources\TraitRank\Passive_Negative_3_icon.png" />
+    <None Remove="Resources\TraitRank\Passive_Positive_1_icon.png" />
+    <None Remove="Resources\TraitRank\Passive_Positive_2_icon.png" />
+    <None Remove="Resources\TraitRank\Passive_Positive_3_icon.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -307,6 +313,12 @@
     <Resource Include="Resources\Pals\Woolipop.png" />
     <Resource Include="Resources\Pals\Wumpo Botan.png" />
     <Resource Include="Resources\Pals\Wumpo.png" />
+    <Resource Include="Resources\TraitRank\Passive_Negative_1_icon.png" />
+    <Resource Include="Resources\TraitRank\Passive_Negative_2_icon.png" />
+    <Resource Include="Resources\TraitRank\Passive_Negative_3_icon.png" />
+    <Resource Include="Resources\TraitRank\Passive_Positive_1_icon.png" />
+    <Resource Include="Resources\TraitRank\Passive_Positive_2_icon.png" />
+    <Resource Include="Resources\TraitRank\Passive_Positive_3_icon.png" />
   </ItemGroup>
 
 </Project>
