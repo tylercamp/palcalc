@@ -20,7 +20,10 @@ function parseHTML(html) {
         if (!match) return;
 
         const name = match[1]
-        const imageUrl = $entry.find('.container > .image img').attr('src')
+        const imageUrl = $entry
+            .find('.container > .image img')
+            .attr('src')
+            .replace('/palicon/', '/full_palicon/')
 
         imageUrls.push({ name, imageUrl })
     });
