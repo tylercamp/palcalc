@@ -29,15 +29,17 @@ namespace PalCalc.UI.Model
                         return source;
                     }
 
-                    Images.Add(-3, IconImage("Passive_Negative_3_icon.png"));
-                    Images.Add(-2, IconImage("Passive_Negative_2_icon.png"));
-                    Images.Add(-1, IconImage("Passive_Negative_1_icon.png"));
+                    images = new Dictionary<int, ImageSource>();
 
-                    Images.Add(0, IconImage("Passive_Positive_1_icon.png"));
+                    images.Add(-3, IconImage("Passive_Negative_3_icon.png"));
+                    images.Add(-2, IconImage("Passive_Negative_2_icon.png"));
+                    images.Add(-1, IconImage("Passive_Negative_1_icon.png"));
 
-                    Images.Add(1, IconImage("Passive_Positive_1_icon.png"));
-                    Images.Add(2, IconImage("Passive_Positive_2_icon.png"));
-                    Images.Add(3, IconImage("Passive_Positive_3_icon.png"));
+                    images.Add(0, IconImage("Passive_Positive_1_icon.png"));
+
+                    images.Add(1, IconImage("Passive_Positive_1_icon.png"));
+                    images.Add(2, IconImage("Passive_Positive_2_icon.png"));
+                    images.Add(3, IconImage("Passive_Positive_3_icon.png"));
                 }
 
                 return images;
