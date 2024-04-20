@@ -30,21 +30,43 @@ namespace PalCalc.SaveReader.SaveFile
             foreach (var container in containerVisitor.CollectedContainers.Skip(2))
                 containerTypeById.Add(container.Id, LocationType.Base);
 
-            return instanceVisitor.Result.Select(gvasInstance =>
-            {
-                return new PalInstance()
+            return instanceVisitor.Result
+                .Select(gvasInstance =>
                 {
-                    Pal = gvasInstance.CharacterId.Replace("Boss_", "", StringComparison.InvariantCultureIgnoreCase).InternalToPal(db),
+                    var sanitizedCharId = gvasInstance.CharacterId.Replace("Boss_", "", StringComparison.InvariantCultureIgnoreCase);
+                    var pal = db.Pals.FirstOrDefault(p => p.InternalName.ToLower() == sanitizedCharId.ToLower());
 
-                    Gender = gvasInstance.Gender.Contains("Female") ? PalGender.FEMALE : PalGender.MALE,
-                    Traits = gvasInstance.Traits.Select(t => t.InternalToTrait(db)).ToList(),
-                    Location = new PalLocation()
+                    if (pal == null)
                     {
-                        Type = containerTypeById[gvasInstance.ContainerId.ToString()],
-                        Index = gvasInstance.SlotIndex,
+                        // skip unrecognized pals
+                        // TODO - log warning
+                        return null;
                     }
-                };
-            }).ToList();
+
+                    var traits = gvasInstance.Traits
+                        .Select(name =>
+                        {
+                            var trait = db.Traits.FirstOrDefault(t => t.InternalName == name);
+                            // TODO - log warning for unrecognized trait
+                            return trait ?? new UnrecognizedTrait(name);
+                        })
+                        .ToList();
+
+                    return new PalInstance()
+                    {
+                        Pal = pal,
+
+                        Gender = gvasInstance.Gender.Contains("Female") ? PalGender.FEMALE : PalGender.MALE,
+                        Traits = traits,
+                        Location = new PalLocation()
+                        {
+                            Type = containerTypeById[gvasInstance.ContainerId.ToString()],
+                            Index = gvasInstance.SlotIndex,
+                        }
+                    };
+                })
+                .SkipNull()
+                .ToList();
         }
     }
 }

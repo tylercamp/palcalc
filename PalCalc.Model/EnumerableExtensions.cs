@@ -46,5 +46,7 @@ namespace PalCalc.Model
                 yield return elements.Skip(i * batchSize).Take(batchSize);
             }
         }
+
+        public static IEnumerable<T> SkipNull<T>(this IEnumerable<T> elements) => elements.Where(v => v != null);
     }
 }
