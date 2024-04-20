@@ -39,7 +39,7 @@ namespace PalCalc.UI.ViewModel
                     Location = new PalCalc.Model.PalLocation() { Index = 0, Type = PalCalc.Model.LocationType.Palbox },
                     Traits = new List<PalCalc.Model.Trait>()
                     {
-                        new PalCalc.Model.Trait("Trait 1", "Internal 1"),
+                        new PalCalc.Model.Trait("Trait 1", "Internal 1", 0),
                     }
                 }))
             }

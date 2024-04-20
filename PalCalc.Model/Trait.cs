@@ -8,14 +8,16 @@ namespace PalCalc.Model
 {
     public class Trait
     {
-        public Trait(string name, string internalName)
+        public Trait(string name, string internalName, int rank)
         {
             Name = name;
             InternalName = internalName;
+            Rank = rank;
         }
 
         public string Name { get; }
         public string InternalName { get; }
+        public int Rank { get; }
 
         public override string ToString() => Name;
 
@@ -27,11 +29,11 @@ namespace PalCalc.Model
 
     public class UnrecognizedTrait : Trait, IUnknownTrait
     {
-        public UnrecognizedTrait(string internalName) : base($"'{internalName}' (unrecognized)", internalName) { }
+        public UnrecognizedTrait(string internalName) : base($"'{internalName}' (unrecognized)", internalName, 0) { }
     }
 
     public class RandomTrait : Trait, IUnknownTrait
     {
-        public RandomTrait() : base("(Random)", "__VIRT_RAND__") { }
+        public RandomTrait() : base("(Random)", "__VIRT_RAND__", 0) { }
     }
 }
