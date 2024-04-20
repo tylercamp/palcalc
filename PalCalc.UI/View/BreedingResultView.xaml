@@ -14,9 +14,11 @@
              d:DataContext="{d:DesignInstance vm:BreedingResultViewModel, IsDesignTimeCreatable=True}"
              >
     <UserControl.Resources>
-        <DataTemplate x:Key="DemoTemplate" DataType="{x:Type sm:IBreedingTreeNode}">
+        <DataTemplate x:Key="DemoTemplate" DataType="{x:Type m:BreedingTreeNodeViewModel}">
             <StackPanel Orientation="Horizontal" Margin="5">
-                <TextBlock Text="{Binding Description}" Foreground="White" />
+                <Image Source="{Binding Pal.Icon}" />
+                
+                <TextBlock Text="{Binding Value.Description}" Foreground="White" />
             </StackPanel>
         </DataTemplate>
 

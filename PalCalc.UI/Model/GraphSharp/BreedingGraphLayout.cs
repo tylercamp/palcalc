@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.Model
 {
-    internal class BreedingGraphLayout : GraphLayout<IBreedingTreeNode, BreedingEdge, BreedingGraph>
+    public class BreedingGraphLayout : GraphLayout<BreedingTreeNodeViewModel, BreedingEdge, BreedingGraph>
     {
         public BreedingGraphLayout()
         {

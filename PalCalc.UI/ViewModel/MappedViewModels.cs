@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace PalCalc.UI.ViewModel
 {
@@ -63,6 +64,8 @@ namespace PalCalc.UI.ViewModel
         }
 
         public Pal ModelObject { get; }
+
+        public ImageSource Icon => PalIcon.Images[ModelObject];
 
         public string Label => ModelObject == null ? "" : $"{ModelObject.Name} (#{ModelObject.Id})";
 

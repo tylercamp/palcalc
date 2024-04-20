@@ -32,25 +32,25 @@ namespace PalCalc.UI.Model
     }
 
     // currently assuming left-to-right layout
-    internal class BreedingTreeLayoutAlgorithm : DefaultParameterizedLayoutAlgorithmBase<IBreedingTreeNode, BreedingEdge, BreedingGraph, BreedingTreeLayoutAlgorithmParameters>
+    internal class BreedingTreeLayoutAlgorithm : DefaultParameterizedLayoutAlgorithmBase<BreedingTreeNodeViewModel, BreedingEdge, BreedingGraph, BreedingTreeLayoutAlgorithmParameters>
 
     {
-        private Dictionary<IBreedingTreeNode, Size> _sizes;
+        private Dictionary<BreedingTreeNodeViewModel, Size> _sizes;
 
-        public BreedingTreeLayoutAlgorithm(BreedingGraph visitedGraph, IDictionary<IBreedingTreeNode, Point> vertexPositions, IDictionary<IBreedingTreeNode, Size> vertexSizes, BreedingTreeLayoutAlgorithmParameters parameters)
+        public BreedingTreeLayoutAlgorithm(BreedingGraph visitedGraph, IDictionary<BreedingTreeNodeViewModel, Point> vertexPositions, IDictionary<BreedingTreeNodeViewModel, Size> vertexSizes, BreedingTreeLayoutAlgorithmParameters parameters)
             : base(visitedGraph, vertexPositions, parameters)
         {
-            _sizes = new Dictionary<IBreedingTreeNode, Size>(vertexSizes);
+            _sizes = new Dictionary<BreedingTreeNodeViewModel, Size>(vertexSizes);
         }
 
-        private Size FullSizeWithChildren(IBreedingTreeNode node)
+        private Size FullSizeWithChildren(BreedingTreeNodeViewModel node)
         {
-            var childrenByDepth = node.TraversedTopDown(0).GroupBy(p => p.Item2).ToDictionary(g => g.Key, g => g.Select(p => p.Item1).ToList());
+            var childrenByDepth = node.Value.TraversedTopDown(0).GroupBy(p => p.Item2).ToDictionary(g => g.Key, g => g.Select(p => p.Item1).ToList());
 
-            var maxWidthByDepth = childrenByDepth.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Max(n => _sizes[n].Width));
+            var maxWidthByDepth = childrenByDepth.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Max(n => _sizes[VisitedGraph.NodeFor(n)].Width));
             var minHeightByDepth = childrenByDepth.ToDictionary(
                 kvp => kvp.Key,
-                kvp => Parameters.VertexGap * (kvp.Value.Count - 1) + kvp.Value.Sum(n => _sizes[n].Height)
+                kvp => Parameters.VertexGap * (kvp.Value.Count - 1) + kvp.Value.Sum(n => _sizes[VisitedGraph.NodeFor(n)].Height)
             );
 
             var fullWidth = (childrenByDepth.Count - 1) * Parameters.LayerGap + maxWidthByDepth.Values.Sum();
@@ -61,9 +61,11 @@ namespace PalCalc.UI.Model
 
         protected override void InternalCompute()
         {
-            var orderedNodesByDepth = VisitedGraph.Tree.AllNodes.GroupBy(p => p.Item2).ToDictionary(g => g.Key, g => g.Select(p => p.Item1).ToList());
+            var orderedNodesByDepth = VisitedGraph.Tree.AllNodes
+                .GroupBy(p => p.Item2)
+                .ToDictionary(g => g.Key, g => g.Select(p => VisitedGraph.NodeFor(p.Item1)).ToList());
 
-            var fullSize = FullSizeWithChildren(VisitedGraph.Tree.Root);
+            var fullSize = FullSizeWithChildren(VisitedGraph.NodeFor(VisitedGraph.Tree.Root));
             var layerX = fullSize.Width / 2;
 
             // start from root node, center-right
@@ -81,7 +83,7 @@ namespace PalCalc.UI.Model
                         continue;
                     }
 
-                    var parentNode = orderedNodesByDepth[depth - 1].Single(p => p.Children.Contains(node));
+                    var parentNode = orderedNodesByDepth[depth - 1].Single(p => p.Value.Children.Contains(node.Value));
 
                     var parentHeight = _sizes[parentNode].Height;
                     var parentPos = VertexPositions[parentNode];
@@ -91,7 +93,7 @@ namespace PalCalc.UI.Model
                     var parentTotalHeight = FullSizeWithChildren(parentNode).Height;
                     
 
-                    bool isFirstChild = parentNode.Children.First() == node;
+                    bool isFirstChild = parentNode.Value.Children.First() == node.Value;
 
                     var selfY = isFirstChild
                         ? parentPos.Y - parentTotalHeight / 2
@@ -106,10 +108,10 @@ namespace PalCalc.UI.Model
             {
                 foreach (var node in orderedNodesByDepth[depth])
                 {
-                    if (node.Children.Any())
+                    if (node.Value.Children.Any())
                     {
-                        var parent1 = node.Children.First();
-                        var parent2 = node.Children.Last();
+                        var parent1 = VisitedGraph.NodeFor(node.Value.Children.First());
+                        var parent2 = VisitedGraph.NodeFor(node.Value.Children.Last());
 
                         var parent1Pos = VertexPositions[parent1];
                         var parent2Pos = VertexPositions[parent2];
