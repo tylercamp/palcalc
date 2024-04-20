@@ -18,15 +18,19 @@ namespace PalCalc.UI.Model
         {
             Value = node;
             Pal = new PalViewModel(node.PalRef.Pal);
+            Traits = node.PalRef.Traits.Select(t => new TraitViewModel(t)).ToList();
+            Location = new PalLocationViewModel(node.PalRef.Location);
+            Gender = node.PalRef.Gender.ToString();
         }
 
         public PalViewModel Pal { get; }
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(Traits))]
-        private IBreedingTreeNode value = null;
+        public IBreedingTreeNode Value { get; }
 
-        [ObservableProperty]
-        private ObservableCollection<TraitViewModel> traits = new ObservableCollection<TraitViewModel>();
+        public List<TraitViewModel> Traits { get; }
+
+        public PalLocationViewModel Location { get; }
+
+        public string Gender { get; }
     }
 }

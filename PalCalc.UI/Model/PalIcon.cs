@@ -17,7 +17,7 @@ namespace PalCalc.UI.Model
     {
         private static Dictionary<string, string> GetIconOverrides()
         {
-            using (var stream = Application.GetResourceStream(new Uri("/Resources/PalIconOverride.json", UriKind.Relative)).Stream)
+            using (var stream = ResourceLookup.Get("PalIconOverride.json"))
             using (var reader = new StreamReader(stream))
             {
                 return JsonConvert.DeserializeObject<Dictionary<string, string>>(reader.ReadToEnd());
@@ -28,15 +28,13 @@ namespace PalCalc.UI.Model
         {
             try
             {
-                var uri = new Uri($"/Resources/Pals/{iconName}", UriKind.Relative);
-                return Application.GetResourceStream(uri).Stream;
+                return ResourceLookup.Get($"Pals/{iconName}");
             }
             catch (IOException)
             {
                 // fallback for pals with missing icons
                 // TODO - log
-                var uri = new Uri("/Resources/Pals/Human.png", UriKind.Relative);
-                return Application.GetResourceStream(uri).Stream;
+                return ResourceLookup.Get("Pals/Human.png");
             }
         }
 

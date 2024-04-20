@@ -73,14 +73,40 @@ namespace PalCalc.UI.ViewModel
         public override int GetHashCode() => ModelObject.GetHashCode();
     }
 
+    public class PalLocationViewModel
+    {
+        public PalLocationViewModel(IPalRefLocation location)
+        {
+            ModelObject = location;
+        }
+
+        public IPalRefLocation ModelObject { get; }
+
+        public string Description => ModelObject.ToString();
+    }
+
     public class TraitViewModel
     {
+        public static Dictionary<int, Color> RankColors = new Dictionary<int, Color>()
+        {
+            { -3, new Color() { R = 247, G = 63, B = 63, A = 255 } },
+            { -2, new Color() { R = 247, G = 63, B = 63, A = 255 } },
+            { -1, new Color() { R = 247, G = 63, B = 63, A = 255 } },
+            { 0, new Color() { R = 230, G = 231, B = 223, A = 255 } },
+            { 1, new Color() { R = 230, G = 231, B = 223, A = 255 } },
+            { 2, new Color() { R = 255, G = 221, B = 0, A = 255 } },
+            { 3, new Color() { R = 255, G = 221, B = 0, A = 255 } },
+        };
+
         public TraitViewModel(Trait trait)
         {
             ModelObject = trait;
         }
 
         public Trait ModelObject { get; }
+
+        public ImageSource RankIcon => TraitIcon.Images[ModelObject.Rank];
+        public Color RankColor => RankColors[ModelObject.Rank];
 
         public string Name => ModelObject?.Name ?? "None";
 
