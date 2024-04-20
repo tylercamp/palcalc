@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PalCalc.UI.Model
 {
@@ -19,6 +20,7 @@ namespace PalCalc.UI.Model
             Value = node;
             Pal = new PalViewModel(node.PalRef.Pal);
             Traits = node.PalRef.Traits.Select(t => new TraitViewModel(t)).ToList();
+            TraitCollection = new TraitCollectionViewModel(Traits);
             Location = new PalLocationViewModel(node.PalRef.Location);
             Gender = node.PalRef.Gender.ToString();
         }
@@ -28,6 +30,10 @@ namespace PalCalc.UI.Model
         public IBreedingTreeNode Value { get; }
 
         public List<TraitViewModel> Traits { get; }
+
+        public TraitCollectionViewModel TraitCollection { get; }
+
+        public Visibility TraitsVisibility => Traits.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
         public PalLocationViewModel Location { get; }
 
