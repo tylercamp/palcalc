@@ -8,6 +8,18 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Model
 {
+    public interface IPalworldCharacterInstance
+    {
+        string InstanceId { get; }
+    }
+
+    public class PlayerInstance : IPalworldCharacterInstance
+    {
+        public string InstanceId { get; set; }
+        public string Name { get; set; }
+        public int Level { get; set; }
+    }
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum PalGender
     {
@@ -19,8 +31,14 @@ namespace PalCalc.Model
         OPPOSITE_WILDCARD = 0b100, // contextual - pals of this gender should be paired with pals of WILDCARD gender
     }
 
-    public class PalInstance
+    public class PalInstance : IPalworldCharacterInstance
     {
+        public string InstanceId { get; set; }
+        public string NickName { get; set; }
+        public int Level { get; set; }
+
+        public string OwnerPlayerId { get; set; }
+
         public Pal Pal { get; set; }
         public PalLocation Location { get; set; }
         public PalGender Gender { get; set; }

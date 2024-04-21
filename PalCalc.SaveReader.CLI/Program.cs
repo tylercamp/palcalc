@@ -18,16 +18,16 @@ foreach (var gameFolder in SavesLocation.AllLocal)
         Console.WriteLine("Checking save folder {0}", save.FolderName);
 
         var meta = save.LevelMeta.ReadGameOptions();
-        var pals = save.Level.ReadPalInstances(db);
+        var characters = save.Level.ReadCharacterData(db);
         var gvas = save.Level.ParseGvas();
 
         var visitor = new ReferenceCollectingVisitor();
         //save.Level.ParseGvas()
 
         Console.WriteLine(meta);
-        Console.WriteLine("{0} owned pals", pals.Count);
+        Console.WriteLine("{0} owned pals", characters.Pals.Count);
 
-        var palsByLocation = pals.GroupBy(p => p.Location.Type).ToDictionary(g => g.Key, g => g.ToList());
+        var palsByLocation = characters.Pals.GroupBy(p => p.Location.Type).ToDictionary(g => g.Key, g => g.ToList());
 
         Console.WriteLine("- {0} in party", palsByLocation.GetValueOrDefault(LocationType.PlayerParty)?.Count ?? 0);
         Console.WriteLine("- {0} in pal box", palsByLocation.GetValueOrDefault(LocationType.Palbox)?.Count ?? 0);

@@ -54,7 +54,7 @@ namespace PalCalc.UI.Model
                 {
                     LastModified = game.LastModified,
                     FolderPath = game.BasePath,
-                    OwnedPals = game.Level.ReadPalInstances(db),
+                    OwnedPals = game.Level.ReadCharacterData(db).Pals,
                     PlayerLevel = meta.PlayerLevel,
                     PlayerName = meta.PlayerName,
                     WorldName = meta.WorldName,

@@ -7,11 +7,19 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile.Support.Level
 {
+    struct PalContainerSlot
+    {
+        public Guid InstanceId;
+        public Guid PlayerId;
+    }
+
     class PalContainer
     {
         public string Id { get; set; }
-        public int MaxEntries { get; set; }
-        public int NumEntries { get; set; }
+        public int MaxEntries => Slots.Count;
+        public int NumEntries => Slots.Count(s => s.InstanceId != Guid.Empty);
+
+        public List<PalContainerSlot> Slots { get; set; }
 
         public override string ToString() => $"{Id} ({NumEntries}/{MaxEntries})";
     }
@@ -30,26 +38,29 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         {
             public SlotInstanceIdEmittingVisitor(string path) : base(path, "Value.Slots.Slots.RawData") { }
 
-            public Action<Guid> OnInstanceId;
+            public Action<PalContainerSlot> OnSlotData;
 
             public override void VisitCharacterContainerPropertyEnd(string path, CharacterContainerDataPropertyMeta meta)
             {
-                OnInstanceId?.Invoke(meta.InstanceId.Value);
+                OnSlotData?.Invoke(new PalContainerSlot()
+                {
+                    InstanceId = meta.InstanceId.Value,
+                    PlayerId = meta.PlayerId,
+                });
             }
         }
 
         public override IEnumerable<IVisitor> VisitMapEntryBegin(string path, int index, MapPropertyMeta meta)
         {
-            workingContainer = new PalContainer();
+            workingContainer = new PalContainer() { Slots = new List<PalContainerSlot>() };
 
             var keyIdCollector = new ValueCollectingVisitor(this, ".Key.ID");
             keyIdCollector.OnExit += v => workingContainer.Id = v[".Key.ID"].ToString();
 
             var slotContentIdEmitter = new SlotInstanceIdEmittingVisitor(path);
-            slotContentIdEmitter.OnInstanceId += id =>
+            slotContentIdEmitter.OnSlotData += slot =>
             {
-                workingContainer.MaxEntries++;
-                if (id != Guid.Empty) workingContainer.NumEntries++;
+                workingContainer.Slots.Add(slot);
             };
 
             yield return keyIdCollector;

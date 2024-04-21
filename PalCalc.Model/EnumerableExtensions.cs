@@ -48,5 +48,11 @@ namespace PalCalc.Model
         }
 
         public static IEnumerable<T> SkipNull<T>(this IEnumerable<T> elements) => elements.Where(v => v != null);
+
+        public static V GetValueOrElse<K, V>(this IDictionary<K, V> dict, K key, V fallback)
+        {
+            if (dict.ContainsKey(key)) return dict[key];
+            else return fallback;
+        }
     }
 }

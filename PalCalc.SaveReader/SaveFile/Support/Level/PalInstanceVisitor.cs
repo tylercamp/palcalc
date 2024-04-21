@@ -1,4 +1,5 @@
-﻿using PalCalc.SaveReader.FArchive;
+﻿using PalCalc.Model;
+using PalCalc.SaveReader.FArchive;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,19 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile.Support.Level
 {
-    class GvasPalInstance
+    class GvasCharacterInstance
     {
+        public Guid InstanceId { get; set; }
+        public string NickName { get; set; }
+        public int Level { get; set; }
+
+        public bool IsPlayer { get; set; }
+
+        public Guid? OwnerPlayerId { get; set; }
+        public List<Guid> OldOwnerPlayerIds { get; set; }
+
         public string CharacterId { get; set; }
-        public Guid ContainerId { get; set; }
+        public Guid? ContainerId { get; set; }
         public int SlotIndex { get; set; }
         public string Gender { get; set; }
 
@@ -19,59 +29,87 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
     class PalInstanceVisitor : IVisitor
     {
-        public PalInstanceVisitor() : base(".worldSaveData.CharacterSaveParameterMap.Value.RawData.SaveParameter") { }
+        public PalInstanceVisitor() : base(".worldSaveData.CharacterSaveParameterMap") { }
 
-        public List<GvasPalInstance> Result = new List<GvasPalInstance>();
+        public List<GvasCharacterInstance> Result = new List<GvasCharacterInstance>();
 
-        GvasPalInstance pendingInstance = null;
+        GvasCharacterInstance pendingInstance = null;
 
-        public override IEnumerable<IVisitor> VisitStructPropertyBegin(string path, StructPropertyMeta meta)
+        const string K_INSTANCE_ID          = ".Key.InstanceId";
+        const string K_NICKNAME             = ".Value.RawData.SaveParameter.NickName";
+        const string K_LEVEL                = ".Value.RawData.SaveParameter.Level";
+        const string K_CHARACTER_ID         = ".Value.RawData.SaveParameter.CharacterID";
+        const string K_IS_PLAYER            = ".Value.RawData.SaveParameter.IsPlayer";
+        const string K_GENDER               = ".Value.RawData.SaveParameter.Gender";
+        const string K_CONTAINER_ID         = ".Value.RawData.SaveParameter.SlotID.ContainerId.ID";
+        const string K_CONTAINER_SLOT_INDEX = ".Value.RawData.SaveParameter.SlotID.SlotIndex";
+        const string K_PASSIVE_SKILL_LIST   = ".Value.RawData.SaveParameter.PassiveSkillList";
+        const string K_OWNER_PLAYER_ID      = ".Value.RawData.SaveParameter.OwnerPlayerUId";
+        const string K_OLD_OWNER_PLAYER_IDS = ".Value.RawData.SaveParameter.OldOwnerPlayerUIds.OldOwnerPlayerUIds";
+
+        static readonly List<string> REQUIRED_PAL_PROPS = new List<string>()
         {
-            if (meta.StructType != "PalIndividualCharacterSaveParameter") yield break;
+            K_CHARACTER_ID,
+            K_GENDER,
+            K_CONTAINER_ID,
+            K_CONTAINER_SLOT_INDEX,
+        };
 
-            pendingInstance = new GvasPalInstance();
+        public override IEnumerable<IVisitor> VisitMapEntryBegin(string path, int index, MapPropertyMeta meta)
+        {
+            base.VisitMapEntryBegin(path, index, meta);
+
+            pendingInstance = new GvasCharacterInstance();
 
             var collectingVisitor = new ValueCollectingVisitor(this,
-                ".CharacterID",
-                ".IsPlayer",
-                ".Gender",
-                ".SlotID.ContainerId.ID",
-                ".SlotID.SlotIndex"
+                K_INSTANCE_ID,
+                K_NICKNAME,
+                K_LEVEL,
+                K_CHARACTER_ID,
+                K_IS_PLAYER,
+                K_GENDER,
+                K_CONTAINER_ID,
+                K_CONTAINER_SLOT_INDEX,
+                K_OWNER_PLAYER_ID
             );
 
             collectingVisitor.OnExit += (vals) =>
             {
-                if (vals.ContainsKey(".IsPlayer") && (bool)vals[".IsPlayer"] == true)
+                pendingInstance.InstanceId = (Guid)vals[K_INSTANCE_ID];
+                pendingInstance.IsPlayer = (bool)vals.GetValueOrElse(K_IS_PLAYER, false);
+
+                // level 1 (i.e. "default level") instances don't have a Level property
+                pendingInstance.Level = (int)vals.GetValueOrElse(K_LEVEL, 1);
+
+                if (pendingInstance.IsPlayer)
                 {
-                    pendingInstance = null;
-                    return;
+                    pendingInstance.NickName = (string)vals[K_NICKNAME];
                 }
-
-                var characterId = vals[".CharacterID"] as string;
-
-                if (
-                    characterId.StartsWith("Hunter_") ||
-                    characterId.StartsWith("SalesPerson_") ||
-                    !vals.ContainsKey(".Gender") ||
-                    !vals.ContainsKey(".SlotID.ContainerId.ID") ||
-                    !vals.ContainsKey(".SlotID.SlotIndex")
-                )
+                else
                 {
-                    pendingInstance = null;
-                    return;
+                    var missingProps = REQUIRED_PAL_PROPS.Where(p => !vals.ContainsKey(p)).ToList();
+                    if (missingProps.Any())
+                    {
+                        // TODO - log missing props
+                        pendingInstance = null;
+                        return;
+                    }
+
+                    pendingInstance.NickName = vals.GetValueOrDefault(K_NICKNAME)?.ToString();
+                    
+                    pendingInstance.OwnerPlayerId = (Guid?)vals.GetValueOrDefault(K_OWNER_PLAYER_ID);
+                    pendingInstance.CharacterId = (string)vals[K_CHARACTER_ID];
+                    pendingInstance.Gender = (string)vals[K_GENDER];
+
+                    pendingInstance.ContainerId = (Guid)vals[K_CONTAINER_ID];
+                    pendingInstance.SlotIndex = (int)vals[K_CONTAINER_SLOT_INDEX];
                 }
-
-                pendingInstance.CharacterId = characterId;
-
-                pendingInstance.Gender = vals[".Gender"].ToString();
-                pendingInstance.ContainerId = (Guid)vals[".SlotID.ContainerId.ID"];
-                pendingInstance.SlotIndex = (int)vals[".SlotID.SlotIndex"];
             };
 
             yield return collectingVisitor;
 
             List<string> traits = new List<string>();
-            var traitsVisitor = new ValueEmittingVisitor(this, ".PassiveSkillList");
+            var traitsVisitor = new ValueEmittingVisitor(this, K_PASSIVE_SKILL_LIST);
             traitsVisitor.OnValue += (_, v) =>
             {
                 traits.Add(v.ToString());
@@ -83,12 +121,23 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             };
 
             yield return traitsVisitor;
+
+            List<Guid> oldOwnerIds = new List<Guid>();
+            var oldOwnersVisitor = new ValueEmittingVisitor(this, K_OLD_OWNER_PLAYER_IDS);
+            oldOwnersVisitor.OnValue += (_, v) =>
+            {
+                oldOwnerIds.Add((Guid)v);
+            };
+            oldOwnersVisitor.OnExit += () =>
+            {
+                if (pendingInstance != null) pendingInstance.OldOwnerPlayerIds = oldOwnerIds;
+            };
+
+            yield return oldOwnersVisitor;
         }
 
-        public override void VisitStructPropertyEnd(string path, StructPropertyMeta meta)
+        public override void VisitMapEntryEnd(string path, int index, MapPropertyMeta meta)
         {
-            if (meta.StructType != "PalIndividualCharacterSaveParameter") return;
-
             if (pendingInstance != null) Result.Add(pendingInstance);
 
             pendingInstance = null;

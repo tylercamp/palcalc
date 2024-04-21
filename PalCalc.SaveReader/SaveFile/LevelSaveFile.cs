@@ -9,29 +9,67 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile
 {
+    public class LevelSaveData
+    {
+        public List<PalInstance> Pals { get; set; }
+        public List<PlayerInstance> Players { get; set; }
+        public List<GuildInstance> Guilds { get; set; }
+    }
+
     public class LevelSaveFile : ISaveFile
     {
         public LevelSaveFile(string folderPath) : base(folderPath) { }
 
         public override string FileName => "Level.sav";
 
-        public List<PalInstance> ReadPalInstances(PalDB db)
+        private Guid MostCommonOwner(PalContainer container) => container.Slots.GroupBy(s => s.PlayerId).MaxBy(g => g.Count()).Key;
+        
+        public LevelSaveData ReadCharacterData(PalDB db)
         {
             var containerVisitor = new PalContainerVisitor();
-            var instanceVisitor = new PalInstanceVisitor();
-            VisitGvas(containerVisitor, instanceVisitor);
+            var instanceVisitor = new CharacterInstanceVisitor();
+            var groupVisitor = new GroupVisitor();
+            VisitGvas(containerVisitor, instanceVisitor, groupVisitor);
 
-            var containerTypeById = new Dictionary<string, LocationType>()
+            // note: you can read `Players/...sav` and fetch ".SaveData.PalStorageContainerId.ID" to see exactly
+            //       which pal box is for which player, but will just infer this from `Level.sav` via the most
+            //       common pal owner ID. makes support easier, don't need to provide extra files
+
+            var containersById = containerVisitor.CollectedContainers.ToDictionary(c => c.Id);
+            var containerOwners = containerVisitor.CollectedContainers.ToDictionary(c => c.Id, MostCommonOwner);
+            var palBoxesByPlayerId = containerVisitor.CollectedContainers.GroupBy(MostCommonOwner).ToDictionary(g => g.Key, g => g.MaxBy(c => c.MaxEntries));
+
+            //var containersByPlayer = containerVisitor.CollectedContainers.GroupBy(c => containerOwners[c.Id]).ToDictionary(g => g.Key, g => g.ToList());
+
+            var containerTypeById = containerVisitor.CollectedContainers.ToDictionary(c => c.Id, c =>
             {
-                { containerVisitor.CollectedContainers[0].Id, LocationType.PlayerParty },
-                { containerVisitor.CollectedContainers[1].Id, LocationType.Palbox },
+                if (c.MaxEntries == GameConstants.PlayerPartySize) return LocationType.PlayerParty;
+
+                var palBoxForPlayer = palBoxesByPlayerId[containerOwners[c.Id]];
+                if (c.Id == palBoxForPlayer.Id) return LocationType.Palbox;
+
+                return LocationType.Base;
+            });
+
+            var result = new LevelSaveData()
+            {
+                Pals = new List<PalInstance>(),
+                Players = new List<PlayerInstance>(),
+                Guilds = groupVisitor.Result,
             };
 
-            foreach (var container in containerVisitor.CollectedContainers.Skip(2))
-                containerTypeById.Add(container.Id, LocationType.Base);
-
-            return instanceVisitor.Result
-                .Select(gvasInstance =>
+            foreach (var gvasInstance in instanceVisitor.Result)
+            {
+                if (gvasInstance.IsPlayer)
+                {
+                    result.Players.Add(new PlayerInstance()
+                    {
+                        InstanceId = gvasInstance.InstanceId.ToString(),
+                        Name = gvasInstance.NickName,
+                        Level = gvasInstance.Level,
+                    });
+                }
+                else
                 {
                     var sanitizedCharId = gvasInstance.CharacterId.Replace("Boss_", "", StringComparison.InvariantCultureIgnoreCase);
                     var pal = db.Pals.FirstOrDefault(p => p.InternalName.ToLower() == sanitizedCharId.ToLower());
@@ -40,7 +78,7 @@ namespace PalCalc.SaveReader.SaveFile
                     {
                         // skip unrecognized pals
                         // TODO - log warning
-                        return null;
+                        continue;
                     }
 
                     var traits = gvasInstance.Traits
@@ -52,10 +90,14 @@ namespace PalCalc.SaveReader.SaveFile
                         })
                         .ToList();
 
-                    return new PalInstance()
+                    result.Pals.Add(new PalInstance()
                     {
                         Pal = pal,
+                        InstanceId = gvasInstance.InstanceId.ToString(),
+                        OwnerPlayerId = gvasInstance.OwnerPlayerId?.ToString() ?? gvasInstance.OldOwnerPlayerIds.First().ToString(),
 
+                        Level = gvasInstance.Level,
+                        NickName = gvasInstance.NickName,
                         Gender = gvasInstance.Gender.Contains("Female") ? PalGender.FEMALE : PalGender.MALE,
                         Traits = traits,
                         Location = new PalLocation()
@@ -63,10 +105,11 @@ namespace PalCalc.SaveReader.SaveFile
                             Type = containerTypeById[gvasInstance.ContainerId.ToString()],
                             Index = gvasInstance.SlotIndex,
                         }
-                    };
-                })
-                .SkipNull()
-                .ToList();
+                    });
+                }
+            }
+
+            return result;
         }
     }
 }

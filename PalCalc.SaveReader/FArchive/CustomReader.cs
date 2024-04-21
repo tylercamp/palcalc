@@ -122,10 +122,53 @@ namespace PalCalc.SaveReader.FArchive
         public IPropertyMeta Meta => TypedMeta;
         public GroupDataPropertyMeta TypedMeta { get; set; }
 
-        public string GroupType { get; set; }
+        public GroupType GroupType { get; set; }
         public string GroupName { get; set; }
-        public List<EntityInstanceId> CharacterHandleIds { get; set; }
-        public Dictionary<string, object> Properties { get; set; }
+        public EntityInstanceId[] CharacterHandleIds { get; set; }
+
+        // For `Meta` match with `Mask_HasBaseIds`
+        public byte? OrgType { get; set; }
+        public Guid[] BaseIds { get; set; }
+
+        // For `Meta` match with `Mask_HasGuildName`
+        public int? BaseCampLevel { get; set; }
+        public Guid[] MapObjectBasePointInstanceIds { get; set; }
+        public string GuildName { get; set; }
+
+        // For `IndependentGuild`
+        public Guid? PlayerUid { get; set; }
+        public string GuildName2 { get; set; } // ?
+        public long? PlayerLastOnlineRealTime { get; set; }
+        public string PlayerName { get; set; }
+
+        // For `Guild`
+        public Guid? AdminPlayerUid { get; set; }
+        public PlayerReference[] Members { get; set; }
+
+        public override string ToString()
+        {
+            switch (GroupType)
+            {
+                case GroupType.Guild: return $"Group '{GroupName}' - Guild ({OrgType}) '{GuildName}' w/ {Members.Length} members";
+                case GroupType.IndependentGuild: return $"Group '{GroupName}' - IndependentGuild ({OrgType}) '{GuildName}'/'{GuildName2}' of '{PlayerName}'";
+                case GroupType.Organization: return $"Group '{GroupName}' - Organization ({OrgType}) w/ {CharacterHandleIds.Length} char handles, {BaseIds.Length} base ids";
+                default: return $"Group '{GroupName}' - {Enum.GetName(GroupType)} w/ {CharacterHandleIds.Length} char handles";
+            }
+        }
+    }
+
+    [Flags]
+    public enum GroupType
+    {
+        Guild = 0b_0_0001,
+        IndependentGuild = 0b_0_0010,
+        Organization = 0b_0_0100,
+        Neutral = 0b_0_1000,
+
+        Unrecognized = 0b_1_0000,
+
+        Mask_HasBaseIds = Guild | IndependentGuild | Organization,
+        Mask_HasGuildName = Guild | IndependentGuild,
     }
 
     public struct EntityInstanceId
@@ -155,64 +198,108 @@ namespace PalCalc.SaveReader.FArchive
     {
         public override string MatchedPath => ".worldSaveData.GroupSaveDataMap.Value";
 
+        private (string, string, ulong) ReadRawProperty(FArchiveReader reader)
+        {
+            var name = reader.ReadString();
+            if (name == "None") throw new Exception(); // TODO
+
+            var typeName = reader.ReadString();
+            var size = reader.ReadUInt64();
+
+            return (name, typeName, size);
+        }
+
+        private string ReadGroupType(FArchiveReader reader)
+        {
+            var (propName, typeName, size) = ReadRawProperty(reader);
+
+            if (propName != "GroupType") throw new Exception(); // TODO
+            if (typeName != "EnumProperty") throw new Exception(); // TODO
+            
+            var enumType = reader.ReadString();
+            if (enumType != "EPalGroupType") throw new Exception(); // TODO
+
+            var enumId = reader.ReadOptionalGuid();
+
+            return reader.ReadString();
+        }
+
+        private byte[] ReadRawData(FArchiveReader reader)
+        {
+            var (propName, typeName, size) = ReadRawProperty(reader);
+
+            if (propName != "RawData") throw new Exception(); // TODO
+            if (typeName != "ArrayProperty") throw new Exception(); // TODO
+
+            var arrayType = reader.ReadString();
+            if (arrayType != "ByteProperty") throw new Exception(); // TODO
+
+            var id = reader.ReadOptionalGuid();
+            var count = reader.ReadUInt32();
+
+            if (count != size - 4) throw new Exception("Labelled ByteProperty not implemented"); // sic
+
+            return reader.ReadBytes((int)count);
+        }
+
         public override IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path, IEnumerable<IVisitor> visitors)
         {
-            var props = reader.ReadPropertiesUntilEnd(path, visitors);
+            // manually read properties instead of using FArchiveReader property helpers to preserve values regardless
+            // of ARCHIVE_PRESERVE flag
+            var groupTypeString = ReadGroupType(reader);
+            var rawDataBytes = ReadRawData(reader);
+            reader.ReadString(); // skip "None" at end of property list
 
-            var groupType = (EnumProperty)props["GroupType"];
-            var arrayProp = (ArrayProperty)props["RawData"];
+            var groupType = groupTypeString switch
+            {
+                "EPalGroupType::Neutral" => GroupType.Neutral,
+                "EPalGroupType::Guild" => GroupType.Guild,
+                "EPalGroupType::IndependentGuild" => GroupType.IndependentGuild,
+                "EPalGroupType::Organization" => GroupType.Organization,
+                _ => GroupType.Unrecognized
+            };
 
-            using (var byteStream = new MemoryStream(arrayProp.ByteValues))
+            using (var byteStream = new MemoryStream(rawDataBytes))
             using (var subReader = reader.Derived(byteStream))
             {
-                var pathVisitors = visitors.Where(v => v.Matches(path));
-                //var extraVisitors = pathVisitors.SelectMany(v => v)
+                var result = new GroupDataProperty() { TypedMeta = new GroupDataPropertyMeta() { Path = path } };
 
-                var groupId = subReader.ReadGuid();
-                var groupName = subReader.ReadString();
-                var characterHandleIds = subReader.ReadArray(r => new EntityInstanceId() { Guid = r.ReadGuid(), InstanceId = r.ReadGuid() });
+                result.TypedMeta.Id = subReader.ReadGuid();
+                result.GroupType = groupType;
+                result.GroupName = subReader.ReadString();
+                result.CharacterHandleIds = subReader.ReadArray(r => new EntityInstanceId() { Guid = r.ReadGuid(), InstanceId = r.ReadGuid() });
 
-                var resultProps = new Dictionary<string, object>(); // TODO
-
-                if (new List<string>() { "EPalGroupType::Guild", "EPalGroupType::IndependentGuild", "EPalGroupType::Organization" }.Contains(groupType.EnumValue))
+                if (GroupType.Mask_HasBaseIds.HasFlag(groupType))
                 {
-                    resultProps.Add("OrgType", subReader.ReadByte());
-                    resultProps.Add("BaseIds", subReader.ReadArray(r => r.ReadGuid()));
+                    result.OrgType = subReader.ReadByte();
+                    result.BaseIds = subReader.ReadArray(r => r.ReadGuid());
                 }
 
-                if (new string[] { "EPalGroupType::Guild", "EPalGroupType::IndependentGuild" }.Contains(groupType.EnumValue))
+                if (GroupType.Mask_HasGuildName.HasFlag(groupType))
                 {
-                    resultProps.Add("BaseCampLevel", subReader.ReadInt32());
-                    resultProps.Add("MapObjectInstanceIdsBaseCampPoints", subReader.ReadArray(r => r.ReadGuid()));
-                    resultProps.Add("GuildName", subReader.ReadString());
+                    result.BaseCampLevel = subReader.ReadInt32();
+                    result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
+                    result.GuildName = subReader.ReadString();
                 }
 
-                if (groupType.EnumValue == "EPalGroupType::IndependentGuild")
+                if (groupType == GroupType.IndependentGuild)
                 {
-                    resultProps.Add("PlayerUid", subReader.ReadGuid());
-                    resultProps.Add("GuildName2", subReader.ReadString());
-                    resultProps.Add("PlayerLastOnlineRealTime", subReader.ReadInt64());
-                    resultProps.Add("PlayerName", subReader.ReadString());
+                    result.PlayerUid = subReader.ReadGuid();
+                    result.GuildName2 = subReader.ReadString();
+                    result.PlayerLastOnlineRealTime = subReader.ReadInt64();
+                    result.PlayerName = subReader.ReadString();
                 }
 
-                if (groupType.EnumValue == "EPalGroupType::Guild")
+                if (groupType == GroupType.Guild)
                 {
-                    resultProps.Add("AdminPlayerUid", subReader.ReadGuid());
-                    resultProps.Add("Members", subReader.ReadArray(PlayerReference.ReadFrom));
+                    result.AdminPlayerUid = subReader.ReadGuid();
+                    result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
                 }
 
-                return new GroupDataProperty()
-                {
-                    TypedMeta = new GroupDataPropertyMeta()
-                    {
-                        Id = groupId,
-                        Path = path
-                    },
-                    GroupName = groupName,
-                    GroupType = groupType.EnumValue,
-                    CharacterHandleIds = characterHandleIds.ToList(),
-                    Properties = resultProps,
-                };
+                foreach (var v in visitors.Where(v => v.Matches(path)))
+                    v.VisitCharacterGroupProperty(path, result);
+
+                return result;
             }
         }
     }

@@ -16,7 +16,7 @@ internal class Program
         var saveGame = SavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LastModified);
         Console.WriteLine("Using {0}", saveGame);
 
-        var savedInstances = saveGame.Level.ReadPalInstances(db);
+        var savedInstances = saveGame.Level.ReadCharacterData(db).Pals;
         Console.WriteLine("Loaded save game");
 
         var solver = new BreedingSolver(

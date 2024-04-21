@@ -19,6 +19,8 @@ namespace PalCalc.Model
 
         public static readonly int MaxTotalTraits = 4;
 
+        public static readonly int PlayerPartySize = 5;
+
         // roughly estimate time to catch a given pal based on paldex num. and whether it's a pal variant rather than base pal
         public static TimeSpan TimeToCatch(Pal pal)
         {
