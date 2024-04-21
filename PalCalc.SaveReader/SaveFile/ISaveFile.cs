@@ -31,13 +31,13 @@ namespace PalCalc.SaveReader.SaveFile
             });
         }
 
-        public GvasFile ParseGvas()
+        public GvasFile ParseGvas(params IVisitor[] visitors)
         {
             GvasFile result = null;
             CompressedSAV.WithDecompressedSave(FilePath, stream =>
             {
                 using (var archiveReader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
-                    result = GvasFile.FromFArchive(archiveReader, Enumerable.Empty<IVisitor>());
+                    result = GvasFile.FromFArchive(archiveReader, visitors);
             });
             return result;
         }

@@ -12,13 +12,17 @@ foreach (var gameFolder in SavesLocation.AllLocal)
 {
     Console.WriteLine("Checking game folder {0}", gameFolder.FolderName);
 
-    foreach (var save in gameFolder.ValidSaveGames)
+    foreach (var save in gameFolder.ValidSaveGames.OrderByDescending(g => g.LastModified))
     {
         var sw = Stopwatch.StartNew();
         Console.WriteLine("Checking save folder {0}", save.FolderName);
 
         var meta = save.LevelMeta.ReadGameOptions();
         var pals = save.Level.ReadPalInstances(db);
+        var gvas = save.Level.ParseGvas();
+
+        var visitor = new ReferenceCollectingVisitor();
+        //save.Level.ParseGvas()
 
         Console.WriteLine(meta);
         Console.WriteLine("{0} owned pals", pals.Count);
@@ -34,3 +38,21 @@ foreach (var gameFolder in SavesLocation.AllLocal)
 
 Console.ReadLine();
 
+class ReferenceCollectingVisitor : IVisitor
+{
+    List<string> observedPaths = new List<string>();
+    Guid[] ids;
+    public ReferenceCollectingVisitor(params Guid[] ids) : base("")
+    {
+        this.ids = ids;
+    }
+
+    public override bool Matches(string path) => true;
+
+    public override void VisitGuid(string path, Guid guid)
+    {
+        base.VisitGuid(path, guid);
+        if (ids.Contains(guid))
+            observedPaths.Add(path);
+    }
+}

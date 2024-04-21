@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -167,8 +168,12 @@ namespace PalCalc.SaveReader.FArchive
                     };
 
                 default:
-                    // treat as property list?
-                    return ReadPropertiesUntilEnd(path, visitors);
+                    var customReader = ICustomReader.All.SingleOrDefault(r => r.MatchedPath == path);
+                    if (customReader != null)
+                        return customReader.Decode(this, structType, 0, path, visitors);
+                    else
+                        // treat as property list?
+                        return ReadPropertiesUntilEnd(path, visitors);
             }
         }
 
