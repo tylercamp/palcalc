@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using PalCalc.Model;
 using PalCalc.SaveReader;
+using PalCalc.SaveReader.SaveFile;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,6 +30,7 @@ namespace PalCalc.UI.Model
 
         public static event Action<SaveGame> SaveFileLoadStart;
         public static event Action<SaveGame> SaveFileLoadEnd;
+        public static event Action<SaveGame, Exception> SaveFileLoadError;
 
         public static string IdentifierFor(SaveGame game)
         {
@@ -42,16 +44,29 @@ namespace PalCalc.UI.Model
         {
             SaveFileLoadStart?.Invoke(game);
 
-            var meta = game.LevelMeta.ReadGameOptions();
-            var result = new CachedSaveGame()
+            CachedSaveGame result;
+#if HANDLE_ERRORS
+            try
             {
-                LastModified = game.LastModified,
-                FolderPath = game.BasePath,
-                OwnedPals = game.Level.ReadPalInstances(db),
-                PlayerLevel = meta.PlayerLevel,
-                PlayerName = meta.PlayerName,
-                WorldName = meta.WorldName,
-            };
+#endif
+                var meta = game.LevelMeta.ReadGameOptions();
+                result = new CachedSaveGame()
+                {
+                    LastModified = game.LastModified,
+                    FolderPath = game.BasePath,
+                    OwnedPals = game.Level.ReadPalInstances(db),
+                    PlayerLevel = meta.PlayerLevel,
+                    PlayerName = meta.PlayerName,
+                    WorldName = meta.WorldName,
+                };
+#if HANDLE_ERRORS
+            }
+            catch (Exception ex)
+            {
+                SaveFileLoadError?.Invoke(game, ex);
+                return null;
+            }
+#endif
 
             SaveFileLoadEnd?.Invoke(game);
 

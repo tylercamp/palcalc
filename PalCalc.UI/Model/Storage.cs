@@ -59,6 +59,8 @@ namespace PalCalc.UI.Model
             else
             {
                 var res = CachedSaveGame.FromSaveGame(save, db);
+                if (res == null) return null;
+
                 File.WriteAllText(path, res.ToJson(db));
                 InMemorySaves.Add(identifier, res);
                 return res;

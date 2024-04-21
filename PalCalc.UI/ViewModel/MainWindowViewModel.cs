@@ -51,6 +51,7 @@ namespace PalCalc.UI.ViewModel
 
             CachedSaveGame.SaveFileLoadStart += CachedSaveGame_SaveFileLoadStart;
             CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
+            CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
             SaveSelection = new SaveSelectorViewModel(SavesLocation.AllLocal);
             SolverControls = new SolverControlsViewModel();
@@ -103,6 +104,19 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
+        private void CachedSaveGame_SaveFileLoadError(SaveGame obj, Exception ex)
+        {
+            if (loadingSaveModal != null)
+            {
+                loadingSaveModal.Close();
+                loadingSaveModal = null;
+            }
+
+            MessageBox.Show("An error occurred when loading the save file");
+
+            // TODO - log
+        }
+
         private void UpdateTargetsList()
         {
             if (PalTargetList != null) PalTargetList.PropertyChanged -= PalTargetList_PropertyChanged;
@@ -146,7 +160,10 @@ namespace PalCalc.UI.ViewModel
             var currentSpec = PalTarget.CurrentPalSpecifier.ModelObject;
             if (currentSpec == null) return;
 
-            var solver = SolverControls.ConfiguredSolver(SaveSelection.SelectedGame.CachedValue.OwnedPals);
+            var cachedData = SaveSelection.SelectedGame.CachedValue;
+            if (cachedData == null) return;
+
+            var solver = SolverControls.ConfiguredSolver(cachedData.OwnedPals);
             solver.SolverStateUpdated += Solver_SolverStateUpdated;
 
             Task.Factory.StartNew(() =>

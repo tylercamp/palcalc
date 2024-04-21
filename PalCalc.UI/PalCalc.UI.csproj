@@ -6,6 +6,12 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants);HANDLE_ERRORS</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Resources\PalIconOverride.json" />
     <None Remove="Resources\Pals\Anubis.png" />
