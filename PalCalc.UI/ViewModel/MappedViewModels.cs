@@ -40,7 +40,8 @@ namespace PalCalc.UI.ViewModel
             try
             {
                 var meta = value.LevelMeta.ReadGameOptions();
-                Label = $"{meta.PlayerName} lv. {meta.PlayerLevel} in {meta.WorldName}";
+                Label = meta.ToString();
+                //Label = $"{meta.PlayerName} lv. {meta.PlayerLevel} in {meta.WorldName}";
             }
             catch (Exception ex)
             {

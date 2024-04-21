@@ -32,7 +32,8 @@ namespace PalCalc.SaveReader
             WorldOption.LastModified,
         }.Max();
 
-        public bool IsValid => Level.Exists && LevelMeta.Exists && LocalData.Exists && WorldOption.Exists;
+        // (don't check `WorldOption`, not present for linux-based server saves)
+        public bool IsValid => Level.Exists && LevelMeta.Exists && LocalData.Exists;
 
         public LevelSaveFile Level { get; }
         public LevelMetaSaveFile LevelMeta { get; }

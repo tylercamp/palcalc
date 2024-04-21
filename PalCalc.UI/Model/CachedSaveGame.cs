@@ -15,9 +15,16 @@ namespace PalCalc.UI.Model
     {
         public DateTime LastModified { get; set; }
         public string FolderPath { get; set; }
+
+        public bool IsServerSave { get; set; }
+
         public string WorldName { get; set; }
         public string PlayerName { get; set; }
-        public int PlayerLevel { get; set; }
+        public int? PlayerLevel { get; set; }
+        public int InGameDay { get; set; }
+
+        public List<PlayerInstance> Players { get; set; }
+        public List<GuildInstance> Guilds { get; set; }
         public List<PalInstance> OwnedPals { get; set; }
 
         public SaveGame UnderlyingSave => new SaveGame(FolderPath);
@@ -50,14 +57,18 @@ namespace PalCalc.UI.Model
             {
 #endif
                 var meta = game.LevelMeta.ReadGameOptions();
+                var charData = game.Level.ReadCharacterData(db);
                 result = new CachedSaveGame()
                 {
                     LastModified = game.LastModified,
                     FolderPath = game.BasePath,
-                    OwnedPals = game.Level.ReadCharacterData(db).Pals,
+                    OwnedPals = charData.Pals,
+                    Guilds = charData.Guilds,
+                    Players = charData.Players,
                     PlayerLevel = meta.PlayerLevel,
                     PlayerName = meta.PlayerName,
                     WorldName = meta.WorldName,
+                    InGameDay = meta.InGameDay,
                 };
 #if HANDLE_ERRORS
             }

@@ -10,10 +10,17 @@ namespace PalCalc.SaveReader.SaveFile
     public class GameMeta
     {
         public string WorldName { get; set; }
-        public string PlayerName { get; set; }
-        public int PlayerLevel { get; set; }
+        public int InGameDay { get; set; }
 
-        public override string ToString() => $"{PlayerName} lv {PlayerLevel} in {WorldName}";
+        public bool IsServerSave { get; set; }
+
+        // (when `IsServerSave = false`)
+        public string PlayerName { get; set; }
+        public int? PlayerLevel { get; set; }
+
+        public override string ToString() => IsServerSave
+            ? $"{WorldName} day {InGameDay} (Server)"
+            : $"{PlayerName} lv {PlayerLevel} in {WorldName} day {InGameDay}";
     }
 
     public class LevelMetaSaveFile : ISaveFile
@@ -24,14 +31,18 @@ namespace PalCalc.SaveReader.SaveFile
 
         public GameMeta ReadGameOptions()
         {
-            var valuesVisitor = new ValueCollectingVisitor(".SaveData", ".WorldName", ".HostPlayerName", ".HostPlayerLevel");
+            var valuesVisitor = new ValueCollectingVisitor(".SaveData", ".WorldName", ".HostPlayerName", ".HostPlayerLevel", ".InGameDay");
             VisitGvas(valuesVisitor);
+
+            bool isServerSave = !valuesVisitor.Result.ContainsKey(".HostPlayerName");
 
             return new GameMeta
             {
                 WorldName = (string)valuesVisitor.Result[".WorldName"],
-                PlayerName = (string)valuesVisitor.Result[".HostPlayerName"],
-                PlayerLevel = (int)valuesVisitor.Result[".HostPlayerLevel"],
+                InGameDay = (int)valuesVisitor.Result[".InGameDay"],
+                IsServerSave = isServerSave,
+                PlayerName = isServerSave ? null : (string)valuesVisitor.Result[".HostPlayerName"],
+                PlayerLevel = isServerSave ? null : (int?)valuesVisitor.Result[".HostPlayerLevel"],
             };
         }
     }
