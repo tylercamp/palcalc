@@ -68,7 +68,21 @@ namespace PalCalc.UI.ViewModel
                         if (File.Exists(targetsFile))
                         {
                             var converter = new PalTargetListViewModelConverter(db, new GameSettings());
-                            return JsonConvert.DeserializeObject<PalTargetListViewModel>(File.ReadAllText(targetsFile), converter);
+#if HANDLE_ERRORS
+                            try
+                            {
+#endif
+                                return JsonConvert.DeserializeObject<PalTargetListViewModel>(File.ReadAllText(targetsFile), converter);
+
+#if HANDLE_ERRORS
+                            }
+                            catch (Exception ex)
+                            {
+                                // TODO - log
+                                File.Delete(targetsFile);
+                                return new PalTargetListViewModel();
+                            }
+#endif
                         }
                         else
                         {

@@ -25,7 +25,11 @@ namespace PalCalc.Model
                 Pal = token["Id"].ToObject<PalId>().ToPal(db),
                 Location = token["Location"].ToObject<PalLocation>(),
                 Gender = token["Gender"].ToObject<PalGender>(),
-                Traits = token["Traits"].ToObject<List<string>>().Select(s => s.ToTrait(db)).ToList()
+                Traits = token["Traits"].ToObject<List<string>>().Select(s => s.ToTrait(db)).ToList(),
+                OwnerPlayerId = token["OwnerPlayerId"].ToObject<string>(),
+                NickName = token["NickName"].ToObject<string>(),
+                Level = token["Level"].ToObject<int>(),
+                InstanceId = token["InstanceId"].ToObject<string>(),
             };
         }
 
@@ -37,6 +41,10 @@ namespace PalCalc.Model
                 Location = value.Location,
                 Gender = value.Gender,
                 Traits = value.Traits.Select(t => t.Name),
+                OwnerPlayerId = value.OwnerPlayerId,
+                NickName = value.NickName,
+                Level = value.Level,
+                InstanceId = value.InstanceId,
             }).WriteTo(writer);
         }
     }

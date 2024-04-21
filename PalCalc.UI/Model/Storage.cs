@@ -40,7 +40,22 @@ namespace PalCalc.UI.Model
             var path = $"{SaveCachePath}/{identifier}.json";
             if (File.Exists(path))
             {
-                var res = CachedSaveGame.FromJson(File.ReadAllText(path), db);
+                CachedSaveGame res;
+#if HANDLE_ERRORS
+                try
+                {
+#endif
+                    res = CachedSaveGame.FromJson(File.ReadAllText(path), db);
+#if HANDLE_ERRORS
+                }
+                catch (Exception e)
+                {
+                    // TODO - log
+                    File.Delete(path);
+                    return LoadSave(save, db);
+                }
+#endif
+
                 if (!res.IsValid)
                 {
                     File.Delete(path);

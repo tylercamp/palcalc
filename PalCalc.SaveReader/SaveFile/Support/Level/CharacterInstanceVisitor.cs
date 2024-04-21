@@ -27,9 +27,9 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         public List<string> Traits { get; set; }
     }
 
-    class PalInstanceVisitor : IVisitor
+    class CharacterInstanceVisitor : IVisitor
     {
-        public PalInstanceVisitor() : base(".worldSaveData.CharacterSaveParameterMap") { }
+        public CharacterInstanceVisitor() : base(".worldSaveData.CharacterSaveParameterMap") { }
 
         public List<GvasCharacterInstance> Result = new List<GvasCharacterInstance>();
 
