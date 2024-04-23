@@ -8,6 +8,15 @@ namespace PalCalc.Model
 {
     public static class GameConstants
     {
+        public static readonly int PlayerPartySize = 5;
+
+        public static readonly int PalBox_GridWidth = 6;
+        public static readonly int PalBox_GridHeight = 5;
+        public static readonly int PalBox_SlotsPerTab = PalBox_GridWidth * PalBox_GridHeight;
+
+        public static readonly int Base_GridWidth = 5;
+        public static readonly int Base_GridHeight = 4;
+
         /*
          * Outstanding questions:
          * 
@@ -18,8 +27,6 @@ namespace PalCalc.Model
          */
 
         public static readonly int MaxTotalTraits = 4;
-
-        public static readonly int PlayerPartySize = 5;
 
         // roughly estimate time to catch a given pal based on paldex num. and whether it's a pal variant rather than base pal
         public static TimeSpan TimeToCatch(Pal pal)

@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -290,13 +291,13 @@ namespace PalCalc.UI
 
     internal class PalSpecifierViewModelConverter : PalConverterBase<PalSpecifierViewModel>
     {
-        public PalSpecifierViewModelConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        public PalSpecifierViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source) : base(db, gameSettings)
         {
             dependencyConverters = new JsonConverter[]
             {
                 new PalViewModelConverter(db, gameSettings),
                 new TraitViewModelConverter(db, gameSettings),
-                new BreedingResultListViewModelConverter(db, gameSettings),
+                new BreedingResultListViewModelConverter(db, gameSettings, source),
             };
         }
 
@@ -330,18 +331,21 @@ namespace PalCalc.UI
 
     internal class BreedingResultViewModelConverter : PalConverterBase<BreedingResultViewModel>
     {
-        public BreedingResultViewModelConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        private CachedSaveGame source;
+        public BreedingResultViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source) : base(db, gameSettings)
         {
             dependencyConverters = new JsonConverter[]
             {
                 new PalReferenceConverter(db, gameSettings),
             };
+
+            this.source = source;
         }
 
         protected override BreedingResultViewModel ReadTypeJson(JsonReader reader, Type objectType, BreedingResultViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var palRef = JToken.ReadFrom(reader).ToObject<IPalReference>(serializer);
-            return new BreedingResultViewModel(palRef);
+            return new BreedingResultViewModel(source, palRef);
         }
 
         protected override void WriteTypeJson(JsonWriter writer, BreedingResultViewModel value, JsonSerializer serializer)
@@ -352,11 +356,11 @@ namespace PalCalc.UI
 
     internal class BreedingResultListViewModelConverter : PalConverterBase<BreedingResultListViewModel>
     {
-        public BreedingResultListViewModelConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        public BreedingResultListViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source) : base(db, gameSettings)
         {
             dependencyConverters = new JsonConverter[]
             {
-                new BreedingResultViewModelConverter(db, gameSettings),
+                new BreedingResultViewModelConverter(db, gameSettings, source),
             };
         }
 
@@ -374,11 +378,11 @@ namespace PalCalc.UI
 
     internal class PalTargetListViewModelConverter : PalConverterBase<PalTargetListViewModel>
     {
-        public PalTargetListViewModelConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        public PalTargetListViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source) : base(db, gameSettings)
         {
             dependencyConverters = new JsonConverter[]
             {
-                new PalSpecifierViewModelConverter(db, gameSettings),
+                new PalSpecifierViewModelConverter(db, gameSettings, source),
             };
         }
 

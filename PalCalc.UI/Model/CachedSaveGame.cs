@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.Model
 {
-    internal class CachedSaveGame
+    public class CachedSaveGame
     {
         public DateTime LastModified { get; set; }
         public string FolderPath { get; set; }
@@ -26,6 +26,17 @@ namespace PalCalc.UI.Model
         public List<PlayerInstance> Players { get; set; }
         public List<GuildInstance> Guilds { get; set; }
         public List<PalInstance> OwnedPals { get; set; }
+
+        private Dictionary<string, PlayerInstance> playersByName;
+        public Dictionary<string, PlayerInstance> PlayersById =>
+            playersByName ??= Players.ToDictionary(p => p.PlayerId);
+
+        public Dictionary<string, PlayerInstance> PlayersByInstanceId =>
+            playersByName ??= Players.ToDictionary(p => p.InstanceId);
+
+        private Dictionary<string, GuildInstance> playerGuilds;
+        public Dictionary<string, GuildInstance> GuildsByPlayerId =>
+            playerGuilds ??= Players.ToDictionary(p => p.PlayerId, p => Guilds.FirstOrDefault(g => g.MemberIds.Contains(p.PlayerId)));
 
         public SaveGame UnderlyingSave => new SaveGame(FolderPath);
 

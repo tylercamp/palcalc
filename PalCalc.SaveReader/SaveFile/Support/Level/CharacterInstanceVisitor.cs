@@ -15,6 +15,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         public int Level { get; set; }
 
         public bool IsPlayer { get; set; }
+        public Guid? PlayerId { get; set; }
 
         public Guid? OwnerPlayerId { get; set; }
         public List<Guid> OldOwnerPlayerIds { get; set; }
@@ -36,6 +37,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         GvasCharacterInstance pendingInstance = null;
 
         const string K_INSTANCE_ID          = ".Key.InstanceId";
+        const string K_PLAYER_ID            = ".Key.PlayerUId";
         const string K_NICKNAME             = ".Value.RawData.SaveParameter.NickName";
         const string K_LEVEL                = ".Value.RawData.SaveParameter.Level";
         const string K_CHARACTER_ID         = ".Value.RawData.SaveParameter.CharacterID";
@@ -62,6 +64,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             pendingInstance = new GvasCharacterInstance();
 
             var collectingVisitor = new ValueCollectingVisitor(this,
+                K_PLAYER_ID,
                 K_INSTANCE_ID,
                 K_NICKNAME,
                 K_LEVEL,
@@ -83,6 +86,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
                 if (pendingInstance.IsPlayer)
                 {
+                    pendingInstance.PlayerId = (Guid?)vals[K_PLAYER_ID];
                     pendingInstance.NickName = (string)vals[K_NICKNAME];
                 }
                 else

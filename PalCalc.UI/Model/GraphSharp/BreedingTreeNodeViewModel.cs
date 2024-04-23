@@ -15,13 +15,13 @@ namespace PalCalc.UI.Model
     public partial class BreedingTreeNodeViewModel : ObservableObject
     {
         private PalDB db;
-        public BreedingTreeNodeViewModel(IBreedingTreeNode node)
+        public BreedingTreeNodeViewModel(CachedSaveGame source, IBreedingTreeNode node)
         {
             Value = node;
             Pal = new PalViewModel(node.PalRef.Pal);
             Traits = node.PalRef.Traits.Select(t => new TraitViewModel(t)).ToList();
             TraitCollection = new TraitCollectionViewModel(Traits);
-            Location = new PalLocationViewModel(node.PalRef.Location);
+            Location = new PalRefLocationViewModel(source, node.PalRef.Location);
             Gender = node.PalRef.Gender.ToString();
         }
 
@@ -35,7 +35,7 @@ namespace PalCalc.UI.Model
 
         public Visibility TraitsVisibility => Traits.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
-        public PalLocationViewModel Location { get; }
+        public PalRefLocationViewModel Location { get; }
 
         public string Gender { get; }
     }

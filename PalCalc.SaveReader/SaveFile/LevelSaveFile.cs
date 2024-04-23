@@ -64,6 +64,7 @@ namespace PalCalc.SaveReader.SaveFile
                 {
                     result.Players.Add(new PlayerInstance()
                     {
+                        PlayerId = gvasInstance.PlayerId.ToString(),
                         InstanceId = gvasInstance.InstanceId.ToString(),
                         Name = gvasInstance.NickName,
                         Level = gvasInstance.Level,

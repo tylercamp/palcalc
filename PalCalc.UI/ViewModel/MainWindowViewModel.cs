@@ -63,11 +63,19 @@ namespace PalCalc.UI.ViewModel
                     sg => sg,
                     sg =>
                     {
-                        var saveLocation = Storage.SaveFileDataPath(sg);
-                        var targetsFile = Path.Join(saveLocation, "pal-targets.json");
+                        var saveTargetsLocation = Storage.SaveFileDataPath(sg);
+                        var targetsFile = Path.Join(saveTargetsLocation, "pal-targets.json");
                         if (File.Exists(targetsFile))
                         {
-                            var converter = new PalTargetListViewModelConverter(db, new GameSettings());
+                            var originalCachedSave = Storage.LoadSaveFromCache(sg, db);
+                            if (originalCachedSave == null)
+                            {
+                                // TODO - log
+                                File.Delete(targetsFile);
+                                return new PalTargetListViewModel();
+                            }
+
+                            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), originalCachedSave);
 #if HANDLE_ERRORS
                             try
                             {
@@ -191,7 +199,7 @@ namespace PalCalc.UI.ViewModel
                 {
                     if (!solverTokenSource.IsCancellationRequested)
                     {
-                        PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(r)).ToList() };
+                        PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(cachedData, r)).ToList() };
                         if (PalTarget.InitialPalSpecifier == null)
                         {
                             PalTargetList.Add(PalTarget.CurrentPalSpecifier);
@@ -208,7 +216,7 @@ namespace PalCalc.UI.ViewModel
                             Directory.CreateDirectory(outputFolder);
 
                         var outputFile = Path.Join(outputFolder, "pal-targets.json");
-                        var converter = new PalTargetListViewModelConverter(db, new GameSettings());
+                        var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedGame.CachedValue);
                         File.WriteAllText(outputFile, JsonConvert.SerializeObject(PalTargetList, converter));
                     }
 

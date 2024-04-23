@@ -19,6 +19,8 @@ namespace PalCalc.Model
     public class PalLocation
     {
         public LocationType Type { get; set; }
+
+        // note: 1-indexed
         public int Index { get; set; }
 
         // pal box is 6x5
@@ -27,20 +29,8 @@ namespace PalCalc.Model
             string indexStr;
             if (Type == LocationType.Palbox)
             {
-                var numCols = 6;
-                var numRows = 5;
-                var palsPerTab = numCols * numRows;
-
-                var idx = Index - 1;
-
-                var tab = (idx - idx % palsPerTab) / palsPerTab;
-                idx -= tab * palsPerTab;
-
-                var row = (idx - idx % numCols) / numCols;
-                idx -= row * numCols;
-                var col = idx;
-
-                indexStr = $"tab #{tab + 1} at ({col + 1}, {row + 1})";
+                var coord = PalboxCoord.FromSlotIndex(Index);
+                indexStr = coord.ToString();
             }
             else
             {
@@ -48,6 +38,60 @@ namespace PalCalc.Model
             }
 
             return $"{Type} ({indexStr})";
+        }
+    }
+
+    public class PalboxCoord
+    {
+        // all 1-indexed
+        public int Tab { get; set; }
+        public int Row { get; set; }
+        public int Column { get; set; }
+
+        public int X => Column;
+        public int Y => Row;
+
+        public override string ToString() => $"Tab {Tab} at ({X},{Y})";
+
+        // (slotIndex is 1-indexed)
+        public static PalboxCoord FromSlotIndex(int slotIndex)
+        {
+            slotIndex -= 1;
+
+            var numCols = GameConstants.PalBox_GridWidth;
+            var numRows = GameConstants.PalBox_GridHeight;
+            var palsPerTab = numCols * numRows;
+
+            var tab = (slotIndex - slotIndex % palsPerTab) / palsPerTab;
+            slotIndex -= tab * palsPerTab;
+
+            var row = (slotIndex - slotIndex % numCols) / numCols;
+            slotIndex -= row * numCols;
+            var col = slotIndex;
+
+            return new PalboxCoord() { Tab = tab + 1, Row = row + 1, Column = col + 1 };
+        }
+    }
+
+    public class BaseCoord
+    {
+        // all 1-indexed
+        public int Row { get; set; }
+        public int Column { get; set; }
+
+        public int X => Column;
+        public int Y => Column;
+
+        public override string ToString() => $"Slot ({X},{Y})";
+
+        // (slotIndex is 1-indexed)
+        public static BaseCoord FromSlotIndex(int slotIndex)
+        {
+            slotIndex -= 1;
+            var row = (slotIndex - slotIndex % GameConstants.Base_GridWidth) / GameConstants.Base_GridWidth;
+            slotIndex -= row;
+
+            return new BaseCoord() { Row = row + 1, Column = slotIndex + 1 };
         }
     }
 }

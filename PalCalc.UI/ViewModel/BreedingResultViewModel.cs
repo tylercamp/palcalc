@@ -44,8 +44,11 @@ namespace PalCalc.UI.ViewModel
             DisplayedResult = solver.SolveFor(targetInstance, CancellationToken.None).MaxBy(r => r.NumTotalBreedingSteps);
         }
 
-        public BreedingResultViewModel(IPalReference displayedResult)
+        private CachedSaveGame source;
+        public BreedingResultViewModel(CachedSaveGame source, IPalReference displayedResult)
         {
+            this.source = source;
+
             DisplayedResult = displayedResult;
         }
 
@@ -60,12 +63,12 @@ namespace PalCalc.UI.ViewModel
         public IPalReference DisplayedResult
         {
             get => displayedResult;
-            set
+            private set
             {
                 displayedResult = value;
 
                 if (displayedResult == null) Graph = null;
-                else Graph = BreedingGraph.FromPalReference(value);
+                else Graph = BreedingGraph.FromPalReference(source, value);
 
                 OnPropertyChanged(nameof(DisplayedResult));
                 OnPropertyChanged(nameof(Graph));

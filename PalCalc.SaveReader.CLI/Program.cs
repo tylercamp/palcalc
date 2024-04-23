@@ -17,6 +17,9 @@ foreach (var gameFolder in SavesLocation.AllLocal)
         var sw = Stopwatch.StartNew();
         Console.WriteLine("Checking save folder {0}", save.FolderName);
 
+        var metagvas = save.LevelMeta.ParseGvas();
+        var localgvas = save.LocalData.ParseGvas();
+
         var meta = save.LevelMeta.ReadGameOptions();
         var characters = save.Level.ReadCharacterData(db);
         var gvas = save.Level.ParseGvas();

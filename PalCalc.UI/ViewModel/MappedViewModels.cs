@@ -8,11 +8,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
+
+// viewmodels which are just wrappers around PalCalc.Model types
 
 namespace PalCalc.UI.ViewModel
 {
-    internal partial class SavesLocationViewModel
+    public partial class SavesLocationViewModel
     {
         public SavesLocationViewModel(SavesLocation sl)
         {
@@ -31,7 +34,7 @@ namespace PalCalc.UI.ViewModel
         public string Label { get; }
     }
 
-    internal partial class SaveGameViewModel
+    public partial class SaveGameViewModel
     {
         public SaveGameViewModel(SaveGame value)
         {
@@ -74,16 +77,61 @@ namespace PalCalc.UI.ViewModel
         public override int GetHashCode() => ModelObject.GetHashCode();
     }
 
-    public class PalLocationViewModel
+    public class PalRefLocationViewModel
     {
-        public PalLocationViewModel(IPalRefLocation location)
+        public PalRefLocationViewModel(CachedSaveGame source, IPalRefLocation location)
         {
             ModelObject = location;
+
+            var ownedLoc = location as OwnedRefLocation;
+            if (ownedLoc == null) return;
+
+            if (source == null)
+            {
+                // for XAML designer preview
+                IsSinglePlayer = true;
+                LocationOwner = ownedLoc.OwnerId;
+            }
+            else
+            {
+                IsSinglePlayer = source.Players.Count == 1;
+
+                // TODO - getting wrong player ID, i.e. instance ID v player ID
+                var ownerName = source.PlayersById[ownedLoc.OwnerId].Name;
+                var ownerGuild = source.GuildsByPlayerId[ownedLoc.OwnerId];
+
+                var isGuildOwner = ownedLoc.Location.Type == LocationType.Base && ownerGuild.MemberIds.Count > 1;
+                LocationOwner = isGuildOwner ? ownerGuild.Name : ownerName;
+            }
+
+            switch (ownedLoc.Location.Type)
+            {
+                case LocationType.PlayerParty:
+                    LocationCoordDescription = $"Party, slot {ownedLoc.Location.Index}";
+                    break;
+
+                case LocationType.Base:
+                    var baseCoord = BaseCoord.FromSlotIndex(ownedLoc.Location.Index);
+                    LocationCoordDescription = $"A base, slot ({baseCoord.X},{baseCoord.Y})";
+                    break;
+
+                case LocationType.Palbox:
+                    var pboxCoord = PalboxCoord.FromSlotIndex(ownedLoc.Location.Index);
+                    LocationCoordDescription = $"Palbox, tab {pboxCoord.Tab} at ({pboxCoord.X},{pboxCoord.Y})";
+                    break;
+            }
         }
 
-        public IPalRefLocation ModelObject { get; }
+        public bool IsSinglePlayer { get; }
 
-        public string Description => ModelObject.ToString();
+        public IPalRefLocation ModelObject { get; }
+        public Visibility Visibility => ModelObject is OwnedRefLocation ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility OwnerVisibility => IsSinglePlayer ? Visibility.Collapsed : Visibility.Visible;
+
+        public string LocationOwner { get; }
+        public string LocationOwnerDescription => $"Owned by {LocationOwner}";
+        
+        public string LocationCoordDescription { get; }
     }
 
     public class TraitViewModel
@@ -173,6 +221,7 @@ namespace PalCalc.UI.ViewModel
             .Where(t => t != null)
             .Select(t => t.ModelObject)
             .OrderBy(mo => mo.Name)
+            .DistinctBy(mo => mo.Name)
             .ToList();
 
         public PalSpecifier ModelObject => TargetPal != null
@@ -241,5 +290,54 @@ namespace PalCalc.UI.ViewModel
         }
 
         public static readonly PalSpecifierViewModel New = new PalSpecifierViewModel(null, true);
+    }
+
+    public class PlayerViewModel
+    {
+        public PlayerViewModel(PlayerInstance player)
+        {
+            ModelObject = player;
+        }
+
+        public PlayerInstance ModelObject { get; }
+
+        public bool IsWildcard => ModelObject == null;
+
+        public string Name => IsWildcard ? "Any Player" : ModelObject.Name;
+
+        public static readonly PlayerViewModel Any = new PlayerViewModel(null);
+    }
+
+    public class GuildViewModel
+    {
+        public GuildViewModel(CachedSaveGame source, GuildInstance guild)
+        {
+            ModelObject = guild;
+
+            AvailableMembers = new List<PlayerViewModel>
+            {
+                PlayerViewModel.Any
+            };
+
+            if (source != null)
+            {
+                AvailableMembers.AddRange(
+                    guild.MemberIds
+                        .Select(id => source.Players.Single(p => p.InstanceId == id))
+                        .Select(player => new PlayerViewModel(player))
+                        .ToList()
+                );
+            }
+        }
+
+        public GuildInstance ModelObject { get; }
+
+        public bool IsWildcard => ModelObject == null;
+
+        public List<PlayerViewModel> AvailableMembers { get; }
+
+        public string Name => IsWildcard ? "Any Guild" : ModelObject.Name;
+
+        public static readonly GuildViewModel Any = new GuildViewModel(null, null);
     }
 }

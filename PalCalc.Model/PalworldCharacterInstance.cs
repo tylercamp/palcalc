@@ -16,6 +16,8 @@ namespace PalCalc.Model
     public class PlayerInstance : IPalworldCharacterInstance
     {
         public string InstanceId { get; set; }
+
+        public string PlayerId { get; set; } // typically this is referenced instead of InstanceId
         public string Name { get; set; }
         public int Level { get; set; }
     }

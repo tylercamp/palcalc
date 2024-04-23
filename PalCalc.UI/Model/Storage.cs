@@ -13,6 +13,7 @@ namespace PalCalc.UI.Model
     {
         public static string CachePath => "cache";
         public static string SaveCachePath => $"{CachePath}/saves";
+        public static string SaveCachePathFor(SaveGame forSaveFile) => $"{SaveCachePath}/{CachedSaveGame.IdentifierFor(forSaveFile)}.json";
         public static string SaveFileDataPath(SaveGame forSaveFile) => $"data/results/{CachedSaveGame.IdentifierFor(forSaveFile)}";
 
         private static bool didInit = false;
@@ -28,16 +29,12 @@ namespace PalCalc.UI.Model
 
         private static Dictionary<string, CachedSaveGame> InMemorySaves = new Dictionary<string, CachedSaveGame>();
 
-        public static CachedSaveGame LoadSave(SaveGame save, PalDB db)
+        // only loads the save if it has been cached, otherwise returns null
+        public static CachedSaveGame LoadSaveFromCache(SaveGame save, PalDB db)
         {
             Init();
 
-            if (!save.IsValid) return null;
-
-            var identifier = CachedSaveGame.IdentifierFor(save);
-            if (InMemorySaves.ContainsKey(identifier)) return InMemorySaves[identifier];
-
-            var path = $"{SaveCachePath}/{identifier}.json";
+            var path = SaveCachePathFor(save);
             if (File.Exists(path))
             {
                 CachedSaveGame res;
@@ -52,12 +49,43 @@ namespace PalCalc.UI.Model
                 {
                     // TODO - log
                     File.Delete(path);
-                    return LoadSave(save, db);
+                    res = null;
                 }
 #endif
+                return res;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        // loads the cached save data and updates it if it's outdated or not yet cached
+        public static CachedSaveGame LoadSave(SaveGame save, PalDB db)
+        {
+            Init();
+
+            var path = SaveCachePathFor(save);
+            if (!save.IsValid)
+            {
+                if (File.Exists(path))
+                {
+                    // TODO - log
+                    File.Delete(path);
+                }
+                return null;
+            }
+
+            var identifier = CachedSaveGame.IdentifierFor(save);
+            if (InMemorySaves.ContainsKey(identifier)) return InMemorySaves[identifier];
+
+            if (File.Exists(path))
+            {
+                var res = LoadSaveFromCache(save, db);
 
                 if (!res.IsValid)
                 {
+                    // TODO - log
                     File.Delete(path);
                     return null;
                 }

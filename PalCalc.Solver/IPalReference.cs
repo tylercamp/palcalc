@@ -45,7 +45,7 @@ namespace PalCalc.Solver
 
         public PalGender Gender => instance.Gender;
 
-        public IPalRefLocation Location => new OwnedRefLocation() { Location = instance.Location };
+        public IPalRefLocation Location => new OwnedRefLocation() { OwnerId = instance.OwnerPlayerId, Location = instance.Location };
 
         public TimeSpan BreedingEffort => TimeSpan.Zero;
         public TimeSpan SelfBreedingEffort => TimeSpan.Zero;

@@ -18,10 +18,10 @@ namespace PalCalc.UI.Model
 
     public class BreedingGraph : HierarchicalGraph<BreedingTreeNodeViewModel, BreedingEdge>
     {
-        private BreedingGraph(BreedingTree tree)
+        private BreedingGraph(CachedSaveGame source, BreedingTree tree)
         {
             Tree = tree;
-            Nodes = tree.AllNodes.Select(p => new BreedingTreeNodeViewModel(p.Item1)).ToList();
+            Nodes = tree.AllNodes.Select(p => new BreedingTreeNodeViewModel(source, p.Item1)).ToList();
         }
 
         public BreedingTree Tree { get; private set; }
@@ -29,10 +29,10 @@ namespace PalCalc.UI.Model
 
         public BreedingTreeNodeViewModel NodeFor(IBreedingTreeNode pref) => Nodes.Single(n => n.Value == pref);
 
-        public static BreedingGraph FromPalReference(IPalReference palRef)
+        public static BreedingGraph FromPalReference(CachedSaveGame source, IPalReference palRef)
         {
             var tree = new BreedingTree(palRef);
-            var result = new BreedingGraph(tree);
+            var result = new BreedingGraph(source, tree);
 
             result.AddVertexRange(result.Nodes);
 

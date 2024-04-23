@@ -10,6 +10,7 @@ namespace PalCalc.Solver
     public interface IPalRefLocation { }
     public class OwnedRefLocation : IPalRefLocation
     {
+        public string OwnerId { get; set; }
         public PalLocation Location { get; set; }
 
         public override string ToString() => Location.ToString();

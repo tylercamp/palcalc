@@ -30,7 +30,7 @@ namespace PalCalc.UI.ViewModel
         {
             Results = new List<BreedingResultViewModel>()
             {
-                new BreedingResultViewModel(new OwnedPalReference(new PalCalc.Model.PalInstance()
+                new BreedingResultViewModel(null, new OwnedPalReference(new PalCalc.Model.PalInstance()
                 {
                     Pal = new PalCalc.Model.Pal() {
                         Id = new PalCalc.Model.PalId() { PalDexNo = 100, IsVariant = false }
