@@ -53,13 +53,16 @@ namespace PalCalc.UI.View
 
             Children.Clear();
 
+            // (though we clear the set of row/column definitions, we can still get an exception due
+            // to "reuse" of VM Row/ColumnDefinitions, so we make copies here instead of direct refs)
+
             ColumnDefinitions.Clear();
             foreach (var cdef in newModel.ColumnDefinitions)
-                ColumnDefinitions.Add(cdef);
+                ColumnDefinitions.Add(new ColumnDefinition() { Width = cdef.Width });
 
             RowDefinitions.Clear();
             foreach (var rdef in newModel.RowDefinitions)
-                RowDefinitions.Add(rdef);
+                RowDefinitions.Add(new RowDefinition() { Height = rdef.Height });
 
             
 
