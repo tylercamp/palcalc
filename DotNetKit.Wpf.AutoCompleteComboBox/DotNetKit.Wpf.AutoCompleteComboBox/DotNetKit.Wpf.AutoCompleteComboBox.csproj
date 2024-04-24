@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <TargetFrameworks>net6-windows</TargetFrameworks>
+    <TargetFrameworks>net8-windows</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <RootNamespace>DotNetKit</RootNamespace>
     <Description>Provides a lightweight combobox with filtering (auto-complete).</Description>
