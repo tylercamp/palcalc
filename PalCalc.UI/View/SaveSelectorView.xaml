@@ -21,8 +21,13 @@
     <ComboBox ItemsSource="{Binding AvailableSaves}" SelectedItem="{Binding SelectedGame}">
         <ItemsControl.ItemTemplate>
             <DataTemplate DataType="vm:SaveGameViewModel">
-                <TextBlock Text="{Binding Label}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="(!) " Visibility="{Binding WarningVisibility}" Foreground="DarkRed" />
+                    <TextBlock Text="{Binding Label}" />
+                </StackPanel>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ComboBox>
+
+    <TextBlock Visibility="{Binding InvalidSaveMessageVisibility}" Margin="0,5,0,0" Text="The selected save file is invalid!" Foreground="DarkRed" />
 </StackPanel>

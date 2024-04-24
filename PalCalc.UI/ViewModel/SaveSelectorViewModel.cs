@@ -77,13 +77,24 @@ namespace PalCalc.UI.ViewModel
                     }
                 }
 
-                if (SetProperty(ref selectedGame, value) && needsReset)
-                    // ComboBox ignores reassignment in the middle of a value-change event, defer until later
-                    Dispatcher.CurrentDispatcher.BeginInvoke(() => SelectedGame = null);
+                if (SetProperty(ref selectedGame, value))
+                {
+                    if (needsReset)
+                    {
+                        // ComboBox ignores reassignment in the middle of a value-change event, defer until later
+                        Dispatcher.CurrentDispatcher.BeginInvoke(() => SelectedGame = null);
+                    }
+                    else
+                    {
+                        OnPropertyChanged(nameof(InvalidSaveMessageVisibility));
+                    }
+                }
             }
         }
 
         public ReadOnlyObservableCollection<SaveGameViewModel> AvailableSaves => selectedLocation.SaveGames;
+
+        public Visibility InvalidSaveMessageVisibility => SelectedGame?.WarningVisibility ?? Visibility.Collapsed;
 
         private ISavesLocationViewModel MostRecentLocation => SavesLocations.OrderByDescending(l => l.LastModified).FirstOrDefault();
         private SaveGameViewModel MostRecentSave => SelectedLocation?.SaveGames?.Where(g => !g.IsAddManualOption)?.OrderByDescending(s => s.LastModified)?.FirstOrDefault();

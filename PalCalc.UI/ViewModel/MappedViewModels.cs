@@ -115,6 +115,8 @@ namespace PalCalc.UI.ViewModel
 
         public bool IsAddManualOption { get; }
 
+        public Visibility WarningVisibility => !IsAddManualOption && !IsValid ? Visibility.Visible : Visibility.Collapsed;
+
         public static readonly SaveGameViewModel AddNewSave = new SaveGameViewModel();
     }
 
