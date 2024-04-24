@@ -56,6 +56,20 @@ namespace PalCalc.UI.ViewModel
 
             settings = Storage.LoadAppSettings();
 
+            // remove manually-added locations which no longer exist
+            var manualLocs = new List<string>(settings.ExtraSaveLocations);
+            foreach (var loc in manualLocs)
+            {
+                if (!Directory.Exists(loc))
+                {
+                    var asSave = new SaveGame(loc);
+                    Storage.ClearForSave(asSave);
+                    manualLocs.Remove(loc);
+                }
+            }
+
+            Storage.SaveAppSettings(settings);
+
             SaveSelection = new SaveSelectorViewModel(SavesLocation.AllLocal, settings.ExtraSaveLocations.Select(saveFolder => new SaveGame(saveFolder)));
             SolverControls = new SolverControlsViewModel();
             PalTargetList = new PalTargetListViewModel();

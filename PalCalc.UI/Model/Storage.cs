@@ -57,6 +57,16 @@ namespace PalCalc.UI.Model
 
         public static void SaveAppSettings(AppSettings settings) => File.WriteAllText(AppSettingsPath, JsonConvert.SerializeObject(settings));
 
+        public static void ClearForSave(SaveGame save)
+        {
+            var cachePath = SaveCachePathFor(save);
+            if (File.Exists(cachePath)) File.Delete(cachePath);
+
+            var dataPath = SaveFileDataPath(save);
+            if (Directory.Exists(dataPath))
+                Directory.Delete(dataPath);
+        }
+
         #region Cached Game Save Files
 
         private static Dictionary<string, CachedSaveGame> InMemorySaves = new Dictionary<string, CachedSaveGame>();
