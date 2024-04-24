@@ -1,31 +1,38 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Win32;
+using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel
 {
     internal partial class SaveSelectorViewModel : ObservableObject
     {
-        [ObservableProperty]
-        private List<SavesLocationViewModel> savesLocations;
+        public event Action<ManualSavesLocationViewModel, SaveGame> NewCustomSaveSelected;
 
-        private SavesLocationViewModel selectedLocation;
-        public SavesLocationViewModel SelectedLocation
+        public List<ISavesLocationViewModel> SavesLocations { get; }
+
+        private ManualSavesLocationViewModel manualLocation;
+        private ISavesLocationViewModel selectedLocation;
+        public ISavesLocationViewModel SelectedLocation
         {
             get => selectedLocation;
             set
             {
-                if (selectedLocation == value) return;
-
-                selectedLocation = value;
-
-                OnPropertyChanged(nameof(SelectedLocation));
-                SelectedGame = MostRecentSave;
+                if (SetProperty(ref selectedLocation, value))
+                {
+                    OnPropertyChanged(nameof(AvailableSaves));
+                    SelectedGame = MostRecentSave;
+                }
             }
         }
 
@@ -35,29 +42,64 @@ namespace PalCalc.UI.ViewModel
             get => selectedGame;
             set
             {
-                if (value == selectedGame) return;
+                bool needsReset = false;
+                if (value != null && value.IsAddManualOption)
+                {
+                    var ofd = new OpenFileDialog();
+                    ofd.Filter = "Level save file|Level.sav";
+                    ofd.Title = "Select the 'Level.sav' file in your save folder";
 
-                selectedGame = value;
-                OnPropertyChanged(nameof(SelectedGame));
-                OnSelectedSaveChanged?.Invoke(value);
+                    if (true == ofd.ShowDialog(App.Current.MainWindow))
+                    {
+                        var asSaveGame = new SaveGame(Path.GetDirectoryName(ofd.FileName));
+                        if (asSaveGame.IsValid)
+                        {
+                            var existingSaves = SavesLocations.SelectMany(l => l.SaveGames.Select(vm => vm.Value)).SkipNull();
+                            if (existingSaves.Any(s => s.BasePath.PathEquals(asSaveGame.BasePath)))
+                            {
+                                MessageBox.Show(App.Current.MainWindow, "The selected file has already been registered");
+                            }
+                            else
+                            {
+                                // leave updates + selection of the new location to the event handler
+                                Dispatcher.CurrentDispatcher.BeginInvoke(() => NewCustomSaveSelected?.Invoke(manualLocation, asSaveGame));
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show(App.Current.MainWindow, "The selected file is not in a complete save-game folder");
+                            needsReset = true;
+                        }
+                    }
+                    else
+                    {
+                        needsReset = true;
+                    }
+                }
+
+                if (SetProperty(ref selectedGame, value) && needsReset)
+                    // ComboBox ignores reassignment in the middle of a value-change event, defer until later
+                    Dispatcher.CurrentDispatcher.BeginInvoke(() => SelectedGame = null);
             }
         }
 
-        public List<SaveGameViewModel> AvailableSaves => selectedLocation.SaveGames;
+        public ReadOnlyObservableCollection<SaveGameViewModel> AvailableSaves => selectedLocation.SaveGames;
 
-        private SavesLocationViewModel MostRecentLocation => SavesLocations.OrderByDescending(l => l.LastModified).FirstOrDefault();
-        private SaveGameViewModel MostRecentSave => SelectedLocation?.SaveGames?.OrderByDescending(s => s.LastModified)?.FirstOrDefault();
+        private ISavesLocationViewModel MostRecentLocation => SavesLocations.OrderByDescending(l => l.LastModified).FirstOrDefault();
+        private SaveGameViewModel MostRecentSave => SelectedLocation?.SaveGames?.Where(g => !g.IsAddManualOption)?.OrderByDescending(s => s.LastModified)?.FirstOrDefault();
 
-        public SaveSelectorViewModel() : this(SavesLocation.AllLocal)
+        public SaveSelectorViewModel() : this(SavesLocation.AllLocal, Enumerable.Empty<SaveGame>())
         {
         }
 
-        public SaveSelectorViewModel(IEnumerable<SavesLocation> savesLocations)
+        public SaveSelectorViewModel(IEnumerable<SavesLocation> savesLocations, IEnumerable<SaveGame> manualSaves)
         {
-            this.savesLocations = savesLocations.Select(sl => new SavesLocationViewModel(sl)).ToList();
+            manualLocation = new ManualSavesLocationViewModel(manualSaves);
+
+            SavesLocations = new List<ISavesLocationViewModel>(savesLocations.Select(l => new StandardSavesLocationViewModel(l)).OrderBy(vm => vm.Label));
+            SavesLocations.Add(manualLocation);
+
             SelectedLocation = MostRecentLocation;
         }
-
-        public event Action<SaveGameViewModel> OnSelectedSaveChanged;
     }
 }

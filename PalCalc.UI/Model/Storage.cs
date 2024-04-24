@@ -1,4 +1,5 @@
-﻿using PalCalc.Model;
+﻿using Newtonsoft.Json;
+using PalCalc.Model;
 using PalCalc.SaveReader;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,14 @@ namespace PalCalc.UI.Model
     {
         public static string CachePath => "cache";
         public static string SaveCachePath => $"{CachePath}/saves";
+
+        // path for cached copy of save file data
         public static string SaveCachePathFor(SaveGame forSaveFile) => $"{SaveCachePath}/{CachedSaveGame.IdentifierFor(forSaveFile)}.json";
+
+        // path for storing data associated with a specific save file
         public static string SaveFileDataPath(SaveGame forSaveFile) => $"data/results/{CachedSaveGame.IdentifierFor(forSaveFile)}";
+
+        public static string AppSettingsPath => $"data/settings.json";
 
         private static bool didInit = false;
         private static void Init()
@@ -26,6 +33,31 @@ namespace PalCalc.UI.Model
 
             didInit = true;
         }
+
+        public static AppSettings LoadAppSettings()
+        {
+            if (File.Exists(AppSettingsPath))
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<AppSettings>(File.ReadAllText(AppSettingsPath));
+                }
+                catch (Exception e)
+                {
+                    // TODO - log
+                    File.Delete(AppSettingsPath);
+                    return LoadAppSettings();
+                }
+            }
+            else
+            {
+                return new AppSettings();
+            }
+        }
+
+        public static void SaveAppSettings(AppSettings settings) => File.WriteAllText(AppSettingsPath, JsonConvert.SerializeObject(settings));
+
+        #region Cached Game Save Files
 
         private static Dictionary<string, CachedSaveGame> InMemorySaves = new Dictionary<string, CachedSaveGame>();
 
@@ -109,5 +141,7 @@ namespace PalCalc.UI.Model
                 return res;
             }
         }
+
+        #endregion
     }
 }

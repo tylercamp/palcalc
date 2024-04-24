@@ -5,6 +5,7 @@ using PalCalc.Solver;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,29 +16,80 @@ using System.Windows.Media;
 
 namespace PalCalc.UI.ViewModel
 {
-    public partial class SavesLocationViewModel
+    public interface ISavesLocationViewModel
     {
-        public SavesLocationViewModel(SavesLocation sl)
+        ReadOnlyObservableCollection<SaveGameViewModel> SaveGames { get; }
+        string Label { get; }
+        DateTime? LastModified { get; }
+    }
+
+    public class StandardSavesLocationViewModel : ISavesLocationViewModel
+    {
+        public StandardSavesLocationViewModel(SavesLocation sl)
         {
             Value = sl;
 
             Label = $"{sl.ValidSaveGames.Count()} valid saves ({sl.FolderName})";
-            SaveGames = sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sg)).ToList();
-            LastModified = SaveGames.OrderByDescending(sg => sg.LastModified).FirstOrDefault()?.LastModified;
+            SaveGames = new ReadOnlyObservableCollection<SaveGameViewModel>(
+                new ObservableCollection<SaveGameViewModel>(sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sg)))
+            );
+            LastModified = sl.ValidSaveGames.OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
         }
 
-        public DateTime? LastModified { get; }
-
-        public List<SaveGameViewModel> SaveGames { get; }
-
         public SavesLocation Value { get; }
+
+        public ReadOnlyObservableCollection<SaveGameViewModel> SaveGames { get; }
+
         public string Label { get; }
+
+        public DateTime? LastModified { get; }
+    }
+
+    public class ManualSavesLocationViewModel : ISavesLocationViewModel
+    {
+        public ManualSavesLocationViewModel(IEnumerable<SaveGame> initialManualSaves)
+        {
+            saveGames = new ObservableCollection<SaveGameViewModel>(initialManualSaves.Select(s => new SaveGameViewModel(s)).OrderBy(vm => vm.Label));
+            saveGames.Add(SaveGameViewModel.AddNewSave);
+
+            SaveGames = new ReadOnlyObservableCollection<SaveGameViewModel>(saveGames);
+        }
+
+        private ObservableCollection<SaveGameViewModel> saveGames;
+        public ReadOnlyObservableCollection<SaveGameViewModel> SaveGames { get; }
+
+        public string Label => "Manually Added";
+
+        public DateTime? LastModified => saveGames.Where(g => !g.IsAddManualOption).OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
+
+        // assume `path` has already been validated
+        public SaveGameViewModel Add(SaveGame saveGame)
+        {
+            var vm = new SaveGameViewModel(saveGame);
+            var orderedIndex = saveGames
+                .Where(vm => !vm.IsAddManualOption)
+                .Append(vm)
+                .OrderBy(vm => vm.Label)
+                .ToList()
+                .IndexOf(vm);
+
+            saveGames.Insert(orderedIndex, vm);
+
+            return vm;
+        }
     }
 
     public partial class SaveGameViewModel
     {
+        private SaveGameViewModel()
+        {
+            IsAddManualOption = true;
+            Label = "Add a new save...";
+        }
+
         public SaveGameViewModel(SaveGame value)
         {
+            IsAddManualOption = false;
             Value = value;
 
             try
@@ -58,6 +110,12 @@ namespace PalCalc.UI.ViewModel
         public SaveGame Value { get; }
         public CachedSaveGame CachedValue => Storage.LoadSave(Value, PalDB.LoadEmbedded());
         public string Label { get; }
+
+        public bool IsValid => Value.IsValid;
+
+        public bool IsAddManualOption { get; }
+
+        public static readonly SaveGameViewModel AddNewSave = new SaveGameViewModel();
     }
 
     public class PalViewModel

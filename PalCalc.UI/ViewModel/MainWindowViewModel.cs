@@ -25,6 +25,7 @@ namespace PalCalc.UI.ViewModel
         private LoadingSaveFileModal loadingSaveModal = null;
         private Dispatcher dispatcher;
         private CancellationTokenSource solverTokenSource;
+        private AppSettings settings;
 
         // https://stackoverflow.com/a/73181682
         private static void AllowUIToUpdate()
@@ -53,11 +54,15 @@ namespace PalCalc.UI.ViewModel
             CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
             CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
-            SaveSelection = new SaveSelectorViewModel(SavesLocation.AllLocal);
+            settings = Storage.LoadAppSettings();
+
+            SaveSelection = new SaveSelectorViewModel(SavesLocation.AllLocal, settings.ExtraSaveLocations.Select(saveFolder => new SaveGame(saveFolder)));
             SolverControls = new SolverControlsViewModel();
             PalTargetList = new PalTargetListViewModel();
 
-            targetsBySaveFile = SaveSelection.AvailableSaves
+            targetsBySaveFile = SaveSelection.SavesLocations
+                .SelectMany(l => l.SaveGames)
+                .Where(vm => !vm.IsAddManualOption)
                 .Select(sgvm => sgvm.Value)
                 .ToDictionary(
                     sg => sg,
@@ -100,8 +105,20 @@ namespace PalCalc.UI.ViewModel
                 );
 
             SaveSelection.PropertyChanged += SaveSelection_PropertyChanged;
+            SaveSelection.NewCustomSaveSelected += SaveSelection_CustomSaveAdded;
 
             UpdateTargetsList();
+        }
+
+        private void SaveSelection_CustomSaveAdded(ManualSavesLocationViewModel manualSaves, SaveGame save)
+        {
+            targetsBySaveFile.Add(save, new PalTargetListViewModel());
+
+            var saveVm = manualSaves.Add(save);
+            SaveSelection.SelectedGame = saveVm;
+
+            settings.ExtraSaveLocations.Add(save.BasePath);
+            Storage.SaveAppSettings(settings);
         }
 
         private void CachedSaveGame_SaveFileLoadStart(SaveGame obj)
@@ -143,22 +160,26 @@ namespace PalCalc.UI.ViewModel
         {
             if (PalTargetList != null) PalTargetList.PropertyChanged -= PalTargetList_PropertyChanged;
 
-            if (SaveSelection.SelectedGame == null)
+            if (SaveSelection.SelectedGame?.Value == null)
             {
                 PalTargetList = null;
                 PalTarget = null;
             }
-
-            PalTargetList = targetsBySaveFile[SaveSelection.SelectedGame.Value];
-            PalTargetList.PropertyChanged += PalTargetList_PropertyChanged;
+            else
+            {
+                PalTargetList = targetsBySaveFile[SaveSelection.SelectedGame.Value];
+                PalTargetList.PropertyChanged += PalTargetList_PropertyChanged;
+            }
 
             UpdatePalTarget();
         }
 
         private void UpdatePalTarget()
         {
-            if (PalTargetList.SelectedTarget !=  null)
+            if (PalTargetList?.SelectedTarget != null)
                 PalTarget = new PalTargetViewModel(PalTargetList.SelectedTarget);
+            else
+                PalTarget = null;
         }
 
         private void SaveSelection_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -207,8 +228,9 @@ namespace PalCalc.UI.ViewModel
                         }
                         else
                         {
-                            PalTargetList.Replace(PalTarget.InitialPalSpecifier, PalTarget.CurrentPalSpecifier);
-                            PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
+                            var updatedSpec = PalTarget.CurrentPalSpecifier;
+                            PalTargetList.Replace(PalTarget.InitialPalSpecifier, updatedSpec);
+                            PalTargetList.SelectedTarget = updatedSpec;
                         }   
 
                         var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
