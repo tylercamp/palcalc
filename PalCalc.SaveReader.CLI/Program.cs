@@ -6,6 +6,8 @@ using PalCalc.SaveReader.GVAS;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 
+Logging.InitCommonFull();
+
 var db = PalDB.LoadEmbedded();
 
 foreach (var gameFolder in SavesLocation.AllLocal)

@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using PalCalc.SaveReader.FArchive;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
     class CharacterInstanceVisitor : IVisitor
     {
+        private static ILogger logger = Log.ForContext<CharacterInstanceVisitor>();
+
         public CharacterInstanceVisitor() : base(".worldSaveData.CharacterSaveParameterMap") { }
 
         public List<GvasCharacterInstance> Result = new List<GvasCharacterInstance>();
@@ -59,6 +62,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
         public override IEnumerable<IVisitor> VisitMapEntryBegin(string path, int index, MapPropertyMeta meta)
         {
+            logger.Verbose("Beginning object read");
             base.VisitMapEntryBegin(path, index, meta);
 
             pendingInstance = new GvasCharacterInstance();
@@ -78,6 +82,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
             collectingVisitor.OnExit += (vals) =>
             {
+                logger.Verbose("property collector exited with values for {fieldNames}", string.Join(", ", vals.Keys));
+
                 pendingInstance.InstanceId = (Guid)vals[K_INSTANCE_ID];
                 pendingInstance.IsPlayer = (bool)vals.GetValueOrElse(K_IS_PLAYER, false);
 
@@ -94,7 +100,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     var missingProps = REQUIRED_PAL_PROPS.Where(p => !vals.ContainsKey(p)).ToList();
                     if (missingProps.Any())
                     {
-                        // TODO - log missing props
+                        logger.Warning("character instance is missing {missingProps}, skipping", string.Join(", ", missingProps));
                         pendingInstance = null;
                         return;
                     }
@@ -116,6 +122,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             var traitsVisitor = new ValueEmittingVisitor(this, K_PASSIVE_SKILL_LIST);
             traitsVisitor.OnValue += (_, v) =>
             {
+                logger.Verbose("Storing trait value {name}", v);
                 traits.Add(v.ToString());
             };
 
@@ -142,7 +149,12 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
         public override void VisitMapEntryEnd(string path, int index, MapPropertyMeta meta)
         {
-            if (pendingInstance != null) Result.Add(pendingInstance);
+            logger.Verbose("Ending object read");
+            if (pendingInstance != null)
+            {
+                logger.Verbose("Generated valid character instance");
+                Result.Add(pendingInstance);
+            }
 
             pendingInstance = null;
         }

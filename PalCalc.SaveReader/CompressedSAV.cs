@@ -1,5 +1,6 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,19 +13,14 @@ using System.Threading.Tasks;
 // palsav.py
 namespace PalCalc.SaveReader
 {
-    public class CompressedSAV
+    public static class CompressedSAV
     {
-        private static void AssertZLibHeader(Stream stream)
-        {
-            var b1 = stream.ReadByte();
-            var b2 = stream.ReadByte();
-
-            if (b1 != 0x78 || b2 != 0x9C) throw new Exception();
-        }
+        private static ILogger logger = Log.ForContext(typeof(CompressedSAV));
 
         static byte[] MAGIC_BYTES = Encoding.ASCII.GetBytes("PlZ");
         public static void WithDecompressedSave(string filePath, Action<Stream> action)
         {
+            logger.Information("Loading {file} as GVAS", filePath);
             using (var fs = File.OpenRead(filePath))
             using (var binaryReader = new BinaryReader(fs))
             {
@@ -58,6 +54,7 @@ namespace PalCalc.SaveReader
                     }
                 }
             }
+            logger.Information("done");
         }
     }
 }

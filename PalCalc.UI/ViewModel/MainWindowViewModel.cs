@@ -5,6 +5,7 @@ using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,6 +21,7 @@ namespace PalCalc.UI.ViewModel
 {
     internal partial class MainWindowViewModel : ObservableObject
     {
+        private static ILogger logger = Log.ForContext<MainWindowViewModel>();
         private static PalDB db = PalDB.LoadEmbedded();
         private Dictionary<SaveGame, PalTargetListViewModel> targetsBySaveFile;
         private LoadingSaveFileModal loadingSaveModal = null;
@@ -89,7 +91,7 @@ namespace PalCalc.UI.ViewModel
                             var originalCachedSave = Storage.LoadSaveFromCache(sg, db);
                             if (originalCachedSave == null)
                             {
-                                // TODO - log
+                                logger.Warning("pal target list for {saveId} was detected but there was no cached data, which is required for loading the target list. resetting target list for this save", CachedSaveGame.IdentifierFor(sg));
                                 File.Delete(targetsFile);
                                 return new PalTargetListViewModel();
                             }
@@ -105,7 +107,7 @@ namespace PalCalc.UI.ViewModel
                             }
                             catch (Exception ex)
                             {
-                                // TODO - log
+                                logger.Warning(ex, "an error occurred loading targets list for {saveId}, deleting the old file and resetting", CachedSaveGame.IdentifierFor(sg));
                                 File.Delete(targetsFile);
                                 return new PalTargetListViewModel();
                             }
@@ -165,9 +167,8 @@ namespace PalCalc.UI.ViewModel
                 loadingSaveModal = null;
             }
 
+            logger.Error(ex, "error when parsing save file for {saveId}", CachedSaveGame.IdentifierFor(obj));
             MessageBox.Show("An error occurred when loading the save file");
-
-            // TODO - log
         }
 
         private void UpdateTargetsList()

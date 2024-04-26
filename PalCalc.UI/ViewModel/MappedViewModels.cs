@@ -3,6 +3,8 @@ using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.UI.Model;
+using Serilog;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -81,6 +83,8 @@ namespace PalCalc.UI.ViewModel
 
     public partial class SaveGameViewModel
     {
+        private static ILogger logger = Log.ForContext<SaveGameViewModel>();
+
         private SaveGameViewModel()
         {
             IsAddManualOption = true;
@@ -100,7 +104,7 @@ namespace PalCalc.UI.ViewModel
             }
             catch (Exception ex)
             {
-                // TODO - log exception
+                logger.Warning(ex, "error when loading LevelMeta for {saveId}", CachedSaveGame.IdentifierFor(value));
                 Label = $"{value.FolderName} (Unable to read metadata)";
             }
         }
@@ -156,7 +160,6 @@ namespace PalCalc.UI.ViewModel
             {
                 IsSinglePlayer = source.Players.Count == 1;
 
-                // TODO - getting wrong player ID, i.e. instance ID v player ID
                 var ownerName = source.PlayersById[ownedLoc.OwnerId].Name;
                 var ownerGuild = source.GuildsByPlayerId[ownedLoc.OwnerId];
 

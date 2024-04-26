@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace PalCalc.Solver
     // a working set of pal instances to be used as potential parents
     internal class WorkingSet
     {
+        private static ILogger logger = Log.ForContext<WorkingSet>();
+
         private HashSet<IPalReference> content;
 
         public IReadOnlySet<IPalReference> Content => content;
@@ -28,6 +31,8 @@ namespace PalCalc.Solver
         // returns the number of entries added/updated
         public int AddFrom(IEnumerable<IPalReference> newRefs, CancellationToken token)
         {
+            logger.Debug("updating working set");
+
             // since we know the breeding effort of each potential instance, we can ignore new instances
             // with higher effort than existing known instances
             //
@@ -35,11 +40,14 @@ namespace PalCalc.Solver
 
             // `PruneCollection` is fairly heavy and single-threaded, perform pruning of multiple batches of the
             // main set of references before pruning the final combined collection
+
+            logger.Debug("performing pre-prune");
             var prePruned = newRefs.ToList().Batched(100000)
                 .AsParallel()
                 .SelectMany(batch => PruneCollection(batch).ToList())
                 .ToList();
 
+            logger.Debug("merging");
             var numChanged = 0;
             foreach (var newInst in PruneCollection(prePruned))
             {
@@ -72,6 +80,7 @@ namespace PalCalc.Solver
                 }
             }
 
+            logger.Debug("done, {numChanged} changed", numChanged);
             return numChanged;
         }
 

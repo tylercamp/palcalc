@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using PalCalc.SaveReader.FArchive;
 using PalCalc.SaveReader.SaveFile.Support.Level;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace PalCalc.SaveReader.SaveFile
 
     public class LevelSaveFile : ISaveFile
     {
+        private static ILogger logger = Log.ForContext<LevelSaveFile>();
+
         public LevelSaveFile(string folderPath) : base(folderPath) { }
 
         public override string FileName => "Level.sav";
@@ -26,10 +29,14 @@ namespace PalCalc.SaveReader.SaveFile
         
         public LevelSaveData ReadCharacterData(PalDB db)
         {
+            logger.Debug("parsing content");
+
             var containerVisitor = new PalContainerVisitor();
             var instanceVisitor = new CharacterInstanceVisitor();
             var groupVisitor = new GroupVisitor();
             VisitGvas(containerVisitor, instanceVisitor, groupVisitor);
+
+            logger.Debug("processing data");
 
             // note: you can read `Players/...sav` and fetch ".SaveData.PalStorageContainerId.ID" to see exactly
             //       which pal box is for which player, but will just infer this from `Level.sav` via the most
@@ -78,7 +85,7 @@ namespace PalCalc.SaveReader.SaveFile
                     if (pal == null)
                     {
                         // skip unrecognized pals
-                        // TODO - log warning
+                        logger.Warning("unrecognized pal '{name}', skipping", sanitizedCharId);
                         continue;
                     }
 
@@ -86,7 +93,10 @@ namespace PalCalc.SaveReader.SaveFile
                         .Select(name =>
                         {
                             var trait = db.Traits.FirstOrDefault(t => t.InternalName == name);
-                            // TODO - log warning for unrecognized trait
+                            if (trait == null)
+                            {
+                                logger.Warning("unrecognized trait '{internalName}', skipping", name);
+                            }
                             return trait ?? new UnrecognizedTrait(name);
                         })
                         .ToList();
@@ -110,6 +120,7 @@ namespace PalCalc.SaveReader.SaveFile
                 }
             }
 
+            logger.Debug("done");
             return result;
         }
     }

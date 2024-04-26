@@ -9,6 +9,8 @@ namespace PalCalc.GenDB
         // min. number of times you need to breed Key1 to get a Key2 (to prune out path checks between pals which would exceed the max breeding steps)
         static Dictionary<Pal, Dictionary<Pal, int>> CalcMinDistances(PalDB db)
         {
+            Logging.InitCommonFull();
+
             Dictionary<Pal, Dictionary<Pal, int>> palDistances = new Dictionary<Pal, Dictionary<Pal, int>>();
 
             foreach (var p in db.Pals)

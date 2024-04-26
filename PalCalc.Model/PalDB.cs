@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -147,11 +148,18 @@ namespace PalCalc.Model
             public Dictionary<string, Dictionary<string, int>> MinBreedingSteps { get; set; }
         }
 
+        private static ILogger logger = Log.ForContext<PalDB>();
+
         private static PalDB embedded = null;
         public static PalDB LoadEmbedded()
         {
-            if (embedded != null) return embedded;
+            if (embedded != null)
+            {
+                logger.Verbose("Using previously-loaded pal DB");
+                return embedded;
+            }
 
+            logger.Information("Loading embedded pal DB");
             var info = Assembly.GetExecutingAssembly().GetName();
             var name = info.Name;
             using var stream = Assembly
@@ -161,6 +169,7 @@ namespace PalCalc.Model
             using (var streamReader = new StreamReader(stream, Encoding.UTF8))
                 embedded = FromJson(streamReader.ReadToEnd());
 
+            logger.Information("Successfully loaded embedded pal DB");
             return embedded;
         }
 

@@ -41,6 +41,6 @@ namespace PalCalc.Solver
             }
         }
 
-        public static PascalsTriangle Instance = new PascalsTriangle(20);
+        public static PascalsTriangle Instance = new PascalsTriangle(100);
     }
 }

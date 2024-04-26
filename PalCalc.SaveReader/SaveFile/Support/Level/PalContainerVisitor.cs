@@ -1,4 +1,5 @@
 ﻿using PalCalc.SaveReader.FArchive;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
     class PalContainerVisitor : IVisitor
     {
+        private static ILogger logger = Log.ForContext<PalContainerVisitor>();
+
         public List<PalContainer> CollectedContainers { get; set; } = new List<PalContainer>();
 
         PalContainer workingContainer = null;
@@ -52,6 +55,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
         public override IEnumerable<IVisitor> VisitMapEntryBegin(string path, int index, MapPropertyMeta meta)
         {
+            logger.Verbose("map entry begin");
+
             workingContainer = new PalContainer() { Slots = new List<PalContainerSlot>() };
 
             var keyIdCollector = new ValueCollectingVisitor(this, ".Key.ID");
@@ -69,6 +74,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
         public override void VisitMapEntryEnd(string path, int index, MapPropertyMeta meta)
         {
+            logger.Verbose("map entry end");
+
             CollectedContainers.Add(workingContainer);
             workingContainer = null;
         }

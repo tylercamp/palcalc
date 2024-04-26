@@ -8,6 +8,8 @@ internal class Program
 {
     static void Main(string[] args)
     {
+        Logging.InitCommonFull();
+
         var sw = Stopwatch.StartNew();
 
         var db = PalDB.LoadEmbedded();

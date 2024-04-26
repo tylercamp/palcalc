@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -11,6 +12,8 @@ namespace PalCalc.SaveReader.FArchive
 {
     public class FArchiveReader : IDisposable
     {
+        private static ILogger logger = Log.ForContext<FArchiveReader>();
+
         BinaryReader reader;
         Dictionary<string, string> typeHints;
 
@@ -523,7 +526,11 @@ namespace PalCalc.SaveReader.FArchive
             if (size == 0) return "";
 
             // haven't seen a string larger than 100 chars yet, if we see it there's likely a bug
-            if (Math.Abs(size) > 100) Debugger.Break();
+            if (Math.Abs(size) > 1000)
+            {
+                logger.Warning("String size of {size} is abnormal, likely a parsing error which will cause a crash");
+                Debugger.Break();
+            }
 
             Encoding encoding;
             byte[] bytes;

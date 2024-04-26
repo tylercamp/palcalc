@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -122,6 +123,8 @@ namespace PalCalc.SaveReader.FArchive
 
     public class ValueCollectingVisitor : IVisitor
     {
+        private static ILogger logger = Log.ForContext<ValueCollectingVisitor>();
+
         string[] propertiesToCollect;
         Dictionary<string, object> collectedValues = new Dictionary<string, object>();
 
@@ -131,6 +134,7 @@ namespace PalCalc.SaveReader.FArchive
 
         public ValueCollectingVisitor(string basePath, params string[] propertySubPaths) : base(basePath)
         {
+            logger.Verbose("init");
             propertiesToCollect = propertySubPaths;
         }
 
@@ -145,7 +149,12 @@ namespace PalCalc.SaveReader.FArchive
             var propPart = path.Substring(MatchedBasePath.Length);
             if (propertiesToCollect.Length > 0 && !propertiesToCollect.Contains(propPart)) return;
 
-            if (collectedValues.ContainsKey(propPart)) Debugger.Break();
+            logger.Verbose("collected {value} at {path}", value, path);
+            if (collectedValues.ContainsKey(propPart))
+            {
+                logger.Warning("value was already collected for {path}, overwriting with new {value}", path, value);
+                Debugger.Break();
+            }
             collectedValues[propPart] = value;
         }
 
@@ -159,6 +168,7 @@ namespace PalCalc.SaveReader.FArchive
 
         public override void Exit()
         {
+            logger.Verbose("exit");
             OnExit?.Invoke(collectedValues);
             OnExit = null;
             collectedValues = null;
@@ -167,6 +177,8 @@ namespace PalCalc.SaveReader.FArchive
 
     public class ValueEmittingVisitor : IVisitor
     {
+        private static ILogger logger = Log.ForContext<ValueEmittingVisitor>();
+
         string[] propertiesToEmit;
 
         public ValueEmittingVisitor(IVisitor parent, params string[] propertySubPaths) : this(parent.MatchedPath, propertySubPaths)
@@ -175,6 +187,7 @@ namespace PalCalc.SaveReader.FArchive
 
         public ValueEmittingVisitor(string basePath, params string[] propertySubPaths) : base(basePath)
         {
+            logger.Verbose("init");
             propertiesToEmit = propertySubPaths;
         }
 
@@ -188,6 +201,7 @@ namespace PalCalc.SaveReader.FArchive
             var propPart = path.Substring(MatchedBasePath.Length);
             if (propertiesToEmit.Length > 0 && !propertiesToEmit.Contains(propPart)) return;
 
+            logger.Verbose("emitting {value} from path {path}", value, path);
             OnValue?.Invoke(propPart, value);
         }
 
@@ -201,6 +215,7 @@ namespace PalCalc.SaveReader.FArchive
 
         public override void Exit()
         {
+            logger.Verbose("exit");
             OnExit?.Invoke();
             OnExit = null;
             OnValue = null;

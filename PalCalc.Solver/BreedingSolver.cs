@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,6 +27,8 @@ namespace PalCalc.Solver
 
     public class BreedingSolver
     {
+        private static ILogger logger = Log.ForContext<BreedingSolver>();
+
         // returns number of ways you can choose k combinations from a list of n
         // TODO - is this the right way to use pascal's triangle??
         static int Choose(int n, int k) => PascalsTriangle.Instance[n - 1][k - 1];
@@ -71,7 +74,7 @@ namespace PalCalc.Solver
             List<PalInstance> relevantInstances = new List<PalInstance>();
 
             var traitPermutations = targetTraits.Combinations(targetTraits.Count).Select(l => l.ToList()).ToList();
-            Console.WriteLine("Looking for pals with traits:\n- {0}", string.Join("\n- ", traitPermutations.Select(p => $"({string.Join(',', p)})")));
+            logger.Debug("Looking for pals with traits:\n- {0}", string.Join("\n- ", traitPermutations.Select(p => $"({string.Join(',', p)})")));
 
             foreach (var pal in db.Pals)
             {
@@ -248,8 +251,8 @@ namespace PalCalc.Solver
                .Where(p => p.Traits.Except(spec.Traits).Count() <= maxIrrelevantTraits)
                .ToList();
 
-            Console.WriteLine(
-                "Using {0}/{1} pals as relevant inputs with traits:\n- {2}",
+            logger.Debug(
+                "Using {relevantCount}/{totalCount} pals as relevant inputs with traits:\n- {summary}",
                 relevantPals.Count,
                 ownedPals.Count,
                 string.Join("\n- ",
@@ -279,7 +282,7 @@ namespace PalCalc.Solver
                 );
             }
 
-            Console.WriteLine("Using {0} pals for graph search:\n- {1}", workingSet.Content.Count, string.Join("\n- ", workingSet.Content));
+            logger.Debug("Using {count} pals for graph search:\n- {summary}", workingSet.Content.Count, string.Join("\n- ", workingSet.Content));
 
             for (int s = 0; s < maxBreedingSteps; s++)
             {
@@ -289,7 +292,7 @@ namespace PalCalc.Solver
                 statusMsg.CurrentStepIndex = s;
                 SolverStateUpdated?.Invoke(statusMsg);
 
-                Console.WriteLine($"Starting search step #{s + 1} with {workingSet.Content.Count} relevant pals");
+                logger.Debug($"Starting search step #{s + 1} with {workingSet.Content.Count} relevant pals");
                 var newInstances = Enumerable.Zip(workingSet.Content, Enumerable.Range(0, workingSet.Content.Count))
                     .TakeWhile(_ => !token.IsCancellationRequested)
                     .AsParallel()
@@ -383,7 +386,7 @@ namespace PalCalc.Solver
                     })
                     .ToList();
 
-                Console.WriteLine("Filtering {0} potential new instances", newInstances.Count);
+                logger.Debug("Filtering {0} potential new instances", newInstances.Count);
 
                 if (token.IsCancellationRequested) break;
                 statusMsg.CurrentPhase = SolverPhase.Simplifying;
@@ -393,7 +396,7 @@ namespace PalCalc.Solver
 
                 if (numChanged == 0)
                 {
-                    Console.WriteLine("Last pass found no new useful options, stopping iteration early");
+                    logger.Debug("Last pass found no new useful options, stopping iteration early");
                     break;
                 }
             }

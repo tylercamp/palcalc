@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using PalCalc.SaveReader.FArchive;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +11,28 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 {
     internal class GroupVisitor : IVisitor
     {
+        private static ILogger logger = Log.ForContext<GroupVisitor>();
+
         public GroupVisitor() : base(".worldSaveData.GroupSaveDataMap.Value") { }
 
         public List<GuildInstance> Result { get; } = new List<GuildInstance>();
-        
+
         public override void VisitCharacterGroupProperty(string path, GroupDataProperty property)
         {
-            // seems like every player should always be in a `Guild`?
-            if (property.GroupType != GroupType.Guild) return;
+            logger.Verbose("Checking group {groupName} | {guildName} | {guildName2} | {playerName}", property.GroupName, property.GuildName, property.GuildName2, property.PlayerName);
 
-            if (property.OrgType != 0) return; // all player guilds I've seen have OrgType 0?
+            // seems like every player should always be in a `Guild`?
+            if (property.GroupType != GroupType.Guild)
+            {
+                logger.Debug("Skipping non-guild group", property.GroupName);
+                return;
+            }
+
+            if (property.OrgType != 0)
+            {
+                logger.Debug("Skipping guild group with OrgType non-zero ({typeId})", property.OrgType);
+                return; // all player guilds I've seen have OrgType 0?
+            }
 
             Result.Add(new GuildInstance()
             {

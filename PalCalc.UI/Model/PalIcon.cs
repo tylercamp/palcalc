@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using PalCalc.Model;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,8 @@ namespace PalCalc.UI.Model
 {
     internal static class PalIcon
     {
+        private static ILogger logger = Log.ForContext(typeof(PalIcon));
+
         private static Dictionary<string, string> GetIconOverrides()
         {
             using (var stream = ResourceLookup.Get("PalIconOverride.json"))
@@ -33,7 +36,7 @@ namespace PalCalc.UI.Model
             catch (IOException)
             {
                 // fallback for pals with missing icons
-                // TODO - log
+                logger.Warning("pal icon {iconName} is unavailable, using fallback", iconName);
                 return ResourceLookup.Get("Pals/Human.png");
             }
         }

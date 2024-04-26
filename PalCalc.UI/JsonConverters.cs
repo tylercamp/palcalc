@@ -93,7 +93,10 @@ namespace PalCalc.UI
             var wrapperToken = JToken.ReadFrom(reader);
 
             var actualLabel = PalReferenceConverter.ReadWrappedTypeLabel(wrapperToken);
-            if (actualLabel != typeLabel) throw new Exception(); // TODO - error message
+            if (actualLabel != typeLabel)
+            {
+                throw new Exception($"Stored type label '{actualLabel}' did not match expected label of '{typeLabel}'");
+            }
 
             var wrappedContent = PalReferenceConverter.ReadWrappedContent(wrapperToken);
             return ReadRefJson(wrappedContent, objectType, existingValue, hasExistingValue, serializer);
@@ -144,7 +147,7 @@ namespace PalCalc.UI
             if (type == wprc.TypeLabel) return wprc.ReadRefJson(wrappedContent, objectType, existingValue as WildPalReference, hasExistingValue, serializer);
             if (type == bprc.TypeLabel) return bprc.ReadRefJson(wrappedContent, objectType, existingValue as BredPalReference, hasExistingValue, serializer);
 
-            throw new Exception(); // TODO - log error message
+            throw new Exception($"Unhandled IPalReference type label {type}");
         }
 
         protected override void WriteTypeJson(JsonWriter writer, IPalReference value, JsonSerializer serializer)
@@ -154,7 +157,7 @@ namespace PalCalc.UI
                 case OwnedPalReference opr: oprc.WriteJson(writer, opr, serializer); break;
                 case WildPalReference wpr: wprc.WriteJson(writer, wpr, serializer); break;
                 case BredPalReference bpr: bprc.WriteJson(writer, bpr, serializer); break;
-                default: throw new Exception(); // TODO - log error message
+                default: throw new Exception($"Unhandled IPalReference type {value?.GetType()?.Name}");
             }
         }
     }

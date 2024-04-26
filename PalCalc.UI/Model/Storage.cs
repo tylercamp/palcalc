@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using PalCalc.Model;
 using PalCalc.SaveReader;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,8 @@ namespace PalCalc.UI.Model
 {
     internal static class Storage
     {
+        private static ILogger logger = Log.ForContext(typeof(Storage));
+
         public static string CachePath => "cache";
         public static string SaveCachePath => $"{CachePath}/saves";
 
@@ -44,7 +47,8 @@ namespace PalCalc.UI.Model
                 }
                 catch (Exception e)
                 {
-                    // TODO - log
+                    logger.Error(e, "error reading app settings files, resetting");
+
                     File.Delete(AppSettingsPath);
                     return LoadAppSettings();
                 }
@@ -89,7 +93,8 @@ namespace PalCalc.UI.Model
                 }
                 catch (Exception e)
                 {
-                    // TODO - log
+                    logger.Error(e, "failed to load cached save-game data, clearing");
+
                     File.Delete(path);
                     res = null;
                 }
@@ -112,7 +117,7 @@ namespace PalCalc.UI.Model
             {
                 if (File.Exists(path))
                 {
-                    // TODO - log
+                    logger.Warning("cached save available but the save-game itself is invalid, deleting cached save for {savePath}", save.BasePath);
                     File.Delete(path);
                 }
                 return null;
@@ -127,6 +132,7 @@ namespace PalCalc.UI.Model
 
                 if (!res.IsValid)
                 {
+                    // TODO - no longer necessary? should have been covered by check at top of this method
                     // TODO - log
                     File.Delete(path);
                     return null;

@@ -1,4 +1,5 @@
 ﻿using PalCalc.SaveReader.FArchive;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,17 +26,21 @@ namespace PalCalc.SaveReader.SaveFile
 
     public class LevelMetaSaveFile : ISaveFile
     {
+        private static ILogger logger = Log.ForContext<LevelMetaSaveFile>();
+
         public LevelMetaSaveFile(string folderPath) : base(folderPath) { }
 
         public override string FileName => "LevelMeta.sav";
 
         public GameMeta ReadGameOptions()
         {
+            logger.Debug("parsing content");
             var valuesVisitor = new ValueCollectingVisitor(".SaveData", ".WorldName", ".HostPlayerName", ".HostPlayerLevel", ".InGameDay");
             VisitGvas(valuesVisitor);
 
             bool isServerSave = !valuesVisitor.Result.ContainsKey(".HostPlayerName");
 
+            logger.Debug("done");
             return new GameMeta
             {
                 WorldName = (string)valuesVisitor.Result[".WorldName"],

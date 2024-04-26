@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,9 +36,12 @@ namespace PalCalc.SaveReader.FArchive
 
     public class CharacterContainerReader : ICustomReader
     {
+        private static ILogger logger = Log.ForContext<CharacterContainerReader>();
+
         public override string MatchedPath => ".worldSaveData.CharacterContainerSaveData.Value.Slots.Slots.RawData";
         public override IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path, IEnumerable<IVisitor> visitors)
         {
+            logger.Verbose("decoding");
             var arrayProp = (ArrayProperty)reader.ReadProperty(typeName, size, path, path, visitors);
 
             var pathVisitors = visitors.Where(v => v.Matches(path));
@@ -62,6 +66,7 @@ namespace PalCalc.SaveReader.FArchive
 
                 foreach (var v in pathVisitors) v.VisitCharacterContainerPropertyEnd(path, meta);
 
+                logger.Verbose("done");
                 return result;
             }
         }
@@ -81,9 +86,12 @@ namespace PalCalc.SaveReader.FArchive
 
     public class CharacterReader : ICustomReader
     {
+        private static ILogger logger = Log.ForContext<CharacterReader>();
+
         public override string MatchedPath => ".worldSaveData.CharacterSaveParameterMap.Value.RawData";
         public override IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path, IEnumerable<IVisitor> visitors)
         {
+            logger.Verbose("decoding");
             var arrayProp = (ArrayProperty)reader.ReadProperty(typeName, size, path, path, visitors);
 
             using (var byteStream = new MemoryStream(arrayProp.ByteValues))
@@ -102,6 +110,7 @@ namespace PalCalc.SaveReader.FArchive
                 foreach (var v in extraVisitors) v.Exit();
                 foreach (var v in pathVisitors) v.VisitCharacterPropertyEnd(path, meta);
 
+                logger.Verbose("done");
                 return new CharacterDataProperty
                 {
                     Meta = meta,
@@ -196,6 +205,8 @@ namespace PalCalc.SaveReader.FArchive
 
     public class GroupReader : ICustomReader
     {
+        private static ILogger logger = Log.ForContext<GroupReader>();
+
         public override string MatchedPath => ".worldSaveData.GroupSaveDataMap.Value";
 
         private (string, string, ulong) ReadRawProperty(FArchiveReader reader)
@@ -244,11 +255,15 @@ namespace PalCalc.SaveReader.FArchive
 
         public override IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path, IEnumerable<IVisitor> visitors)
         {
+            logger.Verbose("decoding");
+
             // manually read properties instead of using FArchiveReader property helpers to preserve values regardless
             // of ARCHIVE_PRESERVE flag
             var groupTypeString = ReadGroupType(reader);
             var rawDataBytes = ReadRawData(reader);
             reader.ReadString(); // skip "None" at end of property list
+
+            logger.Verbose("groupType is {groupTypeString}", groupTypeString);
 
             var groupType = groupTypeString switch
             {
@@ -299,6 +314,7 @@ namespace PalCalc.SaveReader.FArchive
                 foreach (var v in visitors.Where(v => v.Matches(path)))
                     v.VisitCharacterGroupProperty(path, result);
 
+                logger.Verbose("done");
                 return result;
             }
         }
