@@ -17,22 +17,24 @@ namespace PalCalc.UI.Model
 
         public static string CachePath => "cache";
         public static string SaveCachePath => $"{CachePath}/saves";
+        public static string DataPath => "data";
 
         // path for cached copy of save file data
         public static string SaveCachePathFor(SaveGame forSaveFile) => $"{SaveCachePath}/{CachedSaveGame.IdentifierFor(forSaveFile)}.json";
 
         // path for storing data associated with a specific save file
-        public static string SaveFileDataPath(SaveGame forSaveFile) => $"data/results/{CachedSaveGame.IdentifierFor(forSaveFile)}";
+        public static string SaveFileDataPath(SaveGame forSaveFile) => $"{DataPath}/results/{CachedSaveGame.IdentifierFor(forSaveFile)}";
 
-        public static string AppSettingsPath => $"data/settings.json";
+        public static string AppSettingsPath => $"{DataPath}/settings.json";
 
         private static bool didInit = false;
-        private static void Init()
+        public static void Init()
         {
             if (didInit) return;
 
             if (!Directory.Exists(CachePath)) Directory.CreateDirectory(CachePath);
             if (!Directory.Exists(SaveCachePath)) Directory.CreateDirectory(SaveCachePath);
+            if (!Directory.Exists(DataPath)) Directory.CreateDirectory(DataPath);
 
             didInit = true;
         }
@@ -80,6 +82,8 @@ namespace PalCalc.UI.Model
         {
             Init();
 
+            CrashSupport.ReferencedSave(save);
+
             var path = SaveCachePathFor(save);
             if (File.Exists(path))
             {
@@ -99,6 +103,8 @@ namespace PalCalc.UI.Model
                     res = null;
                 }
 #endif
+                
+                CrashSupport.ReferencedCachedSave(res);
                 return res;
             }
             else
@@ -111,6 +117,8 @@ namespace PalCalc.UI.Model
         public static CachedSaveGame LoadSave(SaveGame save, PalDB db)
         {
             Init();
+
+            CrashSupport.ReferencedSave(save);
 
             var path = SaveCachePathFor(save);
             if (!save.IsValid)
@@ -151,6 +159,8 @@ namespace PalCalc.UI.Model
             {
                 var res = CachedSaveGame.FromSaveGame(save, db);
                 if (res == null) return null;
+
+                CrashSupport.ReferencedCachedSave(res);
 
                 File.WriteAllText(path, res.ToJson(db));
                 InMemorySaves.Add(identifier, res);

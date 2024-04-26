@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -18,18 +19,23 @@ namespace PalCalc.UI
     {
         private static ILogger logger;
 
+        public static string LogFolder = "log";
+
         protected override void OnStartup(StartupEventArgs e)
         {
+#if RELEASE
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+#endif
 
-            var logFolder = "log";
-            if (!Directory.Exists(logFolder)) Directory.CreateDirectory(logFolder);
+            Storage.Init();
+
+            if (!Directory.Exists(LogFolder)) Directory.CreateDirectory(LogFolder);
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.PalCommon()
 #if RELEASE
-                .WriteTo.File(Logging.MessageFormat, $"{logFolder}/log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(Logging.MessageFormat, $"{LogFolder}/log.txt", rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
 #endif
                 .CreateLogger();
 
@@ -40,6 +46,10 @@ namespace PalCalc.UI
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             logger.Fatal(e.ExceptionObject as Exception, "An unhandled error occurred");
+
+            Serilog.Log.CloseAndFlush();
+            var logZip = CrashSupport.PrepareSupportFile();
+            MessageBox.Show($"An unhandled error occurred.\n\nPlease find the generated ZIP file to send with any support questions:\n\n{logZip}");
         }
     }
 }

@@ -77,6 +77,8 @@ namespace PalCalc.UI.ViewModel
                     }
                 }
 
+                CrashSupport.ReferencedSave(value?.Value);
+
                 if (SetProperty(ref selectedGame, value))
                 {
                     if (needsReset)

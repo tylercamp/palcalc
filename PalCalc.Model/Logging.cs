@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
+using Serilog.Exceptions;
 using Serilog.Templates;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,6 @@ namespace PalCalc.Model
         public static void InitCommonFull(LogEventLevel consoleLogLevel = LogEventLevel.Information)
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
                 .WriteTo.PalCommon(consoleLogLevel)
                 .CreateLogger();
         }
@@ -29,6 +29,10 @@ namespace PalCalc.Model
     public static class LoggingExtensions
     {
         public static LoggerConfiguration PalCommon(this LoggerSinkConfiguration config, LogEventLevel consoleLogLevel = LogEventLevel.Information) =>
-            config.Debug(Logging.MessageFormat, LogEventLevel.Verbose).WriteTo.Console(Logging.MessageFormat, consoleLogLevel);
+            config
+                .Debug(Logging.MessageFormat, LogEventLevel.Verbose)
+                .WriteTo.Console(Logging.MessageFormat, consoleLogLevel)
+                .MinimumLevel.Verbose()
+                .Enrich.WithExceptionDetails();
     }
 }

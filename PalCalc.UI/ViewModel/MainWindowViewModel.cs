@@ -182,6 +182,8 @@ namespace PalCalc.UI.ViewModel
             }
             else
             {
+                CrashSupport.ReferencedSave(SaveSelection.SelectedGame.Value);
+
                 PalTargetList = targetsBySaveFile[SaveSelection.SelectedGame.Value];
                 PalTargetList.PropertyChanged += PalTargetList_PropertyChanged;
             }
@@ -226,40 +228,51 @@ namespace PalCalc.UI.ViewModel
 
             Task.Factory.StartNew(() =>
             {
-                dispatcher.Invoke(() => IsEditable = false);
-
-                solverTokenSource = new CancellationTokenSource();
-                var results = solver.SolveFor(currentSpec, solverTokenSource.Token);
-
-                dispatcher.Invoke(() =>
+                try
                 {
-                    if (!solverTokenSource.IsCancellationRequested)
+                    dispatcher.Invoke(() => IsEditable = false);
+
+                    solverTokenSource = new CancellationTokenSource();
+                    var results = solver.SolveFor(currentSpec, solverTokenSource.Token);
+
+                    dispatcher.Invoke(() =>
                     {
-                        PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(cachedData, r)).ToList() };
-                        if (PalTarget.InitialPalSpecifier == null)
+                        if (!solverTokenSource.IsCancellationRequested)
                         {
-                            PalTargetList.Add(PalTarget.CurrentPalSpecifier);
-                            PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
+                            PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(cachedData, r)).ToList() };
+                            if (PalTarget.InitialPalSpecifier == null)
+                            {
+                                PalTargetList.Add(PalTarget.CurrentPalSpecifier);
+                                PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
+                            }
+                            else
+                            {
+                                var updatedSpec = PalTarget.CurrentPalSpecifier;
+                                PalTargetList.Replace(PalTarget.InitialPalSpecifier, updatedSpec);
+                                PalTargetList.SelectedTarget = updatedSpec;
+                            }
+
+                            var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
+                            if (!Directory.Exists(outputFolder))
+                                Directory.CreateDirectory(outputFolder);
+
+                            var outputFile = Path.Join(outputFolder, "pal-targets.json");
+                            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedGame.CachedValue);
+                            File.WriteAllText(outputFile, JsonConvert.SerializeObject(PalTargetList, converter));
                         }
-                        else
-                        {
-                            var updatedSpec = PalTarget.CurrentPalSpecifier;
-                            PalTargetList.Replace(PalTarget.InitialPalSpecifier, updatedSpec);
-                            PalTargetList.SelectedTarget = updatedSpec;
-                        }   
 
-                        var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
-                        if (!Directory.Exists(outputFolder))
-                            Directory.CreateDirectory(outputFolder);
-
-                        var outputFile = Path.Join(outputFolder, "pal-targets.json");
-                        var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedGame.CachedValue);
-                        File.WriteAllText(outputFile, JsonConvert.SerializeObject(PalTargetList, converter));
-                    }
-
-                    solverTokenSource = null;
-                    IsEditable = true;
-                });
+                        solverTokenSource = null;
+                        IsEditable = true;
+                    });
+                }
+                catch (Exception e)
+                {
+                    dispatcher.BeginInvoke(() =>
+                    {
+                        // re-throw on UI thread so the app crashes (instead of hangs) with proper error handling
+                        throw new Exception("Unhandled error during solver operation", e);
+                    });
+                }
             });
         }
 
