@@ -5,6 +5,7 @@ using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
+using PalCalc.UI.ViewModel.Mapped;
 using Serilog;
 using System;
 using System.Collections.Generic;

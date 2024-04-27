@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View"
-             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              d:Width="40"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance vm:TraitViewModel, IsDesignTimeCreatable=True}">
+             d:DataContext="{d:DesignInstance mvm:TraitViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4" />

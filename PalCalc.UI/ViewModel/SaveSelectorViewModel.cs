@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

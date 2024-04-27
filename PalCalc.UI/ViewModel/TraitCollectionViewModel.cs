@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PalCalc.UI.ViewModel.Mapped;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;

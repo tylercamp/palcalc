@@ -1,17 +1,18 @@
 ﻿<StackPanel x:Class="PalCalc.UI.View.SaveSelectorView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
-             xmlns:local="clr-namespace:PalCalc.UI.View"
-             mc:Ignorable="d" 
-             d:Background="White"
-             d:DataContext="{d:DesignInstance vm:SaveSelectorViewModel, IsDesignTimeCreatable=True}">
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+            xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+            xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+            xmlns:local="clr-namespace:PalCalc.UI.View"
+            mc:Ignorable="d" 
+            d:Background="White"
+            d:DataContext="{d:DesignInstance vm:SaveSelectorViewModel, IsDesignTimeCreatable=True}">
     <Label Content="Saves Location" />
     <ComboBox ItemsSource="{Binding SavesLocations}" SelectedItem="{Binding SelectedLocation}">
         <ItemsControl.ItemTemplate>
-            <DataTemplate DataType="vm:SavesLocationViewModel">
+            <DataTemplate DataType="mvm:SavesLocationViewModel">
                 <TextBlock Text="{Binding Label}" />
             </DataTemplate>
         </ItemsControl.ItemTemplate>
@@ -20,7 +21,7 @@
     <Label Content="Save Game" />
     <ComboBox ItemsSource="{Binding AvailableSaves}" SelectedItem="{Binding SelectedGame}">
         <ItemsControl.ItemTemplate>
-            <DataTemplate DataType="vm:SaveGameViewModel">
+            <DataTemplate DataType="mvm:SaveGameViewModel">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="(!) " Visibility="{Binding WarningVisibility}" Foreground="DarkRed" />
                     <TextBlock Text="{Binding Label}" />
