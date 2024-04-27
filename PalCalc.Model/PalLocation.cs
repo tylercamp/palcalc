@@ -23,7 +23,29 @@ namespace PalCalc.Model
         // note: 1-indexed
         public int Index { get; set; }
 
-        // pal box is 6x5
+        public static bool operator ==(PalLocation a, PalLocation b)
+        {
+            bool aNull = ReferenceEquals(a, null);
+            bool bNull = ReferenceEquals(b, null);
+
+            if (aNull != bNull) return false;
+            if (aNull) return true;
+
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(PalLocation a, PalLocation b) => !(a == b);
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as PalLocation;
+            if (ReferenceEquals(other, null)) return false;
+
+            return Type == other.Type && Index == other.Index;
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Type, Index);
+
         public override string ToString()
         {
             string indexStr;

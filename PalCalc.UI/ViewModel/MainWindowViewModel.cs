@@ -97,7 +97,7 @@ namespace PalCalc.UI.ViewModel
                                 return new PalTargetListViewModel();
                             }
 
-                            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), originalCachedSave);
+                            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveGameViewModel.FromSave(sg), originalCachedSave);
 #if HANDLE_ERRORS
                             try
                             {
@@ -255,7 +255,11 @@ namespace PalCalc.UI.ViewModel
                     {
                         if (!solverTokenSource.IsCancellationRequested)
                         {
-                            PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(cachedData, r)).ToList() };
+                            PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel()
+                            {
+                                Results = results.Select(r => new BreedingResultViewModel(cachedData, SaveGameViewModel.FromSave(cachedData.UnderlyingSave), r)).ToList()
+                            };
+
                             if (PalTarget.InitialPalSpecifier == null)
                             {
                                 PalTargetList.Add(PalTarget.CurrentPalSpecifier);
@@ -273,7 +277,7 @@ namespace PalCalc.UI.ViewModel
                                 Directory.CreateDirectory(outputFolder);
 
                             var outputFile = Path.Join(outputFolder, "pal-targets.json");
-                            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedGame.CachedValue);
+                            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveGameViewModel.FromSave(cachedData.UnderlyingSave), SaveSelection.SelectedGame.CachedValue);
                             File.WriteAllText(outputFile, JsonConvert.SerializeObject(PalTargetList, converter));
                         }
 

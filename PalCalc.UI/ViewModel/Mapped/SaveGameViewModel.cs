@@ -21,7 +21,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             Label = "Add a new save...";
         }
 
-        public SaveGameViewModel(SaveGame value)
+        private SaveGameViewModel(SaveGame value)
         {
             IsAddManualOption = false;
             Value = value;
@@ -37,6 +37,16 @@ namespace PalCalc.UI.ViewModel.Mapped
                 logger.Warning(ex, "error when loading LevelMeta for {saveId}", CachedSaveGame.IdentifierFor(value));
                 Label = $"{value.FolderName} (Unable to read metadata)";
             }
+        }
+
+        private static Dictionary<string, SaveGameViewModel> vms = new Dictionary<string, SaveGameViewModel>();
+        public static SaveGameViewModel FromSave(SaveGame value)
+        {
+            if (vms.ContainsKey(value.BasePath)) return vms[value.BasePath];
+
+            var vm = new SaveGameViewModel(value);
+            vms.Add(value.BasePath, vm);
+            return vm;
         }
 
         public DateTime LastModified => Value.LastModified;

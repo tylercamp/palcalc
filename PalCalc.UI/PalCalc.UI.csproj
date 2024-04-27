@@ -13,6 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Internal\cross.png" />
+    <None Remove="Resources\Internal\warning.png" />
     <None Remove="Resources\PalIconOverride.json" />
     <None Remove="Resources\Pals\Anubis.png" />
     <None Remove="Resources\Pals\Arsox.png" />
@@ -180,6 +182,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Internal\cross.png" />
+    <Resource Include="Resources\Internal\warning.png" />
     <Resource Include="Resources\PalIconOverride.json" />
     <Resource Include="Resources\Pals\Anubis.png" />
     <Resource Include="Resources\Pals\Arsox.png" />

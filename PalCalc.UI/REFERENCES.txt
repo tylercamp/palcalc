@@ -1,0 +1,8 @@
+
+Error icon:
+
+warning.png
+<a href="https://www.flaticon.com/free-icons/caution" title="caution icons">Caution icons created by Andrean Prabowo - Flaticon</a>
+
+cross.png
+<a href="https://www.flaticon.com/free-icons/error" title="error icons">Error icons created by juicy_fish - Flaticon</a>

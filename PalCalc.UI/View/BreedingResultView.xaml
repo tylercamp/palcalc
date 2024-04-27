@@ -18,11 +18,27 @@
         <DataTemplate x:Key="DemoTemplate" DataType="{x:Type m:BreedingTreeNodeViewModel}">
             <StackPanel Orientation="Vertical" Margin="5" MinWidth="180">
                 <StackPanel Orientation="Horizontal">
-                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="White" Margin="0,0,5,0">
-                        <Border.Background>
-                            <ImageBrush Stretch="Fill" ImageSource="{Binding Pal.Icon}" />
-                        </Border.Background>
-                    </Border>
+                    <Grid>
+                        <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="White" Margin="0,0,5,0">
+                            <Border.Background>
+                                <ImageBrush Stretch="Fill" ImageSource="{Binding Pal.Icon}" />
+                            </Border.Background>
+                        </Border>
+
+                        <Image
+                            Source="{x:Static m:InternalIcons.ErrorIcon}"
+                            Visibility="{Binding OutdatedErrorNoticeVisibility}"
+                            Width="20" Height="20"
+                            ToolTipService.ToolTip="{Binding OutdatedNoticeReason}"
+                            HorizontalAlignment="Left" VerticalAlignment="Top" />
+
+                        <Image
+                            Source="{x:Static m:InternalIcons.WarningIcon}"
+                            Visibility="{Binding OutdatedWarningNoticeVisibility}"
+                            Width="20" Height="20"
+                            ToolTipService.ToolTip="{Binding OutdatedNoticeReason}"
+                            HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    </Grid>
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="{Binding Gender}" Foreground="White" />
                         <StackPanel Orientation="Vertical" Visibility="{Binding Location.Visibility}">

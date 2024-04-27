@@ -3,6 +3,7 @@ using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,9 +46,11 @@ namespace PalCalc.UI.ViewModel
         }
 
         private CachedSaveGame source;
-        public BreedingResultViewModel(CachedSaveGame source, IPalReference displayedResult)
+        private SaveGameViewModel latestSave;
+        public BreedingResultViewModel(CachedSaveGame source, SaveGameViewModel latestSave, IPalReference displayedResult)
         {
             this.source = source;
+            this.latestSave = latestSave;
 
             DisplayedResult = displayedResult;
         }
@@ -68,7 +71,7 @@ namespace PalCalc.UI.ViewModel
                 displayedResult = value;
 
                 if (displayedResult == null) Graph = null;
-                else Graph = BreedingGraph.FromPalReference(source, value);
+                else Graph = BreedingGraph.FromPalReference(latestSave, source, value);
 
                 OnPropertyChanged(nameof(DisplayedResult));
                 OnPropertyChanged(nameof(Graph));
