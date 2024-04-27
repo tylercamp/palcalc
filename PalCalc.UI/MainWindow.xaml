@@ -15,16 +15,22 @@
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition MinWidth="220"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="232*"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="43*"/>
         </Grid.ColumnDefinitions>
         <DockPanel Grid.Column="0" Margin="10,10,10,10" IsEnabled="{Binding IsEditable}">
-            <GroupBox Header="Save File" DockPanel.Dock="Top">
-                <v:SaveSelectorView DataContext="{Binding SaveSelection}" />
-            </GroupBox>
+            <StackPanel DockPanel.Dock="Top">
+                <GroupBox Header="Save File">
+                    <v:SaveSelectorView DataContext="{Binding SaveSelection}" />
+                </GroupBox>
+
+                <GroupBox Header="Game Settings">
+                    <v:GameSettingsView DataContext="{Binding GameSettings}" />
+                </GroupBox>
+            </StackPanel>
 
             <GroupBox Header="Target Pals">
                 <v:PalTargetListView DataContext="{Binding PalTargetList}" />

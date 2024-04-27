@@ -45,8 +45,8 @@ namespace PalCalc.UI.ViewModel
 
         public bool CanCancelSolver => !CanRunSolver;
 
-        public BreedingSolver ConfiguredSolver(List<PalInstance> pals) => new BreedingSolver(
-            new GameSettings(),
+        public BreedingSolver ConfiguredSolver(GameSettings gameSettings, List<PalInstance> pals) => new BreedingSolver(
+            gameSettings,
             PalDB.LoadEmbedded(),
             pals,
             MaxBreedingSteps,

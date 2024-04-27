@@ -2,6 +2,7 @@
 obj/
 bin/
 cache/
+data/
 Level.sav.json
 
 character*.json

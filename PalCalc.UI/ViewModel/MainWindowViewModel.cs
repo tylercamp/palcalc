@@ -124,7 +124,7 @@ namespace PalCalc.UI.ViewModel
             SaveSelection.PropertyChanged += SaveSelection_PropertyChanged;
             SaveSelection.NewCustomSaveSelected += SaveSelection_CustomSaveAdded;
 
-            UpdateTargetsList();
+            UpdateFromSaveProperties();
         }
 
         private void SaveSelection_CustomSaveAdded(ManualSavesLocationViewModel manualSaves, SaveGame save)
@@ -172,14 +172,16 @@ namespace PalCalc.UI.ViewModel
             MessageBox.Show("An error occurred when loading the save file");
         }
 
-        private void UpdateTargetsList()
+        private void UpdateFromSaveProperties()
         {
             if (PalTargetList != null) PalTargetList.PropertyChanged -= PalTargetList_PropertyChanged;
+            if (GameSettings != null) GameSettings.PropertyChanged -= GameSettings_PropertyChanged;
 
             if (SaveSelection.SelectedGame?.Value == null)
             {
                 PalTargetList = null;
                 PalTarget = null;
+                GameSettings = null;
             }
             else
             {
@@ -187,6 +189,9 @@ namespace PalCalc.UI.ViewModel
 
                 PalTargetList = targetsBySaveFile[SaveSelection.SelectedGame.Value];
                 PalTargetList.PropertyChanged += PalTargetList_PropertyChanged;
+
+                GameSettings = GameSettingsViewModel.Load(SaveSelection.SelectedGame.Value);
+                GameSettings.PropertyChanged += GameSettings_PropertyChanged;
             }
 
             UpdatePalTarget();
@@ -200,11 +205,21 @@ namespace PalCalc.UI.ViewModel
                 PalTarget = null;
         }
 
+        private void GameSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var saveGame = SaveSelection.SelectedGame?.Value;
+            if (saveGame != null)
+            {
+                var settings = sender as GameSettingsViewModel;
+                settings.Save(saveGame);
+            }
+        }
+
         private void SaveSelection_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(SaveSelection.SelectedGame))
             {
-                UpdateTargetsList();
+                UpdateFromSaveProperties();
             }
         }
 
@@ -224,7 +239,7 @@ namespace PalCalc.UI.ViewModel
             var cachedData = SaveSelection.SelectedGame.CachedValue;
             if (cachedData == null) return;
 
-            var solver = SolverControls.ConfiguredSolver(cachedData.OwnedPals);
+            var solver = SolverControls.ConfiguredSolver(GameSettings.ModelObject, cachedData.OwnedPals);
             solver.SolverStateUpdated += Solver_SolverStateUpdated;
 
             Task.Factory.StartNew(() =>
@@ -321,6 +336,8 @@ namespace PalCalc.UI.ViewModel
 
         [ObservableProperty]
         private SaveSelectorViewModel saveSelection;
+        [ObservableProperty]
+        private GameSettingsViewModel gameSettings;
         [ObservableProperty]
         private SolverControlsViewModel solverControls;
         [ObservableProperty]

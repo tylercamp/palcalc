@@ -5,6 +5,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Enumeration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +24,10 @@ namespace PalCalc.UI.Model
         public static string SaveCachePathFor(SaveGame forSaveFile) => $"{SaveCachePath}/{CachedSaveGame.IdentifierFor(forSaveFile)}.json";
 
         // path for storing data associated with a specific save file
-        public static string SaveFileDataPath(SaveGame forSaveFile) => $"{DataPath}/results/{CachedSaveGame.IdentifierFor(forSaveFile)}";
+        public static string SaveFileDataPath(SaveGame forSaveFile) => $"{DataPath}/{CachedSaveGame.IdentifierFor(forSaveFile)}";
+
+        // path for storing game-specific game settings (breeding time, etc.)
+        public static string GameSettingsPath(SaveGame forSaveFile) => SaveFileDataPath(forSaveFile) + "/game-settings.json";
 
         public static string AppSettingsPath => $"{DataPath}/settings.json";
 
@@ -35,6 +39,25 @@ namespace PalCalc.UI.Model
             if (!Directory.Exists(CachePath)) Directory.CreateDirectory(CachePath);
             if (!Directory.Exists(SaveCachePath)) Directory.CreateDirectory(SaveCachePath);
             if (!Directory.Exists(DataPath)) Directory.CreateDirectory(DataPath);
+
+            // migrate file locations from before beta-v0.5
+            if (Directory.Exists($"{DataPath}/results"))
+            {
+                foreach (var entry in Directory.EnumerateFileSystemEntries($"{DataPath}/results"))
+                {
+                    var newPath = $"{DataPath}/{Path.GetFileName(entry)}";
+                    if (File.GetAttributes(entry).HasFlag(FileAttributes.Directory))
+                    {
+                        Directory.Move(entry, newPath);
+                    }
+                    else
+                    {
+                        File.Move(entry, newPath);
+                    }
+                }
+
+                Directory.Delete($"{DataPath}/results");
+            }
 
             didInit = true;
         }
@@ -70,7 +93,7 @@ namespace PalCalc.UI.Model
 
             var dataPath = SaveFileDataPath(save);
             if (Directory.Exists(dataPath))
-                Directory.Delete(dataPath);
+                Directory.Delete(dataPath, true);
         }
 
         #region Cached Game Save Files
