@@ -31,6 +31,7 @@ namespace PalCalc.UI.ViewModel
             {
                 if (SetProperty(ref selectedLocation, value))
                 {
+                    OnPropertyChanged(nameof(CanOpenSavesLocation));
                     OnPropertyChanged(nameof(AvailableSaves));
                     SelectedGame = MostRecentSave;
                 }
@@ -106,6 +107,8 @@ namespace PalCalc.UI.ViewModel
         {
         }
 
+        public bool CanOpenSavesLocation => SelectedLocation is not ManualSavesLocationViewModel;
+
         public SaveSelectorViewModel(IEnumerable<SavesLocation> savesLocations, IEnumerable<SaveGame> manualSaves)
         {
             manualLocation = new ManualSavesLocationViewModel(manualSaves);
@@ -114,6 +117,16 @@ namespace PalCalc.UI.ViewModel
             SavesLocations.Add(manualLocation);
 
             SelectedLocation = MostRecentLocation;
+        }
+
+        public void OpenSelectedSavesLocation()
+        {
+
+        }
+
+        public void OpenSelectedGameLocation()
+        {
+
         }
     }
 }

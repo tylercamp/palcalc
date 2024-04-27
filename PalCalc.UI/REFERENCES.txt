@@ -6,3 +6,7 @@ warning.png
 
 cross.png
 <a href="https://www.flaticon.com/free-icons/error" title="error icons">Error icons created by juicy_fish - Flaticon</a>
+
+
+folder.png
+<a href="https://www.flaticon.com/free-icons/open" title="open icons">Open icons created by Smashicons - Flaticon</a>

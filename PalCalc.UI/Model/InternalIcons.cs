@@ -15,5 +15,8 @@ namespace PalCalc.UI.Model
 
         private static BitmapImage warningIcon;
         public static ImageSource WarningIcon => warningIcon ??= ResourceLookup.GetImage("Internal/warning.png");
+
+        private static BitmapImage folderIcon;
+        public static ImageSource FolderIcon => folderIcon ??= ResourceLookup.GetImage("Internal/folder.png");
     }
 }
