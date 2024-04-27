@@ -1,4 +1,5 @@
-﻿using PalCalc.SaveReader.FArchive;
+﻿using PalCalc.Model;
+using PalCalc.SaveReader.FArchive;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,7 @@ namespace PalCalc.SaveReader.SaveFile
             return new GameMeta
             {
                 WorldName = (string)valuesVisitor.Result[".WorldName"],
-                InGameDay = (int)valuesVisitor.Result[".InGameDay"],
+                InGameDay = (int)valuesVisitor.Result.GetValueOrElse(".InGameDay", 1),
                 IsServerSave = isServerSave,
                 PlayerName = isServerSave ? null : (string)valuesVisitor.Result[".HostPlayerName"],
                 PlayerLevel = isServerSave ? null : (int?)valuesVisitor.Result[".HostPlayerLevel"],
