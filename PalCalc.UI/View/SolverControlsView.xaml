@@ -16,11 +16,25 @@
         </Style>
     </WrapPanel.Resources>
     <Label Content="Max Breeding Steps:" />
-    <xctk:IntegerUpDown Value="{Binding MaxBreedingSteps}" IsEnabled="{Binding CanRunSolver}" />
+    <xctk:IntegerUpDown
+        Value="{Binding MaxBreedingSteps}"
+        IsEnabled="{Binding CanRunSolver}"
+        ToolTipService.ToolTip="The maximum number of solver iterations, and the max number of breeding steps to reach the target pal.&#10;Higher values linearly affect time required."
+    />
+    
     <Label Content="Max Wild Pals:" />
-    <xctk:IntegerUpDown Value="{Binding MaxWildPals}" IsEnabled="{Binding CanRunSolver}" />
+    <xctk:IntegerUpDown
+        Value="{Binding MaxWildPals}"
+        IsEnabled="{Binding CanRunSolver}"
+        ToolTipService.ToolTip="The maximum number of wild pals to allow in a breeding path.&#10;Higher values linearly affect time required, depending on how many types of pals are owned."
+    />
+    
     <Label Content="Max Irrelevant Traits:" />
-    <xctk:IntegerUpDown Value="{Binding MaxIrrelevantTraits}" IsEnabled="{Binding CanRunSolver}" />
+    <xctk:IntegerUpDown
+        Value="{Binding MaxIrrelevantTraits}"
+        IsEnabled="{Binding CanRunSolver}"
+        ToolTipService.ToolTip="The maximum number of irrelevant traits allowed for any pal used as part of the breeding path, including the breeding result.&#10;Higher values exponentially affect time required."
+    />
 
     <StackPanel Orientation="Horizontal">
         <Button Content="Run" Height="20" Click="Run_Click" Margin="0,0,20,0" IsEnabled="{Binding CanRunSolver}" />
