@@ -83,7 +83,19 @@ namespace PalCalc.UI.ViewModel
             };
 
             PalTargetList = new PalTargetListViewModel();
-            SaveSelection = new SaveSelectorViewModel(DirectSavesLocation.AllLocal.Cast<ISavesLocation>().Concat(XboxSavesLocation.FindAll().Cast<ISavesLocation>()).ToList(), settings.ExtraSaveLocations.Select(saveFolder => new StandardSaveGame(saveFolder)));
+
+            var availableSavesLocations = new List<ISavesLocation>();
+            availableSavesLocations.AddRange(DirectSavesLocation.AllLocal);
+
+            var xboxSaves = XboxSavesLocation.FindAll();
+            if (xboxSaves.Count > 0) availableSavesLocations.AddRange(xboxSaves);
+            else
+            {
+                // add a placeholder so the user can (optionally) see the explanation why no saves are available (game isn't installed/synced via xbox app)
+                availableSavesLocations.Add(new XboxSavesLocation());
+            }
+            
+            SaveSelection = new SaveSelectorViewModel(availableSavesLocations, settings.ExtraSaveLocations.Select(saveFolder => new StandardSaveGame(saveFolder)));
 
             targetsBySaveFile = SaveSelection.SavesLocations
                 .SelectMany(l => l.SaveGames)
@@ -241,7 +253,7 @@ namespace PalCalc.UI.ViewModel
 
         public void RunSolver()
         {
-            var currentSpec = PalTarget.CurrentPalSpecifier.ModelObject;
+            var currentSpec = PalTarget?.CurrentPalSpecifier?.ModelObject;
             if (currentSpec == null) return;
 
             var cachedData = SaveSelection.SelectedGame.CachedValue;

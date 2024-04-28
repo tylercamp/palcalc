@@ -32,6 +32,7 @@ namespace PalCalc.UI.ViewModel
                 if (SetProperty(ref selectedLocation, value))
                 {
                     OnPropertyChanged(nameof(CanOpenSavesLocation));
+                    OnPropertyChanged(nameof(NoXboxSavesMsgVisibility));
                     OnPropertyChanged(nameof(AvailableSaves));
                     SelectedGame = MostRecentSave;
                 }
@@ -107,7 +108,10 @@ namespace PalCalc.UI.ViewModel
         {
         }
 
-        public bool CanOpenSavesLocation => SelectedLocation is not ManualSavesLocationViewModel;
+        public bool CanOpenSavesLocation => (SelectedLocation as StandardSavesLocationViewModel)?.Value?.FolderPath != null;
+        public bool CanOpenSaveFileLocation => (SelectedLocation as SaveGameViewModel)?.Value?.BasePath != null;
+
+        public Visibility NoXboxSavesMsgVisibility => (SelectedLocation as StandardSavesLocationViewModel)?.Value is XboxSavesLocation && !SelectedLocation.SaveGames.Any() ? Visibility.Visible : Visibility.Collapsed;
 
         public SaveSelectorViewModel(IEnumerable<ISavesLocation> savesLocations, IEnumerable<ISaveGame> manualSaves)
         {
@@ -117,16 +121,6 @@ namespace PalCalc.UI.ViewModel
             SavesLocations.Add(manualLocation);
 
             SelectedLocation = MostRecentLocation;
-        }
-
-        public void OpenSelectedSavesLocation()
-        {
-
-        }
-
-        public void OpenSelectedGameLocation()
-        {
-
         }
     }
 }

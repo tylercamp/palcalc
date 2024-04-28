@@ -9,7 +9,7 @@
             xmlns:local="clr-namespace:PalCalc.UI.View"
             mc:Ignorable="d" 
             d:Background="White"
-            d:DataContext="{d:DesignInstance vm:SaveSelectorViewModel, IsDesignTimeCreatable=True}">
+            d:DataContext="{d:DesignInstance vm:SaveSelectorViewModel, IsDesignTimeCreatable=True}" d:DesignWidth="436.57">
     <Label Content="Saves Location" />
     <Grid>
         <Grid.ColumnDefinitions>
@@ -47,10 +47,14 @@
             </ItemsControl.ItemTemplate>
         </ComboBox>
 
-        <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SaveGameFolder_Click" ToolTipService.ToolTip="Open in Explorer">
+        <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SaveGameFolder_Click" IsEnabled="{Binding CanOpenSaveFileLocation}" ToolTipService.ToolTip="Open in Explorer">
             <Image Source="{x:Static m:InternalIcons.FolderIcon}" Width="20" Height="15" />
         </Button>
     </Grid>
+
+    <TextBlock Visibility="{Binding NoXboxSavesMsgVisibility}" Margin="5,5,5,5" TextWrapping="Wrap" FontStyle="Italic">
+        No Xbox saves were found. Palworld must be installed on the PC through the Xbox app. Save files are synced to your PC when you run the game.
+    </TextBlock>
 
     <TextBlock Visibility="{Binding InvalidSaveMessageVisibility}" Margin="0,5,0,0" Text="The selected save file is invalid!" Foreground="DarkRed" />
 </StackPanel>

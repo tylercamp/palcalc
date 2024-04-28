@@ -17,7 +17,7 @@ namespace PalCalc.SaveReader
     public interface ISavesLocation
     {
         public string FolderPath { get; }
-        public string FolderName => Path.GetFileName(FolderPath);
+        public string FolderName => FolderPath == null ? "None" : Path.GetFileName(FolderPath);
 
         public IEnumerable<ISaveGame> AllSaveGames { get; }
         public IEnumerable<ISaveGame> ValidSaveGames => AllSaveGames.Where(g => g.IsValid);
@@ -195,6 +195,12 @@ namespace PalCalc.SaveReader
             {
                 AllSaveGames = new List<ISaveGame>();
             }
+        }
+
+        public XboxSavesLocation()
+        {
+            AllSaveGames = new List<ISaveGame>();
+            FolderPath = null;
         }
 
         public string FolderPath { get; }

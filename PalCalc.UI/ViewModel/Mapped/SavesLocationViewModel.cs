@@ -23,7 +23,15 @@ namespace PalCalc.UI.ViewModel.Mapped
 
             var saveType = sl is XboxSavesLocation ? "Xbox" : "Steam";
 
-            Label = $"{saveType} user {sl.FolderName.LimitLength(12)} - {sl.ValidSaveGames.Count()} valid saves";
+            if (sl.FolderPath == null)
+            {
+                Label = saveType;
+            }
+            else
+            {
+                Label = $"{saveType} user {sl.FolderName.LimitLength(12)} - {sl.ValidSaveGames.Count()} valid saves";
+            }
+            
             SaveGames = new ReadOnlyObservableCollection<SaveGameViewModel>(
                 new ObservableCollection<SaveGameViewModel>(sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sg)))
             );
