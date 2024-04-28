@@ -15,7 +15,6 @@ namespace PalCalc.Solver
         Breeding,
         Simplifying,
         Finished,
-        Canceled,
     }
 
     public class SolverStatus
@@ -23,6 +22,7 @@ namespace PalCalc.Solver
         public SolverPhase CurrentPhase { get; set; }
         public int CurrentStepIndex { get; set; }
         public int TargetSteps { get; set; }
+        public bool Canceled { get; set; }
     }
 
     public class BreedingSolver
@@ -244,7 +244,7 @@ namespace PalCalc.Solver
                 throw new Exception("Target trait count cannot exceed max number of traits for a single pal");
             }
 
-            var statusMsg = new SolverStatus() { CurrentPhase = SolverPhase.Initializing, CurrentStepIndex = 0, TargetSteps = maxBreedingSteps };
+            var statusMsg = new SolverStatus() { CurrentPhase = SolverPhase.Initializing, CurrentStepIndex = 0, TargetSteps = maxBreedingSteps, Canceled = token.IsCancellationRequested };
             SolverStateUpdated?.Invoke(statusMsg);
 
             var relevantPals = RelevantInstancesForTraits(db, ownedPals, spec.Traits)
@@ -290,6 +290,7 @@ namespace PalCalc.Solver
 
                 statusMsg.CurrentPhase = SolverPhase.Breeding;
                 statusMsg.CurrentStepIndex = s;
+                statusMsg.Canceled = token.IsCancellationRequested;
                 SolverStateUpdated?.Invoke(statusMsg);
 
                 logger.Debug($"Starting search step #{s + 1} with {workingSet.Content.Count} relevant pals");
@@ -404,6 +405,7 @@ namespace PalCalc.Solver
                 }
             }
 
+            statusMsg.Canceled = token.IsCancellationRequested;
             statusMsg.CurrentPhase = SolverPhase.Finished;
             SolverStateUpdated?.Invoke(statusMsg);
 

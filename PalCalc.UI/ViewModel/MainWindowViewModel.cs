@@ -335,12 +335,15 @@ namespace PalCalc.UI.ViewModel
                         break;
 
                     case SolverPhase.Finished:
-                        SolverStatusMsg = $"Finished (took {solverStopwatch.Elapsed.TimeSpanSecondssStr()})";
-                        overallStep = (int)numTotalSteps;
-                        break;
-
-                    case SolverPhase.Canceled:
-                        SolverStatusMsg = null;
+                        if (obj.Canceled)
+                        {
+                            SolverStatusMsg = null;
+                        }
+                        else
+                        {
+                            SolverStatusMsg = $"Finished (took {solverStopwatch.Elapsed.TimeSpanSecondssStr()})";
+                            overallStep = (int)numTotalSteps;
+                        }
                         break;
                 }
 
