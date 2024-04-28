@@ -24,7 +24,6 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 
 ## Main TODOs
 
-- Associate solver results with save file and save-last-modified, show icon if save file was updated
 - Allow filtering of input pals by player
 - Proper packaging + release
 - ~~Logging + error handling~~
@@ -50,7 +49,7 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 - Show preview of involved pals, num wild pals, etc. in solver results list
 - Performance options (max threads)
 - Separate list of "Required traits" and "Optional traits" for target pal
-- Notify when a pal involved in a breeding path is no longer available in the source save
+- Notify when a pal involved in a breeding path is no longer available in the source save or has been moved
 - Show more solver result paths
   - There can be multiple paths to the same target or intermediate with the same final effort, but with differing number of breeding steps and wild pals involved
   - There are even more options if we support "optional" traits for target pal
