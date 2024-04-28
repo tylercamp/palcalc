@@ -10,6 +10,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -307,6 +308,7 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
+        private Stopwatch solverStopwatch = null;
         private void Solver_SolverStateUpdated(SolverStatus obj)
         {
             dispatcher.BeginInvoke(() =>
@@ -316,6 +318,7 @@ namespace PalCalc.UI.ViewModel
                 switch (obj.CurrentPhase)
                 {
                     case SolverPhase.Initializing:
+                        solverStopwatch = Stopwatch.StartNew();
                         SolverStatusMsg = "Initializing";
                         overallStep = 0;
                         break;
@@ -332,8 +335,12 @@ namespace PalCalc.UI.ViewModel
                         break;
 
                     case SolverPhase.Finished:
-                        SolverStatusMsg = "Finished";
+                        SolverStatusMsg = $"Finished (took {solverStopwatch.Elapsed.TimeSpanSecondssStr()})";
                         overallStep = (int)numTotalSteps;
+                        break;
+
+                    case SolverPhase.Canceled:
+                        SolverStatusMsg = null;
                         break;
                 }
 
@@ -356,6 +363,7 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private double solverProgress;
 
+        [NotifyPropertyChangedFor(nameof(ProgressBarVisibility))]
         [ObservableProperty]
         private string solverStatusMsg;
 
@@ -373,7 +381,7 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        public Visibility ProgressBarVisibility => IsEditable ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility ProgressBarVisibility => string.IsNullOrEmpty(SolverStatusMsg) ? Visibility.Collapsed : Visibility.Visible;
 
         public PalDB DB => db;
     }

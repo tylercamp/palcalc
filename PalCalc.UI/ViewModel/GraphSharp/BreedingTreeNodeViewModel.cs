@@ -44,8 +44,8 @@ namespace PalCalc.UI.Model
                 var effort = Value.PalRef.BreedingEffort;
                 var selfEffort = Value.PalRef.SelfBreedingEffort;
 
-                if (effort != selfEffort && Value.PalRef is BredPalReference) return $"{selfEffort.TimeSpanStr()} ({effort.TimeSpanStr()})";
-                else return effort.TimeSpanStr();
+                if (effort != selfEffort && Value.PalRef is BredPalReference) return $"{selfEffort.TimeSpanMinutesStr()} ({effort.TimeSpanMinutesStr()})";
+                else return effort.TimeSpanMinutesStr();
             }
         }
 
