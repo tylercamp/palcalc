@@ -29,17 +29,17 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 IsSinglePlayer = source.Players.Count == 1;
 
-                var ownerName = source.PlayersById[ownedLoc.OwnerId].Name;
-                var ownerGuild = source.GuildsByPlayerId[ownedLoc.OwnerId];
+                var ownerName = source.PlayersById.GetValueOrDefault(ownedLoc.OwnerId)?.Name ?? "Unknown Player";
+                var ownerGuild = source.GuildsByPlayerId.GetValueOrDefault(ownedLoc.OwnerId);
 
-                var isGuildOwner = ownedLoc.Location.Type == LocationType.Base && ownerGuild.MemberIds.Count > 1;
-                LocationOwner = isGuildOwner ? ownerGuild.Name : ownerName;
+                var isGuildOwner = ownedLoc.Location.Type == LocationType.Base && ownerGuild?.MemberIds?.Count > 1;
+                LocationOwner = isGuildOwner ? ownerGuild?.Name ?? "Unkown Guild" : ownerName;
             }
 
             switch (ownedLoc.Location.Type)
             {
                 case LocationType.PlayerParty:
-                    LocationCoordDescription = $"Party, slot {ownedLoc.Location.Index}";
+                    LocationCoordDescription = $"Party, slot {ownedLoc.Location.Index + 1}";
                     break;
 
                 case LocationType.Base:

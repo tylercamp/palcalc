@@ -19,8 +19,6 @@ namespace PalCalc.Model
     public class PalLocation
     {
         public LocationType Type { get; set; }
-
-        // note: 1-indexed
         public int Index { get; set; }
 
         // pal box is 6x5
@@ -34,7 +32,7 @@ namespace PalCalc.Model
             }
             else
             {
-                indexStr = $"Slot #{Index}";
+                indexStr = $"Slot #{Index+1}";
             }
 
             return $"{Type} ({indexStr})";
@@ -53,11 +51,8 @@ namespace PalCalc.Model
 
         public override string ToString() => $"Tab {Tab} at ({X},{Y})";
 
-        // (slotIndex is 1-indexed)
         public static PalboxCoord FromSlotIndex(int slotIndex)
         {
-            slotIndex -= 1;
-
             var numCols = GameConstants.PalBox_GridWidth;
             var numRows = GameConstants.PalBox_GridHeight;
             var palsPerTab = numCols * numRows;
@@ -80,14 +75,12 @@ namespace PalCalc.Model
         public int Column { get; set; }
 
         public int X => Column;
-        public int Y => Column;
+        public int Y => Row;
 
         public override string ToString() => $"Slot ({X},{Y})";
 
-        // (slotIndex is 1-indexed)
         public static BaseCoord FromSlotIndex(int slotIndex)
         {
-            slotIndex -= 1;
             var row = (slotIndex - slotIndex % GameConstants.Base_GridWidth) / GameConstants.Base_GridWidth;
             slotIndex -= row;
 
