@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace PalCalc.UI.ViewModel
     {
         public SolverControlsViewModel()
         {
-            MaxBreedingSteps = 10;
+            MaxBreedingSteps = 6;
             MaxWildPals = 1;
             MaxIrrelevantTraits = 1;
         }
@@ -54,5 +55,19 @@ namespace PalCalc.UI.ViewModel
             MaxIrrelevantTraits,
             TimeSpan.MaxValue
         );
+
+        public SolverSettings AsModel => new SolverSettings()
+        {
+            MaxBreedingSteps = MaxBreedingSteps,
+            MaxWildPals = MaxWildPals,
+            MaxIrrelevantTraits = MaxIrrelevantTraits
+        };
+
+        public static SolverControlsViewModel FromModel(SolverSettings model) => new SolverControlsViewModel()
+        {
+            MaxBreedingSteps = model.MaxBreedingSteps,
+            MaxWildPals = model.MaxWildPals,
+            MaxIrrelevantTraits = model.MaxIrrelevantTraits
+        };
     }
 }

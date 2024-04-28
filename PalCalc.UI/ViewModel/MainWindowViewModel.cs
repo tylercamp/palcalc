@@ -58,6 +58,7 @@ namespace PalCalc.UI.ViewModel
             CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
             settings = Storage.LoadAppSettings();
+            settings.SolverSettings ??= new SolverSettings();
 
             // remove manually-added locations which no longer exist
             var manualLocs = new List<string>(settings.ExtraSaveLocations);
@@ -73,9 +74,15 @@ namespace PalCalc.UI.ViewModel
 
             Storage.SaveAppSettings(settings);
 
-            SaveSelection = new SaveSelectorViewModel(SavesLocation.AllLocal, settings.ExtraSaveLocations.Select(saveFolder => new SaveGame(saveFolder)));
-            SolverControls = new SolverControlsViewModel();
+            SolverControls = SolverControlsViewModel.FromModel(settings.SolverSettings);
+            SolverControls.PropertyChanged += (s, e) =>
+            {
+                settings.SolverSettings = SolverControls.AsModel;
+                Storage.SaveAppSettings(settings);
+            };
+
             PalTargetList = new PalTargetListViewModel();
+            SaveSelection = new SaveSelectorViewModel(SavesLocation.AllLocal, settings.ExtraSaveLocations.Select(saveFolder => new SaveGame(saveFolder)));
 
             targetsBySaveFile = SaveSelection.SavesLocations
                 .SelectMany(l => l.SaveGames)
