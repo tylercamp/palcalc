@@ -54,5 +54,14 @@ namespace PalCalc.Model
             if (dict.ContainsKey(key)) return dict[key];
             else return fallback;
         }
+
+        public static int SetHash<T>(this IEnumerable<T> elements)
+        {
+            var baseHash = elements.Count();
+            foreach (var g in elements.GroupBy(e => e.GetHashCode()).OrderBy(g => g.Key))
+                baseHash = HashCode.Combine(baseHash, g.Key, g.Count());
+
+            return baseHash;
+        }
     }
 }

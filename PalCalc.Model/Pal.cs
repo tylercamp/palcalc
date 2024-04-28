@@ -38,6 +38,9 @@ namespace PalCalc.Model
 
         public override string ToString() => $"{Name} ({Id})";
 
+        public static bool operator ==(Pal a, Pal b) => (ReferenceEquals(a, null) && ReferenceEquals(b, null)) || (a?.Equals(b) ?? false);
+        public static bool operator !=(Pal a, Pal b) => !(a == b);
+
         public override bool Equals(object obj) => (obj as Pal)?.Id == Id;
         public override int GetHashCode() => Id.GetHashCode();
     }

@@ -39,23 +39,6 @@ namespace PalCalc.Model
             }
         }
 
-        public static bool EqualsTraits(this List<Trait> thisTraits, List<Trait> otherTraits)
-        {
-            // assume each list of traits is distinct, i.e. no repeated traits (except random)
-
-            if (thisTraits.Count != otherTraits.Count) return false;
-
-            var thisDefinite = thisTraits.Where(t => t is not IUnknownTrait);
-            var otherDefinite = otherTraits.Where(t => t is not IUnknownTrait);
-
-            var thisRandom = thisTraits.Where(t => t is RandomTrait);
-            var otherRandom = otherTraits.Where(t => t is RandomTrait);
-
-            var thisUnrecognized = thisTraits.Where(t => t is UnrecognizedTrait);
-            var otherUnrecognized = otherTraits.Where(t => t is UnrecognizedTrait);
-
-            return thisRandom.Count() == otherRandom.Count() && thisUnrecognized.Count() == otherUnrecognized.Count() && !thisDefinite.Except(otherDefinite).Any();
-        }
 
         public static string TraitsListToString(this IEnumerable<Trait> traits)
         {

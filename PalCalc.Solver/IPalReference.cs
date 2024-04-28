@@ -12,6 +12,8 @@ namespace PalCalc.Solver
     {
         Pal Pal { get; }
         List<Trait> Traits { get; }
+        int TraitsHash { get; } // optimization
+
         PalGender Gender { get; }
 
         int NumTotalBreedingSteps { get; }
@@ -35,6 +37,8 @@ namespace PalCalc.Solver
         public OwnedPalReference(PalInstance instance)
         {
             this.instance = instance;
+
+            TraitsHash = instance.Traits.SetHash();
         }
 
         public PalInstance UnderlyingInstance => instance;
@@ -42,6 +46,8 @@ namespace PalCalc.Solver
         public Pal Pal => instance.Pal;
 
         public List<Trait> Traits => instance.Traits;
+
+        public int TraitsHash { get; }
 
         public PalGender Gender => instance.Gender;
 
@@ -69,6 +75,8 @@ namespace PalCalc.Solver
             SelfBreedingEffort = GameConstants.TimeToCatch(pal) / GameConstants.TraitWildAtMostN[numTraits];
             Traits = Enumerable.Range(0, numTraits).Select(i => new RandomTrait()).ToList<Trait>();
             Gender = PalGender.WILDCARD;
+
+            TraitsHash = Traits.SetHash();
         }
 
         private WildPalReference(Pal pal)
@@ -99,6 +107,8 @@ namespace PalCalc.Solver
         public TimeSpan SelfBreedingEffort { get; private set; }
 
         public int NumTotalBreedingSteps => 0;
+
+        public int TraitsHash { get; }
 
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
@@ -137,6 +147,7 @@ namespace PalCalc.Solver
                 Parent2 = parent1;
             }
             Traits = traits;
+            TraitsHash = traits.SetHash();
         }
 
         public BredPalReference(GameSettings gameSettings, Pal pal, IPalReference parent1, IPalReference parent2, List<Trait> traits, float traitsProbability) : this(gameSettings, pal, parent1, parent2, traits)
@@ -161,7 +172,7 @@ namespace PalCalc.Solver
         public int AvgRequiredBreedings { get; private set; }
         public TimeSpan SelfBreedingEffort => AvgRequiredBreedings * gameSettings.AvgBreedingTime;
         public TimeSpan BreedingEffort => SelfBreedingEffort + (
-            gameSettings.MultipleBreedingFarms
+            gameSettings.MultipleBreedingFarms && Parent1 is BredPalReference && Parent2 is BredPalReference
                 ? Parent1.BreedingEffort > Parent2.BreedingEffort
                     ? Parent1.BreedingEffort
                     : Parent2.BreedingEffort
@@ -182,6 +193,8 @@ namespace PalCalc.Solver
         }
 
         public List<Trait> Traits { get; }
+
+        public int TraitsHash { get; }
 
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
@@ -232,21 +245,13 @@ namespace PalCalc.Solver
             var asBred = obj as BredPalReference;
             if (ReferenceEquals(asBred, null)) return false;
 
-            return (
-                asBred.Pal == Pal &&
-                asBred.Parent1.Equals(Parent1) &&
-                asBred.Parent2.Equals(Parent2) &&
-                asBred.SelfBreedingEffort == SelfBreedingEffort &&
-                asBred.Gender == Gender &&
-                asBred.Traits.EqualsTraits(asBred.Traits)
-            );
+            return GetHashCode() == obj.GetHashCode();
         }
 
         public override int GetHashCode() => HashCode.Combine(
             Pal,
-            Parent1,
-            Parent2,
-            Traits,
+            Parent1.GetHashCode() ^ Parent2.GetHashCode(),
+            TraitsHash,
             SelfBreedingEffort,
             Gender
         );

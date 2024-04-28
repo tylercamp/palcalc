@@ -301,7 +301,10 @@ namespace PalCalc.Solver
                         var (parent1, idx) = pair;
 
                         var res = workingSet.Content
-                            .Skip(idx + 1) // only search (p1,p2) pairs, not (p1,p2) and (p2,p1)
+                            // only search (p1,p2) pairs, not (p1,p2) and (p2,p1)
+                            // (this SHOULD be safe to directly produce parent combinations, but doing this causes the optimal
+                            //  breeding time to be non-deterministic, i.e. the fastest path isn't always chosen)
+                            //.Skip(idx)
                             .TakeWhile(_ => !token.IsCancellationRequested)
                             .Where(i => i.IsCompatibleGender(parent1.Gender))
                             .Where(i => i != null)
