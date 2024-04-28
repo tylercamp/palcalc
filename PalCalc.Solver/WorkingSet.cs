@@ -1,38 +1,45 @@
-﻿using PalCalc.Model;
+﻿using Newtonsoft.Json.Linq;
+using PalCalc.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PalCalc.Solver
 {
-    // a working set of pal instances to be used as potential parents
     internal class WorkingSet
     {
         private static ILogger logger = Log.ForContext<WorkingSet>();
 
+
+        private CancellationToken token;
         private HashSet<IPalReference> content;
+        private List<(IPalReference, IPalReference)> remainingWork;
 
-        public IReadOnlySet<IPalReference> Content => content;
+        public IReadOnlySet<IPalReference> Result => content;
 
-        public WorkingSet()
+        public WorkingSet(IEnumerable<IPalReference> initialContent, CancellationToken token)
         {
-            content = new HashSet<IPalReference>();
+            content = new HashSet<IPalReference>(PruneCollection(initialContent));
+
+            remainingWork = initialContent.SelectMany(p1 => initialContent.Select(p2 => (p1, p2))).ToList();
+            this.token = token;
         }
 
-        public WorkingSet(IEnumerable<IPalReference> initialContent)
+        /// <summary>
+        /// Uses the provided `doWork` function to produce results for all remaining work to be done. The results
+        /// returned by `doWork` are merged with the current working set of results and the next set of work
+        /// is updated.
+        /// </summary>
+        /// <param name="doWork"></param>
+        /// <returns>Whether or not any changes were made by merging the current working set with the results of `doWork`.</returns>
+        public bool Process(Func<List<(IPalReference, IPalReference)>, IEnumerable<IPalReference>> doWork)
         {
-            content = new HashSet<IPalReference>();
-            AddFrom(initialContent, CancellationToken.None);
-        }
+            if (remainingWork.Count == 0) return false;
 
-        // returns the number of entries added/updated
-        public int AddFrom(IEnumerable<IPalReference> newRefs, CancellationToken token)
-        {
-            logger.Debug("updating working set");
+            var newResults = doWork(remainingWork);
 
             // since we know the breeding effort of each potential instance, we can ignore new instances
             // with higher effort than existing known instances
@@ -43,14 +50,17 @@ namespace PalCalc.Solver
             // main set of references before pruning the final combined collection
 
             logger.Debug("performing pre-prune");
-            var prePruned = newRefs.ToList().Batched(100000)
-                .AsParallel()
-                .SelectMany(batch => PruneCollection(batch).ToList())
-                .ToList();
+            var pruned = PruneCollection(
+                newResults.ToList().BatchedForParallel()
+                    .AsParallel()
+                    .SelectMany(batch => PruneCollection(batch).ToList())
+                    .ToList()
+            );
 
             logger.Debug("merging");
-            var numChanged = 0;
-            foreach (var newInst in PruneCollection(prePruned))
+            var changed = false;
+            var toAdd = new List<IPalReference>();
+            foreach (var newInst in pruned)
             {
                 var existingInstances = content
                     .TakeWhile(_ => !token.IsCancellationRequested)
@@ -59,9 +69,9 @@ namespace PalCalc.Solver
                         pi.Gender == newInst.Gender &&
                         pi.TraitsHash == newInst.TraitsHash
                     )
-                    .ToList();
+                .ToList();
 
-                if (token.IsCancellationRequested) return numChanged;
+                if (token.IsCancellationRequested) return changed;
 
                 var existingInst = existingInstances.SingleOrDefault();
 
@@ -70,27 +80,41 @@ namespace PalCalc.Solver
                     if (newInst.BreedingEffort < existingInst.BreedingEffort)
                     {
                         content.Remove(existingInst);
-                        content.Add(newInst);
-                        numChanged++;
+                        toAdd.Add(newInst);
+                        changed = true;
                     }
                 }
                 else
                 {
-                    content.Add(newInst);
-                    numChanged++;
+                    toAdd.Add(newInst);
+                    changed = true;
                 }
             }
 
-            logger.Debug("done, {numChanged} changed", numChanged);
-            return numChanged;
-        }
+            remainingWork.Clear();
+            remainingWork.EnsureCapacity(toAdd.Count * toAdd.Count + 2 * toAdd.Count * content.Count);
 
-        public int AddFrom(WorkingSet ws, CancellationToken token) => AddFrom(ws.Content, token);
+            remainingWork.AddRange(content
+                // need to check results between new and old content
+                .SelectMany(p1 => toAdd.Select(p2 => (p1, p2)))
+                // TODO - this (p2,p1) set of permutations shouldn't be necessary, but for some reason the result effort can vary
+                //        depending on parent ordering (maybe due to PreferredParentsGenders?)
+                .Concat(toAdd.SelectMany(p1 => content.Select(p2 => (p1, p2))))
+                // and check results within the new content
+                .Concat(toAdd.SelectMany(p1 => toAdd.Select(p2 => (p1, p2))))
+            );
+
+            foreach (var ta in toAdd)
+                content.Add(ta);
+
+            return changed;
+        }
 
         // gives a new, reduced collection which only includes the "most optimal" / lowest-effort
         // reference for each instance spec (gender, traits, etc.)
-        private static IEnumerable<IPalReference> PruneCollection(IEnumerable<IPalReference> refs) =>
+        private IEnumerable<IPalReference> PruneCollection(IEnumerable<IPalReference> refs) =>
             refs
+                .TakeWhile(_ => !token.IsCancellationRequested)
                 .GroupBy(pref => (
                     pref.Pal,
                     pref.Gender,

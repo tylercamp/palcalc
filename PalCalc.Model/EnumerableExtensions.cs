@@ -47,6 +47,8 @@ namespace PalCalc.Model
             }
         }
 
+        public static IEnumerable<IEnumerable<T>> BatchedForParallel<T>(this List<T> elements) => elements.Batched((elements.Count / Environment.ProcessorCount) + 1);
+
         public static IEnumerable<T> SkipNull<T>(this IEnumerable<T> elements) => elements.Where(v => v != null);
 
         public static V GetValueOrElse<K, V>(this IDictionary<K, V> dict, K key, V fallback)

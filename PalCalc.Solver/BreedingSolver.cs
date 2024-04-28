@@ -269,20 +269,20 @@ namespace PalCalc.Solver
 
             bool WithinBreedingSteps(Pal pal, int maxSteps) => db.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
 
-            var workingSet = new WorkingSet(relevantPals.Where(pi => WithinBreedingSteps(pi.Pal, maxBreedingSteps)).Select(i => new OwnedPalReference(i)));
+            var initialContent = relevantPals.Where(pi => WithinBreedingSteps(pi.Pal, maxBreedingSteps)).Select(i => (IPalReference)new OwnedPalReference(i));
             if (maxWildPals > 0)
             {
-                workingSet.AddFrom(
+                initialContent = initialContent.Concat(
                     db.Pals
                         .Where(p => !relevantPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, maxBreedingSteps))
                         .SelectMany(p => Enumerable.Range(0, maxIrrelevantTraits).Select(numTraits => new WildPalReference(p, numTraits)))
-                        .Where(pi => pi.BreedingEffort <= maxEffort),
-                    token
+                        .Where(pi => pi.BreedingEffort <= maxEffort)
                 );
             }
 
-            logger.Debug("Using {count} pals for graph search:\n- {summary}", workingSet.Content.Count, string.Join("\n- ", workingSet.Content));
+            var workingSet = new WorkingSet(initialContent, token);
+            
 
             for (int s = 0; s < maxBreedingSteps; s++)
             {
@@ -293,112 +293,105 @@ namespace PalCalc.Solver
                 statusMsg.Canceled = token.IsCancellationRequested;
                 SolverStateUpdated?.Invoke(statusMsg);
 
-                logger.Debug($"Starting search step #{s + 1} with {workingSet.Content.Count} relevant pals");
-                var newInstances = Enumerable.Zip(workingSet.Content, Enumerable.Range(0, workingSet.Content.Count))
-                    .TakeWhile(_ => !token.IsCancellationRequested)
-                    .AsParallel()
-                    .SelectMany(pair =>
-                    {
-                        var (parent1, idx) = pair;
-
-                        var res = workingSet.Content
-                            // only search (p1,p2) pairs, not (p1,p2) and (p2,p1)
-                            // (this SHOULD be safe to directly produce parent combinations, but doing this causes the optimal
-                            //  breeding time to be non-deterministic, i.e. the fastest path isn't always chosen)
-                            //.Skip(idx)
-                            .TakeWhile(_ => !token.IsCancellationRequested)
-                            .Where(i => i.IsCompatibleGender(parent1.Gender))
-                            .Where(i => i != null)
-                            .Where(parent2 => parent1.NumWildPalParticipants() + parent2.NumWildPalParticipants() <= maxWildPals)
-                            .Where(parent2 =>
-                            {
-                                var childPal = db.BreedingByParent[parent1.Pal][parent2.Pal].Child;
-                                return db.MinBreedingSteps[childPal][spec.Pal] <= maxBreedingSteps - s - 1;
-                            })
-                            .Where(parent2 => parent1.NumTotalBreedingSteps + parent2.NumTotalBreedingSteps < maxBreedingSteps)
-                            .Where(parent2 =>
-                            {
-                                // if we disallow any irrelevant traits, neither parents have a useful trait, and at least 1 parent
-                                // has an irrelevant trait, then it's impossible to breed a child with zero total traits
-                                //
-                                // (child would need to have zero since there's nothing useful to inherit and we disallow irrelevant traits,
-                                //  impossible to have zero since a child always inherits at least 1 direct trait if possible)
-                                if (maxIrrelevantTraits > 0) return true;
-
-                                var combinedTraits = parent1.Traits.Concat(parent2.Traits);
-
-
-                                var anyRelevantFromParents = spec.Traits.Intersect(combinedTraits).Any();
-                                var anyIrrelevantFromParents = combinedTraits.Except(spec.Traits).Any();
-
-                                return anyRelevantFromParents || !anyIrrelevantFromParents;
-
-                            })
-                            .SelectMany(parent2 =>
-                            {
-                                var (preferredParent1, preferredParent2) = PreferredParentsGenders(parent1, parent2);
-
-                                var parentTraits = parent1.Traits.Concat(parent2.Traits).Distinct().ToList();
-                                var desiredParentTraits = spec.Traits.Intersect(parentTraits).ToList();
-
-                                var possibleResults = new List<IPalReference>();
-
-                                var probabilityForUpToNumTraits = 0.0f;
-
-                                // go through each potential final number of traits, accumulate the probability of any of these exact options
-                                // leading to the desired traits within MAX_IRRELEVANT_TRAITS.
-                                //
-                                // we'll generate an option for each possible outcome of up to the max possible number of traits, where each
-                                // option represents the likelyhood of getting all desired traits + up to some number of irrelevant traits
-                                for (int numFinalTraits = desiredParentTraits.Count; numFinalTraits <= Math.Min(GameConstants.MaxTotalTraits, desiredParentTraits.Count + maxIrrelevantTraits); numFinalTraits++)
+                bool didUpdate = workingSet.Process(work =>
+                {
+                    logger.Debug("Performing breeding step {step} with {numWork} work items", s+1, work.Count);
+                    return work
+                        .BatchedForParallel()
+                        .AsParallel()
+                        .SelectMany(workBatch =>
+                            workBatch
+                                .Where(p =>
                                 {
+                                    if (p.Item1.IsCompatibleGender(p.Item2.Gender) != p.Item2.IsCompatibleGender(p.Item1.Gender)) Debugger.Break();
+
+                                    return p.Item1.IsCompatibleGender(p.Item2.Gender);
+                                })
+                                .Where(p => p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() <= maxWildPals)
+                                .Where(p =>
+                                {
+                                    var childPal = db.BreedingByParent[p.Item1.Pal][p.Item2.Pal].Child;
+                                    if (db.BreedingByParent[p.Item1.Pal][p.Item2.Pal].Child != db.BreedingByParent[p.Item2.Pal][p.Item1.Pal].Child) Debugger.Break();
+
+                                    return db.MinBreedingSteps[childPal][spec.Pal] <= maxBreedingSteps - s - 1;
+                                })
+                                .Where(p => p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps < maxBreedingSteps)
+                                .Where(p =>
+                                {
+                                    // if we disallow any irrelevant traits, neither parents have a useful trait, and at least 1 parent
+                                    // has an irrelevant trait, then it's impossible to breed a child with zero total traits
+                                    //
+                                    // (child would need to have zero since there's nothing useful to inherit and we disallow irrelevant traits,
+                                    //  impossible to have zero since a child always inherits at least 1 direct trait if possible)
+                                    if (maxIrrelevantTraits > 0) return true;
+
+                                    var combinedTraits = p.Item1.Traits.Concat(p.Item2.Traits);
+
+                                    var anyRelevantFromParents = spec.Traits.Intersect(combinedTraits).Any();
+                                    var anyIrrelevantFromParents = combinedTraits.Except(spec.Traits).Any();
+
+                                    return anyRelevantFromParents || !anyIrrelevantFromParents;
+                                })
+                                .SelectMany(p =>
+                                {
+                                    var (parent1, parent2) = p;
+                                    var (preferredParent1, preferredParent2) = PreferredParentsGenders(parent1, parent2);
+
+                                    var parentTraits = parent1.Traits.Concat(parent2.Traits).Distinct().ToList();
+                                    var desiredParentTraits = spec.Traits.Intersect(parentTraits).ToList();
+
+                                    var possibleResults = new List<IPalReference>();
+
+                                    var probabilityForUpToNumTraits = 0.0f;
+
+                                    // go through each potential final number of traits, accumulate the probability of any of these exact options
+                                    // leading to the desired traits within MAX_IRRELEVANT_TRAITS.
+                                    //
+                                    // we'll generate an option for each possible outcome of up to the max possible number of traits, where each
+                                    // option represents the likelyhood of getting all desired traits + up to some number of irrelevant traits
+                                    for (int numFinalTraits = desiredParentTraits.Count; numFinalTraits <= Math.Min(GameConstants.MaxTotalTraits, desiredParentTraits.Count + maxIrrelevantTraits); numFinalTraits++)
+                                    {
 #if DEBUG
-                                    float initialProbability = probabilityForUpToNumTraits;
+                                        float initialProbability = probabilityForUpToNumTraits;
 #endif
 
-                                    probabilityForUpToNumTraits += ProbabilityInheritedTargetTraits(parentTraits, desiredParentTraits, numFinalTraits);
+                                        probabilityForUpToNumTraits += ProbabilityInheritedTargetTraits(parentTraits, desiredParentTraits, numFinalTraits);
 
-                                    if (probabilityForUpToNumTraits <= 0) continue;
+                                        if (probabilityForUpToNumTraits <= 0) continue;
 
 #if DEBUG
-                                    if (initialProbability == probabilityForUpToNumTraits) Debugger.Break();
+                                        if (initialProbability == probabilityForUpToNumTraits) Debugger.Break();
 #endif
 
-                                    // (not entirely correct, since some irrelevant traits may be specific and inherited by parents. if we know a child
-                                    //  may have some specific trait, it may be efficient to breed that child with another parent which also has that
-                                    //  irrelevant trait, which would increase the overall likelyhood of a desired trait being inherited)
-                                    var potentialIrrelevantTraits = Enumerable
-                                        .Range(0, Math.Max(0, numFinalTraits - desiredParentTraits.Count))
-                                        .Select(i => new RandomTrait());
+                                        // (not entirely correct, since some irrelevant traits may be specific and inherited by parents. if we know a child
+                                        //  may have some specific trait, it may be efficient to breed that child with another parent which also has that
+                                        //  irrelevant trait, which would increase the overall likelyhood of a desired trait being inherited)
+                                        var potentialIrrelevantTraits = Enumerable
+                                            .Range(0, Math.Max(0, numFinalTraits - desiredParentTraits.Count))
+                                            .Select(i => new RandomTrait());
 
-                                    possibleResults.Add(new BredPalReference(
-                                        gameSettings,
-                                        db.BreedingByParent[parent1.Pal][parent2.Pal].Child,
-                                        preferredParent1,
-                                        preferredParent2,
-                                        desiredParentTraits.Concat(potentialIrrelevantTraits).ToList(),
-                                        probabilityForUpToNumTraits
-                                    ));
-                                }
+                                        possibleResults.Add(new BredPalReference(
+                                            gameSettings,
+                                            db.BreedingByParent[parent1.Pal][parent2.Pal].Child,
+                                            preferredParent1,
+                                            preferredParent2,
+                                            desiredParentTraits.Concat(potentialIrrelevantTraits).ToList(),
+                                            probabilityForUpToNumTraits
+                                        ));
+                                    }
 
-                                return possibleResults;
-                            })
-                            .Where(result => result.BreedingEffort <= maxEffort)
-                            .ToList();
-
-                        return res;
-                    })
-                    .ToList();
-
-                logger.Debug("Filtering {0} potential new instances", newInstances.Count);
+                                    return possibleResults;
+                                })
+                                .Where(res => res.BreedingEffort <= maxEffort)
+                                .ToList()
+                        );
+                });
 
                 if (token.IsCancellationRequested) break;
                 statusMsg.CurrentPhase = SolverPhase.Simplifying;
                 SolverStateUpdated?.Invoke(statusMsg);
 
-                var numChanged = workingSet.AddFrom(newInstances, token);
-
-                if (numChanged == 0)
+                if (!didUpdate)
                 {
                     logger.Debug("Last pass found no new useful options, stopping iteration early");
                     break;
@@ -409,7 +402,7 @@ namespace PalCalc.Solver
             statusMsg.CurrentPhase = SolverPhase.Finished;
             SolverStateUpdated?.Invoke(statusMsg);
 
-            return workingSet.Content.Where(pref => pref.Pal == spec.Pal && !spec.Traits.Except(pref.Traits).Any()).ToList();
+            return workingSet.Result.Where(pref => pref.Pal == spec.Pal && !spec.Traits.Except(pref.Traits).Any()).ToList();
         }
     }
 }
