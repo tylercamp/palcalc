@@ -23,7 +23,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
             Label = $"{sl.ValidSaveGames.Count()} valid saves ({sl.FolderName})";
             SaveGames = new ReadOnlyObservableCollection<SaveGameViewModel>(
-                new ObservableCollection<SaveGameViewModel>(sl.ValidSaveGames.Select(SaveGameViewModel.FromSave))
+                new ObservableCollection<SaveGameViewModel>(sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sg)))
             );
             LastModified = sl.ValidSaveGames.OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
         }
@@ -41,7 +41,7 @@ namespace PalCalc.UI.ViewModel.Mapped
     {
         public ManualSavesLocationViewModel(IEnumerable<SaveGame> initialManualSaves)
         {
-            saveGames = new ObservableCollection<SaveGameViewModel>(initialManualSaves.Select(SaveGameViewModel.FromSave).OrderBy(vm => vm.Label));
+            saveGames = new ObservableCollection<SaveGameViewModel>(initialManualSaves.Select(s => new SaveGameViewModel(s)).OrderBy(vm => vm.Label));
             saveGames.Add(SaveGameViewModel.AddNewSave);
 
             SaveGames = new ReadOnlyObservableCollection<SaveGameViewModel>(saveGames);
@@ -54,10 +54,10 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public DateTime? LastModified => saveGames.Where(g => !g.IsAddManualOption).OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
 
-        // assume `saveGame` has already been validated
+        // assume `path` has already been validated
         public SaveGameViewModel Add(SaveGame saveGame)
         {
-            var vm = SaveGameViewModel.FromSave(saveGame);
+            var vm = new SaveGameViewModel(saveGame);
             var orderedIndex = saveGames
                 .Where(vm => !vm.IsAddManualOption)
                 .Append(vm)

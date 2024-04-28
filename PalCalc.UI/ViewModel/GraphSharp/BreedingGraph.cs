@@ -1,6 +1,5 @@
 ﻿using GraphSharp;
 using PalCalc.Solver;
-using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
 using System;
 using System.Collections.Generic;
@@ -19,10 +18,10 @@ namespace PalCalc.UI.Model
 
     public class BreedingGraph : HierarchicalGraph<BreedingTreeNodeViewModel, BreedingEdge>
     {
-        private BreedingGraph(SaveGameViewModel latestSave, CachedSaveGame source, BreedingTree tree)
+        private BreedingGraph(CachedSaveGame source, BreedingTree tree)
         {
             Tree = tree;
-            Nodes = tree.AllNodes.Select(p => new BreedingTreeNodeViewModel(latestSave, source, p.Item1)).ToList();
+            Nodes = tree.AllNodes.Select(p => new BreedingTreeNodeViewModel(source, p.Item1)).ToList();
         }
 
         public BreedingTree Tree { get; private set; }
@@ -30,10 +29,10 @@ namespace PalCalc.UI.Model
 
         public BreedingTreeNodeViewModel NodeFor(IBreedingTreeNode pref) => Nodes.Single(n => n.Value == pref);
 
-        public static BreedingGraph FromPalReference(SaveGameViewModel latestSave, CachedSaveGame source, IPalReference palRef)
+        public static BreedingGraph FromPalReference(CachedSaveGame source, IPalReference palRef)
         {
             var tree = new BreedingTree(palRef);
-            var result = new BreedingGraph(latestSave, source, tree);
+            var result = new BreedingGraph(source, tree);
 
             result.AddVertexRange(result.Nodes);
 
