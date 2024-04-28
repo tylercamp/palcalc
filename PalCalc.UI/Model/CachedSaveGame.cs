@@ -13,8 +13,12 @@ namespace PalCalc.UI.Model
 {
     public class CachedSaveGame
     {
+        public CachedSaveGame(ISaveGame underlyingSave)
+        {
+            UnderlyingSave = underlyingSave;
+        }
+
         public DateTime LastModified { get; set; }
-        public string FolderPath { get; set; }
 
         public bool IsServerSave { get; set; }
 
@@ -38,7 +42,8 @@ namespace PalCalc.UI.Model
         public Dictionary<string, GuildInstance> GuildsByPlayerId =>
             playerGuilds ??= Players.ToDictionary(p => p.PlayerId, p => Guilds.FirstOrDefault(g => g.MemberIds.Contains(p.PlayerId)));
 
-        public SaveGame UnderlyingSave => new SaveGame(FolderPath);
+        [JsonIgnore]
+        public ISaveGame UnderlyingSave { get; set; }
 
         public bool IsValid => UnderlyingSave.IsValid;
 
@@ -46,19 +51,16 @@ namespace PalCalc.UI.Model
 
         public string StateId => $"{IdentifierFor(UnderlyingSave)}-{LastModified.Ticks}";
 
-        public static event Action<SaveGame> SaveFileLoadStart;
-        public static event Action<SaveGame> SaveFileLoadEnd;
-        public static event Action<SaveGame, Exception> SaveFileLoadError;
+        public static event Action<ISaveGame> SaveFileLoadStart;
+        public static event Action<ISaveGame> SaveFileLoadEnd;
+        public static event Action<ISaveGame, Exception> SaveFileLoadError;
 
-        public static string IdentifierFor(SaveGame game)
+        public static string IdentifierFor(ISaveGame game)
         {
-            var userFolderName = Path.GetFileName(Path.GetDirectoryName(game.BasePath));
-            var saveName = game.FolderName;
-
-            return $"{userFolderName}-{saveName}";
+            return $"{game.UserId}-{game.GameId}";
         }
 
-        public static CachedSaveGame FromSaveGame(SaveGame game, PalDB db)
+        public static CachedSaveGame FromSaveGame(ISaveGame game, PalDB db)
         {
             SaveFileLoadStart?.Invoke(game);
 
@@ -69,10 +71,9 @@ namespace PalCalc.UI.Model
 #endif
                 var meta = game.LevelMeta.ReadGameOptions();
                 var charData = game.Level.ReadCharacterData(db);
-                result = new CachedSaveGame()
+                result = new CachedSaveGame(game)
                 {
                     LastModified = game.LastModified,
-                    FolderPath = game.BasePath,
                     OwnedPals = charData.Pals,
                     Guilds = charData.Guilds,
                     Players = charData.Players,

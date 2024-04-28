@@ -25,7 +25,7 @@ namespace PalCalc.UI.ViewModel
     {
         private static ILogger logger = Log.ForContext<MainWindowViewModel>();
         private static PalDB db = PalDB.LoadEmbedded();
-        private Dictionary<SaveGame, PalTargetListViewModel> targetsBySaveFile;
+        private Dictionary<ISaveGame, PalTargetListViewModel> targetsBySaveFile;
         private LoadingSaveFileModal loadingSaveModal = null;
         private Dispatcher dispatcher;
         private CancellationTokenSource solverTokenSource;
@@ -67,7 +67,7 @@ namespace PalCalc.UI.ViewModel
             {
                 if (!Directory.Exists(loc))
                 {
-                    var asSave = new SaveGame(loc);
+                    var asSave = new StandardSaveGame(loc);
                     Storage.ClearForSave(asSave);
                     manualLocs.Remove(loc);
                 }
@@ -83,7 +83,7 @@ namespace PalCalc.UI.ViewModel
             };
 
             PalTargetList = new PalTargetListViewModel();
-            SaveSelection = new SaveSelectorViewModel(SavesLocation.AllLocal, settings.ExtraSaveLocations.Select(saveFolder => new SaveGame(saveFolder)));
+            SaveSelection = new SaveSelectorViewModel(DirectSavesLocation.AllLocal.Cast<ISavesLocation>().Concat(XboxSavesLocation.FindAll().Cast<ISavesLocation>()).ToList(), settings.ExtraSaveLocations.Select(saveFolder => new StandardSaveGame(saveFolder)));
 
             targetsBySaveFile = SaveSelection.SavesLocations
                 .SelectMany(l => l.SaveGames)
@@ -135,7 +135,7 @@ namespace PalCalc.UI.ViewModel
             UpdateFromSaveProperties();
         }
 
-        private void SaveSelection_CustomSaveAdded(ManualSavesLocationViewModel manualSaves, SaveGame save)
+        private void SaveSelection_CustomSaveAdded(ManualSavesLocationViewModel manualSaves, ISaveGame save)
         {
             targetsBySaveFile.Add(save, new PalTargetListViewModel());
 
@@ -146,7 +146,7 @@ namespace PalCalc.UI.ViewModel
             Storage.SaveAppSettings(settings);
         }
 
-        private void CachedSaveGame_SaveFileLoadStart(SaveGame obj)
+        private void CachedSaveGame_SaveFileLoadStart(ISaveGame obj)
         {
             if (loadingSaveModal == null)
             {
@@ -158,7 +158,7 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        private void CachedSaveGame_SaveFileLoadEnd(SaveGame obj)
+        private void CachedSaveGame_SaveFileLoadEnd(ISaveGame obj)
         {
             if (loadingSaveModal != null)
             {
@@ -168,7 +168,7 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        private void CachedSaveGame_SaveFileLoadError(SaveGame obj, Exception ex)
+        private void CachedSaveGame_SaveFileLoadError(ISaveGame obj, Exception ex)
         {
             if (loadingSaveModal != null)
             {

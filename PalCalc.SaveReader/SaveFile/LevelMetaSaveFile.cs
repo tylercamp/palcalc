@@ -29,9 +29,7 @@ namespace PalCalc.SaveReader.SaveFile
     {
         private static ILogger logger = Log.ForContext<LevelMetaSaveFile>();
 
-        public LevelMetaSaveFile(string folderPath) : base(folderPath) { }
-
-        public override string FileName => "LevelMeta.sav";
+        public LevelMetaSaveFile(string filePath) : base(filePath) { }
 
         public GameMeta ReadGameOptions()
         {

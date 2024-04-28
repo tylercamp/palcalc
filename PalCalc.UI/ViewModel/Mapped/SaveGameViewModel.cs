@@ -21,7 +21,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             Label = "Add a new save...";
         }
 
-        public SaveGameViewModel(SaveGame value)
+        public SaveGameViewModel(ISaveGame value)
         {
             IsAddManualOption = false;
             Value = value;
@@ -35,13 +35,13 @@ namespace PalCalc.UI.ViewModel.Mapped
             catch (Exception ex)
             {
                 logger.Warning(ex, "error when loading LevelMeta for {saveId}", CachedSaveGame.IdentifierFor(value));
-                Label = $"{value.FolderName} (Unable to read metadata)";
+                Label = $"{value.GameId} (Unable to read metadata)";
             }
         }
 
         public DateTime LastModified => Value.LastModified;
 
-        public SaveGame Value { get; }
+        public ISaveGame Value { get; }
         public CachedSaveGame CachedValue => Storage.LoadSave(Value, PalDB.LoadEmbedded());
         public string Label { get; }
 

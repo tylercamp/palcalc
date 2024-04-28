@@ -17,18 +17,20 @@ namespace PalCalc.UI.ViewModel.Mapped
 
     public class StandardSavesLocationViewModel : ISavesLocationViewModel
     {
-        public StandardSavesLocationViewModel(SavesLocation sl)
+        public StandardSavesLocationViewModel(ISavesLocation sl)
         {
             Value = sl;
 
-            Label = $"{sl.ValidSaveGames.Count()} valid saves ({sl.FolderName})";
+            var saveType = sl is XboxSavesLocation ? "Xbox" : "Steam";
+
+            Label = $"{saveType} user {sl.FolderName.LimitLength(12)} - {sl.ValidSaveGames.Count()} valid saves";
             SaveGames = new ReadOnlyObservableCollection<SaveGameViewModel>(
                 new ObservableCollection<SaveGameViewModel>(sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sg)))
             );
             LastModified = sl.ValidSaveGames.OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
         }
 
-        public SavesLocation Value { get; }
+        public ISavesLocation Value { get; }
 
         public ReadOnlyObservableCollection<SaveGameViewModel> SaveGames { get; }
 
@@ -39,7 +41,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
     public class ManualSavesLocationViewModel : ISavesLocationViewModel
     {
-        public ManualSavesLocationViewModel(IEnumerable<SaveGame> initialManualSaves)
+        public ManualSavesLocationViewModel(IEnumerable<ISaveGame> initialManualSaves)
         {
             saveGames = new ObservableCollection<SaveGameViewModel>(initialManualSaves.Select(s => new SaveGameViewModel(s)).OrderBy(vm => vm.Label));
             saveGames.Add(SaveGameViewModel.AddNewSave);
@@ -55,7 +57,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         public DateTime? LastModified => saveGames.Where(g => !g.IsAddManualOption).OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
 
         // assume `path` has already been validated
-        public SaveGameViewModel Add(SaveGame saveGame)
+        public SaveGameViewModel Add(ISaveGame saveGame)
         {
             var vm = new SaveGameViewModel(saveGame);
             var orderedIndex = saveGames

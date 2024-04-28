@@ -18,7 +18,7 @@ namespace PalCalc.UI.ViewModel
         public BreedingResultViewModel()
         {
             var db = PalDB.LoadEmbedded();
-            var latest = SavesLocation.AllLocal.SelectMany(loc => loc.ValidSaveGames).MaxBy(game => game.LastModified);
+            var latest = DirectSavesLocation.AllLocal.SelectMany(loc => loc.ValidSaveGames).MaxBy(game => game.LastModified);
             var saveGame = Storage.LoadSave(latest, db);
 
             var solver = new Solver.BreedingSolver(

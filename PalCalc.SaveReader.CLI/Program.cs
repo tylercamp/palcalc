@@ -10,14 +10,14 @@ Logging.InitCommonFull();
 
 var db = PalDB.LoadEmbedded();
 
-foreach (var gameFolder in SavesLocation.AllLocal)
+foreach (var gameFolder in DirectSavesLocation.AllLocal)
 {
     Console.WriteLine("Checking game folder {0}", gameFolder.FolderName);
 
     foreach (var save in gameFolder.ValidSaveGames.OrderByDescending(g => g.LastModified))
     {
         var sw = Stopwatch.StartNew();
-        Console.WriteLine("Checking save folder {0}", save.FolderName);
+        Console.WriteLine("Checking save folder {0}", save.BasePath);
 
         var metagvas = save.LevelMeta.ParseGvas();
         var localgvas = save.LocalData.ParseGvas();

@@ -21,13 +21,13 @@ namespace PalCalc.UI.Model
         public static string DataPath => "data";
 
         // path for cached copy of save file data
-        public static string SaveCachePathFor(SaveGame forSaveFile) => $"{SaveCachePath}/{CachedSaveGame.IdentifierFor(forSaveFile)}.json";
+        public static string SaveCachePathFor(ISaveGame forSaveFile) => $"{SaveCachePath}/{CachedSaveGame.IdentifierFor(forSaveFile)}.json";
 
         // path for storing data associated with a specific save file
-        public static string SaveFileDataPath(SaveGame forSaveFile) => $"{DataPath}/{CachedSaveGame.IdentifierFor(forSaveFile)}";
+        public static string SaveFileDataPath(ISaveGame forSaveFile) => $"{DataPath}/{CachedSaveGame.IdentifierFor(forSaveFile)}";
 
         // path for storing game-specific game settings (breeding time, etc.)
-        public static string GameSettingsPath(SaveGame forSaveFile) => SaveFileDataPath(forSaveFile) + "/game-settings.json";
+        public static string GameSettingsPath(ISaveGame forSaveFile) => SaveFileDataPath(forSaveFile) + "/game-settings.json";
 
         public static string AppSettingsPath => $"{DataPath}/settings.json";
 
@@ -86,7 +86,7 @@ namespace PalCalc.UI.Model
 
         public static void SaveAppSettings(AppSettings settings) => File.WriteAllText(AppSettingsPath, JsonConvert.SerializeObject(settings));
 
-        public static void ClearForSave(SaveGame save)
+        public static void ClearForSave(ISaveGame save)
         {
             var cachePath = SaveCachePathFor(save);
             if (File.Exists(cachePath)) File.Delete(cachePath);
@@ -101,7 +101,7 @@ namespace PalCalc.UI.Model
         private static Dictionary<string, CachedSaveGame> InMemorySaves = new Dictionary<string, CachedSaveGame>();
 
         // only loads the save if it has been cached, otherwise returns null
-        public static CachedSaveGame LoadSaveFromCache(SaveGame save, PalDB db)
+        public static CachedSaveGame LoadSaveFromCache(ISaveGame save, PalDB db)
         {
             Init();
 
@@ -116,6 +116,7 @@ namespace PalCalc.UI.Model
                 {
 #endif
                     res = CachedSaveGame.FromJson(File.ReadAllText(path), db);
+                    res.UnderlyingSave = save;
 #if HANDLE_ERRORS
                 }
                 catch (Exception e)
@@ -126,7 +127,6 @@ namespace PalCalc.UI.Model
                     res = null;
                 }
 #endif
-                
                 CrashSupport.ReferencedCachedSave(res);
                 return res;
             }
@@ -137,7 +137,7 @@ namespace PalCalc.UI.Model
         }
 
         // loads the cached save data and updates it if it's outdated or not yet cached
-        public static CachedSaveGame LoadSave(SaveGame save, PalDB db)
+        public static CachedSaveGame LoadSave(ISaveGame save, PalDB db)
         {
             Init();
 

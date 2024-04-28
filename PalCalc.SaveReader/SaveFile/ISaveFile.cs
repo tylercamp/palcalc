@@ -10,15 +10,12 @@ namespace PalCalc.SaveReader.SaveFile
 {
     public abstract class ISaveFile
     {
-        private string basePath;
-        public ISaveFile(string folderPath)
+        public ISaveFile(string filePath)
         {
-            basePath = folderPath;
+            FilePath = filePath;
         }
 
-        public abstract string FileName { get; }
-
-        public string FilePath => Path.Join(basePath, FileName);
+        public string FilePath { get; }
         public bool Exists => File.Exists(FilePath);
         public DateTime LastModified => File.GetLastWriteTime(FilePath);
 

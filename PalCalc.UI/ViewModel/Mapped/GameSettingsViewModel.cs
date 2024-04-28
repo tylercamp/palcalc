@@ -47,12 +47,12 @@ namespace PalCalc.UI.ViewModel.Mapped
         public string ToJson() => JsonConvert.SerializeObject(this);
         public static GameSettingsViewModel FromJson(string json) => JsonConvert.DeserializeObject<GameSettingsViewModel>(json);
 
-        public void Save(SaveGame forSave)
+        public void Save(ISaveGame forSave)
         {
             File.WriteAllText(Storage.GameSettingsPath(forSave), ToJson());
         }
 
-        public static GameSettingsViewModel Load(SaveGame forSave)
+        public static GameSettingsViewModel Load(ISaveGame forSave)
         {
             var path = Storage.GameSettingsPath(forSave);
             if (File.Exists(path))

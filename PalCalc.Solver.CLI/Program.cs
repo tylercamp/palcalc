@@ -15,7 +15,7 @@ internal class Program
         var db = PalDB.LoadEmbedded();
         Console.WriteLine("Loaded Pal DB");
 
-        var saveGame = SavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LastModified);
+        var saveGame = DirectSavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LastModified);
         Console.WriteLine("Using {0}", saveGame);
 
         var savedInstances = saveGame.Level.ReadCharacterData(db).Pals;

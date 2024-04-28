@@ -8,8 +8,6 @@ namespace PalCalc.SaveReader.SaveFile
 {
     public class WorldOptionSaveFile : ISaveFile
     {
-        public WorldOptionSaveFile(string folderPath) : base(folderPath) { }
-
-        public override string FileName => "WorldOption.sav";
+        public WorldOptionSaveFile(string filePath) : base(filePath) { }
     }
 }

@@ -18,7 +18,7 @@ namespace PalCalc.UI.ViewModel
 {
     internal partial class SaveSelectorViewModel : ObservableObject
     {
-        public event Action<ManualSavesLocationViewModel, SaveGame> NewCustomSaveSelected;
+        public event Action<ManualSavesLocationViewModel, ISaveGame> NewCustomSaveSelected;
 
         public List<ISavesLocationViewModel> SavesLocations { get; }
 
@@ -53,7 +53,7 @@ namespace PalCalc.UI.ViewModel
 
                     if (true == ofd.ShowDialog(App.Current.MainWindow))
                     {
-                        var asSaveGame = new SaveGame(Path.GetDirectoryName(ofd.FileName));
+                        var asSaveGame = new StandardSaveGame(Path.GetDirectoryName(ofd.FileName));
                         if (asSaveGame.IsValid)
                         {
                             var existingSaves = SavesLocations.SelectMany(l => l.SaveGames.Select(vm => vm.Value)).SkipNull();
@@ -103,13 +103,13 @@ namespace PalCalc.UI.ViewModel
         private ISavesLocationViewModel MostRecentLocation => SavesLocations.OrderByDescending(l => l.LastModified).FirstOrDefault();
         private SaveGameViewModel MostRecentSave => SelectedLocation?.SaveGames?.Where(g => !g.IsAddManualOption)?.OrderByDescending(s => s.LastModified)?.FirstOrDefault();
 
-        public SaveSelectorViewModel() : this(SavesLocation.AllLocal, Enumerable.Empty<SaveGame>())
+        public SaveSelectorViewModel() : this(DirectSavesLocation.AllLocal, Enumerable.Empty<ISaveGame>())
         {
         }
 
         public bool CanOpenSavesLocation => SelectedLocation is not ManualSavesLocationViewModel;
 
-        public SaveSelectorViewModel(IEnumerable<SavesLocation> savesLocations, IEnumerable<SaveGame> manualSaves)
+        public SaveSelectorViewModel(IEnumerable<ISavesLocation> savesLocations, IEnumerable<ISaveGame> manualSaves)
         {
             manualLocation = new ManualSavesLocationViewModel(manualSaves);
 

@@ -1,5 +1,4 @@
 ﻿using PalCalc.Model;
-using PalCalc.SaveReader.FArchive;
 using PalCalc.SaveReader.SaveFile.Support.Level;
 using Serilog;
 using System;
@@ -21,12 +20,10 @@ namespace PalCalc.SaveReader.SaveFile
     {
         private static ILogger logger = Log.ForContext<LevelSaveFile>();
 
-        public LevelSaveFile(string folderPath) : base(folderPath) { }
-
-        public override string FileName => "Level.sav";
+        public LevelSaveFile(string filePath) : base(filePath) { }
 
         private Guid MostCommonOwner(PalContainer container) => container.Slots.GroupBy(s => s.PlayerId).MaxBy(g => g.Count()).Key;
-        
+
         public LevelSaveData ReadCharacterData(PalDB db)
         {
             logger.Debug("parsing content");

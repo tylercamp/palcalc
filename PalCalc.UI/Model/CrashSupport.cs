@@ -19,10 +19,10 @@ namespace PalCalc.UI.Model
             while (collection.Count > MAX_HISTORY_LENGTH) collection.RemoveAt(0);
         }
 
-        private static List<SaveGame> LoadedSaveHistory = new List<SaveGame>();
+        private static List<ISaveGame> LoadedSaveHistory = new List<ISaveGame>();
         private static List<CachedSaveGame> ReferencedCachedSaveHistory = new List<CachedSaveGame>();
 
-        public static void ReferencedSave(SaveGame save)
+        public static void ReferencedSave(ISaveGame save)
         {
             if (save == null) return;
 
@@ -77,7 +77,7 @@ namespace PalCalc.UI.Model
                         {
                             try
                             {
-                                if (file.Exists) archive.CreateEntryFromFile(file.FilePath, $"save-{i}/{file.FileName}");
+                                if (file.Exists) archive.CreateEntryFromFile(file.FilePath, $"save-{i}/{Path.GetFileName(file.FilePath)}");
                             }
                             catch { }
                         }

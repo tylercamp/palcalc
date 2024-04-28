@@ -8,8 +8,6 @@ namespace PalCalc.SaveReader.SaveFile
 {
     public class LocalDataSaveFile : ISaveFile
     {
-        public LocalDataSaveFile(string folderPath) : base(folderPath) { }
-
-        public override string FileName => "LocalData.sav";
+        public LocalDataSaveFile(string filePath) : base(filePath) { }
     }
 }
