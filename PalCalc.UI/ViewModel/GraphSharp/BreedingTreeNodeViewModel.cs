@@ -36,6 +36,19 @@ namespace PalCalc.UI.Model
 
         public Visibility TraitsVisibility => Traits.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
+        public Visibility EffortVisibility => Value.PalRef.BreedingEffort > TimeSpan.Zero ? Visibility.Visible : Visibility.Collapsed;
+        public string Effort
+        {
+            get
+            {
+                var effort = Value.PalRef.BreedingEffort;
+                var selfEffort = Value.PalRef.SelfBreedingEffort;
+
+                if (effort != selfEffort && Value.PalRef is BredPalReference) return $"{selfEffort.TimeSpanStr()} ({effort.TimeSpanStr()})";
+                else return effort.TimeSpanStr();
+            }
+        }
+
         public PalRefLocationViewModel Location { get; }
 
         public string Gender { get; }

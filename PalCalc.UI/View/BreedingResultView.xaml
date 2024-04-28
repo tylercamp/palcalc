@@ -25,6 +25,7 @@
                     </Border>
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="{Binding Gender}" Foreground="White" />
+                        <TextBlock Text="{Binding Effort}" Foreground="White" Visibility="{Binding EffortVisibility}" />
                         <StackPanel Orientation="Vertical" Visibility="{Binding Location.Visibility}">
                             <TextBlock Text="{Binding Location.LocationOwnerDescription}" Foreground="White" Visibility="{Binding Location.OwnerVisibility}" />
                             <TextBlock Text="{Binding Location.LocationCoordDescription}" Foreground="White" />
