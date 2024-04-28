@@ -21,16 +21,16 @@ namespace PalCalc.Model
         public static void InitCommonFull(LogEventLevel consoleLogLevel = LogEventLevel.Information)
         {
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.PalCommon(consoleLogLevel)
+                .PalCommon(consoleLogLevel)
                 .CreateLogger();
         }
     }
 
     public static class LoggingExtensions
     {
-        public static LoggerConfiguration PalCommon(this LoggerSinkConfiguration config, LogEventLevel consoleLogLevel = LogEventLevel.Information) =>
+        public static LoggerConfiguration PalCommon(this LoggerConfiguration config, LogEventLevel consoleLogLevel = LogEventLevel.Information) =>
             config
-                .Debug(Logging.MessageFormat, LogEventLevel.Verbose)
+                .WriteTo.Async(a => a.Debug(Logging.MessageFormat, LogEventLevel.Debug))
                 .WriteTo.Console(Logging.MessageFormat, consoleLogLevel)
                 .MinimumLevel.Verbose()
                 .Enrich.WithExceptionDetails();
