@@ -47,9 +47,7 @@
                 <TextBlock Text="{Binding SolverStatusMsg}" Margin="10,5,0,5" />
             </Grid>
 
-            <Grid IsEnabled="{Binding IsEditable}">
-                <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
-            </Grid>
+            <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
         </DockPanel>
 
         <GridSplitter Grid.Column="3" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
