@@ -212,7 +212,7 @@ namespace PalCalc.Solver
                     // assume that the other parent has the more likely gender
                     return new BredPalReference(gameSettings, Pal, Parent1, Parent2, Traits)
                     {
-                        AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings/ db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
+                        AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
                         Gender = gender,
                         TraitsProbability = TraitsProbability,
                     };
@@ -252,6 +252,7 @@ namespace PalCalc.Solver
             Pal,
             Parent1.GetHashCode() ^ Parent2.GetHashCode(),
             TraitsHash,
+            BreedingEffort,
             SelfBreedingEffort,
             Gender
         );

@@ -108,21 +108,41 @@ namespace PalCalc.Solver
             var optionsParent2 = ParentOptions(parent2);
 
             var parentPairOptions = optionsParent1.SelectMany(p1v => optionsParent2.Where(p2v => p2v.IsCompatibleGender(p1v.Gender)).Select(p2v => (p1v, p2v))).ToList();
-            var optimalTime = parentPairOptions.Min(pair => pair.p1v.BreedingEffort + pair.p2v.BreedingEffort);
 
-            parentPairOptions = parentPairOptions.Where(pair => pair.p1v.BreedingEffort + pair.p2v.BreedingEffort == optimalTime).ToList();
-            if (parentPairOptions.Select(pair => pair.p1v.BreedingEffort + pair.p2v.BreedingEffort).Distinct().Count() == 1)
+            Func<IPalReference, IPalReference, TimeSpan> CombinedEffortFunc = gameSettings.MultipleBreedingFarms
+                ? ((a, b) => a.SelfBreedingEffort > b.SelfBreedingEffort ? a.SelfBreedingEffort : b.SelfBreedingEffort)
+                : ((a, b) => a.SelfBreedingEffort + b.SelfBreedingEffort);
+
+            if (parentPairOptions.Select(pair => CombinedEffortFunc(pair.p1v, pair.p2v)).Distinct().Count() == 1)
             {
                 // either there is no preference or at least 1 parent already has a specific gender
-                if (parent2.Gender == PalGender.WILDCARD) return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender()));
-                if (parent1.Gender == PalGender.WILDCARD) return (parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender()), parent2);
+                var p1wildcard = parent1.Gender == PalGender.WILDCARD;
+                var p2wildcard = parent2.Gender == PalGender.WILDCARD;
+
+                // should we set a specific gender on p1?
+                if (p1wildcard && (
+                    !p2wildcard || // p2 is a specific gender
+                    parent1.SelfBreedingEffort < parent2.SelfBreedingEffort // p1 takes less effort than p2
+                ))
+                {
+                    return (parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender()), parent2);
+                }
+
+                // should we set a specific gender on p2?
+                if (p2wildcard && (
+                    !p1wildcard || // p1 is a specific gender
+                    parent2.SelfBreedingEffort < parent1.SelfBreedingEffort // p2 takes less effort than p1 (need <= to resolve cases where self-effort is same for both wildcards)
+                ))
+                {
+                    return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender()));
+                }
 
                 // neither parents are wildcards
                 return (parent1, parent2);
             }
             else
             {
-                return parentPairOptions.OrderBy(p => p.p1v.BreedingEffort + p.p2v.BreedingEffort).First();
+                return parentPairOptions.MinBy(p => CombinedEffortFunc(p.p1v, p.p2v));
             }
         }
 
@@ -301,17 +321,11 @@ namespace PalCalc.Solver
                         .AsParallel()
                         .SelectMany(workBatch =>
                             workBatch
-                                .Where(p =>
-                                {
-                                    if (p.Item1.IsCompatibleGender(p.Item2.Gender) != p.Item2.IsCompatibleGender(p.Item1.Gender)) Debugger.Break();
-
-                                    return p.Item1.IsCompatibleGender(p.Item2.Gender);
-                                })
+                                .Where(p => p.Item1.IsCompatibleGender(p.Item2.Gender))
                                 .Where(p => p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() <= maxWildPals)
                                 .Where(p =>
                                 {
                                     var childPal = db.BreedingByParent[p.Item1.Pal][p.Item2.Pal].Child;
-                                    if (db.BreedingByParent[p.Item1.Pal][p.Item2.Pal].Child != db.BreedingByParent[p.Item2.Pal][p.Item1.Pal].Child) Debugger.Break();
 
                                     return db.MinBreedingSteps[childPal][spec.Pal] <= maxBreedingSteps - s - 1;
                                 })
