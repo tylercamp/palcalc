@@ -325,7 +325,7 @@ namespace PalCalc.UI.ViewModel
         {
             dispatcher.BeginInvoke(() =>
             {
-                var numTotalSteps = (double)(1 + obj.TargetSteps * 2);
+                var numTotalSteps = (double)(1 + obj.TargetSteps);
                 int overallStep = 0;
                 switch (obj.CurrentPhase)
                 {
@@ -337,13 +337,7 @@ namespace PalCalc.UI.ViewModel
 
                     case SolverPhase.Breeding:
                         SolverStatusMsg = $"Breeding step {obj.CurrentStepIndex + 1}, calculating child pals and probabilities";
-                        overallStep = 1 + obj.CurrentStepIndex * 2;
-                        
-                        break;
-
-                    case SolverPhase.Simplifying:
-                        SolverStatusMsg = $"Breeding step {obj.CurrentStepIndex + 1}, simplifying results";
-                        overallStep = 1 + obj.CurrentStepIndex * 2 + 1;
+                        overallStep = 1 + obj.CurrentStepIndex;
                         break;
 
                     case SolverPhase.Finished:
@@ -353,7 +347,7 @@ namespace PalCalc.UI.ViewModel
                         }
                         else
                         {
-                            SolverStatusMsg = $"Finished (took {solverStopwatch.Elapsed.TimeSpanSecondssStr()})";
+                            SolverStatusMsg = $"Finished (took {solverStopwatch.Elapsed.TimeSpanSecondsStr()})";
                             overallStep = (int)numTotalSteps;
                         }
                         break;

@@ -18,6 +18,6 @@ namespace PalCalc.UI
             value.Length > maxLength ? value.Substring(0, maxLength - 3) + "..." : value;
 
         public static string TimeSpanMinutesStr(this TimeSpan ts) => TimeSpan.FromMinutes((int)ts.TotalMinutes).ToString();
-        public static string TimeSpanSecondssStr(this TimeSpan ts) => TimeSpan.FromSeconds((int)ts.TotalSeconds).ToString();
+        public static string TimeSpanSecondsStr(this TimeSpan ts) => TimeSpan.FromSeconds((int)ts.TotalSeconds).ToString();
     }
 }

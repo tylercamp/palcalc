@@ -13,7 +13,6 @@ namespace PalCalc.Solver
     {
         Initializing,
         Breeding,
-        Simplifying,
         Finished,
     }
 
@@ -402,8 +401,6 @@ namespace PalCalc.Solver
                 });
 
                 if (token.IsCancellationRequested) break;
-                statusMsg.CurrentPhase = SolverPhase.Simplifying;
-                SolverStateUpdated?.Invoke(statusMsg);
 
                 if (!didUpdate)
                 {

@@ -97,9 +97,6 @@ namespace PalCalc.Solver
             remainingWork.AddRange(content
                 // need to check results between new and old content
                 .SelectMany(p1 => toAdd.Select(p2 => (p1, p2)))
-                // TODO - this (p2,p1) set of permutations shouldn't be necessary, but for some reason the result effort can vary
-                //        depending on parent ordering (maybe due to PreferredParentsGenders?)
-                .Concat(toAdd.SelectMany(p1 => content.Select(p2 => (p1, p2))))
                 // and check results within the new content
                 .Concat(toAdd.SelectMany(p1 => toAdd.Select(p2 => (p1, p2))))
             );
