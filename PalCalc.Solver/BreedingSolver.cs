@@ -130,7 +130,7 @@ namespace PalCalc.Solver
                 // should we set a specific gender on p2?
                 if (p2wildcard && (
                     !p1wildcard || // p1 is a specific gender
-                    parent2.SelfBreedingEffort < parent1.SelfBreedingEffort // p2 takes less effort than p1 (need <= to resolve cases where self-effort is same for both wildcards)
+                    parent2.SelfBreedingEffort <= parent1.SelfBreedingEffort // p2 takes less effort than p1 (need <= to resolve cases where self-effort is same for both wildcards)
                 ))
                 {
                     return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender()));
@@ -320,6 +320,7 @@ namespace PalCalc.Solver
                         .AsParallel()
                         .SelectMany(workBatch =>
                             workBatch
+                                .TakeWhile(_ => !token.IsCancellationRequested)
                                 .Where(p => p.Item1.IsCompatibleGender(p.Item2.Gender))
                                 .Where(p => p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() <= maxWildPals)
                                 .Where(p =>
