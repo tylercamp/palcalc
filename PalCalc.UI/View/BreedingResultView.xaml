@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:PalCalc.UI.View"
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
              xmlns:m="clr-namespace:PalCalc.UI.Model"
+             xmlns:gsvm="clr-namespace:PalCalc.UI.ViewModel.GraphSharp"
              xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
              mc:Ignorable="d" 
              xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
@@ -15,7 +16,7 @@
              d:DataContext="{d:DesignInstance vm:BreedingResultViewModel, IsDesignTimeCreatable=True}"
              >
     <UserControl.Resources>
-        <DataTemplate x:Key="DemoTemplate" DataType="{x:Type m:BreedingTreeNodeViewModel}">
+        <DataTemplate x:Key="DemoTemplate" DataType="{x:Type gsvm:BreedingTreeNodeViewModel}">
             <StackPanel Orientation="Vertical" Margin="5" MinWidth="180">
                 <StackPanel Orientation="Horizontal">
                     <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="White" Margin="0,0,5,0">
@@ -65,7 +66,7 @@
         </Style>
     </UserControl.Resources>
     <zoom:ZoomControl Grid.Column="1" Background="Gray" Zoom="2">
-        <m:BreedingGraphLayout
+        <gsvm:BreedingGraphLayout
             Graph="{Binding Graph}"
             AnimationLength="0"
             IsAnimationEnabled="False"

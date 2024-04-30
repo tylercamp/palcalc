@@ -1,5 +1,6 @@
 ﻿using GraphSharp;
 using PalCalc.Solver;
+using PalCalc.UI.Model;
 using QuickGraph;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.Model
+namespace PalCalc.UI.ViewModel.GraphSharp
 {
     public class BreedingEdge : TypedEdge<BreedingTreeNodeViewModel>
     {

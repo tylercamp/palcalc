@@ -11,7 +11,7 @@ using PalCalc.Solver;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows.Media.Animation;
 
-namespace PalCalc.UI.Model
+namespace PalCalc.UI.ViewModel.GraphSharp
 {
     internal partial class BreedingTreeLayoutAlgorithmParameters : ObservableObject, ILayoutParameters
     {

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.Model.GraphSharp
+namespace PalCalc.UI.ViewModel.GraphSharp
 {
     internal class SpecificLayoutAlgorithmFactory : ILayoutAlgorithmFactory<BreedingTreeNodeViewModel, BreedingEdge, BreedingGraph>
     {

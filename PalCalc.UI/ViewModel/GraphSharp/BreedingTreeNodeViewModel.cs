@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
@@ -11,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace PalCalc.UI.Model
+namespace PalCalc.UI.ViewModel.GraphSharp
 {
     public partial class BreedingTreeNodeViewModel : ObservableObject
     {
