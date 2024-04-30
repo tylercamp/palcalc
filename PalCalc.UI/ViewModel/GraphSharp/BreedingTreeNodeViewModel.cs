@@ -24,7 +24,14 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             Traits = node.PalRef.Traits.Select(t => new TraitViewModel(t)).ToList();
             TraitCollection = new TraitCollectionViewModel(Traits);
             Location = new PalRefLocationViewModel(source, node.PalRef.Location);
-            Gender = node.PalRef.Gender.ToString();
+            Gender = node.PalRef.Gender switch
+            {
+                PalGender.MALE => "Male",
+                PalGender.FEMALE => "Female",
+                PalGender.WILDCARD => "Any Gender",
+                PalGender.OPPOSITE_WILDCARD => "Opposite Gender",
+                _ => "Unknown Gender"
+            };
         }
 
         public PalViewModel Pal { get; }

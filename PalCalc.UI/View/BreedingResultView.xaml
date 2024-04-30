@@ -17,7 +17,7 @@
              >
     <UserControl.Resources>
         <DataTemplate x:Key="DemoTemplate" DataType="{x:Type gsvm:BreedingTreeNodeViewModel}">
-            <StackPanel Orientation="Vertical" Margin="5" MinWidth="180">
+            <StackPanel Orientation="Vertical" Margin="5" MinWidth="180" UseLayoutRounding="True">
                 <StackPanel Orientation="Horizontal">
                     <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="White" Margin="0,0,5,0">
                         <Border.Background>
@@ -25,11 +25,12 @@
                         </Border.Background>
                     </Border>
                     <StackPanel Orientation="Vertical">
-                        <TextBlock Text="{Binding Gender}" Foreground="White" />
-                        <TextBlock Text="{Binding Effort}" Foreground="White" Visibility="{Binding EffortVisibility}" />
+                        <TextBlock Text="{Binding Pal.Name}" Foreground="White" />
+                        <TextBlock Text="{Binding Gender}" Foreground="White" FontSize="10" />
+                        <TextBlock Text="{Binding Effort}" Foreground="White" FontSize="10" Visibility="{Binding EffortVisibility}" />
                         <StackPanel Orientation="Vertical" Visibility="{Binding Location.Visibility}">
-                            <TextBlock Text="{Binding Location.LocationOwnerDescription}" Foreground="White" Visibility="{Binding Location.OwnerVisibility}" />
-                            <TextBlock Text="{Binding Location.LocationCoordDescription}" Foreground="White" />
+                            <TextBlock Text="{Binding Location.LocationOwnerDescription}" FontSize="10" Foreground="White" Visibility="{Binding Location.OwnerVisibility}"/>
+                            <TextBlock Text="{Binding Location.LocationCoordDescription}" FontSize="10" Foreground="White" />
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
@@ -51,11 +52,6 @@
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter Content="{TemplateBinding Vertex}" 
                                               ContentTemplate="{StaticResource DemoTemplate}"/>
-
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="2" Color="LightGray" 
-                                                  Opacity="0.3" Direction="315"/>
-                            </Border.Effect>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
@@ -70,6 +66,7 @@
             Graph="{Binding Graph}"
             AnimationLength="0"
             IsAnimationEnabled="False"
+            TextOptions.TextHintingMode="Fixed"
         />
     </zoom:ZoomControl>
 </UserControl>

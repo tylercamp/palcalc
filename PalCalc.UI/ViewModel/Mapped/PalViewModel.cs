@@ -16,6 +16,8 @@ namespace PalCalc.UI.ViewModel.Mapped
             ModelObject = pal;
         }
 
+        public string Name => ModelObject.Name;
+
         public Pal ModelObject { get; }
 
         public ImageSource Icon => PalIcon.Images[ModelObject];
