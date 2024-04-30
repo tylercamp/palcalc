@@ -41,6 +41,7 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 	- ~~Save game settings + associate with save file~~
 
 ## Eventual TODOs
+- Bugfix - Solver prefers breeding a pal to get an opposite gender instead of just using the existing pals
 - Add "About" window for licenses + references
 - Gracefully handle missing references to pals, traits, and pal instances
 - Fix tree layout algorithm
@@ -67,5 +68,5 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 - Allow specifying custom db.json
 - IV inheritance + solving
 - Attack skill inheritance + solving
-- Support Xbox saves ([sample ref](https://github.com/Tom60chat/Xbox-Live-Save-Exporter/tree/main))
+- ~~Support Xbox saves ([sample ref](https://github.com/Tom60chat/Xbox-Live-Save-Exporter/tree/main))~~
 - Figure out how the data miners do their thing and read Pal DB info straight from game files?
