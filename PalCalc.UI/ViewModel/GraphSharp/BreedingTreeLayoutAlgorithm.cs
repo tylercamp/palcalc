@@ -10,6 +10,7 @@ using System.Windows;
 using PalCalc.Solver;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows.Media.Animation;
+using QuickGraph.Serialization;
 
 namespace PalCalc.UI.ViewModel.GraphSharp
 {
@@ -33,30 +34,96 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
     // currently assuming left-to-right layout
     internal class BreedingTreeLayoutAlgorithm : DefaultParameterizedLayoutAlgorithmBase<BreedingTreeNodeViewModel, BreedingEdge, BreedingGraph, BreedingTreeLayoutAlgorithmParameters>
-
     {
         private Dictionary<BreedingTreeNodeViewModel, Size> _sizes;
+        private Dictionary<IBreedingTreeNode, BreedingTreeNodeViewModel> _viewmodels;
+        private Dictionary<BreedingTreeNodeViewModel, Size> _fullSizes = new Dictionary<BreedingTreeNodeViewModel, Size>();
+        private Dictionary<BreedingTreeNodeViewModel, Node> _nodesByVm;
+        private Dictionary<IBreedingTreeNode, Node> _nodesByModel;
+
+        private class Node
+        {
+            private BreedingTreeLayoutAlgorithm algo;
+
+            public Node(BreedingTreeLayoutAlgorithm algo, BreedingTreeNodeViewModel asViewModel, IBreedingTreeNode asModel)
+            {
+                this.algo = algo;
+                AsViewModel = asViewModel;
+                AsModel = asModel;
+            }
+
+            public BreedingTreeNodeViewModel AsViewModel { get; }
+            public IBreedingTreeNode AsModel { get; }
+
+            public Point SelfCenter
+            {
+                get => algo.VertexPositions[AsViewModel];
+                set => algo.VertexPositions[AsViewModel] = value;
+            }
+            public Size SelfSize => algo._sizes[AsViewModel];
+
+            public Size FullSize => algo.FullSizeWithChildren(AsViewModel);
+
+            public double SelfTopY
+            {
+                get => SelfCenter.Y - SelfSize.Height / 2;
+                set
+                {
+                    var p = SelfCenter;
+                    p.Y = value + SelfSize.Height / 2;
+                    SelfCenter = p;
+                }
+            }
+
+            public double SelfBottomY
+            {
+                get => SelfCenter.Y + SelfSize.Height / 2;
+                set
+                {
+                    var p = SelfCenter;
+                    p.Y = value - SelfSize.Height / 2;
+                    SelfCenter = p;
+                }
+            }
+
+            public double FullTopY => SelfCenter.Y - FullSize.Height / 2;
+            public double FullBottomY => SelfCenter.Y + FullSize.Height / 2;
+        }
 
         public BreedingTreeLayoutAlgorithm(BreedingGraph visitedGraph, IDictionary<BreedingTreeNodeViewModel, Point> vertexPositions, IDictionary<BreedingTreeNodeViewModel, Size> vertexSizes, BreedingTreeLayoutAlgorithmParameters parameters)
             : base(visitedGraph, vertexPositions, parameters)
         {
             _sizes = new Dictionary<BreedingTreeNodeViewModel, Size>(vertexSizes);
+            _viewmodels = visitedGraph.Edges.SelectMany(e => new[] { e.Source, e.Target }).Distinct().ToDictionary(vm => vm.Value);
+
+            _nodesByModel = new Dictionary<IBreedingTreeNode, Node>();
+            _nodesByVm = new Dictionary<BreedingTreeNodeViewModel, Node>();
+            foreach (var vm in _viewmodels.Values)
+            {
+                var node = new Node(this, vm, vm.Value);
+                _nodesByModel.Add(vm.Value, node);
+                _nodesByVm.Add(vm, node);
+            }
         }
 
         private Size FullSizeWithChildren(BreedingTreeNodeViewModel node)
         {
-            var childrenByDepth = node.Value.TraversedTopDown(0).GroupBy(p => p.Item2).ToDictionary(g => g.Key, g => g.Select(p => p.Item1).ToList());
+            if (_fullSizes.ContainsKey(node)) return _fullSizes[node];
 
-            var maxWidthByDepth = childrenByDepth.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Max(n => _sizes[VisitedGraph.NodeFor(n)].Width));
-            var minHeightByDepth = childrenByDepth.ToDictionary(
-                kvp => kvp.Key,
-                kvp => Parameters.VertexGap * (kvp.Value.Count - 1) + kvp.Value.Sum(n => _sizes[VisitedGraph.NodeFor(n)].Height)
+            if (!node.Value.Children.Any())
+            {
+                var size = _sizes[node];
+                _fullSizes[node] = size;
+                return size;
+            }
+
+            Size fullSize = new Size(
+                width: node.Value.Children.Max(n => FullSizeWithChildren(_viewmodels[n]).Width) + Parameters.LayerGap + _sizes[node].Width,
+                height: Math.Max(node.Value.Children.Sum(c => FullSizeWithChildren(_viewmodels[c]).Height) + Parameters.VertexGap, _sizes[node].Height)
             );
 
-            var fullWidth = (childrenByDepth.Count - 1) * Parameters.LayerGap + maxWidthByDepth.Values.Sum();
-            var fullHeight = minHeightByDepth.Values.Max();
-
-            return new Size(fullWidth, fullHeight);
+            _fullSizes.Add(node, fullSize);
+            return fullSize;
         }
 
         protected override void InternalCompute()
@@ -66,72 +133,83 @@ namespace PalCalc.UI.ViewModel.GraphSharp
                 .ToDictionary(g => g.Key, g => g.Select(p => VisitedGraph.NodeFor(p.Item1)).ToList());
 
             var fullSize = FullSizeWithChildren(VisitedGraph.NodeFor(VisitedGraph.Tree.Root));
-            var layerX = fullSize.Width / 2;
+            var layerCenterX = fullSize.Width / 2;
 
+            // node positions are centered within the node
             // start from root node, center-right
+            double prevWidth = 0;
             foreach (var kvp in orderedNodesByDepth.OrderBy(kvp => kvp.Key))
             {
-                layerX -= kvp.Value.Max(n => _sizes[n].Width);
-                layerX -= Parameters.LayerGap;
-
                 var depth = kvp.Key;
-                foreach (var node in kvp.Value)
+                var width = kvp.Value.Max(n => _sizes[n].Width);
+
+                if (depth == 0)
                 {
+                    layerCenterX -= width / 2; // properly align right-most (root) node with right side of tree
+                }
+                else
+                {
+                    layerCenterX -= prevWidth / 2;
+                    layerCenterX -= Parameters.LayerGap;
+                    layerCenterX -= width / 2;
+                }
+
+                foreach (var vmNode in kvp.Value)
+                {
+                    var node = _nodesByVm[vmNode];
+
                     if (depth == 0)
                     {
-                        VertexPositions[node] = new Point(layerX, 0);
+                        VertexPositions[vmNode] = new Point(layerCenterX, 0);
                         continue;
                     }
 
-                    var parentNode = orderedNodesByDepth[depth - 1].Single(p => p.Value.Children.Contains(node.Value));
+                    // all of these nodes (depth > 0) will have a parent and a sibling
 
-                    var parentHeight = _sizes[parentNode].Height;
-                    var parentPos = VertexPositions[parentNode];
-                    parentPos.Y += parentHeight / 2;
+                    // self Y will be the center of child Ys.
+                    // child Ys are based on their full height / 2
 
-                    var selfTotalHeight = FullSizeWithChildren(node).Height;
-                    var parentTotalHeight = FullSizeWithChildren(parentNode).Height;
-                    
+                    // ('Y' in this comment block refers to top of node)
+                    // parent Y will be avg(child1y [top], child2y [bottom])
+                    //    child1y = parentFullTopY + child1FullHeight / 2
+                    //    child2y = parentFullBottomY - child2FullHeight / 2
 
-                    bool isFirstChild = parentNode.Value.Children.First() == node.Value;
+                    var parentVm = orderedNodesByDepth[depth - 1].Single(p => p.Value.Children.Contains(vmNode.Value));
+                    var parentNode = _nodesByVm[parentVm];
 
-                    var selfY = isFirstChild
-                        ? parentPos.Y - parentTotalHeight / 2
-                        : parentPos.Y + Parameters.VertexGap;
+                    bool isFirstChild = parentVm.Value.Children.First() == vmNode.Value;
+                    double nodeCenterY;
+                    if (isFirstChild)
+                    {
+                        nodeCenterY = parentNode.FullTopY + node.FullSize.Height / 2;
+                    }
+                    else
+                    {
+                        nodeCenterY = parentNode.FullBottomY - node.FullSize.Height / 2;
+                    }
 
-                    VertexPositions[node] = new Point(layerX, selfY);
+                    node.SelfCenter = new Point(layerCenterX, nodeCenterY);
                 }
+
+                prevWidth = width;
             }
 
             // current positions are roughly accurate, but center each parent within their children
             foreach (var depth in orderedNodesByDepth.Keys.OrderByDescending(d => d))
             {
-                foreach (var node in orderedNodesByDepth[depth])
+                foreach (var nodeVm in orderedNodesByDepth[depth])
                 {
-                    if (node.Value.Children.Any())
+                    if (nodeVm.Value.Children.Any())
                     {
-                        var parent1 = VisitedGraph.NodeFor(node.Value.Children.First());
-                        var parent2 = VisitedGraph.NodeFor(node.Value.Children.Last());
+                        var node = _nodesByVm[nodeVm];
 
-                        var parent1Pos = VertexPositions[parent1];
-                        var parent2Pos = VertexPositions[parent2];
+                        var parent1 = VisitedGraph.NodeFor(nodeVm.Value.Children.First());
+                        var parent2 = VisitedGraph.NodeFor(nodeVm.Value.Children.Last());
 
-                        var parent1Center = new Point(
-                            parent1Pos.X + _sizes[parent1].Width / 2,
-                            parent1Pos.Y + _sizes[parent1].Height / 2
-                        );
+                        var p1Node = _nodesByVm[parent1];
+                        var p2Node = _nodesByVm[parent2];
 
-                        var parent2Center = new Point(
-                            parent2Pos.X + _sizes[parent2].Width / 2,
-                            parent2Pos.Y + _sizes[parent2].Height / 2
-                        );
-
-                        var newPos = new Point(
-                            VertexPositions[node].X,
-                            (parent1Center.Y + parent2Center.Y) / 2 - _sizes[node].Height / 2
-                        );
-
-                        VertexPositions[node] = newPos;
+                        node.SelfCenter = new Point(node.SelfCenter.X, (p1Node.SelfBottomY + p2Node.SelfTopY) / 2);
                     }
                 }
             }
