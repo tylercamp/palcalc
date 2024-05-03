@@ -117,7 +117,7 @@ namespace PalCalc.UI.ViewModel
                                 return new PalTargetListViewModel();
                             }
 
-                            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), originalCachedSave);
+                            var converter = new PalTargetListViewModelConverter(db, GameSettingsViewModel.Load(sg).ModelObject, originalCachedSave);
 #if HANDLE_ERRORS
                             try
                             {
