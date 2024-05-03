@@ -21,7 +21,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         // for XAML designer view
         public GameSettingsViewModel()
         {
-            BreedingTimeMinutes = 10;
+            BreedingTimeMinutes = (int)new GameSettings().BreedingTime.TotalMinutes;
             MultipleBreedingFarms = true;
         }
 
