@@ -119,12 +119,14 @@ namespace PalCalc.UI
         OwnedPalReferenceConverter oprc;
         WildPalReferenceConverter wprc;
         BredPalReferenceConverter bprc;
+        CompositePalReferenceConverter cprc;
 
         public PalReferenceConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
         {
             this.oprc = new OwnedPalReferenceConverter(db, gameSettings);
             this.wprc = new WildPalReferenceConverter(db, gameSettings);
             this.bprc = new BredPalReferenceConverter(db, gameSettings, this);
+            this.cprc = new CompositePalReferenceConverter(db, gameSettings);
         }
 
         public static string ReadWrappedTypeLabel(JToken wrapperToken) => wrapperToken["RefType"].ToObject<string>();
@@ -147,6 +149,7 @@ namespace PalCalc.UI
             if (type == oprc.TypeLabel) return oprc.ReadRefJson(wrappedContent, objectType, existingValue as OwnedPalReference, hasExistingValue, serializer);
             if (type == wprc.TypeLabel) return wprc.ReadRefJson(wrappedContent, objectType, existingValue as WildPalReference, hasExistingValue, serializer);
             if (type == bprc.TypeLabel) return bprc.ReadRefJson(wrappedContent, objectType, existingValue as BredPalReference, hasExistingValue, serializer);
+            if (type == cprc.TypeLabel) return cprc.ReadRefJson(wrappedContent, objectType, existingValue as CompositeOwnedPalReference, hasExistingValue, serializer);
 
             throw new Exception($"Unhandled IPalReference type label {type}");
         }
@@ -158,6 +161,7 @@ namespace PalCalc.UI
                 case OwnedPalReference opr: oprc.WriteJson(writer, opr, serializer); break;
                 case WildPalReference wpr: wprc.WriteJson(writer, wpr, serializer); break;
                 case BredPalReference bpr: bprc.WriteJson(writer, bpr, serializer); break;
+                case CompositeOwnedPalReference cpr: cprc.WriteJson(writer, cpr, serializer); break;
                 default: throw new Exception($"Unhandled IPalReference type {value?.GetType()?.Name}");
             }
         }
@@ -182,7 +186,38 @@ namespace PalCalc.UI
         internal override OwnedPalReference ReadRefJson(JToken token, Type objectType, OwnedPalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             InjectDependencyConverters(serializer);
-            return new OwnedPalReference(token.ToObject<PalInstance>(serializer));
+            var inst = token.ToObject<PalInstance>(serializer);
+            return new OwnedPalReference(inst, inst.Traits); // supposed to be "effective traits", but that only matters when the solver is running, and this is a saved solver result
+        }
+    }
+
+    internal class CompositePalReferenceConverter : IPalReferenceConverterBase<CompositeOwnedPalReference>
+    {
+        public CompositePalReferenceConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings, "COMPOSITE_PAL")
+        {
+            dependencyConverters = new JsonConverter[]
+            {
+                new OwnedPalReferenceConverter(db, gameSettings),
+            };
+        }
+
+        internal override JToken MakeRefJson(CompositeOwnedPalReference value, JsonSerializer serializer)
+        {
+            InjectDependencyConverters(serializer);
+            return JToken.FromObject(new
+            {
+                Male = value.Male,
+                Female = value.Female
+            }, serializer);
+        }
+
+        internal override CompositeOwnedPalReference ReadRefJson(JToken token, Type objectType, CompositeOwnedPalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            InjectDependencyConverters(serializer);
+            var male = token["Male"].ToObject<OwnedPalReference>(serializer);
+            var female = token["Female"].ToObject<OwnedPalReference>(serializer);
+
+            return new CompositeOwnedPalReference(male, female);
         }
     }
 
@@ -197,7 +232,7 @@ namespace PalCalc.UI
             return JToken.FromObject(new
             {
                 PalId = value.Pal.Id,
-                NumTraits = value.Traits.Count,
+                NumTraits = value.EffectiveTraits.Count,
             }, serializer);
         }
 
@@ -240,7 +275,7 @@ namespace PalCalc.UI
             return JToken.FromObject(new
             {
                 PalId = value.Pal.Id,
-                Traits = value.Traits,
+                Traits = value.EffectiveTraits,
                 Parent1 = value.Parent1,
                 Parent2 = value.Parent2,
                 Gender = value.Gender,

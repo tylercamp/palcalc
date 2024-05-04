@@ -11,14 +11,21 @@ namespace PalCalc.Solver
     public interface IPalReference
     {
         Pal Pal { get; }
-        List<Trait> Traits { get; }
-        int TraitsHash { get; } // optimization
+
+        /// <summary>
+        /// The list of DESIRED traits held by this pal. Any irrelevant traits are to
+        /// be represented as a Random trait.
+        /// </summary>
+        List<Trait> EffectiveTraits { get; }
+        int EffectiveTraitsHash { get; } // optimization
+
+        List<Trait> ActualTraits { get; }
 
         PalGender Gender { get; }
 
         int NumTotalBreedingSteps { get; }
 
-        string TraitsString => Traits.TraitsListToString();
+        string EffectiveTraitsString => EffectiveTraits.TraitsListToString();
 
         IPalRefLocation Location { get; }
 
@@ -34,20 +41,26 @@ namespace PalCalc.Solver
     {
         PalInstance instance;
 
-        public OwnedPalReference(PalInstance instance)
+        /// <param name="effectiveTraits">The list of traits held by the `instance`, filtered/re-mapped based on desired traits. (.ToDedicatedTraits())</param>
+        public OwnedPalReference(PalInstance instance, List<Trait> effectiveTraits)
         {
             this.instance = instance;
 
-            TraitsHash = instance.Traits.SetHash();
+            EffectiveTraits = effectiveTraits;
+            EffectiveTraitsHash = EffectiveTraits.SetHash();
+
+            ActualTraits = instance.Traits;
         }
 
         public PalInstance UnderlyingInstance => instance;
 
         public Pal Pal => instance.Pal;
 
-        public List<Trait> Traits => instance.Traits;
+        public List<Trait> EffectiveTraits { get; private set; }
 
-        public int TraitsHash { get; }
+        public int EffectiveTraitsHash { get; }
+
+        public List<Trait> ActualTraits { get; }
 
         public PalGender Gender => instance.Gender;
 
@@ -64,7 +77,71 @@ namespace PalCalc.Solver
             return this;
         }
 
-        public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({Traits.TraitsListToString()}) in {Location}";
+        public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({EffectiveTraits.TraitsListToString()}) in {Location}";
+    }
+
+    /// <summary>
+    /// Represents a pair of male and female instances of the same pal. This allows us to represent
+    /// Male+Female owned pals to act as "wildcard" genders. (Without this the solver will tend to prefer
+    /// redundantly breeding a pal of "opposite gender" compared to another pal step which has lots of
+    /// requirements + breeding attempts. It wouldn't directly pair it with a male or female pal, since
+    /// that would require breeding the "difficult" pal to have a specific gender.)
+    /// 
+    /// These pals _should_, but are not _guaranteed_, to have the same set of traits:
+    /// 
+    /// - If two pals have different desired traits, they should NOT be made composite.
+    /// - Conversely, if one pal has a desired trait, both pals will have that desired trait.
+    /// - The traits for this reference will match whichever pal has the most traits.
+    /// </summary>
+    public class CompositeOwnedPalReference : IPalReference
+    {
+        public CompositeOwnedPalReference(OwnedPalReference male, OwnedPalReference female)
+        {
+            Male = male;
+            Female = female;
+
+            Location = new CompositeRefLocation(male.Location, female.Location);
+
+            // effective traits based on which pal has the most irrelevant traits
+            EffectiveTraits = male.EffectiveTraits.Count > female.EffectiveTraits.Count ? male.EffectiveTraits : female.EffectiveTraits;
+            EffectiveTraitsHash = EffectiveTraits.SetHash();
+
+            ActualTraits = Male.ActualTraits.Intersect(Female.ActualTraits).ToList();
+            while (ActualTraits.Count < EffectiveTraits.Count) ActualTraits.Add(new RandomTrait());
+        }
+
+        public OwnedPalReference Male { get; }
+        public OwnedPalReference Female { get; }
+
+        public Pal Pal => Male.Pal;
+
+        public List<Trait> EffectiveTraits { get; private set; }
+
+        public int EffectiveTraitsHash { get; private set; }
+
+        public List<Trait> ActualTraits { get; }
+
+        public PalGender Gender { get; private set; } = PalGender.WILDCARD;
+
+        public int NumTotalBreedingSteps { get; } = 0;
+
+        public IPalRefLocation Location { get; }
+
+        public TimeSpan BreedingEffort { get; } = TimeSpan.Zero;
+
+        public TimeSpan SelfBreedingEffort { get; } = TimeSpan.Zero;
+
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        {
+            switch (gender)
+            {
+                case PalGender.MALE: return Male;
+                case PalGender.FEMALE: return Female;
+                case PalGender.OPPOSITE_WILDCARD: return new CompositeOwnedPalReference(Male, Female) { Gender = gender };
+                case PalGender.WILDCARD: return this;
+                default: throw new NotImplementedException();
+            }
+        }
     }
 
     public class WildPalReference : IPalReference
@@ -73,10 +150,10 @@ namespace PalCalc.Solver
         {
             Pal = pal;
             SelfBreedingEffort = GameConstants.TimeToCatch(pal) / GameConstants.TraitWildAtMostN[numTraits];
-            Traits = Enumerable.Range(0, numTraits).Select(i => new RandomTrait()).ToList<Trait>();
+            EffectiveTraits = Enumerable.Range(0, numTraits).Select(i => new RandomTrait()).ToList<Trait>();
             Gender = PalGender.WILDCARD;
 
-            TraitsHash = Traits.SetHash();
+            EffectiveTraitsHash = EffectiveTraits.SetHash();
         }
 
         private WildPalReference(Pal pal)
@@ -86,9 +163,11 @@ namespace PalCalc.Solver
 
         public Pal Pal { get; private set; }
 
-        public List<Trait> Traits { get; private set; }
+        public List<Trait> EffectiveTraits { get; private set; }
 
         public PalGender Gender { get; private set; }
+
+        public List<Trait> ActualTraits => EffectiveTraits;
 
         public IPalRefLocation Location { get; } = new CapturedRefLocation();
 
@@ -108,7 +187,7 @@ namespace PalCalc.Solver
 
         public int NumTotalBreedingSteps => 0;
 
-        public int TraitsHash { get; }
+        public int EffectiveTraitsHash { get; }
 
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
@@ -120,11 +199,11 @@ namespace PalCalc.Solver
             {
                 SelfBreedingEffort = SelfBreedingEffort,
                 Gender = gender,
-                Traits = Traits
+                EffectiveTraits = EffectiveTraits
             };
         }
 
-        public override string ToString() => $"Captured {Gender} {Pal} w/ up to {Traits.Count} random traits";
+        public override string ToString() => $"Captured {Gender} {Pal} w/ up to {EffectiveTraits.Count} random traits";
     }
 
     public class BredPalReference : IPalReference
@@ -146,8 +225,8 @@ namespace PalCalc.Solver
                 Parent1 = parent2;
                 Parent2 = parent1;
             }
-            Traits = traits;
-            TraitsHash = traits.SetHash();
+            EffectiveTraits = traits;
+            EffectiveTraitsHash = traits.SetHash();
         }
 
         public BredPalReference(GameSettings gameSettings, Pal pal, IPalReference parent1, IPalReference parent2, List<Trait> traits, float traitsProbability) : this(gameSettings, pal, parent1, parent2, traits)
@@ -192,9 +271,11 @@ namespace PalCalc.Solver
             }
         }
 
-        public List<Trait> Traits { get; }
+        public List<Trait> EffectiveTraits { get; }
 
-        public int TraitsHash { get; }
+        public int EffectiveTraitsHash { get; }
+
+        public List<Trait> ActualTraits => EffectiveTraits;
 
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
@@ -210,7 +291,7 @@ namespace PalCalc.Solver
                 if (db.BreedingMostLikelyGender[Pal] != PalGender.WILDCARD)
                 {
                     // assume that the other parent has the more likely gender
-                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, Traits)
+                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectiveTraits)
                     {
                         AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
                         Gender = gender,
@@ -219,7 +300,7 @@ namespace PalCalc.Solver
                 }
 
                 // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
-                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, Traits)
+                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectiveTraits)
                 {
                     AvgRequiredBreedings = AvgRequiredBreedings * 2,
                     Gender = gender,
@@ -229,7 +310,7 @@ namespace PalCalc.Solver
             else
             {
                 var genderProbability = db.BreedingGenderProbability[Pal][gender];
-                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, Traits)
+                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectiveTraits)
                 {
                     AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / genderProbability),
                     Gender = gender,
@@ -238,7 +319,7 @@ namespace PalCalc.Solver
             }
         }
 
-        public override string ToString() => $"Bred {Gender} {Pal} w/ ({Traits.TraitsListToString()})";
+        public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectiveTraits.TraitsListToString()})";
 
         public override bool Equals(object obj)
         {
@@ -251,7 +332,7 @@ namespace PalCalc.Solver
         public override int GetHashCode() => HashCode.Combine(
             Pal,
             Parent1.GetHashCode() ^ Parent2.GetHashCode(),
-            TraitsHash,
+            EffectiveTraitsHash,
             BreedingEffort,
             SelfBreedingEffort,
             Gender

@@ -67,7 +67,7 @@ namespace PalCalc.Solver
                     .Where(pi =>
                         pi.Pal == newInst.Pal &&
                         pi.Gender == newInst.Gender &&
-                        pi.TraitsHash == newInst.TraitsHash
+                        pi.EffectiveTraitsHash == newInst.EffectiveTraitsHash
                     )
                 .ToList();
 
@@ -115,8 +115,8 @@ namespace PalCalc.Solver
                 .GroupBy(pref => (
                     pref.Pal,
                     pref.Gender,
-                    pref.TraitsHash
+                    pref.EffectiveTraitsHash
                 ))
-                .Select(g => g.OrderBy(pref => pref.BreedingEffort).First());
+                .Select(g => g.OrderBy(pref => pref.BreedingEffort).ThenBy(pref => pref.NumTotalBreedingSteps).First());
     }
 }

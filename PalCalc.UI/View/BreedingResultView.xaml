@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View"
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
-             xmlns:m="clr-namespace:PalCalc.UI.Model"
+             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:gsvm="clr-namespace:PalCalc.UI.ViewModel.GraphSharp"
              xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
              mc:Ignorable="d" 
@@ -18,6 +18,11 @@
     <UserControl.Resources>
         <DataTemplate x:Key="DemoTemplate" DataType="{x:Type gsvm:BreedingTreeNodeViewModel}">
             <StackPanel Orientation="Vertical" Margin="5" MinWidth="180" UseLayoutRounding="True">
+                <StackPanel.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="White" />
+                    </Style>
+                </StackPanel.Resources>
                 <StackPanel Orientation="Horizontal">
                     <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="White" Margin="0,0,5,0">
                         <Border.Background>
@@ -25,13 +30,48 @@
                         </Border.Background>
                     </Border>
                     <StackPanel Orientation="Vertical">
-                        <TextBlock Text="{Binding Pal.Name}" Foreground="White" />
-                        <TextBlock Text="{Binding Gender}" Foreground="White" FontSize="10" />
-                        <TextBlock Text="{Binding Effort}" Foreground="White" FontSize="10" Visibility="{Binding EffortVisibility}" />
-                        <StackPanel Orientation="Vertical" Visibility="{Binding Location.Visibility}">
-                            <TextBlock Text="{Binding Location.LocationOwnerDescription}" FontSize="10" Foreground="White" Visibility="{Binding Location.OwnerVisibility}"/>
-                            <TextBlock Text="{Binding Location.LocationCoordDescription}" FontSize="10" Foreground="White" />
-                        </StackPanel>
+                        <TextBlock Text="{Binding Pal.Name}" />
+                        <TextBlock Text="{Binding Gender}" FontSize="10" />
+                        <TextBlock Text="{Binding Effort}" FontSize="10" Visibility="{Binding EffortVisibility}" />
+                        <ContentControl Content="{Binding Location}">
+                            <ContentControl.Resources>
+                                <DataTemplate DataType="{x:Type mvm:SpecificPalRefLocationViewModel}">
+                                    <StackPanel Orientation="Vertical" Visibility="{Binding Visibility}">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="White"/>
+                                            </Style>
+                                        </StackPanel.Resources>
+                                        
+                                        <TextBlock Text="{Binding LocationOwnerDescription}" FontSize="10" Visibility="{Binding OwnerVisibility}"/>
+                                        <TextBlock Text="{Binding LocationCoordDescription}" FontSize="10" />
+                                    </StackPanel>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type mvm:CompositePalRefLocationViewModel}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="FontSize" Value="8" />
+                                                <Setter Property="Foreground" Value="White" />
+                                            </Style>
+                                        </StackPanel.Resources>
+                                        <StackPanel Orientation="Vertical" Grid.Column="0" MaxWidth="80">
+                                                <TextBlock Text="Male" />
+                                                <TextBlock Text="{Binding MaleViewModel.LocationOwner}" TextWrapping="WrapWithOverflow" />
+                                                <TextBlock Text="{Binding MaleViewModel.LocationCoordDescription}" />
+                                        </StackPanel>
+                                
+                                        <Border BorderBrush="White" Width="1" BorderThickness="1" Margin="10" Grid.Column="1" />
+                                        
+                                        <StackPanel Orientation="Vertical" Grid.Column="2" MaxWidth="80">
+                                            <TextBlock Text="Female" />
+                                            <TextBlock Text="{Binding FemaleViewModel.LocationOwner}" TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding FemaleViewModel.LocationCoordDescription}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ContentControl.Resources>
+                        </ContentControl>
                     </StackPanel>
                 </StackPanel>
                 <Grid Visibility="{Binding TraitsVisibility}">

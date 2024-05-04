@@ -10,10 +10,30 @@ using System.Windows;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
-    public class PalRefLocationViewModel
+    public interface IPalRefLocationViewModel { }
+
+    public class CompositePalRefLocationViewModel : IPalRefLocationViewModel
     {
-        public PalRefLocationViewModel(CachedSaveGame source, IPalRefLocation location)
+        public CompositePalRefLocationViewModel(CachedSaveGame source, CompositeRefLocation location)
         {
+            ModelObject = location;
+
+            MaleViewModel = new SpecificPalRefLocationViewModel(source, location.MaleLoc);
+            FemaleViewModel = new SpecificPalRefLocationViewModel(source, location.FemaleLoc);
+        }
+
+        public CompositeRefLocation ModelObject { get; }
+
+        public SpecificPalRefLocationViewModel MaleViewModel { get; }
+        public SpecificPalRefLocationViewModel FemaleViewModel { get; }
+    }
+
+    public class SpecificPalRefLocationViewModel : IPalRefLocationViewModel
+    {
+        public SpecificPalRefLocationViewModel(CachedSaveGame source, IPalRefLocation location)
+        {
+            if (location is CompositeRefLocation) throw new InvalidOperationException();
+
             ModelObject = location;
 
             var ownedLoc = location as OwnedRefLocation;
@@ -33,7 +53,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 var ownerGuild = source.GuildsByPlayerId.GetValueOrDefault(ownedLoc.OwnerId);
 
                 var isGuildOwner = ownedLoc.Location.Type == LocationType.Base && ownerGuild?.MemberIds?.Count > 1;
-                LocationOwner = isGuildOwner ? ownerGuild?.Name ?? "Unkown Guild" : ownerName;
+                LocationOwner = isGuildOwner ? ownerGuild?.Name ?? "Unknown Guild" : ownerName;
             }
 
             switch (ownedLoc.Location.Type)

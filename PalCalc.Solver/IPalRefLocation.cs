@@ -29,4 +29,18 @@ namespace PalCalc.Solver
 
         public static IPalRefLocation Instance { get; } = new BredRefLocation();
     }
+
+    public class CompositeRefLocation : IPalRefLocation
+    {
+        public CompositeRefLocation(IPalRefLocation maleLoc, IPalRefLocation femaleLoc)
+        {
+            MaleLoc = maleLoc;
+            FemaleLoc = femaleLoc;
+        }
+
+        public IPalRefLocation MaleLoc { get; }
+        public IPalRefLocation FemaleLoc { get; }
+
+        public override string ToString() => $"Either {MaleLoc} (male) or {FemaleLoc} (female)";
+    }
 }

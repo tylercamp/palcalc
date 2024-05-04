@@ -109,8 +109,8 @@ namespace PalCalc.Solver
             var parentPairOptions = optionsParent1.SelectMany(p1v => optionsParent2.Where(p2v => p2v.IsCompatibleGender(p1v.Gender)).Select(p2v => (p1v, p2v))).ToList();
 
             Func<IPalReference, IPalReference, TimeSpan> CombinedEffortFunc = gameSettings.MultipleBreedingFarms
-                ? ((a, b) => a.SelfBreedingEffort > b.SelfBreedingEffort ? a.SelfBreedingEffort : b.SelfBreedingEffort)
-                : ((a, b) => a.SelfBreedingEffort + b.SelfBreedingEffort);
+                ? ((a, b) => a.BreedingEffort > b.BreedingEffort ? a.BreedingEffort : b.BreedingEffort)
+                : ((a, b) => a.BreedingEffort + b.BreedingEffort);
 
             if (parentPairOptions.Select(pair => CombinedEffortFunc(pair.p1v, pair.p2v)).Distinct().Count() == 1)
             {
@@ -121,7 +121,7 @@ namespace PalCalc.Solver
                 // should we set a specific gender on p1?
                 if (p1wildcard && (
                     !p2wildcard || // p2 is a specific gender
-                    parent1.SelfBreedingEffort < parent2.SelfBreedingEffort // p1 takes less effort than p2
+                    parent1.BreedingEffort < parent2.BreedingEffort // p1 takes less effort than p2
                 ))
                 {
                     return (parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender()), parent2);
@@ -130,7 +130,7 @@ namespace PalCalc.Solver
                 // should we set a specific gender on p2?
                 if (p2wildcard && (
                     !p1wildcard || // p1 is a specific gender
-                    parent2.SelfBreedingEffort <= parent1.SelfBreedingEffort // p2 takes less effort than p1 (need <= to resolve cases where self-effort is same for both wildcards)
+                    parent2.BreedingEffort <= parent1.BreedingEffort // p2 takes less effort than p1 (need <= to resolve cases where self-effort is same for both wildcards)
                 ))
                 {
                     return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender()));
@@ -288,10 +288,66 @@ namespace PalCalc.Solver
 
             bool WithinBreedingSteps(Pal pal, int maxSteps) => db.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
 
-            var initialContent = relevantPals.Where(pi => WithinBreedingSteps(pi.Pal, maxBreedingSteps)).Select(i => (IPalReference)new OwnedPalReference(i));
+            var initialContent = new List<IPalReference>();
+            foreach (
+                var palGroup in relevantPals
+                    .Where(pi => WithinBreedingSteps(pi.Pal, maxBreedingSteps))
+                    .Select(pi => new OwnedPalReference(pi, pi.Traits.ToDedicatedTraits(spec.Traits)))
+                    .GroupBy(pi => pi.Pal)
+            )
+            {
+                var pal = palGroup.Key;
+                
+                // group owned pals by the desired traits they contain, and try to find male+female pairs with the same set of traits + num irrelevant traits
+                foreach (
+                    var traitGroup in palGroup
+                        .GroupBy(p => p.EffectiveTraits
+                            .Concat(Enumerable.Range(0, GameConstants.MaxTotalTraits - p.EffectiveTraits.Count).Select(_ => new RandomTrait()))
+                            .SetHash()
+                        )
+                        .Select(g => g.ToList())
+                )
+                {
+                    // `traitGroup` is a list of pals which have the same list of desired traits, though they can have varying numbers of undesired traits.
+                    // (there should be at most 2, due to the previous processing of `relevantPals` which would restrict this group to, at most, a male + female instance)
+
+                    if (traitGroup.Count > 2) throw new NotImplementedException(); // shouldn't happen
+
+                    if (traitGroup.Select(p => p.EffectiveTraits.Count(t => t is RandomTrait)).Distinct().Count() == 1)
+                    {
+                        // all pals in this group have the same number of irrelevant traits
+                        if (traitGroup.Count == 1)
+                        {
+                            // only one pal, cant turn into a composite
+                            initialContent.Add(traitGroup.Single());
+                        }
+                        else if (traitGroup.Count == 2)
+                        {
+                            // two pals with the same desired traits and number of irrelevant traits, treat as a wildcard (composite)
+                            initialContent.Add(
+                                new CompositeOwnedPalReference(traitGroup[0], traitGroup[1])
+                            );
+                        }
+                    }
+                    else
+                    {
+                        // (can only happen if there are two pals in this group)
+
+                        // male and female have matching desired traits but a different number of irrelevant traits, add them each as individual
+                        // options but also allow their combination to be used as a wildcard (traits of the combination will use the "worst-case"
+                        // option, i.e. one with no irrelevant and the other with two irrelevant, the composite will have two irrelevant
+
+                        initialContent.Add(traitGroup[0]);
+                        initialContent.Add(traitGroup[1]);
+
+                        initialContent.Add(new CompositeOwnedPalReference(traitGroup[0], traitGroup[1]));
+                    }
+                }
+            }
+
             if (maxWildPals > 0)
             {
-                initialContent = initialContent.Concat(
+                initialContent.AddRange(
                     db.Pals
                         .Where(p => !relevantPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, maxBreedingSteps))
@@ -339,7 +395,7 @@ namespace PalCalc.Solver
                                     //  impossible to have zero since a child always inherits at least 1 direct trait if possible)
                                     if (maxIrrelevantTraits > 0) return true;
 
-                                    var combinedTraits = p.Item1.Traits.Concat(p.Item2.Traits);
+                                    var combinedTraits = p.Item1.EffectiveTraits.Concat(p.Item2.EffectiveTraits);
 
                                     var anyRelevantFromParents = spec.Traits.Intersect(combinedTraits).Any();
                                     var anyIrrelevantFromParents = combinedTraits.Except(spec.Traits).Any();
@@ -351,7 +407,7 @@ namespace PalCalc.Solver
                                     var (parent1, parent2) = p;
                                     var (preferredParent1, preferredParent2) = PreferredParentsGenders(parent1, parent2);
 
-                                    var parentTraits = parent1.Traits.Concat(parent2.Traits).Distinct().ToList();
+                                    var parentTraits = parent1.EffectiveTraits.Concat(parent2.EffectiveTraits).Distinct().ToList();
                                     var desiredParentTraits = spec.Traits.Intersect(parentTraits).ToList();
 
                                     var possibleResults = new List<IPalReference>();
@@ -414,7 +470,7 @@ namespace PalCalc.Solver
             statusMsg.CurrentPhase = SolverPhase.Finished;
             SolverStateUpdated?.Invoke(statusMsg);
 
-            return workingSet.Result.Where(pref => pref.Pal == spec.Pal && !spec.Traits.Except(pref.Traits).Any()).ToList();
+            return workingSet.Result.Where(pref => pref.Pal == spec.Pal && !spec.Traits.Except(pref.EffectiveTraits).Any()).ToList();
         }
     }
 }

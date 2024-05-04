@@ -41,7 +41,7 @@ namespace PalCalc.UI.ViewModel
                     {
                         new PalCalc.Model.Trait("Trait 1", "Internal 1", 0),
                     }
-                }))
+                }, new List<PalCalc.Model.Trait>() { new PalCalc.Model.Trait("Trait 1", "Internal 1", 0) }))
             }
         };
     }

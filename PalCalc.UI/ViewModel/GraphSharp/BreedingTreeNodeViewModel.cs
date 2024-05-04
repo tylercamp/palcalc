@@ -16,14 +16,16 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 {
     public partial class BreedingTreeNodeViewModel : ObservableObject
     {
-        private PalDB db;
         public BreedingTreeNodeViewModel(CachedSaveGame source, IBreedingTreeNode node)
         {
             Value = node;
             Pal = new PalViewModel(node.PalRef.Pal);
-            Traits = node.PalRef.Traits.Select(t => new TraitViewModel(t)).ToList();
+            Traits = node.PalRef.ActualTraits.Select(t => new TraitViewModel(t)).ToList();
             TraitCollection = new TraitCollectionViewModel(Traits);
-            Location = new PalRefLocationViewModel(source, node.PalRef.Location);
+            Location = node.PalRef.Location is CompositeRefLocation
+                ? new CompositePalRefLocationViewModel(source, node.PalRef.Location as CompositeRefLocation)
+                : new SpecificPalRefLocationViewModel(source, node.PalRef.Location);
+
             Gender = node.PalRef.Gender switch
             {
                 PalGender.MALE => "Male",
@@ -57,7 +59,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             }
         }
 
-        public PalRefLocationViewModel Location { get; }
+        public IPalRefLocationViewModel Location { get; }
 
         public string Gender { get; }
     }

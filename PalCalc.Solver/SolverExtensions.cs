@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PalCalc.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,8 +16,15 @@ namespace PalCalc.Solver
                 case BredPalReference bpr: return NumWildPalParticipants(bpr.Parent1) + NumWildPalParticipants(bpr.Parent2);
                 case OwnedPalReference opr: return 0;
                 case WildPalReference wpr: return 1;
+                case CompositeOwnedPalReference c: return 0;
                 default: throw new Exception($"Unhandled pal reference type {pref.GetType()}");
             }
+        }
+
+        public static List<Trait> ToDedicatedTraits(this IEnumerable<Trait> actualTraits, IEnumerable<Trait> desiredTraits)
+        {
+            var irrelevantAsRandom = actualTraits.Except(desiredTraits).Select(_ => new RandomTrait());
+            return actualTraits.Intersect(desiredTraits).Concat(irrelevantAsRandom).ToList();
         }
     }
 }

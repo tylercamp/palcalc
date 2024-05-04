@@ -43,18 +43,45 @@ namespace PalCalc.Solver
                 {
                     case WildPalReference wild:
                         yield return $"Wild {wild.Pal.Name}";
-                        yield return $"{wild.Gender} gender w/ up to {wild.Traits.Count} random traits";
+                        yield return $"{wild.Gender} gender w/ up to {wild.EffectiveTraits.Count} random traits";
                         break;
 
                     case OwnedPalReference owned:
                         yield return $"Owned {owned.Pal.Name}";
                         yield return $"in {owned.Location}";
-                        yield return $"{owned.Gender} w/ {owned.Traits.TraitsListToString()}";
+                        yield return $"{owned.Gender} w/ {owned.EffectiveTraits.TraitsListToString()}";
                         break;
 
                     default: throw new NotImplementedException();
                 }
             }
+        }
+    }
+
+    public class CompositePalNode : IBreedingTreeNode
+    {
+        public CompositePalNode(CompositeOwnedPalReference compositeRef)
+        {
+            Male = compositeRef.Male;
+            Female = compositeRef.Female;
+
+            PalRef = compositeRef;
+        }
+
+        public OwnedPalReference Male { get; }
+        public OwnedPalReference Female { get; }
+
+        public IPalReference PalRef { get; }
+
+        public IEnumerable<IBreedingTreeNode> Children { get; } = Enumerable.Empty<IBreedingTreeNode>();
+
+        public IEnumerable<string> DescriptionLines => throw new NotImplementedException();
+
+        public string Description => throw new NotImplementedException();
+
+        public IEnumerable<(IBreedingTreeNode, int)> TraversedTopDown(int currentDepth)
+        {
+            yield return (this, currentDepth);
         }
     }
 
@@ -95,7 +122,7 @@ namespace PalCalc.Solver
             {
                 var asBred = PalRef as BredPalReference;
                 yield return $"Bred {asBred.Pal.Name}";
-                yield return $"{asBred.Gender} gender w/ {asBred.Traits.TraitsListToString()}";
+                yield return $"{asBred.Gender} gender w/ {asBred.EffectiveTraits.TraitsListToString()}";
                 yield return $"takes ~{asBred.SelfBreedingEffort} for {asBred.AvgRequiredBreedings} breed attempts";
             }
         }
@@ -113,6 +140,9 @@ namespace PalCalc.Solver
                 case WildPalReference:
                 case OwnedPalReference:
                     return new DirectPalNode(pref);
+
+                case CompositeOwnedPalReference copr:
+                    return new CompositePalNode(copr);
 
                 default: throw new NotImplementedException();
             }
