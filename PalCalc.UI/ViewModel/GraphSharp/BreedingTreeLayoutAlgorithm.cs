@@ -94,7 +94,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             : base(visitedGraph, vertexPositions, parameters)
         {
             _sizes = new Dictionary<BreedingTreeNodeViewModel, Size>(vertexSizes);
-            _viewmodels = visitedGraph.Edges.SelectMany(e => new[] { e.Source, e.Target }).Distinct().ToDictionary(vm => vm.Value);
+            _viewmodels = visitedGraph.Vertices.ToDictionary(vm => vm.Value);
 
             _nodesByModel = new Dictionary<IBreedingTreeNode, Node>();
             _nodesByVm = new Dictionary<BreedingTreeNodeViewModel, Node>();
