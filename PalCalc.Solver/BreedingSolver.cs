@@ -379,13 +379,13 @@ namespace PalCalc.Solver
                                 .TakeWhile(_ => !token.IsCancellationRequested)
                                 .Where(p => p.Item1.IsCompatibleGender(p.Item2.Gender))
                                 .Where(p => p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() <= maxWildPals)
+                                .Where(p => p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps < maxBreedingSteps)
                                 .Where(p =>
                                 {
                                     var childPal = db.BreedingByParent[p.Item1.Pal][p.Item2.Pal].Child;
 
                                     return db.MinBreedingSteps[childPal][spec.Pal] <= maxBreedingSteps - s - 1;
                                 })
-                                .Where(p => p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps < maxBreedingSteps)
                                 .Where(p =>
                                 {
                                     // if we disallow any irrelevant traits, neither parents have a useful trait, and at least 1 parent
@@ -440,14 +440,20 @@ namespace PalCalc.Solver
                                             .Range(0, Math.Max(0, numFinalTraits - desiredParentTraits.Count))
                                             .Select(i => new RandomTrait());
 
-                                        possibleResults.Add(new BredPalReference(
+                                        var newTraits = new List<Trait>(numFinalTraits);
+                                        newTraits.AddRange(desiredParentTraits);
+
+                                        var res = new BredPalReference(
                                             gameSettings,
                                             db.BreedingByParent[parent1.Pal][parent2.Pal].Child,
                                             preferredParent1,
                                             preferredParent2,
                                             desiredParentTraits.Concat(potentialIrrelevantTraits).ToList(),
                                             probabilityForUpToNumTraits
-                                        ));
+                                        );
+
+                                        if (res.BreedingEffort <= maxEffort && workingSet.IsOptimal(res))
+                                            possibleResults.Add(res);
                                     }
 
                                     return possibleResults;

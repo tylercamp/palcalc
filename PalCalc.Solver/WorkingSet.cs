@@ -15,17 +15,27 @@ namespace PalCalc.Solver
 
 
         private CancellationToken token;
-        private HashSet<IPalReference> content;
+        private Dictionary<PalId, List<IPalReference>> content;
         private List<(IPalReference, IPalReference)> remainingWork;
 
-        public IReadOnlySet<IPalReference> Result => content;
+        public IEnumerable<IPalReference> Result => content.Values.SelectMany(v => v);
 
         public WorkingSet(IEnumerable<IPalReference> initialContent, CancellationToken token)
         {
-            content = new HashSet<IPalReference>(PruneCollection(initialContent));
+            content = PruneCollection(initialContent).GroupBy(p => p.Pal.Id).ToDictionary(g => g.Key, g => g.ToList());
 
             remainingWork = initialContent.SelectMany(p1 => initialContent.Select(p2 => (p1, p2))).ToList();
             this.token = token;
+        }
+
+        public bool IsOptimal(IPalReference p)
+        {
+            if (!content.ContainsKey(p.Pal.Id)) return true;
+
+            var items = content[p.Pal.Id];
+            var match = items.FirstOrDefault(i => i.Gender == p.Gender && i.EffectiveTraitsHash == p.EffectiveTraitsHash);
+
+            return match == null || p.BreedingEffort < match.BreedingEffort;
         }
 
         /// <summary>
@@ -62,10 +72,9 @@ namespace PalCalc.Solver
             var toAdd = new List<IPalReference>();
             foreach (var newInst in pruned)
             {
-                var existingInstances = content
+                var existingInstances = content.GetValueOrElse(newInst.Pal.Id, new List<IPalReference>())
                     .TakeWhile(_ => !token.IsCancellationRequested)
                     .Where(pi =>
-                        pi.Pal == newInst.Pal &&
                         pi.Gender == newInst.Gender &&
                         pi.EffectiveTraitsHash == newInst.EffectiveTraitsHash
                     )
@@ -79,7 +88,7 @@ namespace PalCalc.Solver
                 {
                     if (newInst.BreedingEffort < existingInst.BreedingEffort)
                     {
-                        content.Remove(existingInst);
+                        content[newInst.Pal.Id].Remove(existingInst);
                         toAdd.Add(newInst);
                         changed = true;
                     }
@@ -94,7 +103,7 @@ namespace PalCalc.Solver
             remainingWork.Clear();
             remainingWork.EnsureCapacity(toAdd.Count * toAdd.Count + 2 * toAdd.Count * content.Count);
 
-            remainingWork.AddRange(content
+            remainingWork.AddRange(Result
                 // need to check results between new and old content
                 .SelectMany(p1 => toAdd.Select(p2 => (p1, p2)))
                 // and check results within the new content
@@ -102,7 +111,11 @@ namespace PalCalc.Solver
             );
 
             foreach (var ta in toAdd)
-                content.Add(ta);
+            {
+                if (!content.ContainsKey(ta.Pal.Id)) content.Add(ta.Pal.Id, new List<IPalReference>());
+
+                content[ta.Pal.Id].Add(ta);
+            }
 
             return changed;
         }
