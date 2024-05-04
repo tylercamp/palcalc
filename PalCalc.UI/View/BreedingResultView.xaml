@@ -101,7 +101,7 @@
 
         </Style>
     </UserControl.Resources>
-    <zoom:ZoomControl Grid.Column="1" Background="Gray" Zoom="2">
+    <zoom:ZoomControl Grid.Column="1" Background="Gray" Zoom="2" FillMarginPercent="0.1">
         <gsvm:BreedingGraphLayout
             Graph="{Binding Graph}"
             AnimationLength="0"

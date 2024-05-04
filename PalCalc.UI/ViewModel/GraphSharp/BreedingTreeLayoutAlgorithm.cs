@@ -20,7 +20,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         private double vertexGap = 10;
 
         [ObservableProperty]
-        private double layerGap = 50;
+        private double layerGap = 10;
 
         public object Clone()
         {

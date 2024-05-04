@@ -61,6 +61,10 @@ namespace GraphSharp.Controls.Zoom
             DependencyProperty.Register("Zoom", typeof(double), typeof(ZoomControl),
                                         new UIPropertyMetadata(1.0, ZoomPropertyChanged));
 
+        public static readonly DependencyProperty FillMarginPercentProperty =
+            DependencyProperty.Register("FillMarginPercent", typeof(double), typeof(ZoomControl),
+                                        new UIPropertyMetadata(0.0, FillMarginPercentChanged));
+
         private Point _mouseDownPos;
         private ZoomContentPresenter _presenter;
 
@@ -72,6 +76,7 @@ namespace GraphSharp.Controls.Zoom
         /// <summary>Applied to the scrollviewer.</summary>
         private TranslateTransform _translateTransform;
 
+        private double _fillMarginPercent;
         private int _zoomAnimCount;
         private bool _isZooming;
 
@@ -170,6 +175,12 @@ namespace GraphSharp.Controls.Zoom
         {
             get { return (ZoomControlModes)GetValue(ModeProperty); }
             set { SetValue(ModeProperty, value); }
+        }
+
+        public double FillMarginPercent
+        {
+            get => (double)GetValue(FillMarginPercentProperty);
+            set => SetValue(FillMarginPercentProperty, value);
         }
 
         private static object TranslateXCoerce(DependencyObject d, object basevalue)
@@ -274,6 +285,14 @@ namespace GraphSharp.Controls.Zoom
             }
         }
 
+        private static void FillMarginPercentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var zc = (ZoomControl)d;
+            zc._fillMarginPercent = (double)e.NewValue;
+
+            if (zc.Mode == ZoomControlModes.Fill) zc.DoZoomToFill();
+        }
+
         private void ZoomControlMouseWheel(object sender, MouseWheelEventArgs e)
         {
             e.Handled = true;
@@ -373,7 +392,7 @@ namespace GraphSharp.Controls.Zoom
             if (_presenter == null || Mode != ZoomControlModes.Fill)
                 return;
 
-            var deltaZoom = Math.Min(ActualWidth/_presenter.ContentSize.Width, ActualHeight/_presenter.ContentSize.Height);
+            var deltaZoom = Math.Min(ActualWidth/_presenter.ContentSize.Width, ActualHeight/_presenter.ContentSize.Height) * Math.Clamp(1 - _fillMarginPercent/2, 0.1, 1);
             var initialTranslate = GetInitialTranslate();
             DoZoomAnimation(deltaZoom, initialTranslate.X * deltaZoom, initialTranslate.Y * deltaZoom);
         }
