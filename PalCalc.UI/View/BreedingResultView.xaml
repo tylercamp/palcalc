@@ -57,7 +57,7 @@
                                         </StackPanel.Resources>
                                         <StackPanel Orientation="Vertical" Grid.Column="0" MaxWidth="80">
                                                 <TextBlock Text="Male" />
-                                                <TextBlock Text="{Binding MaleViewModel.LocationOwner}" TextWrapping="WrapWithOverflow" />
+                                                <TextBlock Text="{Binding MaleViewModel.LocationOwner}" TextWrapping="WrapWithOverflow" Visibility="{Binding MaleViewModel.OwnerVisibility}" />
                                                 <TextBlock Text="{Binding MaleViewModel.LocationCoordDescription}" />
                                         </StackPanel>
                                 
@@ -65,7 +65,7 @@
                                         
                                         <StackPanel Orientation="Vertical" Grid.Column="2" MaxWidth="80">
                                             <TextBlock Text="Female" />
-                                            <TextBlock Text="{Binding FemaleViewModel.LocationOwner}" TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding FemaleViewModel.LocationOwner}" TextWrapping="WrapWithOverflow" Visibility="{Binding FemaleViewModel.OwnerVisibility}" />
                                             <TextBlock Text="{Binding FemaleViewModel.LocationCoordDescription}" />
                                         </StackPanel>
                                     </StackPanel>
