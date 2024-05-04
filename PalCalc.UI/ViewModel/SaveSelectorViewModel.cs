@@ -84,6 +84,7 @@ namespace PalCalc.UI.ViewModel
 
                 if (SetProperty(ref selectedGame, value))
                 {
+                    OnPropertyChanged(nameof(CanOpenSaveFileLocation));
                     if (needsReset)
                     {
                         // ComboBox ignores reassignment in the middle of a value-change event, defer until later
@@ -109,7 +110,7 @@ namespace PalCalc.UI.ViewModel
         }
 
         public bool CanOpenSavesLocation => (SelectedLocation as StandardSavesLocationViewModel)?.Value?.FolderPath != null;
-        public bool CanOpenSaveFileLocation => (SelectedLocation as SaveGameViewModel)?.Value?.BasePath != null;
+        public bool CanOpenSaveFileLocation => (SelectedGame as SaveGameViewModel)?.Value?.BasePath != null;
 
         public Visibility NoXboxSavesMsgVisibility => (SelectedLocation as StandardSavesLocationViewModel)?.Value is XboxSavesLocation && !SelectedLocation.SaveGames.Any() ? Visibility.Visible : Visibility.Collapsed;
 
@@ -121,6 +122,22 @@ namespace PalCalc.UI.ViewModel
             SavesLocations.Add(manualLocation);
 
             SelectedLocation = MostRecentLocation;
+        }
+
+        public void TrySelectSaveGame(string saveIdentifier)
+        {
+            foreach (var loc in SavesLocations)
+            {
+                foreach (var game in loc.SaveGames)
+                {
+                    if (CachedSaveGame.IdentifierFor(game.Value) == saveIdentifier)
+                    {
+                        SelectedLocation = loc;
+                        SelectedGame = game;
+                        return;
+                    }
+                }
+            }
         }
     }
 }

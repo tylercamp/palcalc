@@ -19,5 +19,7 @@ namespace PalCalc.UI.Model
         public List<string> ExtraSaveLocations { get; set; } = new List<string>();
 
         public SolverSettings SolverSettings { get; set; } = new SolverSettings();
+
+        public string SelectedGameIdentifier { get; set; } = null;
     }
 }

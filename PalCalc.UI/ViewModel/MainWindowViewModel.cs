@@ -144,6 +144,8 @@ namespace PalCalc.UI.ViewModel
             SaveSelection.PropertyChanged += SaveSelection_PropertyChanged;
             SaveSelection.NewCustomSaveSelected += SaveSelection_CustomSaveAdded;
 
+            if (settings.SelectedGameIdentifier != null) SaveSelection.TrySelectSaveGame(settings.SelectedGameIdentifier);
+
             UpdateFromSaveProperties();
         }
 
@@ -206,6 +208,9 @@ namespace PalCalc.UI.ViewModel
             else
             {
                 CrashSupport.ReferencedSave(SaveSelection.SelectedGame.Value);
+
+                settings.SelectedGameIdentifier = CachedSaveGame.IdentifierFor(SaveSelection.SelectedGame.Value);
+                Storage.SaveAppSettings(settings);
 
                 PalTargetList = targetsBySaveFile[SaveSelection.SelectedGame.Value];
                 PalTargetList.PropertyChanged += PalTargetList_PropertyChanged;
