@@ -128,7 +128,7 @@ namespace PalCalc.UI.ViewModel
         {
             foreach (var loc in SavesLocations)
             {
-                foreach (var game in loc.SaveGames)
+                foreach (var game in loc.SaveGames.Where(g => g.Value != null))
                 {
                     if (CachedSaveGame.IdentifierFor(game.Value) == saveIdentifier)
                     {
