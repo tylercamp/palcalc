@@ -22,47 +22,18 @@ namespace PalCalc.SaveReader.SaveFile
 
         public LevelSaveFile(string filePath) : base(filePath) { }
 
-        private Guid MostCommonOwner(PalContainer container) => container.Slots.GroupBy(s => s.PlayerId).MaxBy(g => g.Count()).Key;
+        private Guid MostCommonOwner(PalContainer container, Dictionary<Guid, Guid> palOwnersByInstanceId) => container.Slots.GroupBy(s => palOwnersByInstanceId.GetValueOrElse(s.InstanceId, Guid.Empty)).MaxBy(g => g.Count()).Key;
 
-        public LevelSaveData ReadCharacterData(PalDB db)
+        private LevelSaveData BuildResult(PalDB db, List<GvasCharacterInstance> characters, List<GuildInstance> guilds, Dictionary<string, LocationType> containerTypeById)
         {
-            logger.Debug("parsing content");
-
-            var containerVisitor = new PalContainerVisitor();
-            var instanceVisitor = new CharacterInstanceVisitor();
-            var groupVisitor = new GroupVisitor();
-            VisitGvas(containerVisitor, instanceVisitor, groupVisitor);
-
-            logger.Debug("processing data");
-
-            // note: you can read `Players/...sav` and fetch ".SaveData.PalStorageContainerId.ID" to see exactly
-            //       which pal box is for which player, but will just infer this from `Level.sav` via the most
-            //       common pal owner ID. makes support easier, don't need to provide extra files
-
-            var containersById = containerVisitor.CollectedContainers.ToDictionary(c => c.Id);
-            var containerOwners = containerVisitor.CollectedContainers.ToDictionary(c => c.Id, MostCommonOwner);
-            var palBoxesByPlayerId = containerVisitor.CollectedContainers.GroupBy(MostCommonOwner).ToDictionary(g => g.Key, g => g.MaxBy(c => c.MaxEntries));
-
-            //var containersByPlayer = containerVisitor.CollectedContainers.GroupBy(c => containerOwners[c.Id]).ToDictionary(g => g.Key, g => g.ToList());
-
-            var containerTypeById = containerVisitor.CollectedContainers.ToDictionary(c => c.Id, c =>
-            {
-                if (c.MaxEntries == GameConstants.PlayerPartySize) return LocationType.PlayerParty;
-
-                var palBoxForPlayer = palBoxesByPlayerId[containerOwners[c.Id]];
-                if (c.Id == palBoxForPlayer.Id) return LocationType.Palbox;
-
-                return LocationType.Base;
-            });
-
             var result = new LevelSaveData()
             {
                 Pals = new List<PalInstance>(),
                 Players = new List<PlayerInstance>(),
-                Guilds = groupVisitor.Result,
+                Guilds = guilds,
             };
 
-            foreach (var gvasInstance in instanceVisitor.Result)
+            foreach (var gvasInstance in characters)
             {
                 if (gvasInstance.IsPlayer)
                 {
@@ -116,6 +87,72 @@ namespace PalCalc.SaveReader.SaveFile
                     });
                 }
             }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Uses the provided list of players, which specify party and palbox container IDs, to read the list of character instances and
+        /// properly associate them with their owner + container type.
+        /// </summary>
+        public LevelSaveData ReadCharacterData(PalDB db, List<PlayersSaveFile> playersFiles)
+        {
+            if (playersFiles.Count == 0) return ReadCharacterData(db);
+
+            logger.Debug("parsing content with players list");
+
+            var containerVisitor = new PalContainerVisitor();
+            var instanceVisitor = new CharacterInstanceVisitor();
+            var groupVisitor = new GroupVisitor();
+            VisitGvas(containerVisitor, instanceVisitor, groupVisitor);
+
+            // TODO - handle errors
+            var players = playersFiles.Select(pf => pf.ReadPlayerContent()).ToList();
+
+            var containerTypeById = containerVisitor.CollectedContainers.ToDictionary(c => c.Id, c =>
+            {
+                if (players.Any(p => p.PartyContainerId == c.Id)) return LocationType.PlayerParty;
+                if (players.Any(p => p.PalboxContainerId == c.Id)) return LocationType.Palbox;
+
+                return LocationType.Base;
+            });
+
+            var result = BuildResult(db, instanceVisitor.Result, groupVisitor.Result, containerTypeById);
+            logger.Debug("done");
+            return result;
+        }
+
+        /// <summary>
+        /// Reads the list of character instances and attempts to infer the pal container types based on the owning player and container size.
+        /// </summary>
+        public LevelSaveData ReadCharacterData(PalDB db)
+        {
+            logger.Debug("parsing content");
+
+            var containerVisitor = new PalContainerVisitor();
+            var instanceVisitor = new CharacterInstanceVisitor();
+            var groupVisitor = new GroupVisitor();
+            VisitGvas(containerVisitor, instanceVisitor, groupVisitor);
+
+            logger.Debug("processing data");
+
+            var ownersByInstanceId = instanceVisitor.Result.Where(c => c.OwnerPlayerId != null).ToDictionary(c => c.InstanceId, c => c.OwnerPlayerId.Value);
+
+            var containersById = containerVisitor.CollectedContainers.ToDictionary(c => c.Id);
+            var containerOwners = containerVisitor.CollectedContainers.ToDictionary(c => c.Id, c => MostCommonOwner(c, ownersByInstanceId));
+            var palBoxesByPlayerId = containerVisitor.CollectedContainers.Where(c => c.Slots.Count > GameConstants.PlayerPartySize).GroupBy(c => MostCommonOwner(c, ownersByInstanceId)).ToDictionary(g => g.Key, g => g.MaxBy(c => c.MaxEntries));
+
+            var containerTypeById = containerVisitor.CollectedContainers.ToDictionary(c => c.Id, c =>
+            {
+                if (c.MaxEntries == GameConstants.PlayerPartySize) return LocationType.PlayerParty;
+
+                var palBoxForPlayer = palBoxesByPlayerId[containerOwners[c.Id]];
+                if (c.Id == palBoxForPlayer.Id) return LocationType.Palbox;
+
+                return LocationType.Base;
+            });
+
+            var result = BuildResult(db, instanceVisitor.Result, groupVisitor.Result, containerTypeById);
 
             logger.Debug("done");
             return result;

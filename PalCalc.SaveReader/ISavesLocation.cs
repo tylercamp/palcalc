@@ -123,11 +123,8 @@ namespace PalCalc.SaveReader
 
                     // save files that are part of a single save are grouped by the first part of their name
                     var collectedSaveFiles = new List<XboxSaveFile>();
-                    foreach (var saveFileFolder in dataContainer.Folders)
+                    foreach (var saveFileFolder in dataContainer.Folders.Where(f => f.Name.Count(c => c == '-') != 0))
                     {
-                        // folder names are all `SAVEID-FileName`
-                        if (saveFileFolder.Name.Count(c => c == '-') != 1) continue;
-
                         var saveGameFiles = ContainerFile.TryParse(saveFileFolder);
                         foreach (var saveFile in saveGameFiles)
                         {
@@ -146,6 +143,7 @@ namespace PalCalc.SaveReader
                             LevelMetaSaveFile levelMeta = null;
                             LocalDataSaveFile localData = null;
                             WorldOptionSaveFile worldOption = null;
+                            List<PlayersSaveFile> players = new List<PlayersSaveFile>();
 
                             foreach (var xsf in g)
                             {
@@ -166,10 +164,14 @@ namespace PalCalc.SaveReader
                                     case "WorldOption":
                                         worldOption = new WorldOptionSaveFile(xsf.FilePath);
                                         break;
+
+                                    case "Players":
+                                        players.Add(new PlayersSaveFile(xsf.FilePath));
+                                        break;
                                 }
                             }
 
-                            return new XboxSaveGame(userFolder, g.Key, level, levelMeta, localData, worldOption);
+                            return new XboxSaveGame(userFolder, g.Key, level, levelMeta, localData, worldOption, players);
                         })
                         .ToList();
 

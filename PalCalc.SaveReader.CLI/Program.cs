@@ -10,7 +10,7 @@ Logging.InitCommonFull();
 
 var db = PalDB.LoadEmbedded();
 
-foreach (var gameFolder in DirectSavesLocation.AllLocal)
+foreach (var gameFolder in DirectSavesLocation.AllLocal.Cast<ISavesLocation>().Concat(XboxSavesLocation.FindAll()))
 {
     Console.WriteLine("Checking game folder {0}", gameFolder.FolderName);
 
@@ -23,8 +23,8 @@ foreach (var gameFolder in DirectSavesLocation.AllLocal)
         var localgvas = save.LocalData.ParseGvas();
 
         var meta = save.LevelMeta.ReadGameOptions();
-        var characters = save.Level.ReadCharacterData(db);
-        var gvas = save.Level.ParseGvas();
+        var characters = save.Level.ReadCharacterData(db, save.Players);
+        //var gvas = save.Level.ParseGvas();
 
         var visitor = new ReferenceCollectingVisitor();
         //save.Level.ParseGvas()

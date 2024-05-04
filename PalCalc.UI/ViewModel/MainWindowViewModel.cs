@@ -87,8 +87,8 @@ namespace PalCalc.UI.ViewModel
             var availableSavesLocations = new List<ISavesLocation>();
             availableSavesLocations.AddRange(DirectSavesLocation.AllLocal);
 
-            var xboxSaves = XboxSavesLocation.FindAll();
-            if (xboxSaves.Count > 0) availableSavesLocations.AddRange(xboxSaves);
+            var xboxLocations = XboxSavesLocation.FindAll();
+            if (xboxLocations.Count > 0) availableSavesLocations.AddRange(xboxLocations);
             else
             {
                 // add a placeholder so the user can (optionally) see the explanation why no saves are available (game isn't installed/synced via xbox app)

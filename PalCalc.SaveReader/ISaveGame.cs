@@ -23,6 +23,8 @@ namespace PalCalc.SaveReader
         LocalDataSaveFile LocalData { get; }
         WorldOptionSaveFile WorldOption { get; }
 
+        List<PlayersSaveFile> Players { get; }
+
         // (don't check `WorldOption`, not present for linux-based server saves)
         bool IsValid { get; }
     }
@@ -37,6 +39,12 @@ namespace PalCalc.SaveReader
             LevelMeta = new LevelMetaSaveFile(Path.Join(basePath, "LevelMeta.sav"));
             LocalData = new LocalDataSaveFile(Path.Join(basePath, "LocalData.sav"));
             WorldOption = new WorldOptionSaveFile(Path.Join(basePath, "WorldOption.sav"));
+
+            var playersPath = Path.Join(basePath, "Players");
+            if (Directory.Exists(playersPath))
+                Players = Directory.EnumerateFiles(playersPath).Select(f => new PlayersSaveFile(f)).ToList();
+            else
+                Players = new List<PlayersSaveFile>();
         }
 
         public string BasePath { get; }
@@ -52,12 +60,13 @@ namespace PalCalc.SaveReader
             LevelMeta.LastModified,
             LocalData.LastModified,
             WorldOption.LastModified,
-        }.Max();
+        }.Concat(Players.Select(p => p.LastModified)).Max();
 
         public LevelSaveFile Level { get; }
         public LevelMetaSaveFile LevelMeta { get; }
         public LocalDataSaveFile LocalData { get; }
         public WorldOptionSaveFile WorldOption { get; }
+        public List<PlayersSaveFile> Players { get; }
 
         public bool IsValid =>
             Level != null && Level.Exists &&
@@ -75,7 +84,8 @@ namespace PalCalc.SaveReader
             LevelSaveFile level,
             LevelMetaSaveFile levelMeta,
             LocalDataSaveFile localData,
-            WorldOptionSaveFile worldOption
+            WorldOptionSaveFile worldOption,
+            List<PlayersSaveFile> players
         )
         {
             BasePath = userBasePath;
@@ -84,6 +94,7 @@ namespace PalCalc.SaveReader
             LevelMeta = levelMeta;
             LocalData = localData;
             WorldOption = worldOption;
+            Players = players;
         }
 
         public string BasePath { get; }
@@ -91,12 +102,13 @@ namespace PalCalc.SaveReader
         public string UserId => Path.GetFileName(BasePath);
         public string GameId { get; }
 
-        public DateTime LastModified => new ISaveFile[] { Level, LevelMeta, LocalData, WorldOption }.Max(s => s?.LastModified ?? DateTime.MinValue);
+        public DateTime LastModified => new ISaveFile[] { Level, LevelMeta, LocalData, WorldOption }.Concat(Players).Max(s => s?.LastModified ?? DateTime.MinValue);
 
         public LevelSaveFile Level { get; }
         public LevelMetaSaveFile LevelMeta { get; }
         public LocalDataSaveFile LocalData { get; }
         public WorldOptionSaveFile WorldOption { get; }
+        public List<PlayersSaveFile> Players { get; }
 
         public bool IsValid =>
             Level != null && Level.Exists &&

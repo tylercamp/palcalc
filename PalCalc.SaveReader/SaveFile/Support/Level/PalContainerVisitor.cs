@@ -11,7 +11,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
     struct PalContainerSlot
     {
         public Guid InstanceId;
-        public Guid PlayerId;
+        public Guid PlayerId; // note: not actually useful?
     }
 
     class PalContainer
