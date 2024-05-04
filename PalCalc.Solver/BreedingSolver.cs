@@ -23,6 +23,7 @@ namespace PalCalc.Solver
         public int CurrentStepIndex { get; set; }
         public int TargetSteps { get; set; }
         public bool Canceled { get; set; }
+        public int WorkSize { get; set; }
     }
 
     public class BreedingSolver
@@ -365,13 +366,14 @@ namespace PalCalc.Solver
             {
                 if (token.IsCancellationRequested) break;
 
-                statusMsg.CurrentPhase = SolverPhase.Breeding;
-                statusMsg.CurrentStepIndex = s;
-                statusMsg.Canceled = token.IsCancellationRequested;
-                SolverStateUpdated?.Invoke(statusMsg);
-
                 bool didUpdate = workingSet.Process(work =>
                 {
+                    statusMsg.CurrentPhase = SolverPhase.Breeding;
+                    statusMsg.CurrentStepIndex = s;
+                    statusMsg.Canceled = token.IsCancellationRequested;
+                    statusMsg.WorkSize = work.Count;
+                    SolverStateUpdated?.Invoke(statusMsg);
+
                     logger.Debug("Performing breeding step {step} with {numWork} work items", s+1, work.Count);
                     return work
                         .BatchedForParallel()

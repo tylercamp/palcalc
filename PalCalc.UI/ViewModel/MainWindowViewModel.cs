@@ -341,7 +341,7 @@ namespace PalCalc.UI.ViewModel
                         break;
 
                     case SolverPhase.Breeding:
-                        SolverStatusMsg = $"Breeding step {obj.CurrentStepIndex + 1}, calculating child pals and probabilities";
+                        SolverStatusMsg = $"Breeding step {obj.CurrentStepIndex + 1}, calculating child pals and probabilities of {obj.WorkSize.ToString("#,##")} pairs";
                         overallStep = 1 + obj.CurrentStepIndex;
                         break;
 
