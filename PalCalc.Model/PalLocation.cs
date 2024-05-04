@@ -82,7 +82,7 @@ namespace PalCalc.Model
         public static BaseCoord FromSlotIndex(int slotIndex)
         {
             var row = (slotIndex - slotIndex % GameConstants.Base_GridWidth) / GameConstants.Base_GridWidth;
-            slotIndex -= row;
+            slotIndex -= row * GameConstants.Base_GridWidth;
 
             return new BaseCoord() { Row = row + 1, Column = slotIndex + 1 };
         }
