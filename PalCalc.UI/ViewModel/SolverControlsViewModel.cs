@@ -16,7 +16,8 @@ namespace PalCalc.UI.ViewModel
         {
             MaxBreedingSteps = 6;
             MaxWildPals = 1;
-            MaxIrrelevantTraits = 1;
+            MaxInputIrrelevantTraits = 2;
+            MaxBredIrrelevantTraits = 1;
         }
 
         private int maxBreedingSteps;
@@ -33,11 +34,18 @@ namespace PalCalc.UI.ViewModel
             set => SetProperty(ref maxWildPals, Math.Max(0, value));
         }
 
-        private int maxIrrelevantTraits;
-        public int MaxIrrelevantTraits
+        private int maxInputIrrelevantTraits;
+        public int MaxInputIrrelevantTraits
         {
-            get => maxIrrelevantTraits;
-            set => SetProperty(ref maxIrrelevantTraits, Math.Clamp(value, 0, GameConstants.MaxTotalTraits));
+            get => maxInputIrrelevantTraits;
+            set => SetProperty(ref maxInputIrrelevantTraits, Math.Clamp(value, 0, 3));
+        }
+
+        public int maxBredIrrelevantTraits;
+        public int MaxBredIrrelevantTraits
+        {
+            get => maxBredIrrelevantTraits;
+            set => SetProperty(ref maxBredIrrelevantTraits, Math.Clamp(value, 0, 3));
         }
 
         [NotifyPropertyChangedFor(nameof(CanCancelSolver))]
@@ -52,7 +60,8 @@ namespace PalCalc.UI.ViewModel
             pals,
             MaxBreedingSteps,
             MaxWildPals,
-            MaxIrrelevantTraits,
+            MaxInputIrrelevantTraits,
+            MaxBredIrrelevantTraits,
             TimeSpan.MaxValue
         );
 
@@ -60,14 +69,16 @@ namespace PalCalc.UI.ViewModel
         {
             MaxBreedingSteps = MaxBreedingSteps,
             MaxWildPals = MaxWildPals,
-            MaxIrrelevantTraits = MaxIrrelevantTraits
+            MaxInputIrrelevantTraits = MaxInputIrrelevantTraits,
+            MaxBredIrrelevantTraits = MaxBredIrrelevantTraits,
         };
 
         public static SolverControlsViewModel FromModel(SolverSettings model) => new SolverControlsViewModel()
         {
             MaxBreedingSteps = model.MaxBreedingSteps,
             MaxWildPals = model.MaxWildPals,
-            MaxIrrelevantTraits = model.MaxIrrelevantTraits
+            MaxInputIrrelevantTraits = model.MaxInputIrrelevantTraits,
+            MaxBredIrrelevantTraits = model.MaxBredIrrelevantTraits,
         };
     }
 }

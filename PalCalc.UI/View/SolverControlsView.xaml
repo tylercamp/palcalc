@@ -20,6 +20,7 @@
         Value="{Binding MaxBreedingSteps}"
         IsEnabled="{Binding CanRunSolver}"
         ToolTipService.ToolTip="The maximum number of solver iterations, and the max number of breeding steps to reach the target pal.&#10;Higher values linearly affect time required."
+        ToolTipService.ShowOnDisabled="True"
     />
     
     <Label Content="Max Wild Pals:" />
@@ -27,13 +28,23 @@
         Value="{Binding MaxWildPals}"
         IsEnabled="{Binding CanRunSolver}"
         ToolTipService.ToolTip="The maximum number of wild pals to allow in a breeding path.&#10;Higher values linearly affect time required, depending on how many types of pals are owned."
+        ToolTipService.ShowOnDisabled="True"
     />
     
-    <Label Content="Max Irrelevant Traits:" />
+    <Label Content="Max Input Irrelevant Traits:" />
     <xctk:IntegerUpDown
-        Value="{Binding MaxIrrelevantTraits}"
+        Value="{Binding MaxInputIrrelevantTraits}"
         IsEnabled="{Binding CanRunSolver}"
-        ToolTipService.ToolTip="The maximum number of irrelevant traits allowed for any pal used as part of the breeding path, including the breeding result.&#10;Higher values exponentially affect time required."
+        ToolTipService.ToolTip="The maximum number of irrelevant traits allowed for any owned pal used as a parent.&#10;Higher values linearly affect time required."
+        ToolTipService.ShowOnDisabled="True"
+    />
+
+    <Label Content="Max Bred Irrelevant Traits:" />
+    <xctk:IntegerUpDown
+        Value="{Binding MaxBredIrrelevantTraits}"
+        IsEnabled="{Binding CanRunSolver}"
+        ToolTipService.ToolTip="The maximum number of irrelevant traits allowed for any bred pal, including the breeding result.&#10;Higher values *exponentially* affect time required."
+        ToolTipService.ShowOnDisabled="True"
     />
 
     <StackPanel Orientation="Horizontal">

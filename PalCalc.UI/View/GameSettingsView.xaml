@@ -19,6 +19,7 @@
         <Label Grid.Column="0" Content="Breeding Time (Mins)" HorizontalAlignment="Left" VerticalAlignment="Top" />
         <xctk:IntegerUpDown
             ToolTipService.ToolTip="The average time it takes to produce an egg. Used to estimate how long it will take to produce a pal with specific properties.&#10;This value is doubled internally to account for pal inactivity at night."
+            ToolTipService.ShowOnDisabled="True"
             Grid.Column="1"
             Value="{Binding BreedingTimeMinutes}"
             Minimum="1"
@@ -30,6 +31,7 @@
         <Label Grid.Column="0" Content="Multiple Breeding Farms" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="0,26,0,0" />
         <CheckBox
             ToolTipService.ToolTip="Whether multiple breeding farms will be used.&#10;If enabled, the time to breed a pal from two other bred pals is based on the longest breeding time between the parents.&#10;If disabled, the time to breed a pal is always based on the sum of the time required for the parents."
+            ToolTipService.ShowOnDisabled="True"
             Grid.Column="1"
             IsChecked="{Binding MultipleBreedingFarms}"
             HorizontalAlignment="Left"

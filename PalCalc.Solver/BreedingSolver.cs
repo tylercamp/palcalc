@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,7 +37,7 @@ namespace PalCalc.Solver
         PalDB db;
         List<PalInstance> ownedPals;
 
-        int maxBreedingSteps, maxWildPals, maxIrrelevantTraits;
+        int maxBreedingSteps, maxWildPals, maxBredIrrelevantTraits, maxInputIrrelevantTraits;
         TimeSpan maxEffort;
 
         /// <param name="db"></param>
@@ -51,14 +52,15 @@ namespace PalCalc.Solver
         ///     Effort in estimated time to get the desired pal with the given traits. Goes by constant breeding time, ignores hatching
         ///     time, and roughly estimates time to catch wild pals (with increasing time based on paldex number).
         /// </param>
-        public BreedingSolver(GameSettings gameSettings, PalDB db, List<PalInstance> ownedPals, int maxBreedingSteps, int maxWildPals, int maxIrrelevantTraits, TimeSpan maxEffort)
+        public BreedingSolver(GameSettings gameSettings, PalDB db, List<PalInstance> ownedPals, int maxBreedingSteps, int maxWildPals, int maxInputIrrelevantTraits, int maxBredIrrelevantTraits, TimeSpan maxEffort)
         {
             this.gameSettings = gameSettings;
             this.db = db;
             this.ownedPals = ownedPals;
             this.maxBreedingSteps = maxBreedingSteps;
             this.maxWildPals = maxWildPals;
-            this.maxIrrelevantTraits = Math.Min(3, maxIrrelevantTraits);
+            this.maxInputIrrelevantTraits = Math.Min(3, maxInputIrrelevantTraits);
+            this.maxBredIrrelevantTraits = Math.Min(3, maxBredIrrelevantTraits);
             this.maxEffort = maxEffort;
         }
 
@@ -267,7 +269,7 @@ namespace PalCalc.Solver
             SolverStateUpdated?.Invoke(statusMsg);
 
             var relevantPals = RelevantInstancesForTraits(db, ownedPals, spec.Traits)
-               .Where(p => p.Traits.Except(spec.Traits).Count() <= maxIrrelevantTraits)
+               .Where(p => p.Traits.Except(spec.Traits).Count() <= maxInputIrrelevantTraits)
                .ToList();
 
             logger.Debug(
@@ -351,7 +353,7 @@ namespace PalCalc.Solver
                     db.Pals
                         .Where(p => !relevantPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, maxBreedingSteps))
-                        .SelectMany(p => Enumerable.Range(0, maxIrrelevantTraits).Select(numTraits => new WildPalReference(p, numTraits)))
+                        .SelectMany(p => Enumerable.Range(0, maxInputIrrelevantTraits).Select(numTraits => new WildPalReference(p, numTraits)))
                         .Where(pi => pi.BreedingEffort <= maxEffort)
                 );
             }
@@ -393,7 +395,7 @@ namespace PalCalc.Solver
                                     //
                                     // (child would need to have zero since there's nothing useful to inherit and we disallow irrelevant traits,
                                     //  impossible to have zero since a child always inherits at least 1 direct trait if possible)
-                                    if (maxIrrelevantTraits > 0) return true;
+                                    if (maxBredIrrelevantTraits > 0) return true;
 
                                     var combinedTraits = p.Item1.EffectiveTraits.Concat(p.Item2.EffectiveTraits);
 
@@ -419,7 +421,7 @@ namespace PalCalc.Solver
                                     //
                                     // we'll generate an option for each possible outcome of up to the max possible number of traits, where each
                                     // option represents the likelyhood of getting all desired traits + up to some number of irrelevant traits
-                                    for (int numFinalTraits = desiredParentTraits.Count; numFinalTraits <= Math.Min(GameConstants.MaxTotalTraits, desiredParentTraits.Count + maxIrrelevantTraits); numFinalTraits++)
+                                    for (int numFinalTraits = desiredParentTraits.Count; numFinalTraits <= Math.Min(GameConstants.MaxTotalTraits, desiredParentTraits.Count + maxBredIrrelevantTraits); numFinalTraits++)
                                     {
 #if DEBUG
                                         float initialProbability = probabilityForUpToNumTraits;

@@ -11,7 +11,8 @@ namespace PalCalc.UI.Model
     {
         public int MaxBreedingSteps { get; set; } = 6;
         public int MaxWildPals { get; set; } = 1;
-        public int MaxIrrelevantTraits { get; set; } = 1;
+        public int MaxInputIrrelevantTraits { get; set; } = 3;
+        public int MaxBredIrrelevantTraits { get; set; } = 1;
     }
 
     internal class AppSettings
