@@ -42,9 +42,12 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 
 ## Eventual TODOs
 - Bugfix - Solver prefers breeding a pal to get an opposite gender instead of just using the existing pals
+- Reduce memory usage
+- Separate "max irrelevant input traits" and "max irrelevant bred traits"
+- ~~Optimize by mapping irrelevant traits to "random" for solver operations~~
 - Add "About" window for licenses + references
-- Gracefully handle missing references to pals, traits, and pal instances
-- Fix tree layout algorithm
+- ~~Gracefully handle missing references to pals, traits, and pal instances~~
+- ~~Fix tree layout algorithm~~
 - Option to delete entries from list of target pals
 - Allow solving for multiple pals at once
 - Show preview of involved pals, num wild pals, etc. in solver results list
