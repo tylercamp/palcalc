@@ -69,6 +69,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             : null;
 
         [NotifyPropertyChangedFor(nameof(Label))]
+        [NotifyPropertyChangedFor(nameof(IsValid))]
         [ObservableProperty]
         private PalViewModel targetPal;
 
@@ -90,6 +91,11 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         [ObservableProperty]
         private BreedingResultListViewModel currentResults;
+
+        [ObservableProperty]
+        private string palSourceId;
+
+        public bool IsValid => TargetPal != null;
 
         public string Label
         {
@@ -116,7 +122,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             Trait4
         );
 
-        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(new PalSpecifier() { Pal = TargetPal.ModelObject, Traits = TraitModelObjects }) { CurrentResults = CurrentResults };
+        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(new PalSpecifier() { Pal = TargetPal.ModelObject, Traits = TraitModelObjects }) { CurrentResults = CurrentResults, PalSourceId = PalSourceId };
         public void CopyFrom(PalSpecifierViewModel other)
         {
             if (IsReadOnly) throw new Exception();

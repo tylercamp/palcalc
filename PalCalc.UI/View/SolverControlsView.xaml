@@ -18,7 +18,7 @@
     <Label Content="Max Breeding Steps:" />
     <xctk:IntegerUpDown
         Value="{Binding MaxBreedingSteps}"
-        IsEnabled="{Binding CanRunSolver}"
+        IsEnabled="{Binding CanEditSettings}"
         ToolTipService.ToolTip="The maximum number of solver iterations, and the max number of breeding steps to reach the target pal.&#10;Higher values linearly affect time required."
         ToolTipService.ShowOnDisabled="True"
     />
@@ -26,7 +26,7 @@
     <Label Content="Max Wild Pals:" />
     <xctk:IntegerUpDown
         Value="{Binding MaxWildPals}"
-        IsEnabled="{Binding CanRunSolver}"
+        IsEnabled="{Binding CanEditSettings}"
         ToolTipService.ToolTip="The maximum number of wild pals to allow in a breeding path.&#10;Higher values linearly affect time required, depending on how many types of pals are owned."
         ToolTipService.ShowOnDisabled="True"
     />
@@ -34,7 +34,7 @@
     <Label Content="Max Input Irrelevant Traits:" />
     <xctk:IntegerUpDown
         Value="{Binding MaxInputIrrelevantTraits}"
-        IsEnabled="{Binding CanRunSolver}"
+        IsEnabled="{Binding CanEditSettings}"
         ToolTipService.ToolTip="The maximum number of irrelevant traits allowed for any owned pal used as a parent.&#10;Lower values can somewhat reduce processing at risk of missing some useful paths.&#10;Higher values linearly affect time required."
         ToolTipService.ShowOnDisabled="True"
     />
@@ -42,7 +42,7 @@
     <Label Content="Max Bred Irrelevant Traits:" />
     <xctk:IntegerUpDown
         Value="{Binding MaxBredIrrelevantTraits}"
-        IsEnabled="{Binding CanRunSolver}"
+        IsEnabled="{Binding CanEditSettings}"
         ToolTipService.ToolTip="The maximum number of irrelevant traits allowed for any bred pal, including the final breeding result.&#10;Values higher than '1' will typically add shorter breeding paths if there are unused trait slots in the final pal.&#10;Higher values *exponentially* affect time required."
         ToolTipService.ShowOnDisabled="True"
     />

@@ -23,7 +23,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 AvailableMembers.AddRange(
                     guild.MemberIds
-                        .Select(id => source.Players.Single(p => p.InstanceId == id))
+                        .Select(id => source.Players.Single(p => p.PlayerId == id))
                         .Select(player => new PlayerViewModel(player))
                         .ToList()
                 );

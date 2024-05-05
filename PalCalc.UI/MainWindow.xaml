@@ -53,7 +53,15 @@
         <GridSplitter Grid.Column="3" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
         <DockPanel Grid.Column="4" IsEnabled="{Binding IsEditable}">
-            <v:PalTargetView DataContext="{Binding PalTarget}" DockPanel.Dock="Top" />
+            <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
+                <GroupBox Header="Target Pal">
+                    <v:PalTargetView DataContext="{Binding PalTarget}" />
+                </GroupBox>
+
+                <GroupBox Header="Source Pals">
+                    <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}" />
+                </GroupBox>
+            </StackPanel>
             <v:BreedingResultListView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
         </DockPanel>
     </Grid>

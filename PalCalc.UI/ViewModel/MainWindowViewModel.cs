@@ -196,6 +196,13 @@ namespace PalCalc.UI.ViewModel
 
         private void UpdateFromSaveProperties()
         {
+            if (!Application.Current.MainWindow.IsVisible)
+            {
+                // fix error due to trying to show the "loading save file" window when the main window hasn't been presented yet
+                dispatcher.BeginInvoke(() => UpdateFromSaveProperties(), DispatcherPriority.ApplicationIdle);
+                return;
+            }
+
             if (PalTargetList != null) PalTargetList.PropertyChanged -= PalTargetList_PropertyChanged;
             if (GameSettings != null) GameSettings.PropertyChanged -= GameSettings_PropertyChanged;
 
@@ -220,12 +227,15 @@ namespace PalCalc.UI.ViewModel
             }
 
             UpdatePalTarget();
+            UpdateSolverControls();
         }
 
         private void UpdatePalTarget()
         {
             if (PalTargetList?.SelectedTarget != null)
-                PalTarget = new PalTargetViewModel(PalTargetList.SelectedTarget);
+            {
+                PalTarget = new PalTargetViewModel(SaveSelection.SelectedGame.CachedValue, PalTargetList.SelectedTarget);
+            }
             else
                 PalTarget = null;
         }
@@ -264,7 +274,7 @@ namespace PalCalc.UI.ViewModel
             var cachedData = SaveSelection.SelectedGame.CachedValue;
             if (cachedData == null) return;
 
-            var solver = SolverControls.ConfiguredSolver(GameSettings.ModelObject, cachedData.OwnedPals);
+            var solver = SolverControls.ConfiguredSolver(GameSettings.ModelObject, PalTarget.PalSource.SelectedSource.Filter(cachedData).ToList());
             solver.SolverStateUpdated += Solver_SolverStateUpdated;
 
             Task.Factory.StartNew(() =>
@@ -371,8 +381,35 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private PalTargetListViewModel palTargetList;
 
-        [ObservableProperty]
+        private void UpdateSolverControls()
+        {
+            SolverControls.CanRunSolver = IsEditable && PalTarget.IsValid;
+            SolverControls.CanEditSettings = IsEditable;
+            SolverControls.CanCancelSolver = !IsEditable;
+        }
+
         private PalTargetViewModel palTarget;
+        public PalTargetViewModel PalTarget
+        {
+            get => palTarget;
+            set
+            {
+                var oldValue = PalTarget;
+                if (SetProperty(ref palTarget, value))
+                {
+                    if (oldValue != null) oldValue.PropertyChanged -= PalTarget_PropertyChanged;
+
+                    if (value != null) value.PropertyChanged += PalTarget_PropertyChanged;
+
+                    UpdateSolverControls();
+                }
+            }
+        }
+
+        private void PalTarget_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PalTarget.IsValid)) UpdateSolverControls();
+        }
 
         [ObservableProperty]
         private double solverProgress;
@@ -390,7 +427,7 @@ namespace PalCalc.UI.ViewModel
                 if (SetProperty(ref isEditable, value))
                 {
                     OnPropertyChanged(nameof(ProgressBarVisibility));
-                    SolverControls.CanRunSolver = value;
+                    UpdateSolverControls();
                 }
             }
         }

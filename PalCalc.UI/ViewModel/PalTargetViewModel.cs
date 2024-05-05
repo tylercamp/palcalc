@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
+using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
@@ -11,27 +12,64 @@ namespace PalCalc.UI.ViewModel
 {
     public partial class PalTargetViewModel : ObservableObject
     {
-        public PalTargetViewModel() : this(PalSpecifierViewModel.New) { }
+        public PalTargetViewModel() : this(null, PalSpecifierViewModel.New) { }
 
-        public PalTargetViewModel(PalSpecifierViewModel initial)
+        public PalTargetViewModel(CachedSaveGame sourceSave, PalSpecifierViewModel initial)
         {
             if (initial.IsReadOnly)
             {
                 InitialPalSpecifier = null;
                 CurrentPalSpecifier = new PalSpecifierViewModel();
+
+                PalSource = new PalSourceTreeViewModel(sourceSave);
             }
             else
             {
                 InitialPalSpecifier = initial;
                 CurrentPalSpecifier = initial.Copy();
+
+                PalSource = new PalSourceTreeViewModel(sourceSave);
             }
+
+            if (CurrentPalSpecifier.PalSourceId != null)
+                PalSource.SelectedNode = PalSource.FindById(CurrentPalSpecifier.PalSourceId) as IPalSourceTreeNode;
+
+            PalSource.PropertyChanged += PalSource_PropertyChanged;
+        }
+
+        private void PalSource_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PalSource.HasValidSource))
+                OnPropertyChanged(nameof(IsValid));
+
+            if (e.PropertyName == nameof(PalSource.SelectedSource) && PalSource.SelectedSource != null)
+                CurrentPalSpecifier.PalSourceId = PalSource.SelectedSource.Id;
         }
 
         [ObservableProperty]
         private PalSpecifierViewModel initialPalSpecifier;
 
-        [ObservableProperty]
         private PalSpecifierViewModel currentPalSpecifier;
+        public PalSpecifierViewModel CurrentPalSpecifier
+        {
+            get => currentPalSpecifier;
+            set
+            {
+                var oldValue = CurrentPalSpecifier;
+                if (SetProperty(ref currentPalSpecifier, value))
+                {
+                    if (oldValue != null) oldValue.PropertyChanged -= CurrentSpec_PropertyChanged;
+
+                    value.PropertyChanged += CurrentSpec_PropertyChanged;
+                    OnPropertyChanged(nameof(IsValid));
+                }
+            }
+        }
+
+        private void CurrentSpec_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(CurrentPalSpecifier.IsValid)) OnPropertyChanged(nameof(IsValid));
+        }
 
         public List<PalViewModel> AvailablePals => AllPals;
         public List<TraitViewModel> AvailableTraits => AllTraits;
@@ -46,5 +84,9 @@ namespace PalCalc.UI.ViewModel
             .DistinctBy(t => t.Name)
             .Select(t => new TraitViewModel(t))
             .ToList();
+
+        public bool IsValid => PalSource.HasValidSource && CurrentPalSpecifier.IsValid;
+
+        public PalSourceTreeViewModel PalSource { get; set; }
     }
 }
