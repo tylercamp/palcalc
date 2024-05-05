@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
@@ -84,6 +85,7 @@ namespace PalCalc.UI.ViewModel
 
                 if (SetProperty(ref selectedGame, value))
                 {
+                    OnPropertyChanged(nameof(XboxIncompleteVisibility));
                     OnPropertyChanged(nameof(CanOpenSaveFileLocation));
                     if (needsReset)
                     {
@@ -113,6 +115,7 @@ namespace PalCalc.UI.ViewModel
         public bool CanOpenSaveFileLocation => (SelectedGame as SaveGameViewModel)?.Value?.BasePath != null;
 
         public Visibility NoXboxSavesMsgVisibility => (SelectedLocation as StandardSavesLocationViewModel)?.Value is XboxSavesLocation && !SelectedLocation.SaveGames.Any() ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility XboxIncompleteVisibility => SelectedGame != null && SelectedGame.Value is XboxSaveGame && (SelectedGame.Value as XboxSaveGame).LevelMeta?.IsValid != true ? Visibility.Visible : Visibility.Collapsed;
 
         public SaveSelectorViewModel(IEnumerable<ISavesLocation> savesLocations, IEnumerable<ISaveGame> manualSaves)
         {

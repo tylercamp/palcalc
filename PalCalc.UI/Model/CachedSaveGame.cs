@@ -69,7 +69,11 @@ namespace PalCalc.UI.Model
             try
             {
 #endif
-                var meta = game.LevelMeta.ReadGameOptions();
+                GameMeta meta = null;
+                // `LevelMeta` is sometimes unavailable for Xbox saves, which shouldn't prevent us from
+                // being able to load the data
+                try { meta = game.LevelMeta.ReadGameOptions(); } catch { }
+                
                 var charData = game.Level.ReadCharacterData(db);
                 result = new CachedSaveGame(game)
                 {
@@ -77,10 +81,10 @@ namespace PalCalc.UI.Model
                     OwnedPals = charData.Pals,
                     Guilds = charData.Guilds,
                     Players = charData.Players,
-                    PlayerLevel = meta.PlayerLevel,
-                    PlayerName = meta.PlayerName,
-                    WorldName = meta.WorldName,
-                    InGameDay = meta.InGameDay,
+                    PlayerLevel = meta?.PlayerLevel,
+                    PlayerName = meta?.PlayerName ?? "UNKNOWN",
+                    WorldName = meta?.WorldName ?? "UNKNOWN WORLD",
+                    InGameDay = meta?.InGameDay ?? 0,
                 };
 #if HANDLE_ERRORS
             }

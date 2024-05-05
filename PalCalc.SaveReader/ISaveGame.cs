@@ -70,8 +70,7 @@ namespace PalCalc.SaveReader
 
         public bool IsValid =>
             Level != null && Level.IsValid &&
-            LevelMeta != null && LevelMeta.IsValid &&
-            LocalData != null && LocalData.IsValid;
+            LevelMeta != null && LevelMeta.IsValid;
 
         public override string ToString() => FolderName;
     }
@@ -111,8 +110,6 @@ namespace PalCalc.SaveReader
         public List<PlayersSaveFile> Players { get; }
 
         public bool IsValid =>
-            Level != null && Level.IsValid &&
-            LevelMeta != null && LevelMeta.IsValid &&
-            LocalData != null && LocalData.IsValid;
+            Level != null && Level.IsValid; // don't check for `LevelMeta` - may be temporarily missing for files with "wrapper" header
     }
 }

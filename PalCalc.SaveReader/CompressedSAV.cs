@@ -4,6 +4,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection.PortableExecutable;
@@ -17,6 +18,11 @@ namespace PalCalc.SaveReader
     {
         private static ILogger logger = Log.ForContext(typeof(CompressedSAV));
 
+        // don't know what this is, but I've seen this in newer palworld saves from Game Pass. seems
+        // to clear itself up (back to normal format) after the game has been closed for a little while.
+        // likely an indicator of unsynced save or something like that.
+        static byte[] WRAPPER_MAGIC_BYTES = Encoding.ASCII.GetBytes("CNK");
+
         static byte[] MAGIC_BYTES = Encoding.ASCII.GetBytes("PlZ");
         public static void WithDecompressedSave(string filePath, Action<Stream> action)
         {
@@ -29,8 +35,18 @@ namespace PalCalc.SaveReader
                 var compressedLen = binaryReader.ReadInt32();
 
                 var magicBytes = binaryReader.ReadBytes(3);
+                if (WRAPPER_MAGIC_BYTES.SequenceEqual(magicBytes))
+                {
+                    // unknown content
+                    binaryReader.ReadBytes(9);
+
+                    magicBytes = binaryReader.ReadBytes(3);
+                }
+
                 if (!MAGIC_BYTES.SequenceEqual(magicBytes))
+                {
                     throw new Exception("Magic bytes mismatch");
+                }
 
                 var saveType = binaryReader.ReadByte();
 
@@ -67,6 +83,14 @@ namespace PalCalc.SaveReader
                 var compressedLen = binaryReader.ReadInt32();
 
                 var magicBytes = binaryReader.ReadBytes(3);
+                
+                if (WRAPPER_MAGIC_BYTES.SequenceEqual(magicBytes))
+                {
+                    binaryReader.ReadBytes(9);
+
+                    magicBytes = binaryReader.ReadBytes(3);
+                }
+
                 if (!MAGIC_BYTES.SequenceEqual(magicBytes))
                     return false;
 

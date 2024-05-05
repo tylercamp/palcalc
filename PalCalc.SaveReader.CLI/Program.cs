@@ -10,7 +10,11 @@ Logging.InitCommonFull();
 
 var db = PalDB.LoadEmbedded();
 
-foreach (var gameFolder in DirectSavesLocation.AllLocal.Cast<ISavesLocation>().Concat(XboxSavesLocation.FindAll()))
+var saveFolders = new List<ISavesLocation>();
+//saveFolders.AddRange(DirectSavesLocation.AllLocal);
+saveFolders.AddRange(XboxSavesLocation.FindAll());
+
+foreach (var gameFolder in saveFolders)
 {
     Console.WriteLine("Checking game folder {0}", gameFolder.FolderName);
 
@@ -18,6 +22,12 @@ foreach (var gameFolder in DirectSavesLocation.AllLocal.Cast<ISavesLocation>().C
     {
         var sw = Stopwatch.StartNew();
         Console.WriteLine("Checking save folder {0}", save.BasePath);
+
+        if (!save.IsValid)
+        {
+            Debugger.Break();
+            var x = save.IsValid;
+        }
 
         var metagvas = save.LevelMeta.ParseGvas();
         var localgvas = save.LocalData.ParseGvas();

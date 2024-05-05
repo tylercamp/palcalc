@@ -1,4 +1,5 @@
-﻿using PalCalc.SaveReader.SaveFile;
+﻿using PalCalc.Model;
+using PalCalc.SaveReader.SaveFile;
 using PalCalc.SaveReader.SaveFile.Xbox;
 using Serilog;
 using System;
@@ -126,7 +127,7 @@ namespace PalCalc.SaveReader
                     foreach (var saveFileFolder in dataContainer.Folders.Where(f => f.Name.Count(c => c == '-') != 0))
                     {
                         var saveGameFiles = ContainerFile.TryParse(saveFileFolder);
-                        foreach (var saveFile in saveGameFiles)
+                        foreach (var saveFile in saveGameFiles.Where(f => File.Exists(f.Path)))
                         {
                             // all of the files are stored in their own folders, where the "real" file name is always just "Data"
                             if (saveFile.Name != "Data") continue;
@@ -145,31 +146,28 @@ namespace PalCalc.SaveReader
                             WorldOptionSaveFile worldOption = null;
                             List<PlayersSaveFile> players = new List<PlayersSaveFile>();
 
-                            foreach (var xsf in g)
-                            {
-                                switch (xsf.FileName.Split('-')[1])
-                                {
-                                    case "Level":
-                                        level = new LevelSaveFile(xsf.FilePath);
-                                        break;
+                            var filesByType = g.GroupBy(f => f.FileName.Split('-')[1]).ToDictionary(g => g.Key, g => g.ToList());
 
-                                    case "LevelMeta":
-                                        levelMeta = new LevelMetaSaveFile(xsf.FilePath);
-                                        break;
+                            // there can be multiple `Level` files, supposedly when there's a new file format and the latest file
+                            // get `-1` appended (or the next number after that). sort by this last part and take the highest number
+                            //
+                            // TODO - not sure if this is the right approach, or if the `Level.sav` file is always the latest
+                            var levelFile = filesByType.GetValueOrDefault("Level")
+                                ?.OrderByDescending(l => int.Parse(l.FileName.Split('-').Skip(2).FirstOrDefault() ?? "0"))
+                                ?.FirstOrDefault();
 
-                                    case "LocalData":
-                                        localData = new LocalDataSaveFile(xsf.FilePath);
-                                        break;
+                            if (levelFile != null) level = new LevelSaveFile(levelFile.FilePath);
 
-                                    case "WorldOption":
-                                        worldOption = new WorldOptionSaveFile(xsf.FilePath);
-                                        break;
+                            var levelMetaFile = filesByType.GetValueOrDefault("LevelMeta")?.FirstOrDefault();
+                            if (levelMetaFile != null) levelMeta = new LevelMetaSaveFile(levelMetaFile.FilePath);
 
-                                    case "Players":
-                                        players.Add(new PlayersSaveFile(xsf.FilePath));
-                                        break;
-                                }
-                            }
+                            var localDataFile = filesByType.GetValueOrDefault("LocalData")?.FirstOrDefault();
+                            if (localDataFile != null) localData = new LocalDataSaveFile(localDataFile.FilePath);
+
+                            var worldOptionFile = filesByType.GetValueOrDefault("WorldOption")?.FirstOrDefault();
+                            if (worldOptionFile != null) worldOption = new WorldOptionSaveFile(worldOptionFile.FilePath);
+
+                            players = filesByType.GetValueOrElse("Players", new List<XboxSaveFile>()).Select(f => new PlayersSaveFile(f.FilePath)).ToList();
 
                             return new XboxSaveGame(userFolder, g.Key, level, levelMeta, localData, worldOption, players);
                         })
