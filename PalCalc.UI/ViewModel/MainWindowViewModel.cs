@@ -387,7 +387,7 @@ namespace PalCalc.UI.ViewModel
 
         private void UpdateSolverControls()
         {
-            SolverControls.CanRunSolver = IsEditable && PalTarget.IsValid;
+            SolverControls.CanRunSolver = IsEditable && PalTarget != null && PalTarget.IsValid;
             SolverControls.CanEditSettings = IsEditable;
             SolverControls.CanCancelSolver = !IsEditable;
         }
