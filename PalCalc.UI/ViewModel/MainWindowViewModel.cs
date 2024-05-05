@@ -274,7 +274,11 @@ namespace PalCalc.UI.ViewModel
             var cachedData = SaveSelection.SelectedGame.CachedValue;
             if (cachedData == null) return;
 
-            var solver = SolverControls.ConfiguredSolver(GameSettings.ModelObject, PalTarget.PalSource.SelectedSource.Filter(cachedData).ToList());
+            var inputPals = PalTarget.PalSource.SelectedSource.Filter(cachedData);
+            if (!PalTarget.CurrentPalSpecifier.IncludeBasePals)
+                inputPals = inputPals.Where(p => p.Location.Type != LocationType.Base);
+
+            var solver = SolverControls.ConfiguredSolver(GameSettings.ModelObject, inputPals.ToList());
             solver.SolverStateUpdated += Solver_SolverStateUpdated;
 
             Task.Factory.StartNew(() =>

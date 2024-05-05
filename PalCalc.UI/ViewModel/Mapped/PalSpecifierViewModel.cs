@@ -95,6 +95,9 @@ namespace PalCalc.UI.ViewModel.Mapped
         [ObservableProperty]
         private string palSourceId;
 
+        [ObservableProperty]
+        private bool includeBasePals = true;
+
         public bool IsValid => TargetPal != null;
 
         public string Label
@@ -111,7 +114,15 @@ namespace PalCalc.UI.ViewModel.Mapped
             var psvm = obj as PalSpecifierViewModel;
             if (psvm == null) return false;
 
-            return psvm.TargetPal == TargetPal && psvm.Trait1 == Trait1 && psvm.Trait2 == Trait2 && psvm.Trait3 == Trait3 && psvm.Trait4 == Trait4;
+            return (
+                psvm.TargetPal == TargetPal &&
+                psvm.Trait1 == Trait1 &&
+                psvm.Trait2 == Trait2 &&
+                psvm.Trait3 == Trait3 &&
+                psvm.Trait4 == Trait4 &&
+                psvm.PalSourceId == PalSourceId &&
+                psvm.IncludeBasePals == IncludeBasePals
+            );
         }
 
         public override int GetHashCode() => HashCode.Combine(
@@ -119,21 +130,17 @@ namespace PalCalc.UI.ViewModel.Mapped
             Trait1,
             Trait2,
             Trait3,
-            Trait4
+            Trait4,
+            PalSourceId,
+            IncludeBasePals
         );
 
-        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(new PalSpecifier() { Pal = TargetPal.ModelObject, Traits = TraitModelObjects }) { CurrentResults = CurrentResults, PalSourceId = PalSourceId };
-        public void CopyFrom(PalSpecifierViewModel other)
+        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(new PalSpecifier() { Pal = TargetPal.ModelObject, Traits = TraitModelObjects })
         {
-            if (IsReadOnly) throw new Exception();
-
-            TargetPal = other.TargetPal;
-            Trait1 = other.Trait1;
-            Trait2 = other.Trait2;
-            Trait3 = other.Trait3;
-            Trait4 = other.Trait4;
-            CurrentResults = other.CurrentResults;
-        }
+            CurrentResults = CurrentResults,
+            PalSourceId = PalSourceId,
+            IncludeBasePals = IncludeBasePals,
+        };
 
         public static readonly PalSpecifierViewModel New = new PalSpecifierViewModel(null, true);
     }

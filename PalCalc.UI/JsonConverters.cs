@@ -351,6 +351,7 @@ namespace PalCalc.UI
                 Trait3 = obj["Trait3"].ToObject<TraitViewModel>(serializer),
                 Trait4 = obj["Trait4"].ToObject<TraitViewModel>(serializer),
                 PalSourceId = obj["PalSourceId"]?.ToObject<string>(),
+                IncludeBasePals = obj["IncludeBasePals"]?.ToObject<bool>() ?? true,
                 CurrentResults = obj["CurrentResults"].ToObject<BreedingResultListViewModel>(serializer)
             };
         }
@@ -365,6 +366,7 @@ namespace PalCalc.UI
                 Trait3 = value.Trait3,
                 Trait4 = value.Trait4,
                 PalSourceId = value.PalSourceId,
+                IncludeBasePals = value.IncludeBasePals,
                 CurrentResults = value.CurrentResults
             }, serializer).WriteTo(writer, dependencyConverters);
         }
