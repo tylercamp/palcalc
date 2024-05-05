@@ -56,5 +56,29 @@ namespace PalCalc.SaveReader
             }
             logger.Information("done");
         }
+
+        public static bool IsValidSave(string filePath)
+        {
+            using (var fs = File.OpenRead(filePath))
+            using (var binaryReader = new BinaryReader(fs))
+            {
+                // unused
+                var uncompressedLength = binaryReader.ReadInt32();
+                var compressedLen = binaryReader.ReadInt32();
+
+                var magicBytes = binaryReader.ReadBytes(3);
+                if (!MAGIC_BYTES.SequenceEqual(magicBytes))
+                    return false;
+
+                var saveType = binaryReader.ReadByte();
+
+                switch (saveType)
+                {
+                    case 0x31: return true;
+                    case 0x32: return true;
+                    default: return false;
+                }
+            }
+        }
     }
 }

@@ -70,10 +70,51 @@ namespace PalCalc.SaveReader.GVAS
             return result;
         }
 
-        public static void VisitFromFArchive(FArchiveReader reader, Action<string, object> onValue)
+        public static bool IsValidGvas(string file)
         {
-            GvasHeader.Read(reader);
+            if (CompressedSAV.IsValidSave(file))
+            {
+                var isValid = false;
+                CompressedSAV.WithDecompressedSave(file, stream =>
+                {
+                    using (var reader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
+                        isValid = IsValidGvas(reader);
+                });
+                return isValid;
+            }
+            else
+            {
+                using (var stream = File.OpenRead(file))
+                {
+                    using (var reader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
+                        return IsValidGvas(reader);
+                }
+            }
+        }
 
+        public static bool IsValidGvas(FArchiveReader reader)
+        {
+            var magic = reader.ReadInt32();
+            if (magic != 0x53415647) return false;
+
+            var gameVersion = reader.ReadInt32();
+            if (gameVersion != 3) return false;
+
+            reader.ReadInt32();
+            reader.ReadInt32();
+
+            reader.ReadUInt16();
+            reader.ReadUInt16();
+            reader.ReadUInt16();
+            reader.ReadUInt32();
+
+            reader.ReadString();
+            
+            var customVersionFormat = reader.ReadInt32();
+
+            if (customVersionFormat != 3) return false;
+
+            return true;
         }
     }
 }
