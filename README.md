@@ -24,7 +24,7 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 
 ## Main TODOs
 
-- Allow filtering of input pals by player
+- ~~Allow filtering of input pals by player~~
 - Proper packaging + release
 - ~~Logging + error handling~~
 	- ~~Any exceptions~~
@@ -41,15 +41,15 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 	- ~~Save game settings + associate with save file~~
 
 ## Eventual TODOs
-- Bugfix - Solver prefers breeding a pal to get an opposite gender instead of just using the existing pals
-- Reduce memory usage
-- Separate "max irrelevant input traits" and "max irrelevant bred traits"
+- ~~Bugfix - Solver prefers breeding a pal to get an opposite gender instead of just using the existing pals~~
+- Option to choose whether to include pals deployed to a base
+- ~~Reduce memory usage~~
+- ~~Separate "max irrelevant input traits" and "max irrelevant bred traits"~~
 - ~~Optimize by mapping irrelevant traits to "random" for solver operations~~
 - Add "About" window for licenses + references
 - ~~Gracefully handle missing references to pals, traits, and pal instances~~
 - ~~Fix tree layout algorithm~~
 - Option to delete entries from list of target pals
-- Allow solving for multiple pals at once
 - Show preview of involved pals, num wild pals, etc. in solver results list
 - Performance options (max threads)
 - Separate list of "Required traits" and "Optional traits" for target pal
@@ -73,3 +73,4 @@ This can all probably be ported into a webpage, but I've put in enough effort wi
 - Attack skill inheritance + solving
 - ~~Support Xbox saves ([sample ref](https://github.com/Tom60chat/Xbox-Live-Save-Exporter/tree/main))~~
 - Figure out how the data miners do their thing and read Pal DB info straight from game files?
+- Allow solving for multiple pals at once
