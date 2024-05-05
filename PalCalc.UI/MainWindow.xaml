@@ -52,7 +52,7 @@
 
         <GridSplitter Grid.Column="3" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
-        <DockPanel Grid.Column="4" IsEnabled="{Binding IsEditable}" Margin="0,0,0,10">
+        <DockPanel Grid.Column="4" IsEnabled="{Binding IsEditable}" Margin="0,0,0,5">
             <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
                 <GroupBox Header="Target Pal">
                     <v:PalTargetView DataContext="{Binding PalTarget}" />
@@ -71,9 +71,20 @@
                 </GroupBox>
             </StackPanel>
 
-            <GroupBox Header="Results">
-                <v:BreedingResultListView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
-            </GroupBox>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <GroupBox Header="Results" Grid.Row="0">
+                    <v:BreedingResultListView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
+                </GroupBox>
+
+                <Grid Grid.Row="1" Margin="0,5,0,0">
+                    <Button Width="50" Click="AboutButton_Click">About</Button>
+                </Grid>
+            </Grid>
         </DockPanel>
     </Grid>
 </Window>

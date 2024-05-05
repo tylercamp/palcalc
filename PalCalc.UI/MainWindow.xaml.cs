@@ -1,4 +1,5 @@
-﻿using PalCalc.UI.ViewModel;
+﻿using PalCalc.UI.View;
+using PalCalc.UI.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,6 +46,13 @@ namespace PalCalc.UI
             base.OnClosing(e);
 
             ViewModel.CancelSolver();
+        }
+
+        private void AboutButton_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new AboutWindow();
+            window.Owner = this;
+            window.ShowDialog();
         }
     }
 }

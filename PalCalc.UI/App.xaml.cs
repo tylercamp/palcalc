@@ -17,6 +17,8 @@ namespace PalCalc.UI
     /// </summary>
     public partial class App : Application
     {
+        public static string Version => "v0.9-BETA";
+
         private static ILogger logger;
 
         public static string LogFolder = "log";

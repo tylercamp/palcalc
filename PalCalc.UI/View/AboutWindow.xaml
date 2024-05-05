@@ -1,0 +1,100 @@
+﻿<Window x:Class="PalCalc.UI.View.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PalCalc.UI.View"
+        mc:Ignorable="d"
+        ResizeMode="NoResize"
+        WindowStyle="ToolWindow"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        Title="About Pal Calc">
+    <Window.DataContext>
+        <local:AboutViewModel />
+    </Window.DataContext>
+    <StackPanel Orientation="Vertical" Margin="10,0,10,10">
+        <StackPanel.Resources>
+            <Style TargetType="Label">
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="Separator">
+                <Setter Property="Margin" Value="0,10,0,10" />
+            </Style>
+        </StackPanel.Resources>
+
+        <Label Content="{Binding Title}" FontWeight="Bold" FontSize="20" />
+
+        <TextBlock Text="by Tyler Camp" />
+        <TextBlock>
+                <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/" RequestNavigate="Hyperlink_RequestNavigate">https://github.com/tylercamp/palcalc/</Hyperlink>
+        </TextBlock>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/issues" RequestNavigate="Hyperlink_RequestNavigate">Bug Reports</Hyperlink>
+            |
+            <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/releases" RequestNavigate="Hyperlink_RequestNavigate">Releases</Hyperlink>
+        </TextBlock>
+
+        <TextBlock FontStyle="Italic" FontSize="9">
+            Pal Calc is an independent project and is not affiliated with Palworld or Pocket Pair, Inc.
+        </TextBlock>
+        <TextBlock FontStyle="Italic" FontSize="9">
+            All Palworld resources are owned by Pocket Pair, Inc.
+        </TextBlock>
+
+        <Separator />
+        
+        <Label FontWeight="Bold" FontSize="12">References</Label>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://paldb.cc/en/Pals" RequestNavigate="Hyperlink_RequestNavigate">Pal icons from Paldb.cc</Hyperlink>
+        </TextBlock>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://www.reddit.com/r/Palworld/comments/19d98ws/spreadsheet_all_breeding_combinations_datamined/" RequestNavigate="Hyperlink_RequestNavigate">Initial data scraped by /u/blahable</Hyperlink>
+        </TextBlock>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/" RequestNavigate="Hyperlink_RequestNavigate">Trait breeding calc. reverse engineered by /u/mgxts</Hyperlink>
+        </TextBlock>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://github.com/cheahjs/palworld-save-tools" RequestNavigate="Hyperlink_RequestNavigate">Palworld save support based on palworld-save-tools</Hyperlink>
+            (<Hyperlink NavigateUri="https://github.com/cheahjs/palworld-save-tools/blob/main/LICENSE" RequestNavigate="Hyperlink_RequestNavigate">MIT License</Hyperlink>)
+        </TextBlock>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://github.com/Tom60chat/Xbox-Live-Save-Exporter" RequestNavigate="Hyperlink_RequestNavigate">Xbox save support based on Xbox-Live-Save-Exporter</Hyperlink>
+        </TextBlock>
+
+        <Separator />
+        
+        <Label FontWeight="Bold" FontSize="12">Resources</Label>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://www.flaticon.com/free-icons/open" RequestNavigate="Hyperlink_RequestNavigate">Open Folder icon by Smashicons</Hyperlink>
+        </TextBlock>
+        
+        <Separator />
+        
+        <Label FontWeight="Bold" FontSize="12">Libraries</Label>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://github.com/xceedsoftware/wpftoolkit" RequestNavigate="Hyperlink_RequestNavigate">WPF Toolkit by Xceed Software</Hyperlink>
+            (<Hyperlink NavigateUri="https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md" RequestNavigate="Hyperlink_RequestNavigate">Community License</Hyperlink>)
+        </TextBlock>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://github.com/serilog/serilog" RequestNavigate="Hyperlink_RequestNavigate">Serilog</Hyperlink>
+            (<Hyperlink NavigateUri="https://github.com/serilog/serilog/blob/dev/LICENSE" RequestNavigate="Hyperlink_RequestNavigate">Apache 2 License</Hyperlink>)
+        </TextBlock>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://github.com/vain0x/DotNetKit.Wpf.AutoCompleteComboBox" RequestNavigate="Hyperlink_RequestNavigate">AutoCompleteComboBox by vain0x</Hyperlink>
+            (<Hyperlink NavigateUri="https://github.com/vain0x/DotNetKit.Wpf.AutoCompleteComboBox/blob/main/LICENSE.md" RequestNavigate="Hyperlink_RequestNavigate">MIT License</Hyperlink>)
+        </TextBlock>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://github.com/NinetailLabs/GraphSharp" RequestNavigate="Hyperlink_RequestNavigate">GraphSharp by Various Authors (Defunct, Modified)</Hyperlink>
+            (<Hyperlink NavigateUri="https://github.com/NinetailLabs/GraphSharp/blob/master/LICENSE" RequestNavigate="Hyperlink_RequestNavigate">Apache 2 License</Hyperlink>)
+        </TextBlock>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://github.com/YaccConstructor/QuickGraph" RequestNavigate="Hyperlink_RequestNavigate">QuickGraph by YaccConstructor</Hyperlink>
+            (<Hyperlink NavigateUri="https://github.com/YaccConstructor/QuickGraph/blob/master/LICENSE.txt" RequestNavigate="Hyperlink_RequestNavigate">Ms-PL License</Hyperlink>)
+            (<Hyperlink NavigateUri="https://github.com/deepakkumar1984/QuickGraph.NETStandard" RequestNavigate="Hyperlink_RequestNavigate">.NET Standard Port</Hyperlink>)
+        </TextBlock>
+    </StackPanel>
+</Window>
