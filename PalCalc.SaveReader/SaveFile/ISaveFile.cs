@@ -17,25 +17,9 @@ namespace PalCalc.SaveReader.SaveFile
 
         public string FilePath { get; }
         public bool Exists => File.Exists(FilePath);
-        public bool IsValid
-        {
-            get
-            {
-                if (!Exists) return false;
-                if (!CompressedSAV.IsValidSave(FilePath)) return false;
 
-                return GvasFile.IsValidGvas(FilePath);
-
-                //var isValidSave = false;
-                //CompressedSAV.WithDecompressedSave(FilePath, stream =>
-                //{
-                //    using (var reader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
-                //        isValidSave = GvasFile.IsValidGvas(reader);
-                //});
-
-                //return isValidSave;
-            }
-        }
+        private bool? isValid = null;
+        public bool IsValid => isValid ??= Exists && GvasFile.IsValidGvas(FilePath);
 
         public DateTime LastModified => File.GetLastWriteTime(FilePath);
 

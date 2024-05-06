@@ -17,7 +17,7 @@ namespace PalCalc.UI
     /// </summary>
     public partial class App : Application
     {
-        public static string Version => "v0.9-BETA";
+        public static string Version => "v1.0.0";
 
         private static ILogger logger;
 
@@ -42,6 +42,10 @@ namespace PalCalc.UI
                 .CreateLogger();
 
             logger = Log.ForContext<App>();
+            logger.Information($"Pal Calc version {Version}");
+
+            PalDB.BeginLoadEmbedded();
+
             base.OnStartup(e);
         }
 

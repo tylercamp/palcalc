@@ -27,7 +27,8 @@ internal class Program
             ownedPals: savedInstances,
             maxBreedingSteps: 20,
             maxWildPals: 1,
-            maxIrrelevantTraits: 0,
+            maxBredIrrelevantTraits: 0,
+            maxInputIrrelevantTraits: 2,
             maxEffort: TimeSpan.FromDays(7)
         );
 

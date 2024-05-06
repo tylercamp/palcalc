@@ -146,7 +146,7 @@ namespace PalCalc.UI.ViewModel
 
             if (settings.SelectedGameIdentifier != null) SaveSelection.TrySelectSaveGame(settings.SelectedGameIdentifier);
 
-            UpdateFromSaveProperties();
+            dispatcher.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
         }
 
         private void SaveSelection_CustomSaveAdded(ManualSavesLocationViewModel manualSaves, ISaveGame save)

@@ -1,8 +1,10 @@
 ﻿using PalCalc.UI.View;
 using PalCalc.UI.ViewModel;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,10 +25,15 @@ namespace PalCalc.UI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ILogger logger = Log.ForContext<MainWindow>();
+
         public MainWindow()
         {
             InitializeComponent();
+
+            var sw = Stopwatch.StartNew();
             DataContext = new MainWindowViewModel(Dispatcher);
+            logger.Information("MainWindowViewModel took {ms}ms to start", sw.ElapsedMilliseconds);
         }
 
         private MainWindowViewModel ViewModel => DataContext as MainWindowViewModel;

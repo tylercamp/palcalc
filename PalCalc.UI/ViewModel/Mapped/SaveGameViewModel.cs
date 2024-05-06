@@ -5,6 +5,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -37,6 +38,8 @@ namespace PalCalc.UI.ViewModel.Mapped
                 logger.Warning(ex, "error when loading LevelMeta for {saveId}", CachedSaveGame.IdentifierFor(value));
                 Label = $"{value.GameId} (Unable to read metadata)";
             }
+
+            IsValid = Value.IsValid;
         }
 
         public DateTime LastModified => Value.LastModified;
@@ -45,7 +48,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         public CachedSaveGame CachedValue => Storage.LoadSave(Value, PalDB.LoadEmbedded());
         public string Label { get; }
 
-        public bool IsValid => Value.IsValid;
+        public bool IsValid { get; }
 
         public bool IsAddManualOption { get; }
 

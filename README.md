@@ -6,7 +6,7 @@ Pal Calc is a Windows program for calculating the optimal steps to breed a speci
 
 - Can detect and read from your local game save files, based on [palworld-save-tools by cheahjs](https://github.com/cheahjs/palworld-save-tools)
 - Supports local Steam saves and Xbox saves
-  - Xbox saves are synced to your PC by downloading the game through the 'Xbox' app on Windows and running the game at least once. Save files are synced when the game is run.
+  - Xbox saves are synced to your PC by downloading the game through the ['Xbox' app on Windows](https://apps.microsoft.com/detail/9mv0b5hzvk9z) and running the game at least once. Save files are synced when the game is run.
 - Provides time estimates on each step, based on probabilities and mechanics [derived by /u/mgxts in this Reddit post](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/)
   - Gender probabilities
   - Probability of directly- and randomly-inserted traits

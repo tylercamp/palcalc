@@ -150,15 +150,11 @@ namespace PalCalc.Model
 
         private static ILogger logger = Log.ForContext<PalDB>();
 
+        private static object loadEmbeddedLock = new object();
         private static PalDB embedded = null;
-        public static PalDB LoadEmbedded()
-        {
-            if (embedded != null)
-            {
-                logger.Verbose("Using previously-loaded pal DB");
-                return embedded;
-            }
 
+        private static PalDB _LoadEmbedded()
+        {
             logger.Information("Loading embedded pal DB");
             var info = Assembly.GetExecutingAssembly().GetName();
             var name = info.Name;
@@ -166,11 +162,38 @@ namespace PalCalc.Model
                 .GetExecutingAssembly()
                 .GetManifestResourceStream($"{name}.db.json")!;
 
+            PalDB result;
             using (var streamReader = new StreamReader(stream, Encoding.UTF8))
-                embedded = FromJson(streamReader.ReadToEnd());
+                result = FromJson(streamReader.ReadToEnd());
 
             logger.Information("Successfully loaded embedded pal DB");
-            return embedded;
+            return result;
+        }
+
+        public static void BeginLoadEmbedded()
+        {
+            Task.Run(() =>
+            {
+                lock (loadEmbeddedLock)
+                {
+                    embedded = _LoadEmbedded();
+                }
+            });
+        }
+
+        public static PalDB LoadEmbedded()
+        {
+            lock (loadEmbeddedLock)
+            {
+                if (embedded != null)
+                {
+                    logger.Verbose("Using previously-loaded pal DB");
+                    return embedded;
+                }
+
+                embedded = _LoadEmbedded();
+                return embedded;
+            }
         }
 
         public static PalDB FromJson(string json) => JsonConvert.DeserializeObject<PalDB>(json);
