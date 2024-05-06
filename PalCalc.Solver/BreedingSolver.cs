@@ -102,20 +102,46 @@ namespace PalCalc.Solver
         // gender (if they're wild/bred pals) for the least overall effort (different pals have different gender probabilities)
         (IPalReference, IPalReference) PreferredParentsGenders(IPalReference parent1, IPalReference parent2)
         {
-            List<IPalReference> ParentOptions(IPalReference parent) => parent.Gender == PalGender.WILDCARD
-                ? new List<IPalReference>() { parent.WithGuaranteedGender(db, PalGender.MALE), parent.WithGuaranteedGender(db, PalGender.FEMALE) }
-                : new List<IPalReference>() { parent };
+            IEnumerable<IPalReference> ParentOptions(IPalReference parent)
+            {
+                if (parent.Gender == PalGender.WILDCARD)
+                {
+                    yield return parent.WithGuaranteedGender(db, PalGender.MALE);
+                    yield return parent.WithGuaranteedGender(db, PalGender.FEMALE);
+                }
+                else
+                {
+                    yield return parent;
+                }
+            }
 
             var optionsParent1 = ParentOptions(parent1);
             var optionsParent2 = ParentOptions(parent2);
 
-            var parentPairOptions = optionsParent1.SelectMany(p1v => optionsParent2.Where(p2v => p2v.IsCompatibleGender(p1v.Gender)).Select(p2v => (p1v, p2v))).ToList();
+            var parentPairOptions = optionsParent1
+                .SelectMany(p1v => optionsParent2.Where(p2v => p2v.IsCompatibleGender(p1v.Gender)).Select(p2v => (p1v, p2v)))
+                //.ToList()
+                ;
 
             Func<IPalReference, IPalReference, TimeSpan> CombinedEffortFunc = gameSettings.MultipleBreedingFarms
                 ? ((a, b) => a.BreedingEffort > b.BreedingEffort ? a.BreedingEffort : b.BreedingEffort)
                 : ((a, b) => a.BreedingEffort + b.BreedingEffort);
 
-            if (parentPairOptions.Select(pair => CombinedEffortFunc(pair.p1v, pair.p2v)).Distinct().Count() == 1)
+            TimeSpan optimalTime = TimeSpan.Zero;
+            bool hasNoPreference = true;
+            foreach (var (p1, p2) in parentPairOptions)
+            {
+                var effort = CombinedEffortFunc(p1, p2);
+                if (optimalTime == TimeSpan.Zero) optimalTime = effort;
+                else if (optimalTime != effort)
+                {
+                    hasNoPreference = false;
+
+                    if (effort < optimalTime) optimalTime = effort;
+                }
+            }
+
+            if (hasNoPreference)
             {
                 // either there is no preference or at least 1 parent already has a specific gender
                 var p1wildcard = parent1.Gender == PalGender.WILDCARD;
@@ -144,7 +170,7 @@ namespace PalCalc.Solver
             }
             else
             {
-                return parentPairOptions.MinBy(p => CombinedEffortFunc(p.p1v, p.p2v));
+                return parentPairOptions.First(p => optimalTime == CombinedEffortFunc(p.p1v, p.p2v));
             }
         }
 
@@ -401,7 +427,7 @@ namespace PalCalc.Solver
 
                                     var combinedTraits = p.Item1.EffectiveTraits.Concat(p.Item2.EffectiveTraits);
 
-                                    var anyRelevantFromParents = spec.Traits.Intersect(combinedTraits).Any();
+                                    var anyRelevantFromParents = combinedTraits.Intersect(spec.Traits).Any();
                                     var anyIrrelevantFromParents = combinedTraits.Except(spec.Traits).Any();
 
                                     return anyRelevantFromParents || !anyIrrelevantFromParents;
@@ -440,19 +466,17 @@ namespace PalCalc.Solver
                                         // (not entirely correct, since some irrelevant traits may be specific and inherited by parents. if we know a child
                                         //  may have some specific trait, it may be efficient to breed that child with another parent which also has that
                                         //  irrelevant trait, which would increase the overall likelyhood of a desired trait being inherited)
-                                        var potentialIrrelevantTraits = Enumerable
-                                            .Range(0, Math.Max(0, numFinalTraits - desiredParentTraits.Count))
-                                            .Select(i => new RandomTrait());
-
                                         var newTraits = new List<Trait>(numFinalTraits);
                                         newTraits.AddRange(desiredParentTraits);
+                                        while (newTraits.Count < numFinalTraits)
+                                            newTraits.Add(new RandomTrait());
 
                                         var res = new BredPalReference(
                                             gameSettings,
                                             db.BreedingByParent[parent1.Pal][parent2.Pal].Child,
                                             preferredParent1,
                                             preferredParent2,
-                                            desiredParentTraits.Concat(potentialIrrelevantTraits).ToList(),
+                                            newTraits,
                                             probabilityForUpToNumTraits
                                         );
 

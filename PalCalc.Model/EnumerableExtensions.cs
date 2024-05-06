@@ -59,11 +59,16 @@ namespace PalCalc.Model
 
         public static int SetHash<T>(this IEnumerable<T> elements)
         {
-            var baseHash = elements.Count();
+            var baseHash = 0;
+            var total = 0;
             foreach (var g in elements.GroupBy(e => e.GetHashCode()).OrderBy(g => g.Key))
-                baseHash = HashCode.Combine(baseHash, g.Key, g.Count());
+            {
+                var count = g.Count();
+                baseHash = HashCode.Combine(baseHash, g.Key, total);
+                total += count;
+            }
 
-            return baseHash;
+            return HashCode.Combine(baseHash, total);
         }
     }
 }

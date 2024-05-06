@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -131,14 +132,19 @@ namespace PalCalc.Solver
 
         public TimeSpan SelfBreedingEffort { get; } = TimeSpan.Zero;
 
+        private CompositeOwnedPalReference oppositeWildcardReference;
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
             switch (gender)
             {
                 case PalGender.MALE: return Male;
                 case PalGender.FEMALE: return Female;
-                case PalGender.OPPOSITE_WILDCARD: return new CompositeOwnedPalReference(Male, Female) { Gender = gender };
                 case PalGender.WILDCARD: return this;
+                case PalGender.OPPOSITE_WILDCARD:
+                    if (oppositeWildcardReference == null)
+                        oppositeWildcardReference = new CompositeOwnedPalReference(Male, Female) { Gender = gender };
+                    return oppositeWildcardReference;
+
                 default: throw new NotImplementedException();
             }
         }
@@ -189,18 +195,34 @@ namespace PalCalc.Solver
 
         public int EffectiveTraitsHash { get; }
 
-        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        private IPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)
         {
-            if (Gender != PalGender.WILDCARD) throw new Exception("Wild pal has already been given a guaranteed gender");
-
-            if (gender == PalGender.WILDCARD) return this;
-
             return new WildPalReference(Pal)
             {
                 SelfBreedingEffort = SelfBreedingEffort,
                 Gender = gender,
                 EffectiveTraits = EffectiveTraits
             };
+        }
+
+        private Dictionary<PalGender, IPalReference> cachedGuaranteedGenders = null;
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        {
+            if (Gender != PalGender.WILDCARD) throw new Exception("Wild pal has already been given a guaranteed gender");
+
+            if (gender == PalGender.WILDCARD) return this;
+
+            if (cachedGuaranteedGenders == null)
+            {
+                cachedGuaranteedGenders = new List<PalGender>()
+                {
+                    PalGender.MALE,
+                    PalGender.FEMALE,
+                    PalGender.OPPOSITE_WILDCARD
+                }.ToDictionary(g => g, g => WithGuaranteedGenderImpl(db, g));
+            }
+
+            return cachedGuaranteedGenders[gender];
         }
 
         public override string ToString() => $"Captured {Gender} {Pal} w/ up to {EffectiveTraits.Count} random traits";
@@ -227,6 +249,12 @@ namespace PalCalc.Solver
             }
             EffectiveTraits = traits;
             EffectiveTraitsHash = traits.SetHash();
+
+            parentBreedingEffort = gameSettings.MultipleBreedingFarms && Parent1 is BredPalReference && Parent2 is BredPalReference
+                ? Parent1.BreedingEffort > Parent2.BreedingEffort
+                    ? Parent1.BreedingEffort
+                    : Parent2.BreedingEffort
+                : Parent1.BreedingEffort + Parent2.BreedingEffort;
         }
 
         public BredPalReference(GameSettings gameSettings, Pal pal, IPalReference parent1, IPalReference parent2, List<Trait> traits, float traitsProbability) : this(gameSettings, pal, parent1, parent2, traits)
@@ -250,14 +278,9 @@ namespace PalCalc.Solver
 
         public int AvgRequiredBreedings { get; private set; }
         public TimeSpan SelfBreedingEffort => AvgRequiredBreedings * gameSettings.AvgBreedingTime;
-        public TimeSpan BreedingEffort => SelfBreedingEffort + (
-            gameSettings.MultipleBreedingFarms && Parent1 is BredPalReference && Parent2 is BredPalReference
-                ? Parent1.BreedingEffort > Parent2.BreedingEffort
-                    ? Parent1.BreedingEffort
-                    : Parent2.BreedingEffort
-                : Parent1.BreedingEffort + Parent2.BreedingEffort
 
-        );
+        private TimeSpan parentBreedingEffort;
+        public TimeSpan BreedingEffort => SelfBreedingEffort + parentBreedingEffort;
 
         private int numTotalBreedingSteps = -1;
         public int NumTotalBreedingSteps
@@ -277,10 +300,8 @@ namespace PalCalc.Solver
 
         public List<Trait> ActualTraits => EffectiveTraits;
 
-        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        private IPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)
         {
-            if (this.Gender != PalGender.WILDCARD) throw new Exception("Cannot change gender of bred pal with an already-guaranteed gender");
-
             if (gender == PalGender.WILDCARD)
             {
                 return this;
@@ -298,14 +319,16 @@ namespace PalCalc.Solver
                         TraitsProbability = TraitsProbability,
                     };
                 }
-
-                // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
-                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectiveTraits)
+                else
                 {
-                    AvgRequiredBreedings = AvgRequiredBreedings * 2,
-                    Gender = gender,
-                    TraitsProbability = TraitsProbability,
-                };
+                    // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
+                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectiveTraits)
+                    {
+                        AvgRequiredBreedings = AvgRequiredBreedings * 2,
+                        Gender = gender,
+                        TraitsProbability = TraitsProbability,
+                    };
+                }
             }
             else
             {
@@ -317,6 +340,16 @@ namespace PalCalc.Solver
                     TraitsProbability = TraitsProbability,
                 };
             }
+        }
+
+        private ConcurrentDictionary<PalGender, IPalReference> cachedGuaranteedGenders = null;
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        {
+            if (this.Gender != PalGender.WILDCARD) throw new Exception("Cannot change gender of bred pal with an already-guaranteed gender");
+
+            if (cachedGuaranteedGenders == null) cachedGuaranteedGenders = new ConcurrentDictionary<PalGender, IPalReference>();
+
+            return cachedGuaranteedGenders.GetOrAdd(gender, (gender) => WithGuaranteedGenderImpl(db, gender));            
         }
 
         public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectiveTraits.TraitsListToString()})";

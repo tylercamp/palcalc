@@ -49,7 +49,8 @@ namespace PalCalc.Solver
         {
             if (remainingWork.Count == 0) return false;
 
-            var newResults = doWork(remainingWork);
+            logger.Debug("beginning work processing");
+            var newResults = doWork(remainingWork).ToList();
 
             // since we know the breeding effort of each potential instance, we can ignore new instances
             // with higher effort than existing known instances
