@@ -87,11 +87,30 @@ namespace PalCalc.Solver
 
                     foreach (var instance in instances)
                     {
-                        var matchingPermutation = traitPermutations.OrderByDescending(p => p.Count).ThenBy(p => p.Except(instance.Traits).Count()).First(p => !p.Except(instance.Traits).Any());
+                        var matchingPermutation = traitPermutations
+                            .OrderByDescending(p => p.Count)
+                            .ThenBy(p => p.Except(instance.Traits).Count())
+                            .First(p => !p.Except(instance.Traits).Any());
+
                         instancesByPermutation[matchingPermutation].Add(instance);
                     }
 
-                    relevantInstances.AddRange(instancesByPermutation.Values.Where(instances => instances.Any()).Select(instances => instances.OrderBy(i => i.Traits.Count).First()));
+                    relevantInstances.AddRange(
+                        instancesByPermutation.Values
+                            .Where(instances => instances.Count != 0)
+                            .Select(instances => instances
+                                .OrderBy(i => i.Traits.Count)
+                                .ThenBy(i => i.Location.Type switch
+                                {
+                                    // prefer pals in palbox, then in base, etc
+                                    LocationType.Palbox => 0,
+                                    LocationType.Base => 1,
+                                    LocationType.PlayerParty => 2,
+                                    _ => throw new NotImplementedException(),
+                                })
+                                .First()
+                            )
+                    );
                 }
             }
 
@@ -118,10 +137,7 @@ namespace PalCalc.Solver
             var optionsParent1 = ParentOptions(parent1);
             var optionsParent2 = ParentOptions(parent2);
 
-            var parentPairOptions = optionsParent1
-                .SelectMany(p1v => optionsParent2.Where(p2v => p2v.IsCompatibleGender(p1v.Gender)).Select(p2v => (p1v, p2v)))
-                //.ToList()
-                ;
+            var parentPairOptions = optionsParent1.SelectMany(p1v => optionsParent2.Where(p2v => p2v.IsCompatibleGender(p1v.Gender)).Select(p2v => (p1v, p2v)));
 
             Func<IPalReference, IPalReference, TimeSpan> CombinedEffortFunc = gameSettings.MultipleBreedingFarms
                 ? ((a, b) => a.BreedingEffort > b.BreedingEffort ? a.BreedingEffort : b.BreedingEffort)
@@ -219,11 +235,7 @@ namespace PalCalc.Solver
                 var actualNumInheritedFromParent = Math.Min(numInheritedFromParent, parentTraits.Count);
 
                 var numIrrelevantFromParent = actualNumInheritedFromParent - desiredParentTraits.Count;
-                var numIrrelevantFromRandom = numFinalTraits - (numIrrelevantFromParent + desiredParentTraits.Count);
-
-                // can inherit at most 3 random traits; if this `if` is `true` then we've hit a case which would never actually happen
-                // (e.g. 4 target final traits, 0 from parents, 4 from random)
-                if (numIrrelevantFromRandom > 3) continue;
+                var numIrrelevantFromRandom = numFinalTraits - actualNumInheritedFromParent;
 
 #if DEBUG
                 if (numIrrelevantFromRandom < 0) Debugger.Break();
@@ -331,6 +343,7 @@ namespace PalCalc.Solver
                 foreach (
                     var traitGroup in palGroup
                         .GroupBy(p => p.EffectiveTraits
+                            // (pad them all to have max number of traits, so the grouping ignores the total number of traits)
                             .Concat(Enumerable.Range(0, GameConstants.MaxTotalTraits - p.EffectiveTraits.Count).Select(_ => new RandomTrait()))
                             .SetHash()
                         )
@@ -376,6 +389,7 @@ namespace PalCalc.Solver
 
             if (maxWildPals > 0)
             {
+                // add wild pals with varying number of random traits
                 initialContent.AddRange(
                     db.Pals
                         .Where(p => !relevantPals.Any(i => i.Pal == p))
@@ -386,7 +400,6 @@ namespace PalCalc.Solver
             }
 
             var workingSet = new WorkingSet(initialContent, token);
-            
 
             for (int s = 0; s < maxBreedingSteps; s++)
             {
