@@ -30,7 +30,7 @@
 
         <TextBlock Text="by Tyler Camp" />
         <TextBlock>
-                <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/" RequestNavigate="Hyperlink_RequestNavigate">https://github.com/tylercamp/palcalc/</Hyperlink>
+            <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/" RequestNavigate="Hyperlink_RequestNavigate">https://github.com/tylercamp/palcalc/</Hyperlink>
         </TextBlock>
         <TextBlock>
             <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/issues" RequestNavigate="Hyperlink_RequestNavigate">Bug Reports</Hyperlink>

@@ -53,7 +53,9 @@
     </Grid>
 
     <TextBlock Visibility="{Binding NoXboxSavesMsgVisibility}" Margin="5,5,5,5" TextWrapping="Wrap" FontStyle="Italic">
-        No Xbox saves were found. Palworld must be installed on the PC through the Xbox app. Save files are synced to your PC when you run the game.
+        No Xbox saves were found. Palworld must be installed on the PC through the
+        <Hyperlink NavigateUri="https://apps.microsoft.com/detail/9mv0b5hzvk9z" RequestNavigate="Hyperlink_RequestNavigate">Xbox app / Game Pass.</Hyperlink>
+        Save files are synced to your PC when you run the game.
     </TextBlock>
 
     <TextBlock Visibility="{Binding InvalidSaveMessageVisibility}" Margin="0,5,0,0" Text="The selected save file is invalid!" Foreground="DarkRed" />

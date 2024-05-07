@@ -49,5 +49,10 @@ namespace PalCalc.UI.View
             var fullPath = System.IO.Path.GetFullPath(saveGame.BasePath);
             Process.Start("explorer.exe", fullPath);
         }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo { FileName = e.Uri.AbsoluteUri, UseShellExecute = true });
+        }
     }
 }
