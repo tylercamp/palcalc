@@ -3,12 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace PalCalc.SaveReader.FArchive
 {
     public interface IProperty
     {
         IPropertyMeta Meta { get; }
+
+        /// <summary>
+        /// Calls `action` on each object contained within this property. Has no effect
+        /// for single-value properties.
+        /// </summary>
+        void Traverse(Action<IProperty> action);
     }
 
     public interface IPropertyMeta
@@ -43,6 +50,8 @@ namespace PalCalc.SaveReader.FArchive
 
         public static LiteralProperty Create(string path, object value, Guid? guid) =>
             Create(path, guid, value);
+
+        public void Traverse(Action<IProperty> action) { }
     }
 
     public class EnumPropertyMeta : BasicPropertyMeta
@@ -58,6 +67,8 @@ namespace PalCalc.SaveReader.FArchive
         public string EnumValue { get; set; }
 
         public override string ToString() => $"({TypedMeta.EnumType}){EnumValue}";
+
+        public void Traverse(Action<IProperty> action) { }
     }
 
     public class StructPropertyMeta : BasicPropertyMeta
@@ -74,6 +85,37 @@ namespace PalCalc.SaveReader.FArchive
         public object Value { get; set; }
 
         public override string ToString() => $"({TypedMeta.StructType}){Value}";
+
+        public void Traverse(Action<IProperty> action)
+        {
+            TryTraverse(Value, TypedMeta.StructType, action);
+        }
+
+        // note: synced with cases in `FArchiveReader.ReadStructValue`
+        private static List<string> ignoredStructTypes = ["DateTime", "Guid", "Vector", "Quat", "LinearColor"];
+        internal static void TryTraverse(object maybeStructProperty, string structType, Action<IProperty> action)
+        {
+            if (ignoredStructTypes.Contains(structType)) return;
+
+            if (maybeStructProperty is IProperty)
+            {
+                var prop = maybeStructProperty as IProperty;
+                action(prop);
+                prop.Traverse(action);
+            }
+            else
+            {
+                foreach (var subVal in (maybeStructProperty as Dictionary<string, object>).Values)
+                {
+                    if (subVal is IProperty)
+                    {
+                        var subProp = subVal as IProperty;
+                        action(subProp);
+                        subProp.Traverse(action);
+                    }
+                }
+            }
+        }
     }
 
     public class ArrayPropertyMeta : BasicPropertyMeta
@@ -97,6 +139,17 @@ namespace PalCalc.SaveReader.FArchive
         public object Value { get; set; }
 
         public T[] Values<T>() => Value as T[];
+
+        public void Traverse(Action<IProperty> action)
+        {
+            if (TypedMeta.ArrayType == "StructProperty")
+            {
+                foreach (var val in Values<object>())
+                {
+                    StructProperty.TryTraverse(val, TypedMeta.TypeName, action);
+                }
+            }
+        }
 
         public string[] StringValues
         {
@@ -135,5 +188,17 @@ namespace PalCalc.SaveReader.FArchive
         public MapPropertyMeta TypedMeta { get; set; }
 
         public Dictionary<object, object> Value { get; set; }
+
+        public void Traverse(Action<IProperty> action)
+        {
+            foreach (var kvp in Value)
+            {
+                if (TypedMeta.KeyType == "StructProperty")
+                    StructProperty.TryTraverse(kvp.Key, TypedMeta.KeyStructType, action);
+
+                if (TypedMeta.ValueType == "StructProperty")
+                    StructProperty.TryTraverse(kvp.Value, TypedMeta.ValueStructType, action);
+            }
+        }
     }
 }

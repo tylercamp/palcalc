@@ -14,6 +14,53 @@ var saveFolders = new List<ISavesLocation>();
 //saveFolders.AddRange(DirectSavesLocation.AllLocal);
 saveFolders.AddRange(XboxSavesLocation.FindAll());
 
+var save2 = new StandardSaveGame(@"C:\Users\algor\OneDrive\Desktop\save-0");
+var level2 = save2.Level.ParseGvas();
+var local2 = save2.LocalData.ParseGvas();
+
+var charsGvas = level2.Collect(".worldSaveData.CharacterSaveParameterMap").Cast<MapProperty>().Single().Value;
+foreach (var c in charsGvas)
+{
+    var props = ((c.Value as Dictionary<string, object>)["RawData"] as CharacterDataProperty).Data["SaveParameter"] as StructProperty;
+    var slot = (props.Value as Dictionary<string, object>).GetValueOrDefault("SlotID") as StructProperty;
+
+    var containerIdProp = (slot?.Value as Dictionary<string, object>)?.GetValueOrDefault("ContainerId") as StructProperty;
+
+    var containerIdValueProp = (containerIdProp?.Value as Dictionary<string, object>)?.GetValueOrDefault("ID") as StructProperty;
+    var containerId = (containerIdValueProp?.Value?.ToString());
+
+
+}
+
+var containersGvas = level2.Collect(".worldSaveData.CharacterContainerSaveData").Cast<MapProperty>().Single().Value;
+
+foreach (var kvp in containersGvas)
+{
+    var keyProps = kvp.Key as Dictionary<string, object>;
+
+    var id = (keyProps["ID"] as StructProperty).Value;
+    var valueProps = kvp.Value as Dictionary<string, object>;
+
+    var refSlot = (valueProps["bReferenceSlot"] as LiteralProperty).Value;
+    var slots = (valueProps["Slots"] as ArrayProperty).Values<object>().Cast<Dictionary<string, object>>().ToList();
+
+    foreach (var slot in slots)
+    {
+        var iid = (slot["IndividualId"] as StructProperty).Value as Dictionary<string, object>;
+        var instanceId = (iid["InstanceId"] as StructProperty).Value;
+
+        var rawData = (slot["RawData"] as CharacterContainerDataProperty).TypedMeta;
+        var rawInstanceId = rawData.InstanceId;
+
+        if (instanceId?.ToString() == "b08dca3f-1864-43df-bbf4-4571a749f555" || rawInstanceId?.ToString() == "8564cba0-4358-416e-9d62-895b0e344737")
+            Debugger.Break();
+    }
+}
+
+var chars = save2.Level.ReadCharacterData(PalDB.LoadEmbedded(), []);
+
+return;
+
 foreach (var gameFolder in saveFolders)
 {
     Console.WriteLine("Checking game folder {0}", gameFolder.FolderName);

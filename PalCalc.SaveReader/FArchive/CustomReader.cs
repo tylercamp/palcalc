@@ -32,6 +32,8 @@ namespace PalCalc.SaveReader.FArchive
         public CharacterContainerDataPropertyMeta TypedMeta { get; set; }
 
         public byte PermissionTribeId;
+
+        public void Traverse(Action<IProperty> action) { }
     }
 
     public class CharacterContainerReader : ICustomReader
@@ -82,6 +84,19 @@ namespace PalCalc.SaveReader.FArchive
         public IPropertyMeta Meta { get; set; }
 
         public Dictionary<string, object> Data { get; set; }
+
+        public void Traverse(Action<IProperty> action)
+        {
+            foreach (var value in Data.Values)
+            {
+                var prop = value as IProperty;
+                if (prop != null)
+                {
+                    action(prop);
+                    prop.Traverse(action);
+                }
+            }
+        }
     }
 
     public class CharacterReader : ICustomReader
@@ -164,6 +179,8 @@ namespace PalCalc.SaveReader.FArchive
                 default: return $"Group '{GroupName}' - {Enum.GetName(GroupType)} w/ {CharacterHandleIds.Length} char handles";
             }
         }
+
+        public void Traverse(Action<IProperty> action) { }
     }
 
     [Flags]

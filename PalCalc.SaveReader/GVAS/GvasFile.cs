@@ -60,6 +60,29 @@ namespace PalCalc.SaveReader.GVAS
         public GvasHeader Header { get; set; }
         public Dictionary<string, object> Properties { get; set; }
 
+        public List<object> Collect(params string[] paths)
+        {
+            var result = new List<object>();
+
+            foreach (var value in Properties.Values)
+            {
+                var prop = value as IProperty;
+                if (prop != null)
+                {
+                    if (paths.Contains(prop.Meta.Path))
+                        result.Add(prop);
+
+                    prop.Traverse(subProp =>
+                    {
+                        if (paths.Contains(subProp.Meta.Path))
+                            result.Add(subProp);
+                    });
+                }
+            }
+
+            return result;
+        }
+
         public static GvasFile FromFArchive(FArchiveReader reader, IEnumerable<IVisitor> visitors)
         {
             var result = new GvasFile();
