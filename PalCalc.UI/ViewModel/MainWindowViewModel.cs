@@ -197,7 +197,9 @@ namespace PalCalc.UI.ViewModel
             }
 
             logger.Error(ex, "error when parsing save file for {saveId}", CachedSaveGame.IdentifierFor(obj));
-            MessageBox.Show("An error occurred when loading the save file");
+
+            var crashsupport = CrashSupport.PrepareSupportFile(obj);
+            MessageBox.Show($"An error occurred when loading the save file.\n\nPlease find the generated ZIP file to send with any support questions:\n\n{crashsupport}");
 
             SaveSelection.SelectedGame = null;
         }

@@ -44,7 +44,7 @@ namespace PalCalc.UI.Model
             }
         }
 
-        public static string PrepareSupportFile()
+        public static string PrepareSupportFile(ISaveGame specificSave = null)
         {
             var outputPath = Path.GetFullPath("CRASHLOG.zip");
             if (File.Exists(outputPath)) File.Delete(outputPath);
@@ -66,7 +66,9 @@ namespace PalCalc.UI.Model
                 }
                 catch { }
 
-                for (int i = 0; i < LoadedSaveHistory.Count; i++)
+                var saves = specificSave != null ? [specificSave] : LoadedSaveHistory;
+
+                for (int i = 0; i < saves.Count; i++)
                 {
                     try
                     {
