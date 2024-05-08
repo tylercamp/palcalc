@@ -181,11 +181,13 @@ namespace PalCalc.UI.Model
             else
             {
                 var res = CachedSaveGame.FromSaveGame(save, db);
-                if (res == null) return null;
+                if (res != null)
+                {
+                    CrashSupport.ReferencedCachedSave(res);
+                    File.WriteAllText(path, res.ToJson(db));
+                }
 
-                CrashSupport.ReferencedCachedSave(res);
-
-                File.WriteAllText(path, res.ToJson(db));
+                // TODO - adding `null` entries will prevent re-adding a save at the same path until the app is restarted
                 InMemorySaves.Add(identifier, res);
                 return res;
             }

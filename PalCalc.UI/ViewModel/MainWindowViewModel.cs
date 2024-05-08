@@ -151,6 +151,8 @@ namespace PalCalc.UI.ViewModel
 
         private void SaveSelection_CustomSaveAdded(ManualSavesLocationViewModel manualSaves, ISaveGame save)
         {
+            if (Storage.LoadSave(save, db) == null) return;
+
             targetsBySaveFile.Add(save, new PalTargetListViewModel());
 
             var saveVm = manualSaves.Add(save);
@@ -192,6 +194,8 @@ namespace PalCalc.UI.ViewModel
 
             logger.Error(ex, "error when parsing save file for {saveId}", CachedSaveGame.IdentifierFor(obj));
             MessageBox.Show("An error occurred when loading the save file");
+
+            SaveSelection.SelectedGame = null;
         }
 
         private void UpdateFromSaveProperties()
@@ -232,7 +236,7 @@ namespace PalCalc.UI.ViewModel
 
         private void UpdatePalTarget()
         {
-            if (PalTargetList?.SelectedTarget != null)
+            if (PalTargetList?.SelectedTarget != null && SaveSelection.SelectedGame?.CachedValue != null)
             {
                 PalTarget = new PalTargetViewModel(SaveSelection.SelectedGame.CachedValue, PalTargetList.SelectedTarget);
             }
