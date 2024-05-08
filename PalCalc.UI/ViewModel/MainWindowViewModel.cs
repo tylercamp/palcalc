@@ -151,7 +151,11 @@ namespace PalCalc.UI.ViewModel
 
         private void SaveSelection_CustomSaveAdded(ManualSavesLocationViewModel manualSaves, ISaveGame save)
         {
-            if (Storage.LoadSave(save, db) == null) return;
+            if (Storage.LoadSave(save, db) == null)
+            {
+                SaveSelection.SelectedGame = null;
+                return;
+            }
 
             targetsBySaveFile.Add(save, new PalTargetListViewModel());
 
