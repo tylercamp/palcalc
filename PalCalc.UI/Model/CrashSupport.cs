@@ -44,6 +44,28 @@ namespace PalCalc.UI.Model
             }
         }
 
+        private const int KB = 1000;
+        private const int MB = KB * 1000;
+
+        private static bool IsSmallDirectory(string targetPath)
+        {
+            long totalSize = 0;
+            int count = 0;
+
+            foreach (var path in Directory.EnumerateFiles(targetPath, "*", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    totalSize += new FileInfo(path).Length;
+                    count++;
+                } catch { }
+
+                if (count > 1000 || totalSize > 100 * MB) return false;
+            }
+
+            return true;
+        }
+
         public static string PrepareSupportFile(ISaveGame specificSave = null)
         {
             var outputPath = Path.GetFullPath("CRASHLOG.zip");
@@ -72,26 +94,41 @@ namespace PalCalc.UI.Model
                 {
                     try
                     {
-                        var save = LoadedSaveHistory[i];
+                        var save = saves[i];
                         if (save == null) continue;
 
-                        void AddSaveFile(ISaveFile file)
+                        if (IsSmallDirectory(save.BasePath))
                         {
-                            try
+                            // try to get the whole save folder (if it's a reasonable size)
+                            foreach (var f in Directory.EnumerateFiles(save.BasePath, "*", SearchOption.AllDirectories))
                             {
-                                if (file.Exists) archive.CreateEntryFromFile(file.FilePath, $"save-{i}/{Path.GetFileName(file.FilePath)}");
+                                var relpath = f.Substring(save.BasePath.Length + 1).NormalizedPath();
+                                try
+                                {
+                                    archive.CreateEntryFromFile(f, $"save-{i}/{relpath}");
+                                }
+                                catch { }
                             }
-                            catch { }
                         }
+                        else
+                        {
+                            void AddSaveFile(ISaveFile file)
+                            {
+                                try
+                                {
+                                    if (file.Exists) archive.CreateEntryFromFile(file.FilePath, $"save-{i}/{Path.GetFileName(file.FilePath)}");
+                                }
+                                catch { }
+                            }
 
-                        AddSaveFile(save.Level);
-                        AddSaveFile(save.LevelMeta);
-                        AddSaveFile(save.LocalData);
-                        AddSaveFile(save.WorldOption);
+                            AddSaveFile(save.Level);
+                            AddSaveFile(save.LevelMeta);
+                            AddSaveFile(save.LocalData);
+                            AddSaveFile(save.WorldOption);
 
-                        foreach (var p in save.Players.Where(p => p.Exists))
-                            archive.CreateEntryFromFile(p.FilePath, $"save-{i}/Players/{Path.GetFileName(p.FilePath)}");
-
+                            foreach (var p in save.Players.Where(p => p.Exists))
+                                archive.CreateEntryFromFile(p.FilePath, $"save-{i}/Players/{Path.GetFileName(p.FilePath)}");
+                        }
                     }
                     catch { }
                 }
