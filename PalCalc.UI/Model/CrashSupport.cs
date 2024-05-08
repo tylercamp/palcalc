@@ -86,6 +86,10 @@ namespace PalCalc.UI.Model
                         AddSaveFile(save.LevelMeta);
                         AddSaveFile(save.LocalData);
                         AddSaveFile(save.WorldOption);
+
+                        foreach (var p in save.Players.Where(p => p.Exists))
+                            archive.CreateEntryFromFile(p.FilePath, $"save-{i}/Players/{Path.GetFileName(p.FilePath)}");
+
                     }
                     catch { }
                 }
