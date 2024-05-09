@@ -81,9 +81,13 @@
                     <v:BreedingResultListView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
                 </GroupBox>
 
-                <Grid Grid.Row="1" Margin="0,5,0,0">
-                    <Button Width="50" Click="AboutButton_Click">About</Button>
-                </Grid>
+                <StackPanel Grid.Row="1">
+                    <Button Width="50" Click="AboutButton_Click" Margin="0,5,0,5">About</Button>
+                    <TextBlock Visibility="{Binding UpdatesMessageVisibility}" TextWrapping="Wrap" TextAlignment="Center">
+                        <!-- NavigateUri unused, value must be set for event to trigger -->
+                        <Hyperlink NavigateUri="http://github.com" RequestNavigate="DownloadUpdateLink_RequestNavigate">An update is available!</Hyperlink>
+                    </TextBlock>
+                </StackPanel>
             </Grid>
         </DockPanel>
     </Grid>

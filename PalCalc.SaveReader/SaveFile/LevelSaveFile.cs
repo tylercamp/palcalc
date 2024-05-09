@@ -63,6 +63,8 @@ namespace PalCalc.SaveReader.SaveFile
                         // references a container ID not in this list. the cause is not known, but I've seen "effective"
                         // container sizes from 1 to 40. there's no clear answer to "where" this container is (or its
                         // pals), so we won't bother referencing it
+                        //
+                        // (might be due to butchered pals? https://github.com/tylercamp/palcalc/issues/12#issuecomment-2101688781)
                         logger.Warning("unrecognized pal container id '{id}', skipping", gvasInstance.ContainerId);
                         continue;
                     }

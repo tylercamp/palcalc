@@ -13,6 +13,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -149,6 +151,8 @@ namespace PalCalc.UI.ViewModel
             if (settings.SelectedGameIdentifier != null) SaveSelection.TrySelectSaveGame(settings.SelectedGameIdentifier);
 
             dispatcher.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
+
+            CheckForUpdates();
         }
 
         private void SaveSelection_CustomSaveAdded(ManualSavesLocationViewModel manualSaves, ISaveGame save)
@@ -449,6 +453,57 @@ namespace PalCalc.UI.ViewModel
         }
 
         public Visibility ProgressBarVisibility => string.IsNullOrEmpty(SolverStatusMsg) ? Visibility.Collapsed : Visibility.Visible;
+
+        [ObservableProperty]
+        private Visibility updatesMessageVisibility = Visibility.Collapsed;
+
+        private string VersionFromUrl(string url) => url.Split('/').Last();
+        private string latestVersionUrl;
+
+        private void CheckForUpdates()
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var latestReleaseUrl = $"{App.RepositoryUrl}/releases/latest";
+                    using (var client = new HttpClient(new HttpClientHandler() { AllowAutoRedirect = false }))
+                    using (var response = await client.GetAsync(latestReleaseUrl))
+                    {
+                        if (response.StatusCode == HttpStatusCode.Found)
+                        {
+                            var location = response.Headers?.Location;
+                            if (location != null)
+                            {
+                                latestVersionUrl = location.AbsoluteUri;
+                                var latestVersion = VersionFromUrl(latestVersionUrl);
+                                if (latestVersion != App.Version)
+                                {
+                                    dispatcher.BeginInvoke(() => UpdatesMessageVisibility = Visibility.Visible);
+                                }
+                            }
+                            else
+                            {
+                                logger.Warning("releases response did not include redirect URL, unable to determine latest version");
+                            }
+                        }
+                        else
+                        {
+                            logger.Warning("did not receive FOUND status code, unable to determine latest version");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Warning(e, "error fetching latest version");
+                }
+            });
+        }
+
+        public void TryDownloadLatestVersion()
+        {
+            Process.Start(new ProcessStartInfo { FileName = latestVersionUrl, UseShellExecute = true });
+        }
 
         public PalDB DB => db;
     }

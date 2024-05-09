@@ -61,5 +61,10 @@ namespace PalCalc.UI
             window.Owner = this;
             window.ShowDialog();
         }
+
+        private void DownloadUpdateLink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            ViewModel.TryDownloadLatestVersion();
+        }
     }
 }
