@@ -57,6 +57,16 @@ namespace PalCalc.SaveReader.SaveFile
                         continue;
                     }
 
+                    if (!containerTypeById.ContainsKey(gvasInstance.ContainerId?.ToString()))
+                    {
+                        // Level.sav contains a list of all known containers, but there are some cases where a pal
+                        // references a container ID not in this list. the cause is not known, but I've seen "effective"
+                        // container sizes from 1 to 40. there's no clear answer to "where" this container is (or its
+                        // pals), so we won't bother referencing it
+                        logger.Warning("unrecognized pal container id '{id}', skipping", gvasInstance.ContainerId);
+                        continue;
+                    }
+
                     var traits = gvasInstance.Traits
                         .Select(name =>
                         {
