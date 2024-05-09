@@ -42,7 +42,7 @@ namespace PalCalc.SaveReader
 
             var playersPath = Path.Join(basePath, "Players");
             if (Directory.Exists(playersPath))
-                Players = Directory.EnumerateFiles(playersPath).Select(f => new PlayersSaveFile(f)).ToList();
+                Players = Directory.EnumerateFiles(playersPath, "*.sav").Select(f => new PlayersSaveFile(f)).ToList();
             else
                 Players = new List<PlayersSaveFile>();
         }
