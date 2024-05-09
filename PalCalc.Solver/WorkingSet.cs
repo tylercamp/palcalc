@@ -18,10 +18,13 @@ namespace PalCalc.Solver
         private Dictionary<PalId, List<IPalReference>> content;
         private List<(IPalReference, IPalReference)> remainingWork;
 
-        public IEnumerable<IPalReference> Result => content.Values.SelectMany(v => v);
+        private HashSet<IPalReference> result = new HashSet<IPalReference>();
+        public IEnumerable<IPalReference> Result => result.DistinctBy(r => (r.BreedingEffort, r.NumTotalBreedingSteps, r.EffectiveTraitsHash, r.InvolvedPals().Distinct().Count())).OrderBy(r => r.BreedingEffort);
 
-        public WorkingSet(IEnumerable<IPalReference> initialContent, CancellationToken token)
+        private PalSpecifier target;
+        public WorkingSet(PalSpecifier target, IEnumerable<IPalReference> initialContent, CancellationToken token)
         {
+            this.target = target;
             content = PruneCollection(initialContent).GroupBy(p => p.Pal.Id).ToDictionary(g => g.Key, g => g.ToList());
 
             remainingWork = initialContent.SelectMany(p1 => initialContent.Select(p2 => (p1, p2))).ToList();
@@ -52,6 +55,9 @@ namespace PalCalc.Solver
             logger.Debug("beginning work processing");
             var newResults = doWork(remainingWork).ToList();
 
+            foreach (var res in newResults.Where(pref => pref.Pal == target.Pal && !target.Traits.Except(pref.EffectiveTraits).Any()))
+                result.Add(res);
+
             // since we know the breeding effort of each potential instance, we can ignore new instances
             // with higher effort than existing known instances
             //
@@ -66,7 +72,7 @@ namespace PalCalc.Solver
                     .AsParallel()
                     .SelectMany(batch => PruneCollection(batch).ToList())
                     .ToList()
-            );
+            ).ToList();
 
             logger.Debug("merging");
             var changed = false;
@@ -102,16 +108,19 @@ namespace PalCalc.Solver
             }
 
             remainingWork.Clear();
-            remainingWork.EnsureCapacity(toAdd.Count * toAdd.Count + 2 * toAdd.Count * content.Count);
+            remainingWork.EnsureCapacity(toAdd.Count * toAdd.Count + 2 * toAdd.Count * content.Sum(kvp => kvp.Value.Count));
 
+            // need to precompute `remainingWork` now (can't do lazy IEnumerable) since `content` will be modified
+            // with the list of added pals
             remainingWork.AddRange(Result
                 // need to check results between new and old content
                 .SelectMany(p1 => toAdd.Select(p2 => (p1, p2)))
                 // and check results within the new content
                 .Concat(toAdd.SelectMany(p1 => toAdd.Select(p2 => (p1, p2))))
+                .TakeWhile(_ => !token.IsCancellationRequested)
             );
 
-            foreach (var ta in toAdd)
+            foreach (var ta in toAdd.TakeWhile(_ => !token.IsCancellationRequested))
             {
                 if (!content.ContainsKey(ta.Pal.Id)) content.Add(ta.Pal.Id, new List<IPalReference>());
 

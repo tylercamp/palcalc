@@ -399,7 +399,7 @@ namespace PalCalc.Solver
                 );
             }
 
-            var workingSet = new WorkingSet(initialContent, token);
+            var workingSet = new WorkingSet(spec, initialContent, token);
 
             for (int s = 0; s < maxBreedingSteps; s++)
             {
@@ -506,6 +506,7 @@ namespace PalCalc.Solver
 
                 if (token.IsCancellationRequested) break;
 
+                
                 if (!didUpdate)
                 {
                     logger.Debug("Last pass found no new useful options, stopping iteration early");
@@ -517,7 +518,7 @@ namespace PalCalc.Solver
             statusMsg.CurrentPhase = SolverPhase.Finished;
             SolverStateUpdated?.Invoke(statusMsg);
 
-            return workingSet.Result.Where(pref => pref.Pal == spec.Pal && !spec.Traits.Except(pref.EffectiveTraits).Any()).ToList();
+            return workingSet.Result.ToList();
         }
     }
 }
