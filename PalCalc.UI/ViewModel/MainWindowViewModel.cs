@@ -62,16 +62,18 @@ namespace PalCalc.UI.ViewModel
             settings.SolverSettings ??= new SolverSettings();
 
             // remove manually-added locations which no longer exist
-            var manualLocs = new List<string>(settings.ExtraSaveLocations);
-            foreach (var loc in manualLocs)
-            {
-                if (!Directory.Exists(loc))
+            var manualLocs = settings.ExtraSaveLocations
+                .Where(loc =>
                 {
-                    var asSave = new StandardSaveGame(loc);
-                    Storage.ClearForSave(asSave);
-                    manualLocs.Remove(loc);
-                }
-            }
+                    var exists = Directory.Exists(loc);
+                    if (!exists)
+                    {
+                        var asSave = new StandardSaveGame(loc);
+                        Storage.ClearForSave(asSave);
+                    }
+                    return exists;
+                })
+                .ToList();
 
             Storage.SaveAppSettings(settings);
 
