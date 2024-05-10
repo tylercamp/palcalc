@@ -26,22 +26,5 @@ namespace PalCalc.Solver
             var irrelevantAsRandom = actualTraits.Except(desiredTraits).Select(_ => new RandomTrait());
             return actualTraits.Intersect(desiredTraits).Concat(irrelevantAsRandom).ToList();
         }
-
-        public static IEnumerable<Pal> InvolvedPals(this IPalReference pref)
-        {
-            switch (pref)
-            {
-                case BredPalReference bpr:
-                    yield return bpr.Parent1.Pal;
-                    foreach (var p in bpr.Parent1.InvolvedPals())
-                        yield return p;
-
-                    yield return bpr.Parent2.Pal;
-                    foreach (var p in bpr.Parent2.InvolvedPals())
-                        yield return p;
-
-                    break;
-            }
-        }
     }
 }
