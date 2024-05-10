@@ -20,16 +20,37 @@ namespace PalCalc.UI.Model
         public static string SaveCachePath => $"{CachePath}/saves";
         public static string DataPath => "data";
 
+        public static string AppSettingsPath
+        {
+            get
+            {
+                Init();
+                return $"{DataPath}/settings.json";
+            }
+        }
+
         // path for cached copy of save file data
-        public static string SaveCachePathFor(ISaveGame forSaveFile) => $"{SaveCachePath}/{CachedSaveGame.IdentifierFor(forSaveFile)}.json";
+        public static string SaveCachePathFor(ISaveGame forSaveFile)
+        {
+            Init();
+            return $"{SaveCachePath}/{CachedSaveGame.IdentifierFor(forSaveFile)}.json";
+        }
 
         // path for storing data associated with a specific save file
-        public static string SaveFileDataPath(ISaveGame forSaveFile) => $"{DataPath}/{CachedSaveGame.IdentifierFor(forSaveFile)}";
+        public static string SaveFileDataPath(ISaveGame forSaveFile)
+        {
+            Init();
+            var path = $"{DataPath}/{CachedSaveGame.IdentifierFor(forSaveFile)}";
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+            return path;
+        }
 
         // path for storing game-specific game settings (breeding time, etc.)
-        public static string GameSettingsPath(ISaveGame forSaveFile) => SaveFileDataPath(forSaveFile) + "/game-settings.json";
-
-        public static string AppSettingsPath => $"{DataPath}/settings.json";
+        public static string GameSettingsPath(ISaveGame forSaveFile)
+        {
+            Init();
+            return SaveFileDataPath(forSaveFile) + "/game-settings.json";
+        }
 
         private static bool didInit = false;
         public static void Init()
