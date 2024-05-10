@@ -19,6 +19,9 @@
     <Compile Update="View\GameSettingsView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="View\IntegerTextBox.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\LoadingSaveFileModal.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -58,6 +61,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="View\GameSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="View\IntegerTextBox.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="View\LoadingSaveFileModal.xaml">

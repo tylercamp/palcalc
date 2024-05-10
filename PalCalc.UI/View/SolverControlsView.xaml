@@ -4,6 +4,7 @@
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
            xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+           xmlns:v="clr-namespace:PalCalc.UI.View"
            mc:Ignorable="d" 
            xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
            Orientation="Horizontal"
@@ -11,38 +12,44 @@
            d:Background="White"
            d:DesignWidth="800">
     <WrapPanel.Resources>
-        <Style TargetType="{x:Type xctk:IntegerUpDown}">
+        <Style TargetType="{x:Type v:IntegerTextBox}">
             <Setter Property="Margin" Value="0,0,20,0"/>
+            <Setter Property="Width" Value="25" />
         </Style>
     </WrapPanel.Resources>
     <Label Content="Max Breeding Steps:" />
-    <xctk:IntegerUpDown
+    <v:IntegerTextBox
+        Width="25"
         Value="{Binding MaxBreedingSteps}"
         IsEnabled="{Binding CanEditSettings}"
+        MinValue="1" MaxValue="99"
         ToolTipService.ToolTip="The maximum number of solver iterations, and the max number of breeding steps to reach the target pal.&#10;Higher values linearly affect time required."
         ToolTipService.ShowOnDisabled="True"
     />
-    
+
     <Label Content="Max Wild Pals:" />
-    <xctk:IntegerUpDown
+    <v:IntegerTextBox
         Value="{Binding MaxWildPals}"
         IsEnabled="{Binding CanEditSettings}"
+        MinValue="0" MaxValue="99"
         ToolTipService.ToolTip="The maximum number of wild pals to allow in a breeding path.&#10;Higher values linearly affect time required, depending on how many types of pals are owned."
         ToolTipService.ShowOnDisabled="True"
     />
     
     <Label Content="Max Input Irrelevant Traits:" />
-    <xctk:IntegerUpDown
+    <v:IntegerTextBox
         Value="{Binding MaxInputIrrelevantTraits}"
         IsEnabled="{Binding CanEditSettings}"
+        MinValue="0" MaxValue="4"
         ToolTipService.ToolTip="The maximum number of irrelevant traits allowed for any owned pal used as a parent.&#10;Lower values can somewhat reduce processing at risk of missing some useful paths.&#10;Higher values linearly affect time required."
         ToolTipService.ShowOnDisabled="True"
     />
 
     <Label Content="Max Bred Irrelevant Traits:" />
-    <xctk:IntegerUpDown
+    <v:IntegerTextBox
         Value="{Binding MaxBredIrrelevantTraits}"
         IsEnabled="{Binding CanEditSettings}"
+        MinValue="0" MaxValue="4"
         ToolTipService.ToolTip="The maximum number of irrelevant traits allowed for any bred pal, including the final breeding result.&#10;Values higher than '1' will typically add shorter breeding paths if there are unused trait slots in the final pal.&#10;Higher values *exponentially* affect time required."
         ToolTipService.ShowOnDisabled="True"
     />
