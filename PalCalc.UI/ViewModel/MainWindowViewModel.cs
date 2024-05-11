@@ -330,6 +330,8 @@ namespace PalCalc.UI.ViewModel
                             var outputFile = Path.Join(outputFolder, "pal-targets.json");
                             var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedGame.CachedValue);
                             File.WriteAllText(outputFile, JsonConvert.SerializeObject(PalTargetList, converter));
+
+                            UpdatePalTarget();
                         }
 
                         solverTokenSource = null;
