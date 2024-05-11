@@ -20,8 +20,27 @@ namespace PalCalc.Solver
 
         public IEnumerable<IPalReference> Result => content.Values.SelectMany(v => v);
 
+        Func<IOrderedEnumerable<IPalReference>, IOrderedEnumerable<IPalReference>> OrderingFunc;
+
         public WorkingSet(IEnumerable<IPalReference> initialContent, CancellationToken token)
         {
+            var resultOrderings = new List<IResultOrdering>()
+            {
+                new MinimumInputsOrdering(),
+                new PreferredLocationOrdering(),
+                new MinimumReuseOrdering(),
+                new MinimumWildPalsOrdering(),
+                new MinimumReferencedPlayersOrdering(),
+            };
+
+            OrderingFunc = (results) =>
+            {
+                var ordered = results;
+                foreach (var order in resultOrderings)
+                    ordered = order.Apply(ordered);
+                return ordered;
+            };
+
             content = PruneCollection(initialContent).GroupBy(p => p.Pal.Id).ToDictionary(g => g.Key, g => g.ToList());
 
             remainingWork = initialContent.SelectMany(p1 => initialContent.Select(p2 => (p1, p2))).ToList();
@@ -131,6 +150,6 @@ namespace PalCalc.Solver
                     pref.Gender,
                     pref.EffectiveTraitsHash
                 ))
-                .Select(g => g.OrderBy(pref => pref.BreedingEffort).ThenBy(pref => pref.NumTotalBreedingSteps).First());
+                .Select(g => OrderingFunc(g.OrderBy(pref => pref.BreedingEffort)).First());
     }
 }
