@@ -109,6 +109,12 @@ namespace PalCalc.Solver
 
                 var refNewInst = newInstances.First();
 
+                if (target.IsSatisfiedBy(refNewInst))
+                {
+                    // these are results to be used as output, don't bother adding them to working set / continue breeding those
+                    continue;
+                }
+
                 var existingInstances = content.GetValueOrElse(refNewInst.Pal.Id, new List<IPalReference>())
                     .TakeWhile(_ => !token.IsCancellationRequested)
                     .Where(pi =>
