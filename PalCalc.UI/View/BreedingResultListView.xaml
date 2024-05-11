@@ -1,4 +1,4 @@
-﻿<ListBox x:Class="PalCalc.UI.View.BreedingResultListView"
+﻿<ListView x:Class="PalCalc.UI.View.BreedingResultListView"
          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,13 +8,41 @@
          mc:Ignorable="d" 
          d:DataContext="{x:Static vm:BreedingResultListViewModel.DesignerInstance}"
          d:DesignHeight="450" d:DesignWidth="800"
-         
+         xmlns:util="clr-namespace:Wpf.Util"
          ItemsSource="{Binding Results}"
          SelectedItem="{Binding SelectedResult, Mode=TwoWay}"
+          IsSynchronizedWithCurrentItem="True"
+          util:GridViewSort.AutoSort="True"
          >
-    <ListBox.ItemTemplate>
-        <DataTemplate DataType="vm:BreedingResultViewModel">
-            <TextBlock Text="{Binding Label}" />
-        </DataTemplate>
-    </ListBox.ItemTemplate>
-</ListBox>
+    <ListView.View>
+        <GridView>
+            <GridView.Columns>
+                <GridViewColumn Header="Effort"
+                                DisplayMemberBinding="{Binding TimeEstimate}"
+                                Width="{Binding EffortWidth}"
+                                util:GridViewSort.PropertyName="TimeEstimate"
+                                />
+                <GridViewColumn Header="# Steps" 
+                                DisplayMemberBinding="{Binding NumBreedingSteps}"
+                                Width="{Binding NumStepsWidth}"
+                                util:GridViewSort.PropertyName="NumBreedingSteps"
+                                />
+                <GridViewColumn Header="# Inputs"
+                                DisplayMemberBinding="{Binding NumInputPals}"
+                                Width="{Binding NumInputsWidth}"
+                                util:GridViewSort.PropertyName="NumInputPals"
+                                />
+                <GridViewColumn Header="Traits"
+                                DisplayMemberBinding="{Binding FinalTraits}"
+                                Width="{Binding TraitsWidth}"
+                                util:GridViewSort.PropertyName="FinalTraits"
+                                />
+                <GridViewColumn Header="Input Locations"
+                                DisplayMemberBinding="{Binding InputLocations}"
+                                Width="{Binding LocationsWidth}"
+                                util:GridViewSort.PropertyName="InputLocations"
+                                />
+            </GridView.Columns>
+        </GridView>
+    </ListView.View>
+</ListView>

@@ -18,7 +18,7 @@ namespace PalCalc.UI.View
     /// <summary>
     /// Interaction logic for BreedingResultListView.xaml
     /// </summary>
-    public partial class BreedingResultListView : ListBox
+    public partial class BreedingResultListView : ListView
     {
         public BreedingResultListView()
         {

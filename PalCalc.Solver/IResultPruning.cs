@@ -20,19 +20,6 @@ namespace PalCalc.Solver
 
         protected IEnumerable<IPalReference> FirstGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping) =>
             input.TakeWhile(_ => !token.IsCancellationRequested).GroupBy(grouping).OrderBy(g => g.Key).First().ToList();
-
-        protected IEnumerable<IPalReference> CollectAll(IPalReference startRef)
-        {
-            yield return startRef;
-
-            switch (startRef)
-            {
-                case BredPalReference bpr:
-                    foreach (var r in CollectAll(bpr.Parent1)) yield return r;
-                    foreach (var r in CollectAll(bpr.Parent2)) yield return r;
-                    break;
-            }
-        }
     }
 
     // main default pruning
@@ -55,7 +42,7 @@ namespace PalCalc.Solver
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
             FirstGroupOf(results, r =>
             {
-                var observed = CollectAll(r).ToList();
+                var observed = r.AllReferences().ToList();
                 return -(observed.Count - observed.Distinct().Count());
             });
     }
@@ -77,7 +64,7 @@ namespace PalCalc.Solver
                         { LocationType.PlayerParty, 0 },
                     };
 
-                foreach (var pref in CollectAll(r))
+                foreach (var pref in r.AllReferences())
                 {
                     switch (pref.Location)
                     {
@@ -117,7 +104,7 @@ namespace PalCalc.Solver
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
             FirstGroupOf(results, r =>
-                CollectAll(r)
+                r.AllReferences()
                     .Where(r => r is OwnedPalReference || r is CompositeOwnedPalReference)
                     .Distinct()
                     .Count()
@@ -131,7 +118,7 @@ namespace PalCalc.Solver
         }
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r => CollectAll(r).Count(p => p is WildPalReference));
+            FirstGroupOf(results, r => r.AllReferences().Count(p => p is WildPalReference));
     }
 
     // prefer options where we don't need to borrow pals from multiple players
@@ -159,7 +146,7 @@ namespace PalCalc.Solver
         }
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r => CollectAll(r).SelectMany(PlayerIdsOf).Distinct().Count());
+            FirstGroupOf(results, r => r.AllReferences().SelectMany(PlayerIdsOf).Distinct().Count());
     }
 
     // avoid generating lots of very similar results
@@ -175,7 +162,7 @@ namespace PalCalc.Solver
         {
             var palOccurrences = results.ToDictionary(r => r, r =>
             {
-                return CollectAll(r).GroupBy(ir => ir.Pal).ToDictionary(g => g.Key, g => g.Count());
+                return r.AllReferences().GroupBy(ir => ir.Pal).ToDictionary(g => g.Key, g => g.Count());
             });
 
             var totalPalOccurrences = new Dictionary<Pal, int>();

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace PalCalc.UI.ViewModel
 {
@@ -19,12 +20,34 @@ namespace PalCalc.UI.ViewModel
                 if (SetProperty(ref results, value))
                 {
                     SelectedResult = results.FirstOrDefault();
+                    OnPropertyChanged(nameof(EffortWidth));
+                    OnPropertyChanged(nameof(NumStepsWidth));
+                    OnPropertyChanged(nameof(NumInputsWidth));
+                    OnPropertyChanged(nameof(LocationsWidth));
+                    OnPropertyChanged(nameof(TraitsWidth));
                 }
             }
         }
 
         [ObservableProperty]
         private BreedingResultViewModel selectedResult;
+
+        private readonly double WIDTH_HIDDEN = 0;
+        private readonly double FIT_CONTENT = double.NaN;
+        private readonly double DEFAULT = double.NaN;
+
+        private double HiddenIfRedundant<T>(Func<BreedingResultViewModel, T> selector)
+        {
+            if (Results == null || Results.Count < 2) return DEFAULT;
+            else if (Results.Select(selector).Distinct().Count() == 1) return WIDTH_HIDDEN;
+            else return FIT_CONTENT;
+        }
+
+        public double EffortWidth => DEFAULT;
+        public double NumStepsWidth => HiddenIfRedundant(vm => vm.NumBreedingSteps);
+        public double NumInputsWidth => HiddenIfRedundant(vm => vm.NumInputPals);
+        public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
+        public double TraitsWidth => HiddenIfRedundant(vm => vm.FinalTraits);
 
         public static BreedingResultListViewModel DesignerInstance { get; } = new BreedingResultListViewModel()
         {
@@ -33,6 +56,7 @@ namespace PalCalc.UI.ViewModel
                 new BreedingResultViewModel(null, new OwnedPalReference(new PalCalc.Model.PalInstance()
                 {
                     Pal = new PalCalc.Model.Pal() {
+                        Name = "Test Pal",
                         Id = new PalCalc.Model.PalId() { PalDexNo = 100, IsVariant = false }
                     },
                     Gender = PalCalc.Model.PalGender.WILDCARD,

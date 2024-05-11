@@ -59,6 +59,40 @@ namespace PalCalc.UI.ViewModel
         public TimeSpan? TimeEstimate => DisplayedResult?.BreedingEffort ?? TimeSpan.Zero;
         public string Label => $"{DisplayedResult?.ToString() ?? "Unknown"}, takes ~{TimeEstimate?.TimeSpanMinutesStr()}";
 
+        public int NumWildPals => DisplayedResult.NumWildPalParticipants();
+        public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
+        public int NumInputPals => DisplayedResult.AllReferences().Count(r => r is OwnedPalReference || r is CompositeOwnedPalReference);
+
+        public string FinalTraits => DisplayedResult.EffectiveTraitsString ?? string.Empty;
+
+        private string inputLocations;
+        public string InputLocations => inputLocations ??=
+            string.Join(
+                ", ",
+                DisplayedResult
+                    .AllReferences()
+                    .Where(r => r is OwnedPalReference || r is CompositeOwnedPalReference)
+                    .SelectMany(r =>
+                    {
+                        switch (r)
+                        {
+                            case OwnedPalReference opr: return new List<PalLocation>() { opr.UnderlyingInstance.Location };
+
+                            case CompositeOwnedPalReference corl:
+                                return new List<PalLocation>()
+                                {
+                                    corl.Male.UnderlyingInstance.Location,
+                                    corl.Female.UnderlyingInstance.Location
+                                };
+
+                            default:
+                                throw new NotImplementedException(); // shouldn't happen
+                        }
+                    })
+                    .GroupBy(l => l.Type)
+                    .Select(g => $"{g.Count()} in {g.Key.Label()}")
+            );
+
         public bool HasValue => Graph != null;
 
         private IPalReference displayedResult = null;
