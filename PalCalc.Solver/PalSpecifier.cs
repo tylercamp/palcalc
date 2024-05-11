@@ -13,5 +13,7 @@ namespace PalCalc.Solver
         public List<Trait> Traits { get; set; }
 
         public override string ToString() => $"{Pal.Name} with {Traits.TraitsListToString()}";
+
+        public bool IsSatisfiedBy(IPalReference palRef) => Pal == palRef.Pal && !Traits.Except(palRef.EffectiveTraits).Any();
     }
 }

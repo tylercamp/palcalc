@@ -18,12 +18,17 @@ namespace PalCalc.Solver
         private Dictionary<PalId, List<IPalReference>> content;
         private List<(IPalReference, IPalReference)> remainingWork;
 
-        public IEnumerable<IPalReference> Result => content.Values.SelectMany(v => v);
+        PalSpecifier target;
+        private List<IPalReference> discoveredResults = new List<IPalReference>();
+        public IEnumerable<IPalReference> Result => discoveredResults.Distinct().GroupBy(r => r.BreedingEffort).SelectMany(PruningFunc);
 
         Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>> PruningFunc;
 
-        public WorkingSet(IEnumerable<IPalReference> initialContent, CancellationToken token)
+        public WorkingSet(PalSpecifier target, IEnumerable<IPalReference> initialContent, CancellationToken token)
         {
+            this.target = target;
+
+            // TODO - allow external configuration
             var resultPrunings = new List<IResultPruning>()
             {
                 new MinimumEffortPruning(token),
@@ -45,6 +50,8 @@ namespace PalCalc.Solver
             };
 
             content = PruneCollection(initialContent).GroupBy(p => p.Pal.Id).ToDictionary(g => g.Key, g => g.ToList());
+
+            discoveredResults.AddRange(content.SelectMany(kvp => kvp.Value).Where(target.IsSatisfiedBy));
 
             remainingWork = initialContent.SelectMany(p1 => initialContent.Select(p2 => (p1, p2))).ToList();
             this.token = token;
@@ -82,6 +89,8 @@ namespace PalCalc.Solver
             // `PruneCollection` is fairly heavy and single-threaded, perform pruning of multiple batches of the
             // main set of references before pruning the final combined collection
 
+            discoveredResults.AddRange(newResults.TakeWhile(_ => !token.IsCancellationRequested).Where(target.IsSatisfiedBy));
+
             logger.Debug("performing pre-prune");
             var pruned = PruneCollection(
                 newResults.ToList().BatchedForParallel()
@@ -96,6 +105,8 @@ namespace PalCalc.Solver
 
             foreach (var newInstances in pruned.GroupBy(i => (i.Pal, i.Gender, i.EffectiveTraitsHash)).Select(g => g.ToList()).ToList())
             {
+                if (token.IsCancellationRequested) return changed;
+
                 var refNewInst = newInstances.First();
 
                 var existingInstances = content.GetValueOrElse(refNewInst.Pal.Id, new List<IPalReference>())
@@ -105,8 +116,6 @@ namespace PalCalc.Solver
                         pi.EffectiveTraitsHash == refNewInst.EffectiveTraitsHash
                     )
                 .ToList();
-
-                if (token.IsCancellationRequested) return changed;
 
                 var refInst = existingInstances.FirstOrDefault();
 
