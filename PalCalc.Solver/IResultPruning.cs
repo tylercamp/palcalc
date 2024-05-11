@@ -190,6 +190,7 @@ namespace PalCalc.Solver
 
             // find the result which has the most common set of shared pals
             var commonResults = results.ToList();
+            // (for each observed pal in the results, ordered by which pal is used the most, find the results which have the most references to that pal)
             foreach (var pal in totalPalOccurrences.OrderByDescending(kvp => kvp.Value).Select(kvp => kvp.Key))
             {
                 var nextCommonResults = commonResults.GroupBy(r => palOccurrences[r].GetValueOrElse(pal, 0)).OrderByDescending(g => g.Key).SelectMany(g => g).ToList();
@@ -205,7 +206,7 @@ namespace PalCalc.Solver
                 if (prunedResults.Contains(currentResult)) continue;
 
                 var resultOccurrences = palOccurrences[currentResult];
-                var resultTotalRefs = resultOccurrences.Sum(kvp => kvp.Value);
+                var resultTotalPals = resultOccurrences.Sum(kvp => kvp.Value);
 
                 // TODO - this checks for similarity of `currentResult` contents vs `prunedResult` contents, but maybe it's better
                 //        to do the opposite?
@@ -216,11 +217,11 @@ namespace PalCalc.Solver
                     {
                         differenceCount += Math.Abs(resultOccurrences[p] - palOccurrences[prunedResult].GetValueOrElse(p, 0));
                     }
-                    return differenceCount / (float)resultOccurrences.Sum(kvp => kvp.Value);
+                    return differenceCount / (float)resultTotalPals;
                 });
 
-                var highestSimilarity = 1 - lowestDifferenceScore;
-                if (highestSimilarity < maxSimilarityPercent)
+                var highestSimilarityScore = 1 - lowestDifferenceScore;
+                if (highestSimilarityScore < maxSimilarityPercent)
                     prunedResults.Add(currentResult);
             }
 
