@@ -445,6 +445,14 @@ namespace PalCalc.Solver
 
                                     return anyRelevantFromParents || !anyIrrelevantFromParents;
                                 })
+                                .Select(p =>
+                                {
+                                    // arbitrary reordering of (p1, p2) to prevent duplicate results from swapped pairs
+                                    // (though this shouldn't be necessary if the `IResultPruning` impls are working right?)
+                                    var (parent1, parent2) = p;
+                                    if (parent1.GetHashCode() < parent2.GetHashCode()) return (parent1, parent2);
+                                    else return (parent2, parent1);
+                                })
                                 .SelectMany(p =>
                                 {
                                     var (parent1, parent2) = p;
