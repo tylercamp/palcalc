@@ -296,7 +296,12 @@ namespace DotNetKit.Windows.Controls
             }
             else if (e.Key == Key.Enter)
             {
-                if (!SelectItemFromMatchingText(Text))
+                if (Text == "")
+                {
+                    SelectedItem = null;
+                    lastValidSelectedItem = null;
+                }
+                else if (!SelectItemFromMatchingText(Text))
                 {
                     Text = lastValidSelectedItem == null ? "" : TextFromItem(lastValidSelectedItem);
                     SelectedItem = lastValidSelectedItem;
