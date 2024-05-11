@@ -20,25 +20,28 @@ namespace PalCalc.Solver
 
         public IEnumerable<IPalReference> Result => content.Values.SelectMany(v => v);
 
-        Func<IOrderedEnumerable<IPalReference>, IOrderedEnumerable<IPalReference>> OrderingFunc;
+        Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>> PruningFunc;
 
         public WorkingSet(IEnumerable<IPalReference> initialContent, CancellationToken token)
         {
-            var resultOrderings = new List<IResultOrdering>()
+            var resultPrunings = new List<IResultPruning>()
             {
-                new MinimumInputsOrdering(),
-                new PreferredLocationOrdering(),
-                new MinimumReuseOrdering(),
-                new MinimumWildPalsOrdering(),
-                new MinimumReferencedPlayersOrdering(),
+                new MinimumEffortPruning(token),
+                new MinimumInputsPruning(token),
+                new PreferredLocationPruning(token),
+                new MinimumReusePruning(token),
+                new MinimumWildPalsPruning(token),
+                new MinimumReferencedPlayersPruning(token),
+                new VariedResultsPruning(token, 0.8f),
+                new ResultLimitPruning(token, 5),
             };
 
-            OrderingFunc = (results) =>
+            PruningFunc = (results) =>
             {
-                var ordered = results;
-                foreach (var order in resultOrderings)
-                    ordered = order.Apply(ordered);
-                return ordered;
+                var pruned = results;
+                foreach (var order in resultPrunings)
+                    pruned = order.Apply(pruned);
+                return pruned;
             };
 
             content = PruneCollection(initialContent).GroupBy(p => p.Pal.Id).ToDictionary(g => g.Key, g => g.ToList());
@@ -90,32 +93,45 @@ namespace PalCalc.Solver
             logger.Debug("merging");
             var changed = false;
             var toAdd = new List<IPalReference>();
-            foreach (var newInst in pruned)
+
+            foreach (var newInstances in pruned.GroupBy(i => (i.Pal, i.Gender, i.EffectiveTraitsHash)).Select(g => g.ToList()).ToList())
             {
-                var existingInstances = content.GetValueOrElse(newInst.Pal.Id, new List<IPalReference>())
+                var refNewInst = newInstances.First();
+
+                var existingInstances = content.GetValueOrElse(refNewInst.Pal.Id, new List<IPalReference>())
                     .TakeWhile(_ => !token.IsCancellationRequested)
                     .Where(pi =>
-                        pi.Gender == newInst.Gender &&
-                        pi.EffectiveTraitsHash == newInst.EffectiveTraitsHash
+                        pi.Gender == refNewInst.Gender &&
+                        pi.EffectiveTraitsHash == refNewInst.EffectiveTraitsHash
                     )
                 .ToList();
 
                 if (token.IsCancellationRequested) return changed;
 
-                var existingInst = existingInstances.SingleOrDefault();
+                var refInst = existingInstances.FirstOrDefault();
 
-                if (existingInst != null)
+                if (refInst != null)
                 {
-                    if (newInst.BreedingEffort < existingInst.BreedingEffort)
+                    var newSelection = PruningFunc(existingInstances.Concat(newInstances));
+
+                    var added = newInstances.Intersect(newSelection);
+                    var removed = existingInstances.Intersect(newSelection);
+
+                    if (added.Any())
                     {
-                        content[newInst.Pal.Id].Remove(existingInst);
-                        toAdd.Add(newInst);
+                        toAdd.AddRange(added);
+                        changed = true;
+                    }
+
+                    if (removed.Any())
+                    {
+                        content[refNewInst.Pal.Id].RemoveAll(removed.Contains);
                         changed = true;
                     }
                 }
                 else
                 {
-                    toAdd.Add(newInst);
+                    toAdd.AddRange(newInstances);
                     changed = true;
                 }
             }
@@ -150,6 +166,6 @@ namespace PalCalc.Solver
                     pref.Gender,
                     pref.EffectiveTraitsHash
                 ))
-                .Select(g => OrderingFunc(g.OrderBy(pref => pref.BreedingEffort)).First());
+                .SelectMany(g => PruningFunc(g.Distinct()));
     }
 }
