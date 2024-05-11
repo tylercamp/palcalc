@@ -273,6 +273,14 @@ namespace DotNetKit.Windows.Controls
         }
         #endregion
 
+        bool SelectItemFromMatchingText(string text)
+        {
+            var matchingItem = ItemsSource?.Cast<object>().FirstOrDefault(v => TextFromItem(v).Equals(text, StringComparison.InvariantCultureIgnoreCase));
+            if (matchingItem != null) SelectedItem = matchingItem;
+
+            return matchingItem != null;
+        }
+
         void ComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.Space)
@@ -286,16 +294,28 @@ namespace DotNetKit.Windows.Controls
                 SelectedItem = lastValidSelectedItem;
                 e.Handled = true;
             }
+            else if (e.Key == Key.Enter)
+            {
+                if (!SelectItemFromMatchingText(Text))
+                {
+                    Text = lastValidSelectedItem == null ? "" : TextFromItem(lastValidSelectedItem);
+                    SelectedItem = lastValidSelectedItem;
+                }
+                e.Handled = true;
+            }
         }
 
         void ComboBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (SettingOrDefault.ResetOnInvalidWhenFocusLost && (SelectedItem == null || TextFromItem(SelectedItem) != Text) && Text != "")
             {
-                SelectedItem = lastValidSelectedItem;
-                Text = lastValidSelectedItem == null
-                    ? ""
-                    : TextFromItem(lastValidSelectedItem);
+                if (!SelectItemFromMatchingText(Text))
+                {
+                    SelectedItem = lastValidSelectedItem;
+                    Text = lastValidSelectedItem == null
+                        ? ""
+                        : TextFromItem(lastValidSelectedItem);
+                }
             }
 
             lastValidSelectedItem = SelectedItem;
