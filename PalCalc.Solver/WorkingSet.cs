@@ -37,8 +37,8 @@ namespace PalCalc.Solver
                 new MinimumReusePruning(token),
                 new MinimumWildPalsPruning(token),
                 new MinimumReferencedPlayersPruning(token),
-                new VariedResultsPruning(token, 0.8f),
-                new ResultLimitPruning(token, 5),
+                new VariedResultsPruning(token, maxSimilarityPercent: 0.3f),
+                new ResultLimitPruning(token, maxResults: 5),
             };
 
             PruningFunc = (results) =>

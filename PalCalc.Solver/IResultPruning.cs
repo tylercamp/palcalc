@@ -219,7 +219,8 @@ namespace PalCalc.Solver
                     return differenceCount / (float)resultOccurrences.Sum(kvp => kvp.Value);
                 });
 
-                if ((1 - lowestDifferenceScore) > maxSimilarityPercent)
+                var highestSimilarity = 1 - lowestDifferenceScore;
+                if (highestSimilarity < maxSimilarityPercent)
                     prunedResults.Add(currentResult);
             }
 
