@@ -19,7 +19,7 @@ namespace PalCalc.UI.ViewModel
             {
                 if (SetProperty(ref results, value))
                 {
-                    SelectedResult = results.FirstOrDefault();
+                    SelectedResult = results.OrderBy(r => r.TimeEstimate).FirstOrDefault();
                     OnPropertyChanged(nameof(EffortWidth));
                     OnPropertyChanged(nameof(NumStepsWidth));
                     OnPropertyChanged(nameof(NumInputsWidth));
