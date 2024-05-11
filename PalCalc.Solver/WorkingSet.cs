@@ -148,7 +148,7 @@ namespace PalCalc.Solver
             remainingWork.Clear();
             remainingWork.EnsureCapacity(toAdd.Count * toAdd.Count + 2 * toAdd.Count * content.Count);
 
-            remainingWork.AddRange(Result
+            remainingWork.AddRange(content.Values.SelectMany(l => l)
                 // need to check results between new and old content
                 .SelectMany(p1 => toAdd.Select(p2 => (p1, p2)))
                 // and check results within the new content
