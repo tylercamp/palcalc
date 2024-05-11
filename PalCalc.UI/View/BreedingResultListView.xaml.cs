@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PalCalc.UI.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,8 @@ namespace PalCalc.UI.View
         public BreedingResultListView()
         {
             InitializeComponent();
+
+            Wpf.Util.GridViewSort.ApplySort(Items, nameof(BreedingResultViewModel.TimeEstimate));
         }
     }
 }
