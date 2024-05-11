@@ -56,7 +56,7 @@ namespace PalCalc.Solver
             FirstGroupOf(results, r =>
             {
                 var observed = CollectAll(r).ToList();
-                return observed.Count - observed.Distinct().Count();
+                return -(observed.Count - observed.Distinct().Count());
             });
     }
 
