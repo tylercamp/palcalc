@@ -90,6 +90,13 @@ namespace PalCalc.UI.ViewModel
                         }
                     })
                     .GroupBy(l => l.Type)
+                    .OrderBy(g => g.Key switch
+                    {
+                        LocationType.Palbox => 0,
+                        LocationType.Base => 1,
+                        LocationType.PlayerParty => 2,
+                        _ => throw new NotImplementedException()
+                    })
                     .Select(g => $"{g.Count()} in {g.Key.Label()}")
             );
 
