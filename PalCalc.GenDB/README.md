@@ -2,6 +2,8 @@ Program for regenerating the `PalCalc.Model/db.json` file. The project is set up
 
 DB generation is based on [exported spreadsheets](https://docs.google.com/spreadsheets/d/1YgPc11dgdBUC8jXNp01b7gI6jNHoBRQGwrY_V6lXMgQ/edit?usp=sharing) from [/u/blahable's data scrape](https://www.reddit.com/r/Palworld/comments/19d98ws/spreadsheet_all_breeding_combinations_datamined/), stored under `ref`. These CSVs were manually tweaked to fix some inconsistencies/inaccuracies.
 
+Some data has been manually added using `ref/extra.json`.
+
 New sources can be used instead of this, for example by scraping a Palworld website with all relevant information. The source should include _at minimum_:
 
 - Pals
