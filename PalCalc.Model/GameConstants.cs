@@ -28,13 +28,14 @@ namespace PalCalc.Model
 
         public static readonly int MaxTotalTraits = 4;
 
-        // roughly estimate time to catch a given pal based on paldex num. and whether it's a pal variant rather than base pal
+        // roughly estimate time to catch a given pal
         public static TimeSpan TimeToCatch(Pal pal)
         {
             var minTime = TimeSpan.FromMinutes(3);
 
             // TODO - tweak
-            return minTime + pal.Id.PalDexNo * TimeSpan.FromSeconds(2);
+            var rarityModifier = pal.Rarity + (pal.Id.IsVariant ? 5 : 0);
+            return minTime + TimeSpan.FromMinutes(rarityModifier - 1);
         }
 
         // https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/

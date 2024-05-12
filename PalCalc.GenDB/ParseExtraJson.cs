@@ -64,6 +64,7 @@ namespace PalCalc.GenDB
                 InternalIndex = p.IndexOrder,
                 CanMount = p.Mount,
                 MountType = p.MountType,
+                Rarity = p.Rarity,
             }).ToList();
         }
     }

@@ -99,7 +99,8 @@ namespace PalCalc.GenDB
                     MountType = row.MountType,
                     RideSprintSpeed = row.RideSprintSpeed,
                     RideWalkSpeed = row.RunSpeed,
-                    Stamina = row.Stamina
+                    Stamina = row.Stamina,
+                    Rarity = row.Rarity,
                 }).ToList();
 
             return pals;

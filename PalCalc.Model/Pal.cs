@@ -36,6 +36,12 @@ namespace PalCalc.Model
 
         public int Stamina { get; set; }
 
+        //// fields introduced after first release will need a default value
+
+        public int Rarity { get; set; } = 0;
+
+        ////
+
         public override string ToString() => $"{Name} ({Id})";
 
         public static bool operator ==(Pal a, Pal b) => (ReferenceEquals(a, null) && ReferenceEquals(b, null)) || (a?.Equals(b) ?? false);
