@@ -24,6 +24,7 @@ internal class Program
         var solver = new BreedingSolver(
             gameSettings: new GameSettings(),
             db: db,
+            pruningBuilder: PruningRulesBuilder.Default,
             ownedPals: savedInstances,
             maxBreedingSteps: 20,
             maxWildPals: 1,

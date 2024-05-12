@@ -40,6 +40,7 @@ namespace PalCalc.Solver
 
         int maxBreedingSteps, maxWildPals, maxBredIrrelevantTraits, maxInputIrrelevantTraits;
         TimeSpan maxEffort;
+        PruningRulesBuilder pruningBuilder;
 
         /// <param name="db"></param>
         /// <param name="ownedPals"></param>
@@ -53,10 +54,11 @@ namespace PalCalc.Solver
         ///     Effort in estimated time to get the desired pal with the given traits. Goes by constant breeding time, ignores hatching
         ///     time, and roughly estimates time to catch wild pals (with increasing time based on paldex number).
         /// </param>
-        public BreedingSolver(GameSettings gameSettings, PalDB db, List<PalInstance> ownedPals, int maxBreedingSteps, int maxWildPals, int maxInputIrrelevantTraits, int maxBredIrrelevantTraits, TimeSpan maxEffort)
+        public BreedingSolver(GameSettings gameSettings, PalDB db, PruningRulesBuilder pruningBuilder, List<PalInstance> ownedPals, int maxBreedingSteps, int maxWildPals, int maxInputIrrelevantTraits, int maxBredIrrelevantTraits, TimeSpan maxEffort)
         {
             this.gameSettings = gameSettings;
             this.db = db;
+            this.pruningBuilder = pruningBuilder;
             this.ownedPals = ownedPals;
             this.maxBreedingSteps = maxBreedingSteps;
             this.maxWildPals = maxWildPals;
@@ -393,7 +395,7 @@ namespace PalCalc.Solver
                 );
             }
 
-            var workingSet = new WorkingSet(spec, initialContent, token);
+            var workingSet = new WorkingSet(spec, pruningBuilder.Build(token), initialContent, token);
 
             for (int s = 0; s < maxBreedingSteps; s++)
             {

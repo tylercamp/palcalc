@@ -60,6 +60,7 @@ namespace PalCalc.UI.ViewModel
         public BreedingSolver ConfiguredSolver(GameSettings gameSettings, List<PalInstance> pals) => new BreedingSolver(
             gameSettings,
             PalDB.LoadEmbedded(),
+            PruningRulesBuilder.Default,
             pals,
             MaxBreedingSteps,
             MaxWildPals,

@@ -24,27 +24,14 @@ namespace PalCalc.Solver
 
         Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>> PruningFunc;
 
-        public WorkingSet(PalSpecifier target, IEnumerable<IPalReference> initialContent, CancellationToken token)
+        public WorkingSet(PalSpecifier target, IEnumerable<IResultPruning> orderedPruningRules, IEnumerable<IPalReference> initialContent, CancellationToken token)
         {
             this.target = target;
-
-            // TODO - allow external configuration
-            var resultPrunings = new List<IResultPruning>()
-            {
-                new MinimumEffortPruning(token),
-                new MinimumBreedingStepsPruning(token),
-                new PreferredLocationPruning(token),
-                new MinimumReusePruning(token),
-                new MinimumWildPalsPruning(token),
-                new MinimumReferencedPlayersPruning(token),
-                new VariedResultsPruning(token, maxSimilarityPercent: 0.1f),
-                new ResultLimitPruning(token, maxResults: 3),
-            };
 
             PruningFunc = (results) =>
             {
                 var pruned = results;
-                foreach (var order in resultPrunings)
+                foreach (var order in orderedPruningRules)
                     pruned = order.Apply(pruned);
                 return pruned;
             };
