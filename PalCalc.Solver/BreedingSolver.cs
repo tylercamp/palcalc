@@ -108,6 +108,7 @@ namespace PalCalc.Solver
                                     LocationType.PlayerParty => 2,
                                     _ => throw new NotImplementedException(),
                                 })
+                                .ThenByDescending(i => i.IV_HP + i.IV_Melee + i.IV_Shot + i.IV_Defense)
                                 .First()
                             )
                     );
