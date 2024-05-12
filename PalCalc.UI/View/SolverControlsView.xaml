@@ -66,6 +66,18 @@
         />
     </StackPanel>
 
+    <StackPanel Orientation="Horizontal">
+        <Label Content="Max CPUs" />
+        <v:IntegerTextBox
+            Value="{Binding MaxThreads}"
+            IsEnabled="{Binding CanEditSettings}"
+            MinValue="0"
+            MaxValue="{Binding NumCpus}"
+            ToolTipService.ToolTip="The number of CPUs the solver is allowed to use. If zero, all CPUs will be used."
+            ToolTipService.ShowOnDisabled="True"
+            />
+    </StackPanel>
+
     <StackPanel Orientation="Horizontal" Margin="5,3,0,3">
         <StackPanel.Resources>
             <Style TargetType="Button">

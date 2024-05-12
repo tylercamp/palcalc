@@ -31,7 +31,8 @@ namespace PalCalc.UI.ViewModel
                 maxWildPals: 0,
                 maxInputIrrelevantTraits: 2,
                 maxBredIrrelevantTraits: 0,
-                maxEffort: TimeSpan.FromHours(8)
+                maxEffort: TimeSpan.FromHours(8),
+                maxThreads: 0
             );
 
             var targetInstance = new PalSpecifier

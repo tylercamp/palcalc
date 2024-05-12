@@ -18,13 +18,14 @@ namespace PalCalc.Solver
         private Dictionary<PalId, List<IPalReference>> content;
         private List<(IPalReference, IPalReference)> remainingWork;
 
+        int maxThreads;
         PalSpecifier target;
         private List<IPalReference> discoveredResults = new List<IPalReference>();
         public IEnumerable<IPalReference> Result => discoveredResults.Distinct().GroupBy(r => r.BreedingEffort).SelectMany(PruningFunc);
 
         Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>> PruningFunc;
 
-        public WorkingSet(PalSpecifier target, IEnumerable<IResultPruning> orderedPruningRules, IEnumerable<IPalReference> initialContent, CancellationToken token)
+        public WorkingSet(PalSpecifier target, IEnumerable<IResultPruning> orderedPruningRules, IEnumerable<IPalReference> initialContent, int maxThreads, CancellationToken token)
         {
             this.target = target;
 
@@ -42,6 +43,10 @@ namespace PalCalc.Solver
 
             remainingWork = initialContent.SelectMany(p1 => initialContent.Select(p2 => (p1, p2))).ToList();
             this.token = token;
+
+            if (maxThreads <= 0) maxThreads = Environment.ProcessorCount;
+
+            this.maxThreads = maxThreads;
         }
 
         public bool IsOptimal(IPalReference p)
@@ -80,8 +85,9 @@ namespace PalCalc.Solver
 
             logger.Debug("performing pre-prune");
             var pruned = PruneCollection(
-                newResults.ToList().BatchedForParallel()
+                newResults.Batched(newResults.Count / maxThreads + 1)
                     .AsParallel()
+                    .WithDegreeOfParallelism(maxThreads)
                     .SelectMany(batch => PruneCollection(batch).ToList())
                     .ToList()
             );

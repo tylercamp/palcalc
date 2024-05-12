@@ -30,7 +30,8 @@ internal class Program
             maxWildPals: 1,
             maxBredIrrelevantTraits: 0,
             maxInputIrrelevantTraits: 2,
-            maxEffort: TimeSpan.FromDays(7)
+            maxEffort: TimeSpan.FromDays(7),
+            maxThreads: 0
         );
 
         var targetInstance = new PalSpecifier

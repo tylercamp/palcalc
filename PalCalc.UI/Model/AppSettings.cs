@@ -13,6 +13,7 @@ namespace PalCalc.UI.Model
         public int MaxWildPals { get; set; } = 1;
         public int MaxInputIrrelevantTraits { get; set; } = 3;
         public int MaxBredIrrelevantTraits { get; set; } = 1;
+        public int MaxThreads { get; set; } = 0;
     }
 
     internal class AppSettings

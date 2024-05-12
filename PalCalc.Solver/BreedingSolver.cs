@@ -41,6 +41,7 @@ namespace PalCalc.Solver
         int maxBreedingSteps, maxWildPals, maxBredIrrelevantTraits, maxInputIrrelevantTraits;
         TimeSpan maxEffort;
         PruningRulesBuilder pruningBuilder;
+        int maxThreads;
 
         /// <param name="db"></param>
         /// <param name="ownedPals"></param>
@@ -54,7 +55,7 @@ namespace PalCalc.Solver
         ///     Effort in estimated time to get the desired pal with the given traits. Goes by constant breeding time, ignores hatching
         ///     time, and roughly estimates time to catch wild pals (with increasing time based on paldex number).
         /// </param>
-        public BreedingSolver(GameSettings gameSettings, PalDB db, PruningRulesBuilder pruningBuilder, List<PalInstance> ownedPals, int maxBreedingSteps, int maxWildPals, int maxInputIrrelevantTraits, int maxBredIrrelevantTraits, TimeSpan maxEffort)
+        public BreedingSolver(GameSettings gameSettings, PalDB db, PruningRulesBuilder pruningBuilder, List<PalInstance> ownedPals, int maxBreedingSteps, int maxWildPals, int maxInputIrrelevantTraits, int maxBredIrrelevantTraits, TimeSpan maxEffort, int maxThreads)
         {
             this.gameSettings = gameSettings;
             this.db = db;
@@ -65,6 +66,7 @@ namespace PalCalc.Solver
             this.maxInputIrrelevantTraits = Math.Min(3, maxInputIrrelevantTraits);
             this.maxBredIrrelevantTraits = Math.Min(3, maxBredIrrelevantTraits);
             this.maxEffort = maxEffort;
+            this.maxThreads = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
         }
 
         public event Action<SolverStatus> SolverStateUpdated;
@@ -395,7 +397,7 @@ namespace PalCalc.Solver
                 );
             }
 
-            var workingSet = new WorkingSet(spec, pruningBuilder.Build(token), initialContent, token);
+            var workingSet = new WorkingSet(spec, pruningBuilder.Build(token), initialContent, maxThreads, token);
 
             for (int s = 0; s < maxBreedingSteps; s++)
             {
@@ -411,8 +413,9 @@ namespace PalCalc.Solver
 
                     logger.Debug("Performing breeding step {step} with {numWork} work items", s+1, work.Count);
                     return work
-                        .BatchedForParallel()
+                        .Batched(work.Count / maxThreads + 1)
                         .AsParallel()
+                        .WithDegreeOfParallelism(maxThreads)
                         .SelectMany(workBatch =>
                             workBatch
                                 .TakeWhile(_ => !token.IsCancellationRequested)

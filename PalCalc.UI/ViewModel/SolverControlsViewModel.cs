@@ -48,6 +48,15 @@ namespace PalCalc.UI.ViewModel
             set => SetProperty(ref maxBredIrrelevantTraits, Math.Clamp(value, 0, 4));
         }
 
+        public int NumCpus => Environment.ProcessorCount;
+
+        private int maxThreads;
+        public int MaxThreads
+        {
+            get => maxThreads;
+            set => SetProperty(ref maxThreads, Math.Clamp(value, 0, NumCpus));
+        }
+
         [ObservableProperty]
         private bool canRunSolver = false;
 
@@ -66,7 +75,8 @@ namespace PalCalc.UI.ViewModel
             MaxWildPals,
             MaxInputIrrelevantTraits,
             MaxBredIrrelevantTraits,
-            TimeSpan.MaxValue
+            TimeSpan.MaxValue,
+            MaxThreads
         );
 
         public SolverSettings AsModel => new SolverSettings()
@@ -75,6 +85,7 @@ namespace PalCalc.UI.ViewModel
             MaxWildPals = MaxWildPals,
             MaxInputIrrelevantTraits = MaxInputIrrelevantTraits,
             MaxBredIrrelevantTraits = MaxBredIrrelevantTraits,
+            MaxThreads = MaxThreads,
         };
 
         public static SolverControlsViewModel FromModel(SolverSettings model) => new SolverControlsViewModel()
@@ -83,6 +94,7 @@ namespace PalCalc.UI.ViewModel
             MaxWildPals = model.MaxWildPals,
             MaxInputIrrelevantTraits = model.MaxInputIrrelevantTraits,
             MaxBredIrrelevantTraits = model.MaxBredIrrelevantTraits,
+            maxBredIrrelevantTraits = model.MaxThreads,
         };
     }
 }
