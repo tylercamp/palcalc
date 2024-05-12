@@ -2,6 +2,8 @@
 
 ![Pal Calc Screenshot](./docres/palcalc-screenshot.jpg)
 
+_v1.0.0 screenshot_
+
 Pal Calc is a Windows program for calculating the optimal steps to breed a specific pal with a specific set of traits:
 
 - Can detect and read from your local game save files, based on [palworld-save-tools by cheahjs](https://github.com/cheahjs/palworld-save-tools)
@@ -73,13 +75,9 @@ The Community Toolkit library is used for the viewmodels, which provides the `Ob
 
 ## TODOs
 - Option to delete entries from list of target pals
-- Show preview of involved pals, num wild pals, etc. in solver results list
 - Performance options (max threads)
 - Separate list of "Required traits" and "Optional traits" for target pal
 - Notify when a pal involved in a breeding path is no longer available in the source save or has been moved
-- Show more solver result paths
-  - There can be multiple paths to the same target or intermediate with the same final effort, but with differing number of breeding steps and wild pals involved
-  - There are even more options if we support "optional" traits for target pal
 - Allow filtering of which wild pals may be included
 - Update PalDB reference data for recent game updates
   - Figure out reliable process for updating DB.json with latest pal + trait info (where can I find a frequently-updated source of all required info?)
