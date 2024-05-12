@@ -27,11 +27,6 @@
                                 Width="{Binding NumStepsWidth}"
                                 util:GridViewSort.PropertyName="NumBreedingSteps"
                                 />
-                <GridViewColumn Header="# Inputs"
-                                DisplayMemberBinding="{Binding NumInputPals}"
-                                Width="{Binding NumInputsWidth}"
-                                util:GridViewSort.PropertyName="NumInputPals"
-                                />
                 <GridViewColumn Header="Traits"
                                 DisplayMemberBinding="{Binding FinalTraits}"
                                 Width="{Binding TraitsWidth}"

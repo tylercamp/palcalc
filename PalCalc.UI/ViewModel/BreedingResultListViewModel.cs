@@ -22,7 +22,6 @@ namespace PalCalc.UI.ViewModel
                     SelectedResult = results.OrderBy(r => r.TimeEstimate).FirstOrDefault();
                     OnPropertyChanged(nameof(EffortWidth));
                     OnPropertyChanged(nameof(NumStepsWidth));
-                    OnPropertyChanged(nameof(NumInputsWidth));
                     OnPropertyChanged(nameof(LocationsWidth));
                     OnPropertyChanged(nameof(TraitsWidth));
                 }
@@ -45,7 +44,6 @@ namespace PalCalc.UI.ViewModel
 
         public double EffortWidth => DEFAULT;
         public double NumStepsWidth => HiddenIfRedundant(vm => vm.NumBreedingSteps);
-        public double NumInputsWidth => HiddenIfRedundant(vm => vm.NumInputPals);
         public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
         public double TraitsWidth => HiddenIfRedundant(vm => vm.FinalTraits);
 

@@ -32,7 +32,7 @@ namespace PalCalc.Solver
             var resultPrunings = new List<IResultPruning>()
             {
                 new MinimumEffortPruning(token),
-                new MinimumInputsPruning(token),
+                new MinimumBreedingStepsPruning(token),
                 new PreferredLocationPruning(token),
                 new MinimumReusePruning(token),
                 new MinimumWildPalsPruning(token),

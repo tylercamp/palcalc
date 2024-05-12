@@ -95,17 +95,16 @@ namespace PalCalc.Solver
     // cases where multiple pals for the same input are available
     //public class ManyAlternativesOrdering : IResultOrdering { }
 
-    // (acts like a "minimum breeding steps" ordering)
-    public class MinimumInputsPruning : IResultPruning
+    public class MinimumBreedingStepsPruning : IResultPruning
     {
-        public MinimumInputsPruning(CancellationToken token) : base(token)
+        public MinimumBreedingStepsPruning(CancellationToken token) : base(token)
         {
         }
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
             FirstGroupOf(results, r =>
                 r.AllReferences()
-                    .Where(r => r is OwnedPalReference || r is CompositeOwnedPalReference)
+                    .Where(r => r is BredPalReference)
                     .Distinct()
                     .Count()
             );
