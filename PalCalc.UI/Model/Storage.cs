@@ -190,7 +190,7 @@ namespace PalCalc.UI.Model
                     return null;
                 }
 
-                if (res.IsOutdated)
+                if (res.IsOutdated(db))
                 {
                     File.Delete(path);
                     return LoadSave(save, db);

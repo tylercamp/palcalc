@@ -27,6 +27,8 @@ namespace PalCalc.UI.Model
         public int? PlayerLevel { get; set; }
         public int InGameDay { get; set; }
 
+        public string DatabaseVersion { get; set; }
+
         public List<PlayerInstance> Players { get; set; }
         public List<GuildInstance> Guilds { get; set; }
         public List<PalInstance> OwnedPals { get; set; }
@@ -47,7 +49,7 @@ namespace PalCalc.UI.Model
 
         public bool IsValid => UnderlyingSave.IsValid;
 
-        public bool IsOutdated => LastModified != UnderlyingSave.LastModified;
+        public bool IsOutdated(PalDB currentDb) => LastModified != UnderlyingSave.LastModified || DatabaseVersion != currentDb.Version;
 
         public string StateId => $"{IdentifierFor(UnderlyingSave)}-{LastModified.Ticks}";
 
@@ -77,6 +79,7 @@ namespace PalCalc.UI.Model
                 var charData = game.Level.ReadCharacterData(db);
                 result = new CachedSaveGame(game)
                 {
+                    DatabaseVersion = db.Version,
                     LastModified = game.LastModified,
                     OwnedPals = charData.Pals,
                     Guilds = charData.Guilds,
