@@ -133,5 +133,14 @@ namespace PalCalc.UI.View
         {
             textBox_KeyDown(sender, e);
         }
+
+        private void textBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (IsKeyboardFocusWithin && IsMouseOver)
+            {
+                Value += Math.Clamp(e.Delta, -1, 1);
+                e.Handled = true;
+            }
+        }
     }
 }
