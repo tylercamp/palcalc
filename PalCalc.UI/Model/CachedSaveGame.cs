@@ -13,9 +13,12 @@ namespace PalCalc.UI.Model
 {
     public class CachedSaveGame
     {
+        private static readonly string SaveReaderVersion = "v2";
+
         public CachedSaveGame(ISaveGame underlyingSave)
         {
             UnderlyingSave = underlyingSave;
+            ReaderVersion = SaveReaderVersion;
         }
 
         public DateTime LastModified { get; set; }
@@ -28,6 +31,7 @@ namespace PalCalc.UI.Model
         public int InGameDay { get; set; }
 
         public string DatabaseVersion { get; set; }
+        public string ReaderVersion { get; set; }
 
         public List<PlayerInstance> Players { get; set; }
         public List<GuildInstance> Guilds { get; set; }
@@ -49,7 +53,7 @@ namespace PalCalc.UI.Model
 
         public bool IsValid => UnderlyingSave.IsValid;
 
-        public bool IsOutdated(PalDB currentDb) => LastModified != UnderlyingSave.LastModified || DatabaseVersion != currentDb.Version;
+        public bool IsOutdated(PalDB currentDb) => LastModified != UnderlyingSave.LastModified || DatabaseVersion != currentDb.Version || ReaderVersion != SaveReaderVersion;
 
         public string StateId => $"{IdentifierFor(UnderlyingSave)}-{LastModified.Ticks}";
 
