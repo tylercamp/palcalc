@@ -38,14 +38,14 @@ namespace PalCalc.UI.ViewModel
         public int MaxInputIrrelevantTraits
         {
             get => maxInputIrrelevantTraits;
-            set => SetProperty(ref maxInputIrrelevantTraits, Math.Clamp(value, 0, 3));
+            set => SetProperty(ref maxInputIrrelevantTraits, Math.Clamp(value, 0, 4));
         }
 
         public int maxBredIrrelevantTraits;
         public int MaxBredIrrelevantTraits
         {
             get => maxBredIrrelevantTraits;
-            set => SetProperty(ref maxBredIrrelevantTraits, Math.Clamp(value, 0, 3));
+            set => SetProperty(ref maxBredIrrelevantTraits, Math.Clamp(value, 0, 4));
         }
 
         [ObservableProperty]

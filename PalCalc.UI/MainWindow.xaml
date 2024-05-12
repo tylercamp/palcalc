@@ -9,19 +9,19 @@
         xmlns:m="clr-namespace:PalCalc.UI.Model"
         xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
         mc:Ignorable="d"
-        Title="Pal Calc" Height="450" Width="900"
+        Title="Pal Calc" Height="720" Width="1280"
         xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
         xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition MinWidth="220"/>
+            <ColumnDefinition MinWidth="220" Width="300"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="232*"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="43*"/>
+            <ColumnDefinition Width="80*"/>
         </Grid.ColumnDefinitions>
-        <DockPanel Grid.Column="0" Margin="10,10,10,10" IsEnabled="{Binding IsEditable}">
+        <DockPanel Grid.Column="0" Margin="5" IsEnabled="{Binding IsEditable}">
             <StackPanel DockPanel.Dock="Top">
                 <GroupBox Header="Save File">
                     <v:SaveSelectorView DataContext="{Binding SaveSelection}" />
@@ -33,14 +33,14 @@
             </StackPanel>
 
             <GroupBox Header="Target Pals">
-                <v:PalTargetListView DataContext="{Binding PalTargetList}" />
+                <v:PalTargetListView BorderThickness="0" DataContext="{Binding PalTargetList}" />
             </GroupBox>
         </DockPanel>
 
-        <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
-        <DockPanel Grid.Column="2">
-            <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" OnRun="SolverControlsView_OnRun" OnCancel="SolverControlsView_OnCancel" />
+        <DockPanel Grid.Column="2" Margin="0,5,0,0">
+            <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" OnRun="SolverControlsView_OnRun" OnCancel="SolverControlsView_OnCancel" Margin="0,0,0,5" />
 
             <Grid DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
                 <ProgressBar Value="{Binding SolverProgress}" />
@@ -50,9 +50,9 @@
             <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
         </DockPanel>
 
-        <GridSplitter Grid.Column="3" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+        <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
-        <DockPanel Grid.Column="4" IsEnabled="{Binding IsEditable}" Margin="0,0,0,5">
+        <DockPanel Grid.Column="4" IsEnabled="{Binding IsEditable}" Margin="5">
             <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
                 <GroupBox Header="Target Pal">
                     <v:PalTargetView DataContext="{Binding PalTarget}" />
@@ -60,13 +60,15 @@
 
                 <GroupBox Header="Source Pals">
                     <StackPanel Orientation="Vertical">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                             <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeBasePals}">
                                 <TextBlock Text="Include Pals at Base" TextWrapping="Wrap" />
                             </CheckBox>
                         </StackPanel>
-                    
-                        <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}" />
+
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
+                            <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}" />
+                        </ScrollViewer>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
@@ -78,7 +80,7 @@
                 </Grid.RowDefinitions>
                 
                 <GroupBox Header="Results" Grid.Row="0">
-                    <v:BreedingResultListView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
+                    <v:BreedingResultListView BorderThickness="0" DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
                 </GroupBox>
 
                 <StackPanel Grid.Row="1">

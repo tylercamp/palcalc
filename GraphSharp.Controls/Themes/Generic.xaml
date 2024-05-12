@@ -316,20 +316,20 @@
                         <Border Padding="5" Margin="5"
                                 CornerRadius="5"
                                 Background="#88C0C0C0"
-                                Width="275"
-                                Height="40"
+                                Width="Auto"
+                                Height="Auto"
                                 VerticalAlignment="Top"
-                                HorizontalAlignment="Left">
-                            <StackPanel Orientation="Horizontal">
-                                <ToggleButton Content="1:1" Width="55"
-                                              IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Mode,Converter={StaticResource EqualityConverter},ConverterParameter={x:Static zoom:ZoomControlModes.Original}}" />
-                                <ToggleButton Content="Fill" Width="55"
+                                HorizontalAlignment="Right">
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal" Height="30">
+                                    <ToggleButton Content="Fill" Width="55"
                                               IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Mode,Converter={StaticResource EqualityConverter},ConverterParameter={x:Static zoom:ZoomControlModes.Fill}}" />
-                                <ToggleButton Content="Custom" Width="55"
+                                    <ToggleButton Content="Custom" Width="55"
                                               IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Mode,Converter={StaticResource EqualityConverter},ConverterParameter={x:Static zoom:ZoomControlModes.Custom}}" />
+                                </StackPanel>
                                 <TextBlock
-                                    Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Zoom,StringFormat='Zoom: {0:P2}'}"
-                                    VerticalAlignment="Center" Margin="5,0,0,0" />
+Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Zoom,StringFormat='Zoom: {0:P0}'}"
+HorizontalAlignment="Center" Margin="0,4,0,2" />
                             </StackPanel>
                         </Border>
                     </Grid>

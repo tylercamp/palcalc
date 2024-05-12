@@ -10,7 +10,7 @@
             mc:Ignorable="d" 
             d:Background="White"
             d:DataContext="{d:DesignInstance vm:SaveSelectorViewModel, IsDesignTimeCreatable=True}" d:DesignWidth="436.57">
-    <Label Content="Saves Location" />
+    <Label Content="Location" />
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -29,7 +29,7 @@
         </Button>
     </Grid>
 
-    <Label Content="Save Game" />
+    <Label Content="Game" />
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -52,15 +52,25 @@
         </Button>
     </Grid>
 
-    <TextBlock Visibility="{Binding NoXboxSavesMsgVisibility}" Margin="5,5,5,5" TextWrapping="Wrap" FontStyle="Italic">
-        No Xbox saves were found. Palworld must be installed on the PC through the
-        <Hyperlink NavigateUri="https://apps.microsoft.com/detail/9mv0b5hzvk9z" RequestNavigate="Hyperlink_RequestNavigate">Xbox app / Game Pass.</Hyperlink>
-        Save files are synced to your PC when you run the game.
-    </TextBlock>
+    <StackPanel Margin="5,0,5,0">
+        <StackPanel.Resources>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="Margin" Value="0,5,0,0" />
+            </Style>
+        </StackPanel.Resources>
+        
+        <TextBlock Visibility="{Binding NoXboxSavesMsgVisibility}" TextWrapping="Wrap" FontStyle="Italic">
+            No Xbox saves were found. Palworld must be installed on the PC through the
+            <Hyperlink NavigateUri="https://apps.microsoft.com/detail/9mv0b5hzvk9z" RequestNavigate="Hyperlink_RequestNavigate">Xbox app / Game Pass.</Hyperlink>
+            Save files are synced to your PC when you run the game.
+        </TextBlock>
 
-    <TextBlock Visibility="{Binding InvalidSaveMessageVisibility}" Margin="0,5,0,0" Text="The selected save file is invalid!" Foreground="DarkRed" />
+        <TextBlock Visibility="{Binding InvalidSaveMessageVisibility}" Foreground="DarkRed" TextWrapping="Wrap">
+            The selected save file is invalid!
+        </TextBlock>
 
-    <TextBlock Visibility="{Binding XboxIncompleteVisibility}" Foreground="DarkRed" Margin="0,5,0,0" TextWrapping="Wrap">
-        The Xbox save file is incomplete, but features will still work. This resolves automatically when Palworld is closed for a few minutes and Pal Calc is restarted.
-    </TextBlock>
+        <TextBlock Visibility="{Binding XboxIncompleteVisibility}" Foreground="DarkRed" TextWrapping="Wrap">
+            The Xbox save file is incomplete, but features will still work. This resolves automatically when Palworld is closed for a few minutes and Pal Calc is restarted.
+        </TextBlock>
+    </StackPanel>
 </StackPanel>

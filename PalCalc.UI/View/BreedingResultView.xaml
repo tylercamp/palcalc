@@ -101,12 +101,11 @@
 
         </Style>
     </UserControl.Resources>
-    <zoom:ZoomControl Grid.Column="1" Background="Gray" Zoom="2" FillMarginPercent="0.1">
+    <zoom:ZoomControl Grid.Column="1" Background="#606060" Mode="Fill" FillMarginPercent="0.05">
         <gsvm:BreedingGraphLayout
             Graph="{Binding Graph}"
             AnimationLength="0"
             IsAnimationEnabled="False"
-            TextOptions.TextHintingMode="Fixed"
         />
     </zoom:ZoomControl>
 </UserControl>

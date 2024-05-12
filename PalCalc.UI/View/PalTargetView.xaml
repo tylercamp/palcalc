@@ -16,8 +16,8 @@
             <TextBlock Text="{Binding Name}" />
         </DataTemplate>
     </StackPanel.Resources>
-    <Label Content="Pal" />
-    <dnkc:AutoCompleteComboBox ItemsSource="{Binding AvailablePals}" SelectedValue="{Binding CurrentPalSpecifier.TargetPal, Mode=TwoWay}" TextSearch.TextPath="Label">
+    <Label Content="Pal" Margin="5,0,0,0" />
+    <dnkc:AutoCompleteComboBox ItemsSource="{Binding AvailablePals}" SelectedValue="{Binding CurrentPalSpecifier.TargetPal, Mode=TwoWay}" TextSearch.TextPath="Label" Margin="6,0,6,0">
         <dnkc:AutoCompleteComboBox.ItemTemplate>
             <DataTemplate DataType="vm:PalViewModel">
                 <Label Content="{Binding Label}" />
