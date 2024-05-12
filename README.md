@@ -75,7 +75,6 @@ The Community Toolkit library is used for the viewmodels, which provides the `Ob
 
 ## TODOs
 - Option to delete entries from list of target pals
-- Performance options (max threads)
 - Separate list of "Required traits" and "Optional traits" for target pal
 - Notify when a pal involved in a breeding path is no longer available in the source save or has been moved
 - Allow filtering of which wild pals may be included
