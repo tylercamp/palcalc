@@ -100,14 +100,7 @@ namespace PalCalc.Solver
                             .Where(instances => instances.Count != 0)
                             .Select(instances => instances
                                 .OrderBy(i => i.Traits.Count)
-                                .ThenBy(i => i.Location.Type switch
-                                {
-                                    // prefer pals in palbox, then in base, etc
-                                    LocationType.Palbox => 0,
-                                    LocationType.Base => 1,
-                                    LocationType.PlayerParty => 2,
-                                    _ => throw new NotImplementedException(),
-                                })
+                                .ThenBy(i => PreferredLocationPruning.LocationOrderingOf(i.Location.Type))
                                 .ThenByDescending(i => i.IV_HP + i.IV_Melee + i.IV_Shot + i.IV_Defense)
                                 .First()
                             )

@@ -18,17 +18,17 @@ namespace PalCalc.Solver
 
         public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results);
 
-        internal static readonly IEnumerable<IPalReference> empty = Enumerable.Empty<IPalReference>();
+        protected static readonly IEnumerable<IPalReference> Empty = Enumerable.Empty<IPalReference>();
         protected IEnumerable<IPalReference> FirstGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)
         {
             try
             {
                 if (token.IsCancellationRequested)
-                    return empty;
+                    return Empty;
 
                 var resultGroup = input.TakeWhile(_ => !token.IsCancellationRequested).GroupBy(grouping).OrderBy(g => g.Key).FirstOrDefault();
                 if (token.IsCancellationRequested)
-                    return empty;
+                    return Empty;
 
                 return resultGroup.ToList();
             }
@@ -74,15 +74,24 @@ namespace PalCalc.Solver
         {
         }
 
+        // prefer pals in palbox, then in base, etc
+        public static int LocationOrderingOf(LocationType type) => type switch
+        {
+            LocationType.Palbox => 0,
+            LocationType.Base => 100,
+            LocationType.PlayerParty => 10000,
+            _ => throw new NotImplementedException()
+        };
+
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
             FirstGroupOf(results, r =>
             {
                 var countsByLocationType = new Dictionary<LocationType, int>
-                    {
-                        { LocationType.Palbox, 0 },
-                        { LocationType.Base, 0 },
-                        { LocationType.PlayerParty, 0 },
-                    };
+                {
+                    { LocationType.Palbox, 0 },
+                    { LocationType.Base, 0 },
+                    { LocationType.PlayerParty, 0 },
+                };
 
                 foreach (var pref in r.AllReferences())
                 {
@@ -103,11 +112,10 @@ namespace PalCalc.Solver
                     }
                 }
 
-                // TODO - need to keep this ordering synced with the owned pal filtering done in BreedingSolver prep
                 return (
-                    countsByLocationType[LocationType.Palbox] * 0 +
-                    countsByLocationType[LocationType.Base] * 100 +
-                    countsByLocationType[LocationType.PlayerParty] * 10000
+                    countsByLocationType[LocationType.Palbox] * LocationOrderingOf(LocationType.Palbox) +
+                    countsByLocationType[LocationType.Base] * LocationOrderingOf(LocationType.Base) +
+                    countsByLocationType[LocationType.PlayerParty] * LocationOrderingOf(LocationType.PlayerParty)
                 );
             });
     }
@@ -206,7 +214,7 @@ namespace PalCalc.Solver
                 if (commonResults.Count == 1) break;
             }
 
-            if (token.IsCancellationRequested) return empty;
+            if (token.IsCancellationRequested) return Empty;
 
             var prunedResults = new List<IPalReference>() { commonResults.First() };
             foreach (var currentResult in results.TakeWhile(_ => !token.IsCancellationRequested))
