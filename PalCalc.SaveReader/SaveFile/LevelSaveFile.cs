@@ -87,6 +87,11 @@ namespace PalCalc.SaveReader.SaveFile
                         InstanceId = gvasInstance.InstanceId.ToString(),
                         OwnerPlayerId = gvasInstance.OwnerPlayerId?.ToString() ?? gvasInstance.OldOwnerPlayerIds.First().ToString(),
 
+                        IV_HP = gvasInstance.TalentHp ?? 0,
+                        IV_Melee = gvasInstance.TalentMelee ?? 0,
+                        IV_Shot = gvasInstance.TalentShot ?? 0,
+                        IV_Defense = gvasInstance.TalentDefense ?? 0,
+
                         Level = gvasInstance.Level,
                         NickName = gvasInstance.NickName,
                         Gender = gvasInstance.Gender.Contains("Female") ? PalGender.FEMALE : PalGender.MALE,

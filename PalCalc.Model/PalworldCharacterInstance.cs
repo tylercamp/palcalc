@@ -46,6 +46,11 @@ namespace PalCalc.Model
         public PalGender Gender { get; set; }
         public List<Trait> Traits { get; set; }
 
+        public int IV_HP { get; set; }
+        public int IV_Melee { get; set; }
+        public int IV_Shot { get; set; }
+        public int IV_Defense { get; set; }
+
         public override string ToString() => $"{Gender} {Pal} at {Location} with traits ({string.Join(", ", Traits)})";
 
     }

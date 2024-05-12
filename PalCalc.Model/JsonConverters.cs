@@ -30,6 +30,10 @@ namespace PalCalc.Model
                 NickName = token["NickName"].ToObject<string>(),
                 Level = token["Level"].ToObject<int>(),
                 InstanceId = token["InstanceId"].ToObject<string>(),
+                IV_HP = token["IV_HP"]?.ToObject<int>() ?? 0,
+                IV_Melee = token["IV_Melee"]?.ToObject<int>() ?? 0,
+                IV_Shot = token["IV_Shot"]?.ToObject<int>() ?? 0,
+                IV_Defense = token["IV_Defense"]?.ToObject<int>() ?? 0,
             };
         }
 
@@ -45,6 +49,10 @@ namespace PalCalc.Model
                 NickName = value.NickName,
                 Level = value.Level,
                 InstanceId = value.InstanceId,
+                IV_HP = value.IV_HP,
+                IV_Melee = value.IV_Melee,
+                IV_Shot = value.IV_Shot,
+                IV_Defense = value.IV_Defense,
             }).WriteTo(writer);
         }
     }

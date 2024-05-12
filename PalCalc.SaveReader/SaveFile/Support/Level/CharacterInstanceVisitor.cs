@@ -26,6 +26,11 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         public int SlotIndex { get; set; }
         public string Gender { get; set; }
 
+        public int? TalentHp { get; set; }
+        public int? TalentShot { get; set; }
+        public int? TalentMelee { get; set; }
+        public int? TalentDefense { get; set; }
+
         public List<string> Traits { get; set; }
     }
 
@@ -51,6 +56,10 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         const string K_PASSIVE_SKILL_LIST   = ".Value.RawData.SaveParameter.PassiveSkillList";
         const string K_OWNER_PLAYER_ID      = ".Value.RawData.SaveParameter.OwnerPlayerUId";
         const string K_OLD_OWNER_PLAYER_IDS = ".Value.RawData.SaveParameter.OldOwnerPlayerUIds.OldOwnerPlayerUIds";
+        const string K_TALENT_HP            = ".Value.RawData.SaveParameter.Talent_HP";
+        const string K_TALENT_SHOT          = ".Value.RawData.SaveParameter.Talent_Shot";
+        const string K_TALENT_MELEE         = ".Value.RawData.SaveParameter.Talent_Melee";
+        const string K_TALENT_DEFENSE       = ".Value.RawData.SaveParameter.Talent_Defense";
 
         static readonly List<string> REQUIRED_PAL_PROPS = new List<string>()
         {
@@ -77,7 +86,11 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                 K_GENDER,
                 K_CONTAINER_ID,
                 K_CONTAINER_SLOT_INDEX,
-                K_OWNER_PLAYER_ID
+                K_OWNER_PLAYER_ID,
+                K_TALENT_HP,
+                K_TALENT_SHOT,
+                K_TALENT_MELEE,
+                K_TALENT_DEFENSE
             );
 
             collectingVisitor.OnExit += (vals) =>
@@ -113,6 +126,11 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
                     pendingInstance.ContainerId = (Guid)vals[K_CONTAINER_ID];
                     pendingInstance.SlotIndex = (int)vals[K_CONTAINER_SLOT_INDEX];
+
+                    pendingInstance.TalentHp = vals.ContainsKey(K_TALENT_HP) ? (int)vals[K_TALENT_HP] : null;
+                    pendingInstance.TalentMelee = vals.ContainsKey(K_TALENT_MELEE) ? (int)vals[K_TALENT_MELEE] : null;
+                    pendingInstance.TalentShot = vals.ContainsKey(K_TALENT_SHOT) ? (int)vals[K_TALENT_SHOT] : null;
+                    pendingInstance.TalentDefense = vals.ContainsKey(K_TALENT_DEFENSE) ? (int)vals[K_TALENT_DEFENSE] : null;
                 }
             };
 
