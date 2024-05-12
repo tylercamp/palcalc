@@ -391,7 +391,7 @@ namespace PalCalc.UI.ViewModel
                 }
 
                 SolverProgress = 100 * overallStep / numTotalSteps;
-            });
+            }).Wait();
         }
 
         [ObservableProperty]
