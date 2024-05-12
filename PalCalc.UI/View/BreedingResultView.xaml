@@ -32,7 +32,13 @@
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="{Binding Pal.Name}" />
                         <TextBlock Text="{Binding Gender}" FontSize="10" />
-                        <TextBlock Text="{Binding Effort}" FontSize="10" Visibility="{Binding EffortVisibility}" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">
+                                <Run Text="{Binding AvgRequiredAttemptsDescription, Mode=OneWay}" />
+                                <Run Text=" - " />
+                            </TextBlock>
+                            <TextBlock Text="{Binding Effort}" FontSize="10" Visibility="{Binding EffortVisibility}" />
+                        </StackPanel>
                         <ContentControl Content="{Binding Location}">
                             <ContentControl.Resources>
                                 <DataTemplate DataType="{x:Type mvm:SpecificPalRefLocationViewModel}">

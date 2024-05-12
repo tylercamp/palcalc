@@ -62,5 +62,10 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         public IPalRefLocationViewModel Location { get; }
 
         public string Gender { get; }
+
+        public int AvgRequiredAttempts => (Value.PalRef as BredPalReference)?.AvgRequiredBreedings ?? 0;
+        public string AvgRequiredAttemptsDescription => $"{AvgRequiredAttempts} attempts";
+
+        public Visibility AvgRequiredAttemptsVisibility => Value.PalRef is BredPalReference ? Visibility.Visible : Visibility.Collapsed;
     }
 }
