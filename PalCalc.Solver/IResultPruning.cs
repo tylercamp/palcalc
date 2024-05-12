@@ -18,8 +18,20 @@ namespace PalCalc.Solver
 
         public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results);
 
-        protected IEnumerable<IPalReference> FirstGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping) =>
-            input.TakeWhile(_ => !token.IsCancellationRequested).GroupBy(grouping).OrderBy(g => g.Key).First().ToList();
+        protected IEnumerable<IPalReference> FirstGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)
+        {
+            try
+            {
+                return input.TakeWhile(_ => !token.IsCancellationRequested).GroupBy(grouping).OrderBy(g => g.Key).First().ToList();
+            }
+            catch (Exception)
+            {
+                if (!token.IsCancellationRequested)
+                    return Enumerable.Empty<IPalReference>();
+                else
+                    throw;
+            }
+        }
     }
 
     // main default pruning
