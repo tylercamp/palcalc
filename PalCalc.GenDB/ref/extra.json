@@ -1,0 +1,46 @@
+{
+  "Pals": [
+    {
+      "Name": "Bellanoir",
+      "CodeName": "NightLady",
+      "PalDexNo": 112,
+      "IsVariant": false,
+      "RunSpeed": 600,
+      "RideSprintSpeed": 800,
+      "Stamina": 100,
+      "BreedPower": 1,
+      "IndexOrder": -1,
+      "Mount": false,
+      "MountType": "None",
+      "Rarity": 20,
+
+      "MaleProbability": 5
+    },
+
+    {
+      "Name": "Bellanoir Libero",
+      "CodeName": "NightLady_Dark",
+      "PalDexNo": 112,
+      "IsVariant": true,
+      "RunSpeed": 600,
+      "RideSprintSpeed": 800,
+      "Stamina": 100,
+      "BreedPower": 1,
+      "IndexOrder": -1,
+      "Mount": false,
+      "MountType": "None",
+      "Rarity": 20,
+
+      "MaleProbability": 5
+    }
+  ],
+
+  "Traits": [
+    {
+      "Name": "Mercy Hit",
+      "CodeName": "NonKilling",
+      "IsPassive": true,
+      "Rank": -1
+    }
+  ]
+}

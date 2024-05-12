@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
+using System.Security.Cryptography;
 
 namespace PalCalc.GenDB
 {
-    internal class ParseCsvProgram
+    internal class BuildDBProgram
     {
         // min. number of times you need to breed Key1 to get a Key2 (to prune out path checks between pals which would exceed the max breeding steps)
         static Dictionary<Pal, Dictionary<Pal, int>> CalcMinDistances(PalDB db)
@@ -110,6 +111,8 @@ namespace PalCalc.GenDB
             ("Paladius", "Paladius", "Paladius"),
             ("Necromus", "Necromus", "Necromus"),
             ("Jormuntide Ignis", "Jormuntide Ignis", "Jormuntide Ignis"),
+            ("Bellanoir", "Bellanoir", "Bellanoir"),
+            ("Bellanoir Libero", "Bellanoir Libero", "Bellanoir Libero"),
         };
 
 
@@ -126,94 +129,29 @@ namespace PalCalc.GenDB
             ("Mozzarina", 0.2f),
             ("Elizabee", 0.1f),
             ("Beegarde", 0.1f),
+            ("Bellanoir", 0.05f),
+            ("Bellanoir Libero", 0.05f),
         };
-        
-
-        class PalCsvRow
-        {
-            string[] cols;
-            public PalCsvRow(string[] cols)
-            {
-                this.cols = cols;
-            }
-
-            public string Name => cols[0];
-            public string CodeName => cols[1];
-            public int Id => int.Parse(cols[8]);
-            public bool IsVariant => cols[9].Trim() == "B";
-            public int RunSpeed => int.Parse(cols[32]);
-            public int RideSprintSpeed => int.Parse(cols[33]);
-            public int Stamina => int.Parse(cols[51]);
-            public int BreedPower => int.Parse(cols[53]);
-            public int IndexOrder => int.Parse(cols[71]);
-            public bool Mount => cols[84] == "TRUE";
-            public MountType MountType
-            {
-                get
-                {
-                    switch (cols[85])
-                    {
-                        case "": return MountType.None;
-                        case "Ground": return MountType.Ground;
-                        case "Swim": return MountType.Swim;
-                        case "Fly": return MountType.Fly;
-                        case "Fly+Land": return MountType.FlyLand;
-                        default: throw new Exception("unrecognized mount type: " + cols[85]);
-                    }
-                }
-            }
-        }
-
-        class TraitCsvRow
-        {
-            string[] cols;
-            public TraitCsvRow(string[] cols)
-            {
-                this.cols = cols;
-            }
-
-            public string Name => cols[0];
-            public string InternalName => cols[1];
-            public bool IsPassiveTrait => cols[2] == "TRUE";
-            public int Rank => int.Parse(cols[6]);
-        }
 
         static void Main(string[] args)
         {
-            List<Trait> traits = File
-                // google sheets "Palworld: Breeding Combinations and Calculator (v1.3-014)"; "SkillData" tab (hidden)
-                .ReadAllLines("ref/traits.csv")
-                .Skip(1)
-                .Select(l => l.Split(","))
-                .Select(cols => new TraitCsvRow(cols))
-                .Where(row => row.IsPassiveTrait)
-                .Select(row => new Trait(row.Name, row.InternalName, row.Rank))
-                .ToList();
+            var pals = new List<Pal>();
+            pals.AddRange(ParseCsv.ReadPals());
+            pals.AddRange(ParseExtraJson.ReadPals());
 
-            List<Pal> pals = File
-                // google sheets "Palworld: Breeding Combinations and Calculator (v1.3-014)"; "PalData" tab (hidden)
-                // (required fixing some names / "variant" flags)
-                .ReadAllLines("ref/fulldata.csv")
-                .Skip(1)
-                .Select(l => l.Split(','))
-                .Select(cols => new PalCsvRow(cols))
-                .Select(row => new Pal
-                {
-                    Id = new PalId
-                    {
-                        PalDexNo = row.Id,
-                        IsVariant = row.IsVariant
-                    },
-                    Name = row.Name,
-                    InternalName = row.CodeName,
-                    InternalIndex = row.IndexOrder,
-                    BreedingPower = row.BreedPower,
-                    CanMount = row.Mount,
-                    MountType = row.MountType,
-                    RideSprintSpeed = row.RideSprintSpeed,
-                    RideWalkSpeed = row.RunSpeed,
-                    Stamina = row.Stamina
-                }).ToList();
+            var traits = new List<Trait>();
+            traits.AddRange(ParseCsv.ReadTraits());
+            traits.AddRange(ParseExtraJson.ReadTraits());
+
+            foreach (var (p1, p2, c) in SpecialCombos)
+            {
+                if (!pals.Any(p => p.Name == p1) || !pals.Any(p => p.Name == p2) || !pals.Any(p => p.Name == c))
+                    throw new Exception("Unrecognized pal name");
+            }
+
+            foreach (var (p1, _) in SpecialMaleProbabilities)
+                if (!pals.Any(p => p.Name == p1))
+                    throw new Exception("Unrecognized pal name");
 
             Pal Child(Pal parent1, Pal parent2)
             {
@@ -237,18 +175,18 @@ namespace PalCalc.GenDB
                     .First();
             }
 
-            var db = PalDB.MakeEmptyUnsafe();
+            var db = PalDB.MakeEmptyUnsafe("v2");
             db.Breeding = pals
-                    .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
-                    .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))
-                    .Distinct()
-                    .Select(p => new BreedingResult
-                    {
-                        Parent1 = p.Item1,
-                        Parent2 = p.Item2,
-                        Child = Child(p.Item1, p.Item2)
-                    })
-                    .ToList();
+                .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
+                .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))
+                .Distinct()
+                .Select(p => new BreedingResult
+                {
+                    Parent1 = p.Item1,
+                    Parent2 = p.Item2,
+                    Child = Child(p.Item1, p.Item2)
+                })
+                .ToList();
 
             db.PalsById = pals.ToDictionary(p => p.Id);
 

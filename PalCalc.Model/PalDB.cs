@@ -3,6 +3,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
@@ -14,6 +15,8 @@ namespace PalCalc.Model
     public class PalDB
     {
         internal PalDB() { }
+
+        public string Version { get; set; }
 
         public Dictionary<PalId, Pal> PalsById { get; set; }
 
@@ -201,6 +204,6 @@ namespace PalCalc.Model
         public string ToJson() => JsonConvert.SerializeObject(this);
 
         // should only be used when constructing a DB for serialization
-        public static PalDB MakeEmptyUnsafe() => new PalDB();
+        public static PalDB MakeEmptyUnsafe(string version) => new PalDB() { Version = version };
     }
 }
