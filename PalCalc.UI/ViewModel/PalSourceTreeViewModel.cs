@@ -53,7 +53,7 @@ namespace PalCalc.UI.ViewModel
                     LocationType.PlayerParty => p.OwnerPlayerId == ModelObject.PlayerId,
                     LocationType.Palbox => p.OwnerPlayerId == ModelObject.PlayerId,
                     LocationType.Base => source.GuildsByPlayerId[p.OwnerPlayerId].Id == guildId,
-                    _ => throw new NotImplementedException() // TODO
+                    _ => throw new NotImplementedException()
                 });
         }
     }

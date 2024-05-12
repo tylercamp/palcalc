@@ -229,7 +229,7 @@ namespace PalCalc.SaveReader.FArchive
         private (string, string, ulong) ReadRawProperty(FArchiveReader reader)
         {
             var name = reader.ReadString();
-            if (name == "None") throw new Exception(); // TODO
+            if (name == "None") throw new Exception("Expected to read property but got end of map");
 
             var typeName = reader.ReadString();
             var size = reader.ReadUInt64();
@@ -241,11 +241,11 @@ namespace PalCalc.SaveReader.FArchive
         {
             var (propName, typeName, size) = ReadRawProperty(reader);
 
-            if (propName != "GroupType") throw new Exception(); // TODO
-            if (typeName != "EnumProperty") throw new Exception(); // TODO
+            if (propName != "GroupType") throw new Exception($"Expected to get GroupType but got {propName}");
+            if (typeName != "EnumProperty") throw new Exception($"Expected EnumProperty but got {typeName}");
             
             var enumType = reader.ReadString();
-            if (enumType != "EPalGroupType") throw new Exception(); // TODO
+            if (enumType != "EPalGroupType") throw new Exception($"Expected EPalGroupType but got {enumType}");
 
             var enumId = reader.ReadOptionalGuid();
 
@@ -256,11 +256,11 @@ namespace PalCalc.SaveReader.FArchive
         {
             var (propName, typeName, size) = ReadRawProperty(reader);
 
-            if (propName != "RawData") throw new Exception(); // TODO
-            if (typeName != "ArrayProperty") throw new Exception(); // TODO
+            if (propName != "RawData") throw new Exception($"Expected property RawData but got {propName}");
+            if (typeName != "ArrayProperty") throw new Exception($"Expected ArrayProperty but got {typeName}");
 
             var arrayType = reader.ReadString();
-            if (arrayType != "ByteProperty") throw new Exception(); // TODO
+            if (arrayType != "ByteProperty") throw new Exception($"Expected ByteProperty but got {arrayType}");
 
             var id = reader.ReadOptionalGuid();
             var count = reader.ReadUInt32();

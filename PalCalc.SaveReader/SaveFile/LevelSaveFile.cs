@@ -123,7 +123,6 @@ namespace PalCalc.SaveReader.SaveFile
             var groupVisitor = new GroupVisitor();
             VisitGvas(containerVisitor, instanceVisitor, groupVisitor);
 
-            // TODO - handle errors
             var players = playersFiles.Select(pf => pf.ReadPlayerContent()).ToList();
 
             var containerTypeById = containerVisitor.CollectedContainers.ToDictionary(c => c.Id, c =>
