@@ -86,6 +86,7 @@ namespace PalCalc.Model
         {
             var asToken = JToken.ReadFrom(reader);
 
+            var version = asToken["Version"]?.ToObject<string>();
             var pals = asToken["Pals"].ToObject<List<Pal>>();
             var traits = asToken["Traits"].ToObject<List<Trait>>();
             var breedingGenderProbability = asToken["BreedingGenderProbability"].ToObject<Dictionary<string, Dictionary<PalGender, float>>>();
@@ -96,6 +97,7 @@ namespace PalCalc.Model
 
             return new PalDB()
             {
+                Version = version,
                 PalsById = pals.ToDictionary(p => p.Id),
                 Traits = traits,
                 Breeding = breeding,
@@ -123,6 +125,7 @@ namespace PalCalc.Model
             var breedingToken = JToken.FromObject(value.Breeding, serializer);
             JToken.FromObject(new
             {
+                Version = value.Version,
                 Pals = value.Pals,
                 Breeding = breedingToken,
                 Traits = value.Traits,
