@@ -18,16 +18,24 @@ namespace PalCalc.Solver
 
         public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results);
 
+        internal static readonly IEnumerable<IPalReference> empty = Enumerable.Empty<IPalReference>();
         protected IEnumerable<IPalReference> FirstGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)
         {
             try
             {
-                return input.TakeWhile(_ => !token.IsCancellationRequested).GroupBy(grouping).OrderBy(g => g.Key).First().ToList();
+                if (token.IsCancellationRequested)
+                    return empty;
+
+                var resultGroup = input.TakeWhile(_ => !token.IsCancellationRequested).GroupBy(grouping).OrderBy(g => g.Key).FirstOrDefault();
+                if (token.IsCancellationRequested)
+                    return empty;
+
+                return resultGroup.ToList();
             }
             catch (Exception)
             {
-                if (!token.IsCancellationRequested)
-                    return Enumerable.Empty<IPalReference>();
+                if (token.IsCancellationRequested)
+                    return input;
                 else
                     throw;
             }
@@ -198,8 +206,10 @@ namespace PalCalc.Solver
                 if (commonResults.Count == 1) break;
             }
 
+            if (token.IsCancellationRequested) return empty;
+
             var prunedResults = new List<IPalReference>() { commonResults.First() };
-            foreach (var currentResult in results)
+            foreach (var currentResult in results.TakeWhile(_ => !token.IsCancellationRequested))
             {
                 if (prunedResults.Contains(currentResult)) continue;
 
