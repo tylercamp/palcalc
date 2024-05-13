@@ -368,6 +368,7 @@ namespace GraphSharp.Controls
             if (g == null)
             {
                 gl.LayoutMode = LayoutMode.Automatic;
+                gl.RemoveAllGraphElement();
                 return;
             }
 
