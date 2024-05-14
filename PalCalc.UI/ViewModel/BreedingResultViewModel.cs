@@ -58,8 +58,9 @@ namespace PalCalc.UI.ViewModel
 
         public BreedingGraph Graph { get; private set; }
 
-        public TimeSpan? TimeEstimate => DisplayedResult?.BreedingEffort ?? TimeSpan.Zero;
-        public string Label => $"{DisplayedResult?.ToString() ?? "Unknown"}, takes ~{TimeEstimate?.TimeSpanMinutesStr()}";
+        public TimeSpan TimeEstimate => DisplayedResult?.BreedingEffort ?? TimeSpan.Zero;
+        public string TimeEstimateLabel => TimeEstimate.TimeSpanSecondsStr();
+        public string Label => $"{DisplayedResult?.ToString() ?? "Unknown"}, takes ~{TimeEstimate.TimeSpanMinutesStr()}";
 
         public int NumWildPals => DisplayedResult.NumWildPalParticipants();
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;

@@ -18,7 +18,7 @@
         <GridView>
             <GridView.Columns>
                 <GridViewColumn Header="Effort"
-                                DisplayMemberBinding="{Binding TimeEstimate}"
+                                DisplayMemberBinding="{Binding TimeEstimateLabel}"
                                 Width="{Binding EffortWidth}"
                                 util:GridViewSort.PropertyName="TimeEstimate"
                                 />

@@ -17,7 +17,7 @@ namespace PalCalc.UI
         public static string LimitLength(this string value, int maxLength) =>
             value.Length > maxLength ? value.Substring(0, maxLength - 3) + "..." : value;
 
-        public static string TimeSpanMinutesStr(this TimeSpan ts) => TimeSpan.FromMinutes((int)ts.TotalMinutes).ToString();
-        public static string TimeSpanSecondsStr(this TimeSpan ts) => TimeSpan.FromSeconds((int)ts.TotalSeconds).ToString();
+        public static string TimeSpanMinutesStr(this TimeSpan ts) => TimeSpan.FromMinutes((int)Math.Round(ts.TotalMinutes)).ToString();
+        public static string TimeSpanSecondsStr(this TimeSpan ts) => TimeSpan.FromSeconds((int)Math.Round(ts.TotalSeconds)).ToString();
     }
 }
