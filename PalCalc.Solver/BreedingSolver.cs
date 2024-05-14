@@ -390,9 +390,21 @@ namespace PalCalc.Solver
                 // add wild pals with varying number of random traits
                 initialContent.AddRange(
                     db.Pals
+                        .Where(p => !p.BreedingExclusive)
                         .Where(p => !relevantPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, maxBreedingSteps))
-                        .SelectMany(p => Enumerable.Range(0, maxInputIrrelevantTraits).Select(numTraits => new WildPalReference(p, numTraits)))
+                        .SelectMany(p =>
+                            Enumerable
+                                .Range(
+                                    0,
+                                    // number of "effectively random" traits should exclude guaranteed traits which are part of the desired list of traits
+                                    Math.Max(
+                                        0,
+                                        maxInputIrrelevantTraits - p.GuaranteedTraits(db).Except(spec.Traits).Count()
+                                    )
+                                )
+                                .Select(numRandomTraits => new WildPalReference(p, p.GuaranteedTraits(db).Intersect(spec.Traits), numRandomTraits))
+                        )
                         .Where(pi => pi.BreedingEffort <= maxEffort)
                 );
             }

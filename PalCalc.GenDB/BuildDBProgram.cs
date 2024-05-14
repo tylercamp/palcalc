@@ -133,6 +133,13 @@ namespace PalCalc.GenDB
             ("Bellanoir Libero", 0.05f),
         };
 
+        // pals you can only obtain from breeding
+        static List<string> PalsOnlyFromBreeding = new List<string>()
+        {
+            "Elphidran Aqua",
+            "Frostallion Noct",
+        };
+
         static void Main(string[] args)
         {
             var pals = new List<Pal>();
@@ -152,6 +159,16 @@ namespace PalCalc.GenDB
             foreach (var (p1, _) in SpecialMaleProbabilities)
                 if (!pals.Any(p => p.Name == p1))
                     throw new Exception("Unrecognized pal name");
+
+            foreach (var pal in pals)
+                if (pal.GuaranteedTraitInternalIds.Any(id => !traits.Any(t => t.InternalName == id)))
+                    throw new Exception("Unrecognized trait ID");
+
+            foreach (var name in PalsOnlyFromBreeding)
+            {
+                var pal = pals.Single(p => p.Name == name);
+                pal.BreedingExclusive = true;
+            }
 
             Pal Child(Pal parent1, Pal parent2)
             {
@@ -175,7 +192,7 @@ namespace PalCalc.GenDB
                     .First();
             }
 
-            var db = PalDB.MakeEmptyUnsafe("v3");
+            var db = PalDB.MakeEmptyUnsafe("v5");
             db.Breeding = pals
                 .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
                 .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))

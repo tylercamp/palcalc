@@ -232,16 +232,18 @@ namespace PalCalc.UI
             return JToken.FromObject(new
             {
                 PalId = value.Pal.Id,
-                NumTraits = value.EffectiveTraits.Count,
+                GuaranteedTraits = value.EffectiveTraits.Where(t => t is not RandomTrait).ToList(),
+                NumTraits = value.EffectiveTraits.Count(t => t is RandomTrait),
             }, serializer);
         }
 
         internal override WildPalReference ReadRefJson(JToken token, Type objectType, WildPalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var pal = token["PalId"].ToObject<PalId>(serializer).ToPal(db);
+            var guaranteedTraits = token["GuaranteedTraits"]?.ToObject<List<string>>()?.Select(s => s.InternalToTrait(db))?.ToList();
             var numTraits = token["NumTraits"].ToObject<int>();
 
-            return new WildPalReference(pal, numTraits);
+            return new WildPalReference(pal, guaranteedTraits ?? Enumerable.Empty<Trait>(), numTraits);
         }
     }
 

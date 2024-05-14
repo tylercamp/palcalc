@@ -29,6 +29,11 @@ namespace PalCalc.GenDB
             public int IndexOrder => int.Parse(cols[71]);
             public bool Mount => cols[84] == "TRUE";
 
+            public string GuaranteedTrait1 => cols[67];
+            public string GuaranteedTrait2 => cols[68];
+            public string GuaranteedTrait3 => cols[69];
+            public string GuaranteedTrait4 => cols[70];
+
             public MountType MountType
             {
                 get
@@ -101,6 +106,13 @@ namespace PalCalc.GenDB
                     RideWalkSpeed = row.RunSpeed,
                     Stamina = row.Stamina,
                     Rarity = row.Rarity,
+                    GuaranteedTraitInternalIds = new List<string>()
+                    {
+                        row.GuaranteedTrait1,
+                        row.GuaranteedTrait2,
+                        row.GuaranteedTrait3,
+                        row.GuaranteedTrait4,
+                    }.Where(t => t != "None").ToList()
                 }).ToList();
 
             return pals;

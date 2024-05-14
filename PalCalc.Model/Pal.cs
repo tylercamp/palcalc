@@ -39,6 +39,11 @@ namespace PalCalc.Model
         //// fields introduced after first release will need a default value
 
         public int Rarity { get; set; } = 0;
+        public List<string> GuaranteedTraitInternalIds { get; set; } = new List<string>();
+        public IEnumerable<Trait> GuaranteedTraits(PalDB db) => GuaranteedTraitInternalIds.Select(id => id.InternalToTrait(db));
+
+        // whether the pal can only be obtained by breeding
+        public bool BreedingExclusive { get; set; } = false;
 
         ////
 

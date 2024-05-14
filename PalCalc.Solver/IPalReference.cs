@@ -152,12 +152,15 @@ namespace PalCalc.Solver
 
     public class WildPalReference : IPalReference
     {
-        public WildPalReference(Pal pal, int numTraits)
+        public WildPalReference(Pal pal, IEnumerable<Trait> guaranteedTraits, int numTraits)
         {
             Pal = pal;
             SelfBreedingEffort = GameConstants.TimeToCatch(pal) / GameConstants.TraitWildAtMostN[numTraits];
-            EffectiveTraits = Enumerable.Range(0, numTraits).Select(i => new RandomTrait()).ToList<Trait>();
+            EffectiveTraits = guaranteedTraits.Concat(Enumerable.Range(0, numTraits).Select(i => new RandomTrait())).ToList();
             Gender = PalGender.WILDCARD;
+
+            if (guaranteedTraits.Any(t => !pal.GuaranteedTraitInternalIds.Contains(t.InternalName))) throw new InvalidOperationException();
+            if (EffectiveTraits.Count > GameConstants.MaxTotalTraits) throw new InvalidOperationException();
 
             EffectiveTraitsHash = EffectiveTraits.SetHash();
         }
