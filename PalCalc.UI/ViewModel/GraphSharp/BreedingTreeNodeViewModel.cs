@@ -22,9 +22,21 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             Pal = new PalViewModel(node.PalRef.Pal);
             Traits = node.PalRef.ActualTraits.Select(t => new TraitViewModel(t)).ToList();
             TraitCollection = new TraitCollectionViewModel(Traits);
-            Location = node.PalRef.Location is CompositeRefLocation
-                ? new CompositePalRefLocationViewModel(source, node.PalRef.Location as CompositeRefLocation)
-                : new SpecificPalRefLocationViewModel(source, node.PalRef.Location);
+
+            switch (node.PalRef.Location)
+            {
+                case CompositeRefLocation crl:
+                    Location = new CompositePalRefLocationViewModel(source, crl);
+                    break;
+
+                case CapturedRefLocation carl:
+                    Location = new WildPalRefLocationViewModel();
+                    break;
+
+                default:
+                    Location = new SpecificPalRefLocationViewModel(source, node.PalRef.Location);
+                    break;
+            }
 
             Gender = node.PalRef.Gender switch
             {

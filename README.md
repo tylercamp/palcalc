@@ -81,6 +81,7 @@ The Community Toolkit library is used for the viewmodels, which provides the `Ob
 - Update PalDB reference data for recent game updates
   - Figure out reliable process for updating DB.json with latest pal + trait info (where can I find a frequently-updated source of all required info?)
 - General UI/UX improvements
+- Optimize app startup time - a lot of time is spent reading the `LevelMeta.sav` GVAS files to fetch save data properties and provide a preview of the file contents (e.g. "Player 123, Level 15, Day 17")
 
 ## Maybe TODOs
 - Automatically detect changes to save file + reload
@@ -90,3 +91,4 @@ The Community Toolkit library is used for the viewmodels, which provides the `Ob
 - Attack skill inheritance + solving
 - Figure out how the data miners do their thing and read Pal DB info straight from game files?
 - Allow solving for multiple pals at once
+- Add a sort of "pal search" feature, listing all owned pal instances which have some traits / pal type

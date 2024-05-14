@@ -85,4 +85,9 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public string LocationCoordDescription { get; }
     }
+
+    public class WildPalRefLocationViewModel : IPalRefLocationViewModel
+    {
+
+    }
 }

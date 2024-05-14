@@ -76,6 +76,9 @@
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
+                                <DataTemplate DataType="{x:Type mvm:WildPalRefLocationViewModel}">
+                                    <TextBlock Foreground="White" FontSize="10">Captured</TextBlock>
+                                </DataTemplate>
                             </ContentControl.Resources>
                         </ContentControl>
                     </StackPanel>
