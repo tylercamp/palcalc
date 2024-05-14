@@ -158,6 +158,7 @@ namespace PalCalc.Solver
             SelfBreedingEffort = GameConstants.TimeToCatch(pal) / GameConstants.TraitWildAtMostN[numTraits];
             EffectiveTraits = guaranteedTraits.Concat(Enumerable.Range(0, numTraits).Select(i => new RandomTrait())).ToList();
             Gender = PalGender.WILDCARD;
+            CapturesRequiredForGender = 1;
 
             if (guaranteedTraits.Any(t => !pal.GuaranteedTraitInternalIds.Contains(t.InternalName))) throw new InvalidOperationException();
             if (EffectiveTraits.Count > GameConstants.MaxTotalTraits) throw new InvalidOperationException();
@@ -184,12 +185,7 @@ namespace PalCalc.Solver
 
         // est. number of captured pals required to get a pal of the given gender (assuming you caught every
         // wild pal without checking for gender, not realistic but good enough)
-        public int CapturesRequiredForGender
-        {
-            // assuming 50/50 chance of a wild instance of this pal to have either gender, in which case
-            // you'd need on avg. two captures to get the target gender
-            get => Gender == PalGender.WILDCARD ? 1 : 2;
-        }
+        public int CapturesRequiredForGender { get; private set; }
 
         // used as the effort required to catch one
         public TimeSpan SelfBreedingEffort { get; private set; }
@@ -204,7 +200,21 @@ namespace PalCalc.Solver
             {
                 SelfBreedingEffort = SelfBreedingEffort,
                 Gender = gender,
-                EffectiveTraits = EffectiveTraits
+                EffectiveTraits = EffectiveTraits,
+                CapturesRequiredForGender = gender switch
+                {
+                    PalGender.WILDCARD => 1,
+                    PalGender.OPPOSITE_WILDCARD =>
+                        (int)Math.Round(
+                            1 / Math.Min(
+                                db.BreedingGenderProbability[Pal][PalGender.MALE],
+                                db.BreedingGenderProbability[Pal][PalGender.FEMALE]
+                            )
+                        ),
+                    PalGender.MALE => (int)Math.Round(1 / db.BreedingGenderProbability[Pal][PalGender.MALE]),
+                    PalGender.FEMALE => (int)Math.Round(1 / db.BreedingGenderProbability[Pal][PalGender.FEMALE]),
+                    _ => throw new NotImplementedException()
+                }
             };
         }
 
