@@ -82,6 +82,7 @@ The Community Toolkit library is used for the viewmodels, which provides the `Ob
   - Figure out reliable process for updating DB.json with latest pal + trait info (where can I find a frequently-updated source of all required info?)
 - General UI/UX improvements
 - Optimize app startup time - a lot of time is spent reading the `LevelMeta.sav` GVAS files to fetch save data properties and provide a preview of the file contents (e.g. "Player 123, Level 15, Day 17")
+- Avoid the current default behavior of clearing out old files if there are incompatibilities, ignore and/or preserve a .bak file instead
 
 ## Maybe TODOs
 - Automatically detect changes to save file + reload
