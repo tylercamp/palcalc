@@ -8,21 +8,18 @@
              d:Width="40"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance mvm:TraitViewModel, IsDesignTimeCreatable=True}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <mvm:RankColorConverter x:Key="RCC" />
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Rectangle Grid.Column="0" VerticalAlignment="Stretch">
-            <Rectangle.Fill>
-                <SolidColorBrush Color="{Binding RankColor}" />
-            </Rectangle.Fill>
-        </Rectangle>
-        <Border Grid.Column="2" BorderThickness="0,1,1,1">
-            <Border.BorderBrush>
-                <SolidColorBrush Color="{Binding RankColor}" Opacity="0.5" />
-            </Border.BorderBrush>
-        </Border>
+        <Rectangle Grid.Column="0" VerticalAlignment="Stretch" Fill="{Binding Rank, Converter={StaticResource RCC}}" />
+        <Border Grid.Column="2" BorderThickness="0,1,1,1" Opacity="0.5" BorderBrush="{Binding Rank, Converter={StaticResource RCC}}" />
         <Grid Grid.Column="1" Margin="5,2,2,2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -34,10 +31,7 @@
                 <TextBlock Text="{Binding Name}" Height="14" FontSize="10" VerticalAlignment="Center" Foreground="White" />
             </Viewbox>
             <Grid Grid.Column="2">
-                <Rectangle Width="12" Height="12">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding RankColor}" />
-                    </Rectangle.Fill>
+                <Rectangle Width="12" Height="12" Fill="{Binding Rank, Converter={StaticResource RCC}}">
                     <Rectangle.OpacityMask>
                         <ImageBrush ImageSource="{Binding RankIcon}" />
                     </Rectangle.OpacityMask>
