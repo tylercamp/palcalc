@@ -79,6 +79,8 @@ namespace PalCalc.Solver
         }
 
         public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({EffectiveTraits.TraitsListToString()}) in {Location}";
+
+        public override int GetHashCode() => HashCode.Combine(nameof(OwnedPalReference), UnderlyingInstance.GetHashCode());
     }
 
     /// <summary>
@@ -148,6 +150,10 @@ namespace PalCalc.Solver
                 default: throw new NotImplementedException();
             }
         }
+
+        // TODO - maybe just use Pal, TraitsHash, Gender? don't need hashes specific to the instances chosen?
+        public override int GetHashCode() =>
+            HashCode.Combine(nameof(CompositeOwnedPalReference), Male, Female, EffectiveTraitsHash, Gender);
     }
 
     public class WildPalReference : IPalReference
@@ -239,6 +245,8 @@ namespace PalCalc.Solver
         }
 
         public override string ToString() => $"Captured {Gender} {Pal} w/ up to {EffectiveTraits.Count} random traits";
+
+        public override int GetHashCode() => HashCode.Combine(nameof(WildPalReference), Pal, Gender, EffectiveTraitsHash);
     }
 
     public class BredPalReference : IPalReference
@@ -255,11 +263,22 @@ namespace PalCalc.Solver
                 Parent1 = parent1;
                 Parent2 = parent2;
             }
+            else if (parent1.Pal.InternalIndex < parent2.Pal.InternalIndex)
+            {
+                Parent1 = parent2;
+                Parent2 = parent1;
+            }
+            else if (parent1.GetHashCode() < parent2.GetHashCode())
+            {
+                Parent1 = parent1;
+                Parent2 = parent2;
+            }
             else
             {
                 Parent1 = parent2;
                 Parent2 = parent1;
             }
+
             EffectiveTraits = traits;
             EffectiveTraitsHash = traits.SetHash();
 
@@ -376,6 +395,7 @@ namespace PalCalc.Solver
         }
 
         public override int GetHashCode() => HashCode.Combine(
+            nameof(BredPalReference),
             Pal,
             Parent1.GetHashCode() ^ Parent2.GetHashCode(),
             EffectiveTraitsHash,

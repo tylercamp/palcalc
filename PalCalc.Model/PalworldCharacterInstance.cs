@@ -47,11 +47,42 @@ namespace PalCalc.Model
         public List<Trait> Traits { get; set; }
 
         public int IV_HP { get; set; }
-        public int IV_Melee { get; set; }
         public int IV_Shot { get; set; }
         public int IV_Defense { get; set; }
 
+        // supposedly this is deprecated/unused
+        // https://www.reddit.com/r/Palworld/comments/1aedboa/partner_skill_upgrade_stats_exact_values_for_lv1/
+        public int IV_Melee { get; set; }
+
         public override string ToString() => $"{Gender} {Pal} at {Location} with traits ({string.Join(", ", Traits)})";
 
+        private int? hashCode;
+        public override int GetHashCode()
+        {
+            if (hashCode == null)
+            {
+                hashCode = HashCode.Combine(
+                    HashCode.Combine(
+                        InstanceId,
+                        NickName,
+                        Level,
+                        OwnerPlayerId
+                    ),
+                    HashCode.Combine(
+                        Pal,
+                        Location,
+                        Gender,
+                        Traits.SetHash()
+                    ),
+                    HashCode.Combine(
+                        IV_HP,
+                        IV_Melee,
+                        IV_Shot,
+                        IV_Defense
+                    )
+                );
+            }
+            return hashCode.Value;
+        }
     }
 }
