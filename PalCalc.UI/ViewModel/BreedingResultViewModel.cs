@@ -68,39 +68,53 @@ namespace PalCalc.UI.ViewModel
         public string FinalTraits => DisplayedResult.EffectiveTraitsString ?? string.Empty;
 
         private string inputLocations;
-        public string InputLocations => inputLocations ??=
-            string.Join(
-                ", ",
-                DisplayedResult
-                    .AllReferences()
-                    .Where(r => r is OwnedPalReference || r is CompositeOwnedPalReference)
-                    .SelectMany(r =>
-                    {
-                        switch (r)
+        public string InputLocations
+        {
+            get
+            {
+                if (inputLocations == null)
+                {
+                    var descriptionParts = DisplayedResult
+                        .AllReferences()
+                        .Where(r => r is OwnedPalReference || r is CompositeOwnedPalReference)
+                        .SelectMany(r =>
                         {
-                            case OwnedPalReference opr: return new List<PalLocation>() { opr.UnderlyingInstance.Location };
+                            switch (r)
+                            {
+                                case OwnedPalReference opr: return new List<PalLocation>() { opr.UnderlyingInstance.Location };
 
-                            case CompositeOwnedPalReference corl:
-                                return new List<PalLocation>()
-                                {
-                                    corl.Male.UnderlyingInstance.Location,
-                                    corl.Female.UnderlyingInstance.Location
-                                };
+                                case CompositeOwnedPalReference corl:
+                                    return new List<PalLocation>()
+                                    {
+                                        corl.Male.UnderlyingInstance.Location,
+                                        corl.Female.UnderlyingInstance.Location
+                                    };
 
-                            default:
-                                throw new NotImplementedException(); // shouldn't happen
-                        }
-                    })
-                    .GroupBy(l => l.Type)
-                    .OrderBy(g => g.Key switch
-                    {
-                        LocationType.Palbox => 0,
-                        LocationType.Base => 1,
-                        LocationType.PlayerParty => 2,
-                        _ => throw new NotImplementedException()
-                    })
-                    .Select(g => $"{g.Count()} in {g.Key.Label()}")
-            );
+                                default:
+                                    throw new NotImplementedException(); // shouldn't happen
+                            }
+                        })
+                        .GroupBy(l => l.Type)
+                        .OrderBy(g => g.Key switch
+                        {
+                            LocationType.Palbox => 0,
+                            LocationType.Base => 1,
+                            LocationType.PlayerParty => 2,
+                            _ => throw new NotImplementedException()
+                        })
+                        .Select(g => $"{g.Count()} in {g.Key.Label()}")
+                        .ToList();
+
+                    var numWildPals = DisplayedResult.AllReferences().Count(r => r is WildPalReference);
+                    if (numWildPals > 0)
+                        descriptionParts.Add($"{numWildPals} Wild");
+
+                    inputLocations = string.Join(", ", descriptionParts);
+                }
+
+                return inputLocations;
+            }
+        }
 
         public bool HasValue => Graph != null;
 
