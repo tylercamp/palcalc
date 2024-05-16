@@ -37,7 +37,7 @@ internal class Program
         var targetInstance = new PalSpecifier
         {
             Pal = "Ragnahawk".ToPal(db),
-            Traits = new List<Trait> { "Swift".ToTrait(db), "Runner".ToTrait(db), "Nimble".ToTrait(db) },
+            RequiredTraits = new List<Trait> { "Swift".ToTrait(db), "Runner".ToTrait(db), "Nimble".ToTrait(db) },
         };
 
         var matches = solver.SolveFor(targetInstance, CancellationToken.None);
