@@ -38,7 +38,7 @@ namespace PalCalc.UI.ViewModel
             var targetInstance = new PalSpecifier
             {
                 Pal = "Galeclaw".ToPal(db),
-                Traits = new List<Trait> {
+                RequiredTraits = new List<Trait> {
                     "Swift".ToTrait(db),
                     "Runner".ToTrait(db),
                     "Nimble".ToTrait(db)

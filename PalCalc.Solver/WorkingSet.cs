@@ -102,10 +102,17 @@ namespace PalCalc.Solver
 
                 var refNewInst = newInstances.First();
 
+                // these are results to be used as output, don't bother adding them to working set / continue breeding those
                 if (target.IsSatisfiedBy(refNewInst))
                 {
-                    // these are results to be used as output, don't bother adding them to working set / continue breeding those
-                    continue;
+                    // (though if we're not at the trait limit and there are some optional traits
+                    //  we'd like, then we'll keep this in the pool)
+                    if (
+                        // at max traits
+                        refNewInst.EffectiveTraits.Count(t => t is not RandomTrait) == GameConstants.MaxTotalTraits ||
+                        // there's nothing else we'd be interested in
+                        !target.OptionalTraits.Except(refNewInst.EffectiveTraits).Any()
+                    ) continue;
                 }
 
                 var existingInstances = content.GetValueOrElse(refNewInst.Pal.Id, new List<IPalReference>())

@@ -24,10 +24,5 @@ namespace PalCalc.UI.View
         {
             InitializeComponent();
         }
-
-        private void AutoCompleteComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
     }
 }

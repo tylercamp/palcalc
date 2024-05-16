@@ -297,7 +297,7 @@ namespace PalCalc.Solver
 
         public List<IPalReference> SolveFor(PalSpecifier spec, CancellationToken token)
         {
-            if (spec.Traits.Count > GameConstants.MaxTotalTraits)
+            if (spec.RequiredTraits.Count > GameConstants.MaxTotalTraits)
             {
                 throw new Exception("Target trait count cannot exceed max number of traits for a single pal");
             }
@@ -305,8 +305,8 @@ namespace PalCalc.Solver
             var statusMsg = new SolverStatus() { CurrentPhase = SolverPhase.Initializing, CurrentStepIndex = 0, TargetSteps = maxBreedingSteps, Canceled = token.IsCancellationRequested };
             SolverStateUpdated?.Invoke(statusMsg);
 
-            var relevantPals = RelevantInstancesForTraits(db, ownedPals, spec.Traits)
-               .Where(p => p.Traits.Except(spec.Traits).Count() <= maxInputIrrelevantTraits)
+            var relevantPals = RelevantInstancesForTraits(db, ownedPals, spec.DesiredTraits.ToList())
+               .Where(p => p.Traits.Except(spec.DesiredTraits).Count() <= maxInputIrrelevantTraits)
                .ToList();
 
             logger.Debug(
@@ -331,7 +331,7 @@ namespace PalCalc.Solver
             foreach (
                 var palGroup in relevantPals
                     .Where(pi => WithinBreedingSteps(pi.Pal, maxBreedingSteps))
-                    .Select(pi => new OwnedPalReference(pi, pi.Traits.ToDedicatedTraits(spec.Traits)))
+                    .Select(pi => new OwnedPalReference(pi, pi.Traits.ToDedicatedTraits(spec.DesiredTraits)))
                     .GroupBy(pi => pi.Pal)
             )
             {
@@ -400,10 +400,10 @@ namespace PalCalc.Solver
                                     // number of "effectively random" traits should exclude guaranteed traits which are part of the desired list of traits
                                     Math.Max(
                                         0,
-                                        maxInputIrrelevantTraits - p.GuaranteedTraits(db).Except(spec.Traits).Count()
+                                        maxInputIrrelevantTraits - p.GuaranteedTraits(db).Except(spec.DesiredTraits).Count()
                                     )
                                 )
-                                .Select(numRandomTraits => new WildPalReference(p, p.GuaranteedTraits(db).Intersect(spec.Traits), numRandomTraits))
+                                .Select(numRandomTraits => new WildPalReference(p, p.GuaranteedTraits(db).Intersect(spec.DesiredTraits), numRandomTraits))
                         )
                         .Where(pi => pi.BreedingEffort <= maxEffort)
                 );
@@ -451,8 +451,8 @@ namespace PalCalc.Solver
 
                                     var combinedTraits = p.Item1.EffectiveTraits.Concat(p.Item2.EffectiveTraits);
 
-                                    var anyRelevantFromParents = combinedTraits.Intersect(spec.Traits).Any();
-                                    var anyIrrelevantFromParents = combinedTraits.Except(spec.Traits).Any();
+                                    var anyRelevantFromParents = combinedTraits.Intersect(spec.DesiredTraits).Any();
+                                    var anyIrrelevantFromParents = combinedTraits.Except(spec.DesiredTraits).Any();
 
                                     return anyRelevantFromParents || !anyIrrelevantFromParents;
                                 })
@@ -470,7 +470,7 @@ namespace PalCalc.Solver
                                     var (preferredParent1, preferredParent2) = PreferredParentsGenders(parent1, parent2);
 
                                     var parentTraits = parent1.EffectiveTraits.Concat(parent2.EffectiveTraits).Distinct().ToList();
-                                    var desiredParentTraits = spec.Traits.Intersect(parentTraits).ToList();
+                                    var desiredParentTraits = spec.DesiredTraits.Intersect(parentTraits).ToList();
 
                                     var possibleResults = new List<IPalReference>();
 
