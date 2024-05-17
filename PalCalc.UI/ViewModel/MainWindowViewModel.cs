@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
+using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Mapped;
@@ -305,6 +306,15 @@ namespace PalCalc.UI.ViewModel
 
                     solverTokenSource = new CancellationTokenSource();
                     var results = solver.SolveFor(currentSpec, solverTokenSource.Token);
+
+                    var trimmer = new ResultsTrimmer(
+                        new PruningRulesBuilder(token => [
+                            new MinimumEffortPruning(token)
+                        ]),
+                        solverTokenSource.Token
+                    );
+
+                    results = trimmer.Trim(results).ToList();
 
                     dispatcher.Invoke(() =>
                     {

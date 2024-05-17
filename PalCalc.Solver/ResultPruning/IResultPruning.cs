@@ -29,7 +29,12 @@ namespace PalCalc.Solver.ResultPruning
                 if (token.IsCancellationRequested)
                     return Empty;
 
-                var resultGroup = input.TakeWhile(_ => !token.IsCancellationRequested).GroupBy(grouping).OrderBy(g => g.Key).FirstOrDefault();
+                var resultGroup = input
+                    .TakeWhile(_ => !token.IsCancellationRequested)
+                    .GroupBy(grouping)
+                    .OrderBy(g => g.Key)
+                    .FirstOrDefault();
+
                 if (token.IsCancellationRequested)
                     return Empty;
 
