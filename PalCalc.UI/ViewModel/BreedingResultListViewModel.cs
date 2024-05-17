@@ -48,6 +48,8 @@ namespace PalCalc.UI.ViewModel
         public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
         public double TraitsWidth => HiddenIfRedundant(vm => vm.FinalTraits);
 
+        public string ResultsHeading => Results == null ? "Results" : $"{Results.Count} Results";
+
         public static BreedingResultListViewModel DesignerInstance { get; } = new BreedingResultListViewModel()
         {
             Results = new List<BreedingResultViewModel>()
