@@ -2,6 +2,7 @@
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
+using PalCalc.Solver.PalReference;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.GraphSharp;
 using System;

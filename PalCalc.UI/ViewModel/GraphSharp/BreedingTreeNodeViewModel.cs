@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.Solver.PalReference;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel;
 using PalCalc.UI.ViewModel.Mapped;

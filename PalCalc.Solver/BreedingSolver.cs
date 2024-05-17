@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.PalReference;
 using Serilog;
 using System;
 using System.Collections.Generic;

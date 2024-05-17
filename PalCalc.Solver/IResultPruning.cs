@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Bson;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
+using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

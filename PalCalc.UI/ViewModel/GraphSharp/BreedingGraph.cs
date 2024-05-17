@@ -1,5 +1,6 @@
 ﻿using GraphSharp;
 using PalCalc.Solver;
+using PalCalc.Solver.PalReference;
 using PalCalc.UI.Model;
 using QuickGraph;
 using System;
