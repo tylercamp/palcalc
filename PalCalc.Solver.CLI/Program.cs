@@ -3,6 +3,7 @@ using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.Solver.ResultPruning;
+using PalCalc.Solver.Tree;
 using System.Diagnostics;
 
 internal class Program
