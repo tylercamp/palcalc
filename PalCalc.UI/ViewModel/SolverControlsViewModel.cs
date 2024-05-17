@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;

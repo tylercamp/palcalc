@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PalCalc.Solver.ResultPruning
+{
+    public class PruningRulesBuilder
+    {
+        public Func<CancellationToken, IEnumerable<IResultPruning>> Build { get; }
+
+        public PruningRulesBuilder(Func<CancellationToken, IEnumerable<IResultPruning>> build)
+        {
+            Build = build;
+        }
+
+        public static readonly PruningRulesBuilder Default = new PruningRulesBuilder(
+            token =>
+                new List<IResultPruning>()
+                {
+                    new MinimumEffortPruning(token),
+                    new MinimumBreedingStepsPruning(token),
+                    new PreferredLocationPruning(token),
+                    new MinimumReusePruning(token),
+                    new MinimumWildPalsPruning(token),
+                    new MinimumReferencedPlayersPruning(token),
+                    new VariedResultsPruning(token, maxSimilarityPercent: 0.1f),
+                    new ResultLimitPruning(token, maxResults: 3),
+                }
+        );
+    }
+}
