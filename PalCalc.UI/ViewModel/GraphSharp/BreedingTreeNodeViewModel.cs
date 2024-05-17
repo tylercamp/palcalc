@@ -2,6 +2,7 @@
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.Tree;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel;
 using PalCalc.UI.ViewModel.Mapped;

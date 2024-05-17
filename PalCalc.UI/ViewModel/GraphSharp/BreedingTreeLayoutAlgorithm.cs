@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using PalCalc.Solver;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows.Media.Animation;
 using QuickGraph.Serialization;
+using PalCalc.Solver.Tree;
 
 namespace PalCalc.UI.ViewModel.GraphSharp
 {
