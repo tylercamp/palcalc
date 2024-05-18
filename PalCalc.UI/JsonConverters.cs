@@ -353,9 +353,9 @@ namespace PalCalc.UI
                 Trait3 = obj["Trait3"].ToObject<TraitViewModel>(serializer),
                 Trait4 = obj["Trait4"].ToObject<TraitViewModel>(serializer),
                 OptionalTrait1 = obj["OptionalTrait1"]?.ToObject<TraitViewModel>(serializer),
-                OptionalTrait2 = obj["OptionalTrait1"]?.ToObject<TraitViewModel>(serializer),
-                OptionalTrait3 = obj["OptionalTrait1"]?.ToObject<TraitViewModel>(serializer),
-                OptionalTrait4 = obj["OptionalTrait1"]?.ToObject<TraitViewModel>(serializer),
+                OptionalTrait2 = obj["OptionalTrait2"]?.ToObject<TraitViewModel>(serializer),
+                OptionalTrait3 = obj["OptionalTrait3"]?.ToObject<TraitViewModel>(serializer),
+                OptionalTrait4 = obj["OptionalTrait4"]?.ToObject<TraitViewModel>(serializer),
                 PalSourceId = obj["PalSourceId"]?.ToObject<string>(),
                 IncludeBasePals = obj["IncludeBasePals"]?.ToObject<bool>() ?? true,
                 CurrentResults = obj["CurrentResults"].ToObject<BreedingResultListViewModel>(serializer)
