@@ -26,9 +26,9 @@
         <TextBlock
             Visibility="{Binding IsReadOnly, Converter={StaticResource BVC}}"
             Text="{Binding Label}"
-            HorizontalAlignment="Stretch"
+            HorizontalAlignment="Center"
             FontWeight="Bold"
-            FontSize="12"
+            FontSize="14"
             />
         
         <Grid

@@ -20,8 +20,6 @@
     <ListBox.ItemContainerStyle>
         <Style TargetType="ListBoxItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="Padding" Value="0" />
         </Style>
     </ListBox.ItemContainerStyle>
 </ListBox>
