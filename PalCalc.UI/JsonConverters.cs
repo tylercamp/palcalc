@@ -345,7 +345,7 @@ namespace PalCalc.UI
         protected override PalSpecifierViewModel ReadTypeJson(JsonReader reader, Type objectType, PalSpecifierViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var obj = JToken.ReadFrom(reader);
-            return new PalSpecifierViewModel()
+            return new PalSpecifierViewModel(null)
             {
                 TargetPal = obj["TargetPal"].ToObject<PalViewModel>(serializer),
                 Trait1 = obj["Trait1"].ToObject<TraitViewModel>(serializer),

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
 using System;
@@ -6,13 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
     public partial class PalSpecifierViewModel : ObservableObject
     {
-        public PalSpecifierViewModel() : this(null) { }
-
         public PalSpecifierViewModel(PalSpecifier underlyingSpec)
         {
             IsReadOnly = false;
@@ -68,6 +68,8 @@ namespace PalCalc.UI.ViewModel.Mapped
                 OptionalTrait4 = null;
             }
         }
+
+        public ICommand DeleteCommand { get; set; }
 
         public bool IsReadOnly { get; }
         public bool IsDynamic => !IsReadOnly;
@@ -199,6 +201,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             CurrentResults = CurrentResults,
             PalSourceId = PalSourceId,
             IncludeBasePals = IncludeBasePals,
+            DeleteCommand = DeleteCommand,
         };
 
         public static readonly PalSpecifierViewModel New = new PalSpecifierViewModel(null, true);
@@ -208,7 +211,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             get
             {
                 var db = PalDB.LoadEmbedded();
-                return new PalSpecifierViewModel()
+                return new PalSpecifierViewModel(null)
                 {
                     TargetPal = new PalViewModel("Beakon".ToPal(db)),
                     Trait1 = new TraitViewModel("Runner".ToTrait(db)),

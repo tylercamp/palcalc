@@ -71,6 +71,9 @@
         <TextBlock>
             <Hyperlink NavigateUri="https://www.flaticon.com/free-icons/open" RequestNavigate="Hyperlink_RequestNavigate">Open Folder icon by Smashicons</Hyperlink>
         </TextBlock>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://www.flaticon.com/free-icons/stop" RequestNavigate="Hyperlink_RequestNavigate">Delete icon by Alfredo Hernandez</Hyperlink>
+        </TextBlock>
         
         <Separator />
         

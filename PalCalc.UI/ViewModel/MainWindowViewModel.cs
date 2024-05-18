@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using PalCalc.Model;
 using PalCalc.SaveReader;
@@ -20,6 +21,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel
@@ -33,6 +35,7 @@ namespace PalCalc.UI.ViewModel
         private Dispatcher dispatcher;
         private CancellationTokenSource solverTokenSource;
         private AppSettings settings;
+        private IRelayCommand<PalSpecifierViewModel> deletePalTargetCommand;
 
         // https://stackoverflow.com/a/73181682
         private static void AllowUIToUpdate()
@@ -151,9 +154,42 @@ namespace PalCalc.UI.ViewModel
 
             if (settings.SelectedGameIdentifier != null) SaveSelection.TrySelectSaveGame(settings.SelectedGameIdentifier);
 
+            
+            // TODO - would prefer to have the delete command managed by the target list, rather than having
+            //        to manually assign the command for each specifier VM
+            deletePalTargetCommand = new RelayCommand<PalSpecifierViewModel>(OnDeletePalSpecifier);
+            foreach (var target in targetsBySaveFile.Values.SelectMany(l => l.Targets).Where(t => !t.IsReadOnly))
+                target.DeleteCommand = deletePalTargetCommand;
+
+
             dispatcher.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
 
             CheckForUpdates();
+        }
+
+        private void OnDeletePalSpecifier(PalSpecifierViewModel spec)
+        {
+            if (spec == null) return;
+
+            if (SaveSelection?.SelectedGame == null)
+            {
+                return;
+            }
+
+            var targetList = targetsBySaveFile[SaveSelection.SelectedGame.Value];
+
+            if (!targetList.Targets.Contains(spec))
+            {
+                return;
+            }
+
+            if (MessageBox.Show(App.Current.MainWindow, $"Delete this entry for {spec.TargetPal.Name}?", "Delete Pal Target", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                targetList.Remove(spec);
+                SaveTargetList(targetList);
+
+                UpdatePalTarget();
+            }
         }
 
         private void SaveSelection_CustomSaveAdded(ManualSavesLocationViewModel manualSaves, ISaveGame save)
@@ -283,6 +319,17 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
+        private void SaveTargetList(PalTargetListViewModel list)
+        {
+            var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
+            if (!Directory.Exists(outputFolder))
+                Directory.CreateDirectory(outputFolder);
+
+            var outputFile = Path.Join(outputFolder, "pal-targets.json");
+            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedGame.CachedValue);
+            File.WriteAllText(outputFile, JsonConvert.SerializeObject(list, converter));
+        }
+
         public void RunSolver()
         {
             var currentSpec = PalTarget?.CurrentPalSpecifier?.ModelObject;
@@ -316,6 +363,7 @@ namespace PalCalc.UI.ViewModel
                             PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(cachedData, r)).ToList() };
                             if (PalTarget.InitialPalSpecifier == null)
                             {
+                                PalTarget.CurrentPalSpecifier.DeleteCommand = deletePalTargetCommand;
                                 PalTargetList.Add(PalTarget.CurrentPalSpecifier);
                                 PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
                             }
@@ -326,13 +374,7 @@ namespace PalCalc.UI.ViewModel
                                 PalTargetList.SelectedTarget = updatedSpec;
                             }
 
-                            var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
-                            if (!Directory.Exists(outputFolder))
-                                Directory.CreateDirectory(outputFolder);
-
-                            var outputFile = Path.Join(outputFolder, "pal-targets.json");
-                            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedGame.CachedValue);
-                            File.WriteAllText(outputFile, JsonConvert.SerializeObject(PalTargetList, converter));
+                            SaveTargetList(PalTargetList);
 
                             UpdatePalTarget();
                         }

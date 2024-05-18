@@ -46,6 +46,7 @@ namespace PalCalc.UI.ViewModel
         private PalSpecifierViewModel selectedTarget;
 
         public void Add(PalSpecifierViewModel value) => targets.Insert(1, value);
+        public void Remove(PalSpecifierViewModel value) => targets.Remove(value);
 
         public void Replace(PalSpecifierViewModel oldValue, PalSpecifierViewModel newValue)
         {

@@ -12,5 +12,8 @@ namespace PalCalc.UI.Model
     {
         private static BitmapImage folderIcon;
         public static ImageSource FolderIcon => folderIcon ??= ResourceLookup.GetImage("Internal/folder.png");
+
+        private static BitmapImage deleteIcon;
+        public static ImageSource DeleteIcon => deleteIcon ??= ResourceLookup.GetImage("Internal/delete.png");
     }
 }

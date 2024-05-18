@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Internal\delete.png" />
     <None Remove="Resources\Internal\folder.png" />
     <None Remove="Resources\PalIconOverride.json" />
     <None Remove="Resources\Pals\Anubis.png" />
@@ -188,6 +189,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Internal\delete.png" />
     <Resource Include="Resources\Internal\folder.png" />
     <Resource Include="Resources\PalIconOverride.json" />
     <Resource Include="Resources\Pals\Anubis.png" />

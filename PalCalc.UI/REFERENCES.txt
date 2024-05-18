@@ -3,3 +3,6 @@ Error icon:
 
 folder.png
 <a href="https://www.flaticon.com/free-icons/open" title="open icons">Open icons created by Smashicons - Flaticon</a>
+
+delete.png
+<a href="https://www.flaticon.com/free-icons/stop" title="stop icons">Stop icons created by Alfredo Hernandez - Flaticon</a>

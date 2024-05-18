@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+             xmlns:m="clr-namespace:PalCalc.UI.Model"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              mc:Ignorable="d" 
              d:Background="White"
@@ -52,12 +53,29 @@
                     <RowDefinition />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock
-                    Text="{Binding TargetPal.Name}"
-                    Grid.Row="0"
-                    FontWeight="Bold"
-                    FontSize="14"
-                    />
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Text="{Binding TargetPal.Name}"
+                        Grid.Column="0"
+                        FontWeight="Bold"
+                        FontSize="14"
+                        />
+
+                    <Image
+                        HorizontalAlignment="Right"
+                        Height="12"
+                        Source="{x:Static m:InternalIcons.DeleteIcon}"
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Cursor="Hand"
+                        PreviewMouseDown="Image_PreviewMouseDown"
+                        />
+                </Grid>
 
                 <TextBlock
                     Text="{Binding RequiredTraitsCollection.RequiredDescription}"

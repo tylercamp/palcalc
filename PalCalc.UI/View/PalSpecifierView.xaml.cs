@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PalCalc.UI.ViewModel.Mapped;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,14 @@ namespace PalCalc.UI.View
         public PalSpecifierView()
         {
             InitializeComponent();
+        }
+
+        public PalSpecifierViewModel ViewModel => DataContext as PalSpecifierViewModel;
+
+        private void Image_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ViewModel?.DeleteCommand?.Execute(ViewModel);
+            e.Handled = true;
         }
     }
 }
