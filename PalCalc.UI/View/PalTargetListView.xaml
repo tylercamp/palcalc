@@ -10,10 +10,18 @@
          mc:Ignorable="d" 
          d:DataContext="{d:DesignInstance vm:PalTargetListViewModel, IsDesignTimeCreatable=True}"
          d:Background="White"
-         d:DesignHeight="450" d:DesignWidth="800">
+         d:DesignHeight="450" d:DesignWidth="800"
+         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
     <ListBox.ItemTemplate>
-            <DataTemplate DataType="mvm:PalSpecifierViewModel">
-                <TextBlock Text="{Binding Label}" />
-            </DataTemplate>
-        </ListBox.ItemTemplate>
+        <DataTemplate DataType="mvm:PalSpecifierViewModel">
+            <local:PalSpecifierView DataContext="{Binding}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" />
+        </DataTemplate>
+    </ListBox.ItemTemplate>
+    <ListBox.ItemContainerStyle>
+        <Style TargetType="ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+    </ListBox.ItemContainerStyle>
 </ListBox>

@@ -70,23 +70,25 @@ namespace PalCalc.UI.ViewModel.Mapped
         }
 
         public bool IsReadOnly { get; }
+        public bool IsDynamic => !IsReadOnly;
 
-        private List<Trait> TraitModelObjects => new List<TraitViewModel>() { Trait1, Trait2, Trait3, Trait4 }
-            .Where(t => t != null)
+        private IEnumerable<TraitViewModel> RequiredTraits => new List<TraitViewModel>() { Trait1, Trait2, Trait3, Trait4 }.Where(t => t != null);
+        private IEnumerable<TraitViewModel> OptionalTraits => new List<TraitViewModel>() { OptionalTrait1, OptionalTrait2, OptionalTrait3, OptionalTrait4 }.Where(t => t != null);
+
+        private List<Trait> RequiredTraitModelObjects => RequiredTraits
             .Select(t => t.ModelObject)
             .OrderBy(mo => mo.Name)
             .DistinctBy(mo => mo.Name)
             .ToList();
 
-        private List<Trait> OptionalTraitModelObjects => new List<TraitViewModel>() { OptionalTrait1, OptionalTrait2, OptionalTrait3, OptionalTrait4 }
-            .Where(t => t != null)
+        private List<Trait> OptionalTraitModelObjects => OptionalTraits
             .Select(t => t.ModelObject)
             .OrderBy(mo => mo.Name)
             .DistinctBy(mo => mo.Name)
             .ToList();
 
         public PalSpecifier ModelObject => TargetPal != null
-            ? new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredTraits = TraitModelObjects, OptionalTraits = OptionalTraitModelObjects }
+            ? new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredTraits = RequiredTraitModelObjects, OptionalTraits = OptionalTraitModelObjects }
             : null;
 
         [NotifyPropertyChangedFor(nameof(Label))]
@@ -95,32 +97,44 @@ namespace PalCalc.UI.ViewModel.Mapped
         private PalViewModel targetPal;
 
         [NotifyPropertyChangedFor(nameof(Label))]
+        [NotifyPropertyChangedFor(nameof(RequiredTraitsCollection))]
         [ObservableProperty]
         private TraitViewModel trait1;
 
+        [NotifyPropertyChangedFor(nameof(RequiredTraitsCollection))]
         [NotifyPropertyChangedFor(nameof(Label))]
         [ObservableProperty]
         private TraitViewModel trait2;
 
+        [NotifyPropertyChangedFor(nameof(RequiredTraitsCollection))]
         [NotifyPropertyChangedFor(nameof(Label))]
         [ObservableProperty]
         private TraitViewModel trait3;
 
+        [NotifyPropertyChangedFor(nameof(RequiredTraitsCollection))]
         [NotifyPropertyChangedFor(nameof(Label))]
         [ObservableProperty]
         private TraitViewModel trait4;
 
+        public TraitCollectionViewModel RequiredTraitsCollection => new TraitCollectionViewModel(RequiredTraits);
+
+        [NotifyPropertyChangedFor(nameof(OptionalTraitsCollection))]
         [ObservableProperty]
         private TraitViewModel optionalTrait1;
 
+        [NotifyPropertyChangedFor(nameof(OptionalTraitsCollection))]
         [ObservableProperty]
         private TraitViewModel optionalTrait2;
 
+        [NotifyPropertyChangedFor(nameof(OptionalTraitsCollection))]
         [ObservableProperty]
         private TraitViewModel optionalTrait3;
 
+        [NotifyPropertyChangedFor(nameof(OptionalTraitsCollection))]
         [ObservableProperty]
         private TraitViewModel optionalTrait4;
+
+        public TraitCollectionViewModel OptionalTraitsCollection => new TraitCollectionViewModel(OptionalTraits);
 
         [ObservableProperty]
         private BreedingResultListViewModel currentResults;
@@ -180,7 +194,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             IncludeBasePals
         );
 
-        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredTraits = TraitModelObjects, OptionalTraits = OptionalTraitModelObjects })
+        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredTraits = RequiredTraitModelObjects, OptionalTraits = OptionalTraitModelObjects })
         {
             CurrentResults = CurrentResults,
             PalSourceId = PalSourceId,
@@ -188,5 +202,21 @@ namespace PalCalc.UI.ViewModel.Mapped
         };
 
         public static readonly PalSpecifierViewModel New = new PalSpecifierViewModel(null, true);
+
+        public static PalSpecifierViewModel DesignerInstance
+        {
+            get
+            {
+                var db = PalDB.LoadEmbedded();
+                return new PalSpecifierViewModel()
+                {
+                    TargetPal = new PalViewModel("Beakon".ToPal(db)),
+                    Trait1 = new TraitViewModel("Runner".ToTrait(db)),
+                    Trait2 = new TraitViewModel("Swift".ToTrait(db)),
+
+                    OptionalTrait1 = new TraitViewModel("Aggressive".ToTrait(db))
+                };
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using PalCalc.UI.ViewModel.Mapped;
+﻿using PalCalc.Model;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
@@ -23,9 +24,9 @@ namespace PalCalc.UI.ViewModel
         {
         }
 
-        public TraitCollectionViewModel(List<TraitViewModel> traits)
+        public TraitCollectionViewModel(IEnumerable<TraitViewModel> traits)
         {
-            Traits = traits;
+            Traits = traits.ToList();
 
             RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             for (int i = 1; i < NumRows; i++)
@@ -44,6 +45,11 @@ namespace PalCalc.UI.ViewModel
             ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Spacing) });
             ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
         }
+
+        public string Description => Traits.Select(t => t.ModelObject).TraitsListToString();
+
+        public string RequiredDescription => $"With {Description}";
+        public string OptionalDescription => $"Optionally with {Description}";
 
         public List<TraitViewModel> Traits { get; }
 
