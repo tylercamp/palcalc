@@ -307,14 +307,7 @@ namespace PalCalc.UI.ViewModel
                     solverTokenSource = new CancellationTokenSource();
                     var results = solver.SolveFor(currentSpec, solverTokenSource.Token);
 
-                    var trimmer = new ResultsTrimmer(
-                        new PruningRulesBuilder(token => [
-                            new MinimumEffortPruning(token)
-                        ]),
-                        solverTokenSource.Token
-                    );
-
-                    results = trimmer.Trim(results).ToList();
+                    results = ResultsTrimmer.Default.Trim(results, solverTokenSource.Token).ToList();
 
                     dispatcher.Invoke(() =>
                     {
