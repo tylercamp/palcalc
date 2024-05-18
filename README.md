@@ -74,14 +74,13 @@ The Community Toolkit library is used for the viewmodels, which provides the `Ob
 `GraphSharp`, a defunct library [preserved after the Codeplex shutdown](https://github.com/NinetailLabs/GraphSharp), does not have any documentation. It was added here by referencing [hollowdrutt's implementation](https://github.com/hollowdrutt/GraphSharpDemo) of a useful overview/walkthrough of its usage [by Sacha Barber](https://sachabarbs.wordpress.com/2010/08/31/pretty-cool-graphs-in-wpf/).
 
 ## TODOs
-- Option to delete entries from list of target pals
-- Separate list of "Required traits" and "Optional traits" for target pal
 - Notify when a pal involved in a breeding path is no longer available in the source save or has been moved
 - Allow filtering of which wild pals may be included
 - Update PalDB reference data for recent game updates
   - Figure out reliable process for updating DB.json with latest pal + trait info (where can I find a frequently-updated source of all required info?)
 - General UI/UX improvements
-- Optimize app startup time - a lot of time is spent reading the `LevelMeta.sav` GVAS files to fetch save data properties and provide a preview of the file contents (e.g. "Player 123, Level 15, Day 17")
+- Optimize app startup time
+  - Seems to largely be due to JSON deserialization overhead
 - Avoid the current default behavior of clearing out old files if there are incompatibilities, ignore and/or preserve a .bak file instead
 
 ## Maybe TODOs
@@ -93,3 +92,4 @@ The Community Toolkit library is used for the viewmodels, which provides the `Ob
 - Figure out how the data miners do their thing and read Pal DB info straight from game files?
 - Allow solving for multiple pals at once
 - Add a sort of "pal search" feature, listing all owned pal instances which have some traits / pal type
+- Implement proper graph diffing for the built in GraphSharp animations
