@@ -42,9 +42,14 @@ namespace PalCalc.UI.ViewModel.Mapped
             ModelObject = new Trait("Runner", "runner", 2);
         }
 
+        private int hash;
+        private static Random random = new Random();
         public TraitViewModel(Trait trait)
         {
             ModelObject = trait;
+
+            if (trait is RandomTrait) hash = random.Next();
+            else hash = trait.GetHashCode();
         }
 
         public Trait ModelObject { get; }
@@ -55,7 +60,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         
         public string Name => ModelObject?.Name ?? "None";
 
-        public override bool Equals(object obj) => ModelObject.Equals((obj as TraitViewModel)?.ModelObject);
-        public override int GetHashCode() => ModelObject.GetHashCode();
+        public override bool Equals(object obj) => ModelObject is RandomTrait ? ReferenceEquals(this, obj) : ModelObject.Equals((obj as TraitViewModel)?.ModelObject);
+
+        public override int GetHashCode() => hash;
     }
 }
