@@ -1,0 +1,4 @@
+- Don't need to regen pal references from original save file, don't need to worry about deduplication
+- In VM use "Annotated" reference VMs which would include info on whether the reference is outdated
+- Boot app with a "startup" view
+- Add a "SolverService" for managing multiple solver tasks, allow read-only on specific widgets
