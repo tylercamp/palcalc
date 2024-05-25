@@ -64,7 +64,7 @@ namespace PalCalc.Model
             foreach (var g in elements.GroupBy(e => e.GetHashCode()).OrderBy(g => g.Key))
             {
                 var count = g.Count();
-                baseHash = HashCode.Combine(baseHash, g.Key, total);
+                baseHash = HashCode.Combine(baseHash, g.Key, count);
                 total += count;
             }
 
