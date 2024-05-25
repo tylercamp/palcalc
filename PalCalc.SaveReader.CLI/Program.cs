@@ -11,12 +11,11 @@ Logging.InitCommonFull();
 var db = PalDB.LoadEmbedded();
 
 var saveFolders = new List<ISavesLocation>();
-//saveFolders.AddRange(DirectSavesLocation.AllLocal);
+saveFolders.AddRange(DirectSavesLocation.AllLocal);
 saveFolders.AddRange(XboxSavesLocation.FindAll());
 
-var save2 = new StandardSaveGame(@"C:\Users\algor\OneDrive\Desktop\save-0");
+var save2 = new StandardSaveGame(@"C:\Users\algor\Desktop\Bad Loc");
 var level2 = save2.Level.ParseGvas();
-var local2 = save2.LocalData.ParseGvas();
 
 var charsGvas = level2.Collect(".worldSaveData.CharacterSaveParameterMap").Cast<MapProperty>().Single().Value;
 foreach (var c in charsGvas)
@@ -52,12 +51,13 @@ foreach (var kvp in containersGvas)
         var rawData = (slot["RawData"] as CharacterContainerDataProperty).TypedMeta;
         var rawInstanceId = rawData.InstanceId;
 
-        if (instanceId?.ToString() == "b08dca3f-1864-43df-bbf4-4571a749f555" || rawInstanceId?.ToString() == "8564cba0-4358-416e-9d62-895b0e344737")
+        if (instanceId?.ToString() == "c060ecd3-6ced-415f-94a8-30e9e0ee5ef0" || rawInstanceId?.ToString() == "c060ecd3-6ced-415f-94a8-30e9e0ee5ef0")
             Debugger.Break();
     }
 }
 
-var chars = save2.Level.ReadCharacterData(PalDB.LoadEmbedded(), []);
+var chars = save2.Level.ReadCharacterData(PalDB.LoadEmbedded(), save2.Players);
+var p = chars.Pals.Where(p => p.Pal.Name == "Jetragon" && p.Traits.Select(t => t.Name).Intersect(new string[] { "Legend", "Nimble", "Runner", "Swift" }).Count() == 4).Single();
 
 return;
 
@@ -81,7 +81,7 @@ foreach (var gameFolder in saveFolders)
 
         var meta = save.LevelMeta.ReadGameOptions();
         var characters = save.Level.ReadCharacterData(db, save.Players);
-        //var gvas = save.Level.ParseGvas();
+        var gvas = save.Level.ParseGvas();
 
         var visitor = new ReferenceCollectingVisitor();
         //save.Level.ParseGvas()
