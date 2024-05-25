@@ -80,7 +80,7 @@ namespace PalCalc.UI.Model
                 // being able to load the data
                 try { meta = game.LevelMeta.ReadGameOptions(); } catch { }
                 
-                var charData = game.Level.ReadCharacterData(db);
+                var charData = game.Level.ReadCharacterData(db, game.Players);
                 result = new CachedSaveGame(game)
                 {
                     DatabaseVersion = db.Version,
