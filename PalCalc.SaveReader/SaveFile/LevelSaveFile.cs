@@ -24,7 +24,7 @@ namespace PalCalc.SaveReader.SaveFile
 
         private Guid MostCommonOwner(PalContainer container, Dictionary<Guid, Guid> palOwnersByInstanceId) => container.Slots.GroupBy(s => palOwnersByInstanceId.GetValueOrElse(s.InstanceId, Guid.Empty)).MaxBy(g => g.Count()).Key;
 
-        private LevelSaveData BuildResult(PalDB db, List<GvasCharacterInstance> characters, List<GuildInstance> guilds, Dictionary<string, LocationType> containerTypeById)
+        private LevelSaveData BuildResult(PalDB db, List<GvasCharacterInstance> characters, List<GuildInstance> guilds, List<PalContainer> containers, Dictionary<string, LocationType> containerTypeById)
         {
             var result = new LevelSaveData()
             {
@@ -66,6 +66,13 @@ namespace PalCalc.SaveReader.SaveFile
                         //
                         // (might be due to butchered pals? https://github.com/tylercamp/palcalc/issues/12#issuecomment-2101688781)
                         logger.Warning("unrecognized pal container id '{id}', skipping", gvasInstance.ContainerId);
+                        continue;
+                    }
+
+                    var container = containers.Single(c => c.Id == gvasInstance.ContainerId.ToString());
+                    if (!container.Slots.Any(s => s.InstanceId == gvasInstance.InstanceId))
+                    {
+                        logger.Debug("pal instance data '{palId}' references container '{containerId}' but the container has no record of this pal, skipping", gvasInstance.InstanceId, container.Id);
                         continue;
                     }
 
@@ -133,7 +140,7 @@ namespace PalCalc.SaveReader.SaveFile
                 return LocationType.Base;
             });
 
-            var result = BuildResult(db, instanceVisitor.Result, groupVisitor.Result, containerTypeById);
+            var result = BuildResult(db, instanceVisitor.Result, groupVisitor.Result, containerVisitor.CollectedContainers, containerTypeById);
             logger.Debug("done");
             return result;
         }
@@ -141,7 +148,7 @@ namespace PalCalc.SaveReader.SaveFile
         /// <summary>
         /// Reads the list of character instances and attempts to infer the pal container types based on the owning player and container size.
         /// </summary>
-        public LevelSaveData ReadCharacterData(PalDB db)
+        private LevelSaveData ReadCharacterData(PalDB db)
         {
             logger.Debug("parsing content");
 
@@ -168,7 +175,7 @@ namespace PalCalc.SaveReader.SaveFile
                 return LocationType.Base;
             });
 
-            var result = BuildResult(db, instanceVisitor.Result, groupVisitor.Result, containerTypeById);
+            var result = BuildResult(db, instanceVisitor.Result, groupVisitor.Result, containerVisitor.CollectedContainers, containerTypeById);
 
             logger.Debug("done");
             return result;
