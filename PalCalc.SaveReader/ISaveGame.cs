@@ -68,9 +68,7 @@ namespace PalCalc.SaveReader
         public WorldOptionSaveFile WorldOption { get; }
         public List<PlayersSaveFile> Players { get; }
 
-        public bool IsValid =>
-            Level != null && Level.IsValid &&
-            LevelMeta != null && LevelMeta.IsValid;
+        public bool IsValid => Level != null && Level.IsValid;
 
         public override string ToString() => FolderName;
     }
