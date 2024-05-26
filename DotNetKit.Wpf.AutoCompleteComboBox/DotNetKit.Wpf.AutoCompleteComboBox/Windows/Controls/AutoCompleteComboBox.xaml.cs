@@ -275,10 +275,11 @@ namespace DotNetKit.Windows.Controls
 
         bool SelectItemFromMatchingText(string text)
         {
-            var matchingItem = ItemsSource?.Cast<object>().FirstOrDefault(v => TextFromItem(v).Equals(text, StringComparison.InvariantCultureIgnoreCase));
-            if (matchingItem != null) SelectedItem = matchingItem;
+            var filter = GetFilter(text);
+            var matchingItems = ItemsSource?.Cast<object>().Where(filter.Invoke).ToList();
+            if (matchingItems.Count == 1) SelectedItem = matchingItems.Single();
 
-            return matchingItem != null;
+            return matchingItems.Count == 1;
         }
 
         void ComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -326,9 +327,9 @@ namespace DotNetKit.Windows.Controls
             lastValidSelectedItem = SelectedItem;
         }
 
-        Predicate<object> GetFilter()
+        Predicate<object> GetFilter(string forText = null)
         {
-            var filter = SettingOrDefault.GetFilter(Text, TextFromItem);
+            var filter = SettingOrDefault.GetFilter(forText ?? Text, TextFromItem);
 
             return defaultItemsFilter != null
                 ? i => defaultItemsFilter(i) && filter(i)
