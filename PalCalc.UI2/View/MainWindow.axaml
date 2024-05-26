@@ -7,6 +7,10 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PalCalc.UI2.View.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
+		x:DataType="view:WindowVM"
+		Content="{Binding DisplayedControl, Mode=TwoWay}"
         Title="PalCalc.UI2">
-        <view:MainView />
+	<Window.DataContext>
+		<view:WindowVM />
+	</Window.DataContext>
 </Window>

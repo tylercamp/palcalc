@@ -4,18 +4,100 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:PalCalc.UI2.ViewModel"
 			 xmlns:vc="clr-namespace:PalCalc.UI2.View.Controls"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="600"
+			 xmlns:ctrl="using:GroupBox.Avalonia.Controls" 
+			 xmlns:themes="using:GroupBox.Avalonia.Themes"
              x:Class="PalCalc.UI2.View.MainView"
-			 xmlns:gb="clr-namespace:GroupBox.Avalonia.Controls;assembly=GroupBox.Avalonia"
              x:DataType="vm:MainVM">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainVM />
-  </Design.DataContext>
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+                to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainVM />
+    </Design.DataContext>
+
 	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="300" />
+			<ColumnDefinition Width="5" />
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="5" />
+			<ColumnDefinition Width="300" />
+		</Grid.ColumnDefinitions>
 
-	<vc:SaveSelectorView DataContext="{Binding SaveSelector}" />
+		<!-- LEFT PANE -->
+		<Border Grid.Column="0" Padding="10">
+			<DockPanel>
+				<StackPanel Spacing="10" DockPanel.Dock="Top">
+					<ctrl:GroupBox Header="Save File" Theme="{StaticResource GroupBoxClassic}">
+						<Border Padding="5">
+							<vc:SaveSelectorView DataContext="{Binding SaveSelector}" />
+						</Border>
+					</ctrl:GroupBox>
+					<ctrl:GroupBox Header="Game Settings" Theme="{StaticResource GroupBoxClassic}">
+						<Border Padding="5">
+							<StackPanel>
+								<StackPanel Orientation="Horizontal" Spacing="10">
+									<Label Content="Breeding Time (Mins)" VerticalAlignment="Center" />
+									<NumericUpDown Width="40" ShowButtonSpinner="False" />
+								</StackPanel>
+
+								<StackPanel Orientation="Horizontal" Spacing="10">
+									<Label Content="Multiple Breeding Farms" VerticalAlignment="Center" />
+									<CheckBox />
+								</StackPanel>
+							</StackPanel>
+						</Border>
+					</ctrl:GroupBox>
+				</StackPanel>
+
+				<ctrl:GroupBox Header="Target Pals" Margin="0,5,0,0" Theme="{StaticResource GroupBoxClassic}">
+					<ListBox>
+						<ListBox.Items>
+							<ListBoxItem>Test</ListBoxItem>
+						</ListBox.Items>
+					</ListBox>
+				</ctrl:GroupBox>
+			</DockPanel>
+		</Border>
+
+		<GridSplitter Grid.Column="1" ResizeDirection="Columns" />
+
+		<DockPanel Grid.Column="2">
+			<Border Padding="10">
+				<WrapPanel DockPanel.Dock="Top">
+					<WrapPanel.Styles>
+						<Style Selector="Label">
+							<Setter Property="VerticalAlignment" Value="Center" />
+						</Style>
+
+						<Style Selector="StackPanel">
+							<Setter Property="Spacing" Value="8" />
+							<Setter Property="Orientation" Value="Horizontal" />
+						</Style>
+
+						<Style Selector="NumericUpDown">
+							<Setter Property="ShowButtonSpinner" Value="False" />
+							<Setter Property="Width" Value="40" />
+						</Style>
+					</WrapPanel.Styles>
+
+					<StackPanel>
+						<Label Content="Max Breeding Steps" />
+						<NumericUpDown />
+					</StackPanel>
+
+					<StackPanel>
+						<Label Content="Max Breeding Steps" />
+						<NumericUpDown />
+					</StackPanel>
+
+					<StackPanel>
+						<Label Content="Max Breeding Steps" />
+						<NumericUpDown />
+					</StackPanel>
+				</WrapPanel>
+			</Border>
+		</DockPanel>
 	</Grid>
-
+	
 </UserControl>

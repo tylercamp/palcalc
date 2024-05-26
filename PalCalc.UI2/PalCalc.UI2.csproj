@@ -18,19 +18,21 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Controls.PanAndZoom" Version="11.0.0.3" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.2" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.10.9" />
+    <PackageReference Include="BinToss.GroupBox.Avalonia" Version="1.0.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.1.0" />
     <PackageReference Include="Material.Icons.Avalonia" Version="2.1.9" />
     <PackageReference Include="MikD1.AvaloniaFixedWrapPanel" Version="0.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Semi.Avalonia" Version="11.0.1" />
-    <PackageReference Include="Semi.Avalonia.DataGrid" Version="11.0.1" />
+    <PackageReference Include="Semi.Avalonia" Version="11.0.7.3" />
+    <PackageReference Include="Semi.Avalonia.DataGrid" Version="11.0.7.2" />
     <PackageReference Include="Semi.Avalonia.TreeDataGrid" Version="11.0.1" />
 	<PackageReference Include="Serilog" Version="3.1.1" />
 	<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
@@ -44,5 +46,9 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\PalIconOverride.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="View\LoadingView.axaml" />
   </ItemGroup>
 </Project>
