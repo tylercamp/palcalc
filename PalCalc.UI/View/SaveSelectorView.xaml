@@ -26,7 +26,7 @@
             </ItemsControl.ItemTemplate>
         </ComboBox>
         <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SavesLocationsFolder_Click" IsEnabled="{Binding CanOpenSavesLocation}" ToolTipService.ToolTip="Open in Explorer">
-            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" />
+            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
         </Button>
     </Grid>
 
@@ -49,7 +49,7 @@
         </ComboBox>
 
         <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SaveGameFolder_Click" IsEnabled="{Binding CanOpenSaveFileLocation}" ToolTipService.ToolTip="Open in Explorer">
-            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" />
+            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
         </Button>
     </Grid>
 
