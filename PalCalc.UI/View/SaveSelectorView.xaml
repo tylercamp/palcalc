@@ -76,10 +76,10 @@
     </StackPanel>
 
     <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
-        <Button Margin="0,0,5,0" Command="{Binding ExportSaveCommand}">
+        <Button Margin="0,0,5,0" Command="{Binding ExportSaveCommand}" ToolTip="Exports all known Palworld files for the selected save as a ZIP.">
             Export Save
         </Button>
-        <Button Command="{Binding ExportCrashLogCommand}">
+        <Button Command="{Binding ExportCrashLogCommand}" ToolTip="Exports recently-referenced save files, cache data, and settings as a ZIP.">
             Export Crash Log
         </Button>
     </StackPanel>
