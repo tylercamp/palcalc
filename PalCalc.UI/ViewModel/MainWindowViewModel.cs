@@ -59,7 +59,7 @@ namespace PalCalc.UI.ViewModel
         // main app model
         public MainWindowViewModel(Dispatcher dispatcher)
         {
-            this.dispatcher = dispatcher;
+            this.dispatcher = dispatcher ?? Dispatcher.CurrentDispatcher;
 
             CachedSaveGame.SaveFileLoadStart += CachedSaveGame_SaveFileLoadStart;
             CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
@@ -250,13 +250,6 @@ namespace PalCalc.UI.ViewModel
 
         private void UpdateFromSaveProperties()
         {
-            if (!Application.Current.MainWindow.IsVisible)
-            {
-                // fix error due to trying to show the "loading save file" window when the main window hasn't been presented yet
-                dispatcher.BeginInvoke(() => UpdateFromSaveProperties(), DispatcherPriority.ApplicationIdle);
-                return;
-            }
-
             if (PalTargetList != null) PalTargetList.PropertyChanged -= PalTargetList_PropertyChanged;
             if (GameSettings != null) GameSettings.PropertyChanged -= GameSettings_PropertyChanged;
 

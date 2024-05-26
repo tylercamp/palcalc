@@ -1,18 +1,19 @@
-﻿<Window x:Class="PalCalc.UI.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PalCalc.UI"
-        xmlns:v="clr-namespace:PalCalc.UI.View"
-        xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
-        xmlns:m="clr-namespace:PalCalc.UI.Model"
-        xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
-        mc:Ignorable="d"
-        Title="Pal Calc" Height="720" Width="1280"
-        xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
-        xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
-        d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
+﻿<Page x:Class="PalCalc.UI.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:local="clr-namespace:PalCalc.UI"
+      xmlns:v="clr-namespace:PalCalc.UI.View"
+      xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+      xmlns:m="clr-namespace:PalCalc.UI.Model"
+      xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
+      mc:Ignorable="d"
+      d:Background="White"
+      d:Width="1280" d:Height="720"
+      xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
+      xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
+      d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition MinWidth="220" Width="300"/>
@@ -93,4 +94,4 @@
             </Grid>
         </DockPanel>
     </Grid>
-</Window>
+</Page>

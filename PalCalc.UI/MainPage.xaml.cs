@@ -23,17 +23,23 @@ namespace PalCalc.UI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainPage : Page
     {
-        private ILogger logger = Log.ForContext<MainWindow>();
+        private ILogger logger = Log.ForContext<MainPage>();
 
-        public MainWindow()
+        internal MainPage()
         {
             InitializeComponent();
 
             var sw = Stopwatch.StartNew();
             DataContext = new MainWindowViewModel(Dispatcher);
             logger.Information("MainWindowViewModel took {ms}ms to start", sw.ElapsedMilliseconds);
+        }
+
+        internal MainPage(MainWindowViewModel vm)
+        {
+            InitializeComponent();
+            DataContext = vm;
         }
 
         private MainWindowViewModel ViewModel => DataContext as MainWindowViewModel;
@@ -48,17 +54,17 @@ namespace PalCalc.UI
             ViewModel.CancelSolver();
         }
 
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            base.OnClosing(e);
+        //protected override void OnClosing(CancelEventArgs e)
+        //{
+        //    base.OnClosing(e);
 
-            ViewModel.CancelSolver();
-        }
+        //    ViewModel.CancelSolver();
+        //}
 
         private void AboutButton_Click(object sender, RoutedEventArgs e)
         {
             var window = new AboutWindow();
-            window.Owner = this;
+            window.Owner = App.Current.MainWindow;
             window.ShowDialog();
         }
 
