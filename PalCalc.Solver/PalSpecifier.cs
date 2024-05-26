@@ -20,5 +20,11 @@ namespace PalCalc.Solver
         public override string ToString() => $"{Pal.Name} with {RequiredTraits.TraitsListToString()}";
 
         public bool IsSatisfiedBy(IPalReference palRef) => Pal == palRef.Pal && !RequiredTraits.Except(palRef.EffectiveTraits).Any();
+
+        public void Normalize()
+        {
+            RequiredTraits = RequiredTraits.Distinct().ToList();
+            OptionalTraits = OptionalTraits.Except(RequiredTraits).Distinct().ToList();
+        }
     }
 }

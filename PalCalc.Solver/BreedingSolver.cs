@@ -117,6 +117,48 @@ namespace PalCalc.Solver
             return relevantInstances;
         }
 
+        /// <summary>
+        /// Creates a list of desired combinations of traits. Meant to handle the case where there are over MAX_TRAITS desired traits.
+        /// The `requiredTraits` should never have more than MAX_TRAITS due to a check in `SolveFor`, so this logic is only really
+        /// necessary if `requiredTraits` + `optionalTraits` brings us over MAX_TRAITS.
+        /// </summary>
+        /// <param name="requiredTraits">The list of traits that will be contained in all permutations.</param>
+        /// <param name="optionalTraits">The list of traits that will appear at least once across the permutations, if possible.</param>
+        /// <returns></returns>
+        static IEnumerable<IEnumerable<Trait>> TraitPermutations(IEnumerable<Trait> requiredTraits, IEnumerable<Trait> optionalTraits)
+        {
+#if DEBUG && DEBUG_CHECKS
+            if (
+                requiredTraits.Count() > GameConstants.MaxTotalTraits ||
+                requiredTraits.Distinct().Count() != requiredTraits.Count() ||
+                optionalTraits.Distinct().Count() != optionalTraits.Count() ||
+                requiredTraits.Intersect(optionalTraits).Any()
+            ) Debugger.Break();
+#endif
+
+            // can't add any optional traits, just return required traits
+            if (!optionalTraits.Any() || requiredTraits.Count() == GameConstants.MaxTotalTraits)
+            {
+                yield return requiredTraits;
+                yield break;
+            }
+
+            var numTotalTraits = requiredTraits.Count() + optionalTraits.Count();
+            // we're within the trait limit, return all traits
+            if (numTotalTraits <= GameConstants.MaxTotalTraits)
+            {
+                yield return requiredTraits.Concat(optionalTraits);
+                yield break;
+            }
+
+            var maxOptionalTraits = GameConstants.MaxTotalTraits - requiredTraits.Count();
+            foreach (var optional in optionalTraits.ToList().Combinations(maxOptionalTraits).Where(c => c.Any()))
+            {
+                var res = requiredTraits.Concat(optional);
+                yield return res;
+            }
+        }
+
         // we have two parents but don't necessarily have definite genders for them, figure out which parent should have which
         // gender (if they're wild/bred pals) for the least overall effort (different pals have different gender probabilities)
         (IPalReference, IPalReference) PreferredParentsGenders(IPalReference parent1, IPalReference parent2)
@@ -237,7 +279,7 @@ namespace PalCalc.Solver
                 var numIrrelevantFromParent = actualNumInheritedFromParent - desiredParentTraits.Count;
                 var numIrrelevantFromRandom = numFinalTraits - actualNumInheritedFromParent;
 
-#if DEBUG
+#if DEBUG && DEBUG_CHECKS
                 if (numIrrelevantFromRandom < 0) Debugger.Break();
 #endif
 
@@ -286,7 +328,7 @@ namespace PalCalc.Solver
                     probabilityGotRequiredFromParent = probabilityCombinationWithDesiredTraits * GameConstants.TraitProbabilityDirect[numInheritedFromParent];
                 }
 
-#if DEBUG
+#if DEBUG && DEBUG_CHECKS
                 if (probabilityGotRequiredFromParent > 1) Debugger.Break();
 #endif
 
@@ -299,6 +341,8 @@ namespace PalCalc.Solver
 
         public List<IPalReference> SolveFor(PalSpecifier spec, CancellationToken token)
         {
+            spec.Normalize();
+
             if (spec.RequiredTraits.Count > GameConstants.MaxTotalTraits)
             {
                 throw new Exception("Target trait count cannot exceed max number of traits for a single pal");
@@ -472,50 +516,57 @@ namespace PalCalc.Solver
                                     var (preferredParent1, preferredParent2) = PreferredParentsGenders(parent1, parent2);
 
                                     var parentTraits = parent1.EffectiveTraits.Concat(parent2.EffectiveTraits).Distinct().ToList();
-                                    var desiredParentTraits = spec.DesiredTraits.Intersect(parentTraits).ToList();
-
                                     var possibleResults = new List<IPalReference>();
 
-                                    var probabilityForUpToNumTraits = 0.0f;
+                                    var traitPerms = TraitPermutations(
+                                        spec.RequiredTraits.Intersect(parentTraits).ToList(),
+                                        spec.OptionalTraits.Intersect(parentTraits).ToList()
+                                    ).Select(p => p.ToList()).ToList();
 
-                                    // go through each potential final number of traits, accumulate the probability of any of these exact options
-                                    // leading to the desired traits within MAX_IRRELEVANT_TRAITS.
-                                    //
-                                    // we'll generate an option for each possible outcome of up to the max possible number of traits, where each
-                                    // option represents the likelyhood of getting all desired traits + up to some number of irrelevant traits
-                                    for (int numFinalTraits = desiredParentTraits.Count; numFinalTraits <= Math.Min(GameConstants.MaxTotalTraits, desiredParentTraits.Count + maxBredIrrelevantTraits); numFinalTraits++)
+                                    foreach (var targetTraits in traitPerms)
                                     {
-#if DEBUG
-                                        float initialProbability = probabilityForUpToNumTraits;
+                                        // go through each potential final number of traits, accumulate the probability of any of these exact options
+                                        // leading to the desired traits within MAX_IRRELEVANT_TRAITS.
+                                        //
+                                        // we'll generate an option for each possible outcome of up to the max possible number of traits, where each
+                                        // option represents the likelyhood of getting all desired traits + up to some number of irrelevant traits
+                                        var probabilityForUpToNumTraits = 0.0f;
+
+                                        for (int numFinalTraits = targetTraits.Count; numFinalTraits <= Math.Min(GameConstants.MaxTotalTraits, targetTraits.Count + maxBredIrrelevantTraits); numFinalTraits++)
+                                        {
+#if DEBUG && DEBUG_CHECKS
+                                            float initialProbability = probabilityForUpToNumTraits;
 #endif
 
-                                        probabilityForUpToNumTraits += ProbabilityInheritedTargetTraits(parentTraits, desiredParentTraits, numFinalTraits);
+                                            probabilityForUpToNumTraits += ProbabilityInheritedTargetTraits(parentTraits, targetTraits, numFinalTraits);
 
-                                        if (probabilityForUpToNumTraits <= 0) continue;
+                                            if (probabilityForUpToNumTraits <= 0)
+                                                continue;
 
-#if DEBUG
-                                        if (initialProbability == probabilityForUpToNumTraits) Debugger.Break();
+#if DEBUG && DEBUG_CHECKS
+                                            if (initialProbability == probabilityForUpToNumTraits) Debugger.Break();
 #endif
 
-                                        // (not entirely correct, since some irrelevant traits may be specific and inherited by parents. if we know a child
-                                        //  may have some specific trait, it may be efficient to breed that child with another parent which also has that
-                                        //  irrelevant trait, which would increase the overall likelyhood of a desired trait being inherited)
-                                        var newTraits = new List<Trait>(numFinalTraits);
-                                        newTraits.AddRange(desiredParentTraits);
-                                        while (newTraits.Count < numFinalTraits)
-                                            newTraits.Add(new RandomTrait());
+                                            // (not entirely correct, since some irrelevant traits may be specific and inherited by parents. if we know a child
+                                            //  may have some specific trait, it may be efficient to breed that child with another parent which also has that
+                                            //  irrelevant trait, which would increase the overall likelyhood of a desired trait being inherited)
+                                            var newTraits = new List<Trait>(numFinalTraits);
+                                            newTraits.AddRange(targetTraits);
+                                            while (newTraits.Count < numFinalTraits)
+                                                newTraits.Add(new RandomTrait());
 
-                                        var res = new BredPalReference(
-                                            gameSettings,
-                                            db.BreedingByParent[parent1.Pal][parent2.Pal].Child,
-                                            preferredParent1,
-                                            preferredParent2,
-                                            newTraits,
-                                            probabilityForUpToNumTraits
-                                        );
+                                            var res = new BredPalReference(
+                                                gameSettings,
+                                                db.BreedingByParent[parent1.Pal][parent2.Pal].Child,
+                                                preferredParent1,
+                                                preferredParent2,
+                                                newTraits,
+                                                probabilityForUpToNumTraits
+                                            );
 
-                                        if (res.BreedingEffort <= maxEffort && (spec.IsSatisfiedBy(res) || workingSet.IsOptimal(res)))
-                                            possibleResults.Add(res);
+                                            if (res.BreedingEffort <= maxEffort && (spec.IsSatisfiedBy(res) || workingSet.IsOptimal(res)))
+                                                possibleResults.Add(res);
+                                        }
                                     }
 
                                     return possibleResults;
