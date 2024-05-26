@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.Model
+namespace PalCalc.UI2.Model
 {
     internal static class CrashSupport
     {
@@ -21,7 +21,7 @@ namespace PalCalc.UI.Model
         }
 
         private static List<ISaveGame> LoadedSaveHistory = new List<ISaveGame>();
-        private static List<CachedSaveGame> ReferencedCachedSaveHistory = new List<CachedSaveGame>();
+        private static List<SaveGameDetails> ReferencedCachedSaveHistory = new List<SaveGameDetails>();
 
         public static void ReferencedSave(ISaveGame save)
         {
@@ -34,7 +34,7 @@ namespace PalCalc.UI.Model
             }
         }
 
-        public static void ReferencedCachedSave(CachedSaveGame cached)
+        public static void ReferencedCachedSave(SaveGameDetails cached)
         {
             if (cached == null) return;
 
@@ -75,19 +75,7 @@ namespace PalCalc.UI.Model
             using (var outStream = new FileStream(outputPath, FileMode.Create))
             using (var archive = new ZipArchive(outStream, ZipArchiveMode.Create, true))
             {
-                try
-                {
-                    var basePath = Path.GetFullPath(StorageManager.DataPath);
-                    foreach (var f in Directory.EnumerateFiles(StorageManager.DataPath, "*", SearchOption.AllDirectories).Select(Path.GetFullPath))
-                    {
-                        try
-                        {
-                            archive.CreateEntryFromFile(f, f.Replace(basePath, "").TrimStart('/', '\\'));
-                        }
-                        catch { }
-                    }
-                }
-                catch { }
+                StorageManager.Data.AttachSupportFiles(archive);
 
                 var saves = specificSave != null ? [specificSave] : LoadedSaveHistory;
 
@@ -143,8 +131,7 @@ namespace PalCalc.UI.Model
                         var cached = ReferencedCachedSaveHistory[i];
                         if (cached?.UnderlyingSave == null) continue;
 
-                        var filePath = StorageManager.SaveCachePathFor(cached.UnderlyingSave);
-                        if (File.Exists(filePath)) archive.CreateEntryFromFile(filePath, $"save-cache-{i}.json");
+                        StorageManager.Cache.AttachSupportFiles(archive, $"save-cache-{i}.json", cached.UnderlyingSave);
                     }
                     catch { }
                 }

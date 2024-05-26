@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.Model
+namespace PalCalc.UI2.Model
 {
-    public interface IPalSource
+    internal interface IPalSource
     {
-        List<PalInstance> Filter(CachedSaveGame save);
+        List<PalInstance> Filter(SaveGameDetails save);
     }
 
-    public class PlayerPalSource : IPalSource
+    internal class PlayerPalSource : IPalSource
     {
         public PlayerPalSource(string playerId)
         {
@@ -21,10 +21,10 @@ namespace PalCalc.UI.Model
 
         public string PlayerId { get; }
 
-        public List<PalInstance> Filter(CachedSaveGame save) => save.OwnedPals.Where(p => p.OwnerPlayerId == PlayerId).ToList();
+        public List<PalInstance> Filter(SaveGameDetails save) => save.OwnedPals.Where(p => p.OwnerPlayerId == PlayerId).ToList();
     }
 
-    public class GuildPalSource : IPalSource
+    internal class GuildPalSource : IPalSource
     {
         public GuildPalSource(string guildId)
         {
@@ -33,15 +33,15 @@ namespace PalCalc.UI.Model
 
         public string GuildId { get; }
 
-        public List<PalInstance> Filter(CachedSaveGame save)
+        public List<PalInstance> Filter(SaveGameDetails save)
         {
             var playerIds = save.Guilds.Single(g => g.Id == GuildId).MemberIds;
             return save.OwnedPals.Where(p => playerIds.Contains(p.OwnerPlayerId)).ToList();
         }
     }
 
-    public class AllPalsPalSource : IPalSource
+    internal class AllPalsPalSource : IPalSource
     {
-        public List<PalInstance> Filter(CachedSaveGame save) => save.OwnedPals;
+        public List<PalInstance> Filter(SaveGameDetails save) => save.OwnedPals;
     }
 }

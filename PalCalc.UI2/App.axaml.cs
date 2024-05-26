@@ -3,10 +3,11 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using PalCalc.Model;
-using PalCalc.UI.Model;
+using PalCalc.UI2.Model;
 using PalCalc.UI2.Model.Storage;
+using PalCalc.UI2.View;
+using PalCalc.UI2.ViewModel;
 using PalCalc.UI2.ViewModels;
-using PalCalc.UI2.Views;
 using Serilog;
 using System;
 using System.IO;
@@ -27,8 +28,6 @@ public partial class App : Application
 #if RELEASE
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #endif
-
-        StorageManager.Init();
 
         if (!Directory.Exists(LogFolder)) Directory.CreateDirectory(LogFolder);
 
@@ -52,7 +51,8 @@ public partial class App : Application
 
         Serilog.Log.CloseAndFlush();
         var logZip = CrashSupport.PrepareSupportFile();
-        MessageBox.Show($"An unhandled error occurred.\n\nPlease find the generated ZIP file to send with any support questions:\n\n{logZip}");
+        // TODO
+        //MessageBox.Show($"An unhandled error occurred.\n\nPlease find the generated ZIP file to send with any support questions:\n\n{logZip}");
     }
 
     public override void Initialize()
@@ -70,14 +70,14 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel()
+                DataContext = new MainVM()
             };
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
             singleViewPlatform.MainView = new MainView
             {
-                DataContext = new MainViewModel()
+                DataContext = new MainVM()
             };
         }
 

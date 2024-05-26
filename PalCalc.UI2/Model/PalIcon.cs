@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace PalCalc.UI.Model
+namespace PalCalc.UI2.Model
 {
     internal static class PalIcon
     {

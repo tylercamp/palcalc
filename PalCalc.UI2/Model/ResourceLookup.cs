@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace PalCalc.UI.Model
+namespace PalCalc.UI2.Model
 {
     internal static class ResourceLookup
     {
@@ -18,7 +18,7 @@ namespace PalCalc.UI.Model
         {
             if (Design.IsDesignMode)
             {
-                return File.OpenRead($"PalCalc.UI/Resources/{pathInResources}");
+                return File.OpenRead($"PalCalc.UI2/Resources/{pathInResources}");
             }
             else
             {

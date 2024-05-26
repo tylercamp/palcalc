@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI
+namespace PalCalc.UI2
 {
     internal static class StringExtensions
     {

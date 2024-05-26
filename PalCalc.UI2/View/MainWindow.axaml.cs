@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 
-namespace PalCalc.UI2.Views;
+namespace PalCalc.UI2.View;
 
 public partial class MainWindow : Window
 {

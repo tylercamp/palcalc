@@ -2,15 +2,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:PalCalc.UI2.ViewModels"
+             xmlns:vm="clr-namespace:PalCalc.UI2.ViewModel"
+			 xmlns:vc="clr-namespace:PalCalc.UI2.View.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="PalCalc.UI2.Views.MainView"
-             x:DataType="vm:MainViewModel">
+             x:Class="PalCalc.UI2.View.MainView"
+			 xmlns:gb="clr-namespace:GroupBox.Avalonia.Controls;assembly=GroupBox.Avalonia"
+             x:DataType="vm:MainVM">
   <Design.DataContext>
     <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
+    <vm:MainVM />
   </Design.DataContext>
+	<Grid>
 
-  <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+	<vc:SaveSelectorView DataContext="{Binding SaveSelector}" />
+	</Grid>
+
 </UserControl>

@@ -26,6 +26,7 @@
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0" />
+    <PackageReference Include="Material.Icons.Avalonia" Version="2.1.9" />
     <PackageReference Include="MikD1.AvaloniaFixedWrapPanel" Version="0.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Semi.Avalonia" Version="11.0.1" />
@@ -43,9 +44,5 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\PalIconOverride.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ViewModels\Mapped\" />
   </ItemGroup>
 </Project>

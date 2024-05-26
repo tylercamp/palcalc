@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.Model
+namespace PalCalc.UI2.Model
 {
     public class SolverSettings
     {
