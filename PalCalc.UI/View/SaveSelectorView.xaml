@@ -74,4 +74,13 @@
             The Xbox save file is incomplete, but features will still work. This resolves automatically when Palworld is closed for a few minutes and Pal Calc is restarted.
         </TextBlock>
     </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
+        <Button Margin="0,0,5,0" Command="{Binding ExportSaveCommand}">
+            Export Save
+        </Button>
+        <Button Command="{Binding ExportCrashLogCommand}">
+            Export Crash Log
+        </Button>
+    </StackPanel>
 </StackPanel>

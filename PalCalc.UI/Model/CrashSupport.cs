@@ -66,13 +66,13 @@ namespace PalCalc.UI.Model
             return true;
         }
 
-        public static string PrepareSupportFile(ISaveGame specificSave = null)
+        public static string PrepareSupportFile(string outputPath = null, ISaveGame specificSave = null)
         {
-            var outputPath = Path.GetFullPath("CRASHLOG.zip");
+            outputPath ??= Path.GetFullPath("CRASHLOG.zip");
             if (File.Exists(outputPath)) File.Delete(outputPath);
 
             using (var outStream = new FileStream(outputPath, FileMode.Create))
-            using (var archive = new ZipArchive(outStream, ZipArchiveMode.Create, true))
+            using (var archive = new ZipArchive(outStream, ZipArchiveMode.Create))
             {
                 try
                 {

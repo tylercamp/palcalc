@@ -1,24 +1,32 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
+using Serilog;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
+using Windows.UI.WebUI;
 
 namespace PalCalc.UI.ViewModel
 {
     internal partial class SaveSelectorViewModel : ObservableObject
     {
+        private static ILogger logger = Log.ForContext<SaveSelectorViewModel>();
+
         public event Action<ManualSavesLocationViewModel, ISaveGame> NewCustomSaveSelected;
 
         public List<ISavesLocationViewModel> SavesLocations { get; }
@@ -96,6 +104,8 @@ namespace PalCalc.UI.ViewModel
                     {
                         OnPropertyChanged(nameof(InvalidSaveMessageVisibility));
                     }
+
+                    ExportSaveCommand?.NotifyCanExecuteChanged();
                 }
             }
         }
@@ -125,6 +135,70 @@ namespace PalCalc.UI.ViewModel
             SavesLocations.Add(manualLocation);
 
             SelectedLocation = MostRecentLocation;
+
+            ExportSaveCommand = new RelayCommand(
+                execute: () =>
+                {
+                    var sfd = new SaveFileDialog()
+                    {
+                        FileName = $"Palworld-{CachedSaveGame.IdentifierFor(SelectedGame.Value)}.zip",
+                        Filter = "ZIP | *.zip",
+                        AddExtension = true,
+                        DefaultExt = "zip"
+                    };
+
+                    if (sfd.ShowDialog() == true)
+                    {
+                        using (var outStream = new FileStream(sfd.FileName, FileMode.Create))
+                        using (var archive = new ZipArchive(outStream, ZipArchiveMode.Create))
+                        {
+                            var save = SelectedGame.Value;
+
+                            if (save.Level != null && save.Level.Exists)
+                                archive.CreateEntryFromFile(save.Level.FilePath, "Level.sav");
+
+                            if (save.LevelMeta != null && save.LevelMeta.Exists)
+                                archive.CreateEntryFromFile(save.LevelMeta.FilePath, "LevelMeta.sav");
+
+                            if (save.WorldOption != null && save.WorldOption.Exists)
+                                archive.CreateEntryFromFile(save.WorldOption.FilePath, "WorldOption.sav");
+
+                            if (save.LocalData != null && save.LocalData.Exists)
+                                archive.CreateEntryFromFile(save.LocalData.FilePath, "LocalData.sav");
+
+                            foreach (var player in save.Players.Where(p => p.Exists))
+                            {
+                                archive.CreateEntryFromFile(player.FilePath, $"Players/{Path.GetFileName(player.FilePath)}");
+                            }
+                        }
+                    }
+                },
+                canExecute: () => SelectedGame?.Value != null
+            );
+
+            ExportCrashLogCommand = new RelayCommand(
+                execute: () =>
+                {
+                    var sfd = new SaveFileDialog();
+                    sfd.FileName = "CRASHLOG.zip";
+                    sfd.Filter = "ZIP | *.zip";
+                    sfd.AddExtension = true;
+                    sfd.DefaultExt = "zip";
+
+                    if (sfd.ShowDialog() == true)
+                    {
+                        try
+                        {
+                            CrashSupport.PrepareSupportFile(sfd.FileName);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Warning(e, "unexpected error when attempting to create crashlog file");
+                            MessageBox.Show("Could not create the crashlog file.");
+                        }
+                    }
+                }
+            );
         }
 
         public void TrySelectSaveGame(string saveIdentifier)
@@ -141,6 +215,20 @@ namespace PalCalc.UI.ViewModel
                     }
                 }
             }
+        }
+
+        private IRelayCommand exportSaveCommand;
+        public IRelayCommand ExportSaveCommand
+        {
+            get => exportSaveCommand;
+            private set => SetProperty(ref exportSaveCommand, value);
+        }
+
+        private IRelayCommand exportCrashLogCommand;
+        public IRelayCommand ExportCrashLogCommand
+        {
+            get => exportCrashLogCommand;
+            private set => SetProperty(ref exportCrashLogCommand, value);
         }
     }
 }
