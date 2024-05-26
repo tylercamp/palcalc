@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.ResultPruning
 {
     // avoid generating lots of very similar results
-    public class VariedResultsPruning : IResultPruning
+    public class VariedResultsPruning : IResultPruning.ForceDeterministic
     {
         float maxSimilarityPercent; // 0 - 1
         public VariedResultsPruning(CancellationToken token, float maxSimilarityPercent) : base(token)
@@ -17,7 +17,7 @@ namespace PalCalc.Solver.ResultPruning
             this.maxSimilarityPercent = maxSimilarityPercent;
         }
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results)
+        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results)
         {
             var palOccurrences = results.ToDictionary(r => r, r =>
             {

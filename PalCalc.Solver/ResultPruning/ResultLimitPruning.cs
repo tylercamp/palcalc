@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.ResultPruning
 {
-    public class ResultLimitPruning : IResultPruning
+    public class ResultLimitPruning : IResultPruning.ForceDeterministic
     {
         int maxResults;
         public ResultLimitPruning(CancellationToken token, int maxResults) : base(token)
@@ -15,6 +15,7 @@ namespace PalCalc.Solver.ResultPruning
             this.maxResults = maxResults;
         }
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) => results.TakeWhile(_ => !token.IsCancellationRequested).Take(maxResults);
+        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results) =>
+            results.TakeWhile(_ => !token.IsCancellationRequested).Take(maxResults);
     }
 }

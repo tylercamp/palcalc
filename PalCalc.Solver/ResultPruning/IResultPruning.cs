@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,6 +48,18 @@ namespace PalCalc.Solver.ResultPruning
                 else
                     throw;
             }
+        }
+
+        public abstract class ForceDeterministic : IResultPruning
+        {
+            protected ForceDeterministic(CancellationToken token) : base(token)
+            {
+            }
+
+            public sealed override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
+                ApplyNonDeterministic(results.OrderBy(r => r.GetHashCode()));
+
+            protected abstract IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results);
         }
     }
 }
