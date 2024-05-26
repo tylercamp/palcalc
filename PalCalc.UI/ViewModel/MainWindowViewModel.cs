@@ -355,12 +355,25 @@ namespace PalCalc.UI.ViewModel
                     solverTokenSource = new CancellationTokenSource();
                     var results = solver.SolveFor(currentSpec, solverTokenSource.Token);
 
+                    // general simplification pass, get the best result for each potentially
+                    // interesting combination of result properties
                     var resultsTable = new PalPropertyGrouping(PalProperty.Combine(
                         PalProperty.EffectiveTraits,
+                        PalProperty.NumBreedingSteps,
                         p => p.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
                     ));
                     resultsTable.AddRange(results);
                     resultsTable.FilterAll(PruningRulesBuilder.Default, solverTokenSource.Token);
+
+                    // final simplification pass, ignore any results which are over 2x the effort of the fastest option
+                    resultsTable = resultsTable.BuildNew(PalProperty.Combine(
+                        PalProperty.EffectiveTraits
+                    ));
+                    resultsTable.FilterAll(g =>
+                    {
+                        var fastest = g.Min(r => r.BreedingEffort);
+                        return g.Where(r => r.BreedingEffort <= fastest * 2);
+                    });
 
                     results = resultsTable.All.ToList();
 
