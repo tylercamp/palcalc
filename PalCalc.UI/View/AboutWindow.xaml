@@ -38,11 +38,11 @@
             <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/releases" RequestNavigate="Hyperlink_RequestNavigate">Releases</Hyperlink>
         </TextBlock>
 
-        <TextBlock FontStyle="Italic" FontSize="9">
+        <TextBlock FontStyle="Italic" FontSize="10">
             Pal Calc is an independent project and is not affiliated with Palworld or Pocket Pair, Inc.
         </TextBlock>
-        <TextBlock FontStyle="Italic" FontSize="9">
-            All Palworld resources are owned by Pocket Pair, Inc.
+        <TextBlock FontStyle="Italic" FontSize="10">
+            All Palworld assets are owned by Pocket Pair, Inc.
         </TextBlock>
 
         <Separator />
@@ -66,22 +66,8 @@
         </TextBlock>
 
         <Separator />
-        
-        <Label FontWeight="Bold" FontSize="12">Resources</Label>
-        <TextBlock>
-            <Hyperlink NavigateUri="https://www.flaticon.com/free-icons/open" RequestNavigate="Hyperlink_RequestNavigate">Open Folder icon by Smashicons</Hyperlink>
-        </TextBlock>
-        <TextBlock>
-            <Hyperlink NavigateUri="https://www.flaticon.com/free-icons/stop" RequestNavigate="Hyperlink_RequestNavigate">Delete icon by Alfredo Hernandez</Hyperlink>
-        </TextBlock>
-        
-        <Separator />
-        
+
         <Label FontWeight="Bold" FontSize="12">Libraries</Label>
-        <TextBlock>
-            <Hyperlink NavigateUri="https://github.com/xceedsoftware/wpftoolkit" RequestNavigate="Hyperlink_RequestNavigate">WPF Toolkit by Xceed Software</Hyperlink>
-            (<Hyperlink NavigateUri="https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md" RequestNavigate="Hyperlink_RequestNavigate">Community License</Hyperlink>)
-        </TextBlock>
         <TextBlock>
             <Hyperlink NavigateUri="https://github.com/serilog/serilog" RequestNavigate="Hyperlink_RequestNavigate">Serilog</Hyperlink>
             (<Hyperlink NavigateUri="https://github.com/serilog/serilog/blob/dev/LICENSE" RequestNavigate="Hyperlink_RequestNavigate">Apache 2 License</Hyperlink>)

@@ -7,6 +7,7 @@
             xmlns:m="clr-namespace:PalCalc.UI.Model"
             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
             xmlns:local="clr-namespace:PalCalc.UI.View"
+            xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
             mc:Ignorable="d" 
             d:Background="White"
             d:DataContext="{d:DesignInstance vm:SaveSelectorViewModel, IsDesignTimeCreatable=True}" d:DesignWidth="436.57">
@@ -25,7 +26,7 @@
             </ItemsControl.ItemTemplate>
         </ComboBox>
         <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SavesLocationsFolder_Click" IsEnabled="{Binding CanOpenSavesLocation}" ToolTipService.ToolTip="Open in Explorer">
-            <Image Source="{x:Static m:InternalIcons.FolderIcon}" Width="20" Height="15" />
+            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" />
         </Button>
     </Grid>
 
@@ -48,7 +49,7 @@
         </ComboBox>
 
         <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SaveGameFolder_Click" IsEnabled="{Binding CanOpenSaveFileLocation}" ToolTipService.ToolTip="Open in Explorer">
-            <Image Source="{x:Static m:InternalIcons.FolderIcon}" Width="20" Height="15" />
+            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" />
         </Button>
     </Grid>
 

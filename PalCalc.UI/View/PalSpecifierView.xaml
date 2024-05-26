@@ -7,6 +7,7 @@
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:m="clr-namespace:PalCalc.UI.Model"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              mc:Ignorable="d" 
              d:Background="White"
              d:DataContext="{x:Static mvm:PalSpecifierViewModel.DesignerInstance}">
@@ -66,15 +67,21 @@
                         FontSize="14"
                         />
 
-                    <Image
-                        HorizontalAlignment="Right"
-                        Height="12"
-                        Source="{x:Static m:InternalIcons.DeleteIcon}"
+                    <Button
                         Grid.Column="2"
                         VerticalAlignment="Center"
-                        Cursor="Hand"
+                        HorizontalAlignment="Right"
                         PreviewMouseDown="Image_PreviewMouseDown"
-                        />
+                        Cursor="Hand"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        >
+                        <materialIcons:MaterialIcon
+                            Kind="Remove"
+                            Width="15"
+                            Foreground="DarkRed"
+                            />
+                    </Button>
                 </Grid>
 
                 <TextBlock

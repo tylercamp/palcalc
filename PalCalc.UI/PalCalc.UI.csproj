@@ -17,8 +17,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Internal\delete.png" />
-    <None Remove="Resources\Internal\folder.png" />
     <None Remove="Resources\PalIconOverride.json" />
     <None Remove="Resources\Pals\Anubis.png" />
     <None Remove="Resources\Pals\Arsox.png" />
@@ -183,14 +181,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Material.Icons.WPF" Version="2.1.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Internal\delete.png" />
-    <Resource Include="Resources\Internal\folder.png" />
     <Resource Include="Resources\PalIconOverride.json" />
     <Resource Include="Resources\Pals\Anubis.png" />
     <Resource Include="Resources\Pals\Arsox.png" />
