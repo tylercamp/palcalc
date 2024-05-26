@@ -22,8 +22,7 @@ namespace PalCalc.Solver
         );
 
         private CancellationToken token;
-        private PalPropertyTable content;
-        private Dictionary<PalId, List<IPalReference>> content2;
+        private PalPropertyGrouping content;
         private List<(IPalReference, IPalReference)> remainingWork;
 
         int maxThreads;
@@ -33,21 +32,14 @@ namespace PalCalc.Solver
 
         Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>> PruningFunc;
 
-        public WorkingSet(PalSpecifier target, IEnumerable<IResultPruning> orderedPruningRules, IEnumerable<IPalReference> initialContent, int maxThreads, CancellationToken token)
+        public WorkingSet(PalSpecifier target, PruningRulesBuilder pruningRulesBuilder, IEnumerable<IPalReference> initialContent, int maxThreads, CancellationToken token)
         {
             this.target = target;
 
-            PruningFunc = (results) =>
-            {
-                var pruned = results;
-                foreach (var order in orderedPruningRules)
-                    pruned = order.Apply(pruned);
-                return pruned;
-            };
+            PruningFunc = pruningRulesBuilder.BuildAggregate(token).Apply;
 
-            content = new PalPropertyTable(DefaultGroupFn);
-            foreach (var p in initialContent)
-                content.Add(p);
+            content = new PalPropertyGrouping(DefaultGroupFn);
+            content.AddRange(initialContent);
 
             discoveredResults.AddRange(content.All.Where(target.IsSatisfiedBy));
 

@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.ResultPruning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,21 @@ namespace PalCalc.Solver
         public static GroupIdFn EffectiveTraits = p => p.EffectiveTraitsHash;
         public static GroupIdFn ActualTraits = p => p.ActualTraits.SetHash();
         public static GroupIdFn TotalEffort = p => p.BreedingEffort.GetHashCode();
+        public static GroupIdFn LocationType = p => p.Location.GetType().GetHashCode();
 
+        /// <summary>
+        /// Makes a grouping function based on the result of applying `mainFn` to all
+        /// elements (i.e. children and self) of a provided pal reference.
+        /// </summary>
+        public static GroupIdFn Recursive(GroupIdFn mainFn) => p =>
+            p.AllReferences().Select(i => mainFn(i)).SetHash();
+
+        public static GroupIdFn RecursiveWhere(GroupIdFn mainFn, Func<IPalReference, bool> filter) => p =>
+            p.AllReferences().Where(filter).Select(i => mainFn(i)).SetHash();
+
+        /// <summary>
+        /// Makes a grouping function as a combination of the provided functions.
+        /// </summary>
         public static GroupIdFn Combine(params GroupIdFn[] fns) => p =>
         {
             int groupId = 0;
@@ -28,7 +43,7 @@ namespace PalCalc.Solver
         };
     }
 
-    public class PalPropertyTable(PalProperty.GroupIdFn groupIdFn)
+    public class PalPropertyGrouping(PalProperty.GroupIdFn groupIdFn)
     {
         private Dictionary<int, List<IPalReference>> content = new Dictionary<int, List<IPalReference>>();
         public void Add(IPalReference p)
@@ -38,6 +53,11 @@ namespace PalCalc.Solver
             content.TryAdd(groupId, group);
 
             if (!group.Contains(p)) group.Add(p);
+        }
+
+        public void AddRange(IEnumerable<IPalReference> items)
+        {
+            foreach (var i in items) Add(i);
         }
 
         public void Remove(IPalReference p) => content.GetValueOrDefault(groupIdFn(p))?.Remove(p);
@@ -56,6 +76,13 @@ namespace PalCalc.Solver
                 content[group] = filterFn(content[group]).ToList();
         }
 
+        public void FilterAll(PruningRulesBuilder prb, CancellationToken token)
+        {
+            var pruner = prb.BuildAggregate(token);
+            foreach (var group in content.Keys.TakeWhile(_ => !token.IsCancellationRequested))
+                content[group] = pruner.Apply(content[group]).ToList();
+        }
+
         public void Filter(int key, FilterFunc filterFn)
         {
             var group = content.GetValueOrDefault(key);
@@ -68,9 +95,9 @@ namespace PalCalc.Solver
 
         public void Filter(IPalReference key, FilterFunc filterFn) => Filter(groupIdFn(key), filterFn);
 
-        public PalPropertyTable BuildNew(PalProperty.GroupIdFn newIdFn)
+        public PalPropertyGrouping BuildNew(PalProperty.GroupIdFn newIdFn)
         {
-            var res = new PalPropertyTable(newIdFn);
+            var res = new PalPropertyGrouping(newIdFn);
             foreach (var r in All)
                 res.Add(r);
             return res;

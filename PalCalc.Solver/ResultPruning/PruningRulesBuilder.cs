@@ -10,10 +10,17 @@ namespace PalCalc.Solver.ResultPruning
     {
         public Func<CancellationToken, IEnumerable<IResultPruning>> Build { get; }
 
+        public Func<CancellationToken, IResultPruning> BuildAggregate => t => new AggregatePruning(t, Build(t));
+
         public PruningRulesBuilder(Func<CancellationToken, IEnumerable<IResultPruning>> build)
         {
             Build = build;
         }
+
+        public PruningRulesBuilder WithRule(Func<CancellationToken, IResultPruning> ruleBuilder) =>
+            new PruningRulesBuilder(
+                t => Build(t).Append(ruleBuilder(t))
+            );
 
         public static readonly PruningRulesBuilder Default = new PruningRulesBuilder(
             token =>

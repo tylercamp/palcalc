@@ -455,7 +455,7 @@ namespace PalCalc.Solver
                 );
             }
 
-            var workingSet = new WorkingSet(spec, pruningBuilder.Build(token), initialContent, maxThreads, token);
+            var workingSet = new WorkingSet(spec, pruningBuilder, initialContent, maxThreads, token);
 
             for (int s = 0; s < maxBreedingSteps; s++)
             {

@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
+using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
@@ -354,7 +355,14 @@ namespace PalCalc.UI.ViewModel
                     solverTokenSource = new CancellationTokenSource();
                     var results = solver.SolveFor(currentSpec, solverTokenSource.Token);
 
-                    results = ResultsTrimmer.Default.Trim(results, solverTokenSource.Token).ToList();
+                    var resultsTable = new PalPropertyGrouping(PalProperty.Combine(
+                        PalProperty.EffectiveTraits,
+                        p => p.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
+                    ));
+                    resultsTable.AddRange(results);
+                    resultsTable.FilterAll(PruningRulesBuilder.Default, solverTokenSource.Token);
+
+                    results = resultsTable.All.ToList();
 
                     dispatcher.Invoke(() =>
                     {
