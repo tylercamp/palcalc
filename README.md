@@ -4,6 +4,8 @@
 
 _v1.0.0 screenshot_
 
+**Note: Known to be broken with Sakurajima update, pending fix in [palworld-save-tools](https://github.com/cheahjs/palworld-save-tools/issues/176)**
+
 Pal Calc is a Windows program for calculating the optimal steps to breed a specific pal with a specific set of traits:
 
 - Can detect and read from your local game save files, based on [palworld-save-tools by cheahjs](https://github.com/cheahjs/palworld-save-tools)
