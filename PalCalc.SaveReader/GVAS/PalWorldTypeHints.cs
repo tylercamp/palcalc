@@ -36,7 +36,10 @@ namespace PalCalc.SaveReader.GVAS
             { ".worldSaveData.GroupSaveDataMap.Value", "StructProperty" },
             { ".worldSaveData.EnemyCampSaveData.EnemyCampStatusMap.Value", "StructProperty" },
             { ".worldSaveData.DungeonSaveData.DungeonSaveData.MapObjectSaveData.MapObjectSaveData.Model.EffectMap.Value", "StructProperty" },
-            { ".worldSaveData.DungeonSaveData.DungeonSaveData.MapObjectSaveData.MapObjectSaveData.ConcreteModel.ModuleMap.Value", "StructProperty" }
+            { ".worldSaveData.DungeonSaveData.DungeonSaveData.MapObjectSaveData.MapObjectSaveData.ConcreteModel.ModuleMap.Value", "StructProperty" },
+            { ".worldSaveData.OilrigSaveData.OilrigMap.Value", "StructProperty" },
+            { ".worldSaveData.SupplySaveData.SupplyInfos.Key", "Guid" },
+            { ".worldSaveData.SupplySaveData.SupplyInfos.Value", "StructProperty" },
         };
     }
 }

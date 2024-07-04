@@ -226,114 +226,72 @@ namespace PalCalc.SaveReader.FArchive
 
         public override string MatchedPath => ".worldSaveData.GroupSaveDataMap.Value";
 
-        private (string, string, ulong) ReadRawProperty(FArchiveReader reader)
-        {
-            var name = reader.ReadString();
-            if (name == "None") throw new Exception("Expected to read property but got end of map");
-
-            var typeName = reader.ReadString();
-            var size = reader.ReadUInt64();
-
-            return (name, typeName, size);
-        }
-
-        private string ReadGroupType(FArchiveReader reader)
-        {
-            var (propName, typeName, size) = ReadRawProperty(reader);
-
-            if (propName != "GroupType") throw new Exception($"Expected to get GroupType but got {propName}");
-            if (typeName != "EnumProperty") throw new Exception($"Expected EnumProperty but got {typeName}");
-            
-            var enumType = reader.ReadString();
-            if (enumType != "EPalGroupType") throw new Exception($"Expected EPalGroupType but got {enumType}");
-
-            var enumId = reader.ReadOptionalGuid();
-
-            return reader.ReadString();
-        }
-
-        private byte[] ReadRawData(FArchiveReader reader)
-        {
-            var (propName, typeName, size) = ReadRawProperty(reader);
-
-            if (propName != "RawData") throw new Exception($"Expected property RawData but got {propName}");
-            if (typeName != "ArrayProperty") throw new Exception($"Expected ArrayProperty but got {typeName}");
-
-            var arrayType = reader.ReadString();
-            if (arrayType != "ByteProperty") throw new Exception($"Expected ByteProperty but got {arrayType}");
-
-            var id = reader.ReadOptionalGuid();
-            var count = reader.ReadUInt32();
-
-            if (count != size - 4) throw new Exception("Labelled ByteProperty not implemented"); // sic
-
-            return reader.ReadBytes((int)count);
-        }
-
         public override IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path, IEnumerable<IVisitor> visitors)
         {
-            logger.Verbose("decoding");
-
-            // manually read properties instead of using FArchiveReader property helpers to preserve values regardless
-            // of ARCHIVE_PRESERVE flag
-            var groupTypeString = ReadGroupType(reader);
-            var rawDataBytes = ReadRawData(reader);
-            reader.ReadString(); // skip "None" at end of property list
-
-            logger.Verbose("groupType is {groupTypeString}", groupTypeString);
-
-            var groupType = groupTypeString switch
+            return reader.WithArchivePreserveOverride(true, () =>
             {
-                "EPalGroupType::Neutral" => GroupType.Neutral,
-                "EPalGroupType::Guild" => GroupType.Guild,
-                "EPalGroupType::IndependentGuild" => GroupType.IndependentGuild,
-                "EPalGroupType::Organization" => GroupType.Organization,
-                _ => GroupType.Unrecognized
-            };
+                logger.Verbose("decoding");
 
-            using (var byteStream = new MemoryStream(rawDataBytes))
-            using (var subReader = reader.Derived(byteStream))
-            {
-                var result = new GroupDataProperty() { TypedMeta = new GroupDataPropertyMeta() { Path = path } };
+                var props = reader.ReadPropertiesUntilEnd(path, Enumerable.Empty<IVisitor>());
 
-                result.TypedMeta.Id = subReader.ReadGuid();
-                result.GroupType = groupType;
-                result.GroupName = subReader.ReadString();
-                result.CharacterHandleIds = subReader.ReadArray(r => new EntityInstanceId() { Guid = r.ReadGuid(), InstanceId = r.ReadGuid() });
+                var groupTypeString = (props["GroupType"] as EnumProperty).EnumValue;
+                var rawDataBytes = (props["RawData"] as ArrayProperty).ByteValues;
 
-                if (GroupType.Mask_HasBaseIds.HasFlag(groupType))
+                logger.Verbose("groupType is {groupTypeString}", groupTypeString);
+
+                var groupType = groupTypeString switch
                 {
-                    result.OrgType = subReader.ReadByte();
-                    result.BaseIds = subReader.ReadArray(r => r.ReadGuid());
-                }
+                    "EPalGroupType::Neutral" => GroupType.Neutral,
+                    "EPalGroupType::Guild" => GroupType.Guild,
+                    "EPalGroupType::IndependentGuild" => GroupType.IndependentGuild,
+                    "EPalGroupType::Organization" => GroupType.Organization,
+                    _ => GroupType.Unrecognized
+                };
 
-                if (GroupType.Mask_HasGuildName.HasFlag(groupType))
+                using (var byteStream = new MemoryStream(rawDataBytes))
+                using (var subReader = reader.Derived(byteStream))
                 {
-                    result.BaseCampLevel = subReader.ReadInt32();
-                    result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
-                    result.GuildName = subReader.ReadString();
+                    var result = new GroupDataProperty() { TypedMeta = new GroupDataPropertyMeta() { Path = path } };
+
+                    result.TypedMeta.Id = subReader.ReadGuid();
+                    result.GroupType = groupType;
+                    result.GroupName = subReader.ReadString();
+                    result.CharacterHandleIds = subReader.ReadArray(r => new EntityInstanceId() { Guid = r.ReadGuid(), InstanceId = r.ReadGuid() });
+
+                    if (GroupType.Mask_HasBaseIds.HasFlag(groupType))
+                    {
+                        result.OrgType = subReader.ReadByte();
+                        result.BaseIds = subReader.ReadArray(r => r.ReadGuid());
+                    }
+
+                    if (GroupType.Mask_HasGuildName.HasFlag(groupType))
+                    {
+                        result.BaseCampLevel = subReader.ReadInt32();
+                        result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
+                        result.GuildName = subReader.ReadString();
+                    }
+
+                    if (groupType == GroupType.IndependentGuild)
+                    {
+                        result.PlayerUid = subReader.ReadGuid();
+                        result.GuildName2 = subReader.ReadString();
+                        result.PlayerLastOnlineRealTime = subReader.ReadInt64();
+                        result.PlayerName = subReader.ReadString();
+                    }
+
+                    if (groupType == GroupType.Guild)
+                    {
+                        result.AdminPlayerUid = subReader.ReadGuid();
+                        result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
+                    }
+
+                    foreach (var v in visitors.Where(v => v.Matches(path)))
+                        v.VisitCharacterGroupProperty(path, result);
+
+                    logger.Verbose("done");
+                    return result;
                 }
-
-                if (groupType == GroupType.IndependentGuild)
-                {
-                    result.PlayerUid = subReader.ReadGuid();
-                    result.GuildName2 = subReader.ReadString();
-                    result.PlayerLastOnlineRealTime = subReader.ReadInt64();
-                    result.PlayerName = subReader.ReadString();
-                }
-
-                if (groupType == GroupType.Guild)
-                {
-                    result.AdminPlayerUid = subReader.ReadGuid();
-                    result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
-                }
-
-                foreach (var v in visitors.Where(v => v.Matches(path)))
-                    v.VisitCharacterGroupProperty(path, result);
-
-                logger.Verbose("done");
-                return result;
-            }
+            });
         }
     }
 }

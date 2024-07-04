@@ -16,22 +16,31 @@ namespace PalCalc.SaveReader.FArchive
 
         BinaryReader reader;
         Dictionary<string, string> typeHints;
+        bool archivePreserve;
 
         private static bool ShouldExit(IEnumerable<IVisitor> visitors)
         {
-#if ARCHIVE_PRESERVE
-            return false;
-#else
             //if (!visitors.Any()) return false;
             //else return visitors.All(v => v.IsDone);
             return false;
-#endif
         }
 
-        public FArchiveReader(Stream stream, Dictionary<string, string> typeHints)
+        public FArchiveReader(Stream stream, Dictionary<string, string> typeHints, bool archivePreserve = false)
         {
             reader = new BinaryReader(stream);
             this.typeHints = typeHints;
+            this.archivePreserve = archivePreserve;
+        }
+
+        // should generally try to avoid preserving parsed data (outside of debugging), but in some cases
+        // we need to parse the whole structure
+        public T WithArchivePreserveOverride<T>(bool forcePreserve, Func<T> action)
+        {
+            bool originalPreserve = archivePreserve;
+            archivePreserve = forcePreserve;
+            var res = action();
+            archivePreserve = originalPreserve;
+            return res;
         }
 
         public bool ReadBool() => reader.ReadBoolean();
@@ -77,9 +86,8 @@ namespace PalCalc.SaveReader.FArchive
 
         public Dictionary<string, object> ReadPropertiesUntilEnd(string path, IEnumerable<IVisitor> visitors)
         {
-#if ARCHIVE_PRESERVE
-            var result = new Dictionary<string, object>();
-#endif
+            var result = archivePreserve ? new Dictionary<string, object>() : null;
+
             while (!ShouldExit(visitors))
             {
                 var name = ReadString();
@@ -89,16 +97,11 @@ namespace PalCalc.SaveReader.FArchive
                 var size = ReadUInt64();
                 var value = ReadProperty(typeName, size, $"{path}.{name}", "", visitors);
 
-#if ARCHIVE_PRESERVE
-                result.Add(name, value);
-#endif
+                if (result != null)
+                    result.Add(name, value);
             }
 
-#if ARCHIVE_PRESERVE
             return result;
-#else
-            return null;
-#endif
         }
 
         private IProperty ReadStruct(string path, IEnumerable<IVisitor> visitors)
@@ -121,15 +124,18 @@ namespace PalCalc.SaveReader.FArchive
             foreach (var v in extraVisitors) v.Exit();
             foreach (var v in pathVisitors) v.VisitStructPropertyEnd(path, meta);
 
-#if ARCHIVE_PRESERVE
-            return new StructProperty
+            if (archivePreserve)
             {
-                TypedMeta = meta,
-                Value = value
-            };
-#else
-            return null;
-#endif
+                return new StructProperty
+                {
+                    TypedMeta = meta,
+                    Value = value
+                };
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private object ReadStructValue(string structType, string path, IEnumerable<IVisitor> visitors)
@@ -317,15 +323,18 @@ namespace PalCalc.SaveReader.FArchive
                         foreach (var v in pathVisitors)
                             v.VisitEnumPropertyEnd(path, meta);
 
-#if ARCHIVE_PRESERVE
-                        return new EnumProperty
+                        if (archivePreserve)
                         {
-                            TypedMeta = meta,
-                            EnumValue = enumValue,
-                        };
-#else
-                        return null;
-#endif
+                            return new EnumProperty
+                            {
+                                TypedMeta = meta,
+                                EnumValue = enumValue,
+                            };
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
 
                 case "StructProperty":
@@ -379,15 +388,18 @@ namespace PalCalc.SaveReader.FArchive
                             foreach (var v in extraVisitors) v.Exit();
                             foreach (var v in pathVisitors) v.VisitArrayPropertyEnd(path, meta);
 
-#if ARCHIVE_PRESERVE
-                            return new ArrayProperty
+                            if (archivePreserve)
                             {
-                                TypedMeta = meta,
-                                Value = values
-                            };
-#else
-                            return null;
-#endif
+                                return new ArrayProperty
+                                {
+                                    TypedMeta = meta,
+                                    Value = values
+                                };
+                            }
+                            else
+                            {
+                                return null;
+                            }
                         }
                         else
                         {
@@ -443,6 +455,7 @@ namespace PalCalc.SaveReader.FArchive
                             foreach (var v in extraVisitors) v.Exit();
                             foreach (var v in pathVisitors) v.VisitArrayPropertyEnd(path, meta);
 
+                            // TODO - apply `archivePreserve`
                             return new ArrayProperty
                             {
                                 TypedMeta = meta,
@@ -481,9 +494,7 @@ namespace PalCalc.SaveReader.FArchive
                         var extraVisitors = pathVisitors.SelectMany(v => v.VisitMapPropertyBegin(path, meta)).ToList();
                         var newVisitors = visitors.Concat(extraVisitors);
 
-#if ARCHIVE_PRESERVE
-                        var values = new Dictionary<object, object>();
-#endif
+                        var values = archivePreserve ? new Dictionary<object, object>() : null;
 
                         for (int i = 0; i < count && !ShouldExit(newVisitors); i++)
                         {
@@ -496,24 +507,28 @@ namespace PalCalc.SaveReader.FArchive
                             foreach (var v in extraEntryVisitors) v.Exit();
                             foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitMapEntryEnd(path, i, meta);
 
-#if ARCHIVE_PRESERVE
-                            values.Add(key, value);
-#endif
+                            if (values != null)
+                            {
+                                values.Add(key, value);
+                            }
                         }
 
                         foreach (var v in extraVisitors) v.Exit();
                         foreach (var v in pathVisitors)
                             v.VisitMapPropertyEnd(path, meta);
 
-#if ARCHIVE_PRESERVE
-                        return new MapProperty
+                        if (archivePreserve)
                         {
-                            TypedMeta = meta,
-                            Value = values
-                        };
-#else
-                        return null;
-#endif
+                            return new MapProperty
+                            {
+                                TypedMeta = meta,
+                                Value = values
+                            };
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
 
                 default: throw new Exception("Unrecognized type name: " + typeName);

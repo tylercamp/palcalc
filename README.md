@@ -57,7 +57,7 @@ Pal icons are scraped using the `FetchIcons/fetch.js` program which can be ran u
 
 ## Save File Support
 
-Save file parsing is in `PalCalc.SaveReader`, which is a partial C# port of [palworld-save-tools](https://github.com/cheahjs/palworld-save-tools). By default this will not preserve the full parsed data of a save file, but this can be changed by adding the `ARCHIVE_PRESERVE` build flag. See the project's [README](./PalCalc.SaveReader/) for more information.
+Save file parsing is in `PalCalc.SaveReader`, which is a partial C# port of [palworld-save-tools](https://github.com/cheahjs/palworld-save-tools). See the project's [README](./PalCalc.SaveReader/) for more information.
 
 ## Data and Solver Model
 

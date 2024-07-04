@@ -32,12 +32,23 @@ namespace PalCalc.SaveReader.SaveFile
             });
         }
 
-        public GvasFile ParseGvas(params IVisitor[] visitors)
+        /// <summary>
+        /// Parses the save file as GVAS with the provided visitors. 
+        /// </summary>
+        public void ParseGvas(params IVisitor[] visitors) => ParseGvas(false, visitors);
+
+        /// <summary>
+        /// Parses the save file as GVAS with the provided visitors, optionally preserving (and returning)
+        /// the full, raw, parsed data.
+        /// </summary>
+        /// <param name="preserveValues"></param>
+        /// <returns>A `GvasFile` with a populated `Properties` field (if `preserveValues = true`)</returns>
+        public GvasFile ParseGvas(bool preserveValues, params IVisitor[] visitors)
         {
             GvasFile result = null;
             CompressedSAV.WithDecompressedSave(FilePath, stream =>
             {
-                using (var archiveReader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
+                using (var archiveReader = new FArchiveReader(stream, PalWorldTypeHints.Hints, preserveValues))
                     result = GvasFile.FromFArchive(archiveReader, visitors);
             });
             return result;

@@ -15,7 +15,7 @@ saveFolders.AddRange(DirectSavesLocation.AllLocal);
 saveFolders.AddRange(XboxSavesLocation.FindAll());
 
 var save2 = new StandardSaveGame(@"C:\Users\algor\Desktop\Bad Loc");
-var level2 = save2.Level.ParseGvas();
+var level2 = save2.Level.ParseGvas(true);
 
 var charsGvas = level2.Collect(".worldSaveData.CharacterSaveParameterMap").Cast<MapProperty>().Single().Value;
 foreach (var c in charsGvas)
@@ -76,12 +76,12 @@ foreach (var gameFolder in saveFolders)
             var x = save.IsValid;
         }
 
-        var metagvas = save.LevelMeta.ParseGvas();
-        var localgvas = save.LocalData.ParseGvas();
+        var metagvas = save.LevelMeta.ParseGvas(true);
+        var localgvas = save.LocalData.ParseGvas(true);
 
         var meta = save.LevelMeta.ReadGameOptions();
         var characters = save.Level.ReadCharacterData(db, save.Players);
-        var gvas = save.Level.ParseGvas();
+        var gvas = save.Level.ParseGvas(true);
 
         var visitor = new ReferenceCollectingVisitor();
         //save.Level.ParseGvas()
