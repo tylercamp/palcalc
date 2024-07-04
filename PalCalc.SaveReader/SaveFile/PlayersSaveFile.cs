@@ -31,7 +31,7 @@ namespace PalCalc.SaveReader.SaveFile
         public PlayerMeta ReadPlayerContent()
         {
             var dataVisitor = new ValueCollectingVisitor(".SaveData", K_PLAYER_UID, K_INSTANCE_ID, K_PARTY_CONTAINER_ID, K_PALBOX_CONTAINER_ID);
-            var gvas = ParseGvas(dataVisitor);
+            ParseGvas(dataVisitor);
 
             return new PlayerMeta
             {
