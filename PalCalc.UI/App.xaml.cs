@@ -17,7 +17,7 @@ namespace PalCalc.UI
     /// </summary>
     public partial class App : Application
     {
-        public static string Version => "v1.4.2";
+        public static string Version => "v1.4.3";
         public static string RepositoryUrl => "https://github.com/tylercamp/palcalc/";
 
         private static ILogger logger;
