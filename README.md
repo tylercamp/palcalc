@@ -2,9 +2,9 @@
 
 ![Pal Calc Screenshot](./docres/palcalc-screenshot.jpg)
 
-_v1.0.0 screenshot_
+_v1.4.3 screenshot_
 
-**Note: Known to be broken with Sakurajima update, pending fix in [palworld-save-tools](https://github.com/cheahjs/palworld-save-tools/issues/176)**
+**Fixed for Sakurajima update!**
 
 Pal Calc is a Windows program for calculating the optimal steps to breed a specific pal with a specific set of traits:
 
@@ -34,14 +34,13 @@ Pal Calc is a Windows program for calculating the optimal steps to breed a speci
 Pal Calc currently has some outstanding pieces that need more information to resolve. Some of these need some level of reverse engineering, but some can be figured out through experimentation and statistics. An [issue](https://github.com/tylercamp/palcalc/issues) has been created for each item, where more information can be found.
 
 1. Is there a formula for how long breeding takes? Or is it a constant five minutes? [Issue](https://github.com/tylercamp/palcalc/issues/2)
-2. What's the probability of wild pals having a specific gender? (Namely for pals which are known to have different gender probabilities from breeding) [Issue](https://github.com/tylercamp/palcalc/issues/3)
-3. What's the probability of wild pals having exactly N traits? [Issue](https://github.com/tylercamp/palcalc/issues/4)
-4. Do child pals _always_ inherit at least one of the parent's traits? [Issue](https://github.com/tylercamp/palcalc/issues/5)
-5. How is data mining performed to extract the pal stats necessary for breeding calculations? [Issue](https://github.com/tylercamp/palcalc/issues/6)
-6. Has the trait inheritance calculation changed since /u/mgxts reverse engineered it? Was their reverse engineering accurate? [Issue](https://github.com/tylercamp/palcalc/issues/7)
-7. Assuming the trait inheritance calculation is correct, is Pal Calc's implementation of those probabilities correct? [Issue](https://github.com/tylercamp/palcalc/issues/8)
-8. How can we derive the map coordinates for a base from its world coordinates? [Issue](https://github.com/tylercamp/palcalc/issues/9)
-9. What's a good way to estimate time needed to capture a wild pal of a certain type? e.g. Chikipi would be much faster to find + catch than Paladius. [Issue](https://github.com/tylercamp/palcalc/issues/10)
+2. What's the probability of wild pals having exactly N traits? [Issue](https://github.com/tylercamp/palcalc/issues/4)
+3. Do child pals _always_ inherit at least one of the parent's traits? [Issue](https://github.com/tylercamp/palcalc/issues/5)
+4. How is data mining performed to extract the pal stats necessary for breeding calculations? [Issue](https://github.com/tylercamp/palcalc/issues/6)
+5. Has the trait inheritance calculation changed since /u/mgxts reverse engineered it? Was their reverse engineering accurate? [Issue](https://github.com/tylercamp/palcalc/issues/7)
+6. Assuming the trait inheritance calculation is correct, is Pal Calc's implementation of those probabilities correct? [Issue](https://github.com/tylercamp/palcalc/issues/8)
+7. How can we derive the map coordinates for a base from its world coordinates? [Issue](https://github.com/tylercamp/palcalc/issues/9)
+8. What's a good way to estimate time needed to capture a wild pal of a certain type? e.g. Chikipi would be much faster to find + catch than Paladius. [Issue](https://github.com/tylercamp/palcalc/issues/10)
 
 # Development
 
