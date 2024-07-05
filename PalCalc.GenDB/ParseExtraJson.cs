@@ -24,6 +24,8 @@ namespace PalCalc.GenDB
             public bool Mount { get; set; }
             public MountType MountType { get; set; }
             public int Rarity { get; set; }
+
+            public List<string> GuaranteedTraits { get; set; } = new List<string>();
         }
 
         class JsonTrait
@@ -65,6 +67,7 @@ namespace PalCalc.GenDB
                 CanMount = p.Mount,
                 MountType = p.MountType,
                 Rarity = p.Rarity,
+                GuaranteedTraitInternalIds = p.GuaranteedTraits,
             }).ToList();
         }
     }

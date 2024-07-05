@@ -30,6 +30,9 @@
       "Mount": false,
       "MountType": "None",
       "Rarity": 20,
+      "GuaranteedTraits": [
+        "Witch"
+      ],
 
       "MaleProbability": 5
     }
