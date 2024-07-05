@@ -41,6 +41,90 @@
       "CodeName": "NonKilling",
       "IsPassive": true,
       "Rank": -1
+    },
+    {
+      "Name": "Philanthropist",
+      "CodeName": "Test_PalEgg_HatchingSpeed_Up",
+      "IsPassive": true,
+      "Rank": 3
+    },
+    {
+      "Name": "Impatient",
+      "CodeName": "CoolTimeReduction_Up_1",
+      "IsPassive": true,
+      "Rank": 1
+    },
+    {
+      "Name": "Serenity",
+      "CodeName": "CoolTimeReduction_Up_2",
+      "IsPassive": true,
+      "Rank": 3
+    },
+    {
+      "Name": "Easygoing",
+      "CodeName": "CoolTimeReduction_Down_1",
+      "IsPassive": true,
+      "Rank": -1
+    },
+    {
+      "Name": "Nocturnal",
+      "CodeName": "Nocturnal",
+      "IsPassive": true,
+      "Rank": 1
+    },
+    {
+      "Name": "Fine Furs",
+      "CodeName": "SalePrice_Up_1",
+      "IsPassive": true,
+      "Rank": 1
+    },
+    {
+      "Name": "Noble",
+      "CodeName": "SalePrice_Up_2",
+      "IsPassive": true,
+      "Rank": 3
+    },
+    {
+      "Name": "Shabby",
+      "CodeName": "SalePrice_Down_1",
+      "IsPassive": true,
+      "Rank": -1
+    },
+    {
+      "Name": "Fit as a Fiddle",
+      "CodeName": "Stamina_Up_1",
+      "IsPassive": true,
+      "Rank": 1,
+    },
+    {
+      "Name": "Infinite Stamina",
+      "CodeName": "Stamina_Up_2",
+      "IsPassive": true,
+      "Rank": 3
+    },
+    {
+      "Name": "Sickly",
+      "CodeName": "Stamina_Down_1",
+      "IsPassive": true,
+      "Rank": -1
+    },
+    {
+      "Name": "Otherworldly Cells",
+      "CodeName": "Alien",
+      "IsPassive": true,
+      "Rank": 1
+    },
+    {
+      "Name": "Siren of the Void",
+      "CodeName": "Witch",
+      "IsPassive": true,
+      "Rank": 3
+    },
+    {
+      "Name": "Eternal Flame",
+      "CodeName": "EternalFlame",
+      "IsPassive": true,
+      "Rank": 3
     }
   ]
 }

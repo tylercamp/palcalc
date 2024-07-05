@@ -82,7 +82,7 @@ namespace PalCalc.SaveReader.SaveFile
                             var trait = db.Traits.FirstOrDefault(t => t.InternalName == name);
                             if (trait == null)
                             {
-                                logger.Warning("unrecognized trait '{internalName}', skipping", name);
+                                logger.Warning("unrecognized trait '{internalName}' on pal {Pal}, skipping", name, gvasInstance.CharacterId);
                             }
                             return trait ?? new UnrecognizedTrait(name);
                         })
