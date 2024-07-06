@@ -249,4 +249,38 @@ async function fetchPassives() {
         null,
         4
     ))
+
+    // output raw data as CSV just as a reference for others using this data
+    if (!fs.existsSync('out/csv')) fs.mkdirSync('out/csv')
+    
+    const palColumns = ['Name', 'CodeName']
+    const ignoredPalColumns = ['GuaranteedTraits', 'ExclusiveBreeding']
+    for (const k of Object.keys(resultPals[0]).filter(k => !ignoredPalColumns.includes(k))) {
+        if (!palColumns.includes(k)) palColumns.push(k)
+    }
+
+    fs.writeFileSync('out/csv/pals.csv', [
+        palColumns.join(','),
+        ...resultPals.map(p => palColumns.map(c => p[c]).map(v => typeof v == 'object' ? `'${JSON.stringify(v)}'` : v).join(','))
+    ].join('\n'))
+
+    fs.writeFileSync('out/csv/unique_breeding.csv', [
+        'Parent1,Parent2,Child',
+        ...resultPals
+            .map(p => p.ExclusiveBreeding)
+            .filter(i => i)
+            .map(({ Parent1, Parent2, Child }) => [ Parent1, Parent2, Child ].map(cn => resultPals.find(p => p.CodeName == cn).Name).join(','))
+    ].join('\n'))
+
+    fs.writeFileSync('out/csv/guaranteed_traits.csv', [
+        'Pal,Trait1,Trait2,Trait3,Trait4',
+        ...resultPals.filter(p => p.GuaranteedTraits.length).map(({ Name, GuaranteedTraits }) =>
+            [ Name, ...GuaranteedTraits.map(t => passives.find(p => p.codeName == t).name), ...new Array(4 - GuaranteedTraits.length).map(v => '') ].join(',')
+        )
+    ].join('\n'))
+
+    fs.writeFileSync('out/csv/traits.csv', [
+        'Name,CodeName,Rank',
+        ...passives.map(({ name, codeName, rank}) => [ name, codeName, rank ].join(','))
+    ].join('\n'))
 })()
