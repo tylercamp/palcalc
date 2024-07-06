@@ -83,5 +83,19 @@ namespace PalCalc.GenDB
                 )
                 .ToList();
         }
+
+        public static Dictionary<string, Dictionary<PalGender, float>> ReadGenderProbabilities()
+        {
+            return JsonConvert
+                .DeserializeObject<List<JsonPal>>(File.ReadAllText("ref/scraped-pals.json"))
+                .ToDictionary(
+                    jp => jp.CodeName,
+                    jp => new Dictionary<PalGender, float>()
+                    {
+                        { PalGender.MALE, jp.MaleProbability / 100.0f },
+                        { PalGender.FEMALE, 1 - (jp.MaleProbability / 100.0f) }
+                    }
+                );
+        }
     }
 }

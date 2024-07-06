@@ -74,23 +74,6 @@ namespace PalCalc.GenDB
             return palDistances;
         }
 
-        // Special-case probabilities of breeding a given pal as a male
-        static List<(String, float)> SpecialMaleProbabilities = new List<(string, float)>()
-        {
-            ("Kingpaca", 0.9f),
-            ("Kingpaca Cryst", 0.9f),
-            ("Warsect", 0.85f),
-            ("Lovander", 0.3f),
-            ("Lyleen", 0.3f),
-            ("Lyleen Noct", 0.3f),
-            ("Dazzi", 0.2f),
-            ("Mozzarina", 0.2f),
-            ("Elizabee", 0.1f),
-            ("Beegarde", 0.1f),
-            ("Bellanoir", 0.05f),
-            ("Bellanoir Libero", 0.05f),
-        };
-
         static void Main(string[] args)
         {
             var pals = new List<Pal>();
@@ -110,10 +93,6 @@ namespace PalCalc.GenDB
                 if (!pals.Any(p => p.InternalName == p1) || !pals.Any(p => p.InternalName == p2) || !pals.Any(p => p.InternalName == c))
                     throw new Exception("Unrecognized pal name");
             }
-
-            foreach (var (p1, _) in SpecialMaleProbabilities)
-                if (!pals.Any(p => p.Name == p1))
-                    throw new Exception("Unrecognized pal name");
 
             foreach (var pal in pals)
                 if (pal.GuaranteedTraitInternalIds.Any(id => !traits.Any(t => t.InternalName == id)))
@@ -145,7 +124,7 @@ namespace PalCalc.GenDB
                     .First();
             }
 
-            var db = PalDB.MakeEmptyUnsafe("v9");
+            var db = PalDB.MakeEmptyUnsafe("v10");
             db.Breeding = pals
                 .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
                 .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))
@@ -162,28 +141,10 @@ namespace PalCalc.GenDB
 
             db.Traits = traits;
 
+            var genderProbabilities = ParseScrapedJson.ReadGenderProbabilities();
             db.BreedingGenderProbability = pals.ToDictionary(
                 p => p,
-                p =>
-                {
-                    if (SpecialMaleProbabilities.Any(s => s.Item1 == p.Name))
-                    {
-                        var maleProbability = SpecialMaleProbabilities.Single(s => s.Item1 == p.Name).Item2;
-                        return new Dictionary<PalGender, float>()
-                        {
-                            { PalGender.MALE, maleProbability },
-                            { PalGender.FEMALE, 1 - maleProbability },
-                        };
-                    }
-                    else
-                    {
-                        return new Dictionary<PalGender, float>()
-                        {
-                            { PalGender.MALE, 0.5f },
-                            { PalGender.FEMALE, 0.5f },
-                        };
-                    }
-                }
+                p => genderProbabilities[p.InternalName]
             );
 
             db.MinBreedingSteps = CalcMinDistances(db);
