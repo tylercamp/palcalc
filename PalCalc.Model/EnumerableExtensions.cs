@@ -57,6 +57,8 @@ namespace PalCalc.Model
             else return fallback;
         }
 
+        public static V GetValueFromAny<K, V>(this IDictionary<K, V> dict, params K[] keys) => dict[keys.First(dict.ContainsKey)];
+
         public static int SetHash<T>(this IEnumerable<T> elements)
         {
             var baseHash = 0;

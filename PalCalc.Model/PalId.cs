@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,9 @@ namespace PalCalc.Model
     {
         public int PalDexNo { get; set; }
         public bool IsVariant { get; set; }
+
+        [JsonIgnore]
+        public PalId InvertedVariant => new PalId() { PalDexNo = PalDexNo, IsVariant = !IsVariant };
 
         public static bool operator ==(PalId a, PalId b)
         {

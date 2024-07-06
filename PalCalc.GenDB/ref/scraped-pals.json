@@ -1,0 +1,1865 @@
+[
+    {
+        "Name": "Lamball",
+        "CodeName": "SheepBall",
+        "PalDexNo": 1,
+        "IsVariant": false,
+        "BreedPower": 1470,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1000,
+        "IndexOrder": 28
+    },
+    {
+        "Name": "Cattiva",
+        "CodeName": "PinkCat",
+        "PalDexNo": 2,
+        "IsVariant": false,
+        "BreedPower": 1460,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "PAL_ALLAttack_down1"
+        ],
+        "Price": 1000,
+        "IndexOrder": 47
+    },
+    {
+        "Name": "Chikipi",
+        "CodeName": "ChickenPal",
+        "PalDexNo": 3,
+        "IsVariant": false,
+        "BreedPower": 1500,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1000,
+        "IndexOrder": 63
+    },
+    {
+        "Name": "Lifmunk",
+        "CodeName": "Carbunclo",
+        "PalDexNo": 4,
+        "IsVariant": false,
+        "BreedPower": 1430,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1010,
+        "IndexOrder": 7
+    },
+    {
+        "Name": "Foxparks",
+        "CodeName": "Kitsunebi",
+        "PalDexNo": 5,
+        "IsVariant": false,
+        "BreedPower": 1400,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1040,
+        "IndexOrder": 21
+    },
+    {
+        "Name": "Fuack",
+        "CodeName": "BluePlatypus",
+        "PalDexNo": 6,
+        "IsVariant": false,
+        "BreedPower": 1330,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1120,
+        "IndexOrder": 60
+    },
+    {
+        "Name": "Sparkit",
+        "CodeName": "ElecCat",
+        "PalDexNo": 7,
+        "IsVariant": false,
+        "BreedPower": 1410,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1030,
+        "IndexOrder": 66
+    },
+    {
+        "Name": "Tanzee",
+        "CodeName": "Monkey",
+        "PalDexNo": 8,
+        "IsVariant": false,
+        "BreedPower": 1250,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1280,
+        "IndexOrder": 110
+    },
+    {
+        "Name": "Rooby",
+        "CodeName": "FlameBambi",
+        "PalDexNo": 9,
+        "IsVariant": false,
+        "BreedPower": 1155,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2950,
+        "IndexOrder": 146
+    },
+    {
+        "Name": "Pengullet",
+        "CodeName": "Penguin",
+        "PalDexNo": 10,
+        "IsVariant": false,
+        "BreedPower": 1350,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1080,
+        "IndexOrder": 24
+    },
+    {
+        "Name": "Penking",
+        "CodeName": "CaptainPenguin",
+        "PalDexNo": 11,
+        "IsVariant": false,
+        "BreedPower": 520,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 5410,
+        "IndexOrder": 125
+    },
+    {
+        "Name": "Jolthog",
+        "CodeName": "Hedgehog",
+        "PalDexNo": 12,
+        "IsVariant": false,
+        "BreedPower": 1370,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1060,
+        "IndexOrder": 18
+    },
+    {
+        "Name": "Jolthog Cryst",
+        "CodeName": "Hedgehog_Ice",
+        "PalDexNo": 12,
+        "IsVariant": true,
+        "BreedPower": 1360,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1070,
+        "IndexOrder": 19
+    },
+    {
+        "Name": "Gumoss",
+        "CodeName": "PlantSlime",
+        "PalDexNo": 13,
+        "IsVariant": false,
+        "BreedPower": 1240,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1310,
+        "IndexOrder": 115
+    },
+    {
+        "Name": "Vixy",
+        "CodeName": "CuteFox",
+        "PalDexNo": 14,
+        "IsVariant": false,
+        "BreedPower": 1450,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1000,
+        "IndexOrder": 81
+    },
+    {
+        "Name": "Hoocrates",
+        "CodeName": "WizardOwl",
+        "PalDexNo": 15,
+        "IsVariant": false,
+        "BreedPower": 1390,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1050,
+        "IndexOrder": 85
+    },
+    {
+        "Name": "Teafant",
+        "CodeName": "Ganesha",
+        "PalDexNo": 16,
+        "IsVariant": false,
+        "BreedPower": 1490,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1000,
+        "IndexOrder": 14
+    },
+    {
+        "Name": "Depresso",
+        "CodeName": "NegativeKoala",
+        "PalDexNo": 17,
+        "IsVariant": false,
+        "BreedPower": 1380,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1050,
+        "IndexOrder": 48
+    },
+    {
+        "Name": "Cremis",
+        "CodeName": "WoolFox",
+        "PalDexNo": 18,
+        "IsVariant": false,
+        "BreedPower": 1455,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1420,
+        "IndexOrder": 143
+    },
+    {
+        "Name": "Daedream",
+        "CodeName": "DreamDemon",
+        "PalDexNo": 19,
+        "IsVariant": false,
+        "BreedPower": 1230,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1330,
+        "IndexOrder": 109
+    },
+    {
+        "Name": "Rushoar",
+        "CodeName": "Boar",
+        "PalDexNo": 20,
+        "IsVariant": false,
+        "BreedPower": 1130,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1680,
+        "IndexOrder": 6
+    },
+    {
+        "Name": "Nox",
+        "CodeName": "NightFox",
+        "PalDexNo": 21,
+        "IsVariant": false,
+        "BreedPower": 1180,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1480,
+        "IndexOrder": 124
+    },
+    {
+        "Name": "Fuddler",
+        "CodeName": "CuteMole",
+        "PalDexNo": 22,
+        "IsVariant": false,
+        "BreedPower": 1220,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1360,
+        "IndexOrder": 104
+    },
+    {
+        "Name": "Killamari",
+        "CodeName": "NegativeOctopus",
+        "PalDexNo": 23,
+        "IsVariant": false,
+        "BreedPower": 1290,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1200,
+        "IndexOrder": 88
+    },
+    {
+        "Name": "Mau",
+        "CodeName": "Bastet",
+        "PalDexNo": 24,
+        "IsVariant": false,
+        "BreedPower": 1480,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1000,
+        "IndexOrder": 4
+    },
+    {
+        "Name": "Mau Cryst",
+        "CodeName": "Bastet_Ice",
+        "PalDexNo": 24,
+        "IsVariant": true,
+        "BreedPower": 1440,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1010,
+        "IndexOrder": 5
+    },
+    {
+        "Name": "Celaray",
+        "CodeName": "FlyingManta",
+        "PalDexNo": 25,
+        "IsVariant": false,
+        "BreedPower": 870,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2860,
+        "IndexOrder": 135
+    },
+    {
+        "Name": "Direhowl",
+        "CodeName": "Garm",
+        "PalDexNo": 26,
+        "IsVariant": false,
+        "BreedPower": 1060,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1920,
+        "IndexOrder": 15
+    },
+    {
+        "Name": "Tocotoco",
+        "CodeName": "ColorfulBird",
+        "PalDexNo": 27,
+        "IsVariant": false,
+        "BreedPower": 1340,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1090,
+        "IndexOrder": 8
+    },
+    {
+        "Name": "Flopie",
+        "CodeName": "FlowerRabbit",
+        "PalDexNo": 28,
+        "IsVariant": false,
+        "BreedPower": 1280,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1220,
+        "IndexOrder": 94
+    },
+    {
+        "Name": "Mozzarina",
+        "CodeName": "CowPal",
+        "PalDexNo": 29,
+        "IsVariant": false,
+        "BreedPower": 910,
+        "MaleProbability": 20,
+        "GuaranteedTraits": [],
+        "Price": 2620,
+        "IndexOrder": 89
+    },
+    {
+        "Name": "Bristla",
+        "CodeName": "LittleBriarRose",
+        "PalDexNo": 30,
+        "IsVariant": false,
+        "BreedPower": 1320,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1140,
+        "IndexOrder": 22
+    },
+    {
+        "Name": "Gobfin",
+        "CodeName": "SharkKid",
+        "PalDexNo": 31,
+        "IsVariant": false,
+        "BreedPower": 1090,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1840,
+        "IndexOrder": 26
+    },
+    {
+        "Name": "Gobfin Ignis",
+        "CodeName": "SharkKid_Fire",
+        "PalDexNo": 31,
+        "IsVariant": true,
+        "BreedPower": 1100,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1800,
+        "IndexOrder": 27
+    },
+    {
+        "Name": "Hangyu",
+        "CodeName": "WindChimes",
+        "PalDexNo": 32,
+        "IsVariant": false,
+        "BreedPower": 1420,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1020,
+        "IndexOrder": 32
+    },
+    {
+        "Name": "Hangyu Cryst",
+        "CodeName": "WindChimes_Ice",
+        "PalDexNo": 32,
+        "IsVariant": true,
+        "BreedPower": 1422,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1020,
+        "IndexOrder": 33
+    },
+    {
+        "Name": "Mossanda",
+        "CodeName": "GrassPanda",
+        "PalDexNo": 33,
+        "IsVariant": false,
+        "BreedPower": 430,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 6200,
+        "IndexOrder": 100
+    },
+    {
+        "Name": "Mossanda Lux",
+        "CodeName": "GrassPanda_Electric",
+        "PalDexNo": 33,
+        "IsVariant": true,
+        "BreedPower": 390,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 6610,
+        "IndexOrder": 101
+    },
+    {
+        "Name": "Woolipop",
+        "CodeName": "SweetsSheep",
+        "PalDexNo": 34,
+        "IsVariant": false,
+        "BreedPower": 1190,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1450,
+        "IndexOrder": 40
+    },
+    {
+        "Name": "Caprity",
+        "CodeName": "BerryGoat",
+        "PalDexNo": 35,
+        "IsVariant": false,
+        "BreedPower": 930,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2510,
+        "IndexOrder": 77
+    },
+    {
+        "Name": "Melpaca",
+        "CodeName": "Alpaca",
+        "PalDexNo": 36,
+        "IsVariant": false,
+        "BreedPower": 890,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2740,
+        "IndexOrder": 42
+    },
+    {
+        "Name": "Eikthyrdeer",
+        "CodeName": "Deer",
+        "PalDexNo": 37,
+        "IsVariant": false,
+        "BreedPower": 920,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2620,
+        "IndexOrder": 9
+    },
+    {
+        "Name": "Eikthyrdeer Terra",
+        "CodeName": "Deer_Ground",
+        "PalDexNo": 37,
+        "IsVariant": true,
+        "BreedPower": 900,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2680,
+        "IndexOrder": 10
+    },
+    {
+        "Name": "Nitewing",
+        "CodeName": "HawkBird",
+        "PalDexNo": 38,
+        "IsVariant": false,
+        "BreedPower": 420,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 6300,
+        "IndexOrder": 93
+    },
+    {
+        "Name": "Ribbuny",
+        "CodeName": "PinkRabbit",
+        "PalDexNo": 39,
+        "IsVariant": false,
+        "BreedPower": 1310,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1160,
+        "IndexOrder": 120
+    },
+    {
+        "Name": "Incineram",
+        "CodeName": "Baphomet",
+        "PalDexNo": 40,
+        "IsVariant": false,
+        "BreedPower": 590,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4780,
+        "IndexOrder": 2
+    },
+    {
+        "Name": "Incineram Noct",
+        "CodeName": "Baphomet_Dark",
+        "PalDexNo": 40,
+        "IsVariant": true,
+        "BreedPower": 580,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4870,
+        "IndexOrder": 3
+    },
+    {
+        "Name": "Cinnamoth",
+        "CodeName": "CuteButterfly",
+        "PalDexNo": 41,
+        "IsVariant": false,
+        "BreedPower": 490,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 5700,
+        "IndexOrder": 139
+    },
+    {
+        "Name": "Arsox",
+        "CodeName": "FlameBuffalo",
+        "PalDexNo": 42,
+        "IsVariant": false,
+        "BreedPower": 790,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3520,
+        "IndexOrder": 102
+    },
+    {
+        "Name": "Dumud",
+        "CodeName": "LazyCatfish",
+        "PalDexNo": 43,
+        "IsVariant": false,
+        "BreedPower": 895,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4690,
+        "IndexOrder": 144
+    },
+    {
+        "Name": "Cawgnito",
+        "CodeName": "DarkCrow",
+        "PalDexNo": 44,
+        "IsVariant": false,
+        "BreedPower": 1080,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1840,
+        "IndexOrder": 45
+    },
+    {
+        "Name": "Leezpunk",
+        "CodeName": "LizardMan",
+        "PalDexNo": 45,
+        "IsVariant": false,
+        "BreedPower": 1120,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1720,
+        "IndexOrder": 58
+    },
+    {
+        "Name": "Leezpunk Ignis",
+        "CodeName": "LizardMan_Fire",
+        "PalDexNo": 45,
+        "IsVariant": true,
+        "BreedPower": 1140,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1640,
+        "IndexOrder": 59
+    },
+    {
+        "Name": "Loupmoon",
+        "CodeName": "Werewolf",
+        "PalDexNo": 46,
+        "IsVariant": false,
+        "BreedPower": 950,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2400,
+        "IndexOrder": 31
+    },
+    {
+        "Name": "Galeclaw",
+        "CodeName": "Eagle",
+        "PalDexNo": 47,
+        "IsVariant": false,
+        "BreedPower": 1030,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2010,
+        "IndexOrder": 12
+    },
+    {
+        "Name": "Robinquill",
+        "CodeName": "RobinHood",
+        "PalDexNo": 48,
+        "IsVariant": false,
+        "BreedPower": 1020,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2050,
+        "IndexOrder": 53
+    },
+    {
+        "Name": "Robinquill Terra",
+        "CodeName": "RobinHood_Ground",
+        "PalDexNo": 48,
+        "IsVariant": true,
+        "BreedPower": 1000,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2150,
+        "IndexOrder": 54
+    },
+    {
+        "Name": "Gorirat",
+        "CodeName": "Gorilla",
+        "PalDexNo": 49,
+        "IsVariant": false,
+        "BreedPower": 1040,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "PAL_rude"
+        ],
+        "Price": 2010,
+        "IndexOrder": 16
+    },
+    {
+        "Name": "Gorirat Terra",
+        "CodeName": "Gorilla_Ground",
+        "PalDexNo": 49,
+        "IsVariant": true,
+        "BreedPower": 1030,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "PAL_rude"
+        ],
+        "Price": 4020,
+        "IndexOrder": 17
+    },
+    {
+        "Name": "Beegarde",
+        "CodeName": "SoldierBee",
+        "PalDexNo": 50,
+        "IsVariant": false,
+        "BreedPower": 1070,
+        "MaleProbability": 10,
+        "GuaranteedTraits": [],
+        "Price": 1880,
+        "IndexOrder": 98
+    },
+    {
+        "Name": "Elizabee",
+        "CodeName": "QueenBee",
+        "PalDexNo": 51,
+        "IsVariant": false,
+        "BreedPower": 330,
+        "MaleProbability": 10,
+        "GuaranteedTraits": [],
+        "Price": 6830,
+        "IndexOrder": 97
+    },
+    {
+        "Name": "Grintale",
+        "CodeName": "NaughtyCat",
+        "PalDexNo": 52,
+        "IsVariant": false,
+        "BreedPower": 510,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 5510,
+        "IndexOrder": 138
+    },
+    {
+        "Name": "Swee",
+        "CodeName": "MopBaby",
+        "PalDexNo": 53,
+        "IsVariant": false,
+        "BreedPower": 1300,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1180,
+        "IndexOrder": 116
+    },
+    {
+        "Name": "Sweepa",
+        "CodeName": "MopKing",
+        "PalDexNo": 54,
+        "IsVariant": false,
+        "BreedPower": 410,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 6400,
+        "IndexOrder": 117
+    },
+    {
+        "Name": "Chillet",
+        "CodeName": "WeaselDragon",
+        "PalDexNo": 55,
+        "IsVariant": false,
+        "BreedPower": 800,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3450,
+        "IndexOrder": 126
+    },
+    {
+        "Name": "Chillet Ignis",
+        "CodeName": "WeaselDragon_Fire",
+        "PalDexNo": 55,
+        "IsVariant": true,
+        "BreedPower": 790,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4450,
+        "IndexOrder": 127
+    },
+    {
+        "Name": "Univolt",
+        "CodeName": "Kirin",
+        "PalDexNo": 56,
+        "IsVariant": false,
+        "BreedPower": 680,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4280,
+        "IndexOrder": 20
+    },
+    {
+        "Name": "Foxcicle",
+        "CodeName": "IceFox",
+        "PalDexNo": 57,
+        "IsVariant": false,
+        "BreedPower": 760,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3730,
+        "IndexOrder": 107
+    },
+    {
+        "Name": "Pyrin",
+        "CodeName": "FireKirin",
+        "PalDexNo": 58,
+        "IsVariant": false,
+        "BreedPower": 360,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 6720,
+        "IndexOrder": 36
+    },
+    {
+        "Name": "Pyrin Noct",
+        "CodeName": "FireKirin_Dark",
+        "PalDexNo": 58,
+        "IsVariant": true,
+        "BreedPower": 240,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 7270,
+        "IndexOrder": 37
+    },
+    {
+        "Name": "Reindrix",
+        "CodeName": "IceDeer",
+        "PalDexNo": 59,
+        "IsVariant": false,
+        "BreedPower": 880,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2800,
+        "IndexOrder": 78
+    },
+    {
+        "Name": "Rayhound",
+        "CodeName": "ThunderDog",
+        "PalDexNo": 60,
+        "IsVariant": false,
+        "BreedPower": 740,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3880,
+        "IndexOrder": 103
+    },
+    {
+        "Name": "Kitsun",
+        "CodeName": "AmaterasuWolf",
+        "PalDexNo": 61,
+        "IsVariant": false,
+        "BreedPower": 830,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3170,
+        "IndexOrder": 57
+    },
+    {
+        "Name": "Dazzi",
+        "CodeName": "RaijinDaughter",
+        "PalDexNo": 62,
+        "IsVariant": false,
+        "BreedPower": 1210,
+        "MaleProbability": 20,
+        "GuaranteedTraits": [],
+        "Price": 1390,
+        "IndexOrder": 25
+    },
+    {
+        "Name": "Lunaris",
+        "CodeName": "Mutant",
+        "PalDexNo": 63,
+        "IsVariant": false,
+        "BreedPower": 1110,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1760,
+        "IndexOrder": 23
+    },
+    {
+        "Name": "Dinossom",
+        "CodeName": "FlowerDinosaur",
+        "PalDexNo": 64,
+        "IsVariant": false,
+        "BreedPower": 820,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3240,
+        "IndexOrder": 64
+    },
+    {
+        "Name": "Dinossom Lux",
+        "CodeName": "FlowerDinosaur_Electric",
+        "PalDexNo": 64,
+        "IsVariant": true,
+        "BreedPower": 810,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3380,
+        "IndexOrder": 65
+    },
+    {
+        "Name": "Surfent",
+        "CodeName": "Serpent",
+        "PalDexNo": 65,
+        "IsVariant": false,
+        "BreedPower": 560,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 5050,
+        "IndexOrder": 43
+    },
+    {
+        "Name": "Surfent Terra",
+        "CodeName": "Serpent_Ground",
+        "PalDexNo": 65,
+        "IsVariant": true,
+        "BreedPower": 550,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 5140,
+        "IndexOrder": 44
+    },
+    {
+        "Name": "Maraith",
+        "CodeName": "GhostBeast",
+        "PalDexNo": 66,
+        "IsVariant": false,
+        "BreedPower": 1150,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1570,
+        "IndexOrder": 52
+    },
+    {
+        "Name": "Digtoise",
+        "CodeName": "DrillGame",
+        "PalDexNo": 67,
+        "IsVariant": false,
+        "BreedPower": 850,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "Deffence_up1"
+        ],
+        "Price": 2980,
+        "IndexOrder": 11
+    },
+    {
+        "Name": "Tombat",
+        "CodeName": "CatBat",
+        "PalDexNo": 68,
+        "IsVariant": false,
+        "BreedPower": 750,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3810,
+        "IndexOrder": 99
+    },
+    {
+        "Name": "Lovander",
+        "CodeName": "PinkLizard",
+        "PalDexNo": 69,
+        "IsVariant": false,
+        "BreedPower": 940,
+        "MaleProbability": 30,
+        "GuaranteedTraits": [
+            "ElementResist_Normal_1_PAL"
+        ],
+        "Price": 2450,
+        "IndexOrder": 84
+    },
+    {
+        "Name": "Flambelle",
+        "CodeName": "LavaGirl",
+        "PalDexNo": 70,
+        "IsVariant": false,
+        "BreedPower": 1405,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2500,
+        "IndexOrder": 145
+    },
+    {
+        "Name": "Vanwyrm",
+        "CodeName": "BirdDragon",
+        "PalDexNo": 71,
+        "IsVariant": false,
+        "BreedPower": 660,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4360,
+        "IndexOrder": 61
+    },
+    {
+        "Name": "Vanwyrm Cryst",
+        "CodeName": "BirdDragon_Ice",
+        "PalDexNo": 71,
+        "IsVariant": true,
+        "BreedPower": 620,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4610,
+        "IndexOrder": 62
+    },
+    {
+        "Name": "Bushi",
+        "CodeName": "Ronin",
+        "PalDexNo": 72,
+        "IsVariant": false,
+        "BreedPower": 640,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4520,
+        "IndexOrder": 133
+    },
+    {
+        "Name": "Bushi Noct",
+        "CodeName": "Ronin_Dark",
+        "PalDexNo": 72,
+        "IsVariant": true,
+        "BreedPower": 650,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4520,
+        "IndexOrder": 134
+    },
+    {
+        "Name": "Beakon",
+        "CodeName": "ThunderBird",
+        "PalDexNo": 73,
+        "IsVariant": false,
+        "BreedPower": 220,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 7490,
+        "IndexOrder": 121
+    },
+    {
+        "Name": "Ragnahawk",
+        "CodeName": "RedArmorBird",
+        "PalDexNo": 74,
+        "IsVariant": false,
+        "BreedPower": 380,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 6720,
+        "IndexOrder": 132
+    },
+    {
+        "Name": "Katress",
+        "CodeName": "CatMage",
+        "PalDexNo": 75,
+        "IsVariant": false,
+        "BreedPower": 700,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4120,
+        "IndexOrder": 118
+    },
+    {
+        "Name": "Katress Ignis",
+        "CodeName": "CatMage_Fire",
+        "PalDexNo": 75,
+        "IsVariant": true,
+        "BreedPower": 690,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4120,
+        "IndexOrder": 119
+    },
+    {
+        "Name": "Wixen",
+        "CodeName": "FoxMage",
+        "PalDexNo": 76,
+        "IsVariant": false,
+        "BreedPower": 1160,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3080,
+        "IndexOrder": 82
+    },
+    {
+        "Name": "Wixen Noct",
+        "CodeName": "FoxMage_Dark",
+        "PalDexNo": 76,
+        "IsVariant": true,
+        "BreedPower": 1150,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4080,
+        "IndexOrder": 83
+    },
+    {
+        "Name": "Verdash",
+        "CodeName": "GrassRabbitMan",
+        "PalDexNo": 77,
+        "IsVariant": false,
+        "BreedPower": 990,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2200,
+        "IndexOrder": 106
+    },
+    {
+        "Name": "Vaelet",
+        "CodeName": "VioletFairy",
+        "PalDexNo": 78,
+        "IsVariant": false,
+        "BreedPower": 1050,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1960,
+        "IndexOrder": 92
+    },
+    {
+        "Name": "Sibelyx",
+        "CodeName": "WhiteMoth",
+        "PalDexNo": 79,
+        "IsVariant": false,
+        "BreedPower": 450,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 5900,
+        "IndexOrder": 80
+    },
+    {
+        "Name": "Elphidran",
+        "CodeName": "FairyDragon",
+        "PalDexNo": 80,
+        "IsVariant": false,
+        "BreedPower": 540,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 5230,
+        "IndexOrder": 38
+    },
+    {
+        "Name": "Elphidran Aqua",
+        "CodeName": "FairyDragon_Water",
+        "PalDexNo": 80,
+        "IsVariant": true,
+        "BreedPower": 530,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 5320,
+        "IndexOrder": 39
+    },
+    {
+        "Name": "Kelpsea",
+        "CodeName": "Kelpie",
+        "PalDexNo": 81,
+        "IsVariant": false,
+        "BreedPower": 1260,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1260,
+        "IndexOrder": 86
+    },
+    {
+        "Name": "Kelpsea Ignis",
+        "CodeName": "Kelpie_Fire",
+        "PalDexNo": 81,
+        "IsVariant": true,
+        "BreedPower": 1270,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1240,
+        "IndexOrder": 87
+    },
+    {
+        "Name": "Azurobe",
+        "CodeName": "BlueDragon",
+        "PalDexNo": 82,
+        "IsVariant": false,
+        "BreedPower": 500,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 5600,
+        "IndexOrder": 46
+    },
+    {
+        "Name": "Cryolinx",
+        "CodeName": "WhiteTiger",
+        "PalDexNo": 83,
+        "IsVariant": false,
+        "BreedPower": 130,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 8440,
+        "IndexOrder": 41
+    },
+    {
+        "Name": "Blazehowl",
+        "CodeName": "Manticore",
+        "PalDexNo": 84,
+        "IsVariant": false,
+        "BreedPower": 710,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4040,
+        "IndexOrder": 111
+    },
+    {
+        "Name": "Blazehowl Noct",
+        "CodeName": "Manticore_Dark",
+        "PalDexNo": 84,
+        "IsVariant": true,
+        "BreedPower": 670,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4360,
+        "IndexOrder": 112
+    },
+    {
+        "Name": "Relaxaurus",
+        "CodeName": "LazyDragon",
+        "PalDexNo": 85,
+        "IsVariant": false,
+        "BreedPower": 280,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "PAL_FullStomach_Up_1"
+        ],
+        "Price": 10240,
+        "IndexOrder": 55
+    },
+    {
+        "Name": "Relaxaurus Lux",
+        "CodeName": "LazyDragon_Electric",
+        "PalDexNo": 85,
+        "IsVariant": true,
+        "BreedPower": 270,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 10380,
+        "IndexOrder": 56
+    },
+    {
+        "Name": "Broncherry",
+        "CodeName": "SakuraSaurus",
+        "PalDexNo": 86,
+        "IsVariant": false,
+        "BreedPower": 860,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2920,
+        "IndexOrder": 72
+    },
+    {
+        "Name": "Broncherry Aqua",
+        "CodeName": "SakuraSaurus_Water",
+        "PalDexNo": 86,
+        "IsVariant": true,
+        "BreedPower": 840,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3110,
+        "IndexOrder": 73
+    },
+    {
+        "Name": "Petallia",
+        "CodeName": "FlowerDoll",
+        "PalDexNo": 87,
+        "IsVariant": false,
+        "BreedPower": 780,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3590,
+        "IndexOrder": 137
+    },
+    {
+        "Name": "Reptyro",
+        "CodeName": "VolcanicMonster",
+        "PalDexNo": 88,
+        "IsVariant": false,
+        "BreedPower": 320,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 6940,
+        "IndexOrder": 50
+    },
+    {
+        "Name": "Reptyro Cryst",
+        "CodeName": "VolcanicMonster_Ice",
+        "PalDexNo": 88,
+        "IsVariant": true,
+        "BreedPower": 230,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 7380,
+        "IndexOrder": 51
+    },
+    {
+        "Name": "Kingpaca",
+        "CodeName": "KingAlpaca",
+        "PalDexNo": 89,
+        "IsVariant": false,
+        "BreedPower": 470,
+        "MaleProbability": 90,
+        "GuaranteedTraits": [],
+        "Price": 5800,
+        "IndexOrder": 113
+    },
+    {
+        "Name": "Kingpaca Cryst",
+        "CodeName": "KingAlpaca_Ice",
+        "PalDexNo": 89,
+        "IsVariant": true,
+        "BreedPower": 440,
+        "MaleProbability": 90,
+        "GuaranteedTraits": [],
+        "Price": 6100,
+        "IndexOrder": 114
+    },
+    {
+        "Name": "Mammorest",
+        "CodeName": "GrassMammoth",
+        "PalDexNo": 90,
+        "IsVariant": false,
+        "BreedPower": 300,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 9450,
+        "IndexOrder": 69
+    },
+    {
+        "Name": "Mammorest Cryst",
+        "CodeName": "GrassMammoth_Ice",
+        "PalDexNo": 90,
+        "IsVariant": true,
+        "BreedPower": 290,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 9580,
+        "IndexOrder": 70
+    },
+    {
+        "Name": "Wumpo",
+        "CodeName": "Yeti",
+        "PalDexNo": 91,
+        "IsVariant": false,
+        "BreedPower": 460,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 5900,
+        "IndexOrder": 90
+    },
+    {
+        "Name": "Wumpo Botan",
+        "CodeName": "Yeti_Grass",
+        "PalDexNo": 91,
+        "IsVariant": true,
+        "BreedPower": 480,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 5700,
+        "IndexOrder": 91
+    },
+    {
+        "Name": "Warsect",
+        "CodeName": "HerculesBeetle",
+        "PalDexNo": 92,
+        "IsVariant": false,
+        "BreedPower": 340,
+        "MaleProbability": 85,
+        "GuaranteedTraits": [
+            "Deffence_up1"
+        ],
+        "Price": 6830,
+        "IndexOrder": 122
+    },
+    {
+        "Name": "Fenglope",
+        "CodeName": "FengyunDeeper",
+        "PalDexNo": 93,
+        "IsVariant": false,
+        "BreedPower": 980,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2250,
+        "IndexOrder": 49
+    },
+    {
+        "Name": "Felbat",
+        "CodeName": "CatVampire",
+        "PalDexNo": 94,
+        "IsVariant": false,
+        "BreedPower": 1010,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2100,
+        "IndexOrder": 71
+    },
+    {
+        "Name": "Quivern",
+        "CodeName": "SkyDragon",
+        "PalDexNo": 95,
+        "IsVariant": false,
+        "BreedPower": 350,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 6830,
+        "IndexOrder": 128
+    },
+    {
+        "Name": "Quivern Botan",
+        "CodeName": "SkyDragon_Grass",
+        "PalDexNo": 95,
+        "IsVariant": true,
+        "BreedPower": 340,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 7830,
+        "IndexOrder": 129
+    },
+    {
+        "Name": "Blazamut",
+        "CodeName": "KingBahamut",
+        "PalDexNo": 96,
+        "IsVariant": false,
+        "BreedPower": 10,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "ElementBoost_Fire_2_PAL"
+        ],
+        "Price": 10520,
+        "IndexOrder": 75
+    },
+    {
+        "Name": "Blazamut Ryu",
+        "CodeName": "KingBahamut_Dragon",
+        "PalDexNo": 96,
+        "IsVariant": true,
+        "BreedPower": 9,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "EternalFlame"
+        ],
+        "Price": 10520,
+        "IndexOrder": 76
+    },
+    {
+        "Name": "Helzephyr",
+        "CodeName": "HadesBird",
+        "PalDexNo": 97,
+        "IsVariant": false,
+        "BreedPower": 190,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 7840,
+        "IndexOrder": 130
+    },
+    {
+        "Name": "Helzephyr Lux",
+        "CodeName": "HadesBird_Electric",
+        "PalDexNo": 97,
+        "IsVariant": true,
+        "BreedPower": 180,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 8840,
+        "IndexOrder": 131
+    },
+    {
+        "Name": "Astegon",
+        "CodeName": "BlackMetalDragon",
+        "PalDexNo": 98,
+        "IsVariant": false,
+        "BreedPower": 150,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "Deffence_up1"
+        ],
+        "Price": 8200,
+        "IndexOrder": 105
+    },
+    {
+        "Name": "Menasting",
+        "CodeName": "DarkScorpion",
+        "PalDexNo": 99,
+        "IsVariant": false,
+        "BreedPower": 260,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 7050,
+        "IndexOrder": 140
+    },
+    {
+        "Name": "Menasting Terra",
+        "CodeName": "DarkScorpion_Ground",
+        "PalDexNo": 99,
+        "IsVariant": true,
+        "BreedPower": 250,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 8050,
+        "IndexOrder": 141
+    },
+    {
+        "Name": "Anubis",
+        "CodeName": "Anubis",
+        "PalDexNo": 100,
+        "IsVariant": false,
+        "BreedPower": 570,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "ElementBoost_Earth_2_PAL"
+        ],
+        "Price": 4960,
+        "IndexOrder": 1
+    },
+    {
+        "Name": "Jormuntide",
+        "CodeName": "Umihebi",
+        "PalDexNo": 101,
+        "IsVariant": false,
+        "BreedPower": 310,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "ElementBoost_Aqua_2_PAL"
+        ],
+        "Price": 9320,
+        "IndexOrder": 29
+    },
+    {
+        "Name": "Jormuntide Ignis",
+        "CodeName": "Umihebi_Fire",
+        "PalDexNo": 101,
+        "IsVariant": true,
+        "BreedPower": 315,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 9500,
+        "IndexOrder": 30
+    },
+    {
+        "Name": "Suzaku",
+        "CodeName": "Suzaku",
+        "PalDexNo": 102,
+        "IsVariant": false,
+        "BreedPower": 50,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 9840,
+        "IndexOrder": 34
+    },
+    {
+        "Name": "Suzaku Aqua",
+        "CodeName": "Suzaku_Water",
+        "PalDexNo": 102,
+        "IsVariant": true,
+        "BreedPower": 30,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 10110,
+        "IndexOrder": 35
+    },
+    {
+        "Name": "Grizzbolt",
+        "CodeName": "ElecPanda",
+        "PalDexNo": 103,
+        "IsVariant": false,
+        "BreedPower": 200,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 7720,
+        "IndexOrder": 13
+    },
+    {
+        "Name": "Lyleen",
+        "CodeName": "LilyQueen",
+        "PalDexNo": 104,
+        "IsVariant": false,
+        "BreedPower": 250,
+        "MaleProbability": 30,
+        "GuaranteedTraits": [
+            "ElementBoost_Leaf_2_PAL"
+        ],
+        "Price": 7160,
+        "IndexOrder": 95
+    },
+    {
+        "Name": "Lyleen Noct",
+        "CodeName": "LilyQueen_Dark",
+        "PalDexNo": 104,
+        "IsVariant": true,
+        "BreedPower": 210,
+        "MaleProbability": 30,
+        "GuaranteedTraits": [],
+        "Price": 7610,
+        "IndexOrder": 96
+    },
+    {
+        "Name": "Faleris",
+        "CodeName": "Horus",
+        "PalDexNo": 105,
+        "IsVariant": false,
+        "BreedPower": 370,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 6720,
+        "IndexOrder": 74
+    },
+    {
+        "Name": "Orserk",
+        "CodeName": "ThunderDragonMan",
+        "PalDexNo": 106,
+        "IsVariant": false,
+        "BreedPower": 140,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "ElementBoost_Thunder_2_PAL"
+        ],
+        "Price": 8320,
+        "IndexOrder": 142
+    },
+    {
+        "Name": "Shadowbeak",
+        "CodeName": "BlackGriffon",
+        "PalDexNo": 107,
+        "IsVariant": false,
+        "BreedPower": 60,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 9060,
+        "IndexOrder": 79
+    },
+    {
+        "Name": "Paladius",
+        "CodeName": "SaintCentaur",
+        "PalDexNo": 108,
+        "IsVariant": false,
+        "BreedPower": 80,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "Legend",
+            "ElementBoost_Normal_2_PAL"
+        ],
+        "Price": 8810,
+        "IndexOrder": 123
+    },
+    {
+        "Name": "Necromus",
+        "CodeName": "BlackCentaur",
+        "PalDexNo": 109,
+        "IsVariant": false,
+        "BreedPower": 70,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "Legend",
+            "ElementBoost_Dark_2_PAL"
+        ],
+        "Price": 8930,
+        "IndexOrder": 136
+    },
+    {
+        "Name": "Frostallion",
+        "CodeName": "IceHorse",
+        "PalDexNo": 110,
+        "IsVariant": false,
+        "BreedPower": 120,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "Legend",
+            "ElementBoost_Ice_2_PAL"
+        ],
+        "Price": 8440,
+        "IndexOrder": 67
+    },
+    {
+        "Name": "Frostallion Noct",
+        "CodeName": "IceHorse_Dark",
+        "PalDexNo": 110,
+        "IsVariant": true,
+        "BreedPower": 100,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "Legend"
+        ],
+        "Price": 8560,
+        "IndexOrder": 68
+    },
+    {
+        "Name": "Jetragon",
+        "CodeName": "JetDragon",
+        "PalDexNo": 111,
+        "IsVariant": false,
+        "BreedPower": 90,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "Legend",
+            "ElementBoost_Dragon_2_PAL"
+        ],
+        "Price": 8680,
+        "IndexOrder": 108
+    },
+    {
+        "Name": "Bellanoir",
+        "CodeName": "NightLady",
+        "PalDexNo": 112,
+        "IsVariant": false,
+        "BreedPower": 1,
+        "MaleProbability": 5,
+        "GuaranteedTraits": [],
+        "Price": 10030,
+        "IndexOrder": 147
+    },
+    {
+        "Name": "Bellanoir Libero",
+        "CodeName": "NightLady_Dark",
+        "PalDexNo": 112,
+        "IsVariant": true,
+        "BreedPower": 1,
+        "MaleProbability": 5,
+        "GuaranteedTraits": [
+            "Witch"
+        ],
+        "Price": 10030,
+        "IndexOrder": 148
+    },
+    {
+        "Name": "Selyne",
+        "CodeName": "MoonQueen",
+        "PalDexNo": 113,
+        "IsVariant": false,
+        "BreedPower": 345,
+        "MaleProbability": 20,
+        "GuaranteedTraits": [],
+        "Price": 9500,
+        "IndexOrder": 149
+    },
+    {
+        "Name": "Croajiro",
+        "CodeName": "KendoFrog",
+        "PalDexNo": 114,
+        "IsVariant": false,
+        "BreedPower": 795,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2040,
+        "IndexOrder": 150
+    },
+    {
+        "Name": "Lullu",
+        "CodeName": "LeafPrincess",
+        "PalDexNo": 115,
+        "IsVariant": false,
+        "BreedPower": 905,
+        "MaleProbability": 30,
+        "GuaranteedTraits": [],
+        "Price": 3420,
+        "IndexOrder": 151
+    },
+    {
+        "Name": "Shroomer",
+        "CodeName": "MushroomDragon",
+        "PalDexNo": 116,
+        "IsVariant": false,
+        "BreedPower": 720,
+        "MaleProbability": 55,
+        "GuaranteedTraits": [],
+        "Price": 3660,
+        "IndexOrder": 152
+    },
+    {
+        "Name": "Shroomer Noct",
+        "CodeName": "MushroomDragon_Dark",
+        "PalDexNo": 116,
+        "IsVariant": true,
+        "BreedPower": 730,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4240,
+        "IndexOrder": 153
+    },
+    {
+        "Name": "Kikit",
+        "CodeName": "SmallArmadillo",
+        "PalDexNo": 117,
+        "IsVariant": false,
+        "BreedPower": 1125,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2800,
+        "IndexOrder": 154
+    },
+    {
+        "Name": "Sootseer",
+        "CodeName": "CandleGhost",
+        "PalDexNo": 118,
+        "IsVariant": false,
+        "BreedPower": 545,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4890,
+        "IndexOrder": 155
+    },
+    {
+        "Name": "Prixter",
+        "CodeName": "ScorpionMan",
+        "PalDexNo": 119,
+        "IsVariant": false,
+        "BreedPower": 355,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3939,
+        "IndexOrder": 156
+    },
+    {
+        "Name": "Knocklem",
+        "CodeName": "WingGolem",
+        "PalDexNo": 120,
+        "IsVariant": false,
+        "BreedPower": 265,
+        "MaleProbability": 70,
+        "GuaranteedTraits": [],
+        "Price": 10380,
+        "IndexOrder": 157
+    },
+    {
+        "Name": "Yakumo",
+        "CodeName": "GuardianDog",
+        "PalDexNo": 121,
+        "IsVariant": false,
+        "BreedPower": 945,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 3360,
+        "IndexOrder": 158
+    },
+    {
+        "Name": "Dogen",
+        "CodeName": "SifuDog",
+        "PalDexNo": 122,
+        "IsVariant": false,
+        "BreedPower": 665,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 4440,
+        "IndexOrder": 159
+    },
+    {
+        "Name": "Dazemu",
+        "CodeName": "FeatherOstrich",
+        "PalDexNo": 123,
+        "IsVariant": false,
+        "BreedPower": 675,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 2610,
+        "IndexOrder": 160
+    },
+    {
+        "Name": "Mimog",
+        "CodeName": "MimicDog",
+        "PalDexNo": 124,
+        "IsVariant": false,
+        "BreedPower": 1200,
+        "MaleProbability": 80,
+        "GuaranteedTraits": [],
+        "Price": 6150,
+        "IndexOrder": 161
+    },
+    {
+        "Name": "Xenovader",
+        "CodeName": "DarkAlien",
+        "PalDexNo": 125,
+        "IsVariant": false,
+        "BreedPower": 465,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "Alien"
+        ],
+        "Price": 6750,
+        "IndexOrder": 162
+    },
+    {
+        "Name": "Xenogard",
+        "CodeName": "WhiteAlienDragon",
+        "PalDexNo": 126,
+        "IsVariant": false,
+        "BreedPower": 435,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [
+            "Alien"
+        ],
+        "Price": 8810,
+        "IndexOrder": 163
+    },
+    {
+        "Name": "Gumoss (Special)",
+        "CodeName": "PlantSlime_Flower",
+        "PalDexNo": 13,
+        "IsVariant": true,
+        "BreedPower": 1240,
+        "MaleProbability": 50,
+        "GuaranteedTraits": [],
+        "Price": 1310,
+        "IndexOrder": 115
+    },
+    {
+        "Name": "Warsect Terra",
+        "CodeName": "HerculesBeetle_Ground",
+        "PalDexNo": 92,
+        "IsVariant": true,
+        "BreedPower": 350,
+        "MaleProbability": 85,
+        "GuaranteedTraits": [],
+        "Price": 7830,
+        "IndexOrder": -1
+    }
+]

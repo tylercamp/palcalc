@@ -11,7 +11,9 @@ namespace PalCalc.Model
         public static Pal ToPal(this string s, PalDB db) => db.Pals.Single(p => p.Name == s);
         public static Pal ToPal(this string s, IEnumerable<Pal> pals) => pals.Single(p => p.Name == s);
         public static Pal InternalToPal(this string s, PalDB db) => db.Pals.Single(p => p.InternalName.ToLower() == s.ToLower());
-        public static Pal ToPal(this PalId id, PalDB db) => db.PalsById[id];
+
+        // GetValueOrElse a hackfix for change in "Variant" classification after change in data scraping method
+        public static Pal ToPal(this PalId id, PalDB db) => db.PalsById.GetValueFromAny(id, id.InvertedVariant);
         public static Pal ToPal(this PalId id, IEnumerable<Pal> pals) => pals.Single(p => p.Id == id);
 
         private static Trait RAND_REF = new RandomTrait();

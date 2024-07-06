@@ -74,6 +74,7 @@ namespace PalCalc.GenDB
             return palDistances;
         }
 
+        // TODO - try to fetch this from parsing
         static List<(String, String, String)> SpecialCombos = new List<(String, String, String)>()
         {
             ("Relaxaurus", "Sparkit", "Relaxaurus Lux"),
@@ -133,7 +134,12 @@ namespace PalCalc.GenDB
             ("Bellanoir Libero", 0.05f),
         };
 
+        // TODO - update child pal calc to prefer base over variant pals
+
+        // TODO - fetch possible caught levels from spawners
+
         // pals you can only obtain from breeding
+        // TODO - fetch this from parsing, check for spawners
         static List<string> PalsOnlyFromBreeding = new List<string>()
         {
             "Elphidran Aqua",
@@ -143,12 +149,14 @@ namespace PalCalc.GenDB
         static void Main(string[] args)
         {
             var pals = new List<Pal>();
-            pals.AddRange(ParseCsv.ReadPals());
-            pals.AddRange(ParseExtraJson.ReadPals());
+            //pals.AddRange(ParseCsv.ReadPals());
+            //pals.AddRange(ParseExtraJson.ReadPals());
+            pals.AddRange(ParseScrapedJson.ReadPals());
 
             var traits = new List<Trait>();
-            traits.AddRange(ParseCsv.ReadTraits());
-            traits.AddRange(ParseExtraJson.ReadTraits());
+            //traits.AddRange(ParseCsv.ReadTraits());
+            //traits.AddRange(ParseExtraJson.ReadTraits());
+            traits.AddRange(ParseScrapedJson.ReadTraits());
 
             foreach (var (p1, p2, c) in SpecialCombos)
             {
@@ -192,7 +200,7 @@ namespace PalCalc.GenDB
                     .First();
             }
 
-            var db = PalDB.MakeEmptyUnsafe("v6");
+            var db = PalDB.MakeEmptyUnsafe("v8");
             db.Breeding = pals
                 .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
                 .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))
