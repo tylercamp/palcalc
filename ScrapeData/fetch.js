@@ -261,7 +261,7 @@ async function fetchPassives() {
 
     fs.writeFileSync('out/csv/pals.csv', [
         palColumns.join(','),
-        ...resultPals.map(p => palColumns.map(c => p[c]).map(v => typeof v == 'object' ? `'${JSON.stringify(v)}'` : v).join(','))
+        ...resultPals.map(p => palColumns.map(c => p[c]).join(','))
     ].join('\n'))
 
     fs.writeFileSync('out/csv/unique_breeding.csv', [
