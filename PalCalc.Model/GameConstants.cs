@@ -34,8 +34,8 @@ namespace PalCalc.Model
             var minTime = TimeSpan.FromMinutes(3);
 
             // TODO - tweak
-            var rarityModifier = pal.Price / 75.0f + (pal.Id.IsVariant ? 5 : 0);
-            return minTime + TimeSpan.FromMinutes(rarityModifier - 1);
+            var rarityModifier = (pal.Price - 1000) / 100.0f + (pal.Id.IsVariant ? 5 : 0);
+            return minTime + TimeSpan.FromMinutes(rarityModifier);
         }
 
         // https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/
