@@ -481,9 +481,9 @@ namespace PalCalc.Solver
                                 .Where(p => p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps < maxBreedingSteps)
                                 .Where(p =>
                                 {
-                                    var childPal = db.BreedingByParent[p.Item1.Pal][p.Item2.Pal].Child;
+                                    var childPals = db.BreedingByParent[p.Item1.Pal][p.Item2.Pal].Select(br => br.Child);
 
-                                    return db.MinBreedingSteps[childPal][spec.Pal] <= maxBreedingSteps - s - 1;
+                                    return childPals.Any(c => db.MinBreedingSteps[c][spec.Pal] <= maxBreedingSteps - s - 1);
                                 })
                                 .Where(p =>
                                 {
@@ -500,6 +500,43 @@ namespace PalCalc.Solver
                                     var anyIrrelevantFromParents = combinedTraits.Except(spec.DesiredTraits).Any();
 
                                     return anyRelevantFromParents || !anyIrrelevantFromParents;
+                                })
+                                .SelectMany(p =>
+                                {
+                                    var (parent1, parent2) = p;
+
+                                    // if both parents are wildcards, go through the list of possible gender-specific breeding results
+                                    // and modify the parent genders to cover each possible child
+
+#if DEBUG
+                                    // (shouldn't happen)
+
+                                    if (parent1.Gender == PalGender.OPPOSITE_WILDCARD || parent2.Gender == PalGender.OPPOSITE_WILDCARD)
+                                        Debugger.Break();
+#endif
+
+                                    IEnumerable<(IPalReference, IPalReference)> ExpandGendersByChildren()
+                                    {
+                                        if (parent1.Gender != PalGender.WILDCARD || parent2.Gender != PalGender.WILDCARD)
+                                        {
+                                            yield return p;
+                                        }
+                                        else
+                                        {
+                                            var withModifiedGenders = db.BreedingByParent[parent1.Pal][parent2.Pal].Select(br =>
+                                            {
+                                                return (
+                                                    parent1.WithGuaranteedGender(db, br.RequiredGenderOf(parent1.Pal)),
+                                                    parent2.WithGuaranteedGender(db, br.RequiredGenderOf(parent2.Pal))
+                                                );
+                                            });
+
+                                            foreach (var res in withModifiedGenders)
+                                                yield return res;
+                                        }
+                                    }
+
+                                    return ExpandGendersByChildren();
                                 })
                                 .Select(p =>
                                 {
@@ -556,7 +593,9 @@ namespace PalCalc.Solver
 
                                             var res = new BredPalReference(
                                                 gameSettings,
-                                                db.BreedingByParent[parent1.Pal][parent2.Pal].Child,
+                                                db.BreedingByParent[parent1.Pal][parent2.Pal]
+                                                    .Single(br => br.Matches(parent1.Pal, parent1.Gender, parent2.Pal, parent2.Gender))
+                                                    .Child,
                                                 preferredParent1,
                                                 preferredParent2,
                                                 newTraits,

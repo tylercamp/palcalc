@@ -12,8 +12,22 @@ namespace PalCalc.GenDB
     {
         class JsonPalExclusiveBreeding
         {
-            public string Parent1 { get; set; }
-            public string Parent2 { get; set; }
+            public class Parent
+            {
+                public string CodeName { get; set; }
+                public string RequiredGender { get; set; }
+
+                public PalGender? Gender => RequiredGender switch
+                {
+                    "Male" => PalGender.MALE,
+                    "Female" => PalGender.FEMALE,
+                    null => null,
+                    _ => throw new NotImplementedException()
+                };
+            }
+
+            public Parent Parent1 { get; set; }
+            public Parent Parent2 { get; set; }
             public string Child { get; set; }
         }
 
@@ -71,15 +85,15 @@ namespace PalCalc.GenDB
                 .ToList();
         }
 
-        // returns (parent1, parent2, child) (uses InternalName)
-        public static List<(string, string, string)> ReadExclusiveBreedings()
+        // returns ((parent1, req-gender), (parent2, req-gender), child) (uses InternalName)
+        public static List<((string, PalGender?), (string, PalGender?), string)> ReadExclusiveBreedings()
         {
             return JsonConvert
                 .DeserializeObject<List<JsonPal>>(File.ReadAllText("ref/scraped-pals.json"))
                 .Select(jp => jp.ExclusiveBreeding)
                 .Where(eb => eb != null)
                 .Select(eb =>
-                    (eb.Parent1, eb.Parent2, eb.Child)
+                    ((eb.Parent1.CodeName, eb.Parent1.Gender), (eb.Parent2.CodeName, eb.Parent2.Gender), eb.Child)
                 )
                 .ToList();
         }

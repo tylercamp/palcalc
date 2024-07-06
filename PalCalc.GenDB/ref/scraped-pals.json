@@ -182,8 +182,14 @@
         "MinWildLevel": 1,
         "MaxWildLevel": 20,
         "ExclusiveBreeding": {
-            "Parent1": "Hedgehog",
-            "Parent2": "Penguin",
+            "Parent1": {
+                "CodeName": "Hedgehog",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "Penguin",
+                "RequiredGender": null
+            },
             "Child": "Hedgehog_Ice"
         }
     },
@@ -368,8 +374,14 @@
         "MinWildLevel": 1,
         "MaxWildLevel": 45,
         "ExclusiveBreeding": {
-            "Parent1": "Bastet",
-            "Parent2": "Penguin",
+            "Parent1": {
+                "CodeName": "Bastet",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "Penguin",
+                "RequiredGender": null
+            },
             "Child": "Bastet_Ice"
         }
     },
@@ -484,8 +496,14 @@
         "MinWildLevel": 25,
         "MaxWildLevel": 38,
         "ExclusiveBreeding": {
-            "Parent1": "SharkKid",
-            "Parent2": "FlameBambi",
+            "Parent1": {
+                "CodeName": "SharkKid",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "FlameBambi",
+                "RequiredGender": null
+            },
             "Child": "SharkKid_Fire"
         }
     },
@@ -516,8 +534,14 @@
         "MinWildLevel": 33,
         "MaxWildLevel": 35,
         "ExclusiveBreeding": {
-            "Parent1": "WindChimes",
-            "Parent2": "MopBaby",
+            "Parent1": {
+                "CodeName": "WindChimes",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "MopBaby",
+                "RequiredGender": null
+            },
             "Child": "WindChimes_Ice"
         }
     },
@@ -548,8 +572,14 @@
         "MinWildLevel": 15,
         "MaxWildLevel": 37,
         "ExclusiveBreeding": {
-            "Parent1": "GrassPanda",
-            "Parent2": "ElecPanda",
+            "Parent1": {
+                "CodeName": "GrassPanda",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "ElecPanda",
+                "RequiredGender": null
+            },
             "Child": "GrassPanda_Electric"
         }
     },
@@ -622,8 +652,14 @@
         "MinWildLevel": 18,
         "MaxWildLevel": 22,
         "ExclusiveBreeding": {
-            "Parent1": "Deer",
-            "Parent2": "WindChimes",
+            "Parent1": {
+                "CodeName": "Deer",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "WindChimes",
+                "RequiredGender": null
+            },
             "Child": "Deer_Ground"
         }
     },
@@ -682,8 +718,14 @@
         "MinWildLevel": 29,
         "MaxWildLevel": 45,
         "ExclusiveBreeding": {
-            "Parent1": "Baphomet",
-            "Parent2": "GhostBeast",
+            "Parent1": {
+                "CodeName": "Baphomet",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "GhostBeast",
+                "RequiredGender": null
+            },
             "Child": "Baphomet_Dark"
         }
     },
@@ -770,8 +812,14 @@
         "MinWildLevel": 15,
         "MaxWildLevel": 38,
         "ExclusiveBreeding": {
-            "Parent1": "LizardMan",
-            "Parent2": "LavaGirl",
+            "Parent1": {
+                "CodeName": "LizardMan",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "LavaGirl",
+                "RequiredGender": null
+            },
             "Child": "LizardMan_Fire"
         }
     },
@@ -830,8 +878,14 @@
         "MinWildLevel": 30,
         "MaxWildLevel": 40,
         "ExclusiveBreeding": {
-            "Parent1": "RobinHood",
-            "Parent2": "CuteMole",
+            "Parent1": {
+                "CodeName": "RobinHood",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "CuteMole",
+                "RequiredGender": null
+            },
             "Child": "RobinHood_Ground"
         }
     },
@@ -866,8 +920,14 @@
         "MinWildLevel": 40,
         "MaxWildLevel": 52,
         "ExclusiveBreeding": {
-            "Parent1": "Gorilla",
-            "Parent2": "SmallArmadillo",
+            "Parent1": {
+                "CodeName": "Gorilla",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "SmallArmadillo",
+                "RequiredGender": null
+            },
             "Child": "Gorilla_Ground"
         }
     },
@@ -968,8 +1028,14 @@
         "MinWildLevel": 40,
         "MaxWildLevel": 52,
         "ExclusiveBreeding": {
-            "Parent1": "WeaselDragon",
-            "Parent2": "FlameBuffalo",
+            "Parent1": {
+                "CodeName": "WeaselDragon",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "FlameBuffalo",
+                "RequiredGender": null
+            },
             "Child": "WeaselDragon_Fire"
         }
     },
@@ -1028,8 +1094,14 @@
         "MinWildLevel": 32,
         "MaxWildLevel": 38,
         "ExclusiveBreeding": {
-            "Parent1": "FireKirin",
-            "Parent2": "CatMage",
+            "Parent1": {
+                "CodeName": "FireKirin",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "CatMage",
+                "RequiredGender": null
+            },
             "Child": "FireKirin_Dark"
         }
     },
@@ -1130,8 +1202,14 @@
         "MinWildLevel": 15,
         "MaxWildLevel": 47,
         "ExclusiveBreeding": {
-            "Parent1": "FlowerDinosaur",
-            "Parent2": "ThunderDog",
+            "Parent1": {
+                "CodeName": "FlowerDinosaur",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "ThunderDog",
+                "RequiredGender": null
+            },
             "Child": "FlowerDinosaur_Electric"
         }
     },
@@ -1162,8 +1240,14 @@
         "MinWildLevel": 30,
         "MaxWildLevel": 40,
         "ExclusiveBreeding": {
-            "Parent1": "Serpent",
-            "Parent2": "LazyCatfish",
+            "Parent1": {
+                "CodeName": "Serpent",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "LazyCatfish",
+                "RequiredGender": null
+            },
             "Child": "Serpent_Ground"
         }
     },
@@ -1268,8 +1352,14 @@
         "MinWildLevel": 36,
         "MaxWildLevel": 45,
         "ExclusiveBreeding": {
-            "Parent1": "BirdDragon",
-            "Parent2": "IceFox",
+            "Parent1": {
+                "CodeName": "BirdDragon",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "IceFox",
+                "RequiredGender": null
+            },
             "Child": "BirdDragon_Ice"
         }
     },
@@ -1300,8 +1390,14 @@
         "MinWildLevel": 46,
         "MaxWildLevel": 53,
         "ExclusiveBreeding": {
-            "Parent1": "Ronin",
-            "Parent2": "CandleGhost",
+            "Parent1": {
+                "CodeName": "Ronin",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "CandleGhost",
+                "RequiredGender": null
+            },
             "Child": "Ronin_Dark"
         }
     },
@@ -1360,8 +1456,14 @@
         "MinWildLevel": 40,
         "MaxWildLevel": 52,
         "ExclusiveBreeding": {
-            "Parent1": "CatMage",
-            "Parent2": "FoxMage",
+            "Parent1": {
+                "CodeName": "CatMage",
+                "RequiredGender": "Female"
+            },
+            "Parent2": {
+                "CodeName": "FoxMage",
+                "RequiredGender": "Male"
+            },
             "Child": "CatMage_Fire"
         }
     },
@@ -1392,8 +1494,14 @@
         "MinWildLevel": 46,
         "MaxWildLevel": 53,
         "ExclusiveBreeding": {
-            "Parent1": "CatMage",
-            "Parent2": "FoxMage",
+            "Parent1": {
+                "CodeName": "CatMage",
+                "RequiredGender": "Male"
+            },
+            "Parent2": {
+                "CodeName": "FoxMage",
+                "RequiredGender": "Female"
+            },
             "Child": "FoxMage_Dark"
         }
     },
@@ -1466,8 +1574,14 @@
         "MinWildLevel": null,
         "MaxWildLevel": null,
         "ExclusiveBreeding": {
-            "Parent1": "FairyDragon",
-            "Parent2": "Serpent",
+            "Parent1": {
+                "CodeName": "FairyDragon",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "Serpent",
+                "RequiredGender": null
+            },
             "Child": "FairyDragon_Water"
         }
     },
@@ -1554,8 +1668,14 @@
         "MinWildLevel": 33,
         "MaxWildLevel": 38,
         "ExclusiveBreeding": {
-            "Parent1": "Manticore",
-            "Parent2": "CatVampire",
+            "Parent1": {
+                "CodeName": "Manticore",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "CatVampire",
+                "RequiredGender": null
+            },
             "Child": "Manticore_Dark"
         }
     },
@@ -1588,8 +1708,14 @@
         "MinWildLevel": 31,
         "MaxWildLevel": 31,
         "ExclusiveBreeding": {
-            "Parent1": "LazyDragon",
-            "Parent2": "ElecCat",
+            "Parent1": {
+                "CodeName": "LazyDragon",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "ElecCat",
+                "RequiredGender": null
+            },
             "Child": "LazyDragon_Electric"
         }
     },
@@ -1620,8 +1746,14 @@
         "MinWildLevel": 30,
         "MaxWildLevel": 30,
         "ExclusiveBreeding": {
-            "Parent1": "SakuraSaurus",
-            "Parent2": "BluePlatypus",
+            "Parent1": {
+                "CodeName": "SakuraSaurus",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "BluePlatypus",
+                "RequiredGender": null
+            },
             "Child": "SakuraSaurus_Water"
         }
     },
@@ -1666,8 +1798,14 @@
         "MinWildLevel": 42,
         "MaxWildLevel": 45,
         "ExclusiveBreeding": {
-            "Parent1": "VolcanicMonster",
-            "Parent2": "IceFox",
+            "Parent1": {
+                "CodeName": "VolcanicMonster",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "IceFox",
+                "RequiredGender": null
+            },
             "Child": "VolcanicMonster_Ice"
         }
     },
@@ -1698,8 +1836,14 @@
         "MinWildLevel": 46,
         "MaxWildLevel": 46,
         "ExclusiveBreeding": {
-            "Parent1": "KingAlpaca",
-            "Parent2": "IceDeer",
+            "Parent1": {
+                "CodeName": "KingAlpaca",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "IceDeer",
+                "RequiredGender": null
+            },
             "Child": "KingAlpaca_Ice"
         }
     },
@@ -1730,8 +1874,14 @@
         "MinWildLevel": 41,
         "MaxWildLevel": 45,
         "ExclusiveBreeding": {
-            "Parent1": "GrassMammoth",
-            "Parent2": "Yeti",
+            "Parent1": {
+                "CodeName": "GrassMammoth",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "Yeti",
+                "RequiredGender": null
+            },
             "Child": "GrassMammoth_Ice"
         }
     },
@@ -1834,8 +1984,14 @@
         "MinWildLevel": 51,
         "MaxWildLevel": 54,
         "ExclusiveBreeding": {
-            "Parent1": "SkyDragon",
-            "Parent2": "LeafPrincess",
+            "Parent1": {
+                "CodeName": "SkyDragon",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "LeafPrincess",
+                "RequiredGender": null
+            },
             "Child": "SkyDragon_Grass"
         }
     },
@@ -1870,8 +2026,14 @@
         "MinWildLevel": null,
         "MaxWildLevel": null,
         "ExclusiveBreeding": {
-            "Parent1": "KingBahamut_Dragon",
-            "Parent2": "KingBahamut_Dragon",
+            "Parent1": {
+                "CodeName": "KingBahamut_Dragon",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "KingBahamut_Dragon",
+                "RequiredGender": null
+            },
             "Child": "KingBahamut_Dragon"
         }
     },
@@ -1902,8 +2064,14 @@
         "MinWildLevel": 46,
         "MaxWildLevel": 52,
         "ExclusiveBreeding": {
-            "Parent1": "HadesBird",
-            "Parent2": "ThunderBird",
+            "Parent1": {
+                "CodeName": "HadesBird",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "ThunderBird",
+                "RequiredGender": null
+            },
             "Child": "HadesBird_Electric"
         }
     },
@@ -1950,8 +2118,14 @@
         "MinWildLevel": 54,
         "MaxWildLevel": 54,
         "ExclusiveBreeding": {
-            "Parent1": "DarkScorpion",
-            "Parent2": "WingGolem",
+            "Parent1": {
+                "CodeName": "DarkScorpion",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "WingGolem",
+                "RequiredGender": null
+            },
             "Child": "DarkScorpion_Ground"
         }
     },
@@ -2000,8 +2174,14 @@
         "MinWildLevel": 40,
         "MaxWildLevel": 45,
         "ExclusiveBreeding": {
-            "Parent1": "Umihebi",
-            "Parent2": "Manticore",
+            "Parent1": {
+                "CodeName": "Umihebi",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "Manticore",
+                "RequiredGender": null
+            },
             "Child": "Umihebi_Fire"
         }
     },
@@ -2032,8 +2212,14 @@
         "MinWildLevel": 37,
         "MaxWildLevel": 45,
         "ExclusiveBreeding": {
-            "Parent1": "Suzaku",
-            "Parent2": "Umihebi",
+            "Parent1": {
+                "CodeName": "Suzaku",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "Umihebi",
+                "RequiredGender": null
+            },
             "Child": "Suzaku_Water"
         }
     },
@@ -2050,8 +2236,14 @@
         "MinWildLevel": 18,
         "MaxWildLevel": 22,
         "ExclusiveBreeding": {
-            "Parent1": "GrassPanda",
-            "Parent2": "ThunderDog",
+            "Parent1": {
+                "CodeName": "GrassPanda",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "ThunderDog",
+                "RequiredGender": null
+            },
             "Child": "ElecPanda"
         }
     },
@@ -2070,8 +2262,14 @@
         "MinWildLevel": 15,
         "MaxWildLevel": 51,
         "ExclusiveBreeding": {
-            "Parent1": "GrassPanda",
-            "Parent2": "FlowerDoll",
+            "Parent1": {
+                "CodeName": "GrassPanda",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "FlowerDoll",
+                "RequiredGender": null
+            },
             "Child": "LilyQueen"
         }
     },
@@ -2088,8 +2286,14 @@
         "MinWildLevel": 49,
         "MaxWildLevel": 49,
         "ExclusiveBreeding": {
-            "Parent1": "LilyQueen",
-            "Parent2": "DarkScorpion",
+            "Parent1": {
+                "CodeName": "LilyQueen",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "DarkScorpion",
+                "RequiredGender": null
+            },
             "Child": "LilyQueen_Dark"
         }
     },
@@ -2106,8 +2310,14 @@
         "MinWildLevel": 40,
         "MaxWildLevel": 45,
         "ExclusiveBreeding": {
-            "Parent1": "BirdDragon",
-            "Parent2": "Anubis",
+            "Parent1": {
+                "CodeName": "BirdDragon",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "Anubis",
+                "RequiredGender": null
+            },
             "Child": "Horus"
         }
     },
@@ -2126,8 +2336,14 @@
         "MinWildLevel": 40,
         "MaxWildLevel": 45,
         "ExclusiveBreeding": {
-            "Parent1": "ElecPanda",
-            "Parent2": "LazyDragon",
+            "Parent1": {
+                "CodeName": "ElecPanda",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "LazyDragon",
+                "RequiredGender": null
+            },
             "Child": "ThunderDragonMan"
         }
     },
@@ -2144,8 +2360,14 @@
         "MinWildLevel": 40,
         "MaxWildLevel": 45,
         "ExclusiveBreeding": {
-            "Parent1": "AmaterasuWolf",
-            "Parent2": "BlackMetalDragon",
+            "Parent1": {
+                "CodeName": "AmaterasuWolf",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "BlackMetalDragon",
+                "RequiredGender": null
+            },
             "Child": "BlackGriffon"
         }
     },
@@ -2165,8 +2387,14 @@
         "MinWildLevel": 55,
         "MaxWildLevel": 55,
         "ExclusiveBreeding": {
-            "Parent1": "SaintCentaur",
-            "Parent2": "SaintCentaur",
+            "Parent1": {
+                "CodeName": "SaintCentaur",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "SaintCentaur",
+                "RequiredGender": null
+            },
             "Child": "SaintCentaur"
         }
     },
@@ -2186,8 +2414,14 @@
         "MinWildLevel": 55,
         "MaxWildLevel": 55,
         "ExclusiveBreeding": {
-            "Parent1": "BlackCentaur",
-            "Parent2": "BlackCentaur",
+            "Parent1": {
+                "CodeName": "BlackCentaur",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "BlackCentaur",
+                "RequiredGender": null
+            },
             "Child": "BlackCentaur"
         }
     },
@@ -2207,8 +2441,14 @@
         "MinWildLevel": 55,
         "MaxWildLevel": 55,
         "ExclusiveBreeding": {
-            "Parent1": "IceHorse",
-            "Parent2": "IceHorse",
+            "Parent1": {
+                "CodeName": "IceHorse",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "IceHorse",
+                "RequiredGender": null
+            },
             "Child": "IceHorse"
         }
     },
@@ -2227,8 +2467,14 @@
         "MinWildLevel": null,
         "MaxWildLevel": null,
         "ExclusiveBreeding": {
-            "Parent1": "IceHorse",
-            "Parent2": "HadesBird",
+            "Parent1": {
+                "CodeName": "IceHorse",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "HadesBird",
+                "RequiredGender": null
+            },
             "Child": "IceHorse_Dark"
         }
     },
@@ -2248,8 +2494,14 @@
         "MinWildLevel": 55,
         "MaxWildLevel": 55,
         "ExclusiveBreeding": {
-            "Parent1": "JetDragon",
-            "Parent2": "JetDragon",
+            "Parent1": {
+                "CodeName": "JetDragon",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "JetDragon",
+                "RequiredGender": null
+            },
             "Child": "JetDragon"
         }
     },
@@ -2266,8 +2518,14 @@
         "MinWildLevel": null,
         "MaxWildLevel": null,
         "ExclusiveBreeding": {
-            "Parent1": "NightLady",
-            "Parent2": "NightLady_Dark",
+            "Parent1": {
+                "CodeName": "NightLady",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "NightLady_Dark",
+                "RequiredGender": null
+            },
             "Child": "NightLady"
         }
     },
@@ -2286,8 +2544,14 @@
         "MinWildLevel": null,
         "MaxWildLevel": null,
         "ExclusiveBreeding": {
-            "Parent1": "NightLady_Dark",
-            "Parent2": "NightLady_Dark",
+            "Parent1": {
+                "CodeName": "NightLady_Dark",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "NightLady_Dark",
+                "RequiredGender": null
+            },
             "Child": "NightLady_Dark"
         }
     },
@@ -2304,8 +2568,14 @@
         "MinWildLevel": null,
         "MaxWildLevel": null,
         "ExclusiveBreeding": {
-            "Parent1": "MoonQueen",
-            "Parent2": "MoonQueen",
+            "Parent1": {
+                "CodeName": "MoonQueen",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "MoonQueen",
+                "RequiredGender": null
+            },
             "Child": "MoonQueen"
         }
     },
@@ -2476,8 +2746,14 @@
         "MinWildLevel": 9,
         "MaxWildLevel": 53,
         "ExclusiveBreeding": {
-            "Parent1": "MimicDog",
-            "Parent2": "MimicDog",
+            "Parent1": {
+                "CodeName": "MimicDog",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "MimicDog",
+                "RequiredGender": null
+            },
             "Child": "MimicDog"
         }
     },
@@ -2496,8 +2772,14 @@
         "MinWildLevel": null,
         "MaxWildLevel": null,
         "ExclusiveBreeding": {
-            "Parent1": "DarkAlien",
-            "Parent2": "DarkAlien",
+            "Parent1": {
+                "CodeName": "DarkAlien",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "DarkAlien",
+                "RequiredGender": null
+            },
             "Child": "DarkAlien"
         }
     },
@@ -2516,8 +2798,14 @@
         "MinWildLevel": null,
         "MaxWildLevel": null,
         "ExclusiveBreeding": {
-            "Parent1": "WhiteAlienDragon",
-            "Parent2": "WhiteAlienDragon",
+            "Parent1": {
+                "CodeName": "WhiteAlienDragon",
+                "RequiredGender": null
+            },
+            "Parent2": {
+                "CodeName": "WhiteAlienDragon",
+                "RequiredGender": null
+            },
             "Child": "WhiteAlienDragon"
         }
     },

@@ -131,8 +131,18 @@ async function parsePalUrl(path, expectVariant) {
         if (parts.length != 3 && parts.length) throw new Error()
         
         if (parts.length) {
+            const genders = $breeding.find('img[src*=Gender]').toArray().map(el => /Gender_(\w+)\.webp/.exec($(el).attr('src'))).filter(i => i)
+
             const [p1, p2, child] = parts
-            exclusiveBreeding = { p1, p2, child }
+            const [p1g, p2g] = genders.length == 2
+                ? genders.map(([, g]) => g)
+                : []
+
+            exclusiveBreeding = {
+                p1: { pal: p1, gender: p1g || null },
+                p2: { pal: p2, gender: p2g || null },
+                child
+            }
         }
     }
 
@@ -207,8 +217,14 @@ async function fetchPassives() {
             MaxWildLevel: parsed.maxWildLevel,
 
             ExclusiveBreeding: parsed.exclusiveBreeding ? {
-                Parent1: parsed.exclusiveBreeding.p1,
-                Parent2: parsed.exclusiveBreeding.p2,
+                Parent1: {
+                    CodeName: parsed.exclusiveBreeding.p1.pal,
+                    RequiredGender: parsed.exclusiveBreeding.p1.gender,
+                },
+                Parent2: {
+                    CodeName: parsed.exclusiveBreeding.p2.pal,
+                    RequiredGender: parsed.exclusiveBreeding.p2.gender,
+                },
                 Child: parsed.exclusiveBreeding.child,
             } : null,
         })
@@ -269,7 +285,7 @@ async function fetchPassives() {
         ...resultPals
             .map(p => p.ExclusiveBreeding)
             .filter(i => i)
-            .map(({ Parent1, Parent2, Child }) => [ Parent1, Parent2, Child ].map(cn => resultPals.find(p => p.CodeName == cn).Name).join(','))
+            .map(({ Parent1: { CodeName: Parent1 }, Parent2: { CodeName: Parent2 }, Child }) => [ Parent1, Parent2, Child ].map(cn => resultPals.find(p => p.CodeName == cn).Name).join(','))
     ].join('\n'))
 
     fs.writeFileSync('out/csv/guaranteed_traits.csv', [

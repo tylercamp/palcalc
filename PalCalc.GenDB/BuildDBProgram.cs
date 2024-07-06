@@ -32,7 +32,7 @@ namespace PalCalc.GenDB
                     var target = next.Item2;
 
                     // check if there's a direct way to breed from src to target
-                    if (db.BreedingByChild[target].ContainsKey(src))
+                    if (db.BreedingByChild[target].Any(kvp => kvp.Key.Pal == src))
                     {
                         if (!palDistances[src].ContainsKey(target) || palDistances[src][target] != 1)
                         {
@@ -44,7 +44,12 @@ namespace PalCalc.GenDB
                     }
 
                     // check if there's a possible child of this `src` with known distance to target
-                    var childWithShortestDistance = db.BreedingByParent[src].Values.Select(b => b.Child).Where(child => palDistances[child].ContainsKey(target)).OrderBy(child => palDistances[child][target]).FirstOrDefault();
+                    var childWithShortestDistance = db.BreedingByParent[src].Values
+                        .SelectMany(l => l.Select(b => b.Child))
+                        .Where(child => palDistances[child].ContainsKey(target))
+                        .OrderBy(child => palDistances[child][target])
+                        .FirstOrDefault();
+
                     if (childWithShortestDistance != null)
                     {
                         if (!palDistances[src].ContainsKey(target) || palDistances[src][target] != palDistances[childWithShortestDistance][target] + 1)
@@ -86,7 +91,7 @@ namespace PalCalc.GenDB
 
             foreach (var (p1, p2, c) in specialCombos)
             {
-                if (!pals.Any(p => p.InternalName == p1) || !pals.Any(p => p.InternalName == p2) || !pals.Any(p => p.InternalName == c))
+                if (!pals.Any(p => p.InternalName == p1.Item1) || !pals.Any(p => p.InternalName == p2.Item1) || !pals.Any(p => p.InternalName == c))
                     throw new Exception("Unrecognized pal name");
             }
 
@@ -94,23 +99,36 @@ namespace PalCalc.GenDB
                 if (pal.GuaranteedTraitInternalIds.Any(id => !traits.Any(t => t.InternalName == id)))
                     throw new Exception("Unrecognized trait ID");
 
-            Pal Child(Pal parent1, Pal parent2)
+            Pal Child(GenderedPal parent1, GenderedPal parent2)
             {
-                if (parent1 == parent2) return parent1;
+                if (parent1.Pal == parent2.Pal) return parent1.Pal;
 
                 var specialCombo = specialCombos.Where(c =>
-                    (parent1.InternalName == c.Item1 && parent2.InternalName == c.Item2) ||
-                    (parent2.InternalName == c.Item1 && parent1.InternalName == c.Item2)
+                    (parent1.Pal.InternalName == c.Item1.Item1 && parent2.Pal.InternalName == c.Item2.Item1) ||
+                    (parent2.Pal.InternalName == c.Item1.Item1 && parent1.Pal.InternalName == c.Item2.Item1)
                 );
 
                 if (specialCombo.Any())
                 {
                     // TODO - Katress/Wixen breed result depends on which one is male/female, special combos
                     //        atm don't take gender into account
-                    return pals.Single(p => p.InternalName == specialCombo.First().Item3);
+                    return pals.Single(p =>
+                        p.InternalName == specialCombo.Single(c =>
+                        {
+                            bool Matches(GenderedPal parent, string pal, PalGender? gender) =>
+                                parent.Pal.InternalName == pal && (gender == null || parent.Gender == gender);
+
+                            var ((p1, p1g), (p2, p2g), child) = c;
+
+                            return (
+                                (Matches(parent1, p1, p1g) && Matches(parent2, p2, p2g)) ||
+                                (Matches(parent2, p1, p1g) && Matches(parent1, p2, p2g))
+                            );
+                        }).Item3
+                    );
                 }
 
-                int childPower = (int)Math.Floor((parent1.BreedingPower + parent2.BreedingPower + 1) / 2.0f);
+                int childPower = (int)Math.Floor((parent1.Pal.BreedingPower + parent2.Pal.BreedingPower + 1) / 2.0f);
                 return pals
                     .Where(p => !specialCombos.Any(c => p.InternalName == c.Item3)) // pals produced by a special combo can _only_ be produced by that combo
                     .OrderBy(p => Math.Abs(p.BreedingPower - childPower))
@@ -120,17 +138,57 @@ namespace PalCalc.GenDB
                     .First();
             }
 
-            var db = PalDB.MakeEmptyUnsafe("v10");
+            var db = PalDB.MakeEmptyUnsafe("v11");
             db.Breeding = pals
                 .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
                 .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))
                 .Distinct()
+                .SelectMany(pair => new[] {
+                    (
+                        new GenderedPal() { Pal = pair.Item1, Gender = PalGender.FEMALE },
+                        new GenderedPal() { Pal = pair.Item2, Gender = PalGender.MALE }
+                    ),
+                    (
+                        new GenderedPal() { Pal = pair.Item1, Gender = PalGender.MALE },
+                        new GenderedPal() { Pal = pair.Item2, Gender = PalGender.FEMALE }
+                    )
+                })
+                // get the results of breeding with swapped genders (for results where the child is determined by parent genders)
                 .Select(p => new BreedingResult
                 {
                     Parent1 = p.Item1,
                     Parent2 = p.Item2,
                     Child = Child(p.Item1, p.Item2)
                 })
+                // simplify cases where the child is the same regardless of gender
+                .GroupBy(br => br.Child)
+                .SelectMany(cg =>
+                    cg
+                        .GroupBy(br => (br.Parent1.Pal, br.Parent2.Pal))
+                        .SelectMany(g =>
+                        {
+                            var results = g.ToList();
+                            if (results.Count == 1) return results;
+
+                            return
+                            [
+                                new BreedingResult()
+                                {
+                                    Parent1 = new GenderedPal()
+                                    {
+                                        Pal = results.First().Parent1.Pal,
+                                        Gender = PalGender.WILDCARD
+                                    },
+                                    Parent2 = new GenderedPal()
+                                    {
+                                        Pal = results.First().Parent2.Pal,
+                                        Gender = PalGender.WILDCARD
+                                    },
+                                    Child = results.First().Child
+                                }
+                            ];
+                        })
+                )
                 .ToList();
 
             db.PalsById = pals.ToDictionary(p => p.Id);

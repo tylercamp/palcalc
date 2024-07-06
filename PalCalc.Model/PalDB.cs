@@ -34,19 +34,23 @@ namespace PalCalc.Model
         public IEnumerable<Pal> Pals => PalsById.Values;
 
         // Map[Parent1, Map[Parent2, BreedingResult]]
-        private Dictionary<Pal, Dictionary<Pal, BreedingResult>> breedingByParent;
-        public Dictionary<Pal, Dictionary<Pal, BreedingResult>> BreedingByParent
+        // 
+        // there can be multiple breeding results depending on the genders of the parents (namely for Wixen and Kativa)
+        private Dictionary<Pal, Dictionary<Pal, List<BreedingResult>>> breedingByParent;
+        public Dictionary<Pal, Dictionary<Pal, List<BreedingResult>>> BreedingByParent
         {
             get
             {
                 if (breedingByParent == null)
                 {
                     breedingByParent = Breeding
-                        .SelectMany(breed => breed.Parents.Select(parent1 => (parent1, breed))) // List<(parent, breeding)>
-                        .GroupBy(p => p.parent1)
+                        .SelectMany(breed => breed.Parents.Select(parent1 => (parent1.Pal, breed))) // List<(parent, breeding)>
+                        .GroupBy(p => p.Pal)
                         .ToDictionary(
                             g => g.Key,
-                            g => g.Distinct().ToDictionary(p => p.breed.OtherParent(g.Key), p => p.breed)
+                            g => g.Distinct()
+                                .GroupBy(p => p.breed.OtherParent(g.Key).Pal)
+                                .ToDictionary(g2 => g2.Key, g2 => g2.Select(p => p.breed).ToList())
                         );
                 }
                 return breedingByParent;
@@ -54,8 +58,8 @@ namespace PalCalc.Model
         }
 
         // Map[Child, Map[Parent1, List<Parent2>]]
-        private Dictionary<Pal, Dictionary<Pal, List<Pal>>> breedingByChild;
-        public Dictionary<Pal, Dictionary<Pal, List<Pal>>> BreedingByChild
+        private Dictionary<Pal, Dictionary<GenderedPal, List<GenderedPal>>> breedingByChild;
+        public Dictionary<Pal, Dictionary<GenderedPal, List<GenderedPal>>> BreedingByChild
         {
             get
             {
@@ -63,14 +67,14 @@ namespace PalCalc.Model
                 {
                     breedingByChild =
                         Breeding
-                        .GroupBy(b => b.Child)
-                        .ToDictionary(
-                            g => g.Key,
-                            g => g.SelectMany(b => b.Parents.Select(p1 => (p1, b))).GroupBy(p => p.p1).ToDictionary(
+                            .GroupBy(b => b.Child)
+                            .ToDictionary(
                                 g => g.Key,
-                                g => g.Select(p => p.b.OtherParent(g.Key)).Distinct().ToList()
-                            )
-                        );
+                                g => g.SelectMany(b => b.Parents.Select(p1 => (p1, b))).GroupBy(p => p.p1).ToDictionary(
+                                    g => g.Key,
+                                    g => g.Select(p => p.b.OtherParent(g.Key)).Distinct().ToList()
+                                )
+                            );
                 }
                 return breedingByChild;
             }
@@ -138,17 +142,6 @@ namespace PalCalc.Model
 
                 return traitsByName;
             }
-        }
-
-
-
-        private class Serialized
-        {
-            public List<Pal> Pals { get; set; }
-            public List<BreedingResult.Serialized> Breeding { get; set; }
-            public List<Trait> Traits { get; set; }
-            public Dictionary<string, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
-            public Dictionary<string, Dictionary<string, int>> MinBreedingSteps { get; set; }
         }
 
         private static ILogger logger = Log.ForContext<PalDB>();
