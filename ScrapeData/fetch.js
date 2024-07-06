@@ -174,12 +174,12 @@ async function fetchPassives() {
 ;(async function() {
     const pals = await collectPalList()
 
-    fs.writeFileSync('pals.json', JSON.stringify(pals, null, 4))
+    // fs.writeFileSync('pals.json', JSON.stringify(pals, null, 4))
 
     const breedingInfo = await fetchBreedingRanks()
-    fs.writeFileSync('breedingInfo.json', JSON.stringify(breedingInfo, null, 4))
+    // fs.writeFileSync('breedingInfo.json', JSON.stringify(breedingInfo, null, 4))
     const passives = await fetchPassives()
-    fs.writeFileSync('passive.json', JSON.stringify(passives, null, 4))
+    // fs.writeFileSync('passive.json', JSON.stringify(passives, null, 4))
 
     const resultPals = []
 
