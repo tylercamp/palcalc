@@ -103,7 +103,7 @@ namespace PalCalc.Solver
                 var refNewInst = newInstances.First();
 
                 // these are results to be used as output, don't bother adding them to working set / continue breeding those
-                if (target.IsSatisfiedBy(refNewInst))
+                if (refNewInst is BredPalReference && target.IsSatisfiedBy(refNewInst))
                 {
                     // (though if we're not at the trait limit and there are some optional traits
                     //  we'd like, then we'll keep this in the pool)
