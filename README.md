@@ -4,7 +4,7 @@
 
 _v1.4.3 screenshot_
 
-**Fixed for Sakurajima update!**
+**Fixed for Sakurajima update with latest pals and traits!**
 
 Pal Calc is a Windows program for calculating the optimal steps to breed a specific pal with a specific set of traits:
 
@@ -36,11 +36,10 @@ Pal Calc currently has some outstanding pieces that need more information to res
 1. Is there a formula for how long breeding takes? Or is it a constant five minutes? [Issue](https://github.com/tylercamp/palcalc/issues/2)
 2. What's the probability of wild pals having exactly N traits? [Issue](https://github.com/tylercamp/palcalc/issues/4)
 3. Do child pals _always_ inherit at least one of the parent's traits? [Issue](https://github.com/tylercamp/palcalc/issues/5)
-4. How is data mining performed to extract the pal stats necessary for breeding calculations? [Issue](https://github.com/tylercamp/palcalc/issues/6)
-5. Has the trait inheritance calculation changed since /u/mgxts reverse engineered it? Was their reverse engineering accurate? [Issue](https://github.com/tylercamp/palcalc/issues/7)
-6. Assuming the trait inheritance calculation is correct, is Pal Calc's implementation of those probabilities correct? [Issue](https://github.com/tylercamp/palcalc/issues/8)
-7. How can we derive the map coordinates for a base from its world coordinates? [Issue](https://github.com/tylercamp/palcalc/issues/9)
-8. What's a good way to estimate time needed to capture a wild pal of a certain type? e.g. Chikipi would be much faster to find + catch than Paladius. [Issue](https://github.com/tylercamp/palcalc/issues/10)
+4. Has the trait inheritance calculation changed since /u/mgxts reverse engineered it? Was their reverse engineering accurate? [Issue](https://github.com/tylercamp/palcalc/issues/7)
+5. Assuming the trait inheritance calculation is correct, is Pal Calc's implementation of those probabilities correct? [Issue](https://github.com/tylercamp/palcalc/issues/8)
+6. How can we derive the map coordinates for a base from its world coordinates? [Issue](https://github.com/tylercamp/palcalc/issues/9)
+7. What's a good way to estimate time needed to capture a wild pal of a certain type? e.g. Chikipi would be much faster to find + catch than Paladius. [Issue](https://github.com/tylercamp/palcalc/issues/10)
 
 # Development
 
