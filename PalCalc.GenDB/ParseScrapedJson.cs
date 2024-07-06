@@ -10,6 +10,13 @@ namespace PalCalc.GenDB
 {
     internal static class ParseScrapedJson
     {
+        class JsonPalExclusiveBreeding
+        {
+            public string Parent1 { get; set; }
+            public string Parent2 { get; set; }
+            public string Child { get; set; }
+        }
+
         class JsonPal
         {
             public string Name { get; set; }
@@ -21,7 +28,12 @@ namespace PalCalc.GenDB
             public int Price { get; set; }
             public int MaleProbability { get; set; }
 
+            public int? MinWildLevel { get; set; }
+            public int? MaxWildLevel { get; set; }
+
             public List<string> GuaranteedTraits { get; set; } = new List<string>();
+
+            public JsonPalExclusiveBreeding ExclusiveBreeding { get; set; }
         }
 
         class JsonTrait
@@ -52,8 +64,23 @@ namespace PalCalc.GenDB
                     BreedingPower = jp.BreedPower,
                     InternalIndex = jp.IndexOrder,
                     GuaranteedTraitInternalIds = jp.GuaranteedTraits,
-                    // TODO - bring in remaining properties to `Pal` type
+                    Price = jp.Price,
+                    MinWildLevel = jp.MinWildLevel,
+                    MaxWildLevel = jp.MaxWildLevel,
                 })
+                .ToList();
+        }
+
+        // returns (parent1, parent2, child) (uses InternalName)
+        public static List<(string, string, string)> ReadExclusiveBreedings()
+        {
+            return JsonConvert
+                .DeserializeObject<List<JsonPal>>(File.ReadAllText("ref/scraped-pals.json"))
+                .Select(jp => jp.ExclusiveBreeding)
+                .Where(eb => eb != null)
+                .Select(eb =>
+                    (eb.Parent1, eb.Parent2, eb.Child)
+                )
                 .ToList();
         }
     }

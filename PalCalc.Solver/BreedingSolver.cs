@@ -436,7 +436,6 @@ namespace PalCalc.Solver
                 // add wild pals with varying number of random traits
                 initialContent.AddRange(
                     db.Pals
-                        .Where(p => !p.BreedingExclusive)
                         .Where(p => !relevantPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, maxBreedingSteps))
                         .SelectMany(p =>

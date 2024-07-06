@@ -100,12 +100,6 @@ namespace PalCalc.GenDB
                     InternalName = row.CodeName,
                     InternalIndex = row.IndexOrder,
                     BreedingPower = row.BreedPower,
-                    CanMount = row.Mount,
-                    MountType = row.MountType,
-                    RideSprintSpeed = row.RideSprintSpeed,
-                    RideWalkSpeed = row.RunSpeed,
-                    Stamina = row.Stamina,
-                    Rarity = row.Rarity,
                     GuaranteedTraitInternalIds = new List<string>()
                     {
                         row.GuaranteedTrait1,

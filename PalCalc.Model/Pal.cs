@@ -28,22 +28,14 @@ namespace PalCalc.Model
 
         public int BreedingPower { get; set; }
 
-        public int RideWalkSpeed { get; set; }
-        public int RideSprintSpeed { get; set; }
-
-        public bool CanMount { get; set; }
-        public MountType MountType { get; set; }
-
-        public int Stamina { get; set; }
-
         //// fields introduced after first release will need a default value
 
-        public int Rarity { get; set; } = 0;
+        public int Price { get; set; } = 0;
+        public int? MinWildLevel { get; set; } = null;
+        public int? MaxWildLevel { get; set; } = null;
+        
         public List<string> GuaranteedTraitInternalIds { get; set; } = new List<string>();
         public IEnumerable<Trait> GuaranteedTraits(PalDB db) => GuaranteedTraitInternalIds.Select(id => id.InternalToTrait(db));
-
-        // whether the pal can only be obtained by breeding
-        public bool BreedingExclusive { get; set; } = false;
 
         ////
 

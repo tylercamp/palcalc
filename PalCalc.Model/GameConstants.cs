@@ -34,7 +34,7 @@ namespace PalCalc.Model
             var minTime = TimeSpan.FromMinutes(3);
 
             // TODO - tweak
-            var rarityModifier = pal.Rarity + (pal.Id.IsVariant ? 5 : 0);
+            var rarityModifier = pal.Price / 75.0f + (pal.Id.IsVariant ? 5 : 0);
             return minTime + TimeSpan.FromMinutes(rarityModifier - 1);
         }
 

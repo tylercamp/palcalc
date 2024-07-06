@@ -59,14 +59,8 @@ namespace PalCalc.GenDB
                 Name = p.Name,
                 InternalName = p.CodeName,
                 Id = new PalId() { PalDexNo = p.PalDexNo, IsVariant = p.IsVariant },
-                RideWalkSpeed = p.RunSpeed,
-                RideSprintSpeed = p.RideSprintSpeed,
-                Stamina = p.Stamina,
                 BreedingPower = p.BreedPower,
                 InternalIndex = p.IndexOrder,
-                CanMount = p.Mount,
-                MountType = p.MountType,
-                Rarity = p.Rarity,
                 GuaranteedTraitInternalIds = p.GuaranteedTraits,
             }).ToList();
         }

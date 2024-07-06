@@ -130,8 +130,10 @@ async function parsePalUrl(path, expectVariant) {
 
         if (parts.length != 3 && parts.length) throw new Error()
         
-        const [p1, p2, child] = parts
-        exclusiveBreeding = { p1, p2, child }
+        if (parts.length) {
+            const [p1, p2, child] = parts
+            exclusiveBreeding = { p1, p2, child }
+        }
     }
 
     return {
@@ -204,11 +206,11 @@ async function fetchPassives() {
             MinWildLevel: parsed.minWildLevel,
             MaxWildLevel: parsed.maxWildLevel,
 
-            ExclusiveBreeding: {
+            ExclusiveBreeding: parsed.exclusiveBreeding ? {
                 Parent1: parsed.exclusiveBreeding.p1,
                 Parent2: parsed.exclusiveBreeding.p2,
                 Child: parsed.exclusiveBreeding.child,
-            },
+            } : null,
         })
 
         // fs.writeFileSync('parsed.json', JSON.stringify(parsed, null, 4))

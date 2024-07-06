@@ -74,49 +74,6 @@ namespace PalCalc.GenDB
             return palDistances;
         }
 
-        // TODO - try to fetch this from parsing
-        static List<(String, String, String)> SpecialCombos = new List<(String, String, String)>()
-        {
-            ("Relaxaurus", "Sparkit", "Relaxaurus Lux"),
-            ("Incineram", "Maraith", "Incineram Noct"),
-            ("Mau", "Pengullet", "Mau Cryst"),
-            ("Vanwyrm", "Foxcicle", "Vanwyrm Cryst"),
-            ("Eikthyrdeer", "Hangyu", "Eikthyrdeer Terra"),
-            ("Elphidran", "Surfent", "Elphidran Aqua"),
-            ("Pyrin", "Katress", "Pyrin Noct"),
-            ("Mammorest", "Wumpo", "Mammorest Cryst"),
-            ("Mossanda", "Grizzbolt", "Mossanda Lux"),
-            ("Dinossom", "Rayhound", "Dinossom Lux"),
-            ("Jolthog", "Pengullet", "Jolthog Cryst"),
-            ("Frostallion", "Helzephyr", "Frostallion Noct"),
-            ("Kingpaca", "Reindrix", "Kingpaca Cryst"),
-            ("Lyleen", "Menasting", "Lyleen Noct"),
-            ("Leezpunk", "Flambelle", "Leezpunk Ignis"),
-            ("Blazehowl", "Felbat", "Blazehowl Noct"),
-            ("Robinquill", "Fuddler", "Robinquill Terra"),
-            ("Broncherry", "Fuack", "Broncherry Aqua"),
-            ("Surfent", "Dumud", "Surfent Terra"),
-            ("Gobfin", "Rooby", "Gobfin Ignis"),
-            ("Suzaku", "Jormuntide", "Suzaku Aqua"),
-            ("Reptyro", "Foxcicle", "Reptyro Cryst"),
-            ("Hangyu", "Swee", "Hangyu Cryst"),
-            ("Mossanda", "Petallia", "Lyleen"),
-            ("Vanwyrm", "Anubis", "Faleris"),
-            ("Mossanda", "Rayhound", "Grizzbolt"),
-            ("Grizzbolt", "Relaxaurus", "Orserk"),
-            ("Kitsun", "Astegon", "Shadowbeak"),
-
-            // these pals can only be produced by breeding two of the same parents of the same pal
-            ("Frostallion", "Frostallion", "Frostallion"),
-            ("Jetragon", "Jetragon", "Jetragon"),
-            ("Paladius", "Paladius", "Paladius"),
-            ("Necromus", "Necromus", "Necromus"),
-            ("Jormuntide Ignis", "Jormuntide Ignis", "Jormuntide Ignis"),
-            ("Bellanoir", "Bellanoir", "Bellanoir"),
-            ("Bellanoir Libero", "Bellanoir Libero", "Bellanoir Libero"),
-        };
-
-
         // Special-case probabilities of breeding a given pal as a male
         static List<(String, float)> SpecialMaleProbabilities = new List<(string, float)>()
         {
@@ -134,18 +91,6 @@ namespace PalCalc.GenDB
             ("Bellanoir Libero", 0.05f),
         };
 
-        // TODO - update child pal calc to prefer base over variant pals
-
-        // TODO - fetch possible caught levels from spawners
-
-        // pals you can only obtain from breeding
-        // TODO - fetch this from parsing, check for spawners
-        static List<string> PalsOnlyFromBreeding = new List<string>()
-        {
-            "Elphidran Aqua",
-            "Frostallion Noct",
-        };
-
         static void Main(string[] args)
         {
             var pals = new List<Pal>();
@@ -158,9 +103,11 @@ namespace PalCalc.GenDB
             //traits.AddRange(ParseExtraJson.ReadTraits());
             traits.AddRange(ParseScrapedJson.ReadTraits());
 
-            foreach (var (p1, p2, c) in SpecialCombos)
+            var specialCombos = ParseScrapedJson.ReadExclusiveBreedings();
+
+            foreach (var (p1, p2, c) in specialCombos)
             {
-                if (!pals.Any(p => p.Name == p1) || !pals.Any(p => p.Name == p2) || !pals.Any(p => p.Name == c))
+                if (!pals.Any(p => p.InternalName == p1) || !pals.Any(p => p.InternalName == p2) || !pals.Any(p => p.InternalName == c))
                     throw new Exception("Unrecognized pal name");
             }
 
@@ -172,35 +119,33 @@ namespace PalCalc.GenDB
                 if (pal.GuaranteedTraitInternalIds.Any(id => !traits.Any(t => t.InternalName == id)))
                     throw new Exception("Unrecognized trait ID");
 
-            foreach (var name in PalsOnlyFromBreeding)
-            {
-                var pal = pals.Single(p => p.Name == name);
-                pal.BreedingExclusive = true;
-            }
-
             Pal Child(Pal parent1, Pal parent2)
             {
                 if (parent1 == parent2) return parent1;
 
-                var specialCombo = SpecialCombos.Where(c =>
-                    (parent1.Name == c.Item1 && parent2.Name == c.Item2) ||
-                    (parent2.Name == c.Item1 && parent1.Name == c.Item2)
+                var specialCombo = specialCombos.Where(c =>
+                    (parent1.InternalName == c.Item1 && parent2.InternalName == c.Item2) ||
+                    (parent2.InternalName == c.Item1 && parent1.InternalName == c.Item2)
                 );
 
                 if (specialCombo.Any())
                 {
-                    return pals.Single(p => p.Name == specialCombo.Single().Item3);
+                    // TODO - Katress/Wixen breed result depends on which one is male/female, special combos
+                    //        atm don't take gender into account
+                    return pals.Single(p => p.InternalName == specialCombo.First().Item3);
                 }
 
                 int childPower = (int)Math.Floor((parent1.BreedingPower + parent2.BreedingPower + 1) / 2.0f);
                 return pals
-                    .Where(p => !SpecialCombos.Any(c => p.Name == c.Item3)) // pals produced by a special combo can _only_ be produced by that combo
+                    .Where(p => !specialCombos.Any(c => p.InternalName == c.Item3)) // pals produced by a special combo can _only_ be produced by that combo
                     .OrderBy(p => Math.Abs(p.BreedingPower - childPower))
                     .ThenBy(p => p.InternalIndex)
+                    // if there are two pals with the same internal index, prefer the non-variant pal
+                    .ThenBy(p => p.Id.IsVariant ? 1 : 0)
                     .First();
             }
 
-            var db = PalDB.MakeEmptyUnsafe("v8");
+            var db = PalDB.MakeEmptyUnsafe("v9");
             db.Breeding = pals
                 .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
                 .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))
