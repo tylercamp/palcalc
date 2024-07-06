@@ -12,4 +12,13 @@
     <ProjectReference Include="..\PalCalc.Model\PalCalc.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ref\scraped-pals.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ref\scraped-traits.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
