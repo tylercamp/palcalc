@@ -92,15 +92,55 @@ async function parsePalUrl(path, expectVariant) {
     }
     $container = $($container[0])
 
+    const findSection = (title) => {
+        const res = $container.find('.card').filter((i, el) => $(el).find('> .card-body > .card-title').text().trim() == title)
+        if (res.length > 1) throw new Error()
+        return res
+    }
+
     let name = cleanstr($container.find(`div.align-self-center > a[href=${path}].itemname`).text())
     if (hasTabs && expectVariant) {
         name += " (Special)"
     }
 
+    let minWildLevel = null, maxWildLevel = null
+
+    const $spawners = findSection('Spawner')
+    if ($spawners.length) {
+        const spawners = $spawners.find('tr td:nth-of-type(2)').toArray().map(el => cleanstr($(el).text()))
+        const spawnerLevels = spawners.map(l => /(\d+)\s*.\s*(\d+)$/.exec(l)).filter(i => i)
+
+        for (const [, smin, smax] of spawnerLevels) {
+            const min = parseInt(smin)
+            const max = parseInt(smax)
+            if (minWildLevel === null || maxWildLevel === null) {
+                minWildLevel = min
+                maxWildLevel = max
+            } else {
+                minWildLevel = Math.min(minWildLevel, min)
+                maxWildLevel = Math.max(maxWildLevel, max)
+            }
+        }
+    }
+
+    let exclusiveBreeding = null
+    const $breeding = findSection('Breeding Farm')
+    if ($breeding.length) {
+        const parts = $breeding.find('a.itemname').toArray().map(el => /\w+$/.exec($(el).attr('data-hover'))[0])
+
+        if (parts.length != 3 && parts.length) throw new Error()
+        
+        const [p1, p2, child] = parts
+        exclusiveBreeding = { p1, p2, child }
+    }
+
     return {
         iconUrl: $container.find('.itemPopup a[data-hover] > img.rounded-circle').attr('src'),
         properties: extractProperties($container),
+        minWildLevel,
+        maxWildLevel,
         name,
+        exclusiveBreeding
     }
 }
 
@@ -160,6 +200,15 @@ async function fetchPassives() {
             Price: parseInt(parsed.properties["Gold Coin"]),
 
             IndexOrder: breedingEntry ? parseInt(breedingEntry.indexOrder) : -1,
+
+            MinWildLevel: parsed.minWildLevel,
+            MaxWildLevel: parsed.maxWildLevel,
+
+            ExclusiveBreeding: {
+                Parent1: parsed.exclusiveBreeding.p1,
+                Parent2: parsed.exclusiveBreeding.p2,
+                Child: parsed.exclusiveBreeding.child,
+            },
         })
 
         // fs.writeFileSync('parsed.json', JSON.stringify(parsed, null, 4))
