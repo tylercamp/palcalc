@@ -544,7 +544,9 @@ namespace PalCalc.SaveReader.FArchive
             if (Math.Abs(size) > 1000)
             {
                 logger.Warning("String size of {size} is abnormal, likely a parsing error which will cause a crash");
+#if DEBUG
                 Debugger.Break();
+#endif
             }
 
             Encoding encoding;

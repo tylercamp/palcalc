@@ -153,7 +153,9 @@ namespace PalCalc.SaveReader.FArchive
             if (collectedValues.ContainsKey(propPart))
             {
                 logger.Warning("value was already collected for {path}, overwriting with new {value}", path, value);
+#if DEBUG
                 Debugger.Break();
+#endif
             }
             collectedValues[propPart] = value;
         }
