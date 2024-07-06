@@ -77,13 +77,9 @@ namespace PalCalc.GenDB
         static void Main(string[] args)
         {
             var pals = new List<Pal>();
-            //pals.AddRange(ParseCsv.ReadPals());
-            //pals.AddRange(ParseExtraJson.ReadPals());
             pals.AddRange(ParseScrapedJson.ReadPals());
 
             var traits = new List<Trait>();
-            //traits.AddRange(ParseCsv.ReadTraits());
-            //traits.AddRange(ParseExtraJson.ReadTraits());
             traits.AddRange(ParseScrapedJson.ReadTraits());
 
             var specialCombos = ParseScrapedJson.ReadExclusiveBreedings();

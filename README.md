@@ -76,8 +76,6 @@ The Community Toolkit library is used for the viewmodels, which provides the `Ob
 ## TODOs
 - Notify when a pal involved in a breeding path is no longer available in the source save or has been moved
 - Allow filtering of which wild pals may be included
-- Update PalDB reference data for recent game updates
-  - Figure out reliable process for updating DB.json with latest pal + trait info (where can I find a frequently-updated source of all required info?)
 - General UI/UX improvements
 - Optimize app startup time
   - Seems to largely be due to JSON deserialization overhead
