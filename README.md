@@ -29,6 +29,8 @@ Pal Calc is a Windows program for calculating the optimal steps to breed a speci
   - Relatively fast path-solving process, searches take under a minute
   - Distributes path-solving work across all available CPU cores
 
+_See [here](./PalCalc.Solver/) for an overview of the full solver process._
+
 # Community Help
 
 Pal Calc currently has some outstanding pieces that need more information to resolve. Some of these need some level of reverse engineering, but some can be figured out through experimentation and statistics. An [issue](https://github.com/tylercamp/palcalc/issues) has been created for each item, where more information can be found.
