@@ -3,6 +3,7 @@ using PalCalc.Solver;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,7 +40,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             var ownedLoc = location as OwnedRefLocation;
             if (ownedLoc == null) return;
 
-            if (source == null)
+            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
             {
                 // for XAML designer preview
                 IsSinglePlayer = true;
@@ -47,10 +48,10 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
             else
             {
-                IsSinglePlayer = source.Players.Count == 1;
+                IsSinglePlayer = source == null || source.Players.Count == 1;
 
-                var ownerName = source.PlayersById.GetValueOrDefault(ownedLoc.OwnerId)?.Name ?? "Unknown Player";
-                var ownerGuild = source.GuildsByPlayerId.GetValueOrDefault(ownedLoc.OwnerId);
+                var ownerName = source?.PlayersById?.GetValueOrDefault(ownedLoc.OwnerId)?.Name ?? "Unknown Player";
+                var ownerGuild = source?.GuildsByPlayerId?.GetValueOrDefault(ownedLoc.OwnerId);
 
                 var isGuildOwner = ownedLoc.Location.Type == LocationType.Base && ownerGuild?.MemberIds?.Count > 1;
                 LocationOwner = isGuildOwner ? ownerGuild?.Name ?? "Unknown Guild" : ownerName;

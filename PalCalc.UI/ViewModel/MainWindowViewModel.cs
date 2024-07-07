@@ -119,12 +119,6 @@ namespace PalCalc.UI.ViewModel
                         if (File.Exists(targetsFile))
                         {
                             var originalCachedSave = Storage.LoadSaveFromCache(sg, db);
-                            if (originalCachedSave == null)
-                            {
-                                logger.Warning("pal target list for {saveId} was detected but there was no cached data, which is required for loading the target list. resetting target list for this save", CachedSaveGame.IdentifierFor(sg));
-                                File.Delete(targetsFile);
-                                return new PalTargetListViewModel();
-                            }
 
                             var converter = new PalTargetListViewModelConverter(db, GameSettingsViewModel.Load(sg).ModelObject, originalCachedSave);
 #if HANDLE_ERRORS
