@@ -546,10 +546,10 @@ namespace PalCalc.Solver
                                     if (parent1.GetHashCode() < parent2.GetHashCode()) return (parent1, parent2);
                                     else return (parent2, parent1);
                                 })
+                                .Select(p => PreferredParentsGenders(p.Item1, p.Item2))
                                 .SelectMany(p =>
                                 {
                                     var (parent1, parent2) = p;
-                                    var (preferredParent1, preferredParent2) = PreferredParentsGenders(parent1, parent2);
 
                                     var parentTraits = parent1.EffectiveTraits.Concat(parent2.EffectiveTraits).Distinct().ToList();
                                     var possibleResults = new List<IPalReference>();
@@ -596,8 +596,8 @@ namespace PalCalc.Solver
                                                 db.BreedingByParent[parent1.Pal][parent2.Pal]
                                                     .Single(br => br.Matches(parent1.Pal, parent1.Gender, parent2.Pal, parent2.Gender))
                                                     .Child,
-                                                preferredParent1,
-                                                preferredParent2,
+                                                parent1,
+                                                parent2,
                                                 newTraits,
                                                 probabilityForUpToNumTraits
                                             );
