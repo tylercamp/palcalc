@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,12 @@ namespace PalCalc.UI.ViewModel
         {
             var oldIndex = targets.IndexOf(oldValue);
             targets[oldIndex] = newValue;
+        }
+
+        public void RefreshWith(CachedSaveGame csg)
+        {
+            foreach (var target in targets)
+                target.CurrentResults?.RefreshWith(csg);
         }
     }
 }

@@ -74,6 +74,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         }
 
         public IPalRefLocationViewModel Location { get; }
+        public bool NeedsRefresh => Location.NeedsRefresh;
 
         public string Gender { get; }
 

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
+using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,11 @@ namespace PalCalc.UI.ViewModel
         public double NumStepsWidth => HiddenIfRedundant(vm => vm.NumBreedingSteps);
         public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
         public double TraitsWidth => HiddenIfRedundant(vm => vm.FinalTraits);
+
+        public void RefreshWith(CachedSaveGame csg)
+        {
+            Results = Results.Select(r => new BreedingResultViewModel(csg, r.DisplayedResult)).ToList();
+        }
 
         public string ResultsHeading => Results == null ? "Results" : $"{Results.Count} Results";
 

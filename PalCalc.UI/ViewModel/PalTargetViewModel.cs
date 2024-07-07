@@ -88,5 +88,10 @@ namespace PalCalc.UI.ViewModel
         public bool IsValid => PalSource.HasValidSource && CurrentPalSpecifier.IsValid;
 
         public PalSourceTreeViewModel PalSource { get; set; }
+
+        public void RefreshWith(CachedSaveGame csg)
+        {
+            CurrentPalSpecifier?.CurrentResults?.RefreshWith(csg);
+        }
     }
 }

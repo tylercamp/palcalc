@@ -29,6 +29,8 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         public BreedingTree Tree { get; private set; }
         public List<BreedingTreeNodeViewModel> Nodes { get; }
 
+        public bool NeedsRefresh => Nodes.Any(n => n.NeedsRefresh);
+
         public BreedingTreeNodeViewModel NodeFor(IBreedingTreeNode pref) => Nodes.Single(n => n.Value == pref);
 
         public static BreedingGraph FromPalReference(CachedSaveGame source, IPalReference palRef)
@@ -44,7 +46,6 @@ namespace PalCalc.UI.ViewModel.GraphSharp
                     result.AddEdge(new BreedingEdge(parent: result.NodeFor(parent), child: result.NodeFor(child)));
 
             return result;
-            
         }
     }
 }

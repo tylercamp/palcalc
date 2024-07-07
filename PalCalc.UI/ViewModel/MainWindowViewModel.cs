@@ -216,13 +216,16 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        private void CachedSaveGame_SaveFileLoadEnd(ISaveGame obj)
+        private void CachedSaveGame_SaveFileLoadEnd(ISaveGame obj, CachedSaveGame loaded)
         {
             if (loadingSaveModal != null)
             {
                 loadingSaveModal.Close();
                 loadingSaveModal = null;
                 AllowUIToUpdate();
+
+                if (loaded != null)
+                    targetsBySaveFile[obj].RefreshWith(loaded);
             }
         }
 

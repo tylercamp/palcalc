@@ -11,7 +11,12 @@ using System.Windows;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
-    public interface IPalRefLocationViewModel { }
+    public interface IPalRefLocationViewModel
+    {
+        // locations need a cached save game to fetch owner info, but if the cache was unavailable when
+        // the app was started, these will be left empty.
+        bool NeedsRefresh { get; }
+    }
 
     public class CompositePalRefLocationViewModel : IPalRefLocationViewModel
     {
@@ -27,6 +32,8 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public SpecificPalRefLocationViewModel MaleViewModel { get; }
         public SpecificPalRefLocationViewModel FemaleViewModel { get; }
+
+        public bool NeedsRefresh => MaleViewModel.NeedsRefresh || FemaleViewModel.NeedsRefresh;
     }
 
     public class SpecificPalRefLocationViewModel : IPalRefLocationViewModel
@@ -39,6 +46,8 @@ namespace PalCalc.UI.ViewModel.Mapped
 
             var ownedLoc = location as OwnedRefLocation;
             if (ownedLoc == null) return;
+
+            NeedsRefresh = source == null;
 
             if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
             {
@@ -76,6 +85,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         }
 
         public bool IsSinglePlayer { get; }
+        public bool NeedsRefresh { get; }
 
         public IPalRefLocation ModelObject { get; }
         public Visibility Visibility => ModelObject is OwnedRefLocation ? Visibility.Visible : Visibility.Collapsed;
@@ -89,6 +99,6 @@ namespace PalCalc.UI.ViewModel.Mapped
 
     public class WildPalRefLocationViewModel : IPalRefLocationViewModel
     {
-
+        public bool NeedsRefresh => false;
     }
 }

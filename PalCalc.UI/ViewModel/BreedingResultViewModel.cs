@@ -120,6 +120,8 @@ namespace PalCalc.UI.ViewModel
 
         public bool HasValue => Graph != null;
 
+        public bool NeedsRefresh => Graph?.NeedsRefresh ?? false;
+
         private IPalReference displayedResult = null;
         public IPalReference DisplayedResult
         {

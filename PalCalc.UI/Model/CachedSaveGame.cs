@@ -58,7 +58,7 @@ namespace PalCalc.UI.Model
         public string StateId => $"{IdentifierFor(UnderlyingSave)}-{LastModified.Ticks}";
 
         public static event Action<ISaveGame> SaveFileLoadStart;
-        public static event Action<ISaveGame> SaveFileLoadEnd;
+        public static event Action<ISaveGame, CachedSaveGame> SaveFileLoadEnd;
         public static event Action<ISaveGame, Exception> SaveFileLoadError;
 
         public static string IdentifierFor(ISaveGame game)
@@ -102,7 +102,7 @@ namespace PalCalc.UI.Model
             }
 #endif
 
-            SaveFileLoadEnd?.Invoke(game);
+            SaveFileLoadEnd?.Invoke(game, result);
 
             return result;
         }
