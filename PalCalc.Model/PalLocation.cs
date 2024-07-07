@@ -37,6 +37,8 @@ namespace PalCalc.Model
 
             return $"{Type} ({indexStr})";
         }
+
+        public override int GetHashCode() => HashCode.Combine(Type, Index);
     }
 
     public class PalboxCoord
