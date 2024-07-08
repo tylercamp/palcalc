@@ -224,7 +224,7 @@ namespace PalCalc.UI.ViewModel
                 loadingSaveModal = null;
                 AllowUIToUpdate();
 
-                if (loaded != null)
+                if (loaded != null && targetsBySaveFile.ContainsKey(obj))
                     targetsBySaveFile[obj].RefreshWith(loaded);
             }
         }
