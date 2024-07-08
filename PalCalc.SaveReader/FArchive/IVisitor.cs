@@ -46,6 +46,7 @@ namespace PalCalc.SaveReader.FArchive
         }
 
         public virtual void VisitInt(string path, int value) { }
+        public virtual void VisitUInt32(string path, uint value) { }
         public virtual void VisitInt64(string path, long value) { }
         public virtual void VisitDouble(string path, int value) { } // ??????????????
         public virtual void VisitFloat(string path, float value) { }
