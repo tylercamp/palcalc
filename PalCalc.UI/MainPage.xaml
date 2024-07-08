@@ -86,7 +86,7 @@
 
                 <StackPanel Grid.Row="1">
                     <Button Width="50" Click="AboutButton_Click" Margin="0,5,0,5">About</Button>
-                    <TextBlock Visibility="{Binding UpdatesMessageVisibility}" TextWrapping="Wrap" TextAlignment="Center">
+                    <TextBlock Visibility="{Binding UpdatesMessageVisibility}" TextWrapping="Wrap" TextAlignment="Center" FontSize="20">
                         <!-- NavigateUri unused, value must be set for event to trigger -->
                         <Hyperlink NavigateUri="http://github.com" RequestNavigate="DownloadUpdateLink_RequestNavigate">An update is available!</Hyperlink>
                     </TextBlock>
