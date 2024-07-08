@@ -31,6 +31,7 @@ namespace PalCalc.UI.ViewModel
                 ownedPals: saveGame.OwnedPals,
                 maxBreedingSteps: 3,
                 maxWildPals: 0,
+                allowedWildPals: PalDB.LoadEmbedded().Pals.ToList(),
                 maxInputIrrelevantTraits: 2,
                 maxBredIrrelevantTraits: 0,
                 maxEffort: TimeSpan.FromHours(8),

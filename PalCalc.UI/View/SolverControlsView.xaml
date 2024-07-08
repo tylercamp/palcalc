@@ -44,6 +44,8 @@
         />
     </StackPanel>
 
+    <Button Command="{Binding ChangeWildPals}" Height="20">Allowed Wild Pals</Button>
+
     <StackPanel Orientation="Horizontal">
         <Label Content="Max Input Irrelevant Traits" />
         <v:IntegerTextBox

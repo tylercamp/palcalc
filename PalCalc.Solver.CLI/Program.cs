@@ -30,6 +30,7 @@ internal class Program
             ownedPals: savedInstances,
             maxBreedingSteps: 20,
             maxWildPals: 1,
+            allowedWildPals: db.Pals.ToList(),
             maxBredIrrelevantTraits: 0,
             maxInputIrrelevantTraits: 2,
             maxEffort: TimeSpan.FromDays(7),

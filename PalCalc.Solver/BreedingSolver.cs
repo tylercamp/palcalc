@@ -40,6 +40,7 @@ namespace PalCalc.Solver
         PalDB db;
         List<PalInstance> ownedPals;
 
+        List<Pal> allowedWildPals;
         int maxBreedingSteps, maxWildPals, maxBredIrrelevantTraits, maxInputIrrelevantTraits;
         TimeSpan maxEffort;
         PruningRulesBuilder pruningBuilder;
@@ -57,13 +58,26 @@ namespace PalCalc.Solver
         ///     Effort in estimated time to get the desired pal with the given traits. Goes by constant breeding time, ignores hatching
         ///     time, and roughly estimates time to catch wild pals (with increasing time based on paldex number).
         /// </param>
-        public BreedingSolver(GameSettings gameSettings, PalDB db, PruningRulesBuilder pruningBuilder, List<PalInstance> ownedPals, int maxBreedingSteps, int maxWildPals, int maxInputIrrelevantTraits, int maxBredIrrelevantTraits, TimeSpan maxEffort, int maxThreads)
+        public BreedingSolver(
+            GameSettings gameSettings,
+            PalDB db,
+            PruningRulesBuilder pruningBuilder,
+            List<PalInstance> ownedPals,
+            int maxBreedingSteps,
+            int maxWildPals,
+            List<Pal> allowedWildPals,
+            int maxInputIrrelevantTraits,
+            int maxBredIrrelevantTraits,
+            TimeSpan maxEffort,
+            int maxThreads
+        )
         {
             this.gameSettings = gameSettings;
             this.db = db;
             this.pruningBuilder = pruningBuilder;
             this.ownedPals = ownedPals;
             this.maxBreedingSteps = maxBreedingSteps;
+            this.allowedWildPals = allowedWildPals;
             this.maxWildPals = maxWildPals;
             this.maxInputIrrelevantTraits = Math.Min(3, maxInputIrrelevantTraits);
             this.maxBredIrrelevantTraits = Math.Min(3, maxBredIrrelevantTraits);
@@ -435,7 +449,7 @@ namespace PalCalc.Solver
             {
                 // add wild pals with varying number of random traits
                 initialContent.AddRange(
-                    db.Pals
+                    allowedWildPals
                         .Where(p => !relevantPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, maxBreedingSteps))
                         .SelectMany(p =>

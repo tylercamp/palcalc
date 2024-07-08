@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Model;
+using PalCalc.UI.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +21,20 @@ namespace PalCalc.UI.ViewModel
             MaxWildPals = 1;
             MaxInputIrrelevantTraits = 2;
             MaxBredIrrelevantTraits = 1;
+
+            ChangeWildPals = new RelayCommand(() =>
+            {
+                var window = new PalCheckListWindow();
+                window.DataContext = new PalCheckListViewModel(
+                    onCancel: null,
+                    onSave: (palSelections) => BannedWildPals = palSelections.Where(kvp => !kvp.Value).Select(kvp => kvp.Key).ToList(),
+                    initialState: PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => !BannedWildPals.Contains(p))
+                ) {
+                    Title = "Allowed Wild Pals"
+                };
+                window.Owner = App.Current.MainWindow;
+                window.ShowDialog();
+            });
         }
 
         private int maxBreedingSteps;
@@ -67,6 +83,11 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private bool canEditSettings = true;
 
+        public IRelayCommand ChangeWildPals { get; }
+
+        [ObservableProperty]
+        private List<Pal> bannedWildPals = new List<Pal>();
+
         public BreedingSolver ConfiguredSolver(GameSettings gameSettings, List<PalInstance> pals) => new BreedingSolver(
             gameSettings,
             PalDB.LoadEmbedded(),
@@ -74,6 +95,7 @@ namespace PalCalc.UI.ViewModel
             pals,
             MaxBreedingSteps,
             MaxWildPals,
+            allowedWildPals: PalDB.LoadEmbedded().Pals.Except(BannedWildPals).ToList(),
             MaxInputIrrelevantTraits,
             MaxBredIrrelevantTraits,
             TimeSpan.MaxValue,
@@ -87,6 +109,7 @@ namespace PalCalc.UI.ViewModel
             MaxInputIrrelevantTraits = MaxInputIrrelevantTraits,
             MaxBredIrrelevantTraits = MaxBredIrrelevantTraits,
             MaxThreads = MaxThreads,
+            BannedWildPalInternalNames = BannedWildPals.Select(p => p.InternalName).ToList(),
         };
 
         public static SolverControlsViewModel FromModel(SolverSettings model) => new SolverControlsViewModel()
@@ -95,7 +118,9 @@ namespace PalCalc.UI.ViewModel
             MaxWildPals = model.MaxWildPals,
             MaxInputIrrelevantTraits = model.MaxInputIrrelevantTraits,
             MaxBredIrrelevantTraits = model.MaxBredIrrelevantTraits,
-            maxBredIrrelevantTraits = model.MaxThreads,
+            MaxThreads = model.MaxThreads,
+            
+            BannedWildPals = model.BannedWildPals(PalDB.LoadEmbedded()),
         };
     }
 }
