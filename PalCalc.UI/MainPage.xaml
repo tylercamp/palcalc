@@ -41,7 +41,7 @@
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
         <DockPanel Grid.Column="2" Margin="0,5,0,0">
-            <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" OnRun="SolverControlsView_OnRun" OnCancel="SolverControlsView_OnCancel" Margin="0,0,0,5" />
+            <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" OnRun="SolverControlsView_OnRun" OnCancel="SolverControlsView_OnCancel" Margin="0,0,0,5" HorizontalAlignment="Right" />
 
             <Grid DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
                 <ProgressBar Value="{Binding SolverProgress}" />
