@@ -79,8 +79,11 @@
         <Button Margin="0,0,5,0" Command="{Binding ExportSaveCommand}" ToolTip="Exports all known Palworld files for the selected save as a ZIP.">
             Export Save
         </Button>
-        <Button Command="{Binding ExportCrashLogCommand}" ToolTip="Exports recently-referenced save files, cache data, and settings as a ZIP.">
+        <Button Margin="0,0,5,0" Command="{Binding ExportCrashLogCommand}" ToolTip="Exports recently-referenced save files, cache data, and settings as a ZIP.">
             Export Crash Log
+        </Button>
+        <Button Command="{Binding InspectSaveCommand}">
+            Inspect
         </Button>
     </StackPanel>
 </StackPanel>

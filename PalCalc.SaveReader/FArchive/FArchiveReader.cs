@@ -81,7 +81,7 @@ namespace PalCalc.SaveReader.FArchive
 
         public FArchiveReader Derived(Stream data)
         {
-            return new FArchiveReader(data, typeHints);
+            return new FArchiveReader(data, typeHints, archivePreserve);
         }
 
         public Dictionary<string, object> ReadPropertiesUntilEnd(string path, IEnumerable<IVisitor> visitors)

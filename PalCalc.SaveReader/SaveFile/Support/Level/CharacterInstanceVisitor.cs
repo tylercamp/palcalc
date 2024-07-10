@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile.Support.Level
 {
-    class GvasCharacterInstance
+    public class GvasCharacterInstance
     {
         public Guid InstanceId { get; set; }
         public string NickName { get; set; }

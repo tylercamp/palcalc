@@ -1,0 +1,41 @@
+﻿<Window x:Class="PalCalc.UI.View.SaveInspectorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PalCalc.UI.View"
+        xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+        mc:Ignorable="d"
+        WindowStyle="ToolWindow"
+        WindowStartupLocation="CenterOwner"
+        d:DataContext="{x:Static vm:SaveInspectorViewModel.DesignerInstance}"
+        Title="SaveInspectorWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="149*"/>
+            <ColumnDefinition Width="651*"/>
+        </Grid.ColumnDefinitions>
+        <ListBox Grid.Column="0" ItemsSource="{Binding Containers}">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="vm:InspectedContainerViewModel">
+                    <StackPanel>
+                        <TextBlock>
+                            <Run Text="Type: " />
+                            <Run Text="{Binding Type, Mode=OneTime}" />
+                        </TextBlock>
+                        <TextBlock>
+                            <Run Text="Owner: " />
+                            <Run Text="{Binding Owner.Name, Mode=OneTime}" />
+                        </TextBlock>
+                        <TextBlock>
+                            <Run Text="{Binding UsedSlots, Mode=OneTime}" />
+                            <Run>/</Run>
+                            <Run Text="{Binding TotalSlots, Mode=OneTime}" />
+                            <Run>slots used</Run>
+                        </TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>

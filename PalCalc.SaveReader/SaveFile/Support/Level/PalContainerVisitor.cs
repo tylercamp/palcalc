@@ -8,13 +8,20 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile.Support.Level
 {
-    struct PalContainerSlot
+    public struct PalContainerSlot
     {
         public Guid InstanceId;
         public Guid PlayerId; // note: not actually useful?
     }
 
-    class PalContainer
+    /* TODO
+     * 
+     * In 0.3.3, containers were updated to no longer store empty slots. Each slot now has a `SlotIndex`
+     * and each container now has a `SlotNum` property. There's also a `CustomVersionData` byte array,
+     * not sure what that's for
+     */
+
+    public class PalContainer
     {
         public string Id { get; set; }
         public int MaxEntries => Slots.Count;
