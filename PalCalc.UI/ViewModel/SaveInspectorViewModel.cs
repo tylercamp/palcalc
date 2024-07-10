@@ -24,6 +24,7 @@ namespace PalCalc.UI.ViewModel
         public string Id { get; } = id;
 
         public static OwnerViewModel Unknown => new OwnerViewModel(OwnerType.Unknown, "Unknown", "null");
+        public static OwnerViewModel UnknownWithId(string id) => new OwnerViewModel(OwnerType.Unknown, "Unknown", id);
     }
 
     public interface IContainerSlotViewModel { }
@@ -50,8 +51,8 @@ namespace PalCalc.UI.ViewModel
             .Select<PalInstance, IContainerSlotViewModel>(p => p == null ? new EmptyPalContainerSlotViewModel() : new PalContainerSlotViewModel(p))
             .ToList();
 
-        public int TotalSlots => Slots.Count;
-        public int UsedSlots => Slots.Count(vm => vm is not EmptyPalContainerSlotViewModel);
+        public int TotalSlots => rawContainer.MaxEntries;
+        public int UsedSlots => rawContainer.NumEntries;
 
         public string Id => rawContainer.Id;
         public OwnerViewModel Owner { get; } = owner;
@@ -110,7 +111,8 @@ namespace PalCalc.UI.ViewModel
                         var owners = containedPals.Select(p => p.OwnerPlayerId).Distinct().ToList();
                         if (owners.Count == 1)
                         {
-                            return new InspectedContainerViewModel(ownersById[owners.First()], containedPals, c, containedPals.First().Location.Type);
+                            var ownerId = owners.First();
+                            return new InspectedContainerViewModel(ownersById.GetValueOrElse(ownerId, OwnerViewModel.UnknownWithId(ownerId)), containedPals, c, containedPals.First().Location.Type);
                         }
                         else
                         {
@@ -120,7 +122,7 @@ namespace PalCalc.UI.ViewModel
                                 .MaxBy(g => g.Count())
                                 .Key;
 
-                            return new InspectedContainerViewModel(ownersById[mostCommonGuild], containedPals, c, containedPals.First().Location.Type);
+                            return new InspectedContainerViewModel(ownersById.GetValueOrElse(mostCommonGuild, OwnerViewModel.UnknownWithId(mostCommonGuild)), containedPals, c, containedPals.First().Location.Type);
                         }
                     }
                     else
