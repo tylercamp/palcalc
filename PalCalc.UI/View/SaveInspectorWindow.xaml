@@ -59,9 +59,9 @@
                             <DataTemplate DataType="{x:Type vm:PalContainerSlotViewModel}">
                                 <StackPanel Orientation="Vertical">
                                     <StackPanel Orientation="Horizontal">
-                                        <Image Source="{Binding Pal.Icon}" Width="50" Height="50" />
+                                        <Image Source="{Binding Icon}" Width="50" Height="50" />
                                         <StackPanel Orientation="Vertical">
-                                            <TextBlock Text="{Binding Pal.Name}" />
+                                            <TextBlock Text="{Binding DisplayName}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </StackPanel>

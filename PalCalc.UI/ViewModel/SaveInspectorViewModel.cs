@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Automation;
+using System.Windows.Media;
 
 namespace PalCalc.UI.ViewModel
 {
@@ -23,7 +24,7 @@ namespace PalCalc.UI.ViewModel
 
     public class PalDetailsViewModel(PalInstance pal, GvasCharacterInstance rawData)
     {
-        public List<PalDetailsProperty> PalProperties { get; } =
+        public List<PalDetailsProperty> PalProperties { get; } = pal == null ? [] :
             new Dictionary<string, object>()
             {
                 { "Instance ID", pal.InstanceId },
@@ -73,11 +74,16 @@ namespace PalCalc.UI.ViewModel
 
     public class PalContainerSlotViewModel(PalInstance pal, GvasCharacterInstance rawPal) : IContainerSlotViewModel
     {
+        public string DisplayName => pal?.Pal?.Name ?? rawPal.CharacterId;
+        public ImageSource Icon =>
+            pal == null
+                ? PalIcon.DefaultIcon
+                : PalIcon.Images[pal.Pal];
+
         public PalInstance Instance => pal;
         public GvasCharacterInstance RawInstance => rawPal;
-        public PalViewModel Pal { get; } = new PalViewModel(pal.Pal);
-        public PalGender Gender => pal.Gender;
-        public TraitCollectionViewModel Traits { get; } = new TraitCollectionViewModel(pal.Traits.Select(t => new TraitViewModel(t)));
+        //public PalGender Gender => pal.Gender;
+        //public TraitCollectionViewModel Traits { get; } = new TraitCollectionViewModel(pal.Traits.Select(t => new TraitViewModel(t)));
     }
 
     public class EmptyPalContainerSlotViewModel : IContainerSlotViewModel { }
@@ -93,11 +99,11 @@ namespace PalCalc.UI.ViewModel
         // TODO - change from SingleOrDefault to Single when human pals are handled
         public List<IContainerSlotViewModel> Slots { get; } = Enumerable.Range(0, rawContainer.MaxEntries)
             .Select(i => rawContainer.Slots.SingleOrDefault(s => s.SlotIndex == i))
-            .Select(s => s == null ? null : containedPals.SingleOrDefault(p => p.InstanceId == s.InstanceId.ToString()))
-            .Select<PalInstance, IContainerSlotViewModel>(p =>
-                p == null
+            .Select(s => s == null ? null : containedRawPals.SingleOrDefault(p => p.InstanceId == s.InstanceId))
+            .Select<GvasCharacterInstance, IContainerSlotViewModel>(r =>
+                r == null
                     ? new EmptyPalContainerSlotViewModel()
-                    : new PalContainerSlotViewModel(p, containedRawPals.Single(r => r.InstanceId.ToString() == p.InstanceId))
+                    : new PalContainerSlotViewModel(containedPals.SingleOrDefault(p => p.InstanceId == r.InstanceId.ToString()), r)
             )
             .ToList();
 
