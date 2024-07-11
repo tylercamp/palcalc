@@ -58,7 +58,32 @@ namespace PalCalc.SaveReader.FArchive
 
         public void Skip(int count) => reader.ReadBytes(count);
 
-        public Guid ReadGuid() => new Guid(ReadBytes(16));
+        public Guid ReadGuid()
+        {
+            var b = ReadBytes(16);
+            return new Guid([
+                b[0],
+                b[1],
+                b[2],
+                b[3],
+
+                b[6],
+                b[7],
+
+                b[4],
+                b[5],
+
+                b[11],
+                b[10],
+
+                b[9],
+                b[8],
+                b[15],
+                b[14],
+                b[13],
+                b[12],
+            ]);
+        }
 
         public Guid? ReadOptionalGuid()
         {
