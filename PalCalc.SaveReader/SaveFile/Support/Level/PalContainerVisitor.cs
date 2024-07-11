@@ -51,11 +51,13 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             public SlotInstanceIdEmittingVisitor(string path) : base(path, "Value.Slots")
             {
                 pendingSlot = null;
+                numEmitted = 0;
             }
 
             public Action<PalContainerSlot> OnSlotData;
 
             PalContainerSlot pendingSlot;
+            int numEmitted;
 
             public override bool Matches(string path) => path.StartsWith(MatchedPath);
 
@@ -70,6 +72,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                         Debugger.Break();
 #endif
                     pendingSlot = new PalContainerSlot();
+                    pendingSlot.SlotIndex = -1;
+
                     var vev = new ValueEmittingVisitor(this, ".Slots.SlotIndex");
                     vev.OnValue += (_, v) => pendingSlot.SlotIndex = (int)v;
                     yield return vev;
@@ -81,6 +85,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                 if (path == MatchedPath)
                 {
                     if (pendingSlot == null) Debugger.Break();
+
+                    if (pendingSlot.SlotIndex < 0) pendingSlot.SlotIndex = numEmitted++;
                     OnSlotData?.Invoke(pendingSlot);
                     pendingSlot = null;
                 }

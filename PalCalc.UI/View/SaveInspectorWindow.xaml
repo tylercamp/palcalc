@@ -14,8 +14,9 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="149*"/>
             <ColumnDefinition Width="651*"/>
+            <ColumnDefinition Width="300*" />
         </Grid.ColumnDefinitions>
-        <ListBox Grid.Column="0" ItemsSource="{Binding Containers}">
+        <ListBox Grid.Column="0" ItemsSource="{Binding Containers}" SelectedItem="{Binding SelectedContainer}" IsSynchronizedWithCurrentItem="True">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="vm:InspectedContainerViewModel">
                     <StackPanel>
@@ -37,5 +38,72 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <ListView ItemsSource="{Binding SelectedContainer.Slots}"
+                  Grid.Column="1"
+                  SelectedItem="{Binding SelectedSlot}"
+                  IsSynchronizedWithCurrentItem="True"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  >
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding}" Width="100" Height="100" Margin="5">
+                        <ContentControl.Resources>
+                            <DataTemplate DataType="{x:Type vm:EmptyPalContainerSlotViewModel}">
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Empty</TextBlock>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type vm:PalContainerSlotViewModel}">
+                                <StackPanel Orientation="Vertical">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{Binding Pal.Icon}" Width="50" Height="50" />
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{Binding Pal.Name}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ContentControl.Resources>
+                    </ContentControl>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <DataGrid Grid.Row="0"
+                      AutoGenerateColumns="False"
+                      HeadersVisibility="None"
+                      ItemsSource="{Binding SelectedSlotDetails.PalProperties}"
+                      VerticalScrollBarVisibility="Visible"
+                      IsReadOnly="True"
+                      >
+                <DataGrid.Columns>
+                    <DataGridTextColumn Width="50*" Binding="{Binding Key}" />
+                    <DataGridTextColumn Width="50*" Binding="{Binding Value}" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" Height="5" />
+
+            <DataGrid Grid.Row="2"
+                      AutoGenerateColumns="False"
+                      HeadersVisibility="None"
+                      ItemsSource="{Binding SelectedSlotDetails.RawProperties}"
+                      VerticalScrollBarVisibility="Visible"
+                      IsReadOnly="True"
+                      >
+                <DataGrid.Columns>
+                    <DataGridTextColumn Width="50*" Binding="{Binding Key}" />
+                    <DataGridTextColumn Width="50*" Binding="{Binding Value}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
     </Grid>
 </Window>

@@ -15,6 +15,48 @@ using System.Windows.Automation;
 
 namespace PalCalc.UI.ViewModel
 {
+    public class PalDetailsProperty
+    {
+        public string Key { get; set; }
+        public string Value { get; set; }
+    }
+
+    public class PalDetailsViewModel(PalInstance pal, GvasCharacterInstance rawData)
+    {
+        public List<PalDetailsProperty> PalProperties { get; } =
+            new Dictionary<string, object>()
+            {
+                { "Instance ID", pal.InstanceId },
+                { "Nickname", pal.NickName },
+                { "Level", pal.Level },
+                { "Owner Player ID", pal.OwnerPlayerId },
+                { "Pal", pal.Pal.Name },
+                { "Internal Name", pal.Pal.InternalName },
+                { "Gender", pal.Gender },
+                { "IV - HP", pal.IV_HP },
+                { "IV - Shot", pal.IV_Shot },
+                { "IV - Melee", pal.IV_Melee },
+                { "IV - Defense", pal.IV_Defense },
+            }
+            .Select(kvp => new PalDetailsProperty() { Key = kvp.Key, Value = kvp.Value?.ToString() ?? "null" })
+            .Concat(pal.Traits.Zip(Enumerable.Range(1, pal.Traits.Count)).Select(t => new PalDetailsProperty() { Key = $"Trait {t.Second}", Value = t.First.Name }))
+            .ToList();
+
+        public List<PalDetailsProperty> RawProperties { get; } =
+            new Dictionary<string, object>()
+            {
+                { "Is Player", rawData.IsPlayer },
+                { "Owner Player ID", rawData.OwnerPlayerId },
+                { "Old Owner Player IDs", string.Join(", ", rawData.OldOwnerPlayerIds) },
+                { "Slot Index", rawData.SlotIndex },
+                { "Character ID", rawData.CharacterId },
+                { "Gender", rawData.Gender },
+            }
+            .Select(kvp => new PalDetailsProperty() { Key = kvp.Key, Value = kvp.Value?.ToString() ?? "null" })
+            .Concat(rawData.Traits.Zip(Enumerable.Range(1, rawData.Traits.Count)).Select(t => new PalDetailsProperty() { Key = $"Trait {t.Second}", Value = t.First }))
+            .ToList();
+    }
+
     public enum OwnerType { Player, Guild, Unknown }
 
     public class OwnerViewModel(OwnerType type, string name, string id)
@@ -29,8 +71,10 @@ namespace PalCalc.UI.ViewModel
 
     public interface IContainerSlotViewModel { }
 
-    public class PalContainerSlotViewModel(PalInstance pal) : IContainerSlotViewModel
+    public class PalContainerSlotViewModel(PalInstance pal, GvasCharacterInstance rawPal) : IContainerSlotViewModel
     {
+        public PalInstance Instance => pal;
+        public GvasCharacterInstance RawInstance => rawPal;
         public PalViewModel Pal { get; } = new PalViewModel(pal.Pal);
         public PalGender Gender => pal.Gender;
         public TraitCollectionViewModel Traits { get; } = new TraitCollectionViewModel(pal.Traits.Select(t => new TraitViewModel(t)));
@@ -41,14 +85,20 @@ namespace PalCalc.UI.ViewModel
     public partial class InspectedContainerViewModel(
         OwnerViewModel owner,
         List<PalInstance> containedPals,
+        List<GvasCharacterInstance> containedRawPals,
         PalContainer rawContainer,
         LocationType? locationType
     ) : ObservableObject
     {
         // TODO - change from SingleOrDefault to Single when human pals are handled
-        public List<IContainerSlotViewModel> Slots { get; } = rawContainer.Slots
-            .Select(s => containedPals.SingleOrDefault(p => p.InstanceId == s.InstanceId.ToString()))
-            .Select<PalInstance, IContainerSlotViewModel>(p => p == null ? new EmptyPalContainerSlotViewModel() : new PalContainerSlotViewModel(p))
+        public List<IContainerSlotViewModel> Slots { get; } = Enumerable.Range(0, rawContainer.MaxEntries)
+            .Select(i => rawContainer.Slots.SingleOrDefault(s => s.SlotIndex == i))
+            .Select(s => s == null ? null : containedPals.SingleOrDefault(p => p.InstanceId == s.InstanceId.ToString()))
+            .Select<PalInstance, IContainerSlotViewModel>(p =>
+                p == null
+                    ? new EmptyPalContainerSlotViewModel()
+                    : new PalContainerSlotViewModel(p, containedRawPals.Single(r => r.InstanceId.ToString() == p.InstanceId))
+            )
             .ToList();
 
         public int TotalSlots => rawContainer.MaxEntries;
@@ -66,12 +116,25 @@ namespace PalCalc.UI.ViewModel
             designerInstance ??= new SaveInspectorViewModel(
                 DirectSavesLocation.AllLocal
                     .SelectMany(l => l.ValidSaveGames)
-                    .OrderBy(g => g.LastModified)
+                    .OrderByDescending(g => g.LastModified)
                     .Select(g => CachedSaveGame.FromSaveGame(g, PalDB.LoadEmbedded()))
                     .First()
             );
 
         public List<InspectedContainerViewModel> Containers { get; }
+
+        [ObservableProperty]
+        private InspectedContainerViewModel selectedContainer;
+
+        [NotifyPropertyChangedFor(nameof(SelectedSlotDetails))]
+        [ObservableProperty]
+        private IContainerSlotViewModel selectedSlot;
+
+        public PalDetailsViewModel SelectedSlotDetails => SelectedSlot switch
+        {
+            PalContainerSlotViewModel pcsvm => new PalDetailsViewModel(pcsvm.Instance, pcsvm.RawInstance),
+            _ => null
+        };
 
         public SaveInspectorViewModel(CachedSaveGame csg)
         {
@@ -93,15 +156,20 @@ namespace PalCalc.UI.ViewModel
                     .SkipNull()
                     .ToList();
 
+                var containedRawPals = c.Slots
+                    .Select(s => rawData.Characters.SingleOrDefault(r => r.InstanceId == s.InstanceId))
+                    .SkipNull()
+                    .ToList();
+
                 if (players.Any(p => p.PartyContainerId == c.Id))
                 {
                     var owner = ownersById[players.Single(p => p.PartyContainerId == c.Id).PlayerId];
-                    return new InspectedContainerViewModel(owner, containedPals, c, LocationType.PlayerParty);
+                    return new InspectedContainerViewModel(owner, containedPals, containedRawPals, c, LocationType.PlayerParty);
                 }
                 else if (players.Any(p => p.PalboxContainerId == c.Id))
                 {
                     var owner = ownersById[players.Single(p => p.PalboxContainerId == c.Id).PlayerId];
-                    return new InspectedContainerViewModel(owner, containedPals, c, LocationType.Palbox);
+                    return new InspectedContainerViewModel(owner, containedPals, containedRawPals, c, LocationType.Palbox);
                 }
                 else
                 {
@@ -112,7 +180,13 @@ namespace PalCalc.UI.ViewModel
                         if (owners.Count == 1)
                         {
                             var ownerId = owners.First();
-                            return new InspectedContainerViewModel(ownersById.GetValueOrElse(ownerId, OwnerViewModel.UnknownWithId(ownerId)), containedPals, c, containedPals.First().Location.Type);
+                            return new InspectedContainerViewModel(
+                                ownersById.GetValueOrElse(ownerId, OwnerViewModel.UnknownWithId(ownerId)),
+                                containedPals,
+                                containedRawPals,
+                                c,
+                                containedPals.First().Location.Type
+                            );
                         }
                         else
                         {
@@ -122,15 +196,24 @@ namespace PalCalc.UI.ViewModel
                                 .MaxBy(g => g.Count())
                                 .Key;
 
-                            return new InspectedContainerViewModel(ownersById.GetValueOrElse(mostCommonGuild, OwnerViewModel.UnknownWithId(mostCommonGuild)), containedPals, c, containedPals.First().Location.Type);
+                            return new InspectedContainerViewModel(
+                                ownersById.GetValueOrElse(mostCommonGuild, OwnerViewModel.UnknownWithId(mostCommonGuild)),
+                                containedPals,
+                                containedRawPals,
+                                c,
+                                containedPals.First().Location.Type
+                            );
                         }
                     }
                     else
                     {
-                        return new InspectedContainerViewModel(OwnerViewModel.Unknown, containedPals, c, null);
+                        return new InspectedContainerViewModel(OwnerViewModel.Unknown, containedPals, containedRawPals, c, null);
                     }
                 }
             }).ToList();
+
+            SelectedContainer = Containers.FirstOrDefault();
+            SelectedSlot = SelectedContainer?.Slots?.FirstOrDefault();
         }
     }
 }
