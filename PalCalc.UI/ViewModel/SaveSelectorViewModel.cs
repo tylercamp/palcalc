@@ -207,7 +207,7 @@ namespace PalCalc.UI.ViewModel
             InspectSaveCommand = new RelayCommand(
                 execute: () =>
                 {
-                    var vm = new SaveInspectorViewModel(SelectedGame.CachedValue);
+                    var vm = new SaveInspectorWindowViewModel(SelectedGame.CachedValue);
                     var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
                     inspector.ShowDialog();
                 },
