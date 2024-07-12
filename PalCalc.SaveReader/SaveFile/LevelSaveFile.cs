@@ -127,6 +127,7 @@ namespace PalCalc.SaveReader.SaveFile
                         Traits = traits,
                         Location = new PalLocation()
                         {
+                            ContainerId = gvasInstance.ContainerId.ToString(),
                             Type = containerTypeById[gvasInstance.ContainerId.ToString()],
                             Index = gvasInstance.SlotIndex,
                         }

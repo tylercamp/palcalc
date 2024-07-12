@@ -72,5 +72,7 @@ namespace PalCalc.Model
 
             return HashCode.Combine(baseHash, total);
         }
+
+        public static T MostCommonOrDefault<T>(this IEnumerable<T> e) => e.GroupBy(v => v).OrderByDescending(g => g.Key).Select(g => g.Key).FirstOrDefault();
     }
 }

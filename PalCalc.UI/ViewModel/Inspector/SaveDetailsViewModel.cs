@@ -27,11 +27,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             {
                 if (designerInstance == null)
                 {
-                    var save = DirectSavesLocation.AllLocal
-                        .SelectMany(l => l.ValidSaveGames)
-                        .OrderByDescending(g => g.LastModified)
-                        .Select(g => CachedSaveGame.FromSaveGame(g, PalDB.LoadEmbedded()))
-                        .First();
+                    var save = CachedSaveGame.SampleForDesignerView;
 
                     designerInstance = new SaveDetailsViewModel(
                         save,

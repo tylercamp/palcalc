@@ -12,24 +12,9 @@ namespace PalCalc.UI.ViewModel.Inspector
     public class SaveInspectorWindowViewModel
     {
         private static SaveInspectorWindowViewModel designerInstance = null;
-        public static SaveInspectorWindowViewModel DesignerInstance
-        {
-            get
-            {
-                if (designerInstance == null)
-                {
-                    var save = DirectSavesLocation.AllLocal
-                        .SelectMany(l => l.ValidSaveGames)
-                        .OrderByDescending(g => g.LastModified)
-                        .Select(g => CachedSaveGame.FromSaveGame(g, PalDB.LoadEmbedded()))
-                        .First();
+        public static SaveInspectorWindowViewModel DesignerInstance => designerInstance ??= new SaveInspectorWindowViewModel(CachedSaveGame.SampleForDesignerView);
 
-                    designerInstance = new SaveInspectorWindowViewModel(save);
-                }
-                return designerInstance;
-            }
-        }
-
+        public SearchViewModel Search { get; }
         public SaveDetailsViewModel Details { get; }
 
         public SaveInspectorWindowViewModel(CachedSaveGame csg)
@@ -37,6 +22,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             var rawData = csg.UnderlyingSave.Level.ReadRawCharacterData();
             var players = csg.UnderlyingSave.Players.Select(p => p.ReadPlayerContent()).ToList();
 
+            Search = new SearchViewModel(csg);
             Details = new SaveDetailsViewModel(csg, rawData, players);
         }
     }

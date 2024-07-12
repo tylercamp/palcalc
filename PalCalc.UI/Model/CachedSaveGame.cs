@@ -14,7 +14,7 @@ namespace PalCalc.UI.Model
 {
     public class CachedSaveGame
     {
-        private static readonly string SaveReaderVersion = "v3";
+        private static readonly string SaveReaderVersion = "v4";
 
         public CachedSaveGame(ISaveGame underlyingSave)
         {
@@ -66,6 +66,16 @@ namespace PalCalc.UI.Model
         {
             return $"{game.UserId}-{game.GameId}";
         }
+
+        private static CachedSaveGame sampleForDesignerView;
+        public static CachedSaveGame SampleForDesignerView =>
+            sampleForDesignerView ??=
+                DirectSavesLocation.AllLocal
+                    .SelectMany(l => l.ValidSaveGames)
+                    .OrderByDescending(g => g.LastModified)
+                    .Select(g => FromSaveGame(g, PalDB.LoadEmbedded()))
+                    .First();
+
 
         public static CachedSaveGame FromSaveGame(ISaveGame game, PalDB db)
         {

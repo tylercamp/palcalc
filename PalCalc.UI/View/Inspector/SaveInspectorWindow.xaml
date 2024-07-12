@@ -12,7 +12,7 @@
         Title="Save File Inspector" Height="450" Width="900">
     <TabControl>
         <TabItem Header="Search">
-            
+            <local:SearchView DataContext="{Binding Search}" />
         </TabItem>
         <TabItem Header="Details">
             <local:SaveDetailsView DataContext="{Binding Details}" />
