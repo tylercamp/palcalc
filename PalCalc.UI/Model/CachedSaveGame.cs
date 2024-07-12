@@ -14,7 +14,7 @@ namespace PalCalc.UI.Model
 {
     public class CachedSaveGame
     {
-        private static readonly string SaveReaderVersion = "v2";
+        private static readonly string SaveReaderVersion = "v3";
 
         public CachedSaveGame(ISaveGame underlyingSave)
         {

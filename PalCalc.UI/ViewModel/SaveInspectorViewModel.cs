@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Media;
 
@@ -24,34 +25,42 @@ namespace PalCalc.UI.ViewModel
 
     public class PalDetailsViewModel(PalInstance pal, GvasCharacterInstance rawData)
     {
+        public Visibility ParsedPropsVisibility => pal == null ? Visibility.Hidden : Visibility.Visible;
+        public Visibility RawPropsVisibility => rawData == null ? Visibility.Hidden : Visibility.Visible;
+
         public List<PalDetailsProperty> PalProperties { get; } = pal == null ? [] :
             new Dictionary<string, object>()
             {
-                { "Instance ID", pal.InstanceId },
-                { "Nickname", pal.NickName },
-                { "Level", pal.Level },
-                { "Owner Player ID", pal.OwnerPlayerId },
                 { "Pal", pal.Pal.Name },
-                { "Internal Name", pal.Pal.InternalName },
+                { "Paldex #", pal.Pal.Id.PalDexNo },
+                { "Paldex Is Variant", pal.Pal.Id.IsVariant },
                 { "Gender", pal.Gender },
-                { "IV - HP", pal.IV_HP },
-                { "IV - Shot", pal.IV_Shot },
-                { "IV - Melee", pal.IV_Melee },
-                { "IV - Defense", pal.IV_Defense },
+                { "Detected Owner ID", pal.OwnerPlayerId },
             }
             .Select(kvp => new PalDetailsProperty() { Key = kvp.Key, Value = kvp.Value?.ToString() ?? "null" })
             .Concat(pal.Traits.Zip(Enumerable.Range(1, pal.Traits.Count)).Select(t => new PalDetailsProperty() { Key = $"Trait {t.Second}", Value = t.First.Name }))
             .ToList();
 
-        public List<PalDetailsProperty> RawProperties { get; } =
+        public List<PalDetailsProperty> RawProperties { get; } = rawData == null ? [] :
             new Dictionary<string, object>()
             {
-                { "Is Player", rawData.IsPlayer },
-                { "Owner Player ID", rawData.OwnerPlayerId },
-                { "Old Owner Player IDs", string.Join(", ", rawData.OldOwnerPlayerIds) },
-                { "Slot Index", rawData.SlotIndex },
-                { "Character ID", rawData.CharacterId },
-                { "Gender", rawData.Gender },
+                { "CharacterId", rawData.CharacterId },
+                { "Nickname", rawData.NickName },
+                { "Level", rawData.Level },
+                { "Raw Gender", rawData.Gender },
+
+                { "IsPlayer", rawData.IsPlayer },
+
+                { "Instance ID", rawData.InstanceId },
+                { "OwnerPlayerId", rawData.OwnerPlayerId },
+                { "OldOwnerPlayerIds", string.Join(", ", rawData.OldOwnerPlayerIds) },
+
+                { "SlotIndex", rawData.SlotIndex },
+
+                { "TalentHp", rawData.TalentHp },
+                { "TalentShot", rawData.TalentShot },
+                { "TalentMelee", rawData.TalentMelee },
+                { "TalentDefense", rawData.TalentDefense },
             }
             .Select(kvp => new PalDetailsProperty() { Key = kvp.Key, Value = kvp.Value?.ToString() ?? "null" })
             .Concat(rawData.Traits.Zip(Enumerable.Range(1, rawData.Traits.Count)).Select(t => new PalDetailsProperty() { Key = $"Trait {t.Second}", Value = t.First }))
@@ -72,18 +81,17 @@ namespace PalCalc.UI.ViewModel
 
     public interface IContainerSlotViewModel { }
 
-    public class PalContainerSlotViewModel(PalInstance pal, GvasCharacterInstance rawPal) : IContainerSlotViewModel
+    public class PalContainerSlotViewModel(string instanceId, PalInstance pal, GvasCharacterInstance rawPal) : IContainerSlotViewModel
     {
-        public string DisplayName => pal?.Pal?.Name ?? rawPal.CharacterId;
+        public string DisplayName => pal?.Pal?.Name ?? rawPal?.CharacterId ?? InstanceId;
         public ImageSource Icon =>
             pal == null
                 ? PalIcon.DefaultIcon
                 : PalIcon.Images[pal.Pal];
 
+        public string InstanceId => instanceId;
         public PalInstance Instance => pal;
         public GvasCharacterInstance RawInstance => rawPal;
-        //public PalGender Gender => pal.Gender;
-        //public TraitCollectionViewModel Traits { get; } = new TraitCollectionViewModel(pal.Traits.Select(t => new TraitViewModel(t)));
     }
 
     public class EmptyPalContainerSlotViewModel : IContainerSlotViewModel { }
@@ -99,12 +107,15 @@ namespace PalCalc.UI.ViewModel
         // TODO - change from SingleOrDefault to Single when human pals are handled
         public List<IContainerSlotViewModel> Slots { get; } = Enumerable.Range(0, rawContainer.MaxEntries)
             .Select(i => rawContainer.Slots.SingleOrDefault(s => s.SlotIndex == i))
-            .Select(s => s == null ? null : containedRawPals.SingleOrDefault(p => p.InstanceId == s.InstanceId))
-            .Select<GvasCharacterInstance, IContainerSlotViewModel>(r =>
-                r == null
-                    ? new EmptyPalContainerSlotViewModel()
-                    : new PalContainerSlotViewModel(containedPals.SingleOrDefault(p => p.InstanceId == r.InstanceId.ToString()), r)
-            )
+            .Select<PalContainerSlot, IContainerSlotViewModel>(s =>
+            {
+                if (s == null || s.InstanceId == Guid.Empty) return new EmptyPalContainerSlotViewModel();
+
+                var rawChar = containedRawPals.SingleOrDefault(p => p.InstanceId == s.InstanceId);
+                var rawPal = containedPals.SingleOrDefault(p => p.InstanceId == s.InstanceId.ToString());
+
+                return new PalContainerSlotViewModel(s.InstanceId.ToString(), rawPal, rawChar);
+            })
             .ToList();
 
         public int TotalSlots => rawContainer.MaxEntries;

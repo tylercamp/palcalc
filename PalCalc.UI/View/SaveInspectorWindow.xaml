@@ -9,11 +9,13 @@
         WindowStyle="ToolWindow"
         WindowStartupLocation="CenterOwner"
         d:DataContext="{x:Static vm:SaveInspectorViewModel.DesignerInstance}"
-        Title="SaveInspectorWindow" Height="450" Width="800">
+        Title="Save File Inspector" Height="450" Width="900">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="149*"/>
-            <ColumnDefinition Width="651*"/>
+            <ColumnDefinition Width="149*" MaxWidth="300" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="651*" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="300*" />
         </Grid.ColumnDefinitions>
         <ListBox Grid.Column="0" ItemsSource="{Binding Containers}" SelectedItem="{Binding SelectedContainer}" IsSynchronizedWithCurrentItem="True">
@@ -34,12 +36,19 @@
                             <Run Text="{Binding TotalSlots, Mode=OneTime}" />
                             <Run>slots used</Run>
                         </TextBlock>
+                        <TextBlock>
+                            <Run>ID:</Run>
+                            <Run Text="{Binding Id, Mode=OneTime}" />
+                        </TextBlock>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+
+        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" />
+
         <ListView ItemsSource="{Binding SelectedContainer.Slots}"
-                  Grid.Column="1"
+                  Grid.Column="2"
                   SelectedItem="{Binding SelectedSlot}"
                   IsSynchronizedWithCurrentItem="True"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -51,19 +60,15 @@
             </ListView.ItemsPanel>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <ContentControl Content="{Binding}" Width="100" Height="100" Margin="5">
+                    <ContentControl Content="{Binding}" Margin="5">
                         <ContentControl.Resources>
                             <DataTemplate DataType="{x:Type vm:EmptyPalContainerSlotViewModel}">
                                 <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Empty</TextBlock>
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type vm:PalContainerSlotViewModel}">
                                 <StackPanel Orientation="Vertical">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Image Source="{Binding Icon}" Width="50" Height="50" />
-                                        <StackPanel Orientation="Vertical">
-                                            <TextBlock Text="{Binding DisplayName}" />
-                                        </StackPanel>
-                                    </StackPanel>
+                                    <Image Source="{Binding Icon}" Width="50" Height="50" Margin="0,0,5,0" />
+                                    <TextBlock Text="{Binding DisplayName}" HorizontalAlignment="Center" />
                                 </StackPanel>
                             </DataTemplate>
                         </ContentControl.Resources>
@@ -71,39 +76,44 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Grid Grid.Column="2">
+
+        <GridSplitter Grid.Column="3" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" />
+
+        <Grid Grid.Column="4">
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
-            <DataGrid Grid.Row="0"
-                      AutoGenerateColumns="False"
-                      HeadersVisibility="None"
-                      ItemsSource="{Binding SelectedSlotDetails.PalProperties}"
-                      VerticalScrollBarVisibility="Visible"
-                      IsReadOnly="True"
-                      >
-                <DataGrid.Columns>
-                    <DataGridTextColumn Width="50*" Binding="{Binding Key}" />
-                    <DataGridTextColumn Width="50*" Binding="{Binding Value}" />
-                </DataGrid.Columns>
-            </DataGrid>
+            <GroupBox Header="Detected Properties" Grid.Row="0">
+                <DataGrid AutoGenerateColumns="False"
+                          HeadersVisibility="None"
+                          ItemsSource="{Binding SelectedSlotDetails.PalProperties}"
+                          IsReadOnly="True"
+                          VerticalScrollBarVisibility="Visible"
+                          >
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Width="50*" Binding="{Binding Key}" />
+                        <DataGridTextColumn Width="50*" Binding="{Binding Value}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
 
             <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" Height="5" />
 
-            <DataGrid Grid.Row="2"
-                      AutoGenerateColumns="False"
-                      HeadersVisibility="None"
-                      ItemsSource="{Binding SelectedSlotDetails.RawProperties}"
-                      VerticalScrollBarVisibility="Visible"
-                      IsReadOnly="True"
-                      >
-                <DataGrid.Columns>
-                    <DataGridTextColumn Width="50*" Binding="{Binding Key}" />
-                    <DataGridTextColumn Width="50*" Binding="{Binding Value}" />
-                </DataGrid.Columns>
-            </DataGrid>
+            <GroupBox Header="Raw Properties" Grid.Row="2">
+                <DataGrid AutoGenerateColumns="False"
+                          HeadersVisibility="None"
+                          ItemsSource="{Binding SelectedSlotDetails.RawProperties}"
+                          IsReadOnly="True"
+                          VerticalScrollBarVisibility="Visible"
+                          >
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Width="50*" Binding="{Binding Key}" />
+                        <DataGridTextColumn Width="50*" Binding="{Binding Value}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
         </Grid>
     </Grid>
 </Window>
