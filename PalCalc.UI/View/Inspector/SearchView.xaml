@@ -17,36 +17,44 @@
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="10*" MinWidth="100"/>
+            <ColumnDefinition Width="200" MinWidth="100"/>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="20*" MinWidth="100"/>
         </Grid.ColumnDefinitions>
 
-        <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
-            <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding Label}" />
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type svm:PlayerTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding Label}" />
-                </HierarchicalDataTemplate>
-                <DataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}">
-                    <TextBlock Text="{Binding Label}" />
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
-                    <TextBlock Text="{Binding Label}" />
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
-                    <TextBlock Text="{Binding Label}" />
-                </DataTemplate>
-            </TreeView.Resources>
-        </TreeView>
+        <GroupBox Header="Pal Containers" Grid.Column="0">
+            <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Label}" />
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type svm:PlayerTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Label}" />
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}">
+                        <TextBlock Text="{Binding Label}" />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
+                        <TextBlock Text="{Binding Label}" />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
+                        <TextBlock Text="{Binding Label}" />
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+        </GroupBox>
 
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
 
         <Grid Grid.Column="2">
-            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="52*"/>
+                <RowDefinition Height="173*"/>
+            </Grid.RowDefinitions>
+
+
+            <local:ContainerGridView DataContext="{Binding OwnerTree.SelectedSource.Container.Grid}" Grid.Row="1" />
         </Grid>
-    
+
     </Grid>
 </UserControl>

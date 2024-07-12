@@ -13,5 +13,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public LocationType DetectedType => detectedType;
         public List<string> OwnerIds { get; } = contents.Select(p => p.OwnerPlayerId).Distinct().ToList();
         public List<PalInstance> Contents => contents;
+
+        public ContainerGridViewModel Grid { get; } = new ContainerGridViewModel() { Contents = contents };
     }
 }
