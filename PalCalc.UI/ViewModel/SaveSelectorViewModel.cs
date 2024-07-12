@@ -6,6 +6,8 @@ using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
+using PalCalc.UI.View.Inspector;
+using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
 using Serilog;
 using Serilog.Core;

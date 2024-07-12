@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace PalCalc.UI.View
+namespace PalCalc.UI.View.Inspector
 {
     /// <summary>
     /// Interaction logic for SaveInspectorWindow.xaml

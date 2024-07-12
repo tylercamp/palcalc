@@ -15,7 +15,7 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Media;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI.ViewModel.Inspector
 {
     public class PalDetailsProperty
     {
