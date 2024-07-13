@@ -207,7 +207,13 @@ namespace PalCalc.UI.ViewModel
             InspectSaveCommand = new RelayCommand(
                 execute: () =>
                 {
+                    var loadingModal = new LoadingSaveFileModal() { DataContext = "Reading raw save data...", Owner = App.Current.MainWindow };
+                    loadingModal.ShowSync();
+
                     var vm = new SaveInspectorWindowViewModel(SelectedGame.CachedValue);
+
+                    loadingModal.Close();
+
                     var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
                     inspector.Show();
                 },

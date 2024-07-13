@@ -38,21 +38,7 @@ namespace PalCalc.UI.ViewModel
         private AppSettings settings;
         private IRelayCommand<PalSpecifierViewModel> deletePalTargetCommand;
 
-        // https://stackoverflow.com/a/73181682
-        private static void AllowUIToUpdate()
-        {
-            DispatcherFrame frame = new();
-            // DispatcherPriority set to Input, the highest priority
-            Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate (object parameter)
-            {
-                frame.Continue = false;
-                Thread.Sleep(20); // Stop all processes to make sure the UI update is perform
-                return null;
-            }), null);
-            Dispatcher.PushFrame(frame);
-            // DispatcherPriority set to Input, the highest priority
-            Application.Current.Dispatcher.Invoke(DispatcherPriority.Input, new Action(delegate { }));
-        }
+
 
         public MainWindowViewModel() : this(null) { }
 
@@ -211,8 +197,7 @@ namespace PalCalc.UI.ViewModel
                 loadingSaveModal = new LoadingSaveFileModal();
                 loadingSaveModal.Owner = Application.Current.MainWindow;
                 loadingSaveModal.DataContext = "Save file was not yet cached or cache is outdated, reading content...";
-                loadingSaveModal.Show();
-                AllowUIToUpdate();
+                loadingSaveModal.ShowSync();
             }
         }
 
@@ -222,7 +207,6 @@ namespace PalCalc.UI.ViewModel
             {
                 loadingSaveModal.Close();
                 loadingSaveModal = null;
-                AllowUIToUpdate();
 
                 if (loaded != null && targetsBySaveFile.ContainsKey(obj))
                     targetsBySaveFile[obj].RefreshWith(loaded);
