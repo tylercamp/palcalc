@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
+             xmlns:v="clr-namespace:PalCalc.UI.View"
              xmlns:ivm="clr-namespace:PalCalc.UI.ViewModel.Inspector"
              xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
@@ -114,20 +115,78 @@
 
             <!-- scrolling works when you hover over the background but not when hovering over the container contents
                  and for the life of me I cannot figure out why -->
-            <ScrollViewer Grid.Row="1">
-                <ItemsControl ItemsSource="{Binding OwnerTree.SelectedSource.Container.Grids}" HorizontalAlignment="Center">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type svm:ContainerGridViewModel}">
-                            <local:ContainerGridView DataContext="{Binding}" Margin="15" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+            <DockPanel Grid.Row="1">
+                <Grid DockPanel.Dock="Bottom" Visibility="{Binding SlotDetailsVisibility}" Background="#111">
+                    <Grid.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="White" />
+                        </Style>
+                        <Style TargetType="Label">
+                            <Setter Property="Foreground" Value="White" />
+                        </Style>
+                    </Grid.Resources>
+                    
+                    <WrapPanel Margin="10" DataContext="{Binding OwnerTree.SelectedSource.Container.SelectedPalSlot}">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
+                            <Border Width="64" Height="64" CornerRadius="32" Background="{Binding Pal.IconBrush}" BorderBrush="White" BorderThickness="1" />
+                            <StackPanel Margin="10,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Pal.Name}" FontWeight="Bold" />
+                                <TextBlock>
+                                    <Run>Level</Run>
+                                    <Run Text="{Binding PalInstance.ModelObject.Level}" />
+                                </TextBlock>
+                                <TextBlock Text="{Binding PalInstance.Gender}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" Margin="0,0,25,0">
+                            <StackPanel.Resources>
+                                <Style TargetType="Label">
+                                    <Setter Property="Padding" Value="1" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Orientation" Value="Horizontal" />
+                                </Style>
+                            </StackPanel.Resources>
+
+                            <Label HorizontalContentAlignment="Center" FontWeight="Bold">IVs</Label>
+
+                            <StackPanel>
+                                <Label Width="60">HP:</Label>
+                                <Label Content="{Binding PalInstance.ModelObject.IV_HP}" />
+                            </StackPanel>
+
+                            <StackPanel>
+                                <Label Width="60">Attack:</Label>
+                                <Label Content="{Binding PalInstance.ModelObject.IV_Shot}" />
+                            </StackPanel>
+
+                            <StackPanel>
+                                <Label Width="60">Defense:</Label>
+                                <Label Content="{Binding PalInstance.ModelObject.IV_Defense}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <v:TraitCollectionView DataContext="{Binding PalInstance.Traits}" Background="#111" VerticalAlignment="Center" Width="250" Margin="0,0,25,0" />
+                    </WrapPanel>
+                </Grid>
+
+                <ScrollViewer Grid.Row="1">
+                    <ItemsControl ItemsSource="{Binding OwnerTree.SelectedSource.Container.Grids}" HorizontalAlignment="Center">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type svm:ContainerGridViewModel}">
+                                <local:ContainerGridView DataContext="{Binding}" Margin="15" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
         </Grid>
 
     </Grid>

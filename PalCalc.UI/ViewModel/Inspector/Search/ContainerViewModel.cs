@@ -1,4 +1,5 @@
-﻿using PalCalc.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PalCalc.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search
 {
-    public class ContainerViewModel(string id, LocationType detectedType, List<PalInstance> contents)
+    public class ContainerViewModel(string id, LocationType detectedType, List<PalInstance> contents) : ObservableObject
     {
         public string Id => id;
         public LocationType DetectedType => detectedType;
@@ -40,6 +41,9 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             }
         }
 
+        public IContainerGridSlotViewModel SelectedSlot => Grids.FirstOrDefault(g => g.SelectedSlot != null)?.SelectedSlot;
+        public ContainerGridPalSlotViewModel SelectedPalSlot => SelectedSlot as ContainerGridPalSlotViewModel;
+
         private List<ContainerGridViewModel> grids = null;
         public List<ContainerGridViewModel> Grids
         {
@@ -59,10 +63,38 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                             .Select(pair => new ContainerGridViewModel(pair.Item1.ToList()) { Title = $"Tab {pair.Item2 + 1}", PerRow = PerRow })
                             .ToList();
                     }
+
+                    foreach (var grid in grids)
+                    {
+                        grid.PropertyChanged += Grid_PropertyChanged;
+                    }
                 }
 
                 return grids;
             }
+        }
+
+        // if a value was selected in one grid, deselect values in all other grids
+        private bool isSyncingSlots = false;
+        private void Grid_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (isSyncingSlots || e.PropertyName != nameof(ContainerGridViewModel.SelectedSlot)) return;
+
+            isSyncingSlots = true;
+            var srcGrid = sender as ContainerGridViewModel;
+
+            foreach (var grid in Grids)
+            {
+                if (grid == srcGrid)
+                    continue;
+
+                grid.SelectedSlot = null;
+            }
+
+            isSyncingSlots = false;
+
+            OnPropertyChanged(nameof(SelectedSlot));
+            OnPropertyChanged(nameof(SelectedPalSlot));
         }
     }
 }

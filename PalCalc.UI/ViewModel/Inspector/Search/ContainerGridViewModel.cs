@@ -13,19 +13,24 @@ using System.Windows.Controls;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search
 {
-    public interface IContainerGridSlotViewModel {}
+    public interface IContainerGridSlotViewModel {
+        bool Matches { get; }
+    }
 
     public partial class ContainerGridPalSlotViewModel : ObservableObject, IContainerGridSlotViewModel
     {
-        public PalInstance PalInstance { get; set; }
+        public PalInstanceViewModel PalInstance { get; set; }
 
-        public PalViewModel Pal => new PalViewModel(PalInstance.Pal);
+        public PalViewModel Pal => PalInstance.Pal;
 
         [ObservableProperty]
         private bool matches = true;
     }
 
-    public class ContainerGridEmptySlotViewModel : IContainerGridSlotViewModel { }
+    public class ContainerGridEmptySlotViewModel : IContainerGridSlotViewModel
+    {
+        public bool Matches => false;
+    }
 
     public partial class ContainerGridViewModel(List<PalInstance> contents) : ObservableObject
     {
@@ -58,23 +63,29 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             set
             {
                 foreach (var slot in Slots.Where(s => s is ContainerGridPalSlotViewModel).Cast<ContainerGridPalSlotViewModel>())
-                    slot.Matches = value.Matches(slot.PalInstance);
+                    slot.Matches = value.Matches(slot.PalInstance.ModelObject);
+
+                if (SelectedSlot != null && !SelectedSlot.Matches)
+                    SelectedSlot = null;
 
                 OnPropertyChanged(nameof(GridVisibility));
             }
         }
 
-        public Visibility GridVisibility => Title == null || Slots.Any(s => (s as ContainerGridPalSlotViewModel)?.Matches == true) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GridVisibility => Title == null || Slots.Any(s => s is ContainerGridPalSlotViewModel { Matches: true }) ? Visibility.Visible : Visibility.Collapsed;
 
         public string Title { get; set; }
         public Visibility TitleVisibility => Title == null ? Visibility.Collapsed : Visibility.Visible;
+
+        [ObservableProperty]
+        private IContainerGridSlotViewModel selectedSlot;
 
         public List<IContainerGridSlotViewModel> Slots { get; } = contents == null ? [] :
             contents
                 .Select<PalInstance, IContainerGridSlotViewModel>(p =>
                 {
                     if (p == null) return new ContainerGridEmptySlotViewModel();
-                    else return new ContainerGridPalSlotViewModel() { PalInstance = p, Matches = true };
+                    else return new ContainerGridPalSlotViewModel() { PalInstance = new PalInstanceViewModel(p), Matches = true };
                 })
                 .ToList();
     }

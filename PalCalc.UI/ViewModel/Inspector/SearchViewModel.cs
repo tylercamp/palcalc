@@ -1,14 +1,16 @@
-﻿using PalCalc.UI.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Inspector.Search;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PalCalc.UI.ViewModel.Inspector
 {
-    public partial class SearchViewModel
+    public partial class SearchViewModel : ObservableObject
     {
         private static SearchViewModel designerInstance = null;
         public static SearchViewModel DesignerInstance => designerInstance ??= new SearchViewModel(CachedSaveGame.SampleForDesignerView);
@@ -25,6 +27,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             OwnerTree = new OwnerTreeViewModel(csg, containers.ToList());
             SearchSettings = new SearchSettingsViewModel();
 
+            OwnerTree.PropertyChanging += OwnerTree_PropertyChanging;
             OwnerTree.PropertyChanged += OwnerTree_PropertyChanged;
             SearchSettings.PropertyChanged += SearchSettings_PropertyChanged;
         }
@@ -36,18 +39,46 @@ namespace PalCalc.UI.ViewModel.Inspector
                 grid.SearchCriteria = SearchSettings.AsCriteria;
         }
 
+        private void OwnerTree_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
+        {
+            if (e.PropertyName == nameof(OwnerTree.SelectedSource))
+            {
+                if (OwnerTree.SelectedSource != null)
+                    OwnerTree.SelectedSource.Container.PropertyChanged -= SelectedContainer_PropertyChanged;
+            }
+        }
+
         private void OwnerTree_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName != nameof(OwnerTree.SelectedSource) || OwnerTree.SelectedSource == null) return;
+            if (e.PropertyName == nameof(OwnerTree.SelectedSource))
+            {
+                OnPropertyChanged(nameof(SlotDetailsVisibility));
 
-            ApplySearchSettings();
+                if (OwnerTree.SelectedSource != null)
+                {
+                    ApplySearchSettings();
+                    OwnerTree.SelectedSource.Container.PropertyChanged += SelectedContainer_PropertyChanged;
+                }
+            }
         }
 
         private void SearchSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName != nameof(SearchSettings.AsCriteria) || OwnerTree.SelectedSource == null) return;
+            if (e.PropertyName == nameof(SearchSettings.AsCriteria))
+            {
+                if (OwnerTree.SelectedSource != null)
+                    ApplySearchSettings();
+            }
+        }
 
-            ApplySearchSettings();
+        public Visibility SlotDetailsVisibility => OwnerTree.HasValidSource && OwnerTree.SelectedSource.Container.SelectedSlot != null ? Visibility.Visible : Visibility.Collapsed;
+
+        private void SelectedContainer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ContainerViewModel.SelectedSlot))
+            {
+                OnPropertyChanged(nameof(SlotDetailsVisibility));
+            }
         }
     }
 }
