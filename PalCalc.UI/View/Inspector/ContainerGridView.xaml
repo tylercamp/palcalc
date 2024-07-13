@@ -6,18 +6,26 @@
              xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
              xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
              mc:Ignorable="d" 
+             Visibility="{Binding GridVisibility}"
              d:DataContext="{x:Static svm:ContainerGridViewModel.DesignerInstance}"
              d:Background="White">
     <StackPanel>
         <Label Content="{Binding Title}" Visibility="{Binding TitleVisibility}" FontWeight="Bold" />
-        <ListView ItemsSource="{Binding Slots}" ScrollViewer.CanContentScroll="False">
+        <ListView ItemsSource="{Binding Slots}" ScrollViewer.CanContentScroll="False" x:Name="m_ListView">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Columns="6" />
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
             <ListView.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=Matches, Mode=TwoWay}" Value="False">
+                            <Setter Property="IsEnabled" Value="False" />
+                            <Setter Property="Opacity" Value="0.25" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                    
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="VerticalContentAlignment" Value="Stretch" />
                 </Style>

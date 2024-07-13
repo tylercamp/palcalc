@@ -55,58 +55,61 @@
             </Grid.RowDefinitions>
 
             <GroupBox Header="Search Settings" Grid.Row="0" Margin="5">
-                <WrapPanel Margin="5">
-                    <WrapPanel.Resources>
-                        <Style TargetType="StackPanel">
-                            <Setter Property="Margin" Value="0,0,25,0" />
-                        </Style>
-                    </WrapPanel.Resources>
-                    
-                    <StackPanel Orientation="Vertical">
-                        <Label Content="Pal" />
-                        <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{Binding SearchSettings.PalOptions}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label">
-                            <dnkc:AutoCompleteComboBox.ItemTemplate>
-                                <DataTemplate DataType="mvm:PalViewModel">
-                                    <TextBlock Text="{Binding Label}" />
-                                </DataTemplate>
-                            </dnkc:AutoCompleteComboBox.ItemTemplate>
-                        </dnkc:AutoCompleteComboBox>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Vertical">
-                        <Label Content="Gender" />
-                        <ComboBox ItemsSource="{Binding SearchSettings.GenderOptions}" SelectedItem="{Binding SearchSettings.SearchedGender}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate DataType="{x:Type svm:GenderOption}">
-                                    <TextBlock Text="{Binding Label}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Vertical">
-                        <StackPanel.Resources>
-                            <Style TargetType="dnkc:AutoCompleteComboBox">
-                                <Setter Property="Margin" Value="0,0,10,0" />
-                                <Setter Property="Width" Value="150" />
+                <StackPanel Orientation="Vertical">
+                    <WrapPanel Margin="5">
+                        <WrapPanel.Resources>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Margin" Value="0,0,25,0" />
                             </Style>
-                        </StackPanel.Resources>
-                        <Label Content="Traits" />
-                        <WrapPanel Orientation="Horizontal">
-                            <WrapPanel.Resources>
-                                <DataTemplate x:Key="TraitTemplate" DataType="{x:Type mvm:TraitViewModel}">
-                                    <TextBlock Text="{Binding Name}" />
-                                </DataTemplate>
-                            </WrapPanel.Resources>
+                        </WrapPanel.Resources>
 
-                            <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait1}" ItemTemplate="{StaticResource TraitTemplate}" />
-                            <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait2}" ItemTemplate="{StaticResource TraitTemplate}" />
-                            <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait3}" ItemTemplate="{StaticResource TraitTemplate}" />
-                            <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait4}" ItemTemplate="{StaticResource TraitTemplate}" />
-                        </WrapPanel>
-                    </StackPanel>
-                </WrapPanel>
-                
+                        <StackPanel Orientation="Vertical">
+                            <Label Content="Pal" />
+                            <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{Binding SearchSettings.PalOptions}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label">
+                                <dnkc:AutoCompleteComboBox.ItemTemplate>
+                                    <DataTemplate DataType="mvm:PalViewModel">
+                                        <TextBlock Text="{Binding Label}" />
+                                    </DataTemplate>
+                                </dnkc:AutoCompleteComboBox.ItemTemplate>
+                            </dnkc:AutoCompleteComboBox>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <Label Content="Gender" />
+                            <ComboBox ItemsSource="{Binding SearchSettings.GenderOptions}" SelectedItem="{Binding SearchSettings.SearchedGender}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type svm:GenderOption}">
+                                        <TextBlock Text="{Binding Label}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel.Resources>
+                                <Style TargetType="dnkc:AutoCompleteComboBox">
+                                    <Setter Property="Margin" Value="0,0,10,0" />
+                                    <Setter Property="Width" Value="150" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <Label Content="Traits" />
+                            <WrapPanel Orientation="Horizontal">
+                                <WrapPanel.Resources>
+                                    <DataTemplate x:Key="TraitTemplate" DataType="{x:Type mvm:TraitViewModel}">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </DataTemplate>
+                                </WrapPanel.Resources>
+
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait1}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait2}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait3}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait4}" ItemTemplate="{StaticResource TraitTemplate}" />
+                            </WrapPanel>
+                        </StackPanel>
+                    </WrapPanel>
+
+                    <Button Width="80" Margin="5" HorizontalAlignment="Left" Command="{Binding SearchSettings.ResetCommand}">Reset</Button>
+                </StackPanel>
             </GroupBox>
 
             <!-- scrolling works when you hover over the background but not when hovering over the container contents

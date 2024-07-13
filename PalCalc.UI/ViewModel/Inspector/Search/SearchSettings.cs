@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
@@ -22,6 +23,21 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
     public partial class SearchSettingsViewModel : ObservableObject
     {
+        public SearchSettingsViewModel()
+        {
+            ResetCommand = new RelayCommand(
+                execute: () =>
+                {
+                    SearchedPal = null;
+                    SearchedGender = GenderOption.AnyGender;
+                    SearchedTrait1 = null;
+                    SearchedTrait2 = null;
+                    SearchedTrait3 = null;
+                    SearchedTrait4 = null;
+                }
+            );
+        }
+
         [NotifyPropertyChangedFor(nameof(AsCriteria))]
         [ObservableProperty]
         private PalViewModel searchedPal;
@@ -72,5 +88,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 return new AllOfSearchCriteria(criteria);
             }
         }
+
+        public IRelayCommand ResetCommand { get; }
     }
 }

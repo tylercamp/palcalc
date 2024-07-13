@@ -24,6 +24,30 @@ namespace PalCalc.UI.ViewModel.Inspector
 
             OwnerTree = new OwnerTreeViewModel(csg, containers.ToList());
             SearchSettings = new SearchSettingsViewModel();
+
+            OwnerTree.PropertyChanged += OwnerTree_PropertyChanged;
+            SearchSettings.PropertyChanged += SearchSettings_PropertyChanged;
+        }
+
+        private void ApplySearchSettings()
+        {
+            OwnerTree.SelectedSource.Container.SearchCriteria = SearchSettings.AsCriteria;
+            foreach (var grid in OwnerTree.SelectedSource.Container.Grids)
+                grid.SearchCriteria = SearchSettings.AsCriteria;
+        }
+
+        private void OwnerTree_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != nameof(OwnerTree.SelectedSource) || OwnerTree.SelectedSource == null) return;
+
+            ApplySearchSettings();
+        }
+
+        private void SearchSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != nameof(SearchSettings.AsCriteria) || OwnerTree.SelectedSource == null) return;
+
+            ApplySearchSettings();
         }
     }
 }

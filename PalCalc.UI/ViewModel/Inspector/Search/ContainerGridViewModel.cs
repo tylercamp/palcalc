@@ -4,6 +4,7 @@ using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,16 +15,19 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 {
     public interface IContainerGridSlotViewModel {}
 
-    public class ContainerGridPalSlotViewModel : IContainerGridSlotViewModel
+    public partial class ContainerGridPalSlotViewModel : ObservableObject, IContainerGridSlotViewModel
     {
         public PalInstance PalInstance { get; set; }
 
         public PalViewModel Pal => new PalViewModel(PalInstance.Pal);
+
+        [ObservableProperty]
+        private bool matches = true;
     }
 
     public class ContainerGridEmptySlotViewModel : IContainerGridSlotViewModel { }
 
-    public partial class ContainerGridViewModel : ObservableObject
+    public partial class ContainerGridViewModel(List<PalInstance> contents) : ObservableObject
     {
         private static ContainerGridViewModel designerInstance;
         public static ContainerGridViewModel DesignerInstance
@@ -34,11 +38,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 {
                     var c = CachedSaveGame.SampleForDesignerView.OwnedPals.GroupBy(p => p.Location.ContainerId).First();
 
-                    designerInstance = new ContainerGridViewModel()
+                    designerInstance = new ContainerGridViewModel(c.ToList())
                     {
                         Title = "Tab 1",
-                        PerRow = 5,
-                        Contents = c.ToList()
+                        PerRow = 5
                     };
                 }
                 return designerInstance;
@@ -48,21 +51,30 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         [ObservableProperty]
         private int perRow = 5;
 
-        [NotifyPropertyChangedFor(nameof(Slots))]
-        [ObservableProperty]
-        private List<PalInstance> contents;
+        public List<PalInstance> Contents => contents;
 
-        //public int NumRows => (int)Math.Ceiling(Contents.Max(p => p.Location.Index + 1) / (float)PerRow);
+        public ISearchCriteria SearchCriteria
+        {
+            set
+            {
+                foreach (var slot in Slots.Where(s => s is ContainerGridPalSlotViewModel).Cast<ContainerGridPalSlotViewModel>())
+                    slot.Matches = value.Matches(slot.PalInstance);
+
+                OnPropertyChanged(nameof(GridVisibility));
+            }
+        }
+
+        public Visibility GridVisibility => Title == null || Slots.Any(s => (s as ContainerGridPalSlotViewModel)?.Matches == true) ? Visibility.Visible : Visibility.Collapsed;
 
         public string Title { get; set; }
         public Visibility TitleVisibility => Title == null ? Visibility.Collapsed : Visibility.Visible;
 
-        public List<IContainerGridSlotViewModel> Slots => Contents == null ? [] :
-            Contents
+        public List<IContainerGridSlotViewModel> Slots { get; } = contents == null ? [] :
+            contents
                 .Select<PalInstance, IContainerGridSlotViewModel>(p =>
                 {
                     if (p == null) return new ContainerGridEmptySlotViewModel();
-                    else return new ContainerGridPalSlotViewModel() { PalInstance = p };
+                    else return new ContainerGridPalSlotViewModel() { PalInstance = p, Matches = true };
                 })
                 .ToList();
     }

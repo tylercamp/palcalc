@@ -31,22 +31,37 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         public int RowsPerPage { get; } = 5;
 
+        public ISearchCriteria SearchCriteria
+        {
+            set
+            {
+                foreach (var grid in Grids)
+                    grid.SearchCriteria = value;
+            }
+        }
+
+        private List<ContainerGridViewModel> grids = null;
         public List<ContainerGridViewModel> Grids
         {
             get
             {
-                if (!HasPages)
+                if (grids == null)
                 {
-                    return [new ContainerGridViewModel() { PerRow = PerRow, Contents = Contents }];
+                    if (!HasPages)
+                    {
+                        grids = [new ContainerGridViewModel(Contents) { PerRow = PerRow }];
+                    }
+                    else
+                    {
+                        grids = Contents
+                            .Batched(PerRow * RowsPerPage).ToList()
+                            .ZipWithIndex()
+                            .Select(pair => new ContainerGridViewModel(pair.Item1.ToList()) { Title = $"Tab {pair.Item2 + 1}", PerRow = PerRow })
+                            .ToList();
+                    }
                 }
-                else
-                {
-                    var pages = Contents.Batched(PerRow * RowsPerPage).ToList();
 
-                    return pages.Zip(Enumerable.Range(1, pages.Count))
-                        .Select(pair => new ContainerGridViewModel() { Title = $"Tab {pair.Second}", Contents = pair.First.ToList(), PerRow = PerRow })
-                        .ToList();
-                }
+                return grids;
             }
         }
     }

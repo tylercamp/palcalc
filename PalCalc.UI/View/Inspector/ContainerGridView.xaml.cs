@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PalCalc.UI.ViewModel.Inspector.Search;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
