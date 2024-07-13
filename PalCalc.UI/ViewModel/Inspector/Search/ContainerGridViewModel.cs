@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search
@@ -35,6 +36,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
                     designerInstance = new ContainerGridViewModel()
                     {
+                        Title = "Tab 1",
                         PerRow = 5,
                         Contents = c.ToList()
                     };
@@ -52,12 +54,13 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         //public int NumRows => (int)Math.Ceiling(Contents.Max(p => p.Location.Index + 1) / (float)PerRow);
 
+        public string Title { get; set; }
+        public Visibility TitleVisibility => Title == null ? Visibility.Collapsed : Visibility.Visible;
+
         public List<IContainerGridSlotViewModel> Slots => Contents == null ? [] :
-            Enumerable
-                .Range(0, Contents.Max(p => p.Location.Index) + 1)
-                .Select<int, IContainerGridSlotViewModel>(i =>
+            Contents
+                .Select<PalInstance, IContainerGridSlotViewModel>(p =>
                 {
-                    var p = Contents.FirstOrDefault(p => p.Location.Index == i);
                     if (p == null) return new ContainerGridEmptySlotViewModel();
                     else return new ContainerGridPalSlotViewModel() { PalInstance = p };
                 })

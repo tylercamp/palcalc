@@ -11,7 +11,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 {
     public interface IOwnerTreeNode
     {
-        public string Label { get; }
+        string Label { get; }
+        List<IOwnerTreeNode> Children => [];
+
+        public IEnumerable<IOwnerTreeNode> AllChildren => Children.Concat(Children.SelectMany(c => c.AllChildren));
     }
 
     public interface IContainerSource

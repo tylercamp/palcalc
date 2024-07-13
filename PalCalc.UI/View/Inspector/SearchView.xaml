@@ -52,8 +52,22 @@
                 <RowDefinition Height="173*"/>
             </Grid.RowDefinitions>
 
-
-            <local:ContainerGridView DataContext="{Binding OwnerTree.SelectedSource.Container.Grid}" Grid.Row="1" />
+            <!-- scrolling works when you hover over the background but not when hovering over the container contents
+                 and for the life of me I cannot figure out why -->
+            <ScrollViewer Grid.Row="1">
+                <ItemsControl ItemsSource="{Binding OwnerTree.SelectedSource.Container.Grids}" HorizontalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type svm:ContainerGridViewModel}">
+                            <local:ContainerGridView DataContext="{Binding}" Margin="0,0,0,25" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Grid>
 
     </Grid>
