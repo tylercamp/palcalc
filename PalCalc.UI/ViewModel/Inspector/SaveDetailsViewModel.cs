@@ -106,9 +106,7 @@ namespace PalCalc.UI.ViewModel.Inspector
                         {
                             var mostCommonGuild = owners
                                 .Select(o => rawData.Groups.Single(g => g.MemberIds.Contains(o)).Id)
-                                .GroupBy(id => id)
-                                .MaxBy(g => g.Count())
-                                .Key;
+                                .MostCommonOrDefault();
 
                             return new InspectedContainerDetailsViewModel(
                                 ownersById.GetValueOrElse(mostCommonGuild, OwnerViewModel.UnknownWithId(mostCommonGuild)),
