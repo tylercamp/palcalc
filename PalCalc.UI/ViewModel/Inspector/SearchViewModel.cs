@@ -14,6 +14,7 @@ namespace PalCalc.UI.ViewModel.Inspector
         public static SearchViewModel DesignerInstance => designerInstance ??= new SearchViewModel(CachedSaveGame.SampleForDesignerView);
 
         public OwnerTreeViewModel OwnerTree { get; }
+        public SearchSettingsViewModel SearchSettings { get; }
 
         public SearchViewModel(CachedSaveGame csg)
         {
@@ -22,6 +23,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             var containers = palsByContainerId.Select(kvp => new ContainerViewModel(kvp.Key, kvp.Value.First().Location.Type, kvp.Value));
 
             OwnerTree = new OwnerTreeViewModel(csg, containers.ToList());
+            SearchSettings = new SearchSettingsViewModel();
         }
     }
 }

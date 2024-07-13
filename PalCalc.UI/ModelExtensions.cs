@@ -17,5 +17,15 @@ namespace PalCalc.UI
                 LocationType.PlayerParty => "Party",
                 _ => throw new NotImplementedException()
             };
+
+        public static string Label(this PalGender gender) =>
+            gender switch
+            {
+                PalGender.FEMALE => "Female",
+                PalGender.MALE => "Male",
+                PalGender.WILDCARD => "Any Gender",
+                PalGender.OPPOSITE_WILDCARD => "Opposite Gender",
+                _ => throw new NotImplementedException()
+            };
     }
 }

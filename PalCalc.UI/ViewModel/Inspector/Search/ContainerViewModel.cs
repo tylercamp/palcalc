@@ -44,7 +44,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     var pages = Contents.Batched(PerRow * RowsPerPage).ToList();
 
                     return pages.Zip(Enumerable.Range(1, pages.Count))
-                        .Select(pair => new ContainerGridViewModel() { Title = $"Page {pair.Second}", Contents = pair.First.ToList(), PerRow = PerRow })
+                        .Select(pair => new ContainerGridViewModel() { Title = $"Tab {pair.Second}", Contents = pair.First.ToList(), PerRow = PerRow })
                         .ToList();
                 }
             }

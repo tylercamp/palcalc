@@ -6,6 +6,8 @@
              xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
              xmlns:ivm="clr-namespace:PalCalc.UI.ViewModel.Inspector"
              xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
+             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+             xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              mc:Ignorable="d" 
              d:DataContext="{x:Static ivm:SearchViewModel.DesignerInstance}"
              d:Background="White"
@@ -22,7 +24,7 @@
             <ColumnDefinition Width="20*" MinWidth="100"/>
         </Grid.ColumnDefinitions>
 
-        <GroupBox Header="Pal Containers" Grid.Column="0">
+        <GroupBox Header="Pal Containers" Grid.Column="0" Margin="5">
             <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
@@ -48,9 +50,64 @@
 
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="52*"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="173*"/>
             </Grid.RowDefinitions>
+
+            <GroupBox Header="Search Settings" Grid.Row="0" Margin="5">
+                <WrapPanel Margin="5">
+                    <WrapPanel.Resources>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Margin" Value="0,0,25,0" />
+                        </Style>
+                    </WrapPanel.Resources>
+                    
+                    <StackPanel Orientation="Vertical">
+                        <Label Content="Pal" />
+                        <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{Binding SearchSettings.PalOptions}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label">
+                            <dnkc:AutoCompleteComboBox.ItemTemplate>
+                                <DataTemplate DataType="mvm:PalViewModel">
+                                    <TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </dnkc:AutoCompleteComboBox.ItemTemplate>
+                        </dnkc:AutoCompleteComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical">
+                        <Label Content="Gender" />
+                        <ComboBox ItemsSource="{Binding SearchSettings.GenderOptions}" SelectedItem="{Binding SearchSettings.SearchedGender}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type svm:GenderOption}">
+                                    <TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel.Resources>
+                            <Style TargetType="dnkc:AutoCompleteComboBox">
+                                <Setter Property="Margin" Value="0,0,10,0" />
+                                <Setter Property="Width" Value="150" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <Label Content="Traits" />
+                        <WrapPanel Orientation="Horizontal">
+                            <WrapPanel.Resources>
+                                <DataTemplate x:Key="TraitTemplate" DataType="{x:Type mvm:TraitViewModel}">
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </WrapPanel.Resources>
+
+                            <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait1}" ItemTemplate="{StaticResource TraitTemplate}" />
+                            <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait2}" ItemTemplate="{StaticResource TraitTemplate}" />
+                            <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait3}" ItemTemplate="{StaticResource TraitTemplate}" />
+                            <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait4}" ItemTemplate="{StaticResource TraitTemplate}" />
+                        </WrapPanel>
+                    </StackPanel>
+                </WrapPanel>
+                
+            </GroupBox>
 
             <!-- scrolling works when you hover over the background but not when hovering over the container contents
                  and for the life of me I cannot figure out why -->
@@ -58,12 +115,12 @@
                 <ItemsControl ItemsSource="{Binding OwnerTree.SelectedSource.Container.Grids}" HorizontalAlignment="Center">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <StackPanel />
+                            <WrapPanel />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type svm:ContainerGridViewModel}">
-                            <local:ContainerGridView DataContext="{Binding}" Margin="0,0,0,25" />
+                            <local:ContainerGridView DataContext="{Binding}" Margin="15" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
