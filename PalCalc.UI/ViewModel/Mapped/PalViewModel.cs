@@ -21,6 +21,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         public Pal ModelObject { get; }
 
         public ImageSource Icon => PalIcon.Images[ModelObject];
+        public ImageBrush IconBrush => PalIcon.ImageBrushes[ModelObject];
 
         public string Label => ModelObject == null ? "" : $"{ModelObject.Name} (#{ModelObject.Id})";
 

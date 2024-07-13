@@ -15,10 +15,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
     public class PalContainerSlotDetailsViewModel(string instanceId, PalInstance pal, GvasCharacterInstance rawPal) : IContainerSlotDetailsViewModel
     {
         public string DisplayName => pal?.Pal?.Name ?? rawPal?.CharacterId ?? InstanceId;
-        public ImageSource Icon =>
-            pal == null
-                ? PalIcon.DefaultIcon
-                : PalIcon.Images[pal.Pal];
+        public ImageSource Icon => pal == null ? PalIcon.DefaultIcon : PalIcon.Images[pal.Pal];
+        public ImageBrush IconBrush => pal == null ? PalIcon.DefaultIconBrush : PalIcon.ImageBrushes[pal.Pal];
 
         public string InstanceId => instanceId;
         public PalInstance Instance => pal;

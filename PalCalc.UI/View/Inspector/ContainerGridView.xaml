@@ -31,11 +31,7 @@
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type svm:ContainerGridPalSlotViewModel}">
                                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <Border.Background>
-                                            <ImageBrush Stretch="Fill" ImageSource="{Binding Pal.Icon}" />
-                                        </Border.Background>
-                                    </Border>
+                                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding Pal.IconBrush}" />
                                 </Grid>
                             </DataTemplate>
                         </ContentControl.Resources>
