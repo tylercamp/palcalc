@@ -36,7 +36,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
     public class PlayerTreeNodeViewModel(PlayerInstance player, ContainerViewModel party, ContainerViewModel palbox) : IOwnerTreeNode
     {
-        public string Label => player.Name;
+        public string Label => $"Player '{player.Name}'";
 
         public List<IOwnerTreeNode> Children { get; } = [
             new PlayerPartyContainerViewModel(party),
@@ -54,7 +54,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
         public GuildTreeNodeViewModel(CachedSaveGame source, GuildInstance guild, List<ContainerViewModel> relevantContainers)
         {
-            Label = guild.Name;
+            Label = $"Guild '{guild.Name}'";
 
             var playerIds = relevantContainers.SelectMany(c => c.OwnerIds).Where(source.PlayersById.ContainsKey).Distinct().ToList();
 
