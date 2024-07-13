@@ -35,13 +35,13 @@
                         <TextBlock Text="{Binding Label}" />
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}">
-                        <TextBlock Text="{Binding Label}" />
+                        <TextBlock Text="{Binding SearchedLabel}" />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
-                        <TextBlock Text="{Binding Label}" />
+                        <TextBlock Text="{Binding SearchedLabel}" />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
-                        <TextBlock Text="{Binding Label}" />
+                        <TextBlock Text="{Binding SearchedLabel}" />
                     </DataTemplate>
                 </TreeView.Resources>
             </TreeView>

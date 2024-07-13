@@ -34,9 +34,12 @@ namespace PalCalc.UI.ViewModel.Inspector
 
         private void ApplySearchSettings()
         {
-            OwnerTree.SelectedSource.Container.SearchCriteria = SearchSettings.AsCriteria;
-            foreach (var grid in OwnerTree.SelectedSource.Container.Grids)
-                grid.SearchCriteria = SearchSettings.AsCriteria;
+            foreach (var source in OwnerTree.AllContainerSources)
+                source.SearchCriteria = SearchSettings.AsCriteria;
+
+            //OwnerTree.SelectedSource.SearchCriteria = SearchSettings.AsCriteria;
+            //foreach (var grid in OwnerTree.SelectedSource.Container.Grids)
+            //    grid.SearchCriteria = SearchSettings.AsCriteria;
         }
 
         private void OwnerTree_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
@@ -56,7 +59,6 @@ namespace PalCalc.UI.ViewModel.Inspector
 
                 if (OwnerTree.SelectedSource != null)
                 {
-                    ApplySearchSettings();
                     OwnerTree.SelectedSource.Container.PropertyChanged += SelectedContainer_PropertyChanged;
                 }
             }
@@ -66,8 +68,7 @@ namespace PalCalc.UI.ViewModel.Inspector
         {
             if (e.PropertyName == nameof(SearchSettings.AsCriteria))
             {
-                if (OwnerTree.SelectedSource != null)
-                    ApplySearchSettings();
+                ApplySearchSettings();
             }
         }
 
