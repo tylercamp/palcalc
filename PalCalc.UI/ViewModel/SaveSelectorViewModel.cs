@@ -209,7 +209,7 @@ namespace PalCalc.UI.ViewModel
                 {
                     var vm = new SaveInspectorWindowViewModel(SelectedGame.CachedValue);
                     var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
-                    inspector.ShowDialog();
+                    inspector.Show();
                 },
                 canExecute: () => SelectedGame != null && !SelectedGame.IsAddManualOption && SelectedGame?.CachedValue != null
             );

@@ -6,10 +6,9 @@
         xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
         xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector"
         mc:Ignorable="d"
-        WindowStyle="ToolWindow"
         WindowStartupLocation="CenterOwner"
         d:DataContext="{x:Static svm:SaveInspectorWindowViewModel.DesignerInstance}"
-        Title="Save File Inspector" Height="450" Width="900">
+        Title="{Binding WindowTitle}" Height="450" Width="900">
     <TabControl>
         <TabItem Header="Search">
             <local:SearchView DataContext="{Binding Search}" />

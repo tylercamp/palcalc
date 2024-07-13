@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,8 @@ namespace PalCalc.UI.ViewModel.Inspector
         public SearchViewModel Search { get; }
         public SaveDetailsViewModel Details { get; }
 
+        public string WindowTitle { get; }
+
         public SaveInspectorWindowViewModel(CachedSaveGame csg)
         {
             var rawData = csg.UnderlyingSave.Level.ReadRawCharacterData();
@@ -24,6 +27,8 @@ namespace PalCalc.UI.ViewModel.Inspector
 
             Search = new SearchViewModel(csg);
             Details = new SaveDetailsViewModel(csg, rawData, players);
+
+            WindowTitle = $"Save Inspector - {new SaveGameViewModel(csg.UnderlyingSave).Label}";
         }
     }
 }
