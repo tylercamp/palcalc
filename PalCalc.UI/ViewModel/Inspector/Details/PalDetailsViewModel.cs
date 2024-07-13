@@ -18,41 +18,42 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
     public class PalDetailsViewModel(PalInstance pal, GvasCharacterInstance rawData)
     {
         public List<PalDetailsProperty> PalProperties { get; } = pal == null ? [] :
-            new Dictionary<string, object>()
-            {
-                { "Pal", pal.Pal.Name },
-                { "Paldex #", pal.Pal.Id.PalDexNo },
-                { "Paldex Is Variant", pal.Pal.Id.IsVariant },
-                { "Gender", pal.Gender },
-                { "Detected Owner ID", pal.OwnerPlayerId },
-            }
-            .Select(kvp => new PalDetailsProperty() { Key = kvp.Key, Value = kvp.Value?.ToString() ?? "null" })
-            .Concat(pal.Traits.Zip(Enumerable.Range(1, pal.Traits.Count)).Select(t => new PalDetailsProperty() { Key = $"Trait {t.Second}", Value = t.First.Name }))
+            ((ReadOnlySpan<(string, object)>)[
+                ( "Pal", pal.Pal.Name ),
+                ( "Paldex #", pal.Pal.Id.PalDexNo ),
+                ( "Paldex Is Variant", pal.Pal.Id.IsVariant ),
+                ( "Gender", pal.Gender ),
+                ( "Detected Owner ID", pal.OwnerPlayerId ),
+                .. pal.Traits.ZipWithIndex().Select(p => ($"Trait {p.Item2+1}", p.Item1.Name))
+            ])
+            .ToArray()
+            .Select(p => new PalDetailsProperty() { Key = p.Item1, Value = p.Item2?.ToString() ?? "null" })
             .ToList();
 
         public List<PalDetailsProperty> RawProperties { get; } = rawData == null ? [] :
-            new Dictionary<string, object>()
-            {
-                { "CharacterId", rawData.CharacterId },
-                { "NickName", rawData.NickName },
-                { "Level", rawData.Level },
-                { "RawGender", rawData.Gender },
+            ((ReadOnlySpan<(string, object)>)[
+                ( "CharacterId", rawData.CharacterId ),
+                ( "NickName", rawData.NickName ),
+                ( "Level", rawData.Level ),
+                ( "RawGender", rawData.Gender ),
 
-                { "IsPlayer", rawData.IsPlayer },
+                ( "IsPlayer", rawData.IsPlayer ),
 
-                { "InstanceId", rawData.InstanceId },
-                { "OwnerPlayerId", rawData.OwnerPlayerId },
-                { "OldOwnerPlayerIds", string.Join(", ", rawData.OldOwnerPlayerIds) },
+                ( "InstanceId", rawData.InstanceId ),
+                ( "OwnerPlayerId", rawData.OwnerPlayerId ),
+                ( "OldOwnerPlayerIds", string.Join(", ", rawData.OldOwnerPlayerIds) ),
 
-                { "SlotIndex", rawData.SlotIndex },
+                ( "SlotIndex", rawData.SlotIndex ),
 
-                { "TalentHp", rawData.TalentHp },
-                { "TalentShot", rawData.TalentShot },
-                { "TalentMelee", rawData.TalentMelee },
-                { "TalentDefense", rawData.TalentDefense },
-            }
-            .Select(kvp => new PalDetailsProperty() { Key = kvp.Key, Value = kvp.Value?.ToString() ?? "null" })
-            .Concat(rawData.Traits.Zip(Enumerable.Range(1, rawData.Traits.Count)).Select(t => new PalDetailsProperty() { Key = $"Trait {t.Second}", Value = t.First }))
+                ( "TalentHp", rawData.TalentHp ),
+                ( "TalentShot", rawData.TalentShot ),
+                ( "TalentMelee", rawData.TalentMelee ),
+                ( "TalentDefense", rawData.TalentDefense ),
+
+                .. rawData.Traits.ZipWithIndex().Select(p => ($"Trait {p.Item2+1}", p.Item1))
+            ])
+            .ToArray()
+            .Select(kvp => new PalDetailsProperty() { Key = kvp.Item1, Value = kvp.Item2?.ToString() ?? "null" })
             .ToList();
     }
 }

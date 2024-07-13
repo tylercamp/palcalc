@@ -17,7 +17,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
         LocationType? locationType
     ) : ObservableObject
     {
-        // TODO - change from SingleOrDefault to Single when human pals are handled
         public List<IContainerSlotDetailsViewModel> Slots { get; } = Enumerable.Range(0, rawContainer.MaxEntries)
             .Select(i => rawContainer.Slots.SingleOrDefault(s => s.SlotIndex == i))
             .Select<PalContainerSlot, IContainerSlotDetailsViewModel>(s =>
@@ -35,7 +34,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
         public int UsedSlots => rawContainer.NumEntries;
 
         public string Id => rawContainer.Id;
-        public OwnerViewModel Owner { get; } = owner;
+        public OwnerViewModel Owner => owner;
         public string Type => locationType?.Label() ?? "Unknown";
     }
 }

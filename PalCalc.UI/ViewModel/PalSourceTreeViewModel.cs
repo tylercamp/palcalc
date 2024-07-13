@@ -109,7 +109,7 @@ namespace PalCalc.UI.ViewModel
     public partial class PalSourceTreeViewModel : ObservableObject
     {
         // for XAML designer view
-        public PalSourceTreeViewModel() : this(DirectSavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).OrderBy(g => g.LastModified).Select(g => Storage.LoadSave(g, PalDB.LoadEmbedded())).First())
+        public PalSourceTreeViewModel() : this(CachedSaveGame.SampleForDesignerView)
         {
 
         }

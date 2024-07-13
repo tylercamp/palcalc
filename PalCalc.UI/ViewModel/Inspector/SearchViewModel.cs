@@ -36,10 +36,6 @@ namespace PalCalc.UI.ViewModel.Inspector
         {
             foreach (var source in OwnerTree.AllContainerSources)
                 source.SearchCriteria = SearchSettings.AsCriteria;
-
-            //OwnerTree.SelectedSource.SearchCriteria = SearchSettings.AsCriteria;
-            //foreach (var grid in OwnerTree.SelectedSource.Container.Grids)
-            //    grid.SearchCriteria = SearchSettings.AsCriteria;
         }
 
         private void OwnerTree_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)

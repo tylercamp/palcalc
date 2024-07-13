@@ -65,7 +65,6 @@ namespace PalCalc.UI.ViewModel.Inspector
 
             Containers = rawData.Containers.Select(c =>
             {
-                // TODO - handle characters which aren't properly detected as pals (e.g. captured humans)
                 var containedPals = c.Slots
                     .Select(s => csg.OwnedPals.SingleOrDefault(p => p.InstanceId == s.InstanceId.ToString()))
                     .SkipNull()

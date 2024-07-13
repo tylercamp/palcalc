@@ -101,6 +101,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             var playerNodes = playerIds
                 .Select(pid =>
                 {
+                    // TODO - make use of player data to get palbox + party container IDs directly
                     var player = source.Players.Single(p => p.PlayerId == pid);
                     return new PlayerTreeNodeViewModel(
                         player: player,
@@ -110,6 +111,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 })
                 .ToList();
 
+            // TODO - eventually add support for viewing cages
             var baseContainers = relevantContainers
                 .Where(c => c.DetectedType == LocationType.Base)
                 .OrderBy(c => c.Id)
