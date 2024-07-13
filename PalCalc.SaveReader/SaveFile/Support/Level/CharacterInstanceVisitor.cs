@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile.Support.Level
 {
-    class GvasCharacterInstance
+    public class GvasCharacterInstance
     {
         public Guid InstanceId { get; set; }
         public string NickName { get; set; }
@@ -64,7 +64,6 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         static readonly List<string> REQUIRED_PAL_PROPS = new List<string>()
         {
             K_CHARACTER_ID,
-            K_GENDER,
             K_CONTAINER_ID,
             K_CONTAINER_SLOT_INDEX,
         };
@@ -122,7 +121,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     
                     pendingInstance.OwnerPlayerId = (Guid?)vals.GetValueOrDefault(K_OWNER_PLAYER_ID);
                     pendingInstance.CharacterId = (string)vals[K_CHARACTER_ID];
-                    pendingInstance.Gender = (string)vals[K_GENDER];
+                    pendingInstance.Gender = (string)vals.GetValueOrDefault(K_GENDER);
 
                     pendingInstance.ContainerId = (Guid)vals[K_CONTAINER_ID];
                     pendingInstance.SlotIndex = (int)vals[K_CONTAINER_SLOT_INDEX];

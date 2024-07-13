@@ -16,6 +16,13 @@ namespace PalCalc.SaveReader.SaveFile
         public List<GuildInstance> Guilds { get; set; }
     }
 
+    public class RawLevelSaveData
+    {
+        public List<GvasCharacterInstance> Characters { get; set; }
+        public List<PalContainer> Containers { get; set; }
+        public List<GuildInstance> Groups { get; set; }
+    }
+
     public class LevelSaveFile : ISaveFile
     {
         private static ILogger logger = Log.ForContext<LevelSaveFile>();
@@ -23,6 +30,21 @@ namespace PalCalc.SaveReader.SaveFile
         public LevelSaveFile(string filePath) : base(filePath) { }
 
         private Guid MostCommonOwner(PalContainer container, Dictionary<Guid, Guid> palOwnersByInstanceId) => container.Slots.GroupBy(s => palOwnersByInstanceId.GetValueOrElse(s.InstanceId, Guid.Empty)).MaxBy(g => g.Count()).Key;
+
+        public RawLevelSaveData ReadRawCharacterData()
+        {
+            var containerVisitor = new PalContainerVisitor();
+            var instanceVisitor = new CharacterInstanceVisitor();
+            var groupVisitor = new GroupVisitor();
+            VisitGvas(containerVisitor, instanceVisitor, groupVisitor);
+
+            return new RawLevelSaveData()
+            {
+                Characters = instanceVisitor.Result,
+                Containers = containerVisitor.CollectedContainers,
+                Groups = groupVisitor.Result
+            };
+        }
 
         private LevelSaveData BuildResult(PalDB db, List<GvasCharacterInstance> characters, List<GuildInstance> guilds, List<PalContainer> containers, Dictionary<string, LocationType> containerTypeById)
         {
@@ -105,6 +127,7 @@ namespace PalCalc.SaveReader.SaveFile
                         Traits = traits,
                         Location = new PalLocation()
                         {
+                            ContainerId = gvasInstance.ContainerId.ToString(),
                             Type = containerTypeById[gvasInstance.ContainerId.ToString()],
                             Index = gvasInstance.SlotIndex,
                         }
@@ -125,14 +148,11 @@ namespace PalCalc.SaveReader.SaveFile
 
             logger.Debug("parsing content with players list");
 
-            var containerVisitor = new PalContainerVisitor();
-            var instanceVisitor = new CharacterInstanceVisitor();
-            var groupVisitor = new GroupVisitor();
-            VisitGvas(containerVisitor, instanceVisitor, groupVisitor);
+            var parsed = ReadRawCharacterData();
 
             var players = playersFiles.Select(pf => pf.ReadPlayerContent()).ToList();
 
-            var containerTypeById = containerVisitor.CollectedContainers.ToDictionary(c => c.Id, c =>
+            var containerTypeById = parsed.Containers.ToDictionary(c => c.Id, c =>
             {
                 if (players.Any(p => p.PartyContainerId == c.Id)) return LocationType.PlayerParty;
                 if (players.Any(p => p.PalboxContainerId == c.Id)) return LocationType.Palbox;
@@ -140,7 +160,7 @@ namespace PalCalc.SaveReader.SaveFile
                 return LocationType.Base;
             });
 
-            var result = BuildResult(db, instanceVisitor.Result, groupVisitor.Result, containerVisitor.CollectedContainers, containerTypeById);
+            var result = BuildResult(db, parsed.Characters, parsed.Groups, parsed.Containers, containerTypeById);
             logger.Debug("done");
             return result;
         }
@@ -152,20 +172,17 @@ namespace PalCalc.SaveReader.SaveFile
         {
             logger.Debug("parsing content");
 
-            var containerVisitor = new PalContainerVisitor();
-            var instanceVisitor = new CharacterInstanceVisitor();
-            var groupVisitor = new GroupVisitor();
-            VisitGvas(containerVisitor, instanceVisitor, groupVisitor);
+            var parsed = ReadRawCharacterData();
 
             logger.Debug("processing data");
 
-            var ownersByInstanceId = instanceVisitor.Result.Where(c => c.OwnerPlayerId != null).ToDictionary(c => c.InstanceId, c => c.OwnerPlayerId.Value);
+            var ownersByInstanceId = parsed.Characters.Where(c => c.OwnerPlayerId != null).ToDictionary(c => c.InstanceId, c => c.OwnerPlayerId.Value);
 
-            var containersById = containerVisitor.CollectedContainers.ToDictionary(c => c.Id);
-            var containerOwners = containerVisitor.CollectedContainers.ToDictionary(c => c.Id, c => MostCommonOwner(c, ownersByInstanceId));
-            var palBoxesByPlayerId = containerVisitor.CollectedContainers.Where(c => c.Slots.Count > GameConstants.PlayerPartySize).GroupBy(c => MostCommonOwner(c, ownersByInstanceId)).ToDictionary(g => g.Key, g => g.MaxBy(c => c.MaxEntries));
+            var containersById = parsed.Containers.ToDictionary(c => c.Id);
+            var containerOwners = parsed.Containers.ToDictionary(c => c.Id, c => MostCommonOwner(c, ownersByInstanceId));
+            var palBoxesByPlayerId = parsed.Containers.Where(c => c.Slots.Count > GameConstants.PlayerPartySize).GroupBy(c => MostCommonOwner(c, ownersByInstanceId)).ToDictionary(g => g.Key, g => g.MaxBy(c => c.MaxEntries));
 
-            var containerTypeById = containerVisitor.CollectedContainers.ToDictionary(c => c.Id, c =>
+            var containerTypeById = parsed.Containers.ToDictionary(c => c.Id, c =>
             {
                 if (c.MaxEntries == GameConstants.PlayerPartySize) return LocationType.PlayerParty;
 
@@ -175,7 +192,7 @@ namespace PalCalc.SaveReader.SaveFile
                 return LocationType.Base;
             });
 
-            var result = BuildResult(db, instanceVisitor.Result, groupVisitor.Result, containerVisitor.CollectedContainers, containerTypeById);
+            var result = BuildResult(db, parsed.Characters, parsed.Groups, parsed.Containers, containerTypeById);
 
             logger.Debug("done");
             return result;

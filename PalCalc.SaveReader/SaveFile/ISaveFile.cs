@@ -27,7 +27,7 @@ namespace PalCalc.SaveReader.SaveFile
         {
             CompressedSAV.WithDecompressedSave(FilePath, stream =>
             {
-                using (var archiveReader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
+                using (var archiveReader = new FArchiveReader(stream, PalWorldTypeHints.Hints, false))
                     GvasFile.FromFArchive(archiveReader, visitors);
             });
         }

@@ -40,14 +40,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
                     break;
             }
 
-            Gender = node.PalRef.Gender switch
-            {
-                PalGender.MALE => "Male",
-                PalGender.FEMALE => "Female",
-                PalGender.WILDCARD => "Any Gender",
-                PalGender.OPPOSITE_WILDCARD => "Opposite Gender",
-                _ => "Unknown Gender"
-            };
+            Gender = node.PalRef.Gender.Label();
         }
 
         public PalViewModel Pal { get; }

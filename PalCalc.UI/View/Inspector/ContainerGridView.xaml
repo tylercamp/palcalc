@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="PalCalc.UI.View.Inspector.ContainerGridView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
+             xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
+             mc:Ignorable="d" 
+             Visibility="{Binding GridVisibility}"
+             d:DataContext="{x:Static svm:ContainerGridViewModel.DesignerInstance}"
+             d:Background="White">
+    <StackPanel>
+        <Label Content="{Binding Title}" Visibility="{Binding TitleVisibility}" FontWeight="Bold" />
+        <ListView ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="6" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=Matches, Mode=TwoWay}" Value="False">
+                            <Setter Property="IsEnabled" Value="False" />
+                            <Setter Property="Opacity" Value="0.25" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                    
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding}">
+                        <ContentControl.Resources>
+                            <DataTemplate DataType="{x:Type svm:ContainerGridEmptySlotViewModel}">
+                                <Grid />
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type svm:ContainerGridPalSlotViewModel}">
+                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding Pal.IconBrush}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ContentControl.Resources>
+                    </ContentControl>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackPanel>
+</UserControl>

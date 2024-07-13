@@ -41,6 +41,26 @@ namespace PalCalc.UI.Model
             }
         }
 
+        private static ImageSource defaultIcon;
+        public static ImageSource DefaultIcon
+        {
+            get
+            {
+                if (defaultIcon == null)
+                {
+                    var source = new BitmapImage();
+                    source.BeginInit();
+                    source.StreamSource = ResourceLookup.Get("Pals/Human.png");
+                    source.EndInit();
+                    defaultIcon = source;
+                }
+                return defaultIcon;
+            }
+        }
+
+        private static ImageBrush defaultIconBrush;
+        public static ImageBrush DefaultIconBrush => defaultIconBrush ??= new ImageBrush(DefaultIcon) { Stretch = Stretch.Fill };
+
         private static Dictionary<Pal, ImageSource> images;
         public static Dictionary<Pal, ImageSource> Images
         {
@@ -69,5 +89,8 @@ namespace PalCalc.UI.Model
                 return images;
             }
         }
+
+        private static Dictionary<Pal, ImageBrush> imageBrushes;
+        public static Dictionary<Pal, ImageBrush> ImageBrushes => imageBrushes ??= Images.ToDictionary(kvp => kvp.Key, kvp => new ImageBrush(kvp.Value) { Stretch = Stretch.Fill });
     }
 }

@@ -2,22 +2,31 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile.Support.Level
 {
-    struct PalContainerSlot
+    public class PalContainerSlot
     {
         public Guid InstanceId;
         public Guid PlayerId; // note: not actually useful?
+        public int SlotIndex;
     }
 
-    class PalContainer
+    /* Note:
+     * 
+     * In 0.3.3, containers were updated to no longer store empty slots. Each slot now has a `SlotIndex`
+     * and each container now has a `SlotNum` property. There's also a `CustomVersionData` byte array,
+     * not sure what that's for.
+     */
+
+    public class PalContainer
     {
         public string Id { get; set; }
-        public int MaxEntries => Slots.Count;
+        public int MaxEntries { get; set; }
         public int NumEntries => Slots.Count(s => s.InstanceId != Guid.Empty);
 
         public List<PalContainerSlot> Slots { get; set; }
@@ -39,17 +48,59 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
         class SlotInstanceIdEmittingVisitor : IVisitor
         {
-            public SlotInstanceIdEmittingVisitor(string path) : base(path, "Value.Slots.Slots.RawData") { }
+            public SlotInstanceIdEmittingVisitor(string path) : base(path, "Value.Slots")
+            {
+                pendingSlot = null;
+                numEmitted = 0;
+            }
 
             public Action<PalContainerSlot> OnSlotData;
 
+            PalContainerSlot pendingSlot;
+            int numEmitted;
+
+            public override bool Matches(string path) => path.StartsWith(MatchedPath);
+
+            public override IEnumerable<IVisitor> VisitArrayEntryBegin(string path, int index, ArrayPropertyMeta meta)
+            {
+                if (path != MatchedPath)
+                    yield break;
+                else
+                {
+#if DEBUG
+                    if (pendingSlot != null)
+                        Debugger.Break();
+#endif
+                    pendingSlot = new PalContainerSlot();
+                    pendingSlot.SlotIndex = -1;
+
+                    var vev = new ValueEmittingVisitor(this, ".Slots.SlotIndex");
+                    vev.OnValue += (_, v) => pendingSlot.SlotIndex = (int)v;
+                    yield return vev;
+                }
+            }
+
+            public override void VisitArrayEntryEnd(string path, int index, ArrayPropertyMeta meta)
+            {
+                if (path == MatchedPath)
+                {
+                    if (pendingSlot == null) Debugger.Break();
+
+                    if (pendingSlot.SlotIndex < 0) pendingSlot.SlotIndex = numEmitted++;
+                    OnSlotData?.Invoke(pendingSlot);
+                    pendingSlot = null;
+                }
+            }
+
             public override void VisitCharacterContainerPropertyEnd(string path, CharacterContainerDataPropertyMeta meta)
             {
-                OnSlotData?.Invoke(new PalContainerSlot()
-                {
-                    InstanceId = meta.InstanceId.Value,
-                    PlayerId = meta.PlayerId,
-                });
+#if DEBUG
+                if (pendingSlot == null)
+                    Debugger.Break();
+#endif
+
+                pendingSlot.InstanceId = meta.InstanceId.Value;
+                pendingSlot.PlayerId = meta.PlayerId;
             }
         }
 
@@ -59,8 +110,13 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
             workingContainer = new PalContainer() { Slots = new List<PalContainerSlot>() };
 
-            var keyIdCollector = new ValueCollectingVisitor(this, ".Key.ID");
-            keyIdCollector.OnExit += v => workingContainer.Id = v[".Key.ID"].ToString();
+            var keyIdCollector = new ValueCollectingVisitor(this, ".Key.ID", ".Value.SlotNum");
+            keyIdCollector.OnExit += v =>
+            {
+                workingContainer.Id = v[".Key.ID"].ToString();
+                if (v.ContainsKey(".Value.SlotNum")) workingContainer.MaxEntries = (int)v[".Value.SlotNum"];
+                else workingContainer.MaxEntries = workingContainer.Slots.Count;
+            };
 
             var slotContentIdEmitter = new SlotInstanceIdEmittingVisitor(path);
             slotContentIdEmitter.OnSlotData += slot =>

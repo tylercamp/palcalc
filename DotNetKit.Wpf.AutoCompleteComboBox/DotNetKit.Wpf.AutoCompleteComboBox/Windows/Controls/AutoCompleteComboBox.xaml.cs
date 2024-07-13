@@ -275,8 +275,10 @@ namespace DotNetKit.Windows.Controls
 
         bool SelectItemFromMatchingText(string text)
         {
+            if (ItemsSource == null) return false;
+
             var filter = GetFilter(text);
-            var matchingItems = ItemsSource?.Cast<object>().Where(filter.Invoke).ToList();
+            var matchingItems = ItemsSource.Cast<object>().Where(filter.Invoke).ToList();
             if (matchingItems.Count == 1) SelectedItem = matchingItems.Single();
 
             return matchingItems.Count == 1;
@@ -284,6 +286,8 @@ namespace DotNetKit.Windows.Controls
 
         void ComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (ItemsSource == null) return;
+
             if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.Space)
             {
                 OpenDropDown();
@@ -313,6 +317,8 @@ namespace DotNetKit.Windows.Controls
 
         void ComboBox_LostFocus(object sender, RoutedEventArgs e)
         {
+            if (ItemsSource == null) return;
+
             if (SettingOrDefault.ResetOnInvalidWhenFocusLost && (SelectedItem == null || TextFromItem(SelectedItem) != Text) && Text != "")
             {
                 if (!SelectItemFromMatchingText(Text))

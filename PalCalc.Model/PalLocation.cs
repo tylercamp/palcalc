@@ -18,6 +18,7 @@ namespace PalCalc.Model
 
     public class PalLocation
     {
+        public string ContainerId { get; set; }
         public LocationType Type { get; set; }
         public int Index { get; set; }
 

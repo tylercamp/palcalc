@@ -5,6 +5,9 @@ using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
+using PalCalc.UI.View;
+using PalCalc.UI.View.Inspector;
+using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
 using Serilog;
 using Serilog.Core;
@@ -106,6 +109,7 @@ namespace PalCalc.UI.ViewModel
                     }
 
                     ExportSaveCommand?.NotifyCanExecuteChanged();
+                    InspectSaveCommand?.NotifyCanExecuteChanged();
                 }
             }
         }
@@ -199,6 +203,22 @@ namespace PalCalc.UI.ViewModel
                     }
                 }
             );
+
+            InspectSaveCommand = new RelayCommand(
+                execute: () =>
+                {
+                    var loadingModal = new LoadingSaveFileModal() { DataContext = "Reading raw save data...", Owner = App.Current.MainWindow };
+                    loadingModal.ShowSync();
+
+                    var vm = new SaveInspectorWindowViewModel(SelectedGame.CachedValue);
+
+                    loadingModal.Close();
+
+                    var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
+                    inspector.Show();
+                },
+                canExecute: () => SelectedGame != null && !SelectedGame.IsAddManualOption && SelectedGame?.CachedValue != null
+            );
         }
 
         public void TrySelectSaveGame(string saveIdentifier)
@@ -230,5 +250,8 @@ namespace PalCalc.UI.ViewModel
             get => exportCrashLogCommand;
             private set => SetProperty(ref exportCrashLogCommand, value);
         }
+
+        [ObservableProperty]
+        private IRelayCommand inspectSaveCommand;
     }
 }
