@@ -34,6 +34,9 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     SearchedTrait2 = null;
                     SearchedTrait3 = null;
                     SearchedTrait4 = null;
+                    MinIVHP = 0;
+                    MinIVAttack = 0;
+                    MinIVDefense = 0;
                 }
             );
         }
@@ -62,6 +65,18 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         [ObservableProperty]
         private TraitViewModel searchedTrait4;
 
+        [NotifyPropertyChangedFor(nameof(AsCriteria))]
+        [ObservableProperty]
+        private int minIVHP = 0;
+
+        [NotifyPropertyChangedFor(nameof(AsCriteria))]
+        [ObservableProperty]
+        private int minIVAttack = 0;
+
+        [NotifyPropertyChangedFor(nameof(AsCriteria))]
+        [ObservableProperty]
+        private int minIVDefense = 0;
+
         public List<PalViewModel> PalOptions { get; } = PalDB.LoadEmbedded().Pals.Select(p => new PalViewModel(p)).ToList();
 
         public List<GenderOption> GenderOptions { get; } = [
@@ -84,6 +99,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 if (SearchedTrait2 != null) criteria.Add(new TraitSearchCriteria(SearchedTrait2.ModelObject));
                 if (SearchedTrait3 != null) criteria.Add(new TraitSearchCriteria(SearchedTrait3.ModelObject));
                 if (SearchedTrait4 != null) criteria.Add(new TraitSearchCriteria(SearchedTrait4.ModelObject));
+
+                criteria.Add(new CustomSearchCriteria(p => p.IV_HP >= MinIVHP));
+                criteria.Add(new CustomSearchCriteria(p => p.IV_Shot >= MinIVAttack));
+                criteria.Add(new CustomSearchCriteria(p => p.IV_Defense >= MinIVDefense));
 
                 return new AllOfSearchCriteria(criteria);
             }

@@ -107,6 +107,36 @@
                                 <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait4}" ItemTemplate="{StaticResource TraitTemplate}" />
                             </WrapPanel>
                         </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <Label>Min IVs</Label>
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel.Resources>
+                                    <Style TargetType="Label">
+                                        <Setter Property="Padding" Value="2" />
+                                        <Setter Property="Margin" Value="0,0,5,0" />
+                                    </Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Margin" Value="0,0,15,0" />
+                                    </Style>
+                                </StackPanel.Resources>
+                                
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>HP</Label>
+                                    <v:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.MinIVHP}" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Attack</Label>
+                                    <v:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.MinIVAttack}" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Defense</Label>
+                                    <v:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.MinIVDefense}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
                     </WrapPanel>
 
                     <Button Width="80" Margin="5" HorizontalAlignment="Left" Command="{Binding SearchSettings.ResetCommand}">Reset</Button>

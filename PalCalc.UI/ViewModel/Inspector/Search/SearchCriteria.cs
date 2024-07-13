@@ -27,6 +27,11 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public bool Matches(PalInstance pal) => pal.Gender == gender;
     }
 
+    public class CustomSearchCriteria(Func<PalInstance, bool> f) : ISearchCriteria
+    {
+        public bool Matches(PalInstance pal) => f(pal);
+    }
+
     public class AllOfSearchCriteria(IEnumerable<ISearchCriteria> criteria) : ISearchCriteria
     {
         public bool Matches(PalInstance pal) => !criteria.Any(c => !c.Matches(pal));
