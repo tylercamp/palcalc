@@ -110,8 +110,6 @@ namespace PalCalc.GenDB
 
                 if (specialCombo.Any())
                 {
-                    // TODO - Katress/Wixen breed result depends on which one is male/female, special combos
-                    //        atm don't take gender into account
                     return pals.Single(p =>
                         p.InternalName == specialCombo.Single(c =>
                         {
