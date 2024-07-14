@@ -7,6 +7,7 @@
       xmlns:v="clr-namespace:PalCalc.UI.View"
       xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
       xmlns:m="clr-namespace:PalCalc.UI.Model"
+      xmlns:itl="clr-namespace:PalCalc.UI.Localization"
       xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
       mc:Ignorable="d"
       d:Background="White"
@@ -24,11 +25,11 @@
         </Grid.ColumnDefinitions>
         <DockPanel Grid.Column="0" Margin="5" IsEnabled="{Binding IsEditable}">
             <StackPanel DockPanel.Dock="Top">
-                <GroupBox Header="Save File">
+                <GroupBox Header="{itl:LocalizedText LC_SAVE_FILE}">
                     <v:SaveSelectorView DataContext="{Binding SaveSelection}" />
                 </GroupBox>
 
-                <GroupBox Header="Game Settings">
+                <GroupBox Header="{itl:LocalizedText LC_GAME_SETTINGS}">
                     <v:GameSettingsView DataContext="{Binding GameSettings}" />
                 </GroupBox>
             </StackPanel>

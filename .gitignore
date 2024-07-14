@@ -8,3 +8,4 @@ Level.sav.json
 character*.json
 *.user
 *.dll
+*.Designer.cs

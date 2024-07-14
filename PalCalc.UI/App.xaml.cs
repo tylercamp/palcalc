@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using Serilog;
 using System;
@@ -46,6 +47,8 @@ namespace PalCalc.UI
             logger.Information($"Pal Calc version {Version}");
 
             PalDB.BeginLoadEmbedded();
+
+            Translator.Init();
 
             base.OnStartup(e);
         }

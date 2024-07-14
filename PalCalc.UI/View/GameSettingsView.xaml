@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:PalCalc.UI.View"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              mc:Ignorable="d" 
              d:Background="White"
              d:DataContext="{d:DesignInstance mvm:GameSettingsViewModel, IsDesignTimeCreatable=True}"
@@ -16,9 +17,9 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Column="0" Content="Breeding Time (Mins)" HorizontalAlignment="Left" VerticalAlignment="Top" />
+        <Label Grid.Column="0" Content="{itl:LocalizedText LC_BREEDING_TIME}" HorizontalAlignment="Left" VerticalAlignment="Top" />
         <local:IntegerTextBox
-            ToolTipService.ToolTip="The average time it takes to produce an egg. Used to estimate how long it will take to produce a pal with specific properties.&#10;This value is doubled internally to account for pal inactivity at night."
+            ToolTipService.ToolTip="{itl:LocalizedText LC_BREEDING_TIME_DESC}"
             ToolTipService.ShowOnDisabled="True"
             Grid.Column="1"
             Value="{Binding BreedingTimeMinutes}"
@@ -28,9 +29,9 @@
             Margin="0,3,0,0"
         />
 
-        <Label Grid.Column="0" Content="Multiple Breeding Farms" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="0,26,0,0" />
+        <Label Grid.Column="0" Content="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS}" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="0,26,0,0" />
         <CheckBox
-            ToolTipService.ToolTip="Whether multiple breeding farms will be used.&#10;If enabled, the time to breed a pal from two other bred pals is based on the longest breeding time between the parents.&#10;If disabled, the time to breed a pal is always based on the sum of the time required for the parents."
+            ToolTipService.ToolTip="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS_DESC}"
             ToolTipService.ShowOnDisabled="True"
             Grid.Column="1"
             IsChecked="{Binding MultipleBreedingFarms}"
