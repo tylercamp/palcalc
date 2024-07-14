@@ -78,7 +78,6 @@ namespace PalCalc.UI.ViewModel
         
         public PalCheckListViewModel(Action onCancel, Action<Dictionary<Pal, bool>> onSave, Dictionary<Pal, bool> initialState)
         {
-            // TODO - handle user clicking "X" button on window
             allEntries = initialState.Select(kvp => new PalCheckListEntryViewModel(new PalViewModel(kvp.Key), kvp.Value)).ToList();
             VisibleEntries = allEntries;
 
