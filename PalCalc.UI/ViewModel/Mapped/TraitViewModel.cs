@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,13 @@ namespace PalCalc.UI.ViewModel.Mapped
 
     public class TraitViewModel
     {
+        private static readonly DerivedLocalizableText<Trait> NameLocalizer = new DerivedLocalizableText<Trait>(
+            (locale, trait) => trait switch
+            {
+                RandomTrait => "(Random)", // TODO
+                _ => trait.LocalizedNames?.GetValueOrElse(locale.ToFormalName(), trait.Name) ?? trait.InternalName
+            }
+        );
 
         // for XAML designer view
         public TraitViewModel()
@@ -57,8 +65,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         public ImageSource RankIcon => TraitIcon.Images[ModelObject.Rank];
 
         public int Rank => ModelObject.Rank;
-        
-        public string Name => ModelObject?.Name ?? "None";
+
+        public ILocalizedText Name => NameLocalizer.Bind(ModelObject);
 
         public override bool Equals(object obj) => ModelObject is RandomTrait ? ReferenceEquals(this, obj) : ModelObject.Equals((obj as TraitViewModel)?.ModelObject);
 

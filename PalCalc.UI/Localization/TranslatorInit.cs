@@ -44,7 +44,7 @@ namespace PalCalc.UI.Localization
                 l => l,
                 l =>
                 {
-                    var resxName = l.ToString().Replace('_', '-');
+                    var resxName = l.ToFormalName();
                     var rm = new ResourceManager("PalCalc.UI.Localization.Localizations." + resxName, typeof(Translator).Assembly);
                     return ReadAllResources(rm).ToDictionary(
                         kvp => CodeToId[kvp.Key],
@@ -79,7 +79,7 @@ namespace PalCalc.UI.Localization
 
             Localizations = result;
 
-            Translations = CodeToId.Values.ToDictionary(v => v, v => new LocalizableText(v) { Locale = CurrentLocale });
+            Translations = CodeToId.Values.ToDictionary(v => v, v => new StoredLocalizableText(v) { Locale = CurrentLocale });
         }
     }
 }

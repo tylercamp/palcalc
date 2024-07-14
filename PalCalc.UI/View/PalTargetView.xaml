@@ -13,7 +13,7 @@
             d:DesignHeight="239.714" d:DesignWidth="441.714">
     <StackPanel.Resources>
         <DataTemplate x:Key="TraitTemplate" DataType="{x:Type mvm:TraitViewModel}">
-            <TextBlock Text="{Binding Name}" />
+            <TextBlock Text="{Binding Name.Value}" />
         </DataTemplate>
     </StackPanel.Resources>
     <Label Content="Pal" Margin="5,0,0,0" />
@@ -28,10 +28,10 @@
         <TabControl>
             <TabItem Header="Required">
                 <StackPanel>
-                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait1, Mode=TwoWay}" TextSearch.TextPath="Name" ItemTemplate="{StaticResource TraitTemplate}" />
-                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait2, Mode=TwoWay}" TextSearch.TextPath="Name" ItemTemplate="{StaticResource TraitTemplate}" />
-                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait3, Mode=TwoWay}" TextSearch.TextPath="Name" ItemTemplate="{StaticResource TraitTemplate}" />
-                    <dnkc:AutoCompleteComboBox ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait4, Mode=TwoWay}" TextSearch.TextPath="Name" ItemTemplate="{StaticResource TraitTemplate}" />
+                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait1, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
+                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait2, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
+                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait3, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
+                    <dnkc:AutoCompleteComboBox ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait4, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
                 </StackPanel>
             </TabItem>
             <TabItem Header="Optional">

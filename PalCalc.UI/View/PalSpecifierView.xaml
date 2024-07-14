@@ -61,7 +61,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock
-                        Text="{Binding TargetPal.Name}"
+                        Text="{Binding TargetPal.Name.Value}"
                         Grid.Column="0"
                         FontWeight="Bold"
                         FontSize="14"

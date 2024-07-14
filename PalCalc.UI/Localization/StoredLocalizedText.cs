@@ -8,23 +8,19 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.Localization
 {
-    public partial class LocalizedText : ObservableObject
+    public class StoredLocalizedText : ILocalizedText
     {
-        private LocalizableText src;
+        private StoredLocalizableText src;
 
         private Dictionary<string, object> formatArgs;
 
-        public LocalizedText(LocalizableText src, Dictionary<string, object> formatArgs)
+        public StoredLocalizedText(StoredLocalizableText src, Dictionary<string, object> formatArgs)
         {
             this.src = src;
             this.formatArgs = formatArgs;
         }
 
-        [NotifyPropertyChangedFor(nameof(Value))]
-        [ObservableProperty]
-        private TranslationLocale locale;
-
-        public string Value
+        public override string Value
         {
             get
             {
@@ -35,6 +31,6 @@ namespace PalCalc.UI.Localization
             }
         }
 
-        public override string ToString() => $"{src.Id} => {Value}";
+        public override string ToString() => $"{src} => {Value}";
     }
 }

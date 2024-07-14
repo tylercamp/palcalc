@@ -39,8 +39,8 @@ namespace PalCalc.UI.Localization
         }
 
 
-        private static Dictionary<string, LocalizableText> translations;
-        public static Dictionary<string, LocalizableText> Translations
+        private static Dictionary<string, StoredLocalizableText> translations;
+        public static Dictionary<string, StoredLocalizableText> Translations
         {
             get
             {

@@ -14,7 +14,7 @@ namespace PalCalc.UI.Localization
         public string Code { get; set; }
         public string Id => Translator.CodeToId[Code];
 
-        private LocalizedText lt;
+        private StoredLocalizedText lt;
 
         public LocalizedTextExtension(string code)
         {

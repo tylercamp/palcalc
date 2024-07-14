@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
@@ -11,18 +12,24 @@ namespace PalCalc.UI.ViewModel.Mapped
 {
     public class PalViewModel
     {
+        private static readonly DerivedLocalizableText<Pal> NameLocalizer = new DerivedLocalizableText<Pal>(
+            (locale, pal) => pal.LocalizedNames.GetValueOrElse(locale.ToFormalName(), pal.Name)
+        );
+
         public PalViewModel(Pal pal)
         {
             ModelObject = pal;
         }
 
-        public string Name => ModelObject.Name;
+        public ILocalizedText Name => NameLocalizer.Bind(ModelObject);
 
+        // TODO - make this private?
         public Pal ModelObject { get; }
 
         public ImageSource Icon => PalIcon.Images[ModelObject];
         public ImageBrush IconBrush => PalIcon.ImageBrushes[ModelObject];
 
+        // TODO - localize
         public string Label => ModelObject == null ? "" : $"{ModelObject.Name} (#{ModelObject.Id})";
 
         public override bool Equals(object obj) => ModelObject.Equals((obj as PalViewModel)?.ModelObject);

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -149,12 +150,13 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public bool IsValid => TargetPal != null;
 
-        public string Label
+        public ILocalizedText Label
         {
             get
             {
-                if (TargetPal == null) return "New";
-                else return ModelObject.ToString();
+                // TODO
+                if (TargetPal == null) return null;
+                else return TargetPal.Name;
             }
         }
 
