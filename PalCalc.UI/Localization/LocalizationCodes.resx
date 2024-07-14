@@ -129,11 +129,59 @@
   <data name="LC_BREEDING_TIME_DESC" xml:space="preserve">
     <value>LC_BREEDING_TIME_DESC</value>
   </data>
+  <data name="LC_COMMON_CANCEL" xml:space="preserve">
+    <value>LC_COMMON_CANCEL</value>
+  </data>
+  <data name="LC_COMMON_ENABLED" xml:space="preserve">
+    <value>LC_COMMON_ENABLED</value>
+  </data>
+  <data name="LC_COMMON_GENDER" xml:space="preserve">
+    <value>LC_COMMON_GENDER</value>
+  </data>
+  <data name="LC_COMMON_GENDER_FEMALE" xml:space="preserve">
+    <value>LC_COMMON_GENDER_FEMALE</value>
+  </data>
+  <data name="LC_COMMON_GENDER_MALE" xml:space="preserve">
+    <value>LC_COMMON_GENDER_MALE</value>
+  </data>
+  <data name="LC_COMMON_IVS" xml:space="preserve">
+    <value>LC_COMMON_IVS</value>
+  </data>
+  <data name="LC_COMMON_IV_ATTACK" xml:space="preserve">
+    <value>LC_COMMON_IV_ATTACK</value>
+  </data>
+  <data name="LC_COMMON_IV_DEFENSE" xml:space="preserve">
+    <value>LC_COMMON_IV_DEFENSE</value>
+  </data>
+  <data name="LC_COMMON_IV_HP" xml:space="preserve">
+    <value>LC_COMMON_IV_HP</value>
+  </data>
+  <data name="LC_COMMON_LEVEL" xml:space="preserve">
+    <value>LC_COMMON_LEVEL</value>
+  </data>
+  <data name="LC_COMMON_PAL" xml:space="preserve">
+    <value>LC_COMMON_PAL</value>
+  </data>
+  <data name="LC_COMMON_PALDEX_NUM_SHORT" xml:space="preserve">
+    <value>LC_COMMON_PALDEX_NUM_SHORT</value>
+  </data>
+  <data name="LC_COMMON_SAVE" xml:space="preserve">
+    <value>LC_COMMON_SAVE</value>
+  </data>
+  <data name="LC_COMMON_TRAITS" xml:space="preserve">
+    <value>LC_COMMON_TRAITS</value>
+  </data>
   <data name="LC_EXPORT_CRASH_LOG" xml:space="preserve">
     <value>LC_EXPORT_CRASH_LOG</value>
   </data>
+  <data name="LC_EXPORT_CRASH_LOG_DESCRIPTION" xml:space="preserve">
+    <value>LC_EXPORT_CRASH_LOG_DESCRIPTION</value>
+  </data>
   <data name="LC_EXPORT_SAVE" xml:space="preserve">
     <value>LC_EXPORT_SAVE</value>
+  </data>
+  <data name="LC_EXPORT_SAVE_DESCRIPTION" xml:space="preserve">
+    <value>LC_EXPORT_SAVE_DESCRIPTION</value>
   </data>
   <data name="LC_GAME_SETTINGS" xml:space="preserve">
     <value>LC_GAME_SETTINGS</value>
@@ -172,14 +220,80 @@
   <data name="LC_PALS_AT_BASE" xml:space="preserve">
     <value>LC_PALS_AT_BASE</value>
   </data>
+  <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
+    <value>LC_PAL_CHECKLIST_SEARCH</value>
+  </data>
+  <data name="LC_PAL_LOC_CAPTURED" xml:space="preserve">
+    <value>LC_PAL_LOC_CAPTURED</value>
+  </data>
+  <data name="LC_PAL_TARGET_OPTIONAL_TRAITS" xml:space="preserve">
+    <value>LC_PAL_TARGET_OPTIONAL_TRAITS</value>
+  </data>
+  <data name="LC_PAL_TARGET_REQUIRED_TRAITS" xml:space="preserve">
+    <value>LC_PAL_TARGET_REQUIRED_TRAITS</value>
+  </data>
+  <data name="LC_POPUP_TITLE_LOADING_SAVE_FILE" xml:space="preserve">
+    <value>LC_POPUP_TITLE_LOADING_SAVE_FILE</value>
+  </data>
   <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve">
     <value>LC_REQUIRED_TRAITS_SUMMARY | TraitsList</value>
+  </data>
+  <data name="LC_RESULT_INPUT_LOCS" xml:space="preserve">
+    <value>LC_RESULT_INPUT_LOCS</value>
+  </data>
+  <data name="LC_RESULT_NUM_STEPS" xml:space="preserve">
+    <value>LC_RESULT_NUM_STEPS</value>
+  </data>
+  <data name="LC_RESULT_TIME_ESTIMATE" xml:space="preserve">
+    <value>LC_RESULT_TIME_ESTIMATE</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_ID" xml:space="preserve">
+    <value>LC_SAVEINSPECT_CONTAINER_ID</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_OWNER" xml:space="preserve">
+    <value>LC_SAVEINSPECT_CONTAINER_OWNER</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_SLOTS_USED" xml:space="preserve">
+    <value>LC_SAVEINSPECT_CONTAINER_SLOTS_USED</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_TYPE" xml:space="preserve">
+    <value>LC_SAVEINSPECT_CONTAINER_TYPE</value>
+  </data>
+  <data name="LC_SAVEINSPECT_DETECTED_PROPERTIES" xml:space="preserve">
+    <value>LC_SAVEINSPECT_DETECTED_PROPERTIES</value>
+  </data>
+  <data name="LC_SAVEINSPECT_RAW_PROPERTIES" xml:space="preserve">
+    <value>LC_SAVEINSPECT_RAW_PROPERTIES</value>
+  </data>
+  <data name="LC_SAVEINSPECT_SLOT_EMPTY" xml:space="preserve">
+    <value>LC_SAVEINSPECT_SLOT_EMPTY</value>
+  </data>
+  <data name="LC_SAVESEARCH_GRP_PAL_CONTAINERS" xml:space="preserve">
+    <value>LC_SAVESEARCH_GRP_PAL_CONTAINERS</value>
+  </data>
+  <data name="LC_SAVESEARCH_GRP_SEARCH_SETTINGS" xml:space="preserve">
+    <value>LC_SAVESEARCH_GRP_SEARCH_SETTINGS</value>
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_MIN_IVS" xml:space="preserve">
+    <value>LC_SAVESEARCH_SETTINGS_MIN_IVS</value>
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_RESET" xml:space="preserve">
+    <value>LC_SAVESEARCH_SETTINGS_RESET</value>
+  </data>
+  <data name="LC_SAVEWINDOW_TAB_DETAILS" xml:space="preserve">
+    <value>LC_SAVEWINDOW_TAB_DETAILS</value>
+  </data>
+  <data name="LC_SAVEWINDOW_TAB_SEARCH" xml:space="preserve">
+    <value>LC_SAVEWINDOW_TAB_SEARCH</value>
   </data>
   <data name="LC_SAVE_FILE" xml:space="preserve">
     <value>LC_SAVE_FILE</value>
   </data>
   <data name="LC_SAVE_GAME" xml:space="preserve">
     <value>LC_SAVE_GAME</value>
+  </data>
+  <data name="LC_SAVE_GAME_INVALID" xml:space="preserve">
+    <value>LC_SAVE_GAME_INVALID</value>
   </data>
   <data name="LC_SAVE_GAME_LBL" xml:space="preserve">
     <value>LC_SAVE_GAME_LBL | PlayerName | PlayerLevel | DayNumber | WorldName</value>
@@ -189,6 +303,9 @@
   </data>
   <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve">
     <value>LC_SAVE_GAME_LBL_SERVER | DayNumber | WorldName</value>
+  </data>
+  <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
+    <value>LC_SAVE_GAME_XBOX_INCOMPLETE</value>
   </data>
   <data name="LC_SAVE_LOCATION" xml:space="preserve">
     <value>LC_SAVE_LOCATION</value>
@@ -210,6 +327,39 @@
   </data>
   <data name="LC_SAVE_WARNING" xml:space="preserve">
     <value>LC_SAVE_WARNING</value>
+  </data>
+  <data name="LC_SOLVER_RUN" xml:space="preserve">
+    <value>LC_SOLVER_RUN</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS" xml:space="preserve">
+    <value>LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
+    <value>LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS" xml:space="preserve">
+    <value>LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION" xml:space="preserve">
+    <value>LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve">
+    <value>LC_SOLVER_SETTINGS_MAX_CPU</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION" xml:space="preserve">
+    <value>LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS" xml:space="preserve">
+    <value>LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
+    <value>LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS" xml:space="preserve">
+    <value>LC_SOLVER_SETTINGS_MAX_WILD_PALS</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION" xml:space="preserve">
+    <value>LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION</value>
   </data>
   <data name="LC_SOURCE_PALS" xml:space="preserve">
     <value>LC_SOURCE_PALS</value>

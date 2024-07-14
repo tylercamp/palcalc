@@ -59,22 +59,22 @@
                                             </Style>
                                         </StackPanel.Resources>
                                         <StackPanel Orientation="Vertical" Grid.Column="0" MaxWidth="80">
-                                                <TextBlock Text="Male" />
-                                                <TextBlock Text="{Binding MaleViewModel.LocationOwner}" TextWrapping="WrapWithOverflow" Visibility="{Binding MaleViewModel.OwnerVisibility}" />
-                                                <TextBlock Text="{Binding MaleViewModel.LocationCoordDescription}" />
+                                            <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_MALE}" />
+                                            <TextBlock Text="{Binding MaleViewModel.LocationOwner}" TextWrapping="WrapWithOverflow" Visibility="{Binding MaleViewModel.OwnerVisibility}" />
+                                            <TextBlock Text="{Binding MaleViewModel.LocationCoordDescription}" />
                                         </StackPanel>
                                 
                                         <Border BorderBrush="White" Width="1" BorderThickness="1" Margin="10" Grid.Column="1" />
                                         
                                         <StackPanel Orientation="Vertical" Grid.Column="2" MaxWidth="80">
-                                            <TextBlock Text="Female" />
+                                            <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_FEMALE}" />
                                             <TextBlock Text="{Binding FemaleViewModel.LocationOwner}" TextWrapping="WrapWithOverflow" Visibility="{Binding FemaleViewModel.OwnerVisibility}" />
                                             <TextBlock Text="{Binding FemaleViewModel.LocationCoordDescription}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type mvm:WildPalRefLocationViewModel}">
-                                    <TextBlock Foreground="White" FontSize="10">Captured</TextBlock>
+                                    <TextBlock Foreground="White" FontSize="10" Text="{itl:LocalizedText LC_PAL_LOC_CAPTURED}" />
                                 </DataTemplate>
                             </ContentControl.Resources>
                         </ContentControl>

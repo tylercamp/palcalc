@@ -129,11 +129,59 @@
   <data name="LC_BREEDING_TIME_DESC" xml:space="preserve">
     <value>The average time it takes to produce an egg. Used to estimate how long it will take to produce a pal with specific properties.&amp;#10;This value is doubled internally to account for pal inactivity at night.</value>
   </data>
+  <data name="LC_COMMON_CANCEL" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="LC_COMMON_ENABLED" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="LC_COMMON_GENDER" xml:space="preserve">
+    <value>Gender</value>
+  </data>
+  <data name="LC_COMMON_GENDER_FEMALE" xml:space="preserve">
+    <value>Female</value>
+  </data>
+  <data name="LC_COMMON_GENDER_MALE" xml:space="preserve">
+    <value>Male</value>
+  </data>
+  <data name="LC_COMMON_IVS" xml:space="preserve">
+    <value>IVs</value>
+  </data>
+  <data name="LC_COMMON_IV_ATTACK" xml:space="preserve">
+    <value>Attack</value>
+  </data>
+  <data name="LC_COMMON_IV_DEFENSE" xml:space="preserve">
+    <value>Defense</value>
+  </data>
+  <data name="LC_COMMON_IV_HP" xml:space="preserve">
+    <value>HP</value>
+  </data>
+  <data name="LC_COMMON_LEVEL" xml:space="preserve">
+    <value>Level</value>
+  </data>
+  <data name="LC_COMMON_PAL" xml:space="preserve">
+    <value>Pal</value>
+  </data>
+  <data name="LC_COMMON_PALDEX_NUM_SHORT" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="LC_COMMON_SAVE" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="LC_COMMON_TRAITS" xml:space="preserve">
+    <value>Traits</value>
+  </data>
   <data name="LC_EXPORT_CRASH_LOG" xml:space="preserve">
     <value>Export Crash Log</value>
   </data>
+  <data name="LC_EXPORT_CRASH_LOG_DESCRIPTION" xml:space="preserve">
+    <value>Exports recently-referenced save files, cache data, and settings as a ZIP.</value>
+  </data>
   <data name="LC_EXPORT_SAVE" xml:space="preserve">
     <value>Export Save</value>
+  </data>
+  <data name="LC_EXPORT_SAVE_DESCRIPTION" xml:space="preserve">
+    <value>Exports all known Palworld files for the selected save as a ZIP.</value>
   </data>
   <data name="LC_GAME_SETTINGS" xml:space="preserve">
     <value>Game Settings</value>
@@ -171,14 +219,80 @@
   <data name="LC_PALS_AT_BASE" xml:space="preserve">
     <value>Include Pals at Base</value>
   </data>
+  <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="LC_PAL_LOC_CAPTURED" xml:space="preserve">
+    <value>Captured</value>
+  </data>
+  <data name="LC_PAL_TARGET_OPTIONAL_TRAITS" xml:space="preserve">
+    <value>Optional</value>
+  </data>
+  <data name="LC_PAL_TARGET_REQUIRED_TRAITS" xml:space="preserve">
+    <value>Required</value>
+  </data>
+  <data name="LC_POPUP_TITLE_LOADING_SAVE_FILE" xml:space="preserve">
+    <value>Loading Save File</value>
+  </data>
   <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve">
     <value>With {TraitsList}</value>
+  </data>
+  <data name="LC_RESULT_INPUT_LOCS" xml:space="preserve">
+    <value>Input Locations</value>
+  </data>
+  <data name="LC_RESULT_NUM_STEPS" xml:space="preserve">
+    <value># Steps</value>
+  </data>
+  <data name="LC_RESULT_TIME_ESTIMATE" xml:space="preserve">
+    <value>Effort</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_ID" xml:space="preserve">
+    <value>ID:</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_OWNER" xml:space="preserve">
+    <value>Owner:</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_SLOTS_USED" xml:space="preserve">
+    <value>slots used</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_TYPE" xml:space="preserve">
+    <value>Type:</value>
+  </data>
+  <data name="LC_SAVEINSPECT_DETECTED_PROPERTIES" xml:space="preserve">
+    <value>Detected Properties</value>
+  </data>
+  <data name="LC_SAVEINSPECT_RAW_PROPERTIES" xml:space="preserve">
+    <value>Raw Properties</value>
+  </data>
+  <data name="LC_SAVEINSPECT_SLOT_EMPTY" xml:space="preserve">
+    <value>Empty</value>
+  </data>
+  <data name="LC_SAVESEARCH_GRP_PAL_CONTAINERS" xml:space="preserve">
+    <value>Pal Containers</value>
+  </data>
+  <data name="LC_SAVESEARCH_GRP_SEARCH_SETTINGS" xml:space="preserve">
+    <value>Search Settings</value>
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_MIN_IVS" xml:space="preserve">
+    <value>Min IVs</value>
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_RESET" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="LC_SAVEWINDOW_TAB_DETAILS" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="LC_SAVEWINDOW_TAB_SEARCH" xml:space="preserve">
+    <value>Search</value>
   </data>
   <data name="LC_SAVE_FILE" xml:space="preserve">
     <value>Save File</value>
   </data>
   <data name="LC_SAVE_GAME" xml:space="preserve">
     <value>Game</value>
+  </data>
+  <data name="LC_SAVE_GAME_INVALID" xml:space="preserve">
+    <value>The selected save file is invalid!</value>
   </data>
   <data name="LC_SAVE_GAME_LBL" xml:space="preserve">
     <value>{PlayerName} lv {PlayerLevel} in {WorldName} day {DayNumber}</value>
@@ -188,6 +302,9 @@
   </data>
   <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve">
     <value>{WorldName} day {DayNumber}</value>
+  </data>
+  <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
+    <value>The Xbox save file is incomplete, but features will still work. This resolves automatically when Palworld is closed for a few minutes and Pal Calc is restarted.</value>
   </data>
   <data name="LC_SAVE_LOCATION" xml:space="preserve">
     <value>Location</value>
@@ -209,6 +326,39 @@
   </data>
   <data name="LC_SAVE_WARNING" xml:space="preserve">
     <value>(!)</value>
+  </data>
+  <data name="LC_SOLVER_RUN" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS" xml:space="preserve">
+    <value>Max Bred Irrelevant Traits</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
+    <value>The maximum number of irrelevant traits allowed for any bred pal, including the final breeding result.&amp;#10;Values higher than '1' will typically add shorter breeding paths if there are unused trait slots in the final pal.&amp;#10;Higher values *exponentially* affect time required.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS" xml:space="preserve">
+    <value>Max Breeding Steps</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION" xml:space="preserve">
+    <value>The maximum number of solver iterations, and the max number of breeding steps to reach the target pal.&amp;#10;Higher values linearly affect time required.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve">
+    <value>Max CPUs</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION" xml:space="preserve">
+    <value>The number of CPUs the solver is allowed to use. If zero, all CPUs will be used.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS" xml:space="preserve">
+    <value>Max Input Irrelevant Traits</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
+    <value>The maximum number of irrelevant traits allowed for any owned pal used as a parent.&amp;#10;Lower values can somewhat reduce processing at risk of missing some useful paths.&amp;#10;Higher values linearly affect time required.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS" xml:space="preserve">
+    <value>Max Wild Pals</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION" xml:space="preserve">
+    <value>The maximum number of wild pals to allow in a breeding path.&amp;#10;Higher values linearly affect time required, depending on how many types of pals are owned.</value>
   </data>
   <data name="LC_SOURCE_PALS" xml:space="preserve">
     <value>Source Pals</value>

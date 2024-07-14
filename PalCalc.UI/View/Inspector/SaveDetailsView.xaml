@@ -24,21 +24,21 @@
                 <DataTemplate DataType="dvm:InspectedContainerDetailsViewModel">
                     <StackPanel>
                         <TextBlock>
-                            <Run Text="Type: " />
+                            <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_TYPE}" />
                             <Run Text="{Binding Type, Mode=OneTime}" />
                         </TextBlock>
                         <TextBlock>
-                            <Run Text="Owner: " />
+                            <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_OWNER}" />
                             <Run Text="{Binding Owner.Name, Mode=OneTime}" />
                         </TextBlock>
                         <TextBlock>
                             <Run Text="{Binding UsedSlots, Mode=OneTime}" />
                             <Run>/</Run>
                             <Run Text="{Binding TotalSlots, Mode=OneTime}" />
-                            <Run>slots used</Run>
+                            <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_SLOTS_USED}" />
                         </TextBlock>
                         <TextBlock>
-                            <Run>ID:</Run>
+                            <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_ID}" />
                             <Run Text="{Binding Id, Mode=OneTime}" />
                         </TextBlock>
                     </StackPanel>
@@ -64,7 +64,7 @@
                     <ContentControl Content="{Binding}" Margin="5">
                         <ContentControl.Resources>
                             <DataTemplate DataType="{x:Type dvm:EmptyPalContainerSlotDetailsViewModel}">
-                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Empty</TextBlock>
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{itl:LocalizedText LC_SAVEINSPECT_SLOT_EMPTY}" />
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type dvm:PalContainerSlotDetailsViewModel}">
                                 <StackPanel Orientation="Vertical">
@@ -86,7 +86,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
-            <GroupBox Header="Detected Properties" Grid.Row="0">
+            <GroupBox Header="{itl:LocalizedText LC_SAVEINSPECT_DETECTED_PROPERTIES}" Grid.Row="0">
                 <DataGrid AutoGenerateColumns="False"
                           HeadersVisibility="None"
                           ItemsSource="{Binding SelectedSlotDetails.PalProperties}"
@@ -103,7 +103,7 @@
 
             <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" Height="5" />
 
-            <GroupBox Header="Raw Properties" Grid.Row="2">
+            <GroupBox Header="{itl:LocalizedText LC_SAVEINSPECT_RAW_PROPERTIES}" Grid.Row="2">
                 <DataGrid AutoGenerateColumns="False"
                           HeadersVisibility="None"
                           ItemsSource="{Binding SelectedSlotDetails.RawProperties}"

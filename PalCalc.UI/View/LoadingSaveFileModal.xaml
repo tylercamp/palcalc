@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PalCalc.UI.View"
         mc:Ignorable="d"
         xmlns:itl="clr-namespace:PalCalc.UI.Localization"
-        Title="Loading Save File"
+        Title="{itl:LocalizedText LC_POPUP_TITLE_LOADING_SAVE_FILE}"
         ShowInTaskbar="False"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"

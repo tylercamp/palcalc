@@ -11,10 +11,10 @@
         d:DataContext="{x:Static svm:SaveInspectorWindowViewModel.DesignerInstance}"
         Title="{Binding WindowTitle}" Height="450" Width="900">
     <TabControl>
-        <TabItem Header="Search">
+        <TabItem Header="{itl:LocalizedText LC_SAVEWINDOW_TAB_SEARCH}">
             <local:SearchView DataContext="{Binding Search}" />
         </TabItem>
-        <TabItem Header="Details">
+        <TabItem Header="{itl:LocalizedText LC_SAVEWINDOW_TAB_DETAILS}">
             <local:SaveDetailsView DataContext="{Binding Details}" />
         </TabItem>
     </TabControl>

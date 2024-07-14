@@ -18,22 +18,22 @@
     <ListView.View>
         <GridView>
             <GridView.Columns>
-                <GridViewColumn Header="Effort"
+                <GridViewColumn Header="{itl:LocalizedText LC_RESULT_TIME_ESTIMATE}"
                                 DisplayMemberBinding="{Binding TimeEstimateLabel}"
                                 Width="{Binding EffortWidth}"
                                 util:GridViewSort.PropertyName="TimeEstimate"
                                 />
-                <GridViewColumn Header="# Steps" 
+                <GridViewColumn Header="{itl:LocalizedText LC_RESULT_NUM_STEPS}" 
                                 DisplayMemberBinding="{Binding NumBreedingSteps}"
                                 Width="{Binding NumStepsWidth}"
                                 util:GridViewSort.PropertyName="NumBreedingSteps"
                                 />
-                <GridViewColumn Header="Traits"
+                <GridViewColumn Header="{itl:LocalizedText LC_COMMON_TRAITS}"
                                 DisplayMemberBinding="{Binding FinalTraits}"
                                 Width="{Binding TraitsWidth}"
                                 util:GridViewSort.PropertyName="FinalTraits"
                                 />
-                <GridViewColumn Header="Input Locations"
+                <GridViewColumn Header="{itl:LocalizedText LC_RESULT_INPUT_LOCS}"
                                 DisplayMemberBinding="{Binding InputLocations}"
                                 Width="{Binding LocationsWidth}"
                                 util:GridViewSort.PropertyName="InputLocations"
