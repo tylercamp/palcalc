@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
              xmlns:ivm="clr-namespace:PalCalc.UI.ViewModel.Inspector"
              xmlns:dvm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Details"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              mc:Ignorable="d" 
              d:Background="White"
              d:DataContext="{x:Static ivm:SaveDetailsViewModel.DesignerInstance}"

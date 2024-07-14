@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="LC_ABOUT_APP" xml:space="preserve">
+    <value>LC_ABOUT_APP</value>
+  </data>
   <data name="LC_ADD_NEW_SAVE" xml:space="preserve">
     <value>LC_ADD_NEW_SAVE</value>
   </data>
@@ -135,8 +138,8 @@
   <data name="LC_GAME_SETTINGS" xml:space="preserve">
     <value>LC_GAME_SETTINGS</value>
   </data>
-  <data name="LC_INSPECT" xml:space="preserve">
-    <value>LC_INSPECT</value>
+  <data name="LC_INSPECT_SAVE" xml:space="preserve">
+    <value>LC_INSPECT_SAVE</value>
   </data>
   <data name="LC_ITL_LABEL" xml:space="preserve">
     <value>LC_ITL_LABEL</value>
@@ -160,8 +163,14 @@
   <data name="LC_NO_TRAITS" xml:space="preserve">
     <value>LC_NO_TRAITS</value>
   </data>
+  <data name="LC_OPEN_IN_FILE_EXPLORER" xml:space="preserve">
+    <value>LC_OPEN_IN_FILE_EXPLORER</value>
+  </data>
   <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve">
     <value>LC_OPTIONAL_TRAITS_SUMMARY | TraitsList</value>
+  </data>
+  <data name="LC_PALS_AT_BASE" xml:space="preserve">
+    <value>LC_PALS_AT_BASE</value>
   </data>
   <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve">
     <value>LC_REQUIRED_TRAITS_SUMMARY | TraitsList</value>
@@ -173,7 +182,13 @@
     <value>LC_SAVE_GAME</value>
   </data>
   <data name="LC_SAVE_GAME_LBL" xml:space="preserve">
-    <value>LC_SAVE_LBL_FMT | PlayerName | PlayerLevel | DayNumber | WorldName</value>
+    <value>LC_SAVE_GAME_LBL | PlayerName | PlayerLevel | DayNumber | WorldName</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL_NO_METADATA" xml:space="preserve">
+    <value>LC_SAVE_GAME_LBL_NO_METADATA | GameId</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve">
+    <value>LC_SAVE_GAME_LBL_SERVER | DayNumber | WorldName</value>
   </data>
   <data name="LC_SAVE_LOCATION" xml:space="preserve">
     <value>LC_SAVE_LOCATION</value>
@@ -184,13 +199,34 @@
   <data name="LC_SAVE_LOCATION_LBL_XBOX" xml:space="preserve">
     <value>LC_SAVE_LOCATION_LBL_FMT_XBOX | UserId | NumValidSaves</value>
   </data>
+  <data name="LC_SAVE_LOCATION_MANUAL" xml:space="preserve">
+    <value>LC_SAVE_LOCATION_MANUAL</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_STEAM_EMPTY" xml:space="preserve">
+    <value>LC_SAVE_LOCATION_STEAM_EMPTY</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_EMPTY" xml:space="preserve">
+    <value>LC_SAVE_LOCATION_XBOX_EMPTY</value>
+  </data>
+  <data name="LC_SAVE_WARNING" xml:space="preserve">
+    <value>LC_SAVE_WARNING</value>
+  </data>
+  <data name="LC_SOURCE_PALS" xml:space="preserve">
+    <value>LC_SOURCE_PALS</value>
+  </data>
   <data name="LC_STARTUP_LOADING" xml:space="preserve">
     <value>LC_STARTUP_LOADING</value>
+  </data>
+  <data name="LC_TARGET_PAL" xml:space="preserve">
+    <value>LC_TARGET_PAL</value>
   </data>
   <data name="LC_TARGET_PALS" xml:space="preserve">
     <value>LC_TARGET_PALS</value>
   </data>
-  <data name="LC_WINDOW" xml:space="preserve">
-    <value>LC_WINDOW</value>
+  <data name="LC_UPDATE_AVAILABLE" xml:space="preserve">
+    <value>LC_UPDATE_AVAILABLE</value>
+  </data>
+  <data name="LC_WINDOW_TITLE" xml:space="preserve">
+    <value>LC_WINDOW_TITLE</value>
   </data>
 </root>

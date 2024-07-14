@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="LC_ABOUT_APP" xml:space="preserve">
+    <value>About</value>
+  </data>
   <data name="LC_ADD_NEW_SAVE" xml:space="preserve">
     <value>Add a new save...</value>
   </data>
@@ -135,7 +138,7 @@
   <data name="LC_GAME_SETTINGS" xml:space="preserve">
     <value>Game Settings</value>
   </data>
-  <data name="LC_INSPECT" xml:space="preserve">
+  <data name="LC_INSPECT_SAVE" xml:space="preserve">
     <value>Inspect</value>
   </data>
   <data name="LC_ITL_LABEL" xml:space="preserve">
@@ -159,8 +162,14 @@
   <data name="LC_NO_TRAITS" xml:space="preserve">
     <value>With no traits</value>
   </data>
+  <data name="LC_OPEN_IN_FILE_EXPLORER" xml:space="preserve">
+    <value>Open in Explorer</value>
+  </data>
   <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve">
     <value>Optionally with {TraitsList}</value>
+  </data>
+  <data name="LC_PALS_AT_BASE" xml:space="preserve">
+    <value>Include Pals at Base</value>
   </data>
   <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve">
     <value>With {TraitsList}</value>
@@ -172,7 +181,13 @@
     <value>Game</value>
   </data>
   <data name="LC_SAVE_GAME_LBL" xml:space="preserve">
-    <value>{PlayerName} lv {PlayerLvl} in {WorldName} day {DayNumber}</value>
+    <value>{PlayerName} lv {PlayerLevel} in {WorldName} day {DayNumber}</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL_NO_METADATA" xml:space="preserve">
+    <value>{GameId} (Unable to read metadata)</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve">
+    <value>{WorldName} day {DayNumber}</value>
   </data>
   <data name="LC_SAVE_LOCATION" xml:space="preserve">
     <value>Location</value>
@@ -183,13 +198,34 @@
   <data name="LC_SAVE_LOCATION_LBL_XBOX" xml:space="preserve">
     <value>Xbox user {UserId} - {NumValidSaves} valid saves</value>
   </data>
+  <data name="LC_SAVE_LOCATION_MANUAL" xml:space="preserve">
+    <value>Manually Added</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_STEAM_EMPTY" xml:space="preserve">
+    <value>Steam</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_EMPTY" xml:space="preserve">
+    <value>Xbox</value>
+  </data>
+  <data name="LC_SAVE_WARNING" xml:space="preserve">
+    <value>(!)</value>
+  </data>
+  <data name="LC_SOURCE_PALS" xml:space="preserve">
+    <value>Source Pals</value>
+  </data>
   <data name="LC_STARTUP_LOADING" xml:space="preserve">
     <value>Loading...</value>
+  </data>
+  <data name="LC_TARGET_PAL" xml:space="preserve">
+    <value>Target Pal</value>
   </data>
   <data name="LC_TARGET_PALS" xml:space="preserve">
     <value>Target Pals</value>
   </data>
-  <data name="LC_WINDOW" xml:space="preserve">
+  <data name="LC_UPDATE_AVAILABLE" xml:space="preserve">
+    <value>An update is available!</value>
+  </data>
+  <data name="LC_WINDOW_TITLE" xml:space="preserve">
     <value>Pal Calc</value>
   </data>
 </root>

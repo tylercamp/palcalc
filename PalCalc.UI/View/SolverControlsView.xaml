@@ -5,6 +5,7 @@
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
            xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
            xmlns:v="clr-namespace:PalCalc.UI.View"
+           xmlns:itl="clr-namespace:PalCalc.UI.Localization"
            mc:Ignorable="d" 
            Orientation="Horizontal"
            d:DataContext="{d:DesignInstance vm:SolverControlsViewModel, IsDesignTimeCreatable=True}"

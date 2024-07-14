@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PalCalc.UI"
         mc:Ignorable="d"
-        Title="Pal Calc"
+        xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+        Title="{itl:LocalizedText LC_WINDOW_TITLE}"
         Width="1280" Height="720"
         Content="{Binding Content}">
 </Window>

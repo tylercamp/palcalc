@@ -45,7 +45,7 @@
                     </GroupBox>
                 </StackPanel>
 
-                <GroupBox Header="Target Pals">
+                <GroupBox Header="{itl:LocalizedText LC_TARGET_PALS}">
                     <v:PalTargetListView BorderThickness="0" DataContext="{Binding PalTargetList}" />
                 </GroupBox>
             </DockPanel>
@@ -67,15 +67,15 @@
 
             <DockPanel Grid.Column="4" IsEnabled="{Binding IsEditable}" Margin="5">
                 <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
-                    <GroupBox Header="Target Pal">
+                    <GroupBox Header="{itl:LocalizedText LC_TARGET_PAL}">
                         <v:PalTargetView DataContext="{Binding PalTarget}" />
                     </GroupBox>
 
-                    <GroupBox Header="Source Pals">
+                    <GroupBox Header="{itl:LocalizedText LC_SOURCE_PALS}">
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                                 <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeBasePals}">
-                                    <TextBlock Text="Include Pals at Base" TextWrapping="Wrap" />
+                                    <TextBlock Text="{itl:LocalizedText LC_PALS_AT_BASE}" TextWrapping="Wrap" />
                                 </CheckBox>
                             </StackPanel>
 
@@ -97,10 +97,12 @@
                     </GroupBox>
 
                     <StackPanel Grid.Row="1">
-                        <Button Width="50" Click="AboutButton_Click" Margin="0,5,0,5">About</Button>
+                        <Button Width="50" Click="AboutButton_Click" Margin="0,5,0,5" Content="{itl:LocalizedText LC_ABOUT_APP}" />
                         <TextBlock Visibility="{Binding UpdatesMessageVisibility}" TextWrapping="Wrap" TextAlignment="Center" FontSize="20">
                             <!-- NavigateUri unused, value must be set for event to trigger -->
-                            <Hyperlink NavigateUri="http://github.com" RequestNavigate="DownloadUpdateLink_RequestNavigate">An update is available!</Hyperlink>
+                            <Hyperlink NavigateUri="http://github.com" RequestNavigate="DownloadUpdateLink_RequestNavigate">
+                                <TextBlock Text="{itl:LocalizedText LC_UPDATE_AVAILABLE}" />
+                            </Hyperlink>
                         </TextBlock>
                     </StackPanel>
                 </Grid>

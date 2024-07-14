@@ -135,7 +135,7 @@ namespace PalCalc.UI.ViewModel
         {
             manualLocation = new ManualSavesLocationViewModel(manualSaves);
 
-            SavesLocations = new List<ISavesLocationViewModel>(savesLocations.Select(l => new StandardSavesLocationViewModel(l)).OrderBy(vm => vm.Label));
+            SavesLocations = new List<ISavesLocationViewModel>(savesLocations.Select(l => new StandardSavesLocationViewModel(l)).OrderByDescending(vm => vm.LastModified));
             SavesLocations.Add(manualLocation);
 
             SelectedLocation = MostRecentLocation;

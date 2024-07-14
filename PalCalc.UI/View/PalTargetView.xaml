@@ -7,6 +7,7 @@
             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
             xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+            xmlns:itl="clr-namespace:PalCalc.UI.Localization"
             d:Background="White"
             mc:Ignorable="d" 
             d:DataContext="{d:DesignInstance vm:PalTargetViewModel, IsDesignTimeCreatable=True}"

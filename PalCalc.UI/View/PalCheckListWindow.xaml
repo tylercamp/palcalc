@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PalCalc.UI.View"
         xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+        xmlns:itl="clr-namespace:PalCalc.UI.Localization"
         d:DataContext="{x:Static vm:PalCheckListViewModel.DesignerInstance}"
         mc:Ignorable="d"
         xmlns:util="clr-namespace:Wpf.Util"
