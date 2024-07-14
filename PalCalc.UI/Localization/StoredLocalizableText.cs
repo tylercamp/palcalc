@@ -29,11 +29,7 @@ namespace PalCalc.UI.Localization
         {
             // TODO - validate format args
             var res = new StoredLocalizedText(this, formatArgs) { Locale = Locale };
-            lock (instances)
-            {
-                PruneInstances();
-                instances.Add(new WeakReference<StoredLocalizedText>(res));
-            }
+            Track(res);
             return res;
         }
     }

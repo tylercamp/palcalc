@@ -45,9 +45,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         );
 
         // for XAML designer view
-        public TraitViewModel()
+        public TraitViewModel() : this(new Trait("Runner", "runner", 2))
         {
-            ModelObject = new Trait("Runner", "runner", 2);
         }
 
         private int hash;
@@ -55,6 +54,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         public TraitViewModel(Trait trait)
         {
             ModelObject = trait;
+            Name = NameLocalizer.Bind(ModelObject);
 
             if (trait is RandomTrait) hash = random.Next();
             else hash = trait.GetHashCode();
@@ -66,7 +66,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public int Rank => ModelObject.Rank;
 
-        public ILocalizedText Name => NameLocalizer.Bind(ModelObject);
+        public ILocalizedText Name { get; }
 
         public override bool Equals(object obj) => ModelObject is RandomTrait ? ReferenceEquals(this, obj) : ModelObject.Equals((obj as TraitViewModel)?.ModelObject);
 

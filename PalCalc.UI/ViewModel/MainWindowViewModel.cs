@@ -6,9 +6,11 @@ using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Mapped;
+using QuickGraph;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -38,7 +40,11 @@ namespace PalCalc.UI.ViewModel
         private AppSettings settings;
         private IRelayCommand<PalSpecifierViewModel> deletePalTargetCommand;
 
-
+        public List<TranslationLocaleViewModel> Locales { get; } =
+            Enum
+                .GetValues<TranslationLocale>()
+                .Select(l => new TranslationLocaleViewModel(l))
+                .ToList();
 
         public MainWindowViewModel() : this(null) { }
 

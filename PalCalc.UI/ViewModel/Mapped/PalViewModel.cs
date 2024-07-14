@@ -19,9 +19,11 @@ namespace PalCalc.UI.ViewModel.Mapped
         public PalViewModel(Pal pal)
         {
             ModelObject = pal;
+
+            Name = NameLocalizer.Bind(ModelObject);
         }
 
-        public ILocalizedText Name => NameLocalizer.Bind(ModelObject);
+        public ILocalizedText Name { get; }
 
         // TODO - make this private?
         public Pal ModelObject { get; }

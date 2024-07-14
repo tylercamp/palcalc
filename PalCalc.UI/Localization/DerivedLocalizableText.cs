@@ -25,7 +25,9 @@ namespace PalCalc.UI.Localization
 
         public ILocalizedText Bind(Key key)
         {
-            return new DerivedLocalizedText<Key>(converter, key);
+            var res = new DerivedLocalizedText<Key>(converter, key);
+            Track(res);
+            return res;
         }
     }
 }
