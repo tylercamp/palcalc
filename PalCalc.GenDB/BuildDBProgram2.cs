@@ -12,6 +12,10 @@ namespace PalCalc.GenDB
 {
     static class BuildDBProgram2
     {
+        /*
+         * Shelved while working on translations
+         */
+
         // This is all HEAVILY dependent on having the right Mappings.usmap file for the Palworld version!
         static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld";
         static string MappingsPath = @"C:\Users\algor\Downloads\Mappings.usmap";
