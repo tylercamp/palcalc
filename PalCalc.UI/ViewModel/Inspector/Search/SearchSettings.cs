@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
 using System;
@@ -11,14 +12,14 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search
 {
-    public class GenderOption
+    public class GenderOption(PalGender value)
     {
-        public PalGender Value { get; set; }
-        public string Label => Value.Label();
+        public PalGender Value => value;
+        public ILocalizedText Label { get; } = value.Label();
 
-        public static GenderOption AnyGender { get; } = new GenderOption() { Value = PalGender.WILDCARD };
-        public static GenderOption Female { get; } = new GenderOption() { Value = PalGender.FEMALE };
-        public static GenderOption Male { get; } = new GenderOption() { Value = PalGender.MALE };
+        public static GenderOption AnyGender { get; } = new GenderOption(PalGender.WILDCARD);
+        public static GenderOption Female { get; } = new GenderOption(PalGender.FEMALE);
+        public static GenderOption Male { get; } = new GenderOption(PalGender.MALE);
     }
 
     public partial class SearchSettingsViewModel : ObservableObject

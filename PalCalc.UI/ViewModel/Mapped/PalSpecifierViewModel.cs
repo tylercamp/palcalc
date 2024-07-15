@@ -154,7 +154,6 @@ namespace PalCalc.UI.ViewModel.Mapped
         {
             get
             {
-                // TODO
                 if (TargetPal == null) return null;
                 else return TargetPal.Name;
             }

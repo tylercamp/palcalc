@@ -3,6 +3,7 @@ using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.Tree;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel;
 using PalCalc.UI.ViewModel.Mapped;
@@ -41,6 +42,10 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             }
 
             Gender = node.PalRef.Gender.Label();
+            AvgRequiredAttemptsDescription = Translator.Translations[LocalizationCodes.LC_RESULT_BREEDING_ATTEMPTS].Bind(new()
+            {
+                { "AvgAttempts", AvgRequiredAttempts }
+            });
         }
 
         public PalViewModel Pal { get; }
@@ -69,10 +74,10 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         public IPalRefLocationViewModel Location { get; }
         public bool NeedsRefresh => Location.NeedsRefresh;
 
-        public string Gender { get; }
+        public ILocalizedText Gender { get; }
 
         public int AvgRequiredAttempts => (Value.PalRef as BredPalReference)?.AvgRequiredBreedings ?? 0;
-        public string AvgRequiredAttemptsDescription => $"{AvgRequiredAttempts} attempts";
+        public ILocalizedText AvgRequiredAttemptsDescription { get; }
 
         public Visibility AvgRequiredAttemptsVisibility => Value.PalRef is BredPalReference ? Visibility.Visible : Visibility.Collapsed;
     }

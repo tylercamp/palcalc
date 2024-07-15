@@ -41,13 +41,13 @@
                                         util:GridViewSort.PropertyName="PaldexNoValue"
                                         Width="40"/>
                         <GridViewColumn Header="{itl:LocalizedText LC_COMMON_PAL}"
-                                        util:GridViewSort.PropertyName="PalName"
+                                        util:GridViewSort.PropertyName="PalName.Value"
                                         Width="200">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <Image Source="{Binding Pal.Icon}" Width="24" Height="24" />
-                                        <Label Content="{Binding PalName}" VerticalContentAlignment="Center"/>
+                                        <Label Content="{Binding PalName.Value}" VerticalContentAlignment="Center"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>

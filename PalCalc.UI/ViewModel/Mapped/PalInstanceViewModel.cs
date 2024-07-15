@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,6 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public TraitCollectionViewModel Traits { get; } = new TraitCollectionViewModel(inst.Traits.Select(t => new TraitViewModel(t)));
 
-        public string Gender { get; } = inst.Gender.Label();
+        public ILocalizedText Gender { get; } = inst.Gender.Label();
     }
 }

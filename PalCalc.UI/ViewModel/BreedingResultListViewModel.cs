@@ -1,11 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
@@ -54,7 +56,12 @@ namespace PalCalc.UI.ViewModel
             Results = Results.Select(r => new BreedingResultViewModel(csg, r.DisplayedResult)).ToList();
         }
 
-        public string ResultsHeading => Results == null ? "Results" : $"{Results.Count} Results";
+        [JsonIgnore]
+        private ILocalizedText resultsHeading;
+        public ILocalizedText ResultsHeading => resultsHeading ??=
+            Results == null
+                ? Translator.Translations[LocalizationCodes.LC_RESULT_LIST_TITLE_EMPTY].Bind()
+                : Translator.Translations[LocalizationCodes.LC_RESULT_LIST_TITLE_COUNT].Bind(new() { { "NumResults", Results.Count } });
 
         public static BreedingResultListViewModel DesignerInstance { get; } = new BreedingResultListViewModel()
         {

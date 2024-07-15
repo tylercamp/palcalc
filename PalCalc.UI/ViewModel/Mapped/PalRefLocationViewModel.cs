@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
@@ -53,35 +54,70 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 // for XAML designer preview
                 IsSinglePlayer = true;
-                LocationOwner = ownedLoc.OwnerId;
+                LocationOwner = new HardCodedText(ownedLoc.OwnerId);
             }
             else
             {
                 IsSinglePlayer = source == null || source.Players.Count == 1;
 
-                var ownerName = source?.PlayersById?.GetValueOrDefault(ownedLoc.OwnerId)?.Name ?? "Unknown Player";
+                var rawOwnerName = source?.PlayersById?.GetValueOrDefault(ownedLoc.OwnerId)?.Name;
+                ILocalizedText ownerName = rawOwnerName != null
+                    ? new HardCodedText(rawOwnerName)
+                    : Translator.Translations[LocalizationCodes.LC_UNKNOWN_PLAYER].Bind();
+
                 var ownerGuild = source?.GuildsByPlayerId?.GetValueOrDefault(ownedLoc.OwnerId);
 
                 var isGuildOwner = ownedLoc.Location.Type == LocationType.Base && ownerGuild?.MemberIds?.Count > 1;
-                LocationOwner = isGuildOwner ? ownerGuild?.Name ?? "Unknown Guild" : ownerName;
+
+                if (isGuildOwner)
+                {
+                    if (ownerGuild?.Name != null) LocationOwner = new HardCodedText(ownerGuild.Name);
+                    else LocationOwner = Translator.Translations[LocalizationCodes.LC_UNKNOWN_GUILD].Bind();
+                }
+                else
+                {
+                    LocationOwner = ownerName;
+                }
             }
 
             switch (ownedLoc.Location.Type)
             {
                 case LocationType.PlayerParty:
-                    LocationCoordDescription = $"Party, slot {ownedLoc.Location.Index + 1}";
+                    LocationCoordDescription = Translator.Translations[LocalizationCodes.LC_LOC_COORD_PARTY].Bind(
+                        new() { { "SlotNum", ownedLoc.Location.Index + 1 } }
+                    );
                     break;
 
                 case LocationType.Base:
                     var baseCoord = BaseCoord.FromSlotIndex(ownedLoc.Location.Index);
-                    LocationCoordDescription = $"A base, slot ({baseCoord.X},{baseCoord.Y})";
+                    LocationCoordDescription = Translator.Translations[LocalizationCodes.LC_LOC_COORD_BASE].Bind(
+                        new()
+                        {
+                            { "X", baseCoord.X },
+                            { "Y", baseCoord.Y },
+                        }
+                    );
                     break;
 
                 case LocationType.Palbox:
                     var pboxCoord = PalboxCoord.FromSlotIndex(ownedLoc.Location.Index);
-                    LocationCoordDescription = $"Palbox, tab {pboxCoord.Tab} at ({pboxCoord.X},{pboxCoord.Y})";
+                    LocationCoordDescription = Translator.Translations[LocalizationCodes.LC_LOC_COORD_PALBOX].Bind(
+                        new()
+                        {
+                            { "Tab", pboxCoord.Tab },
+                            { "X", pboxCoord.X },
+                            { "Y", pboxCoord.Y },
+                        }
+                    );
                     break;
             }
+
+            LocationOwnerDescription = Translator.Translations[LocalizationCodes.LC_LOC_OWNED_BY].Bind(
+                new()
+                {
+                    { "Owner", LocationOwner }
+                }
+            );
         }
 
         public bool IsSinglePlayer { get; }
@@ -91,10 +127,11 @@ namespace PalCalc.UI.ViewModel.Mapped
         public Visibility Visibility => ModelObject is OwnedRefLocation ? Visibility.Visible : Visibility.Collapsed;
         public Visibility OwnerVisibility => IsSinglePlayer ? Visibility.Collapsed : Visibility.Visible;
 
-        public string LocationOwner { get; }
-        public string LocationOwnerDescription => $"Owned by {LocationOwner}";
+        public ILocalizedText LocationOwner { get; }
+        
+        public ILocalizedText LocationOwnerDescription { get; }
 
-        public string LocationCoordDescription { get; }
+        public ILocalizedText LocationCoordDescription { get; }
     }
 
     public class WildPalRefLocationViewModel : IPalRefLocationViewModel

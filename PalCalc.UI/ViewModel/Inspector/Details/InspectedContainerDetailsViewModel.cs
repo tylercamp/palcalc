@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.SaveReader.SaveFile.Support.Level;
+using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +36,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
 
         public string Id => rawContainer.Id;
         public OwnerViewModel Owner => owner;
-        public string Type => locationType?.Label() ?? "Unknown";
+        public ILocalizedText Type { get; } = locationType?.Label() ?? Translator.Translations[LocalizationCodes.LC_COMMON_UNKNOWN].Bind();
     }
 }

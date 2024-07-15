@@ -123,6 +123,15 @@
   <data name="LC_ADD_NEW_SAVE" xml:space="preserve">
     <value>Add a new save...</value>
   </data>
+  <data name="LC_ANY_GUILD" xml:space="preserve">
+    <value>Any Guild</value>
+  </data>
+  <data name="LC_ANY_PLAYER" xml:space="preserve">
+    <value>Any Player</value>
+  </data>
+  <data name="LC_BASE_LABEL" xml:space="preserve">
+    <value>Base ({BaseName})</value>
+  </data>
   <data name="LC_BREEDING_TIME" xml:space="preserve">
     <value>Breeding Time (Mins)</value>
   </data>
@@ -143,6 +152,12 @@
   </data>
   <data name="LC_COMMON_GENDER_MALE" xml:space="preserve">
     <value>Male</value>
+  </data>
+  <data name="LC_COMMON_GENDER_OPPOSITE_WILDCARD" xml:space="preserve">
+    <value>Opposite Gender</value>
+  </data>
+  <data name="LC_COMMON_GENDER_WILDCARD" xml:space="preserve">
+    <value>Any Gender</value>
   </data>
   <data name="LC_COMMON_IVS" xml:space="preserve">
     <value>IVs</value>
@@ -171,6 +186,9 @@
   <data name="LC_COMMON_TRAITS" xml:space="preserve">
     <value>Traits</value>
   </data>
+  <data name="LC_COMMON_UNKNOWN" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
   <data name="LC_EXPORT_CRASH_LOG" xml:space="preserve">
     <value>Export Crash Log</value>
   </data>
@@ -186,6 +204,9 @@
   <data name="LC_GAME_SETTINGS" xml:space="preserve">
     <value>Game Settings</value>
   </data>
+  <data name="LC_GUILD_LABEL" xml:space="preserve">
+    <value>Guild '{GuildName}'</value>
+  </data>
   <data name="LC_INSPECT_SAVE" xml:space="preserve">
     <value>Inspect</value>
   </data>
@@ -197,6 +218,21 @@
   </data>
   <data name="LC_LIST_SEPARATOR" xml:space="preserve">
     <value>, </value>
+  </data>
+  <data name="LC_LOC_COORD_BASE" xml:space="preserve">
+    <value>A base, slot ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_COORD_PALBOX" xml:space="preserve">
+    <value>Palbox, tab {Tab} at ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_COORD_PARTY" xml:space="preserve">
+    <value>Party, slot {SlotNum}</value>
+  </data>
+  <data name="LC_LOC_OWNED_BY" xml:space="preserve">
+    <value>Owned by {Owner}</value>
+  </data>
+  <data name="LC_LOC_PALBOX_TAB" xml:space="preserve">
+    <value>Tab {Tab}</value>
   </data>
   <data name="LC_MULTIPLE_BREEDING_FARMS" xml:space="preserve">
     <value>Multiple Breeding Farms</value>
@@ -222,8 +258,20 @@
   <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
     <value>Search</value>
   </data>
+  <data name="LC_PAL_LABEL" xml:space="preserve">
+    <value>{PalName} (#{PaldexNum})</value>
+  </data>
+  <data name="LC_PAL_LOC_BASE" xml:space="preserve">
+    <value>Base</value>
+  </data>
   <data name="LC_PAL_LOC_CAPTURED" xml:space="preserve">
     <value>Captured</value>
+  </data>
+  <data name="LC_PAL_LOC_PALBOX" xml:space="preserve">
+    <value>Palbox</value>
+  </data>
+  <data name="LC_PAL_LOC_PARTY" xml:space="preserve">
+    <value>Party</value>
   </data>
   <data name="LC_PAL_TARGET_OPTIONAL_TRAITS" xml:space="preserve">
     <value>Optional</value>
@@ -231,14 +279,32 @@
   <data name="LC_PAL_TARGET_REQUIRED_TRAITS" xml:space="preserve">
     <value>Required</value>
   </data>
+  <data name="LC_PLAYER_LABEL" xml:space="preserve">
+    <value>Player '{PlayerName}'</value>
+  </data>
   <data name="LC_POPUP_TITLE_LOADING_SAVE_FILE" xml:space="preserve">
     <value>Loading Save File</value>
+  </data>
+  <data name="LC_RANDOM_TRAIT" xml:space="preserve">
+    <value>(Random)</value>
   </data>
   <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve">
     <value>With {TraitsList}</value>
   </data>
+  <data name="LC_RESULT_BREEDING_ATTEMPTS" xml:space="preserve">
+    <value>{AvgAttempts} attempts</value>
+  </data>
   <data name="LC_RESULT_INPUT_LOCS" xml:space="preserve">
     <value>Input Locations</value>
+  </data>
+  <data name="LC_RESULT_LABEL" xml:space="preserve">
+    <value>{PalName} with {TraitsList}, takes ~{TimeEstimate}</value>
+  </data>
+  <data name="LC_RESULT_LIST_TITLE_COUNT" xml:space="preserve">
+    <value>{NumResults} Results</value>
+  </data>
+  <data name="LC_RESULT_LIST_TITLE_EMPTY" xml:space="preserve">
+    <value>Results</value>
   </data>
   <data name="LC_RESULT_NUM_STEPS" xml:space="preserve">
     <value># Steps</value>
@@ -267,6 +333,9 @@
   <data name="LC_SAVEINSPECT_SLOT_EMPTY" xml:space="preserve">
     <value>Empty</value>
   </data>
+  <data name="LC_SAVESEARCH_CONTAINER_LABEL" xml:space="preserve">
+    <value>{Label} ({NumMatches} matches)</value>
+  </data>
   <data name="LC_SAVESEARCH_GRP_PAL_CONTAINERS" xml:space="preserve">
     <value>Pal Containers</value>
   </data>
@@ -284,6 +353,9 @@
   </data>
   <data name="LC_SAVEWINDOW_TAB_SEARCH" xml:space="preserve">
     <value>Search</value>
+  </data>
+  <data name="LC_SAVEWINDOW_TITLE" xml:space="preserve">
+    <value>Save Inspector - {SaveLabel}</value>
   </data>
   <data name="LC_SAVE_FILE" xml:space="preserve">
     <value>Save File</value>
@@ -371,6 +443,12 @@
   </data>
   <data name="LC_TARGET_PALS" xml:space="preserve">
     <value>Target Pals</value>
+  </data>
+  <data name="LC_UNKNOWN_GUILD" xml:space="preserve">
+    <value>Unknown Guild</value>
+  </data>
+  <data name="LC_UNKNOWN_PLAYER" xml:space="preserve">
+    <value>Unknown Player</value>
   </data>
   <data name="LC_UPDATE_AVAILABLE" xml:space="preserve">
     <value>An update is available!</value>

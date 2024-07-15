@@ -26,7 +26,14 @@ namespace PalCalc.UI.Localization
             {
                 var result = src.BaseLocalizedText;
                 foreach (var p in src.Parameters)
-                    result = result.Replace("{" + p + "}", formatArgs[p].ToString());
+                {
+                    var rawArgVal = formatArgs[p];
+                    var argText = rawArgVal is ILocalizedText
+                        ? (rawArgVal as ILocalizedText).Value
+                        : rawArgVal.ToString();
+
+                    result = result.Replace("{" + p + "}", argText);
+                }
                 return result;
             }
         }

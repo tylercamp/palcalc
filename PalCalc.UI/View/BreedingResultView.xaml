@@ -28,10 +28,10 @@
                     <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="White" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="{Binding Pal.Name.Value}" />
-                        <TextBlock Text="{Binding Gender}" FontSize="10" />
+                        <TextBlock Text="{Binding Gender.Value}" FontSize="10" />
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">
-                                <Run Text="{Binding AvgRequiredAttemptsDescription, Mode=OneWay}" />
+                                <Run Text="{Binding AvgRequiredAttemptsDescription.Value, Mode=OneWay}" />
                                 <Run Text=" - " />
                             </TextBlock>
                             <TextBlock Text="{Binding Effort}" FontSize="10" Visibility="{Binding EffortVisibility}" />
@@ -46,8 +46,8 @@
                                             </Style>
                                         </StackPanel.Resources>
                                         
-                                        <TextBlock Text="{Binding LocationOwnerDescription}" FontSize="10" Visibility="{Binding OwnerVisibility}"/>
-                                        <TextBlock Text="{Binding LocationCoordDescription}" FontSize="10" />
+                                        <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" Visibility="{Binding OwnerVisibility}"/>
+                                        <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" />
                                     </StackPanel>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type mvm:CompositePalRefLocationViewModel}">
@@ -60,16 +60,16 @@
                                         </StackPanel.Resources>
                                         <StackPanel Orientation="Vertical" Grid.Column="0" MaxWidth="80">
                                             <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_MALE}" />
-                                            <TextBlock Text="{Binding MaleViewModel.LocationOwner}" TextWrapping="WrapWithOverflow" Visibility="{Binding MaleViewModel.OwnerVisibility}" />
-                                            <TextBlock Text="{Binding MaleViewModel.LocationCoordDescription}" />
+                                            <TextBlock Text="{Binding MaleViewModel.LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding MaleViewModel.OwnerVisibility}" />
+                                            <TextBlock Text="{Binding MaleViewModel.LocationCoordDescription.Value}" />
                                         </StackPanel>
                                 
                                         <Border BorderBrush="White" Width="1" BorderThickness="1" Margin="10" Grid.Column="1" />
                                         
                                         <StackPanel Orientation="Vertical" Grid.Column="2" MaxWidth="80">
                                             <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_FEMALE}" />
-                                            <TextBlock Text="{Binding FemaleViewModel.LocationOwner}" TextWrapping="WrapWithOverflow" Visibility="{Binding FemaleViewModel.OwnerVisibility}" />
-                                            <TextBlock Text="{Binding FemaleViewModel.LocationCoordDescription}" />
+                                            <TextBlock Text="{Binding FemaleViewModel.LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding FemaleViewModel.OwnerVisibility}" />
+                                            <TextBlock Text="{Binding FemaleViewModel.LocationCoordDescription.Value}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>

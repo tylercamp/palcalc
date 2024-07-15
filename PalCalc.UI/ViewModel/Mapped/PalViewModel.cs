@@ -21,6 +21,17 @@ namespace PalCalc.UI.ViewModel.Mapped
             ModelObject = pal;
 
             Name = NameLocalizer.Bind(ModelObject);
+
+            if (pal != null)
+            {
+                Label = Translator.Translations[LocalizationCodes.LC_PAL_LABEL].Bind(
+                    new()
+                    {
+                        { "PalName", Name },
+                        { "PaldexNum", ModelObject.Id }
+                    }
+                );
+            }
         }
 
         public ILocalizedText Name { get; }
@@ -31,8 +42,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         public ImageSource Icon => PalIcon.Images[ModelObject];
         public ImageBrush IconBrush => PalIcon.ImageBrushes[ModelObject];
 
-        // TODO - localize
-        public string Label => ModelObject == null ? "" : $"{ModelObject.Name} (#{ModelObject.Id})";
+        public ILocalizedText Label { get; }
 
         public override bool Equals(object obj) => ModelObject.Equals((obj as PalViewModel)?.ModelObject);
         public override int GetHashCode() => ModelObject.GetHashCode();

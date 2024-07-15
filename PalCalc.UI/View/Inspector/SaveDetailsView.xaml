@@ -25,11 +25,11 @@
                     <StackPanel>
                         <TextBlock>
                             <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_TYPE}" />
-                            <Run Text="{Binding Type, Mode=OneTime}" />
+                            <Run Text="{Binding Type.Value, Mode=OneTime}" />
                         </TextBlock>
                         <TextBlock>
                             <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_OWNER}" />
-                            <Run Text="{Binding Owner.Name, Mode=OneTime}" />
+                            <Run Text="{Binding Owner.Name.Value, Mode=OneTime}" />
                         </TextBlock>
                         <TextBlock>
                             <Run Text="{Binding UsedSlots, Mode=OneTime}" />
@@ -69,7 +69,7 @@
                             <DataTemplate DataType="{x:Type dvm:PalContainerSlotDetailsViewModel}">
                                 <StackPanel Orientation="Vertical">
                                     <Image Source="{Binding Icon}" Width="50" Height="50" Margin="0,0,5,0" />
-                                    <TextBlock Text="{Binding DisplayName}" HorizontalAlignment="Center" />
+                                    <TextBlock Text="{Binding DisplayName.Value}" HorizontalAlignment="Center" />
                                 </StackPanel>
                             </DataTemplate>
                         </ContentControl.Resources>

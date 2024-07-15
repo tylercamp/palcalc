@@ -62,6 +62,8 @@ namespace PalCalc.UI.ViewModel
 
         public TimeSpan TimeEstimate => DisplayedResult?.BreedingEffort ?? TimeSpan.Zero;
         public string TimeEstimateLabel => TimeEstimate.TimeSpanSecondsStr();
+
+        // LC_RESULT_LABEL
         public string Label => $"{DisplayedResult?.ToString() ?? "Unknown"}, takes ~{TimeEstimate.TimeSpanMinutesStr()}";
 
         public int NumWildPals => DisplayedResult.NumWildPalParticipants();

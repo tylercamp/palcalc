@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
         d:DataContext="{x:Static svm:SaveInspectorWindowViewModel.DesignerInstance}"
-        Title="{Binding WindowTitle}" Height="450" Width="900">
+        Title="{Binding WindowTitle.Value}" Height="450" Width="900">
     <TabControl>
         <TabItem Header="{itl:LocalizedText LC_SAVEWINDOW_TAB_SEARCH}">
             <local:SearchView DataContext="{Binding Search}" />

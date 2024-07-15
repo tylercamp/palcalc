@@ -39,7 +39,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         private static readonly DerivedLocalizableText<Trait> NameLocalizer = new DerivedLocalizableText<Trait>(
             (locale, trait) => trait switch
             {
-                RandomTrait => "(Random)", // TODO
+                RandomTrait => Translator.Localizations[locale][LocalizationCodes.LC_RANDOM_TRAIT],
                 _ => trait.LocalizedNames?.GetValueOrElse(locale.ToFormalName(), trait.Name) ?? trait.InternalName
             }
         );

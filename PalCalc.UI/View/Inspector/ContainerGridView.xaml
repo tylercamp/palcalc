@@ -10,7 +10,7 @@
              d:DataContext="{x:Static svm:ContainerGridViewModel.DesignerInstance}"
              d:Background="White">
     <StackPanel>
-        <Label Content="{Binding Title}" Visibility="{Binding TitleVisibility}" FontWeight="Bold" />
+        <Label Content="{Binding Title.Value}" Visibility="{Binding TitleVisibility}" FontWeight="Bold" />
         <ListView ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>

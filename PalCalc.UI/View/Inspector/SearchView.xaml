@@ -30,19 +30,19 @@
             <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Label}" />
+                        <TextBlock Text="{Binding Label.Value}" />
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type svm:PlayerTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Label}" />
+                        <TextBlock Text="{Binding Label.Value}" />
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel}" />
+                        <TextBlock Text="{Binding SearchedLabel.Value}" />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel}" />
+                        <TextBlock Text="{Binding SearchedLabel.Value}" />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel}" />
+                        <TextBlock Text="{Binding SearchedLabel.Value}" />
                     </DataTemplate>
                 </TreeView.Resources>
             </TreeView>
@@ -67,10 +67,10 @@
 
                         <StackPanel Orientation="Vertical">
                             <Label Content="{itl:LocalizedText LC_COMMON_PAL}" />
-                            <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{Binding SearchSettings.PalOptions}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label">
+                            <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{Binding SearchSettings.PalOptions}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label.Value">
                                 <dnkc:AutoCompleteComboBox.ItemTemplate>
                                     <DataTemplate DataType="mvm:PalViewModel">
-                                        <TextBlock Text="{Binding Label}" />
+                                        <TextBlock Text="{Binding Label.Value}" />
                                     </DataTemplate>
                                 </dnkc:AutoCompleteComboBox.ItemTemplate>
                             </dnkc:AutoCompleteComboBox>
@@ -81,7 +81,7 @@
                             <ComboBox ItemsSource="{Binding SearchSettings.GenderOptions}" SelectedItem="{Binding SearchSettings.SearchedGender}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate DataType="{x:Type svm:GenderOption}">
-                                        <TextBlock Text="{Binding Label}" />
+                                        <TextBlock Text="{Binding Label.Value}" />
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
@@ -98,14 +98,14 @@
                             <WrapPanel Orientation="Horizontal">
                                 <WrapPanel.Resources>
                                     <DataTemplate x:Key="TraitTemplate" DataType="{x:Type mvm:TraitViewModel}">
-                                        <TextBlock Text="{Binding Name}" />
+                                        <TextBlock Text="{Binding Name.Value}" />
                                     </DataTemplate>
                                 </WrapPanel.Resources>
 
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait1}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait2}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait3}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait4}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait1}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait2}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait3}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait4}" ItemTemplate="{StaticResource TraitTemplate}" />
                             </WrapPanel>
                         </StackPanel>
 
@@ -166,7 +166,7 @@
                                     <Run Text="{itl:LocalizedText LC_COMMON_LEVEL}" />
                                     <Run Text="{Binding PalInstance.ModelObject.Level}" />
                                 </TextBlock>
-                                <TextBlock Text="{Binding PalInstance.Gender}" />
+                                <TextBlock Text="{Binding PalInstance.Gender.Value}" />
                             </StackPanel>
                         </StackPanel>
 
