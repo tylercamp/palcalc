@@ -92,7 +92,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                 
-                    <GroupBox Header="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.ResultsHeading}" Grid.Row="0">
+                    <GroupBox Header="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.ResultsHeading.Value}" Grid.Row="0">
                         <v:BreedingResultListView BorderThickness="0" DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
                     </GroupBox>
 

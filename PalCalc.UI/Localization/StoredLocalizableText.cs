@@ -9,18 +9,19 @@ namespace PalCalc.UI.Localization
 {
     public class StoredLocalizableText : ILocalizableText
     {
-        public StoredLocalizableText(string id)
+        public StoredLocalizableText(LocalizationCodes code)
         {
-            Id = id;
+            Code = code;
 
-            Parameters = id.Split('|').Skip(1).Select(p => p.Trim()).ToList();
+            var format = Translator.CodeToFormat[code];
+            Parameters = format.Split('|').Skip(1).Select(p => p.Trim()).ToList();
         }
 
-        public string Id { get; }
+        public LocalizationCodes Code { get; }
 
         public List<string> Parameters { get; }
 
-        public string BaseLocalizedText => Translator.Localizations[Locale][Id];
+        public string BaseLocalizedText => Translator.Localizations[Locale][Code];
 
 
         public StoredLocalizedText Bind() => Bind([]);

@@ -189,6 +189,29 @@
   <data name="LC_COMMON_UNKNOWN" xml:space="preserve">
     <value>Unknown</value>
   </data>
+  <data name="LC_CRASHLOG_FAILED" xml:space="preserve">
+    <value>Could not create the crashlog file.</value>
+  </data>
+  <data name="LC_DELETE_PAL_TARGET_MSG" xml:space="preserve">
+    <value>Delete this entry for {PalName}?</value>
+  </data>
+  <data name="LC_DELETE_PAL_TARGET_TITLE" xml:space="preserve">
+    <value>Delete Pal Target</value>
+  </data>
+  <data name="LC_ERROR_HARD_CRASH" xml:space="preserve">
+    <value>An unhandled error occurred.
+
+Please find the generated ZIP file to send with any support questions:
+
+{CrashlogPath}</value>
+  </data>
+  <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve">
+    <value>An error occurred when loading the save file.
+
+Please find the generated ZIP file to send with any support questions:
+
+{CrashlogPath}</value>
+  </data>
   <data name="LC_EXPORT_CRASH_LOG" xml:space="preserve">
     <value>Export Crash Log</value>
   </data>
@@ -203,6 +226,15 @@
   </data>
   <data name="LC_GAME_SETTINGS" xml:space="preserve">
     <value>Game Settings</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_CUSTOM" xml:space="preserve">
+    <value>Custom</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_FILL" xml:space="preserve">
+    <value>Fill</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_PERCENT" xml:space="preserve">
+    <value>Zoom:</value>
   </data>
   <data name="LC_GUILD_LABEL" xml:space="preserve">
     <value>Guild '{GuildName}'</value>
@@ -233,6 +265,18 @@
   </data>
   <data name="LC_LOC_PALBOX_TAB" xml:space="preserve">
     <value>Tab {Tab}</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_ALREADY_REGISTERED" xml:space="preserve">
+    <value>The selected file has already been registered.</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_EXTENSION_LBL" xml:space="preserve">
+    <value>Level save file</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_INCOMPLETE" xml:space="preserve">
+    <value>The selected file is not in a complete save-game folder.</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_SELECTOR_TITLE" xml:space="preserve">
+    <value>Select the 'Level.sav' file in your save folder</value>
   </data>
   <data name="LC_MULTIPLE_BREEDING_FARMS" xml:space="preserve">
     <value>Multiple Breeding Farms</value>
@@ -267,17 +311,29 @@
   <data name="LC_PAL_LOC_CAPTURED" xml:space="preserve">
     <value>Captured</value>
   </data>
+  <data name="LC_PAL_LOC_COUNT" xml:space="preserve">
+    <value>{Count} in {LocType}</value>
+  </data>
   <data name="LC_PAL_LOC_PALBOX" xml:space="preserve">
     <value>Palbox</value>
   </data>
   <data name="LC_PAL_LOC_PARTY" xml:space="preserve">
     <value>Party</value>
   </data>
+  <data name="LC_PAL_SRC_ANY_GUILD_MEMBER" xml:space="preserve">
+    <value>Any guild member</value>
+  </data>
+  <data name="LC_PAL_SRC_ANY_PLAYER_GUILD" xml:space="preserve">
+    <value>Any player in any guild</value>
+  </data>
   <data name="LC_PAL_TARGET_OPTIONAL_TRAITS" xml:space="preserve">
     <value>Optional</value>
   </data>
   <data name="LC_PAL_TARGET_REQUIRED_TRAITS" xml:space="preserve">
     <value>Required</value>
+  </data>
+  <data name="LC_PAL_WILD_COUNT" xml:space="preserve">
+    <value>{NumWild} Wild</value>
   </data>
   <data name="LC_PLAYER_LABEL" xml:space="preserve">
     <value>Player '{PlayerName}'</value>
@@ -360,6 +416,9 @@
   <data name="LC_SAVE_FILE" xml:space="preserve">
     <value>Save File</value>
   </data>
+  <data name="LC_SAVE_FILE_RELOADING" xml:space="preserve">
+    <value>Save file was not yet cached or cache is outdated, reading content...</value>
+  </data>
   <data name="LC_SAVE_GAME" xml:space="preserve">
     <value>Game</value>
   </data>
@@ -377,6 +436,9 @@
   </data>
   <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
     <value>The Xbox save file is incomplete, but features will still work. This resolves automatically when Palworld is closed for a few minutes and Pal Calc is restarted.</value>
+  </data>
+  <data name="LC_SAVE_INSPECTOR_LOADING" xml:space="preserve">
+    <value>Reading raw save data...</value>
   </data>
   <data name="LC_SAVE_LOCATION" xml:space="preserve">
     <value>Location</value>
@@ -401,6 +463,9 @@
   </data>
   <data name="LC_SOLVER_RUN" xml:space="preserve">
     <value>Run</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS" xml:space="preserve">
+    <value>Allowed Wild Pals</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS" xml:space="preserve">
     <value>Max Bred Irrelevant Traits</value>
@@ -432,6 +497,12 @@
   <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION" xml:space="preserve">
     <value>The maximum number of wild pals to allow in a breeding path.&amp;#10;Higher values linearly affect time required, depending on how many types of pals are owned.</value>
   </data>
+  <data name="LC_SOLVER_STATUS_BREEDING" xml:space="preserve">
+    <value>Breeding step {StepNum}, calculating child pals and probabilities of {WorkSize} pairs</value>
+  </data>
+  <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve">
+    <value>Finished (took {Duration})</value>
+  </data>
   <data name="LC_SOURCE_PALS" xml:space="preserve">
     <value>Source Pals</value>
   </data>
@@ -444,6 +515,15 @@
   <data name="LC_TARGET_PALS" xml:space="preserve">
     <value>Target Pals</value>
   </data>
+  <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">
+    <value>no traits</value>
+  </data>
+  <data name="LC_TRAITS_COUNT_RANDOM" xml:space="preserve">
+    <value>{NumRandom} random</value>
+  </data>
+  <data name="LC_TRAITS_COUNT_UNRECOGNIZED" xml:space="preserve">
+    <value>{NumUnrecognized} unrecognized</value>
+  </data>
   <data name="LC_UNKNOWN_GUILD" xml:space="preserve">
     <value>Unknown Guild</value>
   </data>
@@ -455,5 +535,8 @@
   </data>
   <data name="LC_WINDOW_TITLE" xml:space="preserve">
     <value>Pal Calc</value>
+  </data>
+  <data name="LV_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
+    <value>Initializing</value>
   </data>
 </root>

@@ -4,8 +4,10 @@ using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.GraphSharp;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,16 +65,13 @@ namespace PalCalc.UI.ViewModel
         public TimeSpan TimeEstimate => DisplayedResult?.BreedingEffort ?? TimeSpan.Zero;
         public string TimeEstimateLabel => TimeEstimate.TimeSpanSecondsStr();
 
-        // LC_RESULT_LABEL
-        public string Label => $"{DisplayedResult?.ToString() ?? "Unknown"}, takes ~{TimeEstimate.TimeSpanMinutesStr()}";
+        public ILocalizedText Label { get; private set; }
 
         public int NumWildPals => DisplayedResult.NumWildPalParticipants();
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
 
-        public string FinalTraits => DisplayedResult.EffectiveTraitsString ?? string.Empty;
-
-        private string inputLocations;
-        public string InputLocations
+        private ILocalizedText inputLocations;
+        public ILocalizedText InputLocations
         {
             get
             {
@@ -106,14 +105,20 @@ namespace PalCalc.UI.ViewModel
                             LocationType.PlayerParty => 2,
                             _ => throw new NotImplementedException()
                         })
-                        .Select(g => $"{g.Count()} in {g.Key.Label()}")
+                        .Select(g => Translator.Translations[LocalizationCodes.LC_PAL_LOC_COUNT].Bind(
+                            new()
+                            {
+                                { "Count", g.Count() },
+                                { "LocType", g.Key.Label() },
+                            }
+                        ))
                         .ToList();
 
                     var numWildPals = DisplayedResult.AllReferences().Count(r => r is WildPalReference);
                     if (numWildPals > 0)
-                        descriptionParts.Add($"{numWildPals} Wild");
+                        descriptionParts.Add(Translator.Translations[LocalizationCodes.LC_PAL_WILD_COUNT].Bind(new() { { "NumWild", numWildPals } }));
 
-                    inputLocations = string.Join(", ", descriptionParts);
+                    inputLocations = Translator.Join.Bind(descriptionParts);
                 }
 
                 return inputLocations;
@@ -135,10 +140,24 @@ namespace PalCalc.UI.ViewModel
                 if (displayedResult == null) Graph = null;
                 else Graph = BreedingGraph.FromPalReference(source, value);
 
+                Label = DisplayedResult == null
+                    ? Translator.Translations[LocalizationCodes.LC_COMMON_UNKNOWN].Bind()
+                    : Translator.Translations[LocalizationCodes.LC_RESULT_LABEL].Bind(
+                        new()
+                        {
+                            { "PalName", new PalViewModel(DisplayedResult.Pal).Label },
+                            { "TraitsList", EffectiveTraits.Description },
+                            { "TimeEstimate", TimeEstimate.TimeSpanMinutesStr() }
+                        }
+                    );
+
                 OnPropertyChanged(nameof(DisplayedResult));
+                OnPropertyChanged(nameof(Label));
                 OnPropertyChanged(nameof(Graph));
                 OnPropertyChanged(nameof(HasValue));
             }
         }
+
+        public TraitCollectionViewModel EffectiveTraits => new TraitCollectionViewModel(DisplayedResult.EffectiveTraits.Select(t => new TraitViewModel(t)));
     }
 }

@@ -120,7 +120,7 @@ namespace PalCalc.UI.ViewModel
         }
 
         [ObservableProperty]
-        private string title = "Pal Checklist";
+        private ILocalizedText title = new HardCodedText("Pal Checklist");
 
         [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         [ObservableProperty]

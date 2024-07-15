@@ -45,7 +45,7 @@
             />
         </StackPanel>
 
-        <Button Command="{Binding ChangeWildPals}" Height="20">Allowed Wild Pals</Button>
+        <Button Command="{Binding ChangeWildPals}" Height="20" Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS}" />
     </StackPanel>
 
     <StackPanel Margin="10,0" VerticalAlignment="Center">

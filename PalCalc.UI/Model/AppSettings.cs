@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -31,5 +32,7 @@ namespace PalCalc.UI.Model
         public SolverSettings SolverSettings { get; set; } = new SolverSettings();
 
         public string SelectedGameIdentifier { get; set; } = null;
+
+        public TranslationLocale Locale { get; set; } = TranslationLocale.en;
     }
 }

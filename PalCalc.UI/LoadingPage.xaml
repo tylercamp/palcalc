@@ -12,6 +12,6 @@
       Title="LoadingPage">
 
     <StackPanel VerticalAlignment="Center">
-        <TextBlock HorizontalAlignment="Center" FontSize="20" Text="{itl:LocalizedText LC_STARTUP_LOADING}" />
+        <TextBlock HorizontalAlignment="Center" FontSize="20" Text="{itl:LocalizedText Code=LC_STARTUP_LOADING}" />
     </StackPanel>
 </Page>

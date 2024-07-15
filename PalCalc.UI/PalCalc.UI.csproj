@@ -386,17 +386,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Localization\LocalizationCodes.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LocalizationCodes.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Update="Localization\LocalizationCodes.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>LocalizationCodes.Designer.cs</LastGenOutput>
+      <Generator></Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Localization\Localizations\de.resx">
       <Generator></Generator>
@@ -428,6 +419,26 @@
     <EmbeddedResource Update="Localization\Localizations\zh-Hant.resx">
       <Generator></Generator>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Localization\LocalizationCodes.Designer.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>LocalizationCodes.resx</DependentUpon>
+      <LastGenOutput>LocalizationCodes.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Localization\LocalizationCodes.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LocalizationCodes.Designer.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

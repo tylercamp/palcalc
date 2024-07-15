@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
@@ -44,12 +45,51 @@ namespace PalCalc.UI.ViewModel
             ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
             ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Spacing) });
             ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+
+            if (!Traits.Any())
+            {
+                Description = Translator.Translations[LocalizationCodes.LC_TRAITS_COUNT_EMPTY].Bind();
+            }
+            else
+            {
+                var definite = traits.Where(t => t.ModelObject is not IUnknownTrait);
+                var random = traits.Where(t => t.ModelObject is RandomTrait);
+                var unrecognized = traits.Where(t => t.ModelObject is UnrecognizedTrait);
+
+                var parts = new List<ILocalizedText>(definite.Select(t => t.Name));
+
+                if (random.Any())
+                    parts.Add(
+                        Translator.Translations[LocalizationCodes.LC_TRAITS_COUNT_RANDOM].Bind(new() { { "NumRandom", random.Count() } })
+                    );
+
+                if (unrecognized.Any())
+                    parts.Add(
+                        Translator.Translations[LocalizationCodes.LC_TRAITS_COUNT_UNRECOGNIZED].Bind(new() { { "NumUnrecognized", unrecognized.Count() } })
+                    );
+
+                Description = Translator.Join.Bind(parts);
+            }
+
+            RequiredDescription = Translator.Translations[LocalizationCodes.LC_REQUIRED_TRAITS_SUMMARY].Bind(
+                new()
+                {
+                    { "TraitsList", Description }
+                }
+            );
+
+            OptionalDescription = Translator.Translations[LocalizationCodes.LC_OPTIONAL_TRAITS_SUMMARY].Bind(
+                new()
+                {
+                    { "TraitsList", Description }
+                }
+            );
         }
 
-        public string Description => Traits.Select(t => t.ModelObject).TraitsListToString();
+        public ILocalizedText Description { get; }
 
-        public string RequiredDescription => $"With {Description}";
-        public string OptionalDescription => $"Optionally with {Description}";
+        public ILocalizedText RequiredDescription { get; }
+        public ILocalizedText OptionalDescription { get; }
 
         public List<TraitViewModel> Traits { get; }
 

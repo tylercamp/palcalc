@@ -14,5 +14,10 @@ namespace PalCalc.UI.Localization
         private TranslationLocale locale;
 
         public abstract string Value { get; }
+
+        public override bool Equals(object obj) => obj?.GetHashCode() == GetHashCode();
+        public override int GetHashCode() => HashCode.Combine(this.GetType(), Value);
+
+        public override string ToString() => throw new Exception();
     }
 }

@@ -24,6 +24,9 @@ namespace PalCalc.UI.Localization
         {
             get
             {
+                if (Translator.DEBUG_DISABLE_TRANSLATIONS)
+                    return src.Code.ToString();
+
                 var result = src.BaseLocalizedText;
                 foreach (var p in src.Parameters)
                 {
@@ -38,6 +41,7 @@ namespace PalCalc.UI.Localization
             }
         }
 
-        public override string ToString() => $"{src} => {Value}";
+        
+        //public override string ToString() => $"{src} => {Value}";
     }
 }

@@ -189,6 +189,21 @@
   <data name="LC_COMMON_UNKNOWN" xml:space="preserve">
     <value>LC_COMMON_UNKNOWN</value>
   </data>
+  <data name="LC_CRASHLOG_FAILED" xml:space="preserve">
+    <value>LC_CRASHLOG_FAILED</value>
+  </data>
+  <data name="LC_DELETE_PAL_TARGET_MSG" xml:space="preserve">
+    <value>LC_DELETE_PAL_TARGET_MSG | PalName</value>
+  </data>
+  <data name="LC_DELETE_PAL_TARGET_TITLE" xml:space="preserve">
+    <value>LC_DELETE_PAL_TARGET_TITLE</value>
+  </data>
+  <data name="LC_ERROR_HARD_CRASH" xml:space="preserve">
+    <value>LC_ERROR_HARD_CRASH | CrashlogPath</value>
+  </data>
+  <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve">
+    <value>LC_ERROR_SAVE_LOAD_FAILED | CrashlogPath</value>
+  </data>
   <data name="LC_EXPORT_CRASH_LOG" xml:space="preserve">
     <value>LC_EXPORT_CRASH_LOG</value>
   </data>
@@ -203,6 +218,15 @@
   </data>
   <data name="LC_GAME_SETTINGS" xml:space="preserve">
     <value>LC_GAME_SETTINGS</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_CUSTOM" xml:space="preserve">
+    <value>LC_GRAPH_ZOOM_CUSTOM</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_FILL" xml:space="preserve">
+    <value>LC_GRAPH_ZOOM_FILL</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_PERCENT" xml:space="preserve">
+    <value>LC_GRAPH_ZOOM_PERCENT</value>
   </data>
   <data name="LC_GUILD_LABEL" xml:space="preserve">
     <value>LC_GUILD_LABEL | GuildName</value>
@@ -234,6 +258,18 @@
   </data>
   <data name="LC_LOC_PALBOX_TAB" xml:space="preserve">
     <value>LC_LOC_PALBOX_TAB | Tab</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_ALREADY_REGISTERED" xml:space="preserve">
+    <value>LC_MANUAL_SAVE_ALREADY_REGISTERED</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_EXTENSION_LBL" xml:space="preserve">
+    <value>LC_MANUAL_SAVE_EXTENSION_LBL</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_INCOMPLETE" xml:space="preserve">
+    <value>LC_MANUAL_SAVE_INCOMPLETE</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_SELECTOR_TITLE" xml:space="preserve">
+    <value>LC_MANUAL_SAVE_SELECTOR_TITLE</value>
   </data>
   <data name="LC_MULTIPLE_BREEDING_FARMS" xml:space="preserve">
     <value>LC_MULTIPLE_BREEDING_FARMS</value>
@@ -268,17 +304,29 @@
   <data name="LC_PAL_LOC_CAPTURED" xml:space="preserve">
     <value>LC_PAL_LOC_CAPTURED</value>
   </data>
+  <data name="LC_PAL_LOC_COUNT" xml:space="preserve">
+    <value>LC_PAL_LOC_COUNT | Count | LocType</value>
+  </data>
   <data name="LC_PAL_LOC_PALBOX" xml:space="preserve">
     <value>LC_PAL_LOC_PALBOX</value>
   </data>
   <data name="LC_PAL_LOC_PARTY" xml:space="preserve">
     <value>LC_PAL_LOC_PARTY</value>
   </data>
+  <data name="LC_PAL_SRC_ANY_GUILD_MEMBER" xml:space="preserve">
+    <value>LC_PAL_SRC_ANY_GUILD_MEMBER</value>
+  </data>
+  <data name="LC_PAL_SRC_ANY_PLAYER_GUILD" xml:space="preserve">
+    <value>LC_PAL_SRC_ANY_PLAYER_GUILD</value>
+  </data>
   <data name="LC_PAL_TARGET_OPTIONAL_TRAITS" xml:space="preserve">
     <value>LC_PAL_TARGET_OPTIONAL_TRAITS</value>
   </data>
   <data name="LC_PAL_TARGET_REQUIRED_TRAITS" xml:space="preserve">
     <value>LC_PAL_TARGET_REQUIRED_TRAITS</value>
+  </data>
+  <data name="LC_PAL_WILD_COUNT" xml:space="preserve">
+    <value>LC_PAL_WILD_COUNT | NumWild</value>
   </data>
   <data name="LC_PLAYER_LABEL" xml:space="preserve">
     <value>LC_PLAYER_LABEL | PlayerName</value>
@@ -361,6 +409,9 @@
   <data name="LC_SAVE_FILE" xml:space="preserve">
     <value>LC_SAVE_FILE</value>
   </data>
+  <data name="LC_SAVE_FILE_RELOADING" xml:space="preserve">
+    <value>LC_SAVE_FILE_RELOADING</value>
+  </data>
   <data name="LC_SAVE_GAME" xml:space="preserve">
     <value>LC_SAVE_GAME</value>
   </data>
@@ -378,6 +429,9 @@
   </data>
   <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
     <value>LC_SAVE_GAME_XBOX_INCOMPLETE</value>
+  </data>
+  <data name="LC_SAVE_INSPECTOR_LOADING" xml:space="preserve">
+    <value>LC_SAVE_INSPECTOR_LOADING</value>
   </data>
   <data name="LC_SAVE_LOCATION" xml:space="preserve">
     <value>LC_SAVE_LOCATION</value>
@@ -402,6 +456,9 @@
   </data>
   <data name="LC_SOLVER_RUN" xml:space="preserve">
     <value>LC_SOLVER_RUN</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS" xml:space="preserve">
+    <value>LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS" xml:space="preserve">
     <value>LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS</value>
@@ -433,6 +490,12 @@
   <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION" xml:space="preserve">
     <value>LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION</value>
   </data>
+  <data name="LC_SOLVER_STATUS_BREEDING" xml:space="preserve">
+    <value>LC_SOLVER_STATUS_BREEDING | StepNum | WorkSize</value>
+  </data>
+  <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve">
+    <value>LC_SOLVER_STATUS_FINISHED | Duration</value>
+  </data>
   <data name="LC_SOURCE_PALS" xml:space="preserve">
     <value>LC_SOURCE_PALS</value>
   </data>
@@ -445,6 +508,15 @@
   <data name="LC_TARGET_PALS" xml:space="preserve">
     <value>LC_TARGET_PALS</value>
   </data>
+  <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">
+    <value>LC_TRAITS_COUNT_EMPTY</value>
+  </data>
+  <data name="LC_TRAITS_COUNT_RANDOM" xml:space="preserve">
+    <value>LC_TRAITS_COUNT_RANDOM | NumRandom</value>
+  </data>
+  <data name="LC_TRAITS_COUNT_UNRECOGNIZED" xml:space="preserve">
+    <value>LC_TRAITS_COUNT_UNRECOGNIZED | NumUnrecognized</value>
+  </data>
   <data name="LC_UNKNOWN_GUILD" xml:space="preserve">
     <value>LC_UNKNOWN_GUILD</value>
   </data>
@@ -456,5 +528,8 @@
   </data>
   <data name="LC_WINDOW_TITLE" xml:space="preserve">
     <value>LC_WINDOW_TITLE</value>
+  </data>
+  <data name="LV_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
+    <value>LV_SOLVER_STATUS_INITIALIZING</value>
   </data>
 </root>

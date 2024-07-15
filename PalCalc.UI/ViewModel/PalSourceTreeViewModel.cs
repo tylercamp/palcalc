@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.SaveReader;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
@@ -15,7 +16,7 @@ namespace PalCalc.UI.ViewModel
 {
     public interface IPalSourceTreeNode
     {
-        public string Label { get; }
+        public ILocalizedText Label { get; }
     }
 
     public interface IPalSource
@@ -35,13 +36,15 @@ namespace PalCalc.UI.ViewModel
         public PlayerSourceTreeNodeViewModel(PlayerInstance modelObject)
         {
             ModelObject = modelObject;
+
+            Label = new HardCodedText(modelObject.Name);
         }
 
         public PlayerInstance ModelObject { get; }
 
         public string Id => $"PLAYER={ModelObject.PlayerId}";
 
-        public string Label => $"{ModelObject.Name}";
+        public ILocalizedText Label { get; }
 
         public IEnumerable<PalInstance> Filter(CachedSaveGame source)
         {
@@ -69,7 +72,7 @@ namespace PalCalc.UI.ViewModel
 
         public string Id => $"GUILD={ModelObject.Id}";
 
-        public string Label => $"Any guild member";
+        public ILocalizedText Label { get; } = Translator.Translations[LocalizationCodes.LC_PAL_SRC_ANY_GUILD_MEMBER].Bind();
 
         public IEnumerable<PalInstance> Filter(CachedSaveGame source)
         {
@@ -86,20 +89,22 @@ namespace PalCalc.UI.ViewModel
 
             Children = new List<IPalSource>() { new AnyPlayerInGuildSourceTreeNodeViewModel(guild) };
             Children.AddRange(guild.MemberIds.Select(pid => new PlayerSourceTreeNodeViewModel(source.PlayersById[pid])).OrderBy(n => n.ModelObject.Name));
+
+            Label = new HardCodedText(ModelObject.Name);
         }
 
         public GuildInstance ModelObject { get; }
 
         public List<IPalSource> Children { get; }
 
-        public string Label => ModelObject.Name;
+        public ILocalizedText Label { get; }
     }
 
     public class AnyPlayerInAnyGuildTreeNodeViewModel : ObservableObject, IPalSourceTreeNode, IPalSource
     {
         public string Id => "ANY";
 
-        public string Label => "Any player in any guild";
+        public ILocalizedText Label { get; } = Translator.Translations[LocalizationCodes.LC_PAL_SRC_ANY_PLAYER_GUILD].Bind();
 
         public IEnumerable<PalInstance> Filter(CachedSaveGame source) => source.OwnedPals;
     }

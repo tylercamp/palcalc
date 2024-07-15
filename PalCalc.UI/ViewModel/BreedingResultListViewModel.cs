@@ -42,14 +42,14 @@ namespace PalCalc.UI.ViewModel
         private double HiddenIfRedundant<T>(Func<BreedingResultViewModel, T> selector)
         {
             if (Results == null || Results.Count < 2) return DEFAULT;
-            else if (Results.Select(selector).Distinct().Count() == 1) return WIDTH_HIDDEN;
+            else if (Results.Select(selector).Distinct().Count() == 1 && !Translator.DEBUG_DISABLE_TRANSLATIONS) return WIDTH_HIDDEN;
             else return FIT_CONTENT;
         }
 
         public double EffortWidth => DEFAULT;
         public double NumStepsWidth => HiddenIfRedundant(vm => vm.NumBreedingSteps);
         public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
-        public double TraitsWidth => HiddenIfRedundant(vm => vm.FinalTraits);
+        public double TraitsWidth => HiddenIfRedundant(vm => vm.EffectiveTraits.Description);
 
         public void RefreshWith(CachedSaveGame csg)
         {

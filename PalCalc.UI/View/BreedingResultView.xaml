@@ -107,7 +107,13 @@
 
         </Style>
     </UserControl.Resources>
-    <zoom:ZoomControl Grid.Column="1" Background="#606060" Mode="Fill" FillMarginPercent="0.05">
+    <zoom:ZoomControl Grid.Column="1"
+                      Background="#606060"
+                      Mode="Fill"
+                      FillMarginPercent="0.05"
+                      FillLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_FILL}"
+                      CustomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_CUSTOM}"
+                      ZoomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_PERCENT}">
         <gsvm:BreedingGraphLayout
             Graph="{Binding Graph}"
             AnimationLength="0"

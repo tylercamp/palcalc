@@ -150,12 +150,19 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public bool IsValid => TargetPal != null;
 
+        private static ILocalizedText newTargetLabel;
         public ILocalizedText Label
         {
             get
             {
-                if (TargetPal == null) return null;
-                else return TargetPal.Name;
+                if (TargetPal == null)
+                {
+                    return newTargetLabel ??= Translator.Translations[LocalizationCodes.LC_NEW_TARGET_PAL].Bind();
+                }
+                else
+                {
+                    return TargetPal.Name;
+                }
             }
         }
 

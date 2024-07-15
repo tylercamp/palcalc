@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.ResultPruning;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using System;
@@ -30,7 +31,7 @@ namespace PalCalc.UI.ViewModel
                     onSave: (palSelections) => BannedWildPals = palSelections.Where(kvp => !kvp.Value).Select(kvp => kvp.Key).ToList(),
                     initialState: PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => !BannedWildPals.Contains(p))
                 ) {
-                    Title = "Allowed Wild Pals"
+                    Title = Translator.Translations[LocalizationCodes.LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS].Bind()
                 };
                 window.Owner = App.Current.MainWindow;
                 window.ShowDialog();

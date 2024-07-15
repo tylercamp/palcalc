@@ -16,17 +16,17 @@
         </TreeView.BorderBrush>
         <TreeView.Resources>
             <HierarchicalDataTemplate DataType="{x:Type vm:GuildSourceTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                <TextBlock Text="{Binding Label}" />
+                <TextBlock Text="{Binding Label.Value}" />
             </HierarchicalDataTemplate>
 
             <DataTemplate DataType="{x:Type vm:AnyPlayerInGuildSourceTreeNodeViewModel}">
-                <TextBlock Text="{Binding Label}" />
+                <TextBlock Text="{Binding Label.Value}" />
             </DataTemplate>
             <DataTemplate DataType="{x:Type vm:AnyPlayerInAnyGuildTreeNodeViewModel}">
-                <TextBlock Text="{Binding Label}" />
+                <TextBlock Text="{Binding Label.Value}" />
             </DataTemplate>
             <DataTemplate DataType="{x:Type vm:PlayerSourceTreeNodeViewModel}">
-                <TextBlock Text="{Binding Label}" />
+                <TextBlock Text="{Binding Label.Value}" />
             </DataTemplate>
         </TreeView.Resources>
     </TreeView>

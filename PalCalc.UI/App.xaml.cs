@@ -59,7 +59,22 @@ namespace PalCalc.UI
 
             Serilog.Log.CloseAndFlush();
             var logZip = CrashSupport.PrepareSupportFile();
-            MessageBox.Show($"An unhandled error occurred.\n\nPlease find the generated ZIP file to send with any support questions:\n\n{logZip}");
+
+            var message = $"An unhandled error occurred.\n\nPlease find the generated ZIP file to send with any support questions:\n\n{logZip}";
+
+            try
+            {
+                message = Translator.Translations[LocalizationCodes.LC_ERROR_HARD_CRASH].Bind(
+                    new()
+                    {
+                        { "CrashlogPath", logZip }
+                    }
+                ).Value;
+            }
+            finally
+            {
+                MessageBox.Show(message);
+            }
         }
     }
 }

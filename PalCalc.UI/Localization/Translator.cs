@@ -17,17 +17,25 @@ namespace PalCalc.UI.Localization
      * Translation ID: Full ID of the translation code, contains parameters
      */
 
+    // note: code-gen handled by ResXResourceManager extension, must be installed + window opened in the background
+    // https://marketplace.visualstudio.com/items?itemName=TomEnglert.ResXManager
+
     public static partial class Translator
     {
         private static ILogger logger = Log.ForContext(typeof(Translator));
 
+        public const bool DEBUG_DISABLE_TRANSLATIONS = true;
+
 
         // var-name -> ID
-        private static Dictionary<string, string> codeToId;
-        public static Dictionary<string, string> CodeToId => codeToId ??= ReadAllResources(LocalizationCodes.ResourceManager);
+        private static Dictionary<LocalizationCodes, string> codeToFormat;
+        public static Dictionary<LocalizationCodes, string> CodeToFormat =>
+            codeToFormat ??= ReadAllResources(LocalizationCodesResx.ResourceManager)
+                .ToDictionary(kvp => Enum.Parse<LocalizationCodes>(kvp.Key), kvp => kvp.Value);
 
-        private static Dictionary<TranslationLocale, Dictionary<string, string>> localizations;
-        public static Dictionary<TranslationLocale, Dictionary<string, string>> Localizations
+
+        private static Dictionary<TranslationLocale, Dictionary<LocalizationCodes, string>> localizations;
+        public static Dictionary<TranslationLocale, Dictionary<LocalizationCodes, string>> Localizations
         {
             get
             {
@@ -39,8 +47,8 @@ namespace PalCalc.UI.Localization
         }
 
 
-        private static Dictionary<string, StoredLocalizableText> translations;
-        public static Dictionary<string, StoredLocalizableText> Translations
+        private static Dictionary<LocalizationCodes, StoredLocalizableText> translations;
+        public static Dictionary<LocalizationCodes, StoredLocalizableText> Translations
         {
             get
             {
@@ -69,6 +77,12 @@ namespace PalCalc.UI.Localization
             }
         }
 
+        private static ILocalizedText separator;
+        public static ILocalizedText ListSeparator => separator ??= Translations[LocalizationCodes.LC_LIST_SEPARATOR].Bind();
 
+        public static DerivedLocalizableText<IEnumerable<ILocalizedText>> Join { get; } =
+            new DerivedLocalizableText<IEnumerable<ILocalizedText>>(
+                (locale, parts) => string.Join(separator.Value, parts.Select(p => p.Value))
+            );
     }
 }

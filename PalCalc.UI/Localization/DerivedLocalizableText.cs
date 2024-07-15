@@ -14,6 +14,8 @@ namespace PalCalc.UI.Localization
         {
             this.converter = converter;
 
+            Locale = Translator.CurrentLocale;
+
             // TODO - weak event binding
             Translator.LocaleUpdated += Translator_LocaleUpdated;
         }
@@ -25,7 +27,7 @@ namespace PalCalc.UI.Localization
 
         public ILocalizedText Bind(Key key)
         {
-            var res = new DerivedLocalizedText<Key>(converter, key);
+            var res = new DerivedLocalizedText<Key>(converter, key) { Locale = Locale };
             Track(res);
             return res;
         }

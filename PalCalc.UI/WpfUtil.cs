@@ -93,7 +93,8 @@ namespace Wpf.Util
 
         public static string GetPropertyName(DependencyObject obj)
         {
-            return (string)obj.GetValue(PropertyNameProperty);
+            if (obj == null) return null;
+            else return (string)obj.GetValue(PropertyNameProperty);
         }
 
         public static void SetPropertyName(DependencyObject obj, string value)

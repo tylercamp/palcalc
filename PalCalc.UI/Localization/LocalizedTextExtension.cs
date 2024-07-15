@@ -11,15 +11,20 @@ namespace PalCalc.UI.Localization
 {
     public class LocalizedTextExtension : MarkupExtension
     {
-        public string Code { get; set; }
-        public string Id => Translator.CodeToId[Code];
+        public LocalizationCodes Code
+        {
+            set => lt = Translator.Translations[value].Bind();
+        }
 
         private StoredLocalizedText lt;
 
-        public LocalizedTextExtension(string code)
+        public LocalizedTextExtension()
+        {
+        }
+
+        public LocalizedTextExtension(LocalizationCodes code)
         {
             Code = code;
-            lt = Translator.Translations[Id].Bind();
         }
 
         public override object ProvideValue(IServiceProvider serviceProvider)

@@ -46,10 +46,22 @@ namespace PalCalc.UI.Localization
                 {
                     var resxName = l.ToFormalName();
                     var rm = new ResourceManager("PalCalc.UI.Localization.Localizations." + resxName, typeof(Translator).Assembly);
-                    return ReadAllResources(rm).ToDictionary(
-                        kvp => CodeToId[kvp.Key],
-                        kvp => kvp.Value
-                    );
+                    return ReadAllResources(rm)
+                        .Select<KeyValuePair<string, string>, (LocalizationCodes?, string)>(kvp =>
+                        {
+                            if (Enum.TryParse(kvp.Key, out LocalizationCodes code))
+                                return (code, kvp.Value);
+                            else
+                            {
+                                logger.Warning("Locale {locale} has unexpected TL ID: {id}", l, kvp.Key);
+                                return (null, kvp.Value);
+                            }
+                        })
+                        .Where(p => p.Item1 != null)
+                        .ToDictionary(
+                            kvp => kvp.Item1.Value,
+                            kvp => kvp.Item2
+                        );
                 }
             );
 
@@ -57,29 +69,23 @@ namespace PalCalc.UI.Localization
 
             foreach (var localeKvp in result)
             {
-                foreach (var codeKvp in CodeToId)
+                foreach (var codeKvp in CodeToFormat)
                 {
-                    if (!localeKvp.Value.ContainsKey(codeKvp.Value))
+                    if (!localeKvp.Value.ContainsKey(codeKvp.Key))
                     {
                         logger.Warning($"Locale {localeKvp.Key} missing translation for {codeKvp.Key}");
 
-                        if (localeKvp.Key != FallbackLocale && fallbackLocalization.ContainsKey(codeKvp.Value))
-                            localeKvp.Value.Add(codeKvp.Value, fallbackLocalization[codeKvp.Value]);
+                        if (localeKvp.Key != FallbackLocale && fallbackLocalization.ContainsKey(codeKvp.Key))
+                            localeKvp.Value.Add(codeKvp.Key, fallbackLocalization[codeKvp.Key]);
                         else
-                            localeKvp.Value.Add(codeKvp.Value, "MISSING TRANSLATION: " + codeKvp.Key);
+                            localeKvp.Value.Add(codeKvp.Key, "MISSING TRANSLATION: " + codeKvp.Key);
                     }
-                }
-
-                var unexpectedCodes = localeKvp.Value.Keys.Where(id => !CodeToId.ContainsValue(id)).ToList();
-                if (unexpectedCodes.Count > 0)
-                {
-                    logger.Warning("Locale {locale} has unexpected TL IDs: {ids}", localeKvp.Key, unexpectedCodes);
                 }
             }
 
             Localizations = result;
 
-            Translations = CodeToId.Values.ToDictionary(v => v, v => new StoredLocalizableText(v) { Locale = CurrentLocale });
+            Translations = CodeToFormat.Keys.ToDictionary(code => code, code => new StoredLocalizableText(code) { Locale = CurrentLocale });
         }
     }
 }
