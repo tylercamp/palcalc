@@ -44,17 +44,45 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
         );
 
+        private static Dictionary<Trait, TraitViewModel> instances;
+        private static Dictionary<Trait, TraitViewModel> Instance
+        {
+            get
+            {
+                if (instances == null)
+                {
+                    instances = PalDB.LoadEmbedded().Traits.ToDictionary(t => t, t => new TraitViewModel(t, NameLocalizer.Bind(t)));
+                }
+                return instances;
+            }
+        }
+
+        private static ILocalizedText randomTraitLabel;
+        public static TraitViewModel Make(Trait trait)
+        {
+            if (trait is RandomTrait)
+            {
+                randomTraitLabel ??= NameLocalizer.Bind(trait);
+
+                return new TraitViewModel(trait, randomTraitLabel);
+            }
+            else
+            {
+                return Instance[trait];
+            }
+        }
+
         // for XAML designer view
-        public TraitViewModel() : this(new Trait("Runner", "runner", 2))
+        public TraitViewModel() : this(new Trait("Runner", "runner", 2), new HardCodedText("Runner"))
         {
         }
 
         private int hash;
         private static Random random = new Random();
-        public TraitViewModel(Trait trait)
+        private TraitViewModel(Trait trait, ILocalizedText name)
         {
             ModelObject = trait;
-            Name = NameLocalizer.Bind(ModelObject);
+            Name = name;
 
             if (trait is RandomTrait) hash = random.Next();
             else hash = trait.GetHashCode();

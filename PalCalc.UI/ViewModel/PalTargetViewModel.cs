@@ -76,12 +76,12 @@ namespace PalCalc.UI.ViewModel
 
         public static List<PalViewModel> AllPals = PalDB.LoadEmbedded().Pals
             .OrderBy(p => p.Id)
-            .Select(p => new PalViewModel(p))
+            .Select(p => PalViewModel.Instance[p])
             .ToList();
 
         public static List<TraitViewModel> AllTraits = PalDB.LoadEmbedded().Traits
             .DistinctBy(t => t.InternalName)
-            .Select(t => new TraitViewModel(t))
+            .Select(TraitViewModel.Make)
             .OrderBy(t => t.Name.Value)
             .ToList();
 

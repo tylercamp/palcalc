@@ -16,7 +16,20 @@ namespace PalCalc.UI.ViewModel.Mapped
             (locale, pal) => pal.LocalizedNames.GetValueOrElse(locale.ToFormalName(), pal.Name)
         );
 
-        public PalViewModel(Pal pal)
+        private static Dictionary<Pal, PalViewModel> instances;
+        public static Dictionary<Pal, PalViewModel> Instance
+        {
+            get
+            {
+                if (instances == null)
+                {
+                    instances = PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => new PalViewModel(p));
+                }
+                return instances;
+            }
+        }
+
+        private PalViewModel(Pal pal)
         {
             ModelObject = pal;
 

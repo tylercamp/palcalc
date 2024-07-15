@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.UI.Localization;
@@ -67,19 +68,16 @@ namespace PalCalc.UI.ViewModel
         {
             Results = new List<BreedingResultViewModel>()
             {
-                new BreedingResultViewModel(null, new OwnedPalReference(new PalCalc.Model.PalInstance()
+                new BreedingResultViewModel(null, new OwnedPalReference(new PalInstance()
                 {
-                    Pal = new PalCalc.Model.Pal() {
-                        Name = "Test Pal",
-                        Id = new PalCalc.Model.PalId() { PalDexNo = 100, IsVariant = false }
-                    },
-                    Gender = PalCalc.Model.PalGender.WILDCARD,
-                    Location = new PalCalc.Model.PalLocation() { Index = 0, Type = PalCalc.Model.LocationType.Palbox },
-                    Traits = new List<PalCalc.Model.Trait>()
+                    Pal = "Beakon".ToPal(PalDB.LoadEmbedded()),
+                    Gender = PalGender.WILDCARD,
+                    Location = new PalLocation() { Index = 0, Type = LocationType.Palbox },
+                    Traits = new List<Trait>()
                     {
-                        new PalCalc.Model.Trait("Trait 1", "Internal 1", 0),
+                        "Runner".ToTrait(PalDB.LoadEmbedded()),
                     }
-                }, new List<PalCalc.Model.Trait>() { new PalCalc.Model.Trait("Trait 1", "Internal 1", 0) }))
+                }, new List<Trait>() { "Runner".ToTrait(PalDB.LoadEmbedded()) }))
             }
         };
     }

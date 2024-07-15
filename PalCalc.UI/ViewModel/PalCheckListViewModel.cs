@@ -79,7 +79,7 @@ namespace PalCalc.UI.ViewModel
         public PalCheckListViewModel(Action onCancel, Action<Dictionary<Pal, bool>> onSave, Dictionary<Pal, bool> initialState)
         {
             allEntries = initialState
-                .Select(kvp => new PalCheckListEntryViewModel(new PalViewModel(kvp.Key), kvp.Value))
+                .Select(kvp => new PalCheckListEntryViewModel(PalViewModel.Instance[kvp.Key], kvp.Value))
                 .OrderBy(vm => vm.Pal.ModelObject.Id)
                 .ToList();
 

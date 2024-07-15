@@ -331,7 +331,7 @@ namespace PalCalc.UI
         protected override PalViewModel ReadTypeJson(JsonReader reader, Type objectType, PalViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var palId = JToken.ReadFrom(reader).ToObject<PalId>(serializer);
-            return new PalViewModel(palId.ToPal(db));
+            return PalViewModel.Instance[palId.ToPal(db)];
         }
 
         protected override void WriteTypeJson(JsonWriter writer, PalViewModel value, JsonSerializer serializer)
@@ -355,7 +355,7 @@ namespace PalCalc.UI
         {
             var trait = JToken.ReadFrom(reader).ToObject<Trait>(serializer);
             return trait != null
-                ? new TraitViewModel(trait)
+                ? TraitViewModel.Make(trait)
                 : null;
         }
 

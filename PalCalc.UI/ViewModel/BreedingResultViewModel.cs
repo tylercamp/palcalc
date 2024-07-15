@@ -145,7 +145,7 @@ namespace PalCalc.UI.ViewModel
                     : Translator.Translations[LocalizationCodes.LC_RESULT_LABEL].Bind(
                         new()
                         {
-                            { "PalName", new PalViewModel(DisplayedResult.Pal).Label },
+                            { "PalName", PalViewModel.Instance[DisplayedResult.Pal].Label },
                             { "TraitsList", EffectiveTraits.Description },
                             { "TimeEstimate", TimeEstimate.TimeSpanMinutesStr() }
                         }
@@ -158,6 +158,6 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        public TraitCollectionViewModel EffectiveTraits => new TraitCollectionViewModel(DisplayedResult.EffectiveTraits.Select(t => new TraitViewModel(t)));
+        public TraitCollectionViewModel EffectiveTraits => new TraitCollectionViewModel(DisplayedResult.EffectiveTraits.Select(TraitViewModel.Make));
     }
 }

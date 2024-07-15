@@ -28,10 +28,10 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
             else
             {
-                TargetPal = new PalViewModel(underlyingSpec.Pal);
+                TargetPal = PalViewModel.Instance[underlyingSpec.Pal];
 
                 var traitVms = underlyingSpec.RequiredTraits
-                    .Select(t => new TraitViewModel(t))
+                    .Select(TraitViewModel.Make)
                     .Concat(Enumerable.Repeat<TraitViewModel>(null, GameConstants.MaxTotalTraits - underlyingSpec.RequiredTraits.Count))
                     .ToArray();
 
@@ -41,7 +41,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 Trait4 = traitVms[3];
 
                 var optionalVms = underlyingSpec.OptionalTraits
-                    .Select(t => new TraitViewModel(t))
+                    .Select(TraitViewModel.Make)
                     .Concat(Enumerable.Repeat<TraitViewModel>(null, GameConstants.MaxTotalTraits - underlyingSpec.OptionalTraits.Count))
                     .ToArray();
 
@@ -219,11 +219,11 @@ namespace PalCalc.UI.ViewModel.Mapped
                 var db = PalDB.LoadEmbedded();
                 return new PalSpecifierViewModel(null)
                 {
-                    TargetPal = new PalViewModel("Beakon".ToPal(db)),
-                    Trait1 = new TraitViewModel("Runner".ToTrait(db)),
-                    Trait2 = new TraitViewModel("Swift".ToTrait(db)),
+                    TargetPal = PalViewModel.Instance["Beakon".ToPal(db)],
+                    Trait1 = TraitViewModel.Make("Runner".ToTrait(db)),
+                    Trait2 = TraitViewModel.Make("Swift".ToTrait(db)),
 
-                    OptionalTrait1 = new TraitViewModel("Aggressive".ToTrait(db))
+                    OptionalTrait1 = TraitViewModel.Make("Aggressive".ToTrait(db))
                 };
             }
         }

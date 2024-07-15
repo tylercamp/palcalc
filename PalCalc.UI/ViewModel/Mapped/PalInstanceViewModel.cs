@@ -12,9 +12,9 @@ namespace PalCalc.UI.ViewModel.Mapped
     {
         public PalInstance ModelObject => inst;
 
-        public PalViewModel Pal { get; } = new PalViewModel(inst.Pal);
+        public PalViewModel Pal { get; } = PalViewModel.Instance[inst.Pal];
 
-        public TraitCollectionViewModel Traits { get; } = new TraitCollectionViewModel(inst.Traits.Select(t => new TraitViewModel(t)));
+        public TraitCollectionViewModel Traits { get; } = new TraitCollectionViewModel(inst.Traits.Select(TraitViewModel.Make));
 
         public ILocalizedText Gender { get; } = inst.Gender.Label();
     }
