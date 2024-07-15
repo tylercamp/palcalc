@@ -24,7 +24,7 @@ namespace PalCalc.UI.Localization
     {
         private static ILogger logger = Log.ForContext(typeof(Translator));
 
-        public const bool DEBUG_DISABLE_TRANSLATIONS = true;
+        public const bool DEBUG_DISABLE_TRANSLATIONS = false;
 
 
         // var-name -> ID
@@ -82,7 +82,7 @@ namespace PalCalc.UI.Localization
 
         public static DerivedLocalizableText<IEnumerable<ILocalizedText>> Join { get; } =
             new DerivedLocalizableText<IEnumerable<ILocalizedText>>(
-                (locale, parts) => string.Join(separator.Value, parts.Select(p => p.Value))
+                (locale, parts) => string.Join(ListSeparator.Value, parts.Select(p => p.Value))
             );
     }
 }

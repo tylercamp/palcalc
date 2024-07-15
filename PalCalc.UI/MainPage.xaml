@@ -57,7 +57,7 @@
 
                 <Grid DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
                     <ProgressBar Value="{Binding SolverProgress}" />
-                    <TextBlock Text="{Binding SolverStatusMsg}" Margin="10,5,0,5" />
+                    <TextBlock Text="{Binding SolverStatusMsg.Value}" Margin="10,5,0,5" />
                 </Grid>
 
                 <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
