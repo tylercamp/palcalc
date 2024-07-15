@@ -75,14 +75,14 @@ namespace PalCalc.UI.ViewModel
         public List<TraitViewModel> AvailableTraits => AllTraits;
 
         public static List<PalViewModel> AllPals = PalDB.LoadEmbedded().Pals
-            .OrderBy(p => p.Name)
+            .OrderBy(p => p.Id)
             .Select(p => new PalViewModel(p))
             .ToList();
 
         public static List<TraitViewModel> AllTraits = PalDB.LoadEmbedded().Traits
-            .OrderBy(t => t.Name)
-            .DistinctBy(t => t.Name)
+            .DistinctBy(t => t.InternalName)
             .Select(t => new TraitViewModel(t))
+            .OrderBy(t => t.Name.Value)
             .ToList();
 
         public bool IsValid => PalSource.HasValidSource && CurrentPalSpecifier.IsValid;

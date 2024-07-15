@@ -80,14 +80,12 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         private List<Trait> RequiredTraitModelObjects => RequiredTraits
             .Select(t => t.ModelObject)
-            .OrderBy(mo => mo.Name)
-            .DistinctBy(mo => mo.Name)
+            .DistinctBy(mo => mo.InternalName)
             .ToList();
 
         private List<Trait> OptionalTraitModelObjects => OptionalTraits
             .Select(t => t.ModelObject)
-            .OrderBy(mo => mo.Name)
-            .DistinctBy(mo => mo.Name)
+            .DistinctBy(mo => mo.InternalName)
             .ToList();
 
         public PalSpecifier ModelObject => TargetPal != null

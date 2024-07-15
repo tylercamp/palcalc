@@ -24,7 +24,6 @@ namespace PalCalc.UI.ViewModel
         }
 
         public string PaldexNoDisplay => Pal.ModelObject.Id.PalDexNo.ToString() + (Pal.ModelObject.Id.IsVariant ? "B" : "");
-        public double PaldexNoValue => Pal.ModelObject.Id.PalDexNo + (Pal.ModelObject.Id.IsVariant ? 0.1 : 0);
         public ILocalizedText PalName => Pal.Name;
 
         public PalViewModel Pal { get; }
@@ -79,7 +78,11 @@ namespace PalCalc.UI.ViewModel
         
         public PalCheckListViewModel(Action onCancel, Action<Dictionary<Pal, bool>> onSave, Dictionary<Pal, bool> initialState)
         {
-            allEntries = initialState.Select(kvp => new PalCheckListEntryViewModel(new PalViewModel(kvp.Key), kvp.Value)).ToList();
+            allEntries = initialState
+                .Select(kvp => new PalCheckListEntryViewModel(new PalViewModel(kvp.Key), kvp.Value))
+                .OrderBy(vm => vm.Pal.ModelObject.Id)
+                .ToList();
+
             VisibleEntries = allEntries;
 
             foreach (var e in allEntries)
