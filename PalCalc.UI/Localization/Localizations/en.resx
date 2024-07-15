@@ -248,6 +248,9 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_LANGUAGE" xml:space="preserve">
     <value>Language</value>
   </data>
+  <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
+    <value>Pal Calc must be restarted to finish applying the new language.</value>
+  </data>
   <data name="LC_LIST_SEPARATOR" xml:space="preserve">
     <value>, </value>
   </data>

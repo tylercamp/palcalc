@@ -241,6 +241,9 @@
   <data name="LC_LANGUAGE" xml:space="preserve">
     <value>LC_LANGUAGE</value>
   </data>
+  <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
+    <value>LC_LANG_CHANGED_RESTART</value>
+  </data>
   <data name="LC_LIST_SEPARATOR" xml:space="preserve">
     <value>LC_LIST_SEPARATOR</value>
   </data>

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PalCalc.UI.ViewModel
 {
@@ -28,7 +29,13 @@ namespace PalCalc.UI.ViewModel
         public bool IsSelected
         {
             get => Translator.CurrentLocale == Value;
-            set => Translator.CurrentLocale = Value;
+            set
+            {
+                if (value == IsSelected) return;
+
+                Translator.CurrentLocale = Value;
+                MessageBox.Show(Translator.Translations[LocalizationCodes.LC_LANG_CHANGED_RESTART].Bind().Value);
+            }
         }
 
         public IRelayCommand SelectCommand { get; }

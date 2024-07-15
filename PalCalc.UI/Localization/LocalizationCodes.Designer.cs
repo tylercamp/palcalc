@@ -434,6 +434,15 @@ namespace PalCalc.UI.Localization {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to "LC_LANG_CHANGED_RESTART"
+        /// </summary>
+        public static string LC_LANG_CHANGED_RESTART {
+            get {
+                return ResourceManager.GetString("LC_LANG_CHANGED_RESTART", resourceCulture) ?? string.Empty;
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to "LC_LANGUAGE"
         /// </summary>
         public static string LC_LANGUAGE {
@@ -1486,6 +1495,10 @@ namespace PalCalc.UI.Localization {
         /// Label used to represent this language in the dropdown
         /// </remarks>
         LC_ITL_LABEL,
+        /// <summary>
+        ///   Looks up a localized string similar to LC_LANG_CHANGED_RESTART.
+        /// </summary>
+        LC_LANG_CHANGED_RESTART,
         /// <summary>
         ///   Looks up a localized string similar to LC_LANGUAGE.
         /// </summary>
