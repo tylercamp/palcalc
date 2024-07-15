@@ -21,6 +21,7 @@ namespace PalCalc.Model
         {
             if (s == RAND_REF.Name) return new RandomTrait();
             else if (db.TraitsByName.ContainsKey(s)) return db.TraitsByName[s];
+            else if (db.Traits.Any(t => t.InternalName == s)) return db.Traits.Single(t => t.InternalName == s);
             else return new UnrecognizedTrait(s);
         }
         public static Trait InternalToTrait(this string s, PalDB db)

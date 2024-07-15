@@ -44,7 +44,7 @@ namespace PalCalc.Model
                 Id = value.Pal.Id,
                 Location = value.Location,
                 Gender = value.Gender,
-                Traits = value.Traits.Select(t => t.Name),
+                Traits = value.Traits.Select(t => t.InternalName),
                 OwnerPlayerId = value.OwnerPlayerId,
                 NickName = value.NickName,
                 Level = value.Level,
