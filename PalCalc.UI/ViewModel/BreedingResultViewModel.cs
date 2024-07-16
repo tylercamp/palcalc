@@ -33,6 +33,7 @@ namespace PalCalc.UI.ViewModel
                 maxBreedingSteps: 3,
                 maxWildPals: 0,
                 allowedWildPals: PalDB.LoadEmbedded().Pals.ToList(),
+                bannedBredPals: new List<Pal>(),
                 maxInputIrrelevantTraits: 2,
                 maxBredIrrelevantTraits: 0,
                 maxEffort: TimeSpan.FromHours(8),

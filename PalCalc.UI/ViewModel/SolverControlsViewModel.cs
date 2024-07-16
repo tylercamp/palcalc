@@ -23,6 +23,21 @@ namespace PalCalc.UI.ViewModel
             MaxInputIrrelevantTraits = 2;
             MaxBredIrrelevantTraits = 1;
 
+            ChangeBredPals = new RelayCommand(() =>
+            {
+                var window = new PalCheckListWindow();
+                window.DataContext = new PalCheckListViewModel(
+                    onCancel: null,
+                    onSave: (palSelections) => BannedBredPals = palSelections.Where(kvp => !kvp.Value).Select(kvp => kvp.Key).ToList(),
+                    initialState: PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => !BannedBredPals.Contains(p))
+                )
+                {
+                    Title = new HardCodedText("Allowed Bred Pals")
+                };
+                window.Owner = App.Current.MainWindow;
+                window.ShowDialog();
+            });
+
             ChangeWildPals = new RelayCommand(() =>
             {
                 var window = new PalCheckListWindow();
@@ -84,7 +99,11 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private bool canEditSettings = true;
 
+        public IRelayCommand ChangeBredPals { get; }
         public IRelayCommand ChangeWildPals { get; }
+
+        [ObservableProperty]
+        private List<Pal> bannedBredPals = new List<Pal>();
 
         [ObservableProperty]
         private List<Pal> bannedWildPals = new List<Pal>();
@@ -97,6 +116,7 @@ namespace PalCalc.UI.ViewModel
             MaxBreedingSteps,
             MaxWildPals,
             allowedWildPals: PalDB.LoadEmbedded().Pals.Except(BannedWildPals).ToList(),
+            bannedBredPals: BannedBredPals,
             MaxInputIrrelevantTraits,
             MaxBredIrrelevantTraits,
             TimeSpan.MaxValue,
@@ -110,6 +130,7 @@ namespace PalCalc.UI.ViewModel
             MaxInputIrrelevantTraits = MaxInputIrrelevantTraits,
             MaxBredIrrelevantTraits = MaxBredIrrelevantTraits,
             MaxThreads = MaxThreads,
+            BannedBredPalInternalNames = BannedBredPals.Select(p => p.InternalName).ToList(),
             BannedWildPalInternalNames = BannedWildPals.Select(p => p.InternalName).ToList(),
         };
 
@@ -121,6 +142,7 @@ namespace PalCalc.UI.ViewModel
             MaxBredIrrelevantTraits = model.MaxBredIrrelevantTraits,
             MaxThreads = model.MaxThreads,
             
+            BannedBredPals = model.BannedBredPals(PalDB.LoadEmbedded()),
             BannedWildPals = model.BannedWildPals(PalDB.LoadEmbedded()),
         };
     }

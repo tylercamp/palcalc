@@ -22,15 +22,18 @@
         </Style>
     </WrapPanel.Resources>
 
-    <StackPanel Orientation="Horizontal" Margin="10,0" VerticalAlignment="Center">
-        <Label Content="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS}" />
-        <v:IntegerTextBox
-                Value="{Binding MaxBreedingSteps}"
-                IsEnabled="{Binding CanEditSettings}"
-                MinValue="1" MaxValue="99"
-                ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION}"
-                ToolTipService.ShowOnDisabled="True"
+    <StackPanel Margin="10,0" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+            <TextBlock Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS}" Padding="0,4" Margin="0,0,10,0" />
+            <v:IntegerTextBox
+                    Value="{Binding MaxBreedingSteps}"
+                    IsEnabled="{Binding CanEditSettings}"
+                    MinValue="1" MaxValue="99"
+                    ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION}"
+                    ToolTipService.ShowOnDisabled="True"
             />
+        </StackPanel>
+        <Button Command="{Binding ChangeBredPals}" Height="20">Allowed Bred Pals</Button>
     </StackPanel>
 
     <StackPanel Margin="10,0" VerticalAlignment="Center">

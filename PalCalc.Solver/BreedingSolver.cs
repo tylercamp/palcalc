@@ -41,6 +41,7 @@ namespace PalCalc.Solver
         List<PalInstance> ownedPals;
 
         List<Pal> allowedWildPals;
+        List<Pal> bannedBredPals;
         int maxBreedingSteps, maxWildPals, maxBredIrrelevantTraits, maxInputIrrelevantTraits;
         TimeSpan maxEffort;
         PruningRulesBuilder pruningBuilder;
@@ -66,6 +67,7 @@ namespace PalCalc.Solver
             int maxBreedingSteps,
             int maxWildPals,
             List<Pal> allowedWildPals,
+            List<Pal> bannedBredPals,
             int maxInputIrrelevantTraits,
             int maxBredIrrelevantTraits,
             TimeSpan maxEffort,
@@ -78,6 +80,7 @@ namespace PalCalc.Solver
             this.ownedPals = ownedPals;
             this.maxBreedingSteps = maxBreedingSteps;
             this.allowedWildPals = allowedWildPals;
+            this.bannedBredPals = bannedBredPals;
             this.maxWildPals = maxWildPals;
             this.maxInputIrrelevantTraits = Math.Min(3, maxInputIrrelevantTraits);
             this.maxBredIrrelevantTraits = Math.Min(3, maxBredIrrelevantTraits);
@@ -121,7 +124,7 @@ namespace PalCalc.Solver
                             .Select(instances => instances
                                 .OrderBy(i => i.Traits.Count)
                                 .ThenBy(i => PreferredLocationPruning.LocationOrderingOf(i.Location.Type))
-                                .ThenByDescending(i => i.IV_HP + i.IV_Melee + i.IV_Shot + i.IV_Defense)
+                                .ThenByDescending(i => i.IV_HP + i.IV_Shot + i.IV_Defense)
                                 .First()
                             )
                     );
@@ -616,8 +619,11 @@ namespace PalCalc.Solver
                                                 probabilityForUpToNumTraits
                                             );
 
-                                            if (res.BreedingEffort <= maxEffort && (spec.IsSatisfiedBy(res) || workingSet.IsOptimal(res)))
-                                                possibleResults.Add(res);
+                                            if (!bannedBredPals.Contains(res.Pal))
+                                            {
+                                                if (res.BreedingEffort <= maxEffort && (spec.IsSatisfiedBy(res) || workingSet.IsOptimal(res)))
+                                                    possibleResults.Add(res);
+                                            }
                                         }
                                     }
 
