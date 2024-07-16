@@ -31,6 +31,7 @@ internal class Program
             maxBreedingSteps: 20,
             maxWildPals: 1,
             allowedWildPals: db.Pals.ToList(),
+            bannedBredPals: new List<Pal>(),
             maxBredIrrelevantTraits: 0,
             maxInputIrrelevantTraits: 2,
             maxEffort: TimeSpan.FromDays(7),
