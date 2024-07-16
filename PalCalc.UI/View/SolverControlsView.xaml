@@ -21,15 +21,18 @@
         </Style>
     </WrapPanel.Resources>
 
-    <StackPanel Orientation="Horizontal" Margin="10,0" VerticalAlignment="Center">
-        <Label Content="Max Breeding Steps" />
-        <v:IntegerTextBox
-                Value="{Binding MaxBreedingSteps}"
-                IsEnabled="{Binding CanEditSettings}"
-                MinValue="1" MaxValue="99"
-                ToolTipService.ToolTip="The maximum number of solver iterations, and the max number of breeding steps to reach the target pal.&#10;Higher values linearly affect time required."
-                ToolTipService.ShowOnDisabled="True"
+    <StackPanel Margin="10,0" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+            <Label Content="Max Breeding Steps" />
+            <v:IntegerTextBox
+                    Value="{Binding MaxBreedingSteps}"
+                    IsEnabled="{Binding CanEditSettings}"
+                    MinValue="1" MaxValue="99"
+                    ToolTipService.ToolTip="The maximum number of solver iterations, and the max number of breeding steps to reach the target pal.&#10;Higher values linearly affect time required."
+                    ToolTipService.ShowOnDisabled="True"
             />
+        </StackPanel>
+        <Button Command="{Binding ChangeBredPals}" Height="20">Allowed Bred Pals</Button>
     </StackPanel>
 
     <StackPanel Margin="10,0" VerticalAlignment="Center">

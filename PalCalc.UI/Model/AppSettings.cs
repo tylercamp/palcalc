@@ -16,11 +16,13 @@ namespace PalCalc.UI.Model
         public int MaxBredIrrelevantTraits { get; set; } = 1;
         public int MaxThreads { get; set; } = 0;
 
+        public List<string> BannedBredPalInternalNames { get; set; } = [];
         public List<string> BannedWildPalInternalNames { get; set; } = [
             "HerculesBeetle_Ground", // warsect terra, not released yet
             "PlantSlime_Flower", // flower gumoss
         ];
 
+        public List<Pal> BannedBredPals(PalDB db) => BannedBredPalInternalNames.Select(n => n.InternalToPal(db)).ToList();
         public List<Pal> BannedWildPals(PalDB db) => BannedWildPalInternalNames.Select(n => n.InternalToPal(db)).ToList();
     }
 
