@@ -78,57 +78,6 @@ namespace <#= localNamespace #> {
                 return resourceMan;
             }
         }
-
-        
-        /// <summary>
-        ///   Overrides the current thread's CurrentUICulture property for all
-        ///   resource lookups using this strongly typed resource class.
-        /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
-            get {
-                return resourceCulture;
-            }
-            set {
-                resourceCulture = value;
-            }
-        }
-<#
-        foreach (var node in GetResxNodes(reader))
-        {
-            if (node.Type == typeof (string))
-            {
-#>
-
-        /// <summary>
-        ///   Looks up a localized string similar to "<#= XmlEscape(node.Value, 50) #>"
-        /// </summary>
-<# InsertRemarks(node.Comment); #>
-        public static string <#= node.Key #> {
-            get {
-                return ResourceManager.GetString("<#= node.Key #>", resourceCulture) ?? string.Empty;
-            }
-        }
-<#
-            }
-            else
-            {
-#>
-
-        /// <summary>
-        ///   Looks up a localized resource of type <#= node.Type.FullName #>.
-        /// </summary>
-<# InsertRemarks(node.Comment); #>
-        public static <#= node.Type.FullName #> <#= node.Key #> {
-            get {
-                object obj = ResourceManager.GetObject("<#= node.Key #>", resourceCulture);
-                return ((<#= node.Type.FullName #>)(obj));
-            }
-        }
-<#
-            }
-        }
-#>
     }
 
     /// <summary>
