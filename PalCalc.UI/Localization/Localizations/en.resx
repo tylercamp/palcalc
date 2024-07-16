@@ -461,6 +461,15 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_SAVE_LOCATION_XBOX_EMPTY" xml:space="preserve">
     <value>Xbox</value>
   </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_1" xml:space="preserve">
+    <value>No Xbox saves were found. Palworld must be installed on the PC through the</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_2" xml:space="preserve">
+    <value>Xbox app / Game Pass.</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_3" xml:space="preserve">
+    <value>Save files are synced to your PC when you run the game.</value>
+  </data>
   <data name="LC_SAVE_WARNING" xml:space="preserve">
     <value>(!)</value>
   </data>

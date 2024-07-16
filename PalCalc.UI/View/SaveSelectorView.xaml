@@ -61,11 +61,14 @@
             </Style>
         </StackPanel.Resources>
         
-        <!-- TODO ITL -->
-        <TextBlock Visibility="{Binding NoXboxSavesMsgVisibility}" TextWrapping="Wrap" FontStyle="Italic">
-            No Xbox saves were found. Palworld must be installed on the PC through the
-            <Hyperlink NavigateUri="https://apps.microsoft.com/detail/9mv0b5hzvk9z" RequestNavigate="Hyperlink_RequestNavigate">Xbox app / Game Pass.</Hyperlink>
-            Save files are synced to your PC when you run the game.
+        <TextBlock TextWrapping="Wrap" FontStyle="Italic">
+            <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_1}" />
+            
+            <Hyperlink NavigateUri="https://apps.microsoft.com/detail/9mv0b5hzvk9z" RequestNavigate="Hyperlink_RequestNavigate">
+                <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_2}" />
+            </Hyperlink>
+            
+            <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_3}" />
         </TextBlock>
 
         <TextBlock Visibility="{Binding InvalidSaveMessageVisibility}" Foreground="DarkRed" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_INVALID}" />

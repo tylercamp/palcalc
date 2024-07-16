@@ -947,6 +947,33 @@ namespace PalCalc.UI.Localization {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to "LC_SAVE_LOCATION_XBOX_INSTALL_1"
+        /// </summary>
+        public static string LC_SAVE_LOCATION_XBOX_INSTALL_1 {
+            get {
+                return ResourceManager.GetString("LC_SAVE_LOCATION_XBOX_INSTALL_1", resourceCulture) ?? string.Empty;
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to "LC_SAVE_LOCATION_XBOX_INSTALL_2"
+        /// </summary>
+        public static string LC_SAVE_LOCATION_XBOX_INSTALL_2 {
+            get {
+                return ResourceManager.GetString("LC_SAVE_LOCATION_XBOX_INSTALL_2", resourceCulture) ?? string.Empty;
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to "LC_SAVE_LOCATION_XBOX_INSTALL_3"
+        /// </summary>
+        public static string LC_SAVE_LOCATION_XBOX_INSTALL_3 {
+            get {
+                return ResourceManager.GetString("LC_SAVE_LOCATION_XBOX_INSTALL_3", resourceCulture) ?? string.Empty;
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to "LC_SAVE_WARNING"
         /// </summary>
         public static string LC_SAVE_WARNING {
@@ -1723,6 +1750,18 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to LC_SAVE_LOCATION_XBOX_EMPTY.
         /// </summary>
         LC_SAVE_LOCATION_XBOX_EMPTY,
+        /// <summary>
+        ///   Looks up a localized string similar to LC_SAVE_LOCATION_XBOX_INSTALL_1.
+        /// </summary>
+        LC_SAVE_LOCATION_XBOX_INSTALL_1,
+        /// <summary>
+        ///   Looks up a localized string similar to LC_SAVE_LOCATION_XBOX_INSTALL_2.
+        /// </summary>
+        LC_SAVE_LOCATION_XBOX_INSTALL_2,
+        /// <summary>
+        ///   Looks up a localized string similar to LC_SAVE_LOCATION_XBOX_INSTALL_3.
+        /// </summary>
+        LC_SAVE_LOCATION_XBOX_INSTALL_3,
         /// <summary>
         ///   Looks up a localized string similar to LC_SAVE_WARNING.
         /// </summary>

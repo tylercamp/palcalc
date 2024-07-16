@@ -454,6 +454,15 @@
   <data name="LC_SAVE_LOCATION_XBOX_EMPTY" xml:space="preserve">
     <value>LC_SAVE_LOCATION_XBOX_EMPTY</value>
   </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_1" xml:space="preserve">
+    <value>LC_SAVE_LOCATION_XBOX_INSTALL_1</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_2" xml:space="preserve">
+    <value>LC_SAVE_LOCATION_XBOX_INSTALL_2</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_3" xml:space="preserve">
+    <value>LC_SAVE_LOCATION_XBOX_INSTALL_3</value>
+  </data>
   <data name="LC_SAVE_WARNING" xml:space="preserve">
     <value>LC_SAVE_WARNING</value>
   </data>
