@@ -121,7 +121,7 @@ namespace PalCalc.Solver
                             .Select(instances => instances
                                 .OrderBy(i => i.Traits.Count)
                                 .ThenBy(i => PreferredLocationPruning.LocationOrderingOf(i.Location.Type))
-                                .ThenByDescending(i => i.IV_HP + i.IV_Melee + i.IV_Shot + i.IV_Defense)
+                                .ThenByDescending(i => i.IV_HP + i.IV_Shot + i.IV_Defense)
                                 .First()
                             )
                     );
