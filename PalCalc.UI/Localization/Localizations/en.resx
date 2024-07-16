@@ -476,6 +476,9 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_SOLVER_RUN" xml:space="preserve">
     <value>Run</value>
   </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS" xml:space="preserve">
+    <value>Allowed Bred Pals</value>
+  </data>
   <data name="LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS" xml:space="preserve">
     <value>Allowed Wild Pals</value>
   </data>

@@ -469,6 +469,9 @@
   <data name="LC_SOLVER_RUN" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS" xml:space="preserve">
+    <value />
+  </data>
   <data name="LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS" xml:space="preserve">
     <value />
   </data>

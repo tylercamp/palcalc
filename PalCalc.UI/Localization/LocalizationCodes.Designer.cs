@@ -537,6 +537,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS,
         /// <summary>
         ///   Looks up a localized string similar to .

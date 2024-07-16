@@ -33,7 +33,7 @@
                     ToolTipService.ShowOnDisabled="True"
             />
         </StackPanel>
-        <Button Command="{Binding ChangeBredPals}" Height="20">Allowed Bred Pals</Button>
+        <Button Command="{Binding ChangeBredPals}" Height="20" Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS}" />
     </StackPanel>
 
     <StackPanel Margin="10,0" VerticalAlignment="Center">

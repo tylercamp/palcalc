@@ -30,9 +30,8 @@ namespace PalCalc.UI.ViewModel
                     onCancel: null,
                     onSave: (palSelections) => BannedBredPals = palSelections.Where(kvp => !kvp.Value).Select(kvp => kvp.Key).ToList(),
                     initialState: PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => !BannedBredPals.Contains(p))
-                )
-                {
-                    Title = new HardCodedText("Allowed Bred Pals")
+                ) {
+                    Title = LocalizationCodes.LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS.Bind()
                 };
                 window.Owner = App.Current.MainWindow;
                 window.ShowDialog();
