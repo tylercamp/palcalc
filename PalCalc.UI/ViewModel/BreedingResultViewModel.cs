@@ -146,7 +146,7 @@ namespace PalCalc.UI.ViewModel
                     : LocalizationCodes.LC_RESULT_LABEL.Bind(
                         new
                         {
-                            PalName = PalViewModel.Instance[DisplayedResult.Pal].Label,
+                            PalName = PalViewModel.Make(DisplayedResult.Pal).Label,
                             TraitsList = EffectiveTraits.Description,
                             TimeEstimate = TimeEstimate.TimeSpanMinutesStr(),
                         }

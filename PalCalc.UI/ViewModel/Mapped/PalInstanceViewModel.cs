@@ -12,7 +12,7 @@ namespace PalCalc.UI.ViewModel.Mapped
     {
         public PalInstance ModelObject => inst;
 
-        public PalViewModel Pal { get; } = PalViewModel.Instance[inst.Pal];
+        public PalViewModel Pal { get; } = PalViewModel.Make(inst.Pal);
 
         public TraitCollectionViewModel Traits { get; } = new TraitCollectionViewModel(inst.Traits.Select(TraitViewModel.Make));
 

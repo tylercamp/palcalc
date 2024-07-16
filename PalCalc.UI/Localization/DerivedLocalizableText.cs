@@ -16,7 +16,6 @@ namespace PalCalc.UI.Localization
 
             Locale = Translator.CurrentLocale;
 
-            // TODO - weak event binding
             Translator.LocaleUpdated += Translator_LocaleUpdated;
         }
 

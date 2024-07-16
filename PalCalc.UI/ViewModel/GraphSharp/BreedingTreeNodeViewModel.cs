@@ -22,7 +22,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         public BreedingTreeNodeViewModel(CachedSaveGame source, IBreedingTreeNode node)
         {
             Value = node;
-            Pal = PalViewModel.Instance[node.PalRef.Pal];
+            Pal = PalViewModel.Make(node.PalRef.Pal);
             Traits = node.PalRef.ActualTraits.Select(TraitViewModel.Make).ToList();
             TraitCollection = new TraitCollectionViewModel(Traits);
 

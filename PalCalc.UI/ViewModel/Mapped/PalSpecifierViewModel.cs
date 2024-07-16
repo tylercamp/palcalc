@@ -28,7 +28,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
             else
             {
-                TargetPal = PalViewModel.Instance[underlyingSpec.Pal];
+                TargetPal = PalViewModel.Make(underlyingSpec.Pal);
 
                 var traitVms = underlyingSpec.RequiredTraits
                     .Select(TraitViewModel.Make)
@@ -219,7 +219,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 var db = PalDB.LoadEmbedded();
                 return new PalSpecifierViewModel(null)
                 {
-                    TargetPal = PalViewModel.Instance["Beakon".ToPal(db)],
+                    TargetPal = PalViewModel.Make("Beakon".ToPal(db)),
                     Trait1 = TraitViewModel.Make("Runner".ToTrait(db)),
                     Trait2 = TraitViewModel.Make("Swift".ToTrait(db)),
 

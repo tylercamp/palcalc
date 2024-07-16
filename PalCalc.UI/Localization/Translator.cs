@@ -17,16 +17,17 @@ namespace PalCalc.UI.Localization
      * Translation ID: Full ID of the translation code, contains parameters
      */
 
-    // note: code-gen handled by ResXResourceManager extension, must be installed + window opened in the background
+    // note: code-gen handled by ResXResourceManager extension, must be installed in order to regenerate `LocalizationCodes`
     // https://marketplace.visualstudio.com/items?itemName=TomEnglert.ResXManager
 
     public static partial class Translator
     {
         private static ILogger logger = Log.ForContext(typeof(Translator));
 
+        // debug-only prop; when enabled, all text is replaced with placeholder text so we can easily see what isn't being localized
         public const bool DEBUG_DISABLE_TRANSLATIONS = false;
 
-        // var-name -> ID
+        // var-name -> '|'-separated list of named format args
         private static Dictionary<LocalizationCodes, string> codeToFormat;
         public static Dictionary<LocalizationCodes, string> CodeToArgs =>
             codeToFormat ??= ReadAllResources(LocalizationCodesResx.ResourceManager)
@@ -60,7 +61,6 @@ namespace PalCalc.UI.Localization
 
         public static event Action LocaleUpdated;
 
-        // TODO - load from save
         private static TranslationLocale currentLocale = TranslationLocale.en;
         public static TranslationLocale CurrentLocale
         {

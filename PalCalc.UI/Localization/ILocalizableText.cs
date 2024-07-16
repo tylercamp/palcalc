@@ -13,16 +13,13 @@ namespace PalCalc.UI.Localization
 
     public abstract class ILocalizableText
     {
+        // TODO - maybe also cache based on params? lots of unformatted `.Bind()` calls which could just reuse the same object
         protected List<WeakReference<ILocalizedText>> instances = [];
 
         // assumes `instances` is already locked
         protected void PruneInstances()
         {
-            var emptyRefs = instances.Where(i =>
-            {
-                ILocalizedText lt;
-                return !i.TryGetTarget(out lt);
-            }).ToList();
+            var emptyRefs = instances.Where(i => !i.TryGetTarget(out ILocalizedText lt)).ToList();
 
             if (emptyRefs.Any())
                 instances.RemoveAll(emptyRefs.Contains);
@@ -52,7 +49,6 @@ namespace PalCalc.UI.Localization
                         PruneInstances();
                         foreach (var i in instances)
                         {
-                            //i.Locale = locale;
                             if (i.TryGetTarget(out ILocalizedText lt))
                                 lt.Locale = locale;
                         }

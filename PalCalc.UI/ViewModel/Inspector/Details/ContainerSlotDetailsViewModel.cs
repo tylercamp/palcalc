@@ -18,7 +18,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
     {
         public ILocalizedText DisplayName { get; } =
             pal != null
-                ? PalViewModel.Instance[pal.Pal].Name
+                ? PalViewModel.Make(pal.Pal).Name
                 : new HardCodedText(rawPal?.CharacterId ?? instanceId);
 
         public ImageSource Icon => pal == null ? PalIcon.DefaultIcon : PalIcon.Images[pal.Pal];

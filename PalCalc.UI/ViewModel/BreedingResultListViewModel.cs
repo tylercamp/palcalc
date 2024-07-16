@@ -40,9 +40,11 @@ namespace PalCalc.UI.ViewModel
         private readonly double FIT_CONTENT = double.NaN;
         private readonly double DEFAULT = double.NaN;
 
+        // hide columns if they're all the same value
         private double HiddenIfRedundant<T>(Func<BreedingResultViewModel, T> selector)
         {
             if (Results == null || Results.Count < 2) return DEFAULT;
+            // (but don't hide columns if we've disabled translations and are looking for anything that needs updates)
             else if (Results.Select(selector).Distinct().Count() == 1 && !Translator.DEBUG_DISABLE_TRANSLATIONS) return WIDTH_HIDDEN;
             else return FIT_CONTENT;
         }

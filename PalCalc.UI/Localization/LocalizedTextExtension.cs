@@ -9,6 +9,7 @@ using System.Windows.Markup;
 
 namespace PalCalc.UI.Localization
 {
+    // (XAML util, see uses of `{itl:LocalizedText ITL_CODE)`
     public class LocalizedTextExtension : MarkupExtension
     {
         public LocalizationCodes Code

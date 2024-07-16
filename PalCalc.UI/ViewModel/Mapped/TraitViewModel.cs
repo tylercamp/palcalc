@@ -45,21 +45,14 @@ namespace PalCalc.UI.ViewModel.Mapped
         );
 
         private static Dictionary<Trait, TraitViewModel> instances;
-        private static Dictionary<Trait, TraitViewModel> Instance
-        {
-            get
-            {
-                if (instances == null)
-                {
-                    instances = PalDB.LoadEmbedded().Traits.ToDictionary(t => t, t => new TraitViewModel(t, NameLocalizer.Bind(t)));
-                }
-                return instances;
-            }
-        }
-
         private static ILocalizedText randomTraitLabel;
         public static TraitViewModel Make(Trait trait)
         {
+            if (instances == null)
+            {
+                instances = PalDB.LoadEmbedded().Traits.ToDictionary(t => t, t => new TraitViewModel(t, NameLocalizer.Bind(t)));
+            }
+
             if (trait is RandomTrait)
             {
                 randomTraitLabel ??= NameLocalizer.Bind(trait);
@@ -68,7 +61,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
             else
             {
-                return Instance[trait];
+                return instances[trait];
             }
         }
 

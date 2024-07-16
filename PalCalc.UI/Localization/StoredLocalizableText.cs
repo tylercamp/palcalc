@@ -44,7 +44,6 @@ namespace PalCalc.UI.Localization
                 throw new Exception("Binding parameters are null: " + string.Join(", ", nullValues.Select(v => v.Key)));
             }
 
-            // TODO - validate format args
             var res = new StoredLocalizedText(this, formatArgs) { Locale = Locale };
             Track(res);
             return res;

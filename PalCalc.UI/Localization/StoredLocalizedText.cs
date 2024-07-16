@@ -40,8 +40,5 @@ namespace PalCalc.UI.Localization
                 return result;
             }
         }
-
-        
-        //public override string ToString() => $"{src} => {Value}";
     }
 }

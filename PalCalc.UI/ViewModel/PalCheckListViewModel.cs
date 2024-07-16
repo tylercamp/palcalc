@@ -79,7 +79,7 @@ namespace PalCalc.UI.ViewModel
         public PalCheckListViewModel(Action onCancel, Action<Dictionary<Pal, bool>> onSave, Dictionary<Pal, bool> initialState)
         {
             allEntries = initialState
-                .Select(kvp => new PalCheckListEntryViewModel(PalViewModel.Instance[kvp.Key], kvp.Value))
+                .Select(kvp => new PalCheckListEntryViewModel(PalViewModel.Make(kvp.Key), kvp.Value))
                 .OrderBy(vm => vm.Pal.ModelObject.Id)
                 .ToList();
 
@@ -122,6 +122,7 @@ namespace PalCalc.UI.ViewModel
             foreach (var e in allEntries) e.PropertyChanged -= EntryPropertyChanged;
         }
 
+        // for XAML designer preview
         [ObservableProperty]
         private ILocalizedText title = new HardCodedText("Pal Checklist");
 

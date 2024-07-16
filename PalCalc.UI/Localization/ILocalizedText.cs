@@ -18,6 +18,8 @@ namespace PalCalc.UI.Localization
         public override bool Equals(object obj) => obj?.GetHashCode() == GetHashCode();
         public override int GetHashCode() => HashCode.Combine(this.GetType(), Value);
 
+        // helpful for XAML bindings where we forgot to call `.Value`, this (usually) creates a XAML binding
+        // error that you can just double-click on to find the source
         public override string ToString() => throw new Exception();
     }
 }

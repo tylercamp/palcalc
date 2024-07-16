@@ -17,16 +17,14 @@ namespace PalCalc.UI.ViewModel.Mapped
         );
 
         private static Dictionary<Pal, PalViewModel> instances;
-        public static Dictionary<Pal, PalViewModel> Instance
+        public static PalViewModel Make(Pal pal)
         {
-            get
+            if (instances == null)
             {
-                if (instances == null)
-                {
-                    instances = PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => new PalViewModel(p));
-                }
-                return instances;
+                instances = PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => new PalViewModel(p));
             }
+
+            return instances[pal];
         }
 
         private PalViewModel(Pal pal)
@@ -49,7 +47,6 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public ILocalizedText Name { get; }
 
-        // TODO - make this private?
         public Pal ModelObject { get; }
 
         public ImageSource Icon => PalIcon.Images[ModelObject];
