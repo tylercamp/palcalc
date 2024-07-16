@@ -25,6 +25,8 @@ namespace PalCalc.UI
 
         public static string LogFolder = "log";
 
+        public static List<ITranslationError> TranslationErrors { get; } = new List<ITranslationError>();
+
         protected override void OnStartup(StartupEventArgs e)
         {
 #if RELEASE
@@ -48,6 +50,7 @@ namespace PalCalc.UI
 
             PalDB.BeginLoadEmbedded();
 
+            Translator.OnTranslationError += TranslationErrors.Add;
             Translator.Init();
 
             base.OnStartup(e);
@@ -64,12 +67,7 @@ namespace PalCalc.UI
 
             try
             {
-                message = Translator.Translations[LocalizationCodes.LC_ERROR_HARD_CRASH].Bind(
-                    new()
-                    {
-                        { "CrashlogPath", logZip }
-                    }
-                ).Value;
+                message = LocalizationCodes.LC_ERROR_HARD_CRASH.Bind(new { CrashlogPath = logZip }).Value;
             }
             finally
             {

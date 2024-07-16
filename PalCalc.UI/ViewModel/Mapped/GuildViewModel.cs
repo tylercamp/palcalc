@@ -31,7 +31,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
 
             Name = IsWildcard
-                ? Translator.Translations[LocalizationCodes.LC_ANY_GUILD].Bind()
+                ? LocalizationCodes.LC_ANY_GUILD.Bind()
                 : new HardCodedText(ModelObject.Name);
         }
 

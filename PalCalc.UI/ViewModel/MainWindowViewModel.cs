@@ -181,13 +181,8 @@ namespace PalCalc.UI.ViewModel
                 return;
             }
 
-            var title = Translator.Translations[LocalizationCodes.LC_DELETE_PAL_TARGET_TITLE].Bind().Value;
-            var msg = Translator.Translations[LocalizationCodes.LC_DELETE_PAL_TARGET_MSG].Bind(
-                new()
-                {
-                    { "PalName", spec.TargetPal.Name },
-                }
-            ).Value;
+            var title = LocalizationCodes.LC_DELETE_PAL_TARGET_TITLE.Bind().Value;
+            var msg = LocalizationCodes.LC_DELETE_PAL_TARGET_MSG.Bind(spec.TargetPal.Name).Value;
 
             if (MessageBox.Show(App.Current.MainWindow, msg, title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
@@ -221,7 +216,7 @@ namespace PalCalc.UI.ViewModel
             {
                 loadingSaveModal = new LoadingSaveFileModal();
                 loadingSaveModal.Owner = Application.Current.MainWindow;
-                loadingSaveModal.DataContext = Translator.Translations[LocalizationCodes.LC_SAVE_FILE_RELOADING].Bind();
+                loadingSaveModal.DataContext = LocalizationCodes.LC_SAVE_FILE_RELOADING.Bind();
                 loadingSaveModal.ShowSync();
             }
         }
@@ -249,7 +244,7 @@ namespace PalCalc.UI.ViewModel
             logger.Error(ex, "error when parsing save file for {saveId}", CachedSaveGame.IdentifierFor(obj));
 
             var crashsupport = CrashSupport.PrepareSupportFile(specificSave: obj);
-            MessageBox.Show(Translator.Translations[LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED].Bind().Value);
+            MessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind().Value);
 
             SaveSelection.SelectedGame = null;
         }
@@ -433,16 +428,16 @@ namespace PalCalc.UI.ViewModel
                 {
                     case SolverPhase.Initializing:
                         solverStopwatch = Stopwatch.StartNew();
-                        SolverStatusMsg = Translator.Translations[LocalizationCodes.LV_SOLVER_STATUS_INITIALIZING].Bind();
+                        SolverStatusMsg = LocalizationCodes.LV_SOLVER_STATUS_INITIALIZING.Bind();
                         overallStep = 0;
                         break;
 
                     case SolverPhase.Breeding:
-                        SolverStatusMsg = Translator.Translations[LocalizationCodes.LC_SOLVER_STATUS_BREEDING].Bind(
-                            new()
+                        SolverStatusMsg = LocalizationCodes.LC_SOLVER_STATUS_BREEDING.Bind(
+                            new
                             {
-                                { "StepNum", obj.CurrentStepIndex + 1 },
-                                { "WorkSize", obj.WorkSize.ToString("#,##") },
+                                StepNum = obj.CurrentStepIndex + 1,
+                                WorkSize = obj.WorkSize.ToString("#,##"),
                             }
                         );
                         overallStep = 1 + obj.CurrentStepIndex;
@@ -455,12 +450,7 @@ namespace PalCalc.UI.ViewModel
                         }
                         else
                         {
-                            SolverStatusMsg = Translator.Translations[LocalizationCodes.LC_SOLVER_STATUS_FINISHED].Bind(
-                                new()
-                                {
-                                    { "Duration", solverStopwatch.Elapsed.TimeSpanSecondsStr() }
-                                }
-                            );
+                            SolverStatusMsg = LocalizationCodes.LC_SOLVER_STATUS_FINISHED.Bind(solverStopwatch.Elapsed.TimeSpanSecondsStr());
                             overallStep = (int)numTotalSteps;
                         }
                         break;

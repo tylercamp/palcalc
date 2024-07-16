@@ -30,18 +30,18 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     public static class ContainerSourceExtensions
     {
         public static ILocalizedText ToSearchResultsLabel(this IContainerSource src) =>
-            Translator.Translations[LocalizationCodes.LC_SAVESEARCH_CONTAINER_LABEL].Bind(
-                new()
+            LocalizationCodes.LC_SAVESEARCH_CONTAINER_LABEL.Bind(
+                new
                 {
-                    { "Label", src.Label },
-                    { "NumMatches", src.Container.Grids.Sum(g => g.Slots.Count(s => s.Matches)) }
+                    Label = src.Label,
+                    NumMatches = src.Container.Grids.Sum(g => g.Slots.Count(s => s.Matches)),
                 }
             );
     }
 
     public class PlayerPalboxContainerViewModel(ContainerViewModel container) : ObservableObject, IContainerSource
     {
-        public ILocalizedText Label { get; } = Translator.Translations[LocalizationCodes.LC_PAL_LOC_PALBOX].Bind();
+        public ILocalizedText Label { get; } = LocalizationCodes.LC_PAL_LOC_PALBOX.Bind();
         public ContainerViewModel Container => container;
 
         public ILocalizedText SearchedLabel => this.ToSearchResultsLabel();
@@ -57,7 +57,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
     public class PlayerPartyContainerViewModel(ContainerViewModel container) : ObservableObject, IContainerSource
     {
-        public ILocalizedText Label { get; } = Translator.Translations[LocalizationCodes.LC_PAL_LOC_PARTY].Bind();
+        public ILocalizedText Label { get; } = LocalizationCodes.LC_PAL_LOC_PARTY.Bind();
         public ContainerViewModel Container => container;
 
         public ILocalizedText SearchedLabel => this.ToSearchResultsLabel();
@@ -73,7 +73,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
     public class PlayerTreeNodeViewModel(PlayerInstance player, ContainerViewModel party, ContainerViewModel palbox) : IOwnerTreeNode
     {
-        public ILocalizedText Label { get; } = Translator.Translations[LocalizationCodes.LC_PLAYER_LABEL].Bind(new() { { "PlayerName", player.Name } });
+        public ILocalizedText Label { get; } = LocalizationCodes.LC_PLAYER_LABEL.Bind(player.Name);
 
         public List<IOwnerTreeNode> Children { get; } = [
             new PlayerPartyContainerViewModel(party),
@@ -83,7 +83,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
     public class BaseTreeNodeViewModel(ContainerViewModel baseContainer) : ObservableObject, IContainerSource
     {
-        public ILocalizedText Label { get; } = Translator.Translations[LocalizationCodes.LC_BASE_LABEL].Bind(new() { { "BaseName", baseContainer.Id.Split('-')[0] } });
+        public ILocalizedText Label { get; } = LocalizationCodes.LC_BASE_LABEL.Bind(baseContainer.Id.Split('-')[0]);
         public ContainerViewModel Container => baseContainer;
 
         public ILocalizedText SearchedLabel => this.ToSearchResultsLabel();
@@ -101,9 +101,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
         public GuildTreeNodeViewModel(CachedSaveGame source, GuildInstance guild, List<ContainerViewModel> relevantContainers)
         {
-            Label = Translator.Translations[LocalizationCodes.LC_GUILD_LABEL].Bind(
-                new() { { "GuildName", guild.Name } }
-            );
+            Label = LocalizationCodes.LC_GUILD_LABEL.Bind(guild.Name);
 
             var playerIds = relevantContainers.SelectMany(c => c.OwnerIds).Where(source.PlayersById.ContainsKey).Distinct().ToList();
 

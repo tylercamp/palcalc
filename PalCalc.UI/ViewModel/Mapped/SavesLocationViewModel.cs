@@ -27,18 +27,18 @@ namespace PalCalc.UI.ViewModel.Mapped
             if (sl.FolderPath == null)
             {
                 Label = isXbox
-                    ? Translator.Translations[LocalizationCodes.LC_SAVE_LOCATION_XBOX_EMPTY].Bind()
-                    : Translator.Translations[LocalizationCodes.LC_SAVE_LOCATION_STEAM_EMPTY].Bind(); ;
+                    ? LocalizationCodes.LC_SAVE_LOCATION_XBOX_EMPTY.Bind()
+                    : LocalizationCodes.LC_SAVE_LOCATION_STEAM_EMPTY.Bind(); ;
             }
             else
             {
                 var baseText = isXbox
-                    ? Translator.Translations[LocalizationCodes.LC_SAVE_LOCATION_LBL_XBOX]
-                    : Translator.Translations[LocalizationCodes.LC_SAVE_LOCATION_LBL_STEAM];
+                    ? LocalizationCodes.LC_SAVE_LOCATION_LBL_XBOX
+                    : LocalizationCodes.LC_SAVE_LOCATION_LBL_STEAM;
 
-                Label = baseText.Bind(new() {
-                    { "UserId", sl.FolderName.LimitLength(12) },
-                    { "NumValidSaves", sl.ValidSaveGames.Count() }
+                Label = baseText.Bind(new {
+                    UserId = sl.FolderName.LimitLength(12),
+                    NumValidSaves = sl.ValidSaveGames.Count(),
                 });
             }
             
@@ -70,7 +70,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         private ObservableCollection<SaveGameViewModel> saveGames;
         public ReadOnlyObservableCollection<SaveGameViewModel> SaveGames { get; }
 
-        public ILocalizedText Label { get; } = Translator.Translations[LocalizationCodes.LC_SAVE_LOCATION_MANUAL].Bind();
+        public ILocalizedText Label { get; } = LocalizationCodes.LC_SAVE_LOCATION_MANUAL.Bind();
 
         public DateTime? LastModified => saveGames.Where(g => !g.IsAddManualOption).OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
 

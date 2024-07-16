@@ -118,430 +118,430 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LC_ABOUT_APP" xml:space="preserve">
-    <value>LC_ABOUT_APP</value>
+    <value />
   </data>
   <data name="LC_ADD_NEW_SAVE" xml:space="preserve">
-    <value>LC_ADD_NEW_SAVE</value>
+    <value />
   </data>
   <data name="LC_ANY_GUILD" xml:space="preserve">
-    <value>LC_ANY_GUILD</value>
+    <value />
   </data>
   <data name="LC_ANY_PLAYER" xml:space="preserve">
-    <value>LC_ANY_PLAYER</value>
+    <value />
   </data>
   <data name="LC_BASE_LABEL" xml:space="preserve">
-    <value>LC_BASE_LABEL | BaseName</value>
+    <value>BaseName</value>
   </data>
   <data name="LC_BREEDING_TIME" xml:space="preserve">
-    <value>LC_BREEDING_TIMES</value>
+    <value />
   </data>
   <data name="LC_BREEDING_TIME_DESC" xml:space="preserve">
-    <value>LC_BREEDING_TIME_DESC</value>
+    <value />
   </data>
   <data name="LC_COMMON_CANCEL" xml:space="preserve">
-    <value>LC_COMMON_CANCEL</value>
+    <value />
   </data>
   <data name="LC_COMMON_ENABLED" xml:space="preserve">
-    <value>LC_COMMON_ENABLED</value>
+    <value />
   </data>
   <data name="LC_COMMON_GENDER" xml:space="preserve">
-    <value>LC_COMMON_GENDER</value>
+    <value />
   </data>
   <data name="LC_COMMON_GENDER_FEMALE" xml:space="preserve">
-    <value>LC_COMMON_GENDER_FEMALE</value>
+    <value />
   </data>
   <data name="LC_COMMON_GENDER_MALE" xml:space="preserve">
-    <value>LC_COMMON_GENDER_MALE</value>
+    <value />
   </data>
   <data name="LC_COMMON_GENDER_OPPOSITE_WILDCARD" xml:space="preserve">
-    <value>LC_COMMON_GENDER_OPPOSITE_WILDCARD</value>
+    <value />
   </data>
   <data name="LC_COMMON_GENDER_WILDCARD" xml:space="preserve">
-    <value>LC_COMMON_GENDER_WILDCARD</value>
+    <value />
   </data>
   <data name="LC_COMMON_IVS" xml:space="preserve">
-    <value>LC_COMMON_IVS</value>
+    <value />
   </data>
   <data name="LC_COMMON_IV_ATTACK" xml:space="preserve">
-    <value>LC_COMMON_IV_ATTACK</value>
+    <value />
   </data>
   <data name="LC_COMMON_IV_DEFENSE" xml:space="preserve">
-    <value>LC_COMMON_IV_DEFENSE</value>
+    <value />
   </data>
   <data name="LC_COMMON_IV_HP" xml:space="preserve">
-    <value>LC_COMMON_IV_HP</value>
+    <value />
   </data>
   <data name="LC_COMMON_LEVEL" xml:space="preserve">
-    <value>LC_COMMON_LEVEL</value>
+    <value />
   </data>
   <data name="LC_COMMON_PAL" xml:space="preserve">
-    <value>LC_COMMON_PAL</value>
+    <value />
   </data>
   <data name="LC_COMMON_PALDEX_NUM_SHORT" xml:space="preserve">
-    <value>LC_COMMON_PALDEX_NUM_SHORT</value>
+    <value />
   </data>
   <data name="LC_COMMON_SAVE" xml:space="preserve">
-    <value>LC_COMMON_SAVE</value>
+    <value />
   </data>
   <data name="LC_COMMON_TRAITS" xml:space="preserve">
-    <value>LC_COMMON_TRAITS</value>
+    <value />
   </data>
   <data name="LC_COMMON_UNKNOWN" xml:space="preserve">
-    <value>LC_COMMON_UNKNOWN</value>
+    <value />
   </data>
   <data name="LC_CRASHLOG_FAILED" xml:space="preserve">
-    <value>LC_CRASHLOG_FAILED</value>
+    <value />
   </data>
   <data name="LC_DELETE_PAL_TARGET_MSG" xml:space="preserve">
-    <value>LC_DELETE_PAL_TARGET_MSG | PalName</value>
+    <value>PalName</value>
   </data>
   <data name="LC_DELETE_PAL_TARGET_TITLE" xml:space="preserve">
-    <value>LC_DELETE_PAL_TARGET_TITLE</value>
+    <value />
   </data>
   <data name="LC_ERROR_HARD_CRASH" xml:space="preserve">
-    <value>LC_ERROR_HARD_CRASH | CrashlogPath</value>
+    <value>CrashlogPath</value>
   </data>
   <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve">
-    <value>LC_ERROR_SAVE_LOAD_FAILED | CrashlogPath</value>
+    <value>CrashlogPath</value>
   </data>
   <data name="LC_EXPORT_CRASH_LOG" xml:space="preserve">
-    <value>LC_EXPORT_CRASH_LOG</value>
+    <value />
   </data>
   <data name="LC_EXPORT_CRASH_LOG_DESCRIPTION" xml:space="preserve">
-    <value>LC_EXPORT_CRASH_LOG_DESCRIPTION</value>
+    <value />
   </data>
   <data name="LC_EXPORT_SAVE" xml:space="preserve">
-    <value>LC_EXPORT_SAVE</value>
+    <value />
   </data>
   <data name="LC_EXPORT_SAVE_DESCRIPTION" xml:space="preserve">
-    <value>LC_EXPORT_SAVE_DESCRIPTION</value>
+    <value />
   </data>
   <data name="LC_GAME_SETTINGS" xml:space="preserve">
-    <value>LC_GAME_SETTINGS</value>
+    <value />
   </data>
   <data name="LC_GRAPH_ZOOM_CUSTOM" xml:space="preserve">
-    <value>LC_GRAPH_ZOOM_CUSTOM</value>
+    <value />
   </data>
   <data name="LC_GRAPH_ZOOM_FILL" xml:space="preserve">
-    <value>LC_GRAPH_ZOOM_FILL</value>
+    <value />
   </data>
   <data name="LC_GRAPH_ZOOM_PERCENT" xml:space="preserve">
-    <value>LC_GRAPH_ZOOM_PERCENT</value>
+    <value />
   </data>
   <data name="LC_GUILD_LABEL" xml:space="preserve">
-    <value>LC_GUILD_LABEL | GuildName</value>
+    <value>GuildName</value>
   </data>
   <data name="LC_INSPECT_SAVE" xml:space="preserve">
-    <value>LC_INSPECT_SAVE</value>
+    <value />
   </data>
   <data name="LC_ITL_LABEL" xml:space="preserve">
-    <value>LC_ITL_LABEL</value>
+    <value />
     <comment>Label used to represent this language in the dropdown</comment>
   </data>
   <data name="LC_LANGUAGE" xml:space="preserve">
-    <value>LC_LANGUAGE</value>
+    <value />
   </data>
   <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
-    <value>LC_LANG_CHANGED_RESTART</value>
+    <value />
   </data>
   <data name="LC_LIST_SEPARATOR" xml:space="preserve">
-    <value>LC_LIST_SEPARATOR</value>
+    <value />
   </data>
   <data name="LC_LOC_COORD_BASE" xml:space="preserve">
-    <value>LC_LOC_COORD_BASE | X | Y</value>
+    <value>X | Y</value>
   </data>
   <data name="LC_LOC_COORD_PALBOX" xml:space="preserve">
-    <value>LC_LOC_COORD_PALBOX | Tab | X | Y</value>
+    <value>Tab | X | Y</value>
   </data>
   <data name="LC_LOC_COORD_PARTY" xml:space="preserve">
-    <value>LC_LOC_COORD_PARTY | SlotNum</value>
+    <value>SlotNum</value>
   </data>
   <data name="LC_LOC_OWNED_BY" xml:space="preserve">
-    <value>LC_LOC_OWNED_BY | Owner</value>
+    <value>Owner</value>
   </data>
   <data name="LC_LOC_PALBOX_TAB" xml:space="preserve">
-    <value>LC_LOC_PALBOX_TAB | Tab</value>
+    <value>Tab</value>
   </data>
   <data name="LC_MANUAL_SAVE_ALREADY_REGISTERED" xml:space="preserve">
-    <value>LC_MANUAL_SAVE_ALREADY_REGISTERED</value>
+    <value />
   </data>
   <data name="LC_MANUAL_SAVE_EXTENSION_LBL" xml:space="preserve">
-    <value>LC_MANUAL_SAVE_EXTENSION_LBL</value>
+    <value />
   </data>
   <data name="LC_MANUAL_SAVE_INCOMPLETE" xml:space="preserve">
-    <value>LC_MANUAL_SAVE_INCOMPLETE</value>
+    <value />
   </data>
   <data name="LC_MANUAL_SAVE_SELECTOR_TITLE" xml:space="preserve">
-    <value>LC_MANUAL_SAVE_SELECTOR_TITLE</value>
+    <value />
   </data>
   <data name="LC_MULTIPLE_BREEDING_FARMS" xml:space="preserve">
-    <value>LC_MULTIPLE_BREEDING_FARMS</value>
+    <value />
   </data>
   <data name="LC_MULTIPLE_BREEDING_FARMS_DESC" xml:space="preserve">
-    <value>LC_MULTIPLE_BREEDING_FARMS_DESC</value>
+    <value />
   </data>
   <data name="LC_NEW_TARGET_PAL" xml:space="preserve">
-    <value>LC_NEW_TARGET_PAL</value>
+    <value />
   </data>
   <data name="LC_NO_TRAITS" xml:space="preserve">
-    <value>LC_NO_TRAITS</value>
+    <value />
   </data>
   <data name="LC_OPEN_IN_FILE_EXPLORER" xml:space="preserve">
-    <value>LC_OPEN_IN_FILE_EXPLORER</value>
+    <value />
   </data>
   <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve">
-    <value>LC_OPTIONAL_TRAITS_SUMMARY | TraitsList</value>
+    <value>TraitsList</value>
   </data>
   <data name="LC_PALS_AT_BASE" xml:space="preserve">
-    <value>LC_PALS_AT_BASE</value>
+    <value />
   </data>
   <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
-    <value>LC_PAL_CHECKLIST_SEARCH</value>
+    <value />
   </data>
   <data name="LC_PAL_LABEL" xml:space="preserve">
-    <value>LC_PAL_LABEL | PalName | PaldexNum</value>
+    <value>PalName | PaldexNum</value>
   </data>
   <data name="LC_PAL_LOC_BASE" xml:space="preserve">
-    <value>LC_PAL_LOC_BASE</value>
+    <value />
   </data>
   <data name="LC_PAL_LOC_CAPTURED" xml:space="preserve">
-    <value>LC_PAL_LOC_CAPTURED</value>
+    <value />
   </data>
   <data name="LC_PAL_LOC_COUNT" xml:space="preserve">
-    <value>LC_PAL_LOC_COUNT | Count | LocType</value>
+    <value>Count | LocType</value>
   </data>
   <data name="LC_PAL_LOC_PALBOX" xml:space="preserve">
-    <value>LC_PAL_LOC_PALBOX</value>
+    <value />
   </data>
   <data name="LC_PAL_LOC_PARTY" xml:space="preserve">
-    <value>LC_PAL_LOC_PARTY</value>
+    <value />
   </data>
   <data name="LC_PAL_SRC_ANY_GUILD_MEMBER" xml:space="preserve">
-    <value>LC_PAL_SRC_ANY_GUILD_MEMBER</value>
+    <value />
   </data>
   <data name="LC_PAL_SRC_ANY_PLAYER_GUILD" xml:space="preserve">
-    <value>LC_PAL_SRC_ANY_PLAYER_GUILD</value>
+    <value />
   </data>
   <data name="LC_PAL_TARGET_OPTIONAL_TRAITS" xml:space="preserve">
-    <value>LC_PAL_TARGET_OPTIONAL_TRAITS</value>
+    <value />
   </data>
   <data name="LC_PAL_TARGET_REQUIRED_TRAITS" xml:space="preserve">
-    <value>LC_PAL_TARGET_REQUIRED_TRAITS</value>
+    <value />
   </data>
   <data name="LC_PAL_WILD_COUNT" xml:space="preserve">
-    <value>LC_PAL_WILD_COUNT | NumWild</value>
+    <value>NumWild</value>
   </data>
   <data name="LC_PLAYER_LABEL" xml:space="preserve">
-    <value>LC_PLAYER_LABEL | PlayerName</value>
+    <value>PlayerName</value>
   </data>
   <data name="LC_POPUP_TITLE_LOADING_SAVE_FILE" xml:space="preserve">
-    <value>LC_POPUP_TITLE_LOADING_SAVE_FILE</value>
+    <value />
   </data>
   <data name="LC_RANDOM_TRAIT" xml:space="preserve">
-    <value>LC_RANDOM_TRAIT</value>
+    <value />
   </data>
   <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve">
-    <value>LC_REQUIRED_TRAITS_SUMMARY | TraitsList</value>
+    <value>TraitsList</value>
   </data>
   <data name="LC_RESULT_BREEDING_ATTEMPTS" xml:space="preserve">
-    <value>LC_RESULT_BREEDING_ATTEMPTS | AvgAttempts</value>
+    <value>AvgAttempts</value>
   </data>
   <data name="LC_RESULT_INPUT_LOCS" xml:space="preserve">
-    <value>LC_RESULT_INPUT_LOCS</value>
+    <value />
   </data>
   <data name="LC_RESULT_LABEL" xml:space="preserve">
-    <value>LC_RESULT_LABEL | PalName | TraitsList | TimeEstimate</value>
+    <value>PalName | TraitsList | TimeEstimate</value>
   </data>
   <data name="LC_RESULT_LIST_TITLE_COUNT" xml:space="preserve">
-    <value>LC_RESULT_LIST_TITLE_COUNT | NumResults</value>
+    <value>NumResults</value>
   </data>
   <data name="LC_RESULT_LIST_TITLE_EMPTY" xml:space="preserve">
-    <value>LC_RESULT_LIST_TITLE_EMPTY</value>
+    <value />
   </data>
   <data name="LC_RESULT_NUM_STEPS" xml:space="preserve">
-    <value>LC_RESULT_NUM_STEPS</value>
+    <value />
   </data>
   <data name="LC_RESULT_TIME_ESTIMATE" xml:space="preserve">
-    <value>LC_RESULT_TIME_ESTIMATE</value>
+    <value />
   </data>
   <data name="LC_SAVEINSPECT_CONTAINER_ID" xml:space="preserve">
-    <value>LC_SAVEINSPECT_CONTAINER_ID</value>
+    <value />
   </data>
   <data name="LC_SAVEINSPECT_CONTAINER_OWNER" xml:space="preserve">
-    <value>LC_SAVEINSPECT_CONTAINER_OWNER</value>
+    <value />
   </data>
   <data name="LC_SAVEINSPECT_CONTAINER_SLOTS_USED" xml:space="preserve">
-    <value>LC_SAVEINSPECT_CONTAINER_SLOTS_USED</value>
+    <value />
   </data>
   <data name="LC_SAVEINSPECT_CONTAINER_TYPE" xml:space="preserve">
-    <value>LC_SAVEINSPECT_CONTAINER_TYPE</value>
+    <value />
   </data>
   <data name="LC_SAVEINSPECT_DETECTED_PROPERTIES" xml:space="preserve">
-    <value>LC_SAVEINSPECT_DETECTED_PROPERTIES</value>
+    <value />
   </data>
   <data name="LC_SAVEINSPECT_RAW_PROPERTIES" xml:space="preserve">
-    <value>LC_SAVEINSPECT_RAW_PROPERTIES</value>
+    <value />
   </data>
   <data name="LC_SAVEINSPECT_SLOT_EMPTY" xml:space="preserve">
-    <value>LC_SAVEINSPECT_SLOT_EMPTY</value>
+    <value />
   </data>
   <data name="LC_SAVESEARCH_CONTAINER_LABEL" xml:space="preserve">
-    <value>LC_SAVESEARCH_NUM_MATCHES | Label | NumMatches</value>
+    <value>Label | NumMatches</value>
   </data>
   <data name="LC_SAVESEARCH_GRP_PAL_CONTAINERS" xml:space="preserve">
-    <value>LC_SAVESEARCH_GRP_PAL_CONTAINERS</value>
+    <value />
   </data>
   <data name="LC_SAVESEARCH_GRP_SEARCH_SETTINGS" xml:space="preserve">
-    <value>LC_SAVESEARCH_GRP_SEARCH_SETTINGS</value>
+    <value />
   </data>
   <data name="LC_SAVESEARCH_SETTINGS_MIN_IVS" xml:space="preserve">
-    <value>LC_SAVESEARCH_SETTINGS_MIN_IVS</value>
+    <value />
   </data>
   <data name="LC_SAVESEARCH_SETTINGS_RESET" xml:space="preserve">
-    <value>LC_SAVESEARCH_SETTINGS_RESET</value>
+    <value />
   </data>
   <data name="LC_SAVEWINDOW_TAB_DETAILS" xml:space="preserve">
-    <value>LC_SAVEWINDOW_TAB_DETAILS</value>
+    <value />
   </data>
   <data name="LC_SAVEWINDOW_TAB_SEARCH" xml:space="preserve">
-    <value>LC_SAVEWINDOW_TAB_SEARCH</value>
+    <value />
   </data>
   <data name="LC_SAVEWINDOW_TITLE" xml:space="preserve">
-    <value>LC_SAVEWINDOW_TITLE | SaveLabel</value>
+    <value>SaveLabel</value>
   </data>
   <data name="LC_SAVE_FILE" xml:space="preserve">
-    <value>LC_SAVE_FILE</value>
+    <value />
   </data>
   <data name="LC_SAVE_FILE_RELOADING" xml:space="preserve">
-    <value>LC_SAVE_FILE_RELOADING</value>
+    <value />
   </data>
   <data name="LC_SAVE_GAME" xml:space="preserve">
-    <value>LC_SAVE_GAME</value>
+    <value />
   </data>
   <data name="LC_SAVE_GAME_INVALID" xml:space="preserve">
-    <value>LC_SAVE_GAME_INVALID</value>
+    <value />
   </data>
   <data name="LC_SAVE_GAME_LBL" xml:space="preserve">
-    <value>LC_SAVE_GAME_LBL | PlayerName | PlayerLevel | DayNumber | WorldName</value>
+    <value>PlayerName | PlayerLevel | DayNumber | WorldName</value>
   </data>
   <data name="LC_SAVE_GAME_LBL_NO_METADATA" xml:space="preserve">
-    <value>LC_SAVE_GAME_LBL_NO_METADATA | GameId</value>
+    <value>GameId</value>
   </data>
   <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve">
-    <value>LC_SAVE_GAME_LBL_SERVER | DayNumber | WorldName</value>
+    <value>DayNumber | WorldName</value>
   </data>
   <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
-    <value>LC_SAVE_GAME_XBOX_INCOMPLETE</value>
+    <value />
   </data>
   <data name="LC_SAVE_INSPECTOR_LOADING" xml:space="preserve">
-    <value>LC_SAVE_INSPECTOR_LOADING</value>
+    <value />
   </data>
   <data name="LC_SAVE_LOCATION" xml:space="preserve">
-    <value>LC_SAVE_LOCATION</value>
+    <value />
   </data>
   <data name="LC_SAVE_LOCATION_LBL_STEAM" xml:space="preserve">
-    <value>LC_SAVE_LOCATION_LBL_FMT | UserId | NumValidSaves</value>
+    <value>UserId | NumValidSaves</value>
   </data>
   <data name="LC_SAVE_LOCATION_LBL_XBOX" xml:space="preserve">
-    <value>LC_SAVE_LOCATION_LBL_FMT_XBOX | UserId | NumValidSaves</value>
+    <value>UserId | NumValidSaves</value>
   </data>
   <data name="LC_SAVE_LOCATION_MANUAL" xml:space="preserve">
-    <value>LC_SAVE_LOCATION_MANUAL</value>
+    <value />
   </data>
   <data name="LC_SAVE_LOCATION_STEAM_EMPTY" xml:space="preserve">
-    <value>LC_SAVE_LOCATION_STEAM_EMPTY</value>
+    <value />
   </data>
   <data name="LC_SAVE_LOCATION_XBOX_EMPTY" xml:space="preserve">
-    <value>LC_SAVE_LOCATION_XBOX_EMPTY</value>
+    <value />
   </data>
   <data name="LC_SAVE_LOCATION_XBOX_INSTALL_1" xml:space="preserve">
-    <value>LC_SAVE_LOCATION_XBOX_INSTALL_1</value>
+    <value />
   </data>
   <data name="LC_SAVE_LOCATION_XBOX_INSTALL_2" xml:space="preserve">
-    <value>LC_SAVE_LOCATION_XBOX_INSTALL_2</value>
+    <value />
   </data>
   <data name="LC_SAVE_LOCATION_XBOX_INSTALL_3" xml:space="preserve">
-    <value>LC_SAVE_LOCATION_XBOX_INSTALL_3</value>
+    <value />
   </data>
   <data name="LC_SAVE_WARNING" xml:space="preserve">
-    <value>LC_SAVE_WARNING</value>
+    <value />
   </data>
   <data name="LC_SOLVER_RUN" xml:space="preserve">
-    <value>LC_SOLVER_RUN</value>
+    <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS" xml:space="preserve">
-    <value>LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS</value>
+    <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS" xml:space="preserve">
-    <value>LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS</value>
+    <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
-    <value>LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION</value>
+    <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS" xml:space="preserve">
-    <value>LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS</value>
+    <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION" xml:space="preserve">
-    <value>LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION</value>
+    <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve">
-    <value>LC_SOLVER_SETTINGS_MAX_CPU</value>
+    <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION" xml:space="preserve">
-    <value>LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION</value>
+    <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS" xml:space="preserve">
-    <value>LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS</value>
+    <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
-    <value>LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION</value>
+    <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS" xml:space="preserve">
-    <value>LC_SOLVER_SETTINGS_MAX_WILD_PALS</value>
+    <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION" xml:space="preserve">
-    <value>LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION</value>
+    <value />
   </data>
   <data name="LC_SOLVER_STATUS_BREEDING" xml:space="preserve">
-    <value>LC_SOLVER_STATUS_BREEDING | StepNum | WorkSize</value>
+    <value>StepNum | WorkSize</value>
   </data>
   <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve">
-    <value>LC_SOLVER_STATUS_FINISHED | Duration</value>
+    <value>Duration</value>
   </data>
   <data name="LC_SOURCE_PALS" xml:space="preserve">
-    <value>LC_SOURCE_PALS</value>
+    <value />
   </data>
   <data name="LC_STARTUP_LOADING" xml:space="preserve">
-    <value>LC_STARTUP_LOADING</value>
+    <value />
   </data>
   <data name="LC_TARGET_PAL" xml:space="preserve">
-    <value>LC_TARGET_PAL</value>
+    <value />
   </data>
   <data name="LC_TARGET_PALS" xml:space="preserve">
-    <value>LC_TARGET_PALS</value>
+    <value />
   </data>
   <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">
-    <value>LC_TRAITS_COUNT_EMPTY</value>
+    <value />
   </data>
   <data name="LC_TRAITS_COUNT_RANDOM" xml:space="preserve">
-    <value>LC_TRAITS_COUNT_RANDOM | NumRandom</value>
+    <value>NumRandom</value>
   </data>
   <data name="LC_TRAITS_COUNT_UNRECOGNIZED" xml:space="preserve">
-    <value>LC_TRAITS_COUNT_UNRECOGNIZED | NumUnrecognized</value>
+    <value>NumUnrecognized</value>
   </data>
   <data name="LC_UNKNOWN_GUILD" xml:space="preserve">
-    <value>LC_UNKNOWN_GUILD</value>
+    <value />
   </data>
   <data name="LC_UNKNOWN_PLAYER" xml:space="preserve">
-    <value>LC_UNKNOWN_PLAYER</value>
+    <value />
   </data>
   <data name="LC_UPDATE_AVAILABLE" xml:space="preserve">
-    <value>LC_UPDATE_AVAILABLE</value>
+    <value />
   </data>
   <data name="LC_WINDOW_TITLE" xml:space="preserve">
-    <value>LC_WINDOW_TITLE</value>
+    <value />
   </data>
   <data name="LV_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
-    <value>LV_SOLVER_STATUS_INITIALIZING</value>
+    <value />
   </data>
 </root>

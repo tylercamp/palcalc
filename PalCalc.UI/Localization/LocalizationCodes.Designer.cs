@@ -54,21 +54,6 @@ namespace PalCalc.UI.Localization {
                 return resourceMan;
             }
         }
-
-        
-        /// <summary>
-        ///   Overrides the current thread's CurrentUICulture property for all
-        ///   resource lookups using this strongly typed resource class.
-        /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
-            get {
-                return resourceCulture;
-            }
-            set {
-                resourceCulture = value;
-            }
-        }
     }
 
     /// <summary>
@@ -79,574 +64,574 @@ namespace PalCalc.UI.Localization {
     public enum LocalizationCodes
     {
         /// <summary>
-        ///   Looks up a localized string similar to LC_ABOUT_APP.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_ABOUT_APP,
         /// <summary>
-        ///   Looks up a localized string similar to LC_ADD_NEW_SAVE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_ADD_NEW_SAVE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_ANY_GUILD.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_ANY_GUILD,
         /// <summary>
-        ///   Looks up a localized string similar to LC_ANY_PLAYER.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_ANY_PLAYER,
         /// <summary>
-        ///   Looks up a localized string similar to LC_BASE_LABEL | BaseName.
+        ///   Looks up a localized string similar to BaseName.
         /// </summary>
         LC_BASE_LABEL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_BREEDING_TIMES.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_BREEDING_TIME,
         /// <summary>
-        ///   Looks up a localized string similar to LC_BREEDING_TIME_DESC.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_BREEDING_TIME_DESC,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_CANCEL.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_CANCEL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_ENABLED.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_ENABLED,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_GENDER.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_GENDER,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_GENDER_FEMALE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_GENDER_FEMALE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_GENDER_MALE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_GENDER_MALE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_GENDER_OPPOSITE_WILDCARD.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_GENDER_OPPOSITE_WILDCARD,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_GENDER_WILDCARD.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_GENDER_WILDCARD,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_IV_ATTACK.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_IV_ATTACK,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_IV_DEFENSE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_IV_DEFENSE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_IV_HP.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_IV_HP,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_IVS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_IVS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_LEVEL.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_LEVEL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_PAL.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_PAL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_PALDEX_NUM_SHORT.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_PALDEX_NUM_SHORT,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_SAVE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_SAVE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_TRAITS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_TRAITS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_COMMON_UNKNOWN.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_UNKNOWN,
         /// <summary>
-        ///   Looks up a localized string similar to LC_CRASHLOG_FAILED.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_CRASHLOG_FAILED,
         /// <summary>
-        ///   Looks up a localized string similar to LC_DELETE_PAL_TARGET_MSG | PalName.
+        ///   Looks up a localized string similar to PalName.
         /// </summary>
         LC_DELETE_PAL_TARGET_MSG,
         /// <summary>
-        ///   Looks up a localized string similar to LC_DELETE_PAL_TARGET_TITLE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_DELETE_PAL_TARGET_TITLE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_ERROR_HARD_CRASH | CrashlogPath.
+        ///   Looks up a localized string similar to CrashlogPath.
         /// </summary>
         LC_ERROR_HARD_CRASH,
         /// <summary>
-        ///   Looks up a localized string similar to LC_ERROR_SAVE_LOAD_FAILED | CrashlogPath.
+        ///   Looks up a localized string similar to CrashlogPath.
         /// </summary>
         LC_ERROR_SAVE_LOAD_FAILED,
         /// <summary>
-        ///   Looks up a localized string similar to LC_EXPORT_CRASH_LOG.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_EXPORT_CRASH_LOG,
         /// <summary>
-        ///   Looks up a localized string similar to LC_EXPORT_CRASH_LOG_DESCRIPTION.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_EXPORT_CRASH_LOG_DESCRIPTION,
         /// <summary>
-        ///   Looks up a localized string similar to LC_EXPORT_SAVE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_EXPORT_SAVE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_EXPORT_SAVE_DESCRIPTION.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_EXPORT_SAVE_DESCRIPTION,
         /// <summary>
-        ///   Looks up a localized string similar to LC_GAME_SETTINGS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_GAME_SETTINGS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_GRAPH_ZOOM_CUSTOM.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_GRAPH_ZOOM_CUSTOM,
         /// <summary>
-        ///   Looks up a localized string similar to LC_GRAPH_ZOOM_FILL.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_GRAPH_ZOOM_FILL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_GRAPH_ZOOM_PERCENT.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_GRAPH_ZOOM_PERCENT,
         /// <summary>
-        ///   Looks up a localized string similar to LC_GUILD_LABEL | GuildName.
+        ///   Looks up a localized string similar to GuildName.
         /// </summary>
         LC_GUILD_LABEL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_INSPECT_SAVE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_INSPECT_SAVE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_ITL_LABEL.
+        ///   Looks up a localized string similar to .
         /// </summary>
         /// <remarks>
         /// Label used to represent this language in the dropdown
         /// </remarks>
         LC_ITL_LABEL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_LANG_CHANGED_RESTART.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_LANG_CHANGED_RESTART,
         /// <summary>
-        ///   Looks up a localized string similar to LC_LANGUAGE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_LANGUAGE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_LIST_SEPARATOR.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_LIST_SEPARATOR,
         /// <summary>
-        ///   Looks up a localized string similar to LC_LOC_COORD_BASE | X | Y.
+        ///   Looks up a localized string similar to X | Y.
         /// </summary>
         LC_LOC_COORD_BASE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_LOC_COORD_PALBOX | Tab | X | Y.
+        ///   Looks up a localized string similar to Tab | X | Y.
         /// </summary>
         LC_LOC_COORD_PALBOX,
         /// <summary>
-        ///   Looks up a localized string similar to LC_LOC_COORD_PARTY | SlotNum.
+        ///   Looks up a localized string similar to SlotNum.
         /// </summary>
         LC_LOC_COORD_PARTY,
         /// <summary>
-        ///   Looks up a localized string similar to LC_LOC_OWNED_BY | Owner.
+        ///   Looks up a localized string similar to Owner.
         /// </summary>
         LC_LOC_OWNED_BY,
         /// <summary>
-        ///   Looks up a localized string similar to LC_LOC_PALBOX_TAB | Tab.
+        ///   Looks up a localized string similar to Tab.
         /// </summary>
         LC_LOC_PALBOX_TAB,
         /// <summary>
-        ///   Looks up a localized string similar to LC_MANUAL_SAVE_ALREADY_REGISTERED.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_MANUAL_SAVE_ALREADY_REGISTERED,
         /// <summary>
-        ///   Looks up a localized string similar to LC_MANUAL_SAVE_EXTENSION_LBL.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_MANUAL_SAVE_EXTENSION_LBL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_MANUAL_SAVE_INCOMPLETE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_MANUAL_SAVE_INCOMPLETE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_MANUAL_SAVE_SELECTOR_TITLE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_MANUAL_SAVE_SELECTOR_TITLE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_MULTIPLE_BREEDING_FARMS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_MULTIPLE_BREEDING_FARMS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_MULTIPLE_BREEDING_FARMS_DESC.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_MULTIPLE_BREEDING_FARMS_DESC,
         /// <summary>
-        ///   Looks up a localized string similar to LC_NEW_TARGET_PAL.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_NEW_TARGET_PAL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_NO_TRAITS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_NO_TRAITS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_OPEN_IN_FILE_EXPLORER.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_OPEN_IN_FILE_EXPLORER,
         /// <summary>
-        ///   Looks up a localized string similar to LC_OPTIONAL_TRAITS_SUMMARY | TraitsList.
+        ///   Looks up a localized string similar to TraitsList.
         /// </summary>
         LC_OPTIONAL_TRAITS_SUMMARY,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_CHECKLIST_SEARCH.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_PAL_CHECKLIST_SEARCH,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_LABEL | PalName | PaldexNum.
+        ///   Looks up a localized string similar to PalName | PaldexNum.
         /// </summary>
         LC_PAL_LABEL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_LOC_BASE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_PAL_LOC_BASE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_LOC_CAPTURED.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_PAL_LOC_CAPTURED,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_LOC_COUNT | Count | LocType.
+        ///   Looks up a localized string similar to Count | LocType.
         /// </summary>
         LC_PAL_LOC_COUNT,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_LOC_PALBOX.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_PAL_LOC_PALBOX,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_LOC_PARTY.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_PAL_LOC_PARTY,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_SRC_ANY_GUILD_MEMBER.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_PAL_SRC_ANY_GUILD_MEMBER,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_SRC_ANY_PLAYER_GUILD.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_PAL_SRC_ANY_PLAYER_GUILD,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_TARGET_OPTIONAL_TRAITS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_PAL_TARGET_OPTIONAL_TRAITS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_TARGET_REQUIRED_TRAITS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_PAL_TARGET_REQUIRED_TRAITS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PAL_WILD_COUNT | NumWild.
+        ///   Looks up a localized string similar to NumWild.
         /// </summary>
         LC_PAL_WILD_COUNT,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PALS_AT_BASE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_PALS_AT_BASE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_PLAYER_LABEL | PlayerName.
+        ///   Looks up a localized string similar to PlayerName.
         /// </summary>
         LC_PLAYER_LABEL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_POPUP_TITLE_LOADING_SAVE_FILE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_POPUP_TITLE_LOADING_SAVE_FILE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_RANDOM_TRAIT.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_RANDOM_TRAIT,
         /// <summary>
-        ///   Looks up a localized string similar to LC_REQUIRED_TRAITS_SUMMARY | TraitsList.
+        ///   Looks up a localized string similar to TraitsList.
         /// </summary>
         LC_REQUIRED_TRAITS_SUMMARY,
         /// <summary>
-        ///   Looks up a localized string similar to LC_RESULT_BREEDING_ATTEMPTS | AvgAttempts.
+        ///   Looks up a localized string similar to AvgAttempts.
         /// </summary>
         LC_RESULT_BREEDING_ATTEMPTS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_RESULT_INPUT_LOCS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_RESULT_INPUT_LOCS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_RESULT_LABEL | PalName | TraitsList | TimeEstim....
+        ///   Looks up a localized string similar to PalName | TraitsList | TimeEstimate.
         /// </summary>
         LC_RESULT_LABEL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_RESULT_LIST_TITLE_COUNT | NumResults.
+        ///   Looks up a localized string similar to NumResults.
         /// </summary>
         LC_RESULT_LIST_TITLE_COUNT,
         /// <summary>
-        ///   Looks up a localized string similar to LC_RESULT_LIST_TITLE_EMPTY.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_RESULT_LIST_TITLE_EMPTY,
         /// <summary>
-        ///   Looks up a localized string similar to LC_RESULT_NUM_STEPS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_RESULT_NUM_STEPS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_RESULT_TIME_ESTIMATE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_RESULT_TIME_ESTIMATE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_FILE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_FILE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_FILE_RELOADING.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_FILE_RELOADING,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_GAME.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_GAME,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_GAME_INVALID.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_GAME_INVALID,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_GAME_LBL | PlayerName | PlayerLevel | DayN....
+        ///   Looks up a localized string similar to PlayerName | PlayerLevel | DayNumber | WorldName.
         /// </summary>
         LC_SAVE_GAME_LBL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_GAME_LBL_NO_METADATA | GameId.
+        ///   Looks up a localized string similar to GameId.
         /// </summary>
         LC_SAVE_GAME_LBL_NO_METADATA,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_GAME_LBL_SERVER | DayNumber | WorldName.
+        ///   Looks up a localized string similar to DayNumber | WorldName.
         /// </summary>
         LC_SAVE_GAME_LBL_SERVER,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_GAME_XBOX_INCOMPLETE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_GAME_XBOX_INCOMPLETE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_INSPECTOR_LOADING.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_INSPECTOR_LOADING,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_LOCATION.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_LOCATION,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_LOCATION_LBL_FMT | UserId | NumValidSaves.
+        ///   Looks up a localized string similar to UserId | NumValidSaves.
         /// </summary>
         LC_SAVE_LOCATION_LBL_STEAM,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_LOCATION_LBL_FMT_XBOX | UserId | NumValidS....
+        ///   Looks up a localized string similar to UserId | NumValidSaves.
         /// </summary>
         LC_SAVE_LOCATION_LBL_XBOX,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_LOCATION_MANUAL.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_LOCATION_MANUAL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_LOCATION_STEAM_EMPTY.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_LOCATION_STEAM_EMPTY,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_LOCATION_XBOX_EMPTY.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_LOCATION_XBOX_EMPTY,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_LOCATION_XBOX_INSTALL_1.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_LOCATION_XBOX_INSTALL_1,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_LOCATION_XBOX_INSTALL_2.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_LOCATION_XBOX_INSTALL_2,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_LOCATION_XBOX_INSTALL_3.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_LOCATION_XBOX_INSTALL_3,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVE_WARNING.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_WARNING,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVEINSPECT_CONTAINER_ID.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEINSPECT_CONTAINER_ID,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVEINSPECT_CONTAINER_OWNER.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEINSPECT_CONTAINER_OWNER,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVEINSPECT_CONTAINER_SLOTS_USED.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEINSPECT_CONTAINER_SLOTS_USED,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVEINSPECT_CONTAINER_TYPE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEINSPECT_CONTAINER_TYPE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVEINSPECT_DETECTED_PROPERTIES.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEINSPECT_DETECTED_PROPERTIES,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVEINSPECT_RAW_PROPERTIES.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEINSPECT_RAW_PROPERTIES,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVEINSPECT_SLOT_EMPTY.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEINSPECT_SLOT_EMPTY,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVESEARCH_NUM_MATCHES | Label | NumMatches.
+        ///   Looks up a localized string similar to Label | NumMatches.
         /// </summary>
         LC_SAVESEARCH_CONTAINER_LABEL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVESEARCH_GRP_PAL_CONTAINERS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVESEARCH_GRP_PAL_CONTAINERS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVESEARCH_GRP_SEARCH_SETTINGS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVESEARCH_GRP_SEARCH_SETTINGS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVESEARCH_SETTINGS_MIN_IVS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVESEARCH_SETTINGS_MIN_IVS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVESEARCH_SETTINGS_RESET.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVESEARCH_SETTINGS_RESET,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVEWINDOW_TAB_DETAILS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEWINDOW_TAB_DETAILS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVEWINDOW_TAB_SEARCH.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEWINDOW_TAB_SEARCH,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SAVEWINDOW_TITLE | SaveLabel.
+        ///   Looks up a localized string similar to SaveLabel.
         /// </summary>
         LC_SAVEWINDOW_TITLE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_RUN.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_RUN,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESC....
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_SETTINGS_MAX_CPU.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_CPU,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DES....
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_SETTINGS_MAX_WILD_PALS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_WILD_PALS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_STATUS_BREEDING | StepNum | WorkSize.
+        ///   Looks up a localized string similar to StepNum | WorkSize.
         /// </summary>
         LC_SOLVER_STATUS_BREEDING,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOLVER_STATUS_FINISHED | Duration.
+        ///   Looks up a localized string similar to Duration.
         /// </summary>
         LC_SOLVER_STATUS_FINISHED,
         /// <summary>
-        ///   Looks up a localized string similar to LC_SOURCE_PALS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOURCE_PALS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_STARTUP_LOADING.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_STARTUP_LOADING,
         /// <summary>
-        ///   Looks up a localized string similar to LC_TARGET_PAL.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_TARGET_PAL,
         /// <summary>
-        ///   Looks up a localized string similar to LC_TARGET_PALS.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_TARGET_PALS,
         /// <summary>
-        ///   Looks up a localized string similar to LC_TRAITS_COUNT_EMPTY.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_TRAITS_COUNT_EMPTY,
         /// <summary>
-        ///   Looks up a localized string similar to LC_TRAITS_COUNT_RANDOM | NumRandom.
+        ///   Looks up a localized string similar to NumRandom.
         /// </summary>
         LC_TRAITS_COUNT_RANDOM,
         /// <summary>
-        ///   Looks up a localized string similar to LC_TRAITS_COUNT_UNRECOGNIZED | NumUnrecognized.
+        ///   Looks up a localized string similar to NumUnrecognized.
         /// </summary>
         LC_TRAITS_COUNT_UNRECOGNIZED,
         /// <summary>
-        ///   Looks up a localized string similar to LC_UNKNOWN_GUILD.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_UNKNOWN_GUILD,
         /// <summary>
-        ///   Looks up a localized string similar to LC_UNKNOWN_PLAYER.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_UNKNOWN_PLAYER,
         /// <summary>
-        ///   Looks up a localized string similar to LC_UPDATE_AVAILABLE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_UPDATE_AVAILABLE,
         /// <summary>
-        ///   Looks up a localized string similar to LC_WINDOW_TITLE.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LC_WINDOW_TITLE,
         /// <summary>
-        ///   Looks up a localized string similar to LV_SOLVER_STATUS_INITIALIZING.
+        ///   Looks up a localized string similar to .
         /// </summary>
         LV_SOLVER_STATUS_INITIALIZING,
     }

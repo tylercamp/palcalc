@@ -26,10 +26,9 @@ namespace PalCalc.UI.Localization
 
         public const bool DEBUG_DISABLE_TRANSLATIONS = false;
 
-
         // var-name -> ID
         private static Dictionary<LocalizationCodes, string> codeToFormat;
-        public static Dictionary<LocalizationCodes, string> CodeToFormat =>
+        public static Dictionary<LocalizationCodes, string> CodeToArgs =>
             codeToFormat ??= ReadAllResources(LocalizationCodesResx.ResourceManager)
                 .ToDictionary(kvp => Enum.Parse<LocalizationCodes>(kvp.Key), kvp => kvp.Value);
 
@@ -78,7 +77,7 @@ namespace PalCalc.UI.Localization
         }
 
         private static ILocalizedText separator;
-        public static ILocalizedText ListSeparator => separator ??= Translations[LocalizationCodes.LC_LIST_SEPARATOR].Bind();
+        public static ILocalizedText ListSeparator => separator ??= LocalizationCodes.LC_LIST_SEPARATOR.Bind();
 
         public static DerivedLocalizableText<IEnumerable<ILocalizedText>> Join { get; } =
             new DerivedLocalizableText<IEnumerable<ILocalizedText>>(

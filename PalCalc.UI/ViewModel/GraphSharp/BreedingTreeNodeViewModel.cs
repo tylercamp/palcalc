@@ -42,10 +42,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             }
 
             Gender = node.PalRef.Gender.Label();
-            AvgRequiredAttemptsDescription = Translator.Translations[LocalizationCodes.LC_RESULT_BREEDING_ATTEMPTS].Bind(new()
-            {
-                { "AvgAttempts", AvgRequiredAttempts }
-            });
+            AvgRequiredAttemptsDescription = LocalizationCodes.LC_RESULT_BREEDING_ATTEMPTS.Bind(AvgRequiredAttempts);
         }
 
         public PalViewModel Pal { get; }

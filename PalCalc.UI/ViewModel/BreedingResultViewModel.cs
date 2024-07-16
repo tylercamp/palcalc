@@ -105,18 +105,18 @@ namespace PalCalc.UI.ViewModel
                             LocationType.PlayerParty => 2,
                             _ => throw new NotImplementedException()
                         })
-                        .Select(g => Translator.Translations[LocalizationCodes.LC_PAL_LOC_COUNT].Bind(
-                            new()
+                        .Select(g => LocalizationCodes.LC_PAL_LOC_COUNT.Bind(
+                            new
                             {
-                                { "Count", g.Count() },
-                                { "LocType", g.Key.Label() },
+                                Count = g.Count(),
+                                LocType = g.Key.Label(),
                             }
                         ))
                         .ToList();
 
                     var numWildPals = DisplayedResult.AllReferences().Count(r => r is WildPalReference);
                     if (numWildPals > 0)
-                        descriptionParts.Add(Translator.Translations[LocalizationCodes.LC_PAL_WILD_COUNT].Bind(new() { { "NumWild", numWildPals } }));
+                        descriptionParts.Add(LocalizationCodes.LC_PAL_WILD_COUNT.Bind(numWildPals));
 
                     inputLocations = Translator.Join.Bind(descriptionParts);
                 }
@@ -141,13 +141,13 @@ namespace PalCalc.UI.ViewModel
                 else Graph = BreedingGraph.FromPalReference(source, value);
 
                 Label = DisplayedResult == null
-                    ? Translator.Translations[LocalizationCodes.LC_COMMON_UNKNOWN].Bind()
-                    : Translator.Translations[LocalizationCodes.LC_RESULT_LABEL].Bind(
-                        new()
+                    ? LocalizationCodes.LC_COMMON_UNKNOWN.Bind()
+                    : LocalizationCodes.LC_RESULT_LABEL.Bind(
+                        new
                         {
-                            { "PalName", PalViewModel.Instance[DisplayedResult.Pal].Label },
-                            { "TraitsList", EffectiveTraits.Description },
-                            { "TimeEstimate", TimeEstimate.TimeSpanMinutesStr() }
+                            PalName = PalViewModel.Instance[DisplayedResult.Pal].Label,
+                            TraitsList = EffectiveTraits.Description,
+                            TimeEstimate = TimeEstimate.TimeSpanMinutesStr(),
                         }
                     );
 

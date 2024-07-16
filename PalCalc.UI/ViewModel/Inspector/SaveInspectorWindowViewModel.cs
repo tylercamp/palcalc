@@ -29,12 +29,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             Search = new SearchViewModel(csg);
             Details = new SaveDetailsViewModel(csg, rawData, players);
 
-            WindowTitle = Translator.Translations[LocalizationCodes.LC_SAVEWINDOW_TITLE].Bind(
-                new()
-                {
-                    { "SaveLabel", new SaveGameViewModel(csg.UnderlyingSave).Label }
-                }
-            );
+            WindowTitle = LocalizationCodes.LC_SAVEWINDOW_TITLE.Bind(new SaveGameViewModel(csg.UnderlyingSave).Label);
         }
     }
 }

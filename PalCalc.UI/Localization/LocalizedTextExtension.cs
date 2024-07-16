@@ -13,10 +13,10 @@ namespace PalCalc.UI.Localization
     {
         public LocalizationCodes Code
         {
-            set => lt = Translator.Translations[value].Bind();
+            set => lt = value.Bind();
         }
 
-        private StoredLocalizedText lt;
+        private ILocalizedText lt;
 
         public LocalizedTextExtension()
         {

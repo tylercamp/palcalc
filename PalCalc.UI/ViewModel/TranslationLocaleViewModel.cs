@@ -34,7 +34,7 @@ namespace PalCalc.UI.ViewModel
                 if (value == IsSelected) return;
 
                 Translator.CurrentLocale = Value;
-                MessageBox.Show(Translator.Translations[LocalizationCodes.LC_LANG_CHANGED_RESTART].Bind().Value);
+                MessageBox.Show(LocalizationCodes.LC_LANG_CHANGED_RESTART.Bind().Value);
             }
         }
 

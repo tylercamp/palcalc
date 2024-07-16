@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PalCalc.UI.View;
 using PalCalc.UI.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,15 @@ namespace PalCalc.UI
         {
             DataContext = new AppWindowViewModel(Dispatcher);
             InitializeComponent();
+
+#if DEBUG
+            if (App.TranslationErrors.Count > 0)
+            {
+                var debugWindow = new TranslationDebugWindow();
+                debugWindow.DataContext = new TranslationDebugViewModel(App.TranslationErrors);
+                debugWindow.Show();
+            }
+#endif
         }
     }
 }

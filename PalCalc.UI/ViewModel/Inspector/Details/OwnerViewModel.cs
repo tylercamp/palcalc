@@ -15,7 +15,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
         public ILocalizedText Name { get; } = name;
         public string Id { get; } = id;
 
-        private static ILocalizedText LocalizedUnknown => Translator.Translations[LocalizationCodes.LC_COMMON_UNKNOWN].Bind();
+        private static ILocalizedText LocalizedUnknown => LocalizationCodes.LC_COMMON_UNKNOWN.Bind();
 
         public static OwnerViewModel Unknown => new OwnerViewModel(OwnerType.Unknown, LocalizedUnknown, "null");
         public static OwnerViewModel UnknownWithId(string id) => new OwnerViewModel(OwnerType.Unknown, LocalizedUnknown, id);

@@ -48,7 +48,7 @@ namespace PalCalc.UI.ViewModel
 
             if (!Traits.Any())
             {
-                Description = Translator.Translations[LocalizationCodes.LC_TRAITS_COUNT_EMPTY].Bind();
+                Description = LocalizationCodes.LC_TRAITS_COUNT_EMPTY.Bind();
             }
             else
             {
@@ -60,30 +60,19 @@ namespace PalCalc.UI.ViewModel
 
                 if (random.Any())
                     parts.Add(
-                        Translator.Translations[LocalizationCodes.LC_TRAITS_COUNT_RANDOM].Bind(new() { { "NumRandom", random.Count() } })
+                        LocalizationCodes.LC_TRAITS_COUNT_RANDOM.Bind(random.Count())
                     );
 
                 if (unrecognized.Any())
                     parts.Add(
-                        Translator.Translations[LocalizationCodes.LC_TRAITS_COUNT_UNRECOGNIZED].Bind(new() { { "NumUnrecognized", unrecognized.Count() } })
+                        LocalizationCodes.LC_TRAITS_COUNT_UNRECOGNIZED.Bind(unrecognized.Count())
                     );
 
                 Description = Translator.Join.Bind(parts);
             }
 
-            RequiredDescription = Translator.Translations[LocalizationCodes.LC_REQUIRED_TRAITS_SUMMARY].Bind(
-                new()
-                {
-                    { "TraitsList", Description }
-                }
-            );
-
-            OptionalDescription = Translator.Translations[LocalizationCodes.LC_OPTIONAL_TRAITS_SUMMARY].Bind(
-                new()
-                {
-                    { "TraitsList", Description }
-                }
-            );
+            RequiredDescription = LocalizationCodes.LC_REQUIRED_TRAITS_SUMMARY.Bind(Description);
+            OptionalDescription = LocalizationCodes.LC_OPTIONAL_TRAITS_SUMMARY.Bind(Description);
         }
 
         public ILocalizedText Description { get; }

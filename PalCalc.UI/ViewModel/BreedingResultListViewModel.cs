@@ -61,8 +61,8 @@ namespace PalCalc.UI.ViewModel
         private ILocalizedText resultsHeading;
         public ILocalizedText ResultsHeading => resultsHeading ??=
             Results == null
-                ? Translator.Translations[LocalizationCodes.LC_RESULT_LIST_TITLE_EMPTY].Bind()
-                : Translator.Translations[LocalizationCodes.LC_RESULT_LIST_TITLE_COUNT].Bind(new() { { "NumResults", Results.Count } });
+                ? LocalizationCodes.LC_RESULT_LIST_TITLE_EMPTY.Bind()
+                : LocalizationCodes.LC_RESULT_LIST_TITLE_COUNT.Bind(Results.Count);
 
         public static BreedingResultListViewModel DesignerInstance { get; } = new BreedingResultListViewModel()
         {

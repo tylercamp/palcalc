@@ -72,7 +72,7 @@ namespace PalCalc.UI.ViewModel
 
         public string Id => $"GUILD={ModelObject.Id}";
 
-        public ILocalizedText Label { get; } = Translator.Translations[LocalizationCodes.LC_PAL_SRC_ANY_GUILD_MEMBER].Bind();
+        public ILocalizedText Label { get; } = LocalizationCodes.LC_PAL_SRC_ANY_GUILD_MEMBER.Bind();
 
         public IEnumerable<PalInstance> Filter(CachedSaveGame source)
         {
@@ -104,7 +104,7 @@ namespace PalCalc.UI.ViewModel
     {
         public string Id => "ANY";
 
-        public ILocalizedText Label { get; } = Translator.Translations[LocalizationCodes.LC_PAL_SRC_ANY_PLAYER_GUILD].Bind();
+        public ILocalizedText Label { get; } = LocalizationCodes.LC_PAL_SRC_ANY_PLAYER_GUILD.Bind();
 
         public IEnumerable<PalInstance> Filter(CachedSaveGame source) => source.OwnedPals;
     }

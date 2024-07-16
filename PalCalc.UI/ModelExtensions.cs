@@ -13,19 +13,19 @@ namespace PalCalc.UI
         public static ILocalizedText Label(this LocationType locType) =>
             locType switch
             {
-                LocationType.Palbox => Translator.Translations[LocalizationCodes.LC_PAL_LOC_PALBOX].Bind(),
-                LocationType.Base => Translator.Translations[LocalizationCodes.LC_PAL_LOC_BASE].Bind(),
-                LocationType.PlayerParty => Translator.Translations[LocalizationCodes.LC_PAL_LOC_PARTY].Bind(),
+                LocationType.Palbox => LocalizationCodes.LC_PAL_LOC_PALBOX.Bind(),
+                LocationType.Base => LocalizationCodes.LC_PAL_LOC_BASE.Bind(),
+                LocationType.PlayerParty => LocalizationCodes.LC_PAL_LOC_PARTY.Bind(),
                 _ => throw new NotImplementedException()
             };
 
         public static ILocalizedText Label(this PalGender gender) =>
             gender switch
             {
-                PalGender.FEMALE => Translator.Translations[LocalizationCodes.LC_COMMON_GENDER_FEMALE].Bind(),
-                PalGender.MALE => Translator.Translations[LocalizationCodes.LC_COMMON_GENDER_MALE].Bind(),
-                PalGender.WILDCARD => Translator.Translations[LocalizationCodes.LC_COMMON_GENDER_WILDCARD].Bind(),
-                PalGender.OPPOSITE_WILDCARD => Translator.Translations[LocalizationCodes.LC_COMMON_GENDER_OPPOSITE_WILDCARD].Bind(),
+                PalGender.FEMALE => LocalizationCodes.LC_COMMON_GENDER_FEMALE.Bind(),
+                PalGender.MALE => LocalizationCodes.LC_COMMON_GENDER_MALE.Bind(),
+                PalGender.WILDCARD => LocalizationCodes.LC_COMMON_GENDER_WILDCARD.Bind(),
+                PalGender.OPPOSITE_WILDCARD => LocalizationCodes.LC_COMMON_GENDER_OPPOSITE_WILDCARD.Bind(),
                 _ => throw new NotImplementedException()
             };
     }

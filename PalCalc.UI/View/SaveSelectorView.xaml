@@ -61,7 +61,7 @@
             </Style>
         </StackPanel.Resources>
         
-        <TextBlock TextWrapping="Wrap" FontStyle="Italic">
+        <TextBlock TextWrapping="Wrap" Visibility="{Binding NoXboxSavesMsgVisibility}" FontStyle="Italic">
             <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_1}" />
             
             <Hyperlink NavigateUri="https://apps.microsoft.com/detail/9mv0b5hzvk9z" RequestNavigate="Hyperlink_RequestNavigate">

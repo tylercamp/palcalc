@@ -37,11 +37,11 @@ namespace PalCalc.UI.ViewModel.Mapped
 
             if (pal != null)
             {
-                Label = Translator.Translations[LocalizationCodes.LC_PAL_LABEL].Bind(
-                    new()
+                Label = LocalizationCodes.LC_PAL_LABEL.Bind(
+                    new
                     {
-                        { "PalName", Name },
-                        { "PaldexNum", ModelObject.Id }
+                        PalName = Name,
+                        PaldexNum = ModelObject.Id,
                     }
                 );
             }

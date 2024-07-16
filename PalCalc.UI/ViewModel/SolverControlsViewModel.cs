@@ -31,7 +31,7 @@ namespace PalCalc.UI.ViewModel
                     onSave: (palSelections) => BannedWildPals = palSelections.Where(kvp => !kvp.Value).Select(kvp => kvp.Key).ToList(),
                     initialState: PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => !BannedWildPals.Contains(p))
                 ) {
-                    Title = Translator.Translations[LocalizationCodes.LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS].Bind()
+                    Title = LocalizationCodes.LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS.Bind()
                 };
                 window.Owner = App.Current.MainWindow;
                 window.ShowDialog();

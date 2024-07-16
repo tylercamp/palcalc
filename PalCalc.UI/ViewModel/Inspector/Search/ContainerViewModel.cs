@@ -62,7 +62,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                             .Batched(PerRow * RowsPerPage).ToList()
                             .ZipWithIndex()
                             .Select(pair => new ContainerGridViewModel(pair.Item1.ToList()) {
-                                Title = Translator.Translations[LocalizationCodes.LC_LOC_PALBOX_TAB].Bind(new() { { "Tab", pair.Item2 + 1 } }),
+                                Title = LocalizationCodes.LC_LOC_PALBOX_TAB.Bind(pair.Item2 + 1),
                                 PerRow = PerRow
                             })
                             .ToList();

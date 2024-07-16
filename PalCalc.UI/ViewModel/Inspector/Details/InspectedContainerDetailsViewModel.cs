@@ -36,6 +36,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
 
         public string Id => rawContainer.Id;
         public OwnerViewModel Owner => owner;
-        public ILocalizedText Type { get; } = locationType?.Label() ?? Translator.Translations[LocalizationCodes.LC_COMMON_UNKNOWN].Bind();
+        public ILocalizedText Type { get; } = locationType?.Label() ?? LocalizationCodes.LC_COMMON_UNKNOWN.Bind();
     }
 }

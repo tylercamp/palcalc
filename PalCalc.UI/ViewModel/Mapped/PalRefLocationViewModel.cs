@@ -63,7 +63,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 var rawOwnerName = source?.PlayersById?.GetValueOrDefault(ownedLoc.OwnerId)?.Name;
                 ILocalizedText ownerName = rawOwnerName != null
                     ? new HardCodedText(rawOwnerName)
-                    : Translator.Translations[LocalizationCodes.LC_UNKNOWN_PLAYER].Bind();
+                    : LocalizationCodes.LC_UNKNOWN_PLAYER.Bind();
 
                 var ownerGuild = source?.GuildsByPlayerId?.GetValueOrDefault(ownedLoc.OwnerId);
 
@@ -72,7 +72,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 if (isGuildOwner)
                 {
                     if (ownerGuild?.Name != null) LocationOwner = new HardCodedText(ownerGuild.Name);
-                    else LocationOwner = Translator.Translations[LocalizationCodes.LC_UNKNOWN_GUILD].Bind();
+                    else LocationOwner = LocalizationCodes.LC_UNKNOWN_GUILD.Bind();
                 }
                 else
                 {
@@ -83,41 +83,34 @@ namespace PalCalc.UI.ViewModel.Mapped
             switch (ownedLoc.Location.Type)
             {
                 case LocationType.PlayerParty:
-                    LocationCoordDescription = Translator.Translations[LocalizationCodes.LC_LOC_COORD_PARTY].Bind(
-                        new() { { "SlotNum", ownedLoc.Location.Index + 1 } }
-                    );
+                    LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_PARTY.Bind(ownedLoc.Location.Index + 1);
                     break;
 
                 case LocationType.Base:
                     var baseCoord = BaseCoord.FromSlotIndex(ownedLoc.Location.Index);
-                    LocationCoordDescription = Translator.Translations[LocalizationCodes.LC_LOC_COORD_BASE].Bind(
-                        new()
+                    LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_BASE.Bind(
+                        new
                         {
-                            { "X", baseCoord.X },
-                            { "Y", baseCoord.Y },
+                            X = baseCoord.X,
+                            Y = baseCoord.Y,
                         }
                     );
                     break;
 
                 case LocationType.Palbox:
                     var pboxCoord = PalboxCoord.FromSlotIndex(ownedLoc.Location.Index);
-                    LocationCoordDescription = Translator.Translations[LocalizationCodes.LC_LOC_COORD_PALBOX].Bind(
-                        new()
+                    LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_PALBOX.Bind(
+                        new
                         {
-                            { "Tab", pboxCoord.Tab },
-                            { "X", pboxCoord.X },
-                            { "Y", pboxCoord.Y },
+                            Tab = pboxCoord.Tab,
+                            X = pboxCoord.X,
+                            Y = pboxCoord.Y,
                         }
                     );
                     break;
             }
 
-            LocationOwnerDescription = Translator.Translations[LocalizationCodes.LC_LOC_OWNED_BY].Bind(
-                new()
-                {
-                    { "Owner", LocationOwner }
-                }
-            );
+            LocationOwnerDescription = LocalizationCodes.LC_LOC_OWNED_BY.Bind(LocationOwner);
         }
 
         public bool IsSinglePlayer { get; }

@@ -20,7 +20,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         private SaveGameViewModel()
         {
             IsAddManualOption = true;
-            Label = Translator.Translations[LocalizationCodes.LC_ADD_NEW_SAVE].Bind();
+            Label = LocalizationCodes.LC_ADD_NEW_SAVE.Bind();
         }
 
         public SaveGameViewModel(ISaveGame value)
@@ -33,29 +33,27 @@ namespace PalCalc.UI.ViewModel.Mapped
                 var meta = value.LevelMeta.ReadGameOptions();
                 if (meta.IsServerSave)
                 {
-                    Label = Translator.Translations[LocalizationCodes.LC_SAVE_GAME_LBL_SERVER].Bind(new()
+                    Label = LocalizationCodes.LC_SAVE_GAME_LBL_SERVER.Bind(new
                     {
-                        { "DayNumber", meta.InGameDay },
-                        { "WorldName", meta.WorldName }
+                        DayNumber = meta.InGameDay,
+                        WorldName = meta.WorldName,
                     });
                 }
                 else
                 {
-                    Label = Translator.Translations[LocalizationCodes.LC_SAVE_GAME_LBL].Bind(new()
+                    Label = LocalizationCodes.LC_SAVE_GAME_LBL.Bind(new
                     {
-                        { "PlayerName", meta.PlayerName },
-                        { "PlayerLevel", meta.PlayerLevel },
-                        { "DayNumber", meta.InGameDay },
-                        { "WorldName", meta.WorldName },
+                        PlayerName = meta.PlayerName,
+                        PlayerLevel = meta.PlayerLevel,
+                        DayNumber = meta.InGameDay,
+                        WorldName = meta.WorldName,
                     });
                 }
             }
             catch (Exception ex)
             {
                 logger.Warning(ex, "error when loading LevelMeta for {saveId}", CachedSaveGame.IdentifierFor(value));
-                Label = Translator.Translations[LocalizationCodes.LC_SAVE_GAME_LBL_NO_METADATA].Bind(
-                    new (){ { "GameId", value.GameId } }
-                );
+                Label = LocalizationCodes.LC_SAVE_GAME_LBL_NO_METADATA.Bind(value.GameId);
             }
 
             IsValid = Value.IsValid;

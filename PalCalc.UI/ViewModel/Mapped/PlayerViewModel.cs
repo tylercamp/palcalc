@@ -14,7 +14,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         {
             ModelObject = player;
             Name = IsWildcard
-                ? Translator.Translations[LocalizationCodes.LC_ANY_PLAYER].Bind()
+                ? LocalizationCodes.LC_ANY_PLAYER.Bind()
                 : new HardCodedText(ModelObject.Name);
         }
 

@@ -155,7 +155,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 if (TargetPal == null)
                 {
-                    return newTargetLabel ??= Translator.Translations[LocalizationCodes.LC_NEW_TARGET_PAL].Bind();
+                    return newTargetLabel ??= LocalizationCodes.LC_NEW_TARGET_PAL.Bind();
                 }
                 else
                 {

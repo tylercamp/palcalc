@@ -1,9 +1,11 @@
-﻿using System;
+﻿using PalCalc.Model;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Resources;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -53,6 +55,7 @@ namespace PalCalc.UI.Localization
                                 return (code, kvp.Value);
                             else
                             {
+                                OnTranslationError?.Invoke(new UnexpectedTranslationError(l, kvp.Key));
                                 logger.Warning("Locale {locale} has unexpected TL ID: {id}", l, kvp.Key);
                                 return (null, kvp.Value);
                             }
@@ -69,23 +72,56 @@ namespace PalCalc.UI.Localization
 
             foreach (var localeKvp in result)
             {
-                foreach (var codeKvp in CodeToFormat)
+                var locale = localeKvp.Key;
+                foreach (var codeKvp in CodeToArgs)
                 {
-                    if (!localeKvp.Value.ContainsKey(codeKvp.Key))
-                    {
-                        logger.Warning($"Locale {localeKvp.Key} missing translation for {codeKvp.Key}");
+                    var code = codeKvp.Key;
 
-                        if (localeKvp.Key != FallbackLocale && fallbackLocalization.ContainsKey(codeKvp.Key))
-                            localeKvp.Value.Add(codeKvp.Key, fallbackLocalization[codeKvp.Key]);
-                        else
-                            localeKvp.Value.Add(codeKvp.Key, "MISSING TRANSLATION: " + codeKvp.Key);
+                    var fallbackValue = fallbackLocalization.GetValueOrElse(code, "MISSING TRANSLATION: " + code);
+
+                    if (!localeKvp.Value.ContainsKey(code))
+                    {
+                        logger.Warning($"Locale {locale} missing translation for {code}");
+                        OnTranslationError?.Invoke(new MissingTranslationError(locale, code, fallbackValue));
+
+                        localeKvp.Value.Add(codeKvp.Key, fallbackValue);
+                    }
+                    else
+                    {
+                        var paramRegex = new Regex(@"\{([^}]+)}");
+                        var paramMatches = paramRegex
+                            .Matches(localeKvp.Value[code])
+                            .Select(m => m.Groups[1].Value)
+                            .ToList();
+
+                        var expectedParams = StoredLocalizableText.ParseParameters(codeKvp.Value);
+
+                        var missingParams = expectedParams.Except(paramMatches).ToList();
+                        var extraParams = paramMatches.Except(expectedParams).ToList();
+
+                        if (missingParams.Any())
+                        {
+                            logger.Warning("Locale {locale} translation of {code} missing params {params}", locale, code, missingParams);
+                            OnTranslationError?.Invoke(new MissingArgumentError(locale, code, missingParams, fallbackValue));
+                        }
+
+                        if (extraParams.Any())
+                        {
+                            logger.Warning("Locale {locale} translation of {code} as unexpected params {params}", locale, code, extraParams);
+                            OnTranslationError?.Invoke(new UnexpectedArgumentError(locale, code, extraParams, fallbackValue));
+                        }
+
+                        if (missingParams.Any() || extraParams.Any())
+                        {
+                            localeKvp.Value[code] = fallbackValue;
+                        }
                     }
                 }
             }
 
             Localizations = result;
 
-            Translations = CodeToFormat.Keys.ToDictionary(code => code, code => new StoredLocalizableText(code) { Locale = CurrentLocale });
+            Translations = CodeToArgs.Keys.ToDictionary(code => code, code => new StoredLocalizableText(code) { Locale = CurrentLocale });
         }
     }
 }
