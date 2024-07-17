@@ -2,7 +2,7 @@
 
 Pal Calc supports translations for languages used in the game. Pal and Trait names are taken directly from the game files. Other text is for Pal Calc itself.
 
-Each text in Pal Calc has an entry in the `LocalizationCodes.resx` file. Each entry has a name (called the "Localization Code" or `LC`) and sometimes a list of parameters (for dynamic text). Translations for each `LC` are stored in `.resx` files in the [Localizations](./Localizations) folder.
+Each text in Pal Calc has an entry in the `LocalizationCodes.resx` file. Each entry has a name (called the "Localization Code" or `LC`) and sometimes a list of parameters (for dynamic text). Translations for each `LC` are stored in `.resx` files in the [Localizations](./Localizations/) folder.
 
 ## For Translators
 

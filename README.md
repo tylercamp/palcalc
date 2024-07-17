@@ -28,8 +28,59 @@ Pal Calc is a Windows program for calculating the optimal steps to breed a speci
   - Low memory usage and fast load times
   - Relatively fast path-solving process, searches take under a minute
   - Distributes path-solving work across all available CPU cores
+- Multiple languages
+  - Supports all languages in Palworld, pal and trait names imported from game files
+  - Translations for in-app text [can be added](./PalCalc.UI/Localization/README.md)
 
 _See [here](./PalCalc.Solver/) for an overview of the full solver process._
+
+# FAQs
+
+### Why won't the app start?
+
+Pal Calc requires [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.7-windows-x64-installer). You shouldn't need to install this manually as the app should prompt you to install this when you run it if needed.
+
+Pal Calc also creates and manages the folder `data`, `cache`, and `logs`. If Pal Calc is in a folder which already has these files from another program, it may cause startup issues. You should place Pal Calc in a folder which does not have these, or (preferably) in its own dedicated folder.
+
+### Where are my Pals?
+
+Pal Calc should auto-detect all pals across all of your pal containers (palbox, viewing cages, etc.). If you're not sure whether Pal Calc is finding a specific pal, you can use the Save Inspector (select your save game and click the "Inspect" button) to see all of the detected pal containers and their contents. You can open an [issue](https://github.com/tylercamp/palcalc/issues) if your pal isn't showing up. (Make sure your save file is up-to-date first.)
+
+### How do I import server / co-op saves?
+
+You'll need a copy of the save files on your computer for Pal Calc to read them. You'll be looking for a folder containing:
+
+- `Level.sav` (required)
+- `LevelMeta.sav` (optional but recommended)
+- `WorldOption.sav`
+- `LocalData.sav`
+- A `Players` folder (optional but recommended)
+
+For simple co-op saves, the person hosting the game can run Pal Calc and use the "Export Save" button to make a ZIP with all of the needed files. Extract the ZIP locally.
+
+For server saves, the location of the save data can vary. Check with the documentation for your server on how to back up or restore save data - this should mention where these files are stored.
+
+Once you have the save files:
+
+1. Open Pal Calc
+2. Expand the "Location" dropdown on the top-left
+3. Select "Manually Added"
+4. In the "Game" dropdown, select "Add a new save..."
+5. Select the `Level.sav` file in your save folder
+
+These save files will need to be manually updated whenever there changes. Pal Calc will auto-detect changes when it starts and read any new data.
+
+### Why aren't I getting any results?
+
+There are a few reasons for an empty list / result:
+
+- You're trying to get a pal which requires specific parents that you don't have (e.g. Jetragon _requires_ two Jetragons, Chikipi _requires_ two Chikipis).
+- Some of the selected traits can't be found on any of your pals (use the Save Inspector to search by trait).
+- A requested trait can be found in wild pals (e.g. Bellanoir Libero is guaranteed Siren of the Void) but "Max Wild Pals" is set to zero or the pal is excluded from "Allowed Wild Pals".
+- You have a pal with the requested trait, but that pal has been excluded due to filters.
+  - This is often caused by the "Max Input Irrelevant Traits" settings, which should typically be set to the max value (3). This setting is mainly to reduce the starting number of pals and reduce the solver's runtime.
+- You have a pal with the requested trait and the solver _is_ using that pal, but "Max Breeding Steps" is too low for it to find a full path.
+  - This setting is mainly to prevent the solver from taking too long. In practice, it will detect when further breeding is redundant and stop early.
 
 # Community Help
 
