@@ -1,36 +1,67 @@
 ﻿# Pal Calc Translations
 
-Pal Calc supports translations for languages currently offered by the game. Pal and Trait names have been collected directly from the game files. Any remaining translation is for Pal Calc itself.
+Pal Calc supports translations for languages used in the game. Pal and Trait names are taken directly from the game files. Other text is for Pal Calc itself.
 
-Each text in Pal Calc has an entry in the `LocalizationCodes.resx` file, where each entry has a name (which is referenced in code and translation files) and an optional list of parameters (for text which is created dynamically.) The name of the entry is called the "Localization Code" (`LC`), and the translations for each `LC` is stored in `.resx` files in the [Localizations](./Localizations) folder.
+Each text in Pal Calc has an entry in the `LocalizationCodes.resx` file. Each entry has a name (called the "Localization Code" or `LC`) and sometimes a list of parameters (for dynamic text). Translations for each `LC` are stored in `.resx` files in the [Localizations](./Localizations) folder.
 
 ## For Translators
 
-All editing should be done with [Visual Studio](https://visualstudio.microsoft.com/vs/community/). During installation, make sure you enable the ".NET desktop development" option. Once installed, download the code for Pal Calc and double-click on the "PalCalc.sln" file. Expand the "PalCalc.UI" entry, and expand the "Localization" entry within that. All of your work will be done in here.
+### 1. Setup Visual Studio
 
-Running Pal Calc with Visual Studio will open the app as well as a "Translation Debug" window. It contains a tab for each language with translation errors, listing all of the errors, their code/`LC`, and some sample English text for reference.
+You will need Visual Studio to edit the files and run the program.
 
-Find the `.resx` file in the [Localizations](./Localizations/) folder for your language (such as `Localizations/de.resx` for German) and add an entry for any missing LCs. (Note: These cannot be edited while the program is running.) Every entry in `LocalizationCodes.resx` should have a matching entry in the `.resx` for your language.
+1. Download and install [Visual Studio](https://visualstudio.microsoft.com/vs/community/).
+2. During installation, enable the ".NET desktop development" option.
 
-Look at the `Localizations/en.resx` file for the original English text and as an example of how to fill out these forms.
+### 2. Open Pal Calc Project
 
-### Dynamic Text
+1. Download the Pal Calc code.
+2. Double-click on the "PalCalc.sln" file.
+3. Expand the "PalCalc.UI" entry. (Don't double-click on it, click the arrow next to it.)
+4. Expand the "Localization" entry.
 
-Text for most LCs are simple and shown as-is, but some LCs include "format parameters" which are used to modify the final text. For example, the LC `LC_LOC_COORD_PALBOX` in `LocalizationCodes.resx` contains: "Tab | X | Y". Each of these (`Tab`, `X`, `Y`) must appear in the translation in your `.resx` file.
+All changes will be made in this "Localization" folder.
 
-The English translation for `LC_LOC_COORD_PALBOX` is `Palbox, tab {Tab} at ({X},{Y})`. Any text in a translation like `{X}` will be replaced with the appropriate text by Pal Calc. **If the translation for an LC is missing any parameters, or has unexpected parameters, it will not be used and the English translation will be used instead.** These problems will appear in the Translation Debug window when you run the program.
+### 3. Running Pal Calc
 
-### Tips
+1. Right-click the "PalCalc.UI" entry
+2. Click "Set as Startup Project"
+3. Click the green button at the top of the window, which says "PalCalc.UI"
 
-- Use the Translation Debug window, which is opened automatically when you run Pal Calc with Visual Studio, to find any problems with your translations.
-- If you're not sure how some text is used, you can change the file `PalCalc.UI/Localization/Translator.cs` and change `DEBUG_DISABLE_TRANSLATIONS = false` to `true`. When you run Pal Calc with this setting, the LC for _most_ text will be shown instead of the normal text.
-- You can add newlines/line breaks in a `.resx` file by pressing `Ctrl` and `Enter`.
+This will create and run the Pal Calc program.
 
-### Uploading Your Translations
+Running with Visual Studio will also open a "Translation Debug" window. The Translation Debug window has a tab for each language with translation errors. It lists all errors, their `LC`, and sample English text.
 
-(If you're a programmer who knows how to use git, just open a normal PR.)
+### 4. Edit Translation Files
 
-When you're done with your translation, you can create a new [Issue](TODO) on GitHub and upload your `.resx` file. Please include a list of changes and, if you'd like credit for your work, your name that should be included in Pal Calc's "About" window.
+1. Find the `.resx` file for your language in the [Localizations](./Localizations/) folder (e.g., `Localizations/de.resx` for German).
+2. Double-click the file to open the editor.
+3. Add entries for any missing LCs. Note: These cannot be edited while the program is running.
+4. Ensure every entry in `LocalizationCodes.resx` has a matching entry in your language’s `.resx` file.
+5. Use `Localizations/en.resx` as a reference for the original English text.
+
+### 5. Dynamic Text
+
+Some LCs include "format parameters" to modify the final text. For example:
+
+- `LC_LOC_COORD_PALBOX` in `LocalizationCodes.resx` contains: "Tab | X | Y".
+- The English translation is `Palbox, tab {Tab} at ({X},{Y})`.
+
+Replace `{Tab}`, `{X}`, `{Y}` with appropriate text in your translation. If any parameters are missing or incorrect, the English text will be used instead. Errors will appear in the Translation Debug window.
+
+### 6. Tips
+
+- Use the Translation Debug window to find problems with your translations.
+- To see how text is used, change `DEBUG_DISABLE_TRANSLATIONS = false` to `true` in `PalCalc.UI/Localization/Translator.cs`. This will show the LC instead of normal text.
+- Add newlines in a `.resx` file by pressing `Ctrl` + `Enter`.
+
+### 7. Uploading Your Translations
+
+(If you know how to use git, open a normal PR.)
+
+Create a new [Issue](https://github.com/tylercamp/palcalc/issues) on GitHub and upload your `.resx` file. Please include a list of changes.
+
+If you want credit, include your name for Pal Calc's "About" window.
 
 ## For Developers
 
