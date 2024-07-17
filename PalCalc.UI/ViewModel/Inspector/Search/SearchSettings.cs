@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
 using System;
@@ -11,14 +12,14 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search
 {
-    public class GenderOption
+    public class GenderOption(PalGender value)
     {
-        public PalGender Value { get; set; }
-        public string Label => Value.Label();
+        public PalGender Value => value;
+        public ILocalizedText Label { get; } = value.Label();
 
-        public static GenderOption AnyGender { get; } = new GenderOption() { Value = PalGender.WILDCARD };
-        public static GenderOption Female { get; } = new GenderOption() { Value = PalGender.FEMALE };
-        public static GenderOption Male { get; } = new GenderOption() { Value = PalGender.MALE };
+        public static GenderOption AnyGender { get; } = new GenderOption(PalGender.WILDCARD);
+        public static GenderOption Female { get; } = new GenderOption(PalGender.FEMALE);
+        public static GenderOption Male { get; } = new GenderOption(PalGender.MALE);
     }
 
     public partial class SearchSettingsViewModel : ObservableObject
@@ -77,7 +78,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         [ObservableProperty]
         private int minIVDefense = 0;
 
-        public List<PalViewModel> PalOptions { get; } = PalDB.LoadEmbedded().Pals.Select(p => new PalViewModel(p)).ToList();
+        public List<PalViewModel> PalOptions { get; } = PalDB.LoadEmbedded().Pals.Select(PalViewModel.Make).ToList();
 
         public List<GenderOption> GenderOptions { get; } = [
             GenderOption.AnyGender,
@@ -85,7 +86,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             GenderOption.Female,
         ];
 
-        public List<TraitViewModel> TraitOptions { get; } = PalDB.LoadEmbedded().Traits.Select(t => new TraitViewModel(t)).ToList();
+        public List<TraitViewModel> TraitOptions { get; } = PalDB.LoadEmbedded().Traits.Select(TraitViewModel.Make).ToList();
 
         public ISearchCriteria AsCriteria
         {

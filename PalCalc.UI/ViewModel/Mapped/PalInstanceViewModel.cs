@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,10 @@ namespace PalCalc.UI.ViewModel.Mapped
     {
         public PalInstance ModelObject => inst;
 
-        public PalViewModel Pal { get; } = new PalViewModel(inst.Pal);
+        public PalViewModel Pal { get; } = PalViewModel.Make(inst.Pal);
 
-        public TraitCollectionViewModel Traits { get; } = new TraitCollectionViewModel(inst.Traits.Select(t => new TraitViewModel(t)));
+        public TraitCollectionViewModel Traits { get; } = new TraitCollectionViewModel(inst.Traits.Select(TraitViewModel.Make));
 
-        public string Gender { get; } = inst.Gender.Label();
+        public ILocalizedText Gender { get; } = inst.Gender.Label();
     }
 }

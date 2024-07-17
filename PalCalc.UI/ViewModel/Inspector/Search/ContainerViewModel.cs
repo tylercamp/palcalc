@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
+using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,7 +61,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                         grids = Contents
                             .Batched(PerRow * RowsPerPage).ToList()
                             .ZipWithIndex()
-                            .Select(pair => new ContainerGridViewModel(pair.Item1.ToList()) { Title = $"Tab {pair.Item2 + 1}", PerRow = PerRow })
+                            .Select(pair => new ContainerGridViewModel(pair.Item1.ToList()) {
+                                Title = LocalizationCodes.LC_LOC_PALBOX_TAB.Bind(pair.Item2 + 1),
+                                PerRow = PerRow
+                            })
                             .ToList();
                     }
 

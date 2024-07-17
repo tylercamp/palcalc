@@ -3,6 +3,7 @@ using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.SaveReader.SaveFile;
 using PalCalc.SaveReader.SaveFile.Support.Level;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Inspector.Details;
 using PalCalc.UI.ViewModel.Mapped;
@@ -58,8 +59,8 @@ namespace PalCalc.UI.ViewModel.Inspector
         {
             var playerNamesById = rawData.Characters.Where(c => c.IsPlayer).ToDictionary(c => c.PlayerId.ToString(), c => c.NickName);
 
-            var ownerPlayers = rawPlayers.Select(p => new OwnerViewModel(OwnerType.Player, playerNamesById[p.PlayerId], p.PlayerId)).ToList();
-            var ownerGuilds = rawData.Groups.Select(g => new OwnerViewModel(OwnerType.Guild, g.Name, g.Id)).ToList();
+            var ownerPlayers = rawPlayers.Select(p => new OwnerViewModel(OwnerType.Player, new HardCodedText(playerNamesById[p.PlayerId]), p.PlayerId)).ToList();
+            var ownerGuilds = rawData.Groups.Select(g => new OwnerViewModel(OwnerType.Guild, new HardCodedText(g.Name), g.Id)).ToList();
 
             var ownersById = (ownerPlayers.Concat(ownerGuilds)).ToDictionary(o => o.Id);
 

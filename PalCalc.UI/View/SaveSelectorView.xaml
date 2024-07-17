@@ -7,11 +7,12 @@
             xmlns:m="clr-namespace:PalCalc.UI.Model"
             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
             xmlns:local="clr-namespace:PalCalc.UI.View"
+            xmlns:itl="clr-namespace:PalCalc.UI.Localization"
             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
             mc:Ignorable="d" 
             d:Background="White"
             d:DataContext="{d:DesignInstance vm:SaveSelectorViewModel, IsDesignTimeCreatable=True}" d:DesignWidth="436.57">
-    <Label Content="Location" />
+    <Label Content="{itl:LocalizedText LC_SAVE_LOCATION}" />
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -21,16 +22,16 @@
         <ComboBox Grid.Column="0" ItemsSource="{Binding SavesLocations}" SelectedItem="{Binding SelectedLocation}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="mvm:SavesLocationViewModel">
-                    <TextBlock Text="{Binding Label}" />
+                    <TextBlock Text="{Binding Label.Value}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ComboBox>
-        <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SavesLocationsFolder_Click" IsEnabled="{Binding CanOpenSavesLocation}" ToolTipService.ToolTip="Open in Explorer">
+        <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SavesLocationsFolder_Click" IsEnabled="{Binding CanOpenSavesLocation}" ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
             <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
         </Button>
     </Grid>
 
-    <Label Content="Game" />
+    <Label Content="{itl:LocalizedText LC_SAVE_GAME}" />
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -41,14 +42,14 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="mvm:SaveGameViewModel">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="(!) " Visibility="{Binding WarningVisibility}" Foreground="DarkRed" />
-                        <TextBlock Text="{Binding Label}" />
+                        <TextBlock Text="{itl:LocalizedText LC_SAVE_WARNING}" Visibility="{Binding WarningVisibility}" Foreground="DarkRed" />
+                        <TextBlock Text="{Binding Label.Value}" />
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ComboBox>
 
-        <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SaveGameFolder_Click" IsEnabled="{Binding CanOpenSaveFileLocation}" ToolTipService.ToolTip="Open in Explorer">
+        <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SaveGameFolder_Click" IsEnabled="{Binding CanOpenSaveFileLocation}" ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
             <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
         </Button>
     </Grid>
@@ -60,30 +61,33 @@
             </Style>
         </StackPanel.Resources>
         
-        <TextBlock Visibility="{Binding NoXboxSavesMsgVisibility}" TextWrapping="Wrap" FontStyle="Italic">
-            No Xbox saves were found. Palworld must be installed on the PC through the
-            <Hyperlink NavigateUri="https://apps.microsoft.com/detail/9mv0b5hzvk9z" RequestNavigate="Hyperlink_RequestNavigate">Xbox app / Game Pass.</Hyperlink>
-            Save files are synced to your PC when you run the game.
+        <TextBlock TextWrapping="Wrap" Visibility="{Binding NoXboxSavesMsgVisibility}" FontStyle="Italic">
+            <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_1}" />
+            
+            <Hyperlink NavigateUri="https://apps.microsoft.com/detail/9mv0b5hzvk9z" RequestNavigate="Hyperlink_RequestNavigate">
+                <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_2}" />
+            </Hyperlink>
+            
+            <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_3}" />
         </TextBlock>
 
-        <TextBlock Visibility="{Binding InvalidSaveMessageVisibility}" Foreground="DarkRed" TextWrapping="Wrap">
-            The selected save file is invalid!
-        </TextBlock>
+        <TextBlock Visibility="{Binding InvalidSaveMessageVisibility}" Foreground="DarkRed" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_INVALID}" />
 
-        <TextBlock Visibility="{Binding XboxIncompleteVisibility}" Foreground="DarkRed" TextWrapping="Wrap">
-            The Xbox save file is incomplete, but features will still work. This resolves automatically when Palworld is closed for a few minutes and Pal Calc is restarted.
-        </TextBlock>
+        <TextBlock Visibility="{Binding XboxIncompleteVisibility}" Foreground="DarkRed" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_XBOX_INCOMPLETE}" />
+
     </StackPanel>
 
     <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
-        <Button Margin="0,0,5,0" Command="{Binding ExportSaveCommand}" ToolTip="Exports all known Palworld files for the selected save as a ZIP.">
-            Export Save
-        </Button>
-        <Button Margin="0,0,5,0" Command="{Binding ExportCrashLogCommand}" ToolTip="Exports recently-referenced save files, cache data, and settings as a ZIP.">
-            Export Crash Log
-        </Button>
-        <Button Command="{Binding InspectSaveCommand}">
-            Inspect
-        </Button>
+        <Button Margin="0,0,5,0"
+                Command="{Binding ExportSaveCommand}"
+                ToolTip="{itl:LocalizedText LC_EXPORT_SAVE_DESCRIPTION}"
+                Content="{itl:LocalizedText LC_EXPORT_SAVE}" />
+
+        <Button Margin="0,0,5,0"
+                Command="{Binding ExportCrashLogCommand}"
+                ToolTip="{itl:LocalizedText LC_EXPORT_CRASH_LOG_DESCRIPTION}"
+                Content="{itl:LocalizedText LC_EXPORT_CRASH_LOG}" />
+
+        <Button Command="{Binding InspectSaveCommand}" Content="{itl:LocalizedText LC_INSPECT_SAVE}" />
     </StackPanel>
 </StackPanel>

@@ -8,6 +8,7 @@
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:gsvm="clr-namespace:PalCalc.UI.ViewModel.GraphSharp"
              xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              mc:Ignorable="d" 
              xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
              xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
@@ -26,11 +27,11 @@
                 <StackPanel Orientation="Horizontal">
                     <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="White" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
                     <StackPanel Orientation="Vertical">
-                        <TextBlock Text="{Binding Pal.Name}" />
-                        <TextBlock Text="{Binding Gender}" FontSize="10" />
+                        <TextBlock Text="{Binding Pal.Name.Value}" />
+                        <TextBlock Text="{Binding Gender.Value}" FontSize="10" />
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">
-                                <Run Text="{Binding AvgRequiredAttemptsDescription, Mode=OneWay}" />
+                                <Run Text="{Binding AvgRequiredAttemptsDescription.Value, Mode=OneWay}" />
                                 <Run Text=" - " />
                             </TextBlock>
                             <TextBlock Text="{Binding Effort}" FontSize="10" Visibility="{Binding EffortVisibility}" />
@@ -45,8 +46,8 @@
                                             </Style>
                                         </StackPanel.Resources>
                                         
-                                        <TextBlock Text="{Binding LocationOwnerDescription}" FontSize="10" Visibility="{Binding OwnerVisibility}"/>
-                                        <TextBlock Text="{Binding LocationCoordDescription}" FontSize="10" />
+                                        <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" Visibility="{Binding OwnerVisibility}"/>
+                                        <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" />
                                     </StackPanel>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type mvm:CompositePalRefLocationViewModel}">
@@ -58,22 +59,22 @@
                                             </Style>
                                         </StackPanel.Resources>
                                         <StackPanel Orientation="Vertical" Grid.Column="0" MaxWidth="80">
-                                                <TextBlock Text="Male" />
-                                                <TextBlock Text="{Binding MaleViewModel.LocationOwner}" TextWrapping="WrapWithOverflow" Visibility="{Binding MaleViewModel.OwnerVisibility}" />
-                                                <TextBlock Text="{Binding MaleViewModel.LocationCoordDescription}" />
+                                            <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_MALE}" />
+                                            <TextBlock Text="{Binding MaleViewModel.LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding MaleViewModel.OwnerVisibility}" />
+                                            <TextBlock Text="{Binding MaleViewModel.LocationCoordDescription.Value}" />
                                         </StackPanel>
                                 
                                         <Border BorderBrush="White" Width="1" BorderThickness="1" Margin="10" Grid.Column="1" />
                                         
                                         <StackPanel Orientation="Vertical" Grid.Column="2" MaxWidth="80">
-                                            <TextBlock Text="Female" />
-                                            <TextBlock Text="{Binding FemaleViewModel.LocationOwner}" TextWrapping="WrapWithOverflow" Visibility="{Binding FemaleViewModel.OwnerVisibility}" />
-                                            <TextBlock Text="{Binding FemaleViewModel.LocationCoordDescription}" />
+                                            <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_FEMALE}" />
+                                            <TextBlock Text="{Binding FemaleViewModel.LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding FemaleViewModel.OwnerVisibility}" />
+                                            <TextBlock Text="{Binding FemaleViewModel.LocationCoordDescription.Value}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type mvm:WildPalRefLocationViewModel}">
-                                    <TextBlock Foreground="White" FontSize="10">Captured</TextBlock>
+                                    <TextBlock Foreground="White" FontSize="10" Text="{itl:LocalizedText LC_PAL_LOC_CAPTURED}" />
                                 </DataTemplate>
                             </ContentControl.Resources>
                         </ContentControl>
@@ -106,7 +107,13 @@
 
         </Style>
     </UserControl.Resources>
-    <zoom:ZoomControl Grid.Column="1" Background="#606060" Mode="Fill" FillMarginPercent="0.05">
+    <zoom:ZoomControl Grid.Column="1"
+                      Background="#606060"
+                      Mode="Fill"
+                      FillMarginPercent="0.05"
+                      FillLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_FILL}"
+                      CustomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_CUSTOM}"
+                      ZoomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_PERCENT}">
         <gsvm:BreedingGraphLayout
             Graph="{Binding Graph}"
             AnimationLength="0"

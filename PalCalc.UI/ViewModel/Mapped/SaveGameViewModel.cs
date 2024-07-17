@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using PalCalc.SaveReader;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using Serilog;
 using System;
@@ -19,7 +20,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         private SaveGameViewModel()
         {
             IsAddManualOption = true;
-            Label = "Add a new save...";
+            Label = LocalizationCodes.LC_ADD_NEW_SAVE.Bind();
         }
 
         public SaveGameViewModel(ISaveGame value)
@@ -30,13 +31,29 @@ namespace PalCalc.UI.ViewModel.Mapped
             try
             {
                 var meta = value.LevelMeta.ReadGameOptions();
-                Label = meta.ToString();
-                //Label = $"{meta.PlayerName} lv. {meta.PlayerLevel} in {meta.WorldName}";
+                if (meta.IsServerSave)
+                {
+                    Label = LocalizationCodes.LC_SAVE_GAME_LBL_SERVER.Bind(new
+                    {
+                        DayNumber = meta.InGameDay,
+                        WorldName = meta.WorldName,
+                    });
+                }
+                else
+                {
+                    Label = LocalizationCodes.LC_SAVE_GAME_LBL.Bind(new
+                    {
+                        PlayerName = meta.PlayerName,
+                        PlayerLevel = meta.PlayerLevel,
+                        DayNumber = meta.InGameDay,
+                        WorldName = meta.WorldName,
+                    });
+                }
             }
             catch (Exception ex)
             {
                 logger.Warning(ex, "error when loading LevelMeta for {saveId}", CachedSaveGame.IdentifierFor(value));
-                Label = $"{value.GameId} (Unable to read metadata)";
+                Label = LocalizationCodes.LC_SAVE_GAME_LBL_NO_METADATA.Bind(value.GameId);
             }
 
             IsValid = Value.IsValid;
@@ -46,7 +63,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public ISaveGame Value { get; }
         public CachedSaveGame CachedValue => Storage.LoadSave(Value, PalDB.LoadEmbedded());
-        public string Label { get; }
+        public ILocalizedText Label { get; }
 
         public bool IsValid { get; }
 

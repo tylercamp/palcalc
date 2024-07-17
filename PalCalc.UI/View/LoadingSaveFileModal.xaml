@@ -5,12 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PalCalc.UI.View"
         mc:Ignorable="d"
-        Title="Loading Save File"
+        xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+        Title="{itl:LocalizedText LC_POPUP_TITLE_LOADING_SAVE_FILE}"
         ShowInTaskbar="False"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         WindowStyle="ToolWindow"
         SizeToContent="WidthAndHeight"
+        d:DataContext="{x:Type itl:ILocalizedText}"
         >
-    <TextBlock Text="{Binding}" Margin="5,5,5,5" />
+    <TextBlock Text="{Binding Value}" Margin="5,5,5,5" />
 </Window>

@@ -27,7 +27,7 @@
     <Grid>
         <TextBlock
             Visibility="{Binding IsReadOnly, Converter={StaticResource BVC}}"
-            Text="{Binding Label}"
+            Text="{Binding Label.Value}"
             HorizontalAlignment="Center"
             FontWeight="Bold"
             FontSize="14"
@@ -61,7 +61,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock
-                        Text="{Binding TargetPal.Name}"
+                        Text="{Binding TargetPal.Name.Value}"
                         Grid.Column="0"
                         FontWeight="Bold"
                         FontSize="14"
@@ -85,14 +85,14 @@
                 </Grid>
 
                 <TextBlock
-                    Text="{Binding RequiredTraitsCollection.RequiredDescription}"
+                    Text="{Binding RequiredTraitsCollection.RequiredDescription.Value}"
                     TextWrapping="Wrap"
                     FontWeight="Bold"
                     Grid.Row="1"
                     />
 
                 <TextBlock
-                    Text="{Binding OptionalTraitsCollection.OptionalDescription}"
+                    Text="{Binding OptionalTraitsCollection.OptionalDescription.Value}"
                     TextWrapping="Wrap"
                     FontStyle="Italic"
                     Visibility="{Binding OptionalTraitsCollection.Traits, Converter={StaticResource CVC}}"

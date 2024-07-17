@@ -2,11 +2,13 @@
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
@@ -54,6 +56,29 @@ namespace PalCalc.UI
 
         protected abstract T ReadTypeJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer);
         protected abstract void WriteTypeJson(JsonWriter writer, T value, JsonSerializer serializer);
+    }
+
+    // not meant to be used, just for debugging to ensure localized text isn't serialized
+    internal class ILocalizedTextConverter : PalConverterBase<ILocalizedText>
+    {
+        public ILocalizedTextConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        {
+        }
+
+        protected override ILocalizedText ReadTypeJson(JsonReader reader, Type objectType, ILocalizedText existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+#if DEBUG
+            Debugger.Break();
+#endif
+            return null;
+        }
+
+        protected override void WriteTypeJson(JsonWriter writer, ILocalizedText value, JsonSerializer serializer)
+        {
+#if DEBUG
+            Debugger.Break();
+#endif
+        }
     }
 
     #region Model Converters
@@ -174,6 +199,7 @@ namespace PalCalc.UI
             dependencyConverters = new JsonConverter[]
             {
                 new PalInstanceJsonConverter(db),
+                new ILocalizedTextConverter(db, gameSettings),
             };
         }
 
@@ -198,6 +224,7 @@ namespace PalCalc.UI
             dependencyConverters = new JsonConverter[]
             {
                 new OwnedPalReferenceConverter(db, gameSettings),
+                new ILocalizedTextConverter(db, gameSettings),
             };
         }
 
@@ -225,6 +252,9 @@ namespace PalCalc.UI
     {
         public WildPalReferenceConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings, "WILD_PAL")
         {
+            dependencyConverters = [
+                new ILocalizedTextConverter(db, gameSettings),
+            ];
         }
 
         internal override JToken MakeRefJson(WildPalReference value, JsonSerializer serializer)
@@ -255,6 +285,7 @@ namespace PalCalc.UI
             {
                 genericConverter,
                 new TraitConverter(db, gameSettings),
+                new ILocalizedTextConverter(db, gameSettings),
             };
         }
 
@@ -292,12 +323,15 @@ namespace PalCalc.UI
     {
         public PalViewModelConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
         {
+            dependencyConverters = [
+                new ILocalizedTextConverter(db, gameSettings),
+            ];
         }
 
         protected override PalViewModel ReadTypeJson(JsonReader reader, Type objectType, PalViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var palId = JToken.ReadFrom(reader).ToObject<PalId>(serializer);
-            return new PalViewModel(palId.ToPal(db));
+            return PalViewModel.Make(palId.ToPal(db));
         }
 
         protected override void WriteTypeJson(JsonWriter writer, PalViewModel value, JsonSerializer serializer)
@@ -313,6 +347,7 @@ namespace PalCalc.UI
             dependencyConverters = new JsonConverter[]
             {
                 new TraitConverter(db, gameSettings),
+                new ILocalizedTextConverter(db, gameSettings),
             };
         }
 
@@ -320,7 +355,7 @@ namespace PalCalc.UI
         {
             var trait = JToken.ReadFrom(reader).ToObject<Trait>(serializer);
             return trait != null
-                ? new TraitViewModel(trait)
+                ? TraitViewModel.Make(trait)
                 : null;
         }
 
@@ -339,6 +374,7 @@ namespace PalCalc.UI
                 new PalViewModelConverter(db, gameSettings),
                 new TraitViewModelConverter(db, gameSettings),
                 new BreedingResultListViewModelConverter(db, gameSettings, source),
+                new ILocalizedTextConverter(db, gameSettings),
             };
         }
 
@@ -390,6 +426,7 @@ namespace PalCalc.UI
             dependencyConverters = new JsonConverter[]
             {
                 new PalReferenceConverter(db, gameSettings),
+                new ILocalizedTextConverter(db, gameSettings),
             };
 
             this.source = source;
@@ -414,6 +451,7 @@ namespace PalCalc.UI
             dependencyConverters = new JsonConverter[]
             {
                 new BreedingResultViewModelConverter(db, gameSettings, source),
+                new ILocalizedTextConverter(db, gameSettings),
             };
         }
 
@@ -436,6 +474,7 @@ namespace PalCalc.UI
             dependencyConverters = new JsonConverter[]
             {
                 new PalSpecifierViewModelConverter(db, gameSettings, source),
+                new ILocalizedTextConverter(db, gameSettings),
             };
         }
 

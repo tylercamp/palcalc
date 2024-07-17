@@ -1,0 +1,550 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="LC_ABOUT_APP" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_ADD_NEW_SAVE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_ANY_GUILD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_ANY_PLAYER" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_BASE_LABEL" xml:space="preserve">
+    <value>BaseName</value>
+  </data>
+  <data name="LC_BREEDING_TIME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_BREEDING_TIME_DESC" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_CANCEL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_ENABLED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_GENDER" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_GENDER_FEMALE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_GENDER_MALE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_GENDER_OPPOSITE_WILDCARD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_GENDER_WILDCARD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_IVS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_IV_ATTACK" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_IV_DEFENSE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_IV_HP" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_LEVEL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_PAL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_PALDEX_NUM_SHORT" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_SAVE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_TRAITS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_UNKNOWN" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CRASHLOG_FAILED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_DELETE_PAL_TARGET_MSG" xml:space="preserve">
+    <value>PalName</value>
+  </data>
+  <data name="LC_DELETE_PAL_TARGET_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_ERROR_HARD_CRASH" xml:space="preserve">
+    <value>CrashlogPath</value>
+  </data>
+  <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve">
+    <value>CrashlogPath</value>
+  </data>
+  <data name="LC_EXPORT_CRASH_LOG" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_EXPORT_CRASH_LOG_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_EXPORT_SAVE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_EXPORT_SAVE_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_GAME_SETTINGS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_GRAPH_ZOOM_CUSTOM" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_GRAPH_ZOOM_FILL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_GRAPH_ZOOM_PERCENT" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_GUILD_LABEL" xml:space="preserve">
+    <value>GuildName</value>
+  </data>
+  <data name="LC_INSPECT_SAVE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_ITL_LABEL" xml:space="preserve">
+    <value />
+    <comment>Label used to represent this language in the dropdown</comment>
+  </data>
+  <data name="LC_LANGUAGE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LIST_SEPARATOR" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LOC_COORD_BASE" xml:space="preserve">
+    <value>X | Y</value>
+  </data>
+  <data name="LC_LOC_COORD_PALBOX" xml:space="preserve">
+    <value>Tab | X | Y</value>
+  </data>
+  <data name="LC_LOC_COORD_PARTY" xml:space="preserve">
+    <value>SlotNum</value>
+  </data>
+  <data name="LC_LOC_OWNED_BY" xml:space="preserve">
+    <value>Owner</value>
+  </data>
+  <data name="LC_LOC_PALBOX_TAB" xml:space="preserve">
+    <value>Tab</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_ALREADY_REGISTERED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_MANUAL_SAVE_EXTENSION_LBL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_MANUAL_SAVE_INCOMPLETE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_MANUAL_SAVE_SELECTOR_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_MULTIPLE_BREEDING_FARMS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_MULTIPLE_BREEDING_FARMS_DESC" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_NEW_TARGET_PAL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_NO_TRAITS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_OPEN_IN_FILE_EXPLORER" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve">
+    <value>TraitsList</value>
+  </data>
+  <data name="LC_PALS_AT_BASE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LABEL" xml:space="preserve">
+    <value>PalName | PaldexNum</value>
+  </data>
+  <data name="LC_PAL_LOC_BASE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LOC_CAPTURED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LOC_COUNT" xml:space="preserve">
+    <value>Count | LocType</value>
+  </data>
+  <data name="LC_PAL_LOC_PALBOX" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LOC_PARTY" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_SRC_ANY_GUILD_MEMBER" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_SRC_ANY_PLAYER_GUILD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_TARGET_OPTIONAL_TRAITS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_TARGET_REQUIRED_TRAITS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_WILD_COUNT" xml:space="preserve">
+    <value>NumWild</value>
+  </data>
+  <data name="LC_PLAYER_LABEL" xml:space="preserve">
+    <value>PlayerName</value>
+  </data>
+  <data name="LC_POPUP_TITLE_LOADING_SAVE_FILE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_RANDOM_TRAIT" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve">
+    <value>TraitsList</value>
+  </data>
+  <data name="LC_RESULT_BREEDING_ATTEMPTS" xml:space="preserve">
+    <value>AvgAttempts</value>
+  </data>
+  <data name="LC_RESULT_INPUT_LOCS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_RESULT_LABEL" xml:space="preserve">
+    <value>PalName | TraitsList | TimeEstimate</value>
+  </data>
+  <data name="LC_RESULT_LIST_TITLE_COUNT" xml:space="preserve">
+    <value>NumResults</value>
+  </data>
+  <data name="LC_RESULT_LIST_TITLE_EMPTY" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_RESULT_NUM_STEPS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_RESULT_TIME_ESTIMATE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_ID" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_OWNER" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_SLOTS_USED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_TYPE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVEINSPECT_DETECTED_PROPERTIES" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVEINSPECT_RAW_PROPERTIES" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVEINSPECT_SLOT_EMPTY" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVESEARCH_CONTAINER_LABEL" xml:space="preserve">
+    <value>Label | NumMatches</value>
+  </data>
+  <data name="LC_SAVESEARCH_GRP_PAL_CONTAINERS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVESEARCH_GRP_SEARCH_SETTINGS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_MIN_IVS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_RESET" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVEWINDOW_TAB_DETAILS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVEWINDOW_TAB_SEARCH" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVEWINDOW_TITLE" xml:space="preserve">
+    <value>SaveLabel</value>
+  </data>
+  <data name="LC_SAVE_FILE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_FILE_RELOADING" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_GAME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_GAME_INVALID" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_GAME_LBL" xml:space="preserve">
+    <value>PlayerName | PlayerLevel | DayNumber | WorldName</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL_NO_METADATA" xml:space="preserve">
+    <value>GameId</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve">
+    <value>DayNumber | WorldName</value>
+  </data>
+  <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_INSPECTOR_LOADING" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_LOCATION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_LOCATION_LBL_STEAM" xml:space="preserve">
+    <value>UserId | NumValidSaves</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_LBL_XBOX" xml:space="preserve">
+    <value>UserId | NumValidSaves</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_MANUAL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_LOCATION_STEAM_EMPTY" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_EMPTY" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_1" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_2" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_3" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_WARNING" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_RUN" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_STATUS_BREEDING" xml:space="preserve">
+    <value>StepNum | WorkSize</value>
+  </data>
+  <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+  <data name="LC_SOURCE_PALS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_STARTUP_LOADING" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TARGET_PAL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TARGET_PALS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_COUNT_RANDOM" xml:space="preserve">
+    <value>NumRandom</value>
+  </data>
+  <data name="LC_TRAITS_COUNT_UNRECOGNIZED" xml:space="preserve">
+    <value>NumUnrecognized</value>
+  </data>
+  <data name="LC_UNKNOWN_GUILD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_UNKNOWN_PLAYER" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_UPDATE_AVAILABLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_WINDOW_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LV_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
+    <value />
+  </data>
+</root>

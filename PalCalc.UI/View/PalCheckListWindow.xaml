@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PalCalc.UI.View"
         xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+        xmlns:itl="clr-namespace:PalCalc.UI.Localization"
         d:DataContext="{x:Static vm:PalCheckListViewModel.DesignerInstance}"
         mc:Ignorable="d"
         xmlns:util="clr-namespace:Wpf.Util"
         WindowStyle="ToolWindow"
         WindowStartupLocation="CenterOwner"
-        Title="{Binding Title}" Height="450" Width="330">
+        Title="{Binding Title.Value}" Height="450" Width="330">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="40" />
@@ -24,7 +25,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Content="Search" VerticalContentAlignment="Center" />
+            <Label Grid.Column="0" Content="{itl:LocalizedText LC_PAL_CHECKLIST_SEARCH}" VerticalContentAlignment="Center" />
             <TextBox Height="20" Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
 
@@ -35,23 +36,23 @@
             <ListView.View>
                 <GridView>
                     <GridView.Columns>
-                        <GridViewColumn Header="#"
+                        <GridViewColumn Header="{itl:LocalizedText LC_COMMON_PALDEX_NUM_SHORT}"
                                         DisplayMemberBinding="{Binding PaldexNoDisplay}"
                                         util:GridViewSort.PropertyName="PaldexNoValue"
                                         Width="40"/>
-                        <GridViewColumn Header="Pal"
-                                        util:GridViewSort.PropertyName="PalName"
+                        <GridViewColumn Header="{itl:LocalizedText LC_COMMON_PAL}"
+                                        util:GridViewSort.PropertyName="PalName.Value"
                                         Width="200">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <Image Source="{Binding Pal.Icon}" Width="24" Height="24" />
-                                        <Label Content="{Binding PalName}" VerticalContentAlignment="Center"/>
+                                        <Label Content="{Binding PalName.Value}" VerticalContentAlignment="Center"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Enabled"
+                        <GridViewColumn Header="{itl:LocalizedText LC_COMMON_ENABLED}"
                                         util:GridViewSort.PropertyName="IsEnabled">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -69,15 +70,15 @@
                     Margin="5,0,5,0"
                     Command="{Binding SaveCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                    >
-                Save
-            </Button>
+                    Content="{itl:LocalizedText LC_COMMON_SAVE}"
+            />
+
             <Button Width="45"
                     Command="{Binding CancelCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                    >
-                Cancel
-            </Button>
+                    Content="{itl:LocalizedText LC_COMMON_CANCEL}"
+            />
+
         </StackPanel>
     </Grid>
 </Window>

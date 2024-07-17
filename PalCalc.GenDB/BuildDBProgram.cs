@@ -87,6 +87,46 @@ namespace PalCalc.GenDB
             var traits = new List<Trait>();
             traits.AddRange(ParseScrapedJson.ReadTraits());
 
+            var localizations = ParseLocalizedNameJson.ParseLocalizedNames();
+
+            foreach (var kvp in localizations)
+            {
+                var lang = kvp.Key;
+                var i10n = kvp.Value;
+
+                var missingPals = pals.Where(p => !i10n.PalsByLowerInternalName.ContainsKey(p.InternalName.ToLower())).ToList();
+                var missingTraits = traits.Where(t => !i10n.TraitsByLowerInternalName.ContainsKey(t.InternalName.ToLower())).ToList();
+
+                if (missingPals.Count > 0 || missingTraits.Count > 0)
+                {
+                    Console.WriteLine("{0} missing entries:", lang);
+
+                    if (missingPals.Count > 0)
+                    {
+                        Console.WriteLine("Pals");
+                        foreach (var p in missingPals) Console.WriteLine("- {0}", p.InternalName);
+                    }
+
+                    if (missingTraits.Count > 0)
+                    {
+                        Console.WriteLine("Traits");
+                        foreach (var t in missingTraits) Console.WriteLine("- {0}", t.InternalName);
+                    }
+                }
+            }
+
+            foreach (var pal in pals)
+                pal.LocalizedNames = localizations
+                    .Select(kvp => (kvp.Key, kvp.Value.PalsByLowerInternalName.GetValueOrDefault(pal.InternalName.ToLower())))
+                    .Where(p => p.Item2 != null)
+                    .ToDictionary(p => p.Key, p => p.Item2);
+
+            foreach (var trait in traits)
+                trait.LocalizedNames = localizations
+                    .Select(kvp => (kvp.Key, kvp.Value.TraitsByLowerInternalName.GetValueOrDefault(trait.InternalName.ToLower())))
+                    .Where(p => p.Item2 != null)
+                    .ToDictionary(p => p.Key, p => p.Item2);
+
             var specialCombos = ParseScrapedJson.ReadExclusiveBreedings();
 
             foreach (var (p1, p2, c) in specialCombos)
@@ -136,7 +176,7 @@ namespace PalCalc.GenDB
                     .First();
             }
 
-            var db = PalDB.MakeEmptyUnsafe("v11");
+            var db = PalDB.MakeEmptyUnsafe("v12");
             db.Breeding = pals
                 .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
                 .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))

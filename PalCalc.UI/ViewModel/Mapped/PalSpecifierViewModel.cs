@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,10 +28,10 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
             else
             {
-                TargetPal = new PalViewModel(underlyingSpec.Pal);
+                TargetPal = PalViewModel.Make(underlyingSpec.Pal);
 
                 var traitVms = underlyingSpec.RequiredTraits
-                    .Select(t => new TraitViewModel(t))
+                    .Select(TraitViewModel.Make)
                     .Concat(Enumerable.Repeat<TraitViewModel>(null, GameConstants.MaxTotalTraits - underlyingSpec.RequiredTraits.Count))
                     .ToArray();
 
@@ -40,7 +41,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 Trait4 = traitVms[3];
 
                 var optionalVms = underlyingSpec.OptionalTraits
-                    .Select(t => new TraitViewModel(t))
+                    .Select(TraitViewModel.Make)
                     .Concat(Enumerable.Repeat<TraitViewModel>(null, GameConstants.MaxTotalTraits - underlyingSpec.OptionalTraits.Count))
                     .ToArray();
 
@@ -79,14 +80,12 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         private List<Trait> RequiredTraitModelObjects => RequiredTraits
             .Select(t => t.ModelObject)
-            .OrderBy(mo => mo.Name)
-            .DistinctBy(mo => mo.Name)
+            .DistinctBy(mo => mo.InternalName)
             .ToList();
 
         private List<Trait> OptionalTraitModelObjects => OptionalTraits
             .Select(t => t.ModelObject)
-            .OrderBy(mo => mo.Name)
-            .DistinctBy(mo => mo.Name)
+            .DistinctBy(mo => mo.InternalName)
             .ToList();
 
         public PalSpecifier ModelObject => TargetPal != null
@@ -149,12 +148,19 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public bool IsValid => TargetPal != null;
 
-        public string Label
+        private static ILocalizedText newTargetLabel;
+        public ILocalizedText Label
         {
             get
             {
-                if (TargetPal == null) return "New";
-                else return ModelObject.ToString();
+                if (TargetPal == null)
+                {
+                    return newTargetLabel ??= LocalizationCodes.LC_NEW_TARGET_PAL.Bind();
+                }
+                else
+                {
+                    return TargetPal.Name;
+                }
             }
         }
 
@@ -213,11 +219,11 @@ namespace PalCalc.UI.ViewModel.Mapped
                 var db = PalDB.LoadEmbedded();
                 return new PalSpecifierViewModel(null)
                 {
-                    TargetPal = new PalViewModel("Beakon".ToPal(db)),
-                    Trait1 = new TraitViewModel("Runner".ToTrait(db)),
-                    Trait2 = new TraitViewModel("Swift".ToTrait(db)),
+                    TargetPal = PalViewModel.Make("Beakon".ToPal(db)),
+                    Trait1 = TraitViewModel.Make("Runner".ToTrait(db)),
+                    Trait2 = TraitViewModel.Make("Swift".ToTrait(db)),
 
-                    OptionalTrait1 = new TraitViewModel("Aggressive".ToTrait(db))
+                    OptionalTrait1 = TraitViewModel.Make("Aggressive".ToTrait(db))
                 };
             }
         }

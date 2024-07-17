@@ -1,4 +1,5 @@
 ﻿using PalCalc.SaveReader;
+using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,7 +12,7 @@ namespace PalCalc.UI.ViewModel.Mapped
     public interface ISavesLocationViewModel
     {
         ReadOnlyObservableCollection<SaveGameViewModel> SaveGames { get; }
-        string Label { get; }
+        ILocalizedText Label { get; }
         DateTime? LastModified { get; }
     }
 
@@ -21,15 +22,24 @@ namespace PalCalc.UI.ViewModel.Mapped
         {
             Value = sl;
 
-            var saveType = sl is XboxSavesLocation ? "Xbox" : "Steam";
+            var isXbox = sl is XboxSavesLocation;
 
             if (sl.FolderPath == null)
             {
-                Label = saveType;
+                Label = isXbox
+                    ? LocalizationCodes.LC_SAVE_LOCATION_XBOX_EMPTY.Bind()
+                    : LocalizationCodes.LC_SAVE_LOCATION_STEAM_EMPTY.Bind(); ;
             }
             else
             {
-                Label = $"{saveType} user {sl.FolderName.LimitLength(12)} - {sl.ValidSaveGames.Count()} valid saves";
+                var baseText = isXbox
+                    ? LocalizationCodes.LC_SAVE_LOCATION_LBL_XBOX
+                    : LocalizationCodes.LC_SAVE_LOCATION_LBL_STEAM;
+
+                Label = baseText.Bind(new {
+                    UserId = sl.FolderName.LimitLength(12),
+                    NumValidSaves = sl.ValidSaveGames.Count(),
+                });
             }
             
             SaveGames = new ReadOnlyObservableCollection<SaveGameViewModel>(
@@ -42,7 +52,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public ReadOnlyObservableCollection<SaveGameViewModel> SaveGames { get; }
 
-        public string Label { get; }
+        public ILocalizedText Label { get; }
 
         public DateTime? LastModified { get; }
     }
@@ -51,7 +61,7 @@ namespace PalCalc.UI.ViewModel.Mapped
     {
         public ManualSavesLocationViewModel(IEnumerable<ISaveGame> initialManualSaves)
         {
-            saveGames = new ObservableCollection<SaveGameViewModel>(initialManualSaves.Select(s => new SaveGameViewModel(s)).OrderBy(vm => vm.Label));
+            saveGames = new ObservableCollection<SaveGameViewModel>(initialManualSaves.Select(s => new SaveGameViewModel(s)).OrderByDescending(vm => vm.LastModified));
             saveGames.Add(SaveGameViewModel.AddNewSave);
 
             SaveGames = new ReadOnlyObservableCollection<SaveGameViewModel>(saveGames);
@@ -60,7 +70,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         private ObservableCollection<SaveGameViewModel> saveGames;
         public ReadOnlyObservableCollection<SaveGameViewModel> SaveGames { get; }
 
-        public string Label => "Manually Added";
+        public ILocalizedText Label { get; } = LocalizationCodes.LC_SAVE_LOCATION_MANUAL.Bind();
 
         public DateTime? LastModified => saveGames.Where(g => !g.IsAddManualOption).OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
 

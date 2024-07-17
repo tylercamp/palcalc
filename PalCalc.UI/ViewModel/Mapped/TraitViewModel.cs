@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
@@ -35,18 +36,46 @@ namespace PalCalc.UI.ViewModel.Mapped
 
     public class TraitViewModel
     {
+        private static readonly DerivedLocalizableText<Trait> NameLocalizer = new DerivedLocalizableText<Trait>(
+            (locale, trait) => trait switch
+            {
+                RandomTrait => Translator.Localizations[locale][LocalizationCodes.LC_RANDOM_TRAIT],
+                _ => trait.LocalizedNames?.GetValueOrElse(locale.ToFormalName(), trait.Name) ?? trait.InternalName
+            }
+        );
+
+        private static Dictionary<Trait, TraitViewModel> instances;
+        private static ILocalizedText randomTraitLabel;
+        public static TraitViewModel Make(Trait trait)
+        {
+            if (instances == null)
+            {
+                instances = PalDB.LoadEmbedded().Traits.ToDictionary(t => t, t => new TraitViewModel(t, NameLocalizer.Bind(t)));
+            }
+
+            if (trait is RandomTrait)
+            {
+                randomTraitLabel ??= NameLocalizer.Bind(trait);
+
+                return new TraitViewModel(trait, randomTraitLabel);
+            }
+            else
+            {
+                return instances[trait];
+            }
+        }
 
         // for XAML designer view
-        public TraitViewModel()
+        public TraitViewModel() : this(new Trait("Runner", "runner", 2), new HardCodedText("Runner"))
         {
-            ModelObject = new Trait("Runner", "runner", 2);
         }
 
         private int hash;
         private static Random random = new Random();
-        public TraitViewModel(Trait trait)
+        private TraitViewModel(Trait trait, ILocalizedText name)
         {
             ModelObject = trait;
+            Name = name;
 
             if (trait is RandomTrait) hash = random.Next();
             else hash = trait.GetHashCode();
@@ -57,8 +86,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         public ImageSource RankIcon => TraitIcon.Images[ModelObject.Rank];
 
         public int Rank => ModelObject.Rank;
-        
-        public string Name => ModelObject?.Name ?? "None";
+
+        public ILocalizedText Name { get; }
 
         public override bool Equals(object obj) => ModelObject is RandomTrait ? ReferenceEquals(this, obj) : ModelObject.Equals((obj as TraitViewModel)?.ModelObject);
 

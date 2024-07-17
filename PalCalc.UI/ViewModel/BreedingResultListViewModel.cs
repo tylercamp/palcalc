@@ -1,11 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
@@ -37,42 +40,46 @@ namespace PalCalc.UI.ViewModel
         private readonly double FIT_CONTENT = double.NaN;
         private readonly double DEFAULT = double.NaN;
 
+        // hide columns if they're all the same value
         private double HiddenIfRedundant<T>(Func<BreedingResultViewModel, T> selector)
         {
             if (Results == null || Results.Count < 2) return DEFAULT;
-            else if (Results.Select(selector).Distinct().Count() == 1) return WIDTH_HIDDEN;
+            // (but don't hide columns if we've disabled translations and are looking for anything that needs updates)
+            else if (Results.Select(selector).Distinct().Count() == 1 && !Translator.DEBUG_DISABLE_TRANSLATIONS) return WIDTH_HIDDEN;
             else return FIT_CONTENT;
         }
 
         public double EffortWidth => DEFAULT;
         public double NumStepsWidth => HiddenIfRedundant(vm => vm.NumBreedingSteps);
         public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
-        public double TraitsWidth => HiddenIfRedundant(vm => vm.FinalTraits);
+        public double TraitsWidth => HiddenIfRedundant(vm => vm.EffectiveTraits.Description);
 
         public void RefreshWith(CachedSaveGame csg)
         {
             Results = Results.Select(r => new BreedingResultViewModel(csg, r.DisplayedResult)).ToList();
         }
 
-        public string ResultsHeading => Results == null ? "Results" : $"{Results.Count} Results";
+        [JsonIgnore]
+        private ILocalizedText resultsHeading;
+        public ILocalizedText ResultsHeading => resultsHeading ??=
+            Results == null
+                ? LocalizationCodes.LC_RESULT_LIST_TITLE_EMPTY.Bind()
+                : LocalizationCodes.LC_RESULT_LIST_TITLE_COUNT.Bind(Results.Count);
 
         public static BreedingResultListViewModel DesignerInstance { get; } = new BreedingResultListViewModel()
         {
             Results = new List<BreedingResultViewModel>()
             {
-                new BreedingResultViewModel(null, new OwnedPalReference(new PalCalc.Model.PalInstance()
+                new BreedingResultViewModel(null, new OwnedPalReference(new PalInstance()
                 {
-                    Pal = new PalCalc.Model.Pal() {
-                        Name = "Test Pal",
-                        Id = new PalCalc.Model.PalId() { PalDexNo = 100, IsVariant = false }
-                    },
-                    Gender = PalCalc.Model.PalGender.WILDCARD,
-                    Location = new PalCalc.Model.PalLocation() { Index = 0, Type = PalCalc.Model.LocationType.Palbox },
-                    Traits = new List<PalCalc.Model.Trait>()
+                    Pal = "Beakon".ToPal(PalDB.LoadEmbedded()),
+                    Gender = PalGender.WILDCARD,
+                    Location = new PalLocation() { Index = 0, Type = LocationType.Palbox },
+                    Traits = new List<Trait>()
                     {
-                        new PalCalc.Model.Trait("Trait 1", "Internal 1", 0),
+                        "Runner".ToTrait(PalDB.LoadEmbedded()),
                     }
-                }, new List<PalCalc.Model.Trait>() { new PalCalc.Model.Trait("Trait 1", "Internal 1", 0) }))
+                }, new List<Trait>() { "Runner".ToTrait(PalDB.LoadEmbedded()) }))
             }
         };
     }

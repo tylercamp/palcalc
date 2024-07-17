@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using Serilog;
 using System;
@@ -24,6 +25,8 @@ namespace PalCalc.UI
 
         public static string LogFolder = "log";
 
+        public static List<ITranslationError> TranslationErrors { get; } = new List<ITranslationError>();
+
         protected override void OnStartup(StartupEventArgs e)
         {
 #if RELEASE
@@ -47,6 +50,9 @@ namespace PalCalc.UI
 
             PalDB.BeginLoadEmbedded();
 
+            Translator.OnTranslationError += TranslationErrors.Add;
+            Translator.Init();
+
             base.OnStartup(e);
         }
 
@@ -56,7 +62,17 @@ namespace PalCalc.UI
 
             Serilog.Log.CloseAndFlush();
             var logZip = CrashSupport.PrepareSupportFile();
-            MessageBox.Show($"An unhandled error occurred.\n\nPlease find the generated ZIP file to send with any support questions:\n\n{logZip}");
+
+            var message = $"An unhandled error occurred.\n\nPlease find the generated ZIP file to send with any support questions:\n\n{logZip}";
+
+            try
+            {
+                message = LocalizationCodes.LC_ERROR_HARD_CRASH.Bind(new { CrashlogPath = logZip }).Value;
+            }
+            finally
+            {
+                MessageBox.Show(message);
+            }
         }
     }
 }

@@ -15,6 +15,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
         public string Value { get; set; }
     }
 
+    // TODO - Localize (eventually)
+
     public class PalDetailsViewModel(PalInstance pal, GvasCharacterInstance rawData)
     {
         public List<PalDetailsProperty> PalProperties { get; } = pal == null ? [] :

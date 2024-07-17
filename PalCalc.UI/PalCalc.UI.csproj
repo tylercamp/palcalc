@@ -385,4 +385,60 @@
     <Resource Include="Resources\TraitRank\Passive_Positive_3_icon.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Update="Localization\LocalizationCodes.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\de.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\en.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\es.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\fr.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\it.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\ko.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\pt-BR.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\ru.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\zh-Hans.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\zh-Hant.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Localization\LocalizationCodes.Designer.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>LocalizationCodes.resx</DependentUpon>
+      <LastGenOutput>LocalizationCodes.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Localization\LocalizationCodes.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LocalizationCodes.Designer.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

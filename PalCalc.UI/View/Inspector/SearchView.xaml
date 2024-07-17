@@ -9,6 +9,7 @@
              xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              mc:Ignorable="d" 
              d:DataContext="{x:Static ivm:SearchViewModel.DesignerInstance}"
              d:Background="White"
@@ -25,23 +26,23 @@
             <ColumnDefinition Width="20*" MinWidth="100"/>
         </Grid.ColumnDefinitions>
 
-        <GroupBox Header="Pal Containers" Grid.Column="0" Margin="5">
+        <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_PAL_CONTAINERS}" Grid.Column="0" Margin="5">
             <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Label}" />
+                        <TextBlock Text="{Binding Label.Value}" />
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type svm:PlayerTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Label}" />
+                        <TextBlock Text="{Binding Label.Value}" />
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel}" />
+                        <TextBlock Text="{Binding SearchedLabel.Value}" />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel}" />
+                        <TextBlock Text="{Binding SearchedLabel.Value}" />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel}" />
+                        <TextBlock Text="{Binding SearchedLabel.Value}" />
                     </DataTemplate>
                 </TreeView.Resources>
             </TreeView>
@@ -55,7 +56,7 @@
                 <RowDefinition Height="173*"/>
             </Grid.RowDefinitions>
 
-            <GroupBox Header="Search Settings" Grid.Row="0" Margin="5">
+            <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_SEARCH_SETTINGS}" Grid.Row="0" Margin="5">
                 <StackPanel Orientation="Vertical">
                     <WrapPanel Margin="5">
                         <WrapPanel.Resources>
@@ -65,22 +66,22 @@
                         </WrapPanel.Resources>
 
                         <StackPanel Orientation="Vertical">
-                            <Label Content="Pal" />
-                            <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{Binding SearchSettings.PalOptions}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label">
+                            <Label Content="{itl:LocalizedText LC_COMMON_PAL}" />
+                            <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{Binding SearchSettings.PalOptions}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label.Value">
                                 <dnkc:AutoCompleteComboBox.ItemTemplate>
                                     <DataTemplate DataType="mvm:PalViewModel">
-                                        <TextBlock Text="{Binding Label}" />
+                                        <TextBlock Text="{Binding Label.Value}" />
                                     </DataTemplate>
                                 </dnkc:AutoCompleteComboBox.ItemTemplate>
                             </dnkc:AutoCompleteComboBox>
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical">
-                            <Label Content="Gender" />
+                            <Label Content="{itl:LocalizedText LC_COMMON_GENDER}" />
                             <ComboBox ItemsSource="{Binding SearchSettings.GenderOptions}" SelectedItem="{Binding SearchSettings.SearchedGender}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate DataType="{x:Type svm:GenderOption}">
-                                        <TextBlock Text="{Binding Label}" />
+                                        <TextBlock Text="{Binding Label.Value}" />
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
@@ -93,23 +94,23 @@
                                     <Setter Property="Width" Value="150" />
                                 </Style>
                             </StackPanel.Resources>
-                            <Label Content="Traits" />
+                            <Label Content="{itl:LocalizedText LC_COMMON_TRAITS}" />
                             <WrapPanel Orientation="Horizontal">
                                 <WrapPanel.Resources>
                                     <DataTemplate x:Key="TraitTemplate" DataType="{x:Type mvm:TraitViewModel}">
-                                        <TextBlock Text="{Binding Name}" />
+                                        <TextBlock Text="{Binding Name.Value}" />
                                     </DataTemplate>
                                 </WrapPanel.Resources>
 
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait1}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait2}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait3}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name" SelectedValue="{Binding SearchSettings.SearchedTrait4}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait1}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait2}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait3}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait4}" ItemTemplate="{StaticResource TraitTemplate}" />
                             </WrapPanel>
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical">
-                            <Label>Min IVs</Label>
+                            <Label Content="{itl:LocalizedText LC_SAVESEARCH_SETTINGS_MIN_IVS}" />
                             <StackPanel Orientation="Horizontal">
                                 <StackPanel.Resources>
                                     <Style TargetType="Label">
@@ -122,24 +123,24 @@
                                 </StackPanel.Resources>
                                 
                                 <StackPanel Orientation="Horizontal">
-                                    <Label>HP</Label>
+                                    <Label Content="{itl:LocalizedText LC_COMMON_IV_HP}" />
                                     <v:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.MinIVHP}" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal">
-                                    <Label>Attack</Label>
+                                    <Label Content="{itl:LocalizedText LC_COMMON_IV_ATTACK}" />
                                     <v:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.MinIVAttack}" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal">
-                                    <Label>Defense</Label>
+                                    <Label Content="{itl:LocalizedText LC_COMMON_IV_DEFENSE}" />
                                     <v:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.MinIVDefense}" />
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </WrapPanel>
 
-                    <Button Width="80" Margin="5" HorizontalAlignment="Left" Command="{Binding SearchSettings.ResetCommand}">Reset</Button>
+                    <Button Width="80" Margin="5" HorizontalAlignment="Left" Command="{Binding SearchSettings.ResetCommand}" Content="{itl:LocalizedText LC_SAVESEARCH_SETTINGS_RESET}" />
                 </StackPanel>
             </GroupBox>
 
@@ -160,12 +161,12 @@
                         <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
                             <Border Width="64" Height="64" CornerRadius="32" Background="{Binding Pal.IconBrush}" BorderBrush="White" BorderThickness="1" />
                             <StackPanel Margin="10,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Pal.Name}" FontWeight="Bold" />
+                                <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" />
                                 <TextBlock>
-                                    <Run>Level</Run>
+                                    <Run Text="{itl:LocalizedText LC_COMMON_LEVEL}" />
                                     <Run Text="{Binding PalInstance.ModelObject.Level}" />
                                 </TextBlock>
-                                <TextBlock Text="{Binding PalInstance.Gender}" />
+                                <TextBlock Text="{Binding PalInstance.Gender.Value}" />
                             </StackPanel>
                         </StackPanel>
 
@@ -180,20 +181,20 @@
                                 </Style>
                             </StackPanel.Resources>
 
-                            <Label HorizontalContentAlignment="Center" FontWeight="Bold">IVs</Label>
+                            <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{itl:LocalizedText LC_COMMON_IVS}" />
 
                             <StackPanel>
-                                <Label Width="60">HP:</Label>
+                                <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_HP}" />
                                 <Label Content="{Binding PalInstance.ModelObject.IV_HP}" />
                             </StackPanel>
 
                             <StackPanel>
-                                <Label Width="60">Attack:</Label>
+                                <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_ATTACK}" />
                                 <Label Content="{Binding PalInstance.ModelObject.IV_Shot}" />
                             </StackPanel>
 
                             <StackPanel>
-                                <Label Width="60">Defense:</Label>
+                                <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_DEFENSE}" />
                                 <Label Content="{Binding PalInstance.ModelObject.IV_Defense}" />
                             </StackPanel>
                         </StackPanel>

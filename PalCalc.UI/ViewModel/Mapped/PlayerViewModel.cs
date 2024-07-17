@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +13,16 @@ namespace PalCalc.UI.ViewModel.Mapped
         public PlayerViewModel(PlayerInstance player)
         {
             ModelObject = player;
+            Name = IsWildcard
+                ? LocalizationCodes.LC_ANY_PLAYER.Bind()
+                : new HardCodedText(ModelObject.Name);
         }
 
         public PlayerInstance ModelObject { get; }
 
         public bool IsWildcard => ModelObject == null;
 
-        public string Name => IsWildcard ? "Any Player" : ModelObject.Name;
+        public ILocalizedText Name { get; }
 
         public static readonly PlayerViewModel Any = new PlayerViewModel(null);
     }

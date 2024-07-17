@@ -16,6 +16,8 @@ namespace PalCalc.Model
         }
 
         public string Name { get; }
+        public Dictionary<string, string> LocalizedNames { get; set; }
+
         public string InternalName { get; }
         public int Rank { get; }
 

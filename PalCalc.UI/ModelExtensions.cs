@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,22 +10,22 @@ namespace PalCalc.UI
 {
     internal static class ModelExtensions
     {
-        public static string Label(this LocationType locType) =>
+        public static ILocalizedText Label(this LocationType locType) =>
             locType switch
             {
-                LocationType.Palbox => "Palbox",
-                LocationType.Base => "Base",
-                LocationType.PlayerParty => "Party",
+                LocationType.Palbox => LocalizationCodes.LC_PAL_LOC_PALBOX.Bind(),
+                LocationType.Base => LocalizationCodes.LC_PAL_LOC_BASE.Bind(),
+                LocationType.PlayerParty => LocalizationCodes.LC_PAL_LOC_PARTY.Bind(),
                 _ => throw new NotImplementedException()
             };
 
-        public static string Label(this PalGender gender) =>
+        public static ILocalizedText Label(this PalGender gender) =>
             gender switch
             {
-                PalGender.FEMALE => "Female",
-                PalGender.MALE => "Male",
-                PalGender.WILDCARD => "Any Gender",
-                PalGender.OPPOSITE_WILDCARD => "Opposite Gender",
+                PalGender.FEMALE => LocalizationCodes.LC_COMMON_GENDER_FEMALE.Bind(),
+                PalGender.MALE => LocalizationCodes.LC_COMMON_GENDER_MALE.Bind(),
+                PalGender.WILDCARD => LocalizationCodes.LC_COMMON_GENDER_WILDCARD.Bind(),
+                PalGender.OPPOSITE_WILDCARD => LocalizationCodes.LC_COMMON_GENDER_OPPOSITE_WILDCARD.Bind(),
                 _ => throw new NotImplementedException()
             };
     }

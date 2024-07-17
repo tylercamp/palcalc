@@ -26,6 +26,15 @@ namespace GraphSharp.Controls.Zoom
             DependencyProperty.Register("Mode", typeof(ZoomControlModes), typeof(ZoomControl),
                                         new UIPropertyMetadata(ZoomControlModes.Custom, ModePropertyChanged));
 
+        public static readonly DependencyProperty FillLabelProperty =
+            DependencyProperty.Register("FillLabel", typeof(string), typeof(ZoomControl), new UIPropertyMetadata("Fill"));
+
+        public static readonly DependencyProperty CustomLabelProperty =
+            DependencyProperty.Register("CustomLabel", typeof(string), typeof(ZoomControl), new UIPropertyMetadata("Custom"));
+
+        public static readonly DependencyProperty ZoomLabelProperty =
+            DependencyProperty.Register("ZoomLabel", typeof(string), typeof(ZoomControl), new UIPropertyMetadata("Zoom:"));
+
         private static void ModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var zc = (ZoomControl)d;
@@ -141,6 +150,24 @@ namespace GraphSharp.Controls.Zoom
                 BeginAnimation(ZoomProperty, null);
                 SetValue(ZoomProperty, value);
             }
+        }
+
+        public string FillLabel
+        {
+            get => (string)GetValue(FillLabelProperty);
+            set { SetValue(FillLabelProperty, value); }
+        }
+
+        public string CustomLabel
+        {
+            get => (string)GetValue(CustomLabelProperty);
+            set { SetValue(CustomLabelProperty, value); }
+        }
+
+        public string ZoomLabel
+        {
+            get => (string)GetValue(ZoomLabelProperty);
+            set { SetValue(ZoomLabelProperty, value); }
         }
 
         private ZoomContentPresenter Presenter

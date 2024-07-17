@@ -23,6 +23,8 @@ namespace PalCalc.Model
         public PalId Id { get; set; }
         public string Name { get; set; }
 
+        public Dictionary<string, string> LocalizedNames { get; set; }
+
         public string InternalName { get; set; }
         public int InternalIndex { get; set; } // index in the game's internal pal ordering (not paldex)
 

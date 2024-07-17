@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
@@ -23,8 +24,7 @@ namespace PalCalc.UI.ViewModel
         }
 
         public string PaldexNoDisplay => Pal.ModelObject.Id.PalDexNo.ToString() + (Pal.ModelObject.Id.IsVariant ? "B" : "");
-        public double PaldexNoValue => Pal.ModelObject.Id.PalDexNo + (Pal.ModelObject.Id.IsVariant ? 0.1 : 0);
-        public string PalName => Pal.Name;
+        public ILocalizedText PalName => Pal.Name;
 
         public PalViewModel Pal { get; }
 
@@ -66,7 +66,7 @@ namespace PalCalc.UI.ViewModel
                 {
                     if (value.Trim().Length > 0)
                     {
-                        VisibleEntries = allEntries.Where(e => e.PalName.ToLower().Contains(value.ToLower())).ToList();
+                        VisibleEntries = allEntries.Where(e => e.PalName.Value.Contains(value, StringComparison.CurrentCultureIgnoreCase)).ToList();
                     }
                     else
                     {
@@ -78,8 +78,11 @@ namespace PalCalc.UI.ViewModel
         
         public PalCheckListViewModel(Action onCancel, Action<Dictionary<Pal, bool>> onSave, Dictionary<Pal, bool> initialState)
         {
-            // TODO - handle user clicking "X" button on window
-            allEntries = initialState.Select(kvp => new PalCheckListEntryViewModel(new PalViewModel(kvp.Key), kvp.Value)).ToList();
+            allEntries = initialState
+                .Select(kvp => new PalCheckListEntryViewModel(PalViewModel.Make(kvp.Key), kvp.Value))
+                .OrderBy(vm => vm.Pal.ModelObject.Id)
+                .ToList();
+
             VisibleEntries = allEntries;
 
             foreach (var e in allEntries)
@@ -119,8 +122,9 @@ namespace PalCalc.UI.ViewModel
             foreach (var e in allEntries) e.PropertyChanged -= EntryPropertyChanged;
         }
 
+        // for XAML designer preview
         [ObservableProperty]
-        private string title = "Pal Checklist";
+        private ILocalizedText title = new HardCodedText("Pal Checklist");
 
         [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         [ObservableProperty]

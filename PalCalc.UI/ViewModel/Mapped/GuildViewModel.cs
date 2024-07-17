@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,10 @@ namespace PalCalc.UI.ViewModel.Mapped
                         .ToList()
                 );
             }
+
+            Name = IsWildcard
+                ? LocalizationCodes.LC_ANY_GUILD.Bind()
+                : new HardCodedText(ModelObject.Name);
         }
 
         public GuildInstance ModelObject { get; }
@@ -36,7 +41,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public List<PlayerViewModel> AvailableMembers { get; }
 
-        public string Name => IsWildcard ? "Any Guild" : ModelObject.Name;
+        public ILocalizedText Name { get; }
 
         public static readonly GuildViewModel Any = new GuildViewModel(null, null);
     }

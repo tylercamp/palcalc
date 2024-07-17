@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using PalCalc.SaveReader;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
@@ -18,7 +19,7 @@ namespace PalCalc.UI.ViewModel.Inspector
         public SearchViewModel Search { get; }
         public SaveDetailsViewModel Details { get; }
 
-        public string WindowTitle { get; }
+        public ILocalizedText WindowTitle { get; }
 
         public SaveInspectorWindowViewModel(CachedSaveGame csg)
         {
@@ -28,7 +29,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             Search = new SearchViewModel(csg);
             Details = new SaveDetailsViewModel(csg, rawData, players);
 
-            WindowTitle = $"Save Inspector - {new SaveGameViewModel(csg.UnderlyingSave).Label}";
+            WindowTitle = LocalizationCodes.LC_SAVEWINDOW_TITLE.Bind(new SaveGameViewModel(csg.UnderlyingSave).Label);
         }
     }
 }

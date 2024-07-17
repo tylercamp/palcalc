@@ -28,7 +28,7 @@
             </Grid.ColumnDefinitions>
 
             <Viewbox Grid.Column="0" StretchDirection="DownOnly" Stretch="Uniform" HorizontalAlignment="Left">
-                <TextBlock Text="{Binding Name}" Height="14" FontSize="10" VerticalAlignment="Center" Foreground="White" />
+                <TextBlock Text="{Binding Name.Value}" Height="14" FontSize="10" VerticalAlignment="Center" Foreground="White" />
             </Viewbox>
             <Grid Grid.Column="2">
                 <Rectangle Width="12" Height="12" Fill="{Binding Rank, Converter={StaticResource RCC}}">

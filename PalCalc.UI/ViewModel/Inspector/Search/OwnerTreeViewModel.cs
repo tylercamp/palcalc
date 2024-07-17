@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
@@ -13,60 +14,66 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 {
     public interface IOwnerTreeNode
     {
-        string Label { get; }
+        ILocalizedText Label { get; }
         List<IOwnerTreeNode> Children => [];
 
         public IEnumerable<IOwnerTreeNode> AllChildren => Children.Concat(Children.SelectMany(c => c.AllChildren));
     }
 
-    public interface IContainerSource : IOwnerTreeNode
+    public abstract class IContainerSource : ObservableObject, IOwnerTreeNode
     {
-        ContainerViewModel Container { get; }
+        public IContainerSource(ILocalizedText label, ContainerViewModel container)
+        {
+            Container = container;
+            Label = label;
+            SearchedLabel = Label;
+        }
 
-        ISearchCriteria SearchCriteria { set; }
-    }
+        public ContainerViewModel Container { get; }
+        public ILocalizedText Label { get; }
 
-    public static class ContainerSourceExtensions
-    {
-        public static string ToSearchResultsLabel(this IContainerSource src) =>
-            $"{src.Label} ({src.Container.Grids.Sum(g => g.Slots.Count(s => s.Matches))} matches)";
-    }
 
-    public class PlayerPalboxContainerViewModel(ContainerViewModel container) : ObservableObject, IContainerSource
-    {
-        public string Label => "Palbox";
-        public ContainerViewModel Container => container;
+        private ILocalizedText searchedLabel;
+        public ILocalizedText SearchedLabel
+        {
+            get => searchedLabel;
+            private set => SetProperty(ref searchedLabel, value);
+        }
 
-        public string SearchedLabel => this.ToSearchResultsLabel();
         public ISearchCriteria SearchCriteria
         {
             set
             {
                 Container.SearchCriteria = value;
-                OnPropertyChanged(nameof(SearchedLabel));
+                SearchedLabel = LocalizationCodes.LC_SAVESEARCH_CONTAINER_LABEL.Bind(
+                    new
+                    {
+                        Label = Label,
+                        NumMatches = Container.Grids.Sum(g => g.Slots.Count(s => s.Matches)),
+                    }
+                );
             }
         }
     }
 
-    public class PlayerPartyContainerViewModel(ContainerViewModel container) : ObservableObject, IContainerSource
+    public class PlayerPalboxContainerViewModel(ContainerViewModel container) :
+        IContainerSource(LocalizationCodes.LC_PAL_LOC_PALBOX.Bind(), container)
     {
-        public string Label => "Party";
-        public ContainerViewModel Container => container;
+    }
 
-        public string SearchedLabel => this.ToSearchResultsLabel();
-        public ISearchCriteria SearchCriteria
-        {
-            set
-            {
-                Container.SearchCriteria = value;
-                OnPropertyChanged(nameof(SearchedLabel));
-            }
-        }
+    public class PlayerPartyContainerViewModel(ContainerViewModel container) :
+        IContainerSource(LocalizationCodes.LC_PAL_LOC_PARTY.Bind(), container)
+    {
+    }
+
+    public class BaseTreeNodeViewModel(ContainerViewModel baseContainer) :
+        IContainerSource(LocalizationCodes.LC_BASE_LABEL.Bind(baseContainer.Id.Split('-')[0]), baseContainer)
+    {
     }
 
     public class PlayerTreeNodeViewModel(PlayerInstance player, ContainerViewModel party, ContainerViewModel palbox) : IOwnerTreeNode
     {
-        public string Label => $"Player '{player.Name}'";
+        public ILocalizedText Label { get; } = LocalizationCodes.LC_PLAYER_LABEL.Bind(player.Name);
 
         public List<IOwnerTreeNode> Children { get; } = [
             new PlayerPartyContainerViewModel(party),
@@ -74,27 +81,11 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         ];
     }
 
-    public class BaseTreeNodeViewModel(ContainerViewModel baseContainer) : ObservableObject, IContainerSource
-    {
-        public string Label => $"Base ({baseContainer.Id.Split('-')[0]})";
-        public ContainerViewModel Container => baseContainer;
-
-        public string SearchedLabel => this.ToSearchResultsLabel();
-        public ISearchCriteria SearchCriteria
-        {
-            set
-            {
-                Container.SearchCriteria = value;
-                OnPropertyChanged(nameof(SearchedLabel));
-            }
-        }
-    }
-
     public class GuildTreeNodeViewModel : IOwnerTreeNode
     {
         public GuildTreeNodeViewModel(CachedSaveGame source, GuildInstance guild, List<ContainerViewModel> relevantContainers)
         {
-            Label = $"Guild '{guild.Name}'";
+            Label = LocalizationCodes.LC_GUILD_LABEL.Bind(guild.Name);
 
             var playerIds = relevantContainers.SelectMany(c => c.OwnerIds).Where(source.PlayersById.ContainsKey).Distinct().ToList();
 
@@ -121,7 +112,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             Children = playerNodes.Cast<IOwnerTreeNode>().Concat(baseContainers.Cast<IOwnerTreeNode>()).ToList();
         }
 
-        public string Label { get; }
+        public ILocalizedText Label { get; }
         public List<IOwnerTreeNode> Children { get; }
     }
 

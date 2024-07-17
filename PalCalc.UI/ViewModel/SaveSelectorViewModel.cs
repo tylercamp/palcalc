@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using PalCalc.UI.View.Inspector;
@@ -61,8 +62,8 @@ namespace PalCalc.UI.ViewModel
                 if (value != null && value.IsAddManualOption)
                 {
                     var ofd = new OpenFileDialog();
-                    ofd.Filter = "Level save file|Level.sav";
-                    ofd.Title = "Select the 'Level.sav' file in your save folder";
+                    ofd.Filter = LocalizationCodes.LC_MANUAL_SAVE_EXTENSION_LBL.Bind().Value + "|Level.sav";
+                    ofd.Title = LocalizationCodes.LC_MANUAL_SAVE_SELECTOR_TITLE.Bind().Value;
 
                     if (true == ofd.ShowDialog(App.Current.MainWindow))
                     {
@@ -72,7 +73,7 @@ namespace PalCalc.UI.ViewModel
                             var existingSaves = SavesLocations.SelectMany(l => l.SaveGames.Select(vm => vm.Value)).SkipNull();
                             if (existingSaves.Any(s => s.BasePath.PathEquals(asSaveGame.BasePath)))
                             {
-                                MessageBox.Show(App.Current.MainWindow, "The selected file has already been registered");
+                                MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_ALREADY_REGISTERED.Bind().Value);
                             }
                             else
                             {
@@ -82,7 +83,7 @@ namespace PalCalc.UI.ViewModel
                         }
                         else
                         {
-                            MessageBox.Show(App.Current.MainWindow, "The selected file is not in a complete save-game folder");
+                            MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_INCOMPLETE.Bind().Value);
                             needsReset = true;
                         }
                     }
@@ -135,7 +136,7 @@ namespace PalCalc.UI.ViewModel
         {
             manualLocation = new ManualSavesLocationViewModel(manualSaves);
 
-            SavesLocations = new List<ISavesLocationViewModel>(savesLocations.Select(l => new StandardSavesLocationViewModel(l)).OrderBy(vm => vm.Label));
+            SavesLocations = new List<ISavesLocationViewModel>(savesLocations.Select(l => new StandardSavesLocationViewModel(l)).OrderByDescending(vm => vm.LastModified));
             SavesLocations.Add(manualLocation);
 
             SelectedLocation = MostRecentLocation;
@@ -198,7 +199,7 @@ namespace PalCalc.UI.ViewModel
                         catch (Exception e)
                         {
                             logger.Warning(e, "unexpected error when attempting to create crashlog file");
-                            MessageBox.Show("Could not create the crashlog file.");
+                            MessageBox.Show(LocalizationCodes.LC_CRASHLOG_FAILED.Bind().Value);
                         }
                     }
                 }
@@ -207,7 +208,9 @@ namespace PalCalc.UI.ViewModel
             InspectSaveCommand = new RelayCommand(
                 execute: () =>
                 {
-                    var loadingModal = new LoadingSaveFileModal() { DataContext = "Reading raw save data...", Owner = App.Current.MainWindow };
+                    var loadingModal = new LoadingSaveFileModal();
+                    loadingModal.Owner = App.Current.MainWindow;
+                    loadingModal.DataContext = LocalizationCodes.LC_SAVE_INSPECTOR_LOADING.Bind();
                     loadingModal.ShowSync();
 
                     var vm = new SaveInspectorWindowViewModel(SelectedGame.CachedValue);

@@ -1,6 +1,8 @@
 ﻿using PalCalc.Model;
 using PalCalc.SaveReader.SaveFile.Support.Level;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,11 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
 
     public class PalContainerSlotDetailsViewModel(string instanceId, PalInstance pal, GvasCharacterInstance rawPal) : IContainerSlotDetailsViewModel
     {
-        public string DisplayName => pal?.Pal?.Name ?? rawPal?.CharacterId ?? InstanceId;
+        public ILocalizedText DisplayName { get; } =
+            pal != null
+                ? PalViewModel.Make(pal.Pal).Name
+                : new HardCodedText(rawPal?.CharacterId ?? instanceId);
+
         public ImageSource Icon => pal == null ? PalIcon.DefaultIcon : PalIcon.Images[pal.Pal];
         public ImageBrush IconBrush => pal == null ? PalIcon.DefaultIconBrush : PalIcon.ImageBrushes[pal.Pal];
 

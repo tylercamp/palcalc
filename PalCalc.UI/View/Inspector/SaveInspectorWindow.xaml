@@ -5,15 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
         xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector"
+        xmlns:itl="clr-namespace:PalCalc.UI.Localization"
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
         d:DataContext="{x:Static svm:SaveInspectorWindowViewModel.DesignerInstance}"
-        Title="{Binding WindowTitle}" Height="450" Width="900">
+        Title="{Binding WindowTitle.Value}" Height="450" Width="900">
     <TabControl>
-        <TabItem Header="Search">
+        <TabItem Header="{itl:LocalizedText LC_SAVEWINDOW_TAB_SEARCH}">
             <local:SearchView DataContext="{Binding Search}" />
         </TabItem>
-        <TabItem Header="Details">
+        <TabItem Header="{itl:LocalizedText LC_SAVEWINDOW_TAB_DETAILS}">
             <local:SaveDetailsView DataContext="{Binding Details}" />
         </TabItem>
     </TabControl>

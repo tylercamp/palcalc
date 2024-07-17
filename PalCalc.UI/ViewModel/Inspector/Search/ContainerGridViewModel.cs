@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
@@ -45,7 +46,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
                     designerInstance = new ContainerGridViewModel(c.ToList())
                     {
-                        Title = "Tab 1",
+                        Title = new HardCodedText("Tab 1"),
                         PerRow = 5
                     };
                 }
@@ -74,7 +75,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         public Visibility GridVisibility => Title == null || Slots.Any(s => s is ContainerGridPalSlotViewModel { Matches: true }) ? Visibility.Visible : Visibility.Collapsed;
 
-        public string Title { get; set; }
+        public ILocalizedText Title { get; set; }
         public Visibility TitleVisibility => Title == null ? Visibility.Collapsed : Visibility.Visible;
 
         [ObservableProperty]
