@@ -136,7 +136,8 @@
     <value>Breeding Time (Mins)</value>
   </data>
   <data name="LC_BREEDING_TIME_DESC" xml:space="preserve">
-    <value>The average time it takes to produce an egg. Used to estimate how long it will take to produce a pal with specific properties.&amp;#10;This value is doubled internally to account for pal inactivity at night.</value>
+    <value>The average time it takes to produce an egg. Used to estimate how long it will take to produce a pal with specific properties.
+This value is doubled internally to account for pal inactivity at night.</value>
   </data>
   <data name="LC_COMMON_CANCEL" xml:space="preserve">
     <value>Cancel</value>
@@ -285,7 +286,9 @@ Please find the generated ZIP file to send with any support questions:
     <value>Multiple Breeding Farms</value>
   </data>
   <data name="LC_MULTIPLE_BREEDING_FARMS_DESC" xml:space="preserve">
-    <value>Whether multiple breeding farms will be used.&amp;#10;If enabled, the time to breed a pal from two other bred pals is based on the longest breeding time between the parents.&amp;#10;If disabled, the time to breed a pal is always based on the sum of the time required for the parents.</value>
+    <value>Whether multiple breeding farms will be used.
+If enabled, the time to breed a pal from two other bred pals is based on the longest breeding time between the parents.
+If disabled, the time to breed a pal is always based on the sum of the time required for the parents.</value>
   </data>
   <data name="LC_NEW_TARGET_PAL" xml:space="preserve">
     <value>New</value>
@@ -486,13 +489,16 @@ Please find the generated ZIP file to send with any support questions:
     <value>Max Bred Irrelevant Traits</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
-    <value>The maximum number of irrelevant traits allowed for any bred pal, including the final breeding result.&amp;#10;Values higher than '1' will typically add shorter breeding paths if there are unused trait slots in the final pal.&amp;#10;Higher values *exponentially* affect time required.</value>
+    <value>The maximum number of irrelevant traits allowed for any bred pal, including the final breeding result.
+Values higher than '1' will typically add shorter breeding paths if there are unused trait slots in the final pal.
+Higher values *exponentially* affect time required.</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS" xml:space="preserve">
     <value>Max Breeding Steps</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION" xml:space="preserve">
-    <value>The maximum number of solver iterations, and the max number of breeding steps to reach the target pal.&amp;#10;Higher values linearly affect time required.</value>
+    <value>The maximum number of solver iterations, and the max number of breeding steps to reach the target pal.
+Higher values linearly affect time required.</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve">
     <value>Max CPUs</value>
@@ -504,13 +510,16 @@ Please find the generated ZIP file to send with any support questions:
     <value>Max Input Irrelevant Traits</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
-    <value>The maximum number of irrelevant traits allowed for any owned pal used as a parent.&amp;#10;Lower values can somewhat reduce processing at risk of missing some useful paths.&amp;#10;Higher values linearly affect time required.</value>
+    <value>The maximum number of irrelevant traits allowed for any owned pal used as a parent.
+Lower values can somewhat reduce processing at risk of missing some useful paths.
+Higher values linearly affect time required.</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS" xml:space="preserve">
     <value>Max Wild Pals</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION" xml:space="preserve">
-    <value>The maximum number of wild pals to allow in a breeding path.&amp;#10;Higher values linearly affect time required, depending on how many types of pals are owned.</value>
+    <value>The maximum number of wild pals to allow in a breeding path.
+Higher values linearly affect time required, depending on how many types of pals are owned.</value>
   </data>
   <data name="LC_SOLVER_STATUS_BREEDING" xml:space="preserve">
     <value>Breeding step {StepNum}, calculating child pals and probabilities of {WorkSize} pairs</value>
