@@ -44,7 +44,7 @@ _See [here](./PalCalc.Solver/) for an overview of the full solver process._
 
 Pal Calc requires [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.7-windows-x64-installer). You shouldn't need to install this manually as the app should prompt you to install this when you run it if needed.
 
-Pal Calc also creates and manages the folder `data`, `cache`, and `logs`. If Pal Calc is in a folder which already has these files from another program, it may cause startup issues. You should place Pal Calc in a folder which does not have these, or (preferably) in its own dedicated folder.
+Pal Calc also creates and manages the folders `data`, `cache`, and `logs`. If Pal Calc is in a folder which already has these files from another program, it may cause startup issues. You should place Pal Calc in a folder which does not have these, or (preferably) in its own dedicated folder.
 
 ### Where are my Pals?
 

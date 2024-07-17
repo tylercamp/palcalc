@@ -84,7 +84,9 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             {
                 if (path == MatchedPath)
                 {
+#if DEBUG
                     if (pendingSlot == null) Debugger.Break();
+#endif
 
                     if (pendingSlot.SlotIndex < 0) pendingSlot.SlotIndex = numEmitted++;
                     OnSlotData?.Invoke(pendingSlot);
