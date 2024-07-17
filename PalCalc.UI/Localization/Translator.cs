@@ -12,12 +12,9 @@ using Windows.Networking.Sockets;
 
 namespace PalCalc.UI.Localization
 {
-    /*
-     * Translation Code: Readable label, used as variable names in `LocalizationCodes`
-     * Translation ID: Full ID of the translation code, contains parameters
-     */
-
-    // note: code-gen handled by ResXResourceManager extension, must be installed in order to regenerate `LocalizationCodes`
+    // note: code-gen of `LocalizationCodes` handled by ResXResourceManager extension, must be installed in order to
+    // regenerate `LocalizationCodes` enum
+    //
     // https://marketplace.visualstudio.com/items?itemName=TomEnglert.ResXManager
 
     public static partial class Translator

@@ -27,7 +27,6 @@ namespace PalCalc.UI.Localization
 
         public string BaseLocalizedText => Translator.Localizations[Locale][Code];
 
-
         public StoredLocalizedText Bind() => Bind([]);
 
         public StoredLocalizedText Bind(Dictionary<string, object> formatArgs)

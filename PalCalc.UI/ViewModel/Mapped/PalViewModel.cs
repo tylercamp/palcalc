@@ -32,17 +32,13 @@ namespace PalCalc.UI.ViewModel.Mapped
             ModelObject = pal;
 
             Name = NameLocalizer.Bind(ModelObject);
-
-            if (pal != null)
-            {
-                Label = LocalizationCodes.LC_PAL_LABEL.Bind(
-                    new
-                    {
-                        PalName = Name,
-                        PaldexNum = ModelObject.Id,
-                    }
-                );
-            }
+            Label = LocalizationCodes.LC_PAL_LABEL.Bind(
+                new
+                {
+                    PalName = Name,
+                    PaldexNum = ModelObject.Id,
+                }
+            );
         }
 
         public ILocalizedText Name { get; }

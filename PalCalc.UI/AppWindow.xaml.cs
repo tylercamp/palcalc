@@ -50,7 +50,6 @@ namespace PalCalc.UI
             {
                 var debugWindow = new TranslationDebugWindow();
                 debugWindow.DataContext = new TranslationDebugViewModel(App.TranslationErrors);
-                debugWindow.Owner = this;
                 debugWindow.Show();
             }
 #endif

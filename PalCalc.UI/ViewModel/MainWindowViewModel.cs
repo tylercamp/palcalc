@@ -244,7 +244,7 @@ namespace PalCalc.UI.ViewModel
             logger.Error(ex, "error when parsing save file for {saveId}", CachedSaveGame.IdentifierFor(obj));
 
             var crashsupport = CrashSupport.PrepareSupportFile(specificSave: obj);
-            MessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind().Value);
+            MessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind(crashsupport).Value);
 
             SaveSelection.SelectedGame = null;
         }
@@ -520,7 +520,7 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        public Visibility ProgressBarVisibility => string.IsNullOrEmpty(SolverStatusMsg?.Value) ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility ProgressBarVisibility => SolverStatusMsg == null ? Visibility.Collapsed : Visibility.Visible;
 
         [ObservableProperty]
         private Visibility updatesMessageVisibility = Visibility.Collapsed;

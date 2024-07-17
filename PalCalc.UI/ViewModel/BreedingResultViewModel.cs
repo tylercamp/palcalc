@@ -58,107 +58,86 @@ namespace PalCalc.UI.ViewModel
         {
             this.source = source;
 
-            DisplayedResult = displayedResult;
+            if (displayedResult == null)
+            {
+                Graph = null;
+                DisplayedResult = null;
+                Label = LocalizationCodes.LC_COMMON_UNKNOWN.Bind();
+            }
+            else
+            {
+                DisplayedResult = displayedResult;
+                Graph = BreedingGraph.FromPalReference(source, displayedResult);
+                EffectiveTraits = new TraitCollectionViewModel(DisplayedResult.EffectiveTraits.Select(TraitViewModel.Make));
+                Label = LocalizationCodes.LC_RESULT_LABEL.Bind(
+                    new
+                    {
+                        PalName = PalViewModel.Make(DisplayedResult.Pal).Label,
+                        TraitsList = EffectiveTraits.Description,
+                        TimeEstimate = TimeEstimate.TimeSpanMinutesStr(),
+                    }
+                );
+
+                var descriptionParts = DisplayedResult
+                    .AllReferences()
+                    .Where(r => r is OwnedPalReference || r is CompositeOwnedPalReference)
+                    .SelectMany(r =>
+                    {
+                        switch (r)
+                        {
+                            case OwnedPalReference opr: return new List<PalLocation>() { opr.UnderlyingInstance.Location };
+
+                            case CompositeOwnedPalReference corl:
+                                return new List<PalLocation>()
+                                {
+                                                corl.Male.UnderlyingInstance.Location,
+                                                corl.Female.UnderlyingInstance.Location
+                                };
+
+                            default:
+                                throw new NotImplementedException(); // shouldn't happen
+                        }
+                    })
+                    .GroupBy(l => l.Type)
+                    .OrderBy(g => g.Key switch
+                    {
+                        LocationType.Palbox => 0,
+                        LocationType.Base => 1,
+                        LocationType.PlayerParty => 2,
+                        _ => throw new NotImplementedException()
+                    })
+                    .Select(g => LocalizationCodes.LC_PAL_LOC_COUNT.Bind(
+                        new
+                        {
+                            Count = g.Count(),
+                            LocType = g.Key.Label(),
+                        }
+                    ))
+                    .ToList();
+
+                var numWildPals = DisplayedResult.AllReferences().Count(r => r is WildPalReference);
+                if (numWildPals > 0)
+                    descriptionParts.Add(LocalizationCodes.LC_PAL_WILD_COUNT.Bind(numWildPals));
+
+                InputLocations = Translator.Join.Bind(descriptionParts);
+            }
         }
 
-        public BreedingGraph Graph { get; private set; }
+        public ILocalizedText Label { get; }
+        public ILocalizedText InputLocations { get; }
+
+        public BreedingGraph Graph { get; }
+
+        public IPalReference DisplayedResult { get; }
+
+        public TraitCollectionViewModel EffectiveTraits { get; }
 
         public TimeSpan TimeEstimate => DisplayedResult?.BreedingEffort ?? TimeSpan.Zero;
         public string TimeEstimateLabel => TimeEstimate.TimeSpanSecondsStr();
 
-        public ILocalizedText Label { get; private set; }
-
+        public bool HasValue => Graph != null;
+        public bool NeedsRefresh => Graph?.NeedsRefresh ?? false;
         public int NumWildPals => DisplayedResult.NumWildPalParticipants();
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
-
-        private ILocalizedText inputLocations;
-        public ILocalizedText InputLocations
-        {
-            get
-            {
-                if (inputLocations == null)
-                {
-                    var descriptionParts = DisplayedResult
-                        .AllReferences()
-                        .Where(r => r is OwnedPalReference || r is CompositeOwnedPalReference)
-                        .SelectMany(r =>
-                        {
-                            switch (r)
-                            {
-                                case OwnedPalReference opr: return new List<PalLocation>() { opr.UnderlyingInstance.Location };
-
-                                case CompositeOwnedPalReference corl:
-                                    return new List<PalLocation>()
-                                    {
-                                        corl.Male.UnderlyingInstance.Location,
-                                        corl.Female.UnderlyingInstance.Location
-                                    };
-
-                                default:
-                                    throw new NotImplementedException(); // shouldn't happen
-                            }
-                        })
-                        .GroupBy(l => l.Type)
-                        .OrderBy(g => g.Key switch
-                        {
-                            LocationType.Palbox => 0,
-                            LocationType.Base => 1,
-                            LocationType.PlayerParty => 2,
-                            _ => throw new NotImplementedException()
-                        })
-                        .Select(g => LocalizationCodes.LC_PAL_LOC_COUNT.Bind(
-                            new
-                            {
-                                Count = g.Count(),
-                                LocType = g.Key.Label(),
-                            }
-                        ))
-                        .ToList();
-
-                    var numWildPals = DisplayedResult.AllReferences().Count(r => r is WildPalReference);
-                    if (numWildPals > 0)
-                        descriptionParts.Add(LocalizationCodes.LC_PAL_WILD_COUNT.Bind(numWildPals));
-
-                    inputLocations = Translator.Join.Bind(descriptionParts);
-                }
-
-                return inputLocations;
-            }
-        }
-
-        public bool HasValue => Graph != null;
-
-        public bool NeedsRefresh => Graph?.NeedsRefresh ?? false;
-
-        private IPalReference displayedResult = null;
-        public IPalReference DisplayedResult
-        {
-            get => displayedResult;
-            private set
-            {
-                displayedResult = value;
-
-                if (displayedResult == null) Graph = null;
-                else Graph = BreedingGraph.FromPalReference(source, value);
-
-                Label = DisplayedResult == null
-                    ? LocalizationCodes.LC_COMMON_UNKNOWN.Bind()
-                    : LocalizationCodes.LC_RESULT_LABEL.Bind(
-                        new
-                        {
-                            PalName = PalViewModel.Make(DisplayedResult.Pal).Label,
-                            TraitsList = EffectiveTraits.Description,
-                            TimeEstimate = TimeEstimate.TimeSpanMinutesStr(),
-                        }
-                    );
-
-                OnPropertyChanged(nameof(DisplayedResult));
-                OnPropertyChanged(nameof(Label));
-                OnPropertyChanged(nameof(Graph));
-                OnPropertyChanged(nameof(HasValue));
-            }
-        }
-
-        public TraitCollectionViewModel EffectiveTraits => new TraitCollectionViewModel(DisplayedResult.EffectiveTraits.Select(TraitViewModel.Make));
     }
 }
