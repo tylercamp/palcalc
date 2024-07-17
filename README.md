@@ -28,6 +28,10 @@ Pal Calc is a Windows program for calculating the optimal steps to breed a speci
   - Low memory usage and fast load times
   - Relatively fast path-solving process, searches take under a minute
   - Distributes path-solving work across all available CPU cores
+- Save Inspector
+  - Lists all pal containers (palbox, viewing cages, etc.)
+  - Inspect pals to see IVs and traits
+  - Search for specific pals and/or pals with specific traits
 - Multiple languages
   - Supports all languages in Palworld, pal and trait names imported from game files
   - Translations for in-app text [can be added](./PalCalc.UI/Localization/README.md)
