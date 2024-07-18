@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace PalCalc.UI.View
 {
@@ -19,9 +20,22 @@ namespace PalCalc.UI.View
     /// </summary>
     public partial class TranslationDebugWindow : Window
     {
+        private void CheckOwner()
+        {
+            if (Owner == null)
+            {
+                var mainWindow = App.Current.MainWindow;
+                if (mainWindow.IsVisible)
+                    Owner = mainWindow;
+                else
+                    Dispatcher.BeginInvoke(CheckOwner);
+            }
+        }
+
         public TranslationDebugWindow()
         {
             InitializeComponent();
+            CheckOwner();
         }
     }
 }
