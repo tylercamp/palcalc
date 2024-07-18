@@ -81,7 +81,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             var orderedIndex = saveGames
                 .Where(vm => !vm.IsAddManualOption)
                 .Append(vm)
-                .OrderBy(vm => vm.Label)
+                .OrderBy(vm => vm.Label.Value)
                 .ToList()
                 .IndexOf(vm);
 

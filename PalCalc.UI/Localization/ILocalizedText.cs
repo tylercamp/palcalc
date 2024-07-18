@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.Localization
 {
-    public abstract partial class ILocalizedText : ObservableObject
+    public abstract partial class ILocalizedText : ObservableObject, IComparable<ILocalizedText>
     {
         [NotifyPropertyChangedFor(nameof(Value))]
         [ObservableProperty]
@@ -17,6 +17,8 @@ namespace PalCalc.UI.Localization
 
         public override bool Equals(object obj) => obj?.GetHashCode() == GetHashCode();
         public override int GetHashCode() => HashCode.Combine(this.GetType(), Value);
+
+        public int CompareTo(ILocalizedText other) => Value.CompareTo(other.Value);
 
         // helpful for XAML bindings where we forgot to call `.Value`, this (usually) creates a XAML binding
         // error that you can just double-click on to find the source
