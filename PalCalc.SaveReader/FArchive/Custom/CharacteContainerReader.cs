@@ -23,41 +23,37 @@ namespace PalCalc.SaveReader.FArchive.Custom
         public void Traverse(Action<IProperty> action) { }
     }
 
-    public class CharacterContainerReader : ICustomReader
+    public class CharacterContainerReader : ICustomByteArrayReader
     {
         private static ILogger logger = Log.ForContext<CharacterContainerReader>();
 
         public override string MatchedPath => ".worldSaveData.CharacterContainerSaveData.Value.Slots.Slots.RawData";
-        public override IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path, IEnumerable<IVisitor> visitors)
+
+        protected override IProperty Decode(FArchiveReader subReader, string path, IEnumerable<IVisitor> visitors)
         {
             logger.Verbose("decoding");
-            var arrayProp = (ArrayProperty)reader.ReadProperty(typeName, size, path, path, visitors);
 
             var pathVisitors = visitors.Where(v => v.Matches(path));
 
-            using (var byteStream = new MemoryStream(arrayProp.Value as byte[]))
-            using (var subReader = reader.Derived(byteStream))
+            var meta = new CharacterContainerDataPropertyMeta
             {
-                var meta = new CharacterContainerDataPropertyMeta
-                {
-                    Path = path,
-                    PlayerId = subReader.ReadGuid(),
-                    Id = subReader.ReadGuid(),
-                };
+                Path = path,
+                PlayerId = subReader.ReadGuid(),
+                Id = subReader.ReadGuid(),
+            };
 
-                foreach (var v in pathVisitors) v.VisitCharacterContainerPropertyBegin(path, meta);
+            foreach (var v in pathVisitors) v.VisitCharacterContainerPropertyBegin(path, meta);
 
-                var result = new CharacterContainerDataProperty
-                {
-                    TypedMeta = meta,
-                    PermissionTribeId = subReader.ReadByte()
-                };
+            var result = new CharacterContainerDataProperty
+            {
+                TypedMeta = meta,
+                PermissionTribeId = subReader.ReadByte()
+            };
 
-                foreach (var v in pathVisitors) v.VisitCharacterContainerPropertyEnd(path, meta);
+            foreach (var v in pathVisitors) v.VisitCharacterContainerPropertyEnd(path, meta);
 
-                logger.Verbose("done");
-                return result;
-            }
+            logger.Verbose("done");
+            return result;
         }
     }
 }

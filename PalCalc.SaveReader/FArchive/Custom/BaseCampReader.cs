@@ -27,44 +27,39 @@ namespace PalCalc.SaveReader.FArchive.Custom
         public void Traverse(Action<IProperty> action) {}
     }
 
-    public class BaseCampReader : ICustomReader
+    public class BaseCampReader : ICustomByteArrayReader
     {
         private static ILogger logger = Log.ForContext<BaseCampReader>();
 
         public override string MatchedPath => ".worldSaveData.BaseCampSaveData.Value.RawData";
 
-        public override IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path, IEnumerable<IVisitor> visitors)
+        protected override IProperty Decode(FArchiveReader subReader, string path, IEnumerable<IVisitor> visitors)
         {
             logger.Verbose("decoding");
-            var arrayProp = (ArrayProperty)reader.ReadProperty(typeName, size, path, path, visitors);
 
-            using (var byteStream = new MemoryStream(arrayProp.ByteValues))
-            using (var subReader = reader.Derived(byteStream))
+            var meta = new BaseCampDataPropertyMeta()
             {
-                var meta = new BaseCampDataPropertyMeta()
-                {
-                    Path = path,
-                    Id = subReader.ReadGuid(),
-                };
+                Path = path,
+                Id = subReader.ReadGuid(),
+            };
 
-                var result = new BaseCampDataProperty()
-                {
-                    Meta = meta,
-                    Name = subReader.ReadString(),
-                    State = subReader.ReadByte(),
-                    Transform = subReader.ReadFullTransform(),
-                    AreaRange = subReader.ReadFloat(),
-                    GroupIdBelongTo = subReader.ReadGuid(),
-                    FastTravelLocalTransform = subReader.ReadFullTransform(),
-                    OwnerMapObjectInstanceId = subReader.ReadGuid()
-                };
+            var result = new BaseCampDataProperty()
+            {
+                Meta = meta,
+                Name = subReader.ReadString(),
+                State = subReader.ReadByte(),
+                Transform = subReader.ReadFullTransform(),
+                AreaRange = subReader.ReadFloat(),
+                GroupIdBelongTo = subReader.ReadGuid(),
+                FastTravelLocalTransform = subReader.ReadFullTransform(),
+                OwnerMapObjectInstanceId = subReader.ReadGuid()
+            };
 
-                foreach (var v in visitors.Where(v => v.Matches(path)))
-                    v.VisitBaseCampProperty(path, result);
+            foreach (var v in visitors.Where(v => v.Matches(path)))
+                v.VisitBaseCampProperty(path, result);
 
-                logger.Verbose("done");
-                return result;
-            }
+            logger.Verbose("done");
+            return result;
         }
     }
 }

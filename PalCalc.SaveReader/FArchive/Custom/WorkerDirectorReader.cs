@@ -23,41 +23,36 @@ namespace PalCalc.SaveReader.FArchive.Custom
         public void Traverse(Action<IProperty> action) {}
     }
 
-    public class WorkerDirectorReader : ICustomReader
+    public class WorkerDirectorReader : ICustomByteArrayReader
     {
         private static ILogger logger = Log.ForContext<WorkerDirectorReader>();
 
         public override string MatchedPath => ".worldSaveData.BaseCampSaveData.Value.WorkerDirector.RawData";
 
-        public override IProperty Decode(FArchiveReader reader, string typeName, ulong size, string path, IEnumerable<IVisitor> visitors)
+        protected override IProperty Decode(FArchiveReader subReader, string path, IEnumerable<IVisitor> visitors)
         {
             logger.Verbose("decoding");
-            var arrayProp = (ArrayProperty)reader.ReadProperty(typeName, size, path, path, visitors);
 
-            using (var byteStream = new MemoryStream(arrayProp.ByteValues))
-            using (var subReader = reader.Derived(byteStream))
+            var meta = new WorkerDirectorDataPropertyMeta()
             {
-                var meta = new WorkerDirectorDataPropertyMeta()
-                {
-                    Path = path,
-                    Id = subReader.ReadGuid(),
-                };
+                Path = path,
+                Id = subReader.ReadGuid(),
+            };
 
-                var result = new WorkerDirectorDataProperty()
-                {
-                    Meta = meta,
-                    SpawnTransform = subReader.ReadFullTransform(),
-                    CurrentOrderType = subReader.ReadByte(),
-                    CurrentBattleType = subReader.ReadByte(),
-                    ContainerId = subReader.ReadGuid(),
-                };
+            var result = new WorkerDirectorDataProperty()
+            {
+                Meta = meta,
+                SpawnTransform = subReader.ReadFullTransform(),
+                CurrentOrderType = subReader.ReadByte(),
+                CurrentBattleType = subReader.ReadByte(),
+                ContainerId = subReader.ReadGuid(),
+            };
 
-                foreach (var v in visitors.Where(v => v.Matches(path)))
-                    v.VisitWorkerDirectorProperty(path, result);
+            foreach (var v in visitors.Where(v => v.Matches(path)))
+                v.VisitWorkerDirectorProperty(path, result);
 
-                logger.Verbose("done");
-                return result;
-            }
+            logger.Verbose("done");
+            return result;
         }
     }
 }
