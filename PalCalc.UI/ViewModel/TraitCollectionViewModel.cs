@@ -27,7 +27,7 @@ namespace PalCalc.UI.ViewModel
 
         public TraitCollectionViewModel(IEnumerable<TraitViewModel> traits)
         {
-            Traits = traits.ToList();
+            Traits = traits.OrderBy(t => t.ModelObject.InternalName).ToList();
 
             RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             for (int i = 1; i < NumRows; i++)
@@ -52,9 +52,9 @@ namespace PalCalc.UI.ViewModel
             }
             else
             {
-                var definite = traits.Where(t => t.ModelObject is not IUnknownTrait);
-                var random = traits.Where(t => t.ModelObject is RandomTrait);
-                var unrecognized = traits.Where(t => t.ModelObject is UnrecognizedTrait);
+                var definite = Traits.Where(t => t.ModelObject is not IUnknownTrait);
+                var random = Traits.Where(t => t.ModelObject is RandomTrait);
+                var unrecognized = Traits.Where(t => t.ModelObject is UnrecognizedTrait);
 
                 var parts = new List<ILocalizedText>(definite.Select(t => t.Name));
 
