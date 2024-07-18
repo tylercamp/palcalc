@@ -15,10 +15,11 @@ You will need Visual Studio to edit the files and run the program.
 
 ### 2. Open Pal Calc Project
 
-1. Download the Pal Calc code.
-2. Double-click on the "PalCalc.sln" file.
-3. Expand the "PalCalc.UI" entry. (Don't double-click on it, click the arrow next to it.)
-4. Expand the "Localization" entry.
+1. [Download the Pal Calc code.](https://github.com/tylercamp/palcalc/archive/refs/heads/main.zip)
+2. Extract the ZIP file.
+3. Double-click on the "PalCalc.sln" file.
+4. Expand the "PalCalc.UI" entry. (Don't double-click on it, click the arrow next to it.)
+5. Expand the "Localization" entry.
 
 All changes will be made in this "Localization" folder.
 
