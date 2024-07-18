@@ -85,6 +85,7 @@ namespace PalCalc.SaveReader.FArchive
         // deserialized as a whole
         public virtual void VisitCharacterGroupProperty(string path, GroupDataProperty property) { }
         public virtual void VisitBaseCampProperty(string path, BaseCampDataProperty property) { }
+        public virtual void VisitWorkerDirectorProperty(string path, WorkerDirectorDataProperty property) { }
     }
 
     // a visitor that implements `IsDone` if the requested path has been visited at least once and the most recent path does not
