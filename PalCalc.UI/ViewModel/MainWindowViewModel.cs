@@ -365,8 +365,17 @@ namespace PalCalc.UI.ViewModel
                     ));
                     resultsTable.FilterAll(g =>
                     {
-                        var fastest = g.Min(r => r.BreedingEffort);
-                        return g.Where(r => r.BreedingEffort <= fastest * 2);
+                        // (though if "the fastest option" is just a pal we already own with 0 effort, don't count that)
+                        var nonZero = g.Where(r => r.BreedingEffort > TimeSpan.Zero).ToList();
+                        if (nonZero.Count != 0)
+                        {
+                            var fastest = g.Where(r => r.BreedingEffort > TimeSpan.Zero).Min(r => r.BreedingEffort);
+                            return g.Where(r => r.BreedingEffort <= fastest * 2);
+                        }
+                        else
+                        {
+                            return g.Take(1);
+                        }
                     });
 
                     results = resultsTable.All.ToList();
