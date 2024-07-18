@@ -20,4 +20,11 @@ namespace PalCalc.SaveReader.FArchive
     {
         public double x, y, z;
     }
+
+    public struct FullTransform
+    {
+        public QuaternionLiteral Rotation;
+        public VectorLiteral Translation;
+        public VectorLiteral Scale3d;
+    }
 }

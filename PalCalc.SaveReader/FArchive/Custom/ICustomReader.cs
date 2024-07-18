@@ -18,6 +18,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
             new CharacterReader(),
             new CharacterContainerReader(),
             new GroupReader(),
+            new BaseCampReader(),
         };
     }
 }

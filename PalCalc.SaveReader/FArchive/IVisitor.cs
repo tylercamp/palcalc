@@ -81,9 +81,10 @@ namespace PalCalc.SaveReader.FArchive
         public virtual void VisitArrayEntryEnd(string path, int index, ArrayPropertyMeta meta) { }
         public virtual void VisitMapEntryEnd(string path, int index, MapPropertyMeta meta) { }
 
-        // no start/end, this is a custom-serialized type without any property name dictionaries, so it's
+        // no start/end, these are custom-serialized types without any property name dictionaries, so they're
         // deserialized as a whole
         public virtual void VisitCharacterGroupProperty(string path, GroupDataProperty property) { }
+        public virtual void VisitBaseCampProperty(string path, BaseCampDataProperty property) { }
     }
 
     // a visitor that implements `IsDone` if the requested path has been visited at least once and the most recent path does not

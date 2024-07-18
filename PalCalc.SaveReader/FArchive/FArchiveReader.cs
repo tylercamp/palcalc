@@ -169,38 +169,15 @@ namespace PalCalc.SaveReader.FArchive
             switch (structType)
             {
                 case "DateTime": return ReadUInt64();
+                case "Vector": return ReadVector();
+                case "Quat": return ReadQuaternion();
+                case "LinearColor": return ReadLinearColor();
                 case "Guid":
                     {
                         var r = ReadGuid();
                         foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitGuid(path, r);
                         return r;
                     }
-
-                case "Vector":
-                    return new VectorLiteral
-                    {
-                        x = ReadDouble(),
-                        y = ReadDouble(),
-                        z = ReadDouble(),
-                    };
-
-                case "Quat":
-                    return new QuaternionLiteral
-                    {
-                        x = ReadDouble(),
-                        y = ReadDouble(),
-                        z = ReadDouble(),
-                        w = ReadDouble(),
-                    };
-
-                case "LinearColor":
-                    return new LinearColorLiteral
-                    {
-                        r = ReadFloat(),
-                        g = ReadFloat(),
-                        b = ReadFloat(),
-                        a = ReadFloat(),
-                    };
 
                 default:
                     var customReader = ICustomReader.All.SingleOrDefault(r => r.MatchedPath == path);
@@ -615,6 +592,20 @@ namespace PalCalc.SaveReader.FArchive
             for (int i = 0; i < count; i++)
                 result[i] = reader(this);
             return result;
+        }
+
+        public VectorLiteral ReadVector() => new VectorLiteral { x = ReadDouble(), y = ReadDouble(), z = ReadDouble() };
+        public QuaternionLiteral ReadQuaternion() => new QuaternionLiteral() { x = ReadDouble(), y = ReadDouble(), z = ReadDouble(), w = ReadDouble() };
+        public LinearColorLiteral ReadLinearColor() => new LinearColorLiteral() { r = ReadFloat(), g = ReadFloat(), b = ReadFloat(), a = ReadFloat() };
+
+        public FullTransform ReadFullTransform()
+        {
+            return new FullTransform()
+            {
+                Rotation = ReadQuaternion(),
+                Translation = ReadVector(),
+                Scale3d = ReadVector(),
+            };
         }
 
         public void Dispose()
