@@ -119,9 +119,9 @@ namespace PalCalc.UI.Model
             return result;
         }
 
-        public string ToJson(PalDB db) => JsonConvert.SerializeObject(this, new PalInstanceJsonConverter(db));
+        private static JsonConverter<IPalContainer> palContainerConverter = new PalContainerJsonConverter();
+        public string ToJson(PalDB db) => JsonConvert.SerializeObject(this, new PalInstanceJsonConverter(db), palContainerConverter);
 
-        public static CachedSaveGame FromJson(string json, PalDB db) => JsonConvert.DeserializeObject<CachedSaveGame>(json, new PalInstanceJsonConverter(db));
-
+        public static CachedSaveGame FromJson(string json, PalDB db) => JsonConvert.DeserializeObject<CachedSaveGame>(json, new PalInstanceJsonConverter(db), palContainerConverter);
     }
 }

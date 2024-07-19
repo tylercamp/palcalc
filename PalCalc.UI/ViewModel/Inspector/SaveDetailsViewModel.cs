@@ -64,7 +64,7 @@ namespace PalCalc.UI.ViewModel.Inspector
 
             var ownersById = (ownerPlayers.Concat(ownerGuilds)).ToDictionary(o => o.Id);
 
-            Containers = rawData.Containers.Select(c =>
+            Containers = rawData.ContainerContents.Select(c =>
             {
                 var containedPals = c.Slots
                     .Select(s => csg.OwnedPals.SingleOrDefault(p => p.InstanceId == s.InstanceId.ToString()))

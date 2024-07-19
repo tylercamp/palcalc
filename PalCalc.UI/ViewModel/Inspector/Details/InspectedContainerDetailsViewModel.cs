@@ -14,7 +14,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
         OwnerViewModel owner,
         List<PalInstance> containedPals,
         List<GvasCharacterInstance> containedRawPals,
-        PalContainer rawContainer,
+        RawPalContainerContents rawContainer,
         LocationType? locationType
     ) : ObservableObject
     {

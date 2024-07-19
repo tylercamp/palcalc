@@ -13,7 +13,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
         public Guid? Id { get; set; }
     }
 
-    public class GroupDataProperty : IProperty
+    public class GroupDataProperty : ICustomProperty
     {
         public IPropertyMeta Meta => TypedMeta;
         public GroupDataPropertyMeta TypedMeta { get; set; }

@@ -1,5 +1,6 @@
 ﻿using PalCalc.SaveReader.FArchive.Custom;
 using Serilog;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -54,6 +55,10 @@ namespace PalCalc.SaveReader.FArchive
         public virtual void VisitString(string path, string value) { }
         public virtual void VisitBool(string path, bool value) { }
         public virtual void VisitGuid(string path, Guid guid) { }
+        public virtual void VisitDateTime(string path, ulong value) { }
+        public virtual void VisitVector(string path, VectorLiteral value) { }
+        public virtual void VisitQuaternion(string path, QuaternionLiteral value) { }
+        public virtual void VisitLinearColor(string path, LinearColorLiteral value) { }
 
         public virtual void VisitLiteralProperty(string path, LiteralProperty prop) { }
 
@@ -61,8 +66,6 @@ namespace PalCalc.SaveReader.FArchive
         public virtual IEnumerable<IVisitor> VisitStructPropertyBegin(string path, StructPropertyMeta meta) => Enumerable.Empty<IVisitor>();
         public virtual IEnumerable<IVisitor> VisitArrayPropertyBegin(string path, ArrayPropertyMeta meta) => Enumerable.Empty<IVisitor>();
         public virtual IEnumerable<IVisitor> VisitMapPropertyBegin(string path, MapPropertyMeta meta) => Enumerable.Empty<IVisitor>();
-
-        public virtual IEnumerable<IVisitor> VisitCharacterContainerPropertyBegin(string path, CharacterContainerDataPropertyMeta meta) => Enumerable.Empty<IVisitor>();
 
         // meta is at the end
         public virtual IEnumerable<IVisitor> VisitCharacterPropertyBegin(string path) => Enumerable.Empty<IVisitor>();
@@ -75,7 +78,6 @@ namespace PalCalc.SaveReader.FArchive
         public virtual void VisitArrayPropertyEnd(string path, ArrayPropertyMeta meta) { }
         public virtual void VisitMapPropertyEnd(string path, MapPropertyMeta meta) { }
 
-        public virtual void VisitCharacterContainerPropertyEnd(string path, CharacterContainerDataPropertyMeta meta) { }
         public virtual void VisitCharacterPropertyEnd(string path, CharacterDataPropertyMeta meta) { }
 
         public virtual void VisitArrayEntryEnd(string path, int index, ArrayPropertyMeta meta) { }
@@ -87,6 +89,7 @@ namespace PalCalc.SaveReader.FArchive
         public virtual void VisitBaseCampProperty(string path, BaseCampDataProperty property) { }
         public virtual void VisitWorkerDirectorProperty(string path, WorkerDirectorDataProperty property) { }
         public virtual void VisitMapModelProperty(string path, MapModelDataProperty property) { }
+        public virtual void VisitCharacterContainerProperty(string path, CharacterContainerDataProperty property) { }
     }
 
     // a visitor that implements `IsDone` if the requested path has been visited at least once and the most recent path does not
@@ -144,6 +147,11 @@ namespace PalCalc.SaveReader.FArchive
         }
 
         public event Action<Dictionary<string, object>> OnExit;
+        public ValueCollectingVisitor WithOnExit(Action<Dictionary<string, object>> cb)
+        {
+            OnExit += cb;
+            return this;
+        }
 
         public override bool Matches(string path) => path.StartsWith(MatchedBasePath);
 
@@ -172,6 +180,10 @@ namespace PalCalc.SaveReader.FArchive
         public override void VisitGuid(string path, Guid guid) => VisitValue(path, guid);
         public override void VisitInt64(string path, long value) => VisitValue(path, value);
         public override void VisitString(string path, string value) => VisitValue(path, value);
+        public override void VisitDateTime(string path, ulong value) => VisitValue(path, value);
+        public override void VisitVector(string path, VectorLiteral value) => VisitValue(path, value);
+        public override void VisitQuaternion(string path, QuaternionLiteral value) => VisitValue(path, value);
+        public override void VisitLinearColor(string path, LinearColorLiteral value) => VisitValue(path, value);
 
         public override void Exit()
         {
@@ -199,7 +211,18 @@ namespace PalCalc.SaveReader.FArchive
         }
 
         public event Action<string, object> OnValue;
+        public ValueEmittingVisitor WithOnValue(Action<string, object> cb)
+        {
+            OnValue += cb;
+            return this;
+        }
+
         public event Action OnExit;
+        public ValueEmittingVisitor WithOnExit(Action cb)
+        {
+            OnExit += cb;
+            return this;
+        }
 
         public override bool Matches(string path) => path.StartsWith(MatchedBasePath);
 
@@ -227,5 +250,49 @@ namespace PalCalc.SaveReader.FArchive
             OnExit = null;
             OnValue = null;
         }
+    }
+
+    public class PropertyEmittingVisitor<T> : IVisitor where T : class, ICustomProperty
+    {
+        string[] propertiesToEmit;
+
+        public PropertyEmittingVisitor(IVisitor parent, params string[] propertySubPaths) : this(parent.MatchedPath, propertySubPaths)
+        {
+        }
+
+        public PropertyEmittingVisitor(string basePath, params string[] propertySubPaths) : base(basePath)
+        {
+            propertiesToEmit = propertySubPaths;
+        }
+
+        public event Action<string, T> OnValue;
+        public PropertyEmittingVisitor<T> WithOnValue(Action<string, T> cb)
+        {
+            OnValue += cb;
+            return this;
+        }
+
+        public event Action OnExit;
+        public PropertyEmittingVisitor<T> WithOnExit(Action cb)
+        {
+            OnExit += cb;
+            return this;
+        }
+
+        public override bool Matches(string path) => path.StartsWith(MatchedBasePath);
+
+        private void VisitValue<V>(string path, V value) where V : class, ICustomProperty
+        {
+            var propPart = path.Substring(MatchedBasePath.Length);
+            if (propertiesToEmit.Length > 0 && !propertiesToEmit.Contains(propPart)) return;
+            if (value is not T) return;
+
+            OnValue?.Invoke(path, value as T);
+        }
+
+        public override void VisitBaseCampProperty(string path, BaseCampDataProperty property) => VisitValue(path, property);
+        public override void VisitCharacterGroupProperty(string path, GroupDataProperty property) => VisitValue(path, property);
+        public override void VisitWorkerDirectorProperty(string path, WorkerDirectorDataProperty property) => VisitValue(path, property);
+        public override void VisitMapModelProperty(string path, MapModelDataProperty property) => VisitValue(path, property);
     }
 }

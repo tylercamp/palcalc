@@ -13,7 +13,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
         public Guid PlayerId { get; set; }
     }
 
-    public class CharacterContainerDataProperty : IProperty
+    public class CharacterContainerDataProperty : ICustomProperty
     {
         public IPropertyMeta Meta => TypedMeta;
         public CharacterContainerDataPropertyMeta TypedMeta { get; set; }
@@ -42,15 +42,13 @@ namespace PalCalc.SaveReader.FArchive.Custom
                 Id = subReader.ReadGuid(),
             };
 
-            foreach (var v in pathVisitors) v.VisitCharacterContainerPropertyBegin(path, meta);
-
             var result = new CharacterContainerDataProperty
             {
                 TypedMeta = meta,
                 PermissionTribeId = subReader.ReadByte()
             };
 
-            foreach (var v in pathVisitors) v.VisitCharacterContainerPropertyEnd(path, meta);
+            foreach (var v in pathVisitors) v.VisitCharacterContainerProperty(path, result);
 
             logger.Verbose("done");
             return result;

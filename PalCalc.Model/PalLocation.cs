@@ -13,7 +13,8 @@ namespace PalCalc.Model
     {
         PlayerParty,
         Palbox,
-        Base
+        Base,
+        ViewingCage,
     }
 
     public class PalLocation
@@ -90,4 +91,6 @@ namespace PalCalc.Model
             return new BaseCoord() { Row = row + 1, Column = slotIndex + 1 };
         }
     }
+
+    // TODO viewing cage coord
 }

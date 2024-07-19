@@ -62,7 +62,7 @@ namespace PalCalc.SaveReader.FArchive
         public Guid ReadGuid()
         {
             var b = ReadBytes(16);
-            return new Guid([
+            var res = new Guid([
                 b[0],
                 b[1],
                 b[2],
@@ -84,6 +84,12 @@ namespace PalCalc.SaveReader.FArchive
                 b[13],
                 b[12],
             ]);
+
+            Guid g = Guid.Parse("b996f95c-433a-0920-a9b9-9096e678803b");
+            if (res == g)
+                Debugger.Break();
+
+            return res;
         }
 
         public Guid? ReadOptionalGuid()
@@ -168,10 +174,34 @@ namespace PalCalc.SaveReader.FArchive
         {
             switch (structType)
             {
-                case "DateTime": return ReadUInt64();
-                case "Vector": return ReadVector();
-                case "Quat": return ReadQuaternion();
-                case "LinearColor": return ReadLinearColor();
+                case "DateTime":
+                    {
+                        var r = ReadUInt64();
+                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitDateTime(path, r);
+                        return r;
+                    }
+
+                case "Vector":
+                    {
+                        var r = ReadVector();
+                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitVector(path, r);
+                        return r;
+                    }
+
+                case "Quat":
+                    {
+                        var r = ReadQuaternion();
+                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitQuaternion(path, r);
+                        return r;
+                    }
+
+                case "LinearColor":
+                    {
+                        var r = ReadLinearColor();
+                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitLinearColor(path, r);
+                        return r;
+                    }
+
                 case "Guid":
                     {
                         var r = ReadGuid();

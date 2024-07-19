@@ -9,6 +9,30 @@ using static PalCalc.Model.BreedingResult;
 
 namespace PalCalc.Model
 {
+    public class PalContainerJsonConverter : JsonConverter<IPalContainer>
+    {
+        public override IPalContainer ReadJson(JsonReader reader, Type objectType, IPalContainer existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var token = JToken.ReadFrom(reader);
+            switch (token["Type"].ToObject<LocationType>())
+            {
+                case LocationType.Palbox: return token.ToObject<PalboxPalContainer>();
+                case LocationType.Base: return token.ToObject<BasePalContainer>();
+                case LocationType.PlayerParty: return token.ToObject<PlayerPartyContainer>();
+                case LocationType.ViewingCage: return token.ToObject<ViewingCageContainer>();
+                default: throw new NotImplementedException();
+            }
+        }
+
+        public override void WriteJson(JsonWriter writer, IPalContainer value, JsonSerializer serializer)
+        {
+            var baseResult = JToken.FromObject(value);
+            baseResult["Type"] = JToken.FromObject(value.Type);
+
+            baseResult.WriteTo(writer);
+        }
+    }
+
     public class PalInstanceJsonConverter : JsonConverter<PalInstance>
     {
         private PalDB db;

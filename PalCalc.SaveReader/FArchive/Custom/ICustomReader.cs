@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.FArchive.Custom
 {
+    // for custom-serialized properties which don't trigger the usual Begin/End events
+    public interface ICustomProperty : IProperty { }
+
     // ".worldSaveData.BaseCampSaveData"
     // ".worldSaveData.MapObjectSaveData"
     public abstract class ICustomReader

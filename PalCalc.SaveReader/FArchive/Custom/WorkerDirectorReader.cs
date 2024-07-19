@@ -11,7 +11,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
     {
     }
 
-    public class WorkerDirectorDataProperty : IProperty
+    public class WorkerDirectorDataProperty : ICustomProperty
     {
         public IPropertyMeta Meta { get; set; }
 

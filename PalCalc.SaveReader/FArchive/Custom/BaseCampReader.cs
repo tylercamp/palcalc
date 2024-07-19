@@ -12,7 +12,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
     {
     }
 
-    public class BaseCampDataProperty : IProperty
+    public class BaseCampDataProperty : ICustomProperty
     {
         public IPropertyMeta Meta { get; set; }
 

@@ -12,7 +12,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
     {
     }
 
-    public class MapModelDataProperty : IProperty
+    public class MapModelDataProperty : ICustomProperty
     {
         public IPropertyMeta Meta { get; set; }
 

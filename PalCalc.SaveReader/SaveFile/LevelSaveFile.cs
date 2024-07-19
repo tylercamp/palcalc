@@ -14,13 +14,16 @@ namespace PalCalc.SaveReader.SaveFile
         public List<PalInstance> Pals { get; set; }
         public List<PlayerInstance> Players { get; set; }
         public List<GuildInstance> Guilds { get; set; }
+        public List<IPalContainer> PalContainers { get; set; }
     }
 
     public class RawLevelSaveData
     {
         public List<GvasCharacterInstance> Characters { get; set; }
-        public List<PalContainer> Containers { get; set; }
+        public List<RawPalContainerContents> ContainerContents { get; set; }
         public List<GuildInstance> Groups { get; set; }
+        public List<GvasBaseInstance> Bases { get; set; }
+        public List<GvasMapObject> MapObjects { get; set; }
     }
 
     public class LevelSaveFile : ISaveFile
@@ -29,24 +32,66 @@ namespace PalCalc.SaveReader.SaveFile
 
         public LevelSaveFile(string filePath) : base(filePath) { }
 
-        private Guid MostCommonOwner(PalContainer container, Dictionary<Guid, Guid> palOwnersByInstanceId) => container.Slots.GroupBy(s => palOwnersByInstanceId.GetValueOrElse(s.InstanceId, Guid.Empty)).MaxBy(g => g.Count()).Key;
+        private Guid MostCommonOwner(RawPalContainerContents container, Dictionary<Guid, Guid> palOwnersByInstanceId) => container.Slots.GroupBy(s => palOwnersByInstanceId.GetValueOrElse(s.InstanceId, Guid.Empty)).MaxBy(g => g.Count()).Key;
 
         public RawLevelSaveData ReadRawCharacterData()
         {
             var containerVisitor = new PalContainerVisitor();
             var instanceVisitor = new CharacterInstanceVisitor();
             var groupVisitor = new GroupVisitor();
-            VisitGvas(containerVisitor, instanceVisitor, groupVisitor);
+            var baseVisitor = new BaseVisitor();
+            var mapObjectVisitor = new MapObjectVisitor(
+                "PalBoxV2", // palbox
+                "DisplayCharacter" // viewing cage
+            );
+            VisitGvas(containerVisitor, instanceVisitor, groupVisitor, baseVisitor, mapObjectVisitor);
 
             return new RawLevelSaveData()
             {
                 Characters = instanceVisitor.Result,
-                Containers = containerVisitor.CollectedContainers,
-                Groups = groupVisitor.Result
+                ContainerContents = containerVisitor.CollectedContainers,
+                Groups = groupVisitor.Result,
+                Bases = baseVisitor.Result,
+                MapObjects = mapObjectVisitor.Result,
             };
         }
 
-        private LevelSaveData BuildResult(PalDB db, List<GvasCharacterInstance> characters, List<GuildInstance> guilds, List<PalContainer> containers, Dictionary<string, LocationType> containerTypeById)
+        private IPalContainer TryGuessContainer(RawPalContainerContents container, Dictionary<string, string> palBoxesByPlayerId, Dictionary<Guid, Guid> instanceOwners)
+        {
+            var mostCommonOwner = MostCommonOwner(container, instanceOwners).ToString();
+            if (container.MaxEntries == GameConstants.PlayerPartySize)
+            {
+                return new PlayerPartyContainer()
+                {
+                    Id = container.Id,
+                    PlayerId = mostCommonOwner,
+                };
+            }
+            else if (palBoxesByPlayerId.ContainsKey(mostCommonOwner) && palBoxesByPlayerId[mostCommonOwner] == container.Id)
+            {
+                return new PalboxPalContainer()
+                {
+                    Id = container.Id,
+                    PlayerId = palBoxesByPlayerId[mostCommonOwner]
+                };
+            }
+            else
+            {
+                return new BasePalContainer()
+                {
+                    Id = container.Id,
+                    BaseId = null
+                };
+            }
+        }
+
+        private LevelSaveData BuildResult(
+            PalDB db,
+            List<GvasCharacterInstance> characters,
+            List<GuildInstance> guilds,
+            List<RawPalContainerContents> containerContents,
+            List<IPalContainer> detectedContainers
+        )
         {
             var result = new LevelSaveData()
             {
@@ -54,6 +99,8 @@ namespace PalCalc.SaveReader.SaveFile
                 Players = new List<PlayerInstance>(),
                 Guilds = guilds,
             };
+
+            var containerTypeById = detectedContainers.ToDictionary(c => c.Id, c => c.Type);
 
             foreach (var gvasInstance in characters)
             {
@@ -91,7 +138,7 @@ namespace PalCalc.SaveReader.SaveFile
                         continue;
                     }
 
-                    var container = containers.Single(c => c.Id == gvasInstance.ContainerId.ToString());
+                    var container = containerContents.Single(c => c.Id == gvasInstance.ContainerId.ToString());
                     if (!container.Slots.Any(s => s.InstanceId == gvasInstance.InstanceId))
                     {
                         logger.Debug("pal instance data '{palId}' references container '{containerId}' but the container has no record of this pal, skipping", gvasInstance.InstanceId, container.Id);
@@ -148,19 +195,50 @@ namespace PalCalc.SaveReader.SaveFile
 
             logger.Debug("parsing content with players list");
 
+            var players = playersFiles.Select(pf => pf.ReadPlayerContent()).ToList();
             var parsed = ReadRawCharacterData();
 
-            var players = playersFiles.Select(pf => pf.ReadPlayerContent()).ToList();
+            var palBoxesByPlayerId = players.ToDictionary(p => p.PlayerId, p => p.PalboxContainerId);
+            var instanceOwners = parsed.Characters.Where(c => c.OwnerPlayerId != null).ToDictionary(c => c.InstanceId, c => c.OwnerPlayerId.Value);
 
-            var containerTypeById = parsed.Containers.ToDictionary(c => c.Id, c =>
+            var detectedContainers = parsed.ContainerContents.Select(contents =>
             {
-                if (players.Any(p => p.PartyContainerId == c.Id)) return LocationType.PlayerParty;
-                if (players.Any(p => p.PalboxContainerId == c.Id)) return LocationType.Palbox;
+                if (players.Any(p => p.PartyContainerId == contents.Id))
+                {
+                    var player = players.Single(p => p.PartyContainerId == contents.Id);
+                    return new PlayerPartyContainer()
+                    {
+                        Id = contents.Id,
+                        PlayerId = player.PlayerId
+                    };
+                }
+                else if (players.Any(p => p.PalboxContainerId == contents.Id))
+                {
+                    var player = players.Single(p => p.PalboxContainerId == contents.Id);
+                    return new PalboxPalContainer()
+                    {
+                        Id = contents.Id,
+                        PlayerId = player.PlayerId
+                    };
+                }
+                else if (parsed.Bases.Any(b => b.ContainerId.ToString() == contents.Id))
+                {
+                    var b = parsed.Bases.Single(b => b.ContainerId.ToString() == contents.Id);
+                    return new BasePalContainer()
+                    {
+                        Id = contents.Id,
+                        BaseId = b.Id
+                    };
+                }
+                else
+                {
+                    // TODO viewing cages
 
-                return LocationType.Base;
-            });
+                    return TryGuessContainer(contents, palBoxesByPlayerId, instanceOwners);
+                }
+            }).ToList();
 
-            var result = BuildResult(db, parsed.Characters, parsed.Groups, parsed.Containers, containerTypeById);
+            var result = BuildResult(db, parsed.Characters, parsed.Groups, parsed.ContainerContents, detectedContainers);
             logger.Debug("done");
             return result;
         }
@@ -177,22 +255,14 @@ namespace PalCalc.SaveReader.SaveFile
             logger.Debug("processing data");
 
             var ownersByInstanceId = parsed.Characters.Where(c => c.OwnerPlayerId != null).ToDictionary(c => c.InstanceId, c => c.OwnerPlayerId.Value);
+            var palBoxesByPlayerId = parsed.ContainerContents
+                .Where(c => c.Slots.Count > GameConstants.PlayerPartySize)
+                .GroupBy(c => MostCommonOwner(c, ownersByInstanceId))
+                .ToDictionary(g => g.Key.ToString(), g => g.MaxBy(c => c.MaxEntries).Id);
 
-            var containersById = parsed.Containers.ToDictionary(c => c.Id);
-            var containerOwners = parsed.Containers.ToDictionary(c => c.Id, c => MostCommonOwner(c, ownersByInstanceId));
-            var palBoxesByPlayerId = parsed.Containers.Where(c => c.Slots.Count > GameConstants.PlayerPartySize).GroupBy(c => MostCommonOwner(c, ownersByInstanceId)).ToDictionary(g => g.Key, g => g.MaxBy(c => c.MaxEntries));
 
-            var containerTypeById = parsed.Containers.ToDictionary(c => c.Id, c =>
-            {
-                if (c.MaxEntries == GameConstants.PlayerPartySize) return LocationType.PlayerParty;
-
-                var palBoxForPlayer = palBoxesByPlayerId[containerOwners[c.Id]];
-                if (c.Id == palBoxForPlayer.Id) return LocationType.Palbox;
-
-                return LocationType.Base;
-            });
-
-            var result = BuildResult(db, parsed.Characters, parsed.Groups, parsed.Containers, containerTypeById);
+            var detectedContainers = parsed.ContainerContents.Select(container => TryGuessContainer(container, palBoxesByPlayerId, ownersByInstanceId)).ToList();
+            var result = BuildResult(db, parsed.Characters, parsed.Groups, parsed.ContainerContents, detectedContainers);
 
             logger.Debug("done");
             return result;
