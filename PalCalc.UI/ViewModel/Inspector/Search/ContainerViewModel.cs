@@ -14,7 +14,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public string Id => id;
         public LocationType DetectedType => detectedType;
         public List<string> OwnerIds { get; } = contents.Select(p => p.OwnerPlayerId).Distinct().ToList();
-        public List<PalInstance> Contents => contents;
+        public List<PalInstance> RawContents => contents;
 
         public List<PalInstance> SlotContents { get; } =
             Enumerable.Range(0, contents.Max(p => p.Location.Index))
@@ -54,11 +54,11 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 {
                     if (!HasPages)
                     {
-                        grids = [new ContainerGridViewModel(Contents) { PerRow = PerRow }];
+                        grids = [new ContainerGridViewModel(SlotContents) { PerRow = PerRow }];
                     }
                     else
                     {
-                        grids = Contents
+                        grids = SlotContents
                             .Batched(PerRow * RowsPerPage).ToList()
                             .ZipWithIndex()
                             .Select(pair => new ContainerGridViewModel(pair.Item1.ToList()) {
