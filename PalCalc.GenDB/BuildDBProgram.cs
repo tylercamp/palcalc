@@ -176,7 +176,7 @@ namespace PalCalc.GenDB
                     .First();
             }
 
-            var db = PalDB.MakeEmptyUnsafe("v12");
+            var db = PalDB.MakeEmptyUnsafe("v13");
             db.Breeding = pals
                 .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
                 .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))

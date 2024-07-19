@@ -404,6 +404,9 @@
     <EmbeddedResource Update="Localization\Localizations\it.resx">
       <Generator></Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\ja.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Localization\Localizations\ko.resx">
       <Generator></Generator>
     </EmbeddedResource>
