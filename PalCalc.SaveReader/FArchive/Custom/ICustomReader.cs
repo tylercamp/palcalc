@@ -22,6 +22,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
             new GroupReader(),
             new BaseCampReader(),
             new WorkerDirectorReader(),
+            new MapModelReader(),
         };
     }
 
