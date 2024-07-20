@@ -53,7 +53,7 @@
 
     <StackPanel Margin="10,0" VerticalAlignment="Center">
         <StackPanel Orientation="Horizontal">
-            <TextBlock Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS}" Padding="0,4" Width="150" Margin="0,0,0,3" />
+            <TextBlock Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS}" Padding="0,4" Width="160" Margin="0,0,0,3" />
             <v:IntegerTextBox
                 Value="{Binding MaxInputIrrelevantPassives}"
                 IsEnabled="{Binding CanEditSettings}"
@@ -64,7 +64,7 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
-            <TextBlock Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS}" Padding="0,4" Width="150" />
+            <TextBlock Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS}" Padding="0,4" Width="160" />
             <v:IntegerTextBox
                 Value="{Binding MaxBredIrrelevantPassives}"
                 IsEnabled="{Binding CanEditSettings}"
