@@ -549,6 +549,12 @@ Higher values linearly affect time required, depending on how many types of pals
   <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve">
     <value>Finished (took {Duration})</value>
   </data>
+  <data name="LC_SOLVER_STEP_STATUS_BREEDING" xml:space="preserve">
+    <value>Processed {NumProcessed} / {WorkSize} breeding pairs</value>
+  </data>
+  <data name="LC_SOLVER_STEP_STATUS_DONE" xml:space="preserve">
+    <value>Processed a total of {TotalSize} breeding pairs</value>
+  </data>
   <data name="LC_SOURCE_PALS" xml:space="preserve">
     <value>Source Pals</value>
   </data>

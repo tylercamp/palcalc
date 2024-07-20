@@ -603,6 +603,14 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_SOLVER_STATUS_FINISHED,
         /// <summary>
+        ///   Looks up a localized string similar to NumProcessed | WorkSize.
+        /// </summary>
+        LC_SOLVER_STEP_STATUS_BREEDING,
+        /// <summary>
+        ///   Looks up a localized string similar to TotalSize.
+        /// </summary>
+        LC_SOLVER_STEP_STATUS_DONE,
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOURCE_PALS,

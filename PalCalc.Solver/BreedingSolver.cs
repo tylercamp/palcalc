@@ -25,7 +25,16 @@ namespace PalCalc.Solver
         public int CurrentStepIndex { get; set; }
         public int TargetSteps { get; set; }
         public bool Canceled { get; set; }
-        public int WorkSize { get; set; }
+
+        public int CurrentWorkSize { get; set; }
+
+        public int WorkProcessedCount { get; set; }
+        public int TotalWorkProcessedCount { get; set; }
+    }
+
+    class WorkBatchProgress
+    {
+        public int NumProcessed;
     }
 
     public class BreedingSolver
@@ -479,21 +488,41 @@ namespace PalCalc.Solver
             {
                 if (token.IsCancellationRequested) break;
 
+                List<WorkBatchProgress> progressEntries = [];
+
                 bool didUpdate = workingSet.Process(work =>
                 {
+                    logger.Debug("Performing breeding step {step} with {numWork} work items", s+1, work.Count);
+
                     statusMsg.CurrentPhase = SolverPhase.Breeding;
                     statusMsg.CurrentStepIndex = s;
                     statusMsg.Canceled = token.IsCancellationRequested;
-                    statusMsg.WorkSize = work.Count;
+                    statusMsg.CurrentWorkSize = work.Count;
+                    statusMsg.WorkProcessedCount = 0;
                     SolverStateUpdated?.Invoke(statusMsg);
 
-                    logger.Debug("Performing breeding step {step} with {numWork} work items", s+1, work.Count);
-                    return work
+                    void EmitProgressMsg(object _)
+                    {
+                        var progress = progressEntries.Sum(e => e.NumProcessed);
+                        statusMsg.WorkProcessedCount = progress;
+                        SolverStateUpdated?.Invoke(statusMsg);
+                    }
+
+                    const int updateInterval = 100;
+                    var progressTimer = new Timer(EmitProgressMsg, null, updateInterval, updateInterval);
+
+                    var resEnum = work
                         .Batched(work.Count / maxThreads + 1)
                         .AsParallel()
                         .WithDegreeOfParallelism(maxThreads)
                         .SelectMany(workBatch =>
-                            workBatch
+                        {
+                            var progress = new WorkBatchProgress();
+                            lock (progressEntries)
+                                progressEntries.Add(progress);
+
+                            return workBatch
+                                .Tap(_ => progress.NumProcessed++)
                                 .TakeWhile(_ => !token.IsCancellationRequested)
                                 .Where(p => p.Item1.IsCompatibleGender(p.Item2.Gender))
                                 .Where(p => p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() <= maxWildPals)
@@ -634,11 +663,19 @@ namespace PalCalc.Solver
                                     return possibleResults;
                                 })
                                 .Where(res => res.BreedingEffort <= maxEffort)
-                                .ToList()
-                        );
+                                .ToList();
+                        });
+
+                    var res = resEnum.ToList();
+                    progressTimer.Dispose();
+
+                    return res;
                 });
 
                 if (token.IsCancellationRequested) break;
+
+                statusMsg.WorkProcessedCount = progressEntries.Sum(e => e.NumProcessed);
+                statusMsg.TotalWorkProcessedCount += statusMsg.WorkProcessedCount;
 
                 if (!didUpdate)
                 {

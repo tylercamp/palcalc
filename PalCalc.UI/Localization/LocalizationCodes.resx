@@ -520,6 +520,12 @@
   <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve">
     <value>Duration</value>
   </data>
+  <data name="LC_SOLVER_STEP_STATUS_BREEDING" xml:space="preserve">
+    <value>NumProcessed | WorkSize</value>
+  </data>
+  <data name="LC_SOLVER_STEP_STATUS_DONE" xml:space="preserve">
+    <value>TotalSize</value>
+  </data>
   <data name="LC_SOURCE_PALS" xml:space="preserve">
     <value />
   </data>

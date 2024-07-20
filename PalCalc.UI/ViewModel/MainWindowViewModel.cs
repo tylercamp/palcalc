@@ -347,7 +347,7 @@ namespace PalCalc.UI.ViewModel
             var solver = SolverControls.ConfiguredSolver(GameSettings.ModelObject, inputPals.ToList());
             solver.SolverStateUpdated += Solver_SolverStateUpdated;
 
-            Task.Factory.StartNew(() =>
+            var solverThread = new Thread(() =>
             {
                 try
                 {
@@ -423,6 +423,9 @@ namespace PalCalc.UI.ViewModel
                     });
                 }
             });
+
+            solverThread.Priority = ThreadPriority.BelowNormal;
+            solverThread.Start();
         }
 
         public void CancelSolver()
@@ -436,6 +439,8 @@ namespace PalCalc.UI.ViewModel
         private Stopwatch solverStopwatch = null;
         private void Solver_SolverStateUpdated(SolverStatus obj)
         {
+            string FormatNum(int num) => num.ToString("#,##");
+
             dispatcher.BeginInvoke(() =>
             {
                 var numTotalSteps = (double)(1 + obj.TargetSteps);
@@ -446,6 +451,9 @@ namespace PalCalc.UI.ViewModel
                         solverStopwatch = Stopwatch.StartNew();
                         SolverStatusMsg = LocalizationCodes.LV_SOLVER_STATUS_INITIALIZING.Bind();
                         overallStep = 0;
+
+                        StepProgress = 0;
+                        StepStatusMsg = null;
                         break;
 
                     case SolverPhase.Breeding:
@@ -453,10 +461,15 @@ namespace PalCalc.UI.ViewModel
                             new
                             {
                                 StepNum = obj.CurrentStepIndex + 1,
-                                WorkSize = obj.WorkSize.ToString("#,##"),
+                                WorkSize = FormatNum(obj.CurrentWorkSize),
                             }
                         );
                         overallStep = 1 + obj.CurrentStepIndex;
+
+                        StepProgress = 100 * (obj.WorkProcessedCount / (double)obj.CurrentWorkSize);
+                        StepStatusMsg = LocalizationCodes.LC_SOLVER_STEP_STATUS_BREEDING.Bind(
+                            new { NumProcessed = FormatNum(obj.WorkProcessedCount), WorkSize = FormatNum(obj.CurrentWorkSize) }
+                        );
                         break;
 
                     case SolverPhase.Finished:
@@ -468,6 +481,8 @@ namespace PalCalc.UI.ViewModel
                         {
                             SolverStatusMsg = LocalizationCodes.LC_SOLVER_STATUS_FINISHED.Bind(solverStopwatch.Elapsed.TimeSpanSecondsStr());
                             overallStep = (int)numTotalSteps;
+                            StepProgress = 100;
+                            StepStatusMsg = LocalizationCodes.LC_SOLVER_STEP_STATUS_DONE.Bind(FormatNum(obj.TotalWorkProcessedCount));
                         }
                         break;
                 }
@@ -518,9 +533,15 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private double solverProgress;
 
+        [ObservableProperty]
+        private double stepProgress;
+
         [NotifyPropertyChangedFor(nameof(ProgressBarVisibility))]
         [ObservableProperty]
         private ILocalizedText solverStatusMsg;
+
+        [ObservableProperty]
+        private ILocalizedText stepStatusMsg;
 
         private bool isEditable = true;
         public bool IsEditable
