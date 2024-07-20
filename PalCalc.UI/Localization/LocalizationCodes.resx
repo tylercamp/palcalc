@@ -415,6 +415,9 @@
   <data name="LC_SAVE_FILE_RELOADING" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SAVE_FILE_RELOAD_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
   <data name="LC_SAVE_GAME" xml:space="preserve">
     <value />
   </data>

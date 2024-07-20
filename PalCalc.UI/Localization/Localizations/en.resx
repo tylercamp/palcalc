@@ -425,6 +425,9 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   <data name="LC_SAVE_FILE_RELOADING" xml:space="preserve">
     <value>Save file was not yet cached or cache is outdated, reading content...</value>
   </data>
+  <data name="LC_SAVE_FILE_RELOAD_DESCRIPTION" xml:space="preserve">
+    <value>Some of the files for this save have been changed. Click to reload the latest data.</value>
+  </data>
   <data name="LC_SAVE_GAME" xml:space="preserve">
     <value>Game</value>
   </data>

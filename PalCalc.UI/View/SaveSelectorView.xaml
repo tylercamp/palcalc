@@ -69,6 +69,7 @@
                 VerticalAlignment="Stretch"
                 Command="{Binding SelectedGame.ReloadSaveCommand}"
                 Visibility="{Binding SelectedGame.HasChanges, Converter={StaticResource BVC}}"
+                ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SAVE_FILE_RELOAD_DESCRIPTION}"
                 Margin="3,0,0,0">
             <materialIcons:MaterialIcon Kind="Reload" Width="18" />
         </Button>

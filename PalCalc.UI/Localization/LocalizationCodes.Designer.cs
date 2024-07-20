@@ -401,6 +401,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SAVE_FILE_RELOAD_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SAVE_FILE_RELOADING,
         /// <summary>
         ///   Looks up a localized string similar to .
