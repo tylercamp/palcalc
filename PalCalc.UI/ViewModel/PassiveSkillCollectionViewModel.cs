@@ -12,22 +12,22 @@ using System.Windows.Controls;
 
 namespace PalCalc.UI.ViewModel
 {
-    public class TraitCollectionViewModel
+    public class PassiveSkillCollectionViewModel
     {
         // for XAML designer view
-        public TraitCollectionViewModel() : this(
-            new List<TraitViewModel>()
+        public PassiveSkillCollectionViewModel() : this(
+            new List<PassiveSkillViewModel>()
             {
-                new TraitViewModel(),
-                new TraitViewModel(),
-                new TraitViewModel(),
+                new PassiveSkillViewModel(),
+                new PassiveSkillViewModel(),
+                new PassiveSkillViewModel(),
             })
         {
         }
 
-        public TraitCollectionViewModel(IEnumerable<TraitViewModel> traits)
+        public PassiveSkillCollectionViewModel(IEnumerable<PassiveSkillViewModel> passives)
         {
-            Traits = traits.OrderBy(t => t.ModelObject.InternalName).ToList();
+            Passives = passives.OrderBy(t => t.ModelObject.InternalName).ToList();
 
             RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             for (int i = 1; i < NumRows; i++)
@@ -46,15 +46,15 @@ namespace PalCalc.UI.ViewModel
             ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Spacing) });
             ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
 
-            if (!Traits.Any())
+            if (!Passives.Any())
             {
                 Description = LocalizationCodes.LC_TRAITS_COUNT_EMPTY.Bind();
             }
             else
             {
-                var definite = Traits.Where(t => t.ModelObject is not IUnknownTrait);
-                var random = Traits.Where(t => t.ModelObject is RandomTrait);
-                var unrecognized = Traits.Where(t => t.ModelObject is UnrecognizedTrait);
+                var definite = Passives.Where(t => t.ModelObject is not IUnknownPassive);
+                var random = Passives.Where(t => t.ModelObject is RandomPassiveSkill);
+                var unrecognized = Passives.Where(t => t.ModelObject is UnrecognizedPassiveSkill);
 
                 var parts = new List<ILocalizedText>(definite.Select(t => t.Name));
 
@@ -80,7 +80,7 @@ namespace PalCalc.UI.ViewModel
         public ILocalizedText RequiredDescription { get; }
         public ILocalizedText OptionalDescription { get; }
 
-        public List<TraitViewModel> Traits { get; }
+        public List<PassiveSkillViewModel> Passives { get; }
 
         public int Spacing => 3;
 
@@ -90,7 +90,7 @@ namespace PalCalc.UI.ViewModel
         {
             get
             {
-                if (Traits.Count <= 2) return 1;
+                if (Passives.Count <= 2) return 1;
                 else return 3;
             }
         }
@@ -98,16 +98,16 @@ namespace PalCalc.UI.ViewModel
         public List<RowDefinition> RowDefinitions { get; } = new List<RowDefinition>();
         public List<ColumnDefinition> ColumnDefinitions { get; } = new List<ColumnDefinition>();
 
-        public int RowIndexOf(TraitViewModel trait)
+        public int RowIndexOf(PassiveSkillViewModel passive)
         {
-            var mainRow = Traits.IndexOf(trait) / EntriesPerRow;
+            var mainRow = Passives.IndexOf(passive) / EntriesPerRow;
             if (mainRow == 0) return mainRow;
             else return mainRow + 1;
         }
 
-        public int ColumnIndexOf(TraitViewModel trait)
+        public int ColumnIndexOf(PassiveSkillViewModel passive)
         {
-            var mainColumn = Traits.IndexOf(trait) % EntriesPerRow;
+            var mainColumn = Passives.IndexOf(passive) % EntriesPerRow;
             if (mainColumn == 0) return mainColumn;
             else return mainColumn + 1;
         }

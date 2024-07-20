@@ -10,7 +10,7 @@ using System.Windows.Media.Imaging;
 
 namespace PalCalc.UI.Model
 {
-    internal static class TraitIcon
+    internal static class PassiveSkillIcon
     {
         private static Dictionary<int, ImageSource> images;
         public static Dictionary<int, ImageSource> Images

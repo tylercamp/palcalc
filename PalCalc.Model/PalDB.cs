@@ -25,7 +25,7 @@ namespace PalCalc.Model
 
         public Dictionary<Pal, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
 
-        public List<Trait> Traits { get; set; }
+        public List<PassiveSkill> PassiveSkills { get; set; }
 
         public List<BreedingResult> Breeding { get; set; }
 
@@ -130,17 +130,17 @@ namespace PalCalc.Model
         }
 
 
-        private Dictionary<string, Trait> traitsByName;
-        public Dictionary<string, Trait> TraitsByName
+        private Dictionary<string, PassiveSkill> passiveSkillsByName;
+        public Dictionary<string, PassiveSkill> PassiveSkillsByName
         {
             get
             {
-                if (traitsByName == null)
+                if (passiveSkillsByName == null)
                 {
-                    traitsByName = Traits.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
+                    passiveSkillsByName = PassiveSkills.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
                 }
 
-                return traitsByName;
+                return passiveSkillsByName;
             }
         }
 

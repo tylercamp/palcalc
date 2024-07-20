@@ -185,7 +185,7 @@ This value is doubled internally to account for pal inactivity at night.</value>
     <value>Save</value>
   </data>
   <data name="LC_COMMON_TRAITS" xml:space="preserve">
-    <value>Traits</value>
+    <value>Passive Skills</value>
   </data>
   <data name="LC_COMMON_UNKNOWN" xml:space="preserve">
     <value>Unknown</value>
@@ -294,7 +294,7 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
     <value>New</value>
   </data>
   <data name="LC_NO_TRAITS" xml:space="preserve">
-    <value>With no traits</value>
+    <value>With no passives</value>
   </data>
   <data name="LC_OPEN_IN_FILE_EXPLORER" xml:space="preserve">
     <value>Open in Explorer</value>
@@ -486,11 +486,11 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
     <value>Allowed Wild Pals</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS" xml:space="preserve">
-    <value>Max Bred Irrelevant Traits</value>
+    <value>Max Bred Irrelevant Passives</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
-    <value>The maximum number of irrelevant traits allowed for any bred pal, including the final breeding result.
-Values higher than '1' will typically add shorter breeding paths if there are unused trait slots in the final pal.
+    <value>The maximum number of irrelevant passive skills allowed for any bred pal, including the final breeding result.
+Values higher than '1' will typically add shorter breeding paths if there are unused passive skill slots in the final pal.
 Higher values *exponentially* affect time required.</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS" xml:space="preserve">
@@ -507,10 +507,10 @@ Higher values linearly affect time required.</value>
     <value>The number of CPUs the solver is allowed to use. If zero, all CPUs will be used.</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS" xml:space="preserve">
-    <value>Max Input Irrelevant Traits</value>
+    <value>Max Input Irrelevant Passives</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
-    <value>The maximum number of irrelevant traits allowed for any owned pal used as a parent.
+    <value>The maximum number of irrelevant passive skills allowed for any owned pal used as a parent.
 Lower values can somewhat reduce processing at risk of missing some useful paths.
 Higher values linearly affect time required.</value>
   </data>
@@ -540,7 +540,7 @@ Higher values linearly affect time required, depending on how many types of pals
     <value>Target Pals</value>
   </data>
   <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">
-    <value>no traits</value>
+    <value>no passives</value>
   </data>
   <data name="LC_TRAITS_COUNT_RANDOM" xml:space="preserve">
     <value>{NumRandom} random</value>

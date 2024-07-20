@@ -42,7 +42,7 @@ namespace PalCalc.Solver
 
         List<Pal> allowedWildPals;
         List<Pal> bannedBredPals;
-        int maxBreedingSteps, maxWildPals, maxBredIrrelevantTraits, maxInputIrrelevantTraits;
+        int maxBreedingSteps, maxWildPals, maxBredIrrelevantPassives, maxInputIrrelevantPassives;
         TimeSpan maxEffort;
         PruningRulesBuilder pruningBuilder;
         int maxThreads;
@@ -51,12 +51,12 @@ namespace PalCalc.Solver
         /// <param name="ownedPals"></param>
         /// <param name="maxBreedingSteps"></param>
         /// <param name="maxWildPals"></param>
-        /// <param name="maxIrrelevantTraits">
-        ///     Max number of irrelevant traits from any parents or children involved in the final breeding steps (including target pal)
+        /// <param name="maxIrrelevantPassives">
+        ///     Max number of irrelevant passive skills from any parents or children involved in the final breeding steps (including target pal)
         ///     (Lower value runs faster, but considers fewer possibilities)
         /// </param>
         /// <param name="maxEffort">
-        ///     Effort in estimated time to get the desired pal with the given traits. Goes by constant breeding time, ignores hatching
+        ///     Effort in estimated time to get the desired pal with the given passive skills. Goes by constant breeding time, ignores hatching
         ///     time, and roughly estimates time to catch wild pals (with increasing time based on paldex number).
         /// </param>
         public BreedingSolver(
@@ -68,8 +68,8 @@ namespace PalCalc.Solver
             int maxWildPals,
             List<Pal> allowedWildPals,
             List<Pal> bannedBredPals,
-            int maxInputIrrelevantTraits,
-            int maxBredIrrelevantTraits,
+            int maxInputIrrelevantPassives,
+            int maxBredIrrelevantPassives,
             TimeSpan maxEffort,
             int maxThreads
         )
@@ -82,38 +82,38 @@ namespace PalCalc.Solver
             this.allowedWildPals = allowedWildPals;
             this.bannedBredPals = bannedBredPals;
             this.maxWildPals = maxWildPals;
-            this.maxInputIrrelevantTraits = Math.Min(3, maxInputIrrelevantTraits);
-            this.maxBredIrrelevantTraits = Math.Min(3, maxBredIrrelevantTraits);
+            this.maxInputIrrelevantPassives = Math.Min(3, maxInputIrrelevantPassives);
+            this.maxBredIrrelevantPassives = Math.Min(3, maxBredIrrelevantPassives);
             this.maxEffort = maxEffort;
             this.maxThreads = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
         }
 
         public event Action<SolverStatus> SolverStateUpdated;
 
-        // for each available (pal, gender) pair, and for each set of instance traits as a subset of the desired traits (e.g. all male lamballs with "runner",
-        // all with "runner and swift", etc.), pick the instance with the fewest total traits
+        // for each available (pal, gender) pair, and for each set of instance passives as a subset of the desired passives (e.g. all male lamballs with "runner",
+        // all with "runner and swift", etc.), pick the instance with the fewest total passives
         //
-        // (includes pals without any relevant traits, picks the instance with the fewest total traits)
-        static List<PalInstance> RelevantInstancesForTraits(PalDB db, List<PalInstance> availableInstances, List<Trait> targetTraits)
+        // (includes pals without any relevant passives, picks the instance with the fewest total passives)
+        static List<PalInstance> RelevantInstancesForPassiveSkills(PalDB db, List<PalInstance> availableInstances, List<PassiveSkill> targetPassives)
         {
             List<PalInstance> relevantInstances = new List<PalInstance>();
 
-            var traitPermutations = targetTraits.Combinations(targetTraits.Count).Select(l => l.ToList()).ToList();
-            logger.Debug("Looking for pals with traits:\n- {0}", string.Join("\n- ", traitPermutations.Select(p => $"({string.Join(',', p)})")));
+            var passivesPermutations = targetPassives.Combinations(targetPassives.Count).Select(l => l.ToList()).ToList();
+            logger.Debug("Looking for pals with passives:\n- {0}", string.Join("\n- ", passivesPermutations.Select(p => $"({string.Join(',', p)})")));
 
             foreach (var pal in db.Pals)
             {
                 foreach (var gender in new List<PalGender>() { PalGender.MALE, PalGender.FEMALE })
                 {
                     var instances = availableInstances.Where(i => i.Pal == pal && i.Gender == gender).ToList();
-                    var instancesByPermutation = traitPermutations.ToDictionary(p => p, p => new List<PalInstance>());
+                    var instancesByPermutation = passivesPermutations.ToDictionary(p => p, p => new List<PalInstance>());
 
                     foreach (var instance in instances)
                     {
-                        var matchingPermutation = traitPermutations
+                        var matchingPermutation = passivesPermutations
                             .OrderByDescending(p => p.Count)
-                            .ThenBy(p => p.Except(instance.Traits).Count())
-                            .First(p => !p.Except(instance.Traits).Any());
+                            .ThenBy(p => p.Except(instance.PassiveSkills).Count())
+                            .First(p => !p.Except(instance.PassiveSkills).Any());
 
                         instancesByPermutation[matchingPermutation].Add(instance);
                     }
@@ -122,7 +122,7 @@ namespace PalCalc.Solver
                         instancesByPermutation.Values
                             .Where(instances => instances.Count != 0)
                             .Select(instances => instances
-                                .OrderBy(i => i.Traits.Count)
+                                .OrderBy(i => i.PassiveSkills.Count)
                                 .ThenBy(i => PreferredLocationPruning.LocationOrderingOf(i.Location.Type))
                                 .ThenByDescending(i => i.IV_HP + i.IV_Shot + i.IV_Defense)
                                 .First()
@@ -135,43 +135,43 @@ namespace PalCalc.Solver
         }
 
         /// <summary>
-        /// Creates a list of desired combinations of traits. Meant to handle the case where there are over MAX_TRAITS desired traits.
-        /// The `requiredTraits` should never have more than MAX_TRAITS due to a check in `SolveFor`, so this logic is only really
-        /// necessary if `requiredTraits` + `optionalTraits` brings us over MAX_TRAITS.
+        /// Creates a list of desired combinations of passives. Meant to handle the case where there are over MAX_PASSIVES desired passives.
+        /// The `requiredPassives` should never have more than MAX_PASSIVES due to a check in `SolveFor`, so this logic is only really
+        /// necessary if `requiredPassives` + `optionalPassives` brings us over MAX_PASSIVES.
         /// </summary>
-        /// <param name="requiredTraits">The list of traits that will be contained in all permutations.</param>
-        /// <param name="optionalTraits">The list of traits that will appear at least once across the permutations, if possible.</param>
+        /// <param name="requiredPassives">The list of passives that will be contained in all permutations.</param>
+        /// <param name="optionalPassives">The list of passives that will appear at least once across the permutations, if possible.</param>
         /// <returns></returns>
-        static IEnumerable<IEnumerable<Trait>> TraitPermutations(IEnumerable<Trait> requiredTraits, IEnumerable<Trait> optionalTraits)
+        static IEnumerable<IEnumerable<PassiveSkill>> PassiveSkillPermutations(IEnumerable<PassiveSkill> requiredPassives, IEnumerable<PassiveSkill> optionalPassives)
         {
 #if DEBUG && DEBUG_CHECKS
             if (
-                requiredTraits.Count() > GameConstants.MaxTotalTraits ||
-                requiredTraits.Distinct().Count() != requiredTraits.Count() ||
-                optionalTraits.Distinct().Count() != optionalTraits.Count() ||
-                requiredTraits.Intersect(optionalTraits).Any()
+                requiredPassives.Count() > GameConstants.MaxTotalPassives ||
+                requiredPassives.Distinct().Count() != requiredPassives.Count() ||
+                optionalPassives.Distinct().Count() != optionalPassives.Count() ||
+                requiredPassives.Intersect(optionalPassives).Any()
             ) Debugger.Break();
 #endif
 
-            // can't add any optional traits, just return required traits
-            if (!optionalTraits.Any() || requiredTraits.Count() == GameConstants.MaxTotalTraits)
+            // can't add any optional passives, just return required passives
+            if (!optionalPassives.Any() || requiredPassives.Count() == GameConstants.MaxTotalPassives)
             {
-                yield return requiredTraits;
+                yield return requiredPassives;
                 yield break;
             }
 
-            var numTotalTraits = requiredTraits.Count() + optionalTraits.Count();
-            // we're within the trait limit, return all traits
-            if (numTotalTraits <= GameConstants.MaxTotalTraits)
+            var numTotalPassives = requiredPassives.Count() + optionalPassives.Count();
+            // we're within the passive limit, return all passives
+            if (numTotalPassives <= GameConstants.MaxTotalPassives)
             {
-                yield return requiredTraits.Concat(optionalTraits);
+                yield return requiredPassives.Concat(optionalPassives);
                 yield break;
             }
 
-            var maxOptionalTraits = GameConstants.MaxTotalTraits - requiredTraits.Count();
-            foreach (var optional in optionalTraits.ToList().Combinations(maxOptionalTraits).Where(c => c.Any()))
+            var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count();
+            foreach (var optional in optionalPassives.ToList().Combinations(maxOptionalPassives).Where(c => c.Any()))
             {
-                var res = requiredTraits.Concat(optional);
+                var res = requiredPassives.Concat(optional);
                 yield return res;
             }
         }
@@ -250,29 +250,29 @@ namespace PalCalc.Solver
         }
 
         /// <summary>
-        /// Calculates the probability of a child pal with `numFinalTraits` traits having the all desired traits from
-        /// the list of possible parent traits.
+        /// Calculates the probability of a child pal with `numFinalPassives` passive skills having the all desired passives from
+        /// the list of possible parent passives.
         /// </summary>
         /// 
-        /// <param name="parentTraits">The the full set of traits from the parents (deduplicated)</param>
-        /// <param name="desiredParentTraits">The list of traits you want to be inherited</param>
-        /// <param name="numFinalTraits">The exact amount of final traits to calculate for</param>
+        /// <param name="parentPassives">The the full set of passive skills from the parents (deduplicated)</param>
+        /// <param name="desiredParentPassives">The list of passive skills you want to be inherited</param>
+        /// <param name="numFinalPassives">The exact amount of final passive skills to calculate for</param>
         /// <returns></returns>
         /// 
         /// <remarks>
-        /// e.g. "if we decide the child pal has N traits, what's the probability of containing all of the traits we want"
+        /// e.g. "if we decide the child pal has N passive skills, what's the probability of containing all of the passives we want"
         /// </remarks>
         /// <remarks>
-        /// Should be used repeatedly to calculate probabilities for all possible counts of traits (max 4)
+        /// Should be used repeatedly to calculate probabilities for all possible counts of passive skills (max 4)
         /// </remarks>
         /// 
-        float ProbabilityInheritedTargetTraits(List<Trait> parentTraits, List<Trait> desiredParentTraits, int numFinalTraits)
+        float ProbabilityInheritedTargetPassives(List<PassiveSkill> parentPassives, List<PassiveSkill> desiredParentPassives, int numFinalPassives)
         {
-            // we know we need at least `desiredParentTraits.Count` to be inherited from the parents, but the overall number
-            // of traits must be `numFinalTraits`. consider N, N+1, ..., traits inherited from parents, and an inverse amount
-            // of randomly-added traits
+            // we know we need at least `desiredParentPassives.Count` to be inherited from the parents, but the overall number
+            // of passives must be `numFinalPassives`. consider N, N+1, ..., passives inherited from parents, and an inverse amount
+            // of randomly-added passives
             //
-            // e.g. we want 4 total traits with 2 desired from parents. we could have:
+            // e.g. we want 4 total passives with 2 desired from parents. we could have:
             //
             // - 2 inherited + 2 random
             // - 3 inherited + 1 random
@@ -282,19 +282,19 @@ namespace PalCalc.Solver
             //
             // the final probability for these params (fn args) is the sum
 
-            float probabilityForNumTraits = 0.0f;
+            float probabilityForNumPassives = 0.0f;
 
-            for (int numInheritedFromParent = desiredParentTraits.Count; numInheritedFromParent <= numFinalTraits; numInheritedFromParent++)
+            for (int numInheritedFromParent = desiredParentPassives.Count; numInheritedFromParent <= numFinalPassives; numInheritedFromParent++)
             {
-                // we may inherit more traits from the parents than the parents actually have (e.g. inherit 4 traits from parents with
-                // 2 total traits), in which case we'd still inherit just two
+                // we may inherit more passives from the parents than the parents actually have (e.g. inherit 4 passives from parents with
+                // 2 total passives), in which case we'd still inherit just two
                 //
-                // this doesn't affect probabilities of getting `numInherited`, but it affects the number of random traits which must
-                // be added to each `numFinalTraits` and the number of combinations of parent traits that we check
-                var actualNumInheritedFromParent = Math.Min(numInheritedFromParent, parentTraits.Count);
+                // this doesn't affect probabilities of getting `numInherited`, but it affects the number of random passives which must
+                // be added to each `numFinalPassives` and the number of combinations of parent passives that we check
+                var actualNumInheritedFromParent = Math.Min(numInheritedFromParent, parentPassives.Count);
 
-                var numIrrelevantFromParent = actualNumInheritedFromParent - desiredParentTraits.Count;
-                var numIrrelevantFromRandom = numFinalTraits - actualNumInheritedFromParent;
+                var numIrrelevantFromParent = actualNumInheritedFromParent - desiredParentPassives.Count;
+                var numIrrelevantFromRandom = numFinalPassives - actualNumInheritedFromParent;
 
 #if DEBUG && DEBUG_CHECKS
                 if (numIrrelevantFromRandom < 0) Debugger.Break();
@@ -303,90 +303,90 @@ namespace PalCalc.Solver
                 float probabilityGotRequiredFromParent;
                 if (numInheritedFromParent == 0)
                 {
-                    // would only happen if neither parent has a desired trait
+                    // would only happen if neither parent has a desired passive
 
-                    // the only way we could get zero inherited traits is if neither parent actually has any traits, otherwise
-                    // it (seems to) be impossible to get zero direct inherited traits (unconfirmed from reddit thread)
-                    if (parentTraits.Count > 0) continue;
+                    // the only way we could get zero inherited passives is if neither parent actually has any passives, otherwise
+                    // it (seems to) be impossible to get zero direct inherited passives (unconfirmed from reddit thread)
+                    if (parentPassives.Count > 0) continue;
 
-                    // if neither parent has any traits, we'll always get 0 inherited traits, so we'll always get the "required"
-                    // traits regardless of the roll for `TraitProbabilityDirect`
+                    // if neither parent has any passives, we'll always get 0 inherited passives, so we'll always get the "required"
+                    // passives regardless of the roll for `PassiveProbabilityDirect`
                     probabilityGotRequiredFromParent = 1.0f;
                 }
-                else if (!desiredParentTraits.Any())
+                else if (!desiredParentPassives.Any())
                 {
-                    // just the chance of getting this number of traits from parents
-                    probabilityGotRequiredFromParent = GameConstants.TraitProbabilityDirect[numInheritedFromParent];
+                    // just the chance of getting this number of passives from parents
+                    probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent];
                 }
                 else if (numIrrelevantFromParent == 0)
                 {
-                    // chance of getting exactly the required traits
-                    probabilityGotRequiredFromParent = GameConstants.TraitProbabilityDirect[numInheritedFromParent] / Choose(parentTraits.Count, desiredParentTraits.Count);
+                    // chance of getting exactly the required passives
+                    probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent] / Choose(parentPassives.Count, desiredParentPassives.Count);
                 }
                 else
                 {
-                    // (available traits except desired)
+                    // (available passives except desired)
                     // choose
                     // (required num irrelevant)
-                    var numCombinationsWithIrrelevantTrait = (float)Choose(parentTraits.Count - desiredParentTraits.Count, numIrrelevantFromParent);
+                    var numCombinationsWithIrrelevantPassive = (float)Choose(parentPassives.Count - desiredParentPassives.Count, numIrrelevantFromParent);
 
-                    // (all available traits)
+                    // (all available passives)
                     // choose
                     // (actual num inherited from parent)
-                    var numCombinationsWithAnyTraits = (float)Choose(parentTraits.Count, actualNumInheritedFromParent);
+                    var numCombinationsWithAnyPassives = (float)Choose(parentPassives.Count, actualNumInheritedFromParent);
 
-                    // probability of those traits containing the desired traits
-                    // (doesn't affect anything if we don't actually want any of these traits)
+                    // probability of those passives containing the desired passives
+                    // (doesn't affect anything if we don't actually want any of these passives)
                     // (TODO - is this right? got this simple division from chatgpt)
-                    var probabilityCombinationWithDesiredTraits = desiredParentTraits.Count == 0 ? 1 : (
-                        numCombinationsWithIrrelevantTrait / numCombinationsWithAnyTraits
+                    var probabilityCombinationWithDesiredPassives = desiredParentPassives.Count == 0 ? 1 : (
+                        numCombinationsWithIrrelevantPassive / numCombinationsWithAnyPassives
                     );
 
-                    probabilityGotRequiredFromParent = probabilityCombinationWithDesiredTraits * GameConstants.TraitProbabilityDirect[numInheritedFromParent];
+                    probabilityGotRequiredFromParent = probabilityCombinationWithDesiredPassives * GameConstants.PassiveProbabilityDirect[numInheritedFromParent];
                 }
 
 #if DEBUG && DEBUG_CHECKS
                 if (probabilityGotRequiredFromParent > 1) Debugger.Break();
 #endif
 
-                var probabilityGotExactRequiredRandom = GameConstants.TraitRandomAddedProbability[numIrrelevantFromRandom];
-                probabilityForNumTraits += probabilityGotRequiredFromParent * probabilityGotExactRequiredRandom;
+                var probabilityGotExactRequiredRandom = GameConstants.PassiveRandomAddedProbability[numIrrelevantFromRandom];
+                probabilityForNumPassives += probabilityGotRequiredFromParent * probabilityGotExactRequiredRandom;
             }
 
-            return probabilityForNumTraits;
+            return probabilityForNumPassives;
         }
 
         public List<IPalReference> SolveFor(PalSpecifier spec, CancellationToken token)
         {
             spec.Normalize();
 
-            if (spec.RequiredTraits.Count > GameConstants.MaxTotalTraits)
+            if (spec.RequiredPassives.Count > GameConstants.MaxTotalPassives)
             {
-                throw new Exception("Target trait count cannot exceed max number of traits for a single pal");
+                throw new Exception("Target passive skill count cannot exceed max number of passive skills for a single pal");
             }
 
             var statusMsg = new SolverStatus() { CurrentPhase = SolverPhase.Initializing, CurrentStepIndex = 0, TargetSteps = maxBreedingSteps, Canceled = token.IsCancellationRequested };
             SolverStateUpdated?.Invoke(statusMsg);
 
-            var relevantPals = RelevantInstancesForTraits(db, ownedPals, spec.DesiredTraits.ToList())
-               .Where(p => p.Traits.Except(spec.DesiredTraits).Count() <= maxInputIrrelevantTraits)
+            var relevantPals = RelevantInstancesForPassiveSkills(db, ownedPals, spec.DesiredPassives.ToList())
+               .Where(p => p.PassiveSkills.Except(spec.DesiredPassives).Count() <= maxInputIrrelevantPassives)
                .ToList();
 
             logger.Debug(
-                "Using {relevantCount}/{totalCount} pals as relevant inputs with traits:\n- {summary}",
+                "Using {relevantCount}/{totalCount} pals as relevant inputs with passive skills:\n- {summary}",
                 relevantPals.Count,
                 ownedPals.Count,
                 string.Join("\n- ",
                     relevantPals
                         .OrderBy(p => p.Pal.Name)
                         .ThenBy(p => p.Gender)
-                        .ThenBy(p => string.Join(" ", p.Traits.OrderBy(t => t.Name)))
+                        .ThenBy(p => string.Join(" ", p.PassiveSkills.OrderBy(t => t.Name)))
                 )
             );
 
             // `relevantPals` is now a list of all captured Pal types, where multiple of the same pal
             // may be included if they have different genders and/or different matching subsets of
-            // the desired traits
+            // the desired passives
 
             bool WithinBreedingSteps(Pal pal, int maxSteps) => db.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
 
@@ -394,41 +394,41 @@ namespace PalCalc.Solver
             foreach (
                 var palGroup in relevantPals
                     .Where(pi => WithinBreedingSteps(pi.Pal, maxBreedingSteps))
-                    .Select(pi => new OwnedPalReference(pi, pi.Traits.ToDedicatedTraits(spec.DesiredTraits)))
+                    .Select(pi => new OwnedPalReference(pi, pi.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives)))
                     .GroupBy(pi => pi.Pal)
             )
             {
                 var pal = palGroup.Key;
-                
-                // group owned pals by the desired traits they contain, and try to find male+female pairs with the same set of traits + num irrelevant traits
+
+                // group owned pals by the desired passives they contain, and try to find male+female pairs with the same set of passives + num irrelevant passives
                 foreach (
-                    var traitGroup in palGroup
-                        .GroupBy(p => p.EffectiveTraits
-                            // (pad them all to have max number of traits, so the grouping ignores the total number of traits)
-                            .Concat(Enumerable.Range(0, GameConstants.MaxTotalTraits - p.EffectiveTraits.Count).Select(_ => new RandomTrait()))
+                    var passiveGroup in palGroup
+                        .GroupBy(p => p.EffectivePassives
+                            // (pad them all to have max number of passives, so the grouping ignores the total number of passives)
+                            .Concat(Enumerable.Range(0, GameConstants.MaxTotalPassives - p.EffectivePassives.Count).Select(_ => new RandomPassiveSkill()))
                             .SetHash()
                         )
                         .Select(g => g.ToList())
                 )
                 {
-                    // `traitGroup` is a list of pals which have the same list of desired traits, though they can have varying numbers of undesired traits.
+                    // `passiveGroup` is a list of pals which have the same list of desired passives, though they can have varying numbers of undesired passives.
                     // (there should be at most 2, due to the previous processing of `relevantPals` which would restrict this group to, at most, a male + female instance)
 
-                    if (traitGroup.Count > 2) throw new NotImplementedException(); // shouldn't happen
+                    if (passiveGroup.Count > 2) throw new NotImplementedException(); // shouldn't happen
 
-                    if (traitGroup.Select(p => p.EffectiveTraits.Count(t => t is RandomTrait)).Distinct().Count() == 1)
+                    if (passiveGroup.Select(p => p.EffectivePassives.Count(t => t is RandomPassiveSkill)).Distinct().Count() == 1)
                     {
-                        // all pals in this group have the same number of irrelevant traits
-                        if (traitGroup.Count == 1)
+                        // all pals in this group have the same number of irrelevant passives
+                        if (passiveGroup.Count == 1)
                         {
                             // only one pal, cant turn into a composite
-                            initialContent.Add(traitGroup.Single());
+                            initialContent.Add(passiveGroup.Single());
                         }
-                        else if (traitGroup.Count == 2)
+                        else if (passiveGroup.Count == 2)
                         {
-                            // two pals with the same desired traits and number of irrelevant traits, treat as a wildcard (composite)
+                            // two pals with the same desired passives and number of irrelevant passives, treat as a wildcard (composite)
                             initialContent.Add(
-                                new CompositeOwnedPalReference(traitGroup[0], traitGroup[1])
+                                new CompositeOwnedPalReference(passiveGroup[0], passiveGroup[1])
                             );
                         }
                     }
@@ -436,21 +436,21 @@ namespace PalCalc.Solver
                     {
                         // (can only happen if there are two pals in this group)
 
-                        // male and female have matching desired traits but a different number of irrelevant traits, add them each as individual
-                        // options but also allow their combination to be used as a wildcard (traits of the combination will use the "worst-case"
+                        // male and female have matching desired passives but a different number of irrelevant passives, add them each as individual
+                        // options but also allow their combination to be used as a wildcard (passives of the combination will use the "worst-case"
                         // option, i.e. one with no irrelevant and the other with two irrelevant, the composite will have two irrelevant
 
-                        initialContent.Add(traitGroup[0]);
-                        initialContent.Add(traitGroup[1]);
+                        initialContent.Add(passiveGroup[0]);
+                        initialContent.Add(passiveGroup[1]);
 
-                        initialContent.Add(new CompositeOwnedPalReference(traitGroup[0], traitGroup[1]));
+                        initialContent.Add(new CompositeOwnedPalReference(passiveGroup[0], passiveGroup[1]));
                     }
                 }
             }
 
             if (maxWildPals > 0)
             {
-                // add wild pals with varying number of random traits
+                // add wild pals with varying number of random passives
                 initialContent.AddRange(
                     allowedWildPals
                         .Where(p => !relevantPals.Any(i => i.Pal == p))
@@ -459,13 +459,13 @@ namespace PalCalc.Solver
                             Enumerable
                                 .Range(
                                     0,
-                                    // number of "effectively random" traits should exclude guaranteed traits which are part of the desired list of traits
+                                    // number of "effectively random" passives should exclude guaranteed passives which are part of the desired list of passives
                                     Math.Max(
                                         0,
-                                        maxInputIrrelevantTraits - p.GuaranteedTraits(db).Except(spec.DesiredTraits).Count()
+                                        maxInputIrrelevantPassives - p.GuaranteedPassiveSkills(db).Except(spec.DesiredPassives).Count()
                                     )
                                 )
-                                .Select(numRandomTraits => new WildPalReference(p, p.GuaranteedTraits(db).Intersect(spec.DesiredTraits), numRandomTraits))
+                                .Select(numRandomPassives => new WildPalReference(p, p.GuaranteedPassiveSkills(db).Intersect(spec.DesiredPassives), numRandomPassives))
                         )
                         .Where(pi => pi.BreedingEffort <= maxEffort)
                 );
@@ -504,17 +504,17 @@ namespace PalCalc.Solver
                                 })
                                 .Where(p =>
                                 {
-                                    // if we disallow any irrelevant traits, neither parents have a useful trait, and at least 1 parent
-                                    // has an irrelevant trait, then it's impossible to breed a child with zero total traits
+                                    // if we disallow any irrelevant passives, neither parents have a useful passive, and at least 1 parent
+                                    // has an irrelevant passive, then it's impossible to breed a child with zero total passives
                                     //
-                                    // (child would need to have zero since there's nothing useful to inherit and we disallow irrelevant traits,
-                                    //  impossible to have zero since a child always inherits at least 1 direct trait if possible)
-                                    if (maxBredIrrelevantTraits > 0) return true;
+                                    // (child would need to have zero since there's nothing useful to inherit and we disallow irrelevant passives,
+                                    //  impossible to have zero since a child always inherits at least 1 direct passive if possible)
+                                    if (maxBredIrrelevantPassives > 0) return true;
 
-                                    var combinedTraits = p.Item1.EffectiveTraits.Concat(p.Item2.EffectiveTraits);
+                                    var combinedPassives = p.Item1.EffectivePassives.Concat(p.Item2.EffectivePassives);
 
-                                    var anyRelevantFromParents = combinedTraits.Intersect(spec.DesiredTraits).Any();
-                                    var anyIrrelevantFromParents = combinedTraits.Except(spec.DesiredTraits).Any();
+                                    var anyRelevantFromParents = combinedPassives.Intersect(spec.DesiredPassives).Any();
+                                    var anyIrrelevantFromParents = combinedPassives.Except(spec.DesiredPassives).Any();
 
                                     return anyRelevantFromParents || !anyIrrelevantFromParents;
                                 })
@@ -568,45 +568,45 @@ namespace PalCalc.Solver
                                 {
                                     var (parent1, parent2) = p;
 
-                                    var parentTraits = parent1.EffectiveTraits.Concat(parent2.EffectiveTraits).Distinct().ToList();
+                                    var parentPassives = parent1.EffectivePassives.Concat(parent2.EffectivePassives).Distinct().ToList();
                                     var possibleResults = new List<IPalReference>();
 
-                                    var traitPerms = TraitPermutations(
-                                        spec.RequiredTraits.Intersect(parentTraits).ToList(),
-                                        spec.OptionalTraits.Intersect(parentTraits).ToList()
+                                    var passiveSkillPerms = PassiveSkillPermutations(
+                                        spec.RequiredPassives.Intersect(parentPassives).ToList(),
+                                        spec.OptionalPassives.Intersect(parentPassives).ToList()
                                     ).Select(p => p.ToList()).ToList();
 
-                                    foreach (var targetTraits in traitPerms)
+                                    foreach (var targetPassives in passiveSkillPerms)
                                     {
-                                        // go through each potential final number of traits, accumulate the probability of any of these exact options
-                                        // leading to the desired traits within MAX_IRRELEVANT_TRAITS.
+                                        // go through each potential final number of passives, accumulate the probability of any of these exact options
+                                        // leading to the desired passives within MAX_IRRELEVANT_PASSIVES.
                                         //
-                                        // we'll generate an option for each possible outcome of up to the max possible number of traits, where each
-                                        // option represents the likelyhood of getting all desired traits + up to some number of irrelevant traits
-                                        var probabilityForUpToNumTraits = 0.0f;
+                                        // we'll generate an option for each possible outcome of up to the max possible number of passives, where each
+                                        // option represents the likelyhood of getting all desired passives + up to some number of irrelevant passives
+                                        var probabilityForUpToNumPassives = 0.0f;
 
-                                        for (int numFinalTraits = targetTraits.Count; numFinalTraits <= Math.Min(GameConstants.MaxTotalTraits, targetTraits.Count + maxBredIrrelevantTraits); numFinalTraits++)
+                                        for (int numFinalPassives = targetPassives.Count; numFinalPassives <= Math.Min(GameConstants.MaxTotalPassives, targetPassives.Count + maxBredIrrelevantPassives); numFinalPassives++)
                                         {
 #if DEBUG && DEBUG_CHECKS
-                                            float initialProbability = probabilityForUpToNumTraits;
+                                            float initialProbability = probabilityForUpToNumPassives;
 #endif
 
-                                            probabilityForUpToNumTraits += ProbabilityInheritedTargetTraits(parentTraits, targetTraits, numFinalTraits);
+                                            probabilityForUpToNumPassives += ProbabilityInheritedTargetPassives(parentPassives, targetPassives, numFinalPassives);
 
-                                            if (probabilityForUpToNumTraits <= 0)
+                                            if (probabilityForUpToNumPassives <= 0)
                                                 continue;
 
 #if DEBUG && DEBUG_CHECKS
-                                            if (initialProbability == probabilityForUpToNumTraits) Debugger.Break();
+                                            if (initialProbability == probabilityForUpToNumPassives) Debugger.Break();
 #endif
 
-                                            // (not entirely correct, since some irrelevant traits may be specific and inherited by parents. if we know a child
-                                            //  may have some specific trait, it may be efficient to breed that child with another parent which also has that
-                                            //  irrelevant trait, which would increase the overall likelyhood of a desired trait being inherited)
-                                            var newTraits = new List<Trait>(numFinalTraits);
-                                            newTraits.AddRange(targetTraits);
-                                            while (newTraits.Count < numFinalTraits)
-                                                newTraits.Add(new RandomTrait());
+                                            // (not entirely correct, since some irrelevant passives may be specific and inherited by parents. if we know a child
+                                            //  may have some specific passive, it may be efficient to breed that child with another parent which also has that
+                                            //  irrelevant passive, which would increase the overall likelyhood of a desired passive being inherited)
+                                            var newPassives = new List<PassiveSkill>(numFinalPassives);
+                                            newPassives.AddRange(targetPassives);
+                                            while (newPassives.Count < numFinalPassives)
+                                                newPassives.Add(new RandomPassiveSkill());
 
                                             var res = new BredPalReference(
                                                 gameSettings,
@@ -615,8 +615,8 @@ namespace PalCalc.Solver
                                                     .Child,
                                                 parent1,
                                                 parent2,
-                                                newTraits,
-                                                probabilityForUpToNumTraits
+                                                newPassives,
+                                                probabilityForUpToNumPassives
                                             );
 
                                             if (!bannedBredPals.Contains(res.Pal))

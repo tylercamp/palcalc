@@ -11,20 +11,20 @@ namespace PalCalc.Solver
     public class PalSpecifier
     {
         public Pal Pal { get; set; }
-        public List<Trait> RequiredTraits { get; set; } = new List<Trait>();
+        public List<PassiveSkill> RequiredPassives { get; set; } = new List<PassiveSkill>();
 
-        public List<Trait> OptionalTraits { get; set; } = new List<Trait>();
+        public List<PassiveSkill> OptionalPassives { get; set; } = new List<PassiveSkill>();
 
-        public IEnumerable<Trait> DesiredTraits => RequiredTraits.Concat(OptionalTraits);
+        public IEnumerable<PassiveSkill> DesiredPassives => RequiredPassives.Concat(OptionalPassives);
 
-        public override string ToString() => $"{Pal.Name} with {RequiredTraits.TraitsListToString()}";
+        public override string ToString() => $"{Pal.Name} with {RequiredPassives.PassiveSkillListToString()}";
 
-        public bool IsSatisfiedBy(IPalReference palRef) => Pal == palRef.Pal && !RequiredTraits.Except(palRef.EffectiveTraits).Any();
+        public bool IsSatisfiedBy(IPalReference palRef) => Pal == palRef.Pal && !RequiredPassives.Except(palRef.EffectivePassives).Any();
 
         public void Normalize()
         {
-            RequiredTraits = RequiredTraits.Distinct().ToList();
-            OptionalTraits = OptionalTraits.Except(RequiredTraits).Distinct().ToList();
+            RequiredPassives = RequiredPassives.Distinct().ToList();
+            OptionalPassives = OptionalPassives.Except(RequiredPassives).Distinct().ToList();
         }
     }
 }

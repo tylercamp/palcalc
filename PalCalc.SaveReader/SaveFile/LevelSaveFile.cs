@@ -98,15 +98,15 @@ namespace PalCalc.SaveReader.SaveFile
                         continue;
                     }
 
-                    var traits = gvasInstance.Traits
+                    var passives = gvasInstance.PassiveSkills
                         .Select(name =>
                         {
-                            var trait = db.Traits.FirstOrDefault(t => t.InternalName == name);
-                            if (trait == null)
+                            var passive = db.PassiveSkills.FirstOrDefault(t => t.InternalName == name);
+                            if (passive == null)
                             {
-                                logger.Warning("unrecognized trait '{internalName}' on pal {Pal}, skipping", name, gvasInstance.CharacterId);
+                                logger.Warning("unrecognized passive skill '{internalName}' on pal {Pal}, skipping", name, gvasInstance.CharacterId);
                             }
-                            return trait ?? new UnrecognizedTrait(name);
+                            return passive ?? new UnrecognizedPassiveSkill(name);
                         })
                         .ToList();
 
@@ -124,7 +124,7 @@ namespace PalCalc.SaveReader.SaveFile
                         Level = gvasInstance.Level,
                         NickName = gvasInstance.NickName,
                         Gender = gvasInstance.Gender.Contains("Female") ? PalGender.FEMALE : PalGender.MALE,
-                        Traits = traits,
+                        PassiveSkills = passives,
                         Location = new PalLocation()
                         {
                             ContainerId = gvasInstance.ContainerId.ToString(),

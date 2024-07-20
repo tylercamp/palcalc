@@ -28,7 +28,7 @@ namespace PalCalc.UI.ViewModel
                     OnPropertyChanged(nameof(EffortWidth));
                     OnPropertyChanged(nameof(NumStepsWidth));
                     OnPropertyChanged(nameof(LocationsWidth));
-                    OnPropertyChanged(nameof(TraitsWidth));
+                    OnPropertyChanged(nameof(PassiveSkillsWidth));
                 }
             }
         }
@@ -52,7 +52,7 @@ namespace PalCalc.UI.ViewModel
         public double EffortWidth => DEFAULT;
         public double NumStepsWidth => HiddenIfRedundant(vm => vm.NumBreedingSteps);
         public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
-        public double TraitsWidth => HiddenIfRedundant(vm => vm.EffectiveTraits.Description);
+        public double PassiveSkillsWidth => HiddenIfRedundant(vm => vm.EffectivePassives.Description);
 
         public void RefreshWith(CachedSaveGame csg)
         {
@@ -75,11 +75,11 @@ namespace PalCalc.UI.ViewModel
                     Pal = "Beakon".ToPal(PalDB.LoadEmbedded()),
                     Gender = PalGender.WILDCARD,
                     Location = new PalLocation() { Index = 0, Type = LocationType.Palbox },
-                    Traits = new List<Trait>()
+                    PassiveSkills = new List<PassiveSkill>()
                     {
-                        "Runner".ToTrait(PalDB.LoadEmbedded()),
+                        "Runner".ToPassive(PalDB.LoadEmbedded()),
                     }
-                }, new List<Trait>() { "Runner".ToTrait(PalDB.LoadEmbedded()) }))
+                }, new List<PassiveSkill>() { "Runner".ToPassive(PalDB.LoadEmbedded()) }))
             }
         };
     }

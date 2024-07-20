@@ -45,7 +45,7 @@ namespace PalCalc.Solver.Tree
             {
                 var asBred = PalRef as BredPalReference;
                 yield return $"Bred {asBred.Pal.Name}";
-                yield return $"{asBred.Gender} gender w/ {asBred.EffectiveTraits.TraitsListToString()}";
+                yield return $"{asBred.Gender} gender w/ {asBred.EffectivePassives.PassiveSkillListToString()}";
                 yield return $"takes ~{asBred.SelfBreedingEffort} for {asBred.AvgRequiredBreedings} breed attempts";
             }
         }

@@ -97,15 +97,15 @@
                             <Label Content="{itl:LocalizedText LC_COMMON_TRAITS}" />
                             <WrapPanel Orientation="Horizontal">
                                 <WrapPanel.Resources>
-                                    <DataTemplate x:Key="TraitTemplate" DataType="{x:Type mvm:TraitViewModel}">
+                                    <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
                                         <TextBlock Text="{Binding Name.Value}" />
                                     </DataTemplate>
                                 </WrapPanel.Resources>
 
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait1}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait2}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait3}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait4}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.PassiveSkillOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive1}" ItemTemplate="{StaticResource PassiveTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.PassiveSkillOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive2}" ItemTemplate="{StaticResource PassiveTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.PassiveSkillOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive3}" ItemTemplate="{StaticResource PassiveTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.PassiveSkillOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive4}" ItemTemplate="{StaticResource PassiveTemplate}" />
                             </WrapPanel>
                         </StackPanel>
 
@@ -199,7 +199,7 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <v:TraitCollectionView DataContext="{Binding PalInstance.Traits}" Background="#111" VerticalAlignment="Center" Width="250" Margin="0,0,25,0" />
+                        <v:PassiveSkillCollectionView DataContext="{Binding PalInstance.PassiveSkills}" Background="#111" VerticalAlignment="Center" Width="250" Margin="0,0,25,0" />
                     </WrapPanel>
                 </Grid>
 

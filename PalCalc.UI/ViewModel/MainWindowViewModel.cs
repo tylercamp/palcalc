@@ -352,7 +352,7 @@ namespace PalCalc.UI.ViewModel
                     // general simplification pass, get the best result for each potentially
                     // interesting combination of result properties
                     var resultsTable = new PalPropertyGrouping(PalProperty.Combine(
-                        PalProperty.EffectiveTraits,
+                        PalProperty.EffectivePassives,
                         PalProperty.NumBreedingSteps,
                         p => p.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
                     ));
@@ -361,7 +361,7 @@ namespace PalCalc.UI.ViewModel
 
                     // final simplification pass, ignore any results which are over 2x the effort of the fastest option
                     resultsTable = resultsTable.BuildNew(PalProperty.Combine(
-                        PalProperty.EffectiveTraits
+                        PalProperty.EffectivePassives
                     ));
                     resultsTable.FilterAll(g =>
                     {

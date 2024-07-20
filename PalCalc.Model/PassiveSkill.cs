@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Model
 {
-    public class Trait
+    public class PassiveSkill
     {
-        public Trait(string name, string internalName, int rank)
+        public PassiveSkill(string name, string internalName, int rank)
         {
             Name = name;
             InternalName = internalName;
@@ -23,19 +23,19 @@ namespace PalCalc.Model
 
         public override string ToString() => Name;
 
-        public override bool Equals(object obj) => (obj as Trait)?.InternalName == InternalName;
+        public override bool Equals(object obj) => (obj as PassiveSkill)?.InternalName == InternalName;
         public override int GetHashCode() => InternalName.GetHashCode();
     }
 
-    public interface IUnknownTrait { }
+    public interface IUnknownPassive { }
 
-    public class UnrecognizedTrait : Trait, IUnknownTrait
+    public class UnrecognizedPassiveSkill : PassiveSkill, IUnknownPassive
     {
-        public UnrecognizedTrait(string internalName) : base($"'{internalName}' (unrecognized)", internalName, 0) { }
+        public UnrecognizedPassiveSkill(string internalName) : base($"'{internalName}' (unrecognized)", internalName, 0) { }
     }
 
-    public class RandomTrait : Trait, IUnknownTrait
+    public class RandomPassiveSkill : PassiveSkill, IUnknownPassive
     {
-        public RandomTrait() : base("(Random)", "__VIRT_RAND__", 0) { }
+        public RandomPassiveSkill() : base("(Random)", "__VIRT_RAND__", 0) { }
     }
 }

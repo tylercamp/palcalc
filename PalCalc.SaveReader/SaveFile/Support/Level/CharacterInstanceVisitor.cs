@@ -31,7 +31,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         public int? TalentMelee { get; set; }
         public int? TalentDefense { get; set; }
 
-        public List<string> Traits { get; set; }
+        public List<string> PassiveSkills { get; set; }
     }
 
     class CharacterInstanceVisitor : IVisitor
@@ -135,20 +135,20 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
             yield return collectingVisitor;
 
-            List<string> traits = new List<string>();
-            var traitsVisitor = new ValueEmittingVisitor(this, K_PASSIVE_SKILL_LIST);
-            traitsVisitor.OnValue += (_, v) =>
+            List<string> passives = new List<string>();
+            var passiveSkillVisitor = new ValueEmittingVisitor(this, K_PASSIVE_SKILL_LIST);
+            passiveSkillVisitor.OnValue += (_, v) =>
             {
-                logger.Verbose("Storing trait value {name}", v);
-                traits.Add(v.ToString());
+                logger.Verbose("Storing passive skill value {name}", v);
+                passives.Add(v.ToString());
             };
 
-            traitsVisitor.OnExit += () =>
+            passiveSkillVisitor.OnExit += () =>
             {
-                if (pendingInstance != null) pendingInstance.Traits = traits;
+                if (pendingInstance != null) pendingInstance.PassiveSkills = passives;
             };
 
-            yield return traitsVisitor;
+            yield return passiveSkillVisitor;
 
             List<Guid> oldOwnerIds = new List<Guid>();
             var oldOwnersVisitor = new ValueEmittingVisitor(this, K_OLD_OWNER_PLAYER_IDS);

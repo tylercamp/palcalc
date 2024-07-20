@@ -50,7 +50,7 @@
     <None Update="ref\scraped-pals.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ref\scraped-traits.json">
+    <None Update="ref\scraped-passives.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

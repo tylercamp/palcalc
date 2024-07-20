@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace PalCalc.UI.View
 {
     /// <summary>
-    /// Interaction logic for TraitView.xaml
+    /// Interaction logic for PassiveSkillView.xaml
     /// </summary>
-    public partial class TraitView : UserControl
+    public partial class PassiveSkillView : UserControl
     {
-        public TraitView()
+        public PassiveSkillView()
         {
             InitializeComponent();
         }

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="PalCalc.UI.View.TraitView"
+﻿<UserControl x:Class="PalCalc.UI.View.PassiveSkillView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,7 +7,7 @@
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              d:Width="40"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance mvm:TraitViewModel, IsDesignTimeCreatable=True}">
+             d:DataContext="{d:DesignInstance mvm:PassiveSkillViewModel, IsDesignTimeCreatable=True}">
     <UserControl.Resources>
         <ResourceDictionary>
             <mvm:RankColorConverter x:Key="RCC" />

@@ -57,7 +57,7 @@ foreach (var kvp in containersGvas)
 }
 
 var chars = save2.Level.ReadCharacterData(PalDB.LoadEmbedded(), save2.Players);
-var p = chars.Pals.Where(p => p.Pal.Name == "Jetragon" && p.Traits.Select(t => t.Name).Intersect(new string[] { "Legend", "Nimble", "Runner", "Swift" }).Count() == 4).Single();
+var p = chars.Pals.Where(p => p.Pal.Name == "Jetragon" && p.PassiveSkills.Select(t => t.Name).Intersect(new string[] { "Legend", "Nimble", "Runner", "Swift" }).Count() == 4).Single();
 
 return;
 

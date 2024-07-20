@@ -30,7 +30,7 @@ for (const existing of keptPals) {
     const fromOld = oldPalsByInternalName[existing]
     const fromNew = newPalsByInternalName[existing]
 
-    const toCheck = ['Id', 'Name', 'InternalIndex', 'BreedingPower', 'GuaranteedTraitInternalIds']
+    const toCheck = ['Id', 'Name', 'InternalIndex', 'BreedingPower', 'GuaranteedPassiveSkillsInternalIds']
     const changed = toCheck.filter(k => JSON.stringify(fromOld[k]) != JSON.stringify(fromNew[k]))
 
     if (changed.length) {
@@ -56,21 +56,21 @@ for (const existing of keptPals) {
     }
 }
 
-/* COMPARE TRAITS */
-const oldTraitsByInternalName = toObj(oldDb.Traits, 'InternalName')
-const newTraitsByInternalName = toObj(newDb.Traits, 'InternalName')
+/* COMPARE PASSIVES */
+const oldPassivesByInternalName = toObj(oldDb.Traits || oldDb.PassiveSkills, 'InternalName')
+const newPassivesByInternalName = toObj(newDb.Traits || newDb.PassiveSkills, 'InternalName')
 
-const addedTraits = Object.keys(newTraitsByInternalName).filter(t => !oldTraitsByInternalName[t])
-const removedTraits = Object.keys(oldTraitsByInternalName).filter(t => !newTraitsByInternalName[t])
-const keptTraits = Object.keys(oldTraitsByInternalName).filter(t => newTraitsByInternalName[t])
+const addedPassives = Object.keys(newPassivesByInternalName).filter(t => !oldPassivesByInternalName[t])
+const removedPassives = Object.keys(oldPassivesByInternalName).filter(t => !newPassivesByInternalName[t])
+const keptPassives = Object.keys(oldPassivesByInternalName).filter(t => newPassivesByInternalName[t])
 
-console.log('added traits', addedTraits)
-console.log('removed traits', removedTraits)
+console.log('added passives', addedPassives)
+console.log('removed passives', removedPassives)
 
 console.log('checking for diffs')
-for (const existing of keptTraits) {
-    const fromOld = oldTraitsByInternalName[existing]
-    const fromNew = newTraitsByInternalName[existing]
+for (const existing of keptPassives) {
+    const fromOld = oldPassivesByInternalName[existing]
+    const fromNew = newPassivesByInternalName[existing]
 
     const toCheck = ['Name', 'Rank']
     const changed = toCheck.filter(k => fromOld[k] != fromNew[k])

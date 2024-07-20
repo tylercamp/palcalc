@@ -84,8 +84,8 @@ namespace PalCalc.GenDB
             var pals = new List<Pal>();
             pals.AddRange(ParseScrapedJson.ReadPals());
 
-            var traits = new List<Trait>();
-            traits.AddRange(ParseScrapedJson.ReadTraits());
+            var passives = new List<PassiveSkill>();
+            passives.AddRange(ParseScrapedJson.ReadPassives());
 
             var localizations = ParseLocalizedNameJson.ParseLocalizedNames();
 
@@ -95,9 +95,9 @@ namespace PalCalc.GenDB
                 var i10n = kvp.Value;
 
                 var missingPals = pals.Where(p => !i10n.PalsByLowerInternalName.ContainsKey(p.InternalName.ToLower())).ToList();
-                var missingTraits = traits.Where(t => !i10n.TraitsByLowerInternalName.ContainsKey(t.InternalName.ToLower())).ToList();
+                var missingPassives = passives.Where(t => !i10n.TraitsByLowerInternalName.ContainsKey(t.InternalName.ToLower())).ToList();
 
-                if (missingPals.Count > 0 || missingTraits.Count > 0)
+                if (missingPals.Count > 0 || missingPassives.Count > 0)
                 {
                     Console.WriteLine("{0} missing entries:", lang);
 
@@ -107,10 +107,10 @@ namespace PalCalc.GenDB
                         foreach (var p in missingPals) Console.WriteLine("- {0}", p.InternalName);
                     }
 
-                    if (missingTraits.Count > 0)
+                    if (missingPassives.Count > 0)
                     {
-                        Console.WriteLine("Traits");
-                        foreach (var t in missingTraits) Console.WriteLine("- {0}", t.InternalName);
+                        Console.WriteLine("Passives");
+                        foreach (var t in missingPassives) Console.WriteLine("- {0}", t.InternalName);
                     }
                 }
             }
@@ -121,9 +121,9 @@ namespace PalCalc.GenDB
                     .Where(p => p.Item2 != null)
                     .ToDictionary(p => p.Key, p => p.Item2);
 
-            foreach (var trait in traits)
-                trait.LocalizedNames = localizations
-                    .Select(kvp => (kvp.Key, kvp.Value.TraitsByLowerInternalName.GetValueOrDefault(trait.InternalName.ToLower())))
+            foreach (var skill in passives)
+                skill.LocalizedNames = localizations
+                    .Select(kvp => (kvp.Key, kvp.Value.TraitsByLowerInternalName.GetValueOrDefault(skill.InternalName.ToLower())))
                     .Where(p => p.Item2 != null)
                     .ToDictionary(p => p.Key, p => p.Item2);
 
@@ -136,8 +136,8 @@ namespace PalCalc.GenDB
             }
 
             foreach (var pal in pals)
-                if (pal.GuaranteedTraitInternalIds.Any(id => !traits.Any(t => t.InternalName == id)))
-                    throw new Exception("Unrecognized trait ID");
+                if (pal.GuaranteedPassivesInternalIds.Any(id => !passives.Any(t => t.InternalName == id)))
+                    throw new Exception("Unrecognized passive skill ID");
 
             Pal Child(GenderedPal parent1, GenderedPal parent2)
             {
@@ -231,7 +231,7 @@ namespace PalCalc.GenDB
 
             db.PalsById = pals.ToDictionary(p => p.Id);
 
-            db.Traits = traits;
+            db.PassiveSkills = passives;
 
             var genderProbabilities = ParseScrapedJson.ReadGenderProbabilities();
             db.BreedingGenderProbability = pals.ToDictionary(

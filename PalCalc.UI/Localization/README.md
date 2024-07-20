@@ -1,6 +1,6 @@
 ﻿# Pal Calc Translations
 
-Pal Calc supports translations for languages used in the game. Pal and Trait names are taken directly from the game files. Other text is for Pal Calc itself.
+Pal Calc supports translations for languages used in the game. Pal and Passive Skill names are taken directly from the game files. Other text is for Pal Calc itself.
 
 Each text in Pal Calc has an entry in the `LocalizationCodes.resx` file. Each entry has a name (called the "Localization Code" or `LC`) and sometimes a list of parameters (for dynamic text). Translations for each `LC` are stored in `.resx` files in the [Localizations](./Localizations/) folder.
 
@@ -79,7 +79,7 @@ The `Translator` is responsible for loading and resolving localizations, but `IL
 `ILocalizableText` represents some abstract text which _can_ be localized. Most of these expose a `Bind` method for instantiating that text (as a `ILocalizedText`) and mainly exists for applying parameters to format strings:
 
 - `StoredLocalizableText` is used for translations in `.resx` files. Its `Bind` accepts a dictionary of named parameters which match the required parameters listed in the `LocalizationCodes.resx` file. Parameters will generally be converted with `ToString`, though `ILocalizedText` parameter values will have their underlying text used instead.
-- `DerivedLocalizableText` is used for all other cases where text needs to change if the language is updated. This is mainly for pal names (`PalViewModel.NameLocalizer`), trait names (`TraitViewModel.NameLocalizer`), and making lists (`Translator.Join`).
+- `DerivedLocalizableText` is used for all other cases where text needs to change if the language is updated. This is mainly for pal names (`PalViewModel.NameLocalizer`), passive skill names (`TraitViewModel.NameLocalizer`), and making lists (`Translator.Join`).
 - `HardCodedText` (an `ILocalizedText`) is used for text which is constant and never changes regardless of language. This should only be used for e.g. player/guild names, or for debug text.
 
 When using manual translations with `LocalizationCodes`, use the `Bind` extension methods which can be called directly on enums, e.g. `LocalizationCodes.LC_FOO.Bind(...)`. This syntax and its overloads are much easier to use:

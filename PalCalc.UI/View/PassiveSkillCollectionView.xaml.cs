@@ -18,37 +18,37 @@ using System.Windows.Shapes;
 namespace PalCalc.UI.View
 {
     /// <summary>
-    /// Interaction logic for TraitCollectionView.xaml
+    /// Interaction logic for PassiveSkillCollectionView.xaml
     /// </summary>
-    public partial class TraitCollectionView : Grid
+    public partial class PassiveSkillCollectionView : Grid
     {
-        public TraitCollectionView()
+        public PassiveSkillCollectionView()
         {
             InitializeComponent();
 
-            DataContextChanged += TraitCollectionView_DataContextChanged;
+            DataContextChanged += PassiveSkillCollectionView_DataContextChanged;
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             base.OnRenderSizeChanged(sizeInfo);
 
-            var vm = DataContext as TraitCollectionViewModel;
+            var vm = DataContext as PassiveSkillCollectionViewModel;
             if (vm == null) return;
 
             foreach (var child in Children)
             {
-                var traitView = child as TraitView;
-                if (traitView == null) continue;
+                var skillView = child as PassiveSkillView;
+                if (skillView == null) continue;
 
                 // force child sizing (otherwise the '*' column sizing doesn't stay proportional)
-                traitView.Width = (ActualWidth - vm.Spacing) / 2;
+                skillView.Width = (ActualWidth - vm.Spacing) / 2;
             }
         }
 
-        private void TraitCollectionView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void PassiveSkillCollectionView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var newModel = e.NewValue as TraitCollectionViewModel;
+            var newModel = e.NewValue as PassiveSkillCollectionViewModel;
             if (newModel == null) return;
 
             Children.Clear();
@@ -66,15 +66,15 @@ namespace PalCalc.UI.View
 
             
 
-            foreach (var vm in newModel.Traits)
+            foreach (var vm in newModel.Passives)
             {
-                var traitView = new TraitView();
-                traitView.DataContext = vm;
+                var skillView = new PassiveSkillView();
+                skillView.DataContext = vm;
 
-                Grid.SetRow(traitView, newModel.RowIndexOf(vm));
-                Grid.SetColumn(traitView, newModel.ColumnIndexOf(vm));
+                Grid.SetRow(skillView, newModel.RowIndexOf(vm));
+                Grid.SetColumn(skillView, newModel.ColumnIndexOf(vm));
 
-                Children.Add(traitView);
+                Children.Add(skillView);
             }
         }
     }

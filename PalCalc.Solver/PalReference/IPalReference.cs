@@ -14,19 +14,19 @@ namespace PalCalc.Solver.PalReference
         Pal Pal { get; }
 
         /// <summary>
-        /// The list of DESIRED traits held by this pal. Any irrelevant traits are to
-        /// be represented as a Random trait.
+        /// The list of DESIRED passives held by this pal. Any irrelevant passives are to
+        /// be represented as a Random passive.
         /// </summary>
-        List<Trait> EffectiveTraits { get; }
-        int EffectiveTraitsHash { get; } // optimization
+        List<PassiveSkill> EffectivePassives { get; }
+        int EffectivePassivesHash { get; } // optimization
 
-        List<Trait> ActualTraits { get; }
+        List<PassiveSkill> ActualPassives { get; }
 
         PalGender Gender { get; }
 
         int NumTotalBreedingSteps { get; }
 
-        string EffectiveTraitsString => EffectiveTraits.TraitsListToString();
+        string EffectivePassivesString => EffectivePassives.PassiveSkillListToString();
 
         IPalRefLocation Location { get; }
 

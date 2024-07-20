@@ -34,62 +34,62 @@ namespace PalCalc.UI.ViewModel.Mapped
         }
     }
 
-    public class TraitViewModel
+    public class PassiveSkillViewModel
     {
-        private static readonly DerivedLocalizableText<Trait> NameLocalizer = new DerivedLocalizableText<Trait>(
-            (locale, trait) => trait switch
+        private static readonly DerivedLocalizableText<PassiveSkill> NameLocalizer = new DerivedLocalizableText<PassiveSkill>(
+            (locale, passive) => passive switch
             {
-                RandomTrait => Translator.Localizations[locale][LocalizationCodes.LC_RANDOM_TRAIT],
-                _ => trait.LocalizedNames?.GetValueOrElse(locale.ToFormalName(), trait.Name) ?? trait.InternalName
+                RandomPassiveSkill => Translator.Localizations[locale][LocalizationCodes.LC_RANDOM_TRAIT],
+                _ => passive.LocalizedNames?.GetValueOrElse(locale.ToFormalName(), passive.Name) ?? passive.InternalName
             }
         );
 
-        private static Dictionary<Trait, TraitViewModel> instances;
-        private static ILocalizedText randomTraitLabel;
-        public static TraitViewModel Make(Trait trait)
+        private static Dictionary<PassiveSkill, PassiveSkillViewModel> instances;
+        private static ILocalizedText randomPassiveLabel;
+        public static PassiveSkillViewModel Make(PassiveSkill passive)
         {
             if (instances == null)
             {
-                instances = PalDB.LoadEmbedded().Traits.ToDictionary(t => t, t => new TraitViewModel(t, NameLocalizer.Bind(t)));
+                instances = PalDB.LoadEmbedded().PassiveSkills.ToDictionary(t => t, t => new PassiveSkillViewModel(t, NameLocalizer.Bind(t)));
             }
 
-            if (trait is RandomTrait)
+            if (passive is RandomPassiveSkill)
             {
-                randomTraitLabel ??= NameLocalizer.Bind(trait);
+                randomPassiveLabel ??= NameLocalizer.Bind(passive);
 
-                return new TraitViewModel(trait, randomTraitLabel);
+                return new PassiveSkillViewModel(passive, randomPassiveLabel);
             }
             else
             {
-                return instances[trait];
+                return instances[passive];
             }
         }
 
         // for XAML designer view
-        public TraitViewModel() : this(new Trait("Runner", "runner", 2), new HardCodedText("Runner"))
+        public PassiveSkillViewModel() : this(new PassiveSkill("Runner", "runner", 2), new HardCodedText("Runner"))
         {
         }
 
         private int hash;
         private static Random random = new Random();
-        private TraitViewModel(Trait trait, ILocalizedText name)
+        private PassiveSkillViewModel(PassiveSkill passive, ILocalizedText name)
         {
-            ModelObject = trait;
+            ModelObject = passive;
             Name = name;
 
-            if (trait is RandomTrait) hash = random.Next();
-            else hash = trait.GetHashCode();
+            if (passive is RandomPassiveSkill) hash = random.Next();
+            else hash = passive.GetHashCode();
         }
 
-        public Trait ModelObject { get; }
+        public PassiveSkill ModelObject { get; }
 
-        public ImageSource RankIcon => TraitIcon.Images[ModelObject.Rank];
+        public ImageSource RankIcon => PassiveSkillIcon.Images[ModelObject.Rank];
 
         public int Rank => ModelObject.Rank;
 
         public ILocalizedText Name { get; }
 
-        public override bool Equals(object obj) => ModelObject is RandomTrait ? ReferenceEquals(this, obj) : ModelObject.Equals((obj as TraitViewModel)?.ModelObject);
+        public override bool Equals(object obj) => ModelObject is RandomPassiveSkill ? ReferenceEquals(this, obj) : ModelObject.Equals((obj as PassiveSkillViewModel)?.ModelObject);
 
         public override int GetHashCode() => hash;
     }

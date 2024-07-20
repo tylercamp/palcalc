@@ -72,16 +72,16 @@ namespace PalCalc.UI.ViewModel
         }
 
         public List<PalViewModel> AvailablePals => AllPals;
-        public List<TraitViewModel> AvailableTraits => AllTraits;
+        public List<PassiveSkillViewModel> AvailablePassives => AllPassives;
 
         public static List<PalViewModel> AllPals = PalDB.LoadEmbedded().Pals
             .OrderBy(p => p.Id)
             .Select(p => PalViewModel.Make(p))
             .ToList();
 
-        public static List<TraitViewModel> AllTraits = PalDB.LoadEmbedded().Traits
+        public static List<PassiveSkillViewModel> AllPassives = PalDB.LoadEmbedded().PassiveSkills
             .DistinctBy(t => t.InternalName)
-            .Select(TraitViewModel.Make)
+            .Select(PassiveSkillViewModel.Make)
             .OrderBy(t => t.Name.Value)
             .ToList();
 

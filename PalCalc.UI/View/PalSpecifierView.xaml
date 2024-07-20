@@ -19,7 +19,7 @@
             <Setter Property="FontSize" Value="10" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
-        <Style TargetType="{x:Type local:TraitCollectionView}">
+        <Style TargetType="{x:Type local:PassiveSkillCollectionView}">
             <Setter Property="MinWidth" Value="200" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
@@ -85,17 +85,17 @@
                 </Grid>
 
                 <TextBlock
-                    Text="{Binding RequiredTraitsCollection.RequiredDescription.Value}"
+                    Text="{Binding RequiredPassivesCollection.RequiredDescription.Value}"
                     TextWrapping="Wrap"
                     FontWeight="Bold"
                     Grid.Row="1"
                     />
 
                 <TextBlock
-                    Text="{Binding OptionalTraitsCollection.OptionalDescription.Value}"
+                    Text="{Binding OptionalPassivesCollection.OptionalDescription.Value}"
                     TextWrapping="Wrap"
                     FontStyle="Italic"
-                    Visibility="{Binding OptionalTraitsCollection.Traits, Converter={StaticResource CVC}}"
+                    Visibility="{Binding OptionalPassivesCollection.Passives, Converter={StaticResource CVC}}"
                     Grid.Row="2"
                     />
             </Grid>

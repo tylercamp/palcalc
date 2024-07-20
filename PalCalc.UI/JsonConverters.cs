@@ -82,22 +82,22 @@ namespace PalCalc.UI
     }
 
     #region Model Converters
-    internal class TraitConverter : PalConverterBase<Trait>
+    internal class PassiveSkillConverter : PalConverterBase<PassiveSkill>
     {
-        public TraitConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        public PassiveSkillConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
         {
         }
 
-        protected override Trait ReadTypeJson(JsonReader reader, Type objectType, Trait existingValue, bool hasExistingValue, JsonSerializer serializer)
+        protected override PassiveSkill ReadTypeJson(JsonReader reader, Type objectType, PassiveSkill existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var token = JToken.ReadFrom(reader);
-            var traitInternalName = token.ToObject<string>();
-            return traitInternalName != null
-                ? traitInternalName.InternalToTrait(db)
+            var passiveInternalName = token.ToObject<string>();
+            return passiveInternalName != null
+                ? passiveInternalName.InternalToPassive(db)
                 : null;
         }
 
-        protected override void WriteTypeJson(JsonWriter writer, Trait value, JsonSerializer serializer)
+        protected override void WriteTypeJson(JsonWriter writer, PassiveSkill value, JsonSerializer serializer)
         {
             JToken.FromObject(value.InternalName, serializer).WriteTo(writer, dependencyConverters);
         }
@@ -213,7 +213,7 @@ namespace PalCalc.UI
         {
             InjectDependencyConverters(serializer);
             var inst = token.ToObject<PalInstance>(serializer);
-            return new OwnedPalReference(inst, inst.Traits); // supposed to be "effective traits", but that only matters when the solver is running, and this is a saved solver result
+            return new OwnedPalReference(inst, inst.PassiveSkills); // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
         }
     }
 
@@ -262,18 +262,18 @@ namespace PalCalc.UI
             return JToken.FromObject(new
             {
                 PalId = value.Pal.Id,
-                GuaranteedTraits = value.EffectiveTraits.Where(t => t is not RandomTrait).ToList(),
-                NumTraits = value.EffectiveTraits.Count(t => t is RandomTrait),
+                GuaranteedPassives = value.EffectivePassives.Where(t => t is not RandomPassiveSkill).ToList(),
+                NumPassives = value.EffectivePassives.Count(t => t is RandomPassiveSkill),
             }, serializer);
         }
 
         internal override WildPalReference ReadRefJson(JToken token, Type objectType, WildPalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var pal = token["PalId"].ToObject<PalId>(serializer).ToPal(db);
-            var guaranteedTraits = token["GuaranteedTraits"]?.ToObject<List<string>>()?.Select(s => s.InternalToTrait(db))?.ToList();
-            var numTraits = token["NumTraits"].ToObject<int>();
+            var guaranteedPassives = (token["GuaranteedPassives"] ?? token["GuaranteedTraits"])?.ToObject<List<string>>()?.Select(s => s.InternalToPassive(db))?.ToList();
+            var numPassives = (token["NumPassives"] ?? token["NumTraits"]).ToObject<int>();
 
-            return new WildPalReference(pal, guaranteedTraits ?? Enumerable.Empty<Trait>(), numTraits);
+            return new WildPalReference(pal, guaranteedPassives ?? Enumerable.Empty<PassiveSkill>(), numPassives);
         }
     }
 
@@ -284,7 +284,7 @@ namespace PalCalc.UI
             dependencyConverters = new JsonConverter[]
             {
                 genericConverter,
-                new TraitConverter(db, gameSettings),
+                new PassiveSkillConverter(db, gameSettings),
                 new ILocalizedTextConverter(db, gameSettings),
             };
         }
@@ -293,13 +293,13 @@ namespace PalCalc.UI
         {
             InjectDependencyConverters(serializer);
             var pal = token["PalId"].ToObject<PalId>(serializer).ToPal(db);
-            var traits = token["Traits"].ToObject<List<Trait>>(serializer);
+            var passives = (token["Passives"] ?? token["Traits"]).ToObject<List<PassiveSkill>>(serializer);
             var parent1 = token["Parent1"].ToObject<IPalReference>(serializer);
             var parent2 = token["Parent2"].ToObject<IPalReference>(serializer);
             var gender = token["Gender"].ToObject<PalGender>(serializer);
-            var traitsProbability = token["TraitsProbability"].ToObject<float>(serializer);
+            var passivesProbability = (token["PassivesProbability"] ?? token["TraitsProbability"]).ToObject<float>(serializer);
 
-            return new BredPalReference(gameSettings, pal, parent1, parent2, traits, traitsProbability).WithGuaranteedGender(db, gender) as BredPalReference;
+            return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability).WithGuaranteedGender(db, gender) as BredPalReference;
         }
 
         internal override JToken MakeRefJson(BredPalReference value, JsonSerializer serializer)
@@ -308,11 +308,11 @@ namespace PalCalc.UI
             return JToken.FromObject(new
             {
                 PalId = value.Pal.Id,
-                Traits = value.EffectiveTraits,
+                Passives = value.EffectivePassives,
                 Parent1 = value.Parent1,
                 Parent2 = value.Parent2,
                 Gender = value.Gender,
-                TraitsProbability = value.TraitsProbability,
+                PassivesProbability = value.PassivesProbability,
             }, serializer);
         }
     }
@@ -340,26 +340,26 @@ namespace PalCalc.UI
         }
     }
 
-    internal class TraitViewModelConverter : PalConverterBase<TraitViewModel>
+    internal class PassiveSkillViewModelConverter : PalConverterBase<PassiveSkillViewModel>
     {
-        public TraitViewModelConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        public PassiveSkillViewModelConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
         {
             dependencyConverters = new JsonConverter[]
             {
-                new TraitConverter(db, gameSettings),
+                new PassiveSkillConverter(db, gameSettings),
                 new ILocalizedTextConverter(db, gameSettings),
             };
         }
 
-        protected override TraitViewModel ReadTypeJson(JsonReader reader, Type objectType, TraitViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
+        protected override PassiveSkillViewModel ReadTypeJson(JsonReader reader, Type objectType, PassiveSkillViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            var trait = JToken.ReadFrom(reader).ToObject<Trait>(serializer);
-            return trait != null
-                ? TraitViewModel.Make(trait)
+            var passive = JToken.ReadFrom(reader).ToObject<PassiveSkill>(serializer);
+            return passive != null
+                ? PassiveSkillViewModel.Make(passive)
                 : null;
         }
 
-        protected override void WriteTypeJson(JsonWriter writer, TraitViewModel value, JsonSerializer serializer)
+        protected override void WriteTypeJson(JsonWriter writer, PassiveSkillViewModel value, JsonSerializer serializer)
         {
             JToken.FromObject(value.ModelObject, serializer).WriteTo(writer, dependencyConverters);
         }
@@ -372,7 +372,7 @@ namespace PalCalc.UI
             dependencyConverters = new JsonConverter[]
             {
                 new PalViewModelConverter(db, gameSettings),
-                new TraitViewModelConverter(db, gameSettings),
+                new PassiveSkillViewModelConverter(db, gameSettings),
                 new BreedingResultListViewModelConverter(db, gameSettings, source),
                 new ILocalizedTextConverter(db, gameSettings),
             };
@@ -384,14 +384,14 @@ namespace PalCalc.UI
             return new PalSpecifierViewModel(null)
             {
                 TargetPal = obj["TargetPal"].ToObject<PalViewModel>(serializer),
-                Trait1 = obj["Trait1"].ToObject<TraitViewModel>(serializer),
-                Trait2 = obj["Trait2"].ToObject<TraitViewModel>(serializer),
-                Trait3 = obj["Trait3"].ToObject<TraitViewModel>(serializer),
-                Trait4 = obj["Trait4"].ToObject<TraitViewModel>(serializer),
-                OptionalTrait1 = obj["OptionalTrait1"]?.ToObject<TraitViewModel>(serializer),
-                OptionalTrait2 = obj["OptionalTrait2"]?.ToObject<TraitViewModel>(serializer),
-                OptionalTrait3 = obj["OptionalTrait3"]?.ToObject<TraitViewModel>(serializer),
-                OptionalTrait4 = obj["OptionalTrait4"]?.ToObject<TraitViewModel>(serializer),
+                Passive1 = (obj["Passive1"] ?? obj["Trait1"]).ToObject<PassiveSkillViewModel>(serializer),
+                Passive2 = (obj["Passive2"] ?? obj["Trait2"]).ToObject<PassiveSkillViewModel>(serializer),
+                Passive3 = (obj["Passive3"] ?? obj["Trait3"]).ToObject<PassiveSkillViewModel>(serializer),
+                Passive4 = (obj["Passive4"] ?? obj["Trait4"]).ToObject<PassiveSkillViewModel>(serializer),
+                OptionalPassive1 = (obj["OptionalPassive1"] ?? obj["OptionalTrait1"])?.ToObject<PassiveSkillViewModel>(serializer),
+                OptionalPassive2 = (obj["OptionalPassive2"] ?? obj["OptionalTrait2"])?.ToObject<PassiveSkillViewModel>(serializer),
+                OptionalPassive3 = (obj["OptionalPassive3"] ?? obj["OptionalTrait3"])?.ToObject<PassiveSkillViewModel>(serializer),
+                OptionalPassive4 = (obj["OptionalPassive4"] ?? obj["OptionalTrait4"])?.ToObject<PassiveSkillViewModel>(serializer),
                 PalSourceId = obj["PalSourceId"]?.ToObject<string>(),
                 IncludeBasePals = obj["IncludeBasePals"]?.ToObject<bool>() ?? true,
                 CurrentResults = obj["CurrentResults"].ToObject<BreedingResultListViewModel>(serializer)
@@ -403,14 +403,14 @@ namespace PalCalc.UI
             JToken.FromObject(new
             {
                 TargetPal = value.TargetPal,
-                Trait1 = value.Trait1,
-                Trait2 = value.Trait2,
-                Trait3 = value.Trait3,
-                Trait4 = value.Trait4,
-                OptionalTrait1 = value.OptionalTrait1,
-                OptionalTrait2 = value.OptionalTrait2,
-                OptionalTrait3 = value.OptionalTrait3,
-                OptionalTrait4 = value.OptionalTrait4,
+                Passive1 = value.Passive1,
+                Passive2 = value.Passive2,
+                Passive3 = value.Passive3,
+                Passive4 = value.Passive4,
+                OptionalPassive1 = value.OptionalPassive1,
+                OptionalPassive2 = value.OptionalPassive2,
+                OptionalPassive3 = value.OptionalPassive3,
+                OptionalPassive4 = value.OptionalPassive4,
                 PalSourceId = value.PalSourceId,
                 IncludeBasePals = value.IncludeBasePals,
                 CurrentResults = value.CurrentResults

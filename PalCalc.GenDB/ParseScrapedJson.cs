@@ -45,12 +45,12 @@ namespace PalCalc.GenDB
             public int? MinWildLevel { get; set; }
             public int? MaxWildLevel { get; set; }
 
-            public List<string> GuaranteedTraits { get; set; } = new List<string>();
+            public List<string> GuaranteedPassives { get; set; } = new List<string>();
 
             public JsonPalExclusiveBreeding ExclusiveBreeding { get; set; }
         }
 
-        class JsonTrait
+        class JsonPassive
         {
             public string Name { get; set; }
             public string CodeName { get; set; }
@@ -58,11 +58,11 @@ namespace PalCalc.GenDB
             public int Rank { get; set; }
         }
 
-        public static List<Trait> ReadTraits()
+        public static List<PassiveSkill> ReadPassives()
         {
             return JsonConvert
-                .DeserializeObject<List<JsonTrait>>(File.ReadAllText("ref/scraped-traits.json"))
-                .Select(jt => new Trait(jt.Name, jt.CodeName, jt.Rank))
+                .DeserializeObject<List<JsonPassive>>(File.ReadAllText("ref/scraped-passives.json"))
+                .Select(jt => new PassiveSkill(jt.Name, jt.CodeName, jt.Rank))
                 .ToList();
         }
 
@@ -77,7 +77,7 @@ namespace PalCalc.GenDB
                     Id = new PalId() { PalDexNo = jp.PalDexNo, IsVariant = jp.IsVariant },
                     BreedingPower = jp.BreedPower,
                     InternalIndex = jp.IndexOrder,
-                    GuaranteedTraitInternalIds = jp.GuaranteedTraits,
+                    GuaranteedPassivesInternalIds = jp.GuaranteedPassives,
                     Price = jp.Price,
                     MinWildLevel = jp.MinWildLevel,
                     MaxWildLevel = jp.MaxWildLevel,

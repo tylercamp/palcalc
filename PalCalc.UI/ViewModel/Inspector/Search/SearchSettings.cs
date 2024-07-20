@@ -31,10 +31,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 {
                     SearchedPal = null;
                     SearchedGender = GenderOption.AnyGender;
-                    SearchedTrait1 = null;
-                    SearchedTrait2 = null;
-                    SearchedTrait3 = null;
-                    SearchedTrait4 = null;
+                    SearchedPassive1 = null;
+                    SearchedPassive2 = null;
+                    SearchedPassive3 = null;
+                    SearchedPassive4 = null;
                     MinIVHP = 0;
                     MinIVAttack = 0;
                     MinIVDefense = 0;
@@ -52,19 +52,19 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         [NotifyPropertyChangedFor(nameof(AsCriteria))]
         [ObservableProperty]
-        private TraitViewModel searchedTrait1;
+        private PassiveSkillViewModel searchedPassive1;
 
         [NotifyPropertyChangedFor(nameof(AsCriteria))]
         [ObservableProperty]
-        private TraitViewModel searchedTrait2;
+        private PassiveSkillViewModel searchedPassive2;
 
         [NotifyPropertyChangedFor(nameof(AsCriteria))]
         [ObservableProperty]
-        private TraitViewModel searchedTrait3;
+        private PassiveSkillViewModel searchedPassive3;
 
         [NotifyPropertyChangedFor(nameof(AsCriteria))]
         [ObservableProperty]
-        private TraitViewModel searchedTrait4;
+        private PassiveSkillViewModel searchedPassive4;
 
         [NotifyPropertyChangedFor(nameof(AsCriteria))]
         [ObservableProperty]
@@ -86,7 +86,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             GenderOption.Female,
         ];
 
-        public List<TraitViewModel> TraitOptions { get; } = PalDB.LoadEmbedded().Traits.Select(TraitViewModel.Make).ToList();
+        public List<PassiveSkillViewModel> PassiveSkillOptions { get; } = PalDB.LoadEmbedded().PassiveSkills.Select(PassiveSkillViewModel.Make).ToList();
 
         public ISearchCriteria AsCriteria
         {
@@ -96,10 +96,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 if (SearchedPal != null) criteria.Add(new PalSearchCriteria(SearchedPal.ModelObject));
                 if (SearchedGender.Value != PalGender.WILDCARD) criteria.Add(new GenderSearchCriteria(SearchedGender.Value));
 
-                if (SearchedTrait1 != null) criteria.Add(new TraitSearchCriteria(SearchedTrait1.ModelObject));
-                if (SearchedTrait2 != null) criteria.Add(new TraitSearchCriteria(SearchedTrait2.ModelObject));
-                if (SearchedTrait3 != null) criteria.Add(new TraitSearchCriteria(SearchedTrait3.ModelObject));
-                if (SearchedTrait4 != null) criteria.Add(new TraitSearchCriteria(SearchedTrait4.ModelObject));
+                if (SearchedPassive1 != null) criteria.Add(new PassiveSkillSearchCriteria(SearchedPassive1.ModelObject));
+                if (SearchedPassive2 != null) criteria.Add(new PassiveSkillSearchCriteria(SearchedPassive2.ModelObject));
+                if (SearchedPassive3 != null) criteria.Add(new PassiveSkillSearchCriteria(SearchedPassive3.ModelObject));
+                if (SearchedPassive4 != null) criteria.Add(new PassiveSkillSearchCriteria(SearchedPassive4.ModelObject));
 
                 criteria.Add(new CustomSearchCriteria(p => p.IV_HP >= MinIVHP));
                 criteria.Add(new CustomSearchCriteria(p => p.IV_Shot >= MinIVAttack));

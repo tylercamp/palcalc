@@ -8,8 +8,8 @@ const sharp = require('sharp')
 /*
 1. use paldb.cc to fetch the list of pals
 2. use paldb.cc to fetch icons + details for each pal
-3. use paldb.cc to fetch the list of traits and associated pals
-4. scrape Palworld-Pal-Editor source to get the internal codenames for traits
+3. use paldb.cc to fetch the list of passives and associated pals
+4. scrape Palworld-Pal-Editor source to get the internal codenames for passives
 */
 
 if (!fs.existsSync('out/raw-icons')) fs.mkdirSync('out/raw-icons', { recursive: true })
@@ -208,7 +208,7 @@ async function fetchPassives() {
             IsVariant: parsed.properties["ZukanIndexSuffix"] == "B",
             BreedPower: parseInt(parsed.properties["CombiRank"]),
             MaleProbability: parseInt(parsed.properties["MaleProbability"]),
-            GuaranteedTraits: passives.filter(({ guaranteedForPalNames }) => guaranteedForPalNames.includes(palPath)).map(p => p.codeName),
+            GuaranteedPassives: passives.filter(({ guaranteedForPalNames }) => guaranteedForPalNames.includes(palPath)).map(p => p.codeName),
             Price: parseInt(parsed.properties["Gold Coin"]),
 
             IndexOrder: breedingEntry ? parseInt(breedingEntry.indexOrder) : -1,
@@ -258,7 +258,7 @@ async function fetchPassives() {
 
     fs.writeFileSync('out/scraped-pals.json', JSON.stringify(resultPals, null, 4))
 
-    fs.writeFileSync('out/scraped-traits.json', JSON.stringify(
+    fs.writeFileSync('out/scraped-passives.json', JSON.stringify(
         passives.map(({ name, codeName, rank }) => ({
             Name: name, CodeName: codeName, Rank: parseInt(rank), IsPassive: true
         })),
@@ -270,7 +270,7 @@ async function fetchPassives() {
     if (!fs.existsSync('out/csv')) fs.mkdirSync('out/csv')
     
     const palColumns = ['Name', 'CodeName']
-    const ignoredPalColumns = ['GuaranteedTraits', 'ExclusiveBreeding']
+    const ignoredPalColumns = ['GuaranteedPassives', 'ExclusiveBreeding']
     for (const k of Object.keys(resultPals[0]).filter(k => !ignoredPalColumns.includes(k))) {
         if (!palColumns.includes(k)) palColumns.push(k)
     }
@@ -288,14 +288,14 @@ async function fetchPassives() {
             .map(({ Parent1: { CodeName: Parent1 }, Parent2: { CodeName: Parent2 }, Child }) => [ Parent1, Parent2, Child ].map(cn => resultPals.find(p => p.CodeName == cn).Name).join(','))
     ].join('\n'))
 
-    fs.writeFileSync('out/csv/guaranteed_traits.csv', [
-        'Pal,Trait1,Trait2,Trait3,Trait4',
-        ...resultPals.filter(p => p.GuaranteedTraits.length).map(({ Name, GuaranteedTraits }) =>
-            [ Name, ...GuaranteedTraits.map(t => passives.find(p => p.codeName == t).name), ...new Array(4 - GuaranteedTraits.length).map(v => '') ].join(',')
+    fs.writeFileSync('out/csv/guaranteed_passives.csv', [
+        'Pal,Passive4,Passive4,Passive4,Passive4',
+        ...resultPals.filter(p => p.GuaranteedPassives.length).map(({ Name, GuaranteedPassives }) =>
+            [ Name, ...GuaranteedPassives.map(t => passives.find(p => p.codeName == t).name), ...new Array(4 - GuaranteedPassives.length).map(v => '') ].join(',')
         )
     ].join('\n'))
 
-    fs.writeFileSync('out/csv/traits.csv', [
+    fs.writeFileSync('out/csv/passives.csv', [
         'Name,CodeName,Rank',
         ...passives.map(({ name, codeName, rank}) => [ name, codeName, rank ].join(','))
     ].join('\n'))

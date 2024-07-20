@@ -20,8 +20,8 @@ namespace PalCalc.UI.ViewModel
         {
             MaxBreedingSteps = 6;
             MaxWildPals = 1;
-            MaxInputIrrelevantTraits = 2;
-            MaxBredIrrelevantTraits = 1;
+            MaxInputIrrelevantPassives = 2;
+            MaxBredIrrelevantPassives = 1;
 
             ChangeBredPals = new RelayCommand(() =>
             {
@@ -66,18 +66,18 @@ namespace PalCalc.UI.ViewModel
             set => SetProperty(ref maxWildPals, Math.Max(0, value));
         }
 
-        private int maxInputIrrelevantTraits;
-        public int MaxInputIrrelevantTraits
+        private int maxInputIrrelevantPassives;
+        public int MaxInputIrrelevantPassives
         {
-            get => maxInputIrrelevantTraits;
-            set => SetProperty(ref maxInputIrrelevantTraits, Math.Clamp(value, 0, 4));
+            get => maxInputIrrelevantPassives;
+            set => SetProperty(ref maxInputIrrelevantPassives, Math.Clamp(value, 0, 4));
         }
 
-        public int maxBredIrrelevantTraits;
-        public int MaxBredIrrelevantTraits
+        public int maxBredIrrelevantPassives;
+        public int MaxBredIrrelevantPassives
         {
-            get => maxBredIrrelevantTraits;
-            set => SetProperty(ref maxBredIrrelevantTraits, Math.Clamp(value, 0, 4));
+            get => maxBredIrrelevantPassives;
+            set => SetProperty(ref maxBredIrrelevantPassives, Math.Clamp(value, 0, 4));
         }
 
         public int NumCpus => Environment.ProcessorCount;
@@ -116,8 +116,8 @@ namespace PalCalc.UI.ViewModel
             MaxWildPals,
             allowedWildPals: PalDB.LoadEmbedded().Pals.Except(BannedWildPals).ToList(),
             bannedBredPals: BannedBredPals,
-            MaxInputIrrelevantTraits,
-            MaxBredIrrelevantTraits,
+            MaxInputIrrelevantPassives,
+            MaxBredIrrelevantPassives,
             TimeSpan.MaxValue,
             MaxThreads
         );
@@ -126,8 +126,8 @@ namespace PalCalc.UI.ViewModel
         {
             MaxBreedingSteps = MaxBreedingSteps,
             MaxWildPals = MaxWildPals,
-            MaxInputIrrelevantTraits = MaxInputIrrelevantTraits,
-            MaxBredIrrelevantTraits = MaxBredIrrelevantTraits,
+            MaxInputIrrelevantPassives = MaxInputIrrelevantPassives,
+            MaxBredIrrelevantPassives = MaxBredIrrelevantPassives,
             MaxThreads = MaxThreads,
             BannedBredPalInternalNames = BannedBredPals.Select(p => p.InternalName).ToList(),
             BannedWildPalInternalNames = BannedWildPals.Select(p => p.InternalName).ToList(),
@@ -137,8 +137,8 @@ namespace PalCalc.UI.ViewModel
         {
             MaxBreedingSteps = model.MaxBreedingSteps,
             MaxWildPals = model.MaxWildPals,
-            MaxInputIrrelevantTraits = model.MaxInputIrrelevantTraits,
-            MaxBredIrrelevantTraits = model.MaxBredIrrelevantTraits,
+            MaxInputIrrelevantPassives = model.MaxInputIrrelevantPassives,
+            MaxBredIrrelevantPassives = model.MaxBredIrrelevantPassives,
             MaxThreads = model.MaxThreads,
             
             BannedBredPals = model.BannedBredPals(PalDB.LoadEmbedded()),

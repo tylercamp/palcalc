@@ -13,8 +13,8 @@ namespace PalCalc.UI.Model
     {
         public int MaxBreedingSteps { get; set; } = 6;
         public int MaxWildPals { get; set; } = 1;
-        public int MaxInputIrrelevantTraits { get; set; } = 3;
-        public int MaxBredIrrelevantTraits { get; set; } = 1;
+        public int MaxInputIrrelevantPassives { get; set; } = 3;
+        public int MaxBredIrrelevantPassives { get; set; } = 1;
         public int MaxThreads { get; set; } = 0;
 
         public List<string> BannedBredPalInternalNames { get; set; } = [];

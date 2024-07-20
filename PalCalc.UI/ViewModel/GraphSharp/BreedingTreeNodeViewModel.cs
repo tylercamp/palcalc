@@ -23,8 +23,8 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         {
             Value = node;
             Pal = PalViewModel.Make(node.PalRef.Pal);
-            Traits = node.PalRef.ActualTraits.Select(TraitViewModel.Make).ToList();
-            TraitCollection = new TraitCollectionViewModel(Traits);
+            PassiveSkills = node.PalRef.ActualPassives.Select(PassiveSkillViewModel.Make).ToList();
+            PassiveSkillsCollection = new PassiveSkillCollectionViewModel(PassiveSkills);
 
             switch (node.PalRef.Location)
             {
@@ -49,11 +49,11 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
         public IBreedingTreeNode Value { get; }
 
-        public List<TraitViewModel> Traits { get; }
+        public List<PassiveSkillViewModel> PassiveSkills { get; }
 
-        public TraitCollectionViewModel TraitCollection { get; }
+        public PassiveSkillCollectionViewModel PassiveSkillsCollection { get; }
 
-        public Visibility TraitsVisibility => Traits.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PassiveSkillsVisibility => PassiveSkills.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
         public Visibility EffortVisibility => Value.PalRef.BreedingEffort > TimeSpan.Zero ? Visibility.Visible : Visibility.Collapsed;
         public string Effort

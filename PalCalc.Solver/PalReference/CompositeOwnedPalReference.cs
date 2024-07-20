@@ -14,11 +14,11 @@ namespace PalCalc.Solver.PalReference
     /// requirements + breeding attempts. It wouldn't directly pair it with a male or female pal, since
     /// that would require breeding the "difficult" pal to have a specific gender.)
     /// 
-    /// These pals _should_, but are not _guaranteed_, to have the same set of traits:
+    /// These pals _should_, but are not _guaranteed_, to have the same set of passives:
     /// 
-    /// - If two pals have different desired traits, they should NOT be made composite.
-    /// - Conversely, if one pal has a desired trait, both pals will have that desired trait.
-    /// - The traits for this reference will match whichever pal has the most traits.
+    /// - If two pals have different desired passives, they should NOT be made composite.
+    /// - Conversely, if one pal has a desired passive, both pals will have that desired passive.
+    /// - The passives for this reference will match whichever pal has the most passives.
     /// </summary>
     public class CompositeOwnedPalReference : IPalReference
     {
@@ -29,12 +29,12 @@ namespace PalCalc.Solver.PalReference
 
             Location = new CompositeRefLocation(male.Location, female.Location);
 
-            // effective traits based on which pal has the most irrelevant traits
-            EffectiveTraits = male.EffectiveTraits.Count > female.EffectiveTraits.Count ? male.EffectiveTraits : female.EffectiveTraits;
-            EffectiveTraitsHash = EffectiveTraits.SetHash();
+            // effective passives based on which pal has the most irrelevant passives
+            EffectivePassives = male.EffectivePassives.Count > female.EffectivePassives.Count ? male.EffectivePassives : female.EffectivePassives;
+            EffectivePassivesHash = EffectivePassives.SetHash();
 
-            ActualTraits = Male.ActualTraits.Intersect(Female.ActualTraits).ToList();
-            while (ActualTraits.Count < EffectiveTraits.Count) ActualTraits.Add(new RandomTrait());
+            ActualPassives = Male.ActualPassives.Intersect(Female.ActualPassives).ToList();
+            while (ActualPassives.Count < EffectivePassives.Count) ActualPassives.Add(new RandomPassiveSkill());
         }
 
         public OwnedPalReference Male { get; }
@@ -42,11 +42,11 @@ namespace PalCalc.Solver.PalReference
 
         public Pal Pal => Male.Pal;
 
-        public List<Trait> EffectiveTraits { get; private set; }
+        public List<PassiveSkill> EffectivePassives { get; private set; }
 
-        public int EffectiveTraitsHash { get; private set; }
+        public int EffectivePassivesHash { get; private set; }
 
-        public List<Trait> ActualTraits { get; }
+        public List<PassiveSkill> ActualPassives { get; }
 
         public PalGender Gender { get; private set; } = PalGender.WILDCARD;
 
@@ -75,8 +75,8 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
-        // TODO - maybe just use Pal, TraitsHash, Gender? don't need hashes specific to the instances chosen?
+        // TODO - maybe just use Pal, PassivesHash, Gender? don't need hashes specific to the instances chosen?
         public override int GetHashCode() =>
-            HashCode.Combine(nameof(CompositeOwnedPalReference), Male, Female, EffectiveTraitsHash, Gender);
+            HashCode.Combine(nameof(CompositeOwnedPalReference), Male, Female, EffectivePassivesHash, Gender);
     }
 }

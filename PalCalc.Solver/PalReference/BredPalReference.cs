@@ -12,7 +12,7 @@ namespace PalCalc.Solver.PalReference
     {
         private GameSettings gameSettings;
 
-        private BredPalReference(GameSettings gameSettings, Pal pal, IPalReference parent1, IPalReference parent2, List<Trait> traits)
+        private BredPalReference(GameSettings gameSettings, Pal pal, IPalReference parent1, IPalReference parent2, List<PassiveSkill> passives)
         {
             this.gameSettings = gameSettings;
 
@@ -38,8 +38,8 @@ namespace PalCalc.Solver.PalReference
                 Parent2 = parent1;
             }
 
-            EffectiveTraits = traits;
-            EffectiveTraitsHash = traits.SetHash();
+            EffectivePassives = passives;
+            EffectivePassivesHash = passives.SetHash();
 
             parentBreedingEffort = gameSettings.MultipleBreedingFarms && Parent1 is BredPalReference && Parent2 is BredPalReference
                 ? Parent1.BreedingEffort > Parent2.BreedingEffort
@@ -48,16 +48,16 @@ namespace PalCalc.Solver.PalReference
                 : Parent1.BreedingEffort + Parent2.BreedingEffort;
         }
 
-        public BredPalReference(GameSettings gameSettings, Pal pal, IPalReference parent1, IPalReference parent2, List<Trait> traits, float traitsProbability) : this(gameSettings, pal, parent1, parent2, traits)
+        public BredPalReference(GameSettings gameSettings, Pal pal, IPalReference parent1, IPalReference parent2, List<PassiveSkill> passives, float passivesProbability) : this(gameSettings, pal, parent1, parent2, passives)
         {
             Gender = PalGender.WILDCARD;
-            if (traitsProbability <= 0) AvgRequiredBreedings = int.MaxValue;
-            else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / traitsProbability);
+            if (passivesProbability <= 0) AvgRequiredBreedings = int.MaxValue;
+            else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / passivesProbability);
 
-            TraitsProbability = traitsProbability;
+            PassivesProbability = passivesProbability;
         }
 
-        public float TraitsProbability { get; private set; }
+        public float PassivesProbability { get; private set; }
 
         public Pal Pal { get; private set; }
         public IPalReference Parent1 { get; private set; }
@@ -85,11 +85,11 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
-        public List<Trait> EffectiveTraits { get; }
+        public List<PassiveSkill> EffectivePassives { get; }
 
-        public int EffectiveTraitsHash { get; }
+        public int EffectivePassivesHash { get; }
 
-        public List<Trait> ActualTraits => EffectiveTraits;
+        public List<PassiveSkill> ActualPassives => EffectivePassives;
 
         private IPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)
         {
@@ -103,32 +103,32 @@ namespace PalCalc.Solver.PalReference
                 if (db.BreedingMostLikelyGender[Pal] != PalGender.WILDCARD)
                 {
                     // assume that the other parent has the more likely gender
-                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectiveTraits)
+                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives)
                     {
                         AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
                         Gender = gender,
-                        TraitsProbability = TraitsProbability,
+                        PassivesProbability = PassivesProbability,
                     };
                 }
                 else
                 {
                     // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
-                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectiveTraits)
+                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives)
                     {
                         AvgRequiredBreedings = AvgRequiredBreedings * 2,
                         Gender = gender,
-                        TraitsProbability = TraitsProbability,
+                        PassivesProbability = PassivesProbability,
                     };
                 }
             }
             else
             {
                 var genderProbability = db.BreedingGenderProbability[Pal][gender];
-                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectiveTraits)
+                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives)
                 {
                     AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / genderProbability),
                     Gender = gender,
-                    TraitsProbability = TraitsProbability,
+                    PassivesProbability = PassivesProbability,
                 };
             }
         }
@@ -143,7 +143,7 @@ namespace PalCalc.Solver.PalReference
             return cachedGuaranteedGenders.GetOrAdd(gender, (gender) => WithGuaranteedGenderImpl(db, gender));
         }
 
-        public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectiveTraits.TraitsListToString()})";
+        public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectivePassives.PassiveSkillListToString()})";
 
         public override bool Equals(object obj)
         {
@@ -157,7 +157,7 @@ namespace PalCalc.Solver.PalReference
             nameof(BredPalReference),
             Pal,
             Parent1.GetHashCode() ^ Parent2.GetHashCode(),
-            EffectiveTraitsHash,
+            EffectivePassivesHash,
             BreedingEffort,
             SelfBreedingEffort,
             Gender

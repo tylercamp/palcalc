@@ -1,0 +1,80 @@
+Name,CodeName,Rank
+Artisan,CraftSpeed_up2,3
+Burly Body,Deffence_up2,3
+Lucky,Rare,3
+Legend,Legend,3
+Siren of the Void,Witch,3
+Eternal Flame,EternalFlame,3
+Ferocious,PAL_ALLAttack_up2,3
+Vanguard,TrainerATK_UP_1,3
+Stronghold Strategist,TrainerDEF_UP_1,3
+Motivational Leader,TrainerWorkSpeed_UP_1,3
+Mine Foreman,TrainerMining_up1,3
+Logging Foreman,TrainerLogging_up1,3
+Diet Lover,PAL_FullStomach_Down_2,3
+Workaholic,PAL_Sanity_Down_2,3
+Celestial Emperor,ElementBoost_Normal_2_PAL,3
+Flame Emperor,ElementBoost_Fire_2_PAL,3
+Lord of the Sea,ElementBoost_Aqua_2_PAL,3
+Lord of Lightning,ElementBoost_Thunder_2_PAL,3
+Spirit Emperor,ElementBoost_Leaf_2_PAL,3
+Ice Emperor,ElementBoost_Ice_2_PAL,3
+Earth Emperor,ElementBoost_Earth_2_PAL,3
+Lord of the Underworld,ElementBoost_Dark_2_PAL,3
+Divine Dragon,ElementBoost_Dragon_2_PAL,3
+Swift,MoveSpeed_up_3,3
+Philanthropist,Test_PalEgg_HatchingSpeed_Up,3
+Serenity,CoolTimeReduction_Up_1,3
+Infinite Stamina,Stamina_Up_1,3
+Noble,SalePrice_Up_1,3
+Musclehead,Noukin,2
+Runner,MoveSpeed_up_2,2
+Serious,CraftSpeed_up1,1
+Hard Skin,Deffence_up1,1
+Brave,PAL_ALLAttack_up1,1
+Hooligan,PAL_rude,1
+Conceited,PAL_conceited,1
+Sadist,PAL_sadist,1
+Masochist,PAL_masochist,1
+Work Slave,PAL_CorporateSlave,1
+Aggressive,PAL_oraora,1
+Abnormal,ElementResist_Normal_1_PAL,1
+Suntan Lover,ElementResist_Fire_1_PAL,1
+Waterproof,ElementResist_Aqua_1_PAL,1
+Insulated Body,ElementResist_Thunder_1_PAL,1
+Botanical Barrier,ElementResist_Leaf_1_PAL,1
+Heated Body,ElementResist_Ice_1_PAL,1
+Earthquake Resistant,ElementResist_Earth_1_PAL,1
+Cheery,ElementResist_Dark_1_PAL,1
+Dragonkiller,ElementResist_Dragon_1_PAL,1
+Zen Mind,ElementBoost_Normal_1_PAL,1
+Pyromaniac,ElementBoost_Fire_1_PAL,1
+Hydromaniac,ElementBoost_Aqua_1_PAL,1
+Capacitor,ElementBoost_Thunder_1_PAL,1
+Fragrant Foliage,ElementBoost_Leaf_1_PAL,1
+Coldblooded,ElementBoost_Ice_1_PAL,1
+Power of Gaia,ElementBoost_Earth_1_PAL,1
+Veil of Darkness,ElementBoost_Dark_1_PAL,1
+Blood of the Dragon,ElementBoost_Dragon_1_PAL,1
+Dainty Eater,PAL_FullStomach_Down_1,1
+Positive Thinker,PAL_Sanity_Down_1,1
+Nimble,MoveSpeed_up_1,1
+Nocturnal,Nocturnal,1
+Impatient,CoolTimeReduction_Up_2,1
+Fit as a Fiddle,Stamina_Up_2,1
+Fine Furs,SalePrice_Up_2,1
+Otherworldly Cells,Alien,1
+Clumsy,CraftSpeed_down1,-1
+Downtrodden,Deffence_down1,-1
+Coward,PAL_ALLAttack_down1,-1
+Glutton,PAL_FullStomach_Up_1,-1
+Unstable,PAL_Sanity_Up_1,-1
+Mercy Hit,NonKilling,-1
+Easygoing,CoolTimeReduction_Down_1,-1
+Sickly,Stamina_Down_1,-1
+Shabby,SalePrice_Down_1,-1
+Bottomless Stomach,PAL_FullStomach_Up_2,-2
+Destructive,PAL_Sanity_Up_2,-2
+Slacker,CraftSpeed_down2,-3
+Brittle,Deffence_down2,-3
+Pacifist,PAL_ALLAttack_down2,-3
