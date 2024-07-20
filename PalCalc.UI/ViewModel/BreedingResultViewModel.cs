@@ -31,6 +31,7 @@ namespace PalCalc.UI.ViewModel
                 pruningBuilder: PruningRulesBuilder.Default,
                 ownedPals: saveGame.OwnedPals,
                 maxBreedingSteps: 3,
+                maxSolverIterations: 5,
                 maxWildPals: 0,
                 allowedWildPals: PalDB.LoadEmbedded().Pals.ToList(),
                 bannedBredPals: new List<Pal>(),

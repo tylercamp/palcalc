@@ -88,6 +88,18 @@
             />
         </StackPanel>
 
+        <StackPanel Orientation="Horizontal">
+            <Label Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS}" />
+            <v:IntegerTextBox
+                Value="{Binding MaxSolverIterations}"
+                IsEnabled="{Binding CanEditSettings}"
+                MinValue="1"
+                MaxValue="99"
+                ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION}"
+                ToolTipService.ShowOnDisabled="True"
+                />
+        </StackPanel>
+
         <StackPanel Orientation="Horizontal" Margin="5,3,0,3">
             <StackPanel.Resources>
                 <Style TargetType="Button">

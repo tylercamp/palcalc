@@ -493,15 +493,20 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
     <value>The maximum number of irrelevant passive skills allowed for any bred pal, including the final breeding result.
+
 Values higher than '1' will typically add shorter breeding paths if there are unused passive skill slots in the final pal.
+
 Higher values *exponentially* affect time required.</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS" xml:space="preserve">
     <value>Max Breeding Steps</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION" xml:space="preserve">
-    <value>The maximum number of solver iterations, and the max number of breeding steps to reach the target pal.
-Higher values linearly affect time required.</value>
+    <value>The maximum number of breeding steps to reach the target pal.
+
+(This value should typically be smaller than "Max Solver Steps".)
+
+Higher values cause Pal Calc to consider more options, and linearly affects computation time.</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve">
     <value>Max CPUs</value>
@@ -514,8 +519,22 @@ Higher values linearly affect time required.</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
     <value>The maximum number of irrelevant passive skills allowed for any owned pal used as a parent.
+
 Lower values can somewhat reduce processing at risk of missing some useful paths.
-Higher values linearly affect time required.</value>
+
+Higher values linearly affect computation time.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS" xml:space="preserve">
+    <value>Max Solver Steps</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION" xml:space="preserve">
+    <value>The maximum number of times the breeding solver will run. Larger values may allow Pal Calc to find more options when searching for the optimal breeding path.
+
+(Pal Calc will detect if additional breeding attempts are needed and may stop before reaching this limit.)
+
+(This value should typically be the same as, or bigger than, "Max Breeding Steps".)
+
+Higher values linearly affect computation time.</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS" xml:space="preserve">
     <value>Max Wild Pals</value>

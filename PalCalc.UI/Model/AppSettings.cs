@@ -11,7 +11,8 @@ namespace PalCalc.UI.Model
 {
     public class SolverSettings
     {
-        public int MaxBreedingSteps { get; set; } = 6;
+        public int MaxBreedingSteps { get; set; } = 10;
+        public int MaxSolverIterations { get; set; } = 20;
         public int MaxWildPals { get; set; } = 1;
         public int MaxInputIrrelevantPassives { get; set; } = 3;
         public int MaxBredIrrelevantPassives { get; set; } = 1;

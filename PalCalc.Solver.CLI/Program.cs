@@ -29,6 +29,7 @@ internal class Program
             pruningBuilder: PruningRulesBuilder.Default,
             ownedPals: savedInstances,
             maxBreedingSteps: 20,
+            maxSolverIterations: 20,
             maxWildPals: 1,
             allowedWildPals: db.Pals.ToList(),
             bannedBredPals: new List<Pal>(),

@@ -42,7 +42,7 @@ namespace PalCalc.Solver
 
         List<Pal> allowedWildPals;
         List<Pal> bannedBredPals;
-        int maxBreedingSteps, maxWildPals, maxBredIrrelevantPassives, maxInputIrrelevantPassives;
+        int maxBreedingSteps, maxSolverIterations, maxWildPals, maxBredIrrelevantPassives, maxInputIrrelevantPassives;
         TimeSpan maxEffort;
         PruningRulesBuilder pruningBuilder;
         int maxThreads;
@@ -65,6 +65,7 @@ namespace PalCalc.Solver
             PruningRulesBuilder pruningBuilder,
             List<PalInstance> ownedPals,
             int maxBreedingSteps,
+            int maxSolverIterations,
             int maxWildPals,
             List<Pal> allowedWildPals,
             List<Pal> bannedBredPals,
@@ -79,6 +80,7 @@ namespace PalCalc.Solver
             this.pruningBuilder = pruningBuilder;
             this.ownedPals = ownedPals;
             this.maxBreedingSteps = maxBreedingSteps;
+            this.maxSolverIterations = maxSolverIterations;
             this.allowedWildPals = allowedWildPals;
             this.bannedBredPals = bannedBredPals;
             this.maxWildPals = maxWildPals;
@@ -365,7 +367,7 @@ namespace PalCalc.Solver
                 throw new Exception("Target passive skill count cannot exceed max number of passive skills for a single pal");
             }
 
-            var statusMsg = new SolverStatus() { CurrentPhase = SolverPhase.Initializing, CurrentStepIndex = 0, TargetSteps = maxBreedingSteps, Canceled = token.IsCancellationRequested };
+            var statusMsg = new SolverStatus() { CurrentPhase = SolverPhase.Initializing, CurrentStepIndex = 0, TargetSteps = maxSolverIterations, Canceled = token.IsCancellationRequested };
             SolverStateUpdated?.Invoke(statusMsg);
 
             var relevantPals = RelevantInstancesForPassiveSkills(db, ownedPals, spec.DesiredPassives.ToList())
@@ -473,7 +475,7 @@ namespace PalCalc.Solver
 
             var workingSet = new WorkingSet(spec, pruningBuilder, initialContent, maxThreads, token);
 
-            for (int s = 0; s < maxBreedingSteps; s++)
+            for (int s = 0; s < maxSolverIterations; s++)
             {
                 if (token.IsCancellationRequested) break;
 
@@ -500,7 +502,9 @@ namespace PalCalc.Solver
                                 {
                                     var childPals = db.BreedingByParent[p.Item1.Pal][p.Item2.Pal].Select(br => br.Child);
 
-                                    return childPals.Any(c => db.MinBreedingSteps[c][spec.Pal] <= maxBreedingSteps - s - 1);
+                                    // don't bother checking any pals if it's impossible for them to reach the target within the remaining
+                                    // number of iterations
+                                    return childPals.Any(c => db.MinBreedingSteps[c][spec.Pal] <= maxSolverIterations - s - 1);
                                 })
                                 .Where(p =>
                                 {

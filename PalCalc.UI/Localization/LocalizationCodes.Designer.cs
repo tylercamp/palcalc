@@ -581,6 +581,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SOLVER_SETTINGS_MAX_WILD_PALS,
         /// <summary>
         ///   Looks up a localized string similar to .

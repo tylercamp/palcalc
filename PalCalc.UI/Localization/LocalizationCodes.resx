@@ -502,6 +502,12 @@
   <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
   <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS" xml:space="preserve">
     <value />
   </data>
