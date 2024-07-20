@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
              xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              mc:Ignorable="d" 
              Visibility="{Binding GridVisibility}"
              d:DataContext="{x:Static svm:ContainerGridViewModel.DesignerInstance}"
@@ -35,7 +36,9 @@
                     <ContentControl Content="{Binding}">
                         <ContentControl.Resources>
                             <DataTemplate DataType="{x:Type svm:ContainerGridEmptySlotViewModel}">
-                                <Grid />
+                                <TextBlock Text="{itl:LocalizedText Code=LC_SAVEINSPECT_SLOT_EMPTY}"
+                                           VerticalAlignment="Center" HorizontalAlignment="Center"
+                                           Margin="0,0,5,0" />
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type svm:ContainerGridPalSlotViewModel}">
                                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
