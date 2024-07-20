@@ -42,12 +42,30 @@ namespace PalCalc.UI.Model
         public Dictionary<string, PlayerInstance> PlayersById =>
             playersByName ??= Players.ToDictionary(p => p.PlayerId);
 
-        public Dictionary<string, PlayerInstance> PlayersByInstanceId =>
-            playersByName ??= Players.ToDictionary(p => p.InstanceId);
-
         private Dictionary<string, GuildInstance> playerGuilds;
         public Dictionary<string, GuildInstance> GuildsByPlayerId =>
             playerGuilds ??= Players.ToDictionary(p => p.PlayerId, p => Guilds.FirstOrDefault(g => g.MemberIds.Contains(p.PlayerId)));
+
+        // NOTE: Any new fields should be added here
+        public void CopyFrom(CachedSaveGame src)
+        {
+            if (UnderlyingSave != src.UnderlyingSave) throw new InvalidOperationException();
+
+            LastModified = src.LastModified;
+            IsServerSave = src.IsServerSave;
+            WorldName = src.WorldName;
+            PlayerName = src.PlayerName;
+            PlayerLevel = src.PlayerLevel;
+            InGameDay = src.InGameDay;
+            DatabaseVersion = src.DatabaseVersion;
+            ReaderVersion = src.ReaderVersion;
+            Players = [.. src.Players];
+            Guilds = [.. src.Guilds];
+            OwnedPals = [.. src.OwnedPals];
+
+            playersByName = null;
+            playerGuilds = null;
+        }
 
         [JsonIgnore]
         public ISaveGame UnderlyingSave { get; set; }

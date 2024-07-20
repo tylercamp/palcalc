@@ -156,20 +156,45 @@ namespace PalCalc.SaveReader
                                 ?.OrderByDescending(l => int.Parse(l.FileName.Split('-').Skip(2).FirstOrDefault() ?? "0"))
                                 ?.FirstOrDefault();
 
-                            if (levelFile != null) level = new LevelSaveFile(levelFile.FilePath);
+                            var watchers = new List<FileSystemWatcher>();
+
+                            if (levelFile != null)
+                            {
+                                level = new LevelSaveFile(levelFile.FilePath);
+                                watchers.Add(new FileSystemWatcher(levelFile.FilePath));
+                            }
 
                             var levelMetaFile = filesByType.GetValueOrDefault("LevelMeta")?.FirstOrDefault();
-                            if (levelMetaFile != null) levelMeta = new LevelMetaSaveFile(levelMetaFile.FilePath);
+                            if (levelMetaFile != null)
+                            {
+                                levelMeta = new LevelMetaSaveFile(levelMetaFile.FilePath);
+                                watchers.Add(new FileSystemWatcher(levelMetaFile.FilePath));
+                            }
 
                             var localDataFile = filesByType.GetValueOrDefault("LocalData")?.FirstOrDefault();
-                            if (localDataFile != null) localData = new LocalDataSaveFile(localDataFile.FilePath);
+                            if (localDataFile != null)
+                            {
+                                localData = new LocalDataSaveFile(localDataFile.FilePath);
+                                watchers.Add(new FileSystemWatcher(localDataFile.FilePath));
+                            }
 
                             var worldOptionFile = filesByType.GetValueOrDefault("WorldOption")?.FirstOrDefault();
-                            if (worldOptionFile != null) worldOption = new WorldOptionSaveFile(worldOptionFile.FilePath);
+                            if (worldOptionFile != null)
+                            {
+                                worldOption = new WorldOptionSaveFile(worldOptionFile.FilePath);
+                                watchers.Add(new FileSystemWatcher(worldOptionFile.FilePath));
+                            }
 
-                            players = filesByType.GetValueOrElse("Players", new List<XboxSaveFile>()).Select(f => new PlayersSaveFile(f.FilePath)).ToList();
+                            players = filesByType
+                                .GetValueOrElse("Players", new List<XboxSaveFile>())
+                                .Select(f =>
+                                {
+                                    watchers.Add(new FileSystemWatcher(f.FilePath));
+                                    return new PlayersSaveFile(f.FilePath);
+                                })
+                                .ToList();
 
-                            return new XboxSaveGame(userFolder, g.Key, level, levelMeta, localData, worldOption, players);
+                            return new XboxSaveGame(userFolder, g.Key, level, levelMeta, localData, worldOption, players, watchers);
                         })
                         .ToList();
 

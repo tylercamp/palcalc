@@ -27,10 +27,15 @@ namespace PalCalc.SaveReader
 
         // (don't check `WorldOption`, not present for linux-based server saves)
         bool IsValid { get; }
+
+        event Action<ISaveGame> Updated;
     }
 
     public class StandardSaveGame : ISaveGame
     {
+        private FileSystemWatcher folderWatcher;
+        public event Action<ISaveGame> Updated;
+
         public StandardSaveGame(string basePath)
         {
             BasePath = basePath;
@@ -45,6 +50,20 @@ namespace PalCalc.SaveReader
                 Players = Directory.EnumerateFiles(playersPath, "*.sav").Select(f => new PlayersSaveFile(f)).ToList();
             else
                 Players = new List<PlayersSaveFile>();
+
+            folderWatcher = new FileSystemWatcher(basePath);
+            folderWatcher.Changed += FolderWatcher_Updated;
+            folderWatcher.Created += FolderWatcher_Updated;
+            folderWatcher.Deleted += FolderWatcher_Updated;
+            folderWatcher.Renamed += FolderWatcher_Updated;
+
+            folderWatcher.IncludeSubdirectories = true;
+            folderWatcher.EnableRaisingEvents = true;
+        }
+
+        private void FolderWatcher_Updated(object sender, FileSystemEventArgs e)
+        {
+            Updated?.Invoke(this);
         }
 
         public string BasePath { get; }
@@ -75,6 +94,8 @@ namespace PalCalc.SaveReader
 
     public class XboxSaveGame : ISaveGame
     {
+        public event Action<ISaveGame> Updated;
+
         public XboxSaveGame(
             string userBasePath,
             string saveId,
@@ -82,7 +103,8 @@ namespace PalCalc.SaveReader
             LevelMetaSaveFile levelMeta,
             LocalDataSaveFile localData,
             WorldOptionSaveFile worldOption,
-            List<PlayersSaveFile> players
+            List<PlayersSaveFile> players,
+            IEnumerable<FileSystemWatcher> fileWatchers
         )
         {
             BasePath = userBasePath;
@@ -92,6 +114,19 @@ namespace PalCalc.SaveReader
             LocalData = localData;
             WorldOption = worldOption;
             Players = players;
+
+            foreach (var watcher in fileWatchers)
+            {
+                watcher.Changed += Watcher_Updated;
+                watcher.Created += Watcher_Updated;
+                watcher.Deleted += Watcher_Updated;
+                watcher.Renamed += Watcher_Updated;
+            }
+        }
+
+        private void Watcher_Updated(object sender, FileSystemEventArgs e)
+        {
+            Updated?.Invoke(this);
         }
 
         public string BasePath { get; }

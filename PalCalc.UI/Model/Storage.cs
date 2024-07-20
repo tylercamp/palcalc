@@ -16,6 +16,8 @@ namespace PalCalc.UI.Model
     {
         private static ILogger logger = Log.ForContext(typeof(Storage));
 
+        public static event Action<ISaveGame> SaveReloaded;
+
         public static string CachePath => "cache";
         public static string SaveCachePath => $"{CachePath}/saves";
         public static string DataPath => "data";
@@ -211,6 +213,56 @@ namespace PalCalc.UI.Model
                 // TODO - adding `null` entries will prevent re-adding a save at the same path until the app is restarted
                 InMemorySaves.Add(identifier, res);
                 return res;
+            }
+        }
+
+        public static void ReloadSave(ISaveGame save, PalDB db)
+        {
+            Init();
+
+            if (save == null) return;
+
+            CrashSupport.ReferencedSave(save);
+
+            var identifier = CachedSaveGame.IdentifierFor(save);
+            var originalCachedSave = InMemorySaves.GetValueOrDefault(identifier);
+
+            if (originalCachedSave != null)
+            {
+                CrashSupport.ReferencedCachedSave(originalCachedSave);
+                InMemorySaves.Remove(identifier);
+            }
+
+            var path = SaveCachePathFor(save);
+            var wasStored = File.Exists(path);
+            var backupPath = wasStored ? path + ".bak" : null;
+
+            if (wasStored)
+                File.Move(path, backupPath);
+
+            var newCachedSave = LoadSave(save, db);
+
+            if (newCachedSave == null)
+            {
+                if (wasStored)
+                {
+                    if (File.Exists(path)) File.Delete(path);
+
+                    File.Move(backupPath, path);
+                }
+
+                InMemorySaves[identifier] = originalCachedSave;
+            }
+            else
+            {
+                if (wasStored) File.Delete(backupPath);
+
+                if (originalCachedSave != null)
+                    originalCachedSave.CopyFrom(newCachedSave);
+
+                InMemorySaves[identifier] = originalCachedSave ?? newCachedSave;
+
+                SaveReloaded?.Invoke(save);
             }
         }
 

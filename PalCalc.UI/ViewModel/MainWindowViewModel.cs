@@ -159,10 +159,17 @@ namespace PalCalc.UI.ViewModel
             foreach (var target in targetsBySaveFile.Values.SelectMany(l => l.Targets).Where(t => !t.IsReadOnly))
                 target.DeleteCommand = deletePalTargetCommand;
 
+            Storage.SaveReloaded += Storage_SaveReloaded;
 
             dispatcher.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
 
             CheckForUpdates();
+        }
+
+        private void Storage_SaveReloaded(ISaveGame save)
+        {
+            if (SaveSelection?.SelectedGame?.Value == save)
+                UpdateFromSaveProperties();
         }
 
         private void OnDeletePalSpecifier(PalSpecifierViewModel spec)

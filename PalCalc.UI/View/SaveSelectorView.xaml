@@ -12,6 +12,11 @@
             mc:Ignorable="d" 
             d:Background="White"
             d:DataContext="{d:DesignInstance vm:SaveSelectorViewModel, IsDesignTimeCreatable=True}" d:DesignWidth="436.57">
+    <StackPanel.Resources>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BVC" />
+        </ResourceDictionary>
+    </StackPanel.Resources>
     <Label Content="{itl:LocalizedText LC_SAVE_LOCATION}" />
     <Grid>
         <Grid.ColumnDefinitions>
@@ -37,6 +42,7 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="3" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableSaves}" SelectedItem="{Binding SelectedGame}">
             <ItemsControl.ItemTemplate>
@@ -49,8 +55,22 @@
             </ItemsControl.ItemTemplate>
         </ComboBox>
 
-        <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SaveGameFolder_Click" IsEnabled="{Binding CanOpenSaveFileLocation}" ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
+        <Button Grid.Column="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Stretch"
+                Click="SaveGameFolder_Click"
+                IsEnabled="{Binding CanOpenSaveFileLocation}"
+                ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
             <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
+        </Button>
+
+        <Button Grid.Column="3"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Stretch"
+                Command="{Binding SelectedGame.ReloadSaveCommand}"
+                Visibility="{Binding SelectedGame.HasChanges, Converter={StaticResource BVC}}"
+                Margin="3,0,0,0">
+            <materialIcons:MaterialIcon Kind="Reload" Width="18" />
         </Button>
     </Grid>
 
