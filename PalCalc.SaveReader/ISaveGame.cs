@@ -51,14 +51,17 @@ namespace PalCalc.SaveReader
             else
                 Players = new List<PlayersSaveFile>();
 
-            folderWatcher = new FileSystemWatcher(basePath);
-            folderWatcher.Changed += FolderWatcher_Updated;
-            folderWatcher.Created += FolderWatcher_Updated;
-            folderWatcher.Deleted += FolderWatcher_Updated;
-            folderWatcher.Renamed += FolderWatcher_Updated;
+            if (Directory.Exists(basePath))
+            {
+                folderWatcher = new FileSystemWatcher(basePath);
+                folderWatcher.Changed += FolderWatcher_Updated;
+                folderWatcher.Created += FolderWatcher_Updated;
+                folderWatcher.Deleted += FolderWatcher_Updated;
+                folderWatcher.Renamed += FolderWatcher_Updated;
 
-            folderWatcher.IncludeSubdirectories = true;
-            folderWatcher.EnableRaisingEvents = true;
+                folderWatcher.IncludeSubdirectories = true;
+                folderWatcher.EnableRaisingEvents = true;
+            }
         }
 
         private void FolderWatcher_Updated(object sender, FileSystemEventArgs e)
