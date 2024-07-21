@@ -19,14 +19,16 @@ namespace PalCalc.Model
         private static PassiveSkill RAND_REF = new RandomPassiveSkill();
         public static PassiveSkill ToPassive(this string s, PalDB db)
         {
-            if (s == RAND_REF.Name) return new RandomPassiveSkill();
+            if (s == null) return null;
+            else if (s == RAND_REF.Name) return new RandomPassiveSkill();
             else if (db.PassiveSkillsByName.ContainsKey(s)) return db.PassiveSkillsByName[s];
             else if (db.PassiveSkills.Any(t => t.InternalName == s)) return db.PassiveSkills.Single(t => t.InternalName == s);
             else return new UnrecognizedPassiveSkill(s);
         }
         public static PassiveSkill InternalToPassive(this string s, PalDB db)
         {
-            if (s == RAND_REF.InternalName) return new RandomPassiveSkill();
+            if (s == null) return null;
+            else if (s == RAND_REF.InternalName) return new RandomPassiveSkill();
             else return db.PassiveSkills.SingleOrDefault(t => t.InternalName == s) ?? new UnrecognizedPassiveSkill(s);
         }
 

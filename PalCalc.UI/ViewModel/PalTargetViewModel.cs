@@ -1,20 +1,23 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PalCalc.UI.ViewModel
 {
     public partial class PalTargetViewModel : ObservableObject
     {
-        public PalTargetViewModel() : this(null, PalSpecifierViewModel.New) { }
+        public PalTargetViewModel() : this(null, PalSpecifierViewModel.New, PassiveSkillsPresetCollectionViewModel.DesignerInstance) { }
 
-        public PalTargetViewModel(CachedSaveGame sourceSave, PalSpecifierViewModel initial)
+        public PalTargetViewModel(CachedSaveGame sourceSave, PalSpecifierViewModel initial, PassiveSkillsPresetCollectionViewModel presets)
         {
             if (initial.IsReadOnly)
             {
@@ -35,9 +38,14 @@ namespace PalCalc.UI.ViewModel
                 PalSource.SelectedNode = PalSource.FindById(CurrentPalSpecifier.PalSourceId) as IPalSourceTreeNode;
 
             PalSource.PropertyChanged += PalSource_PropertyChanged;
+            
+            Presets = presets;
+            OpenPresetsMenuCommand = new RelayCommand(() => PresetsMenuIsOpen = true);
+
+            presets.PresetSelected += (_) => PresetsMenuIsOpen = false;
         }
 
-        private void PalSource_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void PalSource_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(PalSource.HasValidSource))
                 OnPropertyChanged(nameof(IsValid));
@@ -66,7 +74,7 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        private void CurrentSpec_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void CurrentSpec_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(CurrentPalSpecifier.IsValid)) OnPropertyChanged(nameof(IsValid));
         }
@@ -88,6 +96,13 @@ namespace PalCalc.UI.ViewModel
         public bool IsValid => PalSource.HasValidSource && CurrentPalSpecifier.IsValid;
 
         public PalSourceTreeViewModel PalSource { get; set; }
+
+        public PassiveSkillsPresetCollectionViewModel Presets { get; }
+
+        [ObservableProperty]
+        private bool presetsMenuIsOpen = false;
+
+        public IRelayCommand OpenPresetsMenuCommand { get; }
 
         public void RefreshWith(CachedSaveGame csg)
         {

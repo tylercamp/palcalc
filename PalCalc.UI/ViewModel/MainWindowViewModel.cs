@@ -38,6 +38,7 @@ namespace PalCalc.UI.ViewModel
         private Dispatcher dispatcher;
         private CancellationTokenSource solverTokenSource;
         private AppSettings settings;
+        private PassiveSkillsPresetCollectionViewModel passivePresets;
         private IRelayCommand<PalSpecifierViewModel> deletePalTargetCommand;
 
         public List<TranslationLocaleViewModel> Locales { get; } =
@@ -57,8 +58,9 @@ namespace PalCalc.UI.ViewModel
             CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
             CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
-            settings = Storage.LoadAppSettings();
+            AppSettings.Current = settings = Storage.LoadAppSettings();
             settings.SolverSettings ??= new SolverSettings();
+            passivePresets = new PassiveSkillsPresetCollectionViewModel(settings.PassiveSkillsPresets);
 
             Translator.CurrentLocale = settings.Locale;
 
@@ -151,7 +153,6 @@ namespace PalCalc.UI.ViewModel
             SaveSelection.NewCustomSaveSelected += SaveSelection_CustomSaveAdded;
 
             if (settings.SelectedGameIdentifier != null) SaveSelection.TrySelectSaveGame(settings.SelectedGameIdentifier);
-
             
             // TODO - would prefer to have the delete command managed by the target list, rather than having
             //        to manually assign the command for each specifier VM
@@ -162,6 +163,12 @@ namespace PalCalc.UI.ViewModel
             Storage.SaveReloaded += Storage_SaveReloaded;
 
             dispatcher.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
+
+            passivePresets.PresetSelected += selectedPreset =>
+            {
+                var spec = PalTarget?.CurrentPalSpecifier;
+                if (spec != null) selectedPreset.ApplyTo(spec);
+            };
 
             CheckForUpdates();
         }
@@ -289,7 +296,8 @@ namespace PalCalc.UI.ViewModel
         {
             if (PalTargetList?.SelectedTarget != null && SaveSelection.SelectedGame?.CachedValue != null)
             {
-                PalTarget = new PalTargetViewModel(SaveSelection.SelectedGame.CachedValue, PalTargetList.SelectedTarget);
+                PalTarget = new PalTargetViewModel(SaveSelection.SelectedGame.CachedValue, PalTargetList.SelectedTarget, passivePresets);
+                passivePresets.ActivePalTarget = PalTarget;
             }
             else
                 PalTarget = null;

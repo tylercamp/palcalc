@@ -9,6 +9,21 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.Model
 {
+    public class PassiveSkillsPreset
+    {
+        public string Name { get; set; }
+
+        public string Passive1InternalName { get; set; }
+        public string Passive2InternalName { get; set; }
+        public string Passive3InternalName { get; set; }
+        public string Passive4InternalName { get; set; }
+
+        public string OptionalPassive1InternalName { get; set; }
+        public string OptionalPassive2InternalName { get; set; }
+        public string OptionalPassive3InternalName { get; set; }
+        public string OptionalPassive4InternalName { get; set; }
+    }
+
     public class SolverSettings
     {
         public int MaxBreedingSteps { get; set; } = 10;
@@ -28,11 +43,15 @@ namespace PalCalc.UI.Model
         public List<Pal> BannedWildPals(PalDB db) => BannedWildPalInternalNames.Select(n => n.InternalToPal(db)).ToList();
     }
 
-    internal class AppSettings
+    public class AppSettings
     {
+        public static AppSettings Current = null;
+
         public List<string> ExtraSaveLocations { get; set; } = new List<string>();
 
         public SolverSettings SolverSettings { get; set; } = new SolverSettings();
+
+        public List<PassiveSkillsPreset> PassiveSkillsPresets { get; set; } = new List<PassiveSkillsPreset>();
 
         public string SelectedGameIdentifier { get; set; } = null;
 

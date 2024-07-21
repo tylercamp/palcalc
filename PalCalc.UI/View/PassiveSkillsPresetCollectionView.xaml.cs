@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PalCalc.UI.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,24 +17,24 @@ using System.Windows.Shapes;
 namespace PalCalc.UI.View
 {
     /// <summary>
-    /// Interaction logic for PalTargetView.xaml
+    /// Interaction logic for PassiveSkillsPresetCollectionView.xaml
     /// </summary>
-    public partial class PalTargetView : StackPanel
+    public partial class PassiveSkillsPresetCollectionView : UserControl
     {
-        public PalTargetView()
+        public PassiveSkillsPresetCollectionView()
         {
             InitializeComponent();
         }
 
-        private void PresetsButton_Click(object sender, RoutedEventArgs e)
-        {
-            PresetsPopup.IsOpen = true;
-            PresetsPopup.Focus();
-        }
+        public PassiveSkillsPresetCollectionViewModel ViewModel => DataContext as PassiveSkillsPresetCollectionViewModel;
 
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            PresetsPopup.IsOpen = false;
+            if (m_ListBox.SelectedItem != null)
+            {
+                ViewModel?.SelectPresetCommand?.Execute(m_ListBox.SelectedItem as IPassiveSkillsPresetViewModel);
+                m_ListBox.SelectedItem = null;
+            }
         }
     }
 }

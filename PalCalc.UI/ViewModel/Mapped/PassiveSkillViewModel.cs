@@ -48,6 +48,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         private static ILocalizedText randomPassiveLabel;
         public static PassiveSkillViewModel Make(PassiveSkill passive)
         {
+            if (passive == null) return null;
+
             if (instances == null)
             {
                 instances = PalDB.LoadEmbedded().PassiveSkills.ToDictionary(t => t, t => new PassiveSkillViewModel(t, NameLocalizer.Bind(t)));
