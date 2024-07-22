@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
@@ -13,7 +14,7 @@ namespace PalCalc.UI.ViewModel
 {
     public interface IPassiveSkillsPresetViewModel
     {
-        string Label { get; }
+        ILocalizedText Label { get; }
     }
 
     public partial class PassiveSkillsPresetViewModel : ObservableObject, IPassiveSkillsPresetViewModel
@@ -21,7 +22,7 @@ namespace PalCalc.UI.ViewModel
         public PassiveSkillsPresetViewModel(PassiveSkillsPreset content)
         {
             ModelObject = content;
-            Label = content.Name;
+            Label = new HardCodedText(content.Name);
 
             var db = PalDB.LoadEmbedded();
             RequiredPassive1 = PassiveSkillViewModel.Make(content.Passive1InternalName.InternalToPassive(db));
@@ -48,7 +49,7 @@ namespace PalCalc.UI.ViewModel
         public PassiveSkillViewModel OptionalPassive4 { get; }
 
         [ObservableProperty]
-        private string label;
+        private ILocalizedText label;
 
         public void ApplyTo(PalSpecifierViewModel spec)
         {
@@ -66,9 +67,14 @@ namespace PalCalc.UI.ViewModel
 
     public class NewPassiveSkillsPresetViewModel : IPassiveSkillsPresetViewModel
     {
-        public string Label { get; private set; }
+        public ILocalizedText Label { get; private set; }
 
-        public static NewPassiveSkillsPresetViewModel Instance { get; } = new NewPassiveSkillsPresetViewModel() { Label = "Save passives as new preset..." };
+        public static NewPassiveSkillsPresetViewModel Instance { get; } =
+            new NewPassiveSkillsPresetViewModel()
+            {
+                Label = LocalizationCodes.LC_TRAITS_PRESETS_ADD.Bind()
+            };
+
         private NewPassiveSkillsPresetViewModel() { }
     }
 }

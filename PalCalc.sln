@@ -33,8 +33,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetKit.Wpf.AutoCompleteC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{6632E8CF-5B76-4E86-B394-E33E91C916EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DropDownButtonLib", "DropDownButtonLib\source\DropDownButtonLib\DropDownButtonLib.csproj", "{8786503B-5F08-4CD7-8EC7-7D50C8E6CE01}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,14 +121,6 @@ Global
 		{B76DA379-784F-40FD-B531-BAE2A15C7C37}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B76DA379-784F-40FD-B531-BAE2A15C7C37}.Release|x86.ActiveCfg = Release|Any CPU
 		{B76DA379-784F-40FD-B531-BAE2A15C7C37}.Release|x86.Build.0 = Release|Any CPU
-		{8786503B-5F08-4CD7-8EC7-7D50C8E6CE01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8786503B-5F08-4CD7-8EC7-7D50C8E6CE01}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8786503B-5F08-4CD7-8EC7-7D50C8E6CE01}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8786503B-5F08-4CD7-8EC7-7D50C8E6CE01}.Debug|x86.Build.0 = Debug|Any CPU
-		{8786503B-5F08-4CD7-8EC7-7D50C8E6CE01}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8786503B-5F08-4CD7-8EC7-7D50C8E6CE01}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8786503B-5F08-4CD7-8EC7-7D50C8E6CE01}.Release|x86.ActiveCfg = Release|Any CPU
-		{8786503B-5F08-4CD7-8EC7-7D50C8E6CE01}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -140,7 +130,6 @@ Global
 		{4DF77F25-504A-4D48-8D05-09990BB6B85A} = {B98DEFA3-C254-4B6D-B845-3535E2E049DA}
 		{B98DEFA3-C254-4B6D-B845-3535E2E049DA} = {6632E8CF-5B76-4E86-B394-E33E91C916EE}
 		{B76DA379-784F-40FD-B531-BAE2A15C7C37} = {6632E8CF-5B76-4E86-B394-E33E91C916EE}
-		{8786503B-5F08-4CD7-8EC7-7D50C8E6CE01} = {6632E8CF-5B76-4E86-B394-E33E91C916EE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0171AB8C-D344-4A9B-BE99-146E847BFEFB}

@@ -11,7 +11,7 @@
             d:Background="White"
             mc:Ignorable="d" 
             d:DataContext="{d:DesignInstance vm:PalTargetViewModel, IsDesignTimeCreatable=True}"
-            d:DesignHeight="239.714" d:DesignWidth="441.714">
+            d:DesignHeight="239.714" d:DesignWidth="184.642">
     <StackPanel.Resources>
         <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
             <TextBlock Text="{Binding Name.Value}" />
@@ -45,7 +45,7 @@
                     </StackPanel>
                 </TabItem>
             </TabControl>
-            <Button HorizontalAlignment="Right" VerticalAlignment="Top" Height="Auto" Content="Presets" x:Name="PresetsButton" Command="{Binding OpenPresetsMenuCommand}">
+            <Button HorizontalAlignment="Right" VerticalAlignment="Top" Height="Auto" Content="{itl:LocalizedText Code=LC_TRAITS_PRESETS}" x:Name="PresetsButton" Command="{Binding OpenPresetsMenuCommand}" Margin="0,2,0,0">
             </Button>
             <Popup PlacementTarget="{Binding ElementName=PresetsButton}" x:Name="PresetsPopup" IsOpen="{Binding PresetsMenuIsOpen}" StaysOpen="False" MinWidth="200" MaxHeight="300">
                 <local:PassiveSkillsPresetCollectionView DataContext="{Binding Presets}" />

@@ -641,6 +641,54 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_TRAITS_PRESETS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_ADD,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_ADD_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_DELETE_BTN_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to PresetName.
+        /// </summary>
+        LC_TRAITS_PRESETS_DELETE_MSG,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_DELETE_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_NAME,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_OVERWRITE_BTN_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to PresetName.
+        /// </summary>
+        LC_TRAITS_PRESETS_OVERWRITE_MSG,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_OVERWRITE_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_RENAME_BTN_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to PresetName.
+        /// </summary>
+        LC_TRAITS_PRESETS_RENAME_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_UNKNOWN_GUILD,
         /// <summary>
         ///   Looks up a localized string similar to .

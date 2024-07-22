@@ -576,6 +576,42 @@ Higher values linearly affect time required, depending on how many types of pals
   <data name="LC_TRAITS_COUNT_UNRECOGNIZED" xml:space="preserve">
     <value>{NumUnrecognized} unrecognized</value>
   </data>
+  <data name="LC_TRAITS_PRESETS" xml:space="preserve">
+    <value>Presets</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_ADD" xml:space="preserve">
+    <value>Save passives as new preset...</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_ADD_TITLE" xml:space="preserve">
+    <value>New Preset Name</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_BTN_DESCRIPTION" xml:space="preserve">
+    <value>Delete Preset</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_MSG" xml:space="preserve">
+    <value>Delete the preset '{PresetName}'?</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_TITLE" xml:space="preserve">
+    <value>Delete Preset</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_NAME" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_BTN_DESCRIPTION" xml:space="preserve">
+    <value>Overwrite Preset</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_MSG" xml:space="preserve">
+    <value>Overwrite the preset '{PresetName}' with the current selection of required and optional passive skills?</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_TITLE" xml:space="preserve">
+    <value>Overwrite Preset</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_RENAME_BTN_DESCRIPTION" xml:space="preserve">
+    <value>Rename Preset</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_RENAME_TITLE" xml:space="preserve">
+    <value>Rename Preset '{PresetName}'</value>
+  </data>
   <data name="LC_UNKNOWN_GUILD" xml:space="preserve">
     <value>Unknown Guild</value>
   </data>

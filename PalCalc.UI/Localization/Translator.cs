@@ -12,7 +12,7 @@ using Windows.Networking.Sockets;
 
 namespace PalCalc.UI.Localization
 {
-    // note: code-gen of `LocalizationCodes` handled by ResXResourceManager extension, must be installed in order to
+    // note: code-gen of `LocalizationCodes` handled by ResXManager extension, must be installed in order to
     // regenerate `LocalizationCodes` enum
     //
     // https://marketplace.visualstudio.com/items?itemName=TomEnglert.ResXManager

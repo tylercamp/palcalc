@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Mapped;
@@ -54,10 +55,10 @@ namespace PalCalc.UI.ViewModel
                         case NewPassiveSkillsPresetViewModel:
                             var newNameWindow = new SimpleTextInputWindow()
                             {
-                                Title = "New Preset Name",
-                                InputLabel = "Name",
+                                Title = LocalizationCodes.LC_TRAITS_PRESETS_ADD_TITLE.Bind().Value,
+                                InputLabel = LocalizationCodes.LC_TRAITS_PRESETS_NAME.Bind().Value,
                                 Result = "",
-                                Validator = (name) => name.Length > 0 && !options.Any(o => o.Label == name),
+                                Validator = (name) => name.Length > 0 && !options.Any(o => o.Label.Value == name),
                                 Owner = App.Current.MainWindow,
                             };
 
@@ -69,7 +70,7 @@ namespace PalCalc.UI.ViewModel
                                 newPreset.Name = newName;
 
                                 // insert alphabetically
-                                var previous = Options.FirstOrDefault(o => o is PassiveSkillsPresetViewModel && o.Label.CompareTo(newName) > 0);
+                                var previous = Options.FirstOrDefault(o => o is PassiveSkillsPresetViewModel && o.Label.Value.CompareTo(newName) > 0);
                                 options.Insert(
                                     previous != null ? options.IndexOf(previous) : options.Count,
                                     new PassiveSkillsPresetViewModel(newPreset)
@@ -90,7 +91,9 @@ namespace PalCalc.UI.ViewModel
             DeletePresetCommand = new RelayCommand<PassiveSkillsPresetViewModel>(
                 (presetVm) =>
                 {
-                    if (MessageBox.Show($"Delete the preset '{presetVm.Label}'?", "Delete Preset", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    var msg = LocalizationCodes.LC_TRAITS_PRESETS_DELETE_MSG.Bind(presetVm.Label).Value;
+                    var title = LocalizationCodes.LC_TRAITS_PRESETS_DELETE_TITLE.Bind().Value;
+                    if (MessageBox.Show(msg, title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         options.Remove(presetVm);
                         AppSettings.Current.PassiveSkillsPresets.Remove(presetVm.ModelObject);
@@ -104,10 +107,10 @@ namespace PalCalc.UI.ViewModel
                 {
                     var renameWindow = new SimpleTextInputWindow()
                     {
-                        Title = $"Rename Preset '{presetVm.Label}'",
-                        InputLabel = "Name",
-                        Result = presetVm.Label,
-                        Validator = (name) => name.Length > 0 && !options.Any(o => o.Label == name),
+                        Title = LocalizationCodes.LC_TRAITS_PRESETS_RENAME_TITLE.Bind(presetVm.Label).Value,
+                        InputLabel = LocalizationCodes.LC_TRAITS_PRESETS_NAME.Bind().Value,
+                        Result = presetVm.Label.Value,
+                        Validator = (name) => name.Length > 0 && !options.Any(o => o.Label.Value == name),
                         Owner = App.Current.MainWindow
                     };
 
@@ -121,7 +124,7 @@ namespace PalCalc.UI.ViewModel
 
                         options.Remove(presetVm);
                         // insert alphabetically
-                        var previous = Options.FirstOrDefault(o => o is PassiveSkillsPresetViewModel && o.Label.CompareTo(newName) > 0);
+                        var previous = Options.FirstOrDefault(o => o is PassiveSkillsPresetViewModel && o.Label.Value.CompareTo(newName) > 0);
                         options.Insert(
                             previous != null ? options.IndexOf(previous) : options.Count,
                             new PassiveSkillsPresetViewModel(preset)
@@ -135,7 +138,9 @@ namespace PalCalc.UI.ViewModel
             OverwritePresetCommand = new RelayCommand<PassiveSkillsPresetViewModel>(
                 (presetVm) =>
                 {
-                    if (MessageBox.Show($"Overwrite the preset '{presetVm.Label}' with the current selection of required and optional passive skills?", "Overwrite Preset", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    var msg = LocalizationCodes.LC_TRAITS_PRESETS_OVERWRITE_MSG.Bind(presetVm.Label).Value;
+                    var title = LocalizationCodes.LC_TRAITS_PRESETS_OVERWRITE_TITLE.Bind().Value;
+                    if (MessageBox.Show(msg, title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         var oldPreset = presetVm.ModelObject;
                         var newPreset = ActivePalTarget?.CurrentPalSpecifier?.ToPreset() ?? new PassiveSkillsPreset();
