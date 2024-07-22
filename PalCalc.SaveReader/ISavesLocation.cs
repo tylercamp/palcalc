@@ -161,35 +161,35 @@ namespace PalCalc.SaveReader
                             if (levelFile != null)
                             {
                                 level = new LevelSaveFile(levelFile.FilePath);
-                                watchers.Add(new FileSystemWatcher(levelFile.FilePath));
+                                watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(levelFile.FilePath)));
                             }
 
                             var levelMetaFile = filesByType.GetValueOrDefault("LevelMeta")?.FirstOrDefault();
                             if (levelMetaFile != null)
                             {
                                 levelMeta = new LevelMetaSaveFile(levelMetaFile.FilePath);
-                                watchers.Add(new FileSystemWatcher(levelMetaFile.FilePath));
+                                watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(levelMetaFile.FilePath)));
                             }
 
                             var localDataFile = filesByType.GetValueOrDefault("LocalData")?.FirstOrDefault();
                             if (localDataFile != null)
                             {
                                 localData = new LocalDataSaveFile(localDataFile.FilePath);
-                                watchers.Add(new FileSystemWatcher(localDataFile.FilePath));
+                                watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(localDataFile.FilePath)));
                             }
 
                             var worldOptionFile = filesByType.GetValueOrDefault("WorldOption")?.FirstOrDefault();
                             if (worldOptionFile != null)
                             {
                                 worldOption = new WorldOptionSaveFile(worldOptionFile.FilePath);
-                                watchers.Add(new FileSystemWatcher(worldOptionFile.FilePath));
+                                watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(worldOptionFile.FilePath)));
                             }
 
                             players = filesByType
                                 .GetValueOrElse("Players", new List<XboxSaveFile>())
                                 .Select(f =>
                                 {
-                                    watchers.Add(new FileSystemWatcher(f.FilePath));
+                                    watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(f.FilePath)));
                                     return new PlayersSaveFile(f.FilePath);
                                 })
                                 .ToList();
