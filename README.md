@@ -36,7 +36,7 @@ Pal Calc is a Windows program for calculating the optimal steps to breed a speci
   - Supports all languages in Palworld, pal and passives names imported from game files
   - Translations for in-app text [can be added](./PalCalc.UI/Localization/README.md)
 
-_See [here](./PalCalc.Solver/) for an overview of the full solver process._
+_See [here](./PalCalc.Solver/README.md) for an overview of the full solver process._
 
 # FAQs
 
@@ -85,6 +85,12 @@ There are a few reasons for an empty list / result:
   - This is often caused by the "Max Input Irrelevant Passives" settings, which should typically be set to the max value (3). This setting is mainly to reduce the starting number of pals and reduce the solver's runtime.
 - You have a pal with the requested passive skill and the solver _is_ using that pal, but "Max Breeding Steps" is too low for it to find a full path.
   - This setting is mainly to prevent the solver from taking too long. In practice, it will detect when further breeding is redundant and stop early.
+
+### How does Pal Calc decide which parents to use / how does the breeding calculation work?
+
+Pal Calc starts from a list of relevant pals which match your requirements for passive skills and looks at the breeding results between _all_ of these pals. Their children are then added to the list and the breeding process starts again. The final results are based on which paths are the fastest, regardless of what the exact breeding path is.
+
+The solving process is described in detail [here.](./PalCalc.Solver/README.md)
 
 # Community Help
 
