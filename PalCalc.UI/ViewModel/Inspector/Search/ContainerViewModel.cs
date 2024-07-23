@@ -17,7 +17,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public List<PalInstance> RawContents => contents;
 
         public List<PalInstance> SlotContents { get; } =
-            Enumerable.Range(0, contents.Max(p => p.Location.Index))
+            Enumerable.Range(0, contents.Max(p => p.Location.Index) + 1)
                 .Select(i => contents.SingleOrDefault(p => p.Location.Index == i))
                 .ToList();
 
