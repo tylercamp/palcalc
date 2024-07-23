@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.PointOfService;
 
 namespace PalCalc.SaveReader.SaveFile
 {
@@ -46,7 +47,13 @@ namespace PalCalc.SaveReader.SaveFile
             };
         }
 
-        private LevelSaveData BuildResult(PalDB db, List<GvasCharacterInstance> characters, List<GuildInstance> guilds, List<PalContainer> containers, Dictionary<string, LocationType> containerTypeById)
+        private LevelSaveData BuildResult(
+            PalDB db,
+            List<GvasCharacterInstance> characters,
+            List<GuildInstance> guilds,
+            List<PalContainer> containers,
+            Dictionary<string, LocationType> containerTypeById
+        )
         {
             var result = new LevelSaveData()
             {
@@ -135,6 +142,16 @@ namespace PalCalc.SaveReader.SaveFile
                 }
             }
 
+            var validPlayerIds = result.Players.Select(p => p.PlayerId);
+
+            // sanitize data by removing anything with references to player IDs which don't exist
+            foreach (var guild in result.Guilds)
+            {
+                guild.MemberIds.RemoveAll(id => !characters.Any(c => c.PlayerId?.ToString() == id));
+            }
+
+            result.Pals.RemoveAll(pal => !validPlayerIds.Contains(pal.OwnerPlayerId));
+
             return result;
         }
 
@@ -161,6 +178,14 @@ namespace PalCalc.SaveReader.SaveFile
             });
 
             var result = BuildResult(db, parsed.Characters, parsed.Groups, parsed.Containers, containerTypeById);
+
+            foreach (var player in result.Players)
+            {
+                var playerMeta = players.Single(p => p.PlayerId == player.PlayerId);
+                player.PartyContainerId = playerMeta.PartyContainerId;
+                player.PalboxContainerId = playerMeta.PalboxContainerId;
+            }
+
             logger.Debug("done");
             return result;
         }
@@ -193,6 +218,16 @@ namespace PalCalc.SaveReader.SaveFile
             });
 
             var result = BuildResult(db, parsed.Characters, parsed.Groups, parsed.Containers, containerTypeById);
+
+            foreach (var player in result.Players)
+            {
+                player.PartyContainerId = parsed.Containers
+                    .Where(c => containerTypeById[c.Id] == LocationType.PlayerParty && containerOwners[c.Id].ToString() == player.PlayerId)
+                    .FirstOrDefault()
+                    ?.Id;
+
+                player.PalboxContainerId = palBoxesByPlayerId.GetValueOrDefault(Guid.Parse(player.PlayerId))?.Id;
+            }
 
             logger.Debug("done");
             return result;

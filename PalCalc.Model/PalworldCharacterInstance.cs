@@ -20,6 +20,9 @@ namespace PalCalc.Model
         public string PlayerId { get; set; } // typically this is referenced instead of InstanceId
         public string Name { get; set; }
         public int Level { get; set; }
+
+        public string PartyContainerId { get; set; }
+        public string PalboxContainerId { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

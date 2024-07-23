@@ -75,10 +75,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
         public ILocalizedText Label { get; } = LocalizationCodes.LC_PLAYER_LABEL.Bind(player.Name);
 
-        public List<IOwnerTreeNode> Children { get; } = [
-            new PlayerPartyContainerViewModel(party),
-            new PlayerPalboxContainerViewModel(palbox)
-        ];
+        public List<IOwnerTreeNode> Children { get; } = ((List<IOwnerTreeNode>)[
+            party != null ? new PlayerPartyContainerViewModel(party) : null,
+            palbox != null ? new PlayerPalboxContainerViewModel(palbox) : null
+        ]).SkipNull().ToList();
     }
 
     public class GuildTreeNodeViewModel : IOwnerTreeNode
@@ -96,8 +96,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     var player = source.Players.Single(p => p.PlayerId == pid);
                     return new PlayerTreeNodeViewModel(
                         player: player,
-                        party: relevantContainers.Single(c => c.DetectedType == LocationType.PlayerParty && c.OwnerIds.Count == 1 && c.OwnerIds.Single() == pid),
-                        palbox: relevantContainers.Single(c => c.DetectedType == LocationType.Palbox && c.OwnerIds.Count == 1 && c.OwnerIds.Single() == pid)
+                        party: relevantContainers.SingleOrDefault(c => c.Id == player.PartyContainerId),
+                        palbox: relevantContainers.SingleOrDefault(c => c.Id == player.PalboxContainerId)
                     );
                 })
                 .ToList();
@@ -126,7 +126,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     var apparentGuildId = c.OwnerIds.Where(id => source.Guilds.Any(g => g.Id == id)).MostCommonOrDefault();
                     if (apparentGuildId == null)
                     {
-                        apparentGuildId = c.OwnerIds.Select(id => source.GuildsByPlayerId[id]).MostCommonOrDefault().Id;
+                        apparentGuildId = c.OwnerIds.Select(id => source.GuildsByPlayerId[id].Id).MostCommonOrDefault();
                     }
 
                     return apparentGuildId;
