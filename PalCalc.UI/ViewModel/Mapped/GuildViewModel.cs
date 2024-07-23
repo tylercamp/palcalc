@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace PalCalc.UI.ViewModel.Mapped
 {
     public class GuildViewModel
     {
+        private static ILogger logger = Log.ForContext<GuildViewModel>();
+
         public GuildViewModel(CachedSaveGame source, GuildInstance guild)
         {
             ModelObject = guild;
@@ -24,7 +27,18 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 AvailableMembers.AddRange(
                     guild.MemberIds
-                        .Select(id => source.Players.Single(p => p.PlayerId == id))
+                        .Select(id =>
+                        {
+                            var player = source.Players.SingleOrDefault(p => p.PlayerId == id);
+                            if (player == null)
+                            {
+                                // (seems to be some quirk of game save data, e.g. deleted player no longer in character list but guild members
+                                //  list left unchanged?)
+                                logger.Warning("Unable to find details for player with ID {id} in guild {guildName}, skipping", id, guild.Name);
+                            }
+                            return player;
+                        })
+                        .Where(p => p != null)
                         .Select(player => new PlayerViewModel(player))
                         .ToList()
                 );
