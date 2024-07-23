@@ -54,7 +54,12 @@
             ToolTipService.ShowOnDisabled="True"
         />
 
-        <Button Grid.Row="2" Grid.ColumnSpan="99" Command="{Binding ChangeBredPals}" Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS}" />
+        <Button Grid.Row="2"
+                Grid.ColumnSpan="99"
+                Command="{Binding ChangeBredPals}"
+                IsEnabled="{Binding CanEditSettings}"
+                Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS}"
+                />
     </Grid>
 
     <Grid>
@@ -79,7 +84,12 @@
             ToolTipService.ShowOnDisabled="True"
             />
 
-        <Button Grid.Row="2" Grid.ColumnSpan="99" Command="{Binding ChangeWildPals}" Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS}" />
+        <Button Grid.Row="2"
+                Grid.ColumnSpan="99"
+                Command="{Binding ChangeWildPals}"
+                Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS}"
+                IsEnabled="{Binding CanEditSettings}"
+                />
     </Grid>
 
     <Grid>
