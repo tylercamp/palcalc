@@ -15,7 +15,7 @@
         <ListView ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Columns="6" />
+                    <UniformGrid Columns="{Binding PerRow}" />
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
             <ListView.ItemContainerStyle>
