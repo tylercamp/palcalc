@@ -27,7 +27,7 @@ namespace PalCalc.SaveReader
         public static void WithDecompressedSave(string filePath, Action<Stream> action)
         {
             logger.Information("Loading {file} as GVAS", filePath);
-            using (var fs = File.OpenRead(filePath))
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var binaryReader = new BinaryReader(fs))
             {
                 // unused
@@ -75,7 +75,7 @@ namespace PalCalc.SaveReader
 
         public static bool IsValidSave(string filePath)
         {
-            using (var fs = File.OpenRead(filePath))
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var binaryReader = new BinaryReader(fs))
             {
                 // unused

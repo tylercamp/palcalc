@@ -107,7 +107,7 @@ namespace PalCalc.SaveReader.GVAS
             }
             else
             {
-                using (var stream = File.OpenRead(file))
+                using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     using (var reader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
                         return IsValidGvas(reader);

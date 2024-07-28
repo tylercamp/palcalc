@@ -68,7 +68,7 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
             {
                 // Open a filestream with the user selected file
                 //FileStream stream = new FileStream(path, FileMode.Open);
-                var stream = File.OpenRead(path);
+                var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
                 // Create a binary reader that will be used to read the file
                 BinaryReader reader = new BinaryReader(stream);
