@@ -211,6 +211,9 @@ namespace PalCalc.UI.Model
                 }
 
                 // TODO - adding `null` entries will prevent re-adding a save at the same path until the app is restarted
+                if (InMemorySaves.ContainsKey(identifier))
+                    InMemorySaves.Remove(identifier);
+                
                 InMemorySaves.Add(identifier, res);
                 return res;
             }
