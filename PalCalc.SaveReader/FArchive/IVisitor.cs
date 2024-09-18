@@ -45,7 +45,9 @@ namespace PalCalc.SaveReader.FArchive
 
         }
 
+        public virtual void VisitByte(string path, byte value) { }
         public virtual void VisitInt(string path, int value) { }
+        public virtual void VisitUInt16(string path, ushort value) { }
         public virtual void VisitUInt32(string path, uint value) { }
         public virtual void VisitInt64(string path, long value) { }
         public virtual void VisitDouble(string path, int value) { } // ??????????????
@@ -168,6 +170,9 @@ namespace PalCalc.SaveReader.FArchive
         public override void VisitGuid(string path, Guid guid) => VisitValue(path, guid);
         public override void VisitInt64(string path, long value) => VisitValue(path, value);
         public override void VisitString(string path, string value) => VisitValue(path, value);
+        public override void VisitUInt16(string path, ushort value) => VisitValue(path, value);
+        public override void VisitUInt32(string path, uint value) => VisitValue(path, value);
+        public override void VisitByte(string path, byte value) => VisitValue(path, value);
 
         public override void Exit()
         {
@@ -215,6 +220,9 @@ namespace PalCalc.SaveReader.FArchive
         public override void VisitGuid(string path, Guid guid) => VisitValue(path, guid);
         public override void VisitInt64(string path, long value) => VisitValue(path, value);
         public override void VisitString(string path, string value) => VisitValue(path, value);
+        public override void VisitUInt16(string path, ushort value) => VisitValue(path, value);
+        public override void VisitUInt32(string path, uint value) => VisitValue(path, value);
+        public override void VisitByte(string path, byte value) => VisitValue(path, value);
 
         public override void Exit()
         {

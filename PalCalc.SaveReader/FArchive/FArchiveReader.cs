@@ -265,6 +265,17 @@ namespace PalCalc.SaveReader.FArchive
                         return res;
                     }
 
+                case "UInt16Property":
+                    {
+                        var res = LiteralProperty.Create(path, ReadOptionalGuid(), ReadUInt16());
+                        foreach (var v in pathVisitors)
+                        {
+                            v.VisitLiteralProperty(path, res);
+                            v.VisitUInt16(path, (UInt16)res.Value);
+                        }
+                        return res;
+                    }
+
                 case "UInt32Property":
                     {
                         var res = LiteralProperty.Create(path, ReadOptionalGuid(), ReadUInt32());
@@ -371,6 +382,24 @@ namespace PalCalc.SaveReader.FArchive
                         {
                             return null;
                         }
+                    }
+
+                case "ByteProperty":
+                    {
+                        // always seems to be `"None"`
+                        ReadString();
+
+                        var res = LiteralProperty.Create(path, ReadByte(), null);
+                        
+                        ReadByte(); // padding?
+
+                        foreach (var v in pathVisitors)
+                        {
+                            v.VisitLiteralProperty(path, res);
+                            v.VisitByte(path, (byte)res.Value);
+                        }
+
+                        return res;
                     }
 
                 case "StructProperty":
