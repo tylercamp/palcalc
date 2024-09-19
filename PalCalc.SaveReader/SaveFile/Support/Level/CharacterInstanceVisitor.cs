@@ -100,7 +100,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                 pendingInstance.IsPlayer = (bool)vals.GetValueOrElse(K_IS_PLAYER, false);
 
                 // level 1 (i.e. "default level") instances don't have a Level property
-                pendingInstance.Level = (int)vals.GetValueOrElse(K_LEVEL, 1);
+                pendingInstance.Level = Convert.ToInt32(vals.GetValueOrElse(K_LEVEL, 1));
 
                 if (pendingInstance.IsPlayer)
                 {
@@ -124,12 +124,12 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     pendingInstance.Gender = (string)vals.GetValueOrDefault(K_GENDER);
 
                     pendingInstance.ContainerId = (Guid)vals[K_CONTAINER_ID];
-                    pendingInstance.SlotIndex = (int)vals[K_CONTAINER_SLOT_INDEX];
+                    pendingInstance.SlotIndex = Convert.ToInt32(vals[K_CONTAINER_SLOT_INDEX]);
 
-                    pendingInstance.TalentHp = vals.ContainsKey(K_TALENT_HP) ? (int)vals[K_TALENT_HP] : null;
-                    pendingInstance.TalentMelee = vals.ContainsKey(K_TALENT_MELEE) ? (int)vals[K_TALENT_MELEE] : null;
-                    pendingInstance.TalentShot = vals.ContainsKey(K_TALENT_SHOT) ? (int)vals[K_TALENT_SHOT] : null;
-                    pendingInstance.TalentDefense = vals.ContainsKey(K_TALENT_DEFENSE) ? (int)vals[K_TALENT_DEFENSE] : null;
+                    pendingInstance.TalentHp = vals.ContainsKey(K_TALENT_HP) ? Convert.ToInt32(vals[K_TALENT_HP]) : null;
+                    pendingInstance.TalentMelee = vals.ContainsKey(K_TALENT_MELEE) ? Convert.ToInt32(vals[K_TALENT_MELEE]) : null;
+                    pendingInstance.TalentShot = vals.ContainsKey(K_TALENT_SHOT) ? Convert.ToInt32(vals[K_TALENT_SHOT]) : null;
+                    pendingInstance.TalentDefense = vals.ContainsKey(K_TALENT_DEFENSE) ? Convert.ToInt32(vals[K_TALENT_DEFENSE]) : null;
                 }
             };
 

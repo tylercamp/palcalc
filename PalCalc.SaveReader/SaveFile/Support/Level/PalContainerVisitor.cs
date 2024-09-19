@@ -75,7 +75,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     pendingSlot.SlotIndex = -1;
 
                     var vev = new ValueEmittingVisitor(this, ".Slots.SlotIndex");
-                    vev.OnValue += (_, v) => pendingSlot.SlotIndex = (int)v;
+                    vev.OnValue += (_, v) => pendingSlot.SlotIndex = Convert.ToInt32(v);
                     yield return vev;
                 }
             }
@@ -116,7 +116,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             keyIdCollector.OnExit += v =>
             {
                 workingContainer.Id = v[".Key.ID"].ToString();
-                if (v.ContainsKey(".Value.SlotNum")) workingContainer.MaxEntries = (int)v[".Value.SlotNum"];
+                if (v.ContainsKey(".Value.SlotNum")) workingContainer.MaxEntries = Convert.ToInt32(v[".Value.SlotNum"]);
                 else workingContainer.MaxEntries = workingContainer.Slots.Count;
             };
 
