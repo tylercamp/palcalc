@@ -22,7 +22,7 @@ Terms:
 
 When Pal Calc finds a set of parents to breed, it will produce children which inherit all desired passives from the parents. Each child will have an effort estimation, which is the amount of time needed to produce that child which inherits those specific passives.
 
-The effort estimate is largely possible thanks to [this reverse engineering of the Palworld inheritance calculation by /u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/comment/kppjq4n/). It provides the complete process as well as probabilities of inheriting different numbers of passives from parents.
+The effort estimate is largely possible thanks to [this reverse engineering of the Palworld inheritance calculation by /u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/comment/kppjq4n/). It provides the complete process as well as probabilities of inheriting different numbers of passives from parents. (See [the other README in this folder](./README-BREED-ESTIMATE.md) for details on the exact calculation.)
 
 These probabilities are used when estimating breeding effort. If the child has, e.g., an 8% chance of inheriting all the desired passives from its parents, that's roughly a 1 in 13 chance of success, i.e. on average 13 attempts would be needed to produce that child. At 5 minutes per breeding attempt, that comes to ~65 minutes. (Though Pal Calc will internally double the Breeding Time setting - 10 minutes instead of 5 - to account for lost productivity at night.)
 
@@ -54,7 +54,7 @@ This pruning is applied at the end of each breeding step before building the nex
 
 ### Other Notes
 
-There's a common idea that the distribution of desired passives betweens parents, e.g. a 0/4, 1/3, 2/2 split, affects which passives are inherited by the child. This is [apparently false](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/). Palworld will make a combined, deduplicated list of passives from the parents, and the inherited passives are based on that combined list.
+There's a common idea that the distribution of desired passives betweens parents, e.g. a 0/4, 1/3, 2/2 split, affects which passives are inherited by the child. This is [apparently false](https://www.reddit.com/r/Palworld/comments/1af9in7/comment/kppjq4n/). Palworld will make a combined, deduplicated list of passives from the parents, and the inherited passives are based on that combined list.
 
 Pal Calc does not have any preference for how passives are distributed amongst parents, etc. when searching through breeding paths. It will always consider _all_ possible breeding combinations between _all_ discovered parents, and will preserve the fastest option it's found, whatever that may be.
 
@@ -68,7 +68,7 @@ _This may become outdated in later updates._
 
 - **(1) Prepare the starting list of pals, add to the working set**
   - _The list of available pals is reduced to contain one of each pal with a given gender, and a unique subset of the list of desired passives. Pals are filtered based on "Max Input Irrelevant Passives"._
-  - _If there are multiple pals with the same pal type, gender, and list of traits, the a single pal will be chosen based on highest IVs and its stored location. It will try to pick pals in your palbox, base, and party, in that order. See `BreedingSolver.RelevantInstancesForPassiveSkills`._
+  - _If there are multiple pals with the same pal type, gender, and list of traits, then a single pal will be chosen based on highest IVs and its stored location. It will try to pick pals in your palbox, base, and party, in that order. See `BreedingSolver.RelevantInstancesForPassiveSkills`._
   - _If there is a male and female of the same pal with the same set of desired passives, a composite reference is made which combines them and has "wildcard" gender. Both pals, and the composite reference, are preserved in the final list._
   - _If "Num Wild Pals" > 0, a wild representation of any unowned pal is added to the list with "wildcard" gender. For each wild pal, multiples of that pal may be added with up to "Max Input Irrelevant Passives" random passives. (Wild pals with more random passives have a higher probability / lower effort to acquire.)_
 - **(2) Begin breeding loop**
