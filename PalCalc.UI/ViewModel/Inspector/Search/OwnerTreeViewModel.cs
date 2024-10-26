@@ -100,6 +100,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                         palbox: relevantContainers.SingleOrDefault(c => c.Id == player.PalboxContainerId)
                     );
                 })
+                .Where(n => n.Children.Any())
                 .ToList();
 
             // TODO - eventually add support for viewing cages

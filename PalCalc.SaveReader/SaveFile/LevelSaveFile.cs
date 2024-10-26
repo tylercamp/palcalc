@@ -143,14 +143,36 @@ namespace PalCalc.SaveReader.SaveFile
             }
 
             var validPlayerIds = result.Players.Select(p => p.PlayerId);
+            var allPlayerIds = validPlayerIds
+                .Concat(result.Guilds.SelectMany(g => g.MemberIds))
+                .Concat(result.Pals.Select(p => p.OwnerPlayerId))
+                .Distinct()
+                .ToList();
 
-            // sanitize data by removing anything with references to player IDs which don't exist
-            foreach (var guild in result.Guilds)
+            foreach (var p in allPlayerIds.Except(validPlayerIds).OrderBy(id => id).ZipWithIndex())
             {
-                guild.MemberIds.RemoveAll(id => !characters.Any(c => c.PlayerId?.ToString() == id));
+                var (unknownId, idx) = p;
+                result.Players.Add(new PlayerInstance()
+                {
+                    InstanceId = $"__UNKNOWNID_{unknownId}__",
+                    Level = 1,
+                    Name = $"Unknown ({unknownId[..8]}) (#{idx + 1})",
+                    PlayerId = unknownId,
+                });
             }
 
-            result.Pals.RemoveAll(pal => !validPlayerIds.Contains(pal.OwnerPlayerId));
+            var playersMissingGuilds = allPlayerIds.Except(result.Guilds.SelectMany(g => g.MemberIds)).ToList();
+            if (playersMissingGuilds.Count > 0)
+            {
+                var unknownGuild = new GuildInstance();
+                unknownGuild.Name = "(No Guild) (!)";
+                unknownGuild.InternalName = "__NO_GUILD__";
+                unknownGuild.MemberIds = playersMissingGuilds;
+                unknownGuild.OwnerId = "__UNKNOWN_OWNER__";
+                unknownGuild.Id = "__UNKNOWN_ID__";
+
+                result.Guilds.Add(unknownGuild);
+            }
 
             return result;
         }
@@ -181,7 +203,9 @@ namespace PalCalc.SaveReader.SaveFile
 
             foreach (var player in result.Players)
             {
-                var playerMeta = players.Single(p => p.PlayerId == player.PlayerId);
+                var playerMeta = players.SingleOrDefault(p => p.PlayerId == player.PlayerId);
+                if (playerMeta == null) continue;
+
                 player.PartyContainerId = playerMeta.PartyContainerId;
                 player.PalboxContainerId = playerMeta.PalboxContainerId;
             }
