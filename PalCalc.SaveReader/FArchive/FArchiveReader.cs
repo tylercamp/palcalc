@@ -389,9 +389,8 @@ namespace PalCalc.SaveReader.FArchive
                         // always seems to be `"None"`
                         ReadString();
 
-                        var res = LiteralProperty.Create(path, ReadByte(), null);
-                        
                         ReadByte(); // padding?
+                        var res = LiteralProperty.Create(path, ReadByte(), null);
 
                         foreach (var v in pathVisitors)
                         {
