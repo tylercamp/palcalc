@@ -108,8 +108,10 @@ namespace PalCalc.UI.ViewModel
                 // add a placeholder so the user can (optionally) see the explanation why no saves are available (game isn't installed/synced via xbox app)
                 availableSavesLocations.Add(new XboxSavesLocation());
             }
-            
-            SaveSelection = new SaveSelectorViewModel(availableSavesLocations, settings.ExtraSaveLocations.Select(saveFolder => new StandardSaveGame(saveFolder)));
+
+            var manualSaves = settings.ExtraSaveLocations.Select(saveFolder => new StandardSaveGame(saveFolder));
+            var fakeSaves = settings.FakeSaveNames.Select(FakeSaveGame.Create);
+            SaveSelection = new SaveSelectorViewModel(availableSavesLocations, manualSaves.Concat(fakeSaves));
 
             targetsBySaveFile = SaveSelection.SavesLocations
                 .SelectMany(l => l.SaveGames)
@@ -220,7 +222,15 @@ namespace PalCalc.UI.ViewModel
             var saveVm = manualSaves.Add(save);
             SaveSelection.SelectedGame = saveVm;
 
-            settings.ExtraSaveLocations.Add(save.BasePath);
+            if (save is VirtualSaveGame)
+            {
+                settings.FakeSaveNames.Add(save.GameId);
+            }
+            else
+            {
+                settings.ExtraSaveLocations.Add(save.BasePath);
+            }
+
             Storage.SaveAppSettings(settings);
         }
 

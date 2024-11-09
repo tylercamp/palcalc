@@ -1,11 +1,13 @@
 ﻿using PalCalc.SaveReader.FArchive;
 using PalCalc.SaveReader.GVAS;
 using PalCalc.SaveReader.SaveFile;
+using PalCalc.SaveReader.SaveFile.Virtual;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Media.PlayTo;
 
 namespace PalCalc.SaveReader
 {
@@ -147,5 +149,49 @@ namespace PalCalc.SaveReader
 
         public bool IsValid =>
             Level != null && Level.IsValid; // don't check for `LevelMeta` - may be temporarily missing for files with "wrapper" header
+    }
+
+    public class VirtualSaveGame : ISaveGame
+    {
+        public VirtualSaveGame(
+            string userId,
+            string gameId,
+            VirtualLevelSaveFile level,
+            VirtualLevelMetaSaveFile levelMeta,
+            VirtualLocalDataSaveFile localData,
+            VirtualWorldOptionSaveFile worldOption
+        )
+        {
+            Level = level;
+            LevelMeta = levelMeta;
+            LocalData = localData;
+            WorldOption = worldOption;
+            Players = [];
+
+            UserId = userId;
+            GameId = gameId;
+        }
+
+        public string BasePath => null;
+
+        public string UserId { get; }
+
+        public string GameId { get; }
+
+        public DateTime LastModified { get; set; } = DateTime.Now;
+
+        public LevelSaveFile Level { get; }
+
+        public LevelMetaSaveFile LevelMeta { get; }
+
+        public LocalDataSaveFile LocalData { get; }
+
+        public WorldOptionSaveFile WorldOption { get; }
+
+        public List<PlayersSaveFile> Players { get; }
+
+        public bool IsValid => true;
+
+        public event Action<ISaveGame> Updated;
     }
 }

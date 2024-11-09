@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
+using PalCalc.SaveReader.SaveFile.Virtual;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
@@ -61,35 +62,59 @@ namespace PalCalc.UI.ViewModel
                 bool needsReset = false;
                 if (value != null && value.IsAddManualOption)
                 {
-                    var ofd = new OpenFileDialog();
-                    ofd.Filter = LocalizationCodes.LC_MANUAL_SAVE_EXTENSION_LBL.Bind().Value + "|Level.sav";
-                    ofd.Title = LocalizationCodes.LC_MANUAL_SAVE_SELECTOR_TITLE.Bind().Value;
-
-                    if (true == ofd.ShowDialog(App.Current.MainWindow))
+                    if (MessageBox.Show("Make this a fake save?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
-                        var asSaveGame = new StandardSaveGame(Path.GetDirectoryName(ofd.FileName));
-                        if (asSaveGame.IsValid)
+                        // TODO - allow deleting entries
+                        // TODO - prevent duplicate names
+                        var window = new SimpleTextInputWindow()
                         {
-                            var existingSaves = SavesLocations.SelectMany(l => l.SaveGames.Select(vm => vm.Value)).SkipNull();
-                            if (existingSaves.Any(s => s.BasePath.PathEquals(asSaveGame.BasePath)))
-                            {
-                                MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_ALREADY_REGISTERED.Bind().Value);
-                            }
-                            else
-                            {
-                                // leave updates + selection of the new location to the event handler
-                                Dispatcher.CurrentDispatcher.BeginInvoke(() => NewCustomSaveSelected?.Invoke(manualLocation, asSaveGame));
-                            }
+                            Title = "Save Game Name",
+                            InputLabel = "Name",
+                            Validator = name => name.Length > 0
+                        };
+
+                        if (window.ShowDialog() == true)
+                        {
+                            var saveGame = FakeSaveGame.Create(window.Result);
+                            Dispatcher.CurrentDispatcher.BeginInvoke(() => NewCustomSaveSelected?.Invoke(manualLocation, saveGame));
                         }
                         else
                         {
-                            MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_INCOMPLETE.Bind().Value);
                             needsReset = true;
                         }
                     }
                     else
                     {
-                        needsReset = true;
+                        var ofd = new OpenFileDialog();
+                        ofd.Filter = LocalizationCodes.LC_MANUAL_SAVE_EXTENSION_LBL.Bind().Value + "|Level.sav";
+                        ofd.Title = LocalizationCodes.LC_MANUAL_SAVE_SELECTOR_TITLE.Bind().Value;
+
+                        if (true == ofd.ShowDialog(App.Current.MainWindow))
+                        {
+                            var asSaveGame = new StandardSaveGame(Path.GetDirectoryName(ofd.FileName));
+                            if (asSaveGame.IsValid)
+                            {
+                                var existingSaves = SavesLocations.SelectMany(l => l.SaveGames.Select(vm => vm.Value)).SkipNull();
+                                if (existingSaves.Any(s => s.BasePath.PathEquals(asSaveGame.BasePath)))
+                                {
+                                    MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_ALREADY_REGISTERED.Bind().Value);
+                                }
+                                else
+                                {
+                                    // leave updates + selection of the new location to the event handler
+                                    Dispatcher.CurrentDispatcher.BeginInvoke(() => NewCustomSaveSelected?.Invoke(manualLocation, asSaveGame));
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_INCOMPLETE.Bind().Value);
+                                needsReset = true;
+                            }
+                        }
+                        else
+                        {
+                            needsReset = true;
+                        }
                     }
                 }
 

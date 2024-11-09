@@ -49,6 +49,8 @@ namespace PalCalc.UI.Model
 
         public List<string> ExtraSaveLocations { get; set; } = new List<string>();
 
+        public List<string> FakeSaveNames { get; set; } = new List<string>();
+
         public SolverSettings SolverSettings { get; set; } = new SolverSettings();
 
         public List<PassiveSkillsPreset> PassiveSkillsPresets { get; set; } = new List<PassiveSkillsPreset>();

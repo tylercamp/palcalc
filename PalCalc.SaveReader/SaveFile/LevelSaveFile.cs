@@ -32,7 +32,7 @@ namespace PalCalc.SaveReader.SaveFile
 
         private Guid MostCommonOwner(PalContainer container, Dictionary<Guid, Guid> palOwnersByInstanceId) => container.Slots.GroupBy(s => palOwnersByInstanceId.GetValueOrElse(s.InstanceId, Guid.Empty)).MaxBy(g => g.Count()).Key;
 
-        public RawLevelSaveData ReadRawCharacterData()
+        public virtual RawLevelSaveData ReadRawCharacterData()
         {
             var containerVisitor = new PalContainerVisitor();
             var instanceVisitor = new CharacterInstanceVisitor();
@@ -181,7 +181,7 @@ namespace PalCalc.SaveReader.SaveFile
         /// Uses the provided list of players, which specify party and palbox container IDs, to read the list of character instances and
         /// properly associate them with their owner + container type.
         /// </summary>
-        public LevelSaveData ReadCharacterData(PalDB db, List<PlayersSaveFile> playersFiles)
+        public virtual LevelSaveData ReadCharacterData(PalDB db, List<PlayersSaveFile> playersFiles)
         {
             if (playersFiles.Count == 0) return ReadCharacterData(db);
 
