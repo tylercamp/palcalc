@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,12 @@ namespace PalCalc.UI.View
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
             Process.Start(new ProcessStartInfo { FileName = e.Uri.AbsoluteUri, UseShellExecute = true });
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            Owner = null;
+            base.OnClosing(e);
         }
     }
 }

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,5 +66,11 @@ namespace PalCalc.UI.View
 
         public IRelayCommand SaveCommand { get; }
         public IRelayCommand CancelCommand { get; }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            Owner = null;
+            base.OnClosing(e);
+        }
     }
 }
