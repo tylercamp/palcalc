@@ -26,8 +26,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         override public int RowsPerPage { get; } = 5;
 
-        private List<ContainerGridViewModel> grids = null;
-        public override List<ContainerGridViewModel> Grids
+        private List<IContainerGridViewModel> grids = null;
+        public override List<IContainerGridViewModel> Grids
         {
             get
             {
@@ -35,17 +35,18 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 {
                     if (!HasPages)
                     {
-                        grids = [new ContainerGridViewModel(SlotContents) { PerRow = PerRow }];
+                        grids = [new DefaultContainerGridViewModel(SlotContents) { PerRow = PerRow }];
                     }
                     else
                     {
                         grids = SlotContents
                             .Batched(PerRow * RowsPerPage).ToList()
                             .ZipWithIndex()
-                            .Select(pair => new ContainerGridViewModel(pair.Item1.ToList()) {
+                            .Select(pair => new DefaultContainerGridViewModel(pair.Item1.ToList()) {
                                 Title = LocalizationCodes.LC_LOC_PALBOX_TAB.Bind(pair.Item2 + 1),
                                 PerRow = PerRow
                             })
+                            .Cast<IContainerGridViewModel>()
                             .ToList();
                     }
 
@@ -63,10 +64,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         private bool isSyncingSlots = false;
         private void Grid_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (isSyncingSlots || e.PropertyName != nameof(ContainerGridViewModel.SelectedSlot)) return;
+            if (isSyncingSlots || e.PropertyName != nameof(DefaultContainerGridViewModel.SelectedSlot)) return;
 
             isSyncingSlots = true;
-            var srcGrid = sender as ContainerGridViewModel;
+            var srcGrid = sender as DefaultContainerGridViewModel;
 
             foreach (var grid in Grids)
             {

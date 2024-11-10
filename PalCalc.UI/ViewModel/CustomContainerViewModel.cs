@@ -16,20 +16,15 @@ namespace PalCalc.UI.ViewModel
     {
         public CustomContainerViewModel(CustomContainer value)
         {
-            ModelObject = value;
-
             Label = value.Label;
             Contents = new ObservableCollection<CustomPalInstanceViewModel>(value.Contents.Select(i => new CustomPalInstanceViewModel(i)));
-
-            Contents.CollectionChanged += Contents_CollectionChanged;
         }
 
-        private void Contents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        public CustomContainer ModelObject => new CustomContainer()
         {
-            OnPropertyChanged(nameof(Contents));
-        }
-
-        public CustomContainer ModelObject { get; private set; }
+            Label = Label,
+            Contents = Contents.Select(p => p.ModelObject).SkipNull().ToList(),
+        };
 
         [ObservableProperty]
         private string label;

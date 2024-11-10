@@ -19,21 +19,16 @@ namespace PalCalc.UI.ViewModel.Inspector
         private static SearchViewModel designerInstance = null;
         public static SearchViewModel DesignerInstance => designerInstance ??= new SearchViewModel(SaveGameViewModel.DesignerInstance);
 
-        public OwnerTreeViewModel OwnerTree { get; }
+        [ObservableProperty]
+        private OwnerTreeViewModel ownerTree;
+
         public SearchSettingsViewModel SearchSettings { get; }
 
         public ICommand NewCustomContainerCommand { get; }
 
         public SearchViewModel(SaveGameViewModel sgvm)
         {
-            var csg = sgvm.CachedValue;
-            var palsByContainerId = csg.OwnedPals.GroupBy(p => p.Location.ContainerId).ToDictionary(g => g.Key, g => g.ToList());
-
-            var containers = palsByContainerId
-                .Select(kvp => (ISearchableContainerViewModel)new DefaultSearchableContainerViewModel(kvp.Key, kvp.Value.First().Location.Type, kvp.Value))
-                .Concat(sgvm.Customizations.CustomContainers.Select(c => new CustomSearchableContainerViewModel(c)));
-
-            OwnerTree = new OwnerTreeViewModel(csg, containers.ToList());
+            BuildContainerTree(sgvm);
             SearchSettings = new SearchSettingsViewModel();
 
             OwnerTree.PropertyChanging += OwnerTree_PropertyChanging;
@@ -49,12 +44,27 @@ namespace PalCalc.UI.ViewModel.Inspector
                     // TODO - prevent duplicate names
                     Validator = name => name.Length > 0
                 };
+                nameModal.Owner = App.Current.MainWindow;
                 if (nameModal.ShowDialog() == true)
                 {
                     var container = new CustomContainer() { Label = nameModal.Result };
                     sgvm.Customizations.CustomContainers.Add(new CustomContainerViewModel(container));
+
+                    BuildContainerTree(sgvm);
                 }
             });
+        }
+
+        private void BuildContainerTree(SaveGameViewModel sgvm)
+        {
+            var csg = sgvm.CachedValue;
+            var palsByContainerId = csg.OwnedPals.GroupBy(p => p.Location.ContainerId).ToDictionary(g => g.Key, g => g.ToList());
+
+            var containers = palsByContainerId
+                .Select(kvp => (ISearchableContainerViewModel)new DefaultSearchableContainerViewModel(kvp.Key, kvp.Value.First().Location.Type, kvp.Value))
+                .Concat(sgvm.Customizations.CustomContainers.Select(c => new CustomSearchableContainerViewModel(c)));
+
+            OwnerTree = new OwnerTreeViewModel(csg, containers.ToList());
         }
 
         private void ApplySearchSettings()

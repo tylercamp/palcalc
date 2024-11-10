@@ -223,8 +223,18 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="{x:Type svm:ContainerGridViewModel}">
-                                <local:ContainerGridView DataContext="{Binding}" Margin="15" />
+                            <DataTemplate>
+                                <ContentControl Content="{Binding}">
+                                    <ContentControl.Resources>
+                                        <!-- (same template for either one) -->
+                                        <DataTemplate DataType="{x:Type svm:DefaultContainerGridViewModel}">
+                                            <local:ContainerGridView DataContext="{Binding}" Margin="15" />
+                                        </DataTemplate>
+                                        <DataTemplate DataType="{x:Type svm:CustomContainerGridViewModel}">
+                                            <local:ContainerGridView DataContext="{Binding}" Margin="15" />
+                                        </DataTemplate>
+                                    </ContentControl.Resources>
+                                </ContentControl>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

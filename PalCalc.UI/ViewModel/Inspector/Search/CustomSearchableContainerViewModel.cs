@@ -15,8 +15,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         public override LocationType DetectedType => container.LocationType;
 
-        private List<ContainerGridViewModel> grids;
-        public override List<ContainerGridViewModel> Grids
+        private List<IContainerGridViewModel> grids;
+        public override List<IContainerGridViewModel> Grids
         {
             get
             {
@@ -25,7 +25,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 // updating "other grids")
                 if (grids == null)
                 {
-                    grids = [new ContainerGridViewModel([]) { PerRow = PerRow }];
+                    grids = [new CustomContainerGridViewModel(container) { PerRow = PerRow }];
                 }
                 return grids;
             }

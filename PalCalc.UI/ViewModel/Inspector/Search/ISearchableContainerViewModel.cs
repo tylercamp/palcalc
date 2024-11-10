@@ -25,7 +25,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public abstract bool HasPages { get; }
         public abstract int RowsPerPage { get; }
 
-        public abstract List<ContainerGridViewModel> Grids { get; }
+        public abstract List<IContainerGridViewModel> Grids { get; }
 
         public ISearchCriteria SearchCriteria
         {

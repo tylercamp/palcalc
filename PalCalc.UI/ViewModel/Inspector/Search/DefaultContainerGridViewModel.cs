@@ -5,6 +5,7 @@ using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -14,29 +15,10 @@ using System.Windows.Controls;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search
 {
-    public interface IContainerGridSlotViewModel {
-        bool Matches { get; }
-    }
-
-    public partial class ContainerGridPalSlotViewModel : ObservableObject, IContainerGridSlotViewModel
+    public partial class DefaultContainerGridViewModel(List<PalInstance> contents) : ObservableObject, IContainerGridViewModel
     {
-        public PalInstanceViewModel PalInstance { get; set; }
-
-        public PalViewModel Pal => PalInstance.Pal;
-
-        [ObservableProperty]
-        private bool matches = true;
-    }
-
-    public class ContainerGridEmptySlotViewModel : IContainerGridSlotViewModel
-    {
-        public bool Matches => false;
-    }
-
-    public partial class ContainerGridViewModel(List<PalInstance> contents) : ObservableObject
-    {
-        private static ContainerGridViewModel designerInstance;
-        public static ContainerGridViewModel DesignerInstance
+        private static DefaultContainerGridViewModel designerInstance;
+        public static DefaultContainerGridViewModel DesignerInstance
         {
             get
             {
@@ -44,11 +26,13 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 {
                     var c = CachedSaveGame.SampleForDesignerView.OwnedPals.GroupBy(p => p.Location.ContainerId).First();
 
-                    designerInstance = new ContainerGridViewModel(c.ToList())
+                    designerInstance = new DefaultContainerGridViewModel(c.ToList())
                     {
                         Title = new HardCodedText("Tab 1"),
                         PerRow = 5
                     };
+                    // (don't ever actually do this, just for testing)
+                    designerInstance.Slots.Add(new ContainerGridNewPalSlotViewModel());
                 }
                 return designerInstance;
             }
@@ -81,13 +65,13 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         [ObservableProperty]
         private IContainerGridSlotViewModel selectedSlot;
 
-        public List<IContainerGridSlotViewModel> Slots { get; } = contents == null ? [] :
+        public ObservableCollection<IContainerGridSlotViewModel> Slots { get; } = contents == null ? [] : new ObservableCollection<IContainerGridSlotViewModel>(
             contents
                 .Select<PalInstance, IContainerGridSlotViewModel>(p =>
                 {
                     if (p == null) return new ContainerGridEmptySlotViewModel();
                     else return new ContainerGridPalSlotViewModel() { PalInstance = new PalInstanceViewModel(p), Matches = true };
                 })
-                .ToList();
+        );
     }
 }

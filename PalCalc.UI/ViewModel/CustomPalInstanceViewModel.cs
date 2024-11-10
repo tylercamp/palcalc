@@ -1,12 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.UI.Localization;
+using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace PalCalc.UI.ViewModel
 {
@@ -51,6 +53,9 @@ namespace PalCalc.UI.ViewModel
             Passive4 = passiveVms.Skip(3).FirstOrDefault();
         }
 
+        public ImageSource Icon => Pal?.Icon ?? PalIcon.DefaultIcon;
+        public ImageBrush IconBrush => Pal?.IconBrush ?? PalIcon.DefaultIconBrush;
+
         public PalLocation Location { get; }
 
         [ObservableProperty]
@@ -85,9 +90,9 @@ namespace PalCalc.UI.ViewModel
                 Passive3.ModelObject,
                 Passive4.ModelObject
             }.SkipNull().ToList(),
+            // TODO - sort out locations
             Location = new PalLocation()
             {
-                
                 Type = LocationType.Palbox
             }
         };

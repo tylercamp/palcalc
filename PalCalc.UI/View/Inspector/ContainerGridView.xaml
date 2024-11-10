@@ -6,10 +6,14 @@
              xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
              xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              mc:Ignorable="d" 
              Visibility="{Binding GridVisibility}"
-             d:DataContext="{x:Static svm:ContainerGridViewModel.DesignerInstance}"
+             d:DataContext="{x:Static svm:DefaultContainerGridViewModel.DesignerInstance}"
              d:Background="White">
+    <UserControl.Resources>
+        <svm:ContainerGridSlotEnabledConverter x:Key="SlotEnabledConverter" />
+    </UserControl.Resources>
     <StackPanel>
         <Label Content="{Binding Title.Value}" Visibility="{Binding TitleVisibility}" FontWeight="Bold" />
         <ListView ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}">
@@ -21,7 +25,7 @@
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Path=Matches, Mode=OneWay}" Value="False">
+                        <DataTrigger Binding="{Binding Converter={StaticResource ResourceKey=SlotEnabledConverter}}" Value="False">
                             <Setter Property="IsEnabled" Value="False" />
                             <Setter Property="Opacity" Value="0.25" />
                         </DataTrigger>
@@ -44,6 +48,17 @@
                                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                     <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding Pal.IconBrush}" />
                                 </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type svm:ContainerGridCustomPalSlotViewModel}">
+                                <!-- TODO - Handle incomplete/invalid instances -->
+                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding PalInstance.IconBrush}" />
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type svm:ContainerGridNewPalSlotViewModel}">
+                                <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <materialIcons:MaterialIcon Kind="Add" Foreground="Black" />
+                                </Border>
                             </DataTemplate>
                         </ContentControl.Resources>
                     </ContentControl>
