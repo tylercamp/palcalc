@@ -44,7 +44,7 @@ namespace PalCalc.UI.ViewModel.Inspector
                     // TODO - prevent duplicate names
                     Validator = name => name.Length > 0
                 };
-                nameModal.Owner = App.Current.MainWindow;
+                nameModal.Owner = App.ActiveWindow;
                 if (nameModal.ShowDialog() == true)
                 {
                     var container = new CustomContainer() { Label = nameModal.Result };

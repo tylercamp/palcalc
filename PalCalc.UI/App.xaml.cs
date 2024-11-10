@@ -27,6 +27,8 @@ namespace PalCalc.UI
 
         public static List<ITranslationError> TranslationErrors { get; } = new List<ITranslationError>();
 
+        public static Window ActiveWindow => Current.Windows.Cast<Window>().FirstOrDefault(w => w.IsActive) ?? Current.MainWindow;
+
         protected override void OnStartup(StartupEventArgs e)
         {
 #if RELEASE
