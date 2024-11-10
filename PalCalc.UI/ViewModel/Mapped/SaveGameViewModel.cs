@@ -21,6 +21,10 @@ namespace PalCalc.UI.ViewModel.Mapped
     {
         private static ILogger logger = Log.ForContext<SaveGameViewModel>();
 
+        private static SaveGameViewModel designerInstance;
+        public static SaveGameViewModel DesignerInstance =>
+            designerInstance ??= new SaveGameViewModel(CachedSaveGame.SampleForDesignerView.UnderlyingSave);
+
         private SaveGameViewModel()
         {
             IsAddManualOption = true;
@@ -104,6 +108,9 @@ namespace PalCalc.UI.ViewModel.Mapped
         }
 
         public CachedSaveGame CachedValue => Storage.LoadSave(Value, PalDB.LoadEmbedded());
+
+        private SaveCustomizationsViewModel customizations = null;
+        public SaveCustomizationsViewModel Customizations => customizations ??= new SaveCustomizationsViewModel(this);
 
         private ILocalizedText label;
         public ILocalizedText Label

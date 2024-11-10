@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,14 +23,14 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
     public abstract class IContainerSource : ObservableObject, IOwnerTreeNode
     {
-        public IContainerSource(ILocalizedText label, ContainerViewModel container)
+        public IContainerSource(ILocalizedText label, ISearchableContainerViewModel container)
         {
             Container = container;
             Label = label;
             SearchedLabel = Label;
         }
 
-        public ContainerViewModel Container { get; }
+        public ISearchableContainerViewModel Container { get; }
         public ILocalizedText Label { get; }
 
 
@@ -56,22 +57,22 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         }
     }
 
-    public class PlayerPalboxContainerViewModel(ContainerViewModel container) :
+    public class PlayerPalboxContainerViewModel(DefaultSearchableContainerViewModel container) :
         IContainerSource(LocalizationCodes.LC_PAL_LOC_PALBOX.Bind(), container)
     {
     }
 
-    public class PlayerPartyContainerViewModel(ContainerViewModel container) :
+    public class PlayerPartyContainerViewModel(DefaultSearchableContainerViewModel container) :
         IContainerSource(LocalizationCodes.LC_PAL_LOC_PARTY.Bind(), container)
     {
     }
 
-    public class BaseTreeNodeViewModel(ContainerViewModel baseContainer) :
+    public class BaseTreeNodeViewModel(DefaultSearchableContainerViewModel baseContainer) :
         IContainerSource(LocalizationCodes.LC_BASE_LABEL.Bind(baseContainer.Id.Split('-')[0]), baseContainer)
     {
     }
 
-    public class PlayerTreeNodeViewModel(PlayerInstance player, ContainerViewModel party, ContainerViewModel palbox) : IOwnerTreeNode
+    public class PlayerTreeNodeViewModel(PlayerInstance player, DefaultSearchableContainerViewModel party, DefaultSearchableContainerViewModel palbox) : IOwnerTreeNode
     {
         public ILocalizedText Label { get; } = LocalizationCodes.LC_PLAYER_LABEL.Bind(player.Name);
 
@@ -83,7 +84,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
     public class GuildTreeNodeViewModel : IOwnerTreeNode
     {
-        public GuildTreeNodeViewModel(CachedSaveGame source, GuildInstance guild, List<ContainerViewModel> relevantContainers)
+        public GuildTreeNodeViewModel(CachedSaveGame source, GuildInstance guild, List<DefaultSearchableContainerViewModel> relevantContainers)
         {
             Label = LocalizationCodes.LC_GUILD_LABEL.Bind(guild.Name);
 
@@ -117,11 +118,36 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public List<IOwnerTreeNode> Children { get; }
     }
 
+    public class CustomizationsTreeNodeViewModel : IOwnerTreeNode
+    {
+        public CustomizationsTreeNodeViewModel(List<CustomContainerTreeNodeViewModel> containers)
+        {
+            // TODO - subscribe to customizations.CustomContainers observable events
+
+            // TODO - itln
+            Label = new HardCodedText("Custom Containers");
+
+            Children = containers
+                .OrderBy(c => c.Label.Value)
+                .Cast<IOwnerTreeNode>()
+                .ToList();
+        }
+
+        public ILocalizedText Label { get; }
+        public List<IOwnerTreeNode> Children { get; }
+    }
+
+    public class CustomContainerTreeNodeViewModel(CustomSearchableContainerViewModel customContainer)
+        : IContainerSource(new HardCodedText(customContainer.Label), customContainer)
+    {
+    }
+
     public partial class OwnerTreeViewModel : ObservableObject
     {
-        public OwnerTreeViewModel(CachedSaveGame source, List<ContainerViewModel> containers)
+        public OwnerTreeViewModel(CachedSaveGame source, List<ISearchableContainerViewModel> containers)
         {
-            RootNodes = containers
+            var standardNodes = containers
+                .OfType<DefaultSearchableContainerViewModel>()
                 .GroupBy(c =>
                 {
                     var apparentGuildId = c.OwnerIds.Where(id => source.Guilds.Any(g => g.Id == id)).MostCommonOrDefault();
@@ -137,8 +163,16 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     var guild = source.Guilds.Single(g => g.Id == group.Key);
                     return new GuildTreeNodeViewModel(source, guild, group.ToList());
                 })
-                .Cast<IOwnerTreeNode>()
-                .ToList();
+                .Cast<IOwnerTreeNode>();
+
+            var customNode = new CustomizationsTreeNodeViewModel(
+                containers
+                    .OfType<CustomSearchableContainerViewModel>()
+                    .Select(c => new CustomContainerTreeNodeViewModel(c))
+                    .ToList()
+            );
+
+            RootNodes = standardNodes.Append(customNode).ToList();
         }
 
         [NotifyPropertyChangedFor(nameof(SelectedSource))]

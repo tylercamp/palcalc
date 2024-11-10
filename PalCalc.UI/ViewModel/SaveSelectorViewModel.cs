@@ -238,7 +238,7 @@ namespace PalCalc.UI.ViewModel
                     loadingModal.DataContext = LocalizationCodes.LC_SAVE_INSPECTOR_LOADING.Bind();
                     loadingModal.ShowSync();
 
-                    var vm = new SaveInspectorWindowViewModel(SelectedGame.CachedValue);
+                    var vm = new SaveInspectorWindowViewModel(SelectedGame);
 
                     loadingModal.Close();
 

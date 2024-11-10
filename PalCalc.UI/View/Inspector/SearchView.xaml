@@ -27,25 +27,37 @@
         </Grid.ColumnDefinitions>
 
         <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_PAL_CONTAINERS}" Grid.Column="0" Margin="5">
-            <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Label.Value}" />
-                    </HierarchicalDataTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type svm:PlayerTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Label.Value}" />
-                    </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel.Value}" />
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel.Value}" />
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel.Value}" />
-                    </DataTemplate>
-                </TreeView.Resources>
-            </TreeView>
+            <DockPanel>
+                <Button DockPanel.Dock="Bottom" Command="{Binding NewCustomContainerCommand}">
+                    New custom container
+                </Button>
+
+                <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding Label.Value}" />
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type svm:PlayerTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding Label.Value}" />
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type svm:CustomizationsTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding Label.Value}" />
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}">
+                            <TextBlock Text="{Binding SearchedLabel.Value}" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
+                            <TextBlock Text="{Binding SearchedLabel.Value}" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
+                            <TextBlock Text="{Binding SearchedLabel.Value}" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type svm:CustomContainerTreeNodeViewModel}">
+                            <TextBlock Text="{Binding SearchedLabel.Value}" />
+                        </DataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+            </DockPanel>
         </GroupBox>
 
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />

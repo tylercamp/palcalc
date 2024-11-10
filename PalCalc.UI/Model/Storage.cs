@@ -54,6 +54,12 @@ namespace PalCalc.UI.Model
             return SaveFileDataPath(forSaveFile) + "/game-settings.json";
         }
 
+        public static string CustomContainerPath(ISaveGame forSaveFile)
+        {
+            Init();
+            return SaveFileDataPath(forSaveFile) + "/custom-containers.json";
+        }
+
         private static bool didInit = false;
         public static void Init()
         {
@@ -117,6 +123,23 @@ namespace PalCalc.UI.Model
             var dataPath = SaveFileDataPath(save);
             if (Directory.Exists(dataPath))
                 Directory.Delete(dataPath, true);
+        }
+
+        public static SaveCustomizations LoadSaveCustomizations(ISaveGame forSaveGame, PalDB db)
+        {
+            var filePath = CustomContainerPath(forSaveGame);
+            if (!File.Exists(filePath)) return new SaveCustomizations();
+
+            // TODO - error handling
+            return JsonConvert.DeserializeObject<SaveCustomizations>(File.ReadAllText(filePath), new PalInstanceJsonConverter(db));
+        }
+
+        public static void SaveCustomizations(ISaveGame forSaveGame, SaveCustomizations custom, PalDB db)
+        {
+            File.WriteAllText(
+                CustomContainerPath(forSaveGame),
+                JsonConvert.SerializeObject(custom, new PalInstanceJsonConverter(db))
+            );
         }
 
         #region Cached Game Save Files

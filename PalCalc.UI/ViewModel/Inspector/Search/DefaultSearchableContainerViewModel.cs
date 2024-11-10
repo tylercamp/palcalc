@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search
 {
-    public class ContainerViewModel(string id, LocationType detectedType, List<PalInstance> contents) : ObservableObject
+    public partial class DefaultSearchableContainerViewModel(string id, LocationType detectedType, List<PalInstance> contents) : ISearchableContainerViewModel
     {
-        public string Id => id;
-        public LocationType DetectedType => detectedType;
+        override public string Id => id;
+        override public LocationType DetectedType => detectedType;
+        
         public List<string> OwnerIds { get; } = contents.Select(p => p.OwnerPlayerId).Distinct().ToList();
         public List<PalInstance> RawContents => contents;
 
@@ -21,32 +22,12 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 .Select(i => contents.SingleOrDefault(p => p.Location.Index == i))
                 .ToList();
 
-        public bool HasPages { get; } = detectedType == LocationType.Palbox;
+        override public bool HasPages { get; } = detectedType == LocationType.Palbox;
 
-        public int PerRow { get; } = detectedType switch
-        {
-            LocationType.PlayerParty => 5,
-            LocationType.Palbox => 6,
-            LocationType.Base => 5,
-            _ => throw new NotImplementedException()
-        };
-
-        public int RowsPerPage { get; } = 5;
-
-        public ISearchCriteria SearchCriteria
-        {
-            set
-            {
-                foreach (var grid in Grids)
-                    grid.SearchCriteria = value;
-            }
-        }
-
-        public IContainerGridSlotViewModel SelectedSlot => Grids.FirstOrDefault(g => g.SelectedSlot != null)?.SelectedSlot;
-        public ContainerGridPalSlotViewModel SelectedPalSlot => SelectedSlot as ContainerGridPalSlotViewModel;
+        override public int RowsPerPage { get; } = 5;
 
         private List<ContainerGridViewModel> grids = null;
-        public List<ContainerGridViewModel> Grids
+        public override List<ContainerGridViewModel> Grids
         {
             get
             {
