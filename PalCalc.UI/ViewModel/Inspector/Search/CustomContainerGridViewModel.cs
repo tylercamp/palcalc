@@ -15,7 +15,7 @@ using System.Windows.Media;
 namespace PalCalc.UI.ViewModel.Inspector.Search
 {
     public partial class ContainerGridCustomPalSlotViewModel(CustomPalInstanceViewModel instance)
-        : ObservableObject, IContainerGridSlotViewModel
+        : ObservableObject, IContainerGridInspectableSlotViewModel
     {
         public CustomPalInstanceViewModel PalInstance => instance;
 

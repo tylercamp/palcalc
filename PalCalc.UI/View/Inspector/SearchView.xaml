@@ -159,61 +159,71 @@
             <!-- scrolling works when you hover over the background but not when hovering over the container contents
                  and for the life of me I cannot figure out why -->
             <DockPanel Grid.Row="1">
-                <Grid DockPanel.Dock="Bottom" Visibility="{Binding SlotDetailsVisibility}" Background="#111">
-                    <Grid.Resources>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Foreground" Value="White" />
-                        </Style>
-                        <Style TargetType="Label">
-                            <Setter Property="Foreground" Value="White" />
-                        </Style>
-                    </Grid.Resources>
-                    
-                    <WrapPanel Margin="10" DataContext="{Binding OwnerTree.SelectedSource.Container.SelectedPalSlot}">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
-                            <Border Width="64" Height="64" CornerRadius="32" Background="{Binding Pal.IconBrush}" BorderBrush="White" BorderThickness="1" />
-                            <StackPanel Margin="10,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" />
-                                <TextBlock>
-                                    <Run Text="{itl:LocalizedText LC_COMMON_LEVEL}" />
-                                    <Run Text="{Binding PalInstance.ModelObject.Level}" />
-                                </TextBlock>
-                                <TextBlock Text="{Binding PalInstance.Gender.Value}" />
-                            </StackPanel>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Vertical" Margin="0,0,25,0">
-                            <StackPanel.Resources>
-                                <Style TargetType="Label">
-                                    <Setter Property="Padding" Value="1" />
+                <ContentControl DockPanel.Dock="Bottom" Content="{Binding OwnerTree.SelectedSource.Container.SelectedPalSlot}" Visibility="{Binding SlotDetailsVisibility}">
+                    <ContentControl.Resources>
+                        <DataTemplate DataType="{x:Type svm:ContainerGridCustomPalSlotViewModel}">
+                            <Grid>
+                                <TextBlock>TEST</TextBlock>
+                            </Grid>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type svm:ContainerGridPalSlotViewModel}">
+                            <DataTemplate.Resources>
+                                <Style TargetType="TextBlock">
                                     <Setter Property="Foreground" Value="White" />
                                 </Style>
-                                <Style TargetType="StackPanel">
-                                    <Setter Property="Orientation" Value="Horizontal" />
+                                <Style TargetType="Label">
+                                    <Setter Property="Foreground" Value="White" />
                                 </Style>
-                            </StackPanel.Resources>
+                            </DataTemplate.Resources>
+                            <Grid Background="#111">
+                                <WrapPanel Margin="10">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
+                                        <Border Width="64" Height="64" CornerRadius="32" Background="{Binding Pal.IconBrush}" BorderBrush="White" BorderThickness="1" />
+                                        <StackPanel Margin="10,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" />
+                                            <TextBlock>
+                                                <Run Text="{itl:LocalizedText LC_COMMON_LEVEL}" />
+                                                <Run Text="{Binding PalInstance.ModelObject.Level}" />
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding PalInstance.Gender.Value}" />
+                                        </StackPanel>
+                                    </StackPanel>
 
-                            <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{itl:LocalizedText LC_COMMON_IVS}" />
+                                    <StackPanel Orientation="Vertical" Margin="0,0,25,0">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="Label">
+                                                <Setter Property="Padding" Value="1" />
+                                                <Setter Property="Foreground" Value="White" />
+                                            </Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Orientation" Value="Horizontal" />
+                                            </Style>
+                                        </StackPanel.Resources>
 
-                            <StackPanel>
-                                <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_HP}" />
-                                <Label Content="{Binding PalInstance.ModelObject.IV_HP}" />
-                            </StackPanel>
+                                        <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{itl:LocalizedText LC_COMMON_IVS}" />
 
-                            <StackPanel>
-                                <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_ATTACK}" />
-                                <Label Content="{Binding PalInstance.ModelObject.IV_Shot}" />
-                            </StackPanel>
+                                        <StackPanel>
+                                            <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_HP}" />
+                                            <Label Content="{Binding PalInstance.ModelObject.IV_HP}" />
+                                        </StackPanel>
 
-                            <StackPanel>
-                                <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_DEFENSE}" />
-                                <Label Content="{Binding PalInstance.ModelObject.IV_Defense}" />
-                            </StackPanel>
-                        </StackPanel>
+                                        <StackPanel>
+                                            <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_ATTACK}" />
+                                            <Label Content="{Binding PalInstance.ModelObject.IV_Shot}" />
+                                        </StackPanel>
 
-                        <v:PassiveSkillCollectionView DataContext="{Binding PalInstance.PassiveSkills}" Background="#111" VerticalAlignment="Center" Width="250" Margin="0,0,25,0" />
-                    </WrapPanel>
-                </Grid>
+                                        <StackPanel>
+                                            <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_DEFENSE}" />
+                                            <Label Content="{Binding PalInstance.ModelObject.IV_Defense}" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <v:PassiveSkillCollectionView DataContext="{Binding PalInstance.PassiveSkills}" Background="#111" VerticalAlignment="Center" Width="250" Margin="0,0,25,0" />
+                                </WrapPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ContentControl.Resources>
+                </ContentControl>
 
                 <ScrollViewer Grid.Row="1">
                     <ItemsControl ItemsSource="{Binding OwnerTree.SelectedSource.Container.Grids}" HorizontalAlignment="Center">

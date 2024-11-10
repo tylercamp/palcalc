@@ -19,7 +19,11 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         bool Matches { get; }
     }
 
-    public partial class ContainerGridPalSlotViewModel : ObservableObject, IContainerGridSlotViewModel
+    public interface IContainerGridInspectableSlotViewModel : IContainerGridSlotViewModel
+    {
+    }
+
+    public partial class ContainerGridPalSlotViewModel : ObservableObject, IContainerGridInspectableSlotViewModel
     {
         public PalInstanceViewModel PalInstance { get; set; }
 

@@ -52,35 +52,12 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
                     foreach (var grid in grids)
                     {
-                        grid.PropertyChanged += Grid_PropertyChanged;
+                        grid.PropertyChanged += OnSyncGridSelectedSlot;
                     }
                 }
 
                 return grids;
             }
-        }
-
-        // if a value was selected in one grid, deselect values in all other grids
-        private bool isSyncingSlots = false;
-        private void Grid_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (isSyncingSlots || e.PropertyName != nameof(DefaultContainerGridViewModel.SelectedSlot)) return;
-
-            isSyncingSlots = true;
-            var srcGrid = sender as DefaultContainerGridViewModel;
-
-            foreach (var grid in Grids)
-            {
-                if (grid == srcGrid)
-                    continue;
-
-                grid.SelectedSlot = null;
-            }
-
-            isSyncingSlots = false;
-
-            OnPropertyChanged(nameof(SelectedSlot));
-            OnPropertyChanged(nameof(SelectedPalSlot));
         }
     }
 }

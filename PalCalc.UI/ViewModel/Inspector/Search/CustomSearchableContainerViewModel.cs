@@ -26,6 +26,11 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 if (grids == null)
                 {
                     grids = [new CustomContainerGridViewModel(container) { PerRow = PerRow }];
+
+                    foreach (var grid in grids)
+                    {
+                        grid.PropertyChanged += OnSyncGridSelectedSlot;
+                    }
                 }
                 return grids;
             }
