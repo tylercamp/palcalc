@@ -355,12 +355,16 @@ namespace PalCalc.UI.ViewModel
             var currentSpec = PalTarget?.CurrentPalSpecifier?.ModelObject;
             if (currentSpec == null) return;
 
-            var cachedData = SaveSelection.SelectedGame.CachedValue;
+            var selectedGame = SaveSelection.SelectedGame;
+            var cachedData = selectedGame.CachedValue;
             if (cachedData == null) return;
 
             var inputPals = PalTarget.PalSource.SelectedSource.Filter(cachedData);
             if (!PalTarget.CurrentPalSpecifier.IncludeBasePals)
                 inputPals = inputPals.Where(p => p.Location.Type != LocationType.Base);
+
+            if (PalTarget.CurrentPalSpecifier.IncludeCustomPals)
+                inputPals = inputPals.Concat(selectedGame.Customizations.ModelObject.CustomContainers.SelectMany(c => c.Contents));
 
             var solver = SolverControls.ConfiguredSolver(GameSettings.ModelObject, inputPals.ToList());
             solver.SolverStateUpdated += Solver_SolverStateUpdated;

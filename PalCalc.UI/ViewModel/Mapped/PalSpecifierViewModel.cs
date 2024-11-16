@@ -146,6 +146,9 @@ namespace PalCalc.UI.ViewModel.Mapped
         [ObservableProperty]
         private bool includeBasePals = true;
 
+        [ObservableProperty]
+        private bool includeCustomPals = true;
+
         public bool IsValid => TargetPal != null;
 
         private static ILocalizedText newTargetLabel;
@@ -180,7 +183,8 @@ namespace PalCalc.UI.ViewModel.Mapped
                 psvm.OptionalPassive3 == OptionalPassive3 &&
                 psvm.OptionalPassive4 == OptionalPassive4 &&
                 psvm.PalSourceId == PalSourceId &&
-                psvm.IncludeBasePals == IncludeBasePals
+                psvm.IncludeBasePals == IncludeBasePals &&
+                psvm.IncludeCustomPals == IncludeCustomPals
             );
         }
 
@@ -199,14 +203,17 @@ namespace PalCalc.UI.ViewModel.Mapped
                 OptionalPassive4
             ),
             PalSourceId,
-            IncludeBasePals
+            IncludeBasePals,
+            IncludeCustomPals
         );
 
-        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredPassives = RequiredPassiveModelObjects, OptionalPassives = OptionalPassiveModelObjects })
-        {
+        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(
+            new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredPassives = RequiredPassiveModelObjects, OptionalPassives = OptionalPassiveModelObjects }
+        ) {
             CurrentResults = CurrentResults,
             PalSourceId = PalSourceId,
             IncludeBasePals = IncludeBasePals,
+            IncludeCustomPals = IncludeCustomPals,
             DeleteCommand = DeleteCommand,
         };
 

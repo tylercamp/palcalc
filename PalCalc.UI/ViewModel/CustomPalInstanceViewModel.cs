@@ -43,11 +43,11 @@ namespace PalCalc.UI.ViewModel
             }
         );
 
-        public CustomPalInstanceViewModel(PalLocation location)
+        public CustomPalInstanceViewModel(String containerLabel)
         {
             Pal = null;
             Gender = CustomPalInstanceGender.Male;
-            Location = location;
+            Location = new PalLocation() { ContainerId = containerLabel, Type = LocationType.Custom };
         }
 
         public CustomPalInstanceViewModel(PalInstance instance)
@@ -101,11 +101,11 @@ namespace PalCalc.UI.ViewModel
                 Passive2?.ModelObject,
                 Passive3?.ModelObject,
                 Passive4?.ModelObject
-            }.SkipNull().ToList(),
-            // TODO - sort out locations
+            }.SkipNull().Distinct().ToList(),
             Location = new PalLocation()
             {
-                Type = LocationType.Palbox
+                ContainerId = Location.ContainerId,
+                Type = LocationType.Custom,
             }
         };
 

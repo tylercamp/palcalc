@@ -101,7 +101,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     if (value is ContainerGridNewPalSlotViewModel)
                     {
                         container.Contents.Add(
-                            new CustomPalInstanceViewModel(new PalLocation() { Type = container.LocationType })
+                            new CustomPalInstanceViewModel(container.Label)
                         );
                     }
                 }

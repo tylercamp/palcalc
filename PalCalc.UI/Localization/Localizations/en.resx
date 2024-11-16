@@ -193,6 +193,9 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_CRASHLOG_FAILED" xml:space="preserve">
     <value>Could not create the crashlog file.</value>
   </data>
+  <data name="LC_CUSTOM_CONTAINER" xml:space="preserve">
+    <value>{Label} (custom)</value>
+  </data>
   <data name="LC_CUSTOM_CONTAINERS" xml:space="preserve">
     <value>Custom Containers</value>
   </data>
@@ -248,6 +251,12 @@ Please find the generated ZIP file to send with any support questions:
   </data>
   <data name="LC_GUILD_LABEL" xml:space="preserve">
     <value>Guild '{GuildName}'</value>
+  </data>
+  <data name="LC_INCLUDE_CUSTOM_PALS" xml:space="preserve">
+    <value>Include Pals in Custom Containers</value>
+  </data>
+  <data name="LC_INCLUDE_PALS_AT_BASE" xml:space="preserve">
+    <value>Include Pals at Base</value>
   </data>
   <data name="LC_INSPECT_SAVE" xml:space="preserve">
     <value>Inspect</value>
@@ -311,9 +320,6 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve">
     <value>Optionally with {TraitsList}</value>
   </data>
-  <data name="LC_PALS_AT_BASE" xml:space="preserve">
-    <value>Include Pals at Base</value>
-  </data>
   <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
     <value>Search</value>
   </data>
@@ -328,6 +334,9 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   </data>
   <data name="LC_PAL_LOC_COUNT" xml:space="preserve">
     <value>{Count} in {LocType}</value>
+  </data>
+  <data name="LC_PAL_LOC_CUSTOM" xml:space="preserve">
+    <value>(Custom)</value>
   </data>
   <data name="LC_PAL_LOC_PALBOX" xml:space="preserve">
     <value>Palbox</value>

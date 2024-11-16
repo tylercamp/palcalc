@@ -292,7 +292,7 @@
   <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve">
     <value>TraitsList</value>
   </data>
-  <data name="LC_PALS_AT_BASE" xml:space="preserve">
+  <data name="LC_INCLUDE_PALS_AT_BASE" xml:space="preserve">
     <value />
   </data>
   <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
@@ -601,10 +601,19 @@
   <data name="LC_CUSTOM_CONTAINERS" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_CUSTOM_CONTAINER" xml:space="preserve">
+    <value>Label</value>
+  </data>
   <data name="LC_CUSTOM_SAVE_GAME_NAME" xml:space="preserve">
     <value />
   </data>
   <data name="LC_CUSTOM_SAVE_GAME_NAME_LABEL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_INCLUDE_CUSTOM_PALS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LOC_CUSTOM" xml:space="preserve">
     <value />
   </data>
 </root>

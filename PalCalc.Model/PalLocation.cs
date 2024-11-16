@@ -13,7 +13,8 @@ namespace PalCalc.Model
     {
         PlayerParty,
         Palbox,
-        Base
+        Base,
+        Custom,
     }
 
     public class PalLocation

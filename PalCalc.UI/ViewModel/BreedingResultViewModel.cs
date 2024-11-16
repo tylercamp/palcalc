@@ -105,6 +105,7 @@ namespace PalCalc.UI.ViewModel
                         LocationType.Palbox => 0,
                         LocationType.Base => 1,
                         LocationType.PlayerParty => 2,
+                        LocationType.Custom => 3,
                         _ => throw new NotImplementedException()
                     })
                     .Select(g => LocalizationCodes.LC_PAL_LOC_COUNT.Bind(

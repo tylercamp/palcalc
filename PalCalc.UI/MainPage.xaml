@@ -79,9 +79,13 @@
 
                     <GroupBox Header="{itl:LocalizedText LC_SOURCE_PALS}">
                         <StackPanel Orientation="Vertical">
-                            <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                            <StackPanel Orientation="Vertical" Margin="0,5,0,5">
                                 <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeBasePals}">
-                                    <TextBlock Text="{itl:LocalizedText LC_PALS_AT_BASE}" TextWrapping="Wrap" />
+                                    <TextBlock Text="{itl:LocalizedText LC_INCLUDE_PALS_AT_BASE}" TextWrapping="Wrap" />
+                                </CheckBox>
+
+                                <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCustomPals}">
+                                    <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_CUSTOM_PALS}" TextWrapping="Wrap" />
                                 </CheckBox>
                             </StackPanel>
 

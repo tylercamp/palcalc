@@ -67,7 +67,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
         }
 
-        public static IReadOnlyList<PassiveSkillViewModel> All { get; } = PalDB.LoadEmbedded().PassiveSkills.Select(Make).ToList();
+        public static IReadOnlyList<PassiveSkillViewModel> All { get; } = PalDB.LoadEmbedded().PassiveSkills.Select(Make).OrderBy(p => p.Name.Value).ToList();
 
         // for XAML designer view
         public PassiveSkillViewModel() : this(new PassiveSkill("Runner", "runner", 2), new HardCodedText("Runner"))

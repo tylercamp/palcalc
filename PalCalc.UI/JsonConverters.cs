@@ -394,6 +394,7 @@ namespace PalCalc.UI
                 OptionalPassive4 = (obj["OptionalPassive4"] ?? obj["OptionalTrait4"])?.ToObject<PassiveSkillViewModel>(serializer),
                 PalSourceId = obj["PalSourceId"]?.ToObject<string>(),
                 IncludeBasePals = obj["IncludeBasePals"]?.ToObject<bool>() ?? true,
+                IncludeCustomPals = obj["IncludeCustomPals"]?.ToObject<bool>() ?? true,
                 CurrentResults = obj["CurrentResults"].ToObject<BreedingResultListViewModel>(serializer)
             };
         }
@@ -413,6 +414,7 @@ namespace PalCalc.UI
                 OptionalPassive4 = value.OptionalPassive4,
                 PalSourceId = value.PalSourceId,
                 IncludeBasePals = value.IncludeBasePals,
+                IncludeCustomPals = value.IncludeCustomPals,
                 CurrentResults = value.CurrentResults
             }, serializer).WriteTo(writer, dependencyConverters);
         }

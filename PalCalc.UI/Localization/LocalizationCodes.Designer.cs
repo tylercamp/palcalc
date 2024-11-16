@@ -164,6 +164,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_CRASHLOG_FAILED,
         /// <summary>
+        ///   Looks up a localized string similar to Label.
+        /// </summary>
+        LC_CUSTOM_CONTAINER,
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_CUSTOM_CONTAINERS,
@@ -227,6 +231,14 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to GuildName.
         /// </summary>
         LC_GUILD_LABEL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_INCLUDE_CUSTOM_PALS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_INCLUDE_PALS_AT_BASE,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -333,6 +345,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_PAL_LOC_CUSTOM,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_PAL_LOC_PALBOX,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -358,10 +374,6 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to NumWild.
         /// </summary>
         LC_PAL_WILD_COUNT,
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        LC_PALS_AT_BASE,
         /// <summary>
         ///   Looks up a localized string similar to PlayerName.
         /// </summary>

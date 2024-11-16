@@ -31,6 +31,6 @@ namespace PalCalc.UI.ViewModel
 
         public ObservableCollection<CustomPalInstanceViewModel> Contents { get; }
 
-        public LocationType LocationType { get; } = LocationType.Palbox;
+        public LocationType LocationType { get; } = LocationType.Custom;
     }
 }

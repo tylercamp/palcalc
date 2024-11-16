@@ -20,6 +20,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             LocationType.PlayerParty => 5,
             LocationType.Palbox => 6,
             LocationType.Base => 5,
+            LocationType.Custom => 8,
             _ => throw new NotImplementedException()
         };
 
