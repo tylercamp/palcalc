@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PalCalc.UI.View.Inspector
+namespace PalCalc.UI.View.Inspector.Search
 {
     /// <summary>
     /// Interaction logic for CustomPalEditorView.xaml

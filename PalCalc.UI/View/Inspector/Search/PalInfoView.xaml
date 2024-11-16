@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="PalCalc.UI.View.Inspector.Search.PalInfoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
+             xmlns:ivm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:v="clr-namespace:PalCalc.UI.View"
+             mc:Ignorable="d"
+             d:DataContext="{x:Type ivm:ContainerGridPalSlotViewModel}">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </UserControl.Resources>
+    <Grid Background="#111">
+        <WrapPanel Margin="10">
+            <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
+                <Border Width="64" Height="64" CornerRadius="32" Background="{Binding Pal.IconBrush}" BorderBrush="White" BorderThickness="1" />
+                <StackPanel Margin="10,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" />
+                    <TextBlock>
+                        <Run Text="{itl:LocalizedText LC_COMMON_LEVEL}" />
+                        <Run Text="{Binding PalInstance.ModelObject.Level}" />
+                    </TextBlock>
+                    <TextBlock Text="{Binding PalInstance.Gender.Value}" />
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical" Margin="0,0,25,0">
+                <StackPanel.Resources>
+                    <Style TargetType="Label">
+                        <Setter Property="Padding" Value="1" />
+                        <Setter Property="Foreground" Value="White" />
+                    </Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Orientation" Value="Horizontal" />
+                    </Style>
+                </StackPanel.Resources>
+
+                <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{itl:LocalizedText LC_COMMON_IVS}" />
+
+                <StackPanel>
+                    <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_HP}" />
+                    <Label Content="{Binding PalInstance.ModelObject.IV_HP}" />
+                </StackPanel>
+
+                <StackPanel>
+                    <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_ATTACK}" />
+                    <Label Content="{Binding PalInstance.ModelObject.IV_Shot}" />
+                </StackPanel>
+
+                <StackPanel>
+                    <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_DEFENSE}" />
+                    <Label Content="{Binding PalInstance.ModelObject.IV_Defense}" />
+                </StackPanel>
+            </StackPanel>
+
+            <v:PassiveSkillCollectionView DataContext="{Binding PalInstance.PassiveSkills}" Background="#111" VerticalAlignment="Center" Width="250" Margin="0,0,25,0" />
+        </WrapPanel>
+    </Grid>
+</UserControl>

@@ -1,5 +1,4 @@
-﻿using PalCalc.UI.ViewModel.Inspector.Search;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PalCalc.UI.View.Inspector
+namespace PalCalc.UI.View.Inspector.Search
 {
     /// <summary>
-    /// Interaction logic for ContainerGridView.xaml
+    /// Interaction logic for PalInfoView.xaml
     /// </summary>
-    public partial class ContainerGridView : UserControl
+    public partial class PalInfoView : UserControl
     {
-        public ContainerGridView()
+        public PalInfoView()
         {
             InitializeComponent();
         }
