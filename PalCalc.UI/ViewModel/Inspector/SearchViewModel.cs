@@ -52,13 +52,17 @@ namespace PalCalc.UI.ViewModel.Inspector
             BuildContainerTree(sgvm);
             SearchSettings = new SearchSettingsViewModel();
 
-            OwnerTree.PropertyChanging += OwnerTree_PropertyChanging;
-            OwnerTree.PropertyChanged += OwnerTree_PropertyChanged;
             SearchSettings.PropertyChanged += SearchSettings_PropertyChanged;
         }
 
         private void BuildContainerTree(SaveGameViewModel sgvm)
         {
+            if (OwnerTree != null)
+            {
+                OwnerTree.PropertyChanging -= OwnerTree_PropertyChanging;
+                OwnerTree.PropertyChanged -= OwnerTree_PropertyChanged;
+            }
+
             var csg = sgvm.CachedValue;
             var palsByContainerId = csg.OwnedPals.GroupBy(p => p.Location.ContainerId).ToDictionary(g => g.Key, g => g.ToList());
 
@@ -70,6 +74,9 @@ namespace PalCalc.UI.ViewModel.Inspector
             {
                 CreateCustomContainerCommand = newCustomContainerCommand
             };
+
+            OwnerTree.PropertyChanging += OwnerTree_PropertyChanging;
+            OwnerTree.PropertyChanged += OwnerTree_PropertyChanged;
         }
 
         private void ApplySearchSettings()
