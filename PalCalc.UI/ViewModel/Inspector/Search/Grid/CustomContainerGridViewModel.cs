@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-namespace PalCalc.UI.ViewModel.Inspector.Search
+namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 {
     public partial class ContainerGridCustomPalSlotViewModel(CustomPalInstanceViewModel instance)
         : ObservableObject, IContainerGridInspectableSlotViewModel
@@ -62,7 +62,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
                 case NotifyCollectionChangedAction.Remove:
                     throw new NotImplementedException();
-                    break;
 
                 default:
                     throw new NotImplementedException();

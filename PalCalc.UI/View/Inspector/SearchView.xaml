@@ -8,6 +8,7 @@
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
              xmlns:ivm="clr-namespace:PalCalc.UI.ViewModel.Inspector"
              xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
+             xmlns:sgvm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search.Grid"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
@@ -162,7 +163,7 @@
             <DockPanel Grid.Row="1">
                 <ContentControl DockPanel.Dock="Bottom" Content="{Binding OwnerTree.SelectedSource.Container.SelectedPalSlot}" Visibility="{Binding SlotDetailsVisibility}">
                     <ContentControl.Resources>
-                        <DataTemplate DataType="{x:Type svm:ContainerGridCustomPalSlotViewModel}">
+                        <DataTemplate DataType="{x:Type sgvm:ContainerGridCustomPalSlotViewModel}">
                             <!-- note: putting the editor controls directly in this template causes a weird issue with AutoCompleteComboBox
                                  which clears out the VM values when the control is hidden. this leads to the custom pal being reset whenever
                                  you select a different container. -->
@@ -172,7 +173,7 @@
                                 <sv:CustomPalEditorView DataContext="{Binding PalInstance}" Margin="5,0,5,10" />
                             </StackPanel>
                         </DataTemplate>
-                        <DataTemplate DataType="{x:Type svm:ContainerGridPalSlotViewModel}">
+                        <DataTemplate DataType="{x:Type sgvm:ContainerGridPalSlotViewModel}">
                             <sv:PalInfoView DataContext="{Binding}" />
                         </DataTemplate>
                     </ContentControl.Resources>
@@ -190,10 +191,10 @@
                                 <ContentControl Content="{Binding}">
                                     <ContentControl.Resources>
                                         <!-- (same template for either one) -->
-                                        <DataTemplate DataType="{x:Type svm:DefaultContainerGridViewModel}">
+                                        <DataTemplate DataType="{x:Type sgvm:DefaultContainerGridViewModel}">
                                             <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
                                         </DataTemplate>
-                                        <DataTemplate DataType="{x:Type svm:CustomContainerGridViewModel}">
+                                        <DataTemplate DataType="{x:Type sgvm:CustomContainerGridViewModel}">
                                             <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
                                         </DataTemplate>
                                     </ContentControl.Resources>

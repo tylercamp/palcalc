@@ -1,11 +1,12 @@
 ﻿using PalCalc.Model;
+using PalCalc.UI.ViewModel.Inspector.Search.Grid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.ViewModel.Inspector.Search
+namespace PalCalc.UI.ViewModel.Inspector.Search.Container
 {
     public class CustomSearchableContainerViewModel(CustomContainerViewModel container) : ISearchableContainerViewModel
     {

@@ -2,6 +2,7 @@
 using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.Inspector.Search.Container;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;

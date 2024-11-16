@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
+using PalCalc.UI.ViewModel.Inspector.Search.Grid;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.ViewModel.Inspector.Search
+namespace PalCalc.UI.ViewModel.Inspector.Search.Container
 {
     public abstract class ISearchableContainerViewModel : ObservableObject
     {

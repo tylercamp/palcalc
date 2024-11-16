@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace PalCalc.UI.ViewModel.Inspector.Search
+namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 {
     public interface IContainerGridSlotViewModel
     {

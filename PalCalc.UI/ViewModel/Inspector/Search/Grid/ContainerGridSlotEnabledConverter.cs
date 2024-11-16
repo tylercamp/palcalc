@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace PalCalc.UI.ViewModel.Inspector.Search
+namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 {
     public class ContainerGridSlotEnabledConverter : IValueConverter
     {

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Inspector.Search;
+using PalCalc.UI.ViewModel.Inspector.Search.Container;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph.Graphviz;
 using System;
