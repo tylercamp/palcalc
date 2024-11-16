@@ -4,6 +4,7 @@ using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Inspector.Search;
 using PalCalc.UI.ViewModel.Mapped;
+using QuickGraph.Graphviz;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,10 +40,10 @@ namespace PalCalc.UI.ViewModel.Inspector
             {
                 var nameModal = new SimpleTextInputWindow()
                 {
+                    // TODO - Itl
                     Title = "New Custom Container",
                     InputLabel = "Name",
-                    // TODO - prevent duplicate names
-                    Validator = name => name.Length > 0
+                    Validator = name => name.Length > 0 && !sgvm.Customizations.CustomContainers.Any(c => c.Label == name),
                 };
                 nameModal.Owner = App.ActiveWindow;
                 if (nameModal.ShowDialog() == true)

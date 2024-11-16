@@ -61,8 +61,8 @@ namespace PalCalc.UI.ViewModel
 
         private void PalInst_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            // TODO - check pal validity?
-            SaveChanges();
+            if ((sender as CustomPalInstanceViewModel).IsValid)
+                SaveChanges();
         }
 
         private void ContainerContents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
