@@ -166,7 +166,11 @@
                             <!-- note: putting the editor controls directly in this template causes a weird issue with AutoCompleteComboBox
                                  which clears out the VM values when the control is hidden. this leads to the custom pal being reset whenever
                                  you select a different container. -->
-                            <local:CustomPalEditorView DataContext="{Binding PalInstance}" />
+                            <StackPanel Margin="0,0,0,0">
+                                <!-- (GridSplitter not actually doing anything, just want visual consistency with the other borders) -->
+                                <GridSplitter HorizontalAlignment="Stretch" Height="5" IsEnabled="False" />
+                                <local:CustomPalEditorView DataContext="{Binding PalInstance}" Margin="5,0,5,10" />
+                            </StackPanel>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type svm:ContainerGridPalSlotViewModel}">
                             <DataTemplate.Resources>
