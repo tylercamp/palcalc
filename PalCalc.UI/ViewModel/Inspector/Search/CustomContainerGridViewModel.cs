@@ -20,7 +20,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public CustomPalInstanceViewModel PalInstance => instance;
 
         [ObservableProperty]
-        private bool matches;
+        private bool matches = true;
     }
 
     public class ContainerGridNewPalSlotViewModel : IContainerGridSlotViewModel

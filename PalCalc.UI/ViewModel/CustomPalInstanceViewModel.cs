@@ -33,6 +33,16 @@ namespace PalCalc.UI.ViewModel
 
     public partial class CustomPalInstanceViewModel : ObservableObject
     {
+        static CustomPalInstanceViewModel designInstance;
+        public static CustomPalInstanceViewModel DesignInstance => designInstance ??= new CustomPalInstanceViewModel(
+            new PalInstance()
+            {
+                Gender = PalGender.FEMALE,
+                Pal = PalDB.LoadEmbedded().Pals.First(),
+                PassiveSkills = [PalDB.LoadEmbedded().PassiveSkills.First()]
+            }
+        );
+
         public CustomPalInstanceViewModel(PalLocation location)
         {
             Pal = null;
@@ -58,6 +68,8 @@ namespace PalCalc.UI.ViewModel
 
         public PalLocation Location { get; }
 
+        [NotifyPropertyChangedFor(nameof(Icon))]
+        [NotifyPropertyChangedFor(nameof(IconBrush))]
         [ObservableProperty]
         private PalViewModel pal;
 
@@ -82,13 +94,13 @@ namespace PalCalc.UI.ViewModel
         {
             Gender = Gender.Value,
             Level = 1,
-            Pal = Pal.ModelObject,
+            Pal = Pal?.ModelObject,
             PassiveSkills = new List<PassiveSkill>()
             {
-                Passive1.ModelObject,
-                Passive2.ModelObject,
-                Passive3.ModelObject,
-                Passive4.ModelObject
+                Passive1?.ModelObject,
+                Passive2?.ModelObject,
+                Passive3?.ModelObject,
+                Passive4?.ModelObject
             }.SkipNull().ToList(),
             // TODO - sort out locations
             Location = new PalLocation()

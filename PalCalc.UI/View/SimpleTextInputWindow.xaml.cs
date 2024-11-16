@@ -66,11 +66,5 @@ namespace PalCalc.UI.View
 
         public IRelayCommand SaveCommand { get; }
         public IRelayCommand CancelCommand { get; }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            Owner = null;
-            base.OnClosing(e);
-        }
     }
 }

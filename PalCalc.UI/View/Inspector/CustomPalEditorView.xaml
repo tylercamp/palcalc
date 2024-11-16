@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="PalCalc.UI.View.Inspector.CustomPalEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
+             mc:Ignorable="d"
+             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+             d:Background="White"
+             d:DataContext="{x:Static vm:CustomPalInstanceViewModel.DesignInstance}">
+    <!-- (assignment from VM to AutoCompleteComboBox isn't reflected in designer view for some reason?) -->
+    <Grid>
+        <WrapPanel Margin="5">
+            <WrapPanel.Resources>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Margin" Value="0,0,25,0" />
+                </Style>
+            </WrapPanel.Resources>
+
+            <StackPanel Orientation="Vertical">
+                <Label Content="{itl:LocalizedText LC_COMMON_PAL}" />
+                <dnkc:AutoCompleteComboBox Width="180" SelectedItem="{Binding Pal}" ItemsSource="{x:Static mvm:PalViewModel.All}" TextSearch.TextPath="Label.Value">
+                    <dnkc:AutoCompleteComboBox.ItemTemplate>
+                        <DataTemplate DataType="mvm:PalViewModel">
+                            <TextBlock Text="{Binding Label.Value}" />
+                        </DataTemplate>
+                    </dnkc:AutoCompleteComboBox.ItemTemplate>
+                </dnkc:AutoCompleteComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical">
+                <Label Content="{itl:LocalizedText LC_COMMON_GENDER}" />
+                <ComboBox SelectedItem="{Binding Gender}" ItemsSource="{x:Static vm:CustomPalInstanceGender.Options}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:CustomPalInstanceGender}">
+                            <TextBlock Text="{Binding Label.Value}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical">
+                <StackPanel.Resources>
+                    <Style TargetType="dnkc:AutoCompleteComboBox">
+                        <Setter Property="Margin" Value="0,0,10,0" />
+                        <Setter Property="Width" Value="150" />
+                    </Style>
+                </StackPanel.Resources>
+                <Label Content="{itl:LocalizedText LC_COMMON_TRAITS}" />
+                <WrapPanel Orientation="Horizontal">
+                    <WrapPanel.Resources>
+                        <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
+                            <TextBlock Text="{Binding Name.Value}" />
+                        </DataTemplate>
+                    </WrapPanel.Resources>
+
+                    <dnkc:AutoCompleteComboBox SelectedItem="{Binding Passive1}" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                    <dnkc:AutoCompleteComboBox SelectedItem="{Binding Passive2}" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                    <dnkc:AutoCompleteComboBox SelectedItem="{Binding Passive3}" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                    <dnkc:AutoCompleteComboBox SelectedItem="{Binding Passive4}" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                </WrapPanel>
+            </StackPanel>
+        </WrapPanel>
+    </Grid>
+</UserControl>

@@ -91,7 +91,9 @@ namespace DotNetKit.Windows.Controls
                 comboBox.ItemsSource = newCollectionViewSource.View;
             }
 
-            comboBox.SelectedItem = previousSelectedItem;
+            // avoid unnecessary event re-raise
+            if (comboBox.SelectedItem != previousSelectedItem)
+                comboBox.SelectedItem = previousSelectedItem;
 
             // if ItemsSource doesn't contain previousSelectedItem
             if (comboBox.SelectedItem != previousSelectedItem)

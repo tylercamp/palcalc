@@ -3,7 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:PalCalc.UI"
              StartupUri="AppWindow.xaml">
+    <!--
+        fix for XAML binding errors involving combobox
+        https://gist.github.com/TobiasSekan/73a93c2dfea4a051ff72abb5218d6f8f
+    -->
     <Application.Resources>
-         
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
     </Application.Resources>
 </Application>

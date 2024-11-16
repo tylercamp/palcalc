@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
              xmlns:v="clr-namespace:PalCalc.UI.View"
+             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
              xmlns:ivm="clr-namespace:PalCalc.UI.ViewModel.Inspector"
              xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
@@ -79,7 +80,7 @@
 
                         <StackPanel Orientation="Vertical">
                             <Label Content="{itl:LocalizedText LC_COMMON_PAL}" />
-                            <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{Binding SearchSettings.PalOptions}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label.Value">
+                            <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{x:Static mvm:PalViewModel.All}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label.Value">
                                 <dnkc:AutoCompleteComboBox.ItemTemplate>
                                     <DataTemplate DataType="mvm:PalViewModel">
                                         <TextBlock Text="{Binding Label.Value}" />
@@ -114,10 +115,10 @@
                                     </DataTemplate>
                                 </WrapPanel.Resources>
 
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.PassiveSkillOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive1}" ItemTemplate="{StaticResource PassiveTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.PassiveSkillOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive2}" ItemTemplate="{StaticResource PassiveTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.PassiveSkillOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive3}" ItemTemplate="{StaticResource PassiveTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.PassiveSkillOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive4}" ItemTemplate="{StaticResource PassiveTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive1}" ItemTemplate="{StaticResource PassiveTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive2}" ItemTemplate="{StaticResource PassiveTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive3}" ItemTemplate="{StaticResource PassiveTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive4}" ItemTemplate="{StaticResource PassiveTemplate}" />
                             </WrapPanel>
                         </StackPanel>
 
@@ -162,9 +163,10 @@
                 <ContentControl DockPanel.Dock="Bottom" Content="{Binding OwnerTree.SelectedSource.Container.SelectedPalSlot}" Visibility="{Binding SlotDetailsVisibility}">
                     <ContentControl.Resources>
                         <DataTemplate DataType="{x:Type svm:ContainerGridCustomPalSlotViewModel}">
-                            <Grid>
-                                <TextBlock>TEST</TextBlock>
-                            </Grid>
+                            <!-- note: putting the editor controls directly in this template causes a weird issue with AutoCompleteComboBox
+                                 which clears out the VM values when the control is hidden. this leads to the custom pal being reset whenever
+                                 you select a different container. -->
+                            <local:CustomPalEditorView DataContext="{Binding PalInstance}" />
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type svm:ContainerGridPalSlotViewModel}">
                             <DataTemplate.Resources>

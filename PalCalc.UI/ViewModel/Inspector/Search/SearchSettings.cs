@@ -78,15 +78,11 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         [ObservableProperty]
         private int minIVDefense = 0;
 
-        public List<PalViewModel> PalOptions { get; } = PalDB.LoadEmbedded().Pals.Select(PalViewModel.Make).ToList();
-
         public List<GenderOption> GenderOptions { get; } = [
             GenderOption.AnyGender,
             GenderOption.Male,
             GenderOption.Female,
         ];
-
-        public List<PassiveSkillViewModel> PassiveSkillOptions { get; } = PalDB.LoadEmbedded().PassiveSkills.Select(PassiveSkillViewModel.Make).ToList();
 
         public ISearchCriteria AsCriteria
         {
