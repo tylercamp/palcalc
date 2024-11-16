@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,17 +10,41 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel
 {
+    class Debouncer
+    {
+        private DispatcherTimer timer;
+
+        public Debouncer(TimeSpan delay, Action action)
+        {
+            timer = new(
+                delay,
+                DispatcherPriority.Normal,
+                (_, _) =>
+                {
+                    action();
+                    timer.Stop();
+                },
+                Dispatcher.CurrentDispatcher
+            );
+        }
+
+        public void Run()
+        {
+            if (timer.IsEnabled)
+                timer.Stop();
+
+            timer.Start();
+        }
+    }
+
     public class SaveCustomizationsViewModel
     {
         private SaveGameViewModel save;
-
-        private void SaveChanges()
-        {
-            Storage.SaveCustomizations(save.Value, ModelObject, PalDB.LoadEmbedded());
-        }
+        private Debouncer saveAction;
 
         public SaveCustomizationsViewModel(SaveGameViewModel save)
         {
@@ -32,6 +57,11 @@ namespace PalCalc.UI.ViewModel
                 StartMonitorContainer(container);
 
             CustomContainers.CollectionChanged += CustomContainers_CollectionChanged;
+
+            saveAction = new Debouncer(TimeSpan.FromSeconds(3), () =>
+            {
+                Storage.SaveCustomizations(save.Value, ModelObject, PalDB.LoadEmbedded());
+            });
         }
 
         public SaveCustomizations ModelObject => new SaveCustomizations()
@@ -62,7 +92,7 @@ namespace PalCalc.UI.ViewModel
         private void PalInst_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if ((sender as CustomPalInstanceViewModel).IsValid)
-                SaveChanges();
+                saveAction.Run();
         }
 
         private void ContainerContents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -73,12 +103,12 @@ namespace PalCalc.UI.ViewModel
             foreach (var p in RemovedItems<CustomPalInstanceViewModel>(e))
                 p.PropertyChanged -= PalInst_PropertyChanged;
 
-            SaveChanges();
+            saveAction.Run();
         }
 
         private void Container_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            SaveChanges();
+            saveAction.Run();
         }
 
         private void CustomContainers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -89,15 +119,15 @@ namespace PalCalc.UI.ViewModel
             foreach (var c in RemovedItems<CustomContainerViewModel>(e))
                 StopMonitorContainer(c);
 
-            SaveChanges();
+            saveAction.Run();
         }
 
         private IEnumerable<T> AddedItems<T>(NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
-                case NotifyCollectionChangedAction.Add |
-                     NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Replace:
                     return e.NewItems.Cast<T>();
 
                 default: return [];
@@ -108,9 +138,9 @@ namespace PalCalc.UI.ViewModel
         {
             switch (e.Action)
             {
-                case NotifyCollectionChangedAction.Remove |
-                     NotifyCollectionChangedAction.Reset |
-                     NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Reset:
+                case NotifyCollectionChangedAction.Replace:
                     return e.OldItems.Cast<T>();
 
                 default: return [];
