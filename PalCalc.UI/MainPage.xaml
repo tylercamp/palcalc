@@ -89,9 +89,7 @@
                                 </CheckBox>
                             </StackPanel>
 
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
-                                <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}" />
-                            </ScrollViewer>
+                            <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}" MaxHeight="300" />
                         </StackPanel>
                     </GroupBox>
                 </StackPanel>
