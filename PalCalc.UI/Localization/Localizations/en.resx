@@ -193,6 +193,15 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_CRASHLOG_FAILED" xml:space="preserve">
     <value>Could not create the crashlog file.</value>
   </data>
+  <data name="LC_CUSTOM_CONTAINERS" xml:space="preserve">
+    <value>Custom Containers</value>
+  </data>
+  <data name="LC_CUSTOM_SAVE_GAME_NAME" xml:space="preserve">
+    <value>New Save Name</value>
+  </data>
+  <data name="LC_CUSTOM_SAVE_GAME_NAME_LABEL" xml:space="preserve">
+    <value>Name</value>
+  </data>
   <data name="LC_DELETE_PAL_TARGET_MSG" xml:space="preserve">
     <value>Delete this entry for {PalName}?</value>
   </data>

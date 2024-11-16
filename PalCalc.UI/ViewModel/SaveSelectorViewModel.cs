@@ -68,8 +68,8 @@ namespace PalCalc.UI.ViewModel
                         // TODO - prevent duplicate names
                         var window = new SimpleTextInputWindow()
                         {
-                            Title = "Save Game Name",
-                            InputLabel = "Name",
+                            Title = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME.Bind().Value,
+                            InputLabel = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME_LABEL.Bind().Value,
                             Validator = name => name.Length > 0
                         };
 

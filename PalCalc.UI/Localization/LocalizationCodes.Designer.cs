@@ -164,6 +164,18 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_CRASHLOG_FAILED,
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINERS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_SAVE_GAME_NAME,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_SAVE_GAME_NAME_LABEL,
+        /// <summary>
         ///   Looks up a localized string similar to PalName.
         /// </summary>
         LC_DELETE_PAL_TARGET_MSG,

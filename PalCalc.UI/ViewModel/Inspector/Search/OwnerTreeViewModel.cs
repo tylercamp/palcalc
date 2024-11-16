@@ -123,9 +123,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public CustomizationsTreeNodeViewModel(List<CustomContainerTreeNodeViewModel> containers)
         {
             // TODO - subscribe to customizations.CustomContainers observable events
-
-            // TODO - itln
-            Label = new HardCodedText("Custom Containers");
+            Label = LocalizationCodes.LC_CUSTOM_CONTAINERS.Bind();
 
             Children = containers
                 .OrderBy(c => c.Label.Value)
