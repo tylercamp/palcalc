@@ -26,18 +26,11 @@ namespace PalCalc.UI.ViewModel.Inspector
 
         public SearchSettingsViewModel SearchSettings { get; }
 
-        public ICommand NewCustomContainerCommand { get; }
+        private ICommand newCustomContainerCommand;
 
         public SearchViewModel(SaveGameViewModel sgvm)
         {
-            BuildContainerTree(sgvm);
-            SearchSettings = new SearchSettingsViewModel();
-
-            OwnerTree.PropertyChanging += OwnerTree_PropertyChanging;
-            OwnerTree.PropertyChanged += OwnerTree_PropertyChanged;
-            SearchSettings.PropertyChanged += SearchSettings_PropertyChanged;
-
-            NewCustomContainerCommand = new RelayCommand(() =>
+            newCustomContainerCommand = new RelayCommand(() =>
             {
                 var nameModal = new SimpleTextInputWindow()
                 {
@@ -55,6 +48,13 @@ namespace PalCalc.UI.ViewModel.Inspector
                     BuildContainerTree(sgvm);
                 }
             });
+
+            BuildContainerTree(sgvm);
+            SearchSettings = new SearchSettingsViewModel();
+
+            OwnerTree.PropertyChanging += OwnerTree_PropertyChanging;
+            OwnerTree.PropertyChanged += OwnerTree_PropertyChanged;
+            SearchSettings.PropertyChanged += SearchSettings_PropertyChanged;
         }
 
         private void BuildContainerTree(SaveGameViewModel sgvm)
@@ -66,7 +66,10 @@ namespace PalCalc.UI.ViewModel.Inspector
                 .Select(kvp => (ISearchableContainerViewModel)new DefaultSearchableContainerViewModel(kvp.Key, kvp.Value.First().Location.Type, kvp.Value))
                 .Concat(sgvm.Customizations.CustomContainers.Select(c => new CustomSearchableContainerViewModel(c)));
 
-            OwnerTree = new OwnerTreeViewModel(csg, containers.ToList());
+            OwnerTree = new OwnerTreeViewModel(csg, containers.ToList())
+            {
+                CreateCustomContainerCommand = newCustomContainerCommand
+            };
         }
 
         private void ApplySearchSettings()

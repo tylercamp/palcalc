@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
@@ -11,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search
 {
@@ -129,11 +131,17 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             Children = containers
                 .OrderBy(c => c.Label.Value)
                 .Cast<IOwnerTreeNode>()
+                .Append(new NewCustomContainerTreeNodeViewModel())
                 .ToList();
         }
 
         public ILocalizedText Label { get; }
         public List<IOwnerTreeNode> Children { get; }
+    }
+
+    public class NewCustomContainerTreeNodeViewModel : IOwnerTreeNode
+    {
+        public ILocalizedText Label { get; } = new HardCodedText("Add new..."); // TODO
     }
 
     public class CustomContainerTreeNodeViewModel(CustomSearchableContainerViewModel customContainer)
@@ -174,15 +182,31 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             RootNodes = standardNodes.Append(customNode).ToList();
         }
 
-        [NotifyPropertyChangedFor(nameof(SelectedSource))]
-        [NotifyPropertyChangedFor(nameof(HasValidSource))]
-        [ObservableProperty]
         private IOwnerTreeNode selectedNode;
+        public IOwnerTreeNode SelectedNode
+        {
+            get => selectedNode;
+            set
+            {
+                if (SetProperty(ref selectedNode, value))
+                {
+                    OnPropertyChanged(nameof(SelectedSource));
+                    OnPropertyChanged(nameof(HasValidSource));
+
+                    if (selectedNode is NewCustomContainerTreeNodeViewModel)
+                    {
+                        CreateCustomContainerCommand?.Execute(null);
+                    }
+                }
+            }
+        }
 
         public IContainerSource SelectedSource => SelectedNode as IContainerSource;
         public bool HasValidSource => SelectedSource != null;
 
         public List<IOwnerTreeNode> RootNodes { get; }
+
+        public ICommand CreateCustomContainerCommand { get; set; }
 
         public IEnumerable<IContainerSource> AllContainerSources => RootNodes.SelectMany(n => n.AllChildren).Where(n => n is IContainerSource).Cast<IContainerSource>();
     }

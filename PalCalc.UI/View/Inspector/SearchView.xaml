@@ -30,10 +30,6 @@
 
         <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_PAL_CONTAINERS}" Grid.Column="0" Margin="5">
             <DockPanel>
-                <Button DockPanel.Dock="Bottom" Command="{Binding NewCustomContainerCommand}">
-                    New custom container
-                </Button>
-
                 <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
                     <TreeView.Resources>
                         <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
@@ -56,6 +52,9 @@
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type svm:CustomContainerTreeNodeViewModel}">
                             <TextBlock Text="{Binding SearchedLabel.Value}" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type svm:NewCustomContainerTreeNodeViewModel}">
+                            <TextBlock FontStyle="Italic" Text="{Binding Label.Value}" />
                         </DataTemplate>
                     </TreeView.Resources>
                 </TreeView>
@@ -158,8 +157,6 @@
                 </StackPanel>
             </GroupBox>
 
-            <!-- scrolling works when you hover over the background but not when hovering over the container contents
-                 and for the life of me I cannot figure out why -->
             <DockPanel Grid.Row="1">
                 <ContentControl DockPanel.Dock="Bottom" Content="{Binding OwnerTree.SelectedSource.Container.SelectedPalSlot}" Visibility="{Binding SlotDetailsVisibility}">
                     <ContentControl.Resources>
@@ -179,7 +176,9 @@
                     </ContentControl.Resources>
                 </ContentControl>
 
-                <ScrollViewer Grid.Row="1">
+                <!-- scrolling works when you hover over the background but not when hovering over the container contents
+     and for the life of me I cannot figure out why -->
+                <ScrollViewer>
                     <ItemsControl ItemsSource="{Binding OwnerTree.SelectedSource.Container.Grids}" HorizontalAlignment="Center">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
