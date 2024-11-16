@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
@@ -50,6 +51,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
         public Visibility TitleVisibility { get; }
 
         public IContainerGridSlotViewModel SelectedSlot { get; set; }
+
+        public IRelayCommand<IContainerGridSlotViewModel> DeleteCommand { get; }
 
         public ObservableCollection<IContainerGridSlotViewModel> Slots { get; }
     }

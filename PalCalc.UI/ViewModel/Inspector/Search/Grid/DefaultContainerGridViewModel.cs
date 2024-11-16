@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
@@ -61,6 +62,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 
         public ILocalizedText Title { get; set; }
         public Visibility TitleVisibility => Title == null ? Visibility.Collapsed : Visibility.Visible;
+
+        public IRelayCommand<IContainerGridSlotViewModel> DeleteCommand => null;
 
         [ObservableProperty]
         private IContainerGridSlotViewModel selectedSlot;

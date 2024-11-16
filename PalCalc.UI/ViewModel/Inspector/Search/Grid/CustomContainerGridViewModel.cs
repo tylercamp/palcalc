@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
@@ -41,6 +42,17 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
             Slots.Add(new ContainerGridNewPalSlotViewModel());
 
             container.Contents.CollectionChanged += Contents_CollectionChanged;
+
+            DeleteCommand = new RelayCommand<IContainerGridSlotViewModel>(
+                item =>
+                {
+                    if (item is ContainerGridCustomPalSlotViewModel)
+                    {
+                        var slot = (ContainerGridCustomPalSlotViewModel)item;
+                        container.Contents.Remove(slot.PalInstance);
+                    }
+                }
+            );
         }
 
         private void Contents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -61,7 +73,14 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    throw new NotImplementedException();
+                    if (e.OldItems.Count != 1) throw new NotImplementedException();
+
+                    var removedItem = e.OldItems[0];
+                    if ((Slots[e.OldStartingIndex] as ContainerGridCustomPalSlotViewModel).PalInstance != removedItem)
+                        throw new NotImplementedException();
+
+                    Slots.RemoveAt(e.OldStartingIndex);
+                    break;
 
                 default:
                     throw new NotImplementedException();
@@ -108,5 +127,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
         }
 
         public ObservableCollection<IContainerGridSlotViewModel> Slots { get; }
+
+        // TODO
+        public IRelayCommand<IContainerGridSlotViewModel> DeleteCommand { get; }
     }
 }
