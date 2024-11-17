@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader
 {
-    public interface ISaveGame
+    public interface ISaveGame : IDisposable
     {
         string BasePath { get; }
 
@@ -65,6 +65,20 @@ namespace PalCalc.SaveReader
             }
         }
 
+        public void Dispose()
+        {
+            if (folderWatcher != null)
+            {
+                folderWatcher.Changed -= FolderWatcher_Updated;
+                folderWatcher.Created -= FolderWatcher_Updated;
+                folderWatcher.Deleted -= FolderWatcher_Updated;
+                folderWatcher.Renamed -= FolderWatcher_Updated;
+                folderWatcher.Dispose();
+
+                folderWatcher = null;
+            }
+        }
+
         private void FolderWatcher_Updated(object sender, FileSystemEventArgs e)
         {
             Updated?.Invoke(this);
@@ -100,6 +114,8 @@ namespace PalCalc.SaveReader
     {
         public event Action<ISaveGame> Updated;
 
+        private List<FileSystemWatcher> fileWatchers;
+
         public XboxSaveGame(
             string userBasePath,
             string saveId,
@@ -119,12 +135,31 @@ namespace PalCalc.SaveReader
             WorldOption = worldOption;
             Players = players;
 
-            foreach (var watcher in fileWatchers)
+            this.fileWatchers = fileWatchers.ToList();
+
+            foreach (var watcher in this.fileWatchers)
             {
                 watcher.Changed += Watcher_Updated;
                 watcher.Created += Watcher_Updated;
                 watcher.Deleted += Watcher_Updated;
                 watcher.Renamed += Watcher_Updated;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (fileWatchers != null)
+            {
+                foreach (var watcher in fileWatchers)
+                {
+                    watcher.Changed -= Watcher_Updated;
+                    watcher.Created -= Watcher_Updated;
+                    watcher.Deleted -= Watcher_Updated;
+                    watcher.Renamed -= Watcher_Updated;
+                    watcher.Dispose();
+                }
+
+                fileWatchers = null;
             }
         }
 
@@ -169,6 +204,10 @@ namespace PalCalc.SaveReader
 
             UserId = userId;
             GameId = gameId;
+        }
+
+        public void Dispose()
+        {
         }
 
         public string BasePath => null;

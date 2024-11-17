@@ -273,12 +273,12 @@ namespace PalCalc.UI.ViewModel
                 }
                 else
                 {
-                    // TODO - need to dispose of file watcher for normal manual saves
                     settings.ExtraSaveLocations.Remove(saveGame.BasePath);
                 }
 
                 Storage.RemoveSave(saveGame);
-                
+                saveGame.Dispose();
+
                 Storage.SaveAppSettings(settings);
             }
         }
