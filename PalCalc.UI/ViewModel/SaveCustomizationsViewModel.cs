@@ -14,7 +14,7 @@ using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel
 {
-    class Debouncer
+    class Debouncer : IDisposable
     {
         private DispatcherTimer timer;
 
@@ -34,14 +34,22 @@ namespace PalCalc.UI.ViewModel
 
         public void Run()
         {
+            if (timer == null) return;
+
             if (timer.IsEnabled)
                 timer.Stop();
 
             timer.Start();
         }
+
+        public void Dispose()
+        {
+            timer.Stop();
+            timer = null;
+        }
     }
 
-    public class SaveCustomizationsViewModel
+    public class SaveCustomizationsViewModel : IDisposable
     {
         private SaveGameViewModel save;
         private Debouncer saveAction;
@@ -62,6 +70,11 @@ namespace PalCalc.UI.ViewModel
             {
                 Storage.SaveCustomizations(save.Value, ModelObject, PalDB.LoadEmbedded());
             });
+        }
+
+        public void Dispose()
+        {
+            saveAction.Dispose();
         }
 
         public SaveCustomizations ModelObject => new SaveCustomizations()

@@ -44,6 +44,12 @@ namespace PalCalc.UI.Model
             }
         }
 
+        public static void RemoveReferences(ISaveGame save)
+        {
+            LoadedSaveHistory.Remove(save);
+            ReferencedCachedSaveHistory.RemoveAll(csg => csg.UnderlyingSave == save);
+        }
+
         private const int KB = 1000;
         private const int MB = KB * 1000;
 

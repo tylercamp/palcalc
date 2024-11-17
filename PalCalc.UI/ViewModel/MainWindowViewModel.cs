@@ -9,6 +9,8 @@ using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
+using PalCalc.UI.View.Inspector;
+using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
 using Serilog;
@@ -153,6 +155,7 @@ namespace PalCalc.UI.ViewModel
 
             SaveSelection.PropertyChanged += SaveSelection_PropertyChanged;
             SaveSelection.NewCustomSaveSelected += SaveSelection_CustomSaveAdded;
+            SaveSelection.CustomSaveDelete += SaveSelection_CustomSaveDelete;
 
             if (settings.SelectedGameIdentifier != null) SaveSelection.TrySelectSaveGame(settings.SelectedGameIdentifier);
             
@@ -232,6 +235,52 @@ namespace PalCalc.UI.ViewModel
             }
 
             Storage.SaveAppSettings(settings);
+        }
+
+        private void SaveSelection_CustomSaveDelete(ManualSavesLocationViewModel manualSaves, ISaveGame saveGame)
+        {
+            var saveVm = manualSaves.SaveGames.First(sg => sg.Value == saveGame);
+
+            // TODO - itl
+            var confirmation = MessageBox.Show(
+                App.ActiveWindow,
+                $"Are you sure you want to remove this save from from Pal Calc?\n\n{saveVm.Label.Value}\n\nThis will not delete the save files from your computer.",
+                "Delete Manual Save?",
+                MessageBoxButton.YesNo
+            );
+
+            if (confirmation == MessageBoxResult.Yes)
+            {
+                var toClose = App.Current.Windows
+                    .OfType<SaveInspectorWindow>()
+                    .Where(w => (w.DataContext as SaveInspectorWindowViewModel)?.DisplayedSave?.Value == saveGame)
+                    .ToList();
+
+                foreach (var window in toClose)
+                {
+                    foreach (var child in window.OwnedWindows.OfType<Window>().ToList())
+                        child.Close();
+
+                    window.Close();
+                }
+
+                manualSaves.Remove(saveGame);
+
+                if (saveGame is VirtualSaveGame)
+                {
+                    settings.FakeSaveNames.Remove(saveGame.GameId);
+                    saveVm.Customizations.Dispose();
+                }
+                else
+                {
+                    // TODO - need to dispose of file watcher for normal manual saves
+                    settings.ExtraSaveLocations.Remove(saveGame.BasePath);
+                }
+
+                Storage.RemoveSave(saveGame);
+                
+                Storage.SaveAppSettings(settings);
+            }
         }
 
         private void CachedSaveGame_SaveFileLoadStart(ISaveGame obj)

@@ -16,6 +16,8 @@ namespace PalCalc.UI.ViewModel.Inspector
         private static SaveInspectorWindowViewModel designerInstance = null;
         public static SaveInspectorWindowViewModel DesignerInstance => designerInstance ??= new SaveInspectorWindowViewModel(SaveGameViewModel.DesignerInstance);
 
+        public SaveGameViewModel DisplayedSave { get; }
+
         public SearchViewModel Search { get; }
         public SaveDetailsViewModel Details { get; }
 
@@ -23,6 +25,8 @@ namespace PalCalc.UI.ViewModel.Inspector
 
         public SaveInspectorWindowViewModel(SaveGameViewModel sgvm)
         {
+            DisplayedSave = sgvm;
+
             var rawData = sgvm.CachedValue.UnderlyingSave.Level.ReadRawCharacterData();
             var players = sgvm.Value.Players.Select(p => p.ReadPlayerContent()).ToList();
 

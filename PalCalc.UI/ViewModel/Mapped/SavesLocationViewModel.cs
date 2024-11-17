@@ -90,5 +90,10 @@ namespace PalCalc.UI.ViewModel.Mapped
 
             return vm;
         }
+
+        public void Remove(ISaveGame saveGame)
+        {
+            saveGames.Remove(saveGames.Single(g => g.Value == saveGame));
+        }
     }
 }

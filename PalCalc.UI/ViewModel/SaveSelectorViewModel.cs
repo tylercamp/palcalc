@@ -33,6 +33,7 @@ namespace PalCalc.UI.ViewModel
         private static ILogger logger = Log.ForContext<SaveSelectorViewModel>();
 
         public event Action<ManualSavesLocationViewModel, ISaveGame> NewCustomSaveSelected;
+        public event Action<ManualSavesLocationViewModel, ISaveGame> CustomSaveDelete;
 
         public List<ISavesLocationViewModel> SavesLocations { get; }
 
@@ -48,6 +49,7 @@ namespace PalCalc.UI.ViewModel
                     OnPropertyChanged(nameof(CanOpenSavesLocation));
                     OnPropertyChanged(nameof(NoXboxSavesMsgVisibility));
                     OnPropertyChanged(nameof(AvailableSaves));
+                    OnPropertyChanged(nameof(DeleteSaveVisibility));
                     SelectedGame = MostRecentSave;
                 }
             }
@@ -124,6 +126,7 @@ namespace PalCalc.UI.ViewModel
                 {
                     OnPropertyChanged(nameof(XboxIncompleteVisibility));
                     OnPropertyChanged(nameof(CanOpenSaveFileLocation));
+                    OnPropertyChanged(nameof(DeleteSaveVisibility));
                     if (needsReset)
                     {
                         // ComboBox ignores reassignment in the middle of a value-change event, defer until later
@@ -247,6 +250,13 @@ namespace PalCalc.UI.ViewModel
                 },
                 canExecute: () => SelectedGame != null && !SelectedGame.IsAddManualOption && SelectedGame?.CachedValue != null
             );
+
+            DeleteSaveCommand = new RelayCommand(
+                () =>
+                {
+                    CustomSaveDelete?.Invoke(manualLocation, SelectedGame.Value);
+                }
+            );
         }
 
         public void TrySelectSaveGame(string saveIdentifier)
@@ -280,6 +290,14 @@ namespace PalCalc.UI.ViewModel
         }
 
         [ObservableProperty]
+        private IRelayCommand deleteSaveCommand;
+
+        [ObservableProperty]
         private IRelayCommand inspectSaveCommand;
+
+        public Visibility DeleteSaveVisibility =>
+            SelectedLocation is ManualSavesLocationViewModel && SelectedGame != null
+                ? Visibility.Visible
+                : Visibility.Collapsed;
     }
 }

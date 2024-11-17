@@ -242,6 +242,16 @@ namespace PalCalc.UI.Model
             }
         }
 
+        // Removes all data related to the save (in memory + on disk), but does _not_ remove
+        // any related entries within AppSettings
+        public static void RemoveSave(ISaveGame save)
+        {
+            InMemorySaves.Remove(CachedSaveGame.IdentifierFor(save));
+
+            CrashSupport.RemoveReferences(save);
+            ClearForSave(save);
+        }
+
         public static void ReloadSave(ISaveGame save, PalDB db)
         {
             Init();
