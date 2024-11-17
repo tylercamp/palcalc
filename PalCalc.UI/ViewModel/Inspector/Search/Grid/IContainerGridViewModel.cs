@@ -17,31 +17,19 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 {
     public interface IContainerGridSlotViewModel
     {
+        /// <summary>
+        /// Whether this slot matches the latest applied ISearchCriteria
+        /// </summary>
         bool Matches { get; }
+
+        /// <summary>
+        /// Whether this slot should respond to clicks, usually related to `Matches`
+        /// </summary>
         bool CanInterract { get; }
     }
 
-    public interface IContainerGridInspectableSlotViewModel : IContainerGridSlotViewModel
+    public interface IContainerGridPopulatedSlotViewModel : IContainerGridSlotViewModel
     {
-    }
-
-    public partial class ContainerGridPalSlotViewModel : ObservableObject, IContainerGridInspectableSlotViewModel
-    {
-        public PalInstanceViewModel PalInstance { get; set; }
-
-        public PalViewModel Pal => PalInstance.Pal;
-
-        [NotifyPropertyChangedFor(nameof(CanInterract))]
-        [ObservableProperty]
-        private bool matches = true;
-
-        public bool CanInterract => Matches;
-    }
-
-    public class ContainerGridEmptySlotViewModel : IContainerGridSlotViewModel
-    {
-        public bool Matches => false;
-        public bool CanInterract => false;
     }
 
     public interface IContainerGridViewModel : INotifyPropertyChanged

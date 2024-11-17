@@ -40,7 +40,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
         }
 
         public IContainerGridSlotViewModel SelectedSlot => Grids.FirstOrDefault(g => g.SelectedSlot != null)?.SelectedSlot;
-        public IContainerGridInspectableSlotViewModel SelectedPalSlot => SelectedSlot as IContainerGridInspectableSlotViewModel;
+        public IContainerGridPopulatedSlotViewModel SelectedPalSlot => SelectedSlot as IContainerGridPopulatedSlotViewModel;
 
         // if a slot is selected in the grid, raise a matching event here
         // and, if a value was selected in one grid, deselect values in all other grids

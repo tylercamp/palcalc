@@ -8,6 +8,6 @@ namespace PalCalc.UI.Model
 {
     public class SaveCustomizations
     {
-        public List<CustomContainer> CustomContainers { get; set; } = []; // TODO
+        public List<CustomContainer> CustomContainers { get; set; } = [];
     }
 }

@@ -145,9 +145,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public ILocalizedText Label { get; } = LocalizationCodes.LC_CUSTOM_CONTAINER_ADD_NEW.Bind();
     }
 
-    public class CustomContainerTreeNodeViewModel : IContainerSource
+    public partial class CustomContainerTreeNodeViewModel(CustomSearchableContainerViewModel customContainer)
+        : IContainerSource(new CustomContainerLocalizedText(customContainer), customContainer)
     {
-        private class CustomContainerLocalizedText : ILocalizedText
+        private partial class CustomContainerLocalizedText : ILocalizedText
         {
             private CustomSearchableContainerViewModel container;
 
@@ -165,12 +166,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             public override string Value => container.Label;
         }
 
+        // (needed to give ContextMenu access to rename/delete commands)
         public CustomSearchableContainerViewModel CustomContainer => Container as CustomSearchableContainerViewModel;
-
-        public CustomContainerTreeNodeViewModel(CustomSearchableContainerViewModel customContainer)
-            : base(new CustomContainerLocalizedText(customContainer), customContainer)
-        {
-        }
     }
 
     public partial class OwnerTreeViewModel : ObservableObject
@@ -233,6 +230,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public ICommand CreateCustomContainerCommand { get; set; }
 
         public IEnumerable<IContainerSource> AllContainerSources =>
-            RootNodes.SelectMany(n => n.AllChildren).Where(n => n is IContainerSource).Cast<IContainerSource>();
+            RootNodes.SelectMany(n => n.AllChildren).OfType<IContainerSource>();
     }
 }

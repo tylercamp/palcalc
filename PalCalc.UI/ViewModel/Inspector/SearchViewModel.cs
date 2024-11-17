@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
@@ -11,6 +12,8 @@ using QuickGraph.Graphviz;
 using QuickGraph.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,11 +37,29 @@ namespace PalCalc.UI.ViewModel.Inspector
 
         public IRelayCommand<ISearchableContainerViewModel> RenameContainerCommand { get; }
 
+        public IRelayCommand<IContainerGridSlotViewModel> DeleteSlotCommand { get; }
+
         private static bool IsValidCustomLabel(SaveGameViewModel context, string label) =>
             label.Length > 0 && !context.Customizations.CustomContainers.Any(c => c.Label == label);
 
         public SearchViewModel(SaveGameViewModel sgvm)
         {
+            newCustomContainerCommand = new RelayCommand(() =>
+            {
+                var nameModal = new SimpleTextInputWindow()
+                {
+                    Title = LocalizationCodes.LC_CUSTOM_CONTAINER_NEW_TITLE.Bind().Value,
+                    InputLabel = LocalizationCodes.LC_CUSTOM_CONTAINER_NEW_FIELD.Bind().Value,
+                    Validator = label => IsValidCustomLabel(sgvm, label),
+                };
+                nameModal.Owner = App.ActiveWindow;
+                if (nameModal.ShowDialog() == true)
+                {
+                    var container = new CustomContainer() { Label = nameModal.Result };
+                    sgvm.Customizations.CustomContainers.Add(new CustomContainerViewModel(container));
+                }
+            });
+
             RenameContainerCommand = new RelayCommand<ISearchableContainerViewModel>(
                 container =>
                 {
@@ -51,8 +72,9 @@ namespace PalCalc.UI.ViewModel.Inspector
                         InputLabel = LocalizationCodes.LC_CUSTOM_CONTAINER_RENAME_FIELD.Bind().Value,
                         Validator = label => IsValidCustomLabel(sgvm, label),
                         Result = customContainer.Label,
+                        Owner = App.ActiveWindow,
                     };
-                    nameModal.Owner = App.ActiveWindow;
+
                     if (nameModal.ShowDialog() == true)
                     {
                         customContainer.Value.Label = nameModal.Result;
@@ -70,23 +92,25 @@ namespace PalCalc.UI.ViewModel.Inspector
                 }
             );
 
-            newCustomContainerCommand = new RelayCommand(() =>
-            {
-                var nameModal = new SimpleTextInputWindow()
+            DeleteSlotCommand = new RelayCommand<IContainerGridSlotViewModel>(
+                slot =>
                 {
-                    Title = LocalizationCodes.LC_CUSTOM_CONTAINER_NEW_TITLE.Bind().Value,
-                    InputLabel = LocalizationCodes.LC_CUSTOM_CONTAINER_NEW_FIELD.Bind().Value,
-                    Validator = label => IsValidCustomLabel(sgvm, label),
-                };
-                nameModal.Owner = App.ActiveWindow;
-                if (nameModal.ShowDialog() == true)
-                {
-                    var container = new CustomContainer() { Label = nameModal.Result };
-                    sgvm.Customizations.CustomContainers.Add(new CustomContainerViewModel(container));
-                }
-            });
+                    var subCommands = OwnerTree.AllContainerSources
+                        .SelectMany(s => s.Container.Grids)
+                        .Select(g => g.DeleteSlotCommand)
+                        .SkipNull()
+                        .Where(cmd => cmd.CanExecute(slot))
+                        .ToList();
 
-            sgvm.Customizations.CustomContainers.CollectionChanged += (_, _) => BuildContainerTree(sgvm);
+                    foreach (var cmd in subCommands)
+                        cmd.Execute(slot);
+                }
+            );
+
+            CollectionChangedEventManager.AddHandler(
+                sgvm.Customizations.CustomContainers,
+                (_, _) => BuildContainerTree(sgvm)
+            );
 
             BuildContainerTree(sgvm);
             SearchSettings = new SearchSettingsViewModel();
@@ -96,17 +120,12 @@ namespace PalCalc.UI.ViewModel.Inspector
 
         private void BuildContainerTree(SaveGameViewModel sgvm)
         {
-            if (OwnerTree != null)
-            {
-                OwnerTree.PropertyChanging -= OwnerTree_PropertyChanging;
-                OwnerTree.PropertyChanged -= OwnerTree_PropertyChanged;
-            }
-
             var csg = sgvm.CachedValue;
             var palsByContainerId = csg.OwnedPals.GroupBy(p => p.Location.ContainerId).ToDictionary(g => g.Key, g => g.ToList());
 
             var containers = palsByContainerId
-                .Select(kvp => (ISearchableContainerViewModel)new DefaultSearchableContainerViewModel(kvp.Key, kvp.Value.First().Location.Type, kvp.Value))
+                .Select(kvp => new DefaultSearchableContainerViewModel(kvp.Key, kvp.Value.First().Location.Type, kvp.Value))
+                .Cast<ISearchableContainerViewModel>()
                 .Concat(
                     sgvm.Customizations.CustomContainers.Select(c =>
                         new CustomSearchableContainerViewModel(c)
@@ -121,9 +140,6 @@ namespace PalCalc.UI.ViewModel.Inspector
             {
                 CreateCustomContainerCommand = newCustomContainerCommand
             };
-
-            OwnerTree.PropertyChanging += OwnerTree_PropertyChanging;
-            OwnerTree.PropertyChanged += OwnerTree_PropertyChanged;
         }
 
         private void ApplySearchSettings()
@@ -132,30 +148,7 @@ namespace PalCalc.UI.ViewModel.Inspector
                 source.SearchCriteria = SearchSettings.AsCriteria;
         }
 
-        private void OwnerTree_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
-        {
-            if (e.PropertyName == nameof(OwnerTree.SelectedSource))
-            {
-                if (OwnerTree.SelectedSource != null)
-                    OwnerTree.SelectedSource.Container.PropertyChanged -= SelectedContainer_PropertyChanged;
-            }
-        }
-
-        private void OwnerTree_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(OwnerTree.SelectedSource))
-            {
-                OnPropertyChanged(nameof(SlotDetailsVisibility));
-                OnPropertyChanged(nameof(FocusedGrid));
-
-                if (OwnerTree.SelectedSource != null)
-                {
-                    OwnerTree.SelectedSource.Container.PropertyChanged += SelectedContainer_PropertyChanged;
-                }
-            }
-        }
-
-        private void SearchSettings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void SearchSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(SearchSettings.AsCriteria))
             {
@@ -163,24 +156,5 @@ namespace PalCalc.UI.ViewModel.Inspector
             }
         }
 
-        public Visibility SlotDetailsVisibility => OwnerTree.HasValidSource && OwnerTree.SelectedSource.Container.SelectedSlot != null ? Visibility.Visible : Visibility.Collapsed;
-
-        private void SelectedContainer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(DefaultSearchableContainerViewModel.SelectedSlot))
-            {
-                OnPropertyChanged(nameof(SlotDetailsVisibility));
-                OnPropertyChanged(nameof(FocusedGrid));
-            }
-        }
-
-        public IContainerGridViewModel FocusedGrid
-        {
-            get
-            {
-                var res = OwnerTree.SelectedSource?.Container?.Grids?.FirstOrDefault(g => g.SelectedSlot != null);
-                return res;
-            }
-        }
     }
 }

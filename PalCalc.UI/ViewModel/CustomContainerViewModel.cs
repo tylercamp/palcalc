@@ -29,6 +29,9 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private string label;
 
+        // (hide the detail that ID-based references should be to a custom container's label)
+        public string ContainerId => Label;
+
         public ObservableCollection<CustomPalInstanceViewModel> Contents { get; }
 
         public LocationType LocationType { get; } = LocationType.Custom;

@@ -10,12 +10,32 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 {
+    public partial class ContainerGridPalSlotViewModel : ObservableObject, IContainerGridPopulatedSlotViewModel
+    {
+        public PalInstanceViewModel PalInstance { get; set; }
+
+        public PalViewModel Pal => PalInstance.Pal;
+
+        [NotifyPropertyChangedFor(nameof(CanInterract))]
+        [ObservableProperty]
+        private bool matches = true;
+
+        public bool CanInterract => Matches;
+    }
+
+    public class ContainerGridEmptySlotViewModel : IContainerGridSlotViewModel
+    {
+        public bool Matches => false;
+        public bool CanInterract => false;
+    }
+
     public partial class DefaultContainerGridViewModel(List<PalInstance> contents) : ObservableObject, IContainerGridViewModel
     {
         private static DefaultContainerGridViewModel designerInstance;
@@ -48,7 +68,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
         {
             set
             {
-                foreach (var slot in Slots.Where(s => s is ContainerGridPalSlotViewModel).Cast<ContainerGridPalSlotViewModel>())
+                foreach (var slot in Slots.OfType<ContainerGridPalSlotViewModel>())
                     slot.Matches = value.Matches(slot.PalInstance.ModelObject);
 
                 if (SelectedSlot != null && !SelectedSlot.Matches)

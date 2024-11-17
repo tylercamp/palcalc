@@ -6,6 +6,7 @@
     <UseWPF>true</UseWPF>
     <FileVersion></FileVersion>
 	<DisableFody Condition="'$(Configuration)' == 'Debug'">true</DisableFody>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />

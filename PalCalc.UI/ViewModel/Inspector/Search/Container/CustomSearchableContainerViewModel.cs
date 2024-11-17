@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search.Container
 {
-    public class CustomSearchableContainerViewModel : ISearchableContainerViewModel
+    public partial class CustomSearchableContainerViewModel : ISearchableContainerViewModel
     {
         private CustomContainerViewModel container;
         public CustomSearchableContainerViewModel(CustomContainerViewModel container)
@@ -28,6 +28,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
             );
         }
 
+        // (these are provided by the caller, ContextMenu bound to this VM isn't able to easily
+        //  traverse visual tree to find the main VM)
         public IRelayCommand<ISearchableContainerViewModel> RenameCommand { get; set; }
         public IRelayCommand<ISearchableContainerViewModel> DeleteCommand { get; set; }
 
@@ -44,9 +46,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
         {
             get
             {
-                // (not including Grid PropertyChanged logic from `DefaultSearchableContainerViewModel` since
-                // this container will only ever have a single grid (for now), so we don't need to worry about
-                // updating "other grids")
                 if (grids == null)
                 {
                     grids = [new CustomContainerGridViewModel(container) { PerRow = PerRow }];
@@ -62,6 +61,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
 
         public override bool HasPages => false;
 
+        // (note: not actually being used atm)
         public override int RowsPerPage { get; } = 5;
     }
 }

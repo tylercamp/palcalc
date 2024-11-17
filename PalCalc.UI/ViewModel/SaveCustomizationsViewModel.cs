@@ -49,7 +49,8 @@ namespace PalCalc.UI.ViewModel
         }
     }
 
-    public class SaveCustomizationsViewModel : IDisposable
+    // (Auto-saves any changes with debounce. There should only ever be one instance for each save file)
+    public partial class SaveCustomizationsViewModel : IDisposable
     {
         private SaveGameViewModel save;
         private Debouncer saveAction;
@@ -108,6 +109,11 @@ namespace PalCalc.UI.ViewModel
                 saveAction.Run();
         }
 
+        private void Container_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            saveAction.Run();
+        }
+
         private void ContainerContents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             foreach (var p in AddedItems<CustomPalInstanceViewModel>(e))
@@ -116,11 +122,6 @@ namespace PalCalc.UI.ViewModel
             foreach (var p in RemovedItems<CustomPalInstanceViewModel>(e))
                 p.PropertyChanged -= PalInst_PropertyChanged;
 
-            saveAction.Run();
-        }
-
-        private void Container_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
             saveAction.Run();
         }
 

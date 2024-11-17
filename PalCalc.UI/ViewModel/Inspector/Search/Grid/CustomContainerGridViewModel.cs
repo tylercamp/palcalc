@@ -17,7 +17,7 @@ using System.Windows.Media;
 namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 {
     public partial class ContainerGridCustomPalSlotViewModel
-        : ObservableObject, IContainerGridInspectableSlotViewModel
+        : ObservableObject, IContainerGridPopulatedSlotViewModel
     {
         public ContainerGridCustomPalSlotViewModel(CustomPalInstanceViewModel instance)
         {
@@ -62,14 +62,14 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
             container.Contents.CollectionChanged += Contents_CollectionChanged;
 
             DeleteSlotCommand = new RelayCommand<IContainerGridSlotViewModel>(
-                item =>
+                execute: item =>
                 {
-                    if (item is ContainerGridCustomPalSlotViewModel)
+                    if (item is ContainerGridCustomPalSlotViewModel slot)
                     {
-                        var slot = (ContainerGridCustomPalSlotViewModel)item;
                         container.Contents.Remove(slot.PalInstance);
                     }
-                }
+                },
+                canExecute: item => item is ContainerGridCustomPalSlotViewModel
             );
         }
 
@@ -137,13 +137,15 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
                     if (value is ContainerGridNewPalSlotViewModel)
                     {
                         container.Contents.Add(
-                            new CustomPalInstanceViewModel(container.Label)
+                            new CustomPalInstanceViewModel(container)
                         );
                     }
                 }
             }
         }
 
+        // changes to contents of the main container VM are reflected here via property events
+        // this `Slots` should _not_ be modified directly
         public ObservableCollection<IContainerGridSlotViewModel> Slots { get; }
 
         public IRelayCommand<IContainerGridSlotViewModel> DeleteSlotCommand { get; }

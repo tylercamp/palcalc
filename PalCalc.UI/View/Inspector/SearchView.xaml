@@ -13,10 +13,14 @@
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              mc:Ignorable="d" 
              d:DataContext="{x:Static ivm:SearchViewModel.DesignerInstance}"
              d:Background="White"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <c:ValueVisibilityConverter x:Key="VVC" />
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" MinWidth="100"/>
@@ -178,7 +182,11 @@
             </GroupBox>
 
             <DockPanel Grid.Row="1">
-                <ContentControl DockPanel.Dock="Bottom" Content="{Binding OwnerTree.SelectedSource.Container.SelectedPalSlot}" Visibility="{Binding SlotDetailsVisibility}">
+                <ContentControl DockPanel.Dock="Bottom"
+                                DataContext="{Binding OwnerTree.SelectedSource.Container.SelectedPalSlot}"
+                                Content="{Binding}"
+                                Visibility="{Binding Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                                >
                     <ContentControl.Resources>
                         <DataTemplate DataType="{x:Type sgvm:ContainerGridCustomPalSlotViewModel}">
                             <!-- note: putting the editor controls directly in this template causes a weird issue with AutoCompleteComboBox
@@ -192,12 +200,11 @@
                                     <sv:CustomPalEditorView DataContext="{Binding PalInstance}" />
 
                                     <Grid Margin="0,0,0,5">
-                                        <Button DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=iv:SearchView}, Path=ViewModel.FocusedGrid}"
-                                                HorizontalAlignment="Left"
+                                        <Button HorizontalAlignment="Left"
                                                 VerticalAlignment="Bottom"
                                                 Padding="5,2"
-                                                Command="{Binding DeleteSlotCommand}"
-                                                CommandParameter="{Binding SelectedSlot}"
+                                                Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=iv:SearchView}, Path=ViewModel.DeleteSlotCommand}"
+                                                CommandParameter="{Binding}"
                                         >
                                             Delete
                                         </Button>
