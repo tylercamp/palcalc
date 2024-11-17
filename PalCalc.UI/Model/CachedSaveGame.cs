@@ -82,7 +82,13 @@ namespace PalCalc.UI.Model
 
         public static string IdentifierFor(ISaveGame game)
         {
-            return $"{game.UserId}-{game.GameId}";
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var sb = new StringBuilder();
+
+            foreach (var c in $"{game.UserId}-{game.GameId}")
+                if (!invalidChars.Contains(c)) sb.Append(c);
+
+            return sb.ToString();
         }
 
         private static CachedSaveGame sampleForDesignerView;
