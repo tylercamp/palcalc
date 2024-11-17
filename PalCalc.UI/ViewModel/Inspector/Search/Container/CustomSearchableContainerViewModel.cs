@@ -16,6 +16,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
 
         public override LocationType DetectedType => container.LocationType;
 
+        public CustomContainerViewModel Value => container;
+
         private List<IContainerGridViewModel> grids;
         public override List<IContainerGridViewModel> Grids
         {

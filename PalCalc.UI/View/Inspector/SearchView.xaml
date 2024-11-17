@@ -17,11 +17,6 @@
              d:DataContext="{x:Static ivm:SearchViewModel.DesignerInstance}"
              d:Background="White"
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <Style TargetType="{x:Type TreeViewItem}">
-            <Setter Property="IsExpanded" Value="True" />
-        </Style>
-    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" MinWidth="100"/>
@@ -32,6 +27,15 @@
         <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_PAL_CONTAINERS}" Grid.Column="0" Margin="5">
             <DockPanel>
                 <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
+                    <TreeView.InputBindings>
+                        <KeyBinding Key="Delete" Command="{Binding DeleteContainerCommand}" CommandParameter="{Binding OwnerTree.SelectedSource.Container}" />
+                    </TreeView.InputBindings>
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem">
+                            <!-- Expand all items by default -->
+                            <Setter Property="IsExpanded" Value="True" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
                     <TreeView.Resources>
                         <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
                             <TextBlock Text="{Binding Label.Value}" />
@@ -51,9 +55,11 @@
                         <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
                             <TextBlock Text="{Binding SearchedLabel.Value}" />
                         </DataTemplate>
+                        
                         <DataTemplate DataType="{x:Type svm:CustomContainerTreeNodeViewModel}">
-                            <TextBlock Text="{Binding SearchedLabel.Value}" />
+                                    <TextBlock Text="{Binding SearchedLabel.Value}" />
                         </DataTemplate>
+                        
                         <DataTemplate DataType="{x:Type svm:NewCustomContainerTreeNodeViewModel}">
                             <TextBlock FontStyle="Italic" Text="{Binding Label.Value}" />
                         </DataTemplate>

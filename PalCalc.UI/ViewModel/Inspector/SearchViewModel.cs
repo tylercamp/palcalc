@@ -7,6 +7,7 @@ using PalCalc.UI.ViewModel.Inspector.Search.Container;
 using PalCalc.UI.ViewModel.Inspector.Search.Grid;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph.Graphviz;
+using QuickGraph.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,9 +29,20 @@ namespace PalCalc.UI.ViewModel.Inspector
         public SearchSettingsViewModel SearchSettings { get; }
 
         private ICommand newCustomContainerCommand;
+        public IRelayCommand<ISearchableContainerViewModel> DeleteContainerCommand { get; }
 
         public SearchViewModel(SaveGameViewModel sgvm)
         {
+            DeleteContainerCommand = new RelayCommand<ISearchableContainerViewModel>(
+                container =>
+                {
+                    var customContainer = container as CustomSearchableContainerViewModel;
+                    if (customContainer == null) return;
+
+                    sgvm.Customizations.CustomContainers.Remove(customContainer.Value);
+                }
+            );
+
             newCustomContainerCommand = new RelayCommand(() =>
             {
                 var nameModal = new SimpleTextInputWindow()
