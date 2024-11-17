@@ -111,8 +111,8 @@ namespace PalCalc.UI.ViewModel
                 availableSavesLocations.Add(new XboxSavesLocation());
             }
 
-            var manualSaves = settings.ExtraSaveLocations.Select(saveFolder => new StandardSaveGame(saveFolder));
-            var fakeSaves = settings.FakeSaveNames.Select(FakeSaveGame.Create);
+            var manualSaves = settings.ExtraSaveLocations.Select(saveFolder => new StandardSaveGame(saveFolder)).ToList();
+            var fakeSaves = settings.FakeSaveNames.Select(FakeSaveGame.Create).ToList();
             SaveSelection = new SaveSelectorViewModel(availableSavesLocations, manualSaves.Concat(fakeSaves));
 
             targetsBySaveFile = SaveSelection.SavesLocations
@@ -227,7 +227,7 @@ namespace PalCalc.UI.ViewModel
 
             if (save is VirtualSaveGame)
             {
-                settings.FakeSaveNames.Add(save.GameId);
+                settings.FakeSaveNames.Add(FakeSaveGame.GetLabel(save));
             }
             else
             {
@@ -241,11 +241,10 @@ namespace PalCalc.UI.ViewModel
         {
             var saveVm = manualSaves.SaveGames.OfType<SaveGameViewModel>().First(sg => sg.Value == saveGame);
 
-            // TODO - itl
             var confirmation = MessageBox.Show(
                 App.ActiveWindow,
-                $"Are you sure you want to remove this save from from Pal Calc?\n\n{saveVm.Label.Value}\n\nThis will not delete the save files from your computer.",
-                "Delete Manual Save?",
+                LocalizationCodes.LC_REMOVE_SAVE_DESCRIPTION.Bind(saveVm.Label).Value,
+                LocalizationCodes.LC_REMOVE_SAVE_TITLE.Bind().Value,
                 MessageBoxButton.YesNo
             );
 
@@ -268,7 +267,7 @@ namespace PalCalc.UI.ViewModel
 
                 if (saveGame is VirtualSaveGame)
                 {
-                    settings.FakeSaveNames.Remove(saveGame.GameId);
+                    settings.FakeSaveNames.Remove(FakeSaveGame.GetLabel(saveGame));
                     saveVm.Customizations.Dispose();
                 }
                 else

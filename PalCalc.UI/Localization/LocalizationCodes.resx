@@ -616,4 +616,31 @@
   <data name="LC_PAL_LOC_CUSTOM" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_ADD_FAKE_SAVE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_FIELD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_FIELD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve">
+    <value>SaveLabel</value>
+  </data>
+  <data name="LC_REMOVE_SAVE_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_GAME_REMOVE_BTN_LABEL" xml:space="preserve">
+    <value />
+  </data>
 </root>

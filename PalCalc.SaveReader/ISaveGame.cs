@@ -185,6 +185,9 @@ namespace PalCalc.SaveReader
             Level != null && Level.IsValid; // don't check for `LevelMeta` - may be temporarily missing for files with "wrapper" header
     }
 
+    /// <summary>
+    /// A fake save-game whose ISaveFiles don't return any data. Meant to be a placeholder for "fake" saves added in Pal Calc.
+    /// </summary>
     public class VirtualSaveGame : ISaveGame
     {
         public VirtualSaveGame(

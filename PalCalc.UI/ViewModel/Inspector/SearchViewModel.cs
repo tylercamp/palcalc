@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Inspector.Search;
@@ -46,9 +47,8 @@ namespace PalCalc.UI.ViewModel.Inspector
 
                     var nameModal = new SimpleTextInputWindow()
                     {
-                        // TODO - Itl
-                        Title = "Rename Custom Container",
-                        InputLabel = "Name",
+                        Title = LocalizationCodes.LC_CUSTOM_CONTAINER_RENAME_TITLE.Bind().Value,
+                        InputLabel = LocalizationCodes.LC_CUSTOM_CONTAINER_RENAME_FIELD.Bind().Value,
                         Validator = label => IsValidCustomLabel(sgvm, label),
                         Result = customContainer.Label,
                     };
@@ -74,9 +74,8 @@ namespace PalCalc.UI.ViewModel.Inspector
             {
                 var nameModal = new SimpleTextInputWindow()
                 {
-                    // TODO - Itl
-                    Title = "New Custom Container",
-                    InputLabel = "Name",
+                    Title = LocalizationCodes.LC_CUSTOM_CONTAINER_NEW_TITLE.Bind().Value,
+                    InputLabel = LocalizationCodes.LC_CUSTOM_CONTAINER_NEW_FIELD.Bind().Value,
                     Validator = label => IsValidCustomLabel(sgvm, label),
                 };
                 nameModal.Owner = App.ActiveWindow;

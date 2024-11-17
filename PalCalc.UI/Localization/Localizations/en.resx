@@ -120,6 +120,9 @@
   <data name="LC_ABOUT_APP" xml:space="preserve">
     <value>About</value>
   </data>
+  <data name="LC_ADD_FAKE_SAVE" xml:space="preserve">
+    <value>Add fake save...</value>
+  </data>
   <data name="LC_ADD_NEW_SAVE" xml:space="preserve">
     <value>Add a new save...</value>
   </data>
@@ -198,6 +201,21 @@ This value is doubled internally to account for pal inactivity at night.</value>
   </data>
   <data name="LC_CUSTOM_CONTAINERS" xml:space="preserve">
     <value>Custom Containers</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve">
+    <value>Add new...</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_FIELD" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_TITLE" xml:space="preserve">
+    <value>New Custom Container</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_FIELD" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_TITLE" xml:space="preserve">
+    <value>Rename Custom Container</value>
   </data>
   <data name="LC_CUSTOM_SAVE_GAME_NAME" xml:space="preserve">
     <value>New Save Name</value>
@@ -368,6 +386,16 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   <data name="LC_RANDOM_TRAIT" xml:space="preserve">
     <value>(Random)</value>
   </data>
+  <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve">
+    <value>Are you sure you want to remove this save from from Pal Calc?
+
+{SaveLabel}
+
+This will not delete the save files from your computer.</value>
+  </data>
+  <data name="LC_REMOVE_SAVE_TITLE" xml:space="preserve">
+    <value>Remove Manual Save?</value>
+  </data>
   <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve">
     <value>With {TraitsList}</value>
   </data>
@@ -460,6 +488,9 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   </data>
   <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve">
     <value>{WorldName} day {DayNumber}</value>
+  </data>
+  <data name="LC_SAVE_GAME_REMOVE_BTN_LABEL" xml:space="preserve">
+    <value>Remove</value>
   </data>
   <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
     <value>The Xbox save file is incomplete, but features will still work. This resolves automatically when Palworld is closed for a few minutes and Pal Calc is restarted.</value>

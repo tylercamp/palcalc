@@ -109,9 +109,5 @@ namespace PalCalc.UI.ViewModel
                 Type = LocationType.Custom,
             }
         };
-
-        public PalInstanceViewModel CommmonViewModelObject => !IsValid ? null : new PalInstanceViewModel(ModelObject);
-
-
     }
 }

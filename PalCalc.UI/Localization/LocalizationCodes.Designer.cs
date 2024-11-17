@@ -70,6 +70,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_ADD_FAKE_SAVE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_ADD_NEW_SAVE,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -167,6 +171,26 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to Label.
         /// </summary>
         LC_CUSTOM_CONTAINER,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINER_ADD_NEW,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINER_NEW_FIELD,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINER_NEW_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINER_RENAME_FIELD,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINER_RENAME_TITLE,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -387,6 +411,14 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_RANDOM_TRAIT,
         /// <summary>
+        ///   Looks up a localized string similar to SaveLabel.
+        /// </summary>
+        LC_REMOVE_SAVE_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_REMOVE_SAVE_TITLE,
+        /// <summary>
         ///   Looks up a localized string similar to TraitsList.
         /// </summary>
         LC_REQUIRED_TRAITS_SUMMARY,
@@ -450,6 +482,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to DayNumber | WorldName.
         /// </summary>
         LC_SAVE_GAME_LBL_SERVER,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_GAME_REMOVE_BTN_LABEL,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

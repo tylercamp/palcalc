@@ -142,7 +142,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
     public class NewCustomContainerTreeNodeViewModel : IOwnerTreeNode
     {
-        public ILocalizedText Label { get; } = new HardCodedText("Add new..."); // TODO
+        public ILocalizedText Label { get; } = LocalizationCodes.LC_CUSTOM_CONTAINER_ADD_NEW.Bind();
     }
 
     public class CustomContainerTreeNodeViewModel : IContainerSource

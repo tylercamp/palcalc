@@ -107,15 +107,15 @@ namespace PalCalc.UI.ViewModel
                             .OfType<SaveGameViewModel>()
                             .Select(sgvm => sgvm.Value)
                             .OfType<VirtualSaveGame>()
-                            // TODO - formally document how custom save labels are stored
-                            .Select(vsg => vsg.GameId)
+                            .Select(FakeSaveGame.GetLabel)
                             .ToList();
 
                         var window = new SimpleTextInputWindow()
                         {
                             Title = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME.Bind().Value,
                             InputLabel = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME_LABEL.Bind().Value,
-                            Validator = name => name.Length > 0 && !existingFakeSaves.Contains(name)
+                            Validator = name => name.Length > 0 && !existingFakeSaves.Contains(name),
+                            Owner = App.ActiveWindow,
                         };
 
                         if (window.ShowDialog() == true)

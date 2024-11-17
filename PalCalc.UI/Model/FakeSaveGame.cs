@@ -19,5 +19,7 @@ namespace PalCalc.UI.Model
                 new VirtualLocalDataSaveFile(),
                 new VirtualWorldOptionSaveFile()
             );
+
+        public static string GetLabel(ISaveGame fakeSave) => fakeSave.GameId;
     }
 }

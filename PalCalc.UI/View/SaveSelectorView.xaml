@@ -117,7 +117,7 @@
 
         <Button Command="{Binding DeleteSaveCommand}"
                 Visibility="{Binding DeleteSaveVisibility}"
-                Content="Delete Save"
-                /> <!-- TODO - ITL -->
+                Content="{itl:LocalizedText LC_SAVE_GAME_REMOVE_BTN_LABEL}"
+                />
     </StackPanel>
 </StackPanel>

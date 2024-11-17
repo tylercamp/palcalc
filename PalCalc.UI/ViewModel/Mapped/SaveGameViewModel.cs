@@ -39,7 +39,7 @@ namespace PalCalc.UI.ViewModel.Mapped
     {
         public NewFakeSaveGameViewModel()
         {
-            Label = new HardCodedText("New Fake Save"); // TODO
+            Label = LocalizationCodes.LC_ADD_FAKE_SAVE.Bind();
         }
 
         public ILocalizedText Label { get; }
