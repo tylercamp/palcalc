@@ -117,7 +117,7 @@ namespace PalCalc.UI.ViewModel
 
             targetsBySaveFile = SaveSelection.SavesLocations
                 .SelectMany(l => l.SaveGames)
-                .Where(vm => !vm.IsAddManualOption)
+                .OfType<SaveGameViewModel>()
                 .Select(sgvm => sgvm.Value)
                 .ToDictionary(
                     sg => sg,
@@ -180,7 +180,7 @@ namespace PalCalc.UI.ViewModel
 
         private void Storage_SaveReloaded(ISaveGame save)
         {
-            if (SaveSelection?.SelectedGame?.Value == save)
+            if (SaveSelection?.SelectedFullGame?.Value == save)
                 UpdateFromSaveProperties();
         }
 
@@ -188,12 +188,12 @@ namespace PalCalc.UI.ViewModel
         {
             if (spec == null) return;
 
-            if (SaveSelection?.SelectedGame == null)
+            if (SaveSelection?.SelectedFullGame == null)
             {
                 return;
             }
 
-            var targetList = targetsBySaveFile[SaveSelection.SelectedGame.Value];
+            var targetList = targetsBySaveFile[SaveSelection.SelectedFullGame.Value];
 
             if (!targetList.Targets.Contains(spec))
             {
@@ -239,7 +239,7 @@ namespace PalCalc.UI.ViewModel
 
         private void SaveSelection_CustomSaveDelete(ManualSavesLocationViewModel manualSaves, ISaveGame saveGame)
         {
-            var saveVm = manualSaves.SaveGames.First(sg => sg.Value == saveGame);
+            var saveVm = manualSaves.SaveGames.OfType<SaveGameViewModel>().First(sg => sg.Value == saveGame);
 
             // TODO - itl
             var confirmation = MessageBox.Show(
@@ -327,7 +327,7 @@ namespace PalCalc.UI.ViewModel
             if (PalTargetList != null) PalTargetList.PropertyChanged -= PalTargetList_PropertyChanged;
             if (GameSettings != null) GameSettings.PropertyChanged -= GameSettings_PropertyChanged;
 
-            if (SaveSelection.SelectedGame?.Value == null)
+            if (SaveSelection.SelectedFullGame?.Value == null)
             {
                 PalTargetList = null;
                 PalTarget = null;
@@ -335,15 +335,15 @@ namespace PalCalc.UI.ViewModel
             }
             else
             {
-                CrashSupport.ReferencedSave(SaveSelection.SelectedGame.Value);
+                CrashSupport.ReferencedSave(SaveSelection.SelectedFullGame.Value);
 
-                settings.SelectedGameIdentifier = CachedSaveGame.IdentifierFor(SaveSelection.SelectedGame.Value);
+                settings.SelectedGameIdentifier = CachedSaveGame.IdentifierFor(SaveSelection.SelectedFullGame.Value);
                 Storage.SaveAppSettings(settings);
 
-                PalTargetList = targetsBySaveFile[SaveSelection.SelectedGame.Value];
+                PalTargetList = targetsBySaveFile[SaveSelection.SelectedFullGame.Value];
                 PalTargetList.PropertyChanged += PalTargetList_PropertyChanged;
 
-                GameSettings = GameSettingsViewModel.Load(SaveSelection.SelectedGame.Value);
+                GameSettings = GameSettingsViewModel.Load(SaveSelection.SelectedFullGame.Value);
                 GameSettings.PropertyChanged += GameSettings_PropertyChanged;
             }
 
@@ -353,9 +353,9 @@ namespace PalCalc.UI.ViewModel
 
         private void UpdatePalTarget()
         {
-            if (PalTargetList?.SelectedTarget != null && SaveSelection.SelectedGame?.CachedValue != null)
+            if (PalTargetList?.SelectedTarget != null && SaveSelection.SelectedFullGame?.CachedValue != null)
             {
-                PalTarget = new PalTargetViewModel(SaveSelection.SelectedGame.CachedValue, PalTargetList.SelectedTarget, passivePresets);
+                PalTarget = new PalTargetViewModel(SaveSelection.SelectedFullGame.CachedValue, PalTargetList.SelectedTarget, passivePresets);
                 passivePresets.ActivePalTarget = PalTarget;
             }
             else
@@ -364,7 +364,7 @@ namespace PalCalc.UI.ViewModel
 
         private void GameSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var saveGame = SaveSelection.SelectedGame?.Value;
+            var saveGame = SaveSelection.SelectedFullGame?.Value;
             if (saveGame != null)
             {
                 var settings = sender as GameSettingsViewModel;
@@ -390,12 +390,12 @@ namespace PalCalc.UI.ViewModel
 
         private void SaveTargetList(PalTargetListViewModel list)
         {
-            var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
+            var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedFullGame.Value);
             if (!Directory.Exists(outputFolder))
                 Directory.CreateDirectory(outputFolder);
 
             var outputFile = Path.Join(outputFolder, "pal-targets.json");
-            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedGame.CachedValue);
+            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedFullGame.CachedValue);
             File.WriteAllText(outputFile, JsonConvert.SerializeObject(list, converter));
         }
 
@@ -404,7 +404,7 @@ namespace PalCalc.UI.ViewModel
             var currentSpec = PalTarget?.CurrentPalSpecifier?.ModelObject;
             if (currentSpec == null) return;
 
-            var selectedGame = SaveSelection.SelectedGame;
+            var selectedGame = SaveSelection.SelectedFullGame;
             var cachedData = selectedGame.CachedValue;
             if (cachedData == null) return;
 

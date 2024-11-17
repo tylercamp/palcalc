@@ -55,38 +55,21 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        private SaveGameViewModel selectedGame;
-        public SaveGameViewModel SelectedGame
+        public SaveGameViewModel SelectedFullGame => SelectedGame as SaveGameViewModel;
+
+        private ISaveGameViewModel selectedGameOption;
+        public ISaveGameViewModel SelectedGame
         {
-            get => selectedGame;
+            get => selectedGameOption;
             set
             {
                 bool needsReset = false;
-                if (value != null && value.IsAddManualOption)
-                {
-                    if (MessageBox.Show("Make this a fake save?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                    {
-                        // TODO - allow deleting entries
-                        // TODO - prevent duplicate names
-                        var window = new SimpleTextInputWindow()
-                        {
-                            Title = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME.Bind().Value,
-                            InputLabel = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME_LABEL.Bind().Value,
-                            Validator = name => name.Length > 0
-                        };
 
-                        if (window.ShowDialog() == true)
-                        {
-                            var saveGame = FakeSaveGame.Create(window.Result);
-                            Dispatcher.CurrentDispatcher.BeginInvoke(() => NewCustomSaveSelected?.Invoke(manualLocation, saveGame));
-                        }
-                        else
-                        {
-                            needsReset = true;
-                        }
-                    }
-                    else
-                    {
+                switch (value)
+                {
+                    case null: break;
+
+                    case NewManualSaveGameViewModel:
                         var ofd = new OpenFileDialog();
                         ofd.Filter = LocalizationCodes.LC_MANUAL_SAVE_EXTENSION_LBL.Bind().Value + "|Level.sav";
                         ofd.Title = LocalizationCodes.LC_MANUAL_SAVE_SELECTOR_TITLE.Bind().Value;
@@ -96,7 +79,7 @@ namespace PalCalc.UI.ViewModel
                             var asSaveGame = new StandardSaveGame(Path.GetDirectoryName(ofd.FileName));
                             if (asSaveGame.IsValid)
                             {
-                                var existingSaves = SavesLocations.SelectMany(l => l.SaveGames.Select(vm => vm.Value)).SkipNull();
+                                var existingSaves = SavesLocations.SelectMany(l => l.SaveGames.OfType<SaveGameViewModel>().Select(vm => vm.Value)).SkipNull();
                                 if (existingSaves.Any(s => s.BasePath.PathEquals(asSaveGame.BasePath)))
                                 {
                                     MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_ALREADY_REGISTERED.Bind().Value);
@@ -117,24 +100,49 @@ namespace PalCalc.UI.ViewModel
                         {
                             needsReset = true;
                         }
-                    }
+                        break;
+
+                    case NewFakeSaveGameViewModel:
+                        var existingFakeSaves = manualLocation.SaveGames
+                            .OfType<SaveGameViewModel>()
+                            .Select(sgvm => sgvm.Value)
+                            .OfType<VirtualSaveGame>()
+                            // TODO - formally document how custom save labels are stored
+                            .Select(vsg => vsg.GameId)
+                            .ToList();
+
+                        var window = new SimpleTextInputWindow()
+                        {
+                            Title = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME.Bind().Value,
+                            InputLabel = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME_LABEL.Bind().Value,
+                            Validator = name => name.Length > 0 && !existingFakeSaves.Contains(name)
+                        };
+
+                        if (window.ShowDialog() == true)
+                        {
+                            var saveGame = FakeSaveGame.Create(window.Result);
+                            Dispatcher.CurrentDispatcher.BeginInvoke(() => NewCustomSaveSelected?.Invoke(manualLocation, saveGame));
+                        }
+                        else
+                        {
+                            needsReset = true;
+                        }
+                        break;
                 }
 
-                CrashSupport.ReferencedSave(value?.Value);
+                CrashSupport.ReferencedSave((value as SaveGameViewModel)?.Value);
 
-                if (SetProperty(ref selectedGame, value))
+                if (SetProperty(ref selectedGameOption, value))
                 {
                     OnPropertyChanged(nameof(XboxIncompleteVisibility));
                     OnPropertyChanged(nameof(CanOpenSaveFileLocation));
                     OnPropertyChanged(nameof(DeleteSaveVisibility));
+                    OnPropertyChanged(nameof(SelectedFullGame));
+
                     if (needsReset)
                     {
                         // ComboBox ignores reassignment in the middle of a value-change event, defer until later
                         Dispatcher.CurrentDispatcher.BeginInvoke(() => SelectedGame = null);
-                    }
-                    else
-                    {
-                        OnPropertyChanged(nameof(InvalidSaveMessageVisibility));
                     }
 
                     ExportSaveCommand?.NotifyCanExecuteChanged();
@@ -143,22 +151,20 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        public ReadOnlyObservableCollection<SaveGameViewModel> AvailableSaves => selectedLocation.SaveGames;
-
-        public Visibility InvalidSaveMessageVisibility => SelectedGame?.WarningVisibility ?? Visibility.Collapsed;
+        public ReadOnlyObservableCollection<ISaveGameViewModel> AvailableSaves => selectedLocation.SaveGames;
 
         private ISavesLocationViewModel MostRecentLocation => SavesLocations.OrderByDescending(l => l.LastModified).FirstOrDefault();
-        private SaveGameViewModel MostRecentSave => SelectedLocation?.SaveGames?.Where(g => !g.IsAddManualOption)?.OrderByDescending(s => s.LastModified)?.FirstOrDefault();
+        private SaveGameViewModel MostRecentSave => SelectedLocation?.SaveGames?.OfType<SaveGameViewModel>()?.OrderByDescending(s => s.LastModified)?.FirstOrDefault();
 
         public SaveSelectorViewModel() : this(DirectSavesLocation.AllLocal, Enumerable.Empty<ISaveGame>())
         {
         }
 
         public bool CanOpenSavesLocation => (SelectedLocation as StandardSavesLocationViewModel)?.Value?.FolderPath != null;
-        public bool CanOpenSaveFileLocation => (SelectedGame as SaveGameViewModel)?.Value?.BasePath != null;
+        public bool CanOpenSaveFileLocation => SelectedFullGame?.Value?.BasePath != null;
 
         public Visibility NoXboxSavesMsgVisibility => (SelectedLocation as StandardSavesLocationViewModel)?.Value is XboxSavesLocation && !SelectedLocation.SaveGames.Any() ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility XboxIncompleteVisibility => SelectedGame != null && SelectedGame.Value is XboxSaveGame && (SelectedGame.Value as XboxSaveGame).LevelMeta?.IsValid != true ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility XboxIncompleteVisibility => SelectedFullGame != null && SelectedFullGame.Value is XboxSaveGame && (SelectedFullGame.Value as XboxSaveGame).LevelMeta?.IsValid != true ? Visibility.Visible : Visibility.Collapsed;
 
         public SaveSelectorViewModel(IEnumerable<ISavesLocation> savesLocations, IEnumerable<ISaveGame> manualSaves)
         {
@@ -174,7 +180,7 @@ namespace PalCalc.UI.ViewModel
                 {
                     var sfd = new SaveFileDialog()
                     {
-                        FileName = $"Palworld-{CachedSaveGame.IdentifierFor(SelectedGame.Value)}.zip",
+                        FileName = $"Palworld-{CachedSaveGame.IdentifierFor(SelectedFullGame.Value)}.zip",
                         Filter = "ZIP | *.zip",
                         AddExtension = true,
                         DefaultExt = "zip"
@@ -185,7 +191,7 @@ namespace PalCalc.UI.ViewModel
                         using (var outStream = new FileStream(sfd.FileName, FileMode.Create))
                         using (var archive = new ZipArchive(outStream, ZipArchiveMode.Create))
                         {
-                            var save = SelectedGame.Value;
+                            var save = SelectedFullGame.Value;
 
                             if (save.Level != null && save.Level.Exists)
                                 archive.CreateEntryFromFile(save.Level.FilePath, "Level.sav");
@@ -206,7 +212,7 @@ namespace PalCalc.UI.ViewModel
                         }
                     }
                 },
-                canExecute: () => SelectedGame?.Value != null
+                canExecute: () => SelectedFullGame?.Value != null
             );
 
             ExportCrashLogCommand = new RelayCommand(
@@ -241,20 +247,20 @@ namespace PalCalc.UI.ViewModel
                     loadingModal.DataContext = LocalizationCodes.LC_SAVE_INSPECTOR_LOADING.Bind();
                     loadingModal.ShowSync();
 
-                    var vm = new SaveInspectorWindowViewModel(SelectedGame);
+                    var vm = new SaveInspectorWindowViewModel(SelectedFullGame);
 
                     loadingModal.Close();
 
                     var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
                     inspector.Show();
                 },
-                canExecute: () => SelectedGame != null && !SelectedGame.IsAddManualOption && SelectedGame?.CachedValue != null
+                canExecute: () => SelectedFullGame?.CachedValue != null
             );
 
             DeleteSaveCommand = new RelayCommand(
                 () =>
                 {
-                    CustomSaveDelete?.Invoke(manualLocation, SelectedGame.Value);
+                    CustomSaveDelete?.Invoke(manualLocation, SelectedFullGame.Value);
                 }
             );
         }
@@ -263,7 +269,7 @@ namespace PalCalc.UI.ViewModel
         {
             foreach (var loc in SavesLocations)
             {
-                foreach (var game in loc.SaveGames.Where(g => g.Value != null))
+                foreach (var game in loc.SaveGames.OfType<SaveGameViewModel>().Where(g => g.Value != null))
                 {
                     if (CachedSaveGame.IdentifierFor(game.Value) == saveIdentifier)
                     {
@@ -296,7 +302,7 @@ namespace PalCalc.UI.ViewModel
         private IRelayCommand inspectSaveCommand;
 
         public Visibility DeleteSaveVisibility =>
-            SelectedLocation is ManualSavesLocationViewModel && SelectedGame != null
+            SelectedLocation is ManualSavesLocationViewModel && SelectedFullGame != null
                 ? Visibility.Visible
                 : Visibility.Collapsed;
     }

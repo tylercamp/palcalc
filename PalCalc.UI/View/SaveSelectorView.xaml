@@ -49,7 +49,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="mvm:SaveGameViewModel">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{itl:LocalizedText LC_SAVE_WARNING}" Visibility="{Binding WarningVisibility}" Foreground="DarkRed" />
+                        <TextBlock Text="{itl:LocalizedText LC_SAVE_WARNING}" Visibility="{Binding HasWarnings, Converter={StaticResource BVC}}" Foreground="DarkRed" />
                         <TextBlock Text="{Binding Label.Value}" />
                     </StackPanel>
                 </DataTemplate>
@@ -68,8 +68,8 @@
         <Button Grid.Column="3"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Stretch"
-                Command="{Binding SelectedGame.ReloadSaveCommand}"
-                Visibility="{Binding SelectedGame.HasChanges, Converter={StaticResource BVC}, FallbackValue=Collapsed}"
+                Command="{Binding SelectedFullGame.ReloadSaveCommand}"
+                Visibility="{Binding SelectedFullGame.HasChanges, Converter={StaticResource BVC}, FallbackValue=Collapsed}"
                 ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SAVE_FILE_RELOAD_DESCRIPTION}"
                 Margin="3,0,0,0">
             <materialIcons:MaterialIcon Kind="Reload" Width="18" />
@@ -93,7 +93,7 @@
             <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_3}" />
         </TextBlock>
 
-        <TextBlock Visibility="{Binding InvalidSaveMessageVisibility}" Foreground="DarkRed" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_INVALID}" />
+        <TextBlock Visibility="{Binding SelectedGame.HasWarnings, Converter={StaticResource BVC}, FallbackValue=Collapsed}" Foreground="DarkRed" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_INVALID}" />
 
         <TextBlock Visibility="{Binding XboxIncompleteVisibility}" Foreground="DarkRed" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_XBOX_INCOMPLETE}" />
 

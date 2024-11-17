@@ -8,6 +8,7 @@ using PalCalc.UI.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -17,7 +18,35 @@ using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
-    public partial class SaveGameViewModel : ObservableObject
+    public interface ISaveGameViewModel : INotifyPropertyChanged
+    {
+        public ILocalizedText Label { get; }
+        public bool HasWarnings { get; }
+    }
+
+    public partial class NewManualSaveGameViewModel : ObservableObject, ISaveGameViewModel
+    {
+        public NewManualSaveGameViewModel()
+        {
+            Label = LocalizationCodes.LC_ADD_NEW_SAVE.Bind();
+        }
+
+        public ILocalizedText Label { get; }
+        public bool HasWarnings => false;
+    }
+
+    public partial class NewFakeSaveGameViewModel : ObservableObject, ISaveGameViewModel
+    {
+        public NewFakeSaveGameViewModel()
+        {
+            Label = new HardCodedText("New Fake Save"); // TODO
+        }
+
+        public ILocalizedText Label { get; }
+        public bool HasWarnings => false;
+    }
+
+    public partial class SaveGameViewModel : ObservableObject, ISaveGameViewModel
     {
         private static ILogger logger = Log.ForContext<SaveGameViewModel>();
 
@@ -25,15 +54,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         public static SaveGameViewModel DesignerInstance =>
             designerInstance ??= new SaveGameViewModel(CachedSaveGame.SampleForDesignerView.UnderlyingSave);
 
-        private SaveGameViewModel()
-        {
-            IsAddManualOption = true;
-            Label = LocalizationCodes.LC_ADD_NEW_SAVE.Bind();
-        }
-
         public SaveGameViewModel(ISaveGame value)
         {
-            IsAddManualOption = false;
             Value = value;
 
             ReadSaveDescription();
@@ -119,16 +141,11 @@ namespace PalCalc.UI.ViewModel.Mapped
             private set => SetProperty(ref label, value);
         }
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasWarnings))]
         private bool isValid;
-        public bool IsValid
-        {
-            get => isValid;
-            set => SetProperty(ref isValid, value);
-        }
 
-        public bool IsAddManualOption { get; }
-
-        public Visibility WarningVisibility => !IsAddManualOption && !IsValid ? Visibility.Visible : Visibility.Collapsed;
+        public bool HasWarnings => !IsValid;
 
         private bool hasChanges;
         public bool HasChanges
@@ -138,7 +155,5 @@ namespace PalCalc.UI.ViewModel.Mapped
         }
 
         public IRelayCommand ReloadSaveCommand { get; }
-
-        public static readonly SaveGameViewModel AddNewSave = new SaveGameViewModel();
     }
 }
