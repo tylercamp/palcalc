@@ -70,6 +70,7 @@ namespace PalCalc.UI.ViewModel
 
         [NotifyPropertyChangedFor(nameof(Icon))]
         [NotifyPropertyChangedFor(nameof(IconBrush))]
+        [NotifyPropertyChangedFor(nameof(IsValid))]
         [ObservableProperty]
         private PalViewModel pal;
 

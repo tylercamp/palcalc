@@ -18,6 +18,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
     public interface IContainerGridSlotViewModel
     {
         bool Matches { get; }
+        bool CanInterract { get; }
     }
 
     public interface IContainerGridInspectableSlotViewModel : IContainerGridSlotViewModel
@@ -30,13 +31,17 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 
         public PalViewModel Pal => PalInstance.Pal;
 
+        [NotifyPropertyChangedFor(nameof(CanInterract))]
         [ObservableProperty]
         private bool matches = true;
+
+        public bool CanInterract => Matches;
     }
 
     public class ContainerGridEmptySlotViewModel : IContainerGridSlotViewModel
     {
         public bool Matches => false;
+        public bool CanInterract => false;
     }
 
     public interface IContainerGridViewModel : INotifyPropertyChanged

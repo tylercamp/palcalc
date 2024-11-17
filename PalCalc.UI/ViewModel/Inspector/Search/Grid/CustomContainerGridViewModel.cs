@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,18 +16,35 @@ using System.Windows.Media;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 {
-    public partial class ContainerGridCustomPalSlotViewModel(CustomPalInstanceViewModel instance)
+    public partial class ContainerGridCustomPalSlotViewModel
         : ObservableObject, IContainerGridInspectableSlotViewModel
     {
-        public CustomPalInstanceViewModel PalInstance => instance;
+        public ContainerGridCustomPalSlotViewModel(CustomPalInstanceViewModel instance)
+        {
+            PalInstance = instance;
 
+            PropertyChangedEventManager.AddHandler(
+                instance,
+                (_, _) => OnPropertyChanged(nameof(CanInterract)),
+                nameof(instance.IsValid)
+            );
+        }
+
+        public CustomPalInstanceViewModel PalInstance { get; }
+
+        // note: changes to `PalInstance` will not auto-update `matches` since we don't preserve
+        //       the applied filter anywhere in these VMs. very minor issue, won't bother with a fix
+        [NotifyPropertyChangedFor(nameof(CanInterract))]
         [ObservableProperty]
         private bool matches = true;
+
+        public bool CanInterract => !PalInstance.IsValid || Matches;
     }
 
     public class ContainerGridNewPalSlotViewModel : IContainerGridSlotViewModel
     {
         public bool Matches => false;
+        public bool CanInterract => true;
     }
 
     public partial class CustomContainerGridViewModel : ObservableObject, IContainerGridViewModel

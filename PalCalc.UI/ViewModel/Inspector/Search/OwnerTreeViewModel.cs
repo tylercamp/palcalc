@@ -232,6 +232,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         public ICommand CreateCustomContainerCommand { get; set; }
 
-        public IEnumerable<IContainerSource> AllContainerSources => RootNodes.SelectMany(n => n.AllChildren).Where(n => n is IContainerSource).Cast<IContainerSource>();
+        public IEnumerable<IContainerSource> AllContainerSources =>
+            RootNodes.SelectMany(n => n.AllChildren).Where(n => n is IContainerSource).Cast<IContainerSource>();
     }
 }
