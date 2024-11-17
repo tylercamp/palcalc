@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,5 +66,21 @@ namespace PalCalc.UI.View
 
         public IRelayCommand SaveCommand { get; }
         public IRelayCommand CancelCommand { get; }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                CancelCommand.Execute(null);
+            }
+        }
+
+        private void m_TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && SaveCommand.CanExecute(null))
+            {
+                SaveCommand.Execute(null);
+            }
+        }
     }
 }
