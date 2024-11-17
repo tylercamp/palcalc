@@ -45,10 +45,10 @@ namespace PalCalc.UI.ViewModel.Inspector
                 {
                     var container = new CustomContainer() { Label = nameModal.Result };
                     sgvm.Customizations.CustomContainers.Add(new CustomContainerViewModel(container));
-
-                    BuildContainerTree(sgvm);
                 }
             });
+
+            sgvm.Customizations.CustomContainers.CollectionChanged += (_, _) => BuildContainerTree(sgvm);
 
             BuildContainerTree(sgvm);
             SearchSettings = new SearchSettingsViewModel();

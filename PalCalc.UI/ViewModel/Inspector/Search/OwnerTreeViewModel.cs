@@ -125,7 +125,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
         public CustomizationsTreeNodeViewModel(List<CustomContainerTreeNodeViewModel> containers)
         {
-            // TODO - subscribe to customizations.CustomContainers observable events
             Label = LocalizationCodes.LC_CUSTOM_CONTAINERS.Bind();
 
             Children = containers
