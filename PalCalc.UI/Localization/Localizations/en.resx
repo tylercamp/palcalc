@@ -121,7 +121,7 @@
     <value>About</value>
   </data>
   <data name="LC_ADD_FAKE_SAVE" xml:space="preserve">
-    <value>Add fake save...</value>
+    <value>Add a fake save...</value>
   </data>
   <data name="LC_ADD_NEW_SAVE" xml:space="preserve">
     <value>Add a new save...</value>
