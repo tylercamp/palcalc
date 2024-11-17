@@ -1,4 +1,5 @@
-﻿using PalCalc.SaveReader;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PalCalc.SaveReader;
 using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         DateTime? LastModified { get; }
     }
 
-    public class StandardSavesLocationViewModel : ISavesLocationViewModel
+    public partial class StandardSavesLocationViewModel : ObservableObject, ISavesLocationViewModel
     {
         public StandardSavesLocationViewModel(ISavesLocation sl)
         {
@@ -57,7 +58,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         public DateTime? LastModified { get; }
     }
 
-    public class ManualSavesLocationViewModel : ISavesLocationViewModel
+    public partial class ManualSavesLocationViewModel : ObservableObject, ISavesLocationViewModel
     {
         public ManualSavesLocationViewModel(IEnumerable<ISaveGame> initialManualSaves)
         {

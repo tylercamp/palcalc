@@ -24,11 +24,5 @@ namespace PalCalc.UI.View
         {
             InitializeComponent();
         }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            Owner = null;
-            base.OnClosing(e);
-        }
     }
 }

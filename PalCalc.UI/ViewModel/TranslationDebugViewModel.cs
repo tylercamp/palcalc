@@ -1,4 +1,5 @@
-﻿using PalCalc.UI.Localization;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Windows;
 
 namespace PalCalc.UI.ViewModel
 {
-    public class TranslationLocaleDebugViewModel(TranslationLocale locale, List<ITranslationError> errors)
+    public partial class TranslationLocaleDebugViewModel(TranslationLocale locale, List<ITranslationError> errors) : ObservableObject
     {
         public string TabTitle { get; } =
             $"{locale}" + (
@@ -20,7 +21,7 @@ namespace PalCalc.UI.ViewModel
         public List<ITranslationError> Errors { get; } = errors.OrderBy(e => e.GetType().Name).ThenBy(e => e.Message).ToList();
     }
 
-    public class TranslationDebugViewModel(List<ITranslationError> translationErrors)
+    public partial class TranslationDebugViewModel(List<ITranslationError> translationErrors) : ObservableObject
     {
         public static TranslationDebugViewModel DesignerInstance { get; } =
             new TranslationDebugViewModel([

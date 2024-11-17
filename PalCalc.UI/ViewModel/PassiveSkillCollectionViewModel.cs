@@ -1,4 +1,5 @@
-﻿using PalCalc.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
@@ -12,7 +13,7 @@ using System.Windows.Controls;
 
 namespace PalCalc.UI.ViewModel
 {
-    public class PassiveSkillCollectionViewModel
+    public partial class PassiveSkillCollectionViewModel : ObservableObject
     {
         // for XAML designer view
         public PassiveSkillCollectionViewModel() : this(

@@ -1,4 +1,5 @@
-﻿using PalCalc.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using System;
@@ -10,7 +11,7 @@ using System.Windows.Media;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
-    public class PalViewModel
+    public partial class PalViewModel : ObservableObject
     {
         private static readonly DerivedLocalizableText<Pal> NameLocalizer = new DerivedLocalizableText<Pal>(
             (locale, pal) => pal.LocalizedNames.GetValueOrElse(locale.ToFormalName(), pal.Name)
