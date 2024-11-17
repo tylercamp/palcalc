@@ -37,7 +37,7 @@
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
             <ListView.InputBindings>
-                <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" CommandParameter="{Binding SelectedSlot}" />
+                <KeyBinding Key="Delete" Command="{Binding DeleteSlotCommand}" CommandParameter="{Binding SelectedSlot}" />
             </ListView.InputBindings>
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">

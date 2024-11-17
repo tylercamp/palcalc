@@ -63,7 +63,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
         public ILocalizedText Title { get; set; }
         public Visibility TitleVisibility => Title == null ? Visibility.Collapsed : Visibility.Visible;
 
-        public IRelayCommand<IContainerGridSlotViewModel> DeleteCommand => null;
+        public IRelayCommand<IContainerGridSlotViewModel> DeleteSlotCommand => null;
 
         [ObservableProperty]
         private IContainerGridSlotViewModel selectedSlot;

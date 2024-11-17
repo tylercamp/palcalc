@@ -43,7 +43,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 
             container.Contents.CollectionChanged += Contents_CollectionChanged;
 
-            DeleteCommand = new RelayCommand<IContainerGridSlotViewModel>(
+            DeleteSlotCommand = new RelayCommand<IContainerGridSlotViewModel>(
                 item =>
                 {
                     if (item is ContainerGridCustomPalSlotViewModel)
@@ -129,6 +129,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
         public ObservableCollection<IContainerGridSlotViewModel> Slots { get; }
 
         // TODO
-        public IRelayCommand<IContainerGridSlotViewModel> DeleteCommand { get; }
+        public IRelayCommand<IContainerGridSlotViewModel> DeleteSlotCommand { get; }
     }
 }

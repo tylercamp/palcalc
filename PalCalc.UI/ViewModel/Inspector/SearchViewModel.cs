@@ -4,6 +4,7 @@ using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Inspector.Search;
 using PalCalc.UI.ViewModel.Inspector.Search.Container;
+using PalCalc.UI.ViewModel.Inspector.Search.Grid;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph.Graphviz;
 using System;
@@ -99,6 +100,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             if (e.PropertyName == nameof(OwnerTree.SelectedSource))
             {
                 OnPropertyChanged(nameof(SlotDetailsVisibility));
+                OnPropertyChanged(nameof(FocusedGrid));
 
                 if (OwnerTree.SelectedSource != null)
                 {
@@ -122,6 +124,16 @@ namespace PalCalc.UI.ViewModel.Inspector
             if (e.PropertyName == nameof(DefaultSearchableContainerViewModel.SelectedSlot))
             {
                 OnPropertyChanged(nameof(SlotDetailsVisibility));
+                OnPropertyChanged(nameof(FocusedGrid));
+            }
+        }
+
+        public IContainerGridViewModel FocusedGrid
+        {
+            get
+            {
+                var res = OwnerTree.SelectedSource?.Container?.Grids?.FirstOrDefault(g => g.SelectedSlot != null);
+                return res;
             }
         }
     }

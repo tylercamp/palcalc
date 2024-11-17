@@ -13,7 +13,7 @@
              d:DataContext="{x:Static vm:CustomPalInstanceViewModel.DesignInstance}">
     <!-- (assignment from VM to AutoCompleteComboBox isn't reflected in designer view for some reason?) -->
     <Grid>
-        <WrapPanel Margin="5">
+        <WrapPanel>
             <WrapPanel.Resources>
                 <Style TargetType="StackPanel">
                     <Setter Property="Margin" Value="0,0,25,0" />

@@ -52,7 +52,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 
         public IContainerGridSlotViewModel SelectedSlot { get; set; }
 
-        public IRelayCommand<IContainerGridSlotViewModel> DeleteCommand { get; }
+        public IRelayCommand<IContainerGridSlotViewModel> DeleteSlotCommand { get; }
 
         public ObservableCollection<IContainerGridSlotViewModel> Slots { get; }
     }

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:sv="clr-namespace:PalCalc.UI.View.Inspector.Search"
+             xmlns:iv="clr-namespace:PalCalc.UI.View.Inspector"
              xmlns:v="clr-namespace:PalCalc.UI.View"
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
              xmlns:ivm="clr-namespace:PalCalc.UI.ViewModel.Inspector"
@@ -103,7 +104,7 @@
                         <StackPanel Orientation="Vertical">
                             <StackPanel.Resources>
                                 <Style TargetType="dnkc:AutoCompleteComboBox">
-                                    <Setter Property="Margin" Value="0,0,10,0" />
+                                    <Setter Property="Margin" Value="0,0,10,5" />
                                     <Setter Property="Width" Value="150" />
                                 </Style>
                             </StackPanel.Resources>
@@ -164,10 +165,26 @@
                             <!-- note: putting the editor controls directly in this template causes a weird issue with AutoCompleteComboBox
                                  which clears out the VM values when the control is hidden. this leads to the custom pal being reset whenever
                                  you select a different container. -->
-                            <StackPanel Margin="0,0,0,0">
+                            <StackPanel>
                                 <!-- (GridSplitter not actually doing anything, just want visual consistency with the other borders) -->
                                 <GridSplitter HorizontalAlignment="Stretch" Height="5" IsEnabled="False" />
-                                <sv:CustomPalEditorView DataContext="{Binding PalInstance}" Margin="5,0,5,10" />
+
+                                <WrapPanel Orientation="Horizontal" Margin="10,8,10,15">
+                                    <sv:CustomPalEditorView DataContext="{Binding PalInstance}" />
+
+                                    <Grid Margin="0,0,0,5">
+                                        <Button DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=iv:SearchView}, Path=ViewModel.FocusedGrid}"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Bottom"
+                                                Padding="5,2"
+                                                Command="{Binding DeleteSlotCommand}"
+                                                CommandParameter="{Binding SelectedSlot}"
+                                        >
+                                            Delete
+                                        </Button>
+                                    </Grid>
+                                </WrapPanel>
+
                             </StackPanel>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type sgvm:ContainerGridPalSlotViewModel}">
@@ -176,8 +193,6 @@
                     </ContentControl.Resources>
                 </ContentControl>
 
-                <!-- scrolling works when you hover over the background but not when hovering over the container contents
-     and for the life of me I cannot figure out why -->
                 <ScrollViewer>
                     <ItemsControl ItemsSource="{Binding OwnerTree.SelectedSource.Container.Grids}" HorizontalAlignment="Center">
                         <ItemsControl.ItemsPanel>
