@@ -57,7 +57,20 @@
                         </DataTemplate>
                         
                         <DataTemplate DataType="{x:Type svm:CustomContainerTreeNodeViewModel}">
-                                    <TextBlock Text="{Binding SearchedLabel.Value}" />
+                            <TextBlock Text="{Binding SearchedLabel.Value}">
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Rename"
+                                                  Command="{Binding CustomContainer.RenameCommand}"
+                                                  CommandParameter="{Binding Container}"
+                                        />
+                                        <MenuItem Header="Delete"
+                                                  Command="{Binding CustomContainer.DeleteCommand}"
+                                                  CommandParameter="{Binding Container}"
+                                        />
+                                    </ContextMenu>
+                                </TextBlock.ContextMenu>
+                            </TextBlock>
                         </DataTemplate>
                         
                         <DataTemplate DataType="{x:Type svm:NewCustomContainerTreeNodeViewModel}">

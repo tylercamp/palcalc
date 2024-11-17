@@ -31,8 +31,35 @@ namespace PalCalc.UI.ViewModel.Inspector
         private ICommand newCustomContainerCommand;
         public IRelayCommand<ISearchableContainerViewModel> DeleteContainerCommand { get; }
 
+        public IRelayCommand<ISearchableContainerViewModel> RenameContainerCommand { get; }
+
+        private static bool IsValidCustomLabel(SaveGameViewModel context, string label) =>
+            label.Length > 0 && !context.Customizations.CustomContainers.Any(c => c.Label == label);
+
         public SearchViewModel(SaveGameViewModel sgvm)
         {
+            RenameContainerCommand = new RelayCommand<ISearchableContainerViewModel>(
+                container =>
+                {
+                    var customContainer = container as CustomSearchableContainerViewModel;
+                    if (customContainer == null) return;
+
+                    var nameModal = new SimpleTextInputWindow()
+                    {
+                        // TODO - Itl
+                        Title = "Rename Custom Container",
+                        InputLabel = "Name",
+                        Validator = label => IsValidCustomLabel(sgvm, label),
+                        Result = customContainer.Label,
+                    };
+                    nameModal.Owner = App.ActiveWindow;
+                    if (nameModal.ShowDialog() == true)
+                    {
+                        customContainer.Value.Label = nameModal.Result;
+                    }
+                }
+            );
+
             DeleteContainerCommand = new RelayCommand<ISearchableContainerViewModel>(
                 container =>
                 {
@@ -50,7 +77,7 @@ namespace PalCalc.UI.ViewModel.Inspector
                     // TODO - Itl
                     Title = "New Custom Container",
                     InputLabel = "Name",
-                    Validator = name => name.Length > 0 && !sgvm.Customizations.CustomContainers.Any(c => c.Label == name),
+                    Validator = label => IsValidCustomLabel(sgvm, label),
                 };
                 nameModal.Owner = App.ActiveWindow;
                 if (nameModal.ShowDialog() == true)
@@ -81,7 +108,15 @@ namespace PalCalc.UI.ViewModel.Inspector
 
             var containers = palsByContainerId
                 .Select(kvp => (ISearchableContainerViewModel)new DefaultSearchableContainerViewModel(kvp.Key, kvp.Value.First().Location.Type, kvp.Value))
-                .Concat(sgvm.Customizations.CustomContainers.Select(c => new CustomSearchableContainerViewModel(c)));
+                .Concat(
+                    sgvm.Customizations.CustomContainers.Select(c =>
+                        new CustomSearchableContainerViewModel(c)
+                        {
+                            RenameCommand = RenameContainerCommand,
+                            DeleteCommand = DeleteContainerCommand,
+                        }
+                    )
+                );
 
             OwnerTree = new OwnerTreeViewModel(csg, containers.ToList())
             {

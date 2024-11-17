@@ -1,11 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
+using PalCalc.SaveReader.SaveFile.Xbox;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Inspector.Search.Container;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -143,9 +145,32 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public ILocalizedText Label { get; } = new HardCodedText("Add new..."); // TODO
     }
 
-    public class CustomContainerTreeNodeViewModel(CustomSearchableContainerViewModel customContainer)
-        : IContainerSource(new HardCodedText(customContainer.Label), customContainer)
+    public class CustomContainerTreeNodeViewModel : IContainerSource
     {
+        private class CustomContainerLocalizedText : ILocalizedText
+        {
+            private CustomSearchableContainerViewModel container;
+
+            public CustomContainerLocalizedText(CustomSearchableContainerViewModel container)
+            {
+                this.container = container;
+
+                PropertyChangedEventManager.AddHandler(
+                    container,
+                    (_, _) => OnPropertyChanged(nameof(Value)),
+                    nameof(container.Label)
+                );
+            }
+
+            public override string Value => container.Label;
+        }
+
+        public CustomSearchableContainerViewModel CustomContainer => Container as CustomSearchableContainerViewModel;
+
+        public CustomContainerTreeNodeViewModel(CustomSearchableContainerViewModel customContainer)
+            : base(new CustomContainerLocalizedText(customContainer), customContainer)
+        {
+        }
     }
 
     public partial class OwnerTreeViewModel : ObservableObject

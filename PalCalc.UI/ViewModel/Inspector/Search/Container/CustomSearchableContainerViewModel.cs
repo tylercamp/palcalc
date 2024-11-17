@@ -1,15 +1,36 @@
-﻿using PalCalc.Model;
+﻿using CommunityToolkit.Mvvm.Input;
+using PalCalc.Model;
 using PalCalc.UI.ViewModel.Inspector.Search.Grid;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search.Container
 {
-    public class CustomSearchableContainerViewModel(CustomContainerViewModel container) : ISearchableContainerViewModel
+    public class CustomSearchableContainerViewModel : ISearchableContainerViewModel
     {
+        private CustomContainerViewModel container;
+        public CustomSearchableContainerViewModel(CustomContainerViewModel container)
+        {
+            this.container = container;
+
+            PropertyChangedEventManager.AddHandler(
+                container,
+                (_, _) =>
+                {
+                    OnPropertyChanged(nameof(Label));
+                    OnPropertyChanged(nameof(Id));
+                },
+                nameof(container.Label)
+            );
+        }
+
+        public IRelayCommand<ISearchableContainerViewModel> RenameCommand { get; set; }
+        public IRelayCommand<ISearchableContainerViewModel> DeleteCommand { get; set; }
+
         public string Label => container.Label;
 
         public override string Id => container.Label;
