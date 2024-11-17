@@ -12,7 +12,10 @@ namespace PalCalc.UI
         public static string NormalizedPath(this string path) => path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
 
         public static bool PathEquals(this string path1, string path2) =>
-            path1.NormalizedPath().Equals(path2.NormalizedPath(), StringComparison.InvariantCultureIgnoreCase);
+            (path1 == null && path2 == null) ||
+            (path1 != null && path2 != null &&
+                path1.NormalizedPath().Equals(path2.NormalizedPath(), StringComparison.InvariantCultureIgnoreCase)
+            );
 
         public static string LimitLength(this string value, int maxLength) =>
             value.Length > maxLength ? value.Substring(0, maxLength - 3) + "..." : value;
