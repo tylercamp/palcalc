@@ -634,6 +634,9 @@
   <data name="LC_CUSTOM_CONTAINER_RENAME_TITLE" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_REMOVE_CUSTOM_CONTAINER_DESCRIPTION" xml:space="preserve">
+    <value>Label</value>
+  </data>
   <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve">
     <value>SaveLabel</value>
   </data>

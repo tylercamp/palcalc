@@ -63,7 +63,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 
             DeleteSlotCommand = new RelayCommand<IContainerGridSlotViewModel>(
                 execute: item => container.Contents.Remove((item as ContainerGridCustomPalSlotViewModel)?.PalInstance),
-                canExecute: item => item is ContainerGridCustomPalSlotViewModel
+                canExecute: item => item is ContainerGridCustomPalSlotViewModel && Slots.Contains(item)
             );
         }
 

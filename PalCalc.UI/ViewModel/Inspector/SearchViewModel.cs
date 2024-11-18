@@ -88,6 +88,9 @@ namespace PalCalc.UI.ViewModel.Inspector
                     var customContainer = container as CustomSearchableContainerViewModel;
                     if (customContainer == null) return;
 
+                    if (MessageBox.Show(LocalizationCodes.LC_REMOVE_CUSTOM_CONTAINER_DESCRIPTION.Bind(customContainer.Label).Value, "", MessageBoxButton.OKCancel) != MessageBoxResult.OK)
+                        return;
+
                     sgvm.Customizations.CustomContainers.Remove(customContainer.Value);
                 }
             );

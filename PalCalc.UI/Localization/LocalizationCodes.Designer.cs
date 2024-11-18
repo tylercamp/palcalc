@@ -411,6 +411,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_RANDOM_TRAIT,
         /// <summary>
+        ///   Looks up a localized string similar to Label.
+        /// </summary>
+        LC_REMOVE_CUSTOM_CONTAINER_DESCRIPTION,
+        /// <summary>
         ///   Looks up a localized string similar to SaveLabel.
         /// </summary>
         LC_REMOVE_SAVE_DESCRIPTION,

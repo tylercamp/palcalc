@@ -386,6 +386,9 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   <data name="LC_RANDOM_TRAIT" xml:space="preserve">
     <value>(Random)</value>
   </data>
+  <data name="LC_REMOVE_CUSTOM_CONTAINER_DESCRIPTION" xml:space="preserve">
+    <value>The custom container '{Label}' will be removed.</value>
+  </data>
   <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve">
     <value>Are you sure you want to remove this save from from Pal Calc?
 

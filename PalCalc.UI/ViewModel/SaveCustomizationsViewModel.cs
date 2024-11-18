@@ -52,12 +52,10 @@ namespace PalCalc.UI.ViewModel
     // (Auto-saves any changes with debounce. There should only ever be one instance for each save file)
     public partial class SaveCustomizationsViewModel : IDisposable
     {
-        private SaveGameViewModel save;
         private Debouncer saveAction;
 
         public SaveCustomizationsViewModel(SaveGameViewModel save)
         {
-            this.save = save;
             var data = Storage.LoadSaveCustomizations(save.Value, PalDB.LoadEmbedded());
 
             CustomContainers = new ObservableCollection<CustomContainerViewModel>(data.CustomContainers.Select(c => new CustomContainerViewModel(c)));
