@@ -10,6 +10,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * To get the latest usmap file:
+ * 
+ * 1. Download the latest UE4SS dev build: https://github.com/UE4SS-RE/RE-UE4SS/releases
+ *       "zDEV-UE4SS...zip"
+ * 
+ * 2. Go to Palworld install dir, copy contents directly next to Palworld-Win64-Shipping.exe
+ * 
+ * 3. Run the game, secondary windows pop up in background, one of them will be "UE4SS Debugging Tools"
+ * 
+ * 4. Go to "Dumpers" tab, click "Generate .usmap file..."
+ * 
+ * 5. Copy "Mappings.usmap" file created next to "Palworld-Win64-Shipping.exe"
+ * 
+ * (Delete / rename "dwmapi.dll" to effectively disable)
+ */
+
 namespace PalCalc.GenDB
 {
     static class BuildDBProgram2
