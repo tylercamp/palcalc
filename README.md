@@ -4,9 +4,13 @@
 
 _v1.8.0 screenshot_
 
+---
+
 **[Click here to get the latest version.](https://github.com/tylercamp/palcalc/releases/latest)** (Expand "Assets" at the bottom, download `PalCalc.UI.exe`, place in its own folder and run.)
 
 **The Pal Calc wiki can be found [here.](https://github.com/tylercamp/palcalc/wiki)**
+
+---
 
 Pal Calc is a Windows program for calculating the optimal steps to breed a specific pal with a specific set of passive skills:
 
