@@ -2,9 +2,9 @@
 
 ![Pal Calc Screenshot](./docres/palcalc-screenshot.jpg)
 
-_v1.4.3 screenshot_
+_v1.8.0 screenshot_
 
-**Fixed for Sakurajima update with latest pals and passive skills!**
+**[Click here to get the latest version.](https://github.com/tylercamp/palcalc/releases/latest)** (Expand "Assets" at the bottom, download `PalCalc.UI.exe`, place in its own folder and run.)
 
 Pal Calc is a Windows program for calculating the optimal steps to breed a specific pal with a specific set of passive skills:
 
@@ -32,6 +32,7 @@ Pal Calc is a Windows program for calculating the optimal steps to breed a speci
   - Lists all pal containers (palbox, viewing cages, etc.)
   - Inspect pals to see IVs and passives
   - Search for specific pals and/or pals with specific passives
+  - Manually add pals in custom containers for use in breeding calculations (does _not_ affect Palworld save data)
 - Multiple languages
   - Supports all languages in Palworld, pal and passives names imported from game files
   - Translations for in-app text [can be added](./PalCalc.UI/Localization/README.md)
