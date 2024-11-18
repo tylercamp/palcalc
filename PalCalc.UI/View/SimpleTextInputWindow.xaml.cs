@@ -23,8 +23,12 @@ namespace PalCalc.UI.View
     [ObservableObject]
     public partial class SimpleTextInputWindow : Window
     {
-        public SimpleTextInputWindow()
+        public SimpleTextInputWindow() : this("") { }
+
+        public SimpleTextInputWindow(string defaultValue)
         {
+            InitializeComponent();
+
             SaveCommand = new RelayCommand(
                 execute: () =>
                 {
@@ -46,9 +50,12 @@ namespace PalCalc.UI.View
                 }
             );
 
-            InitializeComponent();
+            Result = defaultValue;
 
             m_TextBox.Focus();
+
+            if (defaultValue.Length > 0)
+                m_TextBox.SelectAll();
         }
 
         public delegate bool ValidatorCallback(string value);

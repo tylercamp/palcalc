@@ -50,17 +50,15 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
                     designerInstance = new DefaultContainerGridViewModel(c.ToList())
                     {
                         Title = new HardCodedText("Tab 1"),
-                        PerRow = 5
+                        RowSize = 5
                     };
-                    // (don't ever actually do this, just for testing)
-                    designerInstance.Slots.Add(new ContainerGridNewPalSlotViewModel());
                 }
                 return designerInstance;
             }
         }
 
         [ObservableProperty]
-        private int perRow = 5;
+        private int rowSize = 5;
 
         public List<PalInstance> Contents => contents;
 
@@ -81,7 +79,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
         public Visibility GridVisibility => Title == null || Slots.Any(s => s is ContainerGridPalSlotViewModel { Matches: true }) ? Visibility.Visible : Visibility.Collapsed;
 
         public ILocalizedText Title { get; set; }
-        public Visibility TitleVisibility => Title == null ? Visibility.Collapsed : Visibility.Visible;
 
         public IRelayCommand<IContainerGridSlotViewModel> DeleteSlotCommand => null;
 

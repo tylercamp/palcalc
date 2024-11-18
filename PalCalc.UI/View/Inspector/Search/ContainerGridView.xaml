@@ -8,12 +8,16 @@
              xmlns:sgvm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search.Grid"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              mc:Ignorable="d" 
              d:DataContext="{x:Static sgvm:DefaultContainerGridViewModel.DesignerInstance}"
              Visibility="{Binding GridVisibility}"
              d:Background="White">
+    <UserControl.Resources>
+        <c:ValueVisibilityConverter x:Key="VVC" />
+    </UserControl.Resources>
     <StackPanel>
-        <Label Content="{Binding Title.Value}" Visibility="{Binding TitleVisibility}" FontWeight="Bold" />
+        <Label Content="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}, FallbackValue=Collapsed}" FontWeight="Bold" />
         <ListView ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}" SelectionMode="Single">
 
             <ListView.Template>
@@ -30,7 +34,7 @@
 
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Columns="{Binding PerRow}" />
+                    <UniformGrid Columns="{Binding RowSize}" />
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
             <ListView.InputBindings>

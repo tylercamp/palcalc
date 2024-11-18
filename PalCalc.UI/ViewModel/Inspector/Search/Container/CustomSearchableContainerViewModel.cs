@@ -48,7 +48,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
             {
                 if (grids == null)
                 {
-                    grids = [new CustomContainerGridViewModel(container) { PerRow = PerRow }];
+                    grids = [new CustomContainerGridViewModel(container) { RowSize = RowSize }];
 
                     foreach (var grid in grids)
                     {
@@ -58,10 +58,5 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
                 return grids;
             }
         }
-
-        public override bool HasPages => false;
-
-        // (note: not actually being used atm)
-        public override int RowsPerPage { get; } = 5;
     }
 }

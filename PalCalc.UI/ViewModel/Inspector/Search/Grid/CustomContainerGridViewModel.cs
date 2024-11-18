@@ -62,51 +62,13 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
             container.Contents.CollectionChanged += Contents_CollectionChanged;
 
             DeleteSlotCommand = new RelayCommand<IContainerGridSlotViewModel>(
-                execute: item =>
-                {
-                    if (item is ContainerGridCustomPalSlotViewModel slot)
-                    {
-                        container.Contents.Remove(slot.PalInstance);
-                    }
-                },
+                execute: item => container.Contents.Remove((item as ContainerGridCustomPalSlotViewModel)?.PalInstance),
                 canExecute: item => item is ContainerGridCustomPalSlotViewModel
             );
         }
 
-        private void Contents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    if (e.NewItems.Count != 1) throw new NotImplementedException();
-
-                    var newItem = (CustomPalInstanceViewModel)e.NewItems[0];
-                    var newSlot = new ContainerGridCustomPalSlotViewModel(newItem);
-                    Slots.Insert(e.NewStartingIndex, newSlot);
-
-                    if (SelectedSlot is ContainerGridNewPalSlotViewModel)
-                    {
-                        SelectedSlot = newSlot;
-                    }
-                    break;
-
-                case NotifyCollectionChangedAction.Remove:
-                    if (e.OldItems.Count != 1) throw new NotImplementedException();
-
-                    var removedItem = e.OldItems[0];
-                    if ((Slots[e.OldStartingIndex] as ContainerGridCustomPalSlotViewModel).PalInstance != removedItem)
-                        throw new NotImplementedException();
-
-                    Slots.RemoveAt(e.OldStartingIndex);
-                    break;
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
         [ObservableProperty]
-        private int perRow; 
+        private int rowSize;
 
         public ISearchCriteria SearchCriteria
         {
@@ -124,23 +86,14 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 
         public ILocalizedText Title => null;
 
-        public Visibility TitleVisibility => Visibility.Collapsed;
-
         private IContainerGridSlotViewModel selectedSlot;
         public IContainerGridSlotViewModel SelectedSlot
         {
             get => selectedSlot;
             set
             {
-                if (SetProperty(ref selectedSlot, value))
-                {
-                    if (value is ContainerGridNewPalSlotViewModel)
-                    {
-                        container.Contents.Add(
-                            new CustomPalInstanceViewModel(container)
-                        );
-                    }
-                }
+                if (SetProperty(ref selectedSlot, value) && value is ContainerGridNewPalSlotViewModel)
+                    container.Contents.Add(new CustomPalInstanceViewModel(container));
             }
         }
 
@@ -149,5 +102,34 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
         public ObservableCollection<IContainerGridSlotViewModel> Slots { get; }
 
         public IRelayCommand<IContainerGridSlotViewModel> DeleteSlotCommand { get; }
+
+        private void Contents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if (e.NewItems.Count != 1) throw new NotImplementedException();
+
+                    var newSlot = new ContainerGridCustomPalSlotViewModel(
+                        (CustomPalInstanceViewModel)e.NewItems[0]
+                    );
+
+                    Slots.Insert(e.NewStartingIndex, newSlot);
+
+                    if (SelectedSlot is ContainerGridNewPalSlotViewModel)
+                        SelectedSlot = newSlot;
+
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    if (e.OldItems.Count != 1) throw new NotImplementedException();
+
+                    Slots.RemoveAt(e.OldStartingIndex);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
     }
 }

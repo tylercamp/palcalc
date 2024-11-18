@@ -34,19 +34,18 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
 
     public interface IContainerGridViewModel : INotifyPropertyChanged
     {
-        public int PerRow { get; }
+        public int RowSize { get; }
 
         public ISearchCriteria SearchCriteria { set; }
 
         public Visibility GridVisibility { get; }
 
         public ILocalizedText Title { get; }
-        public Visibility TitleVisibility { get; }
+
+        public ObservableCollection<IContainerGridSlotViewModel> Slots { get; }
 
         public IContainerGridSlotViewModel SelectedSlot { get; set; }
 
         public IRelayCommand<IContainerGridSlotViewModel> DeleteSlotCommand { get; }
-
-        public ObservableCollection<IContainerGridSlotViewModel> Slots { get; }
     }
 }

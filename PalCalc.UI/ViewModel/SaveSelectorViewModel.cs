@@ -258,10 +258,7 @@ namespace PalCalc.UI.ViewModel
             );
 
             DeleteSaveCommand = new RelayCommand(
-                () =>
-                {
-                    CustomSaveDelete?.Invoke(manualLocation, SelectedFullGame.Value);
-                }
+                () => CustomSaveDelete?.Invoke(manualLocation, SelectedFullGame.Value)
             );
         }
 

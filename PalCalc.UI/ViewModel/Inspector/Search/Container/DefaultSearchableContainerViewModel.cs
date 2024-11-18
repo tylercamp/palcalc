@@ -23,10 +23,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
                 .Select(i => contents.SingleOrDefault(p => p.Location.Index == i))
                 .ToList();
 
-        override public bool HasPages { get; } = detectedType == LocationType.Palbox;
-
-        override public int RowsPerPage { get; } = 5;
-
         private List<IContainerGridViewModel> grids = null;
         public override List<IContainerGridViewModel> Grids
         {
@@ -34,18 +30,19 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
             {
                 if (grids == null)
                 {
-                    if (!HasPages)
+                    if (DetectedType != LocationType.Palbox)
                     {
-                        grids = [new DefaultContainerGridViewModel(SlotContents) { PerRow = PerRow }];
+                        grids = [new DefaultContainerGridViewModel(SlotContents) { RowSize = RowSize }];
                     }
                     else
                     {
+                        const int rowsPerPage = 5;
                         grids = SlotContents
-                            .Batched(PerRow * RowsPerPage).ToList()
+                            .Batched(RowSize * rowsPerPage).ToList()
                             .ZipWithIndex()
                             .Select(pair => new DefaultContainerGridViewModel(pair.Item1.ToList()) {
                                 Title = LocalizationCodes.LC_LOC_PALBOX_TAB.Bind(pair.Item2 + 1),
-                                PerRow = PerRow
+                                RowSize = RowSize
                             })
                             .Cast<IContainerGridViewModel>()
                             .ToList();

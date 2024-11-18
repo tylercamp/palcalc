@@ -51,8 +51,9 @@ namespace PalCalc.UI.ViewModel.Inspector
                     Title = LocalizationCodes.LC_CUSTOM_CONTAINER_NEW_TITLE.Bind().Value,
                     InputLabel = LocalizationCodes.LC_CUSTOM_CONTAINER_NEW_FIELD.Bind().Value,
                     Validator = label => IsValidCustomLabel(sgvm, label),
+                    Owner = App.ActiveWindow,
                 };
-                nameModal.Owner = App.ActiveWindow;
+
                 if (nameModal.ShowDialog() == true)
                 {
                     var container = new CustomContainer() { Label = nameModal.Result };
@@ -66,12 +67,11 @@ namespace PalCalc.UI.ViewModel.Inspector
                     var customContainer = container as CustomSearchableContainerViewModel;
                     if (customContainer == null) return;
 
-                    var nameModal = new SimpleTextInputWindow()
+                    var nameModal = new SimpleTextInputWindow(customContainer.Label)
                     {
                         Title = LocalizationCodes.LC_CUSTOM_CONTAINER_RENAME_TITLE.Bind().Value,
                         InputLabel = LocalizationCodes.LC_CUSTOM_CONTAINER_RENAME_FIELD.Bind().Value,
                         Validator = label => IsValidCustomLabel(sgvm, label),
-                        Result = customContainer.Label,
                         Owner = App.ActiveWindow,
                     };
 

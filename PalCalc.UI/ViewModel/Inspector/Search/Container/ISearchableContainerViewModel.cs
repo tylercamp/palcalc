@@ -16,7 +16,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
         public abstract string Id { get; }
         public abstract LocationType DetectedType { get; }
 
-        public int PerRow => DetectedType switch
+        public int RowSize => DetectedType switch
         {
             LocationType.PlayerParty => 5,
             LocationType.Palbox => 6,
@@ -24,9 +24,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
             LocationType.Custom => 8,
             _ => throw new NotImplementedException()
         };
-
-        public abstract bool HasPages { get; }
-        public abstract int RowsPerPage { get; }
 
         public abstract List<IContainerGridViewModel> Grids { get; }
 
