@@ -619,6 +619,9 @@
   <data name="LC_ADD_FAKE_SAVE" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
   <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve">
     <value />
   </data>

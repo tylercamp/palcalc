@@ -198,6 +198,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_CUSTOM_CONTAINERS_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_CUSTOM_SAVE_GAME_NAME,
         /// <summary>
         ///   Looks up a localized string similar to .

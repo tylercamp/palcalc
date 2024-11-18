@@ -202,6 +202,9 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_CUSTOM_CONTAINERS" xml:space="preserve">
     <value>Custom Containers</value>
   </data>
+  <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve">
+    <value>Changes will be saved in Pal Calc automatically. Custom containers do not affect Palworld save files.</value>
+  </data>
   <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve">
     <value>Add new...</value>
   </data>

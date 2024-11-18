@@ -235,7 +235,10 @@
                                             <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
                                         </DataTemplate>
                                         <DataTemplate DataType="{x:Type sgvm:CustomContainerGridViewModel}">
-                                            <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
+                                            <StackPanel>
+                                                <TextBlock HorizontalAlignment="Center" FontStyle="Italic" Text="{itl:LocalizedText LC_CUSTOM_CONTAINERS_DESCRIPTION}" />
+                                                <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
+                                            </StackPanel>
                                         </DataTemplate>
                                     </ContentControl.Resources>
                                 </ContentControl>
