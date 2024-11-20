@@ -23,7 +23,7 @@ namespace PalCalc.GenDB.GameDataReaders
         public int Rarity { get; set; }
 
         [FStructProperty]
-        public int Price { get; set; }
+        public float Price { get; set; }
 
         [FStructProperty("CombiRank")]
         public int BreedingPower { get; set; }
@@ -42,6 +42,14 @@ namespace PalCalc.GenDB.GameDataReaders
 
         [FStructProperty]
         public string PassiveSkill4 { get; set; }
+
+        public List<string> GuaranteedPassives => new List<string>()
+        {
+            PassiveSkill1,
+            PassiveSkill2,
+            PassiveSkill3,
+            PassiveSkill4
+        }.Where(p => p != null && p.Length > 0 && p != "None").ToList();
 
         [FStructProperty]
         public bool IsBoss { get; set; }

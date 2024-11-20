@@ -85,7 +85,7 @@ namespace PalCalc.GenDB
                         IsVariant = rawPal.PalDexNumSuffix != null && rawPal.PalDexNumSuffix.Length > 0,
                     },
                     BreedingPower = rawPal.BreedingPower,
-                    Price = rawPal.Price,
+                    Price = (int)rawPal.Price,
                     InternalIndex = rawPal.InternalIndex,
                     InternalName = rawPal.InternalName,
                     Name = englishName,
@@ -93,13 +93,7 @@ namespace PalCalc.GenDB
                     MinWildLevel = minWildLevel,
                     MaxWildLevel = maxWildLevel,
 
-                    GuaranteedPassivesInternalIds = new List<string>()
-                    {
-                        rawPal.PassiveSkill1,
-                        rawPal.PassiveSkill2,
-                        rawPal.PassiveSkill3,
-                        rawPal.PassiveSkill4
-                    }.Where(n => n != null && n.Length > 0).ToList()
+                    GuaranteedPassivesInternalIds = rawPal.GuaranteedPassives,
                 };
             }).ToList();
 
@@ -228,7 +222,7 @@ namespace PalCalc.GenDB
 
             db.MinBreedingSteps = BreedingDistanceMap.CalcMinDistances(db);
 
-            File.WriteAllText("../PalCalc.Model/db2.json", db.ToJson());
+            File.WriteAllText("../PalCalc.Model/db.json", db.ToJson());
 
             int palIconSize = 100;
 

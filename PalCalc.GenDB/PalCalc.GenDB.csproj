@@ -4,12 +4,13 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <StartupObject>PalCalc.GenDB.BuildDBProgram</StartupObject>
+    <Nullable>disable</Nullable>
+    <StartupObject>PalCalc.GenDB.BuildDBProgram2</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CUE4Parse" Version="1.1.1" />
+    <PackageReference Include="CUE4Parse-Conversion" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
