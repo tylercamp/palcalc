@@ -42,7 +42,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.GenDB
 {
-    static class BuildDBProgram2
+    static class BuildDBProgram
     {
         // This is all HEAVILY dependent on having the right Mappings.usmap file for the Palworld version!
         static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld";
