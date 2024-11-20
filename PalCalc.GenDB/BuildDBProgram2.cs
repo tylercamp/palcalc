@@ -6,9 +6,12 @@ using CUE4Parse.UE4.Assets.Objects;
 using CUE4Parse.UE4.Objects.Core.i18N;
 using CUE4Parse.UE4.Objects.UObject;
 using CUE4Parse.UE4.Versions;
+using CUE4Parse_Conversion;
+using CUE4Parse_Conversion.Textures;
 using PalCalc.GenDB.GameDataReaders;
 using PalCalc.Model;
 using Serilog;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -226,6 +229,38 @@ namespace PalCalc.GenDB
             db.MinBreedingSteps = BreedingDistanceMap.CalcMinDistances(db);
 
             File.WriteAllText("../PalCalc.Model/db2.json", db.ToJson());
+
+            int palIconSize = 100;
+
+            foreach (var icon in palIcons)
+            {
+                string palName;
+
+                var internalName = icon.Key;
+                if (internalName == "Human")
+                {
+                    palName = internalName;
+                }
+                else
+                {
+                    var pal = pals.SingleOrDefault(p => p.InternalName.ToLower() == internalName.ToLower());
+                    if (pal == null)
+                    {
+                        Console.WriteLine("Unknown pal {0}, skipping icon", internalName);
+                        continue;
+                    }
+                    palName = pal.Name;
+                }
+
+                var img = icon.Value;
+
+                var rawData = img.Decode(ETexturePlatform.DesktopMobile);
+                var resized = rawData.Resize(new SKSizeI() { Width = palIconSize, Height = palIconSize }, SKFilterQuality.High);
+                var encoded = resized.Encode(SKEncodedImageFormat.Png, 10);
+
+                using (var o = new FileStream("../PalCalc.UI/Resources/Pals/" + palName + ".png", FileMode.Create))
+                    encoded.SaveTo(o);
+            }
         }
 
 
