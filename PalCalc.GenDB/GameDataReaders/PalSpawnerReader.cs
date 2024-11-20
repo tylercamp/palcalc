@@ -2,6 +2,7 @@
 using CUE4Parse.UE4.Assets.Exports.Engine;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,15 +71,21 @@ namespace PalCalc.GenDB.GameDataReaders
             var rawWildLevels = rawWildSpawnEntries.RowMap.SelectMany(entry => entry.Value.ToObject<UPalSpawner>().Entries());
             var rawCagedLevels = rawCagedSpawnEntries.RowMap.Select(entry => entry.Value.ToObject<UCagedPalSpawner>()).Select(e => (e.PalID, e.MinLevel, e.MaxLevel));
 
+            // this seems to cover *almost* every way a pal can be spawned, other than:
+            // - raids on player bases
+            // - raid bosses
+
             return rawWildLevels.Concat(rawCagedLevels)
                 .GroupBy(s => TrimPalId(s.Item1), StringComparer.InvariantCultureIgnoreCase)
                 .ToDictionary(
                     g => g.Key,
                     g => g.Aggregate(
-                        (int.MaxValue, int.MinValue),
+                        // (explicit cast to tuple to remove 'MaxValue', 'MinValue' anonymous fields, which were
+                        // confusing since they stored the opposite data you'd expect from the name)
+                        ((int, int))(int.MaxValue, int.MinValue),
                         (accum, e) => (
-                            Math.Min(accum.MinValue, e.Item2),
-                            Math.Max(accum.MaxValue, e.Item3)
+                            Math.Min(accum.Item1, e.Item2),
+                            Math.Max(accum.Item2, e.Item3)
                         )
                     )
                 );
