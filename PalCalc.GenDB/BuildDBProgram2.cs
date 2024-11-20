@@ -1,12 +1,22 @@
 ﻿using CUE4Parse.FileProvider;
 using CUE4Parse.MappingsProvider;
 using CUE4Parse.UE4.Assets.Exports.Engine;
+using CUE4Parse.UE4.Assets.Exports.Texture;
+using CUE4Parse.UE4.Assets.Objects;
+using CUE4Parse.UE4.Objects.Core.i18N;
+using CUE4Parse.UE4.Objects.UObject;
 using CUE4Parse.UE4.Versions;
+using PalCalc.GenDB.GameDataReaders;
 using PalCalc.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Dynamic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,46 +41,9 @@ namespace PalCalc.GenDB
 {
     static class BuildDBProgram2
     {
-        /*
-         * Shelved while working on translations
-         */
-
         // This is all HEAVILY dependent on having the right Mappings.usmap file for the Palworld version!
         static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld";
-        static string MappingsPath = @"C:\Users\algor\OneDrive\Desktop\Mappings.usmap";
-
-        /*
-         [INF] Successfully saved Pal/Content/L10N
-         [INF] Successfully saved Pal/Content/Pal/DataTable/Waza
-         [INF] Successfully saved Pal/Content/Pal/DataTable/PassiveSkill
-         [INF] Successfully saved Pal/Content/Pal/DataTable/Character
-         [INF] Successfully saved Pal/Content/Pal/Texture/PalIcon/Normal
-         */
-
-        const string PASSIVE_SKILLS_PATH = "Pal/Content/Pal/DataTable/PassiveSkill/DT_PassiveSkill_Main";
-        const string PALS_PATH = "Pal/Content/Pal/DataTable/Character/DT_PalMonsterParameter";
-
-        private static void FetchLocalizations(IFileProvider provider)
-        {
-            var L10N_BASE_PATH = "Pal/Content/L10N";
-            var l10nAssets = provider.Files.Where(kvp => kvp.Key.StartsWith(L10N_BASE_PATH, StringComparison.InvariantCultureIgnoreCase)).ToList();
-
-            var langs = l10nAssets.Select(kvp => kvp.Key.Substring(L10N_BASE_PATH.Length + 1).Split('/').First()).Distinct().ToList();
-        }
-
-        private static List<PassiveSkill> ReadPassiveSkills(IFileProvider provider)
-        {
-            var rawPassives = provider.LoadObject<UDataTable>(PASSIVE_SKILLS_PATH);
-
-            return null;
-        }
-
-        private static List<Pal> ReadPals(IFileProvider provider)
-        {
-            var rawPals = provider.LoadObject<UDataTable>(PALS_PATH);
-
-            return null;
-        }
+        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
 
         public static void Main(string[] args)
         {
@@ -82,22 +55,179 @@ namespace PalCalc.GenDB
             provider.Initialize();
             provider.Mount();
             provider.LoadVirtualPaths();
-
             provider.LoadLocalization();
 
-            FetchLocalizations(provider);
+            var localizations = LocalizationsReader.FetchLocalizations(provider);
+            var palNames = localizations.ToDictionary(l => l.LanguageCode, l => l.ReadPalNames(provider));
+            var skillNames = localizations.ToDictionary(l => l.LanguageCode, l => l.ReadSkillNames(provider));
 
-            ReadPassiveSkills(provider);
-            ReadPals(provider);
+            var rawPals = PalReader.ReadPals(provider);
+            var palIcons = PalIconMappingsReader.ReadPalIconMappings(provider);
+            var uniqueBreedingCombos = UniqueBreedComboReader.ReadUniqueBreedCombos(provider);
+            var wildPalLevels = PalSpawnerReader.ReadWildLevelRanges(provider);
 
-            var allFiles = provider.Files.ToList();
+            var pals = rawPals.Select(rawPal =>
+            {
+                var localizedNames = palNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetOneOf(rawPal.InternalName, rawPal.AlternativeInternalName));
+                var englishName = localizedNames["en"];
 
-            var palFiles = allFiles.Where(f => f.Key.StartsWith("Pal/Content", StringComparison.InvariantCultureIgnoreCase)).ToList();
+                var minWildLevel = wildPalLevels.ContainsKey(rawPal.InternalName) ? (int?)wildPalLevels[rawPal.InternalName].Item1 : null;
+                var maxWildLevel = wildPalLevels.ContainsKey(rawPal.InternalName) ? (int?)wildPalLevels[rawPal.InternalName].Item2 : null;
 
-            var traits = provider.LoadAllObjects("pal/content/pal/datatable/passiveskill/dt_passiveskill_main").First() as UDataTable;
+                return new Pal()
+                {
+                    Id = new PalId()
+                    {
+                        PalDexNo = rawPal.PalDexNum,
+                        IsVariant = rawPal.PalDexNumSuffix != null && rawPal.PalDexNumSuffix.Length > 0,
+                    },
+                    BreedingPower = rawPal.BreedingPower,
+                    Price = rawPal.Price,
+                    InternalIndex = rawPal.InternalIndex,
+                    InternalName = rawPal.InternalName,
+                    Name = englishName,
+                    LocalizedNames = localizedNames,
+                    MinWildLevel = minWildLevel,
+                    MaxWildLevel = maxWildLevel,
 
-            var palData = provider.LoadAllObjects("Pal/Content/Pal/DataTable/Character");
-            var icons = provider.LoadAllObjects("Pal/Content/Pal/Texture/PalIcon/Normal");
+                    GuaranteedPassivesInternalIds = new List<string>()
+                    {
+                        rawPal.PassiveSkill1,
+                        rawPal.PassiveSkill2,
+                        rawPal.PassiveSkill3,
+                        rawPal.PassiveSkill4
+                    }.Where(n => n != null && n.Length > 0).ToList()
+                };
+            }).ToList();
+
+            // (passives in game data may have "IsPal" or similar flags, which affect whether those passives can be
+            //  obtained randomly, but this flag isn't set for passives which are pal-specific, e.g. Legend.)
+            var extraPassives = pals.SelectMany(p => p.GuaranteedPassivesInternalIds).ToList();
+
+            var rawPassiveSkills = PassiveSkillsReader.ReadPassiveSkills(provider, extraPassives);
+            var passives = rawPassiveSkills.Select(rawPassive =>
+            {
+                var localizedNames = skillNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value[rawPassive.InternalName]);
+                var englishName = localizedNames["en"];
+
+                return new PassiveSkill(englishName, rawPassive.InternalName, rawPassive.Rank)
+                {
+                    LocalizedNames = localizedNames
+                };
+            }).ToList();
+
+            var breedingCalc = new PalBreedingCalculator(
+                pals,
+                uniqueBreedingCombos.Select(combo =>
+                {
+                    var parent1 = pals.SingleOrDefault(p => p.InternalName.Equals(combo.Item1.Item1, StringComparison.InvariantCultureIgnoreCase));
+                    var parent2 = pals.SingleOrDefault(p => p.InternalName.Equals(combo.Item2.Item1, StringComparison.InvariantCultureIgnoreCase));
+                    var child = pals.SingleOrDefault(p => p.InternalName.Equals(combo.Item3, StringComparison.InvariantCultureIgnoreCase));
+
+                    // (game data seems to have combos for unreleased pals; pal data scraper here skips pals with paldex no. -1)
+
+                    if (parent1 == null)
+                        Console.WriteLine("Unrecognized parent1 {0}", combo.Item1.Item1);
+                    if (parent2 == null)
+                        Console.WriteLine("Unrecognized parent2 {0}", combo.Item2.Item1);
+                    if (child == null)
+                        Console.WriteLine("Unrecognized child {0}", combo.Item3);
+
+                    if (parent1 == null || parent2 == null || child == null)
+                    {
+                        Console.WriteLine("Skipping");
+                        return null;
+                    }
+
+                    return new UniqueBreedingCombo()
+                    {
+                        Parent1 = parent1,
+                        Parent1Gender = combo.Item1.Item2,
+
+                        Parent2 = parent2,
+                        Parent2Gender = combo.Item2.Item2,
+
+                        Child = child
+                    };
+                }).SkipNull().ToList()
+            );
+
+            var db = PalDB.MakeEmptyUnsafe("v13");
+
+            Console.WriteLine("Calculating all possible pal children");
+            db.Breeding = pals
+                .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
+                .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))
+                .Distinct()
+                .SelectMany(pair => new[] {
+                    (
+                        new GenderedPal() { Pal = pair.Item1, Gender = PalGender.FEMALE },
+                        new GenderedPal() { Pal = pair.Item2, Gender = PalGender.MALE }
+                    ),
+                    (
+                        new GenderedPal() { Pal = pair.Item1, Gender = PalGender.MALE },
+                        new GenderedPal() { Pal = pair.Item2, Gender = PalGender.FEMALE }
+                    )
+                })
+                // get the results of breeding with swapped genders (for results where the child is determined by parent genders)
+                .Select(p => new BreedingResult
+                {
+                    Parent1 = p.Item1,
+                    Parent2 = p.Item2,
+                    Child = breedingCalc.Child(p.Item1, p.Item2)
+                })
+                // simplify cases where the child is the same regardless of gender
+                .GroupBy(br => br.Child)
+                .SelectMany(cg =>
+                    cg
+                        .GroupBy(br => (br.Parent1.Pal, br.Parent2.Pal))
+                        .SelectMany(g =>
+                        {
+                            var results = g.ToList();
+                            if (results.Count == 1) return results;
+
+                            return
+                            [
+                                new BreedingResult()
+                                {
+                                    Parent1 = new GenderedPal()
+                                    {
+                                        Pal = results.First().Parent1.Pal,
+                                        Gender = PalGender.WILDCARD
+                                    },
+                                    Parent2 = new GenderedPal()
+                                    {
+                                        Pal = results.First().Parent2.Pal,
+                                        Gender = PalGender.WILDCARD
+                                    },
+                                    Child = results.First().Child
+                                }
+                            ];
+                        })
+                )
+                .ToList();
+
+            Console.WriteLine("Done");
+
+            db.PalsById = pals.ToDictionary(p => p.Id);
+
+            db.PassiveSkills = passives;
+
+            var genderProbabilities = rawPals.ToDictionary(p => p.InternalName, p => new Dictionary<PalGender, float>()
+            {
+                { PalGender.MALE, p.MaleProbability / 100.0f },
+                { PalGender.FEMALE, 1 - (p.MaleProbability / 100.0f) }
+            });
+            db.BreedingGenderProbability = pals.ToDictionary(
+                p => p,
+                p => genderProbabilities[p.InternalName]
+            );
+
+            db.MinBreedingSteps = BreedingDistanceMap.CalcMinDistances(db);
+
+            File.WriteAllText("../PalCalc.Model/db2.json", db.ToJson());
         }
+
+
     }
 }

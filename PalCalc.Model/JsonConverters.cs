@@ -123,15 +123,15 @@ namespace PalCalc.Model
                 Breeding = breeding,
 
                 MinBreedingSteps = minBreedingSteps.ToDictionary(
-                    kvp => kvp.Key.ToPal(pals),
+                    kvp => kvp.Key.InternalToPal(pals),
                     kvp => kvp.Value.ToDictionary(
-                        ikvp => ikvp.Key.ToPal(pals),
+                        ikvp => ikvp.Key.InternalToPal(pals),
                         ikvp => ikvp.Value
                     )
                 ),
 
                 BreedingGenderProbability = breedingGenderProbability.ToDictionary(
-                    kvp => kvp.Key.ToPal(pals),
+                    kvp => kvp.Key.InternalToPal(pals),
                     kvp => kvp.Value
                 ),
             };
@@ -149,11 +149,11 @@ namespace PalCalc.Model
                 Pals = value.Pals,
                 Breeding = breedingToken,
                 PassiveSkills = value.PassiveSkills,
-                BreedingGenderProbability = value.BreedingGenderProbability.ToDictionary(kvp => kvp.Key.Name, kvp => kvp.Value),
+                BreedingGenderProbability = value.BreedingGenderProbability.ToDictionary(kvp => kvp.Key.InternalName, kvp => kvp.Value),
                 MinBreedingSteps = value.MinBreedingSteps.ToDictionary(
-                    kvp => kvp.Key.Name,
+                    kvp => kvp.Key.InternalName,
                     kvp => kvp.Value.ToDictionary(
-                        ikvp => ikvp.Key.Name,
+                        ikvp => ikvp.Key.InternalName,
                         ikvp => ikvp.Value
                     )
                 )
