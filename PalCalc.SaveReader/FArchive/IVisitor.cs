@@ -62,6 +62,9 @@ namespace PalCalc.SaveReader.FArchive
         public virtual void VisitQuaternion(string path, QuaternionLiteral value) { }
         public virtual void VisitLinearColor(string path, LinearColorLiteral value) { }
 
+        // (byte arrays are typically large enough that per-element events are very slow)
+        public virtual void VisitByteArray(string path, byte[] value) { }
+
         public virtual void VisitLiteralProperty(string path, LiteralProperty prop) { }
 
         public virtual IEnumerable<IVisitor> VisitEnumPropertyBegin(string path, EnumPropertyMeta meta) => Enumerable.Empty<IVisitor>();

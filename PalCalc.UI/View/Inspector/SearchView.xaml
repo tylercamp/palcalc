@@ -50,13 +50,20 @@
                         <HierarchicalDataTemplate DataType="{x:Type svm:CustomizationsTreeNodeViewModel}" ItemsSource="{Binding Children}">
                             <TextBlock Text="{Binding Label.Value}" />
                         </HierarchicalDataTemplate>
-                        <DataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}">
-                            <TextBlock Text="{Binding SearchedLabel.Value}" />
-                        </DataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding Label.Value}" />
+                        </HierarchicalDataTemplate>
+
                         <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
                             <TextBlock Text="{Binding SearchedLabel.Value}" />
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
+                            <TextBlock Text="{Binding SearchedLabel.Value}" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type svm:BaseAssignedPalsTreeNodeViewModel}">
+                            <TextBlock Text="{Binding SearchedLabel.Value}" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type svm:ViewingCageTreeNodeViewModel}">
                             <TextBlock Text="{Binding SearchedLabel.Value}" />
                         </DataTemplate>
                         

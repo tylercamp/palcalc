@@ -93,5 +93,26 @@ namespace PalCalc.Model
         }
     }
 
-    // TODO viewing cage coord
+    public class ViewingCageCoord
+    {
+        // all 1-indexed
+        public int Row { get; set; }
+        public int Column { get; set; }
+
+        public int X => Column;
+        public int Y => Row;
+
+        public override string ToString() => $"Slot ({X},{Y})";
+
+        public static PalboxCoord FromSlotIndex(int slotIndex)
+        {
+            var numCols = GameConstants.ViewingCage_GridWidth;
+
+            var row = (slotIndex - slotIndex % numCols) / numCols;
+            slotIndex -= row * numCols;
+            var col = slotIndex;
+
+            return new PalboxCoord() { Row = row + 1, Column = col + 1 };
+        }
+    }
 }

@@ -72,9 +72,25 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
     }
 
-    public class BaseTreeNodeViewModel(DefaultSearchableContainerViewModel baseContainer) :
-        IContainerSource(LocalizationCodes.LC_BASE_LABEL.Bind(baseContainer.Id.Split('-')[0]), baseContainer)
+    public class BaseAssignedPalsTreeNodeViewModel(DefaultSearchableContainerViewModel baseContainer) :
+        IContainerSource(new HardCodedText("Assigned Pals"), baseContainer)
     {
+    }
+
+    public class ViewingCageTreeNodeViewModel(DefaultSearchableContainerViewModel viewingCageContainer) :
+        IContainerSource(new HardCodedText($"Viewing Cage ({viewingCageContainer.Id.Split('-')[0]})"), viewingCageContainer)
+    {
+    }
+
+    public class BaseTreeNodeViewModel(DefaultSearchableContainerViewModel baseContainer, List<DefaultSearchableContainerViewModel> viewingCageContainers) : IOwnerTreeNode
+    {
+        public ILocalizedText Label { get; } = LocalizationCodes.LC_BASE_LABEL.Bind(baseContainer.Id.Split('-')[0]);
+
+        public List<IOwnerTreeNode> Children { get; } =
+        [
+            new BaseAssignedPalsTreeNodeViewModel(baseContainer),
+            .. viewingCageContainers.Select(c => new ViewingCageTreeNodeViewModel(c))
+        ];
     }
 
     public class PlayerTreeNodeViewModel(PlayerInstance player, DefaultSearchableContainerViewModel party, DefaultSearchableContainerViewModel palbox) : IOwnerTreeNode
@@ -108,11 +124,16 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 .Where(n => n.Children.Any())
                 .ToList();
 
-            // TODO - eventually add support for viewing cages
+
             var baseContainers = relevantContainers
                 .Where(c => c.DetectedType == LocationType.Base)
                 .OrderBy(c => c.Id)
-                .Select(c => new BaseTreeNodeViewModel(c))
+                .Select(c =>
+                {
+                    var b = source.Bases.Single(b => b.Container.Id == c.Id);
+                    var cageContainers = relevantContainers.Where(r => r.DetectedType == LocationType.ViewingCage && b.ViewingCages.Any(v => v.Id == r.Id)).ToList();
+                    return new BaseTreeNodeViewModel(c, cageContainers);
+                })
                 .ToList();
 
             Children = playerNodes.Cast<IOwnerTreeNode>().Concat(baseContainers.Cast<IOwnerTreeNode>()).ToList();

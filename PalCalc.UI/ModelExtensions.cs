@@ -19,6 +19,7 @@ namespace PalCalc.UI
                 LocationType.Palbox => LocalizationCodes.LC_PAL_LOC_PALBOX.Bind(),
                 LocationType.Base => LocalizationCodes.LC_PAL_LOC_BASE.Bind(),
                 LocationType.PlayerParty => LocalizationCodes.LC_PAL_LOC_PARTY.Bind(),
+                LocationType.ViewingCage => new HardCodedText("Viewing Cage"), // TODO
                 LocationType.Custom => LocalizationCodes.LC_PAL_LOC_CUSTOM.Bind(),
                 _ => throw new NotImplementedException()
             };

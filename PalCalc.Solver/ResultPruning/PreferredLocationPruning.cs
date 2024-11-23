@@ -19,9 +19,14 @@ namespace PalCalc.Solver.ResultPruning
         public static int LocationOrderingOf(LocationType type) => type switch
         {
             LocationType.Palbox => 0,
+
             LocationType.Base => 100,
+            LocationType.ViewingCage => 100,
+
             LocationType.PlayerParty => 10000,
+
             LocationType.Custom => 1000000,
+
             _ => throw new NotImplementedException()
         };
 
@@ -33,6 +38,7 @@ namespace PalCalc.Solver.ResultPruning
                     { LocationType.Palbox, 0 },
                     { LocationType.Base, 0 },
                     { LocationType.PlayerParty, 0 },
+                    { LocationType.ViewingCage, 0 },
                     { LocationType.Custom, 0 },
                 };
 
@@ -58,7 +64,9 @@ namespace PalCalc.Solver.ResultPruning
                 return
                     countsByLocationType[LocationType.Palbox] * LocationOrderingOf(LocationType.Palbox) +
                     countsByLocationType[LocationType.Base] * LocationOrderingOf(LocationType.Base) +
-                    countsByLocationType[LocationType.PlayerParty] * LocationOrderingOf(LocationType.PlayerParty)
+                    countsByLocationType[LocationType.PlayerParty] * LocationOrderingOf(LocationType.PlayerParty) +
+                    countsByLocationType[LocationType.ViewingCage] * LocationOrderingOf(LocationType.ViewingCage) +
+                    countsByLocationType[LocationType.Custom] * LocationOrderingOf(LocationType.Custom)
                 ;
             });
     }

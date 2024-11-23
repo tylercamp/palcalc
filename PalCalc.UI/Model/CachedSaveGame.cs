@@ -14,7 +14,7 @@ namespace PalCalc.UI.Model
 {
     public class CachedSaveGame
     {
-        private static readonly string SaveReaderVersion = "v8";
+        private static readonly string SaveReaderVersion = "v13";
 
         public CachedSaveGame(ISaveGame underlyingSave)
         {
@@ -37,14 +37,22 @@ namespace PalCalc.UI.Model
         public List<PlayerInstance> Players { get; set; }
         public List<GuildInstance> Guilds { get; set; }
         public List<PalInstance> OwnedPals { get; set; }
+        public List<BaseInstance> Bases { get; set; }
 
         private Dictionary<string, PlayerInstance> playersByName;
+        [JsonIgnore]
         public Dictionary<string, PlayerInstance> PlayersById =>
             playersByName ??= Players.ToDictionary(p => p.PlayerId);
 
         private Dictionary<string, GuildInstance> playerGuilds;
+        [JsonIgnore]
         public Dictionary<string, GuildInstance> GuildsByPlayerId =>
             playerGuilds ??= Players.ToDictionary(p => p.PlayerId, p => Guilds.FirstOrDefault(g => g.MemberIds.Contains(p.PlayerId)));
+
+        private Dictionary<string, List<BaseInstance>> basesByGuild;
+        [JsonIgnore]
+        public Dictionary<string, List<BaseInstance>> BasesByGuildId =>
+            basesByGuild ??= Guilds.Select(g => g.Id).Concat(Bases.Select(b => b.OwnerGuildId)).Distinct().ToDictionary(g => g, g => Bases.Where(b => b.OwnerGuildId == g).ToList());
 
         // NOTE: Any new fields should be added here
         public void CopyFrom(CachedSaveGame src)
@@ -62,9 +70,11 @@ namespace PalCalc.UI.Model
             Players = [.. src.Players];
             Guilds = [.. src.Guilds];
             OwnedPals = [.. src.OwnedPals];
+            Bases = [.. src.Bases];
 
             playersByName = null;
             playerGuilds = null;
+            basesByGuild = null;
         }
 
         [JsonIgnore]
@@ -124,6 +134,7 @@ namespace PalCalc.UI.Model
                     OwnedPals = charData.Pals,
                     Guilds = charData.Guilds,
                     Players = charData.Players,
+                    Bases = charData.Bases,
                     PlayerLevel = meta?.PlayerLevel,
                     PlayerName = meta?.PlayerName ?? "UNKNOWN",
                     WorldName = meta?.WorldName ?? "UNKNOWN WORLD",

@@ -53,10 +53,10 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             base.VisitString(path, value);
         }
 
-        public override void VisitByte(string path, byte value)
+        public override void VisitByteArray(string path, byte[] value)
         {
-            if (collectingContainerId) pendingContainerId.Add(value);
-            base.VisitByte(path, value);
+            if (collectingContainerId) pendingContainerId = value.ToList();
+            base.VisitByteArray(path, value);
         }
 
         public override void VisitArrayPropertyEnd(string path, ArrayPropertyMeta meta)

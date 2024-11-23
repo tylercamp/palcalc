@@ -55,7 +55,9 @@ namespace PalCalc.UI.ViewModel
                 {
                     LocationType.PlayerParty => p.OwnerPlayerId == ModelObject.PlayerId,
                     LocationType.Palbox => p.OwnerPlayerId == ModelObject.PlayerId,
+                    // TODO - should check for the owner of the base instead of the owner of the pal
                     LocationType.Base => source.GuildsByPlayerId[p.OwnerPlayerId].Id == guildId,
+                    LocationType.ViewingCage => source.GuildsByPlayerId[p.OwnerPlayerId].Id == guildId,
                     // (Pals in custom containers aren't expected to have an "owner")
                     LocationType.Custom => false,
                     _ => throw new NotImplementedException()

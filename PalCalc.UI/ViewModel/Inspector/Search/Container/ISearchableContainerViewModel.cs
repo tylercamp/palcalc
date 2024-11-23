@@ -22,6 +22,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
             LocationType.Palbox => 6,
             LocationType.Base => 5,
             LocationType.Custom => 8,
+            LocationType.ViewingCage => 6,
             _ => throw new NotImplementedException()
         };
 

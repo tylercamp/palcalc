@@ -532,17 +532,11 @@ namespace PalCalc.SaveReader.FArchive
                                 case "ByteProperty":
                                     if (count != size - 4) throw new Exception("Labelled ByteProperty not implemented"); // sic
 
-                                    content = iteration.Select(i =>
+                                    content = ReadBytes((int)count);
+                                    foreach (var v in newVisitors)
                                     {
-                                        var b = ReadByte();
-                                        foreach (var v in newVisitors)
-                                        {
-                                            v.VisitArrayEntryBegin(path, i, meta);
-                                            v.VisitByte(path, b);
-                                            v.VisitArrayEntryEnd(path, i, meta);
-                                        }
-                                        return b;
-                                    }).ToArray();
+                                        v.VisitByteArray(path, (byte[])content);
+                                    }
                                     break;
 
                                 default:

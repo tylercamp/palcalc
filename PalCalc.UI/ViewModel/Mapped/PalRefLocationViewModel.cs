@@ -70,7 +70,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
                     var ownerGuild = source?.GuildsByPlayerId?.GetValueOrDefault(ownedLoc.OwnerId);
 
-                    var isGuildOwner = ownedLoc.Location.Type == LocationType.Base && ownerGuild?.MemberIds?.Count > 1;
+                    var isGuildOwner = (ownedLoc.Location.Type == LocationType.Base || ownedLoc.Location.Type == LocationType.ViewingCage) && ownerGuild?.MemberIds?.Count > 1;
 
                     if (isGuildOwner)
                     {
@@ -115,6 +115,12 @@ namespace PalCalc.UI.ViewModel.Mapped
                             Y = pboxCoord.Y,
                         }
                     );
+                    break;
+
+                case LocationType.ViewingCage:
+                    var cageCoord = ViewingCageCoord.FromSlotIndex(ownedLoc.Location.Index);
+                    // TODO
+                    LocationCoordDescription = new HardCodedText($"Viewing cage at ({cageCoord.X},{cageCoord.Y})");
                     break;
 
                 case LocationType.Custom:
