@@ -43,7 +43,7 @@ namespace PalCalc.UI.View
 
         private void SaveGameFolder_Click(object sender, RoutedEventArgs e)
         {
-            var saveGame = ViewModel?.SelectedGame?.Value;
+            var saveGame = ViewModel?.SelectedFullGame?.Value;
             if (saveGame == null) return;
 
             var fullPath = System.IO.Path.GetFullPath(saveGame.BasePath);

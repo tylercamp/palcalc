@@ -29,11 +29,12 @@ internal class Program
             pruningBuilder: PruningRulesBuilder.Default,
             ownedPals: savedInstances,
             maxBreedingSteps: 20,
+            maxSolverIterations: 20,
             maxWildPals: 1,
             allowedWildPals: db.Pals.ToList(),
             bannedBredPals: new List<Pal>(),
-            maxBredIrrelevantTraits: 0,
-            maxInputIrrelevantTraits: 2,
+            maxBredIrrelevantPassives: 0,
+            maxInputIrrelevantPassives: 2,
             maxEffort: TimeSpan.FromDays(7),
             maxThreads: 0
         );
@@ -41,7 +42,7 @@ internal class Program
         var targetInstance = new PalSpecifier
         {
             Pal = "Ragnahawk".ToPal(db),
-            RequiredTraits = new List<Trait> { "Swift".ToTrait(db), "Runner".ToTrait(db), "Nimble".ToTrait(db) },
+            RequiredPassives = new List<PassiveSkill> { "Swift".ToPassive(db), "Runner".ToPassive(db), "Nimble".ToPassive(db) },
         };
 
         var matches = solver.SolveFor(targetInstance, CancellationToken.None);

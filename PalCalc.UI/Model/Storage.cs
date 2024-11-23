@@ -16,6 +16,8 @@ namespace PalCalc.UI.Model
     {
         private static ILogger logger = Log.ForContext(typeof(Storage));
 
+        public static event Action<ISaveGame> SaveReloaded;
+
         public static string CachePath => "cache";
         public static string SaveCachePath => $"{CachePath}/saves";
         public static string DataPath => "data";
@@ -50,6 +52,12 @@ namespace PalCalc.UI.Model
         {
             Init();
             return SaveFileDataPath(forSaveFile) + "/game-settings.json";
+        }
+
+        public static string CustomContainerPath(ISaveGame forSaveFile)
+        {
+            Init();
+            return SaveFileDataPath(forSaveFile) + "/custom-containers.json";
         }
 
         private static bool didInit = false;
@@ -115,6 +123,43 @@ namespace PalCalc.UI.Model
             var dataPath = SaveFileDataPath(save);
             if (Directory.Exists(dataPath))
                 Directory.Delete(dataPath, true);
+        }
+
+        public static SaveCustomizations LoadSaveCustomizations(ISaveGame forSaveGame, PalDB db)
+        {
+            var filePath = CustomContainerPath(forSaveGame);
+            if (!File.Exists(filePath)) return new SaveCustomizations();
+
+#if HANDLE_ERRORS
+            try
+            {
+#endif
+                return JsonConvert.DeserializeObject<SaveCustomizations>(File.ReadAllText(filePath), new PalInstanceJsonConverter(db));
+#if HANDLE_ERRORS
+            }
+            catch (Exception re)
+            {
+                logger.Warning(re, "failed to load save customizations for {label}, clearing", CachedSaveGame.IdentifierFor(forSaveGame));
+                try
+                {
+                    File.Delete(filePath);
+                }
+                catch (Exception fe)
+                {
+                    logger.Warning(fe, "failed to delete customizations file");
+                }
+
+                return new SaveCustomizations();
+            }
+#endif
+        }
+
+        public static void SaveCustomizations(ISaveGame forSaveGame, SaveCustomizations custom, PalDB db)
+        {
+            File.WriteAllText(
+                CustomContainerPath(forSaveGame),
+                JsonConvert.SerializeObject(custom, new PalInstanceJsonConverter(db))
+            );
         }
 
         #region Cached Game Save Files
@@ -209,8 +254,71 @@ namespace PalCalc.UI.Model
                 }
 
                 // TODO - adding `null` entries will prevent re-adding a save at the same path until the app is restarted
+                if (InMemorySaves.ContainsKey(identifier))
+                    InMemorySaves.Remove(identifier);
+                
                 InMemorySaves.Add(identifier, res);
                 return res;
+            }
+        }
+
+        // Removes all data related to the save (in memory + on disk), but does _not_ remove
+        // any related entries within AppSettings
+        public static void RemoveSave(ISaveGame save)
+        {
+            InMemorySaves.Remove(CachedSaveGame.IdentifierFor(save));
+
+            CrashSupport.RemoveReferences(save);
+            ClearForSave(save);
+        }
+
+        public static void ReloadSave(ISaveGame save, PalDB db)
+        {
+            Init();
+
+            if (save == null) return;
+
+            CrashSupport.ReferencedSave(save);
+
+            var identifier = CachedSaveGame.IdentifierFor(save);
+            var originalCachedSave = InMemorySaves.GetValueOrDefault(identifier);
+
+            if (originalCachedSave != null)
+            {
+                CrashSupport.ReferencedCachedSave(originalCachedSave);
+                InMemorySaves.Remove(identifier);
+            }
+
+            var path = SaveCachePathFor(save);
+            var wasStored = File.Exists(path);
+            var backupPath = wasStored ? path + ".bak" : null;
+
+            if (wasStored)
+                File.Move(path, backupPath);
+
+            var newCachedSave = LoadSave(save, db);
+
+            if (newCachedSave == null)
+            {
+                if (wasStored)
+                {
+                    if (File.Exists(path)) File.Delete(path);
+
+                    File.Move(backupPath, path);
+                }
+
+                InMemorySaves[identifier] = originalCachedSave;
+            }
+            else
+            {
+                if (wasStored) File.Delete(backupPath);
+
+                if (originalCachedSave != null)
+                    originalCachedSave.CopyFrom(newCachedSave);
+
+                InMemorySaves[identifier] = originalCachedSave ?? newCachedSave;
+
+                SaveReloaded?.Invoke(save);
             }
         }
 

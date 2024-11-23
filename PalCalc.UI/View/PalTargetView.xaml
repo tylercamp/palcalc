@@ -11,14 +11,14 @@
             d:Background="White"
             mc:Ignorable="d" 
             d:DataContext="{d:DesignInstance vm:PalTargetViewModel, IsDesignTimeCreatable=True}"
-            d:DesignHeight="239.714" d:DesignWidth="441.714">
+            d:DesignHeight="239.714" d:DesignWidth="184.642">
     <StackPanel.Resources>
-        <DataTemplate x:Key="TraitTemplate" DataType="{x:Type mvm:TraitViewModel}">
+        <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
             <TextBlock Text="{Binding Name.Value}" />
         </DataTemplate>
     </StackPanel.Resources>
     <Label Content="{itl:LocalizedText LC_COMMON_PAL}" Margin="5,0,0,0" />
-    <dnkc:AutoCompleteComboBox ItemsSource="{Binding AvailablePals}" SelectedValue="{Binding CurrentPalSpecifier.TargetPal, Mode=TwoWay}" TextSearch.TextPath="Label.Value" Margin="6,0,6,0">
+    <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PalViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.TargetPal, Mode=TwoWay}" TextSearch.TextPath="Label.Value" Margin="6,0,6,0">
         <dnkc:AutoCompleteComboBox.ItemTemplate>
             <DataTemplate DataType="vm:PalViewModel">
                 <Label Content="{Binding Label.Value}" />
@@ -26,23 +26,30 @@
         </dnkc:AutoCompleteComboBox.ItemTemplate>
     </dnkc:AutoCompleteComboBox>
     <GroupBox Header="{itl:LocalizedText LC_COMMON_TRAITS}">
-        <TabControl>
-            <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_REQUIRED_TRAITS}">
-                <StackPanel>
-                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait1, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
-                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait2, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
-                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait3, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
-                    <dnkc:AutoCompleteComboBox ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.Trait4, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_OPTIONAL_TRAITS}">
-                <StackPanel>
-                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.OptionalTrait1, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
-                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.OptionalTrait2, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
-                    <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.OptionalTrait3, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
-                    <dnkc:AutoCompleteComboBox ItemsSource="{Binding AvailableTraits}" SelectedValue="{Binding CurrentPalSpecifier.OptionalTrait4, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource TraitTemplate}" />
-                </StackPanel>
-            </TabItem>
-        </TabControl>
+        <Grid>
+            <TabControl>
+                <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_REQUIRED_TRAITS}">
+                    <StackPanel>
+                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive1, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive2, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive3, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                        <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive4, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_OPTIONAL_TRAITS}">
+                    <StackPanel>
+                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive1, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive2, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive3, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                        <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive4, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+            <Button HorizontalAlignment="Right" VerticalAlignment="Top" Height="Auto" Content="{itl:LocalizedText Code=LC_TRAITS_PRESETS}" x:Name="PresetsButton" Command="{Binding OpenPresetsMenuCommand}" Margin="0,2,0,0">
+            </Button>
+            <Popup PlacementTarget="{Binding ElementName=PresetsButton}" x:Name="PresetsPopup" IsOpen="{Binding PresetsMenuIsOpen}" StaysOpen="False" MinWidth="200" MaxHeight="300">
+                <local:PassiveSkillsPresetCollectionView DataContext="{Binding Presets}" />
+            </Popup>
+        </Grid>
     </GroupBox>
 </StackPanel>

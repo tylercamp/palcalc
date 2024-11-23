@@ -19,7 +19,7 @@ Most of the `Visit*Begin` methods on an `IVisitor` allow you to return a list of
 
 Palworld data notes:
 
-- It's common for properties to be omitted if they're at their "default" value, e.g. pal level (1), in-game day number, (1), traits (empty list)
+- It's common for properties to be omitted if they're at their "default" value, e.g. pal level (1), in-game day number, (1), passive skills (empty list)
 
 ---
 

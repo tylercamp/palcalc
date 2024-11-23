@@ -18,7 +18,7 @@ namespace PalCalc.UI
     /// </summary>
     public partial class App : Application
     {
-        public static string Version => "v1.6.0";
+        public static string Version => "v1.8.0";
         public static string RepositoryUrl => "https://github.com/tylercamp/palcalc/";
 
         private static ILogger logger;
@@ -26,6 +26,8 @@ namespace PalCalc.UI
         public static string LogFolder = "log";
 
         public static List<ITranslationError> TranslationErrors { get; } = new List<ITranslationError>();
+
+        public static Window ActiveWindow => Current.Windows.Cast<Window>().FirstOrDefault(w => w.IsActive) ?? Current.MainWindow;
 
         protected override void OnStartup(StartupEventArgs e)
         {

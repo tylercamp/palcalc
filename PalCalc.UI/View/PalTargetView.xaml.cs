@@ -24,5 +24,16 @@ namespace PalCalc.UI.View
         {
             InitializeComponent();
         }
+
+        private void PresetsButton_Click(object sender, RoutedEventArgs e)
+        {
+            PresetsPopup.IsOpen = true;
+            PresetsPopup.Focus();
+        }
+
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            PresetsPopup.IsOpen = false;
+        }
     }
 }

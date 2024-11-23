@@ -31,11 +31,12 @@ namespace PalCalc.UI.ViewModel
                 pruningBuilder: PruningRulesBuilder.Default,
                 ownedPals: saveGame.OwnedPals,
                 maxBreedingSteps: 3,
+                maxSolverIterations: 5,
                 maxWildPals: 0,
                 allowedWildPals: PalDB.LoadEmbedded().Pals.ToList(),
                 bannedBredPals: new List<Pal>(),
-                maxInputIrrelevantTraits: 2,
-                maxBredIrrelevantTraits: 0,
+                maxInputIrrelevantPassives: 2,
+                maxBredIrrelevantPassives: 0,
                 maxEffort: TimeSpan.FromHours(8),
                 maxThreads: 0
             );
@@ -43,10 +44,10 @@ namespace PalCalc.UI.ViewModel
             var targetInstance = new PalSpecifier
             {
                 Pal = "Galeclaw".ToPal(db),
-                RequiredTraits = new List<Trait> {
-                    "Swift".ToTrait(db),
-                    "Runner".ToTrait(db),
-                    "Nimble".ToTrait(db)
+                RequiredPassives = new List<PassiveSkill> {
+                    "Swift".ToPassive(db),
+                    "Runner".ToPassive(db),
+                    "Nimble".ToPassive(db)
                 },
             };
 
@@ -68,12 +69,12 @@ namespace PalCalc.UI.ViewModel
             {
                 DisplayedResult = displayedResult;
                 Graph = BreedingGraph.FromPalReference(source, displayedResult);
-                EffectiveTraits = new TraitCollectionViewModel(DisplayedResult.EffectiveTraits.Select(TraitViewModel.Make));
+                EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
                 Label = LocalizationCodes.LC_RESULT_LABEL.Bind(
                     new
                     {
                         PalName = PalViewModel.Make(DisplayedResult.Pal).Label,
-                        TraitsList = EffectiveTraits.Description,
+                        TraitsList = EffectivePassives.Description,
                         TimeEstimate = TimeEstimate.TimeSpanMinutesStr(),
                     }
                 );
@@ -104,6 +105,7 @@ namespace PalCalc.UI.ViewModel
                         LocationType.Palbox => 0,
                         LocationType.Base => 1,
                         LocationType.PlayerParty => 2,
+                        LocationType.Custom => 3,
                         _ => throw new NotImplementedException()
                     })
                     .Select(g => LocalizationCodes.LC_PAL_LOC_COUNT.Bind(
@@ -130,7 +132,7 @@ namespace PalCalc.UI.ViewModel
 
         public IPalReference DisplayedResult { get; }
 
-        public TraitCollectionViewModel EffectiveTraits { get; }
+        public PassiveSkillCollectionViewModel EffectivePassives { get; }
 
         public TimeSpan TimeEstimate => DisplayedResult?.BreedingEffort ?? TimeSpan.Zero;
         public string TimeEstimateLabel => TimeEstimate.TimeSpanSecondsStr();

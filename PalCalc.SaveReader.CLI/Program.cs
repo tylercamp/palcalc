@@ -2,6 +2,7 @@
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.SaveReader.FArchive;
+using PalCalc.SaveReader.FArchive.Custom;
 using PalCalc.SaveReader.GVAS;
 using System.Diagnostics;
 using System.Net.Http.Headers;
@@ -13,6 +14,53 @@ var db = PalDB.LoadEmbedded();
 var saveFolders = new List<ISavesLocation>();
 saveFolders.AddRange(DirectSavesLocation.AllLocal);
 saveFolders.AddRange(XboxSavesLocation.FindAll());
+
+var save2 = new StandardSaveGame(@"C:\Users\algor\Desktop\Bad Loc");
+var level2 = save2.Level.ParseGvas(true);
+
+var charsGvas = level2.Collect(".worldSaveData.CharacterSaveParameterMap").Cast<MapProperty>().Single().Value;
+foreach (var c in charsGvas)
+{
+    var props = ((c.Value as Dictionary<string, object>)["RawData"] as CharacterDataProperty).Data["SaveParameter"] as StructProperty;
+    var slot = (props.Value as Dictionary<string, object>).GetValueOrDefault("SlotID") as StructProperty;
+
+    var containerIdProp = (slot?.Value as Dictionary<string, object>)?.GetValueOrDefault("ContainerId") as StructProperty;
+
+    var containerIdValueProp = (containerIdProp?.Value as Dictionary<string, object>)?.GetValueOrDefault("ID") as StructProperty;
+    var containerId = (containerIdValueProp?.Value?.ToString());
+
+
+}
+
+var containersGvas = level2.Collect(".worldSaveData.CharacterContainerSaveData").Cast<MapProperty>().Single().Value;
+
+foreach (var kvp in containersGvas)
+{
+    var keyProps = kvp.Key as Dictionary<string, object>;
+
+    var id = (keyProps["ID"] as StructProperty).Value;
+    var valueProps = kvp.Value as Dictionary<string, object>;
+
+    var refSlot = (valueProps["bReferenceSlot"] as LiteralProperty).Value;
+    var slots = (valueProps["Slots"] as ArrayProperty).Values<object>().Cast<Dictionary<string, object>>().ToList();
+
+    foreach (var slot in slots)
+    {
+        var iid = (slot["IndividualId"] as StructProperty).Value as Dictionary<string, object>;
+        var instanceId = (iid["InstanceId"] as StructProperty).Value;
+
+        var rawData = (slot["RawData"] as CharacterContainerDataProperty).TypedMeta;
+        var rawInstanceId = rawData.InstanceId;
+
+        if (instanceId?.ToString() == "c060ecd3-6ced-415f-94a8-30e9e0ee5ef0" || rawInstanceId?.ToString() == "c060ecd3-6ced-415f-94a8-30e9e0ee5ef0")
+            Debugger.Break();
+    }
+}
+
+var chars = save2.Level.ReadCharacterData(PalDB.LoadEmbedded(), save2.Players);
+var p = chars.Pals.Where(p => p.Pal.Name == "Jetragon" && p.PassiveSkills.Select(t => t.Name).Intersect(new string[] { "Legend", "Nimble", "Runner", "Swift" }).Count() == 4).Single();
+
+return;
 
 foreach (var gameFolder in saveFolders)
 {

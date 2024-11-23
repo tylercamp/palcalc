@@ -28,7 +28,7 @@ namespace PalCalc.SaveReader.SaveFile
         private const string K_PARTY_CONTAINER_ID = ".OtomoCharacterContainerId.ID";
         private const string K_PALBOX_CONTAINER_ID = ".PalStorageContainerId.ID";
 
-        public PlayerMeta ReadPlayerContent()
+        public virtual PlayerMeta ReadPlayerContent()
         {
             var dataVisitor = new ValueCollectingVisitor(".SaveData", K_PLAYER_UID, K_INSTANCE_ID, K_PARTY_CONTAINER_ID, K_PALBOX_CONTAINER_ID);
             ParseGvas(dataVisitor);

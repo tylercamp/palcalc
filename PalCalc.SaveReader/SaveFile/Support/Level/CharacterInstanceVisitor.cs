@@ -31,7 +31,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         public int? TalentMelee { get; set; }
         public int? TalentDefense { get; set; }
 
-        public List<string> Traits { get; set; }
+        public List<string> PassiveSkills { get; set; }
     }
 
     class CharacterInstanceVisitor : IVisitor
@@ -100,7 +100,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                 pendingInstance.IsPlayer = (bool)vals.GetValueOrElse(K_IS_PLAYER, false);
 
                 // level 1 (i.e. "default level") instances don't have a Level property
-                pendingInstance.Level = (int)vals.GetValueOrElse(K_LEVEL, 1);
+                pendingInstance.Level = Convert.ToInt32(vals.GetValueOrElse(K_LEVEL, 1));
 
                 if (pendingInstance.IsPlayer)
                 {
@@ -124,31 +124,31 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     pendingInstance.Gender = (string)vals.GetValueOrDefault(K_GENDER);
 
                     pendingInstance.ContainerId = (Guid)vals[K_CONTAINER_ID];
-                    pendingInstance.SlotIndex = (int)vals[K_CONTAINER_SLOT_INDEX];
+                    pendingInstance.SlotIndex = Convert.ToInt32(vals[K_CONTAINER_SLOT_INDEX]);
 
-                    pendingInstance.TalentHp = vals.ContainsKey(K_TALENT_HP) ? (int)vals[K_TALENT_HP] : null;
-                    pendingInstance.TalentMelee = vals.ContainsKey(K_TALENT_MELEE) ? (int)vals[K_TALENT_MELEE] : null;
-                    pendingInstance.TalentShot = vals.ContainsKey(K_TALENT_SHOT) ? (int)vals[K_TALENT_SHOT] : null;
-                    pendingInstance.TalentDefense = vals.ContainsKey(K_TALENT_DEFENSE) ? (int)vals[K_TALENT_DEFENSE] : null;
+                    pendingInstance.TalentHp = vals.ContainsKey(K_TALENT_HP) ? Convert.ToInt32(vals[K_TALENT_HP]) : null;
+                    pendingInstance.TalentMelee = vals.ContainsKey(K_TALENT_MELEE) ? Convert.ToInt32(vals[K_TALENT_MELEE]) : null;
+                    pendingInstance.TalentShot = vals.ContainsKey(K_TALENT_SHOT) ? Convert.ToInt32(vals[K_TALENT_SHOT]) : null;
+                    pendingInstance.TalentDefense = vals.ContainsKey(K_TALENT_DEFENSE) ? Convert.ToInt32(vals[K_TALENT_DEFENSE]) : null;
                 }
             };
 
             yield return collectingVisitor;
 
-            List<string> traits = new List<string>();
-            var traitsVisitor = new ValueEmittingVisitor(this, K_PASSIVE_SKILL_LIST);
-            traitsVisitor.OnValue += (_, v) =>
+            List<string> passives = new List<string>();
+            var passiveSkillVisitor = new ValueEmittingVisitor(this, K_PASSIVE_SKILL_LIST);
+            passiveSkillVisitor.OnValue += (_, v) =>
             {
-                logger.Verbose("Storing trait value {name}", v);
-                traits.Add(v.ToString());
+                logger.Verbose("Storing passive skill value {name}", v);
+                passives.Add(v.ToString());
             };
 
-            traitsVisitor.OnExit += () =>
+            passiveSkillVisitor.OnExit += () =>
             {
-                if (pendingInstance != null) pendingInstance.Traits = traits;
+                if (pendingInstance != null) pendingInstance.PassiveSkills = passives;
             };
 
-            yield return traitsVisitor;
+            yield return passiveSkillVisitor;
 
             List<Guid> oldOwnerIds = new List<Guid>();
             var oldOwnersVisitor = new ValueEmittingVisitor(this, K_OLD_OWNER_PLAYER_IDS);

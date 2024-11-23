@@ -76,5 +76,14 @@ namespace PalCalc.Model
         public static T MostCommonOrDefault<T>(this IEnumerable<T> e) => e.GroupBy(v => v).OrderByDescending(g => g.Key).Select(g => g.Key).FirstOrDefault();
 
         public static IEnumerable<(T, int)> ZipWithIndex<T>(this IEnumerable<T> e) => e.Zip(Enumerable.Range(0, e.Count()));
+
+        public static IEnumerable<T> Tap<T>(this IEnumerable<T> e, Action<T> action)
+        {
+            foreach (var r in e)
+            {
+                action(r);
+                yield return r;
+            }
+        }
     }
 }

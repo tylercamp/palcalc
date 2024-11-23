@@ -29,9 +29,9 @@
                                 util:GridViewSort.PropertyName="NumBreedingSteps"
                                 />
                 <GridViewColumn Header="{itl:LocalizedText LC_COMMON_TRAITS}"
-                                DisplayMemberBinding="{Binding EffectiveTraits.Description.Value}"
-                                Width="{Binding TraitsWidth}"
-                                util:GridViewSort.PropertyName="FinalTraits"
+                                DisplayMemberBinding="{Binding EffectivePassives.Description.Value}"
+                                Width="{Binding PassiveSkillsWidth}"
+                                util:GridViewSort.PropertyName="NumFinalPassives"
                                 />
                 <GridViewColumn Header="{itl:LocalizedText LC_RESULT_INPUT_LOCS}"
                                 DisplayMemberBinding="{Binding InputLocations.Value}"

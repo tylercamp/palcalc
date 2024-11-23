@@ -3,21 +3,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
+             xmlns:sv="clr-namespace:PalCalc.UI.View.Inspector.Search"
+             xmlns:iv="clr-namespace:PalCalc.UI.View.Inspector"
              xmlns:v="clr-namespace:PalCalc.UI.View"
+             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
              xmlns:ivm="clr-namespace:PalCalc.UI.ViewModel.Inspector"
              xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
+             xmlns:sgvm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search.Grid"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              mc:Ignorable="d" 
              d:DataContext="{x:Static ivm:SearchViewModel.DesignerInstance}"
              d:Background="White"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <Style TargetType="{x:Type TreeViewItem}">
-            <Setter Property="IsExpanded" Value="True" />
-        </Style>
+        <c:ValueVisibilityConverter x:Key="VVC" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -27,25 +29,60 @@
         </Grid.ColumnDefinitions>
 
         <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_PAL_CONTAINERS}" Grid.Column="0" Margin="5">
-            <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Label.Value}" />
-                    </HierarchicalDataTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type svm:PlayerTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Label.Value}" />
-                    </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel.Value}" />
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel.Value}" />
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
-                        <TextBlock Text="{Binding SearchedLabel.Value}" />
-                    </DataTemplate>
-                </TreeView.Resources>
-            </TreeView>
+            <DockPanel>
+                <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
+                    <TreeView.InputBindings>
+                        <KeyBinding Key="Delete" Command="{Binding DeleteContainerCommand}" CommandParameter="{Binding OwnerTree.SelectedSource.Container}" />
+                    </TreeView.InputBindings>
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem">
+                            <!-- Expand all items by default -->
+                            <Setter Property="IsExpanded" Value="True" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding Label.Value}" />
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type svm:PlayerTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding Label.Value}" />
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type svm:CustomizationsTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding Label.Value}" />
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}">
+                            <TextBlock Text="{Binding SearchedLabel.Value}" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
+                            <TextBlock Text="{Binding SearchedLabel.Value}" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
+                            <TextBlock Text="{Binding SearchedLabel.Value}" />
+                        </DataTemplate>
+                        
+                        <DataTemplate DataType="{x:Type svm:CustomContainerTreeNodeViewModel}">
+                            <TextBlock Text="{Binding SearchedLabel.Value}">
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Rename"
+                                                  Command="{Binding CustomContainer.RenameCommand}"
+                                                  CommandParameter="{Binding Container}"
+                                        />
+                                        <MenuItem Header="Delete"
+                                                  Command="{Binding CustomContainer.DeleteCommand}"
+                                                  CommandParameter="{Binding Container}"
+                                        />
+                                    </ContextMenu>
+                                </TextBlock.ContextMenu>
+                            </TextBlock>
+                        </DataTemplate>
+                        
+                        <DataTemplate DataType="{x:Type svm:NewCustomContainerTreeNodeViewModel}">
+                            <TextBlock FontStyle="Italic" Text="{Binding Label.Value}" />
+                        </DataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+            </DockPanel>
         </GroupBox>
 
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
@@ -67,7 +104,7 @@
 
                         <StackPanel Orientation="Vertical">
                             <Label Content="{itl:LocalizedText LC_COMMON_PAL}" />
-                            <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{Binding SearchSettings.PalOptions}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label.Value">
+                            <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{x:Static mvm:PalViewModel.All}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label.Value">
                                 <dnkc:AutoCompleteComboBox.ItemTemplate>
                                     <DataTemplate DataType="mvm:PalViewModel">
                                         <TextBlock Text="{Binding Label.Value}" />
@@ -90,22 +127,22 @@
                         <StackPanel Orientation="Vertical">
                             <StackPanel.Resources>
                                 <Style TargetType="dnkc:AutoCompleteComboBox">
-                                    <Setter Property="Margin" Value="0,0,10,0" />
+                                    <Setter Property="Margin" Value="0,0,10,5" />
                                     <Setter Property="Width" Value="150" />
                                 </Style>
                             </StackPanel.Resources>
                             <Label Content="{itl:LocalizedText LC_COMMON_TRAITS}" />
                             <WrapPanel Orientation="Horizontal">
                                 <WrapPanel.Resources>
-                                    <DataTemplate x:Key="TraitTemplate" DataType="{x:Type mvm:TraitViewModel}">
+                                    <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
                                         <TextBlock Text="{Binding Name.Value}" />
                                     </DataTemplate>
                                 </WrapPanel.Resources>
 
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait1}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait2}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait3}" ItemTemplate="{StaticResource TraitTemplate}" />
-                                <dnkc:AutoCompleteComboBox ItemsSource="{Binding SearchSettings.TraitOptions}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedTrait4}" ItemTemplate="{StaticResource TraitTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive1}" ItemTemplate="{StaticResource PassiveTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive2}" ItemTemplate="{StaticResource PassiveTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive3}" ItemTemplate="{StaticResource PassiveTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive4}" ItemTemplate="{StaticResource PassiveTemplate}" />
                             </WrapPanel>
                         </StackPanel>
 
@@ -144,66 +181,45 @@
                 </StackPanel>
             </GroupBox>
 
-            <!-- scrolling works when you hover over the background but not when hovering over the container contents
-                 and for the life of me I cannot figure out why -->
             <DockPanel Grid.Row="1">
-                <Grid DockPanel.Dock="Bottom" Visibility="{Binding SlotDetailsVisibility}" Background="#111">
-                    <Grid.Resources>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Foreground" Value="White" />
-                        </Style>
-                        <Style TargetType="Label">
-                            <Setter Property="Foreground" Value="White" />
-                        </Style>
-                    </Grid.Resources>
-                    
-                    <WrapPanel Margin="10" DataContext="{Binding OwnerTree.SelectedSource.Container.SelectedPalSlot}">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
-                            <Border Width="64" Height="64" CornerRadius="32" Background="{Binding Pal.IconBrush}" BorderBrush="White" BorderThickness="1" />
-                            <StackPanel Margin="10,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" />
-                                <TextBlock>
-                                    <Run Text="{itl:LocalizedText LC_COMMON_LEVEL}" />
-                                    <Run Text="{Binding PalInstance.ModelObject.Level}" />
-                                </TextBlock>
-                                <TextBlock Text="{Binding PalInstance.Gender.Value}" />
-                            </StackPanel>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Vertical" Margin="0,0,25,0">
-                            <StackPanel.Resources>
-                                <Style TargetType="Label">
-                                    <Setter Property="Padding" Value="1" />
-                                    <Setter Property="Foreground" Value="White" />
-                                </Style>
-                                <Style TargetType="StackPanel">
-                                    <Setter Property="Orientation" Value="Horizontal" />
-                                </Style>
-                            </StackPanel.Resources>
-
-                            <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{itl:LocalizedText LC_COMMON_IVS}" />
-
+                <ContentControl DockPanel.Dock="Bottom"
+                                DataContext="{Binding OwnerTree.SelectedSource.Container.SelectedPalSlot}"
+                                Content="{Binding}"
+                                Visibility="{Binding Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                                >
+                    <ContentControl.Resources>
+                        <DataTemplate DataType="{x:Type sgvm:ContainerGridCustomPalSlotViewModel}">
+                            <!-- note: putting the editor controls directly in this template causes a weird issue with AutoCompleteComboBox
+                                 which clears out the VM values when the control is hidden. this leads to the custom pal being reset whenever
+                                 you select a different container. -->
                             <StackPanel>
-                                <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_HP}" />
-                                <Label Content="{Binding PalInstance.ModelObject.IV_HP}" />
+                                <!-- (GridSplitter not actually doing anything, just want visual consistency with the other borders) -->
+                                <GridSplitter HorizontalAlignment="Stretch" Height="5" IsEnabled="False" />
+
+                                <WrapPanel Orientation="Horizontal" Margin="10,8,10,15">
+                                    <sv:CustomPalEditorView DataContext="{Binding PalInstance}" />
+
+                                    <Grid Margin="0,0,0,5">
+                                        <Button HorizontalAlignment="Left"
+                                                VerticalAlignment="Bottom"
+                                                Padding="5,2"
+                                                Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=iv:SearchView}, Path=ViewModel.DeleteSlotCommand}"
+                                                CommandParameter="{Binding}"
+                                        >
+                                            Delete
+                                        </Button>
+                                    </Grid>
+                                </WrapPanel>
+
                             </StackPanel>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type sgvm:ContainerGridPalSlotViewModel}">
+                            <sv:PalInfoView DataContext="{Binding}" />
+                        </DataTemplate>
+                    </ContentControl.Resources>
+                </ContentControl>
 
-                            <StackPanel>
-                                <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_ATTACK}" />
-                                <Label Content="{Binding PalInstance.ModelObject.IV_Shot}" />
-                            </StackPanel>
-
-                            <StackPanel>
-                                <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_DEFENSE}" />
-                                <Label Content="{Binding PalInstance.ModelObject.IV_Defense}" />
-                            </StackPanel>
-                        </StackPanel>
-
-                        <v:TraitCollectionView DataContext="{Binding PalInstance.Traits}" Background="#111" VerticalAlignment="Center" Width="250" Margin="0,0,25,0" />
-                    </WrapPanel>
-                </Grid>
-
-                <ScrollViewer Grid.Row="1">
+                <ScrollViewer>
                     <ItemsControl ItemsSource="{Binding OwnerTree.SelectedSource.Container.Grids}" HorizontalAlignment="Center">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -211,8 +227,21 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="{x:Type svm:ContainerGridViewModel}">
-                                <local:ContainerGridView DataContext="{Binding}" Margin="15" />
+                            <DataTemplate>
+                                <ContentControl Content="{Binding}">
+                                    <ContentControl.Resources>
+                                        <!-- (same template for either one) -->
+                                        <DataTemplate DataType="{x:Type sgvm:DefaultContainerGridViewModel}">
+                                            <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
+                                        </DataTemplate>
+                                        <DataTemplate DataType="{x:Type sgvm:CustomContainerGridViewModel}">
+                                            <StackPanel>
+                                                <TextBlock HorizontalAlignment="Center" FontStyle="Italic" Text="{itl:LocalizedText LC_CUSTOM_CONTAINERS_DESCRIPTION}" />
+                                                <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ContentControl.Resources>
+                                </ContentControl>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

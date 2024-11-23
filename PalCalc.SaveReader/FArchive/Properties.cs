@@ -54,6 +54,23 @@ namespace PalCalc.SaveReader.FArchive
         public void Traverse(Action<IProperty> action) { }
     }
 
+    public class BytePropertyMeta : IPropertyMeta
+    {
+        public string Path { get; set; }
+        public Guid? Id { get; set; } = null;
+    }
+
+    public class ByteProperty : IProperty
+    {
+        public IPropertyMeta Meta => TypedMeta;
+        public BytePropertyMeta TypedMeta { get; set; }
+
+        public string Text { get; set; }
+        public ushort Num { get; set; }
+
+        public void Traverse(Action<IProperty> action) { }
+    }
+
     public class EnumPropertyMeta : BasicPropertyMeta
     {
         public string EnumType { get; set; }

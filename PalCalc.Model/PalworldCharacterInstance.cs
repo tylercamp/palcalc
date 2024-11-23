@@ -20,6 +20,9 @@ namespace PalCalc.Model
         public string PlayerId { get; set; } // typically this is referenced instead of InstanceId
         public string Name { get; set; }
         public int Level { get; set; }
+
+        public string PartyContainerId { get; set; }
+        public string PalboxContainerId { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -44,7 +47,7 @@ namespace PalCalc.Model
         public Pal Pal { get; set; }
         public PalLocation Location { get; set; }
         public PalGender Gender { get; set; }
-        public List<Trait> Traits { get; set; }
+        public List<PassiveSkill> PassiveSkills { get; set; }
 
         public int IV_HP { get; set; }
         public int IV_Shot { get; set; }
@@ -54,7 +57,7 @@ namespace PalCalc.Model
         // https://www.reddit.com/r/Palworld/comments/1aedboa/partner_skill_upgrade_stats_exact_values_for_lv1/
         public int IV_Melee { get; set; }
 
-        public override string ToString() => $"{Gender} {Pal} at {Location} with traits ({string.Join(", ", Traits)})";
+        public override string ToString() => $"{Gender} {Pal} at {Location} with passive skills ({string.Join(", ", PassiveSkills)})";
 
         private int? hashCode;
         public override int GetHashCode()
@@ -72,7 +75,7 @@ namespace PalCalc.Model
                         Pal,
                         Location,
                         Gender,
-                        Traits.SetHash()
+                        PassiveSkills.SetHash()
                     ),
                     HashCode.Combine(
                         IV_HP,

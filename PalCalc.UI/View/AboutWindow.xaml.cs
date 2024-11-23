@@ -1,5 +1,7 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -15,7 +17,7 @@ using System.Windows.Shapes;
 
 namespace PalCalc.UI.View
 {
-    public class AboutViewModel
+    public partial class AboutViewModel : ObservableObject
     {
         public string Title => $"Pal Calc {App.Version}";
     }

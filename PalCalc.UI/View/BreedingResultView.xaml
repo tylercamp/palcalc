@@ -80,8 +80,8 @@
                         </ContentControl>
                     </StackPanel>
                 </StackPanel>
-                <Grid Visibility="{Binding TraitsVisibility}">
-                    <local:TraitCollectionView Margin="0,5,0,0" DataContext="{Binding TraitCollection}" Width="Auto" Background="Black" />
+                <Grid Visibility="{Binding PassiveSkillsVisibility}">
+                    <local:PassiveSkillCollectionView Margin="0,5,0,0" DataContext="{Binding PassiveSkillsCollection}" Width="Auto" Background="Black" />
                 </Grid>
             </StackPanel>
         </DataTemplate>

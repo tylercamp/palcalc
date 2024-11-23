@@ -21,6 +21,7 @@ namespace PalCalc.Solver.ResultPruning
             LocationType.Palbox => 0,
             LocationType.Base => 100,
             LocationType.PlayerParty => 10000,
+            LocationType.Custom => 1000000,
             _ => throw new NotImplementedException()
         };
 
@@ -32,6 +33,7 @@ namespace PalCalc.Solver.ResultPruning
                     { LocationType.Palbox, 0 },
                     { LocationType.Base, 0 },
                     { LocationType.PlayerParty, 0 },
+                    { LocationType.Custom, 0 },
                 };
 
                 foreach (var pref in r.AllReferences())

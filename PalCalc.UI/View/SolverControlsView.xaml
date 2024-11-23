@@ -10,75 +10,150 @@
            Orientation="Horizontal"
            d:DataContext="{d:DesignInstance vm:SolverControlsViewModel, IsDesignTimeCreatable=True}"
            d:Background="White"
-           d:DesignWidth="759.621">
+           d:DesignWidth="1000.621">
     <WrapPanel.Resources>
-        <Style TargetType="{x:Type Label}">
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
+        <GridLength x:Key="SepHeight">5</GridLength>
+        <GridLength x:Key="SepWidth">10</GridLength>
+
         <Style TargetType="{x:Type v:IntegerTextBox}">
-            <!--<Setter Property="Margin" Value="0,0,20,0"/>-->
             <Setter Property="Width" Value="20" />
             <Setter Property="Height" Value="20" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+        </Style>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Padding" Value="5,2,5,2" />
+        </Style>
+        <Style TargetType="{x:Type Grid}">
+            <Setter Property="Margin" Value="25,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Top" />
         </Style>
     </WrapPanel.Resources>
 
-    <StackPanel Margin="10,0" VerticalAlignment="Center">
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-            <TextBlock Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS}" Padding="0,4" Margin="0,0,10,0" />
-            <v:IntegerTextBox
-                    Value="{Binding MaxBreedingSteps}"
-                    IsEnabled="{Binding CanEditSettings}"
-                    MinValue="1" MaxValue="99"
-                    ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION}"
-                    ToolTipService.ShowOnDisabled="True"
-            />
-        </StackPanel>
-        <Button Command="{Binding ChangeBredPals}" Height="20" Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS}" />
-    </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="{StaticResource SepHeight}" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="{StaticResource SepWidth}" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
 
-    <StackPanel Margin="10,0" VerticalAlignment="Center">
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-            <TextBlock Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_WILD_PALS}" Padding="0,4" Margin="0,0,10,0" />
-            <v:IntegerTextBox
-                Value="{Binding MaxWildPals}"
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS}"/>
+        <v:IntegerTextBox
+            Grid.Row="0" Grid.Column="2"
+            Value="{Binding MaxBreedingSteps}"
+            IsEnabled="{Binding CanEditSettings}"
+            MinValue="1" MaxValue="99"
+            ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION}"
+            ToolTipService.ShowOnDisabled="True"
+        />
+
+        <Button Grid.Row="2"
+                Grid.ColumnSpan="99"
+                Command="{Binding ChangeBredPals}"
                 IsEnabled="{Binding CanEditSettings}"
-                MinValue="0" MaxValue="99"
-                ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION}"
-                ToolTipService.ShowOnDisabled="True"
+                Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS}"
+                />
+    </Grid>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="{StaticResource SepHeight}" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="{StaticResource SepWidth}" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_WILD_PALS}" />
+        <v:IntegerTextBox
+            Grid.Row="0" Grid.Column="2"
+            Value="{Binding MaxWildPals}"
+            IsEnabled="{Binding CanEditSettings}"
+            MinValue="0" MaxValue="99"
+            ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION}"
+            ToolTipService.ShowOnDisabled="True"
             />
-        </StackPanel>
 
-        <Button Command="{Binding ChangeWildPals}" Height="20" Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS}" />
-    </StackPanel>
-
-    <StackPanel Margin="10,0" VerticalAlignment="Center">
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS}" Padding="0,4" Width="150" Margin="0,0,0,3" />
-            <v:IntegerTextBox
-                Value="{Binding MaxInputIrrelevantTraits}"
+        <Button Grid.Row="2"
+                Grid.ColumnSpan="99"
+                Command="{Binding ChangeWildPals}"
+                Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS}"
                 IsEnabled="{Binding CanEditSettings}"
-                MinValue="0" MaxValue="4"
-                ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION}"
-                ToolTipService.ShowOnDisabled="True"
-            />
-        </StackPanel>
+                />
+    </Grid>
 
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS}" Padding="0,4" Width="150" />
-            <v:IntegerTextBox
-                Value="{Binding MaxBredIrrelevantTraits}"
-                IsEnabled="{Binding CanEditSettings}"
-                MinValue="0" MaxValue="4"
-                ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION}"
-                ToolTipService.ShowOnDisabled="True"
-            />
-        </StackPanel>
-    </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="{StaticResource SepHeight}" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="{StaticResource SepWidth}" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS}" />
+        <v:IntegerTextBox
+            Grid.Row="0" Grid.Column="2"
+            Value="{Binding MaxInputIrrelevantPassives}"
+            IsEnabled="{Binding CanEditSettings}"
+            MinValue="0" MaxValue="4"
+            ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION}"
+            ToolTipService.ShowOnDisabled="True"
+        />
 
-    <StackPanel Margin="10,0">
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Label Content="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_CPU}" />
-            <v:IntegerTextBox
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS}" />
+        <v:IntegerTextBox
+            Grid.Row="2" Grid.Column="2"
+            Value="{Binding MaxBredIrrelevantPassives}"
+            IsEnabled="{Binding CanEditSettings}"
+            MinValue="0" MaxValue="4"
+            ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION}"
+            ToolTipService.ShowOnDisabled="True"
+        />
+    </Grid>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="{StaticResource SepHeight}" />
+            <RowDefinition />
+            <RowDefinition Height="{StaticResource SepHeight}" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="{StaticResource SepWidth}" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS}" />
+        <v:IntegerTextBox
+            Grid.Row="0"
+            Grid.Column="2"
+            Value="{Binding MaxSolverIterations}"
+            IsEnabled="{Binding CanEditSettings}"
+            MinValue="1"
+            MaxValue="99"
+            ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION}"
+            ToolTipService.ShowOnDisabled="True"
+            />
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_CPU}" />
+        <v:IntegerTextBox
+            Grid.Row="2" Grid.Column="2"
             Value="{Binding MaxThreads}"
             IsEnabled="{Binding CanEditSettings}"
             MinValue="0"
@@ -86,17 +161,10 @@
             ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION}"
             ToolTipService.ShowOnDisabled="True"
             />
-        </StackPanel>
 
-        <StackPanel Orientation="Horizontal" Margin="5,3,0,3">
-            <StackPanel.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="Width" Value="50" />
-                </Style>
-            </StackPanel.Resources>
-
-            <Button Content="{itl:LocalizedText LC_SOLVER_RUN}" Height="20" Click="Run_Click" Margin="0,0,10,0" IsEnabled="{Binding CanRunSolver}" />
-            <Button Content="{itl:LocalizedText LC_COMMON_CANCEL}" Height="20" Click="Cancel_Click" IsEnabled="{Binding CanCancelSolver}" />
-        </StackPanel>
-    </StackPanel>
+        <DockPanel Grid.Row="4" Grid.ColumnSpan="99">
+            <Button DockPanel.Dock="Right" Content="{itl:LocalizedText LC_COMMON_CANCEL}" Click="Cancel_Click" IsEnabled="{Binding CanCancelSolver}" />
+            <Button Content="{itl:LocalizedText LC_SOLVER_RUN}" Click="Run_Click" HorizontalAlignment="Left" IsEnabled="{Binding CanRunSolver}" />
+        </DockPanel>
+    </Grid>
 </WrapPanel>

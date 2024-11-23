@@ -12,9 +12,9 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         bool Matches(PalInstance pal);
     }
 
-    public class TraitSearchCriteria(Trait trait) : ISearchCriteria
+    public class PassiveSkillSearchCriteria(PassiveSkill passive) : ISearchCriteria
     {
-        public bool Matches(PalInstance pal) => pal.Traits.Contains(trait);
+        public bool Matches(PalInstance pal) => pal.PassiveSkills.Contains(passive);
     }
 
     public class PalSearchCriteria(Pal palType) : ISearchCriteria

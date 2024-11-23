@@ -55,7 +55,7 @@
             <Hyperlink NavigateUri="https://paldb.cc" RequestNavigate="Hyperlink_RequestNavigate">Latest data scraped from paldb.cc</Hyperlink>
         </TextBlock>
         <TextBlock>
-            <Hyperlink NavigateUri="https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/" RequestNavigate="Hyperlink_RequestNavigate">Trait breeding calc. reverse engineered by /u/mgxts</Hyperlink>
+            <Hyperlink NavigateUri="https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/" RequestNavigate="Hyperlink_RequestNavigate">Passive skill breeding calc. reverse engineered by /u/mgxts</Hyperlink>
         </TextBlock>
         <TextBlock>
             <Hyperlink NavigateUri="https://github.com/cheahjs/palworld-save-tools" RequestNavigate="Hyperlink_RequestNavigate">Palworld save support based on palworld-save-tools</Hyperlink>

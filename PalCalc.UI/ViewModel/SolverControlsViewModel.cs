@@ -20,8 +20,8 @@ namespace PalCalc.UI.ViewModel
         {
             MaxBreedingSteps = 6;
             MaxWildPals = 1;
-            MaxInputIrrelevantTraits = 2;
-            MaxBredIrrelevantTraits = 1;
+            MaxInputIrrelevantPassives = 2;
+            MaxBredIrrelevantPassives = 1;
 
             ChangeBredPals = new RelayCommand(() =>
             {
@@ -56,7 +56,15 @@ namespace PalCalc.UI.ViewModel
         public int MaxBreedingSteps
         {
             get => maxBreedingSteps;
-            set => SetProperty(ref maxBreedingSteps, Math.Max(1, value));
+            set
+            {
+                if (SetProperty(ref maxBreedingSteps, Math.Max(1, value)))
+                {
+                    // try to keep "max solver iterations" capable of reaching the requested number of breeding steps
+                    if (MaxSolverIterations < MaxBreedingSteps)
+                        MaxSolverIterations = MaxBreedingSteps;
+                }
+            }
         }
 
         private int maxWildPals;
@@ -66,18 +74,18 @@ namespace PalCalc.UI.ViewModel
             set => SetProperty(ref maxWildPals, Math.Max(0, value));
         }
 
-        private int maxInputIrrelevantTraits;
-        public int MaxInputIrrelevantTraits
+        private int maxInputIrrelevantPassives;
+        public int MaxInputIrrelevantPassives
         {
-            get => maxInputIrrelevantTraits;
-            set => SetProperty(ref maxInputIrrelevantTraits, Math.Clamp(value, 0, 4));
+            get => maxInputIrrelevantPassives;
+            set => SetProperty(ref maxInputIrrelevantPassives, Math.Clamp(value, 0, 4));
         }
 
-        public int maxBredIrrelevantTraits;
-        public int MaxBredIrrelevantTraits
+        private int maxBredIrrelevantPassives;
+        public int MaxBredIrrelevantPassives
         {
-            get => maxBredIrrelevantTraits;
-            set => SetProperty(ref maxBredIrrelevantTraits, Math.Clamp(value, 0, 4));
+            get => maxBredIrrelevantPassives;
+            set => SetProperty(ref maxBredIrrelevantPassives, Math.Clamp(value, 0, 4));
         }
 
         public int NumCpus => Environment.ProcessorCount;
@@ -87,6 +95,13 @@ namespace PalCalc.UI.ViewModel
         {
             get => maxThreads;
             set => SetProperty(ref maxThreads, Math.Clamp(value, 0, NumCpus));
+        }
+
+        private int maxSolverIterations;
+        public int MaxSolverIterations
+        {
+            get => maxSolverIterations;
+            set => SetProperty(ref maxSolverIterations, Math.Clamp(value, 1, 99));
         }
 
         [ObservableProperty]
@@ -108,26 +123,28 @@ namespace PalCalc.UI.ViewModel
         private List<Pal> bannedWildPals = new List<Pal>();
 
         public BreedingSolver ConfiguredSolver(GameSettings gameSettings, List<PalInstance> pals) => new BreedingSolver(
-            gameSettings,
-            PalDB.LoadEmbedded(),
-            PruningRulesBuilder.Default,
-            pals,
-            MaxBreedingSteps,
-            MaxWildPals,
+            gameSettings: gameSettings,
+            db: PalDB.LoadEmbedded(),
+            pruningBuilder: PruningRulesBuilder.Default,
+            ownedPals: pals,
+            maxBreedingSteps: MaxBreedingSteps,
+            maxSolverIterations: MaxSolverIterations,
+            maxWildPals: MaxWildPals,
             allowedWildPals: PalDB.LoadEmbedded().Pals.Except(BannedWildPals).ToList(),
             bannedBredPals: BannedBredPals,
-            MaxInputIrrelevantTraits,
-            MaxBredIrrelevantTraits,
-            TimeSpan.MaxValue,
-            MaxThreads
+            maxInputIrrelevantPassives: MaxInputIrrelevantPassives,
+            maxBredIrrelevantPassives: MaxBredIrrelevantPassives,
+            maxEffort: TimeSpan.MaxValue,
+            maxThreads: MaxThreads
         );
 
         public SolverSettings AsModel => new SolverSettings()
         {
             MaxBreedingSteps = MaxBreedingSteps,
+            MaxSolverIterations = MaxSolverIterations,
             MaxWildPals = MaxWildPals,
-            MaxInputIrrelevantTraits = MaxInputIrrelevantTraits,
-            MaxBredIrrelevantTraits = MaxBredIrrelevantTraits,
+            MaxInputIrrelevantPassives = MaxInputIrrelevantPassives,
+            MaxBredIrrelevantPassives = MaxBredIrrelevantPassives,
             MaxThreads = MaxThreads,
             BannedBredPalInternalNames = BannedBredPals.Select(p => p.InternalName).ToList(),
             BannedWildPalInternalNames = BannedWildPals.Select(p => p.InternalName).ToList(),
@@ -136,9 +153,10 @@ namespace PalCalc.UI.ViewModel
         public static SolverControlsViewModel FromModel(SolverSettings model) => new SolverControlsViewModel()
         {
             MaxBreedingSteps = model.MaxBreedingSteps,
+            MaxSolverIterations = model.MaxSolverIterations,
             MaxWildPals = model.MaxWildPals,
-            MaxInputIrrelevantTraits = model.MaxInputIrrelevantTraits,
-            MaxBredIrrelevantTraits = model.MaxBredIrrelevantTraits,
+            MaxInputIrrelevantPassives = model.MaxInputIrrelevantPassives,
+            MaxBredIrrelevantPassives = model.MaxBredIrrelevantPassives,
             MaxThreads = model.MaxThreads,
             
             BannedBredPals = model.BannedBredPals(PalDB.LoadEmbedded()),

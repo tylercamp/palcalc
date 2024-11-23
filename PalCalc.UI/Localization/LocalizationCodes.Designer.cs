@@ -70,6 +70,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_ADD_FAKE_SAVE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_ADD_NEW_SAVE,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -164,6 +168,46 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_CRASHLOG_FAILED,
         /// <summary>
+        ///   Looks up a localized string similar to Label.
+        /// </summary>
+        LC_CUSTOM_CONTAINER,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINER_ADD_NEW,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINER_NEW_FIELD,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINER_NEW_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINER_RENAME_FIELD,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINER_RENAME_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINERS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_CONTAINERS_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_SAVE_GAME_NAME,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_CUSTOM_SAVE_GAME_NAME_LABEL,
+        /// <summary>
         ///   Looks up a localized string similar to PalName.
         /// </summary>
         LC_DELETE_PAL_TARGET_MSG,
@@ -215,6 +259,14 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to GuildName.
         /// </summary>
         LC_GUILD_LABEL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_INCLUDE_CUSTOM_PALS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_INCLUDE_PALS_AT_BASE,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -321,6 +373,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_PAL_LOC_CUSTOM,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_PAL_LOC_PALBOX,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -347,10 +403,6 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_PAL_WILD_COUNT,
         /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        LC_PALS_AT_BASE,
-        /// <summary>
         ///   Looks up a localized string similar to PlayerName.
         /// </summary>
         LC_PLAYER_LABEL,
@@ -362,6 +414,18 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_RANDOM_TRAIT,
+        /// <summary>
+        ///   Looks up a localized string similar to Label.
+        /// </summary>
+        LC_REMOVE_CUSTOM_CONTAINER_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to SaveLabel.
+        /// </summary>
+        LC_REMOVE_SAVE_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_REMOVE_SAVE_TITLE,
         /// <summary>
         ///   Looks up a localized string similar to TraitsList.
         /// </summary>
@@ -401,6 +465,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SAVE_FILE_RELOAD_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SAVE_FILE_RELOADING,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -422,6 +490,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to DayNumber | WorldName.
         /// </summary>
         LC_SAVE_GAME_LBL_SERVER,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_GAME_REMOVE_BTN_LABEL,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -577,6 +649,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SOLVER_SETTINGS_MAX_WILD_PALS,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -590,6 +670,14 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to Duration.
         /// </summary>
         LC_SOLVER_STATUS_FINISHED,
+        /// <summary>
+        ///   Looks up a localized string similar to NumProcessed | WorkSize.
+        /// </summary>
+        LC_SOLVER_STEP_STATUS_BREEDING,
+        /// <summary>
+        ///   Looks up a localized string similar to TotalSize.
+        /// </summary>
+        LC_SOLVER_STEP_STATUS_DONE,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -618,6 +706,54 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to NumUnrecognized.
         /// </summary>
         LC_TRAITS_COUNT_UNRECOGNIZED,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_ADD,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_ADD_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_DELETE_BTN_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to PresetName.
+        /// </summary>
+        LC_TRAITS_PRESETS_DELETE_MSG,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_DELETE_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_NAME,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_OVERWRITE_BTN_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to PresetName.
+        /// </summary>
+        LC_TRAITS_PRESETS_OVERWRITE_MSG,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_OVERWRITE_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_PRESETS_RENAME_BTN_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to PresetName.
+        /// </summary>
+        LC_TRAITS_PRESETS_RENAME_TITLE,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using PalCalc.SaveReader;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PalCalc.SaveReader;
 using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,12 @@ namespace PalCalc.UI.ViewModel.Mapped
 {
     public interface ISavesLocationViewModel
     {
-        ReadOnlyObservableCollection<SaveGameViewModel> SaveGames { get; }
+        ReadOnlyObservableCollection<ISaveGameViewModel> SaveGames { get; }
         ILocalizedText Label { get; }
         DateTime? LastModified { get; }
     }
 
-    public class StandardSavesLocationViewModel : ISavesLocationViewModel
+    public partial class StandardSavesLocationViewModel : ObservableObject, ISavesLocationViewModel
     {
         public StandardSavesLocationViewModel(ISavesLocation sl)
         {
@@ -42,44 +43,46 @@ namespace PalCalc.UI.ViewModel.Mapped
                 });
             }
             
-            SaveGames = new ReadOnlyObservableCollection<SaveGameViewModel>(
-                new ObservableCollection<SaveGameViewModel>(sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sg)))
+            SaveGames = new ReadOnlyObservableCollection<ISaveGameViewModel>(
+                new ObservableCollection<ISaveGameViewModel>(sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sg)))
             );
             LastModified = sl.ValidSaveGames.OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
         }
 
         public ISavesLocation Value { get; }
 
-        public ReadOnlyObservableCollection<SaveGameViewModel> SaveGames { get; }
+        public ReadOnlyObservableCollection<ISaveGameViewModel> SaveGames { get; }
 
         public ILocalizedText Label { get; }
 
         public DateTime? LastModified { get; }
     }
 
-    public class ManualSavesLocationViewModel : ISavesLocationViewModel
+    public partial class ManualSavesLocationViewModel : ObservableObject, ISavesLocationViewModel
     {
         public ManualSavesLocationViewModel(IEnumerable<ISaveGame> initialManualSaves)
         {
-            saveGames = new ObservableCollection<SaveGameViewModel>(initialManualSaves.Select(s => new SaveGameViewModel(s)).OrderByDescending(vm => vm.LastModified));
-            saveGames.Add(SaveGameViewModel.AddNewSave);
+            saveGames = new ObservableCollection<ISaveGameViewModel>(initialManualSaves.Select(s => new SaveGameViewModel(s)).OrderByDescending(vm => vm.LastModified));
+            saveGames.Add(new NewManualSaveGameViewModel());
+            saveGames.Add(new NewFakeSaveGameViewModel());
 
-            SaveGames = new ReadOnlyObservableCollection<SaveGameViewModel>(saveGames);
+
+            SaveGames = new ReadOnlyObservableCollection<ISaveGameViewModel>(saveGames);
         }
 
-        private ObservableCollection<SaveGameViewModel> saveGames;
-        public ReadOnlyObservableCollection<SaveGameViewModel> SaveGames { get; }
+        private ObservableCollection<ISaveGameViewModel> saveGames;
+        public ReadOnlyObservableCollection<ISaveGameViewModel> SaveGames { get; }
 
         public ILocalizedText Label { get; } = LocalizationCodes.LC_SAVE_LOCATION_MANUAL.Bind();
 
-        public DateTime? LastModified => saveGames.Where(g => !g.IsAddManualOption).OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
+        public DateTime? LastModified => saveGames.OfType<SaveGameViewModel>().OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
 
         // assume `path` has already been validated
         public SaveGameViewModel Add(ISaveGame saveGame)
         {
             var vm = new SaveGameViewModel(saveGame);
             var orderedIndex = saveGames
-                .Where(vm => !vm.IsAddManualOption)
+                .OfType<SaveGameViewModel>()
                 .Append(vm)
                 .OrderBy(vm => vm.Label.Value)
                 .ToList()
@@ -88,6 +91,11 @@ namespace PalCalc.UI.ViewModel.Mapped
             saveGames.Insert(orderedIndex, vm);
 
             return vm;
+        }
+
+        public void Remove(ISaveGame saveGame)
+        {
+            saveGames.Remove(saveGames.OfType<SaveGameViewModel>().Single(g => g.Value == saveGame));
         }
     }
 }

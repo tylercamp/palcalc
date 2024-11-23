@@ -60,23 +60,31 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 IsSinglePlayer = source == null || source.Players.Count == 1;
 
-                var rawOwnerName = source?.PlayersById?.GetValueOrDefault(ownedLoc.OwnerId)?.Name;
-                ILocalizedText ownerName = rawOwnerName != null
-                    ? new HardCodedText(rawOwnerName)
-                    : LocalizationCodes.LC_UNKNOWN_PLAYER.Bind();
-
-                var ownerGuild = source?.GuildsByPlayerId?.GetValueOrDefault(ownedLoc.OwnerId);
-
-                var isGuildOwner = ownedLoc.Location.Type == LocationType.Base && ownerGuild?.MemberIds?.Count > 1;
-
-                if (isGuildOwner)
+                if (ownedLoc.Location.Type != LocationType.Custom)
                 {
-                    if (ownerGuild?.Name != null) LocationOwner = new HardCodedText(ownerGuild.Name);
-                    else LocationOwner = LocalizationCodes.LC_UNKNOWN_GUILD.Bind();
+                    var rawOwnerName = source?.PlayersById?.GetValueOrDefault(ownedLoc.OwnerId)?.Name;
+
+                    ILocalizedText ownerName = rawOwnerName != null
+                        ? new HardCodedText(rawOwnerName)
+                        : LocalizationCodes.LC_UNKNOWN_PLAYER.Bind();
+
+                    var ownerGuild = source?.GuildsByPlayerId?.GetValueOrDefault(ownedLoc.OwnerId);
+
+                    var isGuildOwner = ownedLoc.Location.Type == LocationType.Base && ownerGuild?.MemberIds?.Count > 1;
+
+                    if (isGuildOwner)
+                    {
+                        if (ownerGuild?.Name != null) LocationOwner = new HardCodedText(ownerGuild.Name);
+                        else LocationOwner = LocalizationCodes.LC_UNKNOWN_GUILD.Bind();
+                    }
+                    else
+                    {
+                        LocationOwner = ownerName;
+                    }
                 }
                 else
                 {
-                    LocationOwner = ownerName;
+                    LocationOwner = null;
                 }
             }
 
@@ -108,9 +116,17 @@ namespace PalCalc.UI.ViewModel.Mapped
                         }
                     );
                     break;
+
+                case LocationType.Custom:
+                    LocationCoordDescription = LocalizationCodes.LC_CUSTOM_CONTAINER.Bind(ownedLoc.Location.ContainerId);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
 
-            LocationOwnerDescription = LocalizationCodes.LC_LOC_OWNED_BY.Bind(LocationOwner);
+            if (LocationOwner != null)
+                LocationOwnerDescription = LocalizationCodes.LC_LOC_OWNED_BY.Bind(LocationOwner);
         }
 
         public bool IsSinglePlayer { get; }
@@ -118,7 +134,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public IPalRefLocation ModelObject { get; }
         public Visibility Visibility => ModelObject is OwnedRefLocation ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility OwnerVisibility => IsSinglePlayer ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility OwnerVisibility => IsSinglePlayer || LocationOwner == null ? Visibility.Collapsed : Visibility.Visible;
 
         public ILocalizedText LocationOwner { get; }
         

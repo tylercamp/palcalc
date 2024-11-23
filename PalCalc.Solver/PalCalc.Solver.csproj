@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>$(DefineConstants);XDEBUG_CHECKS</DefineConstants>
+    <DefineConstants>$(DefineConstants);XDEBUG_CHECKS;DEBUG_CHECKS</DefineConstants>
     <Optimize>False</Optimize>
   </PropertyGroup>
 

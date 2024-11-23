@@ -31,7 +31,7 @@ namespace PalCalc.SaveReader.SaveFile
 
         public LevelMetaSaveFile(string filePath) : base(filePath) { }
 
-        public GameMeta ReadGameOptions()
+        public virtual GameMeta ReadGameOptions()
         {
             logger.Debug("parsing content");
             var valuesVisitor = new ValueCollectingVisitor(".SaveData", ".WorldName", ".HostPlayerName", ".HostPlayerLevel", ".InGameDay");

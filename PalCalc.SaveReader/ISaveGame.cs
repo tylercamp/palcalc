@@ -1,6 +1,7 @@
 ﻿using PalCalc.SaveReader.FArchive;
 using PalCalc.SaveReader.GVAS;
 using PalCalc.SaveReader.SaveFile;
+using PalCalc.SaveReader.SaveFile.Virtual;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader
 {
-    public interface ISaveGame
+    public interface ISaveGame : IDisposable
     {
         string BasePath { get; }
 
@@ -27,10 +28,15 @@ namespace PalCalc.SaveReader
 
         // (don't check `WorldOption`, not present for linux-based server saves)
         bool IsValid { get; }
+
+        event Action<ISaveGame> Updated;
     }
 
     public class StandardSaveGame : ISaveGame
     {
+        private FileSystemWatcher folderWatcher;
+        public event Action<ISaveGame> Updated;
+
         public StandardSaveGame(string basePath)
         {
             BasePath = basePath;
@@ -45,6 +51,37 @@ namespace PalCalc.SaveReader
                 Players = Directory.EnumerateFiles(playersPath, "*.sav").Select(f => new PlayersSaveFile(f)).ToList();
             else
                 Players = new List<PlayersSaveFile>();
+
+            if (Directory.Exists(basePath))
+            {
+                folderWatcher = new FileSystemWatcher(basePath);
+                folderWatcher.Changed += FolderWatcher_Updated;
+                folderWatcher.Created += FolderWatcher_Updated;
+                folderWatcher.Deleted += FolderWatcher_Updated;
+                folderWatcher.Renamed += FolderWatcher_Updated;
+
+                folderWatcher.IncludeSubdirectories = true;
+                folderWatcher.EnableRaisingEvents = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (folderWatcher != null)
+            {
+                folderWatcher.Changed -= FolderWatcher_Updated;
+                folderWatcher.Created -= FolderWatcher_Updated;
+                folderWatcher.Deleted -= FolderWatcher_Updated;
+                folderWatcher.Renamed -= FolderWatcher_Updated;
+                folderWatcher.Dispose();
+
+                folderWatcher = null;
+            }
+        }
+
+        private void FolderWatcher_Updated(object sender, FileSystemEventArgs e)
+        {
+            Updated?.Invoke(this);
         }
 
         public string BasePath { get; }
@@ -75,6 +112,10 @@ namespace PalCalc.SaveReader
 
     public class XboxSaveGame : ISaveGame
     {
+        public event Action<ISaveGame> Updated;
+
+        private List<FileSystemWatcher> fileWatchers;
+
         public XboxSaveGame(
             string userBasePath,
             string saveId,
@@ -82,7 +123,8 @@ namespace PalCalc.SaveReader
             LevelMetaSaveFile levelMeta,
             LocalDataSaveFile localData,
             WorldOptionSaveFile worldOption,
-            List<PlayersSaveFile> players
+            List<PlayersSaveFile> players,
+            IEnumerable<FileSystemWatcher> fileWatchers
         )
         {
             BasePath = userBasePath;
@@ -92,6 +134,38 @@ namespace PalCalc.SaveReader
             LocalData = localData;
             WorldOption = worldOption;
             Players = players;
+
+            this.fileWatchers = fileWatchers.ToList();
+
+            foreach (var watcher in this.fileWatchers)
+            {
+                watcher.Changed += Watcher_Updated;
+                watcher.Created += Watcher_Updated;
+                watcher.Deleted += Watcher_Updated;
+                watcher.Renamed += Watcher_Updated;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (fileWatchers != null)
+            {
+                foreach (var watcher in fileWatchers)
+                {
+                    watcher.Changed -= Watcher_Updated;
+                    watcher.Created -= Watcher_Updated;
+                    watcher.Deleted -= Watcher_Updated;
+                    watcher.Renamed -= Watcher_Updated;
+                    watcher.Dispose();
+                }
+
+                fileWatchers = null;
+            }
+        }
+
+        private void Watcher_Updated(object sender, FileSystemEventArgs e)
+        {
+            Updated?.Invoke(this);
         }
 
         public string BasePath { get; }
@@ -109,5 +183,56 @@ namespace PalCalc.SaveReader
 
         public bool IsValid =>
             Level != null && Level.IsValid; // don't check for `LevelMeta` - may be temporarily missing for files with "wrapper" header
+    }
+
+    /// <summary>
+    /// A fake save-game whose ISaveFiles don't return any data. Meant to be a placeholder for "fake" saves added in Pal Calc.
+    /// </summary>
+    public class VirtualSaveGame : ISaveGame
+    {
+        public VirtualSaveGame(
+            string userId,
+            string gameId,
+            VirtualLevelSaveFile level,
+            VirtualLevelMetaSaveFile levelMeta,
+            VirtualLocalDataSaveFile localData,
+            VirtualWorldOptionSaveFile worldOption
+        )
+        {
+            Level = level;
+            LevelMeta = levelMeta;
+            LocalData = localData;
+            WorldOption = worldOption;
+            Players = [];
+
+            UserId = userId;
+            GameId = gameId;
+        }
+
+        public void Dispose()
+        {
+        }
+
+        public string BasePath => null;
+
+        public string UserId { get; }
+
+        public string GameId { get; }
+
+        public DateTime LastModified { get; set; } = DateTime.Now;
+
+        public LevelSaveFile Level { get; }
+
+        public LevelMetaSaveFile LevelMeta { get; }
+
+        public LocalDataSaveFile LocalData { get; }
+
+        public WorldOptionSaveFile WorldOption { get; }
+
+        public List<PlayersSaveFile> Players { get; }
+
+        public bool IsValid => true;
+
+        public event Action<ISaveGame> Updated;
     }
 }

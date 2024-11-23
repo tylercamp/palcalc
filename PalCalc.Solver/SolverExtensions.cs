@@ -22,10 +22,10 @@ namespace PalCalc.Solver
             }
         }
 
-        public static List<Trait> ToDedicatedTraits(this IEnumerable<Trait> actualTraits, IEnumerable<Trait> desiredTraits)
+        public static List<PassiveSkill> ToDedicatedPassives(this IEnumerable<PassiveSkill> actualPassives, IEnumerable<PassiveSkill> desiredPassives)
         {
-            var irrelevantAsRandom = actualTraits.Except(desiredTraits).Select(_ => new RandomTrait());
-            return actualTraits.Intersect(desiredTraits).Concat(irrelevantAsRandom).ToList();
+            var irrelevantAsRandom = actualPassives.Except(desiredPassives).Select(_ => new RandomPassiveSkill());
+            return actualPassives.Intersect(desiredPassives).Concat(irrelevantAsRandom).ToList();
         }
 
         public static IEnumerable<IPalReference> AllReferences(this IPalReference pref)

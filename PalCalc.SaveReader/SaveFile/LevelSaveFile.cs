@@ -34,7 +34,7 @@ namespace PalCalc.SaveReader.SaveFile
 
         private Guid MostCommonOwner(RawPalContainerContents container, Dictionary<Guid, Guid> palOwnersByInstanceId) => container.Slots.GroupBy(s => palOwnersByInstanceId.GetValueOrElse(s.InstanceId, Guid.Empty)).MaxBy(g => g.Count()).Key;
 
-        public RawLevelSaveData ReadRawCharacterData()
+        public virtual RawLevelSaveData ReadRawCharacterData()
         {
             var containerVisitor = new PalContainerVisitor();
             var instanceVisitor = new CharacterInstanceVisitor();
@@ -145,15 +145,15 @@ namespace PalCalc.SaveReader.SaveFile
                         continue;
                     }
 
-                    var traits = gvasInstance.Traits
+                    var passives = gvasInstance.PassiveSkills
                         .Select(name =>
                         {
-                            var trait = db.Traits.FirstOrDefault(t => t.InternalName == name);
-                            if (trait == null)
+                            var passive = db.PassiveSkills.FirstOrDefault(t => t.InternalName == name);
+                            if (passive == null)
                             {
-                                logger.Warning("unrecognized trait '{internalName}' on pal {Pal}, skipping", name, gvasInstance.CharacterId);
+                                logger.Warning("unrecognized passive skill '{internalName}' on pal {Pal}, skipping", name, gvasInstance.CharacterId);
                             }
-                            return trait ?? new UnrecognizedTrait(name);
+                            return passive ?? new UnrecognizedPassiveSkill(name);
                         })
                         .ToList();
 
@@ -171,7 +171,7 @@ namespace PalCalc.SaveReader.SaveFile
                         Level = gvasInstance.Level,
                         NickName = gvasInstance.NickName,
                         Gender = gvasInstance.Gender.Contains("Female") ? PalGender.FEMALE : PalGender.MALE,
-                        Traits = traits,
+                        PassiveSkills = passives,
                         Location = new PalLocation()
                         {
                             ContainerId = gvasInstance.ContainerId.ToString(),
@@ -182,6 +182,38 @@ namespace PalCalc.SaveReader.SaveFile
                 }
             }
 
+            var validPlayerIds = result.Players.Select(p => p.PlayerId);
+            var allPlayerIds = validPlayerIds
+                .Concat(result.Guilds.SelectMany(g => g.MemberIds))
+                .Concat(result.Pals.Select(p => p.OwnerPlayerId))
+                .Distinct()
+                .ToList();
+
+            foreach (var p in allPlayerIds.Except(validPlayerIds).OrderBy(id => id).ZipWithIndex())
+            {
+                var (unknownId, idx) = p;
+                result.Players.Add(new PlayerInstance()
+                {
+                    InstanceId = $"__UNKNOWNID_{unknownId}__",
+                    Level = 1,
+                    Name = $"Unknown ({unknownId[..8]}) (#{idx + 1})",
+                    PlayerId = unknownId,
+                });
+            }
+
+            var playersMissingGuilds = allPlayerIds.Except(result.Guilds.SelectMany(g => g.MemberIds)).ToList();
+            if (playersMissingGuilds.Count > 0)
+            {
+                var unknownGuild = new GuildInstance();
+                unknownGuild.Name = "(No Guild) (!)";
+                unknownGuild.InternalName = "__NO_GUILD__";
+                unknownGuild.MemberIds = playersMissingGuilds;
+                unknownGuild.OwnerId = "__UNKNOWN_OWNER__";
+                unknownGuild.Id = "__UNKNOWN_ID__";
+
+                result.Guilds.Add(unknownGuild);
+            }
+
             return result;
         }
 
@@ -189,7 +221,7 @@ namespace PalCalc.SaveReader.SaveFile
         /// Uses the provided list of players, which specify party and palbox container IDs, to read the list of character instances and
         /// properly associate them with their owner + container type.
         /// </summary>
-        public LevelSaveData ReadCharacterData(PalDB db, List<PlayersSaveFile> playersFiles)
+        public virtual LevelSaveData ReadCharacterData(PalDB db, List<PlayersSaveFile> playersFiles)
         {
             if (playersFiles.Count == 0) return ReadCharacterData(db);
 
@@ -239,6 +271,16 @@ namespace PalCalc.SaveReader.SaveFile
             }).ToList();
 
             var result = BuildResult(db, parsed.Characters, parsed.Groups, parsed.ContainerContents, detectedContainers);
+
+            foreach (var player in result.Players)
+            {
+                var playerMeta = players.SingleOrDefault(p => p.PlayerId == player.PlayerId);
+                if (playerMeta == null) continue;
+
+                player.PartyContainerId = playerMeta.PartyContainerId;
+                player.PalboxContainerId = playerMeta.PalboxContainerId;
+            }
+
             logger.Debug("done");
             return result;
         }
@@ -263,6 +305,17 @@ namespace PalCalc.SaveReader.SaveFile
 
             var detectedContainers = parsed.ContainerContents.Select(container => TryGuessContainer(container, palBoxesByPlayerId, ownersByInstanceId)).ToList();
             var result = BuildResult(db, parsed.Characters, parsed.Groups, parsed.ContainerContents, detectedContainers);
+
+            foreach (var player in result.Players)
+            {
+                player.PartyContainerId = detectedContainers
+                    .OfType<PlayerPartyContainer>()
+                    .Where(c => c.PlayerId == player.PlayerId)
+                    .FirstOrDefault()
+                    ?.Id;
+
+                player.PalboxContainerId = palBoxesByPlayerId.GetValueOrDefault(player.PlayerId);
+            }
 
             logger.Debug("done");
             return result;

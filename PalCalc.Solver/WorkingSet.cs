@@ -18,7 +18,7 @@ namespace PalCalc.Solver
         private static PalProperty.GroupIdFn DefaultGroupFn = PalProperty.Combine(
             PalProperty.Pal,
             PalProperty.Gender,
-            PalProperty.EffectiveTraits
+            PalProperty.EffectivePassives
         );
 
         private CancellationToken token;
@@ -105,13 +105,13 @@ namespace PalCalc.Solver
                 // these are results to be used as output, don't bother adding them to working set / continue breeding those
                 if (refNewInst is BredPalReference && target.IsSatisfiedBy(refNewInst))
                 {
-                    // (though if we're not at the trait limit and there are some optional traits
+                    // (though if we're not at the passive limit and there are some optional passives
                     //  we'd like, then we'll keep this in the pool)
                     if (
-                        // at max traits
-                        refNewInst.EffectiveTraits.Count(t => t is not RandomTrait) == GameConstants.MaxTotalTraits ||
+                        // at max passives
+                        refNewInst.EffectivePassives.Count(t => t is not RandomPassiveSkill) == GameConstants.MaxTotalPassives ||
                         // there's nothing else we'd be interested in
-                        !target.OptionalTraits.Except(refNewInst.EffectiveTraits).Any()
+                        !target.OptionalPassives.Except(refNewInst.EffectivePassives).Any()
                     ) continue;
                 }
 
@@ -162,7 +162,7 @@ namespace PalCalc.Solver
         }
 
         // gives a new, reduced collection which only includes the "most optimal" / lowest-effort
-        // reference for each instance spec (gender, traits, etc.)
+        // reference for each instance spec (gender, passives, etc.)
         private IEnumerable<IPalReference> PruneCollection(IEnumerable<IPalReference> refs) =>
             refs
                 .TakeWhile(_ => !token.IsCancellationRequested)

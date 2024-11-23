@@ -292,7 +292,7 @@
   <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve">
     <value>TraitsList</value>
   </data>
-  <data name="LC_PALS_AT_BASE" xml:space="preserve">
+  <data name="LC_INCLUDE_PALS_AT_BASE" xml:space="preserve">
     <value />
   </data>
   <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
@@ -415,6 +415,9 @@
   <data name="LC_SAVE_FILE_RELOADING" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SAVE_FILE_RELOAD_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
   <data name="LC_SAVE_GAME" xml:space="preserve">
     <value />
   </data>
@@ -499,6 +502,12 @@
   <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
   <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS" xml:space="preserve">
     <value />
   </data>
@@ -510,6 +519,12 @@
   </data>
   <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve">
     <value>Duration</value>
+  </data>
+  <data name="LC_SOLVER_STEP_STATUS_BREEDING" xml:space="preserve">
+    <value>NumProcessed | WorkSize</value>
+  </data>
+  <data name="LC_SOLVER_STEP_STATUS_DONE" xml:space="preserve">
+    <value>TotalSize</value>
   </data>
   <data name="LC_SOURCE_PALS" xml:space="preserve">
     <value />
@@ -532,6 +547,42 @@
   <data name="LC_TRAITS_COUNT_UNRECOGNIZED" xml:space="preserve">
     <value>NumUnrecognized</value>
   </data>
+  <data name="LC_TRAITS_PRESETS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_PRESETS_ADD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_PRESETS_ADD_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_BTN_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_MSG" xml:space="preserve">
+    <value>PresetName</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_PRESETS_NAME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_BTN_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_MSG" xml:space="preserve">
+    <value>PresetName</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_PRESETS_RENAME_BTN_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_PRESETS_RENAME_TITLE" xml:space="preserve">
+    <value>PresetName</value>
+  </data>
   <data name="LC_UNKNOWN_GUILD" xml:space="preserve">
     <value />
   </data>
@@ -545,6 +596,57 @@
     <value />
   </data>
   <data name="LV_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINERS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINER" xml:space="preserve">
+    <value>Label</value>
+  </data>
+  <data name="LC_CUSTOM_SAVE_GAME_NAME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_SAVE_GAME_NAME_LABEL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_INCLUDE_CUSTOM_PALS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LOC_CUSTOM" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_ADD_FAKE_SAVE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_FIELD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_FIELD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_REMOVE_CUSTOM_CONTAINER_DESCRIPTION" xml:space="preserve">
+    <value>Label</value>
+  </data>
+  <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve">
+    <value>SaveLabel</value>
+  </data>
+  <data name="LC_REMOVE_SAVE_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_GAME_REMOVE_BTN_LABEL" xml:space="preserve">
     <value />
   </data>
 </root>

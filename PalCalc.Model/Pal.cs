@@ -36,8 +36,8 @@ namespace PalCalc.Model
         public int? MinWildLevel { get; set; } = null;
         public int? MaxWildLevel { get; set; } = null;
         
-        public List<string> GuaranteedTraitInternalIds { get; set; } = new List<string>();
-        public IEnumerable<Trait> GuaranteedTraits(PalDB db) => GuaranteedTraitInternalIds.Select(id => id.InternalToTrait(db));
+        public List<string> GuaranteedPassivesInternalIds { get; set; } = new List<string>();
+        public IEnumerable<PassiveSkill> GuaranteedPassiveSkills(PalDB db) => GuaranteedPassivesInternalIds.Select(id => id.InternalToPassive(db));
 
         ////
 

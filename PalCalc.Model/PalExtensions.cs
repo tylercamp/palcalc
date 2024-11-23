@@ -11,23 +11,26 @@ namespace PalCalc.Model
         public static Pal ToPal(this string s, PalDB db) => db.Pals.Single(p => p.Name == s);
         public static Pal ToPal(this string s, IEnumerable<Pal> pals) => pals.Single(p => p.Name == s);
         public static Pal InternalToPal(this string s, PalDB db) => db.Pals.Single(p => p.InternalName.ToLower() == s.ToLower());
+        public static Pal InternalToPal(this string s, IEnumerable<Pal> pals) => pals.Single(p => p.InternalName.ToLower() == s.ToLower());
 
         // GetValueOrElse a hackfix for change in "Variant" classification after change in data scraping method
         public static Pal ToPal(this PalId id, PalDB db) => db.PalsById.GetValueFromAny(id, id.InvertedVariant);
         public static Pal ToPal(this PalId id, IEnumerable<Pal> pals) => pals.Single(p => p.Id == id);
 
-        private static Trait RAND_REF = new RandomTrait();
-        public static Trait ToTrait(this string s, PalDB db)
+        private static PassiveSkill RAND_REF = new RandomPassiveSkill();
+        public static PassiveSkill ToPassive(this string s, PalDB db)
         {
-            if (s == RAND_REF.Name) return new RandomTrait();
-            else if (db.TraitsByName.ContainsKey(s)) return db.TraitsByName[s];
-            else if (db.Traits.Any(t => t.InternalName == s)) return db.Traits.Single(t => t.InternalName == s);
-            else return new UnrecognizedTrait(s);
+            if (s == null) return null;
+            else if (s == RAND_REF.Name) return new RandomPassiveSkill();
+            else if (db.PassiveSkillsByName.ContainsKey(s)) return db.PassiveSkillsByName[s];
+            else if (db.PassiveSkills.Any(t => t.InternalName == s)) return db.PassiveSkills.Single(t => t.InternalName == s);
+            else return new UnrecognizedPassiveSkill(s);
         }
-        public static Trait InternalToTrait(this string s, PalDB db)
+        public static PassiveSkill InternalToPassive(this string s, PalDB db)
         {
-            if (s == RAND_REF.InternalName) return new RandomTrait();
-            else return db.Traits.SingleOrDefault(t => t.InternalName == s) ?? new UnrecognizedTrait(s);
+            if (s == null) return null;
+            else if (s == RAND_REF.InternalName) return new RandomPassiveSkill();
+            else return db.PassiveSkills.SingleOrDefault(t => t.InternalName == s) ?? new UnrecognizedPassiveSkill(s);
         }
 
         public static PalGender OppositeGender(this PalGender gender)
@@ -43,13 +46,13 @@ namespace PalCalc.Model
         }
 
 
-        public static string TraitsListToString(this IEnumerable<Trait> traits)
+        public static string PassiveSkillListToString(this IEnumerable<PassiveSkill> passives)
         {
-            if (!traits.Any()) return "no traits";
+            if (!passives.Any()) return "no passives";
 
-            var definite = traits.Where(t => t is not IUnknownTrait);
-            var random = traits.Where(t => t is RandomTrait);
-            var unrecognized = traits.Where(t => t is UnrecognizedTrait);
+            var definite = passives.Where(t => t is not IUnknownPassive);
+            var random = passives.Where(t => t is RandomPassiveSkill);
+            var unrecognized = passives.Where(t => t is UnrecognizedPassiveSkill);
 
             var parts = new List<string>();
             if (definite.Any()) parts.Add(string.Join(", ", definite));

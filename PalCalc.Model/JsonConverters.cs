@@ -44,12 +44,14 @@ namespace PalCalc.Model
         public override PalInstance ReadJson(JsonReader reader, Type objectType, PalInstance existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var token = JToken.ReadFrom(reader);
+            var passives = token["PassiveSkills"] ?? token["Traits"];
             return new PalInstance()
             {
+                // TODO - apparently paldex num. can change, should switch to internal pal name
                 Pal = token["Id"].ToObject<PalId>().ToPal(db),
                 Location = token["Location"].ToObject<PalLocation>(),
                 Gender = token["Gender"].ToObject<PalGender>(),
-                Traits = token["Traits"].ToObject<List<string>>().Select(s => s.ToTrait(db)).ToList(),
+                PassiveSkills = passives.ToObject<List<string>>().Select(s => s.ToPassive(db)).ToList(),
                 OwnerPlayerId = token["OwnerPlayerId"].ToObject<string>(),
                 NickName = token["NickName"].ToObject<string>(),
                 Level = token["Level"].ToObject<int>(),
@@ -68,7 +70,7 @@ namespace PalCalc.Model
                 Id = value.Pal.Id,
                 Location = value.Location,
                 Gender = value.Gender,
-                Traits = value.Traits.Select(t => t.InternalName),
+                PassiveSkills = value.PassiveSkills.Select(t => t.InternalName),
                 OwnerPlayerId = value.OwnerPlayerId,
                 NickName = value.NickName,
                 Level = value.Level,
@@ -130,7 +132,7 @@ namespace PalCalc.Model
 
             var version = asToken["Version"]?.ToObject<string>();
             var pals = asToken["Pals"].ToObject<List<Pal>>();
-            var traits = asToken["Traits"].ToObject<List<Trait>>();
+            var passives = asToken["PassiveSkills"].ToObject<List<PassiveSkill>>();
             var breedingGenderProbability = asToken["BreedingGenderProbability"].ToObject<Dictionary<string, Dictionary<PalGender, float>>>();
             var minBreedingSteps = asToken["MinBreedingSteps"].ToObject<Dictionary<string, Dictionary<string, int>>>();
 
@@ -141,19 +143,19 @@ namespace PalCalc.Model
             {
                 Version = version,
                 PalsById = pals.ToDictionary(p => p.Id),
-                Traits = traits,
+                PassiveSkills = passives,
                 Breeding = breeding,
 
                 MinBreedingSteps = minBreedingSteps.ToDictionary(
-                    kvp => kvp.Key.ToPal(pals),
+                    kvp => kvp.Key.InternalToPal(pals),
                     kvp => kvp.Value.ToDictionary(
-                        ikvp => ikvp.Key.ToPal(pals),
+                        ikvp => ikvp.Key.InternalToPal(pals),
                         ikvp => ikvp.Value
                     )
                 ),
 
                 BreedingGenderProbability = breedingGenderProbability.ToDictionary(
-                    kvp => kvp.Key.ToPal(pals),
+                    kvp => kvp.Key.InternalToPal(pals),
                     kvp => kvp.Value
                 ),
             };
@@ -170,12 +172,12 @@ namespace PalCalc.Model
                 Version = value.Version,
                 Pals = value.Pals,
                 Breeding = breedingToken,
-                Traits = value.Traits,
-                BreedingGenderProbability = value.BreedingGenderProbability.ToDictionary(kvp => kvp.Key.Name, kvp => kvp.Value),
+                PassiveSkills = value.PassiveSkills,
+                BreedingGenderProbability = value.BreedingGenderProbability.ToDictionary(kvp => kvp.Key.InternalName, kvp => kvp.Value),
                 MinBreedingSteps = value.MinBreedingSteps.ToDictionary(
-                    kvp => kvp.Key.Name,
+                    kvp => kvp.Key.InternalName,
                     kvp => kvp.Value.ToDictionary(
-                        ikvp => ikvp.Key.Name,
+                        ikvp => ikvp.Key.InternalName,
                         ikvp => ikvp.Value
                     )
                 )

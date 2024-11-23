@@ -9,6 +9,8 @@ using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
+using PalCalc.UI.View.Inspector;
+using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
 using Serilog;
@@ -38,6 +40,7 @@ namespace PalCalc.UI.ViewModel
         private Dispatcher dispatcher;
         private CancellationTokenSource solverTokenSource;
         private AppSettings settings;
+        private PassiveSkillsPresetCollectionViewModel passivePresets;
         private IRelayCommand<PalSpecifierViewModel> deletePalTargetCommand;
 
         public List<TranslationLocaleViewModel> Locales { get; } =
@@ -57,8 +60,9 @@ namespace PalCalc.UI.ViewModel
             CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
             CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
-            settings = Storage.LoadAppSettings();
+            AppSettings.Current = settings = Storage.LoadAppSettings();
             settings.SolverSettings ??= new SolverSettings();
+            passivePresets = new PassiveSkillsPresetCollectionViewModel(settings.PassiveSkillsPresets);
 
             Translator.CurrentLocale = settings.Locale;
 
@@ -106,12 +110,14 @@ namespace PalCalc.UI.ViewModel
                 // add a placeholder so the user can (optionally) see the explanation why no saves are available (game isn't installed/synced via xbox app)
                 availableSavesLocations.Add(new XboxSavesLocation());
             }
-            
-            SaveSelection = new SaveSelectorViewModel(availableSavesLocations, settings.ExtraSaveLocations.Select(saveFolder => new StandardSaveGame(saveFolder)));
+
+            var manualSaves = settings.ExtraSaveLocations.Select(saveFolder => new StandardSaveGame(saveFolder)).ToList();
+            var fakeSaves = settings.FakeSaveNames.Select(FakeSaveGame.Create).ToList();
+            SaveSelection = new SaveSelectorViewModel(availableSavesLocations, manualSaves.Concat(fakeSaves));
 
             targetsBySaveFile = SaveSelection.SavesLocations
                 .SelectMany(l => l.SaveGames)
-                .Where(vm => !vm.IsAddManualOption)
+                .OfType<SaveGameViewModel>()
                 .Select(sgvm => sgvm.Value)
                 .ToDictionary(
                     sg => sg,
@@ -149,9 +155,9 @@ namespace PalCalc.UI.ViewModel
 
             SaveSelection.PropertyChanged += SaveSelection_PropertyChanged;
             SaveSelection.NewCustomSaveSelected += SaveSelection_CustomSaveAdded;
+            SaveSelection.CustomSaveDelete += SaveSelection_CustomSaveDelete;
 
             if (settings.SelectedGameIdentifier != null) SaveSelection.TrySelectSaveGame(settings.SelectedGameIdentifier);
-
             
             // TODO - would prefer to have the delete command managed by the target list, rather than having
             //        to manually assign the command for each specifier VM
@@ -159,22 +165,35 @@ namespace PalCalc.UI.ViewModel
             foreach (var target in targetsBySaveFile.Values.SelectMany(l => l.Targets).Where(t => !t.IsReadOnly))
                 target.DeleteCommand = deletePalTargetCommand;
 
+            Storage.SaveReloaded += Storage_SaveReloaded;
 
             dispatcher.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
 
+            passivePresets.PresetSelected += selectedPreset =>
+            {
+                var spec = PalTarget?.CurrentPalSpecifier;
+                if (spec != null) selectedPreset.ApplyTo(spec);
+            };
+
             CheckForUpdates();
+        }
+
+        private void Storage_SaveReloaded(ISaveGame save)
+        {
+            if (SaveSelection?.SelectedFullGame?.Value == save)
+                UpdateFromSaveProperties();
         }
 
         private void OnDeletePalSpecifier(PalSpecifierViewModel spec)
         {
             if (spec == null) return;
 
-            if (SaveSelection?.SelectedGame == null)
+            if (SaveSelection?.SelectedFullGame == null)
             {
                 return;
             }
 
-            var targetList = targetsBySaveFile[SaveSelection.SelectedGame.Value];
+            var targetList = targetsBySaveFile[SaveSelection.SelectedFullGame.Value];
 
             if (!targetList.Targets.Contains(spec))
             {
@@ -206,8 +225,61 @@ namespace PalCalc.UI.ViewModel
             var saveVm = manualSaves.Add(save);
             SaveSelection.SelectedGame = saveVm;
 
-            settings.ExtraSaveLocations.Add(save.BasePath);
+            if (save is VirtualSaveGame)
+            {
+                settings.FakeSaveNames.Add(FakeSaveGame.GetLabel(save));
+            }
+            else
+            {
+                settings.ExtraSaveLocations.Add(save.BasePath);
+            }
+
             Storage.SaveAppSettings(settings);
+        }
+
+        private void SaveSelection_CustomSaveDelete(ManualSavesLocationViewModel manualSaves, ISaveGame saveGame)
+        {
+            var saveVm = manualSaves.SaveGames.OfType<SaveGameViewModel>().First(sg => sg.Value == saveGame);
+
+            var confirmation = MessageBox.Show(
+                App.ActiveWindow,
+                LocalizationCodes.LC_REMOVE_SAVE_DESCRIPTION.Bind(saveVm.Label).Value,
+                LocalizationCodes.LC_REMOVE_SAVE_TITLE.Bind().Value,
+                MessageBoxButton.YesNo
+            );
+
+            if (confirmation == MessageBoxResult.Yes)
+            {
+                var toClose = App.Current.Windows
+                    .OfType<SaveInspectorWindow>()
+                    .Where(w => (w.DataContext as SaveInspectorWindowViewModel)?.DisplayedSave?.Value == saveGame)
+                    .ToList();
+
+                foreach (var window in toClose)
+                {
+                    foreach (var child in window.OwnedWindows.OfType<Window>().ToList())
+                        child.Close();
+
+                    window.Close();
+                }
+
+                manualSaves.Remove(saveGame);
+
+                if (saveGame is VirtualSaveGame)
+                {
+                    settings.FakeSaveNames.Remove(FakeSaveGame.GetLabel(saveGame));
+                    saveVm.Customizations.Dispose();
+                }
+                else
+                {
+                    settings.ExtraSaveLocations.Remove(saveGame.BasePath);
+                }
+
+                Storage.RemoveSave(saveGame);
+                saveGame.Dispose();
+
+                Storage.SaveAppSettings(settings);
+            }
         }
 
         private void CachedSaveGame_SaveFileLoadStart(ISaveGame obj)
@@ -254,7 +326,7 @@ namespace PalCalc.UI.ViewModel
             if (PalTargetList != null) PalTargetList.PropertyChanged -= PalTargetList_PropertyChanged;
             if (GameSettings != null) GameSettings.PropertyChanged -= GameSettings_PropertyChanged;
 
-            if (SaveSelection.SelectedGame?.Value == null)
+            if (SaveSelection.SelectedFullGame?.Value == null)
             {
                 PalTargetList = null;
                 PalTarget = null;
@@ -262,15 +334,15 @@ namespace PalCalc.UI.ViewModel
             }
             else
             {
-                CrashSupport.ReferencedSave(SaveSelection.SelectedGame.Value);
+                CrashSupport.ReferencedSave(SaveSelection.SelectedFullGame.Value);
 
-                settings.SelectedGameIdentifier = CachedSaveGame.IdentifierFor(SaveSelection.SelectedGame.Value);
+                settings.SelectedGameIdentifier = CachedSaveGame.IdentifierFor(SaveSelection.SelectedFullGame.Value);
                 Storage.SaveAppSettings(settings);
 
-                PalTargetList = targetsBySaveFile[SaveSelection.SelectedGame.Value];
+                PalTargetList = targetsBySaveFile[SaveSelection.SelectedFullGame.Value];
                 PalTargetList.PropertyChanged += PalTargetList_PropertyChanged;
 
-                GameSettings = GameSettingsViewModel.Load(SaveSelection.SelectedGame.Value);
+                GameSettings = GameSettingsViewModel.Load(SaveSelection.SelectedFullGame.Value);
                 GameSettings.PropertyChanged += GameSettings_PropertyChanged;
             }
 
@@ -280,9 +352,10 @@ namespace PalCalc.UI.ViewModel
 
         private void UpdatePalTarget()
         {
-            if (PalTargetList?.SelectedTarget != null && SaveSelection.SelectedGame?.CachedValue != null)
+            if (PalTargetList?.SelectedTarget != null && SaveSelection.SelectedFullGame?.CachedValue != null)
             {
-                PalTarget = new PalTargetViewModel(SaveSelection.SelectedGame.CachedValue, PalTargetList.SelectedTarget);
+                PalTarget = new PalTargetViewModel(SaveSelection.SelectedFullGame.CachedValue, PalTargetList.SelectedTarget, passivePresets);
+                passivePresets.ActivePalTarget = PalTarget;
             }
             else
                 PalTarget = null;
@@ -290,7 +363,7 @@ namespace PalCalc.UI.ViewModel
 
         private void GameSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var saveGame = SaveSelection.SelectedGame?.Value;
+            var saveGame = SaveSelection.SelectedFullGame?.Value;
             if (saveGame != null)
             {
                 var settings = sender as GameSettingsViewModel;
@@ -316,12 +389,12 @@ namespace PalCalc.UI.ViewModel
 
         private void SaveTargetList(PalTargetListViewModel list)
         {
-            var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedGame.Value);
+            var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedFullGame.Value);
             if (!Directory.Exists(outputFolder))
                 Directory.CreateDirectory(outputFolder);
 
             var outputFile = Path.Join(outputFolder, "pal-targets.json");
-            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedGame.CachedValue);
+            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedFullGame.CachedValue);
             File.WriteAllText(outputFile, JsonConvert.SerializeObject(list, converter));
         }
 
@@ -330,17 +403,21 @@ namespace PalCalc.UI.ViewModel
             var currentSpec = PalTarget?.CurrentPalSpecifier?.ModelObject;
             if (currentSpec == null) return;
 
-            var cachedData = SaveSelection.SelectedGame.CachedValue;
+            var selectedGame = SaveSelection.SelectedFullGame;
+            var cachedData = selectedGame.CachedValue;
             if (cachedData == null) return;
 
             var inputPals = PalTarget.PalSource.SelectedSource.Filter(cachedData);
             if (!PalTarget.CurrentPalSpecifier.IncludeBasePals)
                 inputPals = inputPals.Where(p => p.Location.Type != LocationType.Base);
 
+            if (PalTarget.CurrentPalSpecifier.IncludeCustomPals)
+                inputPals = inputPals.Concat(selectedGame.Customizations.ModelObject.CustomContainers.SelectMany(c => c.Contents));
+
             var solver = SolverControls.ConfiguredSolver(GameSettings.ModelObject, inputPals.ToList());
             solver.SolverStateUpdated += Solver_SolverStateUpdated;
 
-            Task.Factory.StartNew(() =>
+            var solverThread = new Thread(() =>
             {
                 try
                 {
@@ -352,7 +429,7 @@ namespace PalCalc.UI.ViewModel
                     // general simplification pass, get the best result for each potentially
                     // interesting combination of result properties
                     var resultsTable = new PalPropertyGrouping(PalProperty.Combine(
-                        PalProperty.EffectiveTraits,
+                        PalProperty.EffectivePassives,
                         PalProperty.NumBreedingSteps,
                         p => p.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
                     ));
@@ -361,7 +438,7 @@ namespace PalCalc.UI.ViewModel
 
                     // final simplification pass, ignore any results which are over 2x the effort of the fastest option
                     resultsTable = resultsTable.BuildNew(PalProperty.Combine(
-                        PalProperty.EffectiveTraits
+                        PalProperty.EffectivePassives
                     ));
                     resultsTable.FilterAll(g =>
                     {
@@ -416,6 +493,9 @@ namespace PalCalc.UI.ViewModel
                     });
                 }
             });
+
+            solverThread.Priority = ThreadPriority.BelowNormal;
+            solverThread.Start();
         }
 
         public void CancelSolver()
@@ -429,6 +509,8 @@ namespace PalCalc.UI.ViewModel
         private Stopwatch solverStopwatch = null;
         private void Solver_SolverStateUpdated(SolverStatus obj)
         {
+            string FormatNum(int num) => num.ToString("#,##");
+
             dispatcher.BeginInvoke(() =>
             {
                 var numTotalSteps = (double)(1 + obj.TargetSteps);
@@ -439,6 +521,9 @@ namespace PalCalc.UI.ViewModel
                         solverStopwatch = Stopwatch.StartNew();
                         SolverStatusMsg = LocalizationCodes.LV_SOLVER_STATUS_INITIALIZING.Bind();
                         overallStep = 0;
+
+                        StepProgress = 0;
+                        StepStatusMsg = null;
                         break;
 
                     case SolverPhase.Breeding:
@@ -446,10 +531,15 @@ namespace PalCalc.UI.ViewModel
                             new
                             {
                                 StepNum = obj.CurrentStepIndex + 1,
-                                WorkSize = obj.WorkSize.ToString("#,##"),
+                                WorkSize = FormatNum(obj.CurrentWorkSize),
                             }
                         );
                         overallStep = 1 + obj.CurrentStepIndex;
+
+                        StepProgress = 100 * (obj.WorkProcessedCount / (double)obj.CurrentWorkSize);
+                        StepStatusMsg = LocalizationCodes.LC_SOLVER_STEP_STATUS_BREEDING.Bind(
+                            new { NumProcessed = FormatNum(obj.WorkProcessedCount), WorkSize = FormatNum(obj.CurrentWorkSize) }
+                        );
                         break;
 
                     case SolverPhase.Finished:
@@ -461,6 +551,8 @@ namespace PalCalc.UI.ViewModel
                         {
                             SolverStatusMsg = LocalizationCodes.LC_SOLVER_STATUS_FINISHED.Bind(solverStopwatch.Elapsed.TimeSpanSecondsStr());
                             overallStep = (int)numTotalSteps;
+                            StepProgress = 100;
+                            StepStatusMsg = LocalizationCodes.LC_SOLVER_STEP_STATUS_DONE.Bind(FormatNum(obj.TotalWorkProcessedCount));
                         }
                         break;
                 }
@@ -511,9 +603,15 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private double solverProgress;
 
+        [ObservableProperty]
+        private double stepProgress;
+
         [NotifyPropertyChangedFor(nameof(ProgressBarVisibility))]
         [ObservableProperty]
         private ILocalizedText solverStatusMsg;
+
+        [ObservableProperty]
+        private ILocalizedText stepStatusMsg;
 
         private bool isEditable = true;
         public bool IsEditable

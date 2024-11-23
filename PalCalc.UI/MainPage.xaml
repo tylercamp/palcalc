@@ -53,12 +53,18 @@
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
             <DockPanel Grid.Column="2" Margin="0,5,0,0">
-                <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" OnRun="SolverControlsView_OnRun" OnCancel="SolverControlsView_OnCancel" Margin="0,0,0,5" HorizontalAlignment="Right" />
+                <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" OnRun="SolverControlsView_OnRun" OnCancel="SolverControlsView_OnCancel" Margin="5" HorizontalAlignment="Right" />
 
-                <Grid DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
-                    <ProgressBar Value="{Binding SolverProgress}" />
-                    <TextBlock Text="{Binding SolverStatusMsg.Value}" Margin="10,5,0,5" />
-                </Grid>
+                <StackPanel DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
+                    <Grid>
+                        <ProgressBar Value="{Binding SolverProgress}" />
+                        <TextBlock Text="{Binding SolverStatusMsg.Value}" Margin="10,5,0,5" />
+                    </Grid>
+                    <Grid Margin="0,0,0,0">
+                        <ProgressBar Value="{Binding StepProgress}" />
+                        <TextBlock Text="{Binding StepStatusMsg.Value}" Margin="10,5,0,5" />
+                    </Grid>
+                </StackPanel>
 
                 <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
             </DockPanel>
@@ -73,15 +79,17 @@
 
                     <GroupBox Header="{itl:LocalizedText LC_SOURCE_PALS}">
                         <StackPanel Orientation="Vertical">
-                            <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                            <StackPanel Orientation="Vertical" Margin="0,5,0,5">
                                 <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeBasePals}">
-                                    <TextBlock Text="{itl:LocalizedText LC_PALS_AT_BASE}" TextWrapping="Wrap" />
+                                    <TextBlock Text="{itl:LocalizedText LC_INCLUDE_PALS_AT_BASE}" TextWrapping="Wrap" />
+                                </CheckBox>
+
+                                <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCustomPals}">
+                                    <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_CUSTOM_PALS}" TextWrapping="Wrap" />
                                 </CheckBox>
                             </StackPanel>
 
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
-                                <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}" />
-                            </ScrollViewer>
+                            <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}" MaxHeight="300" />
                         </StackPanel>
                     </GroupBox>
                 </StackPanel>

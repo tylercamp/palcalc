@@ -21,34 +21,34 @@ namespace PalCalc.UI.ViewModel.Mapped
             if (underlyingSpec == null)
             {
                 TargetPal = null;
-                Trait1 = null;
-                Trait2 = null;
-                Trait3 = null;
-                Trait4 = null;
+                Passive1 = null;
+                Passive2 = null;
+                Passive3 = null;
+                Passive4 = null;
             }
             else
             {
                 TargetPal = PalViewModel.Make(underlyingSpec.Pal);
 
-                var traitVms = underlyingSpec.RequiredTraits
-                    .Select(TraitViewModel.Make)
-                    .Concat(Enumerable.Repeat<TraitViewModel>(null, GameConstants.MaxTotalTraits - underlyingSpec.RequiredTraits.Count))
+                var passiveVms = underlyingSpec.RequiredPassives
+                    .Select(PassiveSkillViewModel.Make)
+                    .Concat(Enumerable.Repeat<PassiveSkillViewModel>(null, GameConstants.MaxTotalPassives - underlyingSpec.RequiredPassives.Count))
                     .ToArray();
 
-                Trait1 = traitVms[0];
-                Trait2 = traitVms[1];
-                Trait3 = traitVms[2];
-                Trait4 = traitVms[3];
+                Passive1 = passiveVms[0];
+                Passive2 = passiveVms[1];
+                Passive3 = passiveVms[2];
+                Passive4 = passiveVms[3];
 
-                var optionalVms = underlyingSpec.OptionalTraits
-                    .Select(TraitViewModel.Make)
-                    .Concat(Enumerable.Repeat<TraitViewModel>(null, GameConstants.MaxTotalTraits - underlyingSpec.OptionalTraits.Count))
+                var optionalVms = underlyingSpec.OptionalPassives
+                    .Select(PassiveSkillViewModel.Make)
+                    .Concat(Enumerable.Repeat<PassiveSkillViewModel>(null, GameConstants.MaxTotalPassives - underlyingSpec.OptionalPassives.Count))
                     .ToArray();
 
-                OptionalTrait1 = optionalVms[0];
-                OptionalTrait2 = optionalVms[1];
-                OptionalTrait3 = optionalVms[2];
-                OptionalTrait4 = optionalVms[3];
+                OptionalPassive1 = optionalVms[0];
+                OptionalPassive2 = optionalVms[1];
+                OptionalPassive3 = optionalVms[2];
+                OptionalPassive4 = optionalVms[3];
             }
         }
 
@@ -59,14 +59,14 @@ namespace PalCalc.UI.ViewModel.Mapped
             if (isReadOnly)
             {
                 TargetPal = null;
-                Trait1 = null;
-                Trait2 = null;
-                Trait3 = null;
-                Trait4 = null;
-                OptionalTrait1 = null;
-                OptionalTrait2 = null;
-                OptionalTrait3 = null;
-                OptionalTrait4 = null;
+                Passive1 = null;
+                Passive2 = null;
+                Passive3 = null;
+                Passive4 = null;
+                OptionalPassive1 = null;
+                OptionalPassive2 = null;
+                OptionalPassive3 = null;
+                OptionalPassive4 = null;
             }
         }
 
@@ -75,21 +75,21 @@ namespace PalCalc.UI.ViewModel.Mapped
         public bool IsReadOnly { get; }
         public bool IsDynamic => !IsReadOnly;
 
-        private IEnumerable<TraitViewModel> RequiredTraits => new List<TraitViewModel>() { Trait1, Trait2, Trait3, Trait4 }.Where(t => t != null);
-        private IEnumerable<TraitViewModel> OptionalTraits => new List<TraitViewModel>() { OptionalTrait1, OptionalTrait2, OptionalTrait3, OptionalTrait4 }.Where(t => t != null);
+        private IEnumerable<PassiveSkillViewModel> RequiredPassives => new List<PassiveSkillViewModel>() { Passive1, Passive2, Passive3, Passive4 }.Where(t => t != null);
+        private IEnumerable<PassiveSkillViewModel> OptionalPassives => new List<PassiveSkillViewModel>() { OptionalPassive1, OptionalPassive2, OptionalPassive3, OptionalPassive4 }.Where(t => t != null);
 
-        private List<Trait> RequiredTraitModelObjects => RequiredTraits
+        private List<PassiveSkill> RequiredPassiveModelObjects => RequiredPassives
             .Select(t => t.ModelObject)
             .DistinctBy(mo => mo.InternalName)
             .ToList();
 
-        private List<Trait> OptionalTraitModelObjects => OptionalTraits
+        private List<PassiveSkill> OptionalPassiveModelObjects => OptionalPassives
             .Select(t => t.ModelObject)
             .DistinctBy(mo => mo.InternalName)
             .ToList();
 
         public PalSpecifier ModelObject => TargetPal != null
-            ? new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredTraits = RequiredTraitModelObjects, OptionalTraits = OptionalTraitModelObjects }
+            ? new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredPassives = RequiredPassiveModelObjects, OptionalPassives = OptionalPassiveModelObjects }
             : null;
 
         [NotifyPropertyChangedFor(nameof(Label))]
@@ -98,44 +98,44 @@ namespace PalCalc.UI.ViewModel.Mapped
         private PalViewModel targetPal;
 
         [NotifyPropertyChangedFor(nameof(Label))]
-        [NotifyPropertyChangedFor(nameof(RequiredTraitsCollection))]
+        [NotifyPropertyChangedFor(nameof(RequiredPassivesCollection))]
         [ObservableProperty]
-        private TraitViewModel trait1;
+        private PassiveSkillViewModel passive1;
 
-        [NotifyPropertyChangedFor(nameof(RequiredTraitsCollection))]
+        [NotifyPropertyChangedFor(nameof(RequiredPassivesCollection))]
         [NotifyPropertyChangedFor(nameof(Label))]
         [ObservableProperty]
-        private TraitViewModel trait2;
+        private PassiveSkillViewModel passive2;
 
-        [NotifyPropertyChangedFor(nameof(RequiredTraitsCollection))]
+        [NotifyPropertyChangedFor(nameof(RequiredPassivesCollection))]
         [NotifyPropertyChangedFor(nameof(Label))]
         [ObservableProperty]
-        private TraitViewModel trait3;
+        private PassiveSkillViewModel passive3;
 
-        [NotifyPropertyChangedFor(nameof(RequiredTraitsCollection))]
+        [NotifyPropertyChangedFor(nameof(RequiredPassivesCollection))]
         [NotifyPropertyChangedFor(nameof(Label))]
         [ObservableProperty]
-        private TraitViewModel trait4;
+        private PassiveSkillViewModel passive4;
 
-        public TraitCollectionViewModel RequiredTraitsCollection => new TraitCollectionViewModel(RequiredTraits);
+        public PassiveSkillCollectionViewModel RequiredPassivesCollection => new PassiveSkillCollectionViewModel(RequiredPassives);
 
-        [NotifyPropertyChangedFor(nameof(OptionalTraitsCollection))]
+        [NotifyPropertyChangedFor(nameof(OptionalPassivesCollection))]
         [ObservableProperty]
-        private TraitViewModel optionalTrait1;
+        private PassiveSkillViewModel optionalPassive1;
 
-        [NotifyPropertyChangedFor(nameof(OptionalTraitsCollection))]
+        [NotifyPropertyChangedFor(nameof(OptionalPassivesCollection))]
         [ObservableProperty]
-        private TraitViewModel optionalTrait2;
+        private PassiveSkillViewModel optionalPassive2;
 
-        [NotifyPropertyChangedFor(nameof(OptionalTraitsCollection))]
+        [NotifyPropertyChangedFor(nameof(OptionalPassivesCollection))]
         [ObservableProperty]
-        private TraitViewModel optionalTrait3;
+        private PassiveSkillViewModel optionalPassive3;
 
-        [NotifyPropertyChangedFor(nameof(OptionalTraitsCollection))]
+        [NotifyPropertyChangedFor(nameof(OptionalPassivesCollection))]
         [ObservableProperty]
-        private TraitViewModel optionalTrait4;
+        private PassiveSkillViewModel optionalPassive4;
 
-        public TraitCollectionViewModel OptionalTraitsCollection => new TraitCollectionViewModel(OptionalTraits);
+        public PassiveSkillCollectionViewModel OptionalPassivesCollection => new PassiveSkillCollectionViewModel(OptionalPassives);
 
         [ObservableProperty]
         private BreedingResultListViewModel currentResults;
@@ -145,6 +145,9 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         [ObservableProperty]
         private bool includeBasePals = true;
+
+        [ObservableProperty]
+        private bool includeCustomPals = true;
 
         public bool IsValid => TargetPal != null;
 
@@ -171,42 +174,46 @@ namespace PalCalc.UI.ViewModel.Mapped
 
             return (
                 psvm.TargetPal == TargetPal &&
-                psvm.Trait1 == Trait1 &&
-                psvm.Trait2 == Trait2 &&
-                psvm.Trait3 == Trait3 &&
-                psvm.Trait4 == Trait4 &&
-                psvm.OptionalTrait1 == OptionalTrait1 &&
-                psvm.OptionalTrait2 == OptionalTrait2 &&
-                psvm.OptionalTrait3 == OptionalTrait3 &&
-                psvm.OptionalTrait4 == OptionalTrait4 &&
+                psvm.Passive1 == Passive1 &&
+                psvm.Passive2 == Passive2 &&
+                psvm.Passive3 == Passive3 &&
+                psvm.Passive4 == Passive4 &&
+                psvm.OptionalPassive1 == OptionalPassive1 &&
+                psvm.OptionalPassive2 == OptionalPassive2 &&
+                psvm.OptionalPassive3 == OptionalPassive3 &&
+                psvm.OptionalPassive4 == OptionalPassive4 &&
                 psvm.PalSourceId == PalSourceId &&
-                psvm.IncludeBasePals == IncludeBasePals
+                psvm.IncludeBasePals == IncludeBasePals &&
+                psvm.IncludeCustomPals == IncludeCustomPals
             );
         }
 
         public override int GetHashCode() => HashCode.Combine(
             TargetPal,
             HashCode.Combine(
-                Trait1,
-                Trait2,
-                Trait3,
-                Trait4
+                Passive1,
+                Passive2,
+                Passive3,
+                Passive4
             ),
             HashCode.Combine(
-                OptionalTrait1,
-                OptionalTrait2,
-                OptionalTrait3,
-                OptionalTrait4
+                OptionalPassive1,
+                OptionalPassive2,
+                OptionalPassive3,
+                OptionalPassive4
             ),
             PalSourceId,
-            IncludeBasePals
+            IncludeBasePals,
+            IncludeCustomPals
         );
 
-        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredTraits = RequiredTraitModelObjects, OptionalTraits = OptionalTraitModelObjects })
-        {
+        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(
+            new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredPassives = RequiredPassiveModelObjects, OptionalPassives = OptionalPassiveModelObjects }
+        ) {
             CurrentResults = CurrentResults,
             PalSourceId = PalSourceId,
             IncludeBasePals = IncludeBasePals,
+            IncludeCustomPals = IncludeCustomPals,
             DeleteCommand = DeleteCommand,
         };
 
@@ -220,10 +227,10 @@ namespace PalCalc.UI.ViewModel.Mapped
                 return new PalSpecifierViewModel(null)
                 {
                     TargetPal = PalViewModel.Make("Beakon".ToPal(db)),
-                    Trait1 = TraitViewModel.Make("Runner".ToTrait(db)),
-                    Trait2 = TraitViewModel.Make("Swift".ToTrait(db)),
+                    Passive1 = PassiveSkillViewModel.Make("Runner".ToPassive(db)),
+                    Passive2 = PassiveSkillViewModel.Make("Swift".ToPassive(db)),
 
-                    OptionalTrait1 = TraitViewModel.Make("Aggressive".ToTrait(db))
+                    OptionalPassive1 = PassiveSkillViewModel.Make("Aggressive".ToPassive(db))
                 };
             }
         }

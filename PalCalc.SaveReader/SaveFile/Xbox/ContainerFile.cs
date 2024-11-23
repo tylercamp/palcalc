@@ -18,15 +18,18 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
         public string Name { get; private set; }
         /// <summary> File guid </summary>
         public Guid Guid { get; private set; }
+        /// <summary> Additional file guid (intent not clear) </summary>
+        public Guid Guid2 { get; private set; }
         /// <summary> File path </summary>
         public string Path { get; private set; }
         #endregion
 
         #region Constructors
-        public ContainerFile(string name, Guid guid, string path)
+        public ContainerFile(string name, Guid guid, Guid guid2, string path)
         {
             Name = name;
             Guid = guid;
+            Guid2 = guid2;
             Path = path;
         }
         #endregion
@@ -65,7 +68,7 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
             {
                 // Open a filestream with the user selected file
                 //FileStream stream = new FileStream(path, FileMode.Open);
-                var stream = File.OpenRead(path);
+                var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
                 // Create a binary reader that will be used to read the file
                 BinaryReader reader = new BinaryReader(stream);
@@ -106,12 +109,16 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
                     byte[] guid10 = reader.ReadBytes(6);
 
                     Guid guid = new Guid(BitConverter.ToString(guid1).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid2).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid3).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid4).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid5).Replace("-", string.Empty));
-                    // The second guid is the same
-                    string subSecondGuid = BitConverter.ToString(guid6).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid7).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid8).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid9).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid10).Replace("-", string.Empty);
+                    // The second guid is NOT ALWAYS the same
+                    Guid subSecondGuid = new Guid(BitConverter.ToString(guid6).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid7).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid8).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid9).Replace("-", string.Empty) + "-" + BitConverter.ToString(guid10).Replace("-", string.Empty));
 
-                    string filePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path), guid.ToString("N").ToUpper());
+                    var basePath = System.IO.Path.GetDirectoryName(path);
 
-                    files.Add(new ContainerFile(fileName, guid, filePath));
+                    string filePath = System.IO.Path.Combine(basePath, guid.ToString("N").ToUpper());
+                    if (!File.Exists(filePath))
+                        filePath = System.IO.Path.Combine(basePath, subSecondGuid.ToString("N").ToUpper());
+
+                    files.Add(new ContainerFile(fileName, guid, subSecondGuid, filePath));
                 }
 
                 reader.Dispose();

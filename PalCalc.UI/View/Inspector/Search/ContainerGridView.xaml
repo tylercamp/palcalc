@@ -1,0 +1,86 @@
+﻿<UserControl x:Class="PalCalc.UI.View.Inspector.Search.ContainerGridView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
+             xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
+             xmlns:sgvm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search.Grid"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             mc:Ignorable="d" 
+             d:DataContext="{x:Static sgvm:DefaultContainerGridViewModel.DesignerInstance}"
+             Visibility="{Binding GridVisibility}"
+             d:Background="White">
+    <UserControl.Resources>
+        <c:ValueVisibilityConverter x:Key="VVC" />
+    </UserControl.Resources>
+    <StackPanel>
+        <Label Content="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}, FallbackValue=Collapsed}" FontWeight="Bold" />
+        <ListView ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}" SelectionMode="Single">
+
+            <ListView.Template>
+                <ControlTemplate>
+                    <!--
+                    Reapply control template with the default <Border> element, BUT without the <ScrollViewer>
+                    (which caused scroll events to be eaten and prevent scrolling within the parent container)
+                    -->
+                    <Border BorderBrush="#FFABADB3" BorderThickness="1" Background="White" Padding="1">
+                        <ItemsPresenter />
+                    </Border>
+                </ControlTemplate>
+            </ListView.Template>
+
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="{Binding RowSize}" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.InputBindings>
+                <KeyBinding Key="Delete" Command="{Binding DeleteSlotCommand}" CommandParameter="{Binding SelectedSlot}" />
+            </ListView.InputBindings>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CanInterract}" Value="False">
+                            <Setter Property="IsEnabled" Value="False" />
+                            <Setter Property="Opacity" Value="0.25" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                    
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding}">
+                        <ContentControl.Resources>
+                            <DataTemplate DataType="{x:Type sgvm:ContainerGridEmptySlotViewModel}">
+                                <TextBlock Text="{itl:LocalizedText Code=LC_SAVEINSPECT_SLOT_EMPTY}"
+                                           VerticalAlignment="Center" HorizontalAlignment="Center"
+                                           Margin="0,0,5,0" />
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type sgvm:ContainerGridPalSlotViewModel}">
+                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding Pal.IconBrush}" />
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type sgvm:ContainerGridCustomPalSlotViewModel}">
+                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding PalInstance.IconBrush}" />
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type sgvm:ContainerGridNewPalSlotViewModel}">
+                                <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <materialIcons:MaterialIcon Kind="Add" Foreground="Black" />
+                                </Border>
+                            </DataTemplate>
+                        </ContentControl.Resources>
+                    </ContentControl>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackPanel>
+</UserControl>

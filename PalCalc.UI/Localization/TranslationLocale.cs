@@ -10,7 +10,7 @@ namespace PalCalc.UI.Localization
     {
         // list of localizations supported by Palworld (at time of writing 07/2025), any key in Pal.LocalizedNames should
         // also appear here
-        de, en, es, fr, it, ko, pt_BR, ru, zh_Hans, zh_Hant
+        de, en, es, fr, it, ja, ko, pt_BR, ru, zh_Hans, zh_Hant
     }
 
     public static class TranslationLocaleExtensions

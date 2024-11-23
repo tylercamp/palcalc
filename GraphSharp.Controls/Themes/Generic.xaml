@@ -318,7 +318,7 @@
                                 Background="#88C0C0C0"
                                 Width="Auto"
                                 Height="Auto"
-                                VerticalAlignment="Top"
+                                VerticalAlignment="Bottom"
                                 HorizontalAlignment="Right">
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Orientation="Horizontal" Height="30">

@@ -22,11 +22,10 @@ namespace PalCalc.Model
          * 
          * - What's the formula for how long breeding will take?
          * - What's the probability of wild pals having a specific gender?
-         * - What's the probability of wild pals having exactly N traits?
-         * - Do child pals ALWAYS inherit at least one of the parent's traits?
+         * - What's the probability of wild pals having exactly N passives?
          */
 
-        public static readonly int MaxTotalTraits = 4;
+        public static readonly int MaxTotalPassives = 4;
 
         // roughly estimate time to catch a given pal
         public static TimeSpan TimeToCatch(Pal pal)
@@ -39,10 +38,10 @@ namespace PalCalc.Model
         }
 
         // https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/
-        // supposedly the child will always inherit at least 1 trait directly from a parent?
+        // supposedly the child will always inherit at least 1 passive directly from a parent?
 
-        // probability of getting N traits from parent pool
-        public static readonly IReadOnlyDictionary<int, float> TraitProbabilityDirect = new Dictionary<int, float>()
+        // probability of getting N passives from parent pool
+        public static readonly IReadOnlyDictionary<int, float> PassiveProbabilityDirect = new Dictionary<int, float>()
         {
             { 4, 0.10f },
             { 3, 0.20f },
@@ -50,8 +49,8 @@ namespace PalCalc.Model
             { 1, 0.40f },
         };
 
-        // probability of getting N traits from parent pool without any random passives
-        public static readonly IReadOnlyDictionary<int, float> TraitProbabilityNoRandom = new Dictionary<int, float>()
+        // probability of getting N passives from parent pool without any random passives
+        public static readonly IReadOnlyDictionary<int, float> PassiveProbabilityNoRandom = new Dictionary<int, float>()
         {
             { 4, 0.10f },
             { 3, 0.08f },
@@ -59,7 +58,7 @@ namespace PalCalc.Model
             { 1, 0.16f },
         };
 
-        public static readonly IReadOnlyDictionary<int, float> TraitProbabilityAtLeastN = new Dictionary<int, float>()
+        public static readonly IReadOnlyDictionary<int, float> PassiveProbabilityAtLeastN = new Dictionary<int, float>()
         {
             { 4, 0.10f },
             { 3, 0.30f },
@@ -67,7 +66,7 @@ namespace PalCalc.Model
             { 1, 1.00f },
         };
 
-        public static readonly IReadOnlyDictionary<int, float> TraitProbabilityNoRandomAtLeastN = new Dictionary<int, float>()
+        public static readonly IReadOnlyDictionary<int, float> PassiveProbabilityNoRandomAtLeastN = new Dictionary<int, float>()
         {
             { 4, 0.10f },
             { 3, 0.12f },
@@ -75,8 +74,8 @@ namespace PalCalc.Model
             { 1, 0.40f },
         };
 
-        // probability of getting N additional random traits added
-        public static readonly IReadOnlyDictionary<int, float> TraitRandomAddedProbability = new Dictionary<int, float>()
+        // probability of getting N additional random passives added
+        public static readonly IReadOnlyDictionary<int, float> PassiveRandomAddedProbability = new Dictionary<int, float>()
         {
             { 4, 0.0f },
             { 3, 0.10f },
@@ -85,10 +84,10 @@ namespace PalCalc.Model
             { 0, 0.40f },
         };
 
-        // probability of a wild pal having, at most, N random traits
-        // (assume equal probability of gaining anywhere from 0 through 4 random traits)
-        // (20% chance of exactly N traits)
-        public static readonly IReadOnlyDictionary<int, float> TraitWildAtMostN = new Dictionary<int, float>()
+        // probability of a wild pal having, at most, N random passives
+        // (assume equal probability of gaining anywhere from 0 through 4 random passives)
+        // (20% chance of exactly N passives)
+        public static readonly IReadOnlyDictionary<int, float> PassivesWildAtMostN = new Dictionary<int, float>()
         {
             { 0, 0.2f },
             { 1, 0.4f },
