@@ -6,8 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
-using Windows.Foundation.Metadata;
 
 namespace PalCalc.SaveReader.SaveFile.Support.Level
 {
@@ -27,6 +25,62 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
         public int CurrentHP { get; set; }
         public int MaxHP { get; set; }
+
+        public Guid? PalContainerId { get; set; }
+    }
+
+    class MapContainerCollectingVisitor : IVisitor
+    {
+        public MapContainerCollectingVisitor() : base(".worldSaveData.MapObjectSaveData.MapObjectSaveData")
+        {
+
+        }
+
+        public override bool Matches(string path) => path.StartsWith(MatchedBasePath);
+
+        bool collectingContainerId = false;
+        List<byte> pendingContainerId;
+        public override void VisitString(string path, string value)
+        {
+            if (path != $"{MatchedBasePath}.ConcreteModel.ModuleMap.Key")
+                return;
+
+            if (value == "EPalMapObjectConcreteModelModuleType::CharacterContainer")
+            {
+                collectingContainerId = true;
+                pendingContainerId = [];
+            }
+            base.VisitString(path, value);
+        }
+
+        public override void VisitByte(string path, byte value)
+        {
+            if (collectingContainerId) pendingContainerId.Add(value);
+            base.VisitByte(path, value);
+        }
+
+        public override void VisitArrayPropertyEnd(string path, ArrayPropertyMeta meta)
+        {
+            collectingContainerId = false;
+            base.VisitArrayPropertyEnd(path, meta);
+        }
+
+        public event Action<Guid?> OnExit;
+        public IVisitor WithOnExit(Action<Guid?> onExit)
+        {
+            OnExit += onExit;
+            return this;
+        }
+
+        public override void Exit()
+        {
+            base.Exit();
+            var res = pendingContainerId != null && pendingContainerId.Count > 0
+                ? (Guid?)FArchiveReader.ParseGuid(pendingContainerId.ToArray())
+                : null;
+
+            OnExit?.Invoke(res);
+        }
     }
 
     public class MapObjectVisitor : IVisitor
@@ -72,7 +126,12 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     pendingEntry.BuilderPlayerId = prop.BuildPlayerUid;
                     pendingEntry.CurrentHP = prop.CurrentHp;
                     pendingEntry.MaxHP = prop.MaxHp;
+
+                    //if (prop.BaseCampIdBelongTo != Guid.Empty) Debugger.Break();
                 });
+
+            yield return new MapContainerCollectingVisitor()
+                .WithOnExit(containerId => pendingEntry.PalContainerId = containerId);
         }
 
         public override void VisitArrayEntryEnd(string path, int index, ArrayPropertyMeta meta)

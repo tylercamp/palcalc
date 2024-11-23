@@ -1,4 +1,4 @@
-﻿using PalCalc.SaveReader.FArchive.Custom;
+using PalCalc.SaveReader.FArchive.Custom;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -59,9 +59,8 @@ namespace PalCalc.SaveReader.FArchive
 
         public void Skip(int count) => reader.ReadBytes(count);
 
-        public Guid ReadGuid()
+        public static Guid ParseGuid(byte[] b)
         {
-            var b = ReadBytes(16);
             var res = new Guid([
                 b[0],
                 b[1],
@@ -85,9 +84,25 @@ namespace PalCalc.SaveReader.FArchive
                 b[12],
             ]);
 
-            Guid g = Guid.Parse("b996f95c-433a-0920-a9b9-9096e678803b");
-            if (res == g)
-                Debugger.Break();
+            //Guid g = Guid.Parse("b996f95c-433a-0920-a9b9-9096e678803b");
+            //if (res == g)
+            //    Debugger.Break();
+
+            return res;
+        }
+
+        public static byte[] UnparseGuid(Guid guid)
+        {
+            // reapplying the ParseGuid reordering will undo the original ordering
+            return ParseGuid(guid.ToByteArray()).ToByteArray();
+        }
+
+        public Guid ReadGuid()
+        {
+            var b = ReadBytes(16);
+            var res = ParseGuid(b);
+
+            //if (res.ToString().StartsWith("b996f95c")) Debugger.Break();
 
             return res;
         }
@@ -517,7 +532,17 @@ namespace PalCalc.SaveReader.FArchive
                                 case "ByteProperty":
                                     if (count != size - 4) throw new Exception("Labelled ByteProperty not implemented"); // sic
 
-                                    content = ReadBytes((int)count).ToArray();
+                                    content = iteration.Select(i =>
+                                    {
+                                        var b = ReadByte();
+                                        foreach (var v in newVisitors)
+                                        {
+                                            v.VisitArrayEntryBegin(path, i, meta);
+                                            v.VisitByte(path, b);
+                                            v.VisitArrayEntryEnd(path, i, meta);
+                                        }
+                                        return b;
+                                    }).ToArray();
                                     break;
 
                                 default:
