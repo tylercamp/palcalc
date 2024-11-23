@@ -84,28 +84,19 @@ namespace PalCalc.SaveReader.FArchive
                 b[12],
             ]);
 
-            //Guid g = Guid.Parse("b996f95c-433a-0920-a9b9-9096e678803b");
-            //if (res == g)
-            //    Debugger.Break();
-
             return res;
         }
 
         public static byte[] UnparseGuid(Guid guid)
         {
+            // (for debugging, where we want to take a GUID from UI and convert it to its original
+            //  byte array for lookup in a hex editor)
+            //
             // reapplying the ParseGuid reordering will undo the original ordering
             return ParseGuid(guid.ToByteArray()).ToByteArray();
         }
 
-        public Guid ReadGuid()
-        {
-            var b = ReadBytes(16);
-            var res = ParseGuid(b);
-
-            //if (res.ToString().StartsWith("b996f95c")) Debugger.Break();
-
-            return res;
-        }
+        public Guid ReadGuid() => ParseGuid(ReadBytes(16));
 
         public Guid? ReadOptionalGuid()
         {

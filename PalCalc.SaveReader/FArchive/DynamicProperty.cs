@@ -9,6 +9,15 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.FArchive
 {
+    /// <summary>
+    /// A convenience wrapper for IProperty values which allows you to access data without needing to cast all the time.
+    /// E.g. `myGvas.Dynamic.worldSaveData.MapObjectSaveData`.
+    /// 
+    /// Iterable values like `ArrayProperty` or `MapProperty` will still need an explicit cast to `IEnumerable{dynamic}` before
+    /// you can iterate.
+    /// 
+    /// Only meant to be used for exploring data, not as part of a normal parser.
+    /// </summary>
     public class DynamicProperty(IProperty value) : DynamicObject
     {
         public static object WrapValue(object value) =>
