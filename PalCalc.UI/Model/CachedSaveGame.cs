@@ -37,6 +37,11 @@ namespace PalCalc.UI.Model
         public List<PlayerInstance> Players { get; set; }
         public List<GuildInstance> Guilds { get; set; }
         public List<PalInstance> OwnedPals { get; set; }
+
+        // note: `OwnedPals` is the primary source of pal info, `Bases` and `PalContainers` are
+        //       just used for supplemental info like which bases belong to which guild, which
+        //       viewing cages belong to bases, world coordinates of bases, etc.
+
         public List<BaseInstance> Bases { get; set; }
         public List<IPalContainer> PalContainers { get; set; }
 

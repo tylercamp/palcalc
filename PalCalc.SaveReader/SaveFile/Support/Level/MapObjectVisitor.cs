@@ -29,6 +29,9 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         public int MaxHP { get; set; }
 
         public Guid? PalContainerId { get; set; }
+
+        public static readonly string PalBoxObjectId = "PalBoxV2";
+        public static readonly string ViewingCageObjectId = "DisplayCharacter";
     }
 
     class MapContainerCollectingVisitor : IVisitor

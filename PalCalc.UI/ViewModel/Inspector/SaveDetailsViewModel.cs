@@ -21,6 +21,8 @@ namespace PalCalc.UI.ViewModel.Inspector
 {
     public partial class SaveDetailsViewModel : ObservableObject
     {
+        // TODO - should eventually show world coordinates too
+
         private static SaveDetailsViewModel designerInstance = null;
         public static SaveDetailsViewModel DesignerInstance
         {
@@ -88,40 +90,54 @@ namespace PalCalc.UI.ViewModel.Inspector
                 }
                 else
                 {
-                    if (containedPals.Count > 0)
+                    var matchingBase = rawData.Bases.FirstOrDefault(b => b.ContainerId.ToString() == c.Id);
+                    var matchingCage = rawData.MapObjects.FirstOrDefault(m => m.ObjectId == GvasMapObject.ViewingCageObjectId && m.PalContainerId?.ToString() == c.Id);
+
+                    LocationType? definiteType = null;
+                    string ownerId = null;
+                    if (matchingBase != null && matchingBase.OwnerGroupId != Guid.Empty)
+                    {
+                        ownerId = matchingBase.OwnerGroupId.ToString();
+                        definiteType = LocationType.Base;
+                    }
+                    else if (matchingCage != null)
+                    {
+                        var cageBase = rawData.Bases.FirstOrDefault(b => matchingCage.OwnerBaseId.ToString() == b.Id);
+                        if (cageBase != null && cageBase.OwnerGroupId != Guid.Empty)
+                            ownerId = cageBase.OwnerGroupId.ToString();
+
+                        definiteType = LocationType.ViewingCage;
+                    }
+
+
+                    if (ownerId == null && containedPals.Count > 0)
                     {
                         var mostCommonType = containedPals.GroupBy(p => p.Location).MaxBy(g => g.Count()).Key;
                         var owners = containedPals.Select(p => p.OwnerPlayerId).Distinct().ToList();
+
                         if (owners.Count == 1)
                         {
-                            var ownerId = owners.First();
-                            return new InspectedContainerDetailsViewModel(
-                                ownersById.GetValueOrElse(ownerId, OwnerViewModel.UnknownWithId(ownerId)),
-                                containedPals,
-                                containedRawPals,
-                                c,
-                                containedPals.First().Location.Type
-                            );
+                            ownerId = owners.First();
                         }
                         else
                         {
-                            var mostCommonGuild = owners
+                            ownerId = owners
                                 .SelectMany(o => rawData.Groups.Where(g => g.MemberIds.Contains(o)).Select(g => g.Id))
                                 .MostCommonOrDefault();
-
-                            return new InspectedContainerDetailsViewModel(
-                                ownersById.GetValueOrElse(mostCommonGuild, OwnerViewModel.UnknownWithId(mostCommonGuild)),
-                                containedPals,
-                                containedRawPals,
-                                c,
-                                containedPals.First().Location.Type
-                            );
                         }
                     }
-                    else
-                    {
-                        return new InspectedContainerDetailsViewModel(OwnerViewModel.Unknown, containedPals, containedRawPals, c, null);
-                    }
+
+                    var owner = ownerId == null
+                        ? OwnerViewModel.Unknown
+                        : ownersById.GetValueOrElse(ownerId, OwnerViewModel.UnknownWithId(ownerId));
+
+                    return new InspectedContainerDetailsViewModel(
+                        owner,
+                        containedPals,
+                        containedRawPals,
+                        c,
+                        definiteType ?? containedPals.FirstOrDefault()?.Location?.Type
+                    );
                 }
             }).ToList();
 

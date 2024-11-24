@@ -42,8 +42,8 @@ namespace PalCalc.SaveReader.SaveFile
             var groupVisitor = new GroupVisitor();
             var baseVisitor = new BaseVisitor();
             var mapObjectVisitor = new MapObjectVisitor(
-                "PalBoxV2", // palbox
-                "DisplayCharacter" // viewing cage
+                GvasMapObject.PalBoxObjectId,
+                GvasMapObject.ViewingCageObjectId
             );
             VisitGvas(containerVisitor, instanceVisitor, groupVisitor, baseVisitor, mapObjectVisitor);
 
@@ -62,7 +62,7 @@ namespace PalCalc.SaveReader.SaveFile
             return parsed.ContainerContents.Select<RawPalContainerContents, IPalContainer>(c =>
             {
                 var fromBase = parsed.Bases.FirstOrDefault(b => b.ContainerId.ToString() == c.Id);
-                var fromCage = parsed.MapObjects.FirstOrDefault(m => m.ObjectId == "DisplayCharacter" && m.PalContainerId != null && m.PalContainerId.ToString() == c.Id);
+                var fromCage = parsed.MapObjects.FirstOrDefault(m => m.ObjectId == GvasMapObject.ViewingCageObjectId && m.PalContainerId != null && m.PalContainerId.ToString() == c.Id);
                 var fromParty = players.FirstOrDefault(p => p.PartyContainerId == c.Id);
                 var fromPalbox = players.FirstOrDefault(p => p.PalboxContainerId == c.Id);
 

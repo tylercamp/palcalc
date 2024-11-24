@@ -18,7 +18,7 @@ var db = PalDB.LoadEmbedded();
 //        stream.CopyTo(f);
 //});
 var save3 = new StandardSaveGame(@"C:\Users\algor\Desktop\Wormhole PeQoN");
-var v2 = new MapObjectVisitor("PalBoxV2", "DisplayCharacter");
+var v2 = new MapObjectVisitor(GvasMapObject.PalBoxObjectId, GvasMapObject.ViewingCageObjectId);
 var level3 = save3.Level.ParseGvas(true, v2);
 
 var d = level3.Dynamic;
