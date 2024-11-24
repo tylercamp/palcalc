@@ -60,6 +60,21 @@ namespace PalCalc.UI.Model
         public Dictionary<string, List<BaseInstance>> BasesByGuildId =>
             basesByGuild ??= Guilds.Select(g => g.Id).Concat(Bases.Select(b => b.OwnerGuildId)).Distinct().ToDictionary(g => g, g => Bases.Where(b => b.OwnerGuildId == g).ToList());
 
+        private Dictionary<string, GuildInstance> containerGuilds;
+        [JsonIgnore]
+        public Dictionary<string, GuildInstance> GuildsByContainerId =>
+            containerGuilds ??= PalContainers?.ToDictionary(
+                c => c.Id,
+                c => c switch
+                {
+                    PalboxPalContainer pbc => GuildsByPlayerId.GetValueOrDefault(pbc.PlayerId),
+                    PlayerPartyContainer ppc => GuildsByPlayerId.GetValueOrDefault(ppc.PlayerId),
+                    BasePalContainer bpc => Guilds.FirstOrDefault(g => g.Id == Bases.FirstOrDefault(b => b.Id == bpc.BaseId)?.OwnerGuildId),
+                    ViewingCageContainer vcc => Guilds.FirstOrDefault(g => g.Id == Bases.FirstOrDefault(b => b.Id == vcc.BaseId)?.OwnerGuildId),
+                    _ => null
+                }
+            );
+
         // NOTE: Any new fields should be added here
         public void CopyFrom(CachedSaveGame src)
         {

@@ -68,7 +68,12 @@ namespace PalCalc.UI.ViewModel.Mapped
                         ? new HardCodedText(rawOwnerName)
                         : LocalizationCodes.LC_UNKNOWN_PLAYER.Bind();
 
-                    var ownerGuild = source?.GuildsByPlayerId?.GetValueOrDefault(ownedLoc.OwnerId);
+
+                    // (old cached saves may be missing PalContainers, which would cause GuildsByContainerId to be null)
+                    var guildFromDirect = source?.GuildsByContainerId?.GetValueOrDefault(ownedLoc.Location.ContainerId);
+                    var guildFromPlayer = source?.GuildsByPlayerId?.GetValueOrDefault(ownedLoc.OwnerId);
+
+                    var ownerGuild = guildFromDirect ?? guildFromPlayer;
 
                     var isGuildOwner = (ownedLoc.Location.Type == LocationType.Base || ownedLoc.Location.Type == LocationType.ViewingCage) && ownerGuild?.MemberIds?.Count > 1;
 

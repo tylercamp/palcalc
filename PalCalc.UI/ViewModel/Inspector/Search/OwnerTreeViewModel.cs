@@ -207,29 +207,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
             foreach (var container in containers.OfType<DefaultSearchableContainerViewModel>())
             {
-                string guildId = null;
-                switch (container.SourceContainer)
-                {
-                    case PlayerPartyContainer ppc:
-                        guildId = source.GuildsByPlayerId[ppc.PlayerId].Id;
-                        break;
-
-                    case PalboxPalContainer ppc:
-                        guildId = source.GuildsByPlayerId[ppc.PlayerId].Id;
-                        break;
-
-                    case BasePalContainer bpc:
-                        guildId = source.Bases.Single(b => b.Id == bpc.BaseId).OwnerGuildId;
-                        break;
-
-                    case ViewingCageContainer vcc:
-                        guildId = source.Bases.Single(b => b.Id == vcc.BaseId).OwnerGuildId;
-                        break;
-
-                    default:
-                        logger.Warning("Unrecognized source container type {Type}, skipping", container.SourceContainer?.GetType());
-                        continue;
-                }
+                string guildId = source.GuildsByContainerId.GetValueOrDefault(container.Id)?.Id;
 
                 if (!guildContainers.ContainsKey(guildId))
                     guildContainers.Add(guildId, []);
