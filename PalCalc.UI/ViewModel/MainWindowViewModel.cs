@@ -409,7 +409,10 @@ namespace PalCalc.UI.ViewModel
 
             var inputPals = PalTarget.PalSource.SelectedSource.Filter(cachedData);
             if (!PalTarget.CurrentPalSpecifier.IncludeBasePals)
-                inputPals = inputPals.Where(p => p.Location.Type != LocationType.Base && p.Location.Type != LocationType.ViewingCage);
+                inputPals = inputPals.Where(p => p.Location.Type != LocationType.Base);
+
+            if (!PalTarget.CurrentPalSpecifier.IncludeCagedPals)
+                inputPals = inputPals.Where(p => p.Location.Type != LocationType.ViewingCage);
 
             if (PalTarget.CurrentPalSpecifier.IncludeCustomPals)
                 inputPals = inputPals.Concat(selectedGame.Customizations.ModelObject.CustomContainers.SelectMany(c => c.Contents));

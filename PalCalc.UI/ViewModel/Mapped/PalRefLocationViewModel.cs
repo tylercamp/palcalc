@@ -119,8 +119,13 @@ namespace PalCalc.UI.ViewModel.Mapped
 
                 case LocationType.ViewingCage:
                     var cageCoord = ViewingCageCoord.FromSlotIndex(ownedLoc.Location.Index);
-                    // TODO
-                    LocationCoordDescription = new HardCodedText($"Viewing cage at ({cageCoord.X},{cageCoord.Y})");
+                    LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_VIEWING_CAGE.Bind(
+                        new
+                        {
+                            X = cageCoord.X,
+                            Y = cageCoord.Y,
+                        }
+                    );
                     break;
 
                 case LocationType.Custom:

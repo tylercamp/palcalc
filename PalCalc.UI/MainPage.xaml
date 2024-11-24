@@ -84,6 +84,10 @@
                                     <TextBlock Text="{itl:LocalizedText LC_INCLUDE_PALS_AT_BASE}" TextWrapping="Wrap" />
                                 </CheckBox>
 
+                                <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCagedPals}">
+                                    <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_IN_CAGES}" TextWrapping="Wrap" />
+                                </CheckBox>
+
                                 <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCustomPals}">
                                     <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_CUSTOM_PALS}" TextWrapping="Wrap" />
                                 </CheckBox>

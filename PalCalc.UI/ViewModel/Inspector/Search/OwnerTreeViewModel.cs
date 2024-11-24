@@ -5,6 +5,7 @@ using PalCalc.SaveReader.SaveFile.Xbox;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Inspector.Search.Container;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -72,15 +73,13 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
     }
 
-    // TODO
     public class BaseAssignedPalsTreeNodeViewModel(DefaultSearchableContainerViewModel baseContainer) :
-        IContainerSource(new HardCodedText("Assigned Pals"), baseContainer)
+        IContainerSource(LocalizationCodes.LC_BASE_ASSIGNED_LABEL.Bind(), baseContainer)
     {
     }
 
-    // TODO
     public class ViewingCageTreeNodeViewModel(DefaultSearchableContainerViewModel viewingCageContainer) :
-        IContainerSource(new HardCodedText($"Viewing Cage ({viewingCageContainer.Id.Split('-')[0]})"), viewingCageContainer)
+        IContainerSource(LocalizationCodes.LC_VIEWING_CAGE_LABEL.Bind(viewingCageContainer.Id.Split('-')[0]), viewingCageContainer)
     {
     }
 
@@ -200,10 +199,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
     public partial class OwnerTreeViewModel : ObservableObject
     {
+        private static ILogger logger = Log.ForContext<OwnerTreeViewModel>();
+
         public OwnerTreeViewModel(CachedSaveGame source, List<ISearchableContainerViewModel> containers)
         {
-            var actualContainers = containers.OfType<DefaultSearchableContainerViewModel>();
-
             var guildContainers = new Dictionary<string, List<DefaultSearchableContainerViewModel>>();
 
             foreach (var container in containers.OfType<DefaultSearchableContainerViewModel>())
@@ -228,8 +227,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                         break;
 
                     default:
-                        // TODO - log
-                        break;
+                        logger.Warning("Unrecognized source container type {Type}, skipping", container.SourceContainer?.GetType());
+                        continue;
                 }
 
                 if (!guildContainers.ContainsKey(guildId))

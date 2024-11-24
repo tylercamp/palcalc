@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Model
 {
-    // TODO JSON serializers
     public interface IPalContainer
     {
         string Id { get; }
