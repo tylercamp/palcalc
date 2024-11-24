@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,11 +23,16 @@ namespace PalCalc.GenDB
     {
         public Pal Child(GenderedPal parent1, GenderedPal parent2)
         {
+            if (
+                (parent1.Pal.InternalName == "Ronin" && parent2.Pal.InternalName == "CandleGhost") ||
+                (parent2.Pal.InternalName == "Ronin" && parent1.Pal.InternalName == "CandleGhost")
+            ) Debugger.Break();
+
             if (parent1.Pal == parent2.Pal) return parent1.Pal;
 
             var specialCombo = uniqueCombos.Where(c =>
                 (parent1.Pal == c.Parent1 && parent2.Pal == c.Parent2) ||
-                (parent2.Pal == c.Parent2 && parent1.Pal == c.Parent1)
+                (parent2.Pal == c.Parent1 && parent1.Pal == c.Parent2)
             );
 
             if (specialCombo.Any())
