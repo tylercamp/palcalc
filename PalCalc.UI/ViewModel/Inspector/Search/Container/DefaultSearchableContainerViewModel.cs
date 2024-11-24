@@ -10,10 +10,12 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search.Container
 {
-    public partial class DefaultSearchableContainerViewModel(string id, LocationType detectedType, List<PalInstance> contents) : ISearchableContainerViewModel
+    public partial class DefaultSearchableContainerViewModel(IPalContainer sourceContainer, List<PalInstance> contents) : ISearchableContainerViewModel
     {
-        override public string Id => id;
-        override public LocationType DetectedType => detectedType;
+        override public string Id => sourceContainer.Id;
+        override public LocationType DetectedType => sourceContainer.Type;
+
+        public IPalContainer SourceContainer => sourceContainer;
         
         public List<string> OwnerIds { get; } = contents.Select(p => p.OwnerPlayerId).Distinct().ToList();
         public List<PalInstance> RawContents => contents;

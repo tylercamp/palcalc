@@ -14,7 +14,7 @@ namespace PalCalc.UI.Model
 {
     public class CachedSaveGame
     {
-        private static readonly string SaveReaderVersion = "v13";
+        private static readonly string SaveReaderVersion = "v17";
 
         public CachedSaveGame(ISaveGame underlyingSave)
         {
@@ -38,6 +38,7 @@ namespace PalCalc.UI.Model
         public List<GuildInstance> Guilds { get; set; }
         public List<PalInstance> OwnedPals { get; set; }
         public List<BaseInstance> Bases { get; set; }
+        public List<IPalContainer> PalContainers { get; set; }
 
         private Dictionary<string, PlayerInstance> playersByName;
         [JsonIgnore]
@@ -67,6 +68,7 @@ namespace PalCalc.UI.Model
             InGameDay = src.InGameDay;
             DatabaseVersion = src.DatabaseVersion;
             ReaderVersion = src.ReaderVersion;
+            PalContainers = [.. src.PalContainers];
             Players = [.. src.Players];
             Guilds = [.. src.Guilds];
             OwnedPals = [.. src.OwnedPals];
@@ -135,6 +137,7 @@ namespace PalCalc.UI.Model
                     Guilds = charData.Guilds,
                     Players = charData.Players,
                     Bases = charData.Bases,
+                    PalContainers = charData.PalContainers,
                     PlayerLevel = meta?.PlayerLevel,
                     PlayerName = meta?.PlayerName ?? "UNKNOWN",
                     WorldName = meta?.WorldName ?? "UNKNOWN WORLD",

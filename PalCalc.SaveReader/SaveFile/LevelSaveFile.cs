@@ -167,6 +167,7 @@ namespace PalCalc.SaveReader.SaveFile
             {
                 Pals = [],
                 Players = [],
+                PalContainers = detectedContainers,
                 Guilds = parsed.Groups,
                 Bases = parsed.Bases.Select(b => new BaseInstance()
                 {

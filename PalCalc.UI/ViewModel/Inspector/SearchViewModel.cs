@@ -126,8 +126,9 @@ namespace PalCalc.UI.ViewModel.Inspector
             var csg = sgvm.CachedValue;
             var palsByContainerId = csg.OwnedPals.GroupBy(p => p.Location.ContainerId).ToDictionary(g => g.Key, g => g.ToList());
 
-            var containers = palsByContainerId
-                .Select(kvp => new DefaultSearchableContainerViewModel(kvp.Key, kvp.Value.First().Location.Type, kvp.Value))
+            var containers = csg.PalContainers
+                .Where(c => palsByContainerId.ContainsKey(c.Id))
+                .Select(c => new DefaultSearchableContainerViewModel(c, palsByContainerId[c.Id]))
                 .Cast<ISearchableContainerViewModel>()
                 .Concat(
                     sgvm.Customizations.CustomContainers.Select(c =>
