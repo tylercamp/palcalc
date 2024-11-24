@@ -17,5 +17,8 @@ namespace PalCalc.GenDB.GameDataReaders
         public const string PAL_CAGED_SPAWNERS_PATH = "Pal/Content/Pal/DataTable/Character/DT_CapturedCagePal";
 
         public const string LOCALIZATIONS_BASE = "Pal/Content/L10N";
+
+        public const string MAP_IMAGE_PATH = "Pal/Content/Pal/Texture/UI/Map/T_WorldMap";
+        public const string MAP_PROPERTIES_PATH = "Pal/Content/Pal/DataTable/WorldMapUIData/DT_WorldMapUIData";
     }
 }

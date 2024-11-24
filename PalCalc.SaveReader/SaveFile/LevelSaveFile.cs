@@ -176,9 +176,12 @@ namespace PalCalc.SaveReader.SaveFile
                     Container = detectedContainers.OfType<BasePalContainer>().FirstOrDefault(c => c.Id == b.ContainerId.ToString()),
                     ViewingCages = detectedContainers.OfType<ViewingCageContainer>().Where(c => c.BaseId == b.Id).ToList(),
 
-                    WorldX = b.Position.x,
-                    WorldY = b.Position.y,
-                    WorldZ = b.Position.z,
+                    Position = new WorldCoord()
+                    {
+                        X = b.Position.x,
+                        Y = b.Position.y,
+                        Z = b.Position.z,
+                    },
                 }).ToList()
             };
 

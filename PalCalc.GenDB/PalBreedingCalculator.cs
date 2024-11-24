@@ -23,11 +23,6 @@ namespace PalCalc.GenDB
     {
         public Pal Child(GenderedPal parent1, GenderedPal parent2)
         {
-            if (
-                (parent1.Pal.InternalName == "Ronin" && parent2.Pal.InternalName == "CandleGhost") ||
-                (parent2.Pal.InternalName == "Ronin" && parent1.Pal.InternalName == "CandleGhost")
-            ) Debugger.Break();
-
             if (parent1.Pal == parent2.Pal) return parent1.Pal;
 
             var specialCombo = uniqueCombos.Where(c =>

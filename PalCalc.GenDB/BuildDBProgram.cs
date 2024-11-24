@@ -137,23 +137,33 @@ namespace PalCalc.GenDB
                 .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
                 .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))
                 .Distinct()
-                .SelectMany(pair => new[] {
-                    (
-                        new GenderedPal() { Pal = pair.Item1, Gender = PalGender.FEMALE },
-                        new GenderedPal() { Pal = pair.Item2, Gender = PalGender.MALE }
-                    ),
-                    (
-                        new GenderedPal() { Pal = pair.Item1, Gender = PalGender.MALE },
-                        new GenderedPal() { Pal = pair.Item2, Gender = PalGender.FEMALE }
-                    )
-                })
-                // get the results of breeding with swapped genders (for results where the child is determined by parent genders)
-                .Select(p => new BreedingResult
-                {
-                    Parent1 = p.Item1,
-                    Parent2 = p.Item2,
-                    Child = breedingCalc.Child(p.Item1, p.Item2)
-                })
+                // (the `.Child` calc takes a while, parallelize that part)
+                .ToList()
+                .BatchedForParallel()
+                .AsParallel()
+                .SelectMany(batch =>
+                    batch
+                        .SelectMany(pair => new[] {
+                            (
+                                new GenderedPal() { Pal = pair.Item1, Gender = PalGender.FEMALE },
+                                new GenderedPal() { Pal = pair.Item2, Gender = PalGender.MALE }
+                            ),
+                            (
+                                new GenderedPal() { Pal = pair.Item1, Gender = PalGender.MALE },
+                                new GenderedPal() { Pal = pair.Item2, Gender = PalGender.FEMALE }
+                            )
+                        })
+                        // get the results of breeding with swapped genders (for results where the child is determined by parent genders)
+                        .Select(p => new BreedingResult
+                        {
+                            Parent1 = p.Item1,
+                            Parent2 = p.Item2,
+                            Child = breedingCalc.Child(p.Item1, p.Item2)
+                        })
+                        .ToList()
+                )
+                // (join all threads)
+                .ToList()
                 // simplify cases where the child is the same regardless of gender
                 .GroupBy(br => br.Child)
                 .SelectMany(cg =>
@@ -190,6 +200,16 @@ namespace PalCalc.GenDB
             return res;
         }
 
+        private static void ExportImage(UTexture2D tex, string path, int width, int height, SKEncodedImageFormat format, int quality = 100)
+        {
+            var rawData = tex.Decode(ETexturePlatform.DesktopMobile);
+            var resized = rawData.Resize(new SKSizeI() { Width = width, Height = height }, SKFilterQuality.High);
+            var encoded = resized.Encode(format, quality);
+
+            using (var o = new FileStream(path, FileMode.Create))
+                encoded.SaveTo(o);
+        }
+
         private static void ExportPalIcons(List<Pal> pals, Dictionary<string, UTexture2D> palIcons, int iconSize)
         {
             Console.WriteLine("Exporting pal icons...");
@@ -215,13 +235,7 @@ namespace PalCalc.GenDB
                 }
 
                 var img = icon.Value;
-
-                var rawData = img.Decode(ETexturePlatform.DesktopMobile);
-                var resized = rawData.Resize(new SKSizeI() { Width = iconSize, Height = iconSize }, SKFilterQuality.High);
-                var encoded = resized.Encode(SKEncodedImageFormat.Png, 10);
-
-                using (var o = new FileStream("../PalCalc.UI/Resources/Pals/" + palName + ".png", FileMode.Create))
-                    encoded.SaveTo(o);
+                ExportImage(icon.Value, "../PalCalc.UI/Resources/Pals/" + palName + ".png", iconSize, iconSize, SKEncodedImageFormat.Png);
             }
             Console.WriteLine("\tDone");
         }
@@ -293,6 +307,11 @@ namespace PalCalc.GenDB
                 palIcons: PalIconMappingsReader.ReadPalIconMappings(provider),
                 iconSize: 100
             );
+
+            var mapInfo = MapReader.ReadMapInfo(provider);
+
+            ExportImage(mapInfo.MapTexture, "../PalCalc.UI/Resources/Map.jpeg", 2048, 2048, SKEncodedImageFormat.Jpeg, 80);
+            Console.WriteLine("Map dimensions:\nMin: {0} | {1}\nMax: {2} | {3}", mapInfo.MapMinX, mapInfo.MapMaxX, mapInfo.MapMinY, mapInfo.MapMaxY);
         }
 
 
