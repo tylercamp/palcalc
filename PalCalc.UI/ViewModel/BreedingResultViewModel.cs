@@ -104,8 +104,9 @@ namespace PalCalc.UI.ViewModel
                     {
                         LocationType.Palbox => 0,
                         LocationType.Base => 1,
-                        LocationType.PlayerParty => 2,
-                        LocationType.Custom => 3,
+                        LocationType.ViewingCage => 2,
+                        LocationType.PlayerParty => 3,
+                        LocationType.Custom => 4,
                         _ => throw new NotImplementedException()
                     })
                     .Select(g => LocalizationCodes.LC_PAL_LOC_COUNT.Bind(

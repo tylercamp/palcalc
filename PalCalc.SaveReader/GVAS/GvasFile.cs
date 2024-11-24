@@ -1,6 +1,8 @@
 ﻿using PalCalc.SaveReader.FArchive;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -81,6 +83,20 @@ namespace PalCalc.SaveReader.GVAS
             }
 
             return result;
+        }
+
+        public dynamic Dynamic
+        {
+            get
+            {
+                var res = new ExpandoObject();
+                var rwres = (ICollection<KeyValuePair<string, object>>)res;
+
+                foreach (var kvp in Properties)
+                    rwres.Add(new KeyValuePair<string, object>(kvp.Key, DynamicProperty.WrapValue(kvp.Value)));
+
+                return rwres;
+            }
         }
 
         public static GvasFile FromFArchive(FArchiveReader reader, IEnumerable<IVisitor> visitors)

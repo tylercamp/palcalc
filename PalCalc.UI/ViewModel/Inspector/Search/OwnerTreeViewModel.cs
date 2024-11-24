@@ -5,6 +5,7 @@ using PalCalc.SaveReader.SaveFile.Xbox;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Inspector.Search.Container;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +16,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search
 {
@@ -22,6 +24,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
         ILocalizedText Label { get; }
         List<IOwnerTreeNode> Children => [];
+
+        bool IsSelected { get; set; }
 
         public IEnumerable<IOwnerTreeNode> AllChildren => Children.Concat(Children.SelectMany(c => c.AllChildren));
     }
@@ -35,9 +39,15 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             SearchedLabel = Label;
         }
 
+        private bool isSelected = false;
+        public bool IsSelected
+        {
+            get => isSelected;
+            set => SetProperty(ref isSelected, value);
+        }
+
         public ISearchableContainerViewModel Container { get; }
         public ILocalizedText Label { get; }
-
 
         private ILocalizedText searchedLabel;
         public ILocalizedText SearchedLabel
@@ -72,12 +82,42 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
     }
 
-    public class BaseTreeNodeViewModel(DefaultSearchableContainerViewModel baseContainer) :
-        IContainerSource(LocalizationCodes.LC_BASE_LABEL.Bind(baseContainer.Id.Split('-')[0]), baseContainer)
+    public class BaseAssignedPalsTreeNodeViewModel(DefaultSearchableContainerViewModel baseContainer) :
+        IContainerSource(LocalizationCodes.LC_BASE_ASSIGNED_LABEL.Bind(), baseContainer)
     {
     }
 
-    public class PlayerTreeNodeViewModel(PlayerInstance player, DefaultSearchableContainerViewModel party, DefaultSearchableContainerViewModel palbox) : IOwnerTreeNode
+    public class ViewingCageTreeNodeViewModel(DefaultSearchableContainerViewModel viewingCageContainer) :
+        IContainerSource(LocalizationCodes.LC_VIEWING_CAGE_LABEL.Bind(viewingCageContainer.Id.Split('-')[0]), viewingCageContainer)
+    {
+    }
+
+    public partial class BaseTreeNodeViewModel : ObservableObject, IOwnerTreeNode
+    {
+        public BaseTreeNodeViewModel(BaseInstance baseInst, DefaultSearchableContainerViewModel baseContainer, List<DefaultSearchableContainerViewModel> viewingCageContainers)
+        {
+            Label = LocalizationCodes.LC_BASE_LABEL.Bind(baseInst.Id.Split('-')[0]);
+            Children = [];
+
+            if (baseContainer != null)
+                Children.Add(new BaseAssignedPalsTreeNodeViewModel(baseContainer));
+
+            Children.AddRange(viewingCageContainers.OrderBy(c => c.Id).Select(c => new ViewingCageTreeNodeViewModel(c)));
+        }
+
+        public ILocalizedText Label { get; }
+
+        public List<IOwnerTreeNode> Children { get; }
+
+        [ObservableProperty]
+        private bool isSelected;
+    }
+
+    public partial class PlayerTreeNodeViewModel(
+        PlayerInstance player,
+        DefaultSearchableContainerViewModel party,
+        DefaultSearchableContainerViewModel palbox
+    ) : ObservableObject, IOwnerTreeNode
     {
         public ILocalizedText Label { get; } = LocalizationCodes.LC_PLAYER_LABEL.Bind(player.Name);
 
@@ -85,9 +125,12 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             party != null ? new PlayerPartyContainerViewModel(party) : null,
             palbox != null ? new PlayerPalboxContainerViewModel(palbox) : null
         ]).SkipNull().ToList();
+
+        [ObservableProperty]
+        private bool isSelected;
     }
 
-    public class GuildTreeNodeViewModel : IOwnerTreeNode
+    public partial class GuildTreeNodeViewModel : ObservableObject, IOwnerTreeNode
     {
         public GuildTreeNodeViewModel(CachedSaveGame source, GuildInstance guild, List<DefaultSearchableContainerViewModel> relevantContainers)
         {
@@ -108,21 +151,28 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 .Where(n => n.Children.Any())
                 .ToList();
 
-            // TODO - eventually add support for viewing cages
-            var baseContainers = relevantContainers
-                .Where(c => c.DetectedType == LocationType.Base)
-                .OrderBy(c => c.Id)
-                .Select(c => new BaseTreeNodeViewModel(c))
+            var baseNodes = source.BasesByGuildId[guild.Id]
+                .OrderBy(b => b.Id)
+                .Select(b =>
+                {
+                    var baseContainer = relevantContainers.Where(r => r.DetectedType == LocationType.Base && r.Id == b.Container.Id).FirstOrDefault();
+                    var cageContainers = relevantContainers.Where(r => r.DetectedType == LocationType.ViewingCage && b.ViewingCages.Any(v => v.Id == r.Id)).ToList();
+                    return new BaseTreeNodeViewModel(b, baseContainer, cageContainers);
+                })
+                .Where(n => n.Children.Any())
                 .ToList();
 
-            Children = playerNodes.Cast<IOwnerTreeNode>().Concat(baseContainers.Cast<IOwnerTreeNode>()).ToList();
+            Children = playerNodes.Cast<IOwnerTreeNode>().Concat(baseNodes.Cast<IOwnerTreeNode>()).ToList();
         }
 
         public ILocalizedText Label { get; }
         public List<IOwnerTreeNode> Children { get; }
+
+        [ObservableProperty]
+        private bool isSelected;
     }
 
-    public class CustomizationsTreeNodeViewModel : IOwnerTreeNode
+    public partial class CustomizationsTreeNodeViewModel : ObservableObject, IOwnerTreeNode
     {
         public CustomizationsTreeNodeViewModel(List<CustomContainerTreeNodeViewModel> containers)
         {
@@ -137,11 +187,17 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         public ILocalizedText Label { get; }
         public List<IOwnerTreeNode> Children { get; }
+
+        [ObservableProperty]
+        private bool isSelected;
     }
 
-    public class NewCustomContainerTreeNodeViewModel : IOwnerTreeNode
+    public partial class NewCustomContainerTreeNodeViewModel : ObservableObject, IOwnerTreeNode
     {
         public ILocalizedText Label { get; } = LocalizationCodes.LC_CUSTOM_CONTAINER_ADD_NEW.Bind();
+
+        [ObservableProperty]
+        private bool isSelected;
     }
 
     public partial class CustomContainerTreeNodeViewModel(CustomSearchableContainerViewModel customContainer)
@@ -171,25 +227,24 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
     public partial class OwnerTreeViewModel : ObservableObject
     {
+        private static ILogger logger = Log.ForContext<OwnerTreeViewModel>();
+
         public OwnerTreeViewModel(CachedSaveGame source, List<ISearchableContainerViewModel> containers)
         {
-            var standardNodes = containers
-                .OfType<DefaultSearchableContainerViewModel>()
-                .GroupBy(c =>
-                {
-                    var apparentGuildId = c.OwnerIds.Where(id => source.Guilds.Any(g => g.Id == id)).MostCommonOrDefault();
-                    if (apparentGuildId == null)
-                    {
-                        apparentGuildId = c.OwnerIds.Select(id => source.GuildsByPlayerId[id].Id).MostCommonOrDefault();
-                    }
+            var guildContainers = new Dictionary<string, List<DefaultSearchableContainerViewModel>>();
 
-                    return apparentGuildId;
-                })
-                .Select(group =>
-                {
-                    var guild = source.Guilds.Single(g => g.Id == group.Key);
-                    return new GuildTreeNodeViewModel(source, guild, group.ToList());
-                })
+            foreach (var container in containers.OfType<DefaultSearchableContainerViewModel>())
+            {
+                string guildId = source.GuildsByContainerId.GetValueOrDefault(container.Id)?.Id;
+
+                if (!guildContainers.ContainsKey(guildId))
+                    guildContainers.Add(guildId, []);
+
+                guildContainers[guildId].Add(container);
+            }
+
+            var standardNodes = source.Guilds
+                .Select(guild => new GuildTreeNodeViewModel(source, guild, guildContainers.GetValueOrElse(guild.Id, [])))
                 .Cast<IOwnerTreeNode>();
 
             var customNode = new CustomizationsTreeNodeViewModel(
@@ -214,7 +269,24 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     OnPropertyChanged(nameof(HasValidSource));
 
                     if (selectedNode is NewCustomContainerTreeNodeViewModel)
+                    {
+                        Dispatcher.CurrentDispatcher.BeginInvoke(() => value.IsSelected = false);
                         CreateCustomContainerCommand?.Execute(null);
+                    }
+                    else if (selectedNode != null && selectedNode is not IContainerSource)
+                    {
+                        // if the selected node isn't a valid source, and it only has one valid child source, just select
+                        // the valid child instead
+                        var childSources = selectedNode.AllChildren.Where(c => c is IContainerSource).ToList();
+                        if (childSources.Count == 1)
+                        {
+                            Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+                            {
+                                value.IsSelected = false;
+                                childSources[0].IsSelected = true;
+                            });
+                        }
+                    }
                 }
             }
         }

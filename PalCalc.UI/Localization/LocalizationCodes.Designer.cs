@@ -84,6 +84,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_ANY_PLAYER,
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_BASE_ASSIGNED_LABEL,
+        /// <summary>
         ///   Looks up a localized string similar to BaseName.
         /// </summary>
         LC_BASE_LABEL,
@@ -270,6 +274,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_INCLUDE_PALS_IN_CAGES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_INSPECT_SAVE,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -302,6 +310,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to SlotNum.
         /// </summary>
         LC_LOC_COORD_PARTY,
+        /// <summary>
+        ///   Looks up a localized string similar to X | Y.
+        /// </summary>
+        LC_LOC_COORD_VIEWING_CAGE,
         /// <summary>
         ///   Looks up a localized string similar to Owner.
         /// </summary>
@@ -382,6 +394,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_PAL_LOC_PARTY,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LOC_VIEWING_CAGE,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -766,6 +782,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_UPDATE_AVAILABLE,
+        /// <summary>
+        ///   Looks up a localized string similar to CageId.
+        /// </summary>
+        LC_VIEWING_CAGE_LABEL,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

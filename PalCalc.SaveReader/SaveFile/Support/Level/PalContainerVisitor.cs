@@ -1,4 +1,5 @@
 ﻿using PalCalc.SaveReader.FArchive;
+using PalCalc.SaveReader.FArchive.Custom;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
      * not sure what that's for.
      */
 
-    public class PalContainer
+    public class RawPalContainerContents
     {
         public string Id { get; set; }
         public int MaxEntries { get; set; }
@@ -38,9 +39,9 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
     {
         private static ILogger logger = Log.ForContext<PalContainerVisitor>();
 
-        public List<PalContainer> CollectedContainers { get; set; } = new List<PalContainer>();
+        public List<RawPalContainerContents> CollectedContainers { get; set; } = new List<RawPalContainerContents>();
 
-        PalContainer workingContainer = null;
+        RawPalContainerContents workingContainer = null;
 
         public PalContainerVisitor() : base(".worldSaveData.CharacterContainerSaveData")
         {
@@ -94,15 +95,15 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                 }
             }
 
-            public override void VisitCharacterContainerPropertyEnd(string path, CharacterContainerDataPropertyMeta meta)
+            public override void VisitCharacterContainerProperty(string path, CharacterContainerDataProperty property)
             {
 #if DEBUG
                 if (pendingSlot == null)
                     Debugger.Break();
 #endif
 
-                pendingSlot.InstanceId = meta.InstanceId.Value;
-                pendingSlot.PlayerId = meta.PlayerId;
+                pendingSlot.InstanceId = property.TypedMeta.InstanceId.Value;
+                pendingSlot.PlayerId = property.TypedMeta.PlayerId;
             }
         }
 
@@ -110,7 +111,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         {
             logger.Verbose("map entry begin");
 
-            workingContainer = new PalContainer() { Slots = new List<PalContainerSlot>() };
+            workingContainer = new RawPalContainerContents() { Slots = new List<PalContainerSlot>() };
 
             var keyIdCollector = new ValueCollectingVisitor(this, ".Key.ID", ".Value.SlotNum");
             keyIdCollector.OnExit += v =>

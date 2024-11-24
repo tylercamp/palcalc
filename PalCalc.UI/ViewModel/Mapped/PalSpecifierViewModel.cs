@@ -149,6 +149,9 @@ namespace PalCalc.UI.ViewModel.Mapped
         [ObservableProperty]
         private bool includeCustomPals = true;
 
+        [ObservableProperty]
+        private bool includeCagedPals = true;
+
         public bool IsValid => TargetPal != null;
 
         private static ILocalizedText newTargetLabel;
@@ -184,7 +187,8 @@ namespace PalCalc.UI.ViewModel.Mapped
                 psvm.OptionalPassive4 == OptionalPassive4 &&
                 psvm.PalSourceId == PalSourceId &&
                 psvm.IncludeBasePals == IncludeBasePals &&
-                psvm.IncludeCustomPals == IncludeCustomPals
+                psvm.IncludeCustomPals == IncludeCustomPals &&
+                psvm.IncludeCagedPals == IncludeCagedPals
             );
         }
 
@@ -204,7 +208,8 @@ namespace PalCalc.UI.ViewModel.Mapped
             ),
             PalSourceId,
             IncludeBasePals,
-            IncludeCustomPals
+            IncludeCustomPals,
+            IncludeCagedPals
         );
 
         public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(
@@ -214,6 +219,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             PalSourceId = PalSourceId,
             IncludeBasePals = IncludeBasePals,
             IncludeCustomPals = IncludeCustomPals,
+            IncludeCagedPals = IncludeCagedPals,
             DeleteCommand = DeleteCommand,
         };
 

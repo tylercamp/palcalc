@@ -18,8 +18,10 @@ namespace PalCalc.SaveReader.SaveFile.Virtual
             return new RawLevelSaveData()
             {
                 Characters = [],
-                Containers = [],
-                Groups = []
+                ContainerContents = [],
+                Groups = [],
+                Bases = [],
+                MapObjects = [],
             };
         }
 
@@ -29,7 +31,9 @@ namespace PalCalc.SaveReader.SaveFile.Virtual
             {
                 Guilds = [],
                 Pals = [],
-                Players = []
+                Players = [],
+                Bases = [],
+                PalContainers = [],
             };
         }
     }

@@ -68,9 +68,14 @@ namespace PalCalc.UI.ViewModel.Mapped
                         ? new HardCodedText(rawOwnerName)
                         : LocalizationCodes.LC_UNKNOWN_PLAYER.Bind();
 
-                    var ownerGuild = source?.GuildsByPlayerId?.GetValueOrDefault(ownedLoc.OwnerId);
 
-                    var isGuildOwner = ownedLoc.Location.Type == LocationType.Base && ownerGuild?.MemberIds?.Count > 1;
+                    // (old cached saves may be missing PalContainers, which would cause GuildsByContainerId to be null)
+                    var guildFromDirect = ownedLoc.Location.ContainerId == null ? null : source?.GuildsByContainerId?.GetValueOrDefault(ownedLoc.Location.ContainerId);
+                    var guildFromPlayer = source?.GuildsByPlayerId?.GetValueOrDefault(ownedLoc.OwnerId);
+
+                    var ownerGuild = guildFromDirect ?? guildFromPlayer;
+
+                    var isGuildOwner = (ownedLoc.Location.Type == LocationType.Base || ownedLoc.Location.Type == LocationType.ViewingCage) && ownerGuild?.MemberIds?.Count > 1;
 
                     if (isGuildOwner)
                     {
@@ -113,6 +118,17 @@ namespace PalCalc.UI.ViewModel.Mapped
                             Tab = pboxCoord.Tab,
                             X = pboxCoord.X,
                             Y = pboxCoord.Y,
+                        }
+                    );
+                    break;
+
+                case LocationType.ViewingCage:
+                    var cageCoord = ViewingCageCoord.FromSlotIndex(ownedLoc.Location.Index);
+                    LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_VIEWING_CAGE.Bind(
+                        new
+                        {
+                            X = cageCoord.X,
+                            Y = cageCoord.Y,
                         }
                     );
                     break;

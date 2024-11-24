@@ -14,7 +14,7 @@ namespace PalCalc.UI.Model
 {
     public class CachedSaveGame
     {
-        private static readonly string SaveReaderVersion = "v8";
+        private static readonly string SaveReaderVersion = "v17";
 
         public CachedSaveGame(ISaveGame underlyingSave)
         {
@@ -38,13 +38,42 @@ namespace PalCalc.UI.Model
         public List<GuildInstance> Guilds { get; set; }
         public List<PalInstance> OwnedPals { get; set; }
 
+        // note: `OwnedPals` is the primary source of pal info, `Bases` and `PalContainers` are
+        //       just used for supplemental info like which bases belong to which guild, which
+        //       viewing cages belong to bases, world coordinates of bases, etc.
+
+        public List<BaseInstance> Bases { get; set; }
+        public List<IPalContainer> PalContainers { get; set; }
+
         private Dictionary<string, PlayerInstance> playersByName;
+        [JsonIgnore]
         public Dictionary<string, PlayerInstance> PlayersById =>
             playersByName ??= Players.ToDictionary(p => p.PlayerId);
 
         private Dictionary<string, GuildInstance> playerGuilds;
+        [JsonIgnore]
         public Dictionary<string, GuildInstance> GuildsByPlayerId =>
             playerGuilds ??= Players.ToDictionary(p => p.PlayerId, p => Guilds.FirstOrDefault(g => g.MemberIds.Contains(p.PlayerId)));
+
+        private Dictionary<string, List<BaseInstance>> basesByGuild;
+        [JsonIgnore]
+        public Dictionary<string, List<BaseInstance>> BasesByGuildId =>
+            basesByGuild ??= Guilds.Select(g => g.Id).Concat(Bases.Select(b => b.OwnerGuildId)).Distinct().ToDictionary(g => g, g => Bases.Where(b => b.OwnerGuildId == g).ToList());
+
+        private Dictionary<string, GuildInstance> containerGuilds;
+        [JsonIgnore]
+        public Dictionary<string, GuildInstance> GuildsByContainerId =>
+            containerGuilds ??= PalContainers?.ToDictionary(
+                c => c.Id,
+                c => c switch
+                {
+                    PalboxPalContainer pbc => GuildsByPlayerId.GetValueOrDefault(pbc.PlayerId),
+                    PlayerPartyContainer ppc => GuildsByPlayerId.GetValueOrDefault(ppc.PlayerId),
+                    BasePalContainer bpc => Guilds.FirstOrDefault(g => g.Id == Bases.FirstOrDefault(b => b.Id == bpc.BaseId)?.OwnerGuildId),
+                    ViewingCageContainer vcc => Guilds.FirstOrDefault(g => g.Id == Bases.FirstOrDefault(b => b.Id == vcc.BaseId)?.OwnerGuildId),
+                    _ => null
+                }
+            );
 
         // NOTE: Any new fields should be added here
         public void CopyFrom(CachedSaveGame src)
@@ -59,12 +88,15 @@ namespace PalCalc.UI.Model
             InGameDay = src.InGameDay;
             DatabaseVersion = src.DatabaseVersion;
             ReaderVersion = src.ReaderVersion;
+            PalContainers = [.. src.PalContainers];
             Players = [.. src.Players];
             Guilds = [.. src.Guilds];
             OwnedPals = [.. src.OwnedPals];
+            Bases = [.. src.Bases];
 
             playersByName = null;
             playerGuilds = null;
+            basesByGuild = null;
         }
 
         [JsonIgnore]
@@ -124,6 +156,8 @@ namespace PalCalc.UI.Model
                     OwnedPals = charData.Pals,
                     Guilds = charData.Guilds,
                     Players = charData.Players,
+                    Bases = charData.Bases,
+                    PalContainers = charData.PalContainers,
                     PlayerLevel = meta?.PlayerLevel,
                     PlayerName = meta?.PlayerName ?? "UNKNOWN",
                     WorldName = meta?.WorldName ?? "UNKNOWN WORLD",
@@ -143,9 +177,9 @@ namespace PalCalc.UI.Model
             return result;
         }
 
-        public string ToJson(PalDB db) => JsonConvert.SerializeObject(this, new PalInstanceJsonConverter(db));
+        private static JsonConverter<IPalContainer> palContainerConverter = new PalContainerJsonConverter();
+        public string ToJson(PalDB db) => JsonConvert.SerializeObject(this, new PalInstanceJsonConverter(db), palContainerConverter);
 
-        public static CachedSaveGame FromJson(string json, PalDB db) => JsonConvert.DeserializeObject<CachedSaveGame>(json, new PalInstanceJsonConverter(db));
-
+        public static CachedSaveGame FromJson(string json, PalDB db) => JsonConvert.DeserializeObject<CachedSaveGame>(json, new PalInstanceJsonConverter(db), palContainerConverter);
     }
 }

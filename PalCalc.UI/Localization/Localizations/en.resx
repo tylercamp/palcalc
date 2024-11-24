@@ -132,6 +132,9 @@
   <data name="LC_ANY_PLAYER" xml:space="preserve">
     <value>Any Player</value>
   </data>
+  <data name="LC_BASE_ASSIGNED_LABEL" xml:space="preserve">
+    <value>Assigned to Base</value>
+  </data>
   <data name="LC_BASE_LABEL" xml:space="preserve">
     <value>Base ({BaseName})</value>
   </data>
@@ -279,6 +282,9 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_INCLUDE_PALS_AT_BASE" xml:space="preserve">
     <value>Include Pals at Base</value>
   </data>
+  <data name="LC_INCLUDE_PALS_IN_CAGES" xml:space="preserve">
+    <value>Include Pals in Viewing Cages</value>
+  </data>
   <data name="LC_INSPECT_SAVE" xml:space="preserve">
     <value>Inspect</value>
   </data>
@@ -302,6 +308,9 @@ Please find the generated ZIP file to send with any support questions:
   </data>
   <data name="LC_LOC_COORD_PARTY" xml:space="preserve">
     <value>Party, slot {SlotNum}</value>
+  </data>
+  <data name="LC_LOC_COORD_VIEWING_CAGE" xml:space="preserve">
+    <value>Viewing cage at ({X},{Y})</value>
   </data>
   <data name="LC_LOC_OWNED_BY" xml:space="preserve">
     <value>Owned by {Owner}</value>
@@ -364,6 +373,9 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   </data>
   <data name="LC_PAL_LOC_PARTY" xml:space="preserve">
     <value>Party</value>
+  </data>
+  <data name="LC_PAL_LOC_VIEWING_CAGE" xml:space="preserve">
+    <value>Viewing Cage</value>
   </data>
   <data name="LC_PAL_SRC_ANY_GUILD_MEMBER" xml:space="preserve">
     <value>Any guild member</value>
@@ -675,6 +687,9 @@ Higher values linearly affect time required, depending on how many types of pals
   </data>
   <data name="LC_UPDATE_AVAILABLE" xml:space="preserve">
     <value>An update is available!</value>
+  </data>
+  <data name="LC_VIEWING_CAGE_LABEL" xml:space="preserve">
+    <value>Viewing Cage ({CageId})</value>
   </data>
   <data name="LC_WINDOW_TITLE" xml:space="preserve">
     <value>Pal Calc</value>

@@ -395,6 +395,7 @@ namespace PalCalc.UI
                 PalSourceId = obj["PalSourceId"]?.ToObject<string>(),
                 IncludeBasePals = obj["IncludeBasePals"]?.ToObject<bool>() ?? true,
                 IncludeCustomPals = obj["IncludeCustomPals"]?.ToObject<bool>() ?? true,
+                IncludeCagedPals = obj["IncludeCagedPals"]?.ToObject<bool>() ?? true,
                 CurrentResults = obj["CurrentResults"].ToObject<BreedingResultListViewModel>(serializer)
             };
         }
@@ -415,6 +416,7 @@ namespace PalCalc.UI
                 PalSourceId = value.PalSourceId,
                 IncludeBasePals = value.IncludeBasePals,
                 IncludeCustomPals = value.IncludeCustomPals,
+                IncludeCagedPals = value.IncludeCagedPals,
                 CurrentResults = value.CurrentResults
             }, serializer).WriteTo(writer, dependencyConverters);
         }

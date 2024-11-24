@@ -503,8 +503,11 @@ namespace PalCalc.Solver
 
                     void EmitProgressMsg(object _)
                     {
-                        var progress = progressEntries.Sum(e => e.NumProcessed);
-                        statusMsg.WorkProcessedCount = progress;
+                        lock (progressEntries)
+                        {
+                            var progress = progressEntries.Sum(e => e.NumProcessed);
+                            statusMsg.WorkProcessedCount = progress;
+                        }
                         SolverStateUpdated?.Invoke(statusMsg);
                     }
 
@@ -674,7 +677,9 @@ namespace PalCalc.Solver
 
                 if (token.IsCancellationRequested) break;
 
-                statusMsg.WorkProcessedCount = progressEntries.Sum(e => e.NumProcessed);
+                lock(progressEntries)
+                    statusMsg.WorkProcessedCount = progressEntries.Sum(e => e.NumProcessed);
+
                 statusMsg.TotalWorkProcessedCount += statusMsg.WorkProcessedCount;
 
                 if (!didUpdate)

@@ -1,4 +1,5 @@
-﻿using Serilog;
+using PalCalc.SaveReader.FArchive.Custom;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -58,10 +59,9 @@ namespace PalCalc.SaveReader.FArchive
 
         public void Skip(int count) => reader.ReadBytes(count);
 
-        public Guid ReadGuid()
+        public static Guid ParseGuid(byte[] b)
         {
-            var b = ReadBytes(16);
-            return new Guid([
+            var res = new Guid([
                 b[0],
                 b[1],
                 b[2],
@@ -83,7 +83,20 @@ namespace PalCalc.SaveReader.FArchive
                 b[13],
                 b[12],
             ]);
+
+            return res;
         }
+
+        public static byte[] UnparseGuid(Guid guid)
+        {
+            // (for debugging, where we want to take a GUID from UI and convert it to its original
+            //  byte array for lookup in a hex editor)
+            //
+            // reapplying the ParseGuid reordering will undo the original ordering
+            return ParseGuid(guid.ToByteArray()).ToByteArray();
+        }
+
+        public Guid ReadGuid() => ParseGuid(ReadBytes(16));
 
         public Guid? ReadOptionalGuid()
         {
@@ -167,39 +180,40 @@ namespace PalCalc.SaveReader.FArchive
         {
             switch (structType)
             {
-                case "DateTime": return ReadUInt64();
+                case "DateTime":
+                    {
+                        var r = ReadUInt64();
+                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitDateTime(path, r);
+                        return r;
+                    }
+
+                case "Vector":
+                    {
+                        var r = ReadVector();
+                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitVector(path, r);
+                        return r;
+                    }
+
+                case "Quat":
+                    {
+                        var r = ReadQuaternion();
+                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitQuaternion(path, r);
+                        return r;
+                    }
+
+                case "LinearColor":
+                    {
+                        var r = ReadLinearColor();
+                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitLinearColor(path, r);
+                        return r;
+                    }
+
                 case "Guid":
                     {
                         var r = ReadGuid();
                         foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitGuid(path, r);
                         return r;
                     }
-
-                case "Vector":
-                    return new VectorLiteral
-                    {
-                        x = ReadDouble(),
-                        y = ReadDouble(),
-                        z = ReadDouble(),
-                    };
-
-                case "Quat":
-                    return new QuaternionLiteral
-                    {
-                        x = ReadDouble(),
-                        y = ReadDouble(),
-                        z = ReadDouble(),
-                        w = ReadDouble(),
-                    };
-
-                case "LinearColor":
-                    return new LinearColorLiteral
-                    {
-                        r = ReadFloat(),
-                        g = ReadFloat(),
-                        b = ReadFloat(),
-                        a = ReadFloat(),
-                    };
 
                 default:
                     var customReader = ICustomReader.All.SingleOrDefault(r => r.MatchedPath == path);
@@ -509,7 +523,11 @@ namespace PalCalc.SaveReader.FArchive
                                 case "ByteProperty":
                                     if (count != size - 4) throw new Exception("Labelled ByteProperty not implemented"); // sic
 
-                                    content = ReadBytes((int)count).ToArray();
+                                    content = ReadBytes((int)count);
+                                    foreach (var v in newVisitors)
+                                    {
+                                        v.VisitByteArray(path, (byte[])content);
+                                    }
                                     break;
 
                                 default:
@@ -642,6 +660,20 @@ namespace PalCalc.SaveReader.FArchive
             for (int i = 0; i < count; i++)
                 result[i] = reader(this);
             return result;
+        }
+
+        public VectorLiteral ReadVector() => new VectorLiteral { x = ReadDouble(), y = ReadDouble(), z = ReadDouble() };
+        public QuaternionLiteral ReadQuaternion() => new QuaternionLiteral() { x = ReadDouble(), y = ReadDouble(), z = ReadDouble(), w = ReadDouble() };
+        public LinearColorLiteral ReadLinearColor() => new LinearColorLiteral() { r = ReadFloat(), g = ReadFloat(), b = ReadFloat(), a = ReadFloat() };
+
+        public FullTransform ReadFullTransform()
+        {
+            return new FullTransform()
+            {
+                Rotation = ReadQuaternion(),
+                Translation = ReadVector(),
+                Scale3d = ReadVector(),
+            };
         }
 
         public void Dispose()

@@ -50,13 +50,23 @@ namespace PalCalc.UI.ViewModel
         {
             var guildId = source.GuildsByPlayerId[ModelObject.PlayerId]?.Id;
 
+            var bases = source.BasesByGuildId.GetValueOrDefault(guildId, []);
+
+            var baseContainerIds = bases.Select(b => b.Container.Id).ToList();
+            var cageContainerIds = source.PalContainers
+                .OfType<ViewingCageContainer>()
+                .Where(c => bases.Any(b => b.Id == c.BaseId))
+                .Select(c => c.Id)
+                .ToList();
+
             return source.OwnedPals
                 .Where(p => p.Location.Type switch
                 {
                     LocationType.PlayerParty => p.OwnerPlayerId == ModelObject.PlayerId,
                     LocationType.Palbox => p.OwnerPlayerId == ModelObject.PlayerId,
-                    LocationType.Base => source.GuildsByPlayerId[p.OwnerPlayerId].Id == guildId,
-                    // (Pals in custom containers aren't expected to have an "owner")
+                    LocationType.Base => baseContainerIds.Contains(p.Location.ContainerId),
+                    LocationType.ViewingCage => cageContainerIds.Contains(p.Location.ContainerId),
+                    // (Pals in custom containers aren't expected to have an "owner", and are handled separately in MainWindowViewModel anyway)
                     LocationType.Custom => false,
                     _ => throw new NotImplementedException()
                 });

@@ -2,13 +2,43 @@
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.SaveReader.FArchive;
+using PalCalc.SaveReader.FArchive.Custom;
 using PalCalc.SaveReader.GVAS;
+using PalCalc.SaveReader.SaveFile.Support.Level;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 
 Logging.InitCommonFull();
 
 var db = PalDB.LoadEmbedded();
+
+//CompressedSAV.WithDecompressedSave(@"C:\Users\algor\Desktop\Wormhole PeQoN\Level.sav", stream =>
+//{
+//    using (var f = new FileStream("decompressed", FileMode.Create))
+//        stream.CopyTo(f);
+//});
+var save3 = new StandardSaveGame(@"C:\Users\algor\Desktop\Wormhole PeQoN");
+var v2 = new MapObjectVisitor(GvasMapObject.PalBoxObjectId, GvasMapObject.ViewingCageObjectId);
+var level3 = save3.Level.ParseGvas(true, v2);
+
+var d = level3.Dynamic;
+var t = d.worldSaveData.MapObjectSaveData[0].ConcreteModel;
+
+var mapObjects = (IEnumerable<dynamic>)level3.Dynamic.worldSaveData.MapObjectSaveData.ToEnumerable();
+
+foreach (var obj in mapObjects.Where(o => ((IEnumerable<dynamic>)o.ConcreteModel.ModuleMap.ToEnumerable()).Any(m => m.Key == "EPalMapObjectConcreteModelModuleType::CharacterContainer")))
+{
+    foreach (var mod in (IEnumerable<dynamic>)obj.ConcreteModel.ModuleMap.ToEnumerable())
+    {
+        var k = mod.Key;
+        var v = mod.Value;
+    }
+    Debugger.Break();
+}
+
+var e = level3.Dynamic.worldSaveData.MapObjectSaveData[0].ConcreteModel.ModuleMap.ToEnumerable();
+
+
 
 var saveFolders = new List<ISavesLocation>();
 saveFolders.AddRange(DirectSavesLocation.AllLocal);

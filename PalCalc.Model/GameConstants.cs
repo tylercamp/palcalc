@@ -15,7 +15,8 @@ namespace PalCalc.Model
         public static readonly int PalBox_SlotsPerTab = PalBox_GridWidth * PalBox_GridHeight;
 
         public static readonly int Base_GridWidth = 5;
-        public static readonly int Base_GridHeight = 4;
+
+        public static readonly int ViewingCage_GridWidth = 6;
 
         /*
          * Outstanding questions:

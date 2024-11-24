@@ -16,6 +16,8 @@ namespace PalCalc.SaveReader.FArchive
         /// for single-value properties.
         /// </summary>
         void Traverse(Action<IProperty> action);
+
+        dynamic Dynamic => new DynamicProperty(this);
     }
 
     public interface IPropertyMeta

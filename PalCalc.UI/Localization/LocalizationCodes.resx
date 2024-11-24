@@ -649,4 +649,19 @@
   <data name="LC_SAVE_GAME_REMOVE_BTN_LABEL" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_BASE_ASSIGNED_LABEL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_INCLUDE_PALS_IN_CAGES" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LOC_COORD_VIEWING_CAGE" xml:space="preserve">
+    <value>X | Y</value>
+  </data>
+  <data name="LC_PAL_LOC_VIEWING_CAGE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_VIEWING_CAGE_LABEL" xml:space="preserve">
+    <value>CageId</value>
+  </data>
 </root>
