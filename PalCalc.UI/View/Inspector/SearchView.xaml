@@ -38,6 +38,7 @@
                         <Style TargetType="TreeViewItem">
                             <!-- Expand all items by default -->
                             <Setter Property="IsExpanded" Value="True" />
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                         </Style>
                     </TreeView.ItemContainerStyle>
                     <TreeView.Resources>

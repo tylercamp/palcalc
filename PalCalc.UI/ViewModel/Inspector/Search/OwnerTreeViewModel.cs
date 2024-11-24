@@ -16,6 +16,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search
 {
@@ -23,6 +24,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
         ILocalizedText Label { get; }
         List<IOwnerTreeNode> Children => [];
+
+        bool IsSelected { get; set; }
 
         public IEnumerable<IOwnerTreeNode> AllChildren => Children.Concat(Children.SelectMany(c => c.AllChildren));
     }
@@ -36,9 +39,15 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             SearchedLabel = Label;
         }
 
+        private bool isSelected = false;
+        public bool IsSelected
+        {
+            get => isSelected;
+            set => SetProperty(ref isSelected, value);
+        }
+
         public ISearchableContainerViewModel Container { get; }
         public ILocalizedText Label { get; }
-
 
         private ILocalizedText searchedLabel;
         public ILocalizedText SearchedLabel
@@ -83,7 +92,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
     }
 
-    public class BaseTreeNodeViewModel : IOwnerTreeNode
+    public partial class BaseTreeNodeViewModel : ObservableObject, IOwnerTreeNode
     {
         public BaseTreeNodeViewModel(BaseInstance baseInst, DefaultSearchableContainerViewModel baseContainer, List<DefaultSearchableContainerViewModel> viewingCageContainers)
         {
@@ -99,9 +108,16 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public ILocalizedText Label { get; }
 
         public List<IOwnerTreeNode> Children { get; }
+
+        [ObservableProperty]
+        private bool isSelected;
     }
 
-    public class PlayerTreeNodeViewModel(PlayerInstance player, DefaultSearchableContainerViewModel party, DefaultSearchableContainerViewModel palbox) : IOwnerTreeNode
+    public partial class PlayerTreeNodeViewModel(
+        PlayerInstance player,
+        DefaultSearchableContainerViewModel party,
+        DefaultSearchableContainerViewModel palbox
+    ) : ObservableObject, IOwnerTreeNode
     {
         public ILocalizedText Label { get; } = LocalizationCodes.LC_PLAYER_LABEL.Bind(player.Name);
 
@@ -109,9 +125,12 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             party != null ? new PlayerPartyContainerViewModel(party) : null,
             palbox != null ? new PlayerPalboxContainerViewModel(palbox) : null
         ]).SkipNull().ToList();
+
+        [ObservableProperty]
+        private bool isSelected;
     }
 
-    public class GuildTreeNodeViewModel : IOwnerTreeNode
+    public partial class GuildTreeNodeViewModel : ObservableObject, IOwnerTreeNode
     {
         public GuildTreeNodeViewModel(CachedSaveGame source, GuildInstance guild, List<DefaultSearchableContainerViewModel> relevantContainers)
         {
@@ -148,9 +167,12 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         public ILocalizedText Label { get; }
         public List<IOwnerTreeNode> Children { get; }
+
+        [ObservableProperty]
+        private bool isSelected;
     }
 
-    public class CustomizationsTreeNodeViewModel : IOwnerTreeNode
+    public partial class CustomizationsTreeNodeViewModel : ObservableObject, IOwnerTreeNode
     {
         public CustomizationsTreeNodeViewModel(List<CustomContainerTreeNodeViewModel> containers)
         {
@@ -165,11 +187,17 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         public ILocalizedText Label { get; }
         public List<IOwnerTreeNode> Children { get; }
+
+        [ObservableProperty]
+        private bool isSelected;
     }
 
-    public class NewCustomContainerTreeNodeViewModel : IOwnerTreeNode
+    public partial class NewCustomContainerTreeNodeViewModel : ObservableObject, IOwnerTreeNode
     {
         public ILocalizedText Label { get; } = LocalizationCodes.LC_CUSTOM_CONTAINER_ADD_NEW.Bind();
+
+        [ObservableProperty]
+        private bool isSelected;
     }
 
     public partial class CustomContainerTreeNodeViewModel(CustomSearchableContainerViewModel customContainer)
@@ -241,7 +269,24 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     OnPropertyChanged(nameof(HasValidSource));
 
                     if (selectedNode is NewCustomContainerTreeNodeViewModel)
+                    {
+                        Dispatcher.CurrentDispatcher.BeginInvoke(() => value.IsSelected = false);
                         CreateCustomContainerCommand?.Execute(null);
+                    }
+                    else if (selectedNode != null && selectedNode is not IContainerSource)
+                    {
+                        // if the selected node isn't a valid source, and it only has one valid child source, just select
+                        // the valid child instead
+                        var childSources = selectedNode.AllChildren.Where(c => c is IContainerSource).ToList();
+                        if (childSources.Count == 1)
+                        {
+                            Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+                            {
+                                value.IsSelected = false;
+                                childSources[0].IsSelected = true;
+                            });
+                        }
+                    }
                 }
             }
         }
