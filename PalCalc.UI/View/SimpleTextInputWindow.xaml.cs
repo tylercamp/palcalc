@@ -27,8 +27,6 @@ namespace PalCalc.UI.View
 
         public SimpleTextInputWindow(string defaultValue)
         {
-            InitializeComponent();
-
             SaveCommand = new RelayCommand(
                 execute: () =>
                 {
@@ -49,6 +47,10 @@ namespace PalCalc.UI.View
                     this.Close();
                 }
             );
+
+            // note: must be AFTER the SaveCommand/CancelCommand assignment since we don't raise property changed
+            //       events for those, view will onnly fetch these values once
+            InitializeComponent();
 
             Result = defaultValue;
 
@@ -79,6 +81,10 @@ namespace PalCalc.UI.View
             if (e.Key == Key.Escape)
             {
                 CancelCommand.Execute(null);
+            }
+            else
+            {
+                base.OnPreviewKeyDown(e);
             }
         }
 
