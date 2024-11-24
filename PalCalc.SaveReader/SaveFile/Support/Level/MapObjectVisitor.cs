@@ -1,5 +1,7 @@
-﻿using PalCalc.SaveReader.FArchive;
+﻿using PalCalc.Model;
+using PalCalc.SaveReader.FArchive;
 using PalCalc.SaveReader.FArchive.Custom;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,6 +33,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
     class MapContainerCollectingVisitor : IVisitor
     {
+        private ILogger logger = Log.ForContext<MapContainerCollectingVisitor>();
+
         public MapContainerCollectingVisitor() : base(".worldSaveData.MapObjectSaveData.MapObjectSaveData")
         {
 
@@ -39,7 +43,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         public override bool Matches(string path) => path.StartsWith(MatchedBasePath);
 
         bool collectingContainerId = false;
-        List<byte> pendingContainerId;
+        byte[] pendingContainerId;
+
         public override void VisitString(string path, string value)
         {
             if (path != $"{MatchedBasePath}.ConcreteModel.ModuleMap.Key")
@@ -48,21 +53,18 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             if (value == "EPalMapObjectConcreteModelModuleType::CharacterContainer")
             {
                 collectingContainerId = true;
-                pendingContainerId = [];
             }
-            base.VisitString(path, value);
         }
 
         public override void VisitByteArray(string path, byte[] value)
         {
-            if (collectingContainerId) pendingContainerId = value.ToList();
-            base.VisitByteArray(path, value);
+            if (collectingContainerId && value.Length > 0)
+                pendingContainerId = value;
         }
 
         public override void VisitArrayPropertyEnd(string path, ArrayPropertyMeta meta)
         {
             collectingContainerId = false;
-            base.VisitArrayPropertyEnd(path, meta);
         }
 
         public event Action<Guid?> OnExit;
@@ -74,17 +76,32 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
         public override void Exit()
         {
-            base.Exit();
-            var res = pendingContainerId != null && pendingContainerId.Count > 0
-                ? (Guid?)FArchiveReader.ParseGuid(pendingContainerId.ToArray())
-                : null;
-
-            OnExit?.Invoke(res);
+            if (pendingContainerId == null)
+            {
+                OnExit?.Invoke(null);
+            }
+            else
+            {
+                try
+                {
+                    OnExit?.Invoke(FArchiveReader.ParseGuid(pendingContainerId));
+                }
+                catch (Exception e)
+                {
+#if DEBUG
+                    Debugger.Break();
+#endif
+                    logger.Warning(e, "Error while trying to parse map object container ID");
+                    OnExit?.Invoke(null);
+                }
+            }
         }
     }
 
     public class MapObjectVisitor : IVisitor
     {
+        private static ILogger logger = Log.ForContext<MapObjectVisitor>();
+
         public List<GvasMapObject> Result { get; } = new List<GvasMapObject>();
 
         GvasMapObject pendingEntry;
@@ -104,7 +121,10 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         {
             if (pendingEntry != null)
             {
+#if DEBUG
                 Debugger.Break();
+#endif
+                logger.Warning("Starting new map object entry but the previous entry wasn't finished");
             }
 
             pendingEntry = new GvasMapObject();
@@ -112,10 +132,10 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             yield return new ValueCollectingVisitor(this, K_MAP_OBJECT_ID, K_WORLD_LOCATION, K_MAP_OBJECT_INSTANCE_ID, K_MAP_OBJECT_CONCRETE_INSTANCE_ID)
                 .WithOnExit(values =>
                 {
-                    pendingEntry.ObjectId = (string)values[K_MAP_OBJECT_ID];
-                    pendingEntry.WorldLocation = (VectorLiteral)values[K_WORLD_LOCATION];
-                    pendingEntry.InstanceId = (Guid)values[K_MAP_OBJECT_INSTANCE_ID];
-                    pendingEntry.ConcreteModelInstanceId = (Guid)values[K_MAP_OBJECT_CONCRETE_INSTANCE_ID];
+                    pendingEntry.ObjectId = values.GetValueOrDefault(K_MAP_OBJECT_ID) as string;
+                    pendingEntry.WorldLocation = (VectorLiteral)values.GetValueOrElse(K_WORLD_LOCATION, new VectorLiteral());
+                    pendingEntry.InstanceId = (Guid)values.GetValueOrElse(K_MAP_OBJECT_INSTANCE_ID, Guid.Empty);
+                    pendingEntry.ConcreteModelInstanceId = (Guid)values.GetValueOrElse(K_MAP_OBJECT_CONCRETE_INSTANCE_ID, Guid.Empty);
                 });
 
             yield return new PropertyEmittingVisitor<MapModelDataProperty>(this, ".MapObjectSaveData.Model.RawData")
@@ -126,8 +146,6 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     pendingEntry.BuilderPlayerId = prop.BuildPlayerUid;
                     pendingEntry.CurrentHP = prop.CurrentHp;
                     pendingEntry.MaxHP = prop.MaxHp;
-
-                    //if (prop.BaseCampIdBelongTo != Guid.Empty) Debugger.Break();
                 });
 
             yield return new MapContainerCollectingVisitor()
@@ -138,15 +156,17 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         {
             if (pendingEntry == null)
             {
+#if DEBUG
                 Debugger.Break();
+#endif
+                logger.Warning("Reached end of map object entry but no data was being tracked");
+                return;
             }
 
             if (objectIds.Length == 0 || objectIds.Contains(pendingEntry.ObjectId))
                 Result.Add(pendingEntry);
 
             pendingEntry = null;
-
-            base.VisitArrayEntryEnd(path, index, meta);
         }
     }
 }

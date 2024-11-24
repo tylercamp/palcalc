@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using PalCalc.SaveReader.FArchive;
 using PalCalc.SaveReader.FArchive.Custom;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile.Support.Level
 {
+    // (just for debugging)
     [Flags]
     public enum BaseDataSource
     {
@@ -36,11 +38,12 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         public Guid ContainerId { get; set; }
 
         public BaseDataSource DataSources { get; set; }
-        public bool IsComplete => DataSources == BaseDataSource.All;
     }
 
     internal class BaseVisitor : IVisitor
     {
+        private static ILogger logger = Log.ForContext<BaseVisitor>();
+
         public BaseVisitor() : base(".worldSaveData.BaseCampSaveData")
         {
         }
@@ -53,7 +56,11 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         {
             if (pendingInstance != null)
             {
+#if DEBUG
                 Debugger.Break();
+#endif
+
+                logger.Warning("Started a new Base entry before the previous Base was finished");
             }
 
             pendingInstance = new GvasBaseInstance();
@@ -88,7 +95,11 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         {
             if (pendingInstance == null)
             {
+#if DEBUG
                 Debugger.Break();
+#endif
+                logger.Warning("Reached end of Base entry but no data was being tracked");
+                return;
             }
 
             Result.Add(pendingInstance);
