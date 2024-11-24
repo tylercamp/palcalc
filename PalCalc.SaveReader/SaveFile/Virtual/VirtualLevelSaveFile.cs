@@ -31,7 +31,9 @@ namespace PalCalc.SaveReader.SaveFile.Virtual
             {
                 Guilds = [],
                 Pals = [],
-                Players = []
+                Players = [],
+                Bases = [],
+                PalContainers = [],
             };
         }
     }

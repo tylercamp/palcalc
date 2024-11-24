@@ -70,7 +70,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
 
                     // (old cached saves may be missing PalContainers, which would cause GuildsByContainerId to be null)
-                    var guildFromDirect = source?.GuildsByContainerId?.GetValueOrDefault(ownedLoc.Location.ContainerId);
+                    var guildFromDirect = ownedLoc.Location.ContainerId == null ? null : source?.GuildsByContainerId?.GetValueOrDefault(ownedLoc.Location.ContainerId);
                     var guildFromPlayer = source?.GuildsByPlayerId?.GetValueOrDefault(ownedLoc.OwnerId);
 
                     var ownerGuild = guildFromDirect ?? guildFromPlayer;
