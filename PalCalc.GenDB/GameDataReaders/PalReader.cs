@@ -1,5 +1,6 @@
 ﻿using CUE4Parse.FileProvider;
 using CUE4Parse.UE4.Assets.Exports.Engine;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,9 +74,11 @@ namespace PalCalc.GenDB.GameDataReaders
 
     internal class PalReader
     {
+        private static ILogger logger = Log.ForContext<PalReader>();
+
         public static List<UPal> ReadPals(IFileProvider provider)
         {
-            Console.WriteLine("Reading pals");
+            logger.Information("Reading pals");
             var rawPals = provider.LoadObject<UDataTable>(AssetPaths.PALS_PATH);
             List<UPal> result = [];
 

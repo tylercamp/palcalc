@@ -46,10 +46,13 @@ namespace PalCalc.GenDB
 {
     static class BuildDBProgram
     {
-        // This is all HEAVILY dependent on having the right Mappings.usmap file for the Palworld version!
-        static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld";
-        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
+        private static ILogger logger = Log.ForContext(typeof(BuildDBProgram));
 
+        // This is all HEAVILY dependent on having the right Mappings.usmap file for the Palworld version!
+        //
+        // (should be a folder containing "Pal-Windows.pak")
+        static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Content\Paks";
+        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
@@ -106,16 +109,17 @@ namespace PalCalc.GenDB
 
             // (game data seems to have combos for unreleased pals; pal data scraper here skips pals with paldex no. -1)
 
+            List<string> errors = [];
             if (parent1 == null)
-                Console.WriteLine("Unrecognized parent1 {0}", parent1Id);
+                errors.Add($"Unrecognized parent1 {parent1Id}");
             if (parent2 == null)
-                Console.WriteLine("Unrecognized parent2 {0}", parent2Id);
+                errors.Add($"Unrecognized parent2 {parent2Id}");
             if (child == null)
-                Console.WriteLine("Unrecognized child {0}", childId);
+                errors.Add($"Unrecognized child {childId}");
 
             if (parent1 == null || parent2 == null || child == null)
             {
-                Console.WriteLine("Skipping");
+                logger.Warning("{Errors} - skipping", string.Join(", ", errors));
                 return null;
             }
 
@@ -133,7 +137,7 @@ namespace PalCalc.GenDB
 
         private static List<BreedingResult> BuildAllBreedingResults(List<Pal> pals, PalBreedingCalculator breedingCalc)
         {
-            Console.WriteLine("Building the complete list of breeding results...");
+            logger.Information("Building the complete list of breeding results...");
 
             var res = pals
                 .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
@@ -197,8 +201,6 @@ namespace PalCalc.GenDB
                 )
                 .ToList();
 
-            Console.WriteLine("\tDone");
-
             return res;
         }
 
@@ -214,7 +216,7 @@ namespace PalCalc.GenDB
 
         private static void ExportPalIcons(List<Pal> pals, Dictionary<string, UTexture2D> palIcons, int iconSize)
         {
-            Console.WriteLine("Exporting pal icons...");
+            logger.Information("Exporting pal icons...");
             foreach (var icon in palIcons)
             {
                 string palName;
@@ -230,7 +232,7 @@ namespace PalCalc.GenDB
                     var pal = pals.SingleOrDefault(p => p.InternalName.ToLower() == internalName.ToLower());
                     if (pal == null)
                     {
-                        Console.WriteLine("Unknown pal {0}, skipping icon", internalName);
+                        logger.Warning("Unknown pal {PalName}, skipping icon", internalName);
                         continue;
                     }
                     palName = pal.Name;
@@ -239,7 +241,6 @@ namespace PalCalc.GenDB
                 var img = icon.Value;
                 ExportImage(icon.Value, "../PalCalc.UI/Resources/Pals/" + palName + ".png", iconSize, iconSize, SKEncodedImageFormat.Png);
             }
-            Console.WriteLine("\tDone");
         }
 
         public static void Main(string[] args)
@@ -254,7 +255,7 @@ namespace PalCalc.GenDB
             provider.LoadVirtualPaths();
             provider.LoadLocalization();
 
-            Console.WriteLine("Reading localizations, pals, and passives...");
+            logger.Information("Reading localizations, pals, and passives...");
             var localizations = LocalizationsReader.FetchLocalizations(provider);
 
             var rawPals = PalReader.ReadPals(provider);
@@ -277,7 +278,6 @@ namespace PalCalc.GenDB
                 rawPassiveSkills,
                 skillNames: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadSkillNames(provider))
             );
-            Console.WriteLine("\tDone");
 
             var uniqueBreedingCombos = UniqueBreedComboReader.ReadUniqueBreedCombos(provider);
             var breedingCalc = new PalBreedingCalculator(
@@ -304,13 +304,17 @@ namespace PalCalc.GenDB
 
             File.WriteAllText("../PalCalc.Model/db.json", db.ToJson());
 
+            logger.Information("Scraping pal icons");
             ExportPalIcons(
                 pals: pals,
                 palIcons: PalIconMappingsReader.ReadPalIconMappings(provider),
                 iconSize: 100
             );
 
+            logger.Information("Scraping map data");
             var mapInfo = MapReader.ReadMapInfo(provider);
+
+            if (mapInfo != null)
             {
                 var rawData = mapInfo.MapTexture.Decode(ETexturePlatform.DesktopMobile);
                 var resized = rawData.Resize(new SKSizeI() { Width = 2048, Height = 2048 }, SKFilterQuality.High);
@@ -337,10 +341,10 @@ namespace PalCalc.GenDB
 
                 using (var o = new FileStream("../PalCalc.UI/Resources/Map.jpeg", FileMode.Create))
                         encoded.SaveTo(o);
-            }
 
-            // Dimensions should be reflected in `PalCalc.Model.GameConstants`
-            Console.WriteLine("Map dimensions:\nMin: {0} | {1}\nMax: {2} | {3}", mapInfo.MapMinX, mapInfo.MapMaxX, mapInfo.MapMinY, mapInfo.MapMaxY);
+                // Dimensions should be reflected in `PalCalc.Model.GameConstants`
+                logger.Information("Map dimensions:\nMin: {0} | {1}\nMax: {2} | {3}", mapInfo.MapMinX, mapInfo.MapMaxX, mapInfo.MapMinY, mapInfo.MapMaxY);
+            }
         }
 
 

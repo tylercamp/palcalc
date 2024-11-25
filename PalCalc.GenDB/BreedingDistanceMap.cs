@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace PalCalc.GenDB
 {
     internal class BreedingDistanceMap
     {
+        private static ILogger logger = Log.ForContext<BreedingDistanceMap>();
+
         // min. number of times you need to breed Key1 to get a Key2 (to prune out path checks between pals which would exceed the max breeding steps)
         public static Dictionary<Pal, Dictionary<Pal, int>> CalcMinDistances(PalDB db)
         {
@@ -66,7 +69,7 @@ namespace PalCalc.GenDB
                     unresolved.Add(next);
                 }
 
-                Console.WriteLine("Resolved {0} entries with {1} left unresolved", resolved.Count, unresolved.Count);
+                logger.Information("Resolved {0} entries with {1} left unresolved", resolved.Count, unresolved.Count);
 
                 if (!didUpdate)
                 {

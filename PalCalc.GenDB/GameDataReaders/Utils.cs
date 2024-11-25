@@ -1,5 +1,6 @@
 ﻿using CUE4Parse.UE4.Assets.Objects;
 using CUE4Parse.UE4.Objects.UObject;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace PalCalc.GenDB.GameDataReaders
 
     static class FStructExtensions
     {
+        private static ILogger logger = Log.ForContext(typeof(FStructExtensions));
+
         public static T ToObject<T>(this FStructFallback dt) where T : class
         {
             var result = Activator.CreateInstance<T>();
@@ -51,7 +54,7 @@ namespace PalCalc.GenDB.GameDataReaders
 
             if (missingProps.Count > 0)
             {
-                Console.WriteLine("Entry missing props: " + string.Join(", ", missingProps));
+                logger.Warning("Entry missing props: {Missing}", string.Join(", ", missingProps));
             }
 
             return result;

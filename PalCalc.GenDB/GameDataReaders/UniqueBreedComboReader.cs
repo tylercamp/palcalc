@@ -1,6 +1,7 @@
 ﻿using CUE4Parse.FileProvider;
 using CUE4Parse.UE4.Assets.Exports.Engine;
 using PalCalc.Model;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +28,11 @@ namespace PalCalc.GenDB.GameDataReaders
 
     internal class UniqueBreedComboReader
     {
+        private static ILogger logger = Log.ForContext<UniqueBreedComboReader>();
+
         public static List<((string, PalGender?), (string, PalGender?), string)> ReadUniqueBreedCombos(IFileProvider provider)
         {
-            Console.WriteLine("Reading unique breeding combos");
+            logger.Information("Reading unique breeding combos");
             var rawCombos = provider.LoadObject<UDataTable>(AssetPaths.PALS_UNIQUE_BREEDING_PATH);
 
             string TribeToPal(string tribe) => tribe.Split("::").Last();

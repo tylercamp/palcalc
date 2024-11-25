@@ -1,5 +1,6 @@
 ﻿using CUE4Parse.FileProvider;
 using CUE4Parse.UE4.Assets.Exports.Engine;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +27,11 @@ namespace PalCalc.GenDB.GameDataReaders
 
     internal class PassiveSkillsReader
     {
+        private static ILogger logger = Log.ForContext<PassiveSkillsReader>();
+
         public static List<UPassiveSkill> ReadPassiveSkills(IFileProvider provider, List<string> extraPassives)
         {
-            Console.WriteLine("Reading passive skills");
+            logger.Information("Reading passive skills");
             var rawPassives = provider.LoadObject<UDataTable>(AssetPaths.PASSIVE_SKILLS_PATH);
 
             var res = new List<UPassiveSkill>();

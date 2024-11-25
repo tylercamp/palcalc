@@ -4,6 +4,7 @@ using CUE4Parse.UE4.Assets.Exports.Texture;
 using CUE4Parse.UE4.Assets.Objects;
 using CUE4Parse.UE4.Objects.Core.Math;
 using CUE4Parse.UE4.Objects.UObject;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,8 @@ namespace PalCalc.GenDB.GameDataReaders
 
     internal class MapReader
     {
+        private static ILogger logger = Log.ForContext<MapReader>();
+
         public static MapInfo ReadMapInfo(IFileProvider provider)
         {
             var maps = provider.LoadObject<UDataTable>(AssetPaths.MAP_PROPERTIES_PATH);
@@ -34,13 +37,13 @@ namespace PalCalc.GenDB.GameDataReaders
             {
                 if (result != null)
                 {
-                    // TODO log
+                    logger.Warning("Found map {Name}, but it was unexpected since map data was already collected", row.Key.Text);
                 }
 
                 var mapName = row.Key.Text;
                 if (mapName != "MainMap")
                 {
-                    // TODO log
+                    logger.Warning("Unrecognized map named {Name}, updates may be needed to support multiple maps, skipping", mapName);
                     continue;
                 }
 
@@ -53,9 +56,10 @@ namespace PalCalc.GenDB.GameDataReaders
 
                 foreach (var texProp in textureProperties.Properties)
                 {
-                    if (texProp.Key.GetValue<FName>().Text != "FirstRegion")
+                    var propName = texProp.Key.GetValue<FName>().Text;
+                    if (propName != "FirstRegion")
                     {
-                        // TODO log
+                        logger.Warning("Unexpected map texture property {PropName}, skipping", propName);
                         continue;
                     }
 
@@ -77,7 +81,11 @@ namespace PalCalc.GenDB.GameDataReaders
                 }
             }
 
-            // TODO log
+            if (result == null)
+            {
+                logger.Warning("No map data was collected!");
+            }
+
             return result;
         }
     }
