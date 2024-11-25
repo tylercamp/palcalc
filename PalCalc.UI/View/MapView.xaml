@@ -8,6 +8,18 @@
              mc:Ignorable="d"
              d:DataContext="{x:Static mvm:MapCoordViewModel.DesignerInstance}"
              d:DesignHeight="400" d:DesignWidth="400">
+    
+    <!-- note:
+    
+    tried adding pan-and-zoom using the ZoomControl from GraphSharp, but there isn't a good way to
+    prevent zooming/panning outside the bounds of the base image. the transform process used by that
+    control (and pretty much all other attempts at pan-and-zoom) make it non-trivial to calculate the
+    bounds/corrections needed when the zoom level changes
+    
+    if I try this again, anything hosting this via <ToolTip> should instead use <Popup> and have its
+    IsOpen state bound to IsMouseOver of the host control
+    
+    -->
 
     <Image Grid.ColumnSpan="100" Grid.RowSpan="100" Source="pack://application:,,,/PalCalc.UI;component/Resources/Map.jpeg" Stretch="Uniform" />
 
