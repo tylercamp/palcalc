@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
@@ -17,6 +18,47 @@ namespace PalCalc.UI.ViewModel.Mapped
         // locations need a cached save game to fetch owner info, but if the cache was unavailable when
         // the app was started, these will be left empty.
         bool NeedsRefresh { get; }
+    }
+
+    public class MapCoordViewModel(WorldCoord worldCoord, int iconSizePercent = 10)
+    {
+        public WorldCoord WorldCoords => worldCoord;
+
+        public MapCoord DisplayCoords { get; } = MapCoord.UIFromWorldCoord(worldCoord);
+        public MapCoord NormalizedCoords { get; } = MapCoord.NormalizedFromWorldCoord(worldCoord);
+
+        public string DisplayCoordsText => $"{DisplayCoords.X:N0}, {DisplayCoords.Y:N0}";
+        public string WorldCoordsText => $"{WorldCoords.X:N0}, {WorldCoords.Y:N0}, {WorldCoords.Z:N0}";
+
+        // (don't like the use of `Grid` for this, but this is the most straightforward way (afaik) to get
+        // reliable + scaling positioning of the coord within the MapView)
+
+        // note: the normalized coords are used directly for positioning here, but the map locs at
+        // (-1000,-1000) and (1000,1000) in-game don't exactly match the bottom-left + top-right locs
+        // in the image displayed in Pal Calc. i.e. the resulting coords aren't 100% correct
+
+        private List<RowDefinition> gridRows;
+        public List<RowDefinition> GridRows => gridRows ??=
+        [
+            // (Rows used for Y positioning, Y=0 is top and Y=Max is bottom in WPF, but the Palworld map has this inverted)
+            new RowDefinition() { Height = new GridLength((100 - iconSizePercent) * (1 - NormalizedCoords.Y), GridUnitType.Star) },
+            new RowDefinition() { Height = new GridLength(iconSizePercent, GridUnitType.Star) },
+            new RowDefinition() { Height = new GridLength((100 - iconSizePercent) * NormalizedCoords.Y, GridUnitType.Star) }
+        ];
+
+        private List<ColumnDefinition> gridColumns;
+        public List<ColumnDefinition> GridColumns => gridColumns ??=
+        [
+            // (Columns used for X positioning, normalized coords used directly)
+            new ColumnDefinition() { Width = new GridLength((100 - iconSizePercent) * NormalizedCoords.X, GridUnitType.Star) },
+            new ColumnDefinition() { Width = new GridLength(iconSizePercent, GridUnitType.Star) },
+            new ColumnDefinition() { Width = new GridLength((100 - iconSizePercent) * (1 - NormalizedCoords.X), GridUnitType.Star) }
+        ];
+
+        public static MapCoordViewModel DesignerInstance { get; } = new MapCoordViewModel(new WorldCoord() { X = 10000, Y = 10000, Z = 0 });
+
+        public static MapCoordViewModel FromCoord(WorldCoord coord, int iconSizePercent = 10) => coord == null ? null : new MapCoordViewModel(coord);
+        public static MapCoordViewModel FromBase(BaseInstance inst, int iconSizePercent = 10) => FromCoord(inst?.Position, iconSizePercent);
     }
 
     public class CompositePalRefLocationViewModel : IPalRefLocationViewModel
@@ -93,6 +135,8 @@ namespace PalCalc.UI.ViewModel.Mapped
                 }
             }
 
+            BaseInstance sourceBase = null;
+
             switch (ownedLoc.Location.Type)
             {
                 case LocationType.PlayerParty:
@@ -100,6 +144,8 @@ namespace PalCalc.UI.ViewModel.Mapped
                     break;
 
                 case LocationType.Base:
+                    sourceBase = source.Bases?.FirstOrDefault(b => b.Container?.Id == ownedLoc.Location.ContainerId);
+
                     var baseCoord = BaseCoord.FromSlotIndex(ownedLoc.Location.Index);
                     LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_BASE.Bind(
                         new
@@ -123,6 +169,8 @@ namespace PalCalc.UI.ViewModel.Mapped
                     break;
 
                 case LocationType.ViewingCage:
+                    sourceBase = source.Bases?.FirstOrDefault(b => b.ViewingCages.Any(c => c.Id == ownedLoc.Location.ContainerId));
+
                     var cageCoord = ViewingCageCoord.FromSlotIndex(ownedLoc.Location.Index);
                     LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_VIEWING_CAGE.Bind(
                         new
@@ -143,6 +191,8 @@ namespace PalCalc.UI.ViewModel.Mapped
 
             if (LocationOwner != null)
                 LocationOwnerDescription = LocalizationCodes.LC_LOC_OWNED_BY.Bind(LocationOwner);
+
+            MapCoord = MapCoordViewModel.FromBase(sourceBase);
         }
 
         public bool IsSinglePlayer { get; }
@@ -157,6 +207,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         public ILocalizedText LocationOwnerDescription { get; }
 
         public ILocalizedText LocationCoordDescription { get; }
+
+        public MapCoordViewModel MapCoord { get; }
     }
 
     public class WildPalRefLocationViewModel : IPalRefLocationViewModel

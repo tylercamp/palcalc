@@ -13,10 +13,15 @@
              xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
              xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
              xmlns:ab="clr-namespace:GraphSharp.AttachedBehaviours;assembly=GraphSharp.Controls"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance vm:BreedingResultViewModel, IsDesignTimeCreatable=True}"
              >
     <UserControl.Resources>
+        <c:ValueBoolConverter x:Key="VBC" />
+        <c:ValueVisibilityConverter x:Key="VVC" />
+
         <DataTemplate x:Key="DemoTemplate" DataType="{x:Type gsvm:BreedingTreeNodeViewModel}">
             <StackPanel Orientation="Vertical" Margin="5" MinWidth="180" UseLayoutRounding="True">
                 <StackPanel.Resources>
@@ -27,6 +32,25 @@
                 <StackPanel Orientation="Horizontal">
                     <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="White" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
                     <StackPanel Orientation="Vertical">
+                        <StackPanel.Resources>
+                            <!-- stack panels bound to a pal ref with map coords will get a tooltip -->
+                            <Style TargetType="StackPanel" x:Key="LocationStyle">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MapCoord, Converter={StaticResource VBC}, FallbackValue=False}" Value="True">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <ToolTip DataContext="{Binding PlacementTarget.DataContext.MapCoord, RelativeSource={RelativeSource Self}}">
+                                                    <local:MapView DataContext="{Binding}" Width="300" Height="300" />
+                                                </ToolTip>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Cursor" Value="Hand" />
+                                        <Setter Property="Background" Value="Black" />
+                                        <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Resources>
                         <TextBlock Text="{Binding Pal.Name.Value}" />
                         <TextBlock Text="{Binding Gender.Value}" FontSize="10" />
                         <StackPanel Orientation="Horizontal">
@@ -39,16 +63,22 @@
                         <ContentControl Content="{Binding Location}">
                             <ContentControl.Resources>
                                 <DataTemplate DataType="{x:Type mvm:SpecificPalRefLocationViewModel}">
-                                    <StackPanel Orientation="Vertical" Visibility="{Binding Visibility}">
-                                        <StackPanel.Resources>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="White"/>
-                                            </Style>
-                                        </StackPanel.Resources>
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal" Visibility="{Binding Visibility}" Style="{StaticResource LocationStyle}">
+                                            <StackPanel Orientation="Vertical" DataContext="{Binding}">
+                                                <StackPanel.Resources>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                    </Style>
+                                                </StackPanel.Resources>
                                         
-                                        <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" Visibility="{Binding OwnerVisibility}"/>
-                                        <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" />
-                                    </StackPanel>
+                                                <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" Visibility="{Binding OwnerVisibility}"/>
+                                                <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" />
+                                            </StackPanel>
+
+                                            <materialIcons:MaterialIcon Visibility="{Binding MapCoord, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                        </StackPanel>
+                                    </Grid>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type mvm:CompositePalRefLocationViewModel}">
                                     <StackPanel Orientation="Horizontal">
@@ -58,18 +88,25 @@
                                                 <Setter Property="Foreground" Value="White" />
                                             </Style>
                                         </StackPanel.Resources>
-                                        <StackPanel Orientation="Vertical" Grid.Column="0" MaxWidth="80">
-                                            <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_MALE}" />
-                                            <TextBlock Text="{Binding MaleViewModel.LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding MaleViewModel.OwnerVisibility}" />
-                                            <TextBlock Text="{Binding MaleViewModel.LocationCoordDescription.Value}" />
+                                        <StackPanel Orientation="Horizontal" Grid.Column="0" MaxWidth="100" DataContext="{Binding MaleViewModel}" Style="{StaticResource LocationStyle}">
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_MALE}" />
+                                                <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
+                                                <TextBlock Text="{Binding LocationCoordDescription.Value}" />
+                                            </StackPanel>
+                                            <materialIcons:MaterialIcon Visibility="{Binding MapCoord, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="8" VerticalAlignment="Center" Margin="5,0,0,0" />
                                         </StackPanel>
                                 
                                         <Border BorderBrush="White" Width="1" BorderThickness="1" Margin="10" Grid.Column="1" />
                                         
-                                        <StackPanel Orientation="Vertical" Grid.Column="2" MaxWidth="80">
-                                            <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_FEMALE}" />
-                                            <TextBlock Text="{Binding FemaleViewModel.LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding FemaleViewModel.OwnerVisibility}" />
-                                            <TextBlock Text="{Binding FemaleViewModel.LocationCoordDescription.Value}" />
+                                        <StackPanel Orientation="Horizontal" Grid.Column="2" MaxWidth="100" DataContext="{Binding FemaleViewModel}" Style="{StaticResource LocationStyle}">
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_FEMALE}" />
+                                                <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
+                                                <TextBlock Text="{Binding LocationCoordDescription.Value}" />
+                                            </StackPanel>
+
+                                            <materialIcons:MaterialIcon Visibility="{Binding MapCoord, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="8" VerticalAlignment="Center" Margin="5,0,0,0" />
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>

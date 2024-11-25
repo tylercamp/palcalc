@@ -7,11 +7,15 @@
              xmlns:ivm="clr-namespace:PalCalc.UI.ViewModel.Inspector"
              xmlns:dvm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Details"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              mc:Ignorable="d" 
              d:Background="White"
              d:DataContext="{x:Static ivm:SaveDetailsViewModel.DesignerInstance}"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
+        <Grid.Resources>
+            <c:ValueVisibilityConverter x:Key="VVC" />
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="149*" MaxWidth="300" />
             <ColumnDefinition Width="Auto" />
@@ -41,6 +45,17 @@
                             <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_ID}" />
                             <Run Text="{Binding Id, Mode=OneTime}" />
                         </TextBlock>
+
+                        <StackPanel Visibility="{Binding Coord, Converter={StaticResource VVC}}">
+                            <TextBlock>
+                                <Run Text="World Coords:" />
+                                <Run Text="{Binding Coord.WorldCoordsText, Mode=OneTime}" />
+                            </TextBlock>
+                            <TextBlock>
+                                <Run Text="Map Coords:" />
+                                <Run Text="{Binding Coord.DisplayCoordsText, Mode=OneTime}" />
+                            </TextBlock>
+                        </StackPanel>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>

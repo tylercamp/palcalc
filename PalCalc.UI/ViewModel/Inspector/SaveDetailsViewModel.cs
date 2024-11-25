@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.SaveReader;
+using PalCalc.SaveReader.FArchive;
 using PalCalc.SaveReader.SaveFile;
 using PalCalc.SaveReader.SaveFile.Support.Level;
 using PalCalc.UI.Localization;
@@ -81,30 +82,34 @@ namespace PalCalc.UI.ViewModel.Inspector
                 if (rawPlayers.Any(p => p.PartyContainerId == c.Id))
                 {
                     var owner = ownersById[rawPlayers.Single(p => p.PartyContainerId == c.Id).PlayerId];
-                    return new InspectedContainerDetailsViewModel(owner, containedPals, containedRawPals, c, LocationType.PlayerParty);
+                    return new InspectedContainerDetailsViewModel(owner, containedPals, containedRawPals, c, LocationType.PlayerParty, null);
                 }
                 else if (rawPlayers.Any(p => p.PalboxContainerId == c.Id))
                 {
                     var owner = ownersById[rawPlayers.Single(p => p.PalboxContainerId == c.Id).PlayerId];
-                    return new InspectedContainerDetailsViewModel(owner, containedPals, containedRawPals, c, LocationType.Palbox);
+                    return new InspectedContainerDetailsViewModel(owner, containedPals, containedRawPals, c, LocationType.Palbox, null);
                 }
                 else
                 {
                     var matchingBase = rawData.Bases.FirstOrDefault(b => b.ContainerId.ToString() == c.Id);
                     var matchingCage = rawData.MapObjects.FirstOrDefault(m => m.ObjectId == GvasMapObject.ViewingCageObjectId && m.PalContainerId?.ToString() == c.Id);
 
+                    VectorLiteral? position = null;
                     LocationType? definiteType = null;
                     string ownerId = null;
                     if (matchingBase != null && matchingBase.OwnerGroupId != Guid.Empty)
                     {
                         ownerId = matchingBase.OwnerGroupId.ToString();
                         definiteType = LocationType.Base;
+                        position = matchingBase.Position;
                     }
                     else if (matchingCage != null)
                     {
                         var cageBase = rawData.Bases.FirstOrDefault(b => matchingCage.OwnerBaseId.ToString() == b.Id);
                         if (cageBase != null && cageBase.OwnerGroupId != Guid.Empty)
                             ownerId = cageBase.OwnerGroupId.ToString();
+
+                        position = cageBase?.Position;
 
                         definiteType = LocationType.ViewingCage;
                     }
@@ -136,7 +141,13 @@ namespace PalCalc.UI.ViewModel.Inspector
                         containedPals,
                         containedRawPals,
                         c,
-                        definiteType ?? containedPals.FirstOrDefault()?.Location?.Type
+                        definiteType ?? containedPals.FirstOrDefault()?.Location?.Type,
+                        position == null ? null : new WorldCoord()
+                        {
+                            X = matchingBase.Position.x,
+                            Y = matchingBase.Position.y,
+                            Z = matchingBase.Position.z
+                        }
                     );
                 }
             }).ToList();

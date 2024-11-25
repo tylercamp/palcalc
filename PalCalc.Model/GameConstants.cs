@@ -18,6 +18,15 @@ namespace PalCalc.Model
 
         public static readonly int ViewingCage_GridWidth = 6;
 
+        // Used for calculating map coords from world coords
+        //
+        // (these values are fetched from game files and output at the end of `PalCalc.GenDB.BuildDBProgram`)
+        public static readonly double Map_MinX = -582888.0;
+        public static readonly double Map_MaxX = 335112.0;
+
+        public static readonly double Map_MinY = -301000.0;
+        public static readonly double Map_MaxY = 617000.0;
+
         /*
          * Outstanding questions:
          * 

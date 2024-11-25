@@ -2,6 +2,7 @@
 using CUE4Parse.UE4.Assets.Exports.Engine;
 using CUE4Parse.UE4.Assets.Exports.Texture;
 using CUE4Parse.UE4.Objects.UObject;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,12 @@ namespace PalCalc.GenDB.GameDataReaders
 {
     internal class PalIconMappingsReader
     {
+
+        private static ILogger logger = Log.ForContext<PalIconMappingsReader>();
+
         public static Dictionary<string, UTexture2D> ReadPalIconMappings(IFileProvider provider)
         {
-            Console.WriteLine("Reading pal icon mappings");
+            logger.Information("Reading pal icon mappings");
             var rawMappings = provider.LoadObject<UDataTable>(AssetPaths.PAL_ICONS_MAPPING_PATH);
             var res = new Dictionary<string, UTexture2D>();
 
@@ -24,7 +28,7 @@ namespace PalCalc.GenDB.GameDataReaders
                 if (iconPath.TryLoad<UTexture2D>(out var tex))
                     res.Add(entry.Key.Text, tex);
                 else
-                    Console.WriteLine("Unable to load icon for " + entry.Key.Text + " at " + iconPath.AssetPathName);
+                    logger.Warning("Unable to load icon for {Name} at {Path}", entry.Key.Text, iconPath.AssetPathName);
             }
 
             return res;

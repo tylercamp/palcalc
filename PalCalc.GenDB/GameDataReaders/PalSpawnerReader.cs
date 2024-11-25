@@ -1,5 +1,6 @@
 ﻿using CUE4Parse.FileProvider;
 using CUE4Parse.UE4.Assets.Exports.Engine;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -56,6 +57,8 @@ namespace PalCalc.GenDB.GameDataReaders
 
     internal class PalSpawnerReader
     {
+        private static ILogger logger = Log.ForContext<PalSpawnerReader>();
+
         static string TrimPalId(string palId) =>
             palId
                 .Replace("Boss_", "", StringComparison.InvariantCultureIgnoreCase)
@@ -64,7 +67,7 @@ namespace PalCalc.GenDB.GameDataReaders
 
         public static Dictionary<string, (int, int)> ReadWildLevelRanges(IFileProvider provider)
         {
-            Console.WriteLine("Reading wild pal level ranges");
+            logger.Information("Reading wild pal level ranges");
             var rawWildSpawnEntries = provider.LoadObject<UDataTable>(AssetPaths.PAL_SPAWNERS_PATH);
             var rawCagedSpawnEntries = provider.LoadObject<UDataTable>(AssetPaths.PAL_CAGED_SPAWNERS_PATH);
 

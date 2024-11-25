@@ -14,12 +14,14 @@
              xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              mc:Ignorable="d" 
              d:DataContext="{x:Static ivm:SearchViewModel.DesignerInstance}"
              d:Background="White"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
+        <c:ValueBoolConverter x:Key="VBC" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -52,7 +54,29 @@
                             <TextBlock Text="{Binding Label.Value}" />
                         </HierarchicalDataTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                            <TextBlock Text="{Binding Label.Value}" />
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Coords, Converter={StaticResource VBC}}" Value="True">
+                                                <Setter Property="Cursor" Value="Hand" />
+                                                <Setter Property="Background" Value="White" />
+                                                <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+                                                <Setter Property="ToolTip">
+                                                    <Setter.Value>
+                                                        <ToolTip>
+                                                            <v:MapView DataContext="{Binding Coords}" Width="300" Height="300" />
+                                                        </ToolTip>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+
+                                <TextBlock Text="{Binding Label.Value}" />
+                                <materialIcons:MaterialIcon Kind="Crosshairs" Height="12" Margin="5,0,0,0" Visibility="{Binding Coords, Converter={StaticResource VVC}}" />
+                            </StackPanel>
                         </HierarchicalDataTemplate>
 
                         <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">

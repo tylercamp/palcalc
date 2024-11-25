@@ -16,12 +16,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 /*
  * To get the latest usmap file:
@@ -44,10 +46,13 @@ namespace PalCalc.GenDB
 {
     static class BuildDBProgram
     {
-        // This is all HEAVILY dependent on having the right Mappings.usmap file for the Palworld version!
-        static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld";
-        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
+        private static ILogger logger = Log.ForContext(typeof(BuildDBProgram));
 
+        // This is all HEAVILY dependent on having the right Mappings.usmap file for the Palworld version!
+        //
+        // (should be a folder containing "Pal-Windows.pak")
+        static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Content\Paks";
+        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
@@ -104,16 +109,17 @@ namespace PalCalc.GenDB
 
             // (game data seems to have combos for unreleased pals; pal data scraper here skips pals with paldex no. -1)
 
+            List<string> errors = [];
             if (parent1 == null)
-                Console.WriteLine("Unrecognized parent1 {0}", parent1Id);
+                errors.Add($"Unrecognized parent1 {parent1Id}");
             if (parent2 == null)
-                Console.WriteLine("Unrecognized parent2 {0}", parent2Id);
+                errors.Add($"Unrecognized parent2 {parent2Id}");
             if (child == null)
-                Console.WriteLine("Unrecognized child {0}", childId);
+                errors.Add($"Unrecognized child {childId}");
 
             if (parent1 == null || parent2 == null || child == null)
             {
-                Console.WriteLine("Skipping");
+                logger.Warning("{Errors} - skipping", string.Join(", ", errors));
                 return null;
             }
 
@@ -131,29 +137,39 @@ namespace PalCalc.GenDB
 
         private static List<BreedingResult> BuildAllBreedingResults(List<Pal> pals, PalBreedingCalculator breedingCalc)
         {
-            Console.WriteLine("Building the complete list of breeding results...");
+            logger.Information("Building the complete list of breeding results...");
 
             var res = pals
                 .SelectMany(parent1 => pals.Select(parent2 => (parent1, parent2)))
                 .Select(pair => pair.parent1.GetHashCode() > pair.parent2.GetHashCode() ? (pair.parent1, pair.parent2) : (pair.parent2, pair.parent1))
                 .Distinct()
-                .SelectMany(pair => new[] {
-                    (
-                        new GenderedPal() { Pal = pair.Item1, Gender = PalGender.FEMALE },
-                        new GenderedPal() { Pal = pair.Item2, Gender = PalGender.MALE }
-                    ),
-                    (
-                        new GenderedPal() { Pal = pair.Item1, Gender = PalGender.MALE },
-                        new GenderedPal() { Pal = pair.Item2, Gender = PalGender.FEMALE }
-                    )
-                })
-                // get the results of breeding with swapped genders (for results where the child is determined by parent genders)
-                .Select(p => new BreedingResult
-                {
-                    Parent1 = p.Item1,
-                    Parent2 = p.Item2,
-                    Child = breedingCalc.Child(p.Item1, p.Item2)
-                })
+                // (the `.Child` calc takes a while, parallelize that part)
+                .ToList()
+                .BatchedForParallel()
+                .AsParallel()
+                .SelectMany(batch =>
+                    batch
+                        .SelectMany(pair => new[] {
+                            (
+                                new GenderedPal() { Pal = pair.Item1, Gender = PalGender.FEMALE },
+                                new GenderedPal() { Pal = pair.Item2, Gender = PalGender.MALE }
+                            ),
+                            (
+                                new GenderedPal() { Pal = pair.Item1, Gender = PalGender.MALE },
+                                new GenderedPal() { Pal = pair.Item2, Gender = PalGender.FEMALE }
+                            )
+                        })
+                        // get the results of breeding with swapped genders (for results where the child is determined by parent genders)
+                        .Select(p => new BreedingResult
+                        {
+                            Parent1 = p.Item1,
+                            Parent2 = p.Item2,
+                            Child = breedingCalc.Child(p.Item1, p.Item2)
+                        })
+                        .ToList()
+                )
+                // (join all threads)
+                .ToList()
                 // simplify cases where the child is the same regardless of gender
                 .GroupBy(br => br.Child)
                 .SelectMany(cg =>
@@ -185,14 +201,22 @@ namespace PalCalc.GenDB
                 )
                 .ToList();
 
-            Console.WriteLine("\tDone");
-
             return res;
+        }
+
+        private static void ExportImage(UTexture2D tex, string path, int width, int height, SKEncodedImageFormat format, int quality = 100)
+        {
+            var rawData = tex.Decode(ETexturePlatform.DesktopMobile);
+            var resized = rawData.Resize(new SKSizeI() { Width = width, Height = height }, SKFilterQuality.High);
+            var encoded = resized.Encode(format, quality);
+
+            using (var o = new FileStream(path, FileMode.Create))
+                encoded.SaveTo(o);
         }
 
         private static void ExportPalIcons(List<Pal> pals, Dictionary<string, UTexture2D> palIcons, int iconSize)
         {
-            Console.WriteLine("Exporting pal icons...");
+            logger.Information("Exporting pal icons...");
             foreach (var icon in palIcons)
             {
                 string palName;
@@ -208,22 +232,15 @@ namespace PalCalc.GenDB
                     var pal = pals.SingleOrDefault(p => p.InternalName.ToLower() == internalName.ToLower());
                     if (pal == null)
                     {
-                        Console.WriteLine("Unknown pal {0}, skipping icon", internalName);
+                        logger.Warning("Unknown pal {PalName}, skipping icon", internalName);
                         continue;
                     }
                     palName = pal.Name;
                 }
 
                 var img = icon.Value;
-
-                var rawData = img.Decode(ETexturePlatform.DesktopMobile);
-                var resized = rawData.Resize(new SKSizeI() { Width = iconSize, Height = iconSize }, SKFilterQuality.High);
-                var encoded = resized.Encode(SKEncodedImageFormat.Png, 10);
-
-                using (var o = new FileStream("../PalCalc.UI/Resources/Pals/" + palName + ".png", FileMode.Create))
-                    encoded.SaveTo(o);
+                ExportImage(icon.Value, "../PalCalc.UI/Resources/Pals/" + palName + ".png", iconSize, iconSize, SKEncodedImageFormat.Png);
             }
-            Console.WriteLine("\tDone");
         }
 
         public static void Main(string[] args)
@@ -238,7 +255,7 @@ namespace PalCalc.GenDB
             provider.LoadVirtualPaths();
             provider.LoadLocalization();
 
-            Console.WriteLine("Reading localizations, pals, and passives...");
+            logger.Information("Reading localizations, pals, and passives...");
             var localizations = LocalizationsReader.FetchLocalizations(provider);
 
             var rawPals = PalReader.ReadPals(provider);
@@ -261,7 +278,6 @@ namespace PalCalc.GenDB
                 rawPassiveSkills,
                 skillNames: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadSkillNames(provider))
             );
-            Console.WriteLine("\tDone");
 
             var uniqueBreedingCombos = UniqueBreedComboReader.ReadUniqueBreedCombos(provider);
             var breedingCalc = new PalBreedingCalculator(
@@ -288,11 +304,47 @@ namespace PalCalc.GenDB
 
             File.WriteAllText("../PalCalc.Model/db.json", db.ToJson());
 
+            logger.Information("Scraping pal icons");
             ExportPalIcons(
                 pals: pals,
                 palIcons: PalIconMappingsReader.ReadPalIconMappings(provider),
                 iconSize: 100
             );
+
+            logger.Information("Scraping map data");
+            var mapInfo = MapReader.ReadMapInfo(provider);
+
+            if (mapInfo != null)
+            {
+                var rawData = mapInfo.MapTexture.Decode(ETexturePlatform.DesktopMobile);
+                var resized = rawData.Resize(new SKSizeI() { Width = 2048, Height = 2048 }, SKFilterQuality.High);
+
+                // this image seems to have some extra margin with a vignette? this margin messes with coord calcs
+                // crop it just enough to remove that vignette
+                // (would prefer to properly read this info from game files but I can't find anything for it)
+                //var marginPercent = 0.05f;
+                //var resizedPM = new SKPixmap(resized.Info, resized.GetPixels());
+                //var cropped = resizedPM.ExtractSubset(
+                //    new SKRectI()
+                //    {
+                //        Left = (int)(resized.Width * marginPercent),
+                //        Top = (int)(resized.Height * marginPercent),
+                //        Right = (int)(resized.Width * (1 - marginPercent)),
+                //        Bottom = (int)(resized.Height * (1 - marginPercent))
+                //    }
+                //);
+                //
+                // (... BUT the general "Map Coord" -> "Image Position" calc is incomplete in general, and cropping
+                //  makes the issue worse, so leaving it uncropped for now)
+
+                var encoded = resized.Encode(SKEncodedImageFormat.Jpeg, 80);
+
+                using (var o = new FileStream("../PalCalc.UI/Resources/Map.jpeg", FileMode.Create))
+                        encoded.SaveTo(o);
+
+                // Dimensions should be reflected in `PalCalc.Model.GameConstants`
+                logger.Information("Map dimensions:\nMin: {0} | {1}\nMax: {2} | {3}", mapInfo.MapMinX, mapInfo.MapMaxX, mapInfo.MapMinY, mapInfo.MapMaxY);
+            }
         }
 
 

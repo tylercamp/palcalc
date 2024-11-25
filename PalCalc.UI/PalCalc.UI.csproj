@@ -16,6 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Map.jpeg" />
     <None Remove="Resources\PalIconOverride.json" />
     <None Remove="Resources\Pals\Anubis.png" />
     <None Remove="Resources\Pals\Arsox.png" />
@@ -188,6 +189,7 @@
     <None Remove="Resources\TraitRank\Passive_Positive_1_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Positive_2_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Positive_3_icon.png" />
+    <None Remove="Resources\T_icon_compass_camp.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -212,6 +214,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Map.jpeg" />
     <Resource Include="Resources\PalIconOverride.json" />
     <Resource Include="Resources\Pals\Anubis.png" />
     <Resource Include="Resources\Pals\Arsox.png" />
@@ -384,6 +387,7 @@
     <Resource Include="Resources\TraitRank\Passive_Positive_1_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Positive_2_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Positive_3_icon.png" />
+    <Resource Include="Resources\T_icon_compass_camp.png" />
   </ItemGroup>
 
   <ItemGroup>
