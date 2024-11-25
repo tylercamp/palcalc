@@ -51,8 +51,10 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Resources>
-                        <TextBlock Text="{Binding Pal.Name.Value}" />
-                        <TextBlock Text="{Binding Gender.Value}" FontSize="10" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Pal.Name.Value}" />
+                            <local:PalGenderView DataContext="{Binding Gender}" Height="14" Foreground="White" Margin="2,0,0,0" />
+                        </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">
                                 <Run Text="{Binding AvgRequiredAttemptsDescription.Value, Mode=OneWay}" />

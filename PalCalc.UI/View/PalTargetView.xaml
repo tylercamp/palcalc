@@ -26,9 +26,9 @@
         </dnkc:AutoCompleteComboBox.ItemTemplate>
     </dnkc:AutoCompleteComboBox>
     <Label Content="{itl:LocalizedText Code=LC_COMMON_GENDER}" Margin="5,0,0,0" />
-    <ComboBox ItemsSource="{x:Static mvm:PalSpecifierGenderViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.RequiredGender}" Margin="6,0,6,5">
+    <ComboBox ItemsSource="{x:Static mvm:PalGenderViewModel.AllStandard}" SelectedValue="{Binding CurrentPalSpecifier.RequiredGender}" Margin="6,0,6,5">
         <ComboBox.ItemTemplate>
-            <DataTemplate DataType="mvm:PalSpecifierGenderViewModel">
+            <DataTemplate DataType="mvm:PalGenderViewModel">
                 <TextBlock Text="{Binding Label.Value}" />
             </DataTemplate>
         </ComboBox.ItemTemplate>

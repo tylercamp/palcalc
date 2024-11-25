@@ -66,14 +66,12 @@
                             FontWeight="Bold"
                             FontSize="14"
                             />
-                        <TextBlock
-                            FontSize="12"
-                            VerticalAlignment="Center"
-                            Margin="5,0,0,0"
-                            Visibility="{Binding RequiredGender.IsSpecific, Converter={StaticResource BVC}, FallbackValue=Collapsed}"
-                        >
-                            (<Run Text="{Binding RequiredGender.Label.Value, Mode=OneWay}" />)
-                        </TextBlock>
+
+                        <local:PalGenderView
+                            DataContext="{Binding RequiredGender}"
+                            Visibility="{Binding IsSpecific, Converter={StaticResource BVC}, FallbackValue=Collapsed}"
+                            Height="18"
+                            />
                     </StackPanel>
 
                     <Button

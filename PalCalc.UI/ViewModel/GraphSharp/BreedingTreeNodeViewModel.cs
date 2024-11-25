@@ -41,7 +41,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
                     break;
             }
 
-            Gender = node.PalRef.Gender.Label();
+            Gender = PalGenderViewModel.Make(node.PalRef.Gender);
             AvgRequiredAttemptsDescription = LocalizationCodes.LC_RESULT_BREEDING_ATTEMPTS.Bind(AvgRequiredAttempts);
         }
 
@@ -71,7 +71,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         public IPalRefLocationViewModel Location { get; }
         public bool NeedsRefresh => Location.NeedsRefresh;
 
-        public ILocalizedText Gender { get; }
+        public PalGenderViewModel Gender { get; }
 
         public int AvgRequiredAttempts => (Value.PalRef as BredPalReference)?.AvgRequiredBreedings ?? 0;
         public ILocalizedText AvgRequiredAttemptsDescription { get; }

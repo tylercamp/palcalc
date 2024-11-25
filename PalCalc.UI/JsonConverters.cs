@@ -393,7 +393,7 @@ namespace PalCalc.UI
                 OptionalPassive3 = (obj["OptionalPassive3"] ?? obj["OptionalTrait3"])?.ToObject<PassiveSkillViewModel>(serializer),
                 OptionalPassive4 = (obj["OptionalPassive4"] ?? obj["OptionalTrait4"])?.ToObject<PassiveSkillViewModel>(serializer),
                 PalSourceId = obj["PalSourceId"]?.ToObject<string>(),
-                RequiredGender = PalSpecifierGenderViewModel.Make(obj["RequiredGender"]?.ToObject<PalGender>() ?? PalGender.WILDCARD),
+                RequiredGender = PalGenderViewModel.Make(obj["RequiredGender"]?.ToObject<PalGender>() ?? PalGender.WILDCARD),
                 IncludeBasePals = obj["IncludeBasePals"]?.ToObject<bool>() ?? true,
                 IncludeCustomPals = obj["IncludeCustomPals"]?.ToObject<bool>() ?? true,
                 IncludeCagedPals = obj["IncludeCagedPals"]?.ToObject<bool>() ?? true,
