@@ -16,12 +16,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 /*
  * To get the latest usmap file:
@@ -309,8 +311,31 @@ namespace PalCalc.GenDB
             );
 
             var mapInfo = MapReader.ReadMapInfo(provider);
+            {
+                var rawData = mapInfo.MapTexture.Decode(ETexturePlatform.DesktopMobile);
+                var resized = rawData.Resize(new SKSizeI() { Width = 2048, Height = 2048 }, SKFilterQuality.High);
 
-            ExportImage(mapInfo.MapTexture, "../PalCalc.UI/Resources/Map.jpeg", 2048, 2048, SKEncodedImageFormat.Jpeg, 80);
+                // this image seems to have some extra margin with a vignette? this margin messes with coord calcs
+                // crop it just enough to remove that vignette
+                // (would prefer to properly read this info from game files but I can't find anything for it)
+                var marginPercent = 0.05f;
+                var resizedPM = new SKPixmap(resized.Info, resized.GetPixels());
+                var cropped = resizedPM.ExtractSubset(
+                    new SKRectI()
+                    {
+                        Left = (int)(resized.Width * marginPercent),
+                        Top = (int)(resized.Height * marginPercent),
+                        Right = (int)(resized.Width * (1 - marginPercent)),
+                        Bottom = (int)(resized.Height * (1 - marginPercent))
+                    }
+                );
+
+                var encoded = resized.Encode(SKEncodedImageFormat.Jpeg, 80);
+
+                using (var o = new FileStream("../PalCalc.UI/Resources/Map.jpeg", FileMode.Create))
+                        encoded.SaveTo(o);
+            }
+
             Console.WriteLine("Map dimensions:\nMin: {0} | {1}\nMax: {2} | {3}", mapInfo.MapMinX, mapInfo.MapMaxX, mapInfo.MapMinY, mapInfo.MapMaxY);
         }
 

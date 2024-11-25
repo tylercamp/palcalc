@@ -2,6 +2,7 @@
 using PalCalc.Model;
 using PalCalc.SaveReader.SaveFile.Support.Level;
 using PalCalc.UI.Localization;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
         List<PalInstance> containedPals,
         List<GvasCharacterInstance> containedRawPals,
         RawPalContainerContents rawContainer,
-        LocationType? locationType
+        LocationType? locationType,
+        WorldCoord position
     ) : ObservableObject
     {
         public List<IContainerSlotDetailsViewModel> Slots { get; } = Enumerable.Range(0, rawContainer.MaxEntries)
@@ -37,5 +39,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
         public string Id => rawContainer.Id;
         public OwnerViewModel Owner => owner;
         public ILocalizedText Type { get; } = locationType?.Label() ?? LocalizationCodes.LC_COMMON_UNKNOWN.Bind();
+
+        public MapCoordViewModel Coord { get; } = position == null ? null : new MapCoordViewModel(position);
     }
 }

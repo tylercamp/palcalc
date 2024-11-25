@@ -18,16 +18,24 @@ namespace PalCalc.Model
         public double X { get; set; }
         public double Y { get; set; }
 
-        public static MapCoord FromWorldCoord(WorldCoord coord)
+        public static MapCoord NormalizedFromWorldCoord(WorldCoord coord)
         {
-            double xnorm = (coord.X - GameConstants.Map_MinX) / (GameConstants.Map_MaxX - GameConstants.Map_MinX);
-            double ynorm = (coord.Y - GameConstants.Map_MinY) / (GameConstants.Map_MaxY - GameConstants.Map_MinY);
-
             // (X and Y world coords are swapped when presented as map coords; Z is unused)
             return new MapCoord()
             {
-                X = 1000 * (ynorm * 2 - 1),
-                Y = 1000 * (xnorm * 2 - 1),
+                X = (coord.Y - GameConstants.Map_MinY) / (GameConstants.Map_MaxY - GameConstants.Map_MinY),
+                Y = (coord.X - GameConstants.Map_MinX) / (GameConstants.Map_MaxX - GameConstants.Map_MinX)
+            };
+        }
+
+        public static MapCoord UIFromWorldCoord(WorldCoord coord)
+        {
+            var norm = NormalizedFromWorldCoord(coord);
+
+            return new MapCoord()
+            {
+                X = 1000 * (norm.X * 2 - 1),
+                Y = 1000 * (norm.Y * 2 - 1),
             };
         }
     }

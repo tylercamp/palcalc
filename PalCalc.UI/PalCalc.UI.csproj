@@ -190,6 +190,7 @@
     <None Remove="Resources\TraitRank\Passive_Positive_1_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Positive_2_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Positive_3_icon.png" />
+    <None Remove="Resources\T_icon_compass_camp.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -387,6 +388,7 @@
     <Resource Include="Resources\TraitRank\Passive_Positive_1_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Positive_2_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Positive_3_icon.png" />
+    <Resource Include="Resources\T_icon_compass_camp.png" />
   </ItemGroup>
 
   <ItemGroup>
