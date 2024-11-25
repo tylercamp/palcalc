@@ -432,7 +432,11 @@ namespace GraphSharp.Controls.Zoom
             if (Presenter != null)
             {
                 Presenter.SizeChanged += (s, a) => DoZoomToFill();
-                Presenter.ContentSizeChanged += (s, a) => DoZoomToFill();
+                Presenter.ContentSizeChanged += (s, a) =>
+                {
+                    Mode = ZoomControlModes.Fill;
+                    DoZoomToFill();
+                };
             }
             ZoomToFill();
         }
