@@ -16,6 +16,6 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public PassiveSkillCollectionViewModel PassiveSkills { get; } = new PassiveSkillCollectionViewModel(inst.PassiveSkills.Select(PassiveSkillViewModel.Make));
 
-        public ILocalizedText Gender { get; } = inst.Gender.Label();
+        public PalGenderViewModel Gender { get; } = PalGenderViewModel.Make(inst.Gender);
     }
 }

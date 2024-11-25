@@ -5,10 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
              xmlns:ivm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
+             xmlns:ivmg="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search.Grid"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:v="clr-namespace:PalCalc.UI.View"
              mc:Ignorable="d"
-             d:DataContext="{x:Type ivm:ContainerGridPalSlotViewModel}">
+             d:DataContext="{x:Type ivmg:ContainerGridPalSlotViewModel}">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="White" />
@@ -22,12 +23,14 @@
             <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
                 <Border Width="64" Height="64" CornerRadius="32" Background="{Binding Pal.IconBrush}" BorderBrush="White" BorderThickness="1" />
                 <StackPanel Margin="10,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" />
+                        <v:PalGenderView DataContext="{Binding PalInstance.Gender}" Height="16" />
+                    </StackPanel>
                     <TextBlock>
                         <Run Text="{itl:LocalizedText LC_COMMON_LEVEL}" />
                         <Run Text="{Binding PalInstance.ModelObject.Level}" />
                     </TextBlock>
-                    <TextBlock Text="{Binding PalInstance.Gender.Value}" />
                 </StackPanel>
             </StackPanel>
 
