@@ -12,6 +12,37 @@ using System.Windows.Input;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
+    public class PalSpecifierGenderViewModel
+    {
+        private PalSpecifierGenderViewModel(PalGender value)
+        {
+            Value = value;
+            Label = value.Label();
+        }
+
+        public PalGender Value { get; }
+        public ILocalizedText Label { get; }
+
+        public bool IsWildcard => Value == PalGender.WILDCARD || Value == PalGender.OPPOSITE_WILDCARD;
+        public bool IsSpecific => !IsWildcard;
+
+        public static PalSpecifierGenderViewModel Any { get; } = new PalSpecifierGenderViewModel(PalGender.WILDCARD);
+        public static PalSpecifierGenderViewModel Male { get; } = new PalSpecifierGenderViewModel(PalGender.MALE);
+        public static PalSpecifierGenderViewModel Female { get; } = new PalSpecifierGenderViewModel(PalGender.FEMALE);
+
+        public static PalSpecifierGenderViewModel Make(PalGender value) =>
+            value switch
+            {
+                PalGender.WILDCARD => Any,
+                PalGender.OPPOSITE_WILDCARD => Any,
+                PalGender.MALE => Male,
+                PalGender.FEMALE => Female,
+                _ => null
+            };
+
+        public static List<PalSpecifierGenderViewModel> All { get; } = [Any, Male, Female];
+    }
+
     public partial class PalSpecifierViewModel : ObservableObject
     {
         public PalSpecifierViewModel(PalSpecifier underlyingSpec)
@@ -25,6 +56,8 @@ namespace PalCalc.UI.ViewModel.Mapped
                 Passive2 = null;
                 Passive3 = null;
                 Passive4 = null;
+
+                RequiredGender = PalSpecifierGenderViewModel.Any;
             }
             else
             {
@@ -49,6 +82,8 @@ namespace PalCalc.UI.ViewModel.Mapped
                 OptionalPassive2 = optionalVms[1];
                 OptionalPassive3 = optionalVms[2];
                 OptionalPassive4 = optionalVms[3];
+
+                RequiredGender = PalSpecifierGenderViewModel.Make(underlyingSpec.RequiredGender);
             }
         }
 
@@ -89,7 +124,13 @@ namespace PalCalc.UI.ViewModel.Mapped
             .ToList();
 
         public PalSpecifier ModelObject => TargetPal != null
-            ? new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredPassives = RequiredPassiveModelObjects, OptionalPassives = OptionalPassiveModelObjects }
+            ? new PalSpecifier()
+            {
+                Pal = TargetPal.ModelObject,
+                RequiredPassives = RequiredPassiveModelObjects,
+                OptionalPassives = OptionalPassiveModelObjects,
+                RequiredGender = RequiredGender.Value,
+            }
             : null;
 
         [NotifyPropertyChangedFor(nameof(Label))]
@@ -141,6 +182,9 @@ namespace PalCalc.UI.ViewModel.Mapped
         private BreedingResultListViewModel currentResults;
 
         [ObservableProperty]
+        private PalSpecifierGenderViewModel requiredGender;
+
+        [ObservableProperty]
         private string palSourceId;
 
         [ObservableProperty]
@@ -185,6 +229,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 psvm.OptionalPassive2 == OptionalPassive2 &&
                 psvm.OptionalPassive3 == OptionalPassive3 &&
                 psvm.OptionalPassive4 == OptionalPassive4 &&
+                psvm.RequiredGender == RequiredGender &&
                 psvm.PalSourceId == PalSourceId &&
                 psvm.IncludeBasePals == IncludeBasePals &&
                 psvm.IncludeCustomPals == IncludeCustomPals &&
@@ -206,6 +251,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 OptionalPassive3,
                 OptionalPassive4
             ),
+            RequiredGender.Value,
             PalSourceId,
             IncludeBasePals,
             IncludeCustomPals,
@@ -213,7 +259,13 @@ namespace PalCalc.UI.ViewModel.Mapped
         );
 
         public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(
-            new PalSpecifier() { Pal = TargetPal.ModelObject, RequiredPassives = RequiredPassiveModelObjects, OptionalPassives = OptionalPassiveModelObjects }
+            new PalSpecifier()
+            {
+                Pal = TargetPal.ModelObject,
+                RequiredPassives = RequiredPassiveModelObjects,
+                OptionalPassives = OptionalPassiveModelObjects,
+                RequiredGender = RequiredGender.Value,
+            }
         ) {
             CurrentResults = CurrentResults,
             PalSourceId = PalSourceId,

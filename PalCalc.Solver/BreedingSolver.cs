@@ -693,7 +693,14 @@ namespace PalCalc.Solver
             statusMsg.CurrentPhase = SolverPhase.Finished;
             SolverStateUpdated?.Invoke(statusMsg);
 
-            return workingSet.Result.ToList();
+            return workingSet.Result.Select(r =>
+            {
+                if (spec.RequiredGender != PalGender.WILDCARD)
+                    return r.WithGuaranteedGender(db, spec.RequiredGender);
+                else
+                    return r;
+
+            }).ToList();
         }
     }
 }

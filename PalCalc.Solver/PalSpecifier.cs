@@ -12,6 +12,7 @@ namespace PalCalc.Solver
     {
         public Pal Pal { get; set; }
         public List<PassiveSkill> RequiredPassives { get; set; } = new List<PassiveSkill>();
+        public PalGender RequiredGender { get; set; } = PalGender.WILDCARD;
 
         public List<PassiveSkill> OptionalPassives { get; set; } = new List<PassiveSkill>();
 
@@ -19,7 +20,10 @@ namespace PalCalc.Solver
 
         public override string ToString() => $"{Pal.Name} with {RequiredPassives.PassiveSkillListToString()}";
 
-        public bool IsSatisfiedBy(IPalReference palRef) => Pal == palRef.Pal && !RequiredPassives.Except(palRef.EffectivePassives).Any();
+        public bool IsSatisfiedBy(IPalReference palRef) =>
+            Pal == palRef.Pal &&
+            !RequiredPassives.Except(palRef.EffectivePassives).Any() &&
+            (RequiredGender == PalGender.WILDCARD || palRef.Gender == PalGender.WILDCARD || palRef.Gender == RequiredGender);
 
         public void Normalize()
         {

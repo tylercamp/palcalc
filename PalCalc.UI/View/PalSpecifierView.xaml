@@ -60,12 +60,21 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Text="{Binding TargetPal.Name.Value}"
-                        Grid.Column="0"
-                        FontWeight="Bold"
-                        FontSize="14"
-                        />
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <TextBlock
+                            Text="{Binding TargetPal.Name.Value}"
+                            FontWeight="Bold"
+                            FontSize="14"
+                            />
+                        <TextBlock
+                            FontSize="12"
+                            VerticalAlignment="Center"
+                            Margin="5,0,0,0"
+                            Visibility="{Binding RequiredGender.IsSpecific, Converter={StaticResource BVC}, FallbackValue=Collapsed}"
+                        >
+                            (<Run Text="{Binding RequiredGender.Label.Value, Mode=OneWay}" />)
+                        </TextBlock>
+                    </StackPanel>
 
                     <Button
                         Grid.Column="2"
