@@ -5,6 +5,7 @@ using PalCalc.SaveReader.SaveFile.Xbox;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Inspector.Search.Container;
+using PalCalc.UI.ViewModel.Mapped;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -103,9 +104,13 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 Children.Add(new BaseAssignedPalsTreeNodeViewModel(baseContainer));
 
             Children.AddRange(viewingCageContainers.OrderBy(c => c.Id).Select(c => new ViewingCageTreeNodeViewModel(c)));
+
+            Coords = baseInst?.Position != null ? new MapCoordViewModel(baseInst.Position) : null;
         }
 
         public ILocalizedText Label { get; }
+
+        public MapCoordViewModel Coords { get; }
 
         public List<IOwnerTreeNode> Children { get; }
 
