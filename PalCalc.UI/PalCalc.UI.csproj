@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <None Remove="Resources\Map.jpeg" />
-    <None Remove="Resources\Map.png" />
     <None Remove="Resources\PalIconOverride.json" />
     <None Remove="Resources\Pals\Anubis.png" />
     <None Remove="Resources\Pals\Arsox.png" />

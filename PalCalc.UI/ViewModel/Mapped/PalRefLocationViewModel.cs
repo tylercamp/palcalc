@@ -30,9 +30,17 @@ namespace PalCalc.UI.ViewModel.Mapped
         public string DisplayCoordsText => $"{DisplayCoords.X:N0}, {DisplayCoords.Y:N0}";
         public string WorldCoordsText => $"{WorldCoords.X:N0}, {WorldCoords.Y:N0}, {WorldCoords.Z:N0}";
 
+        // (don't like the use of `Grid` for this, but this is the most straightforward way (afaik) to get
+        // reliable + scaling positioning of the coord within the MapView)
+
+        // note: the normalized coords are used directly for positioning here, but the map locs at
+        // (-1000,-1000) and (1000,1000) in-game don't exactly match the bottom-left + top-right locs
+        // in the image displayed in Pal Calc. i.e. the resulting coords aren't 100% correct
+
         private List<RowDefinition> gridRows;
         public List<RowDefinition> GridRows => gridRows ??=
         [
+            // (Rows used for Y positioning, Y=0 is top and Y=Max is bottom in WPF, but the Palworld map has this inverted)
             new RowDefinition() { Height = new GridLength((100 - iconSizePercent) * (1 - NormalizedCoords.Y), GridUnitType.Star) },
             new RowDefinition() { Height = new GridLength(iconSizePercent, GridUnitType.Star) },
             new RowDefinition() { Height = new GridLength((100 - iconSizePercent) * NormalizedCoords.Y, GridUnitType.Star) }
@@ -41,6 +49,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         private List<ColumnDefinition> gridColumns;
         public List<ColumnDefinition> GridColumns => gridColumns ??=
         [
+            // (Columns used for X positioning, normalized coords used directly)
             new ColumnDefinition() { Width = new GridLength((100 - iconSizePercent) * NormalizedCoords.X, GridUnitType.Star) },
             new ColumnDefinition() { Width = new GridLength(iconSizePercent, GridUnitType.Star) },
             new ColumnDefinition() { Width = new GridLength((100 - iconSizePercent) * (1 - NormalizedCoords.X), GridUnitType.Star) }

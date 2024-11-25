@@ -318,17 +318,20 @@ namespace PalCalc.GenDB
                 // this image seems to have some extra margin with a vignette? this margin messes with coord calcs
                 // crop it just enough to remove that vignette
                 // (would prefer to properly read this info from game files but I can't find anything for it)
-                var marginPercent = 0.05f;
-                var resizedPM = new SKPixmap(resized.Info, resized.GetPixels());
-                var cropped = resizedPM.ExtractSubset(
-                    new SKRectI()
-                    {
-                        Left = (int)(resized.Width * marginPercent),
-                        Top = (int)(resized.Height * marginPercent),
-                        Right = (int)(resized.Width * (1 - marginPercent)),
-                        Bottom = (int)(resized.Height * (1 - marginPercent))
-                    }
-                );
+                //var marginPercent = 0.05f;
+                //var resizedPM = new SKPixmap(resized.Info, resized.GetPixels());
+                //var cropped = resizedPM.ExtractSubset(
+                //    new SKRectI()
+                //    {
+                //        Left = (int)(resized.Width * marginPercent),
+                //        Top = (int)(resized.Height * marginPercent),
+                //        Right = (int)(resized.Width * (1 - marginPercent)),
+                //        Bottom = (int)(resized.Height * (1 - marginPercent))
+                //    }
+                //);
+                //
+                // (... BUT the general "Map Coord" -> "Image Position" calc is incomplete in general, and cropping
+                //  makes the issue worse, so leaving it uncropped for now)
 
                 var encoded = resized.Encode(SKEncodedImageFormat.Jpeg, 80);
 
@@ -336,6 +339,7 @@ namespace PalCalc.GenDB
                         encoded.SaveTo(o);
             }
 
+            // Dimensions should be reflected in `PalCalc.Model.GameConstants`
             Console.WriteLine("Map dimensions:\nMin: {0} | {1}\nMax: {2} | {3}", mapInfo.MapMinX, mapInfo.MapMaxX, mapInfo.MapMinY, mapInfo.MapMaxY);
         }
 

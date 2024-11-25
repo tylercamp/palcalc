@@ -18,6 +18,9 @@ namespace PalCalc.Model
         public double X { get; set; }
         public double Y { get; set; }
 
+        /// <summary>
+        /// Returns the world coords in normalized map coordinates (X and Y in range [0 1], used for UI position calcs in Pal Calc)
+        /// </summary>
         public static MapCoord NormalizedFromWorldCoord(WorldCoord coord)
         {
             // (X and Y world coords are swapped when presented as map coords; Z is unused)
@@ -28,6 +31,9 @@ namespace PalCalc.Model
             };
         }
 
+        /// <summary>
+        /// Returns the associated coordinates you would see in-game if you opened the map and moved the cursor to this world position.
+        /// </summary>
         public static MapCoord UIFromWorldCoord(WorldCoord coord)
         {
             var norm = NormalizedFromWorldCoord(coord);
