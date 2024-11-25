@@ -40,6 +40,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
         public OwnerViewModel Owner => owner;
         public ILocalizedText Type { get; } = locationType?.Label() ?? LocalizationCodes.LC_COMMON_UNKNOWN.Bind();
 
-        public MapCoordViewModel Coord { get; } = position == null ? null : new MapCoordViewModel(position);
+        public MapCoordViewModel Coord { get; } = MapCoordViewModel.FromCoord(position);
     }
 }

@@ -56,6 +56,9 @@ namespace PalCalc.UI.ViewModel.Mapped
         ];
 
         public static MapCoordViewModel DesignerInstance { get; } = new MapCoordViewModel(new WorldCoord() { X = 10000, Y = 10000, Z = 0 });
+
+        public static MapCoordViewModel FromCoord(WorldCoord coord, int iconSizePercent = 10) => coord == null ? null : new MapCoordViewModel(coord);
+        public static MapCoordViewModel FromBase(BaseInstance inst, int iconSizePercent = 10) => FromCoord(inst?.Position, iconSizePercent);
     }
 
     public class CompositePalRefLocationViewModel : IPalRefLocationViewModel
@@ -189,8 +192,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             if (LocationOwner != null)
                 LocationOwnerDescription = LocalizationCodes.LC_LOC_OWNED_BY.Bind(LocationOwner);
 
-            if (sourceBase?.Position != null)
-                MapCoord = new MapCoordViewModel(sourceBase.Position);
+            MapCoord = MapCoordViewModel.FromBase(sourceBase);
         }
 
         public bool IsSinglePlayer { get; }

@@ -105,7 +105,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
             Children.AddRange(viewingCageContainers.OrderBy(c => c.Id).Select(c => new ViewingCageTreeNodeViewModel(c)));
 
-            Coords = baseInst?.Position != null ? new MapCoordViewModel(baseInst.Position) : null;
+            Coords = MapCoordViewModel.FromBase(baseInst);
         }
 
         public ILocalizedText Label { get; }

@@ -48,21 +48,12 @@
 
                         <StackPanel Visibility="{Binding Coord, Converter={StaticResource VVC}}">
                             <TextBlock>
-                                <Run Text="World Coords: " /><Run Text="(" />
-                                <Run Text="{Binding Coord.WorldCoords.X, StringFormat=N0}" />
-                                <Run Text="," />
-                                <Run Text="{Binding Coord.WorldCoords.Y, StringFormat=N0}" />
-                                <Run Text="," />
-                                <Run Text="{Binding Coord.WorldCoords.Z, StringFormat=N0}" />
-                                <Run Text=")" />
+                                <Run Text="World Coords:" />
+                                <Run Text="{Binding Coord.WorldCoordsText, Mode=OneTime}" />
                             </TextBlock>
                             <TextBlock>
-                                <Run Text="Map Coords: " />
-                                <Run Text="(" />
-                                <Run Text="{Binding Coord.DisplayCoords.X, StringFormat=N0}" />
-                                <Run Text="," />
-                                <Run Text="{Binding Coord.DisplayCoords.Y, StringFormat=N0}" />
-                                <Run Text=")" />
+                                <Run Text="Map Coords:" />
+                                <Run Text="{Binding Coord.DisplayCoordsText, Mode=OneTime}" />
                             </TextBlock>
                         </StackPanel>
                     </StackPanel>
