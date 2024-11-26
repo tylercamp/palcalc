@@ -24,6 +24,10 @@ No more effort spent manually building a breeding tree!
 
 _v1.8.0 screenshot_
 
+![](./docres/Animation.gif)
+
+_v1.9.0 animation_
+
 ---
 
 **[Click here to get the latest version.](https://github.com/tylercamp/palcalc/releases/latest)** (Expand "Assets" at the bottom, download `PalCalc.UI.exe`, place in its own folder and run.)
