@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.Localization
 {
-    public abstract partial class ILocalizedText : ObservableObject, IComparable<ILocalizedText>
+    public abstract partial class ILocalizedText : ObservableObject, IComparable<ILocalizedText>, IComparable
     {
         [NotifyPropertyChangedFor(nameof(Value))]
         [ObservableProperty]
@@ -23,5 +23,7 @@ namespace PalCalc.UI.Localization
         // helpful for XAML bindings where we forgot to call `.Value`, this (usually) creates a XAML binding
         // error that you can just double-click on to find the source
         public override string ToString() => throw new Exception();
+
+        public int CompareTo(object obj) => CompareTo(obj as ILocalizedText);
     }
 }

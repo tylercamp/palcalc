@@ -13,7 +13,7 @@ using System.Windows.Controls;
 
 namespace PalCalc.UI.ViewModel
 {
-    public partial class PassiveSkillCollectionViewModel : ObservableObject
+    public partial class PassiveSkillCollectionViewModel : ObservableObject, IComparable
     {
         // for XAML designer view
         public PassiveSkillCollectionViewModel() : this(
@@ -111,6 +111,16 @@ namespace PalCalc.UI.ViewModel
             var mainColumn = Passives.IndexOf(passive) % EntriesPerRow;
             if (mainColumn == 0) return mainColumn;
             else return mainColumn + 1;
+        }
+
+        public int CompareTo(object obj)
+        {
+            var other = obj as PassiveSkillCollectionViewModel;
+
+            if (other.Passives.Count != Passives.Count)
+                return Passives.Count.CompareTo(other.Passives.Count);
+
+            return Description.CompareTo(other.Description);
         }
     }
 }

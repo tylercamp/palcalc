@@ -31,7 +31,7 @@
                 <GridViewColumn Header="{itl:LocalizedText LC_COMMON_TRAITS}"
                                 DisplayMemberBinding="{Binding EffectivePassives.Description.Value}"
                                 Width="{Binding PassiveSkillsWidth}"
-                                util:GridViewSort.PropertyName="NumFinalPassives"
+                                util:GridViewSort.PropertyName="EffectivePassives"
                                 />
                 <GridViewColumn Header="{itl:LocalizedText LC_RESULT_INPUT_LOCS}"
                                 DisplayMemberBinding="{Binding InputLocations.Value}"
