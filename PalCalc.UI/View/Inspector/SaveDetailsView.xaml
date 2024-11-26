@@ -8,6 +8,7 @@
              xmlns:dvm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Details"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:v="clr-namespace:PalCalc.UI.View"
              mc:Ignorable="d" 
              d:Background="White"
              d:DataContext="{x:Static ivm:SaveDetailsViewModel.DesignerInstance}"
@@ -63,35 +64,40 @@
 
         <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" />
 
-        <ListView ItemsSource="{Binding SelectedContainer.Slots}"
-                  Grid.Column="2"
-                  SelectedItem="{Binding SelectedSlot}"
-                  IsSynchronizedWithCurrentItem="True"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  >
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.ItemTemplate>
+        <v:CachingContentPresenter Grid.Column="2" Content="{Binding SelectedContainer}">
+            <v:CachingContentPresenter.ContentTemplate>
                 <DataTemplate>
-                    <ContentControl Content="{Binding}" Margin="5">
-                        <ContentControl.Resources>
-                            <DataTemplate DataType="{x:Type dvm:EmptyPalContainerSlotDetailsViewModel}">
-                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{itl:LocalizedText LC_SAVEINSPECT_SLOT_EMPTY}" />
+                    <ListView ItemsSource="{Binding Slots}"
+                              SelectedItem="{Binding RelativeSource={RelativeSource AncestorType=local:SaveDetailsView}, Path=DataContext.SelectedSlot}"
+                              IsSynchronizedWithCurrentItem="True"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              >
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ContentControl Content="{Binding}" Margin="5">
+                                    <ContentControl.Resources>
+                                        <DataTemplate DataType="{x:Type dvm:EmptyPalContainerSlotDetailsViewModel}">
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{itl:LocalizedText LC_SAVEINSPECT_SLOT_EMPTY}" />
+                                        </DataTemplate>
+                                        <DataTemplate DataType="{x:Type dvm:PalContainerSlotDetailsViewModel}">
+                                            <StackPanel Orientation="Vertical">
+                                                <Image Source="{Binding Icon}" Width="50" Height="50" Margin="0,0,5,0" />
+                                                <TextBlock Text="{Binding DisplayName.Value}" HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ContentControl.Resources>
+                                </ContentControl>
                             </DataTemplate>
-                            <DataTemplate DataType="{x:Type dvm:PalContainerSlotDetailsViewModel}">
-                                <StackPanel Orientation="Vertical">
-                                    <Image Source="{Binding Icon}" Width="50" Height="50" Margin="0,0,5,0" />
-                                    <TextBlock Text="{Binding DisplayName.Value}" HorizontalAlignment="Center" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ContentControl.Resources>
-                    </ContentControl>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </v:CachingContentPresenter.ContentTemplate>
+        </v:CachingContentPresenter>
 
         <GridSplitter Grid.Column="3" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" />
 

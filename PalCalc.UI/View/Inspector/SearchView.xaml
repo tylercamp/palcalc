@@ -252,31 +252,38 @@
                 </ContentControl>
 
                 <ScrollViewer>
-                    <ItemsControl ItemsSource="{Binding OwnerTree.SelectedSource.Container.Grids}" HorizontalAlignment="Center">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <ContentControl Content="{Binding}">
-                                    <ContentControl.Resources>
-                                        <!-- (same template for either one) -->
-                                        <DataTemplate DataType="{x:Type sgvm:DefaultContainerGridViewModel}">
-                                            <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
+                    <v:CachingContentPresenter Content="{Binding OwnerTree.SelectedSource}">
+                        <v:CachingContentPresenter.ContentTemplate>
+                            <DataTemplate DataType="{x:Type svm:IContainerSource}">
+                                <ItemsControl ItemsSource="{Binding Container.Grids}" HorizontalAlignment="Center">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <!-- Note: VirtualizingWrapPanel on NuGet doesn't seem to improve performance much and has gaps between empty tabs -->
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <ContentControl Content="{Binding}">
+                                                <ContentControl.Resources>
+                                                    <!-- (same template for either one) -->
+                                                    <DataTemplate DataType="{x:Type sgvm:DefaultContainerGridViewModel}">
+                                                        <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
+                                                    </DataTemplate>
+                                                    <DataTemplate DataType="{x:Type sgvm:CustomContainerGridViewModel}">
+                                                        <StackPanel>
+                                                            <TextBlock HorizontalAlignment="Center" FontStyle="Italic" Text="{itl:LocalizedText LC_CUSTOM_CONTAINERS_DESCRIPTION}" />
+                                                            <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ContentControl.Resources>
+                                            </ContentControl>
                                         </DataTemplate>
-                                        <DataTemplate DataType="{x:Type sgvm:CustomContainerGridViewModel}">
-                                            <StackPanel>
-                                                <TextBlock HorizontalAlignment="Center" FontStyle="Italic" Text="{itl:LocalizedText LC_CUSTOM_CONTAINERS_DESCRIPTION}" />
-                                                <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ContentControl.Resources>
-                                </ContentControl>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                        </v:CachingContentPresenter.ContentTemplate>
+                    </v:CachingContentPresenter>
                 </ScrollViewer>
             </DockPanel>
         </Grid>
