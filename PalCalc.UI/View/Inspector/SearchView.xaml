@@ -61,7 +61,7 @@
                                             <DataTrigger Binding="{Binding Coords, Converter={StaticResource VBC}}" Value="True">
                                                 <Setter Property="Cursor" Value="Hand" />
                                                 <Setter Property="Background" Value="White" />
-                                                <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+                                                <Setter Property="ToolTipService.InitialShowDelay" Value="200" />
                                                 <Setter Property="ToolTip">
                                                     <Setter.Value>
                                                         <ToolTip>

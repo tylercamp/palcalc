@@ -46,7 +46,7 @@
                                         </Setter>
                                         <Setter Property="Cursor" Value="Hand" />
                                         <Setter Property="Background" Value="Black" />
-                                        <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+                                        <Setter Property="ToolTipService.InitialShowDelay" Value="200" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
