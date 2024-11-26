@@ -4,6 +4,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
@@ -18,6 +19,39 @@ namespace PalCalc.SaveReader
     {
         private static ILogger logger = Log.ForContext(typeof(CompressedSAV));
 
+        // file operations can take a while, and they can happen while Palworld is running + saving file contents.
+        // save files are relatively small (typically ~10MB at most), prefer loading the whole file into memory up
+        // front so we can close the handle ASAP.
+        private static Stream ReadFileNonLocking(string filePath)
+        {
+            // since the file can be moved or changed during the read op, auto-retry any failed attempts
+
+            byte[] fileBytes;
+
+            const int maxAttempts = 3;
+            for (int i = 1; i <= maxAttempts; i++)
+            {
+                try
+                {
+                    using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+                    using (var ms = new MemoryStream())
+                    {
+                        fs.CopyTo(ms);
+                        fileBytes = ms.ToArray();
+                    }
+
+                    return new MemoryStream(fileBytes);
+                }
+                catch (Exception e) when (i != maxAttempts)
+                {
+                    logger.Warning(e, "Error while reading {File}, retrying", filePath);
+                }
+            }
+
+            // (shouldn't happen, we should have returned a stream or thrown an exception by now)
+            throw new NotImplementedException();
+        }
+
         // don't know what this is, but I've seen this in newer palworld saves from Game Pass. seems
         // to clear itself up (back to normal format) after the game has been closed for a little while.
         // likely an indicator of unsynced save or something like that.
@@ -27,7 +61,8 @@ namespace PalCalc.SaveReader
         public static void WithDecompressedSave(string filePath, Action<Stream> action)
         {
             logger.Information("Loading {file} as GVAS", filePath);
-            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            
+            using (var fs = ReadFileNonLocking(filePath))
             using (var binaryReader = new BinaryReader(fs))
             {
                 // unused
@@ -75,7 +110,7 @@ namespace PalCalc.SaveReader
 
         public static bool IsValidSave(string filePath)
         {
-            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var fs = ReadFileNonLocking(filePath))
             using (var binaryReader = new BinaryReader(fs))
             {
                 // unused
