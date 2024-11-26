@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
+using PalCalc.UI.View.Utils;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
 using System;

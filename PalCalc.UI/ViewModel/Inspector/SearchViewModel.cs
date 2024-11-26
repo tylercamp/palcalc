@@ -4,6 +4,7 @@ using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
+using PalCalc.UI.View.Utils;
 using PalCalc.UI.ViewModel.Inspector.Search;
 using PalCalc.UI.ViewModel.Inspector.Search.Container;
 using PalCalc.UI.ViewModel.Inspector.Search.Grid;

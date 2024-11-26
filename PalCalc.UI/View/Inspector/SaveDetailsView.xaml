@@ -9,6 +9,7 @@
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:v="clr-namespace:PalCalc.UI.View"
+             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              mc:Ignorable="d" 
              d:Background="White"
              d:DataContext="{x:Static ivm:SaveDetailsViewModel.DesignerInstance}"
@@ -64,8 +65,8 @@
 
         <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" />
 
-        <v:CachingContentPresenter Grid.Column="2" Content="{Binding SelectedContainer}">
-            <v:CachingContentPresenter.ContentTemplate>
+        <vu:CachingContentPresenter Grid.Column="2" Content="{Binding SelectedContainer}">
+            <vu:CachingContentPresenter.ContentTemplate>
                 <DataTemplate>
                     <ListView ItemsSource="{Binding Slots}"
                               SelectedItem="{Binding RelativeSource={RelativeSource AncestorType=local:SaveDetailsView}, Path=DataContext.SelectedSlot}"
@@ -96,8 +97,8 @@
                         </ListView.ItemTemplate>
                     </ListView>
                 </DataTemplate>
-            </v:CachingContentPresenter.ContentTemplate>
-        </v:CachingContentPresenter>
+            </vu:CachingContentPresenter.ContentTemplate>
+        </vu:CachingContentPresenter>
 
         <GridSplitter Grid.Column="3" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" />
 

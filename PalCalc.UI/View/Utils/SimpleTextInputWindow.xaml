@@ -1,0 +1,31 @@
+﻿<Window x:Class="PalCalc.UI.View.Utils.SimpleTextInputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+        mc:Ignorable="d"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        WindowStyle="ToolWindow"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="Height"
+        Title="SimpleTextInputWindow"
+        Height="Auto" Width="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding InputLabel}" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Center"/>
+        <TextBox x:Name="m_TextBox" PreviewKeyDown="m_TextBox_PreviewKeyDown" Margin="10,0,10,0" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Column="1" Text="{Binding Result, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        
+        <Button Grid.Column="1" Content="{itl:LocalizedText Code=LC_COMMON_CANCEL}" HorizontalAlignment="Right" Margin="10,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Command="{Binding CancelCommand}" />
+        <Button Grid.Column="1" Content="{itl:LocalizedText Code=LC_COMMON_SAVE}" HorizontalAlignment="Right" Margin="0,0,55,10" Grid.Row="1" VerticalAlignment="Bottom" Command="{Binding SaveCommand}" />
+
+    </Grid>
+</Window>

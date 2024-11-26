@@ -8,6 +8,7 @@
              xmlns:ivmg="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search.Grid"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:v="clr-namespace:PalCalc.UI.View"
+             xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
              mc:Ignorable="d"
              d:DataContext="{x:Type ivmg:ContainerGridPalSlotViewModel}">
     <UserControl.Resources>
@@ -25,7 +26,7 @@
                 <StackPanel Margin="10,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" />
-                        <v:PalGenderView DataContext="{Binding PalInstance.Gender}" Height="16" />
+                        <vp:PalGenderView DataContext="{Binding PalInstance.Gender}" Height="16" />
                     </StackPanel>
                     <TextBlock>
                         <Run Text="{itl:LocalizedText LC_COMMON_LEVEL}" />
@@ -63,7 +64,7 @@
                 </StackPanel>
             </StackPanel>
 
-            <v:PassiveSkillCollectionView DataContext="{Binding PalInstance.PassiveSkills}" Background="#111" VerticalAlignment="Center" Width="250" Margin="0,0,25,0" />
+            <vp:PassiveSkillCollectionView DataContext="{Binding PalInstance.PassiveSkills}" Background="#111" VerticalAlignment="Center" Width="250" Margin="0,0,25,0" />
         </WrapPanel>
     </Grid>
 </UserControl>

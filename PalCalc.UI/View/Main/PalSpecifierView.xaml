@@ -1,0 +1,112 @@
+﻿<UserControl x:Class="PalCalc.UI.View.Main.PalSpecifierView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PalCalc.UI.View.Main"
+             xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
+             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+             xmlns:m="clr-namespace:PalCalc.UI.Model"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             mc:Ignorable="d" 
+             d:Background="White"
+             d:DataContext="{x:Static mvm:PalSpecifierViewModel.DesignerInstance}">
+    <UserControl.Resources>
+        <c:CollectionVisibilityConverter x:Key="CVC" />
+        <BooleanToVisibilityConverter x:Key="BVC" />
+
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="{x:Type vp:PassiveSkillCollectionView}">
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <TextBlock
+            Visibility="{Binding IsReadOnly, Converter={StaticResource BVC}}"
+            Text="{Binding Label.Value}"
+            HorizontalAlignment="Center"
+            FontWeight="Bold"
+            FontSize="14"
+            />
+        
+        <Grid
+            Visibility="{Binding IsDynamic, Converter={StaticResource BVC}}" 
+            Margin="2"
+        >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            
+            <Grid Grid.Column="0">
+                <Image Source="{Binding TargetPal.Icon}" Stretch="Uniform" />
+            </Grid>
+            
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <TextBlock
+                            Text="{Binding TargetPal.Name.Value}"
+                            FontWeight="Bold"
+                            FontSize="14"
+                            />
+
+                        <vp:PalGenderView
+                            DataContext="{Binding RequiredGender}"
+                            Visibility="{Binding IsSpecific, Converter={StaticResource BVC}, FallbackValue=Collapsed}"
+                            Height="18"
+                            />
+                    </StackPanel>
+
+                    <Button
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        PreviewMouseDown="Image_PreviewMouseDown"
+                        Cursor="Hand"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        >
+                        <materialIcons:MaterialIcon
+                            Kind="Remove"
+                            Width="15"
+                            Foreground="DarkRed"
+                            />
+                    </Button>
+                </Grid>
+
+                <TextBlock
+                    Text="{Binding RequiredPassivesCollection.RequiredDescription.Value}"
+                    TextWrapping="Wrap"
+                    FontWeight="Bold"
+                    Grid.Row="1"
+                    />
+
+                <TextBlock
+                    Text="{Binding OptionalPassivesCollection.OptionalDescription.Value}"
+                    TextWrapping="Wrap"
+                    FontStyle="Italic"
+                    Visibility="{Binding OptionalPassivesCollection.Passives, Converter={StaticResource CVC}}"
+                    Grid.Row="2"
+                    />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>
