@@ -221,44 +221,48 @@ namespace PalCalc.UI.Model
             }
 
             var identifier = CachedSaveGame.IdentifierFor(save);
-            if (InMemorySaves.ContainsKey(identifier)) return InMemorySaves[identifier];
 
-            if (File.Exists(path))
+            lock (InMemorySaves)
             {
-                var res = LoadSaveFromCache(save, db);
+                if (InMemorySaves.ContainsKey(identifier)) return InMemorySaves[identifier];
 
-                if (!res.IsValid)
+                if (File.Exists(path))
                 {
-                    // TODO - no longer necessary? should have been covered by check at top of this method
-                    // TODO - log
-                    File.Delete(path);
-                    return null;
-                }
+                    var res = LoadSaveFromCache(save, db);
 
-                if (res.IsOutdated(db))
+                    if (!res.IsValid)
+                    {
+                        // TODO - no longer necessary? should have been covered by check at top of this method
+                        // TODO - log
+                        File.Delete(path);
+                        return null;
+                    }
+
+                    if (res.IsOutdated(db))
+                    {
+                        File.Delete(path);
+                        return LoadSave(save, db);
+                    }
+
+                    InMemorySaves.Add(identifier, res);
+                    return res;
+                }
+                else
                 {
-                    File.Delete(path);
-                    return LoadSave(save, db);
-                }
+                    var res = CachedSaveGame.FromSaveGame(save, db);
+                    if (res != null)
+                    {
+                        CrashSupport.ReferencedCachedSave(res);
+                        File.WriteAllText(path, res.ToJson(db));
+                    }
 
-                InMemorySaves.Add(identifier, res);
-                return res;
-            }
-            else
-            {
-                var res = CachedSaveGame.FromSaveGame(save, db);
-                if (res != null)
-                {
-                    CrashSupport.ReferencedCachedSave(res);
-                    File.WriteAllText(path, res.ToJson(db));
-                }
+                    // TODO - adding `null` entries will prevent re-adding a save at the same path until the app is restarted
+                    if (InMemorySaves.ContainsKey(identifier))
+                        InMemorySaves.Remove(identifier);
 
-                // TODO - adding `null` entries will prevent re-adding a save at the same path until the app is restarted
-                if (InMemorySaves.ContainsKey(identifier))
-                    InMemorySaves.Remove(identifier);
-                
-                InMemorySaves.Add(identifier, res);
-                return res;
+                    InMemorySaves.Add(identifier, res);
+                    return res;
+                }
             }
         }
 
@@ -266,7 +270,8 @@ namespace PalCalc.UI.Model
         // any related entries within AppSettings
         public static void RemoveSave(ISaveGame save)
         {
-            InMemorySaves.Remove(CachedSaveGame.IdentifierFor(save));
+            lock (InMemorySaves)
+                InMemorySaves.Remove(CachedSaveGame.IdentifierFor(save));
 
             CrashSupport.RemoveReferences(save);
             ClearForSave(save);
@@ -280,45 +285,48 @@ namespace PalCalc.UI.Model
 
             CrashSupport.ReferencedSave(save);
 
-            var identifier = CachedSaveGame.IdentifierFor(save);
-            var originalCachedSave = InMemorySaves.GetValueOrDefault(identifier);
-
-            if (originalCachedSave != null)
+            lock (InMemorySaves)
             {
-                CrashSupport.ReferencedCachedSave(originalCachedSave);
-                InMemorySaves.Remove(identifier);
-            }
-
-            var path = SaveCachePathFor(save);
-            var wasStored = File.Exists(path);
-            var backupPath = wasStored ? path + ".bak" : null;
-
-            if (wasStored)
-                File.Move(path, backupPath);
-
-            var newCachedSave = LoadSave(save, db);
-
-            if (newCachedSave == null)
-            {
-                if (wasStored)
-                {
-                    if (File.Exists(path)) File.Delete(path);
-
-                    File.Move(backupPath, path);
-                }
-
-                InMemorySaves[identifier] = originalCachedSave;
-            }
-            else
-            {
-                if (wasStored) File.Delete(backupPath);
+                var identifier = CachedSaveGame.IdentifierFor(save);
+                var originalCachedSave = InMemorySaves.GetValueOrDefault(identifier);
 
                 if (originalCachedSave != null)
-                    originalCachedSave.CopyFrom(newCachedSave);
+                {
+                    CrashSupport.ReferencedCachedSave(originalCachedSave);
+                    InMemorySaves.Remove(identifier);
+                }
 
-                InMemorySaves[identifier] = originalCachedSave ?? newCachedSave;
+                var path = SaveCachePathFor(save);
+                var wasStored = File.Exists(path);
+                var backupPath = wasStored ? path + ".bak" : null;
 
-                SaveReloaded?.Invoke(save);
+                if (wasStored)
+                    File.Move(path, backupPath);
+
+                var newCachedSave = LoadSave(save, db);
+
+                if (newCachedSave == null)
+                {
+                    if (wasStored)
+                    {
+                        if (File.Exists(path)) File.Delete(path);
+
+                        File.Move(backupPath, path);
+                    }
+
+                    InMemorySaves[identifier] = originalCachedSave;
+                }
+                else
+                {
+                    if (wasStored) File.Delete(backupPath);
+
+                    if (originalCachedSave != null)
+                        originalCachedSave.CopyFrom(newCachedSave);
+
+                    InMemorySaves[identifier] = originalCachedSave ?? newCachedSave;
+
+                    SaveReloaded?.Invoke(save);
+                }
             }
         }
 
