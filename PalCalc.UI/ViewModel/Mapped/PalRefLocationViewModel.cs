@@ -155,7 +155,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                     break;
 
                 case LocationType.Base:
-                    sourceBase = source.Bases?.FirstOrDefault(b => b.Container?.Id == ownedLoc.Location.ContainerId);
+                    sourceBase = source?.Bases?.FirstOrDefault(b => b.Container?.Id == ownedLoc.Location.ContainerId);
 
                     var baseCoord = PalDisplayCoord.FromLocation(ownedLoc.Location);
                     LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_BASE.Bind(
@@ -180,7 +180,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                     break;
 
                 case LocationType.ViewingCage:
-                    sourceBase = source.Bases?.FirstOrDefault(b => b.ViewingCages.Any(c => c.Id == ownedLoc.Location.ContainerId));
+                    sourceBase = source?.Bases?.FirstOrDefault(b => b.ViewingCages.Any(c => c.Id == ownedLoc.Location.ContainerId));
 
                     var cageCoord = PalDisplayCoord.FromLocation(ownedLoc.Location);
                     LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_VIEWING_CAGE.Bind(
