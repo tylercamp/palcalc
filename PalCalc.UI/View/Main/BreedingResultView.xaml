@@ -37,11 +37,14 @@
                             <!-- stack panels bound to a pal ref with map coords will get a tooltip -->
                             <Style TargetType="StackPanel" x:Key="LocationStyle">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding MapCoord, Converter={StaticResource VBC}, FallbackValue=False}" Value="True">
+                                    <DataTrigger Binding="{Binding HasPreview, Converter={StaticResource VBC}, FallbackValue=False}" Value="True">
                                         <Setter Property="ToolTip">
                                             <Setter.Value>
-                                                <ToolTip DataContext="{Binding PlacementTarget.DataContext.MapCoord, RelativeSource={RelativeSource Self}}">
-                                                    <vp:MapView DataContext="{Binding}" Width="300" Height="300" />
+                                                <ToolTip DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}" Background="#040F15">
+                                                    <StackPanel>
+                                                        <vp:PalLocationView DataContext="{Binding MapLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" Width="300" Height="300" />
+                                                        <vp:PalLocationView DataContext="{Binding ContainerLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" />
+                                                    </StackPanel>
                                                 </ToolTip>
                                             </Setter.Value>
                                         </Setter>
@@ -79,7 +82,7 @@
                                                 <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" />
                                             </StackPanel>
 
-                                            <materialIcons:MaterialIcon Visibility="{Binding MapCoord, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
                                         </StackPanel>
                                     </Grid>
                                 </DataTemplate>
@@ -97,7 +100,7 @@
                                                 <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
                                                 <TextBlock Text="{Binding LocationCoordDescription.Value}" />
                                             </StackPanel>
-                                            <materialIcons:MaterialIcon Visibility="{Binding MapCoord, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="8" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="8" VerticalAlignment="Center" Margin="5,0,0,0" />
                                         </StackPanel>
                                 
                                         <Border BorderBrush="White" Width="1" BorderThickness="1" Margin="10" Grid.Column="1" />
@@ -109,7 +112,7 @@
                                                 <TextBlock Text="{Binding LocationCoordDescription.Value}" />
                                             </StackPanel>
 
-                                            <materialIcons:MaterialIcon Visibility="{Binding MapCoord, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="8" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="8" VerticalAlignment="Center" Margin="5,0,0,0" />
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>

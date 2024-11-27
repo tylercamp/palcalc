@@ -81,6 +81,13 @@ namespace PalCalc.UI.ViewModel.Mapped
 
     public class SpecificPalRefLocationViewModel : IPalRefLocationViewModel
     {
+        private static SpecificPalRefLocationViewModel designerInstance;
+        public static SpecificPalRefLocationViewModel DesignerInstance => designerInstance ??= new SpecificPalRefLocationViewModel();
+        private SpecificPalRefLocationViewModel()
+        {
+            IsSinglePlayer = true;
+        }
+
         public SpecificPalRefLocationViewModel(CachedSaveGame source, IPalRefLocation location)
         {
             if (location is CompositeRefLocation) throw new InvalidOperationException();
@@ -143,10 +150,14 @@ namespace PalCalc.UI.ViewModel.Mapped
                     LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_PARTY.Bind(ownedLoc.Location.Index + 1);
                     break;
 
+                case LocationType.Custom:
+                    LocationCoordDescription = LocalizationCodes.LC_CUSTOM_CONTAINER.Bind(ownedLoc.Location.ContainerId);
+                    break;
+
                 case LocationType.Base:
                     sourceBase = source.Bases?.FirstOrDefault(b => b.Container?.Id == ownedLoc.Location.ContainerId);
 
-                    var baseCoord = BaseCoord.FromSlotIndex(ownedLoc.Location.Index);
+                    var baseCoord = PalDisplayCoord.FromLocation(ownedLoc.Location);
                     LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_BASE.Bind(
                         new
                         {
@@ -157,11 +168,11 @@ namespace PalCalc.UI.ViewModel.Mapped
                     break;
 
                 case LocationType.Palbox:
-                    var pboxCoord = PalboxCoord.FromSlotIndex(ownedLoc.Location.Index);
+                    var pboxCoord = PalDisplayCoord.FromLocation(ownedLoc.Location);
                     LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_PALBOX.Bind(
                         new
                         {
-                            Tab = pboxCoord.Tab,
+                            Tab = pboxCoord.Tab.Value,
                             X = pboxCoord.X,
                             Y = pboxCoord.Y,
                         }
@@ -171,7 +182,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 case LocationType.ViewingCage:
                     sourceBase = source.Bases?.FirstOrDefault(b => b.ViewingCages.Any(c => c.Id == ownedLoc.Location.ContainerId));
 
-                    var cageCoord = ViewingCageCoord.FromSlotIndex(ownedLoc.Location.Index);
+                    var cageCoord = PalDisplayCoord.FromLocation(ownedLoc.Location);
                     LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_VIEWING_CAGE.Bind(
                         new
                         {
@@ -181,10 +192,6 @@ namespace PalCalc.UI.ViewModel.Mapped
                     );
                     break;
 
-                case LocationType.Custom:
-                    LocationCoordDescription = LocalizationCodes.LC_CUSTOM_CONTAINER.Bind(ownedLoc.Location.ContainerId);
-                    break;
-
                 default:
                     throw new NotImplementedException();
             }
@@ -192,7 +199,11 @@ namespace PalCalc.UI.ViewModel.Mapped
             if (LocationOwner != null)
                 LocationOwnerDescription = LocalizationCodes.LC_LOC_OWNED_BY.Bind(LocationOwner);
 
-            MapCoord = MapCoordViewModel.FromBase(sourceBase);
+            var mapCoord = MapCoordViewModel.FromBase(sourceBase);
+            if (mapCoord != null) MapLocationPreview = new MapLocationPreviewViewModel(mapCoord);
+
+            if (ownedLoc.Location.Type != LocationType.Custom)
+                ContainerLocationPreview = new ContainerLocationPreviewViewModel(ownedLoc.Location);
         }
 
         public bool IsSinglePlayer { get; }
@@ -208,7 +219,10 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public ILocalizedText LocationCoordDescription { get; }
 
-        public MapCoordViewModel MapCoord { get; }
+        public bool HasPreview => ContainerLocationPreview != null || MapLocationPreview != null;
+
+        public ContainerLocationPreviewViewModel ContainerLocationPreview { get; }
+        public MapLocationPreviewViewModel MapLocationPreview { get; }
     }
 
     public class WildPalRefLocationViewModel : IPalRefLocationViewModel

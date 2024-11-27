@@ -34,9 +34,9 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="220" Width="300"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="232*"/>
+                <ColumnDefinition Width="232*" />
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="80*"/>
+                <ColumnDefinition Width="80*" MinWidth="200"/>
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0" Margin="5" IsEnabled="{Binding IsEditable}">
                 <StackPanel DockPanel.Dock="Top">

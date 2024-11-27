@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="PalCalc.UI.View.Pal.PalLocationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PalCalc.UI.View.Pal"
+             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             mc:Ignorable="d"
+             d:DataContext="{x:Static vm:ContainerLocationPreviewViewModel.PalboxDesignerInstance}">
+    <UserControl.Resources>
+        <c:ValueVisibilityConverter x:Key="VVC" />
+    </UserControl.Resources>
+    <ContentPresenter Content="{Binding}">
+        <ContentPresenter.Resources>
+            <DataTemplate DataType="{x:Type vm:MapLocationPreviewViewModel}">
+                <local:MapView DataContext="{Binding MapCoord}" />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:ContainerLocationPreviewViewModel}">
+                <StackPanel Background="#040F15" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Foreground="White" FontSize="16" Margin="0,4,0,0" FontWeight="Bold" TextAlignment="Center" Visibility="{Binding ContainerCoord.Tab, FallbackValue=Collapsed, Converter={StaticResource VVC}}">
+                        <Run Text="Tab" />
+                        <Run Text="{Binding ContainerCoord.Tab}" />
+                    </TextBlock>
+                    
+                    <ItemsControl ItemsSource="{Binding SlotContents}" Padding="4">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="{Binding NumCols}" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.Resources>
+                            <Style TargetType="Border" x:Key="SlotStyle">
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter Property="VerticalAlignment" Value="Stretch" />
+
+                                <Setter Property="Background" Value="#1C2124" />
+                                <Setter Property="CornerRadius" Value="999" />
+                                <Setter Property="BorderBrush" Value="#33383a" />
+                                <Setter Property="BorderThickness" Value="2" />
+
+                                <Setter Property="Margin" Value="2" />
+                            </Style>
+                        </ItemsControl.Resources>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ContentControl Content="{Binding}">
+                                    <ContentControl.Style>
+                                        <Style TargetType="ContentControl">
+                                            <Setter Property="MinWidth" Value="32" />
+                                            <Setter Property="MinHeight" Value="32" />
+                                        </Style>
+                                    </ContentControl.Style>
+                                    <ContentControl.Resources>
+                                        <DataTemplate DataType="{x:Type vm:EmptyContainerLocationPreviewSlotViewModel}">
+                                            <Border Style="{StaticResource SlotStyle}">
+                                                <Grid />
+                                            </Border>
+                                        </DataTemplate>
+
+                                        <DataTemplate DataType="{x:Type vm:FocusedContainerLocationPreviewSlotViewModel}">
+                                            <Border Style="{StaticResource SlotStyle}">
+                                                <Grid>
+                                                    <materialIcons:MaterialIcon Kind="HighlightOff" Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ContentControl.Resources>
+                                </ContentControl>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </DataTemplate>
+        </ContentPresenter.Resources>
+    </ContentPresenter>
+</UserControl>
