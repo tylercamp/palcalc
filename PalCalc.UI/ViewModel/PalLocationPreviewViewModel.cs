@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
+using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,9 @@ namespace PalCalc.UI.ViewModel
         public int NumRows => GameConstants.LocationTypeGridHeights[location.Type] ?? ContainerCoord.Row;
 
         public bool HasTabs => ContainerCoord.Tab != null;
+
+        ILocalizedText tabTitle;
+        public ILocalizedText TabTitle => HasTabs ? (tabTitle ??= LocalizationCodes.LC_LOC_PALBOX_TAB.Bind(ContainerCoord.Tab)) : null;
 
         private List<IContainerLocationPreviewSlotViewModel> slotContents = null;
         public List<IContainerLocationPreviewSlotViewModel> SlotContents =>

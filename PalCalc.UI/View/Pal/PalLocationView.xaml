@@ -20,11 +20,15 @@
 
             <DataTemplate DataType="{x:Type vm:ContainerLocationPreviewViewModel}">
                 <StackPanel Background="#040F15" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Foreground="White" FontSize="16" Margin="0,4,0,0" FontWeight="Bold" TextAlignment="Center" Visibility="{Binding ContainerCoord.Tab, FallbackValue=Collapsed, Converter={StaticResource VVC}}">
-                        <Run Text="Tab" />
-                        <Run Text="{Binding ContainerCoord.Tab}" />
-                    </TextBlock>
-                    
+                    <Label Foreground="White"
+                           FontSize="16"
+                           Margin="0,4,0,0"
+                           FontWeight="Bold"
+                           HorizontalContentAlignment="Center"
+                           Visibility="{Binding ContainerCoord.Tab, FallbackValue=Collapsed, Converter={StaticResource VVC}}"
+                           Content="{Binding TabTitle.Value}"
+                           />
+
                     <ItemsControl ItemsSource="{Binding SlotContents}" Padding="4">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
