@@ -43,7 +43,10 @@ namespace PalCalc.UI.ViewModel
         public PalDisplayCoord ContainerCoord { get; } = PalDisplayCoord.FromLocation(location);
 
         public int NumCols => GameConstants.LocationTypeGridWidths[location.Type];
-        public int NumRows => GameConstants.LocationTypeGridHeights[location.Type] ?? ContainerCoord.Row;
+
+        // (if no specific row count exists, usually only shows as many rows as needed for the coord, but this looks weird
+        // for bases if the pal is in the first row. force at least 3 rows for that case)
+        public int NumRows => GameConstants.LocationTypeGridHeights[location.Type] ?? (location.Type == LocationType.Base ? Math.Max(3, ContainerCoord.Row) : ContainerCoord.Row);
 
         public bool HasTabs => ContainerCoord.Tab != null;
 
