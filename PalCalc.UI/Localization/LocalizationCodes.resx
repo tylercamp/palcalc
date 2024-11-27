@@ -664,4 +664,13 @@
   <data name="LC_VIEWING_CAGE_LABEL" xml:space="preserve">
     <value>CageId</value>
   </data>
+  <data name="LC_NO_RESULTS_FAQ_1" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_NO_RESULTS_FAQ_2" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_NO_RESULTS_FAQ_3" xml:space="preserve">
+    <value />
+  </data>
 </root>

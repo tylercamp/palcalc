@@ -110,13 +110,12 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock TextWrapping="Wrap" Visibility="{Binding ShowNoResultsNotice, Converter={StaticResource VVC}, FallbackValue=Collapsed}" Grid.Row="0" Padding="5">
-                        <Run Text="No results? Check" />
+                        <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_1}" />
                         <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/wiki/Frequently-Asked-Questions#why-arent-i-getting-any-results"
                                    RequestNavigate="Hyperlink_RequestNavigate">
-                            <Run Text="the FAQs" />
+                            <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_2}" />
                         </Hyperlink>
-                        
-                        <Run Text="for possible causes." />
+                        <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_3}" />
                     </TextBlock>
 
                     <GroupBox Header="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.ResultsHeading.Value}" Grid.Row="1">
