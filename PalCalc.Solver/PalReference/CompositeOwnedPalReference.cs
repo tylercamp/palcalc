@@ -22,6 +22,18 @@ namespace PalCalc.Solver.PalReference
     /// </summary>
     public class CompositeOwnedPalReference : IPalReference
     {
+        private static IV_IValue PropagateIVs(IV_IValue a, IV_IValue b)
+        {
+            if (a is IV_Range ar && b is IV_Range br)
+            {
+                return IV_Range.Merge(ar, br);
+            }
+            else
+            {
+                return IV_Random.Instance;
+            }
+        }
+
         public CompositeOwnedPalReference(OwnedPalReference male, OwnedPalReference female)
         {
             Male = male;
@@ -35,6 +47,10 @@ namespace PalCalc.Solver.PalReference
 
             ActualPassives = Male.ActualPassives.Intersect(Female.ActualPassives).ToList();
             while (ActualPassives.Count < EffectivePassives.Count) ActualPassives.Add(new RandomPassiveSkill());
+
+            IV_HP = PropagateIVs(male.IV_HP, female.IV_HP);
+            IV_Attack = PropagateIVs(male.IV_Attack, female.IV_Attack);
+            IV_Defense = PropagateIVs(male.IV_Defense, female.IV_Defense);
         }
 
         public OwnedPalReference Male { get; }
@@ -47,6 +63,10 @@ namespace PalCalc.Solver.PalReference
         public int EffectivePassivesHash { get; private set; }
 
         public List<PassiveSkill> ActualPassives { get; }
+
+        public IV_IValue IV_HP { get; }
+        public IV_IValue IV_Attack { get; }
+        public IV_IValue IV_Defense { get; }
 
         public PalGender Gender { get; private set; } = PalGender.WILDCARD;
 
@@ -75,8 +95,14 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
-        // TODO - maybe just use Pal, PassivesHash, Gender? don't need hashes specific to the instances chosen?
+        // TODO - maybe just use Pal, PassivesHash, Gender, IVs? don't need hashes specific to the instances chosen?
         public override int GetHashCode() =>
-            HashCode.Combine(nameof(CompositeOwnedPalReference), Male, Female, EffectivePassivesHash, Gender);
+            HashCode.Combine(
+                nameof(CompositeOwnedPalReference),
+                Male, Female,
+                EffectivePassivesHash,
+                Gender,
+                HashCode.Combine(IV_HP, IV_Attack, IV_Defense)
+            );
     }
 }

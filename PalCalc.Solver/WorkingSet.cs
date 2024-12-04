@@ -18,7 +18,8 @@ namespace PalCalc.Solver
         private static PalProperty.GroupIdFn DefaultGroupFn = PalProperty.Combine(
             PalProperty.Pal,
             PalProperty.Gender,
-            PalProperty.EffectivePassives
+            PalProperty.EffectivePassives,
+            PalProperty.IvValidity
         );
 
         private CancellationToken token;

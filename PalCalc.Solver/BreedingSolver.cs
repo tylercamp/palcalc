@@ -45,6 +45,9 @@ namespace PalCalc.Solver
         // TODO - is this the right way to use pascal's triangle??
         static int Choose(int n, int k) => PascalsTriangle.Instance[n - 1][k - 1];
 
+        static IV_IValue MakeIV(int minValue, int value) =>
+            (minValue == 0 || value < minValue) ? IV_Random.Instance : new IV_Range(value);
+
         GameSettings gameSettings;
         PalDB db;
         List<PalInstance> ownedPals;
@@ -367,6 +370,62 @@ namespace PalCalc.Solver
             return probabilityForNumPassives;
         }
 
+        // https://github.com/tylercamp/palcalc/issues/22#issuecomment-2509171056
+        // [NumInherited-1][NumDesired-1]
+        float[][] IvDesiredProbabilitiesTable = [
+            // 1 inherited
+            [
+                0.5f * (1.0f / 3.0f), // 1 desired
+                0.0f,                 // 2 desired
+                0.0f                  // 3 desired
+            ],
+            // 2 inherited
+            [
+                0.25f * (2.0f / 3.0f), // 1 desired
+                0.25f * (1.0f / 3.0f), // 2 desired
+                0.0f                   // 3 desired
+            ],
+            // 3 inherited
+            [
+                0.25f,
+                0.25f,
+                0.25f
+            ]
+        ];
+
+        float ProbabilityInheritedTargetIVs(
+            IV_IValue A_hp, IV_IValue A_attack, IV_IValue A_defense,
+            IV_IValue B_hp, IV_IValue B_attack, IV_IValue B_defense
+        )
+        {
+            IV_IValue[] hps = [A_hp, B_hp];
+            IV_IValue[] attacks = [A_attack, B_attack];
+            IV_IValue[] defenses = [A_defense, B_defense];
+
+            int numRelevantHP = hps.Count(iv => iv.IsValid);
+            int numRelevantAttack = attacks.Count(iv => iv.IsValid);
+            int numRelevantDefense = defenses.Count(iv => iv.IsValid);
+
+            int numRequiredIVs = 0;
+            if (numRelevantHP > 0) numRequiredIVs++;
+            if (numRelevantAttack > 0) numRequiredIVs++;
+            if (numRelevantDefense > 0) numRequiredIVs++;
+
+            if (numRequiredIVs == 0) return 1.0f;
+
+            float result = 0.0f;
+            for (int numInherited = 1; numInherited <= 3; numInherited++)
+                result += IvDesiredProbabilitiesTable[numInherited - 1][numRequiredIVs - 1];
+
+            if (numRelevantHP == 1) result *= 0.5f;
+            if (numRelevantAttack == 1) result *= 0.5f;
+            if (numRelevantDefense == 1) result *= 0.5f;
+
+            if (result <= 0.0001f) Debugger.Break();
+
+            return result;
+        }
+
         public List<IPalReference> SolveFor(PalSpecifier spec, CancellationToken token)
         {
             spec.Normalize();
@@ -405,11 +464,20 @@ namespace PalCalc.Solver
             foreach (
                 var palGroup in relevantPals
                     .Where(pi => WithinBreedingSteps(pi.Pal, maxBreedingSteps))
-                    .Select(pi => new OwnedPalReference(pi, pi.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives)))
+                    .Select(pi => new OwnedPalReference(
+                        pi,
+                        pi.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives),
+                        MakeIV(spec.IV_HP, pi.IV_HP),
+                        MakeIV(spec.IV_Attack, pi.IV_Shot),
+                        MakeIV(spec.IV_Defense, pi.IV_Defense)
+                    ))
                     .GroupBy(pi => pi.Pal)
             )
             {
                 var pal = palGroup.Key;
+
+                initialContent.AddRange(palGroup);
+                continue;
 
                 // group owned pals by the desired passives they contain, and try to find male+female pairs with the same set of passives + num irrelevant passives
                 foreach (
@@ -612,6 +680,25 @@ namespace PalCalc.Solver
                                         spec.OptionalPassives.Intersect(parentPassives).ToList()
                                     ).Select(p => p.ToList()).ToList();
 
+                                    var ivsProbability = ProbabilityInheritedTargetIVs(
+                                        parent1.IV_HP, parent1.IV_Attack, parent1.IV_Defense,
+                                        parent2.IV_HP, parent2.IV_Attack, parent2.IV_Defense
+                                    );
+
+                                    IV_IValue MergeIVs(IV_IValue a, IV_IValue b) =>
+                                        (a, b) switch
+                                        {
+                                            (IV_Random, IV_Random) => a,
+                                            (IV_Random, IV_Range vb) => vb,
+                                            (IV_Range va, IV_Random) => va,
+                                            (IV_Range va, IV_Range vb) => IV_Range.Merge(va, vb),
+                                            _ => throw new NotImplementedException()
+                                        };
+
+                                    var finalHp = MergeIVs(parent1.IV_HP, parent2.IV_HP);
+                                    var finalAttack = MergeIVs(parent1.IV_Attack, parent2.IV_Attack);
+                                    var finalDefense = MergeIVs(parent1.IV_Defense, parent2.IV_Defense);
+
                                     foreach (var targetPassives in passiveSkillPerms)
                                     {
                                         // go through each potential final number of passives, accumulate the probability of any of these exact options
@@ -652,7 +739,11 @@ namespace PalCalc.Solver
                                                 parent1,
                                                 parent2,
                                                 newPassives,
-                                                probabilityForUpToNumPassives
+                                                probabilityForUpToNumPassives,
+                                                finalHp,
+                                                finalAttack,
+                                                finalDefense,
+                                                ivsProbability
                                             );
 
                                             if (!bannedBredPals.Contains(res.Pal))

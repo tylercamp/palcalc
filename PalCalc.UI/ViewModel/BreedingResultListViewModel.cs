@@ -70,16 +70,22 @@ namespace PalCalc.UI.ViewModel
         {
             Results = new List<BreedingResultViewModel>()
             {
-                new BreedingResultViewModel(null, new OwnedPalReference(new PalInstance()
-                {
-                    Pal = "Beakon".ToPal(PalDB.LoadEmbedded()),
-                    Gender = PalGender.WILDCARD,
-                    Location = new PalLocation() { Index = 0, Type = LocationType.Palbox },
-                    PassiveSkills = new List<PassiveSkill>()
+                new BreedingResultViewModel(null, new OwnedPalReference(
+                    new PalInstance()
                     {
-                        "Runner".ToPassive(PalDB.LoadEmbedded()),
-                    }
-                }, new List<PassiveSkill>() { "Runner".ToPassive(PalDB.LoadEmbedded()) }))
+                        Pal = "Beakon".ToPal(PalDB.LoadEmbedded()),
+                        Gender = PalGender.WILDCARD,
+                        Location = new PalLocation() { Index = 0, Type = LocationType.Palbox },
+                        PassiveSkills = new List<PassiveSkill>()
+                        {
+                            "Runner".ToPassive(PalDB.LoadEmbedded()),
+                        }
+                    },
+                    new List<PassiveSkill>() { "Runner".ToPassive(PalDB.LoadEmbedded()) },
+                    new IV_Range(80, 90),
+                    IV_Random.Instance,
+                    IV_Random.Instance
+                ))
             }
         };
     }

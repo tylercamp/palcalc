@@ -144,9 +144,9 @@ namespace PalCalc.UI.ViewModel.Inspector
                         definiteType ?? containedPals.FirstOrDefault()?.Location?.Type,
                         position == null ? null : new WorldCoord()
                         {
-                            X = matchingBase.Position.x,
-                            Y = matchingBase.Position.y,
-                            Z = matchingBase.Position.z
+                            X = (matchingBase?.Position ?? position).Value.x,
+                            Y = (matchingBase?.Position ?? position).Value.y,
+                            Z = (matchingBase?.Position ?? position).Value.z
                         }
                     );
                 }

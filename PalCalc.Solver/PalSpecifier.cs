@@ -18,12 +18,19 @@ namespace PalCalc.Solver
 
         public IEnumerable<PassiveSkill> DesiredPassives => RequiredPassives.Concat(OptionalPassives);
 
+        public int IV_HP { get; set; }
+        public int IV_Attack { get; set; }
+        public int IV_Defense { get; set; }
+
         public override string ToString() => $"{Pal.Name} with {RequiredPassives.PassiveSkillListToString()}";
 
         public bool IsSatisfiedBy(IPalReference palRef) =>
             Pal == palRef.Pal &&
             !RequiredPassives.Except(palRef.EffectivePassives).Any() &&
-            (RequiredGender == PalGender.WILDCARD || palRef.Gender == PalGender.WILDCARD || palRef.Gender == RequiredGender);
+            (RequiredGender == PalGender.WILDCARD || palRef.Gender == PalGender.WILDCARD || palRef.Gender == RequiredGender) &&
+            (IV_HP == 0 || palRef.IV_HP.Satisfies(IV_HP)) &&
+            (IV_Attack == 0 || palRef.IV_Attack.Satisfies(IV_Attack)) &&
+            (IV_Defense == 0 || palRef.IV_Defense.Satisfies(IV_Defense));
 
         public void Normalize()
         {

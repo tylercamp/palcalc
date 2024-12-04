@@ -12,7 +12,16 @@ namespace PalCalc.Solver.PalReference
     {
         private GameSettings gameSettings;
 
-        private BredPalReference(GameSettings gameSettings, Pal pal, IPalReference parent1, IPalReference parent2, List<PassiveSkill> passives)
+        private BredPalReference(
+            GameSettings gameSettings,
+            Pal pal,
+            IPalReference parent1,
+            IPalReference parent2,
+            List<PassiveSkill> passives,
+            IV_IValue hp,
+            IV_IValue attack,
+            IV_IValue defense
+        )
         {
             this.gameSettings = gameSettings;
 
@@ -38,6 +47,10 @@ namespace PalCalc.Solver.PalReference
                 Parent2 = parent1;
             }
 
+            IV_HP = hp;
+            IV_Attack = attack;
+            IV_Defense = defense;
+
             EffectivePassives = passives;
             EffectivePassivesHash = passives.SetHash();
 
@@ -48,13 +61,26 @@ namespace PalCalc.Solver.PalReference
                 : Parent1.BreedingEffort + Parent2.BreedingEffort;
         }
 
-        public BredPalReference(GameSettings gameSettings, Pal pal, IPalReference parent1, IPalReference parent2, List<PassiveSkill> passives, float passivesProbability) : this(gameSettings, pal, parent1, parent2, passives)
+        public BredPalReference(
+            GameSettings gameSettings,
+            Pal pal,
+            IPalReference parent1,
+            IPalReference parent2,
+            List<PassiveSkill> passives,
+            float passivesProbability,
+            IV_IValue hp,
+            IV_IValue attack,
+            IV_IValue defense,
+            float ivsProbability
+        ) : this(gameSettings, pal, parent1, parent2, passives, hp, attack, defense)
         {
             Gender = PalGender.WILDCARD;
-            if (passivesProbability <= 0) AvgRequiredBreedings = int.MaxValue;
-            else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / passivesProbability);
+            // TODO - is this check actually needed?
+            if (passivesProbability <= 0 || ivsProbability <= 0) AvgRequiredBreedings = int.MaxValue;
+            else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / (passivesProbability * ivsProbability));
 
             PassivesProbability = passivesProbability;
+            IVsProbability = ivsProbability;
         }
 
         public float PassivesProbability { get; private set; }
@@ -66,6 +92,11 @@ namespace PalCalc.Solver.PalReference
         public PalGender Gender { get; private set; } = PalGender.WILDCARD;
 
         public IPalRefLocation Location => BredRefLocation.Instance;
+
+        public IV_IValue IV_HP { get; }
+        public IV_IValue IV_Attack { get; }
+        public IV_IValue IV_Defense { get; }
+        public float IVsProbability { get; private set; }
 
         public int AvgRequiredBreedings { get; private set; }
         public TimeSpan SelfBreedingEffort => AvgRequiredBreedings * gameSettings.AvgBreedingTime;
@@ -103,32 +134,35 @@ namespace PalCalc.Solver.PalReference
                 if (db.BreedingMostLikelyGender[Pal] != PalGender.WILDCARD)
                 {
                     // assume that the other parent has the more likely gender
-                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives)
+                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IV_HP, IV_Attack, IV_Defense)
                     {
                         AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
                         Gender = gender,
                         PassivesProbability = PassivesProbability,
+                        IVsProbability = IVsProbability,
                     };
                 }
                 else
                 {
                     // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
-                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives)
+                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IV_HP, IV_Attack, IV_Defense)
                     {
                         AvgRequiredBreedings = AvgRequiredBreedings * 2,
                         Gender = gender,
                         PassivesProbability = PassivesProbability,
+                        IVsProbability = IVsProbability,
                     };
                 }
             }
             else
             {
                 var genderProbability = db.BreedingGenderProbability[Pal][gender];
-                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives)
+                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IV_HP, IV_Attack, IV_Defense)
                 {
                     AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / genderProbability),
                     Gender = gender,
                     PassivesProbability = PassivesProbability,
+                    IVsProbability = IVsProbability,
                 };
             }
         }
@@ -160,7 +194,8 @@ namespace PalCalc.Solver.PalReference
             EffectivePassivesHash,
             BreedingEffort,
             SelfBreedingEffort,
-            Gender
+            Gender,
+            HashCode.Combine(IV_HP, IV_Attack, IV_Defense)
         );
     }
 }

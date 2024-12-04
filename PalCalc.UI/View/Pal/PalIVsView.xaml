@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="PalCalc.UI.View.Pal.PalIVsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PalCalc.UI.View.Pal"
+             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+
+             mc:Ignorable="d" 
+             d:DesignHeight="208.272" d:DesignWidth="766.148">
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type mvm:IVAnyValueViewModel}">
+            <TextBlock>-</TextBlock>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type mvm:IVRangeValueViewModel}">
+            <TextBlock>
+                <Run Text="{Binding Min, Mode=OneWay}" /><Run Text="-" /><Run Text="{Binding Max, Mode=OneWay}" />
+            </TextBlock>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type mvm:IVDirectValueViewModel}">
+            <TextBlock Text="{Binding Value, Mode=OneWay}" />
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0">
+            <TextBlock>HP</TextBlock>
+            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Mode=OneWay}" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="1">
+            <TextBlock>ATK</TextBlock>
+            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Mode=OneWay}" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="2">
+            <TextBlock>DEF</TextBlock>
+            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Mode=OneWay}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

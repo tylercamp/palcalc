@@ -118,6 +118,7 @@
                                 </DataTemplate>
                             </ContentControl.Resources>
                         </ContentControl>
+                        <vp:PalIVsView Foreground="White" FontSize="9" IV_HP="{Binding IV_HP}" IV_Attack="{Binding IV_Attack}" IV_Defense="{Binding IV_Defense}" />
                     </StackPanel>
                 </StackPanel>
                 <Grid Visibility="{Binding PassiveSkillsVisibility}">
