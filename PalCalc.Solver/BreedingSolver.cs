@@ -59,6 +59,12 @@ namespace PalCalc.Solver
         PruningRulesBuilder pruningBuilder;
         int maxThreads;
 
+        // https://github.com/tylercamp/palcalc/issues/22#issuecomment-2509171056
+        // [NumDesired - 1]
+        // eg if there's 1 specific type of IV we want, then ivDP[0] gives the probability of getting that IV
+        // (not including 50/50 chance of inheriting from specific parent)
+        float[] ivDesiredProbabilities;
+
         /// <param name="db"></param>
         /// <param name="ownedPals"></param>
         /// <param name="maxBreedingSteps"></param>
@@ -100,53 +106,66 @@ namespace PalCalc.Solver
             this.maxBredIrrelevantPassives = Math.Min(3, maxBredIrrelevantPassives);
             this.maxEffort = maxEffort;
             this.maxThreads = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
+
+            // for IV inheritance there's the probability of:
+            //
+            // 1. the chance of inheriting exactly N IVs
+            // 2. the chance of those IVs being what we want
+
+            // (1) is stored in GameConstants and can change depending on game updates
+            // (2) is represented in `combinationsProbabilityTable` and is just from the possible combinations,
+            //     regardless of game logic
+
+            var combinationsProbabilityTable = new Dictionary<int, Dictionary<int, float>>()
+            {
+                // 1 inherited
+                { 1, new() {
+                    { 1, 1.0f / 3.0f }, // 1 desired
+                    { 2, 0.0f },        // 2 desired (no way to get 2 if we only inherited 1)
+                    { 3, 0.0f },        // 3 desired (...)
+                } },
+
+                // 2 inherited
+                { 2, new() {
+                    { 1, 2.0f / 3.0f }, // 1 desired
+                    { 2, 1.0f / 3.0f }, // 2 desired
+                    { 3, 0.0f }         // 3 desired (no way to get 3 if we only inherited 2
+                } },
+
+                // 3 inherited
+                { 3, new() {
+                    // 3 inherited means all IVs inherited, doesn't matter what IV we actually wanted, we'll always get it
+                    { 1, 1.0f },
+                    { 2, 1.0f },
+                    { 3, 1.0f }
+                } }
+            };
+
+            /*
+            IV probabilities have similar approach as `ProbabilityInheritedTargetPassives` - a pal will end up inheriting
+            exactly 1, 2, or 3 IVs; get the probability of each case combined with the probability of those cases giving us
+            what we want
+            */
+            
+            // stores the final probabilities of getting some number of desired IVs
+            //
+            // (the final real probability will also need to account for 50/50 chance of inheriting the IV from either specific parent)
+            this.ivDesiredProbabilities = new float[3];
+            for (int i = 0; i < 3; i++) ivDesiredProbabilities[i] = 0.0f;
+
+            for (int numInherited = 1; numInherited <= 3; numInherited++)
+            {
+                var probabilityInherited = GameConstants.IVProbabilityDirect[numInherited];
+                for (int numDesired = 1; numDesired <= 3; numDesired++)
+                {
+                    var probabilityMatched = combinationsProbabilityTable[numInherited][numDesired];
+
+                    ivDesiredProbabilities[numDesired - 1] += probabilityInherited * probabilityMatched;
+                }
+            }
         }
 
         public event Action<SolverStatus> SolverStateUpdated;
-
-        // for each available (pal, gender) pair, and for each set of instance passives as a subset of the desired passives (e.g. all male lamballs with "runner",
-        // all with "runner and swift", etc.), pick the instance with the fewest total passives
-        //
-        // (includes pals without any relevant passives, picks the instance with the fewest total passives)
-        static List<PalInstance> RelevantInstancesForPassiveSkills(PalDB db, List<PalInstance> availableInstances, List<PassiveSkill> targetPassives)
-        {
-            List<PalInstance> relevantInstances = new List<PalInstance>();
-
-            var passivesPermutations = targetPassives.Combinations(targetPassives.Count).Select(l => l.ToList()).ToList();
-            logger.Debug("Looking for pals with passives:\n- {0}", string.Join("\n- ", passivesPermutations.Select(p => $"({string.Join(',', p)})")));
-
-            foreach (var pal in db.Pals)
-            {
-                foreach (var gender in new List<PalGender>() { PalGender.MALE, PalGender.FEMALE })
-                {
-                    var instances = availableInstances.Where(i => i.Pal == pal && i.Gender == gender).ToList();
-                    var instancesByPermutation = passivesPermutations.ToDictionary(p => p, p => new List<PalInstance>());
-
-                    foreach (var instance in instances)
-                    {
-                        var matchingPermutation = passivesPermutations
-                            .OrderByDescending(p => p.Count)
-                            .ThenBy(p => p.Except(instance.PassiveSkills).Count())
-                            .First(p => !p.Except(instance.PassiveSkills).Any());
-
-                        instancesByPermutation[matchingPermutation].Add(instance);
-                    }
-
-                    relevantInstances.AddRange(
-                        instancesByPermutation.Values
-                            .Where(instances => instances.Count != 0)
-                            .Select(instances => instances
-                                .OrderBy(i => i.PassiveSkills.Count)
-                                .ThenBy(i => PreferredLocationPruning.LocationOrderingOf(i.Location.Type))
-                                .ThenByDescending(i => i.IV_HP + i.IV_Shot + i.IV_Defense)
-                                .First()
-                            )
-                    );
-                }
-            }
-
-            return relevantInstances;
-        }
 
         /// <summary>
         /// Creates a list of desired combinations of passives. Meant to handle the case where there are over MAX_PASSIVES desired passives.
@@ -370,34 +389,18 @@ namespace PalCalc.Solver
             return probabilityForNumPassives;
         }
 
-        // https://github.com/tylercamp/palcalc/issues/22#issuecomment-2509171056
-        // [NumInherited-1][NumDesired-1]
-        float[][] IvDesiredProbabilitiesTable = [
-            // 1 inherited
-            [
-                0.5f * (1.0f / 3.0f), // 1 desired
-                0.0f,                 // 2 desired
-                0.0f                  // 3 desired
-            ],
-            // 2 inherited
-            [
-                0.25f * (2.0f / 3.0f), // 1 desired
-                0.25f * (1.0f / 3.0f), // 2 desired
-                0.0f                   // 3 desired
-            ],
-            // 3 inherited
-            [
-                0.25f,
-                0.25f,
-                0.25f
-            ]
-        ];
-
+        /// <summary>
+        /// Given the IVs from two parents, returns the probability of inheriting all desired IVs from the parents.
+        /// 
+        /// A desired IV is determined by whether it's a "valid" (i.e. non-random) IV.
+        /// </summary>
         float ProbabilityInheritedTargetIVs(
             IV_IValue A_hp, IV_IValue A_attack, IV_IValue A_defense,
             IV_IValue B_hp, IV_IValue B_attack, IV_IValue B_defense
         )
         {
+            // TODO - likely hotpath, optimize?
+
             IV_IValue[] hps = [A_hp, B_hp];
             IV_IValue[] attacks = [A_attack, B_attack];
             IV_IValue[] defenses = [A_defense, B_defense];
@@ -413,15 +416,24 @@ namespace PalCalc.Solver
 
             if (numRequiredIVs == 0) return 1.0f;
 
-            float result = 0.0f;
-            for (int numInherited = 1; numInherited <= 3; numInherited++)
-                result += IvDesiredProbabilitiesTable[numInherited - 1][numRequiredIVs - 1];
+            // base probability is the chance of getting the IV categories we want
+            float result = ivDesiredProbabilities[numRequiredIVs - 1];
 
+            // even if we got the right IV categories, we might not get the right parents/values
+            //
+            // for each IV:
+            // - if 0 relevant values, we weren't trying to inherit it, no effect
+            // - if 1 relevant value, we need to inherit from the right parent, extra 50/50 chance
+            // - if 2 relevant values, inheriting from either parent would suffice, no effect
+            //
+            // so if any IV has just one relevant parent, cut the final probability in half
             if (numRelevantHP == 1) result *= 0.5f;
             if (numRelevantAttack == 1) result *= 0.5f;
             if (numRelevantDefense == 1) result *= 0.5f;
 
+#if DEBUG
             if (result <= 0.0001f) Debugger.Break();
+#endif
 
             return result;
         }
@@ -438,101 +450,91 @@ namespace PalCalc.Solver
             var statusMsg = new SolverStatus() { CurrentPhase = SolverPhase.Initializing, CurrentStepIndex = 0, TargetSteps = maxSolverIterations, Canceled = token.IsCancellationRequested };
             SolverStateUpdated?.Invoke(statusMsg);
 
-            var relevantPals = RelevantInstancesForPassiveSkills(db, ownedPals, spec.DesiredPassives.ToList())
-               .Where(p => p.PassiveSkills.Except(spec.DesiredPassives).Count() <= maxInputIrrelevantPassives)
-               .ToList();
+            /* Build the initial list of pals to breed */
 
-            logger.Debug(
-                "Using {relevantCount}/{totalCount} pals as relevant inputs with passive skills:\n- {summary}",
-                relevantPals.Count,
-                ownedPals.Count,
-                string.Join("\n- ",
-                    relevantPals
-                        .OrderBy(p => p.Pal.Name)
-                        .ThenBy(p => p.Gender)
-                        .ThenBy(p => string.Join(" ", p.PassiveSkills.OrderBy(t => t.Name)))
-                )
-            );
+            // attempt to deduplicate pals and *intelligently* reduce the initial working set size
+            //
+            // effectively need to group pals based on their passives, IVs, and gender
+            // (though they only count if they're passives/IVs that are desired/in the PalSpecifier)
+            //
+            // if there are "duplicates", we'll pick based on the pal's IVs and where the pal is stored
+            //
 
-            // `relevantPals` is now a list of all captured Pal types, where multiple of the same pal
-            // may be included if they have different genders and/or different matching subsets of
-            // the desired passives
+            // PalProperty makes it easy to group by different properties
+            // (main grouping function)
+            var allPropertiesGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvValidity, PalProperty.Gender);
+
+            // (needed for the last step where we try to combine two pals into one (`CompositePalReference`) if they are
+            // different genders but otherwise have all the same properties)
+            var allExceptGenderGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvValidity);
 
             bool WithinBreedingSteps(Pal pal, int maxSteps) => db.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
 
-            var initialContent = new List<IPalReference>();
-            foreach (
-                var palGroup in relevantPals
-                    .Where(pi => WithinBreedingSteps(pi.Pal, maxBreedingSteps))
-                    .Select(pi => new OwnedPalReference(
-                        pi,
-                        pi.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives),
-                        MakeIV(spec.IV_HP, pi.IV_HP),
-                        MakeIV(spec.IV_Attack, pi.IV_Shot),
-                        MakeIV(spec.IV_Defense, pi.IV_Defense)
-                    ))
-                    .GroupBy(pi => pi.Pal)
-            )
-            {
-                var pal = palGroup.Key;
-
-                initialContent.AddRange(palGroup);
-                continue;
-
-                // group owned pals by the desired passives they contain, and try to find male+female pairs with the same set of passives + num irrelevant passives
-                foreach (
-                    var passiveGroup in palGroup
-                        .GroupBy(p => p.EffectivePassives
-                            // (pad them all to have max number of passives, so the grouping ignores the total number of passives)
-                            .Concat(Enumerable.Range(0, GameConstants.MaxTotalPassives - p.EffectivePassives.Count).Select(_ => new RandomPassiveSkill()))
-                            .SetHash()
-                        )
-                        .Select(g => g.ToList())
+            var initialContent = ownedPals
+                // skip pals if they can't be used to reach the desired pals (e.g. Jetragon can only be bred from other Jetragons)
+                .Where(p => WithinBreedingSteps(p.Pal, maxBreedingSteps))
+                // apply "Max Input Irrelevant Passives" setting
+                .Where(p => p.PassiveSkills.Except(spec.DesiredPassives).Count() <= maxInputIrrelevantPassives)
+                // convert from Model to Solver repr
+                .Select(p => new OwnedPalReference( 
+                    instance: p,
+                    effectivePassives: p.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives),
+                    effectiveHp: MakeIV(spec.IV_HP, p.IV_HP),
+                    effectiveAttack: MakeIV(spec.IV_Attack, p.IV_Shot),
+                    effectiveDefense: MakeIV(spec.IV_Defense, p.IV_Defense)
+                ))
+                // group pals by their "important" properties and select the "best" pal from each group
+                .GroupBy(p => allPropertiesGroupFn(p))
+                .Select(g => g
+                    .OrderBy(p => p.ActualPassives.Count)
+                    .ThenBy(p => PreferredLocationPruning.LocationOrderingOf(p.UnderlyingInstance.Location.Type))
+                    .ThenByDescending(p => p.UnderlyingInstance.IV_HP + p.UnderlyingInstance.IV_Shot + p.UnderlyingInstance.IV_Defense)
+                    .First()
                 )
+                // try to consolidate pals which are the same in every way that matters but are opposite genders
+                .GroupBy(p => allExceptGenderGroupFn(p))
+                .Select(g => g.ToList())
+                .SelectMany<List<OwnedPalReference>, IPalReference>(g =>
                 {
-                    // `passiveGroup` is a list of pals which have the same list of desired passives, though they can have varying numbers of undesired passives.
-                    // (there should be at most 2, due to the previous processing of `relevantPals` which would restrict this group to, at most, a male + female instance)
+                    // only one pal in this group, cant turn into a composite, keep as-is
+                    if (g.Count == 1) return g;
 
-                    if (passiveGroup.Count > 2) throw new NotImplementedException(); // shouldn't happen
+                    // shouldn't happen, at this point groups should have at most one male and at most one female
+                    if (g.Count != 2) throw new NotImplementedException();
 
-                    if (passiveGroup.Select(p => p.EffectivePassives.Count(t => t is RandomPassiveSkill)).Distinct().Count() == 1)
+                    var malePal = g.SingleOrDefault(p => p.Gender == PalGender.MALE);
+                    var femalePal = g.SingleOrDefault(p => p.Gender == PalGender.FEMALE);
+                    var composite = new CompositeOwnedPalReference(malePal, femalePal);
+
+                    // the pals are practically the same aside from gender, i.e. they satisfy all the same requirements, but they could
+                    // still have different numbers of irrelevant passives.
+                    //
+                    // if they're *really* the same in all aspects, we can just merge them, otherwise we can merge but
+                    // should still keep track of the original pals
+
+                    // (note - these pals weren't combined in earlier groupings since PalProperty.RelevantPassives is intentionally used
+                    //         instead of EffectivePassives or ActualPassives)
+                    if (malePal.EffectivePassivesHash == femalePal.EffectivePassivesHash)
                     {
-                        // all pals in this group have the same number of irrelevant passives
-                        if (passiveGroup.Count == 1)
-                        {
-                            // only one pal, cant turn into a composite
-                            initialContent.Add(passiveGroup.Single());
-                        }
-                        else if (passiveGroup.Count == 2)
-                        {
-                            // two pals with the same desired passives and number of irrelevant passives, treat as a wildcard (composite)
-                            initialContent.Add(
-                                new CompositeOwnedPalReference(passiveGroup[0], passiveGroup[1])
-                            );
-                        }
+                        return [composite];
                     }
                     else
                     {
-                        // (can only happen if there are two pals in this group)
-
-                        // male and female have matching desired passives but a different number of irrelevant passives, add them each as individual
-                        // options but also allow their combination to be used as a wildcard (passives of the combination will use the "worst-case"
-                        // option, i.e. one with no irrelevant and the other with two irrelevant, the composite will have two irrelevant
-
-                        initialContent.Add(passiveGroup[0]);
-                        initialContent.Add(passiveGroup[1]);
-
-                        initialContent.Add(new CompositeOwnedPalReference(passiveGroup[0], passiveGroup[1]));
+                        return [
+                            malePal,
+                            femalePal,
+                            composite
+                        ];
                     }
-                }
-            }
+                })
+                .ToList();
 
             if (maxWildPals > 0)
             {
                 // add wild pals with varying number of random passives
                 initialContent.AddRange(
                     allowedWildPals
-                        .Where(p => !relevantPals.Any(i => i.Pal == p))
+                        .Where(p => !ownedPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, maxBreedingSteps))
                         .SelectMany(p =>
                             Enumerable

@@ -283,7 +283,7 @@ namespace PalCalc.UI
         public override IV_IValue ReadJson(JsonReader reader, Type objectType, IV_IValue existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var token = JToken.ReadFrom(reader);
-            if (token.ToObject<string>() != null) return IV_Random.Instance;
+            if (token is not JObject) return IV_Random.Instance;
             else
             {
                 return new IV_Range(

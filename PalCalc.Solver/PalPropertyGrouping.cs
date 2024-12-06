@@ -18,6 +18,7 @@ namespace PalCalc.Solver
         public static GroupIdFn WildPalCount = p => p.NumWildPalParticipants();
         public static GroupIdFn NumBreedingSteps = p => p.NumTotalBreedingSteps;
         public static GroupIdFn EffectivePassives = p => p.EffectivePassivesHash;
+        public static GroupIdFn RelevantPassives = p => p.ActualPassives.Intersect(p.EffectivePassives).SetHash();
         public static GroupIdFn ActualPassives = p => p.ActualPassives.SetHash();
         public static GroupIdFn TotalEffort = p => p.BreedingEffort.GetHashCode();
         public static GroupIdFn LocationType = p => p.Location.GetType().GetHashCode();

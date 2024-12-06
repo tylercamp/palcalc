@@ -15,7 +15,7 @@ namespace PalCalc.Solver
     {
         private static ILogger logger = Log.ForContext<WorkingSet>();
 
-        private static PalProperty.GroupIdFn DefaultGroupFn = PalProperty.Combine(
+        public static PalProperty.GroupIdFn DefaultGroupFn = PalProperty.Combine(
             PalProperty.Pal,
             PalProperty.Gender,
             PalProperty.EffectivePassives,
