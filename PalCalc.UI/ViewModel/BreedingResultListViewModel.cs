@@ -4,6 +4,7 @@ using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace PalCalc.UI.ViewModel
                     OnPropertyChanged(nameof(NumStepsWidth));
                     OnPropertyChanged(nameof(LocationsWidth));
                     OnPropertyChanged(nameof(PassiveSkillsWidth));
+                    OnPropertyChanged(nameof(IVsWidth));
                 }
             }
         }
@@ -53,6 +55,21 @@ namespace PalCalc.UI.ViewModel
         public double NumStepsWidth => HiddenIfRedundant(vm => vm.NumBreedingSteps);
         public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
         public double PassiveSkillsWidth => HiddenIfRedundant(vm => vm.EffectivePassives.Description);
+        public double IVsWidth
+        {
+            get
+            {
+                if (Results == null || Results.Count < 2) return DEFAULT;
+
+                if (Results.All(r =>
+                    r.IV_HP is IVAnyValueViewModel &&
+                    r.IV_Attack is IVAnyValueViewModel &&
+                    r.IV_Defense is IVAnyValueViewModel)
+                ) return WIDTH_HIDDEN;
+
+                return FIT_CONTENT;
+            }
+        }
 
         public void RefreshWith(CachedSaveGame csg)
         {

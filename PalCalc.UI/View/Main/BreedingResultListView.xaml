@@ -40,17 +40,17 @@
                                 />
                 <GridViewColumn Header="IV HP"
                                 DisplayMemberBinding="{Binding IV_HP.Label}"
-                                Width="50"
+                                Width="{Binding IVsWidth}"
                                 util:GridViewSort.PropertyName="IV_HP"
                                 />
                 <GridViewColumn Header="IV DEF"
                                 DisplayMemberBinding="{Binding IV_Defense.Label}"
-                                Width="50"
+                                Width="{Binding IVsWidth}"
                                 util:GridViewSort.PropertyName="IV_Defense"
                                 />
                 <GridViewColumn Header="IV ATK"
                                 DisplayMemberBinding="{Binding IV_Attack.Label}"
-                                Width="50"
+                                Width="{Binding IVsWidth}"
                                 util:GridViewSort.PropertyName="IV_Attack"
                                 />
             </GridView.Columns>
