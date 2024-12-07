@@ -154,12 +154,15 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public PassiveSkillCollectionViewModel OptionalPassivesCollection => new PassiveSkillCollectionViewModel(OptionalPassives);
 
+        [NotifyPropertyChangedFor(nameof(HasIVs))]
         [ObservableProperty]
         private int minIv_HP;
 
+        [NotifyPropertyChangedFor(nameof(HasIVs))]
         [ObservableProperty]
         private int minIv_Attack;
 
+        [NotifyPropertyChangedFor(nameof(HasIVs))]
         [ObservableProperty]
         private int minIv_Defense;
 
@@ -180,6 +183,8 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         [ObservableProperty]
         private bool includeCagedPals = true;
+
+        public bool HasIVs => MinIv_HP > 0 || MinIv_Attack > 0 || MinIv_Defense > 0;
 
         public bool IsValid => TargetPal != null;
 
@@ -286,7 +291,9 @@ namespace PalCalc.UI.ViewModel.Mapped
                     Passive1 = PassiveSkillViewModel.Make("Runner".ToPassive(db)),
                     Passive2 = PassiveSkillViewModel.Make("Swift".ToPassive(db)),
 
-                    OptionalPassive1 = PassiveSkillViewModel.Make("Aggressive".ToPassive(db))
+                    OptionalPassive1 = PassiveSkillViewModel.Make("Aggressive".ToPassive(db)),
+
+                    MinIv_Attack = 90,
                 };
             }
         }

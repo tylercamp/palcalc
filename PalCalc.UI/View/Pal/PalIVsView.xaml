@@ -29,19 +29,19 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0">
-            <TextBlock>HP</TextBlock>
-            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Mode=OneWay}" />
+        <StackPanel Grid.Column="0" Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}">
+            <Label>HP</Label>
+            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Mode=OneWay}" VerticalAlignment="Center" />
         </StackPanel>
 
-        <StackPanel Grid.Column="1">
-            <TextBlock>ATK</TextBlock>
-            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Mode=OneWay}" />
+        <StackPanel Grid.Column="1" Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}">
+            <Label>ATK</Label>
+            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Mode=OneWay}" VerticalAlignment="Center" />
         </StackPanel>
 
-        <StackPanel Grid.Column="2">
-            <TextBlock>DEF</TextBlock>
-            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Mode=OneWay}" />
+        <StackPanel Grid.Column="2" Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}">
+            <Label>DEF</Label>
+            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Mode=OneWay}" VerticalAlignment="Center" />
         </StackPanel>
     </Grid>
 </UserControl>
