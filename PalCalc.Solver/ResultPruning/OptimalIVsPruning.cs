@@ -40,6 +40,8 @@ namespace PalCalc.Solver.ResultPruning
             int TotalIVs(IPalReference p) =>
                 SelectValue(p.IV_HP) + SelectValue(p.IV_Attack) + SelectValue(p.IV_Defense);
 
+            if (token.IsCancellationRequested) return results;
+
             var bestValue = results.Max(TotalIVs);
             var threshold = bestValue - maxIvDifference * 3;
 
