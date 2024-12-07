@@ -30,7 +30,7 @@
 
         <StackPanel Grid.Column="0">
             <TextBlock>HP</TextBlock>
-            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Mode=OneWay}" />
+            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Mode=OneWay}" />
         </StackPanel>
 
         <StackPanel Grid.Column="1">
