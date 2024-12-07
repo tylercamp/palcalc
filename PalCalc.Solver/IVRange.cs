@@ -11,14 +11,14 @@ namespace PalCalc.Solver
         bool Satisfies(int minValue);
         bool BetterThan(IV_IValue other);
 
-        bool IsValid { get; }
+        bool IsRelevant { get; }
     }
 
     public class IV_Random : IV_IValue
     {
         private IV_Random() { }
 
-        public bool IsValid => false;
+        public bool IsRelevant => false;
 
         public bool Satisfies(int minValue) => false;
         public bool BetterThan(IV_IValue other) => false;
@@ -32,27 +32,32 @@ namespace PalCalc.Solver
         public override string ToString() => "(Random IV)";
     }
 
+    // TODO - convert to record to prevent excessive additional instances? or maintain an internal cache of
+    //        instances which have been seen + reuse?
     public class IV_Range : IV_IValue
     {
-        public IV_Range(int a, int b)
+        public IV_Range(bool isRelevant, int a, int b)
         {
+            IsRelevant = isRelevant;
             Min = Math.Min(a, b);
             Max = Math.Max(a, b);
         }
 
-        public IV_Range(int value)
+        public IV_Range(bool isRelevant, int value)
         {
+            IsRelevant = isRelevant;
             Min = value;
             Max = value;
         }
 
         public IV_Range(IV_Range other)
         {
+            IsRelevant = other.IsRelevant;
             Min = other.Min;
             Max = other.Max;
         }
 
-        public bool IsValid => true;
+        public bool IsRelevant { get; }
 
         public bool Satisfies(int minValue) => Min >= minValue;
 
@@ -75,7 +80,10 @@ namespace PalCalc.Solver
 
         public static IV_Range Merge(params IV_Range[] ranges)
         {
-            var res = new IV_Range(ranges.First());
+            var first = ranges.First();
+            var isRelevant = ranges.All(r => r.IsRelevant);
+
+            var res = new IV_Range(isRelevant, first.Min, first.Max);
             foreach (var range in ranges.Skip(1))
             {
                 res.Min = Math.Min(range.Min, res.Min);

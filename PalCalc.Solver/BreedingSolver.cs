@@ -56,8 +56,11 @@ namespace PalCalc.Solver
         // TODO - is this the right way to use pascal's triangle??
         static int Choose(int n, int k) => PascalsTriangle.Instance[n - 1][k - 1];
 
-        static IV_IValue MakeIV(int minValue, int value) =>
-            (minValue == 0 || value < minValue) ? IV_Random.Instance : new IV_Range(value);
+        static IV_Range MakeIV(int minValue, int value) =>
+            new(
+                isRelevant: minValue != 0 && value >= minValue,
+                value: value
+            );
 
         GameSettings gameSettings;
         PalDB db;
@@ -416,9 +419,9 @@ namespace PalCalc.Solver
             IV_IValue[] attacks = [A_attack, B_attack];
             IV_IValue[] defenses = [A_defense, B_defense];
 
-            int numRelevantHP = hps.Count(iv => iv.IsValid);
-            int numRelevantAttack = attacks.Count(iv => iv.IsValid);
-            int numRelevantDefense = defenses.Count(iv => iv.IsValid);
+            int numRelevantHP = hps.Count(iv => iv.IsRelevant);
+            int numRelevantAttack = attacks.Count(iv => iv.IsRelevant);
+            int numRelevantDefense = defenses.Count(iv => iv.IsRelevant);
 
             int numRequiredIVs = 0;
             if (numRelevantHP > 0) numRequiredIVs++;
@@ -473,11 +476,11 @@ namespace PalCalc.Solver
 
             // PalProperty makes it easy to group by different properties
             // (main grouping function)
-            var allPropertiesGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvValidity, PalProperty.Gender);
+            var allPropertiesGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvRelevance, PalProperty.Gender);
 
             // (needed for the last step where we try to combine two pals into one (`CompositePalReference`) if they are
             // different genders but otherwise have all the same properties)
-            var allExceptGenderGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvValidity);
+            var allExceptGenderGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvRelevance);
 
             bool WithinBreedingSteps(Pal pal, int maxSteps) => db.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
 
@@ -701,9 +704,12 @@ namespace PalCalc.Solver
                                     IV_IValue MergeIVs(IV_IValue a, IV_IValue b) =>
                                         (a, b) switch
                                         {
-                                            (IV_Random, IV_Random) => a,
-                                            (IV_Random, IV_Range vb) => vb,
-                                            (IV_Range va, IV_Random) => va,
+                                            (IV_IValue, IV_IValue) when a.IsRelevant && !b.IsRelevant => a,
+                                            (IV_IValue, IV_IValue) when !a.IsRelevant && b.IsRelevant => b,
+
+                                            (IV_IValue, IV_Random) => a,
+                                            (IV_Random, IV_IValue) => b,
+
                                             (IV_Range va, IV_Range vb) => IV_Range.Merge(va, vb),
                                             _ => throw new NotImplementedException()
                                         };

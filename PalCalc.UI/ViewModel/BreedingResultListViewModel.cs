@@ -82,7 +82,7 @@ namespace PalCalc.UI.ViewModel
                         }
                     },
                     new List<PassiveSkill>() { "Runner".ToPassive(PalDB.LoadEmbedded()) },
-                    new IV_Range(80, 90),
+                    new IV_Range(true, 80, 90),
                     IV_Random.Instance,
                     IV_Random.Instance
                 ))

@@ -214,7 +214,15 @@ namespace PalCalc.UI
         {
             InjectDependencyConverters(serializer);
             var inst = token.ToObject<PalInstance>(serializer);
-            return new OwnedPalReference(inst, inst.PassiveSkills, new IV_Range(inst.IV_HP), new IV_Range(inst.IV_Shot), new IV_Range(inst.IV_Defense)); // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
+            return new OwnedPalReference(
+                inst,
+                // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
+                inst.PassiveSkills,
+                // (isRelevant only matters while the solver is running)
+                new IV_Range(isRelevant: true, inst.IV_HP),
+                new IV_Range(isRelevant: true, inst.IV_Shot),
+                new IV_Range(isRelevant: true, inst.IV_Defense)
+            );
         }
     }
 
@@ -287,6 +295,7 @@ namespace PalCalc.UI
             else
             {
                 return new IV_Range(
+                    isRelevant: true, // (note: isRelevant only matters while the solver is running)
                     token["Min"].ToObject<int>(),
                     token["Max"].ToObject<int>()
                 );

@@ -19,7 +19,7 @@ namespace PalCalc.Solver
             PalProperty.Pal,
             PalProperty.Gender,
             PalProperty.EffectivePassives,
-            PalProperty.IvValidity
+            PalProperty.IvRelevance
         );
 
         private CancellationToken token;
