@@ -10,6 +10,17 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * TODO
+ * 
+ * - Consider adding "desired property consolidation" again?
+ * - Track + prefer higher IVs even if no min. IVs are set
+ * - Add a pause button
+ * - Use bitset for grouping instead of hash?
+ * - Additional check during breeding step to build up best-result times before merge step
+ * - Check for other spots which just use Batched instead of BatchedForParallel
+ */
+
 namespace PalCalc.Solver
 {
     public enum SolverPhase
@@ -585,7 +596,7 @@ namespace PalCalc.Solver
                     var progressTimer = new Timer(EmitProgressMsg, null, updateInterval, updateInterval);
 
                     var resEnum = work
-                        .Batched(work.Count / maxThreads + 1)
+                        .BatchedForParallel()
                         .AsParallel()
                         .WithDegreeOfParallelism(maxThreads)
                         .SelectMany(workBatch =>
