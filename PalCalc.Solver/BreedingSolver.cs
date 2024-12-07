@@ -18,7 +18,7 @@ using System.Threading.Tasks;
  * - Add a pause button
  * - Use bitset for grouping instead of hash?
  * - Additional check during breeding step to build up best-result times before merge step
- * - Check for other spots which just use Batched instead of BatchedForParallel
+ * - Add warning when memory size likely exceeds system limits
  */
 
 namespace PalCalc.Solver
@@ -415,6 +415,7 @@ namespace PalCalc.Solver
         {
             // TODO - likely hotpath, optimize?
 
+            // (note: use of `.Count` and superficial array creation doesn't seem to be significant for perf)
             IV_IValue[] hps = [A_hp, B_hp];
             IV_IValue[] attacks = [A_attack, B_attack];
             IV_IValue[] defenses = [A_defense, B_defense];
