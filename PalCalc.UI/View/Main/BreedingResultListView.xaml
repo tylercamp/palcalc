@@ -53,6 +53,11 @@
                                 Width="{Binding IVsWidth}"
                                 util:GridViewSort.PropertyName="IV_Attack"
                                 />
+                <GridViewColumn Header="IV AVG"
+                                DisplayMemberBinding="{Binding IV_Average.Label}"
+                                Width="{Binding IVsWidth}"
+                                util:GridViewSort.PropertyName="IV_Average"
+                                />
             </GridView.Columns>
         </GridView>
     </ListView.View>
