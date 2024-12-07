@@ -9,6 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="208.272" d:DesignWidth="766.148">
     <UserControl.Resources>
+        <!-- note: could just use `.Label` from IVs? -->
         <DataTemplate DataType="{x:Type mvm:IVAnyValueViewModel}">
             <TextBlock>-</TextBlock>
         </DataTemplate>

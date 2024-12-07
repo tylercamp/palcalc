@@ -52,6 +52,10 @@ namespace PalCalc.UI.ViewModel
             };
 
             DisplayedResult = solver.SolveFor(targetInstance, CancellationToken.None).MaxBy(r => r.NumTotalBreedingSteps);
+
+            IV_HP = new IVDirectValueViewModel(80);
+            IV_Attack = new IVDirectValueViewModel(70);
+            IV_Defense = new IVDirectValueViewModel(60);
         }
 
         private CachedSaveGame source;
@@ -70,6 +74,11 @@ namespace PalCalc.UI.ViewModel
                 DisplayedResult = displayedResult;
                 Graph = BreedingGraph.FromPalReference(source, displayedResult);
                 EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
+
+                IV_HP = IVValueViewModel.FromIV(displayedResult.IV_HP);
+                IV_Attack = IVValueViewModel.FromIV(displayedResult.IV_Attack);
+                IV_Defense = IVValueViewModel.FromIV(displayedResult.IV_Defense);
+
                 Label = LocalizationCodes.LC_RESULT_LABEL.Bind(
                     new
                     {
@@ -142,5 +151,9 @@ namespace PalCalc.UI.ViewModel
         public bool NeedsRefresh => Graph?.NeedsRefresh ?? false;
         public int NumWildPals => DisplayedResult.NumWildPalParticipants();
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
+
+        public IVValueViewModel IV_HP { get; }
+        public IVValueViewModel IV_Attack { get; }
+        public IVValueViewModel IV_Defense { get; }
     }
 }

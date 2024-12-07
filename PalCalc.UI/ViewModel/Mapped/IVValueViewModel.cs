@@ -7,8 +7,12 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
-    public interface IVValueViewModel
+    public interface IVValueViewModel : IComparable
     {
+        /* Properties */
+        string Label { get; }
+
+        /* Utils */
         public static IVValueViewModel FromIV(IV_IValue value)
         {
             switch (value)
@@ -22,17 +26,34 @@ namespace PalCalc.UI.ViewModel.Mapped
                     throw new NotImplementedException();
             }
         }
+
+        int IComparable.CompareTo(object obj)
+        {
+            int ValueOf(object iv) =>
+                iv switch
+                {
+                    IVDirectValueViewModel d => d.Value,
+                    IVRangeValueViewModel r => (r.Min + r.Max) / 2,
+                    IVAnyValueViewModel => 0,
+                    _ => 0
+                };
+
+            return ValueOf(obj) - ValueOf(this);
+        }
     }
 
     public class IVDirectValueViewModel(int value) : IVValueViewModel
     {
         public int Value => value;
+        public string Label { get; } = value.ToString();
     }
 
     public class IVRangeValueViewModel(int min, int max) : IVValueViewModel
     {
         public int Min => min;
         public int Max => max;
+
+        public string Label { get; } = $"{min}-{max}";
     }
 
     public class IVAnyValueViewModel : IVValueViewModel
@@ -40,5 +61,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         private IVAnyValueViewModel() { }
 
         public static IVAnyValueViewModel Instance { get; } = new();
+
+        public string Label { get; } = "-";
     }
 }
