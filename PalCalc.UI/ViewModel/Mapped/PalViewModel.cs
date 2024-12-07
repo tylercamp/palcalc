@@ -28,7 +28,8 @@ namespace PalCalc.UI.ViewModel.Mapped
             return instances[pal];
         }
 
-        public static IReadOnlyList<PalViewModel> All { get; } = PalDB.LoadEmbedded().Pals.Select(Make).ToList();
+        private static IReadOnlyList<PalViewModel> all;
+        public static IReadOnlyList<PalViewModel> All => all ??= PalDB.LoadEmbedded().Pals.Select(Make).OrderBy(p => p.Name.Value).ToList();
 
         private PalViewModel(Pal pal)
         {
