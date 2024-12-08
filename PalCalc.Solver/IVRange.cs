@@ -36,11 +36,15 @@ namespace PalCalc.Solver
     //        instances which have been seen + reuse?
     public class IV_Range : IV_IValue
     {
-        public IV_Range(bool isRelevant, int a, int b)
+        public IV_Range(bool isRelevant, int min, int max)
         {
+#if DEBUG
+            if (min > max) throw new InvalidOperationException();
+#endif
+
             IsRelevant = isRelevant;
-            Min = Math.Min(a, b);
-            Max = Math.Max(a, b);
+            Min = min;
+            Max = max;
         }
 
         public IV_Range(bool isRelevant, int value)
@@ -80,16 +84,20 @@ namespace PalCalc.Solver
 
         public static IV_Range Merge(params IV_Range[] ranges)
         {
-            var first = ranges.First();
-            var isRelevant = ranges.All(r => r.IsRelevant);
+            var first = ranges[0];
 
-            var res = new IV_Range(isRelevant, first.Min, first.Max);
-            foreach (var range in ranges.Skip(1))
+            int xmin = first.Min;
+            int xmax = first.Max;
+            bool isRelevant = first.IsRelevant;
+
+            for (int i = 1; i < ranges.Length; i++)
             {
-                res.Min = Math.Min(range.Min, res.Min);
-                res.Max = Math.Max(range.Max, res.Max);
+                var range = ranges[i];
+                xmin = Math.Min(range.Min, xmin);
+                xmax = Math.Max(range.Max, xmax);
             }
-            return res;
+
+            return new IV_Range(isRelevant, xmin, xmax);
         }
 
         private static int _baseHash = typeof(IV_Range).GetHashCode();

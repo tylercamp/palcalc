@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Serilog;
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -36,22 +37,27 @@ namespace PalCalc.Model
         // Map[Parent1, Map[Parent2, BreedingResult]]
         // 
         // there can be multiple breeding results depending on the genders of the parents (namely for Wixen and Kativa)
-        private Dictionary<Pal, Dictionary<Pal, List<BreedingResult>>> breedingByParent;
-        public Dictionary<Pal, Dictionary<Pal, List<BreedingResult>>> BreedingByParent
+        private IReadOnlyDictionary<Pal, IReadOnlyDictionary<Pal, BreedingResult[]>> breedingByParent;
+        private IReadOnlyDictionary<Pal, IReadOnlyDictionary<Pal, BreedingResult[]>> MakeBreedingByParent()
         {
-            get
-            {
-                if (breedingByParent == null)
-                {
-                    breedingByParent = Breeding
+            return Breeding
                         .SelectMany(breed => breed.Parents.Select(parent1 => (parent1.Pal, breed))) // List<(parent, breeding)>
                         .GroupBy(p => p.Pal)
                         .ToDictionary(
                             g => g.Key,
                             g => g.Distinct()
                                 .GroupBy(p => p.breed.OtherParent(g.Key).Pal)
-                                .ToDictionary(g2 => g2.Key, g2 => g2.Select(p => p.breed).ToList())
+                                .ToDictionary(g2 => g2.Key, g2 => g2.Select(p => p.breed).ToArray())
+                                .ToFrozenDictionary() as IReadOnlyDictionary<Pal, BreedingResult[]>
                         );
+        }
+        public IReadOnlyDictionary<Pal, IReadOnlyDictionary<Pal, BreedingResult[]>> BreedingByParent
+        {
+            get
+            {
+                if (breedingByParent == null)
+                {
+                    breedingByParent = MakeBreedingByParent();
                 }
                 return breedingByParent;
             }

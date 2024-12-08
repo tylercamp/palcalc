@@ -122,7 +122,7 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> ActualPassives => EffectivePassives;
 
-        private IPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)
+        private BredPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)
         {
             if (gender == PalGender.WILDCARD)
             {
@@ -168,13 +168,22 @@ namespace PalCalc.Solver.PalReference
         }
 
         private ConcurrentDictionary<PalGender, IPalReference> cachedGuaranteedGenders = null;
+        private IPalReference cachedOppositeWildcardRef;
+        private IPalReference cachedMaleRef;
+        private IPalReference cachedFemaleRef;
+
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
             if (Gender != PalGender.WILDCARD) throw new Exception("Cannot change gender of bred pal with an already-guaranteed gender");
 
-            if (cachedGuaranteedGenders == null) cachedGuaranteedGenders = new ConcurrentDictionary<PalGender, IPalReference>();
-
-            return cachedGuaranteedGenders.GetOrAdd(gender, (gender) => WithGuaranteedGenderImpl(db, gender));
+            switch (gender)
+            {
+                case PalGender.WILDCARD: return this;
+                case PalGender.OPPOSITE_WILDCARD: return cachedOppositeWildcardRef ??= WithGuaranteedGenderImpl(db, gender);
+                case PalGender.MALE: return cachedMaleRef ??= WithGuaranteedGenderImpl(db, gender);
+                case PalGender.FEMALE: return cachedFemaleRef ??= WithGuaranteedGenderImpl(db, gender);
+                default: throw new NotImplementedException();
+            }
         }
 
         public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectivePassives.PassiveSkillListToString()})";

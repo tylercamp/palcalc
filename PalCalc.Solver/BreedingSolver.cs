@@ -3,6 +3,8 @@ using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -573,6 +575,8 @@ namespace PalCalc.Solver
             {
                 if (token.IsCancellationRequested) break;
 
+                var wotByPalId = db.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, TimeSpan>());
+                //var workingOptimalTimes = new ConcurrentDictionary<int, TimeSpan>();
                 List<WorkBatchProgress> progressEntries = [];
 
                 bool didUpdate = workingSet.Process(work =>
@@ -634,10 +638,12 @@ namespace PalCalc.Solver
 
                                     var combinedPassives = p.Item1.EffectivePassives.Concat(p.Item2.EffectivePassives);
 
-                                    var anyRelevantFromParents = combinedPassives.Intersect(spec.DesiredPassives).Any();
-                                    var anyIrrelevantFromParents = combinedPassives.Except(spec.DesiredPassives).Any();
-
-                                    return anyRelevantFromParents || !anyIrrelevantFromParents;
+                                    return (
+                                        // any relevant from parents?
+                                        combinedPassives.Intersect(spec.DesiredPassives).Any() ||
+                                        // no irrelevant passives from parents?
+                                        !combinedPassives.Except(spec.DesiredPassives).Any()
+                                    );
                                 })
                                 .SelectMany(p =>
                                 {
@@ -766,10 +772,29 @@ namespace PalCalc.Solver
                                                 ivsProbability
                                             );
 
+                                            var workingOptimalTimes = wotByPalId[res.Pal.Id];
+
                                             if (!bannedBredPals.Contains(res.Pal))
                                             {
-                                                if (res.BreedingEffort <= maxEffort && (spec.IsSatisfiedBy(res) || workingSet.IsOptimal(res)))
-                                                    possibleResults.Add(res);
+                                                var effort = res.BreedingEffort;
+                                                if (effort <= maxEffort && (spec.IsSatisfiedBy(res) || workingSet.IsOptimal(res)))
+                                                {
+                                                    var resultId = WorkingSet.DefaultGroupFn(res);
+
+                                                    bool updated = workingOptimalTimes.TryAdd(resultId, effort);
+                                                    while (!updated)
+                                                    {
+                                                        var v = workingOptimalTimes[resultId];
+                                                        if (v < effort) break;
+
+                                                        updated = workingOptimalTimes.TryUpdate(resultId, effort, v);
+                                                    }
+
+                                                    if (updated)
+                                                    {
+                                                        possibleResults.Add(res);
+                                                    }
+                                                }
                                             }
                                         }
                                     }

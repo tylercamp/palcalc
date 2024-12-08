@@ -48,7 +48,14 @@ namespace PalCalc.Solver
 
     public class PalPropertyGrouping(PalProperty.GroupIdFn groupIdFn)
     {
+        private PalProperty.GroupIdFn groupIdFn = groupIdFn;
         private Dictionary<int, List<IPalReference>> content = new Dictionary<int, List<IPalReference>>();
+
+        public PalPropertyGrouping(PalPropertyGrouping src) : this(src.groupIdFn)
+        {
+            content = src.content.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToList());
+        }
+
         public void Add(IPalReference p)
         {
             var groupId = groupIdFn(p);
