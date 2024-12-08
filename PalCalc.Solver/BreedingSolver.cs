@@ -52,8 +52,9 @@ namespace PalCalc.Solver
     {
         private static ILogger logger = Log.ForContext<BreedingSolver>();
 
-        // returns number of ways you can choose k combinations from a list of n
-        // TODO - is this the right way to use pascal's triangle??
+        /// <summary>
+        /// `n` Choose `k`
+        /// </summary>
         static int Choose(int n, int k) => PascalsTriangle.Instance[n - 1][k - 1];
 
         static IV_Range MakeIV(int minValue, int value) =>
@@ -287,6 +288,10 @@ namespace PalCalc.Solver
                     return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender()));
                 }
 
+#if DEBUG && DEBUG_CHECKS
+                if (p1wildcard || p2wildcard) Debugger.Break();
+#endif
+
                 // neither parents are wildcards
                 return (parent1, parent2);
             }
@@ -446,7 +451,7 @@ namespace PalCalc.Solver
             if (numRelevantAttack == 1) result *= 0.5f;
             if (numRelevantDefense == 1) result *= 0.5f;
 
-#if DEBUG
+#if DEBUG && DEBUG_CHECKS
             if (result <= 0.0001f) Debugger.Break();
 #endif
 
@@ -574,7 +579,6 @@ namespace PalCalc.Solver
                 if (token.IsCancellationRequested) break;
 
                 var wotByPalId = db.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, TimeSpan>());
-                //var workingOptimalTimes = new ConcurrentDictionary<int, TimeSpan>();
                 List<WorkBatchProgress> progressEntries = [];
 
                 bool didUpdate = workingSet.Process(work =>
@@ -650,7 +654,7 @@ namespace PalCalc.Solver
                                     // if both parents are wildcards, go through the list of possible gender-specific breeding results
                                     // and modify the parent genders to cover each possible child
 
-#if DEBUG
+#if DEBUG && DEBUG_CHECKS
                                     // (shouldn't happen)
 
                                     if (parent1.Gender == PalGender.OPPOSITE_WILDCARD || parent2.Gender == PalGender.OPPOSITE_WILDCARD)
@@ -692,6 +696,15 @@ namespace PalCalc.Solver
                                 .SelectMany(p =>
                                 {
                                     var (parent1, parent2) = p;
+
+#if DEBUG && DEBUG_CHECKS
+                                    if (
+                                        // if either parent is a wildcard
+                                        (parent1.Gender == PalGender.WILDCARD || parent2.Gender == PalGender.WILDCARD) &&
+                                        // the other parent must be an opposite-wildcard
+                                        (parent1.Gender != PalGender.OPPOSITE_WILDCARD && parent2.Gender != PalGender.OPPOSITE_WILDCARD)
+                                    ) Debugger.Break();
+#endif
 
                                     var parentPassives = parent1.EffectivePassives.Concat(parent2.EffectivePassives).Distinct().ToList();
                                     var possibleResults = new List<IPalReference>();

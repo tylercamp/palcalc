@@ -243,7 +243,8 @@ namespace PalCalc.UI
             return JToken.FromObject(new
             {
                 Male = value.Male,
-                Female = value.Female
+                Female = value.Female,
+                Gender = value.Gender,
             }, serializer);
         }
 
@@ -252,8 +253,9 @@ namespace PalCalc.UI
             InjectDependencyConverters(serializer);
             var male = token["Male"].ToObject<OwnedPalReference>(serializer);
             var female = token["Female"].ToObject<OwnedPalReference>(serializer);
+            var gender = token["Gender"]?.ToObject<PalGender>(serializer) ?? PalGender.WILDCARD;
 
-            return new CompositeOwnedPalReference(male, female);
+            return (CompositeOwnedPalReference)new CompositeOwnedPalReference(male, female).WithGuaranteedGender(db, gender);
         }
     }
 

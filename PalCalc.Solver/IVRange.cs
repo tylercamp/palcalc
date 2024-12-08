@@ -38,7 +38,7 @@ namespace PalCalc.Solver
     {
         public IV_Range(bool isRelevant, int min, int max)
         {
-#if DEBUG
+#if DEBUG && DEBUG_CHECKS
             if (min > max) throw new InvalidOperationException();
 #endif
 
