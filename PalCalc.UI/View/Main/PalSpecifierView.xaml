@@ -14,11 +14,16 @@
              d:DataContext="{x:Static mvm:PalSpecifierViewModel.DesignerInstance}">
     <UserControl.Resources>
         <c:CollectionVisibilityConverter x:Key="CVC" />
+        <c:IntToIVConverter x:Key="IIVC" />
         <BooleanToVisibilityConverter x:Key="BVC" />
 
         <Style TargetType="{x:Type TextBlock}">
             <Setter Property="FontSize" Value="10" />
             <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="{x:Type vp:PalIVsView}">
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontWeight" Value="Bold" />
         </Style>
         <Style TargetType="{x:Type vp:PassiveSkillCollectionView}">
             <Setter Property="MinWidth" Value="200" />
@@ -50,6 +55,7 @@
             
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
+                    <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
@@ -106,6 +112,30 @@
                     Visibility="{Binding OptionalPassivesCollection.Passives, Converter={StaticResource CVC}}"
                     Grid.Row="2"
                     />
+
+                <Grid
+                    Grid.Row="3"
+                    Visibility="{Binding HasIVs, Converter={StaticResource BVC}}"
+                    >
+                    <Grid.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="Padding" Value="0,0,5,0" />
+                        </Style>
+                    </Grid.Resources>
+
+                    <!-- https://stackoverflow.com/questions/280331/horizontalalignment-stretch-maxwidth-and-left-aligned-at-the-same-time -->
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MaxWidth="180" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <vp:PalIVsView
+                        Orientation="Horizontal"
+                        Grid.Column="0"
+                        IV_HP="{Binding MinIv_HP, Converter={StaticResource IIVC}}"
+                        IV_Attack="{Binding MinIv_Attack, Converter={StaticResource IIVC}}"
+                        IV_Defense="{Binding MinIv_Defense, Converter={StaticResource IIVC}}"
+                        />
+                </Grid>
             </Grid>
         </Grid>
     </Grid>

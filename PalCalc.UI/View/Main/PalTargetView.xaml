@@ -8,10 +8,11 @@
             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
             xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+            xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
             d:Background="White"
             mc:Ignorable="d" 
             d:DataContext="{d:DesignInstance vm:PalTargetViewModel, IsDesignTimeCreatable=True}"
-            d:DesignHeight="239.714" d:DesignWidth="184.642">
+            d:DesignHeight="401.428" d:DesignWidth="178.928">
     <StackPanel.Resources>
         <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
             <TextBlock Text="{Binding Name.Value}" />
@@ -58,6 +59,30 @@
             <Popup PlacementTarget="{Binding ElementName=PresetsButton}" x:Name="PresetsPopup" IsOpen="{Binding PresetsMenuIsOpen}" StaysOpen="False" MinWidth="200" MaxHeight="300">
                 <local:PassiveSkillsPresetCollectionView DataContext="{Binding Presets}" />
             </Popup>
+        </Grid>
+    </GroupBox>
+    <GroupBox Header="IVs">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="3" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="3" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0">HP</Label>
+            <vu:IntegerTextBox Grid.Row="0" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_HP, Mode=TwoWay}" MinValue="0" MaxValue="100" />
+
+            <Label Grid.Row="2" Grid.Column="0">Attack</Label>
+            <vu:IntegerTextBox Grid.Row="2" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_Attack, Mode=TwoWay}" MinValue="0" MaxValue="100" />
+
+            <Label Grid.Row="4" Grid.Column="0">Defense</Label>
+            <vu:IntegerTextBox Grid.Row="4" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_Defense, Mode=TwoWay}" MinValue="0" MaxValue="100" />
         </Grid>
     </GroupBox>
 </StackPanel>

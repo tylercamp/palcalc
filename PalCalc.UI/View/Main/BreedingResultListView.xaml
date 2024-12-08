@@ -38,6 +38,26 @@
                                 Width="{Binding LocationsWidth}"
                                 util:GridViewSort.PropertyName="InputLocations"
                                 />
+                <GridViewColumn Header="IV HP"
+                                DisplayMemberBinding="{Binding IV_HP.Label}"
+                                Width="{Binding IVsWidth}"
+                                util:GridViewSort.PropertyName="IV_HP"
+                                />
+                <GridViewColumn Header="IV DEF"
+                                DisplayMemberBinding="{Binding IV_Defense.Label}"
+                                Width="{Binding IVsWidth}"
+                                util:GridViewSort.PropertyName="IV_Defense"
+                                />
+                <GridViewColumn Header="IV ATK"
+                                DisplayMemberBinding="{Binding IV_Attack.Label}"
+                                Width="{Binding IVsWidth}"
+                                util:GridViewSort.PropertyName="IV_Attack"
+                                />
+                <GridViewColumn Header="IV AVG"
+                                DisplayMemberBinding="{Binding IV_Average.Label}"
+                                Width="{Binding IVsWidth}"
+                                util:GridViewSort.PropertyName="IV_Average"
+                                />
             </GridView.Columns>
         </GridView>
     </ListView.View>

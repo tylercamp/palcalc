@@ -32,6 +32,10 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> EffectivePassives { get; private set; }
 
+        public IV_IValue IV_HP => IV_Random.Instance;
+        public IV_IValue IV_Attack => IV_Random.Instance;
+        public IV_IValue IV_Defense => IV_Random.Instance;
+
         public PalGender Gender { get; private set; }
 
         public List<PassiveSkill> ActualPassives => EffectivePassives;

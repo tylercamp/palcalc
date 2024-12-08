@@ -37,6 +37,17 @@ namespace PalCalc.Model
 
         public static readonly int MaxTotalPassives = 4;
 
+        // probability of inheriting exactly N IVs from parents
+        public static readonly Dictionary<int, float> IVProbabilityDirect = new()
+        {
+            // will always inherit at least 1
+            { 0, 0.0f },
+            // (determined manually by gathering samples, unlike passive probabilities which were reverse engineered)
+            { 1, 0.5f },
+            { 2, 0.25f },
+            { 3, 0.25f },
+        };
+
         // roughly estimate time to catch a given pal
         public static TimeSpan TimeToCatch(Pal pal)
         {

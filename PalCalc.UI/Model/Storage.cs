@@ -97,7 +97,7 @@ namespace PalCalc.UI.Model
             {
                 try
                 {
-                    return JsonConvert.DeserializeObject<AppSettings>(File.ReadAllText(AppSettingsPath));
+                    return JsonConvert.DeserializeObject<AppSettings>(File.ReadAllText(AppSettingsPath)) ?? new();
                 }
                 catch (Exception e)
                 {
@@ -109,7 +109,7 @@ namespace PalCalc.UI.Model
             }
             else
             {
-                return new AppSettings();
+                return new();
             }
         }
 
