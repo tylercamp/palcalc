@@ -297,7 +297,7 @@ namespace PalCalc.UI
             else
             {
                 return new IV_Range(
-                    isRelevant: true, // (note: isRelevant only matters while the solver is running)
+                    IsRelevant: true, // (note: isRelevant only matters while the solver is running)
                     token["Min"].ToObject<int>(),
                     token["Max"].ToObject<int>()
                 );

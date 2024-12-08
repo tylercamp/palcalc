@@ -14,7 +14,7 @@ namespace PalCalc.Solver
         bool IsRelevant { get; }
     }
 
-    public class IV_Random : IV_IValue
+    public record class IV_Random : IV_IValue
     {
         private IV_Random() { }
 
@@ -23,8 +23,7 @@ namespace PalCalc.Solver
         public bool Satisfies(int minValue) => false;
         public bool BetterThan(IV_IValue other) => false;
 
-        private static int _hash = typeof(IV_Random).GetHashCode();
-        public override bool Equals(object obj) => obj is IV_Random;
+        private static int _hash = nameof(IV_Random).GetHashCode();
         public override int GetHashCode() => _hash;
 
         public static readonly IV_Random Instance = new();
@@ -32,36 +31,11 @@ namespace PalCalc.Solver
         public override string ToString() => "(Random IV)";
     }
 
-    // TODO - convert to record to prevent excessive additional instances? or maintain an internal cache of
-    //        instances which have been seen + reuse?
-    public class IV_Range : IV_IValue
+    public readonly record struct IV_Range(bool IsRelevant, int Min, int Max) : IV_IValue
     {
-        public IV_Range(bool isRelevant, int min, int max)
+        public IV_Range(bool isRelevant, int value) : this(isRelevant, value, value)
         {
-#if DEBUG && DEBUG_CHECKS
-            if (min > max) throw new InvalidOperationException();
-#endif
-
-            IsRelevant = isRelevant;
-            Min = min;
-            Max = max;
         }
-
-        public IV_Range(bool isRelevant, int value)
-        {
-            IsRelevant = isRelevant;
-            Min = value;
-            Max = value;
-        }
-
-        public IV_Range(IV_Range other)
-        {
-            IsRelevant = other.IsRelevant;
-            Min = other.Min;
-            Max = other.Max;
-        }
-
-        public bool IsRelevant { get; }
 
         public bool Satisfies(int minValue) => Min >= minValue;
 
@@ -78,9 +52,6 @@ namespace PalCalc.Solver
                 default: throw new NotImplementedException();
             }
         }
-
-        public int Min { get; private set; }
-        public int Max { get; private set; }
 
         public static IV_Range Merge(params IV_Range[] ranges)
         {
@@ -99,11 +70,6 @@ namespace PalCalc.Solver
 
             return new IV_Range(isRelevant, xmin, xmax);
         }
-
-        private static int _baseHash = typeof(IV_Range).GetHashCode();
-        public override int GetHashCode() => HashCode.Combine(Min, Max, _baseHash);
-
-        public override bool Equals(object obj) => obj is IV_Random && obj.GetHashCode() == GetHashCode();
 
         public override string ToString() => Min == Max ? Min.ToString() : $"{Min}-{Max}";
     }
