@@ -54,6 +54,16 @@ namespace PalCalc.UI
             ViewModel.CancelSolver();
         }
 
+        private void SolverControlsView_OnPause()
+        {
+            ViewModel.PauseSolver();
+        }
+
+        private void SolverControlsView_OnResume()
+        {
+            ViewModel.ResumeSolver();
+        }
+
         //protected override void OnClosing(CancelEventArgs e)
         //{
         //    base.OnClosing(e);

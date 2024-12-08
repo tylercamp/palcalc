@@ -14,6 +14,13 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel
 {
+    public enum SolverState
+    {
+        Idle,
+        Running,
+        Paused
+    }
+
     public partial class SolverControlsViewModel : ObservableObject
     {
         public SolverControlsViewModel()
@@ -104,14 +111,19 @@ namespace PalCalc.UI.ViewModel
             set => SetProperty(ref maxSolverIterations, Math.Clamp(value, 1, 99));
         }
 
+        [NotifyPropertyChangedFor(nameof(CanRunSolver))]
         [ObservableProperty]
-        private bool canRunSolver = false;
+        private bool isValidConfig;
 
+        [NotifyPropertyChangedFor(nameof(CanRunSolver))]
+        [NotifyPropertyChangedFor(nameof(CanCancelSolver))]
+        [NotifyPropertyChangedFor(nameof(CanEditSettings))]
         [ObservableProperty]
-        private bool canCancelSolver = false;
+        private SolverState currentSolverState;
 
-        [ObservableProperty]
-        private bool canEditSettings = true;
+        public bool CanRunSolver => IsValidConfig && CurrentSolverState == SolverState.Idle;
+        public bool CanCancelSolver => CurrentSolverState != SolverState.Idle;
+        public bool CanEditSettings => CurrentSolverState == SolverState.Idle;
 
         public IRelayCommand ChangeBredPals { get; }
         public IRelayCommand ChangeWildPals { get; }

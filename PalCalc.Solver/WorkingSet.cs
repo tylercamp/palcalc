@@ -149,7 +149,7 @@ namespace PalCalc.Solver
             /*
              * Time spent trying to optimize this "work pre-allocation":
              * 
-             * - 2 hours
+             * - 3 hours
              * 
              * ... in practice the final perf. bump we get from precomputing outweighs the up-front perf cost
              * of preallocating. an alternative impl. may improve memory performance, but typically if the

@@ -45,7 +45,11 @@ internal class Program
             RequiredPassives = new List<PassiveSkill> { "Swift".ToPassive(db), "Runner".ToPassive(db), "Nimble".ToPassive(db) },
         };
 
-        var matches = solver.SolveFor(targetInstance, CancellationToken.None);
+        var controller = new SolverStateController()
+        {
+            CancellationToken = CancellationToken.None,
+        };
+        var matches = solver.SolveFor(targetInstance, controller);
 
         Console.WriteLine("Took {0}", TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds));
 

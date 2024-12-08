@@ -24,13 +24,6 @@ namespace PalCalc.Solver.ResultPruning
                 _ => throw new NotImplementedException()
             };
 
-        static int ReduceIVs(IPalReference pref, int fallback, Func<IV_Range, int> map, Func<IEnumerable<int>, int> reduce) =>
-            reduce((int[])[
-                ValueOf(pref.IV_HP, fallback, map),
-                ValueOf(pref.IV_Attack, fallback, map),
-                ValueOf(pref.IV_Defense, fallback, map),
-            ]);
-
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results)
         {
             // TODO - would min+max average be better?

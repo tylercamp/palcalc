@@ -163,8 +163,37 @@
             />
 
         <DockPanel Grid.Row="4" Grid.ColumnSpan="99">
+            <DockPanel.Resources>
+                <DataTemplate x:Key="RunButtonTemplate">
+                    <Button Content="{itl:LocalizedText LC_SOLVER_RUN}" Click="Run_Click" HorizontalAlignment="Left" IsEnabled="{Binding CanRunSolver}" />
+                </DataTemplate>
+
+                <DataTemplate x:Key="PauseButtonTemplate">
+                    <Button Content="Pause" Click="Pause_Click" HorizontalAlignment="Left" />
+                </DataTemplate>
+
+                <DataTemplate x:Key="ResumeButtonTemplate">
+                    <Button Content="Resume" Click="Resume_Click" HorizontalAlignment="Left" />
+                </DataTemplate>
+
+                <Style x:Key="ContentPresenterTemplate" TargetType="ContentPresenter">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentSolverState}" Value="Idle">
+                            <Setter Property="ContentTemplate" Value="{StaticResource RunButtonTemplate}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding CurrentSolverState}" Value="Running">
+                            <Setter Property="ContentTemplate" Value="{StaticResource PauseButtonTemplate}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding CurrentSolverState}" Value="Paused">
+                            <Setter Property="ContentTemplate" Value="{StaticResource ResumeButtonTemplate}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DockPanel.Resources>
+            
             <Button DockPanel.Dock="Right" Content="{itl:LocalizedText LC_COMMON_CANCEL}" Click="Cancel_Click" IsEnabled="{Binding CanCancelSolver}" />
-            <Button Content="{itl:LocalizedText LC_SOLVER_RUN}" Click="Run_Click" HorizontalAlignment="Left" IsEnabled="{Binding CanRunSolver}" />
+
+            <ContentPresenter Style="{StaticResource ContentPresenterTemplate}" Content="{Binding}" />
         </DockPanel>
     </Grid>
 </WrapPanel>

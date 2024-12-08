@@ -51,7 +51,7 @@ namespace PalCalc.UI.ViewModel
                 },
             };
 
-            DisplayedResult = solver.SolveFor(targetInstance, CancellationToken.None).MaxBy(r => r.NumTotalBreedingSteps);
+            DisplayedResult = solver.SolveFor(targetInstance, new SolverStateController() { CancellationToken = CancellationToken.None }).MaxBy(r => r.NumTotalBreedingSteps);
 
             IV_HP = new IVDirectValueViewModel(80);
             IV_Attack = new IVDirectValueViewModel(70);

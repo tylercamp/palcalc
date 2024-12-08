@@ -39,6 +39,7 @@ namespace PalCalc.UI.ViewModel
         private LoadingSaveFileModal loadingSaveModal = null;
         private Dispatcher dispatcher;
         private CancellationTokenSource solverTokenSource;
+        private SolverStateController solverController;
         private AppSettings settings;
         private PassiveSkillsPresetCollectionViewModel passivePresets;
         private IRelayCommand<PalSpecifierViewModel> deletePalTargetCommand;
@@ -424,13 +425,19 @@ namespace PalCalc.UI.ViewModel
             {
                 try
                 {
-                    dispatcher.Invoke(() => IsEditable = false);
+                    dispatcher.Invoke(() =>
+                    {
+                        IsEditable = false;
+                        SolverControls.CurrentSolverState = SolverState.Running;
+                    });
 
                     solverTokenSource = new CancellationTokenSource();
+                    solverController = new SolverStateController();
+                    solverController.CancellationToken = solverTokenSource.Token;
                     List<IPalReference> results;
                     try
                     {
-                        results = solver.SolveFor(currentSpec, solverTokenSource.Token);
+                        results = solver.SolveFor(currentSpec, solverController);
                     }
                     catch (OperationCanceledException)
                     {
@@ -492,6 +499,9 @@ namespace PalCalc.UI.ViewModel
                         }
 
                         solverTokenSource = null;
+                        solverController = null;
+
+                        SolverControls.CurrentSolverState = SolverState.Idle;
                         IsEditable = true;
                     });
                 }
@@ -517,6 +527,18 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
+        public void PauseSolver()
+        {
+            if (solverController != null)
+                solverController.Pause = true;
+        }
+
+        public void ResumeSolver()
+        {
+            if (solverController != null)
+                solverController.Pause = false;
+        }
+
         private Stopwatch solverStopwatch = null;
         private void Solver_SolverStateUpdated(SolverStatus obj)
         {
@@ -524,6 +546,8 @@ namespace PalCalc.UI.ViewModel
 
             dispatcher.BeginInvoke(() =>
             {
+                SolverControls.CurrentSolverState = obj.Paused ? SolverState.Paused : SolverState.Running;
+
                 var numTotalSteps = (double)(1 + obj.TargetSteps);
                 int overallStep = 0;
                 switch (obj.CurrentPhase)
@@ -583,9 +607,10 @@ namespace PalCalc.UI.ViewModel
 
         private void UpdateSolverControls()
         {
-            SolverControls.CanRunSolver = IsEditable && PalTarget != null && PalTarget.IsValid;
-            SolverControls.CanEditSettings = IsEditable;
-            SolverControls.CanCancelSolver = !IsEditable;
+            SolverControls.IsValidConfig = PalTarget?.IsValid == true;
+            //SolverControls.CanRunSolver = IsEditable && PalTarget != null && PalTarget.IsValid;
+            //SolverControls.CanEditSettings = IsEditable;
+            //SolverControls.CanCancelSolver = !IsEditable;
         }
 
         private PalTargetViewModel palTarget;
