@@ -427,7 +427,15 @@ namespace PalCalc.UI.ViewModel
                     dispatcher.Invoke(() => IsEditable = false);
 
                     solverTokenSource = new CancellationTokenSource();
-                    var results = solver.SolveFor(currentSpec, solverTokenSource.Token);
+                    List<IPalReference> results;
+                    try
+                    {
+                        results = solver.SolveFor(currentSpec, solverTokenSource.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        results = [];
+                    }
 
                     // general simplification pass, get the best result for each potentially
                     // interesting combination of result properties
