@@ -18,8 +18,6 @@ using System.Threading.Tasks;
  * - Consider adding "desired property consolidation" again?
  * - Track + prefer higher IVs even if no min. IVs are set
  * - Add a pause button
- * - Use bitset for grouping instead of hash?
- * - Additional check during breeding step to build up best-result times before merge step
  * - Add warning when memory size likely exceeds system limits
  */
 

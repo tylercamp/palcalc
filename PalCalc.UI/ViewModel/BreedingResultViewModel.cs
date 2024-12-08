@@ -80,26 +80,26 @@ namespace PalCalc.UI.ViewModel
                 IV_Attack = IVValueViewModel.FromIV(displayedResult.IV_Attack);
                 IV_Defense = IVValueViewModel.FromIV(displayedResult.IV_Defense);
 
-                int avgIv = 0, numReal = 0;
-                if (displayedResult.IV_HP is IV_Range rhp)
+                var validIVs = new[]
                 {
-                    avgIv += (rhp.Min + rhp.Max) / 2;
-                    numReal++;
-                }
+                    displayedResult.IV_HP,
+                    displayedResult.IV_Attack,
+                    displayedResult.IV_Defense
+                }.OfType<IV_Range>().ToArray();
 
-                if (displayedResult.IV_Attack is IV_Range ratk)
+                if (validIVs.Length > 0)
                 {
-                    avgIv += (ratk.Min + ratk.Max) / 2;
-                    numReal++;
-                }
+                    var min = (int)Math.Round(validIVs.Average(iv => iv.Min));
+                    var max = (int)Math.Round(validIVs.Average(iv => iv.Max));
 
-                if (displayedResult.IV_Defense is IV_Range rdef)
+                    IV_Average = min != max
+                        ? new IVRangeValueViewModel(min, max)
+                        : new IVDirectValueViewModel(min);
+                }
+                else
                 {
-                    avgIv += (rdef.Min + rdef.Max) / 2;
-                    numReal++;
+                    IV_Average = IVAnyValueViewModel.Instance;
                 }
-
-                IV_Average = numReal > 0 ? new IVDirectValueViewModel((int)Math.Round(avgIv / (float)numReal)) : IVAnyValueViewModel.Instance;
 
                 Label = LocalizationCodes.LC_RESULT_LABEL.Bind(
                     new

@@ -33,7 +33,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 iv switch
                 {
                     IVDirectValueViewModel d => d.Value,
-                    IVRangeValueViewModel r => (r.Min + r.Max) / 2,
+                    IVRangeValueViewModel r => r.Max,
                     IVAnyValueViewModel => 0,
                     _ => 0
                 };
@@ -54,6 +54,17 @@ namespace PalCalc.UI.ViewModel.Mapped
         public int Max => max;
 
         public string Label { get; } = $"{min}-{max}";
+
+        int IComparable.CompareTo(object obj)
+        {
+            return obj switch
+            {
+                IVAnyValueViewModel => -1,
+                IVDirectValueViewModel d => d.Value - max,
+                IVRangeValueViewModel r => r.Max == Max ? r.Min - min : r.Max - max,
+                _ => 0
+            };
+        }
     }
 
     public class IVAnyValueViewModel : IVValueViewModel
