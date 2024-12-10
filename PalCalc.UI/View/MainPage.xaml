@@ -9,12 +9,16 @@
       xmlns:m="clr-namespace:PalCalc.UI.Model"
       xmlns:itl="clr-namespace:PalCalc.UI.Localization"
       xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
+      xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
       mc:Ignorable="d"
       d:Background="White"
       d:Width="1280" d:Height="720"
       xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
       xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
       d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
+    <Page.Resources>
+        <c:ValueVisibilityConverter x:Key="VVC" />
+    </Page.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="{itl:LocalizedText LC_LANGUAGE}" ItemsSource="{Binding Locales}">
@@ -30,9 +34,9 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="220" Width="300"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="232*"/>
+                <ColumnDefinition Width="232*" />
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="80*"/>
+                <ColumnDefinition Width="80*" MinWidth="200"/>
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0" Margin="5" IsEnabled="{Binding IsEditable}">
                 <StackPanel DockPanel.Dock="Top">
@@ -100,15 +104,25 @@
 
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                
-                    <GroupBox Header="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.ResultsHeading.Value}" Grid.Row="0">
+
+                    <TextBlock TextWrapping="Wrap" Visibility="{Binding ShowNoResultsNotice, Converter={StaticResource VVC}, FallbackValue=Collapsed}" Grid.Row="0" Padding="5">
+                        <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_1}" />
+                        <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/wiki/Frequently-Asked-Questions#why-arent-i-getting-any-results"
+                                   RequestNavigate="Hyperlink_RequestNavigate">
+                            <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_2}" />
+                        </Hyperlink>
+                        <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_3}" />
+                    </TextBlock>
+
+                    <GroupBox Header="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.ResultsHeading.Value}" Grid.Row="1">
                         <v:BreedingResultListView BorderThickness="0" DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
                     </GroupBox>
 
-                    <StackPanel Grid.Row="1">
+                    <StackPanel Grid.Row="2">
                         <Button Width="50" Click="AboutButton_Click" Margin="0,5,0,5" Content="{itl:LocalizedText LC_ABOUT_APP}" />
                         <TextBlock Visibility="{Binding UpdatesMessageVisibility}" TextWrapping="Wrap" TextAlignment="Center" FontSize="20">
                             <!-- NavigateUri unused, value must be set for event to trigger -->

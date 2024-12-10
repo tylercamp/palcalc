@@ -10,13 +10,25 @@ namespace PalCalc.Model
     {
         public static readonly int PlayerPartySize = 5;
 
-        public static readonly int PalBox_GridWidth = 6;
-        public static readonly int PalBox_GridHeight = 5;
-        public static readonly int PalBox_SlotsPerTab = PalBox_GridWidth * PalBox_GridHeight;
+        public static readonly Dictionary<LocationType, int> LocationTypeGridWidths = new() {
+            { LocationType.PlayerParty, 5 },
+            { LocationType.Palbox, 6 },
+            { LocationType.Base, 5 },
+            { LocationType.ViewingCage, 6 },
 
-        public static readonly int Base_GridWidth = 5;
+            // (not real, just so it's defined)
+            { LocationType.Custom, 8 },
+        };
 
-        public static readonly int ViewingCage_GridWidth = 6;
+        public static readonly Dictionary<LocationType, int?> LocationTypeGridHeights = new()
+        {
+            { LocationType.Palbox, 5 },
+
+            { LocationType.PlayerParty, null },
+            { LocationType.Base, null },
+            { LocationType.ViewingCage, null },
+            { LocationType.Custom, null },
+        };
 
         // Used for calculating map coords from world coords
         //

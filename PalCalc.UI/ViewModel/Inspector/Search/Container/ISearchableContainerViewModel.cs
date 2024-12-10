@@ -16,15 +16,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
         public abstract string Id { get; }
         public abstract LocationType DetectedType { get; }
 
-        public int RowSize => DetectedType switch
-        {
-            LocationType.PlayerParty => 5,
-            LocationType.Palbox => 6,
-            LocationType.Base => 5,
-            LocationType.Custom => 8,
-            LocationType.ViewingCage => 6,
-            _ => throw new NotImplementedException()
-        };
+        public int RowSize => GameConstants.LocationTypeGridWidths[DetectedType];
 
         public abstract List<IContainerGridViewModel> Grids { get; }
 
