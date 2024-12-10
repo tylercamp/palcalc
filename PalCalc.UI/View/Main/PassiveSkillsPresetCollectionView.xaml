@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PalCalc.UI.View"
+             xmlns:local="clr-namespace:PalCalc.UI.View.Main"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
