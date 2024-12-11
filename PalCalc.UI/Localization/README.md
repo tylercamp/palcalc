@@ -1,4 +1,4 @@
-﻿# Pal Calc Translations
+# Pal Calc Translations
 
 Pal Calc supports translations for languages used in the game. Pal and Passive Skill names are taken directly from the game files. Other text is for Pal Calc itself.
 
@@ -48,7 +48,7 @@ Some LCs include "format parameters" to modify the final text. For example:
 - `LC_LOC_COORD_PALBOX` in `LocalizationCodes.resx` contains: "Tab | X | Y".
 - The English translation is `Palbox, tab {Tab} at ({X},{Y})`.
 
-Replace `{Tab}`, `{X}`, `{Y}` with appropriate text in your translation. If any parameters are missing or incorrect, the English text will be used instead. Errors will appear in the Translation Debug window.
+`{Tab}`, `{X}`, and `{Y}` in the translation will be replaced with appropriate text when Pal Calc is running. If any parameters are missing or incorrect, the English text will be used instead. Errors will appear in the Translation Debug window.
 
 ### 6. Tips
 
