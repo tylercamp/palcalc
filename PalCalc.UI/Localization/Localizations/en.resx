@@ -341,6 +341,15 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   <data name="LC_NEW_TARGET_PAL" xml:space="preserve">
     <value>New</value>
   </data>
+  <data name="LC_NO_RESULTS_FAQ_1" xml:space="preserve">
+    <value>No results? Check</value>
+  </data>
+  <data name="LC_NO_RESULTS_FAQ_2" xml:space="preserve">
+    <value>the FAQs</value>
+  </data>
+  <data name="LC_NO_RESULTS_FAQ_3" xml:space="preserve">
+    <value>for possible causes.</value>
+  </data>
   <data name="LC_NO_TRAITS" xml:space="preserve">
     <value>With no passives</value>
   </data>

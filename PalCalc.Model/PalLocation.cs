@@ -28,14 +28,14 @@ namespace PalCalc.Model
         public override string ToString()
         {
             string indexStr;
-            if (Type == LocationType.Palbox)
+            if (Type == LocationType.PlayerParty)
             {
-                var coord = PalboxCoord.FromSlotIndex(Index);
-                indexStr = coord.ToString();
+                indexStr = $"Slot #{Index + 1}";
             }
             else
             {
-                indexStr = $"Slot #{Index+1}";
+                var coord = PalDisplayCoord.FromLocation(this);
+                indexStr = coord.ToString();
             }
 
             return $"{Type} ({indexStr})";
@@ -44,75 +44,49 @@ namespace PalCalc.Model
         public override int GetHashCode() => HashCode.Combine(Type, Index);
     }
 
-    public class PalboxCoord
+    public class PalDisplayCoord
     {
         // all 1-indexed
-        public int Tab { get; set; }
+        public int? Tab { get; set; }
         public int Row { get; set; }
         public int Column { get; set; }
 
         public int X => Column;
         public int Y => Row;
 
-        public override string ToString() => $"Tab {Tab} at ({X},{Y})";
-
-        public static PalboxCoord FromSlotIndex(int slotIndex)
+        public override string ToString()
         {
-            var numCols = GameConstants.PalBox_GridWidth;
-            var numRows = GameConstants.PalBox_GridHeight;
-            var palsPerTab = numCols * numRows;
+            if (Tab != null) return $"Tab {Tab.Value} at ({X},{Y})";
+            else return $"Slot ({X},{Y})";
+        }
 
-            var tab = (slotIndex - slotIndex % palsPerTab) / palsPerTab;
-            slotIndex -= tab * palsPerTab;
+        public static PalDisplayCoord FromLocation(PalLocation loc) => FromLocation(loc.Type, loc.Index);
+
+        public static PalDisplayCoord FromLocation(LocationType type, int slotIndex)
+        {
+            var numCols = GameConstants.LocationTypeGridWidths[type];
+            var numRows = GameConstants.LocationTypeGridHeights[type];
+
+            int? tab = null;
+
+            if (numRows != null)
+            {
+                var palsPerTab = numCols * numRows.Value;
+
+                tab = (slotIndex - slotIndex % palsPerTab) / palsPerTab;
+                slotIndex -= tab.Value * palsPerTab;
+            }
 
             var row = (slotIndex - slotIndex % numCols) / numCols;
             slotIndex -= row * numCols;
             var col = slotIndex;
 
-            return new PalboxCoord() { Tab = tab + 1, Row = row + 1, Column = col + 1 };
-        }
-    }
-
-    public class BaseCoord
-    {
-        // all 1-indexed
-        public int Row { get; set; }
-        public int Column { get; set; }
-
-        public int X => Column;
-        public int Y => Row;
-
-        public override string ToString() => $"Slot ({X},{Y})";
-
-        public static BaseCoord FromSlotIndex(int slotIndex)
-        {
-            var row = (slotIndex - slotIndex % GameConstants.Base_GridWidth) / GameConstants.Base_GridWidth;
-            slotIndex -= row * GameConstants.Base_GridWidth;
-
-            return new BaseCoord() { Row = row + 1, Column = slotIndex + 1 };
-        }
-    }
-
-    public class ViewingCageCoord
-    {
-        // all 1-indexed
-        public int Row { get; set; }
-        public int Column { get; set; }
-
-        public int X => Column;
-        public int Y => Row;
-
-        public override string ToString() => $"Slot ({X},{Y})";
-
-        public static PalboxCoord FromSlotIndex(int slotIndex)
-        {
-            var numCols = GameConstants.ViewingCage_GridWidth;
-
-            var row = (slotIndex - slotIndex % numCols) / numCols;
-            slotIndex -= row * numCols;
-            var col = slotIndex;
-
-            return new PalboxCoord() { Row = row + 1, Column = col + 1 };
+            return new PalDisplayCoord()
+            {
+                Tab = tab == null ? tab : (tab.Value + 1),
+                Row = row + 1,
+                Column = col + 1
+            };
         }
     }
 }

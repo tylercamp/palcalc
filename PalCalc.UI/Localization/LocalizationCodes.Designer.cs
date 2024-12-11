@@ -353,6 +353,18 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_NO_RESULTS_FAQ_1,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_NO_RESULTS_FAQ_2,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_NO_RESULTS_FAQ_3,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_NO_TRAITS,
         /// <summary>
         ///   Looks up a localized string similar to .

@@ -510,6 +510,8 @@ namespace PalCalc.UI.ViewModel
                                 PalTargetList.SelectedTarget = updatedSpec;
                             }
 
+                            ShowNoResultsNotice = (results.Count == 0);
+
                             SaveTargetList(PalTargetList);
 
                             UpdatePalTarget();
@@ -667,6 +669,8 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private PalTargetListViewModel palTargetList;
 
+        [ObservableProperty]
+        private bool showNoResultsNotice = false;
         private void UpdateSolverControls()
         {
             SolverControls.IsValidConfig = PalTarget?.IsValid == true;
@@ -687,6 +691,9 @@ namespace PalCalc.UI.ViewModel
                     if (oldValue != null) oldValue.PropertyChanged -= PalTarget_PropertyChanged;
 
                     if (value != null) value.PropertyChanged += PalTarget_PropertyChanged;
+
+                    var currentResults = PalTarget?.CurrentPalSpecifier?.CurrentResults;
+                    ShowNoResultsNotice = currentResults != null && currentResults.Results.Count == 0;
 
                     UpdateSolverControls();
                 }

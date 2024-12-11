@@ -82,5 +82,10 @@ namespace PalCalc.UI
         {
             ViewModel.TryDownloadLatestVersion();
         }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo { FileName = e.Uri.ToString(), UseShellExecute = true });
+        }
     }
 }
