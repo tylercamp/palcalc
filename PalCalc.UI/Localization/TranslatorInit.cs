@@ -56,7 +56,7 @@ namespace PalCalc.UI.Localization
                             else
                             {
                                 OnTranslationError?.Invoke(new UnexpectedTranslationError(l, kvp.Key));
-                                logger.Debug("Locale {locale} has unexpected TL ID: {id}", l, kvp.Key);
+                                logger.Warning("Locale {locale} has unexpected TL ID: {id}", l, kvp.Key);
                                 return (null, kvp.Value);
                             }
                         })
@@ -81,7 +81,7 @@ namespace PalCalc.UI.Localization
 
                     if (!localeKvp.Value.ContainsKey(code))
                     {
-                        logger.Debug($"Locale {locale} missing translation for {code}");
+                        logger.Verbose($"Locale {locale} missing translation for {code}");
                         OnTranslationError?.Invoke(new MissingTranslationError(locale, code, fallbackValue));
 
                         localeKvp.Value.Add(codeKvp.Key, fallbackValue);

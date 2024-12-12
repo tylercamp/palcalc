@@ -51,7 +51,12 @@ namespace PalCalc.UI.ViewModel
                 },
             };
 
-            DisplayedResult = solver.SolveFor(targetInstance, CancellationToken.None).MaxBy(r => r.NumTotalBreedingSteps);
+            DisplayedResult = solver.SolveFor(targetInstance, new SolverStateController() { CancellationToken = CancellationToken.None }).MaxBy(r => r.NumTotalBreedingSteps);
+
+            IV_HP = new IVDirectValueViewModel(80);
+            IV_Attack = new IVDirectValueViewModel(70);
+            IV_Defense = new IVDirectValueViewModel(60);
+            IV_Average = new IVDirectValueViewModel(70);
         }
 
         private CachedSaveGame source;
@@ -70,6 +75,32 @@ namespace PalCalc.UI.ViewModel
                 DisplayedResult = displayedResult;
                 Graph = BreedingGraph.FromPalReference(source, displayedResult);
                 EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
+
+                IV_HP = IVValueViewModel.FromIV(displayedResult.IV_HP);
+                IV_Attack = IVValueViewModel.FromIV(displayedResult.IV_Attack);
+                IV_Defense = IVValueViewModel.FromIV(displayedResult.IV_Defense);
+
+                var validIVs = new[]
+                {
+                    displayedResult.IV_HP,
+                    displayedResult.IV_Attack,
+                    displayedResult.IV_Defense
+                }.OfType<IV_Range>().ToArray();
+
+                if (validIVs.Length > 0)
+                {
+                    var min = (int)Math.Round(validIVs.Average(iv => iv.Min));
+                    var max = (int)Math.Round(validIVs.Average(iv => iv.Max));
+
+                    IV_Average = min != max
+                        ? new IVRangeValueViewModel(min, max)
+                        : new IVDirectValueViewModel(min);
+                }
+                else
+                {
+                    IV_Average = IVAnyValueViewModel.Instance;
+                }
+
                 Label = LocalizationCodes.LC_RESULT_LABEL.Bind(
                     new
                     {
@@ -142,5 +173,11 @@ namespace PalCalc.UI.ViewModel
         public bool NeedsRefresh => Graph?.NeedsRefresh ?? false;
         public int NumWildPals => DisplayedResult.NumWildPalParticipants();
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
+
+        public IVValueViewModel IV_HP { get; }
+        public IVValueViewModel IV_Attack { get; }
+        public IVValueViewModel IV_Defense { get; }
+
+        public IVValueViewModel IV_Average { get; }
     }
 }

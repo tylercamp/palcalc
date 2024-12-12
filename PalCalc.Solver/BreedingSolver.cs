@@ -3,12 +3,20 @@ using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+
+/*
+ * TODO
+ * 
+ * - Add warning when memory size likely exceeds system limits
+ */
 
 namespace PalCalc.Solver
 {
@@ -25,11 +33,18 @@ namespace PalCalc.Solver
         public int CurrentStepIndex { get; set; }
         public int TargetSteps { get; set; }
         public bool Canceled { get; set; }
+        public bool Paused { get; set; }
 
         public int CurrentWorkSize { get; set; }
 
         public int WorkProcessedCount { get; set; }
         public int TotalWorkProcessedCount { get; set; }
+    }
+
+    public class SolverStateController
+    {
+        public CancellationToken CancellationToken { get; set; }
+        public bool Pause { get; set; }
     }
 
     class WorkBatchProgress
@@ -41,9 +56,16 @@ namespace PalCalc.Solver
     {
         private static ILogger logger = Log.ForContext<BreedingSolver>();
 
-        // returns number of ways you can choose k combinations from a list of n
-        // TODO - is this the right way to use pascal's triangle??
+        /// <summary>
+        /// `n` Choose `k`
+        /// </summary>
         static int Choose(int n, int k) => PascalsTriangle.Instance[n - 1][k - 1];
+
+        static IV_Range MakeIV(int minValue, int value) =>
+            new(
+                isRelevant: minValue != 0 && value >= minValue,
+                value: value
+            );
 
         GameSettings gameSettings;
         PalDB db;
@@ -55,6 +77,12 @@ namespace PalCalc.Solver
         TimeSpan maxEffort;
         PruningRulesBuilder pruningBuilder;
         int maxThreads;
+
+        // https://github.com/tylercamp/palcalc/issues/22#issuecomment-2509171056
+        // [NumDesired - 1]
+        // eg if there's 1 specific type of IV we want, then ivDP[0] gives the probability of getting that IV
+        // (not including 50/50 chance of inheriting from specific parent)
+        float[] ivDesiredProbabilities;
 
         /// <param name="db"></param>
         /// <param name="ownedPals"></param>
@@ -97,53 +125,66 @@ namespace PalCalc.Solver
             this.maxBredIrrelevantPassives = Math.Min(3, maxBredIrrelevantPassives);
             this.maxEffort = maxEffort;
             this.maxThreads = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
+
+            // for IV inheritance there's the probability of:
+            //
+            // 1. the chance of inheriting exactly N IVs
+            // 2. the chance of those IVs being what we want
+
+            // (1) is stored in GameConstants and can change depending on game updates
+            // (2) is represented in `combinationsProbabilityTable` and is just from the possible combinations,
+            //     regardless of game logic
+
+            var combinationsProbabilityTable = new Dictionary<int, Dictionary<int, float>>()
+            {
+                // 1 inherited
+                { 1, new() {
+                    { 1, 1.0f / 3.0f }, // 1 desired
+                    { 2, 0.0f },        // 2 desired (no way to get 2 if we only inherited 1)
+                    { 3, 0.0f },        // 3 desired (...)
+                } },
+
+                // 2 inherited
+                { 2, new() {
+                    { 1, 2.0f / 3.0f }, // 1 desired
+                    { 2, 1.0f / 3.0f }, // 2 desired
+                    { 3, 0.0f }         // 3 desired (no way to get 3 if we only inherited 2
+                } },
+
+                // 3 inherited
+                { 3, new() {
+                    // 3 inherited means all IVs inherited, doesn't matter what IV we actually wanted, we'll always get it
+                    { 1, 1.0f },
+                    { 2, 1.0f },
+                    { 3, 1.0f }
+                } }
+            };
+
+            /*
+            IV probabilities have similar approach as `ProbabilityInheritedTargetPassives` - a pal will end up inheriting
+            exactly 1, 2, or 3 IVs; get the probability of each case combined with the probability of those cases giving us
+            what we want
+            */
+            
+            // stores the final probabilities of getting some number of desired IVs
+            //
+            // (the final real probability will also need to account for 50/50 chance of inheriting the IV from either specific parent)
+            this.ivDesiredProbabilities = new float[3];
+            for (int i = 0; i < 3; i++) ivDesiredProbabilities[i] = 0.0f;
+
+            for (int numInherited = 1; numInherited <= 3; numInherited++)
+            {
+                var probabilityInherited = GameConstants.IVProbabilityDirect[numInherited];
+                for (int numDesired = 1; numDesired <= 3; numDesired++)
+                {
+                    var probabilityMatched = combinationsProbabilityTable[numInherited][numDesired];
+
+                    ivDesiredProbabilities[numDesired - 1] += probabilityInherited * probabilityMatched;
+                }
+            }
         }
 
         public event Action<SolverStatus> SolverStateUpdated;
-
-        // for each available (pal, gender) pair, and for each set of instance passives as a subset of the desired passives (e.g. all male lamballs with "runner",
-        // all with "runner and swift", etc.), pick the instance with the fewest total passives
-        //
-        // (includes pals without any relevant passives, picks the instance with the fewest total passives)
-        static List<PalInstance> RelevantInstancesForPassiveSkills(PalDB db, List<PalInstance> availableInstances, List<PassiveSkill> targetPassives)
-        {
-            List<PalInstance> relevantInstances = new List<PalInstance>();
-
-            var passivesPermutations = targetPassives.Combinations(targetPassives.Count).Select(l => l.ToList()).ToList();
-            logger.Debug("Looking for pals with passives:\n- {0}", string.Join("\n- ", passivesPermutations.Select(p => $"({string.Join(',', p)})")));
-
-            foreach (var pal in db.Pals)
-            {
-                foreach (var gender in new List<PalGender>() { PalGender.MALE, PalGender.FEMALE })
-                {
-                    var instances = availableInstances.Where(i => i.Pal == pal && i.Gender == gender).ToList();
-                    var instancesByPermutation = passivesPermutations.ToDictionary(p => p, p => new List<PalInstance>());
-
-                    foreach (var instance in instances)
-                    {
-                        var matchingPermutation = passivesPermutations
-                            .OrderByDescending(p => p.Count)
-                            .ThenBy(p => p.Except(instance.PassiveSkills).Count())
-                            .First(p => !p.Except(instance.PassiveSkills).Any());
-
-                        instancesByPermutation[matchingPermutation].Add(instance);
-                    }
-
-                    relevantInstances.AddRange(
-                        instancesByPermutation.Values
-                            .Where(instances => instances.Count != 0)
-                            .Select(instances => instances
-                                .OrderBy(i => i.PassiveSkills.Count)
-                                .ThenBy(i => PreferredLocationPruning.LocationOrderingOf(i.Location.Type))
-                                .ThenByDescending(i => i.IV_HP + i.IV_Shot + i.IV_Defense)
-                                .First()
-                            )
-                    );
-                }
-            }
-
-            return relevantInstances;
-        }
 
         /// <summary>
         /// Creates a list of desired combinations of passives. Meant to handle the case where there are over MAX_PASSIVES desired passives.
@@ -251,6 +292,10 @@ namespace PalCalc.Solver
                     return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender()));
                 }
 
+#if DEBUG && DEBUG_CHECKS
+                if (p1wildcard || p2wildcard) Debugger.Break();
+#endif
+
                 // neither parents are wildcards
                 return (parent1, parent2);
             }
@@ -277,7 +322,7 @@ namespace PalCalc.Solver
         /// Should be used repeatedly to calculate probabilities for all possible counts of passive skills (max 4)
         /// </remarks>
         /// 
-        float ProbabilityInheritedTargetPassives(List<PassiveSkill> parentPassives, List<PassiveSkill> desiredParentPassives, int numFinalPassives)
+        float ProbabilityInheritedTargetPassives(PassiveSkill[] parentPassives, PassiveSkill[] desiredParentPassives, int numFinalPassives)
         {
             // we know we need at least `desiredParentPassives.Count` to be inherited from the parents, but the overall number
             // of passives must be `numFinalPassives`. consider N, N+1, ..., passives inherited from parents, and an inverse amount
@@ -295,16 +340,16 @@ namespace PalCalc.Solver
 
             float probabilityForNumPassives = 0.0f;
 
-            for (int numInheritedFromParent = desiredParentPassives.Count; numInheritedFromParent <= numFinalPassives; numInheritedFromParent++)
+            for (int numInheritedFromParent = desiredParentPassives.Length; numInheritedFromParent <= numFinalPassives; numInheritedFromParent++)
             {
                 // we may inherit more passives from the parents than the parents actually have (e.g. inherit 4 passives from parents with
                 // 2 total passives), in which case we'd still inherit just two
                 //
                 // this doesn't affect probabilities of getting `numInherited`, but it affects the number of random passives which must
                 // be added to each `numFinalPassives` and the number of combinations of parent passives that we check
-                var actualNumInheritedFromParent = Math.Min(numInheritedFromParent, parentPassives.Count);
+                var actualNumInheritedFromParent = Math.Min(numInheritedFromParent, parentPassives.Length);
 
-                var numIrrelevantFromParent = actualNumInheritedFromParent - desiredParentPassives.Count;
+                var numIrrelevantFromParent = actualNumInheritedFromParent - desiredParentPassives.Length;
                 var numIrrelevantFromRandom = numFinalPassives - actualNumInheritedFromParent;
 
 #if DEBUG && DEBUG_CHECKS
@@ -318,13 +363,13 @@ namespace PalCalc.Solver
 
                     // the only way we could get zero inherited passives is if neither parent actually has any passives, otherwise
                     // it (seems to) be impossible to get zero direct inherited passives (unconfirmed from reddit thread)
-                    if (parentPassives.Count > 0) continue;
+                    if (parentPassives.Length > 0) continue;
 
                     // if neither parent has any passives, we'll always get 0 inherited passives, so we'll always get the "required"
                     // passives regardless of the roll for `PassiveProbabilityDirect`
                     probabilityGotRequiredFromParent = 1.0f;
                 }
-                else if (!desiredParentPassives.Any())
+                else if (desiredParentPassives.Length == 0)
                 {
                     // just the chance of getting this number of passives from parents
                     probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent];
@@ -332,24 +377,24 @@ namespace PalCalc.Solver
                 else if (numIrrelevantFromParent == 0)
                 {
                     // chance of getting exactly the required passives
-                    probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent] / Choose(parentPassives.Count, desiredParentPassives.Count);
+                    probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent] / Choose(parentPassives.Length, desiredParentPassives.Length);
                 }
                 else
                 {
                     // (available passives except desired)
                     // choose
                     // (required num irrelevant)
-                    var numCombinationsWithIrrelevantPassive = (float)Choose(parentPassives.Count - desiredParentPassives.Count, numIrrelevantFromParent);
+                    var numCombinationsWithIrrelevantPassive = (float)Choose(parentPassives.Length - desiredParentPassives.Length, numIrrelevantFromParent);
 
                     // (all available passives)
                     // choose
                     // (actual num inherited from parent)
-                    var numCombinationsWithAnyPassives = (float)Choose(parentPassives.Count, actualNumInheritedFromParent);
+                    var numCombinationsWithAnyPassives = (float)Choose(parentPassives.Length, actualNumInheritedFromParent);
 
                     // probability of those passives containing the desired passives
                     // (doesn't affect anything if we don't actually want any of these passives)
                     // (TODO - is this right? got this simple division from chatgpt)
-                    var probabilityCombinationWithDesiredPassives = desiredParentPassives.Count == 0 ? 1 : (
+                    var probabilityCombinationWithDesiredPassives = desiredParentPassives.Length == 0 ? 1 : (
                         numCombinationsWithIrrelevantPassive / numCombinationsWithAnyPassives
                     );
 
@@ -367,7 +412,55 @@ namespace PalCalc.Solver
             return probabilityForNumPassives;
         }
 
-        public List<IPalReference> SolveFor(PalSpecifier spec, CancellationToken token)
+        /// <summary>
+        /// Given the IVs from two parents, returns the probability of inheriting all desired IVs from the parents.
+        /// 
+        /// A desired IV is determined by whether it's a "valid" (i.e. non-random) IV.
+        /// </summary>
+        float ProbabilityInheritedTargetIVs(
+            IV_IValue A_hp, IV_IValue A_attack, IV_IValue A_defense,
+            IV_IValue B_hp, IV_IValue B_attack, IV_IValue B_defense
+        )
+        {
+            // (note: use of `.Count` and superficial array creation doesn't seem to be significant for perf)
+            IV_IValue[] hps = [A_hp, B_hp];
+            IV_IValue[] attacks = [A_attack, B_attack];
+            IV_IValue[] defenses = [A_defense, B_defense];
+
+            int numRelevantHP = hps.Count(iv => iv.IsRelevant);
+            int numRelevantAttack = attacks.Count(iv => iv.IsRelevant);
+            int numRelevantDefense = defenses.Count(iv => iv.IsRelevant);
+
+            int numRequiredIVs = 0;
+            if (numRelevantHP > 0) numRequiredIVs++;
+            if (numRelevantAttack > 0) numRequiredIVs++;
+            if (numRelevantDefense > 0) numRequiredIVs++;
+
+            if (numRequiredIVs == 0) return 1.0f;
+
+            // base probability is the chance of getting the IV categories we want
+            float result = ivDesiredProbabilities[numRequiredIVs - 1];
+
+            // even if we got the right IV categories, we might not get the right parents/values
+            //
+            // for each IV:
+            // - if 0 relevant values, we weren't trying to inherit it, no effect
+            // - if 1 relevant value, we need to inherit from the right parent, extra 50/50 chance
+            // - if 2 relevant values, inheriting from either parent would suffice, no effect
+            //
+            // so if any IV has just one relevant parent, cut the final probability in half
+            if (numRelevantHP == 1) result *= 0.5f;
+            if (numRelevantAttack == 1) result *= 0.5f;
+            if (numRelevantDefense == 1) result *= 0.5f;
+
+#if DEBUG && DEBUG_CHECKS
+            if (result <= 0.0001f) Debugger.Break();
+#endif
+
+            return result;
+        }
+
+        public List<IPalReference> SolveFor(PalSpecifier spec, SolverStateController controller)
         {
             spec.Normalize();
 
@@ -376,95 +469,101 @@ namespace PalCalc.Solver
                 throw new Exception("Target passive skill count cannot exceed max number of passive skills for a single pal");
             }
 
-            var statusMsg = new SolverStatus() { CurrentPhase = SolverPhase.Initializing, CurrentStepIndex = 0, TargetSteps = maxSolverIterations, Canceled = token.IsCancellationRequested };
+            var statusMsg = new SolverStatus()
+            {
+                CurrentPhase = SolverPhase.Initializing,
+                CurrentStepIndex = 0,
+                TargetSteps = maxSolverIterations,
+                Canceled = controller.CancellationToken.IsCancellationRequested,
+                Paused = controller.Pause,
+            };
             SolverStateUpdated?.Invoke(statusMsg);
 
-            var relevantPals = RelevantInstancesForPassiveSkills(db, ownedPals, spec.DesiredPassives.ToList())
-               .Where(p => p.PassiveSkills.Except(spec.DesiredPassives).Count() <= maxInputIrrelevantPassives)
-               .ToList();
+            /* Build the initial list of pals to breed */
 
-            logger.Debug(
-                "Using {relevantCount}/{totalCount} pals as relevant inputs with passive skills:\n- {summary}",
-                relevantPals.Count,
-                ownedPals.Count,
-                string.Join("\n- ",
-                    relevantPals
-                        .OrderBy(p => p.Pal.Name)
-                        .ThenBy(p => p.Gender)
-                        .ThenBy(p => string.Join(" ", p.PassiveSkills.OrderBy(t => t.Name)))
-                )
-            );
+            // attempt to deduplicate pals and *intelligently* reduce the initial working set size
+            //
+            // effectively need to group pals based on their passives, IVs, and gender
+            // (though they only count if they're passives/IVs that are desired/in the PalSpecifier)
+            //
+            // if there are "duplicates", we'll pick based on the pal's IVs and where the pal is stored
+            //
 
-            // `relevantPals` is now a list of all captured Pal types, where multiple of the same pal
-            // may be included if they have different genders and/or different matching subsets of
-            // the desired passives
+            // PalProperty makes it easy to group by different properties
+            // (main grouping function)
+            var allPropertiesGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvRelevance, PalProperty.Gender);
+
+            // (needed for the last step where we try to combine two pals into one (`CompositePalReference`) if they are
+            // different genders but otherwise have all the same properties)
+            var allExceptGenderGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvRelevance);
 
             bool WithinBreedingSteps(Pal pal, int maxSteps) => db.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
 
-            var initialContent = new List<IPalReference>();
-            foreach (
-                var palGroup in relevantPals
-                    .Where(pi => WithinBreedingSteps(pi.Pal, maxBreedingSteps))
-                    .Select(pi => new OwnedPalReference(pi, pi.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives)))
-                    .GroupBy(pi => pi.Pal)
-            )
-            {
-                var pal = palGroup.Key;
-
-                // group owned pals by the desired passives they contain, and try to find male+female pairs with the same set of passives + num irrelevant passives
-                foreach (
-                    var passiveGroup in palGroup
-                        .GroupBy(p => p.EffectivePassives
-                            // (pad them all to have max number of passives, so the grouping ignores the total number of passives)
-                            .Concat(Enumerable.Range(0, GameConstants.MaxTotalPassives - p.EffectivePassives.Count).Select(_ => new RandomPassiveSkill()))
-                            .SetHash()
-                        )
-                        .Select(g => g.ToList())
+            var initialContent = ownedPals
+                // skip pals if they can't be used to reach the desired pals (e.g. Jetragon can only be bred from other Jetragons)
+                .Where(p => WithinBreedingSteps(p.Pal, maxBreedingSteps))
+                // apply "Max Input Irrelevant Passives" setting
+                .Where(p => p.PassiveSkills.Except(spec.DesiredPassives).Count() <= maxInputIrrelevantPassives)
+                // convert from Model to Solver repr
+                .Select(p => new OwnedPalReference( 
+                    instance: p,
+                    effectivePassives: p.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives),
+                    effectiveHp: MakeIV(spec.IV_HP, p.IV_HP),
+                    effectiveAttack: MakeIV(spec.IV_Attack, p.IV_Shot),
+                    effectiveDefense: MakeIV(spec.IV_Defense, p.IV_Defense)
+                ))
+                // group pals by their "important" properties and select the "best" pal from each group
+                .GroupBy(p => allPropertiesGroupFn(p))
+                .Select(g => g
+                    .OrderBy(p => p.ActualPassives.Count)
+                    .ThenBy(p => PreferredLocationPruning.LocationOrderingOf(p.UnderlyingInstance.Location.Type))
+                    .ThenByDescending(p => p.UnderlyingInstance.IV_HP + p.UnderlyingInstance.IV_Shot + p.UnderlyingInstance.IV_Defense)
+                    .First()
                 )
+                // try to consolidate pals which are the same in every way that matters but are opposite genders
+                .GroupBy(p => allExceptGenderGroupFn(p))
+                .Select(g => g.ToList())
+                .SelectMany<List<OwnedPalReference>, IPalReference>(g =>
                 {
-                    // `passiveGroup` is a list of pals which have the same list of desired passives, though they can have varying numbers of undesired passives.
-                    // (there should be at most 2, due to the previous processing of `relevantPals` which would restrict this group to, at most, a male + female instance)
+                    // only one pal in this group, cant turn into a composite, keep as-is
+                    if (g.Count == 1) return g;
 
-                    if (passiveGroup.Count > 2) throw new NotImplementedException(); // shouldn't happen
+                    // shouldn't happen, at this point groups should have at most one male and at most one female
+                    if (g.Count != 2) throw new NotImplementedException();
 
-                    if (passiveGroup.Select(p => p.EffectivePassives.Count(t => t is RandomPassiveSkill)).Distinct().Count() == 1)
+                    var malePal = g.SingleOrDefault(p => p.Gender == PalGender.MALE);
+                    var femalePal = g.SingleOrDefault(p => p.Gender == PalGender.FEMALE);
+                    var composite = new CompositeOwnedPalReference(malePal, femalePal);
+
+                    // the pals are practically the same aside from gender, i.e. they satisfy all the same requirements, but they could
+                    // still have different numbers of irrelevant passives.
+                    //
+                    // if they're *really* the same in all aspects, we can just merge them, otherwise we can merge but
+                    // should still keep track of the original pals
+
+                    // (note - these pals weren't combined in earlier groupings since PalProperty.RelevantPassives is intentionally used
+                    //         instead of EffectivePassives or ActualPassives)
+                    if (malePal.EffectivePassivesHash == femalePal.EffectivePassivesHash)
                     {
-                        // all pals in this group have the same number of irrelevant passives
-                        if (passiveGroup.Count == 1)
-                        {
-                            // only one pal, cant turn into a composite
-                            initialContent.Add(passiveGroup.Single());
-                        }
-                        else if (passiveGroup.Count == 2)
-                        {
-                            // two pals with the same desired passives and number of irrelevant passives, treat as a wildcard (composite)
-                            initialContent.Add(
-                                new CompositeOwnedPalReference(passiveGroup[0], passiveGroup[1])
-                            );
-                        }
+                        return [composite];
                     }
                     else
                     {
-                        // (can only happen if there are two pals in this group)
-
-                        // male and female have matching desired passives but a different number of irrelevant passives, add them each as individual
-                        // options but also allow their combination to be used as a wildcard (passives of the combination will use the "worst-case"
-                        // option, i.e. one with no irrelevant and the other with two irrelevant, the composite will have two irrelevant
-
-                        initialContent.Add(passiveGroup[0]);
-                        initialContent.Add(passiveGroup[1]);
-
-                        initialContent.Add(new CompositeOwnedPalReference(passiveGroup[0], passiveGroup[1]));
+                        return [
+                            malePal,
+                            femalePal,
+                            composite
+                        ];
                     }
-                }
-            }
+                })
+                .ToList();
 
             if (maxWildPals > 0)
             {
                 // add wild pals with varying number of random passives
                 initialContent.AddRange(
                     allowedWildPals
-                        .Where(p => !relevantPals.Any(i => i.Pal == p))
+                        .Where(p => !ownedPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, maxBreedingSteps))
                         .SelectMany(p =>
                             Enumerable
@@ -482,12 +581,13 @@ namespace PalCalc.Solver
                 );
             }
 
-            var workingSet = new WorkingSet(spec, pruningBuilder, initialContent, maxThreads, token);
+            var workingSet = new WorkingSet(spec, pruningBuilder, initialContent, maxThreads, controller.CancellationToken);
 
             for (int s = 0; s < maxSolverIterations; s++)
             {
-                if (token.IsCancellationRequested) break;
+                if (controller.CancellationToken.IsCancellationRequested) break;
 
+                var wotByPalId = db.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, TimeSpan>());
                 List<WorkBatchProgress> progressEntries = [];
 
                 bool didUpdate = workingSet.Process(work =>
@@ -496,7 +596,7 @@ namespace PalCalc.Solver
 
                     statusMsg.CurrentPhase = SolverPhase.Breeding;
                     statusMsg.CurrentStepIndex = s;
-                    statusMsg.Canceled = token.IsCancellationRequested;
+                    statusMsg.Canceled = controller.CancellationToken.IsCancellationRequested;
                     statusMsg.CurrentWorkSize = work.Count;
                     statusMsg.WorkProcessedCount = 0;
                     SolverStateUpdated?.Invoke(statusMsg);
@@ -508,6 +608,7 @@ namespace PalCalc.Solver
                             var progress = progressEntries.Sum(e => e.NumProcessed);
                             statusMsg.WorkProcessedCount = progress;
                         }
+                        statusMsg.Paused = controller.Pause;
                         SolverStateUpdated?.Invoke(statusMsg);
                     }
 
@@ -515,7 +616,7 @@ namespace PalCalc.Solver
                     var progressTimer = new Timer(EmitProgressMsg, null, updateInterval, updateInterval);
 
                     var resEnum = work
-                        .Batched(work.Count / maxThreads + 1)
+                        .BatchedForParallel()
                         .AsParallel()
                         .WithDegreeOfParallelism(maxThreads)
                         .SelectMany(workBatch =>
@@ -525,8 +626,15 @@ namespace PalCalc.Solver
                                 progressEntries.Add(progress);
 
                             return workBatch
+                                .Tap(_ =>
+                                {
+                                    while (controller.Pause)
+                                    {
+                                        Thread.Sleep(1);
+                                    }
+                                })
                                 .Tap(_ => progress.NumProcessed++)
-                                .TakeWhile(_ => !token.IsCancellationRequested)
+                                .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)
                                 .Where(p => p.Item1.IsCompatibleGender(p.Item2.Gender))
                                 .Where(p => p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() <= maxWildPals)
                                 .Where(p => p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps < maxBreedingSteps)
@@ -549,10 +657,12 @@ namespace PalCalc.Solver
 
                                     var combinedPassives = p.Item1.EffectivePassives.Concat(p.Item2.EffectivePassives);
 
-                                    var anyRelevantFromParents = combinedPassives.Intersect(spec.DesiredPassives).Any();
-                                    var anyIrrelevantFromParents = combinedPassives.Except(spec.DesiredPassives).Any();
-
-                                    return anyRelevantFromParents || !anyIrrelevantFromParents;
+                                    return (
+                                        // any relevant from parents?
+                                        combinedPassives.Intersect(spec.DesiredPassives).Any() ||
+                                        // no irrelevant passives from parents?
+                                        !combinedPassives.Except(spec.DesiredPassives).Any()
+                                    );
                                 })
                                 .SelectMany(p =>
                                 {
@@ -561,7 +671,7 @@ namespace PalCalc.Solver
                                     // if both parents are wildcards, go through the list of possible gender-specific breeding results
                                     // and modify the parent genders to cover each possible child
 
-#if DEBUG
+#if DEBUG && DEBUG_CHECKS
                                     // (shouldn't happen)
 
                                     if (parent1.Gender == PalGender.OPPOSITE_WILDCARD || parent2.Gender == PalGender.OPPOSITE_WILDCARD)
@@ -604,13 +714,44 @@ namespace PalCalc.Solver
                                 {
                                     var (parent1, parent2) = p;
 
-                                    var parentPassives = parent1.EffectivePassives.Concat(parent2.EffectivePassives).Distinct().ToList();
+#if DEBUG && DEBUG_CHECKS
+                                    if (
+                                        // if either parent is a wildcard
+                                        (parent1.Gender == PalGender.WILDCARD || parent2.Gender == PalGender.WILDCARD) &&
+                                        // the other parent must be an opposite-wildcard
+                                        (parent1.Gender != PalGender.OPPOSITE_WILDCARD && parent2.Gender != PalGender.OPPOSITE_WILDCARD)
+                                    ) Debugger.Break();
+#endif
+
+                                    var parentPassives = parent1.EffectivePassives.Concat(parent2.EffectivePassives).Distinct().ToArray();
                                     var possibleResults = new List<IPalReference>();
 
                                     var passiveSkillPerms = PassiveSkillPermutations(
                                         spec.RequiredPassives.Intersect(parentPassives).ToList(),
                                         spec.OptionalPassives.Intersect(parentPassives).ToList()
-                                    ).Select(p => p.ToList()).ToList();
+                                    ).Select(p => p.ToArray()).ToArray();
+
+                                    var ivsProbability = ProbabilityInheritedTargetIVs(
+                                        parent1.IV_HP, parent1.IV_Attack, parent1.IV_Defense,
+                                        parent2.IV_HP, parent2.IV_Attack, parent2.IV_Defense
+                                    );
+
+                                    IV_IValue MergeIVs(IV_IValue a, IV_IValue b) =>
+                                        (a, b) switch
+                                        {
+                                            (IV_IValue, IV_IValue) when a.IsRelevant && !b.IsRelevant => a,
+                                            (IV_IValue, IV_IValue) when !a.IsRelevant && b.IsRelevant => b,
+
+                                            (IV_IValue, IV_Random) => a,
+                                            (IV_Random, IV_IValue) => b,
+
+                                            (IV_Range va, IV_Range vb) => IV_Range.Merge(va, vb),
+                                            _ => throw new NotImplementedException()
+                                        };
+
+                                    var finalHp = MergeIVs(parent1.IV_HP, parent2.IV_HP);
+                                    var finalAttack = MergeIVs(parent1.IV_Attack, parent2.IV_Attack);
+                                    var finalDefense = MergeIVs(parent1.IV_Defense, parent2.IV_Defense);
 
                                     foreach (var targetPassives in passiveSkillPerms)
                                     {
@@ -621,7 +762,7 @@ namespace PalCalc.Solver
                                         // option represents the likelyhood of getting all desired passives + up to some number of irrelevant passives
                                         var probabilityForUpToNumPassives = 0.0f;
 
-                                        for (int numFinalPassives = targetPassives.Count; numFinalPassives <= Math.Min(GameConstants.MaxTotalPassives, targetPassives.Count + maxBredIrrelevantPassives); numFinalPassives++)
+                                        for (int numFinalPassives = targetPassives.Length; numFinalPassives <= Math.Min(GameConstants.MaxTotalPassives, targetPassives.Length + maxBredIrrelevantPassives); numFinalPassives++)
                                         {
 #if DEBUG && DEBUG_CHECKS
                                             float initialProbability = probabilityForUpToNumPassives;
@@ -652,13 +793,36 @@ namespace PalCalc.Solver
                                                 parent1,
                                                 parent2,
                                                 newPassives,
-                                                probabilityForUpToNumPassives
+                                                probabilityForUpToNumPassives,
+                                                finalHp,
+                                                finalAttack,
+                                                finalDefense,
+                                                ivsProbability
                                             );
+
+                                            var workingOptimalTimes = wotByPalId[res.Pal.Id];
 
                                             if (!bannedBredPals.Contains(res.Pal))
                                             {
-                                                if (res.BreedingEffort <= maxEffort && (spec.IsSatisfiedBy(res) || workingSet.IsOptimal(res)))
-                                                    possibleResults.Add(res);
+                                                var effort = res.BreedingEffort;
+                                                if (effort <= maxEffort && (spec.IsSatisfiedBy(res) || workingSet.IsOptimal(res)))
+                                                {
+                                                    var resultId = WorkingSet.DefaultGroupFn(res);
+
+                                                    bool updated = workingOptimalTimes.TryAdd(resultId, effort);
+                                                    while (!updated)
+                                                    {
+                                                        var v = workingOptimalTimes[resultId];
+                                                        if (v < effort) break;
+
+                                                        updated = workingOptimalTimes.TryUpdate(resultId, effort, v);
+                                                    }
+
+                                                    if (updated)
+                                                    {
+                                                        possibleResults.Add(res);
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -675,7 +839,7 @@ namespace PalCalc.Solver
                     return res;
                 });
 
-                if (token.IsCancellationRequested) break;
+                if (controller.CancellationToken.IsCancellationRequested) break;
 
                 lock(progressEntries)
                     statusMsg.WorkProcessedCount = progressEntries.Sum(e => e.NumProcessed);
@@ -689,7 +853,7 @@ namespace PalCalc.Solver
                 }
             }
 
-            statusMsg.Canceled = token.IsCancellationRequested;
+            statusMsg.Canceled = controller.CancellationToken.IsCancellationRequested;
             statusMsg.CurrentPhase = SolverPhase.Finished;
             SolverStateUpdated?.Invoke(statusMsg);
 

@@ -27,12 +27,14 @@ namespace PalCalc.Solver.ResultPruning
                 new List<IResultPruning>()
                 {
                     new MinimumEffortPruning(token),
+                    new OptimalIVsPruning(token, maxIvDifference: 10),
                     new MinimumBreedingStepsPruning(token),
                     new PreferredLocationPruning(token),
                     new MinimumReusePruning(token),
                     new MinimumWildPalsPruning(token),
                     new MinimumReferencedPlayersPruning(token),
                     new VariedResultsPruning(token, maxSimilarityPercent: 0.1f),
+                    // TODO - revert? add a separate limit to avoid excessive work size?
                     new ResultLimitPruning(token, maxResults: 3),
                 }
         );

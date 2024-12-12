@@ -20,6 +20,10 @@ namespace PalCalc.Solver.PalReference
         List<PassiveSkill> EffectivePassives { get; }
         int EffectivePassivesHash { get; } // optimization
 
+        IV_IValue IV_HP { get; }
+        IV_IValue IV_Attack { get; }
+        IV_IValue IV_Defense { get; }
+
         List<PassiveSkill> ActualPassives { get; }
 
         PalGender Gender { get; }

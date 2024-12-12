@@ -26,10 +26,16 @@ namespace PalCalc.UI.View.Main
         }
 
         public event Action OnRun;
+        public event Action OnPause;
+        public event Action OnResume;
         public event Action OnCancel;
 
         private void Run_Click(object sender, RoutedEventArgs e) => OnRun?.Invoke();
 
         private void Cancel_Click(object sender, RoutedEventArgs e) => OnCancel?.Invoke();
+
+        private void Pause_Click(object sender, RoutedEventArgs e) => OnPause?.Invoke();
+
+        private void Resume_Click(object sender, RoutedEventArgs e) => OnResume?.Invoke();
     }
 }

@@ -38,10 +38,16 @@ namespace PalCalc.UI.ViewModel
         private Dictionary<ISaveGame, PalTargetListViewModel> targetsBySaveFile;
         private LoadingSaveFileModal loadingSaveModal = null;
         private Dispatcher dispatcher;
-        private CancellationTokenSource solverTokenSource;
         private AppSettings settings;
         private PassiveSkillsPresetCollectionViewModel passivePresets;
         private IRelayCommand<PalSpecifierViewModel> deletePalTargetCommand;
+        private SolverJob currentJob;
+
+        private record class SolverJob(
+            CancellationTokenSource TokenSource,
+            SolverStateController SolverController,
+            MemoryMonitor MemoryMonitor
+        );
 
         public List<TranslationLocaleViewModel> Locales { get; } =
             Enum
@@ -424,10 +430,32 @@ namespace PalCalc.UI.ViewModel
             {
                 try
                 {
-                    dispatcher.Invoke(() => IsEditable = false);
+                    dispatcher.Invoke(() =>
+                    {
+                        IsEditable = false;
+                        SolverControls.CurrentSolverState = SolverState.Running;
+                    });
 
-                    solverTokenSource = new CancellationTokenSource();
-                    var results = solver.SolveFor(currentSpec, solverTokenSource.Token);
+                    var solverTokenSource2 = new CancellationTokenSource();
+
+                    currentJob = new SolverJob(
+                        solverTokenSource2,
+                        new SolverStateController() { CancellationToken = solverTokenSource2.Token },
+                        new MemoryMonitor(solverTokenSource2.Token) { PauseNotices = true }
+                    );
+
+                    // monitor memory usage and pause if we take up a significant amount
+                    currentJob.MemoryMonitor.MemoryWarning += MemoryMonitor_MemoryWarning;
+
+                    List<IPalReference> results;
+                    try
+                    {
+                        results = solver.SolveFor(currentSpec, currentJob.SolverController);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        results = [];
+                    }
 
                     // general simplification pass, get the best result for each potentially
                     // interesting combination of result properties
@@ -437,7 +465,7 @@ namespace PalCalc.UI.ViewModel
                         p => p.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
                     ));
                     resultsTable.AddRange(results);
-                    resultsTable.FilterAll(PruningRulesBuilder.Default, solverTokenSource.Token);
+                    resultsTable.FilterAll(PruningRulesBuilder.Default, currentJob.TokenSource.Token);
 
                     // final simplification pass, ignore any results which are over 2x the effort of the fastest option
                     resultsTable = resultsTable.BuildNew(PalProperty.Combine(
@@ -460,9 +488,13 @@ namespace PalCalc.UI.ViewModel
 
                     results = resultsTable.All.ToList();
 
+                    //// force memory cleanup if we're using a significant amount
+                    //if (MemoryMonitor.ProcessMemory > MemoryMonitor.TotalSystemMemory / 3)
+                    //    GC.Collect(generation: 2, GCCollectionMode.Forced, blocking: true, compacting: true);
+
                     dispatcher.Invoke(() =>
                     {
-                        if (!solverTokenSource.IsCancellationRequested)
+                        if (!currentJob.TokenSource.IsCancellationRequested)
                         {
                             PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(cachedData, r)).ToList() };
                             if (PalTarget.InitialPalSpecifier == null)
@@ -485,7 +517,11 @@ namespace PalCalc.UI.ViewModel
                             UpdatePalTarget();
                         }
 
-                        solverTokenSource = null;
+                        currentJob.TokenSource.Dispose();
+                        currentJob?.MemoryMonitor?.Dispose();
+                        currentJob = null;
+
+                        SolverControls.CurrentSolverState = SolverState.Idle;
                         IsEditable = true;
                     });
                 }
@@ -503,21 +539,70 @@ namespace PalCalc.UI.ViewModel
             solverThread.Start();
         }
 
+        private void MemoryMonitor_MemoryWarning()
+        {
+            currentJob.SolverController.Pause = true;
+            currentJob.MemoryMonitor.PauseNotices = true;
+
+            dispatcher.BeginInvoke(() =>
+            {
+                var response = MessageBox.Show(
+                    owner: App.Current.MainWindow,
+                    messageBoxText: "Notice: The solver has been temporarily paused since the system is low on memory. Work will resume once this message has closed.\n\nWould you like to ignore future warnings for this run?",
+                    caption: "Memory Warning!",
+                    button: MessageBoxButton.YesNoCancel
+                );
+
+                switch (response)
+                {
+                    case MessageBoxResult.Yes:
+                        currentJob.MemoryMonitor.Dispose();
+                        break;
+
+                    case MessageBoxResult.No:
+                        break;
+
+                    default:
+                        CancelSolver();
+                        break;
+                }
+
+                if (currentJob?.SolverController != null)
+                    currentJob.SolverController.Pause = false;
+            });
+        }
+
         public void CancelSolver()
         {
-            if (solverTokenSource != null)
+            if (currentJob != null)
             {
-                solverTokenSource.Cancel();
+                currentJob?.TokenSource?.Cancel();
+                currentJob.SolverController.Pause = false;
             }
         }
 
+        public void PauseSolver()
+        {
+            if (currentJob != null)
+                currentJob.SolverController.Pause = true;
+        }
+
+        public void ResumeSolver()
+        {
+            if (currentJob != null)
+                currentJob.SolverController.Pause = false;
+        }
+
         private Stopwatch solverStopwatch = null;
+        private int lastStepIndex = -1;
         private void Solver_SolverStateUpdated(SolverStatus obj)
         {
             string FormatNum(int num) => num.ToString("#,##");
 
             dispatcher.BeginInvoke(() =>
             {
+                SolverControls.CurrentSolverState = obj.Paused ? SolverState.Paused : SolverState.Running;
+
                 var numTotalSteps = (double)(1 + obj.TargetSteps);
                 int overallStep = 0;
                 switch (obj.CurrentPhase)
@@ -526,6 +611,9 @@ namespace PalCalc.UI.ViewModel
                         solverStopwatch = Stopwatch.StartNew();
                         SolverStatusMsg = LocalizationCodes.LV_SOLVER_STATUS_INITIALIZING.Bind();
                         overallStep = 0;
+                        lastStepIndex = -1;
+
+                        currentJob.MemoryMonitor.PauseNotices = false;
 
                         StepProgress = 0;
                         StepStatusMsg = null;
@@ -545,6 +633,12 @@ namespace PalCalc.UI.ViewModel
                         StepStatusMsg = LocalizationCodes.LC_SOLVER_STEP_STATUS_BREEDING.Bind(
                             new { NumProcessed = FormatNum(obj.WorkProcessedCount), WorkSize = FormatNum(obj.CurrentWorkSize) }
                         );
+
+                        if (obj.CurrentStepIndex != lastStepIndex)
+                        {
+                            currentJob.MemoryMonitor.PauseNotices = false;
+                            lastStepIndex = obj.CurrentStepIndex;
+                        }
                         break;
 
                     case SolverPhase.Finished:
@@ -579,9 +673,10 @@ namespace PalCalc.UI.ViewModel
         private bool showNoResultsNotice = false;
         private void UpdateSolverControls()
         {
-            SolverControls.CanRunSolver = IsEditable && PalTarget != null && PalTarget.IsValid;
-            SolverControls.CanEditSettings = IsEditable;
-            SolverControls.CanCancelSolver = !IsEditable;
+            SolverControls.IsValidConfig = PalTarget?.IsValid == true;
+            //SolverControls.CanRunSolver = IsEditable && PalTarget != null && PalTarget.IsValid;
+            //SolverControls.CanEditSettings = IsEditable;
+            //SolverControls.CanCancelSolver = !IsEditable;
         }
 
         private PalTargetViewModel palTarget;

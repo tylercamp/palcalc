@@ -18,9 +18,12 @@ namespace PalCalc.Solver
         public static GroupIdFn WildPalCount = p => p.NumWildPalParticipants();
         public static GroupIdFn NumBreedingSteps = p => p.NumTotalBreedingSteps;
         public static GroupIdFn EffectivePassives = p => p.EffectivePassivesHash;
+        public static GroupIdFn RelevantPassives = p => p.ActualPassives.Intersect(p.EffectivePassives).SetHash();
         public static GroupIdFn ActualPassives = p => p.ActualPassives.SetHash();
         public static GroupIdFn TotalEffort = p => p.BreedingEffort.GetHashCode();
         public static GroupIdFn LocationType = p => p.Location.GetType().GetHashCode();
+        public static GroupIdFn IvRelevance = p => HashCode.Combine(p.IV_HP.IsRelevant, p.IV_Attack.IsRelevant, p.IV_Defense.IsRelevant);
+        public static GroupIdFn IvExact = p => HashCode.Combine(p.IV_HP, p.IV_Attack, p.IV_Defense);
 
         /// <summary>
         /// Makes a grouping function based on the result of applying `mainFn` to all
@@ -45,7 +48,14 @@ namespace PalCalc.Solver
 
     public class PalPropertyGrouping(PalProperty.GroupIdFn groupIdFn)
     {
+        private PalProperty.GroupIdFn groupIdFn = groupIdFn;
         private Dictionary<int, List<IPalReference>> content = new Dictionary<int, List<IPalReference>>();
+
+        public PalPropertyGrouping(PalPropertyGrouping src) : this(src.groupIdFn)
+        {
+            content = src.content.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToList());
+        }
+
         public void Add(IPalReference p)
         {
             var groupId = groupIdFn(p);
