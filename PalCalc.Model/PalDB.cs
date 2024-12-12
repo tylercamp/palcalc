@@ -38,117 +38,64 @@ namespace PalCalc.Model
         // 
         // there can be multiple breeding results depending on the genders of the parents (namely for Wixen and Kativa)
         private IReadOnlyDictionary<Pal, IReadOnlyDictionary<Pal, BreedingResult[]>> breedingByParent;
-        private IReadOnlyDictionary<Pal, IReadOnlyDictionary<Pal, BreedingResult[]>> MakeBreedingByParent()
-        {
-            return Breeding
-                        .SelectMany(breed => breed.Parents.Select(parent1 => (parent1.Pal, breed))) // List<(parent, breeding)>
-                        .GroupBy(p => p.Pal)
-                        .ToDictionary(
-                            g => g.Key,
-                            g => g.Distinct()
-                                .GroupBy(p => p.breed.OtherParent(g.Key).Pal)
-                                .ToDictionary(g2 => g2.Key, g2 => g2.Select(p => p.breed).ToArray())
-                                .ToFrozenDictionary() as IReadOnlyDictionary<Pal, BreedingResult[]>
-                        );
-        }
-        public IReadOnlyDictionary<Pal, IReadOnlyDictionary<Pal, BreedingResult[]>> BreedingByParent
-        {
-            get
-            {
-                if (breedingByParent == null)
-                {
-                    breedingByParent = MakeBreedingByParent();
-                }
-                return breedingByParent;
-            }
-        }
+        public IReadOnlyDictionary<Pal, IReadOnlyDictionary<Pal, BreedingResult[]>> BreedingByParent =>
+            breedingByParent ??= Breeding
+                .SelectMany(breed => breed.Parents.Select(parent1 => (parent1.Pal, breed))) // List<(parent, breeding)>
+                .GroupBy(p => p.Pal)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Distinct()
+                        .GroupBy(p => p.breed.OtherParent(g.Key).Pal)
+                        .ToDictionary(g2 => g2.Key, g2 => g2.Select(p => p.breed).ToArray())
+                        .ToFrozenDictionary() as IReadOnlyDictionary<Pal, BreedingResult[]>
+                );
 
         // Map[Child, Map[Parent1, List<Parent2>]]
         private Dictionary<Pal, Dictionary<GenderedPal, List<GenderedPal>>> breedingByChild;
-        public Dictionary<Pal, Dictionary<GenderedPal, List<GenderedPal>>> BreedingByChild
-        {
-            get
-            {
-                if (breedingByChild == null)
-                {
-                    breedingByChild =
-                        Breeding
-                            .GroupBy(b => b.Child)
-                            .ToDictionary(
-                                g => g.Key,
-                                g => g.SelectMany(b => b.Parents.Select(p1 => (p1, b))).GroupBy(p => p.p1).ToDictionary(
-                                    g => g.Key,
-                                    g => g.Select(p => p.b.OtherParent(g.Key)).Distinct().ToList()
-                                )
-                            );
-                }
-                return breedingByChild;
-            }
-        }
+        public Dictionary<Pal, Dictionary<GenderedPal, List<GenderedPal>>> BreedingByChild =>
+            breedingByChild ??= Breeding
+                .GroupBy(b => b.Child)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.SelectMany(b => b.Parents.Select(p1 => (p1, b))).GroupBy(p => p.p1).ToDictionary(
+                        g => g.Key,
+                        g => g.Select(p => p.b.OtherParent(g.Key)).Distinct().ToList()
+                    )
+                );
 
         private Dictionary<Pal, PalGender> breedingMostLikelyGender;
-        public Dictionary<Pal, PalGender> BreedingMostLikelyGender
-        {
-            get
-            {
-                if (breedingMostLikelyGender == null)
+        public Dictionary<Pal, PalGender> BreedingMostLikelyGender =>
+            breedingMostLikelyGender ??= Pals.ToDictionary(
+                p => p,
+                p =>
                 {
-                    breedingMostLikelyGender = Pals.ToDictionary(
-                        p => p,
-                        p =>
-                        {
-                            var genderProbability = BreedingGenderProbability[p];
-                            var maleProbability = genderProbability[PalGender.MALE];
-                            var femaleProbability = genderProbability[PalGender.FEMALE];
+                    var genderProbability = BreedingGenderProbability[p];
+                    var maleProbability = genderProbability[PalGender.MALE];
+                    var femaleProbability = genderProbability[PalGender.FEMALE];
 
-                            if (maleProbability > femaleProbability) return PalGender.MALE;
-                            else if (femaleProbability > maleProbability) return PalGender.FEMALE;
-                            else return PalGender.WILDCARD;
-                        }
-                    );
+                    if (maleProbability > femaleProbability) return PalGender.MALE;
+                    else if (femaleProbability > maleProbability) return PalGender.FEMALE;
+                    else return PalGender.WILDCARD;
                 }
-
-                return breedingMostLikelyGender;
-            }
-        }
+            );
 
 
         private Dictionary<Pal, PalGender> breedingLeastLikelyGender;
-        public Dictionary<Pal, PalGender> BreedingLeastLikelyGender
-        {
-            get
-            {
-                if (breedingLeastLikelyGender == null)
+        public Dictionary<Pal, PalGender> BreedingLeastLikelyGender =>
+            breedingLeastLikelyGender ??= BreedingMostLikelyGender.ToDictionary(
+                kvp => kvp.Key,
+                kvp =>
                 {
-                    breedingLeastLikelyGender = BreedingMostLikelyGender.ToDictionary(
-                        kvp => kvp.Key,
-                        kvp =>
-                        {
-                            if (kvp.Value == PalGender.WILDCARD) return PalGender.WILDCARD;
-                            else if (kvp.Value == PalGender.MALE) return PalGender.FEMALE;
-                            else return PalGender.MALE;
-                        }
-                    );
+                    if (kvp.Value == PalGender.WILDCARD) return PalGender.WILDCARD;
+                    else if (kvp.Value == PalGender.MALE) return PalGender.FEMALE;
+                    else return PalGender.MALE;
                 }
-
-                return breedingLeastLikelyGender;
-            }
-        }
+            );
 
 
         private Dictionary<string, PassiveSkill> passiveSkillsByName;
-        public Dictionary<string, PassiveSkill> PassiveSkillsByName
-        {
-            get
-            {
-                if (passiveSkillsByName == null)
-                {
-                    passiveSkillsByName = PassiveSkills.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
-                }
-
-                return passiveSkillsByName;
-            }
-        }
+        public Dictionary<string, PassiveSkill> PassiveSkillsByName =>
+            passiveSkillsByName ??= PassiveSkills.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
 
         private static ILogger logger = Log.ForContext<PalDB>();
 
