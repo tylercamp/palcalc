@@ -134,11 +134,23 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMMON_IV_ATTACK_SHORT,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMMON_IV_DEFENSE,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMMON_IV_DEFENSE_SHORT,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMMON_IV_HP,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMMON_IV_HP_SHORT,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

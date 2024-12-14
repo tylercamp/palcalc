@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:PalCalc.UI.View.Pal"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              mc:Ignorable="d" 
              d:DesignHeight="208.272" d:DesignWidth="766.148">
     <UserControl.Resources>
@@ -27,7 +28,7 @@
             Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
             Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Converter={StaticResource RTOC}}"
         >
-            <Label>HP</Label>
+            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_HP_SHORT}" />
             <ContentPresenter
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Mode=OneWay}"
                 VerticalAlignment="Center"
@@ -38,7 +39,7 @@
             Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
             Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Converter={StaticResource RTOC}}"
         >
-            <Label>ATK</Label>
+            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK_SHORT}" />
             <ContentPresenter
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Mode=OneWay}"
                 VerticalAlignment="Center"
@@ -49,7 +50,7 @@
             Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
             Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Converter={StaticResource RTOC}}"
         >
-            <Label>DEF</Label>
+            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE_SHORT}" />
             <ContentPresenter
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Mode=OneWay}"
                 VerticalAlignment="Center"

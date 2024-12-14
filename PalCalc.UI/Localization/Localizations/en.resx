@@ -172,10 +172,19 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_COMMON_IV_ATTACK" xml:space="preserve">
     <value>Attack</value>
   </data>
+  <data name="LC_COMMON_IV_ATTACK_SHORT" xml:space="preserve">
+    <value>ATK</value>
+  </data>
   <data name="LC_COMMON_IV_DEFENSE" xml:space="preserve">
     <value>Defense</value>
   </data>
+  <data name="LC_COMMON_IV_DEFENSE_SHORT" xml:space="preserve">
+    <value>DEF</value>
+  </data>
   <data name="LC_COMMON_IV_HP" xml:space="preserve">
+    <value>HP</value>
+  </data>
+  <data name="LC_COMMON_IV_HP_SHORT" xml:space="preserve">
     <value>HP</value>
   </data>
   <data name="LC_COMMON_LEVEL" xml:space="preserve">
