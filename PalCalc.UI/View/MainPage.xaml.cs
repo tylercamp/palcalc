@@ -44,33 +44,6 @@ namespace PalCalc.UI
 
         private MainWindowViewModel ViewModel => DataContext as MainWindowViewModel;
 
-        private void SolverControlsView_OnRun()
-        {
-            ViewModel.RunSolver();
-        }
-
-        private void SolverControlsView_OnCancel()
-        {
-            ViewModel.CancelSolver();
-        }
-
-        private void SolverControlsView_OnPause()
-        {
-            ViewModel.PauseSolver();
-        }
-
-        private void SolverControlsView_OnResume()
-        {
-            ViewModel.ResumeSolver();
-        }
-
-        //protected override void OnClosing(CancelEventArgs e)
-        //{
-        //    base.OnClosing(e);
-
-        //    ViewModel.CancelSolver();
-        //}
-
         private void AboutButton_Click(object sender, RoutedEventArgs e)
         {
             var window = new AboutWindow();

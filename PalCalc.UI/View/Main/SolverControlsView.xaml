@@ -8,7 +8,7 @@
            xmlns:itl="clr-namespace:PalCalc.UI.Localization"
            mc:Ignorable="d" 
            Orientation="Horizontal"
-           d:DataContext="{d:DesignInstance vm:SolverControlsViewModel, IsDesignTimeCreatable=True}"
+           d:DataContext="{x:Static vm:SolverControlsViewModel.DesignerInstance}"
            d:Background="White"
            d:DesignWidth="1000.621">
     <WrapPanel.Resources>
@@ -165,15 +165,15 @@
         <DockPanel Grid.Row="4" Grid.ColumnSpan="99">
             <DockPanel.Resources>
                 <DataTemplate x:Key="RunButtonTemplate">
-                    <Button Content="{itl:LocalizedText LC_SOLVER_RUN}" Click="Run_Click" HorizontalAlignment="Left" IsEnabled="{Binding CanRunSolver}" />
+                    <Button Content="{itl:LocalizedText LC_SOLVER_RUN}" Command="{Binding RunSolverCommand}" HorizontalAlignment="Left" IsEnabled="{Binding CanRunSolver}" />
                 </DataTemplate>
 
                 <DataTemplate x:Key="PauseButtonTemplate">
-                    <Button Content="Pause" Click="Pause_Click" HorizontalAlignment="Left" />
+                    <Button Content="Pause" Command="{Binding PauseSolverCommand}" HorizontalAlignment="Left" />
                 </DataTemplate>
 
                 <DataTemplate x:Key="ResumeButtonTemplate">
-                    <Button Content="Resume" Click="Resume_Click" HorizontalAlignment="Left" />
+                    <Button Content="Resume" Command="{Binding ResumeSolverCommand}" HorizontalAlignment="Left" />
                 </DataTemplate>
 
                 <Style x:Key="ContentPresenterTemplate" TargetType="ContentPresenter">
@@ -191,7 +191,7 @@
                 </Style>
             </DockPanel.Resources>
             
-            <Button DockPanel.Dock="Right" Content="{itl:LocalizedText LC_COMMON_CANCEL}" Click="Cancel_Click" IsEnabled="{Binding CanCancelSolver}" />
+            <Button DockPanel.Dock="Right" Content="{itl:LocalizedText LC_COMMON_CANCEL}" Command="{Binding CancelSolverCommand}" IsEnabled="{Binding CanCancelSolver}" />
 
             <ContentPresenter Style="{StaticResource ContentPresenterTemplate}" Content="{Binding}" />
         </DockPanel>

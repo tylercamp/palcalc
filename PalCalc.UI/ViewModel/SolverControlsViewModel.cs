@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace PalCalc.UI.ViewModel
 {
@@ -23,7 +24,14 @@ namespace PalCalc.UI.ViewModel
 
     public partial class SolverControlsViewModel : ObservableObject
     {
-        public SolverControlsViewModel()
+        public static SolverControlsViewModel DesignerInstance { get; } = new SolverControlsViewModel(null, null, null, null);
+
+        public SolverControlsViewModel(
+            ICommand runSolverCommand,
+            ICommand cancelSolverCommand,
+            ICommand pauseSolverCommand,
+            ICommand resumeSolverCommand
+        )
         {
             MaxBreedingSteps = 6;
             MaxWildPals = 1;
@@ -37,7 +45,8 @@ namespace PalCalc.UI.ViewModel
                     onCancel: null,
                     onSave: (palSelections) => BannedBredPals = palSelections.Where(kvp => !kvp.Value).Select(kvp => kvp.Key).ToList(),
                     initialState: PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => !BannedBredPals.Contains(p))
-                ) {
+                )
+                {
                     Title = LocalizationCodes.LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS.Bind()
                 };
                 window.Owner = App.Current.MainWindow;
@@ -51,12 +60,18 @@ namespace PalCalc.UI.ViewModel
                     onCancel: null,
                     onSave: (palSelections) => BannedWildPals = palSelections.Where(kvp => !kvp.Value).Select(kvp => kvp.Key).ToList(),
                     initialState: PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => !BannedWildPals.Contains(p))
-                ) {
+                )
+                {
                     Title = LocalizationCodes.LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS.Bind()
                 };
                 window.Owner = App.Current.MainWindow;
                 window.ShowDialog();
             });
+
+            RunSolverCommand = runSolverCommand;
+            CancelSolverCommand = cancelSolverCommand;
+            PauseSolverCommand = pauseSolverCommand;
+            ResumeSolverCommand = resumeSolverCommand;
         }
 
         private int maxBreedingSteps;
@@ -121,6 +136,11 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private SolverState currentSolverState;
 
+        public ICommand RunSolverCommand { get; }
+        public ICommand CancelSolverCommand { get; }
+        public ICommand PauseSolverCommand { get; }
+        public ICommand ResumeSolverCommand { get; }
+
         public bool CanRunSolver => IsValidConfig && CurrentSolverState == SolverState.Idle;
         public bool CanCancelSolver => CurrentSolverState != SolverState.Idle;
         public bool CanEditSettings => CurrentSolverState == SolverState.Idle;
@@ -162,17 +182,17 @@ namespace PalCalc.UI.ViewModel
             BannedWildPalInternalNames = BannedWildPals.Select(p => p.InternalName).ToList(),
         };
 
-        public static SolverControlsViewModel FromModel(SolverSettings model) => new SolverControlsViewModel()
+        public void CopyFrom(SolverSettings model)
         {
-            MaxBreedingSteps = model.MaxBreedingSteps,
-            MaxSolverIterations = model.MaxSolverIterations,
-            MaxWildPals = model.MaxWildPals,
-            MaxInputIrrelevantPassives = model.MaxInputIrrelevantPassives,
-            MaxBredIrrelevantPassives = model.MaxBredIrrelevantPassives,
-            MaxThreads = model.MaxThreads,
-            
-            BannedBredPals = model.BannedBredPals(PalDB.LoadEmbedded()),
-            BannedWildPals = model.BannedWildPals(PalDB.LoadEmbedded()),
-        };
+            MaxBreedingSteps = model.MaxBreedingSteps;
+            MaxSolverIterations = model.MaxSolverIterations;
+            MaxWildPals = model.MaxWildPals;
+            MaxInputIrrelevantPassives = model.MaxInputIrrelevantPassives;
+            MaxBredIrrelevantPassives = model.MaxBredIrrelevantPassives;
+            MaxThreads = model.MaxThreads;
+
+            BannedBredPals = model.BannedBredPals(PalDB.LoadEmbedded());
+            BannedWildPals = model.BannedWildPals(PalDB.LoadEmbedded());
+        }
     }
 }

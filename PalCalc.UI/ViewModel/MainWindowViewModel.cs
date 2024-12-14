@@ -49,6 +49,11 @@ namespace PalCalc.UI.ViewModel
             MemoryMonitor MemoryMonitor
         );
 
+        public ICommand RunSolverCommand { get; }
+        public ICommand PauseSolverCommand { get; }
+        public ICommand ResumeSolverCommand { get; }
+        public ICommand CancelSolverCommand { get; }
+
         public List<TranslationLocaleViewModel> Locales { get; } =
             Enum
                 .GetValues<TranslationLocale>()
@@ -97,7 +102,18 @@ namespace PalCalc.UI.ViewModel
 
             Storage.SaveAppSettings(settings);
 
-            SolverControls = SolverControlsViewModel.FromModel(settings.SolverSettings);
+            RunSolverCommand = new RelayCommand(RunSolver);
+            PauseSolverCommand = new RelayCommand(PauseSolver);
+            ResumeSolverCommand = new RelayCommand(ResumeSolver);
+            CancelSolverCommand = new RelayCommand(CancelSolver);
+
+            SolverControls = new SolverControlsViewModel(
+                runSolverCommand: RunSolverCommand,
+                cancelSolverCommand: CancelSolverCommand,
+                pauseSolverCommand: PauseSolverCommand,
+                resumeSolverCommand: ResumeSolverCommand
+            );
+            SolverControls.CopyFrom(settings.SolverSettings);
             SolverControls.PropertyChanged += (s, e) =>
             {
                 settings.SolverSettings = SolverControls.AsModel;
@@ -404,7 +420,7 @@ namespace PalCalc.UI.ViewModel
             File.WriteAllText(outputFile, JsonConvert.SerializeObject(list, converter));
         }
 
-        public void RunSolver()
+        private void RunSolver()
         {
             var currentSpec = PalTarget?.CurrentPalSpecifier?.ModelObject;
             if (currentSpec == null) return;
@@ -573,18 +589,18 @@ namespace PalCalc.UI.ViewModel
             });
         }
 
-        public void CancelSolver()
+        private void CancelSolver()
         {
             currentJob?.TokenSource?.Cancel();
             currentJob?.SolverController?.Resume();
         }
 
-        public void PauseSolver()
+        private void PauseSolver()
         {
             currentJob?.SolverController?.Pause();
         }
 
-        public void ResumeSolver()
+        private void ResumeSolver()
         {
             currentJob?.SolverController?.Resume();
         }
