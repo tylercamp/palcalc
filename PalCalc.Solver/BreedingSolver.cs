@@ -59,17 +59,6 @@ namespace PalCalc.Solver
     {
         private static ILogger logger = Log.ForContext<BreedingSolver>();
 
-        /// <summary>
-        /// `n` Choose `k`
-        /// </summary>
-        static int Choose(int n, int k) => PascalsTriangle.Instance[n - 1][k - 1];
-
-        static IV_Range MakeIV(int minValue, int value) =>
-            new(
-                isRelevant: minValue != 0 && value >= minValue,
-                value: value
-            );
-
         GameSettings gameSettings;
         PalDB db;
         List<PalInstance> ownedPals;
@@ -80,12 +69,6 @@ namespace PalCalc.Solver
         TimeSpan maxEffort;
         PruningRulesBuilder pruningBuilder;
         int maxThreads;
-
-        // https://github.com/tylercamp/palcalc/issues/22#issuecomment-2509171056
-        // [NumDesired - 1]
-        // eg if there's 1 specific type of IV we want, then ivDP[0] gives the probability of getting that IV
-        // (not including 50/50 chance of inheriting from specific parent)
-        float[] ivDesiredProbabilities;
 
         /// <param name="db"></param>
         /// <param name="ownedPals"></param>
@@ -128,63 +111,6 @@ namespace PalCalc.Solver
             this.maxBredIrrelevantPassives = Math.Min(3, maxBredIrrelevantPassives);
             this.maxEffort = maxEffort;
             this.maxThreads = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
-
-            // for IV inheritance there's the probability of:
-            //
-            // 1. the chance of inheriting exactly N IVs
-            // 2. the chance of those IVs being what we want
-
-            // (1) is stored in GameConstants and can change depending on game updates
-            // (2) is represented in `combinationsProbabilityTable` and is just from the possible combinations,
-            //     regardless of game logic
-
-            var combinationsProbabilityTable = new Dictionary<int, Dictionary<int, float>>()
-            {
-                // 1 inherited
-                { 1, new() {
-                    { 1, 1.0f / 3.0f }, // 1 desired
-                    { 2, 0.0f },        // 2 desired (no way to get 2 if we only inherited 1)
-                    { 3, 0.0f },        // 3 desired (...)
-                } },
-
-                // 2 inherited
-                { 2, new() {
-                    { 1, 2.0f / 3.0f }, // 1 desired
-                    { 2, 1.0f / 3.0f }, // 2 desired
-                    { 3, 0.0f }         // 3 desired (no way to get 3 if we only inherited 2
-                } },
-
-                // 3 inherited
-                { 3, new() {
-                    // 3 inherited means all IVs inherited, doesn't matter what IV we actually wanted, we'll always get it
-                    { 1, 1.0f },
-                    { 2, 1.0f },
-                    { 3, 1.0f }
-                } }
-            };
-
-            /*
-            IV probabilities have similar approach as `ProbabilityInheritedTargetPassives` - a pal will end up inheriting
-            exactly 1, 2, or 3 IVs; get the probability of each case combined with the probability of those cases giving us
-            what we want
-            */
-            
-            // stores the final probabilities of getting some number of desired IVs
-            //
-            // (the final real probability will also need to account for 50/50 chance of inheriting the IV from either specific parent)
-            this.ivDesiredProbabilities = new float[3];
-            for (int i = 0; i < 3; i++) ivDesiredProbabilities[i] = 0.0f;
-
-            for (int numInherited = 1; numInherited <= 3; numInherited++)
-            {
-                var probabilityInherited = GameConstants.IVProbabilityDirect[numInherited];
-                for (int numDesired = 1; numDesired <= 3; numDesired++)
-                {
-                    var probabilityMatched = combinationsProbabilityTable[numInherited][numDesired];
-
-                    ivDesiredProbabilities[numDesired - 1] += probabilityInherited * probabilityMatched;
-                }
-            }
         }
 
         public event Action<SolverStatus> SolverStateUpdated;
@@ -308,158 +234,6 @@ namespace PalCalc.Solver
             }
         }
 
-        /// <summary>
-        /// Calculates the probability of a child pal with `numFinalPassives` passive skills having the all desired passives from
-        /// the list of possible parent passives.
-        /// </summary>
-        /// 
-        /// <param name="parentPassives">The the full set of passive skills from the parents (deduplicated)</param>
-        /// <param name="desiredParentPassives">The list of passive skills you want to be inherited</param>
-        /// <param name="numFinalPassives">The exact amount of final passive skills to calculate for</param>
-        /// <returns></returns>
-        /// 
-        /// <remarks>
-        /// e.g. "if we decide the child pal has N passive skills, what's the probability of containing all of the passives we want"
-        /// </remarks>
-        /// <remarks>
-        /// Should be used repeatedly to calculate probabilities for all possible counts of passive skills (max 4)
-        /// </remarks>
-        /// 
-        float ProbabilityInheritedTargetPassives(List<PassiveSkill> parentPassives, List<PassiveSkill> desiredParentPassives, int numFinalPassives)
-        {
-            // we know we need at least `desiredParentPassives.Count` to be inherited from the parents, but the overall number
-            // of passives must be `numFinalPassives`. consider N, N+1, ..., passives inherited from parents, and an inverse amount
-            // of randomly-added passives
-            //
-            // e.g. we want 4 total passives with 2 desired from parents. we could have:
-            //
-            // - 2 inherited + 2 random
-            // - 3 inherited + 1 random
-            // - 4 inherited + 0 random
-            //
-            // ... each of these has a separate probability of getting exactly that outcome.
-            //
-            // the final probability for these params (fn args) is the sum
-
-            float probabilityForNumPassives = 0.0f;
-
-            for (int numInheritedFromParent = desiredParentPassives.Count; numInheritedFromParent <= numFinalPassives; numInheritedFromParent++)
-            {
-                // we may inherit more passives from the parents than the parents actually have (e.g. inherit 4 passives from parents with
-                // 2 total passives), in which case we'd still inherit just two
-                //
-                // this doesn't affect probabilities of getting `numInherited`, but it affects the number of random passives which must
-                // be added to each `numFinalPassives` and the number of combinations of parent passives that we check
-                var actualNumInheritedFromParent = Math.Min(numInheritedFromParent, parentPassives.Count);
-
-                var numIrrelevantFromParent = actualNumInheritedFromParent - desiredParentPassives.Count;
-                var numIrrelevantFromRandom = numFinalPassives - actualNumInheritedFromParent;
-
-#if DEBUG && DEBUG_CHECKS
-                if (numIrrelevantFromRandom < 0) Debugger.Break();
-#endif
-
-                float probabilityGotRequiredFromParent;
-                if (numInheritedFromParent == 0)
-                {
-                    // would only happen if neither parent has a desired passive
-
-                    // the only way we could get zero inherited passives is if neither parent actually has any passives, otherwise
-                    // it (seems to) be impossible to get zero direct inherited passives (unconfirmed from reddit thread)
-                    if (parentPassives.Count > 0) continue;
-
-                    // if neither parent has any passives, we'll always get 0 inherited passives, so we'll always get the "required"
-                    // passives regardless of the roll for `PassiveProbabilityDirect`
-                    probabilityGotRequiredFromParent = 1.0f;
-                }
-                else if (desiredParentPassives.Count == 0)
-                {
-                    // just the chance of getting this number of passives from parents
-                    probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent];
-                }
-                else if (numIrrelevantFromParent == 0)
-                {
-                    // chance of getting exactly the required passives
-                    probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent] / Choose(parentPassives.Count, desiredParentPassives.Count);
-                }
-                else
-                {
-                    // (available passives except desired)
-                    // choose
-                    // (required num irrelevant)
-                    var numCombinationsWithIrrelevantPassive = (float)Choose(parentPassives.Count - desiredParentPassives.Count, numIrrelevantFromParent);
-
-                    // (all available passives)
-                    // choose
-                    // (actual num inherited from parent)
-                    var numCombinationsWithAnyPassives = (float)Choose(parentPassives.Count, actualNumInheritedFromParent);
-
-                    // probability of those passives containing the desired passives
-                    // (doesn't affect anything if we don't actually want any of these passives)
-                    // (TODO - is this right? got this simple division from chatgpt)
-                    var probabilityCombinationWithDesiredPassives = desiredParentPassives.Count == 0 ? 1 : (
-                        numCombinationsWithIrrelevantPassive / numCombinationsWithAnyPassives
-                    );
-
-                    probabilityGotRequiredFromParent = probabilityCombinationWithDesiredPassives * GameConstants.PassiveProbabilityDirect[numInheritedFromParent];
-                }
-
-#if DEBUG && DEBUG_CHECKS
-                if (probabilityGotRequiredFromParent > 1) Debugger.Break();
-#endif
-
-                var probabilityGotExactRequiredRandom = GameConstants.PassiveRandomAddedProbability[numIrrelevantFromRandom];
-                probabilityForNumPassives += probabilityGotRequiredFromParent * probabilityGotExactRequiredRandom;
-            }
-
-            return probabilityForNumPassives;
-        }
-
-        /// <summary>
-        /// Given the IVs from two parents, returns the probability of inheriting all desired IVs from the parents.
-        /// 
-        /// A desired IV is determined by whether it's a "valid" (i.e. non-random) IV.
-        /// </summary>
-        float ProbabilityInheritedTargetIVs(IV_Set a, IV_Set b)
-        {
-            // (note: use of `.Count` and superficial array creation doesn't seem to be significant for perf)
-            IV_IValue[] hps = [a.HP, b.HP];
-            IV_IValue[] attacks = [a.Attack, b.Attack];
-            IV_IValue[] defenses = [a.Defense, b.Defense];
-
-            int numRelevantHP = hps.Count(iv => iv.IsRelevant);
-            int numRelevantAttack = attacks.Count(iv => iv.IsRelevant);
-            int numRelevantDefense = defenses.Count(iv => iv.IsRelevant);
-
-            int numRequiredIVs = 0;
-            if (numRelevantHP > 0) numRequiredIVs++;
-            if (numRelevantAttack > 0) numRequiredIVs++;
-            if (numRelevantDefense > 0) numRequiredIVs++;
-
-            if (numRequiredIVs == 0) return 1.0f;
-
-            // base probability is the chance of getting the IV categories we want
-            float result = ivDesiredProbabilities[numRequiredIVs - 1];
-
-            // even if we got the right IV categories, we might not get the right parents/values
-            //
-            // for each IV:
-            // - if 0 relevant values, we weren't trying to inherit it, no effect
-            // - if 1 relevant value, we need to inherit from the right parent, extra 50/50 chance
-            // - if 2 relevant values, inheriting from either parent would suffice, no effect
-            //
-            // so if any IV has just one relevant parent, cut the final probability in half
-            if (numRelevantHP == 1) result *= 0.5f;
-            if (numRelevantAttack == 1) result *= 0.5f;
-            if (numRelevantDefense == 1) result *= 0.5f;
-
-#if DEBUG && DEBUG_CHECKS
-            if (result <= 0.0001f) Debugger.Break();
-#endif
-
-            return result;
-        }
-
         public List<IPalReference> SolveFor(PalSpecifier spec, SolverStateController controller)
         {
             spec.Normalize();
@@ -498,6 +272,11 @@ namespace PalCalc.Solver
             var allExceptGenderGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvRelevance);
 
             bool WithinBreedingSteps(Pal pal, int maxSteps) => db.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
+            static IV_Range MakeIV(int minValue, int value) =>
+                new(
+                    isRelevant: minValue != 0 && value >= minValue,
+                    value: value
+                );
 
             var initialContent = ownedPals
                 // skip pals if they can't be used to reach the desired pals (e.g. Jetragon can only be bred from other Jetragons)
@@ -732,7 +511,7 @@ namespace PalCalc.Solver
                                         spec.OptionalPassives.Intersect(parentPassives).ToList()
                                     ).Select(p => p.ToList()).ToList();
 
-                                    var ivsProbability = ProbabilityInheritedTargetIVs(parent1.IVs, parent2.IVs);
+                                    var ivsProbability = Probabilities.IVs.ProbabilityInheritedTargetIVs(parent1.IVs, parent2.IVs);
 
                                     IV_IValue MergeIVs(IV_IValue a, IV_IValue b) =>
                                         (a, b) switch
@@ -769,7 +548,7 @@ namespace PalCalc.Solver
                                             float initialProbability = probabilityForUpToNumPassives;
 #endif
 
-                                            probabilityForUpToNumPassives += ProbabilityInheritedTargetPassives(parentPassives, targetPassives, numFinalPassives);
+                                            probabilityForUpToNumPassives += Probabilities.Passives.ProbabilityInheritedTargetPassives(parentPassives, targetPassives, numFinalPassives);
 
                                             if (probabilityForUpToNumPassives <= 0)
                                                 continue;

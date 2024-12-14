@@ -30,8 +30,7 @@ namespace PalCalc.Solver.ResultPruning
             //
             //   (would be enforced by grouping with `WorkingSet.DefaultGroupFn`)
             //
-            // - all have relevant min/max values if the IV in general is considered relevant
-            //   e.g. if HP is relevant, the min/max values will also be relevant
+            // - if an IV range is relevant, all its min/max values will also be relevant
             //
             //   (would be enforced by applying min-IV filter on input pals (done in
             //   `BreedingSolver`), so the only IVs included will be relevant IVs)
