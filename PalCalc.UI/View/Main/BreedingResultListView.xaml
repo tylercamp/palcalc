@@ -38,22 +38,22 @@
                                 Width="{Binding LocationsWidth}"
                                 util:GridViewSort.PropertyName="InputLocations"
                                 />
-                <GridViewColumn Header="IV HP"
+                <GridViewColumn Header="{itl:LocalizedText Code=LC_RESULT_IV_HP}"
                                 DisplayMemberBinding="{Binding IV_HP.Label}"
                                 Width="{Binding IVsWidth}"
                                 util:GridViewSort.PropertyName="IV_HP"
                                 />
-                <GridViewColumn Header="IV DEF"
-                                DisplayMemberBinding="{Binding IV_Defense.Label}"
-                                Width="{Binding IVsWidth}"
-                                util:GridViewSort.PropertyName="IV_Defense"
-                                />
-                <GridViewColumn Header="IV ATK"
+                <GridViewColumn Header="{itl:LocalizedText Code=LC_RESULT_IV_ATTACK}"
                                 DisplayMemberBinding="{Binding IV_Attack.Label}"
                                 Width="{Binding IVsWidth}"
                                 util:GridViewSort.PropertyName="IV_Attack"
                                 />
-                <GridViewColumn Header="IV AVG"
+                <GridViewColumn Header="{itl:LocalizedText Code=LC_RESULT_IV_DEFENSE}"
+                                DisplayMemberBinding="{Binding IV_Defense.Label}"
+                                Width="{Binding IVsWidth}"
+                                util:GridViewSort.PropertyName="IV_Defense"
+                                />
+                <GridViewColumn Header="{itl:LocalizedText Code=LC_RESULT_IV_AVERAGE}"
                                 DisplayMemberBinding="{Binding IV_Average.Label}"
                                 Width="{Binding IVsWidth}"
                                 util:GridViewSort.PropertyName="IV_Average"

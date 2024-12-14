@@ -467,6 +467,22 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_RESULT_INPUT_LOCS,
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_RESULT_IV_ATTACK,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_RESULT_IV_AVERAGE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_RESULT_IV_DEFENSE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_RESULT_IV_HP,
+        /// <summary>
         ///   Looks up a localized string similar to PalName | TraitsList | TimeEstimate.
         /// </summary>
         LC_RESULT_LABEL,
@@ -630,6 +646,14 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to SaveLabel.
         /// </summary>
         LC_SAVEWINDOW_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_PAUSE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_RESUME,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

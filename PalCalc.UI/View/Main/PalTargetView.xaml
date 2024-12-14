@@ -61,7 +61,7 @@
             </Popup>
         </Grid>
     </GroupBox>
-    <GroupBox Header="IVs">
+    <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_IVS}">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -75,13 +75,13 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0">HP</Label>
+            <Label Grid.Row="0" Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_HP}" />
             <vu:IntegerTextBox Grid.Row="0" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_HP, Mode=TwoWay}" MinValue="0" MaxValue="100" />
 
-            <Label Grid.Row="2" Grid.Column="0">Attack</Label>
+            <Label Grid.Row="2" Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK}" />
             <vu:IntegerTextBox Grid.Row="2" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_Attack, Mode=TwoWay}" MinValue="0" MaxValue="100" />
 
-            <Label Grid.Row="4" Grid.Column="0">Defense</Label>
+            <Label Grid.Row="4" Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE}" />
             <vu:IntegerTextBox Grid.Row="4" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_Defense, Mode=TwoWay}" MinValue="0" MaxValue="100" />
         </Grid>
     </GroupBox>
