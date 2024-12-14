@@ -503,7 +503,27 @@ namespace PalCalc.Solver
                                     ) Debugger.Break();
 #endif
 
-                                    var parentPassives = parent1.EffectivePassives.Concat(parent2.EffectivePassives).Distinct().ToList();
+                                    // Note: We need to use `ActualPassives` for inheritance calc, NOT `EffectivePassives`. If we have:
+                                    //
+                                    //    Parent 1: [A, B, D]
+                                    //    Parent 2: [A, B]
+                                    //    Combined + Deduped: [A, B, D]
+                                    //
+                                    // (Where D is desired, A and B are irrelevant)
+                                    //
+                                    // Their effective passives become:
+                                    //
+                                    //    Parent 1: [Random 1, Random 2, D]
+                                    //    Parent 2: [Random 3, Random 4]
+                                    //    Combined + Deduped: [Random 1, Random 2, Random 3, Random 4, D]
+                                    //
+                                    // The list of deduplicated passives changes.
+                                    //
+                                    // Desired passive chance goes up with a smaller list of combined + deduped passives,
+                                    // so we'd end up overestimating the effort of parents which have the same (but irrelevant)
+                                    // passives.
+
+                                    var parentPassives = parent1.ActualPassives.Concat(parent2.ActualPassives).Distinct().ToList();
                                     var possibleResults = new List<IPalReference>();
 
                                     var passiveSkillPerms = PassiveSkillPermutations(

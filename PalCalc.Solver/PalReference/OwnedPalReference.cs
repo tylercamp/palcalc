@@ -17,7 +17,7 @@ namespace PalCalc.Solver.PalReference
             this.instance = instance;
 
             EffectivePassives = effectivePassives;
-            EffectivePassivesHash = EffectivePassives.SetHash();
+            EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
 
             ActualPassives = instance.PassiveSkills;
 

@@ -20,7 +20,7 @@ namespace PalCalc.Solver.PalReference
             if (guaranteedPassives.Any(t => !pal.GuaranteedPassivesInternalIds.Contains(t.InternalName))) throw new InvalidOperationException();
             if (EffectivePassives.Count > GameConstants.MaxTotalPassives) throw new InvalidOperationException();
 
-            EffectivePassivesHash = EffectivePassives.SetHash();
+            EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
             IVs = new IV_Set() { HP = IV_Random.Instance, Attack =  IV_Random.Instance, Defense = IV_Random.Instance };
         }
 

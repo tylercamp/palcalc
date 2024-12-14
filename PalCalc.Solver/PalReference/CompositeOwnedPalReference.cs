@@ -43,7 +43,7 @@ namespace PalCalc.Solver.PalReference
 
             // effective passives based on which pal has the most irrelevant passives
             EffectivePassives = male.EffectivePassives.Count > female.EffectivePassives.Count ? male.EffectivePassives : female.EffectivePassives;
-            EffectivePassivesHash = EffectivePassives.SetHash();
+            EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
 
             ActualPassives = Male.ActualPassives.Intersect(Female.ActualPassives).ToList();
             while (ActualPassives.Count < EffectivePassives.Count) ActualPassives.Add(new RandomPassiveSkill());

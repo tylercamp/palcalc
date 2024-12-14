@@ -5,6 +5,7 @@ using PalCalc.Solver.ResultPruning;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -157,7 +158,18 @@ namespace PalCalc.Solver
              * be catastrophically high
              */
             remainingWork.Clear();
-            remainingWork.EnsureCapacity(toAdd.Count * toAdd.Count + 2 * toAdd.Count * content.TotalCount);
+            var newCapacity = toAdd.Count * toAdd.Count + 2 * toAdd.Count * content.TotalCount;
+
+            // (can happen if the new work size is massive
+            if (newCapacity < 0)
+            {
+#if DEBUG
+                Debugger.Break();
+#endif
+                ulong requestedCapacity = (ulong)toAdd.Count * (ulong)toAdd.Count + 2 * (ulong)toAdd.Count * (ulong)content.TotalCount;
+                throw new Exception("Attempted to begin a solving step involving a massive work size: " + requestedCapacity);
+            }
+            remainingWork.EnsureCapacity(newCapacity);
 
             remainingWork.AddRange(content.All
                 // need to check results between new and old content
