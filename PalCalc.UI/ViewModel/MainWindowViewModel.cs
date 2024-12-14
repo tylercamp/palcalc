@@ -488,10 +488,6 @@ namespace PalCalc.UI.ViewModel
 
                     results = resultsTable.All.ToList();
 
-                    //// force memory cleanup if we're using a significant amount
-                    //if (MemoryMonitor.ProcessMemory > MemoryMonitor.TotalSystemMemory / 3)
-                    //    GC.Collect(generation: 2, GCCollectionMode.Forced, blocking: true, compacting: true);
-
                     dispatcher.Invoke(() =>
                     {
                         if (!currentJob.TokenSource.IsCancellationRequested)
@@ -541,7 +537,7 @@ namespace PalCalc.UI.ViewModel
 
         private void MemoryMonitor_MemoryWarning()
         {
-            currentJob.SolverController.Pause = true;
+            currentJob.SolverController.Pause();
             currentJob.MemoryMonitor.PauseNotices = true;
 
             dispatcher.BeginInvoke(() =>
@@ -567,30 +563,24 @@ namespace PalCalc.UI.ViewModel
                         break;
                 }
 
-                if (currentJob?.SolverController != null)
-                    currentJob.SolverController.Pause = false;
+                currentJob?.SolverController?.Resume();
             });
         }
 
         public void CancelSolver()
         {
-            if (currentJob != null)
-            {
-                currentJob?.TokenSource?.Cancel();
-                currentJob.SolverController.Pause = false;
-            }
+            currentJob?.TokenSource?.Cancel();
+            currentJob?.SolverController?.Resume();
         }
 
         public void PauseSolver()
         {
-            if (currentJob != null)
-                currentJob.SolverController.Pause = true;
+            currentJob?.SolverController?.Pause();
         }
 
         public void ResumeSolver()
         {
-            if (currentJob != null)
-                currentJob.SolverController.Pause = false;
+            currentJob?.SolverController?.Resume();
         }
 
         private Stopwatch solverStopwatch = null;
@@ -674,9 +664,6 @@ namespace PalCalc.UI.ViewModel
         private void UpdateSolverControls()
         {
             SolverControls.IsValidConfig = PalTarget?.IsValid == true;
-            //SolverControls.CanRunSolver = IsEditable && PalTarget != null && PalTarget.IsValid;
-            //SolverControls.CanEditSettings = IsEditable;
-            //SolverControls.CanCancelSolver = !IsEditable;
         }
 
         private PalTargetViewModel palTarget;

@@ -44,7 +44,10 @@ namespace PalCalc.Solver
     public class SolverStateController
     {
         public CancellationToken CancellationToken { get; set; }
-        public bool Pause { get; set; }
+        public bool IsPaused { get; private set; }
+
+        public void Pause() => IsPaused = true;
+        public void Resume() => IsPaused = false;
     }
 
     class WorkBatchProgress
@@ -475,7 +478,7 @@ namespace PalCalc.Solver
                 CurrentStepIndex = 0,
                 TargetSteps = maxSolverIterations,
                 Canceled = controller.CancellationToken.IsCancellationRequested,
-                Paused = controller.Pause,
+                Paused = controller.IsPaused,
             };
             SolverStateUpdated?.Invoke(statusMsg);
 
@@ -608,7 +611,7 @@ namespace PalCalc.Solver
                             var progress = progressEntries.Sum(e => e.NumProcessed);
                             statusMsg.WorkProcessedCount = progress;
                         }
-                        statusMsg.Paused = controller.Pause;
+                        statusMsg.Paused = controller.IsPaused;
                         SolverStateUpdated?.Invoke(statusMsg);
                     }
 
@@ -628,10 +631,8 @@ namespace PalCalc.Solver
                             return workBatch
                                 .Tap(_ =>
                                 {
-                                    while (controller.Pause)
-                                    {
+                                    while (controller.IsPaused)
                                         Thread.Sleep(1);
-                                    }
                                 })
                                 .Tap(_ => progress.NumProcessed++)
                                 .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)

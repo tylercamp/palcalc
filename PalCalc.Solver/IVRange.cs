@@ -9,7 +9,6 @@ namespace PalCalc.Solver
     public interface IV_IValue
     {
         bool Satisfies(int minValue);
-        bool BetterThan(IV_IValue other);
 
         bool IsRelevant { get; }
     }
@@ -21,7 +20,6 @@ namespace PalCalc.Solver
         public bool IsRelevant => false;
 
         public bool Satisfies(int minValue) => false;
-        public bool BetterThan(IV_IValue other) => false;
 
         private static int _hash = nameof(IV_Random).GetHashCode();
         public override int GetHashCode() => _hash;
@@ -38,20 +36,6 @@ namespace PalCalc.Solver
         }
 
         public bool Satisfies(int minValue) => Min >= minValue;
-
-        public bool BetterThan(IV_IValue other)
-        {
-            switch (other)
-            {
-                case IV_Random: return true;
-                case IV_Range ivr:
-                    if (Max > ivr.Max) return true;
-                    else if (Max < ivr.Max) return false;
-                    else return Min > ivr.Min;
-
-                default: throw new NotImplementedException();
-            }
-        }
 
         public static IV_Range Merge(params IV_Range[] ranges)
         {

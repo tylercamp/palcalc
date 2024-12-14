@@ -34,7 +34,6 @@ namespace PalCalc.Solver.ResultPruning
                     new MinimumWildPalsPruning(token),
                     new MinimumReferencedPlayersPruning(token),
                     new VariedResultsPruning(token, maxSimilarityPercent: 0.1f),
-                    // TODO - revert? add a separate limit to avoid excessive work size?
                     new ResultLimitPruning(token, maxResults: 3),
                 }
         );
