@@ -48,6 +48,11 @@ namespace PalCalc.Solver
 
         public void Pause() => IsPaused = true;
         public void Resume() => IsPaused = false;
+
+        internal void PauseIfRequested()
+        {
+            while (IsPaused) Thread.Sleep(10);
+        }
     }
 
     class WorkBatchProgress
@@ -363,7 +368,7 @@ namespace PalCalc.Solver
                 );
             }
 
-            var workingSet = new WorkingSet(spec, pruningBuilder, initialContent, maxThreads, controller.CancellationToken);
+            var workingSet = new WorkingSet(spec, pruningBuilder, initialContent, maxThreads, controller);
 
             for (int s = 0; s < maxSolverIterations; s++)
             {
@@ -408,11 +413,7 @@ namespace PalCalc.Solver
                                 progressEntries.Add(progress);
 
                             return workBatch
-                                .Tap(_ =>
-                                {
-                                    while (controller.IsPaused)
-                                        Thread.Sleep(1);
-                                })
+                                .Tap(_ => controller.PauseIfRequested())
                                 .Tap(_ => progress.NumProcessed++)
                                 .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)
                                 .Where(p => p.Item1.IsCompatibleGender(p.Item2.Gender))

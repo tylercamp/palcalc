@@ -598,11 +598,16 @@ namespace PalCalc.UI.ViewModel
         private void PauseSolver()
         {
             currentJob?.SolverController?.Pause();
+
+            // we'd prefer to get the current state from the solver's update events,
+            // but not everything is wired up to emit those events (namely `WorkingSet`)
+            SolverControls.CurrentSolverState = SolverState.Paused;
         }
 
         private void ResumeSolver()
         {
             currentJob?.SolverController?.Resume();
+            SolverControls.CurrentSolverState = SolverState.Running;
         }
 
         private Stopwatch solverStopwatch = null;

@@ -23,7 +23,7 @@ namespace PalCalc.Solver
             PalProperty.IvRelevance
         );
 
-        private CancellationToken token;
+        private SolverStateController controller;
         private PalPropertyGrouping content;
         private List<(IPalReference, IPalReference)> remainingWork;
 
@@ -34,11 +34,12 @@ namespace PalCalc.Solver
 
         Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>> PruningFunc;
 
-        public WorkingSet(PalSpecifier target, PruningRulesBuilder pruningRulesBuilder, IEnumerable<IPalReference> initialContent, int maxThreads, CancellationToken token)
+        public WorkingSet(PalSpecifier target, PruningRulesBuilder pruningRulesBuilder, IEnumerable<IPalReference> initialContent, int maxThreads, SolverStateController controller)
         {
             this.target = target;
+            this.controller = controller;
 
-            PruningFunc = pruningRulesBuilder.BuildAggregate(token).Apply;
+            PruningFunc = pruningRulesBuilder.BuildAggregate(controller.CancellationToken).Apply;
 
             content = new PalPropertyGrouping(DefaultGroupFn);
             content.AddRange(initialContent);
@@ -46,7 +47,6 @@ namespace PalCalc.Solver
             discoveredResults.AddRange(content.All.Where(target.IsSatisfiedBy));
 
             remainingWork = initialContent.SelectMany(p1 => initialContent.Select(p2 => (p1, p2))).ToList();
-            this.token = token;
 
             if (maxThreads <= 0) maxThreads = Environment.ProcessorCount;
 
@@ -83,7 +83,12 @@ namespace PalCalc.Solver
             // `PruneCollection` is fairly heavy and single-threaded, perform pruning of multiple batches of the
             // main set of references before pruning the final combined collection
 
-            discoveredResults.AddRange(newResults.TakeWhile(_ => !token.IsCancellationRequested).Where(target.IsSatisfiedBy));
+            discoveredResults.AddRange(
+                newResults
+                    .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)
+                    .Tap(_ => controller.PauseIfRequested())
+                    .Where(target.IsSatisfiedBy)
+            );
 
             logger.Debug("performing pre-prune");
             var pruned = PruneCollection(
@@ -100,7 +105,8 @@ namespace PalCalc.Solver
 
             foreach (var newInstances in pruned.GroupBy(i => DefaultGroupFn(i)).Select(g => g.ToList()).ToList())
             {
-                if (token.IsCancellationRequested) return changed;
+                if (controller.CancellationToken.IsCancellationRequested) return changed;
+                controller.PauseIfRequested();
 
                 var refNewInst = newInstances.First();
 
@@ -176,10 +182,15 @@ namespace PalCalc.Solver
                 .SelectMany(p1 => toAdd.Select(p2 => (p1, p2)))
                 // and check results within the new content
                 .Concat(toAdd.SelectMany(p1 => toAdd.Select(p2 => (p1, p2))))
+                .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)
+                .Tap(_ => controller.PauseIfRequested())
             );
 
-            foreach (var ta in toAdd)
+            foreach (var ta in toAdd.TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested))
+            {
+                controller.PauseIfRequested();
                 content.Add(ta);
+            }
 
             return changed;
         }
@@ -188,7 +199,8 @@ namespace PalCalc.Solver
         // reference for each instance spec (gender, passives, etc.)
         private IEnumerable<IPalReference> PruneCollection(IEnumerable<IPalReference> refs) =>
             refs
-                .TakeWhile(_ => !token.IsCancellationRequested)
+                .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)
+                .Tap(_ => controller.PauseIfRequested())
                 .GroupBy(pref => DefaultGroupFn(pref))
                 .SelectMany(g => PruningFunc(g.Distinct()));
     }
