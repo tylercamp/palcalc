@@ -37,7 +37,7 @@
 
         <StackPanel
             Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
-            Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Converter={StaticResource RTOC}}"
+            Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Converter={StaticResource RTOC}}"
         >
             <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK_SHORT}" />
             <ContentPresenter

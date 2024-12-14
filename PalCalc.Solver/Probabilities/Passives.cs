@@ -10,7 +10,7 @@ namespace PalCalc.Solver.Probabilities
 {
     public static class Passives
     {
-        // note: pascal's triangle is also 0-indexed! i.e. `0 choose 0` is a valid operation
+        // note: pascal's triangle is also 0-indexed! `0 choose 0` is a valid operation
         /// <summary>
         /// `n` Choose `k`
         /// </summary>
@@ -27,7 +27,7 @@ namespace PalCalc.Solver.Probabilities
         /// <returns></returns>
         /// 
         /// <remarks>
-        /// e.g. "if we decide the child pal has N passive skills, what's the probability of containing all of the passives we want"
+        /// "if we decide the child pal has N passive skills, what's the probability of containing all of the passives we want"
         /// </remarks>
         /// <remarks>
         /// Should be used repeatedly to calculate probabilities for all possible counts of passive skills (max 4)
@@ -39,7 +39,7 @@ namespace PalCalc.Solver.Probabilities
             // of passives must be `numFinalPassives`. consider N, N+1, ..., passives inherited from parents, and an inverse amount
             // of randomly-added passives
             //
-            // e.g. we want 4 total passives with 2 desired from parents. we could have:
+            // say we want 4 total passives with 2 desired from parents. we could have:
             //
             // - 2 inherited + 2 random
             // - 3 inherited + 1 random

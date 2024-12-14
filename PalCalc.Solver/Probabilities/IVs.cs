@@ -79,7 +79,7 @@ namespace PalCalc.Solver.Probabilities
         /// <summary>
         /// Given the IVs from two parents, returns the probability of inheriting all desired IVs from the parents.
         /// 
-        /// A desired IV is determined by whether it's a "valid" (i.e. non-random) IV.
+        /// A desired IV is determined by whether it's a "relevant" IV. (i.e. targetted during solving)
         /// </summary>
         public static float ProbabilityInheritedTargetIVs(IV_Set a, IV_Set b)
         {
