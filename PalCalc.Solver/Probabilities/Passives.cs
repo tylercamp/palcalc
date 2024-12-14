@@ -10,10 +10,11 @@ namespace PalCalc.Solver.Probabilities
 {
     public static class Passives
     {
+        // note: pascal's triangle is also 0-indexed! i.e. `0 choose 0` is a valid operation
         /// <summary>
         /// `n` Choose `k`
         /// </summary>
-        static int Choose(int n, int k) => PascalsTriangle.Instance[n - 1][k - 1];
+        static int Choose(int n, int k) => PascalsTriangle.Instance[n][k];
 
         /// <summary>
         /// Calculates the probability of a child pal with `numFinalPassives` passive skills having the all desired passives from
