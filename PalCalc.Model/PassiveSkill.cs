@@ -37,5 +37,11 @@ namespace PalCalc.Model
     public class RandomPassiveSkill : PassiveSkill, IUnknownPassive
     {
         public RandomPassiveSkill() : base("(Random)", "__VIRT_RAND__", 0) { }
+
+        public override bool Equals(object obj) => ReferenceEquals(this, obj);
+
+        private static ulong randomHash = 0;
+        private int hash = (int)(Interlocked.Increment(ref randomHash) % int.MaxValue);
+        public override int GetHashCode() => hash;
     }
 }
