@@ -98,7 +98,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 if (SearchedPassive4 != null) criteria.Add(new PassiveSkillSearchCriteria(SearchedPassive4.ModelObject));
 
                 criteria.Add(new CustomSearchCriteria(p => p.IV_HP >= MinIVHP));
-                criteria.Add(new CustomSearchCriteria(p => p.IV_Shot >= MinIVAttack));
+                criteria.Add(new CustomSearchCriteria(p => p.IV_Attack >= MinIVAttack));
                 criteria.Add(new CustomSearchCriteria(p => p.IV_Defense >= MinIVDefense));
 
                 return new AllOfSearchCriteria(criteria);

@@ -7,6 +7,16 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
+    public record class IVSetViewModel(IVValueViewModel HP, IVValueViewModel Attack, IVValueViewModel Defense)
+    {
+        public static IVSetViewModel FromIVs(IV_Set ivs) =>
+            new IVSetViewModel(
+                HP: IVValueViewModel.FromIV(ivs.HP),
+                Attack: IVValueViewModel.FromIV(ivs.Attack),
+                Defense: IVValueViewModel.FromIV(ivs.Defense)
+            );
+    }
+
     public interface IVValueViewModel : IComparable
     {
         /* Properties */

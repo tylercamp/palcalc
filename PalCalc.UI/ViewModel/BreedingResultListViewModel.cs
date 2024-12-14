@@ -62,9 +62,9 @@ namespace PalCalc.UI.ViewModel
                 if (Results == null || Results.Count < 2) return DEFAULT;
 
                 if (Results.All(r =>
-                    r.IV_HP is IVAnyValueViewModel &&
-                    r.IV_Attack is IVAnyValueViewModel &&
-                    r.IV_Defense is IVAnyValueViewModel)
+                    r.IVs.HP is IVAnyValueViewModel &&
+                    r.IVs.Attack is IVAnyValueViewModel &&
+                    r.IVs.Defense is IVAnyValueViewModel)
                 ) return WIDTH_HIDDEN;
 
                 return FIT_CONTENT;
@@ -99,9 +99,12 @@ namespace PalCalc.UI.ViewModel
                         }
                     },
                     new List<PassiveSkill>() { "Runner".ToPassive(PalDB.LoadEmbedded()) },
-                    new IV_Range(true, 80, 90),
-                    IV_Random.Instance,
-                    IV_Random.Instance
+                    new IV_Set()
+                    {
+                        HP = new IV_Range(true, 80, 90),
+                        Attack = IV_Random.Instance,
+                        Defense = IV_Random.Instance
+                    }
                 ))
             }
         };

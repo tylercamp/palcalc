@@ -53,9 +53,11 @@ namespace PalCalc.UI.ViewModel
 
             DisplayedResult = solver.SolveFor(targetInstance, new SolverStateController() { CancellationToken = CancellationToken.None }).MaxBy(r => r.NumTotalBreedingSteps);
 
-            IV_HP = new IVDirectValueViewModel(80);
-            IV_Attack = new IVDirectValueViewModel(70);
-            IV_Defense = new IVDirectValueViewModel(60);
+            IVs = new IVSetViewModel(
+                HP: new IVDirectValueViewModel(80),
+                Attack: new IVDirectValueViewModel(70),
+                Defense: new IVDirectValueViewModel(60)
+            );
             IV_Average = new IVDirectValueViewModel(70);
         }
 
@@ -76,15 +78,13 @@ namespace PalCalc.UI.ViewModel
                 Graph = BreedingGraph.FromPalReference(source, displayedResult);
                 EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
 
-                IV_HP = IVValueViewModel.FromIV(displayedResult.IV_HP);
-                IV_Attack = IVValueViewModel.FromIV(displayedResult.IV_Attack);
-                IV_Defense = IVValueViewModel.FromIV(displayedResult.IV_Defense);
+                IVs = IVSetViewModel.FromIVs(displayedResult.IVs);
 
                 var validIVs = new[]
                 {
-                    displayedResult.IV_HP,
-                    displayedResult.IV_Attack,
-                    displayedResult.IV_Defense
+                    displayedResult.IVs.HP,
+                    displayedResult.IVs.Attack,
+                    displayedResult.IVs.Defense
                 }.OfType<IV_Range>().ToArray();
 
                 if (validIVs.Length > 0)
@@ -174,9 +174,11 @@ namespace PalCalc.UI.ViewModel
         public int NumWildPals => DisplayedResult.NumWildPalParticipants();
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
 
-        public IVValueViewModel IV_HP { get; }
-        public IVValueViewModel IV_Attack { get; }
-        public IVValueViewModel IV_Defense { get; }
+        public IVSetViewModel IVs { get; }
+        // (needed for BreedingResultListView which uses `util:GridViewSort.PropertyName`)
+        public IVValueViewModel IV_HP => IVs.HP;
+        public IVValueViewModel IV_Attack => IVs.Attack;
+        public IVValueViewModel IV_Defense => IVs.Defense;
 
         public IVValueViewModel IV_Average { get; }
     }

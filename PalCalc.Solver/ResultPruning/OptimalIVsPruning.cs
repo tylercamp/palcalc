@@ -30,15 +30,15 @@ namespace PalCalc.Solver.ResultPruning
             int SelectValue(IV_IValue value) =>
                 ValueOf(value, 0, r => r.Max);
 
-            int TotalIVs(IPalReference p) =>
-                SelectValue(p.IV_HP) + SelectValue(p.IV_Attack) + SelectValue(p.IV_Defense);
+            int TotalIVs(IV_Set ivs) =>
+                SelectValue(ivs.HP) + SelectValue(ivs.Attack) + SelectValue(ivs.Defense);
 
             if (token.IsCancellationRequested) return results;
 
-            var bestValue = results.Max(TotalIVs);
+            var bestValue = results.Max(r => TotalIVs(r.IVs));
             var threshold = bestValue - maxIvDifference * 3;
 
-            return results.Where(p => TotalIVs(p) >= threshold).ToList();
+            return results.Where(p => TotalIVs(p.IVs) >= threshold).ToList();
         }
     }
 }

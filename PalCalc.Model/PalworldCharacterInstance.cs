@@ -53,6 +53,8 @@ namespace PalCalc.Model
         public int IV_Shot { get; set; }
         public int IV_Defense { get; set; }
 
+        public int IV_Attack => IV_Shot;
+
         // supposedly this is deprecated/unused
         // https://www.reddit.com/r/Palworld/comments/1aedboa/partner_skill_upgrade_stats_exact_values_for_lv1/
         public int IV_Melee { get; set; }

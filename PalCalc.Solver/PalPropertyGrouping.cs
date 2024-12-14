@@ -22,8 +22,8 @@ namespace PalCalc.Solver
         public static GroupIdFn ActualPassives = p => p.ActualPassives.SetHash();
         public static GroupIdFn TotalEffort = p => p.BreedingEffort.GetHashCode();
         public static GroupIdFn LocationType = p => p.Location.GetType().GetHashCode();
-        public static GroupIdFn IvRelevance = p => HashCode.Combine(p.IV_HP.IsRelevant, p.IV_Attack.IsRelevant, p.IV_Defense.IsRelevant);
-        public static GroupIdFn IvExact = p => HashCode.Combine(p.IV_HP, p.IV_Attack, p.IV_Defense);
+        public static GroupIdFn IvRelevance = p => HashCode.Combine(p.IVs.HP.IsRelevant, p.IVs.Attack.IsRelevant, p.IVs.Defense.IsRelevant);
+        public static GroupIdFn IvExact = p => HashCode.Combine(p.IVs.HP, p.IVs.Attack, p.IVs.Defense);
 
         /// <summary>
         /// Makes a grouping function based on the result of applying `mainFn` to all

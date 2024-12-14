@@ -420,15 +420,12 @@ namespace PalCalc.Solver
         /// 
         /// A desired IV is determined by whether it's a "valid" (i.e. non-random) IV.
         /// </summary>
-        float ProbabilityInheritedTargetIVs(
-            IV_IValue A_hp, IV_IValue A_attack, IV_IValue A_defense,
-            IV_IValue B_hp, IV_IValue B_attack, IV_IValue B_defense
-        )
+        float ProbabilityInheritedTargetIVs(IV_Set a, IV_Set b)
         {
             // (note: use of `.Count` and superficial array creation doesn't seem to be significant for perf)
-            IV_IValue[] hps = [A_hp, B_hp];
-            IV_IValue[] attacks = [A_attack, B_attack];
-            IV_IValue[] defenses = [A_defense, B_defense];
+            IV_IValue[] hps = [a.HP, b.HP];
+            IV_IValue[] attacks = [a.Attack, b.Attack];
+            IV_IValue[] defenses = [a.Defense, b.Defense];
 
             int numRelevantHP = hps.Count(iv => iv.IsRelevant);
             int numRelevantAttack = attacks.Count(iv => iv.IsRelevant);
@@ -511,16 +508,19 @@ namespace PalCalc.Solver
                 .Select(p => new OwnedPalReference( 
                     instance: p,
                     effectivePassives: p.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives),
-                    effectiveHp: MakeIV(spec.IV_HP, p.IV_HP),
-                    effectiveAttack: MakeIV(spec.IV_Attack, p.IV_Shot),
-                    effectiveDefense: MakeIV(spec.IV_Defense, p.IV_Defense)
+                    effectiveIVs: new IV_Set()
+                    {
+                        HP = MakeIV(spec.IV_HP, p.IV_HP),
+                        Attack = MakeIV(spec.IV_Attack, p.IV_Attack),
+                        Defense = MakeIV(spec.IV_Defense, p.IV_Defense)
+                    }
                 ))
                 // group pals by their "important" properties and select the "best" pal from each group
                 .GroupBy(p => allPropertiesGroupFn(p))
                 .Select(g => g
                     .OrderBy(p => p.ActualPassives.Count)
                     .ThenBy(p => PreferredLocationPruning.LocationOrderingOf(p.UnderlyingInstance.Location.Type))
-                    .ThenByDescending(p => p.UnderlyingInstance.IV_HP + p.UnderlyingInstance.IV_Shot + p.UnderlyingInstance.IV_Defense)
+                    .ThenByDescending(p => p.UnderlyingInstance.IV_HP + p.UnderlyingInstance.IV_Attack + p.UnderlyingInstance.IV_Defense)
                     .First()
                 )
                 // try to consolidate pals which are the same in every way that matters but are opposite genders
@@ -732,10 +732,7 @@ namespace PalCalc.Solver
                                         spec.OptionalPassives.Intersect(parentPassives).ToList()
                                     ).Select(p => p.ToList()).ToList();
 
-                                    var ivsProbability = ProbabilityInheritedTargetIVs(
-                                        parent1.IV_HP, parent1.IV_Attack, parent1.IV_Defense,
-                                        parent2.IV_HP, parent2.IV_Attack, parent2.IV_Defense
-                                    );
+                                    var ivsProbability = ProbabilityInheritedTargetIVs(parent1.IVs, parent2.IVs);
 
                                     IV_IValue MergeIVs(IV_IValue a, IV_IValue b) =>
                                         (a, b) switch
@@ -750,9 +747,12 @@ namespace PalCalc.Solver
                                             _ => throw new NotImplementedException()
                                         };
 
-                                    var finalHp = MergeIVs(parent1.IV_HP, parent2.IV_HP);
-                                    var finalAttack = MergeIVs(parent1.IV_Attack, parent2.IV_Attack);
-                                    var finalDefense = MergeIVs(parent1.IV_Defense, parent2.IV_Defense);
+                                    var finalIVs = new IV_Set()
+                                    {
+                                        HP = MergeIVs(parent1.IVs.HP, parent2.IVs.HP),
+                                        Attack = MergeIVs(parent1.IVs.Attack, parent2.IVs.Attack),
+                                        Defense = MergeIVs(parent1.IVs.Defense, parent2.IVs.Defense)
+                                    };
 
                                     foreach (var targetPassives in passiveSkillPerms)
                                     {
@@ -795,9 +795,7 @@ namespace PalCalc.Solver
                                                 parent2,
                                                 newPassives,
                                                 probabilityForUpToNumPassives,
-                                                finalHp,
-                                                finalAttack,
-                                                finalDefense,
+                                                finalIVs,
                                                 ivsProbability
                                             );
 

@@ -218,10 +218,13 @@ namespace PalCalc.UI
                 inst,
                 // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
                 inst.PassiveSkills,
-                // (isRelevant only matters while the solver is running)
-                new IV_Range(isRelevant: true, inst.IV_HP),
-                new IV_Range(isRelevant: true, inst.IV_Shot),
-                new IV_Range(isRelevant: true, inst.IV_Defense)
+                new IV_Set()
+                {
+                    // (isRelevant only matters while the solver is running)
+                    HP = new IV_Range(isRelevant: true, inst.IV_HP),
+                    Attack = new IV_Range(isRelevant: true, inst.IV_Attack),
+                    Defense = new IV_Range(isRelevant: true, inst.IV_Defense)
+                }
             );
         }
     }
@@ -349,11 +352,12 @@ namespace PalCalc.UI
             var passivesProbability = (token["PassivesProbability"] ?? token["TraitsProbability"]).ToObject<float>(serializer);
             var ivsProbability = token["IVsProbability"]?.ToObject<float>(serializer) ?? 1.0f;
 
-            var IV_HP = token["IV_HP"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
+            var IV_hp = token["IV_HP"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
             var IV_attack = token["IV_Attack"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
             var IV_defense = token["IV_Defense"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
+            var ivs = new IV_Set() { HP = IV_hp, Attack = IV_attack, Defense = IV_defense };
 
-            return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability, IV_HP, IV_attack, IV_defense, ivsProbability).WithGuaranteedGender(db, gender) as BredPalReference;
+            return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability, ivs, ivsProbability).WithGuaranteedGender(db, gender) as BredPalReference;
         }
 
         internal override JToken MakeRefJson(BredPalReference value, JsonSerializer serializer)
@@ -367,9 +371,9 @@ namespace PalCalc.UI
                 Parent2 = value.Parent2,
                 Gender = value.Gender,
                 PassivesProbability = value.PassivesProbability,
-                IV_HP = value.IV_HP,
-                IV_Attack = value.IV_Attack,
-                IV_Defense = value.IV_Defense,
+                IV_HP = value.IVs.HP,
+                IV_Attack = value.IVs.Attack,
+                IV_Defense = value.IVs.Defense,
                 IVsProbability = value.IVsProbability
 
             }, serializer);

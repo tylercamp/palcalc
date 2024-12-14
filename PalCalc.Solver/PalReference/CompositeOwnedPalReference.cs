@@ -48,9 +48,12 @@ namespace PalCalc.Solver.PalReference
             ActualPassives = Male.ActualPassives.Intersect(Female.ActualPassives).ToList();
             while (ActualPassives.Count < EffectivePassives.Count) ActualPassives.Add(new RandomPassiveSkill());
 
-            IV_HP = PropagateIVs(male.IV_HP, female.IV_HP);
-            IV_Attack = PropagateIVs(male.IV_Attack, female.IV_Attack);
-            IV_Defense = PropagateIVs(male.IV_Defense, female.IV_Defense);
+            IVs = new IV_Set()
+            {
+                HP = PropagateIVs(male.IVs.HP, female.IVs.HP),
+                Attack = PropagateIVs(male.IVs.Attack, female.IVs.Attack),
+                Defense = PropagateIVs(male.IVs.Defense, female.IVs.Defense)
+            };
         }
 
         public OwnedPalReference Male { get; }
@@ -64,9 +67,7 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> ActualPassives { get; }
 
-        public IV_IValue IV_HP { get; }
-        public IV_IValue IV_Attack { get; }
-        public IV_IValue IV_Defense { get; }
+        public IV_Set IVs { get; }
 
         public PalGender Gender { get; private set; } = PalGender.WILDCARD;
 
@@ -102,7 +103,7 @@ namespace PalCalc.Solver.PalReference
                 Male, Female,
                 EffectivePassivesHash,
                 Gender,
-                HashCode.Combine(IV_HP, IV_Attack, IV_Defense)
+                IVs
             );
     }
 }

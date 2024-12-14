@@ -21,6 +21,7 @@ namespace PalCalc.Solver.PalReference
             if (EffectivePassives.Count > GameConstants.MaxTotalPassives) throw new InvalidOperationException();
 
             EffectivePassivesHash = EffectivePassives.SetHash();
+            IVs = new IV_Set() { HP = IV_Random.Instance, Attack =  IV_Random.Instance, Defense = IV_Random.Instance };
         }
 
         private WildPalReference(Pal pal)
@@ -32,9 +33,7 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> EffectivePassives { get; private set; }
 
-        public IV_IValue IV_HP => IV_Random.Instance;
-        public IV_IValue IV_Attack => IV_Random.Instance;
-        public IV_IValue IV_Defense => IV_Random.Instance;
+        public IV_Set IVs { get; private set; }
 
         public PalGender Gender { get; private set; }
 
@@ -62,6 +61,7 @@ namespace PalCalc.Solver.PalReference
                 SelfBreedingEffort = SelfBreedingEffort,
                 Gender = gender,
                 EffectivePassives = EffectivePassives,
+                IVs = IVs,
                 CapturesRequiredForGender = gender switch
                 {
                     PalGender.WILDCARD => 1,
