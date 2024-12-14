@@ -169,11 +169,11 @@
                 </DataTemplate>
 
                 <DataTemplate x:Key="PauseButtonTemplate">
-                    <Button Content="Pause" Command="{Binding PauseSolverCommand}" HorizontalAlignment="Left" />
+                    <Button Content="{itl:LocalizedText Code=LC_SOLVER_PAUSE}" Command="{Binding PauseSolverCommand}" HorizontalAlignment="Left" />
                 </DataTemplate>
 
                 <DataTemplate x:Key="ResumeButtonTemplate">
-                    <Button Content="Resume" Command="{Binding ResumeSolverCommand}" HorizontalAlignment="Left" />
+                    <Button Content="{itl:LocalizedText Code=LC_SOLVER_RESUME}" Command="{Binding ResumeSolverCommand}" HorizontalAlignment="Left" />
                 </DataTemplate>
 
                 <Style x:Key="ContentPresenterTemplate" TargetType="ContentPresenter">
