@@ -5,11 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View.Pal"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
-
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="208.272" d:DesignWidth="766.148">
     <UserControl.Resources>
-        <!-- note: could just use `.Label` from IVs? -->
+        <c:IVRelevanceToOpacityConverter x:Key="RTOC" />
         <DataTemplate DataType="{x:Type mvm:IVAnyValueViewModel}">
             <TextBlock>-</TextBlock>
         </DataTemplate>
@@ -22,26 +22,38 @@
             <TextBlock Text="{Binding Value, Mode=OneWay}" />
         </DataTemplate>
     </UserControl.Resources>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <StackPanel Grid.Column="0" Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}">
+    <UniformGrid Columns="3">
+        <StackPanel
+            Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
+            Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Converter={StaticResource RTOC}}"
+        >
             <Label>HP</Label>
-            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Mode=OneWay}" VerticalAlignment="Center" />
+            <ContentPresenter
+                Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Mode=OneWay}"
+                VerticalAlignment="Center"
+            />
         </StackPanel>
 
-        <StackPanel Grid.Column="1" Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}">
+        <StackPanel
+            Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
+            Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Converter={StaticResource RTOC}}"
+        >
             <Label>ATK</Label>
-            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Mode=OneWay}" VerticalAlignment="Center" />
+            <ContentPresenter
+                Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Mode=OneWay}"
+                VerticalAlignment="Center"
+            />
         </StackPanel>
 
-        <StackPanel Grid.Column="2" Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}">
+        <StackPanel
+            Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
+            Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Converter={StaticResource RTOC}}"
+        >
             <Label>DEF</Label>
-            <ContentPresenter Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Mode=OneWay}" VerticalAlignment="Center" />
+            <ContentPresenter
+                Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Mode=OneWay}"
+                VerticalAlignment="Center"
+            />
         </StackPanel>
-    </Grid>
+    </UniformGrid>
 </UserControl>

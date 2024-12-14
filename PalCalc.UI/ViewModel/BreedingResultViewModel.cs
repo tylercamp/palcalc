@@ -54,11 +54,11 @@ namespace PalCalc.UI.ViewModel
             DisplayedResult = solver.SolveFor(targetInstance, new SolverStateController() { CancellationToken = CancellationToken.None }).MaxBy(r => r.NumTotalBreedingSteps);
 
             IVs = new IVSetViewModel(
-                HP: new IVDirectValueViewModel(80),
-                Attack: new IVDirectValueViewModel(70),
-                Defense: new IVDirectValueViewModel(60)
+                HP: new IVDirectValueViewModel(true, 80),
+                Attack: new IVDirectValueViewModel(true, 70),
+                Defense: new IVDirectValueViewModel(true, 60)
             );
-            IV_Average = new IVDirectValueViewModel(70);
+            IV_Average = new IVDirectValueViewModel(true, 70);
         }
 
         private CachedSaveGame source;
@@ -93,8 +93,8 @@ namespace PalCalc.UI.ViewModel
                     var max = (int)Math.Round(validIVs.Average(iv => iv.Max));
 
                     IV_Average = min != max
-                        ? new IVRangeValueViewModel(min, max)
-                        : new IVDirectValueViewModel(min);
+                        ? new IVRangeValueViewModel(true, min, max)
+                        : new IVDirectValueViewModel(true, min);
                 }
                 else
                 {

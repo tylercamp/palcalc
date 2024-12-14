@@ -1,4 +1,5 @@
 ﻿using PalCalc.Solver;
+using QuickGraph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         /* Properties */
         string Label { get; }
 
+        bool IsRelevant { get; }
+
         /* Utils */
         public static IVValueViewModel FromIV(IV_IValue value)
         {
@@ -29,8 +32,8 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 case IV_Random: return IVAnyValueViewModel.Instance;
                 case IV_Range range:
-                    if (range.Min == range.Max) return new IVDirectValueViewModel(range.Min);
-                    else return new IVRangeValueViewModel(range.Min, range.Max);
+                    if (range.Min == range.Max) return new IVDirectValueViewModel(range.IsRelevant, range.Min);
+                    else return new IVRangeValueViewModel(range.IsRelevant, range.Min, range.Max);
 
                 default:
                     throw new NotImplementedException();
@@ -52,14 +55,16 @@ namespace PalCalc.UI.ViewModel.Mapped
         }
     }
 
-    public class IVDirectValueViewModel(int value) : IVValueViewModel
+    public class IVDirectValueViewModel(bool isRelevant, int value) : IVValueViewModel
     {
         public int Value => value;
+        public bool IsRelevant => isRelevant;
         public string Label { get; } = value.ToString();
     }
 
-    public class IVRangeValueViewModel(int min, int max) : IVValueViewModel
+    public class IVRangeValueViewModel(bool isRelevant, int min, int max) : IVValueViewModel
     {
+        public bool IsRelevant => isRelevant;
         public int Min => min;
         public int Max => max;
 
@@ -82,6 +87,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         private IVAnyValueViewModel() { }
 
         public static IVAnyValueViewModel Instance { get; } = new();
+
+        public bool IsRelevant { get; } = false;
 
         public string Label { get; } = "-";
     }

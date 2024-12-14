@@ -9,13 +9,15 @@ using System.Windows.Data;
 
 namespace PalCalc.UI.ViewModel.Converters
 {
-    internal class IntToIVConverter : IValueConverter
+    internal class IVRelevanceToOpacityConverter : IValueConverter
     {
+        private static double IrrelevantOpacity = 0.7;
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) return null;
-            else if ((int)value == 0) return IVAnyValueViewModel.Instance;
-            else return new IVDirectValueViewModel(true, (int)value);
+            if (value == null) return IrrelevantOpacity;
+            if (value is IVValueViewModel v && !v.IsRelevant) return IrrelevantOpacity;
+            else return 1.0;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

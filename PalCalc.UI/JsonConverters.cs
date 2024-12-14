@@ -199,6 +199,7 @@ namespace PalCalc.UI
         {
             dependencyConverters = new JsonConverter[]
             {
+                new IV_IValueConverter(),
                 new PalInstanceJsonConverter(db),
                 new ILocalizedTextConverter(db, gameSettings),
             };
@@ -207,23 +208,54 @@ namespace PalCalc.UI
         internal override JToken MakeRefJson(OwnedPalReference value, JsonSerializer serializer)
         {
             InjectDependencyConverters(serializer);
-            return JToken.FromObject(value.UnderlyingInstance, serializer);
+
+            return JToken.FromObject(new
+            {
+                Instance = value.UnderlyingInstance,
+                IVs = new
+                {
+                    HP = value.IVs.HP,
+                    Attack = value.IVs.Attack,
+                    Defense = value.IVs.Defense
+                }
+            }, serializer);
         }
 
         internal override OwnedPalReference ReadRefJson(JToken token, Type objectType, OwnedPalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             InjectDependencyConverters(serializer);
-            var inst = token.ToObject<PalInstance>(serializer);
+
+            PalInstance inst;
+            IV_IValue hp;
+            IV_IValue attack;
+            IV_IValue defense;
+
+            if (token["Instance"] != null)
+            {
+                inst = token["Instance"].ToObject<PalInstance>(serializer);
+                hp = token["IVs"]["HP"].ToObject<IV_IValue>(serializer);
+                attack = token["IVs"]["Attack"].ToObject<IV_IValue>(serializer);
+                defense = token["IVs"]["Defense"].ToObject<IV_IValue>(serializer);
+            }
+            else
+            {
+                // old format (changed 1.10.0)
+                inst = token.ToObject<PalInstance>(serializer);
+
+                hp = new IV_Range(isRelevant: true, inst.IV_HP);
+                attack = new IV_Range(isRelevant: true, inst.IV_Attack);
+                defense = new IV_Range(isRelevant: true, inst.IV_Defense);
+            }
+
             return new OwnedPalReference(
                 inst,
                 // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
                 inst.PassiveSkills,
                 new IV_Set()
                 {
-                    // (isRelevant only matters while the solver is running)
-                    HP = new IV_Range(isRelevant: true, inst.IV_HP),
-                    Attack = new IV_Range(isRelevant: true, inst.IV_Attack),
-                    Defense = new IV_Range(isRelevant: true, inst.IV_Defense)
+                    HP = hp,
+                    Attack = attack,
+                    Defense = defense
                 }
             );
         }
@@ -300,7 +332,7 @@ namespace PalCalc.UI
             else
             {
                 return new IV_Range(
-                    IsRelevant: true, // (note: isRelevant only matters while the solver is running)
+                    token["IsRelevant"]?.ToObject<bool>() ?? true,
                     token["Min"].ToObject<int>(),
                     token["Max"].ToObject<int>()
                 );
@@ -317,6 +349,7 @@ namespace PalCalc.UI
                 case IV_Range range:
                     JToken.FromObject(new
                     {
+                        IsRelevant = range.IsRelevant,
                         Min = range.Min,
                         Max = range.Max
                     }).WriteTo(writer);
