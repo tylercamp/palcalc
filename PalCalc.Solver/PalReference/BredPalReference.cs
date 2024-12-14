@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -69,8 +70,14 @@ namespace PalCalc.Solver.PalReference
         ) : this(gameSettings, pal, parent1, parent2, passives, ivs)
         {
             Gender = PalGender.WILDCARD;
-            // TODO - is this check actually needed?
-            if (passivesProbability <= 0 || ivsProbability <= 0) AvgRequiredBreedings = int.MaxValue;
+            if (passivesProbability <= 0 || ivsProbability <= 0)
+            {
+                // don't think this is actually needed anymore, keeping just in case
+#if DEBUG
+                Debugger.Break();
+#endif
+                AvgRequiredBreedings = int.MaxValue;
+            }
             else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / (passivesProbability * ivsProbability));
 
             PassivesProbability = passivesProbability;

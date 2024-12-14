@@ -7,9 +7,6 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.ResultPruning
 {
-    /// <summary>
-    /// TODO
-    /// </summary>
     /// <param name="maxIvDifference">
     /// Given a pal with the highest IVs, other pals will only be kept if their IVs differ by at most this much.
     /// </param>
@@ -26,7 +23,24 @@ namespace PalCalc.Solver.ResultPruning
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results)
         {
-            // TODO - would min+max average be better?
+            // note: all pals within a group being pruned should:
+            //
+            // - all have the same `IsRelevant` for each type of IV
+            //   e.g. all HP will be relevant or all HP will be irrelevant
+            //
+            //   (would be enforced by grouping with `WorkingSet.DefaultGroupFn`)
+            //
+            // - all have relevant min/max values if the IV in general is considered relevant
+            //   e.g. if HP is relevant, the min/max values will also be relevant
+            //
+            //   (would be enforced by applying min-IV filter on input pals (done in
+            //   `BreedingSolver`), so the only IVs included will be relevant IVs)
+            //
+
+            // current impl just compares the maximum part of the IV range. filtering by min/avg
+            // IVs doesn't affect whether we get a relevant result (see above), so we'll instead
+            // try to maximize the highest possible value
+
             int SelectValue(IV_IValue value) =>
                 ValueOf(value, 0, r => r.Max);
 
@@ -35,6 +49,9 @@ namespace PalCalc.Solver.ResultPruning
 
             if (token.IsCancellationRequested) return results;
 
+            // could multiply maxIvDifference by the number of relevant IV types, but this
+            // just further prunes results, and I'd prefer to give later pruning steps an
+            // opportunity to apply their pruning
             var bestValue = results.Max(r => TotalIVs(r.IVs));
             var threshold = bestValue - maxIvDifference * 3;
 
