@@ -353,6 +353,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_MEMORY_WARNING_MSG,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_MEMORY_WARNING_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_MULTIPLE_BREEDING_FARMS,
         /// <summary>
         ///   Looks up a localized string similar to .

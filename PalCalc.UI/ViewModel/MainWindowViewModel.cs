@@ -564,8 +564,8 @@ namespace PalCalc.UI.ViewModel
             {
                 var response = MessageBox.Show(
                     owner: App.Current.MainWindow,
-                    messageBoxText: "Notice: The solver has been temporarily paused since the system is low on memory. Work will resume once this message has closed.\n\nWould you like to ignore future warnings for this run?",
-                    caption: "Memory Warning!",
+                    messageBoxText: LocalizationCodes.LC_MEMORY_WARNING_MSG.Bind().Value,
+                    caption: LocalizationCodes.LC_MEMORY_WARNING_TITLE.Bind().Value,
                     button: MessageBoxButton.YesNoCancel
                 );
 

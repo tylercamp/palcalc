@@ -339,6 +339,14 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_MANUAL_SAVE_SELECTOR_TITLE" xml:space="preserve">
     <value>Select the 'Level.sav' file in your save folder</value>
   </data>
+  <data name="LC_MEMORY_WARNING_MSG" xml:space="preserve">
+    <value>Notice: The solver has been temporarily paused since the system is low on memory. Work will resume once this message has closed.
+
+Would you like to ignore future warnings for this run?</value>
+  </data>
+  <data name="LC_MEMORY_WARNING_TITLE" xml:space="preserve">
+    <value>Memory Warning!</value>
+  </data>
   <data name="LC_MULTIPLE_BREEDING_FARMS" xml:space="preserve">
     <value>Multiple Breeding Farms</value>
   </data>
