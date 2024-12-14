@@ -441,6 +441,8 @@ namespace PalCalc.UI.ViewModel
                     currentJob = new SolverJob(
                         solverTokenSource2,
                         new SolverStateController() { CancellationToken = solverTokenSource2.Token },
+                        // start the monitor paused - race condition in `MemoryMonitor_MemoryWarning` callback
+                        // when accessing `currentJob`. will be unpaused in `Solver_SolverStateUpdated`
                         new MemoryMonitor(solverTokenSource2.Token) { PauseNotices = true }
                     );
 
@@ -538,6 +540,8 @@ namespace PalCalc.UI.ViewModel
         private void MemoryMonitor_MemoryWarning()
         {
             currentJob.SolverController.Pause();
+            // (regardless of the user's selection, notices will be paused until the end of the current
+            // breeding step. notices will resume once the next step starts)
             currentJob.MemoryMonitor.PauseNotices = true;
 
             dispatcher.BeginInvoke(() =>
@@ -552,6 +556,8 @@ namespace PalCalc.UI.ViewModel
                 switch (response)
                 {
                     case MessageBoxResult.Yes:
+                        // stop the memory monitor entirely, it's still accessible but will no
+                        // longer emit events regardless of `PauseNotices`
                         currentJob.MemoryMonitor.Dispose();
                         break;
 
@@ -603,6 +609,8 @@ namespace PalCalc.UI.ViewModel
                         overallStep = 0;
                         lastStepIndex = -1;
 
+                        // monitor starts paused to avoid an init race condition, resume it once
+                        // solver inits
                         currentJob.MemoryMonitor.PauseNotices = false;
 
                         StepProgress = 0;
@@ -626,6 +634,12 @@ namespace PalCalc.UI.ViewModel
 
                         if (obj.CurrentStepIndex != lastStepIndex)
                         {
+                            // resume the memory monitor whenever the current step changes. the user might've
+                            // ignored the warning during the previous step, but the new step may have so much
+                            // extra data that they might change their mind.
+                            //
+                            // this has no effect if `currentJob.MemoryMonitor.Dispose()` was called at any point
+                            // (see `MemoryMonitor_MemoryWarning` callback)
                             currentJob.MemoryMonitor.PauseNotices = false;
                             lastStepIndex = obj.CurrentStepIndex;
                         }
@@ -771,7 +785,5 @@ namespace PalCalc.UI.ViewModel
         {
             Process.Start(new ProcessStartInfo { FileName = latestVersionUrl, UseShellExecute = true });
         }
-
-        public PalDB DB => db;
     }
 }
