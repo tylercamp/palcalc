@@ -38,10 +38,21 @@ namespace PalCalc.UI.ViewModel
         private Dictionary<ISaveGame, PalTargetListViewModel> targetsBySaveFile;
         private LoadingSaveFileModal loadingSaveModal = null;
         private Dispatcher dispatcher;
-        private CancellationTokenSource solverTokenSource;
         private AppSettings settings;
         private PassiveSkillsPresetCollectionViewModel passivePresets;
         private IRelayCommand<PalSpecifierViewModel> deletePalTargetCommand;
+        private SolverJob currentJob;
+
+        private record class SolverJob(
+            CancellationTokenSource TokenSource,
+            SolverStateController SolverController,
+            MemoryMonitor MemoryMonitor
+        );
+
+        public ICommand RunSolverCommand { get; }
+        public ICommand PauseSolverCommand { get; }
+        public ICommand ResumeSolverCommand { get; }
+        public ICommand CancelSolverCommand { get; }
 
         public List<TranslationLocaleViewModel> Locales { get; } =
             Enum
@@ -91,7 +102,18 @@ namespace PalCalc.UI.ViewModel
 
             Storage.SaveAppSettings(settings);
 
-            SolverControls = SolverControlsViewModel.FromModel(settings.SolverSettings);
+            RunSolverCommand = new RelayCommand(RunSolver);
+            PauseSolverCommand = new RelayCommand(PauseSolver);
+            ResumeSolverCommand = new RelayCommand(ResumeSolver);
+            CancelSolverCommand = new RelayCommand(CancelSolver);
+
+            SolverControls = new SolverControlsViewModel(
+                runSolverCommand: RunSolverCommand,
+                cancelSolverCommand: CancelSolverCommand,
+                pauseSolverCommand: PauseSolverCommand,
+                resumeSolverCommand: ResumeSolverCommand
+            );
+            SolverControls.CopyFrom(settings.SolverSettings);
             SolverControls.PropertyChanged += (s, e) =>
             {
                 settings.SolverSettings = SolverControls.AsModel;
@@ -398,7 +420,7 @@ namespace PalCalc.UI.ViewModel
             File.WriteAllText(outputFile, JsonConvert.SerializeObject(list, converter));
         }
 
-        public void RunSolver()
+        private void RunSolver()
         {
             var currentSpec = PalTarget?.CurrentPalSpecifier?.ModelObject;
             if (currentSpec == null) return;
@@ -424,10 +446,34 @@ namespace PalCalc.UI.ViewModel
             {
                 try
                 {
-                    dispatcher.Invoke(() => IsEditable = false);
+                    dispatcher.Invoke(() =>
+                    {
+                        IsEditable = false;
+                        SolverControls.CurrentSolverState = SolverState.Running;
+                    });
 
-                    solverTokenSource = new CancellationTokenSource();
-                    var results = solver.SolveFor(currentSpec, solverTokenSource.Token);
+                    var solverTokenSource2 = new CancellationTokenSource();
+
+                    currentJob = new SolverJob(
+                        solverTokenSource2,
+                        new SolverStateController() { CancellationToken = solverTokenSource2.Token },
+                        // start the monitor paused - race condition in `MemoryMonitor_MemoryWarning` callback
+                        // when accessing `currentJob`. will be unpaused in `Solver_SolverStateUpdated`
+                        new MemoryMonitor(solverTokenSource2.Token) { PauseNotices = true }
+                    );
+
+                    // monitor memory usage and pause if we take up a significant amount
+                    currentJob.MemoryMonitor.MemoryWarning += MemoryMonitor_MemoryWarning;
+
+                    List<IPalReference> results;
+                    try
+                    {
+                        results = solver.SolveFor(currentSpec, currentJob.SolverController);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        results = [];
+                    }
 
                     // general simplification pass, get the best result for each potentially
                     // interesting combination of result properties
@@ -437,7 +483,7 @@ namespace PalCalc.UI.ViewModel
                         p => p.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
                     ));
                     resultsTable.AddRange(results);
-                    resultsTable.FilterAll(PruningRulesBuilder.Default, solverTokenSource.Token);
+                    resultsTable.FilterAll(PruningRulesBuilder.Default, currentJob.TokenSource.Token);
 
                     // final simplification pass, ignore any results which are over 2x the effort of the fastest option
                     resultsTable = resultsTable.BuildNew(PalProperty.Combine(
@@ -462,7 +508,7 @@ namespace PalCalc.UI.ViewModel
 
                     dispatcher.Invoke(() =>
                     {
-                        if (!solverTokenSource.IsCancellationRequested)
+                        if (!currentJob.TokenSource.IsCancellationRequested)
                         {
                             PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(cachedData, r)).ToList() };
                             if (PalTarget.InitialPalSpecifier == null)
@@ -485,7 +531,11 @@ namespace PalCalc.UI.ViewModel
                             UpdatePalTarget();
                         }
 
-                        solverTokenSource = null;
+                        currentJob.TokenSource.Dispose();
+                        currentJob?.MemoryMonitor?.Dispose();
+                        currentJob = null;
+
+                        SolverControls.CurrentSolverState = SolverState.Idle;
                         IsEditable = true;
                     });
                 }
@@ -503,21 +553,73 @@ namespace PalCalc.UI.ViewModel
             solverThread.Start();
         }
 
-        public void CancelSolver()
+        private void MemoryMonitor_MemoryWarning()
         {
-            if (solverTokenSource != null)
+            currentJob.SolverController.Pause();
+            // (regardless of the user's selection, notices will be paused until the end of the current
+            // breeding step. notices will resume once the next step starts)
+            currentJob.MemoryMonitor.PauseNotices = true;
+
+            dispatcher.BeginInvoke(() =>
             {
-                solverTokenSource.Cancel();
-            }
+                var response = MessageBox.Show(
+                    owner: App.Current.MainWindow,
+                    messageBoxText: LocalizationCodes.LC_MEMORY_WARNING_MSG.Bind().Value,
+                    caption: LocalizationCodes.LC_MEMORY_WARNING_TITLE.Bind().Value,
+                    button: MessageBoxButton.YesNoCancel
+                );
+
+                switch (response)
+                {
+                    case MessageBoxResult.Yes:
+                        // stop the memory monitor entirely, it's still accessible but will no
+                        // longer emit events regardless of `PauseNotices`
+                        currentJob.MemoryMonitor.Dispose();
+                        break;
+
+                    case MessageBoxResult.No:
+                        break;
+
+                    default:
+                        CancelSolver();
+                        break;
+                }
+
+                currentJob?.SolverController?.Resume();
+            });
+        }
+
+        private void CancelSolver()
+        {
+            currentJob?.TokenSource?.Cancel();
+            currentJob?.SolverController?.Resume();
+        }
+
+        private void PauseSolver()
+        {
+            currentJob?.SolverController?.Pause();
+
+            // we'd prefer to get the current state from the solver's update events,
+            // but not everything is wired up to emit those events (namely `WorkingSet`)
+            SolverControls.CurrentSolverState = SolverState.Paused;
+        }
+
+        private void ResumeSolver()
+        {
+            currentJob?.SolverController?.Resume();
+            SolverControls.CurrentSolverState = SolverState.Running;
         }
 
         private Stopwatch solverStopwatch = null;
+        private int lastStepIndex = -1;
         private void Solver_SolverStateUpdated(SolverStatus obj)
         {
             string FormatNum(int num) => num.ToString("#,##");
 
             dispatcher.BeginInvoke(() =>
             {
+                SolverControls.CurrentSolverState = obj.Paused ? SolverState.Paused : SolverState.Running;
+
                 var numTotalSteps = (double)(1 + obj.TargetSteps);
                 int overallStep = 0;
                 switch (obj.CurrentPhase)
@@ -526,6 +628,11 @@ namespace PalCalc.UI.ViewModel
                         solverStopwatch = Stopwatch.StartNew();
                         SolverStatusMsg = LocalizationCodes.LV_SOLVER_STATUS_INITIALIZING.Bind();
                         overallStep = 0;
+                        lastStepIndex = -1;
+
+                        // monitor starts paused to avoid an init race condition, resume it once
+                        // solver inits
+                        currentJob.MemoryMonitor.PauseNotices = false;
 
                         StepProgress = 0;
                         StepStatusMsg = null;
@@ -545,6 +652,18 @@ namespace PalCalc.UI.ViewModel
                         StepStatusMsg = LocalizationCodes.LC_SOLVER_STEP_STATUS_BREEDING.Bind(
                             new { NumProcessed = FormatNum(obj.WorkProcessedCount), WorkSize = FormatNum(obj.CurrentWorkSize) }
                         );
+
+                        if (obj.CurrentStepIndex != lastStepIndex)
+                        {
+                            // resume the memory monitor whenever the current step changes. the user might've
+                            // ignored the warning during the previous step, but the new step may have so much
+                            // extra data that they might change their mind.
+                            //
+                            // this has no effect if `currentJob.MemoryMonitor.Dispose()` was called at any point
+                            // (see `MemoryMonitor_MemoryWarning` callback)
+                            currentJob.MemoryMonitor.PauseNotices = false;
+                            lastStepIndex = obj.CurrentStepIndex;
+                        }
                         break;
 
                     case SolverPhase.Finished:
@@ -579,9 +698,7 @@ namespace PalCalc.UI.ViewModel
         private bool showNoResultsNotice = false;
         private void UpdateSolverControls()
         {
-            SolverControls.CanRunSolver = IsEditable && PalTarget != null && PalTarget.IsValid;
-            SolverControls.CanEditSettings = IsEditable;
-            SolverControls.CanCancelSolver = !IsEditable;
+            SolverControls.IsValidConfig = PalTarget?.IsValid == true;
         }
 
         private PalTargetViewModel palTarget;
@@ -689,7 +806,5 @@ namespace PalCalc.UI.ViewModel
         {
             Process.Start(new ProcessStartInfo { FileName = latestVersionUrl, UseShellExecute = true });
         }
-
-        public PalDB DB => db;
     }
 }

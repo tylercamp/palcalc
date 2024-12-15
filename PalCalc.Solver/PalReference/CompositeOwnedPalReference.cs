@@ -22,6 +22,18 @@ namespace PalCalc.Solver.PalReference
     /// </summary>
     public class CompositeOwnedPalReference : IPalReference
     {
+        private static IV_IValue PropagateIVs(IV_IValue a, IV_IValue b)
+        {
+            if (a is IV_Range ar && b is IV_Range br)
+            {
+                return IV_Range.Merge(ar, br);
+            }
+            else
+            {
+                return IV_Random.Instance;
+            }
+        }
+
         public CompositeOwnedPalReference(OwnedPalReference male, OwnedPalReference female)
         {
             Male = male;
@@ -31,10 +43,17 @@ namespace PalCalc.Solver.PalReference
 
             // effective passives based on which pal has the most irrelevant passives
             EffectivePassives = male.EffectivePassives.Count > female.EffectivePassives.Count ? male.EffectivePassives : female.EffectivePassives;
-            EffectivePassivesHash = EffectivePassives.SetHash();
+            EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
 
             ActualPassives = Male.ActualPassives.Intersect(Female.ActualPassives).ToList();
             while (ActualPassives.Count < EffectivePassives.Count) ActualPassives.Add(new RandomPassiveSkill());
+
+            IVs = new IV_Set()
+            {
+                HP = PropagateIVs(male.IVs.HP, female.IVs.HP),
+                Attack = PropagateIVs(male.IVs.Attack, female.IVs.Attack),
+                Defense = PropagateIVs(male.IVs.Defense, female.IVs.Defense)
+            };
         }
 
         public OwnedPalReference Male { get; }
@@ -47,6 +66,8 @@ namespace PalCalc.Solver.PalReference
         public int EffectivePassivesHash { get; private set; }
 
         public List<PassiveSkill> ActualPassives { get; }
+
+        public IV_Set IVs { get; }
 
         public PalGender Gender { get; private set; } = PalGender.WILDCARD;
 
@@ -75,8 +96,14 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
-        // TODO - maybe just use Pal, PassivesHash, Gender? don't need hashes specific to the instances chosen?
+        // TODO - maybe just use Pal, PassivesHash, Gender, IVs? don't need hashes specific to the instances chosen?
         public override int GetHashCode() =>
-            HashCode.Combine(nameof(CompositeOwnedPalReference), Male, Female, EffectivePassivesHash, Gender);
+            HashCode.Combine(
+                nameof(CompositeOwnedPalReference),
+                Male, Female,
+                EffectivePassivesHash,
+                Gender,
+                IVs
+            );
     }
 }

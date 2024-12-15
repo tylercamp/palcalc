@@ -20,7 +20,8 @@ namespace PalCalc.Solver.PalReference
             if (guaranteedPassives.Any(t => !pal.GuaranteedPassivesInternalIds.Contains(t.InternalName))) throw new InvalidOperationException();
             if (EffectivePassives.Count > GameConstants.MaxTotalPassives) throw new InvalidOperationException();
 
-            EffectivePassivesHash = EffectivePassives.SetHash();
+            EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
+            IVs = new IV_Set() { HP = IV_Random.Instance, Attack =  IV_Random.Instance, Defense = IV_Random.Instance };
         }
 
         private WildPalReference(Pal pal)
@@ -31,6 +32,8 @@ namespace PalCalc.Solver.PalReference
         public Pal Pal { get; private set; }
 
         public List<PassiveSkill> EffectivePassives { get; private set; }
+
+        public IV_Set IVs { get; private set; }
 
         public PalGender Gender { get; private set; }
 
@@ -58,6 +61,7 @@ namespace PalCalc.Solver.PalReference
                 SelfBreedingEffort = SelfBreedingEffort,
                 Gender = gender,
                 EffectivePassives = EffectivePassives,
+                IVs = IVs,
                 CapturesRequiredForGender = gender switch
                 {
                     PalGender.WILDCARD => 1,

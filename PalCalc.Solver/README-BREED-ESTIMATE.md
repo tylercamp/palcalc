@@ -96,4 +96,4 @@ In that case we can combine the probabilities for [1] and [2], giving us a 7.5% 
 
 **This gives us our final result - from these two parents we create two children, one with an ~8 hour estimate, and the other with a ~2 hour estimate.**
 
-(The logic involving `P(Direct)` and `P(Random)` are implemented in `BreedingSolver.ProbabilityInheritedTargetPassives`. The logic for accumulating and assigning these probabilities is in `BreedingSolver.SolveFor`.)
+(The logic involving `P(Direct)` and `P(Random)` are implemented in `Probabilities.Passives.ProbabilityInheritedTargetPassives`. The logic for accumulating and assigning these probabilities is in `BreedingSolver.SolveFor`.)

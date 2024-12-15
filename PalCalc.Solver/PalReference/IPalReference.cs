@@ -18,7 +18,13 @@ namespace PalCalc.Solver.PalReference
         /// be represented as a Random passive.
         /// </summary>
         List<PassiveSkill> EffectivePassives { get; }
-        int EffectivePassivesHash { get; } // optimization
+
+        // (note: should be based on the effective passives names, not on the effective passives themselves. we
+        // want random passives to be distinct from each other for passive-list-dedup purposes, but not for set-hash,
+        // since that would prevent random-passive pals from being grouped together during pruning.)
+        int EffectivePassivesHash { get; } // optimizations
+
+        IV_Set IVs { get; }
 
         List<PassiveSkill> ActualPassives { get; }
 

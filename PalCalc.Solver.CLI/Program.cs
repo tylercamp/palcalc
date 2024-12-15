@@ -2,6 +2,7 @@
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
+using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 using PalCalc.Solver.Tree;
 using System.Diagnostics;
@@ -16,6 +17,34 @@ internal class Program
 
         var db = PalDB.LoadEmbedded();
         Console.WriteLine("Loaded Pal DB");
+
+        var reptyro = new OwnedPalReference(
+            new PalInstance()
+            {
+                Gender = PalGender.MALE,
+                Pal = "Reptyro Cryst".ToPal(db),
+                PassiveSkills = ["Brave".ToPassive(db), "Workaholic".ToPassive(db), "Runner".ToPassive(db)]
+            },
+            ["Runner".ToPassive(db), new RandomPassiveSkill(), new RandomPassiveSkill()],
+            new IV_Set()
+        );
+
+        var wixen = new OwnedPalReference(
+            new PalInstance()
+            {
+                Gender = PalGender.FEMALE,
+                Pal = "Wixen".ToPal(db),
+                PassiveSkills = ["Lucky".ToPassive(db), "Brave".ToPassive(db)]
+            },
+            ["Lucky".ToPassive(db), "Brave".ToPassive(db)],
+            new IV_Set()
+        );
+
+        var parentPassives = reptyro.ActualPassives.Concat(wixen.ActualPassives).Distinct().ToList();
+        var targetPassives = new List<PassiveSkill>() { "Lucky".ToPassive(db), "Runner".ToPassive(db) };
+        var numFinalPassives = 3;
+
+        var prob = PalCalc.Solver.Probabilities.Passives.ProbabilityInheritedTargetPassives(parentPassives, targetPassives, numFinalPassives);
 
         var saveGame = DirectSavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LastModified);
         Console.WriteLine("Using {0}", saveGame);
@@ -45,7 +74,11 @@ internal class Program
             RequiredPassives = new List<PassiveSkill> { "Swift".ToPassive(db), "Runner".ToPassive(db), "Nimble".ToPassive(db) },
         };
 
-        var matches = solver.SolveFor(targetInstance, CancellationToken.None);
+        var controller = new SolverStateController()
+        {
+            CancellationToken = CancellationToken.None,
+        };
+        var matches = solver.SolveFor(targetInstance, controller);
 
         Console.WriteLine("Took {0}", TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds));
 

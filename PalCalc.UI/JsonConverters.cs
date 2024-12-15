@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
+using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
@@ -198,6 +199,7 @@ namespace PalCalc.UI
         {
             dependencyConverters = new JsonConverter[]
             {
+                new IV_IValueConverter(),
                 new PalInstanceJsonConverter(db),
                 new ILocalizedTextConverter(db, gameSettings),
             };
@@ -206,14 +208,56 @@ namespace PalCalc.UI
         internal override JToken MakeRefJson(OwnedPalReference value, JsonSerializer serializer)
         {
             InjectDependencyConverters(serializer);
-            return JToken.FromObject(value.UnderlyingInstance, serializer);
+
+            return JToken.FromObject(new
+            {
+                Instance = value.UnderlyingInstance,
+                IVs = new
+                {
+                    HP = value.IVs.HP,
+                    Attack = value.IVs.Attack,
+                    Defense = value.IVs.Defense
+                }
+            }, serializer);
         }
 
         internal override OwnedPalReference ReadRefJson(JToken token, Type objectType, OwnedPalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             InjectDependencyConverters(serializer);
-            var inst = token.ToObject<PalInstance>(serializer);
-            return new OwnedPalReference(inst, inst.PassiveSkills); // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
+
+            PalInstance inst;
+            IV_IValue hp;
+            IV_IValue attack;
+            IV_IValue defense;
+
+            if (token["Instance"] != null)
+            {
+                inst = token["Instance"].ToObject<PalInstance>(serializer);
+                hp = token["IVs"]["HP"].ToObject<IV_IValue>(serializer);
+                attack = token["IVs"]["Attack"].ToObject<IV_IValue>(serializer);
+                defense = token["IVs"]["Defense"].ToObject<IV_IValue>(serializer);
+            }
+            else
+            {
+                // old format (changed 1.10.0)
+                inst = token.ToObject<PalInstance>(serializer);
+
+                hp = new IV_Range(isRelevant: true, inst.IV_HP);
+                attack = new IV_Range(isRelevant: true, inst.IV_Attack);
+                defense = new IV_Range(isRelevant: true, inst.IV_Defense);
+            }
+
+            return new OwnedPalReference(
+                inst,
+                // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
+                inst.PassiveSkills,
+                new IV_Set()
+                {
+                    HP = hp,
+                    Attack = attack,
+                    Defense = defense
+                }
+            );
         }
     }
 
@@ -234,7 +278,8 @@ namespace PalCalc.UI
             return JToken.FromObject(new
             {
                 Male = value.Male,
-                Female = value.Female
+                Female = value.Female,
+                Gender = value.Gender,
             }, serializer);
         }
 
@@ -243,8 +288,9 @@ namespace PalCalc.UI
             InjectDependencyConverters(serializer);
             var male = token["Male"].ToObject<OwnedPalReference>(serializer);
             var female = token["Female"].ToObject<OwnedPalReference>(serializer);
+            var gender = token["Gender"]?.ToObject<PalGender>(serializer) ?? PalGender.WILDCARD;
 
-            return new CompositeOwnedPalReference(male, female);
+            return (CompositeOwnedPalReference)new CompositeOwnedPalReference(male, female).WithGuaranteedGender(db, gender);
         }
     }
 
@@ -277,6 +323,44 @@ namespace PalCalc.UI
         }
     }
 
+    internal class IV_IValueConverter : JsonConverter<IV_IValue>
+    {
+        public override IV_IValue ReadJson(JsonReader reader, Type objectType, IV_IValue existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var token = JToken.ReadFrom(reader);
+            if (token is not JObject) return IV_Random.Instance;
+            else
+            {
+                return new IV_Range(
+                    token["IsRelevant"]?.ToObject<bool>() ?? true,
+                    token["Min"].ToObject<int>(),
+                    token["Max"].ToObject<int>()
+                );
+            }
+        }
+
+        public override void WriteJson(JsonWriter writer, IV_IValue value, JsonSerializer serializer)
+        {
+            switch (value)
+            {
+                case IV_Random:
+                    JToken.FromObject("any").WriteTo(writer); break;
+
+                case IV_Range range:
+                    JToken.FromObject(new
+                    {
+                        IsRelevant = range.IsRelevant,
+                        Min = range.Min,
+                        Max = range.Max
+                    }).WriteTo(writer);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+    }
+
     internal class BredPalReferenceConverter : IPalReferenceConverterBase<BredPalReference>
     {
         public BredPalReferenceConverter(PalDB db, GameSettings gameSettings, PalReferenceConverter genericConverter) : base(db, gameSettings, "BRED_PAL")
@@ -286,6 +370,7 @@ namespace PalCalc.UI
                 genericConverter,
                 new PassiveSkillConverter(db, gameSettings),
                 new ILocalizedTextConverter(db, gameSettings),
+                new IV_IValueConverter(),
             };
         }
 
@@ -298,8 +383,14 @@ namespace PalCalc.UI
             var parent2 = token["Parent2"].ToObject<IPalReference>(serializer);
             var gender = token["Gender"].ToObject<PalGender>(serializer);
             var passivesProbability = (token["PassivesProbability"] ?? token["TraitsProbability"]).ToObject<float>(serializer);
+            var ivsProbability = token["IVsProbability"]?.ToObject<float>(serializer) ?? 1.0f;
 
-            return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability).WithGuaranteedGender(db, gender) as BredPalReference;
+            var IV_hp = token["IV_HP"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
+            var IV_attack = token["IV_Attack"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
+            var IV_defense = token["IV_Defense"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
+            var ivs = new IV_Set() { HP = IV_hp, Attack = IV_attack, Defense = IV_defense };
+
+            return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability, ivs, ivsProbability).WithGuaranteedGender(db, gender) as BredPalReference;
         }
 
         internal override JToken MakeRefJson(BredPalReference value, JsonSerializer serializer)
@@ -313,6 +404,11 @@ namespace PalCalc.UI
                 Parent2 = value.Parent2,
                 Gender = value.Gender,
                 PassivesProbability = value.PassivesProbability,
+                IV_HP = value.IVs.HP,
+                IV_Attack = value.IVs.Attack,
+                IV_Defense = value.IVs.Defense,
+                IVsProbability = value.IVsProbability
+
             }, serializer);
         }
     }
@@ -392,6 +488,9 @@ namespace PalCalc.UI
                 OptionalPassive2 = (obj["OptionalPassive2"] ?? obj["OptionalTrait2"])?.ToObject<PassiveSkillViewModel>(serializer),
                 OptionalPassive3 = (obj["OptionalPassive3"] ?? obj["OptionalTrait3"])?.ToObject<PassiveSkillViewModel>(serializer),
                 OptionalPassive4 = (obj["OptionalPassive4"] ?? obj["OptionalTrait4"])?.ToObject<PassiveSkillViewModel>(serializer),
+                MinIv_HP = obj["MinIV_HP"]?.ToObject<int>() ?? 0,
+                MinIv_Attack = obj["MinIV_Attack"]?.ToObject<int>() ?? 0,
+                MinIv_Defense = obj["MinIV_Defense"]?.ToObject<int>() ?? 0,
                 PalSourceId = obj["PalSourceId"]?.ToObject<string>(),
                 RequiredGender = PalGenderViewModel.Make(obj["RequiredGender"]?.ToObject<PalGender>() ?? PalGender.WILDCARD),
                 IncludeBasePals = obj["IncludeBasePals"]?.ToObject<bool>() ?? true,
@@ -414,6 +513,9 @@ namespace PalCalc.UI
                 OptionalPassive2 = value.OptionalPassive2,
                 OptionalPassive3 = value.OptionalPassive3,
                 OptionalPassive4 = value.OptionalPassive4,
+                MinIV_HP = value.MinIv_HP,
+                MinIV_Attack = value.MinIv_Attack,
+                MinIV_Defense = value.MinIv_Defense,
                 PalSourceId = value.PalSourceId,
                 RequiredGender = value.RequiredGender?.Value ?? PalGender.WILDCARD,
                 IncludeBasePals = value.IncludeBasePals,

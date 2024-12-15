@@ -51,7 +51,14 @@ namespace PalCalc.UI.ViewModel
                 },
             };
 
-            DisplayedResult = solver.SolveFor(targetInstance, CancellationToken.None).MaxBy(r => r.NumTotalBreedingSteps);
+            DisplayedResult = solver.SolveFor(targetInstance, new SolverStateController() { CancellationToken = CancellationToken.None }).MaxBy(r => r.NumTotalBreedingSteps);
+
+            IVs = new IVSetViewModel(
+                HP: new IVDirectValueViewModel(true, 80),
+                Attack: new IVDirectValueViewModel(true, 70),
+                Defense: new IVDirectValueViewModel(true, 60)
+            );
+            IV_Average = new IVDirectValueViewModel(true, 70);
         }
 
         private CachedSaveGame source;
@@ -70,6 +77,30 @@ namespace PalCalc.UI.ViewModel
                 DisplayedResult = displayedResult;
                 Graph = BreedingGraph.FromPalReference(source, displayedResult);
                 EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
+
+                IVs = IVSetViewModel.FromIVs(displayedResult.IVs);
+
+                var validIVs = new[]
+                {
+                    displayedResult.IVs.HP,
+                    displayedResult.IVs.Attack,
+                    displayedResult.IVs.Defense
+                }.OfType<IV_Range>().ToArray();
+
+                if (validIVs.Length > 0)
+                {
+                    var min = (int)Math.Round(validIVs.Average(iv => iv.Min));
+                    var max = (int)Math.Round(validIVs.Average(iv => iv.Max));
+
+                    IV_Average = min != max
+                        ? new IVRangeValueViewModel(true, min, max)
+                        : new IVDirectValueViewModel(true, min);
+                }
+                else
+                {
+                    IV_Average = IVAnyValueViewModel.Instance;
+                }
+
                 Label = LocalizationCodes.LC_RESULT_LABEL.Bind(
                     new
                     {
@@ -142,5 +173,13 @@ namespace PalCalc.UI.ViewModel
         public bool NeedsRefresh => Graph?.NeedsRefresh ?? false;
         public int NumWildPals => DisplayedResult.NumWildPalParticipants();
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
+
+        public IVSetViewModel IVs { get; }
+        // (needed for BreedingResultListView which uses `util:GridViewSort.PropertyName`)
+        public IVValueViewModel IV_HP => IVs.HP;
+        public IVValueViewModel IV_Attack => IVs.Attack;
+        public IVValueViewModel IV_Defense => IVs.Defense;
+
+        public IVValueViewModel IV_Average { get; }
     }
 }

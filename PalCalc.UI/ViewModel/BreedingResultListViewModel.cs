@@ -4,6 +4,7 @@ using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace PalCalc.UI.ViewModel
                     OnPropertyChanged(nameof(NumStepsWidth));
                     OnPropertyChanged(nameof(LocationsWidth));
                     OnPropertyChanged(nameof(PassiveSkillsWidth));
+                    OnPropertyChanged(nameof(IVsWidth));
                 }
             }
         }
@@ -53,6 +55,21 @@ namespace PalCalc.UI.ViewModel
         public double NumStepsWidth => HiddenIfRedundant(vm => vm.NumBreedingSteps);
         public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
         public double PassiveSkillsWidth => HiddenIfRedundant(vm => vm.EffectivePassives.Description);
+        public double IVsWidth
+        {
+            get
+            {
+                if (Results == null || Results.Count < 2) return DEFAULT;
+
+                if (Results.All(r =>
+                    r.IVs.HP is IVAnyValueViewModel &&
+                    r.IVs.Attack is IVAnyValueViewModel &&
+                    r.IVs.Defense is IVAnyValueViewModel)
+                ) return WIDTH_HIDDEN;
+
+                return FIT_CONTENT;
+            }
+        }
 
         public void RefreshWith(CachedSaveGame csg)
         {
@@ -70,16 +87,25 @@ namespace PalCalc.UI.ViewModel
         {
             Results = new List<BreedingResultViewModel>()
             {
-                new BreedingResultViewModel(null, new OwnedPalReference(new PalInstance()
-                {
-                    Pal = "Beakon".ToPal(PalDB.LoadEmbedded()),
-                    Gender = PalGender.WILDCARD,
-                    Location = new PalLocation() { Index = 0, Type = LocationType.Palbox },
-                    PassiveSkills = new List<PassiveSkill>()
+                new BreedingResultViewModel(null, new OwnedPalReference(
+                    new PalInstance()
                     {
-                        "Runner".ToPassive(PalDB.LoadEmbedded()),
+                        Pal = "Beakon".ToPal(PalDB.LoadEmbedded()),
+                        Gender = PalGender.WILDCARD,
+                        Location = new PalLocation() { Index = 0, Type = LocationType.Palbox },
+                        PassiveSkills = new List<PassiveSkill>()
+                        {
+                            "Runner".ToPassive(PalDB.LoadEmbedded()),
+                        }
+                    },
+                    new List<PassiveSkill>() { "Runner".ToPassive(PalDB.LoadEmbedded()) },
+                    new IV_Set()
+                    {
+                        HP = new IV_Range(true, 80, 90),
+                        Attack = IV_Random.Instance,
+                        Defense = IV_Random.Instance
                     }
-                }, new List<PassiveSkill>() { "Runner".ToPassive(PalDB.LoadEmbedded()) }))
+                ))
             }
         };
     }

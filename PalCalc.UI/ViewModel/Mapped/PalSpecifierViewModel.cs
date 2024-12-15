@@ -52,6 +52,10 @@ namespace PalCalc.UI.ViewModel.Mapped
                 OptionalPassive3 = optionalVms[2];
                 OptionalPassive4 = optionalVms[3];
 
+                MinIv_HP = underlyingSpec.IV_HP;
+                MinIv_Attack = underlyingSpec.IV_Attack;
+                MinIv_Defense = underlyingSpec.IV_Defense;
+
                 RequiredGender = PalGenderViewModel.Make(underlyingSpec.RequiredGender);
             }
         }
@@ -99,6 +103,9 @@ namespace PalCalc.UI.ViewModel.Mapped
                 RequiredPassives = RequiredPassiveModelObjects,
                 OptionalPassives = OptionalPassiveModelObjects,
                 RequiredGender = RequiredGender.Value,
+                IV_HP = MinIv_HP,
+                IV_Attack = MinIv_Attack,
+                IV_Defense = MinIv_Defense,
             }
             : null;
 
@@ -147,6 +154,18 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public PassiveSkillCollectionViewModel OptionalPassivesCollection => new PassiveSkillCollectionViewModel(OptionalPassives);
 
+        [NotifyPropertyChangedFor(nameof(HasIVs))]
+        [ObservableProperty]
+        private int minIv_HP;
+
+        [NotifyPropertyChangedFor(nameof(HasIVs))]
+        [ObservableProperty]
+        private int minIv_Attack;
+
+        [NotifyPropertyChangedFor(nameof(HasIVs))]
+        [ObservableProperty]
+        private int minIv_Defense;
+
         [ObservableProperty]
         private BreedingResultListViewModel currentResults;
 
@@ -164,6 +183,8 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         [ObservableProperty]
         private bool includeCagedPals = true;
+
+        public bool HasIVs => MinIv_HP > 0 || MinIv_Attack > 0 || MinIv_Defense > 0;
 
         public bool IsValid => TargetPal != null;
 
@@ -202,7 +223,10 @@ namespace PalCalc.UI.ViewModel.Mapped
                 psvm.PalSourceId == PalSourceId &&
                 psvm.IncludeBasePals == IncludeBasePals &&
                 psvm.IncludeCustomPals == IncludeCustomPals &&
-                psvm.IncludeCagedPals == IncludeCagedPals
+                psvm.IncludeCagedPals == IncludeCagedPals &&
+                psvm.MinIv_HP == MinIv_HP &&
+                psvm.MinIv_Attack == MinIv_Attack &&
+                psvm.MinIv_Defense == MinIv_Defense
             );
         }
 
@@ -220,11 +244,18 @@ namespace PalCalc.UI.ViewModel.Mapped
                 OptionalPassive3,
                 OptionalPassive4
             ),
+            HashCode.Combine(
+                MinIv_HP,
+                MinIv_Attack,
+                MinIv_Defense
+            ),
             RequiredGender.Value,
             PalSourceId,
-            IncludeBasePals,
-            IncludeCustomPals,
-            IncludeCagedPals
+            HashCode.Combine(
+                IncludeBasePals,
+                IncludeCustomPals,
+                IncludeCagedPals
+            )
         );
 
         public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(
@@ -234,6 +265,9 @@ namespace PalCalc.UI.ViewModel.Mapped
                 RequiredPassives = RequiredPassiveModelObjects,
                 OptionalPassives = OptionalPassiveModelObjects,
                 RequiredGender = RequiredGender.Value,
+                IV_HP = MinIv_HP,
+                IV_Attack = MinIv_Attack,
+                IV_Defense = MinIv_Defense,
             }
         ) {
             CurrentResults = CurrentResults,
@@ -257,7 +291,9 @@ namespace PalCalc.UI.ViewModel.Mapped
                     Passive1 = PassiveSkillViewModel.Make("Runner".ToPassive(db)),
                     Passive2 = PassiveSkillViewModel.Make("Swift".ToPassive(db)),
 
-                    OptionalPassive1 = PassiveSkillViewModel.Make("Aggressive".ToPassive(db))
+                    OptionalPassive1 = PassiveSkillViewModel.Make("Aggressive".ToPassive(db)),
+
+                    MinIv_Attack = 90,
                 };
             }
         }

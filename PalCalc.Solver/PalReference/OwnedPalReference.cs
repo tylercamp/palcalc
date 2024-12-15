@@ -12,14 +12,16 @@ namespace PalCalc.Solver.PalReference
         PalInstance instance;
 
         /// <param name="effectivePassives">The list of passives held by the `instance`, filtered/re-mapped based on desired passives. (.ToDedicatedPassives())</param>
-        public OwnedPalReference(PalInstance instance, List<PassiveSkill> effectivePassives)
+        public OwnedPalReference(PalInstance instance, List<PassiveSkill> effectivePassives, IV_Set effectiveIVs)
         {
             this.instance = instance;
 
             EffectivePassives = effectivePassives;
-            EffectivePassivesHash = EffectivePassives.SetHash();
+            EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
 
             ActualPassives = instance.PassiveSkills;
+
+            IVs = effectiveIVs;
         }
 
         public PalInstance UnderlyingInstance => instance;
@@ -31,6 +33,8 @@ namespace PalCalc.Solver.PalReference
         public int EffectivePassivesHash { get; }
 
         public List<PassiveSkill> ActualPassives { get; }
+
+        public IV_Set IVs { get; }
 
         public PalGender Gender => instance.Gender;
 

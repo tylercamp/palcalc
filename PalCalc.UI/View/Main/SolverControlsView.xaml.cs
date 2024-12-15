@@ -24,12 +24,5 @@ namespace PalCalc.UI.View.Main
         {
             InitializeComponent();
         }
-
-        public event Action OnRun;
-        public event Action OnCancel;
-
-        private void Run_Click(object sender, RoutedEventArgs e) => OnRun?.Invoke();
-
-        private void Cancel_Click(object sender, RoutedEventArgs e) => OnCancel?.Invoke();
     }
 }

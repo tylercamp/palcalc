@@ -172,10 +172,19 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_COMMON_IV_ATTACK" xml:space="preserve">
     <value>Attack</value>
   </data>
+  <data name="LC_COMMON_IV_ATTACK_SHORT" xml:space="preserve">
+    <value>ATK</value>
+  </data>
   <data name="LC_COMMON_IV_DEFENSE" xml:space="preserve">
     <value>Defense</value>
   </data>
+  <data name="LC_COMMON_IV_DEFENSE_SHORT" xml:space="preserve">
+    <value>DEF</value>
+  </data>
   <data name="LC_COMMON_IV_HP" xml:space="preserve">
+    <value>HP</value>
+  </data>
+  <data name="LC_COMMON_IV_HP_SHORT" xml:space="preserve">
     <value>HP</value>
   </data>
   <data name="LC_COMMON_LEVEL" xml:space="preserve">
@@ -330,6 +339,14 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_MANUAL_SAVE_SELECTOR_TITLE" xml:space="preserve">
     <value>Select the 'Level.sav' file in your save folder</value>
   </data>
+  <data name="LC_MEMORY_WARNING_MSG" xml:space="preserve">
+    <value>Notice: The solver has been temporarily paused since the system is low on memory. Work will resume once this message has closed.
+
+Would you like to ignore future warnings for this run?</value>
+  </data>
+  <data name="LC_MEMORY_WARNING_TITLE" xml:space="preserve">
+    <value>Memory Warning!</value>
+  </data>
   <data name="LC_MULTIPLE_BREEDING_FARMS" xml:space="preserve">
     <value>Multiple Breeding Farms</value>
   </data>
@@ -431,6 +448,18 @@ This will not delete the save files from your computer.</value>
   </data>
   <data name="LC_RESULT_INPUT_LOCS" xml:space="preserve">
     <value>Input Locations</value>
+  </data>
+  <data name="LC_RESULT_IV_ATTACK" xml:space="preserve">
+    <value>IV ATK</value>
+  </data>
+  <data name="LC_RESULT_IV_AVERAGE" xml:space="preserve">
+    <value>IV AVG</value>
+  </data>
+  <data name="LC_RESULT_IV_DEFENSE" xml:space="preserve">
+    <value>IV DEF</value>
+  </data>
+  <data name="LC_RESULT_IV_HP" xml:space="preserve">
+    <value>IV HP</value>
   </data>
   <data name="LC_RESULT_LABEL" xml:space="preserve">
     <value>{PalName} with {TraitsList}, takes ~{TimeEstimate}</value>
@@ -554,6 +583,12 @@ This will not delete the save files from your computer.</value>
   </data>
   <data name="LC_SAVE_WARNING" xml:space="preserve">
     <value>(!)</value>
+  </data>
+  <data name="LC_SOLVER_PAUSE" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="LC_SOLVER_RESUME" xml:space="preserve">
+    <value>Resume</value>
   </data>
   <data name="LC_SOLVER_RUN" xml:space="preserve">
     <value>Run</value>

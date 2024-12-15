@@ -1,0 +1,60 @@
+﻿<UserControl x:Class="PalCalc.UI.View.Pal.PalIVsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PalCalc.UI.View.Pal"
+             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             mc:Ignorable="d" 
+             d:DesignHeight="208.272" d:DesignWidth="766.148">
+    <UserControl.Resources>
+        <c:IVRelevanceToOpacityConverter x:Key="RTOC" />
+        <DataTemplate DataType="{x:Type mvm:IVAnyValueViewModel}">
+            <TextBlock>-</TextBlock>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type mvm:IVRangeValueViewModel}">
+            <TextBlock>
+                <Run Text="{Binding Min, Mode=OneWay}" /><Run Text="-" /><Run Text="{Binding Max, Mode=OneWay}" />
+            </TextBlock>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type mvm:IVDirectValueViewModel}">
+            <TextBlock Text="{Binding Value, Mode=OneWay}" />
+        </DataTemplate>
+    </UserControl.Resources>
+    <UniformGrid Columns="3">
+        <StackPanel
+            Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
+            Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Converter={StaticResource RTOC}}"
+        >
+            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_HP_SHORT}" />
+            <ContentPresenter
+                Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Mode=OneWay}"
+                VerticalAlignment="Center"
+            />
+        </StackPanel>
+
+        <StackPanel
+            Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
+            Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Converter={StaticResource RTOC}}"
+        >
+            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK_SHORT}" />
+            <ContentPresenter
+                Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Mode=OneWay}"
+                VerticalAlignment="Center"
+            />
+        </StackPanel>
+
+        <StackPanel
+            Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
+            Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Converter={StaticResource RTOC}}"
+        >
+            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE_SHORT}" />
+            <ContentPresenter
+                Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Mode=OneWay}"
+                VerticalAlignment="Center"
+            />
+        </StackPanel>
+    </UniformGrid>
+</UserControl>
