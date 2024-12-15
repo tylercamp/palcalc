@@ -40,7 +40,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             (locale, passive) => passive switch
             {
                 RandomPassiveSkill => Translator.Localizations[locale][LocalizationCodes.LC_RANDOM_TRAIT],
-                _ => passive.LocalizedNames?.GetValueOrElse(locale.ToFormalName(), passive.Name) ?? passive.InternalName
+                _ => passive.LocalizedNames?.GetValueOrElse(locale.ToFormalName().ToLower(), passive.Name) ?? passive.InternalName
             }
         );
 

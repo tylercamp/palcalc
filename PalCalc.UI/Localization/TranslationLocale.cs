@@ -16,6 +16,7 @@ namespace PalCalc.UI.Localization
     public static class TranslationLocaleExtensions
     {
         // convert enum name to stored name for pals + localization files
+        // (note: the locale names are all lower-case when we read these from game files)
         public static string ToFormalName(this TranslationLocale locale) => locale.ToString().Replace('_', '-');
     }
 }
