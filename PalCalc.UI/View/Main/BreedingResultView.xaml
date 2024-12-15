@@ -46,6 +46,12 @@
                                             <Setter.Value>
                                                 <ToolTip DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}" Background="#040F15">
                                                     <StackPanel>
+                                                        <!-- (some nodes, like composites, have styles which override text size - ensure consistent size in popups) -->
+                                                        <StackPanel.Resources>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="FontSize" Value="13" />
+                                                            </Style>
+                                                        </StackPanel.Resources>
                                                         <vp:PalLocationView DataContext="{Binding MapLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" Width="300" Height="300" />
                                                         <vp:PalLocationView DataContext="{Binding ContainerLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" />
                                                     </StackPanel>
