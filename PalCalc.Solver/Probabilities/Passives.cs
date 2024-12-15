@@ -67,11 +67,12 @@ namespace PalCalc.Solver.Probabilities
                 if (numIrrelevantFromRandom < 0) Debugger.Break();
 #endif
 
+                // (will end up including the probability of inheriting exactly `numInheritedFromParent`, but the logic is
+                // easier to organize if we include it for each individual case below)
                 float probabilityGotRequiredFromParent;
-                if (numInheritedFromParent == 0)
-                {
-                    // would only happen if neither parent has a desired passive
 
+                if (numInheritedFromParent == 0) // would only happen if neither parent has a desired passive
+                {
                     // the only way we could get zero inherited passives is if neither parent actually has any passives, otherwise
                     // it (seems to) be impossible to get zero direct inherited passives (unconfirmed from reddit thread)
                     if (parentPassives.Count > 0) continue;
@@ -92,6 +93,13 @@ namespace PalCalc.Solver.Probabilities
                 }
                 else
                 {
+                    // chance of getting `numInherited` which include the desired passives
+                    //
+                    // https://math.stackexchange.com/a/3642093 - "method 1"
+                    //
+                    // (that link is for 1 random, just change "1" for any `k`. the detail of "random" in that link is also irrelevant,
+                    // still works even though we want `k` "specific" elements instead of "random" elements.)
+
                     // (available passives except desired)
                     // choose
                     // (required num irrelevant)
@@ -102,12 +110,8 @@ namespace PalCalc.Solver.Probabilities
                     // (actual num inherited from parent)
                     var numCombinationsWithAnyPassives = (float)Choose(parentPassives.Count, actualNumInheritedFromParent);
 
-                    // probability of those passives containing the desired passives
-                    // (doesn't affect anything if we don't actually want any of these passives)
-                    // (TODO - is this right? got this simple division from chatgpt)
-                    var probabilityCombinationWithDesiredPassives = desiredParentPassives.Count == 0 ? 1 : (
-                        numCombinationsWithIrrelevantPassive / numCombinationsWithAnyPassives
-                    );
+                    var probabilityCombinationWithDesiredPassives =
+                        numCombinationsWithIrrelevantPassive / numCombinationsWithAnyPassives;
 
                     probabilityGotRequiredFromParent = probabilityCombinationWithDesiredPassives * GameConstants.PassiveProbabilityDirect[numInheritedFromParent];
                 }
@@ -116,7 +120,13 @@ namespace PalCalc.Solver.Probabilities
                 if (probabilityGotRequiredFromParent > 1) Debugger.Break();
 #endif
 
+                // we've inherited as many passives as we can get from the parents, now we need to fill in the remaining with
+                // random passives until we get `numFinalPassives`
+
+                // TODO - if we inherit 4 passives and "need exactly 0 random", then the random probability doesn't matter
+                //        at all - no additional passives would be added
                 var probabilityGotExactRequiredRandom = GameConstants.PassiveRandomAddedProbability[numIrrelevantFromRandom];
+
                 probabilityForNumPassives += probabilityGotRequiredFromParent * probabilityGotExactRequiredRandom;
             }
 

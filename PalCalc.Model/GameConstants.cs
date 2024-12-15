@@ -80,6 +80,7 @@ namespace PalCalc.Model
             { 3, 0.20f },
             { 2, 0.30f },
             { 1, 0.40f },
+            { 0, 0.0f },
         };
 
         // probability of getting N passives from parent pool without any random passives
