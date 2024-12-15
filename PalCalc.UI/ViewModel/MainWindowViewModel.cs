@@ -107,6 +107,11 @@ namespace PalCalc.UI.ViewModel
             ResumeSolverCommand = new RelayCommand(ResumeSolver);
             CancelSolverCommand = new RelayCommand(CancelSolver);
 
+            App.Current.MainWindow.Closing += (o, e) =>
+            {
+                CancelSolverCommand.Execute(null);
+            };
+
             SolverControls = new SolverControlsViewModel(
                 runSolverCommand: RunSolverCommand,
                 cancelSolverCommand: CancelSolverCommand,
