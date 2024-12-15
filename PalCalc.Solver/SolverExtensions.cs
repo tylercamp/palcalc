@@ -24,9 +24,27 @@ namespace PalCalc.Solver
 
         public static List<PassiveSkill> ToDedicatedPassives(this IEnumerable<PassiveSkill> actualPassives, IEnumerable<PassiveSkill> desiredPassives)
         {
-            var irrelevantAsRandom = actualPassives.Except(desiredPassives).Select(_ => new RandomPassiveSkill());
-            return actualPassives.Intersect(desiredPassives).Concat(irrelevantAsRandom).ToList();
+            var irrelevantAsRandom = actualPassives
+                .Except(desiredPassives)
+                .Where(p => !GameConstants.PassiveSkillTimeFactors.ContainsKey(p.InternalName))
+                .Select(_ => new RandomPassiveSkill());
+
+            return actualPassives
+                .Select(p =>
+                    desiredPassives.Contains(p) || GameConstants.PassiveSkillTimeFactors.ContainsKey(p.InternalName)
+                        ? p
+                        : new RandomPassiveSkill()
+                )
+                .ToList();
         }
+
+        // TODO - atm only Philanthropist affects breeding time. if another is added, how do they interact if both are on a given pal?
+        public static float ToTimeFactor(this IEnumerable<PassiveSkill> passives) =>
+            passives
+                .Where(p => GameConstants.PassiveSkillTimeFactors.ContainsKey(p.InternalName))
+                .Select(p => GameConstants.PassiveSkillTimeFactors[p.InternalName])
+                .DefaultIfEmpty(1.0f)
+                .Min();
 
         public static IEnumerable<IPalReference> AllReferences(this IPalReference pref)
         {

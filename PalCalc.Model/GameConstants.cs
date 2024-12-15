@@ -30,6 +30,15 @@ namespace PalCalc.Model
             { LocationType.Custom, null },
         };
 
+        /// <summary>
+        /// Passive skills which affect breeding times
+        /// </summary>
+        public static readonly Dictionary<string, float> PassiveSkillTimeFactors = new()
+        {
+            // TODO - could this be scraped from game files?
+            { "Test_PalEgg_HatchingSpeed_Up", 0.5f }
+        };
+
         // Used for calculating map coords from world coords
         //
         // (these values are fetched from game files and output at the end of `PalCalc.GenDB.BuildDBProgram`)

@@ -56,6 +56,8 @@ namespace PalCalc.Solver.PalReference
                     ? Parent1.BreedingEffort
                     : Parent2.BreedingEffort
                 : Parent1.BreedingEffort + Parent2.BreedingEffort;
+
+            TimeFactor = EffectivePassives.ToTimeFactor();
         }
 
         public BredPalReference(
@@ -97,8 +99,10 @@ namespace PalCalc.Solver.PalReference
         public IV_Set IVs { get; private set; }
         public float IVsProbability { get; private set; }
 
+        public float TimeFactor { get; }
+
         public int AvgRequiredBreedings { get; private set; }
-        public TimeSpan SelfBreedingEffort => AvgRequiredBreedings * gameSettings.AvgBreedingTime;
+        public TimeSpan SelfBreedingEffort => AvgRequiredBreedings * gameSettings.AvgBreedingTime * Parent1.TimeFactor * Parent2.TimeFactor;
 
         private TimeSpan parentBreedingEffort;
         public TimeSpan BreedingEffort => SelfBreedingEffort + parentBreedingEffort;

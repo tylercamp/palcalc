@@ -39,6 +39,8 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> ActualPassives => EffectivePassives;
 
+        public float TimeFactor => 1.0f;
+
         public IPalRefLocation Location { get; } = new CapturedRefLocation();
 
         public TimeSpan BreedingEffort => SelfBreedingEffort * CapturesRequiredForGender;

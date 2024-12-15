@@ -48,6 +48,8 @@ namespace PalCalc.Solver.PalReference
             ActualPassives = Male.ActualPassives.Intersect(Female.ActualPassives).ToList();
             while (ActualPassives.Count < EffectivePassives.Count) ActualPassives.Add(new RandomPassiveSkill());
 
+            TimeFactor = ActualPassives.ToTimeFactor();
+
             IVs = new IV_Set()
             {
                 HP = PropagateIVs(male.IVs.HP, female.IVs.HP),
@@ -74,6 +76,8 @@ namespace PalCalc.Solver.PalReference
         public int NumTotalBreedingSteps { get; } = 0;
 
         public IPalRefLocation Location { get; }
+
+        public float TimeFactor { get; }
 
         public TimeSpan BreedingEffort { get; } = TimeSpan.Zero;
 

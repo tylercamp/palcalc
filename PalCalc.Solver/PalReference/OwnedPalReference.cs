@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace PalCalc.Solver.PalReference
 
             EffectivePassives = effectivePassives;
             EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
+            TimeFactor = effectivePassives.ToTimeFactor();
 
             ActualPassives = instance.PassiveSkills;
 
@@ -33,6 +35,8 @@ namespace PalCalc.Solver.PalReference
         public int EffectivePassivesHash { get; }
 
         public List<PassiveSkill> ActualPassives { get; }
+
+        public float TimeFactor { get; }
 
         public IV_Set IVs { get; }
 
