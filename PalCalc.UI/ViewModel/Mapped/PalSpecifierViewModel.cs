@@ -204,60 +204,6 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
         }
 
-        public override bool Equals(object obj)
-        {
-            var psvm = obj as PalSpecifierViewModel;
-            if (psvm == null) return false;
-
-            return (
-                psvm.TargetPal == TargetPal &&
-                psvm.Passive1 == Passive1 &&
-                psvm.Passive2 == Passive2 &&
-                psvm.Passive3 == Passive3 &&
-                psvm.Passive4 == Passive4 &&
-                psvm.OptionalPassive1 == OptionalPassive1 &&
-                psvm.OptionalPassive2 == OptionalPassive2 &&
-                psvm.OptionalPassive3 == OptionalPassive3 &&
-                psvm.OptionalPassive4 == OptionalPassive4 &&
-                psvm.RequiredGender == RequiredGender &&
-                psvm.PalSourceId == PalSourceId &&
-                psvm.IncludeBasePals == IncludeBasePals &&
-                psvm.IncludeCustomPals == IncludeCustomPals &&
-                psvm.IncludeCagedPals == IncludeCagedPals &&
-                psvm.MinIv_HP == MinIv_HP &&
-                psvm.MinIv_Attack == MinIv_Attack &&
-                psvm.MinIv_Defense == MinIv_Defense
-            );
-        }
-
-        public override int GetHashCode() => HashCode.Combine(
-            TargetPal,
-            HashCode.Combine(
-                Passive1,
-                Passive2,
-                Passive3,
-                Passive4
-            ),
-            HashCode.Combine(
-                OptionalPassive1,
-                OptionalPassive2,
-                OptionalPassive3,
-                OptionalPassive4
-            ),
-            HashCode.Combine(
-                MinIv_HP,
-                MinIv_Attack,
-                MinIv_Defense
-            ),
-            RequiredGender.Value,
-            PalSourceId,
-            HashCode.Combine(
-                IncludeBasePals,
-                IncludeCustomPals,
-                IncludeCagedPals
-            )
-        );
-
         public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(
             new PalSpecifier()
             {
