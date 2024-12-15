@@ -104,10 +104,10 @@
                                                 <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
                                                 <TextBlock Text="{Binding LocationCoordDescription.Value}" />
                                             </StackPanel>
-                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="8" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
                                         </StackPanel>
                                 
-                                        <Border BorderBrush="White" Width="1" BorderThickness="1" Margin="10" Grid.Column="1" />
+                                        <Border BorderBrush="White" Width="1" BorderThickness="1" Margin="10,5,10,5" Grid.Column="1" VerticalAlignment="Stretch" />
                                         
                                         <StackPanel Orientation="Horizontal" Grid.Column="2" MaxWidth="100" DataContext="{Binding FemaleViewModel}" Style="{StaticResource LocationStyle}">
                                             <StackPanel Orientation="Vertical">
@@ -116,7 +116,7 @@
                                                 <TextBlock Text="{Binding LocationCoordDescription.Value}" />
                                             </StackPanel>
 
-                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="8" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
