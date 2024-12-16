@@ -72,6 +72,7 @@ namespace PalCalc.Solver
         List<Pal> bannedBredPals;
         int maxBreedingSteps, maxSolverIterations, maxWildPals, maxBredIrrelevantPassives, maxInputIrrelevantPassives;
         TimeSpan maxEffort;
+        bool forceTimeFactorPassives;
         PruningRulesBuilder pruningBuilder;
         int maxThreads;
 
@@ -116,6 +117,8 @@ namespace PalCalc.Solver
             this.maxBredIrrelevantPassives = Math.Min(3, maxBredIrrelevantPassives);
             this.maxEffort = maxEffort;
             this.maxThreads = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
+
+            this.forceTimeFactorPassives = true;
         }
 
         public event Action<SolverStatus> SolverStateUpdated;
@@ -146,16 +149,16 @@ namespace PalCalc.Solver
                 yield break;
             }
 
-            var numTotalPassives = requiredPassives.Count() + optionalPassives.Count();
-            // we're within the passive limit, return all passives
-            if (numTotalPassives <= GameConstants.MaxTotalPassives)
-            {
-                yield return requiredPassives.Concat(optionalPassives);
-                yield break;
-            }
+            //var numTotalPassives = requiredPassives.Count() + optionalPassives.Count();
+            //// we're within the passive limit, return all passives
+            //if (numTotalPassives <= GameConstants.MaxTotalPassives)
+            //{
+            //    yield return requiredPassives.Concat(optionalPassives);
+            //    yield break;
+            //}
 
             var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count();
-            foreach (var optional in optionalPassives.ToList().Combinations(maxOptionalPassives).Where(c => c.Any()))
+            foreach (var optional in optionalPassives.ToList().Combinations(maxOptionalPassives) /* .Where(c => c.Any()) */)
             {
                 var res = requiredPassives.Concat(optional);
                 yield return res;
@@ -258,6 +261,20 @@ namespace PalCalc.Solver
             };
             SolverStateUpdated?.Invoke(statusMsg);
 
+            var allowedOptionalPassives = spec.OptionalPassives.ToList(); // important - make a copy!
+            if (forceTimeFactorPassives)
+            {
+                foreach (var passiveName in GameConstants.PassiveSkillTimeFactors.Keys)
+                {
+                    var passive = passiveName.InternalToPassive(db);
+
+                    if (!allowedOptionalPassives.Contains(passive))
+                        allowedOptionalPassives.Add(passive);
+                }
+            }
+
+            var finalDesiredPassives = spec.DesiredPassives.Concat(allowedOptionalPassives).Distinct().ToList();
+
             /* Build the initial list of pals to breed */
 
             // attempt to deduplicate pals and *intelligently* reduce the initial working set size
@@ -287,7 +304,7 @@ namespace PalCalc.Solver
                 // skip pals if they can't be used to reach the desired pals (e.g. Jetragon can only be bred from other Jetragons)
                 .Where(p => WithinBreedingSteps(p.Pal, maxBreedingSteps))
                 // apply "Max Input Irrelevant Passives" setting
-                .Where(p => p.PassiveSkills.Except(spec.DesiredPassives).Count() <= maxInputIrrelevantPassives)
+                .Where(p => p.PassiveSkills.Except(finalDesiredPassives).Count() <= maxInputIrrelevantPassives)
                 // convert from Model to Solver repr
                 .Select(p => new OwnedPalReference( 
                     instance: p,
@@ -359,10 +376,10 @@ namespace PalCalc.Solver
                                     // number of "effectively random" passives should exclude guaranteed passives which are part of the desired list of passives
                                     Math.Max(
                                         0,
-                                        maxInputIrrelevantPassives - p.GuaranteedPassiveSkills(db).Except(spec.DesiredPassives).Count()
+                                        maxInputIrrelevantPassives - p.GuaranteedPassiveSkills(db).Except(finalDesiredPassives).Count()
                                     )
                                 )
-                                .Select(numRandomPassives => new WildPalReference(p, p.GuaranteedPassiveSkills(db).Intersect(spec.DesiredPassives), numRandomPassives))
+                                .Select(numRandomPassives => new WildPalReference(p, p.GuaranteedPassiveSkills(db).Intersect(finalDesiredPassives), numRandomPassives))
                         )
                         .Where(pi => pi.BreedingEffort <= maxEffort)
                 );
@@ -440,9 +457,9 @@ namespace PalCalc.Solver
 
                                     return (
                                         // any relevant from parents?
-                                        combinedPassives.Intersect(spec.DesiredPassives).Any() ||
+                                        combinedPassives.Intersect(finalDesiredPassives).Any() ||
                                         // no irrelevant passives from parents?
-                                        !combinedPassives.Except(spec.DesiredPassives).Any()
+                                        !combinedPassives.Except(finalDesiredPassives).Any()
                                     );
                                 })
                                 .SelectMany(p =>
@@ -529,7 +546,7 @@ namespace PalCalc.Solver
 
                                     var passiveSkillPerms = PassiveSkillPermutations(
                                         spec.RequiredPassives.Intersect(parentPassives).ToList(),
-                                        spec.OptionalPassives.Intersect(parentPassives).ToList()
+                                        allowedOptionalPassives.Intersect(parentPassives).ToList()
                                     ).Select(p => p.ToList()).ToList();
 
                                     var ivsProbability = Probabilities.IVs.ProbabilityInheritedTargetIVs(parent1.IVs, parent2.IVs);
