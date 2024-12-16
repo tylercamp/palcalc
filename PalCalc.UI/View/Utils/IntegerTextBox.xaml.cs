@@ -104,6 +104,11 @@ namespace PalCalc.UI.View.Utils
                     if (Value != newValue) textBox.Text = lastValidText;
                 }
             }
+            else if (textBox.Text.Length == 0)
+            {
+                Value = MinValue;
+                textBox.Text = lastValidText;
+            }
             else
             {
                 textBox.Text = lastValidText;
