@@ -52,6 +52,8 @@ namespace PalCalc.Model
                 Location = token["Location"].ToObject<PalLocation>(),
                 Gender = token["Gender"].ToObject<PalGender>(),
                 PassiveSkills = passives.ToObject<List<string>>().Select(s => s.ToPassive(db)).ToList(),
+                ActiveSkills = (token["ActiveSkills"]?.ToObject<List<string>>() ?? []).Select(s => s.ToActive(db)).ToList(),
+                EquippedActiveSkills = (token["EquippedActiveSkills"]?.ToObject<List<string>>() ?? []).Select(s => s.ToActive(db)).ToList(),
                 OwnerPlayerId = token["OwnerPlayerId"].ToObject<string>(),
                 NickName = token["NickName"].ToObject<string>(),
                 Level = token["Level"].ToObject<int>(),
@@ -71,6 +73,8 @@ namespace PalCalc.Model
                 Location = value.Location,
                 Gender = value.Gender,
                 PassiveSkills = value.PassiveSkills.Select(t => t.InternalName),
+                ActiveSkills = value.ActiveSkills?.Select(s => s.InternalName) ?? [],
+                EquippedActiveSkills = value.EquippedActiveSkills?.Select(s => s.InternalName) ?? [],
                 OwnerPlayerId = value.OwnerPlayerId,
                 NickName = value.NickName,
                 Level = value.Level,
@@ -133,6 +137,8 @@ namespace PalCalc.Model
             var version = asToken["Version"]?.ToObject<string>();
             var pals = asToken["Pals"].ToObject<List<Pal>>();
             var passives = asToken["PassiveSkills"].ToObject<List<PassiveSkill>>();
+            var attacks = asToken["ActiveSkills"].ToObject<List<ActiveSkill>>();
+            var elements = asToken["Elements"].ToObject<List<PalElement>>();
             var breedingGenderProbability = asToken["BreedingGenderProbability"].ToObject<Dictionary<string, Dictionary<PalGender, float>>>();
             var minBreedingSteps = asToken["MinBreedingSteps"].ToObject<Dictionary<string, Dictionary<string, int>>>();
 
@@ -144,6 +150,8 @@ namespace PalCalc.Model
                 Version = version,
                 PalsById = pals.ToDictionary(p => p.Id),
                 PassiveSkills = passives,
+                ActiveSkills = attacks,
+                Elements = elements,
                 Breeding = breeding,
 
                 MinBreedingSteps = minBreedingSteps.ToDictionary(
@@ -173,6 +181,8 @@ namespace PalCalc.Model
                 Pals = value.Pals,
                 Breeding = breedingToken,
                 PassiveSkills = value.PassiveSkills,
+                ActiveSkills = value.ActiveSkills,
+                Elements = value.Elements,
                 BreedingGenderProbability = value.BreedingGenderProbability.ToDictionary(kvp => kvp.Key.InternalName, kvp => kvp.Value),
                 MinBreedingSteps = value.MinBreedingSteps.ToDictionary(
                     kvp => kvp.Key.InternalName,

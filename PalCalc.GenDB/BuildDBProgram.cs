@@ -52,7 +52,7 @@ namespace PalCalc.GenDB
         //
         // (should be a folder containing "Pal-Windows.pak")
         static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Content\Paks";
-        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
+        static string MappingsPath = @"C:\Users\algor\OneDrive\Desktop\Mappings.usmap";
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
@@ -96,6 +96,45 @@ namespace PalCalc.GenDB
                 {
                     LocalizedNames = localizedNames
                 };
+            }).ToList();
+        }
+
+        private static List<ActiveSkill> BuildActiveSkills(List<UActiveSkill> rawActiveSkills, List<PalElement> elements, Dictionary<string, Dictionary<string, string>> attackNames)
+        {
+            return rawActiveSkills.Where(s => !s.DisabledData).Select(rawAttack =>
+            {
+                var attackId = rawAttack.WazaType.Replace("EPalWazaID::", "");
+                var localizedNames = attackNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetValueOrDefault(attackId));
+
+                if (localizedNames.Any(kvp => kvp.Value == null))
+                {
+                    logger.Warning("Skill {InternalName} missing at least 1 translation, skipping", attackId);
+                    return null;
+                }
+
+                var englishName = localizedNames["en"];
+                var element = elements.Single(e => e.InternalName == rawAttack.Element.Replace("EPalElementType::", ""));
+
+                return new ActiveSkill(englishName, attackId, element)
+                {
+                    CooldownSeconds = rawAttack.CoolTime,
+                    CanInherit = !rawAttack.IgnoreRandomInherit,
+                    Power = rawAttack.Power,
+                    LocalizedNames = localizedNames
+                };
+            }).SkipNull().ToList();
+        }
+
+        private static List<PalElement> BuildElements(Dictionary<string, Dictionary<string, string>> elementNames)
+        {
+            var elementTypes = elementNames.SelectMany(kvp => kvp.Value.Keys).Distinct().ToList();
+
+            return elementTypes.Select(internalName =>
+            {
+                var localizedNames = elementNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value[internalName]);
+                var englishName = localizedNames["en"];
+
+                return new PalElement(englishName, internalName) { LocalizedNames = localizedNames };
             }).ToList();
         }
 
@@ -279,13 +318,23 @@ namespace PalCalc.GenDB
                 skillNames: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadSkillNames(provider))
             );
 
+            var elements = BuildElements(localizations.ToDictionary(l => l.LanguageCode, l => l.ReadElementNames(provider)));
+
+            var rawAttacks = ActiveSkillReader.ReadActiveSkills(provider);
+
+            var attacks = BuildActiveSkills(
+                rawAttacks,
+                elements,
+                localizations.ToDictionary(l => l.LanguageCode, l => l.ReadAttackNames(provider))
+            );
+
             var uniqueBreedingCombos = UniqueBreedComboReader.ReadUniqueBreedCombos(provider);
             var breedingCalc = new PalBreedingCalculator(
                 pals,
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v13");
+            var db = PalDB.MakeEmptyUnsafe("v14");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.PassiveSkills = passives;

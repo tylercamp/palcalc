@@ -30,6 +30,9 @@ namespace PalCalc.Model
 
         public List<BreedingResult> Breeding { get; set; }
 
+        public List<PalElement> Elements { get; set; }
+        public List<ActiveSkill> ActiveSkills { get; set; }
+
 
 
         public IEnumerable<Pal> Pals => PalsById.Values;

@@ -12,6 +12,9 @@ namespace PalCalc.GenDB.GameDataReaders
         public const string PALS_PATH = "Pal/Content/Pal/DataTable/Character/DT_PalMonsterParameter";
         public const string PALS_UNIQUE_BREEDING_PATH = "Pal/Content/Pal/DataTable/Character/DT_PalCombiUnique";
 
+        public const string ACTIVE_SKILLS_PATH = "Pal/Content/Pal/DataTable/Waza/DT_WazaDataTable";
+        public const string ACTIVE_SKILLS_PAL_LEVEL_PATH = "Pal/Content/Pal/DataTable/Waza/DT_WazaMasterLevel";
+
         public const string PAL_ICONS_MAPPING_PATH = "Pal/Content/Pal/DataTable/Character/DT_PalCharacterIconDataTable";
         public const string PAL_SPAWNERS_PATH = "Pal/Content/Pal/DataTable/Spawner/DT_PalWildSpawner";
         public const string PAL_CAGED_SPAWNERS_PATH = "Pal/Content/Pal/DataTable/Character/DT_CapturedCagePal";

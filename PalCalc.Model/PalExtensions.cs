@@ -33,6 +33,10 @@ namespace PalCalc.Model
             else return db.PassiveSkills.SingleOrDefault(t => t.InternalName == s) ?? new UnrecognizedPassiveSkill(s);
         }
 
+        public static PalElement ToElement(this string s, PalDB db) => throw new NotImplementedException();
+
+        public static ActiveSkill ToActive(this string s, PalDB db) => throw new NotImplementedException();
+
         public static PalGender OppositeGender(this PalGender gender)
         {
             switch (gender)
