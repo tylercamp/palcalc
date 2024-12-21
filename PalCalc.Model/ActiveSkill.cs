@@ -28,6 +28,6 @@ namespace PalCalc.Model
 
     public class UnrecognizedActiveSkill : ActiveSkill
     {
-        public UnrecognizedActiveSkill(string internalName) : base($"Unknown ({internalName})", internalName, null) { }
+        public UnrecognizedActiveSkill(string internalName) : base($"'{internalName}' (unrecognized)", internalName, null) { }
     }
 }

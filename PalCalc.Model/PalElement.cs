@@ -19,10 +19,8 @@ namespace PalCalc.Model
         public override int GetHashCode() => InternalName.GetHashCode();
     }
 
-    public class UnknownPalElement
+    public class UnrecognizedPalElement : PalElement
     {
-        private UnknownPalElement() { }
-
-        public static readonly UnknownPalElement Instance = new();
+        public UnrecognizedPalElement(string internalName) : base($"'{internalName}' (unrecognized)", internalName) { }
     }
 }

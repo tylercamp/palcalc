@@ -16,6 +16,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Elements\Dark.png" />
+    <None Remove="Resources\Elements\Dragon.png" />
+    <None Remove="Resources\Elements\Electric.png" />
+    <None Remove="Resources\Elements\Fire.png" />
+    <None Remove="Resources\Elements\Grass.png" />
+    <None Remove="Resources\Elements\Ground.png" />
+    <None Remove="Resources\Elements\Ice.png" />
+    <None Remove="Resources\Elements\Neutral.png" />
+    <None Remove="Resources\Elements\Water.png" />
     <None Remove="Resources\Map.jpeg" />
     <None Remove="Resources\PalIconOverride.json" />
     <None Remove="Resources\Pals\Anubis.png" />
@@ -183,7 +192,15 @@
     <None Remove="Resources\Pals\Xenogard.png" />
     <None Remove="Resources\Pals\Xenovader.png" />
     <None Remove="Resources\Pals\Yakumo.png" />
-    <None Remove="Resources\TraitRank\Passive_Negative_1_icon.png" />
+    <None Remove="Resources\SkillElements\Dark.png" />
+    <None Remove="Resources\SkillElements\Dragon.png" />
+    <None Remove="Resources\SkillElements\Electric.png" />
+    <None Remove="Resources\SkillElements\Fire.png" />
+    <None Remove="Resources\SkillElements\Grass.png" />
+    <None Remove="Resources\SkillElements\Ground.png" />
+    <None Remove="Resources\SkillElements\Ice.png" />
+    <None Remove="Resources\SkillElements\Neutral.png" />
+    <None Remove="Resources\SkillElements\Water.png" />
     <None Remove="Resources\TraitRank\Passive_Negative_2_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Negative_3_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Positive_1_icon.png" />
@@ -214,6 +231,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Elements\Dark.png" />
+    <Resource Include="Resources\Elements\Dragon.png" />
+    <Resource Include="Resources\Elements\Electric.png" />
+    <Resource Include="Resources\Elements\Fire.png" />
+    <Resource Include="Resources\Elements\Grass.png" />
+    <Resource Include="Resources\Elements\Ground.png" />
+    <Resource Include="Resources\Elements\Ice.png" />
+    <Resource Include="Resources\Elements\Neutral.png" />
+    <Resource Include="Resources\Elements\Water.png" />
     <Resource Include="Resources\Map.jpeg" />
     <Resource Include="Resources\PalIconOverride.json" />
     <Resource Include="Resources\Pals\Anubis.png" />
@@ -381,6 +407,15 @@
     <Resource Include="Resources\Pals\Xenogard.png" />
     <Resource Include="Resources\Pals\Xenovader.png" />
     <Resource Include="Resources\Pals\Yakumo.png" />
+    <Resource Include="Resources\SkillElements\Dark.png" />
+    <Resource Include="Resources\SkillElements\Dragon.png" />
+    <Resource Include="Resources\SkillElements\Electric.png" />
+    <Resource Include="Resources\SkillElements\Fire.png" />
+    <Resource Include="Resources\SkillElements\Grass.png" />
+    <Resource Include="Resources\SkillElements\Ground.png" />
+    <Resource Include="Resources\SkillElements\Ice.png" />
+    <Resource Include="Resources\SkillElements\Neutral.png" />
+    <Resource Include="Resources\SkillElements\Water.png" />
     <Resource Include="Resources\TraitRank\Passive_Negative_1_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Negative_2_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Negative_3_icon.png" />

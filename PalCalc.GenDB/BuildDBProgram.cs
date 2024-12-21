@@ -52,7 +52,7 @@ namespace PalCalc.GenDB
         //
         // (should be a folder containing "Pal-Windows.pak")
         static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Content\Paks";
-        static string MappingsPath = @"C:\Users\algor\OneDrive\Desktop\Mappings.usmap";
+        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
@@ -253,6 +253,105 @@ namespace PalCalc.GenDB
                 encoded.SaveTo(o);
         }
 
+        private static void ExportImage(UTexture2D tex, string path, SKEncodedImageFormat format, int quality = 100)
+        {
+            var rawData = tex.Decode(ETexturePlatform.DesktopMobile);
+            var encoded = rawData.Encode(format, 100);
+            using (var o = new FileStream(path, FileMode.Create))
+                encoded.SaveTo(o);
+        }
+
+        private static void ExportElementIcons(Dictionary<string, UTexture2D> elementIcons)
+        {
+            // AssetFileName => ExportedFileName
+            var fileNames = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                { "T_Icon_element_s_00.uasset", "Neutral.png" },
+                { "T_Icon_element_s_01.uasset", "Fire.png" },
+                { "T_Icon_element_s_02.uasset", "Water.png" },
+                { "T_Icon_element_s_03.uasset", "Electric.png" },
+                { "T_Icon_element_s_04.uasset", "Grass.png" },
+                { "T_Icon_element_s_05.uasset", "Dark.png" },
+                { "T_Icon_element_s_06.uasset", "Dragon.png" },
+                { "T_Icon_element_s_07.uasset", "Ground.png" },
+                { "T_Icon_element_s_08.uasset", "Ice.png" },
+            };
+
+            foreach (var icon in elementIcons)
+                ExportImage(icon.Value, $"../PalCalc.UI/Resources/Elements/{fileNames[icon.Key]}", SKEncodedImageFormat.Png);
+        }
+
+        private static void ExportSkillElementIcons(Dictionary<string, UTexture2D> skillElementIcons)
+        {
+            var fileNames = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                { "T_prt_pal_skill_base_element_00.uasset", "Neutral.png" },
+                { "T_prt_pal_skill_base_element_01.uasset", "Fire.png" },
+                { "T_prt_pal_skill_base_element_02.uasset", "Water.png" },
+                { "T_prt_pal_skill_base_element_03.uasset", "Electric.png" },
+                { "T_prt_pal_skill_base_element_04.uasset", "Grass.png" },
+                { "T_prt_pal_skill_base_element_05.uasset", "Dark.png" },
+                { "T_prt_pal_skill_base_element_06.uasset", "Dragon.png" },
+                { "T_prt_pal_skill_base_element_07.uasset", "Ground.png" },
+                { "T_prt_pal_skill_base_element_08.uasset", "Ice.png" },
+            };
+
+            foreach (var icon in skillElementIcons)
+                ExportImage(icon.Value, $"../PalCalc.UI/Resources/SkillElements/{fileNames[icon.Key]}", SKEncodedImageFormat.Png);
+        }
+
+        private static void ExportSkillRankIcons(Dictionary<string, UTexture2D> skillRankIcons)
+        {
+            /*
+            note:
+            we get T_icon_skillstatus_rank_arrow_00 through 04, but paldb.cc only uses 01 through 03 (positive rank)
+            and just flips them for the negative ranks
+            
+            not sure why they skip 00, and 04 just seems unused (three-bar with "+" icon)
+            */
+
+            var ciSkillRankIcons = new Dictionary<string, UTexture2D>(skillRankIcons, StringComparer.InvariantCultureIgnoreCase);
+
+            void ExportRankIcon(UTexture2D tex, string iconName, Func<SKBitmap, SKBitmap> transform)
+            {
+                var rawData = tex.Decode(ETexturePlatform.DesktopMobile);
+                var modified = transform(rawData);
+                var encoded = modified.Encode(SKEncodedImageFormat.Png, 100);
+                using (var o = new FileStream($"../PalCalc.UI/Resources/TraitRank/{iconName}", FileMode.Create))
+                    encoded.SaveTo(o);
+            }
+
+            SKBitmap NoOp(SKBitmap b) => b;
+            SKBitmap Flip(SKBitmap b)
+            {
+                // https://github.com/mono/SkiaSharp/discussions/2978#discussioncomment-10491028
+
+                // Create a bitmap (to return)
+                var flipped = new SKBitmap(b.Width, b.Height, b.Info.ColorType, b.Info.AlphaType);
+
+                // Create a canvas to draw into the bitmap
+                using var canvas = new SKCanvas(flipped);
+                canvas.Clear(new SKColor(0, 0, 0, 0));
+
+                // Set a transform matrix which moves the bitmap to the right,
+                // and then "scales" it by -1, which just flips the pixels
+                // horizontally
+                canvas.Translate(0, b.Height);
+                canvas.Scale(1, -1);
+                canvas.DrawBitmap(b, 0, 0);
+                return flipped;
+            }
+
+            ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_01.uasset"], "Passive_Positive_1_icon.png", NoOp);
+            ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_01.uasset"], "Passive_Negative_1_icon.png", Flip);
+
+            ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_02.uasset"], "Passive_Positive_2_icon.png", NoOp);
+            ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_02.uasset"], "Passive_Negative_2_icon.png", Flip);
+
+            ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_03.uasset"], "Passive_Positive_3_icon.png", NoOp);
+            ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_03.uasset"], "Passive_Negative_3_icon.png", Flip);
+        }
+
         private static void ExportPalIcons(List<Pal> pals, Dictionary<string, UTexture2D> palIcons, int iconSize)
         {
             logger.Information("Exporting pal icons...");
@@ -361,6 +460,12 @@ namespace PalCalc.GenDB
                 palIcons: PalIconMappingsReader.ReadPalIconMappings(provider),
                 iconSize: 100
             );
+
+            logger.Information("Scraping misc. icons");
+            var otherIcons = OtherIconsReader.ReadIcons(provider);
+            ExportElementIcons(otherIcons.ElementIcons);
+            ExportSkillElementIcons(otherIcons.SkillElementIcons);
+            ExportSkillRankIcons(otherIcons.SkillRankIcons);
 
             logger.Information("Scraping map data");
             var mapInfo = MapReader.ReadMapInfo(provider);
