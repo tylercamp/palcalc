@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace PalCalc.SaveReader.SaveFile
 {
@@ -244,6 +245,28 @@ namespace PalCalc.SaveReader.SaveFile
                         })
                         .ToList();
 
+                    ActiveSkill MakeActiveSkill(string name)
+                    {
+                        var activeSkill = db.ActiveSkills.FirstOrDefault(t => t.InternalName == name);
+                        if (activeSkill == null)
+                        {
+                            logger.Warning("TODO");
+                        }
+                        return activeSkill ?? new UnrecognizedActiveSkill(name);
+                    }
+
+                    string FormatSkillName(string skillId) => skillId.Replace("EPalWazaID::", "");
+
+                    var activeSkills = gvasInstance.ActiveSkills
+                        .Select(FormatSkillName)
+                        .Select(MakeActiveSkill)
+                        .ToList();
+
+                    var equippedActiveSkills = gvasInstance.EquippedActiveSkills
+                        .Select(FormatSkillName)
+                        .Select(MakeActiveSkill)
+                        .ToList();
+
                     result.Pals.Add(new PalInstance()
                     {
                         Pal = pal,
@@ -259,6 +282,8 @@ namespace PalCalc.SaveReader.SaveFile
                         NickName = gvasInstance.NickName,
                         Gender = gvasInstance.Gender.Contains("Female") ? PalGender.FEMALE : PalGender.MALE,
                         PassiveSkills = passives,
+                        ActiveSkills = activeSkills,
+                        EquippedActiveSkills = equippedActiveSkills,
                         Location = new PalLocation()
                         {
                             ContainerId = gvasInstance.ContainerId.ToString(),

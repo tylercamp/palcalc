@@ -32,6 +32,9 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         public int? TalentDefense { get; set; }
 
         public List<string> PassiveSkills { get; set; }
+
+        public List<string> ActiveSkills { get; set; }
+        public List<string> EquippedActiveSkills { get; set; }
     }
 
     class CharacterInstanceVisitor : IVisitor
@@ -54,6 +57,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         const string K_CONTAINER_ID         = ".Value.RawData.SaveParameter.SlotID.ContainerId.ID";
         const string K_CONTAINER_SLOT_INDEX = ".Value.RawData.SaveParameter.SlotID.SlotIndex";
         const string K_PASSIVE_SKILL_LIST   = ".Value.RawData.SaveParameter.PassiveSkillList";
+        const string K_ACTIVE_SKILL_LIST    = ".Value.RawData.SaveParameter.MasteredWaza";
+        const string K_ACTIVE_SKILL_USED_LIST = ".Value.RawData.SaveParameter.EquipWaza";
         const string K_OWNER_PLAYER_ID      = ".Value.RawData.SaveParameter.OwnerPlayerUId";
         const string K_OLD_OWNER_PLAYER_IDS = ".Value.RawData.SaveParameter.OldOwnerPlayerUIds.OldOwnerPlayerUIds";
         const string K_TALENT_HP            = ".Value.RawData.SaveParameter.Talent_HP";
@@ -75,93 +80,133 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
             pendingInstance = new GvasCharacterInstance();
 
-            var collectingVisitor = new ValueCollectingVisitor(this,
-                K_PLAYER_ID,
-                K_INSTANCE_ID,
-                K_NICKNAME,
-                K_LEVEL,
-                K_CHARACTER_ID,
-                K_IS_PLAYER,
-                K_GENDER,
-                K_CONTAINER_ID,
-                K_CONTAINER_SLOT_INDEX,
-                K_OWNER_PLAYER_ID,
-                K_TALENT_HP,
-                K_TALENT_SHOT,
-                K_TALENT_MELEE,
-                K_TALENT_DEFENSE
-            );
-
-            collectingVisitor.OnExit += (vals) =>
             {
-                logger.Verbose("property collector exited with values for {fieldNames}", string.Join(", ", vals.Keys));
+                var collectingVisitor = new ValueCollectingVisitor(this,
+                    K_PLAYER_ID,
+                    K_INSTANCE_ID,
+                    K_NICKNAME,
+                    K_LEVEL,
+                    K_CHARACTER_ID,
+                    K_IS_PLAYER,
+                    K_GENDER,
+                    K_CONTAINER_ID,
+                    K_CONTAINER_SLOT_INDEX,
+                    K_OWNER_PLAYER_ID,
+                    K_TALENT_HP,
+                    K_TALENT_SHOT,
+                    K_TALENT_MELEE,
+                    K_TALENT_DEFENSE
+                );
 
-                pendingInstance.InstanceId = (Guid)vals[K_INSTANCE_ID];
-                pendingInstance.IsPlayer = (bool)vals.GetValueOrElse(K_IS_PLAYER, false);
-
-                // level 1 (i.e. "default level") instances don't have a Level property
-                pendingInstance.Level = Convert.ToInt32(vals.GetValueOrElse(K_LEVEL, 1));
-
-                if (pendingInstance.IsPlayer)
+                collectingVisitor.OnExit += (vals) =>
                 {
-                    pendingInstance.PlayerId = (Guid?)vals[K_PLAYER_ID];
-                    pendingInstance.NickName = (string)vals[K_NICKNAME];
-                }
-                else
-                {
-                    var missingProps = REQUIRED_PAL_PROPS.Where(p => !vals.ContainsKey(p)).ToList();
-                    if (missingProps.Any())
+                    logger.Verbose("property collector exited with values for {fieldNames}", string.Join(", ", vals.Keys));
+
+                    pendingInstance.InstanceId = (Guid)vals[K_INSTANCE_ID];
+                    pendingInstance.IsPlayer = (bool)vals.GetValueOrElse(K_IS_PLAYER, false);
+
+                    // level 1 (i.e. "default level") instances don't have a Level property
+                    pendingInstance.Level = Convert.ToInt32(vals.GetValueOrElse(K_LEVEL, 1));
+
+                    if (pendingInstance.IsPlayer)
                     {
-                        logger.Warning("character instance is missing {missingProps}, skipping", string.Join(", ", missingProps));
-                        pendingInstance = null;
-                        return;
+                        pendingInstance.PlayerId = (Guid?)vals[K_PLAYER_ID];
+                        pendingInstance.NickName = (string)vals[K_NICKNAME];
                     }
+                    else
+                    {
+                        var missingProps = REQUIRED_PAL_PROPS.Where(p => !vals.ContainsKey(p)).ToList();
+                        if (missingProps.Any())
+                        {
+                            logger.Warning("character instance is missing {missingProps}, skipping", string.Join(", ", missingProps));
+                            pendingInstance = null;
+                            return;
+                        }
 
-                    pendingInstance.NickName = vals.GetValueOrDefault(K_NICKNAME)?.ToString();
-                    
-                    pendingInstance.OwnerPlayerId = (Guid?)vals.GetValueOrDefault(K_OWNER_PLAYER_ID);
-                    pendingInstance.CharacterId = (string)vals[K_CHARACTER_ID];
-                    pendingInstance.Gender = (string)vals.GetValueOrDefault(K_GENDER);
+                        pendingInstance.NickName = vals.GetValueOrDefault(K_NICKNAME)?.ToString();
 
-                    pendingInstance.ContainerId = (Guid)vals[K_CONTAINER_ID];
-                    pendingInstance.SlotIndex = Convert.ToInt32(vals[K_CONTAINER_SLOT_INDEX]);
+                        pendingInstance.OwnerPlayerId = (Guid?)vals.GetValueOrDefault(K_OWNER_PLAYER_ID);
+                        pendingInstance.CharacterId = (string)vals[K_CHARACTER_ID];
+                        pendingInstance.Gender = (string)vals.GetValueOrDefault(K_GENDER);
 
-                    pendingInstance.TalentHp = vals.ContainsKey(K_TALENT_HP) ? Convert.ToInt32(vals[K_TALENT_HP]) : null;
-                    pendingInstance.TalentMelee = vals.ContainsKey(K_TALENT_MELEE) ? Convert.ToInt32(vals[K_TALENT_MELEE]) : null;
-                    pendingInstance.TalentShot = vals.ContainsKey(K_TALENT_SHOT) ? Convert.ToInt32(vals[K_TALENT_SHOT]) : null;
-                    pendingInstance.TalentDefense = vals.ContainsKey(K_TALENT_DEFENSE) ? Convert.ToInt32(vals[K_TALENT_DEFENSE]) : null;
-                }
-            };
+                        pendingInstance.ContainerId = (Guid)vals[K_CONTAINER_ID];
+                        pendingInstance.SlotIndex = Convert.ToInt32(vals[K_CONTAINER_SLOT_INDEX]);
 
-            yield return collectingVisitor;
+                        pendingInstance.TalentHp = vals.ContainsKey(K_TALENT_HP) ? Convert.ToInt32(vals[K_TALENT_HP]) : null;
+                        pendingInstance.TalentMelee = vals.ContainsKey(K_TALENT_MELEE) ? Convert.ToInt32(vals[K_TALENT_MELEE]) : null;
+                        pendingInstance.TalentShot = vals.ContainsKey(K_TALENT_SHOT) ? Convert.ToInt32(vals[K_TALENT_SHOT]) : null;
+                        pendingInstance.TalentDefense = vals.ContainsKey(K_TALENT_DEFENSE) ? Convert.ToInt32(vals[K_TALENT_DEFENSE]) : null;
+                    }
+                };
 
-            List<string> passives = new List<string>();
-            var passiveSkillVisitor = new ValueEmittingVisitor(this, K_PASSIVE_SKILL_LIST);
-            passiveSkillVisitor.OnValue += (_, v) =>
+                yield return collectingVisitor;
+            }
+
             {
-                logger.Verbose("Storing passive skill value {name}", v);
-                passives.Add(v.ToString());
-            };
+                List<string> passives = new List<string>();
+                var passiveSkillVisitor = new ValueEmittingVisitor(this, K_PASSIVE_SKILL_LIST);
+                passiveSkillVisitor.OnValue += (_, v) =>
+                {
+                    logger.Verbose("Storing passive skill value {name}", v);
+                    passives.Add(v.ToString());
+                };
 
-            passiveSkillVisitor.OnExit += () =>
+                passiveSkillVisitor.OnExit += () =>
+                {
+                    if (pendingInstance != null) pendingInstance.PassiveSkills = passives;
+                };
+
+                yield return passiveSkillVisitor;
+            }
+
             {
-                if (pendingInstance != null) pendingInstance.PassiveSkills = passives;
-            };
+                List<string> activeSkills = [];
+                var activeSkillsVisitor = new ValueEmittingVisitor(this, K_ACTIVE_SKILL_LIST);
+                activeSkillsVisitor.OnValue += (_, v) =>
+                {
+                    logger.Verbose("Storing active skill value {name}", v);
+                    activeSkills.Add(v.ToString());
+                };
 
-            yield return passiveSkillVisitor;
+                activeSkillsVisitor.OnExit += () =>
+                {
+                    if (pendingInstance != null) pendingInstance.ActiveSkills = activeSkills;
+                };
 
-            List<Guid> oldOwnerIds = new List<Guid>();
-            var oldOwnersVisitor = new ValueEmittingVisitor(this, K_OLD_OWNER_PLAYER_IDS);
-            oldOwnersVisitor.OnValue += (_, v) =>
+                yield return activeSkillsVisitor;
+            }
+
             {
-                oldOwnerIds.Add((Guid)v);
-            };
-            oldOwnersVisitor.OnExit += () =>
-            {
-                if (pendingInstance != null) pendingInstance.OldOwnerPlayerIds = oldOwnerIds;
-            };
+                List<string> equippedSkills = [];
+                var equippedSkillsVisitor = new ValueEmittingVisitor(this, K_ACTIVE_SKILL_USED_LIST);
+                equippedSkillsVisitor.OnValue += (_, v) =>
+                {
+                    logger.Verbose("Storing equipped skill value {name}", v);
+                    equippedSkills.Add(v.ToString());
+                };
 
-            yield return oldOwnersVisitor;
+                equippedSkillsVisitor.OnExit += () =>
+                {
+                    if (pendingInstance != null) pendingInstance.EquippedActiveSkills = equippedSkills;
+                };
+
+                yield return equippedSkillsVisitor;
+            }
+
+            {
+                List<Guid> oldOwnerIds = new List<Guid>();
+                var oldOwnersVisitor = new ValueEmittingVisitor(this, K_OLD_OWNER_PLAYER_IDS);
+                oldOwnersVisitor.OnValue += (_, v) =>
+                {
+                    oldOwnerIds.Add((Guid)v);
+                };
+                oldOwnersVisitor.OnExit += () =>
+                {
+                    if (pendingInstance != null) pendingInstance.OldOwnerPlayerIds = oldOwnerIds;
+                };
+
+                yield return oldOwnersVisitor;
+            }
         }
 
         public override void VisitMapEntryEnd(string path, int index, MapPropertyMeta meta)

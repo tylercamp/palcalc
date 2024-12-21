@@ -338,6 +338,8 @@ namespace PalCalc.GenDB
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.PassiveSkills = passives;
+            db.ActiveSkills = attacks;
+            db.Elements = elements;
             db.Breeding = BuildAllBreedingResults(pals, breedingCalc);
             db.MinBreedingSteps = BreedingDistanceMap.CalcMinDistances(db);
 

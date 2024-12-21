@@ -18,7 +18,7 @@ namespace PalCalc.Model
         public bool CanInherit { get; set; }
 
         public int Power { get; set; }
-        public int CooldownSeconds { get; set; }
+        public float CooldownSeconds { get; set; }
 
         public override string ToString() => Name;
 
@@ -26,8 +26,8 @@ namespace PalCalc.Model
         public override int GetHashCode() => InternalName.GetHashCode();
     }
 
-    public class UnknownActiveSkill : ActiveSkill
+    public class UnrecognizedActiveSkill : ActiveSkill
     {
-        private UnknownActiveSkill(string internalName) : base($"Unknown ({internalName})", internalName, null) { }
+        public UnrecognizedActiveSkill(string internalName) : base($"Unknown ({internalName})", internalName, null) { }
     }
 }

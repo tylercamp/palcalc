@@ -30,7 +30,7 @@ namespace PalCalc.GenDB.GameDataReaders
         public int Power { get; set; }
 
         [FStructProperty]
-        public int CoolTime { get; set; }
+        public float CoolTime { get; set; }
 
         [FStructProperty]
         public bool DisabledData { get; set; }

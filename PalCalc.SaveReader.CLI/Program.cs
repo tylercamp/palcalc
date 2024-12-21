@@ -17,9 +17,10 @@ var db = PalDB.LoadEmbedded();
 //    using (var f = new FileStream("decompressed", FileMode.Create))
 //        stream.CopyTo(f);
 //});
-var save3 = new StandardSaveGame(@"C:\Users\algor\Desktop\Wormhole PeQoN");
+var save3 = new StandardSaveGame(@"C:\Users\algor\OneDrive\Desktop\Palworld-000900000986B166_0000000000000000000000006B210A9C-F0CEFEA04271692EB202A78E57A3A40D");
 var v2 = new MapObjectVisitor(GvasMapObject.PalBoxObjectId, GvasMapObject.ViewingCageObjectId);
 var level3 = save3.Level.ParseGvas(true, v2);
+var dataLevel3 = save3.Level.ReadCharacterData(db, save3.Players);
 
 var d = level3.Dynamic;
 var t = d.worldSaveData.MapObjectSaveData[0].ConcreteModel;
