@@ -145,6 +145,9 @@ namespace PalCalc.Model
             serializer.Converters.Add(new BreedingResultJsonConverter(pals));
             var breeding = asToken["Breeding"].ToObject<List<BreedingResult>>(serializer);
 
+            foreach (var attack in attacks)
+                attack.Element = elements.Single(e => e.InternalName == attack.ElementInternalName);
+
             return new PalDB()
             {
                 Version = version,

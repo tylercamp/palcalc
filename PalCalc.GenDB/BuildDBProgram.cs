@@ -266,14 +266,14 @@ namespace PalCalc.GenDB
             // AssetFileName => ExportedFileName
             var fileNames = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
             {
-                { "T_Icon_element_s_00.uasset", "Neutral.png" },
+                { "T_Icon_element_s_00.uasset", "Normal.png" },
                 { "T_Icon_element_s_01.uasset", "Fire.png" },
                 { "T_Icon_element_s_02.uasset", "Water.png" },
-                { "T_Icon_element_s_03.uasset", "Electric.png" },
-                { "T_Icon_element_s_04.uasset", "Grass.png" },
+                { "T_Icon_element_s_03.uasset", "Electricity.png" },
+                { "T_Icon_element_s_04.uasset", "Leaf.png" },
                 { "T_Icon_element_s_05.uasset", "Dark.png" },
                 { "T_Icon_element_s_06.uasset", "Dragon.png" },
-                { "T_Icon_element_s_07.uasset", "Ground.png" },
+                { "T_Icon_element_s_07.uasset", "Earth.png" },
                 { "T_Icon_element_s_08.uasset", "Ice.png" },
             };
 
@@ -285,14 +285,14 @@ namespace PalCalc.GenDB
         {
             var fileNames = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
             {
-                { "T_prt_pal_skill_base_element_00.uasset", "Neutral.png" },
+                { "T_prt_pal_skill_base_element_00.uasset", "Normal.png" },
                 { "T_prt_pal_skill_base_element_01.uasset", "Fire.png" },
                 { "T_prt_pal_skill_base_element_02.uasset", "Water.png" },
-                { "T_prt_pal_skill_base_element_03.uasset", "Electric.png" },
-                { "T_prt_pal_skill_base_element_04.uasset", "Grass.png" },
+                { "T_prt_pal_skill_base_element_03.uasset", "Electricity.png" },
+                { "T_prt_pal_skill_base_element_04.uasset", "Leaf.png" },
                 { "T_prt_pal_skill_base_element_05.uasset", "Dark.png" },
                 { "T_prt_pal_skill_base_element_06.uasset", "Dragon.png" },
-                { "T_prt_pal_skill_base_element_07.uasset", "Ground.png" },
+                { "T_prt_pal_skill_base_element_07.uasset", "Earth.png" },
                 { "T_prt_pal_skill_base_element_08.uasset", "Ice.png" },
             };
 

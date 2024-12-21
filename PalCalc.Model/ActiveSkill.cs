@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,14 +7,28 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Model
 {
-    public class ActiveSkill(string name, string internalName, PalElement element)
+    public class ActiveSkill
     {
-        public string Name { get; } = name;
+        public ActiveSkill(string name, string internalName, PalElement element)
+        {
+            Name = name;
+            InternalName = internalName;
+            Element = element;
+            ElementInternalName = element?.InternalName;
+        }
+
+        public string Name { get; private set; }
         public Dictionary<string, string> LocalizedNames { get; set; }
 
-        public PalElement Element { get; } = element;
+        // (avoid serializing a whole copy of each element for a skill, the proper element objects will be resolved
+        // by `PalDBSerializer`)
 
-        public string InternalName { get; } = internalName;
+        [JsonProperty]
+        internal string ElementInternalName { get; private set; }
+        [JsonIgnore]
+        public PalElement Element { get; internal set; }
+
+        public string InternalName { get; private set; }
 
         public bool CanInherit { get; set; }
 

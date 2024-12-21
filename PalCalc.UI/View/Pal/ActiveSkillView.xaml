@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="PalCalc.UI.View.Pal.ActiveSkillView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PalCalc.UI.View.Pal"
+             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+             mc:Ignorable="d"
+             MinWidth="150"
+             d:DataContext="{x:Static mvm:ActiveSkillViewModel.DesignerInstance}"
+             d:DesignWidth="100">
+    <local:SkillEntryView>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{Binding Name.Value}" FontSize="10" Foreground="White" />
+
+            <Grid Grid.Column="1">
+                <Image Source="{Binding SkillElementImage}" Height="15" />
+
+                <TextBlock Text="{Binding ModelObject.Power}" Padding="0" Margin="0,-2,5,0" VerticalAlignment="Top" Foreground="White" HorizontalAlignment="Right" Width="13" />
+            </Grid>
+        </Grid>
+    </local:SkillEntryView>
+</UserControl>

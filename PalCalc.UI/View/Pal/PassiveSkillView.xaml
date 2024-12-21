@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PalCalc.UI.View"
+             xmlns:local="clr-namespace:PalCalc.UI.View.Pal"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
-             d:Width="40"
+             d:Width="80"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance mvm:PassiveSkillViewModel, IsDesignTimeCreatable=True}">
     <UserControl.Resources>
@@ -13,14 +13,8 @@
             <mvm:RankColorConverter x:Key="RCC" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Rectangle Grid.Column="0" VerticalAlignment="Stretch" Fill="{Binding Rank, Converter={StaticResource RCC}}" />
-        <Border Grid.Column="2" BorderThickness="0,1,1,1" Opacity="0.5" BorderBrush="{Binding Rank, Converter={StaticResource RCC}}" />
-        <Grid Grid.Column="1" Margin="5,2,2,2">
+    <local:SkillEntryView BorderBrush="{Binding Rank, Converter={StaticResource RCC}}">
+        <Grid Margin="0,2,2,2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="5" />
@@ -38,5 +32,5 @@
                 </Rectangle>
             </Grid>
         </Grid>
-    </Grid>
+    </local:SkillEntryView>
 </UserControl>
