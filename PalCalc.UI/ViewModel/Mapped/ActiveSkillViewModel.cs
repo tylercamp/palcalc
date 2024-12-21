@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
-    internal class ActiveSkillViewModel
+    public class ActiveSkillViewModel
     {
         private static readonly DerivedLocalizableText<ActiveSkill> NameLocalizer = new DerivedLocalizableText<ActiveSkill>(
             (locale, skill) => skill.LocalizedNames.GetValueOrElse(locale.ToFormalName().ToLower(), skill.Name)

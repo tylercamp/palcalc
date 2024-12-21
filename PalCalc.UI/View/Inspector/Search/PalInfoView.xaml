@@ -6,11 +6,13 @@
              xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
              xmlns:ivm="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search"
              xmlns:ivmg="clr-namespace:PalCalc.UI.ViewModel.Inspector.Search.Grid"
+             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:v="clr-namespace:PalCalc.UI.View"
              xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
              mc:Ignorable="d"
-             d:DataContext="{x:Type ivmg:ContainerGridPalSlotViewModel}">
+             d:DataContext="{x:Type ivmg:ContainerGridPalSlotViewModel}"
+             Background="#111">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="White" />
@@ -19,8 +21,8 @@
             <Setter Property="Foreground" Value="White" />
         </Style>
     </UserControl.Resources>
-    <Grid Background="#111">
-        <WrapPanel Margin="10">
+    <StackPanel Margin="10">
+        <WrapPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
                 <Border Width="64" Height="64" CornerRadius="32" Background="{Binding Pal.IconBrush}" BorderBrush="White" BorderThickness="1" />
                 <StackPanel Margin="10,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
@@ -64,7 +66,36 @@
                 </StackPanel>
             </StackPanel>
 
-            <vp:PassiveSkillCollectionView DataContext="{Binding PalInstance.PassiveSkills}" Background="#111" VerticalAlignment="Center" Width="250" Margin="0,0,25,0" />
+            <StackPanel>
+                <Label FontWeight="Bold" Padding="1">Passive Skills</Label>
+                <vp:PassiveSkillCollectionView DataContext="{Binding PalInstance.PassiveSkills}" Width="250" Margin="0,0,25,0" />
+            </StackPanel>
+
+            <StackPanel>
+                <Label HorizontalAlignment="Center" FontWeight="Bold" Padding="1">Equipped Active Skills</Label>
+                <ItemsControl ItemsSource="{Binding PalInstance.EquippedActiveSkills}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="mvm:ActiveSkillViewModel">
+                            <vp:ActiveSkillView DataContext="{Binding}" Margin="0,2,0,2" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
         </WrapPanel>
-    </Grid>
+        <StackPanel Margin="0,5,0,0">
+            <Label FontWeight="Bold" Padding="1">All Active Skills</Label>
+            <ItemsControl ItemsSource="{Binding PalInstance.ActiveSkills}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="mvm:ActiveSkillViewModel">
+                        <vp:ActiveSkillView DataContext="{Binding}" Margin="2" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </StackPanel>
 </UserControl>

@@ -20,7 +20,7 @@
             <Grid Grid.Column="1">
                 <Image Source="{Binding SkillElementImage}" Height="15" />
 
-                <TextBlock Text="{Binding ModelObject.Power}" Padding="0" Margin="0,-2,5,0" VerticalAlignment="Top" Foreground="White" HorizontalAlignment="Right" Width="13" />
+                <TextBlock Text="{Binding ModelObject.Power}" Padding="0" Margin="0,-1,5,0" VerticalAlignment="Top" Foreground="White" HorizontalAlignment="Right" Width="13" />
             </Grid>
         </Grid>
     </local:SkillEntryView>

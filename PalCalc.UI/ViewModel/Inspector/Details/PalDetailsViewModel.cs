@@ -26,7 +26,9 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
                 ( "Paldex Is Variant", pal.Pal.Id.IsVariant ),
                 ( "Gender", pal.Gender ),
                 ( "Detected Owner ID", pal.OwnerPlayerId ),
-                .. pal.PassiveSkills.ZipWithIndex().Select(p => ($"Passive Skill {p.Item2+1}", p.Item1.Name))
+                .. pal.PassiveSkills.ZipWithIndex().Select(p => ($"Passive Skill {p.Item2+1}", p.Item1.Name)),
+                .. pal.EquippedActiveSkills.ZipWithIndex().Select(s => ($"Equipped Active Skill {s.Item2+1}", s.Item1.Name)),
+                .. pal.ActiveSkills.ZipWithIndex().Select(s => ($"Active Skill {s.Item2+1}", s.Item1.Name)),
             ])
             .ToArray()
             .Select(p => new PalDetailsProperty() { Key = p.Item1, Value = p.Item2?.ToString() ?? "null" })
@@ -52,7 +54,9 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
                 ( "TalentMelee", rawData.TalentMelee ),
                 ( "TalentDefense", rawData.TalentDefense ),
 
-                .. rawData.PassiveSkills.ZipWithIndex().Select(p => ($"Passive Skill {p.Item2+1}", p.Item1))
+                .. rawData.PassiveSkills.ZipWithIndex().Select(p => ($"Passive Skill {p.Item2+1}", p.Item1)),
+                .. rawData.EquippedActiveSkills.ZipWithIndex().Select(s => ($"Equipped Active Skill {s.Item2+1}", s.Item1)),
+                .. rawData.ActiveSkills.ZipWithIndex().Select(s => ($"Active Skill {s.Item2+1}", s.Item1)),
             ])
             .ToArray()
             .Select(kvp => new PalDetailsProperty() { Key = kvp.Item1, Value = kvp.Item2?.ToString() ?? "null" })
