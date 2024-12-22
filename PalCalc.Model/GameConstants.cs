@@ -127,6 +127,15 @@ namespace PalCalc.Model
             { 0, 0.40f },
         };
 
+        public static readonly IReadOnlyDictionary<int, float> PassiveRandomAddedAtLeastN = new Dictionary<int, float>()
+        {
+            { 4, 0.0f },
+            { 3, 0.10f },
+            { 2, 0.3f },
+            { 1, 0.6f },
+            { 0, 1.0f }
+        };
+
         // probability of a wild pal having, at most, N random passives
         // (assume equal probability of gaining anywhere from 0 through 4 random passives)
         // (20% chance of exactly N passives)

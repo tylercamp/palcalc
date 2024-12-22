@@ -14,7 +14,7 @@ namespace PalCalc.Solver.Probabilities
         /// <summary>
         /// `n` Choose `k`
         /// </summary>
-        static int Choose(int n, int k) => PascalsTriangle.Instance[n][k];
+        public static int Choose(int n, int k) => k > n ? 0 : PascalsTriangle.Instance[n][k];
 
         /// <summary>
         /// Calculates the probability of a child pal with `numFinalPassives` passive skills having the all desired passives from
@@ -51,7 +51,7 @@ namespace PalCalc.Solver.Probabilities
 
             float probabilityForNumPassives = 0.0f;
 
-            for (int numInheritedFromParent = desiredParentPassives.Count; numInheritedFromParent <= numFinalPassives; numInheritedFromParent++)
+            for (int numInheritedFromParent = desiredParentPassives.Count; numInheritedFromParent <= GameConstants.MaxTotalPassives; numInheritedFromParent++)
             {
                 // we may inherit more passives from the parents than the parents actually have (e.g. inherit 4 passives from parents with
                 // 2 total passives), in which case we'd still inherit just two
@@ -61,7 +61,9 @@ namespace PalCalc.Solver.Probabilities
                 var actualNumInheritedFromParent = Math.Min(numInheritedFromParent, parentPassives.Count);
 
                 var numIrrelevantFromParent = actualNumInheritedFromParent - desiredParentPassives.Count;
-                var numIrrelevantFromRandom = numFinalPassives - actualNumInheritedFromParent;
+                var numIrrelevantFromRandom = Math.Max(0, numFinalPassives - actualNumInheritedFromParent);
+
+                if (actualNumInheritedFromParent + numIrrelevantFromRandom > numFinalPassives) continue;
 
 #if DEBUG && DEBUG_CHECKS
                 if (numIrrelevantFromRandom < 0) Debugger.Break();
@@ -71,17 +73,7 @@ namespace PalCalc.Solver.Probabilities
                 // easier to organize if we include it for each individual case below)
                 float probabilityGotRequiredFromParent;
 
-                if (numInheritedFromParent == 0) // would only happen if neither parent has a desired passive
-                {
-                    // the only way we could get zero inherited passives is if neither parent actually has any passives, otherwise
-                    // it (seems to) be impossible to get zero direct inherited passives (unconfirmed from reddit thread)
-                    if (parentPassives.Count > 0) continue;
-
-                    // if neither parent has any passives, we'll always get 0 inherited passives, so we'll always get the "required"
-                    // passives regardless of the roll for `PassiveProbabilityDirect`
-                    probabilityGotRequiredFromParent = 1.0f;
-                }
-                else if (desiredParentPassives.Count == 0)
+                if (desiredParentPassives.Count == 0)
                 {
                     // just the chance of getting this number of passives from parents
                     probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent];
@@ -123,9 +115,12 @@ namespace PalCalc.Solver.Probabilities
                 // we've inherited as many passives as we can get from the parents, now we need to fill in the remaining with
                 // random passives until we get `numFinalPassives`
 
-                // TODO - if we inherit 4 passives and "need exactly 0 random", then the random probability doesn't matter
-                //        at all - no additional passives would be added
-                var probabilityGotExactRequiredRandom = GameConstants.PassiveRandomAddedProbability[numIrrelevantFromRandom];
+                // if we inherit 4 passives and "need exactly 0 random", then the random probability doesn't matter
+                // at all - no additional random passives would be added. in that case we don't need exactly `N`
+                // random passives, we just need _at least_ `N` random passives
+                var probabilityGotExactRequiredRandom = numFinalPassives == GameConstants.MaxTotalPassives
+                    ? GameConstants.PassiveRandomAddedAtLeastN[numIrrelevantFromRandom]
+                    : GameConstants.PassiveRandomAddedProbability[numIrrelevantFromRandom];
 
                 probabilityForNumPassives += probabilityGotRequiredFromParent * probabilityGotExactRequiredRandom;
             }
