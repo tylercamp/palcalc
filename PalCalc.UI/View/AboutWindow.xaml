@@ -85,5 +85,34 @@
             (<Hyperlink NavigateUri="https://github.com/YaccConstructor/QuickGraph/blob/master/LICENSE.txt" RequestNavigate="Hyperlink_RequestNavigate">Ms-PL License</Hyperlink>)
             (<Hyperlink NavigateUri="https://github.com/deepakkumar1984/QuickGraph.NETStandard" RequestNavigate="Hyperlink_RequestNavigate">.NET Standard Port</Hyperlink>)
         </TextBlock>
+
+        <Separator />
+
+        <Label FontWeight="Bold" FontSize="12">Translations</Label>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Column="1" Grid.RowSpan="999" Width="1" Margin="0,2,0,2" Background="Gray" />
+
+            <!-- zh-Hans -->
+            <Label Grid.Row="0" Grid.Column="0">
+                中文 (简体) | zh-Hans
+            </Label>
+            <StackPanel Grid.Row="0" Grid.Column="2">
+                <Label>
+                    <TextBlock>
+                        在这251秒赌上我的一起
+                        <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/70" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
+                    </TextBlock>
+                </Label>
+            </StackPanel>
+        </Grid>
     </StackPanel>
 </Window>
