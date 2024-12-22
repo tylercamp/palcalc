@@ -68,6 +68,22 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         [NotifyPropertyChangedFor(nameof(AsCriteria))]
         [ObservableProperty]
+        private ActiveSkillViewModel searchedSkill1;
+
+        [NotifyPropertyChangedFor(nameof(AsCriteria))]
+        [ObservableProperty]
+        private ActiveSkillViewModel searchedSkill2;
+
+        [NotifyPropertyChangedFor(nameof(AsCriteria))]
+        [ObservableProperty]
+        private ActiveSkillViewModel searchedSkill3;
+
+        [NotifyPropertyChangedFor(nameof(AsCriteria))]
+        [ObservableProperty]
+        private ActiveSkillViewModel searchedSkill4;
+
+        [NotifyPropertyChangedFor(nameof(AsCriteria))]
+        [ObservableProperty]
         private int minIVHP = 0;
 
         [NotifyPropertyChangedFor(nameof(AsCriteria))]
@@ -96,6 +112,11 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 if (SearchedPassive2 != null) criteria.Add(new PassiveSkillSearchCriteria(SearchedPassive2.ModelObject));
                 if (SearchedPassive3 != null) criteria.Add(new PassiveSkillSearchCriteria(SearchedPassive3.ModelObject));
                 if (SearchedPassive4 != null) criteria.Add(new PassiveSkillSearchCriteria(SearchedPassive4.ModelObject));
+
+                if (SearchedSkill1 != null) criteria.Add(new ActiveSkillSearchCriteria(SearchedSkill1.ModelObject));
+                if (SearchedSkill2 != null) criteria.Add(new ActiveSkillSearchCriteria(SearchedSkill2.ModelObject));
+                if (SearchedSkill3 != null) criteria.Add(new ActiveSkillSearchCriteria(SearchedSkill3.ModelObject));
+                if (SearchedSkill4 != null) criteria.Add(new ActiveSkillSearchCriteria(SearchedSkill4.ModelObject));
 
                 criteria.Add(new CustomSearchCriteria(p => p.IV_HP >= MinIVHP));
                 criteria.Add(new CustomSearchCriteria(p => p.IV_Attack >= MinIVAttack));

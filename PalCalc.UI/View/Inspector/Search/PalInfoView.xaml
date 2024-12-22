@@ -66,13 +66,9 @@
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel>
-                <Label FontWeight="Bold" Padding="1">Passive Skills</Label>
-                <vp:PassiveSkillCollectionView DataContext="{Binding PalInstance.PassiveSkills}" Width="250" Margin="0,0,25,0" />
-            </StackPanel>
-
-            <StackPanel>
-                <Label HorizontalAlignment="Center" FontWeight="Bold" Padding="1">Equipped Active Skills</Label>
+            <StackPanel Margin="0,0,25,0">
+                <!-- TODO itl -->
+                <Label HorizontalAlignment="Center" FontWeight="Bold" Padding="1" Margin="0,0,0,4">Equipped Active Skills</Label>
                 <ItemsControl ItemsSource="{Binding PalInstance.EquippedActiveSkills}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="mvm:ActiveSkillViewModel">
@@ -81,8 +77,27 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
+
+            <StackPanel Margin="0,0,25,0">
+                <!-- TODO itl -->
+                <Label FontWeight="Bold" Padding="1" Margin="0,0,0,4">Passive Skills</Label>
+                <!--<vp:PassiveSkillCollectionView DataContext="{Binding PalInstance.PassiveSkills}" Width="250" Margin="0,0,25,0" />-->
+                <ItemsControl ItemsSource="{Binding PalInstance.PassiveSkills.Passives}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="mvm:PassiveSkillViewModel">
+                            <vp:PassiveSkillView DataContext="{Binding}" Width="125" Margin="0,0,5,5" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
         </WrapPanel>
         <StackPanel Margin="0,5,0,0">
+            <!-- TODO itl -->
             <Label FontWeight="Bold" Padding="1">All Active Skills</Label>
             <ItemsControl ItemsSource="{Binding PalInstance.ActiveSkills}">
                 <ItemsControl.ItemsPanel>

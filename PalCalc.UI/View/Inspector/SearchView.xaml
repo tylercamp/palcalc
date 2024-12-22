@@ -27,96 +27,94 @@
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" MinWidth="100"/>
+            <ColumnDefinition Width="Auto" MinWidth="100"/>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="20*" MinWidth="100"/>
         </Grid.ColumnDefinitions>
 
         <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_PAL_CONTAINERS}" Grid.Column="0" Margin="5">
-            <DockPanel>
-                <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
-                    <TreeView.InputBindings>
-                        <KeyBinding Key="Delete" Command="{Binding DeleteContainerCommand}" CommandParameter="{Binding OwnerTree.SelectedSource.Container}" />
-                    </TreeView.InputBindings>
-                    <TreeView.ItemContainerStyle>
-                        <Style TargetType="TreeViewItem">
-                            <!-- Expand all items by default -->
-                            <Setter Property="IsExpanded" Value="True" />
-                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                        </Style>
-                    </TreeView.ItemContainerStyle>
-                    <TreeView.Resources>
-                        <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                            <TextBlock Text="{Binding Label.Value}" />
-                        </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type svm:PlayerTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                            <TextBlock Text="{Binding Label.Value}" />
-                        </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type svm:CustomizationsTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                            <TextBlock Text="{Binding Label.Value}" />
-                        </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel.Style>
-                                    <Style TargetType="StackPanel">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Coords, Converter={StaticResource VBC}}" Value="True">
-                                                <Setter Property="Cursor" Value="Hand" />
-                                                <Setter Property="Background" Value="White" />
-                                                <Setter Property="ToolTipService.InitialShowDelay" Value="200" />
-                                                <Setter Property="ToolTip">
-                                                    <Setter.Value>
-                                                        <ToolTip>
-                                                            <vp:MapView DataContext="{Binding Coords}" Width="300" Height="300" />
-                                                        </ToolTip>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </StackPanel.Style>
+            <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
+                <TreeView.InputBindings>
+                    <KeyBinding Key="Delete" Command="{Binding DeleteContainerCommand}" CommandParameter="{Binding OwnerTree.SelectedSource.Container}" />
+                </TreeView.InputBindings>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <!-- Expand all items by default -->
+                        <Setter Property="IsExpanded" Value="True" />
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type svm:GuildTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Label.Value}" />
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type svm:PlayerTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Label.Value}" />
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type svm:CustomizationsTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Label.Value}" />
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Coords, Converter={StaticResource VBC}}" Value="True">
+                                            <Setter Property="Cursor" Value="Hand" />
+                                            <Setter Property="Background" Value="White" />
+                                            <Setter Property="ToolTipService.InitialShowDelay" Value="200" />
+                                            <Setter Property="ToolTip">
+                                                <Setter.Value>
+                                                    <ToolTip>
+                                                        <vp:MapView DataContext="{Binding Coords}" Width="300" Height="300" />
+                                                    </ToolTip>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
 
-                                <TextBlock Text="{Binding Label.Value}" />
-                                <materialIcons:MaterialIcon Kind="Crosshairs" Height="12" Margin="5,0,0,0" Visibility="{Binding Coords, Converter={StaticResource VVC}}" />
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
+                            <TextBlock Text="{Binding Label.Value}" />
+                            <materialIcons:MaterialIcon Kind="Crosshairs" Height="12" Margin="5,0,0,0" Visibility="{Binding Coords, Converter={StaticResource VVC}}" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
 
-                        <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
-                            <TextBlock Text="{Binding SearchedLabel.Value}" />
-                        </DataTemplate>
-                        <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
-                            <TextBlock Text="{Binding SearchedLabel.Value}" />
-                        </DataTemplate>
-                        <DataTemplate DataType="{x:Type svm:BaseAssignedPalsTreeNodeViewModel}">
-                            <TextBlock Text="{Binding SearchedLabel.Value}" />
-                        </DataTemplate>
-                        <DataTemplate DataType="{x:Type svm:ViewingCageTreeNodeViewModel}">
-                            <TextBlock Text="{Binding SearchedLabel.Value}" />
-                        </DataTemplate>
-                        
-                        <DataTemplate DataType="{x:Type svm:CustomContainerTreeNodeViewModel}">
-                            <TextBlock Text="{Binding SearchedLabel.Value}">
-                                <TextBlock.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="Rename"
+                    <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">
+                        <TextBlock Text="{Binding SearchedLabel.Value}" />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
+                        <TextBlock Text="{Binding SearchedLabel.Value}" />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type svm:BaseAssignedPalsTreeNodeViewModel}">
+                        <TextBlock Text="{Binding SearchedLabel.Value}" />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type svm:ViewingCageTreeNodeViewModel}">
+                        <TextBlock Text="{Binding SearchedLabel.Value}" />
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type svm:CustomContainerTreeNodeViewModel}">
+                        <TextBlock Text="{Binding SearchedLabel.Value}">
+                            <TextBlock.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Rename"
                                                   Command="{Binding CustomContainer.RenameCommand}"
                                                   CommandParameter="{Binding Container}"
                                         />
-                                        <MenuItem Header="Delete"
+                                    <MenuItem Header="Delete"
                                                   Command="{Binding CustomContainer.DeleteCommand}"
                                                   CommandParameter="{Binding Container}"
                                         />
-                                    </ContextMenu>
-                                </TextBlock.ContextMenu>
-                            </TextBlock>
-                        </DataTemplate>
-                        
-                        <DataTemplate DataType="{x:Type svm:NewCustomContainerTreeNodeViewModel}">
-                            <TextBlock FontStyle="Italic" Text="{Binding Label.Value}" />
-                        </DataTemplate>
-                    </TreeView.Resources>
-                </TreeView>
-            </DockPanel>
+                                </ContextMenu>
+                            </TextBlock.ContextMenu>
+                        </TextBlock>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type svm:NewCustomContainerTreeNodeViewModel}">
+                        <TextBlock FontStyle="Italic" Text="{Binding Label.Value}" />
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
         </GroupBox>
 
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
@@ -177,6 +175,29 @@
                                 <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive2}" ItemTemplate="{StaticResource PassiveTemplate}" />
                                 <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive3}" ItemTemplate="{StaticResource PassiveTemplate}" />
                                 <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedPassive4}" ItemTemplate="{StaticResource PassiveTemplate}" />
+                            </WrapPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel.Resources>
+                                <Style TargetType="dnkc:AutoCompleteComboBox">
+                                    <Setter Property="Margin" Value="0,0,10,5" />
+                                    <Setter Property="Width" Value="150" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <!-- TODO itl -->
+                            <Label Content="Active Skills" />
+                            <WrapPanel Orientation="Horizontal">
+                                <WrapPanel.Resources>
+                                    <DataTemplate x:Key="SkillTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
+                                        <TextBlock Text="{Binding Name.Value}" />
+                                    </DataTemplate>
+                                </WrapPanel.Resources>
+
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:ActiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedSkill1}" ItemTemplate="{StaticResource SkillTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:ActiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedSkill2}" ItemTemplate="{StaticResource SkillTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:ActiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedSkill3}" ItemTemplate="{StaticResource SkillTemplate}" />
+                                <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:ActiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" SelectedValue="{Binding SearchSettings.SearchedSkill4}" ItemTemplate="{StaticResource SkillTemplate}" />
                             </WrapPanel>
                         </StackPanel>
 
