@@ -239,7 +239,7 @@ namespace PalCalc.SaveReader.SaveFile
                             var passive = db.PassiveSkills.FirstOrDefault(t => t.InternalName == name);
                             if (passive == null)
                             {
-                                logger.Warning("unrecognized passive skill '{internalName}' on pal {Pal}, skipping", name, gvasInstance.CharacterId);
+                                logger.Warning("unrecognized passive skill '{internalName}' on pal {Pal}", name, gvasInstance.CharacterId);
                             }
                             return passive ?? new UnrecognizedPassiveSkill(name);
                         })
@@ -250,7 +250,7 @@ namespace PalCalc.SaveReader.SaveFile
                         var activeSkill = db.ActiveSkills.FirstOrDefault(t => t.InternalName == name);
                         if (activeSkill == null)
                         {
-                            logger.Warning("TODO");
+                            logger.Warning("unrecognized active skill '{internalName}' on pal {Pal}", name, gvasInstance.CharacterId);
                         }
                         return activeSkill ?? new UnrecognizedActiveSkill(name);
                     }

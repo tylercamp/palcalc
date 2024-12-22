@@ -67,8 +67,7 @@
             </StackPanel>
 
             <StackPanel Margin="0,0,25,0">
-                <!-- TODO itl -->
-                <Label HorizontalAlignment="Center" FontWeight="Bold" Padding="1" Margin="0,0,0,4">Equipped Active Skills</Label>
+                <Label HorizontalAlignment="Center" FontWeight="Bold" Padding="1" Margin="0,0,0,4" Content="{itl:LocalizedText Code=LC_COMMON_EQUIPPED_ATTACK_SKILLS}" />
                 <ItemsControl ItemsSource="{Binding PalInstance.EquippedActiveSkills}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="mvm:ActiveSkillViewModel">
@@ -79,9 +78,7 @@
             </StackPanel>
 
             <StackPanel Margin="0,0,25,0">
-                <!-- TODO itl -->
-                <Label FontWeight="Bold" Padding="1" Margin="0,0,0,4">Passive Skills</Label>
-                <!--<vp:PassiveSkillCollectionView DataContext="{Binding PalInstance.PassiveSkills}" Width="250" Margin="0,0,25,0" />-->
+                <Label FontWeight="Bold" Padding="1" Margin="0,0,0,4" Content="{itl:LocalizedText Code=LC_COMMON_TRAITS}" />
                 <ItemsControl ItemsSource="{Binding PalInstance.PassiveSkills.Passives}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -97,8 +94,7 @@
             </StackPanel>
         </WrapPanel>
         <StackPanel Margin="0,5,0,0">
-            <!-- TODO itl -->
-            <Label FontWeight="Bold" Padding="1">All Active Skills</Label>
+            <Label FontWeight="Bold" Padding="1" Content="{itl:LocalizedText Code=LC_COMMON_ALL_ATTACK_SKILLS}" />
             <ItemsControl ItemsSource="{Binding PalInstance.ActiveSkills}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>

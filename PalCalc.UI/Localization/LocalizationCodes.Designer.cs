@@ -102,11 +102,23 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMMON_ALL_ATTACK_SKILLS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMMON_ATTACK_SKILLS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMMON_CANCEL,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_ENABLED,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMMON_EQUIPPED_ATTACK_SKILLS,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

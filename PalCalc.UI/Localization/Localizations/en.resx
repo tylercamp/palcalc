@@ -145,11 +145,20 @@
     <value>The average time it takes to produce an egg. Used to estimate how long it will take to produce a pal with specific properties.
 This value is doubled internally to account for pal inactivity at night.</value>
   </data>
+  <data name="LC_COMMON_ALL_ATTACK_SKILLS" xml:space="preserve">
+    <value>All Active Skills</value>
+  </data>
+  <data name="LC_COMMON_ATTACK_SKILLS" xml:space="preserve">
+    <value>Active Skills</value>
+  </data>
   <data name="LC_COMMON_CANCEL" xml:space="preserve">
     <value>Cancel</value>
   </data>
   <data name="LC_COMMON_ENABLED" xml:space="preserve">
     <value>Enabled</value>
+  </data>
+  <data name="LC_COMMON_EQUIPPED_ATTACK_SKILLS" xml:space="preserve">
+    <value>Equipped Active Skills</value>
   </data>
   <data name="LC_COMMON_GENDER" xml:space="preserve">
     <value>Gender</value>

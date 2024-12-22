@@ -185,8 +185,7 @@
                                     <Setter Property="Width" Value="150" />
                                 </Style>
                             </StackPanel.Resources>
-                            <!-- TODO itl -->
-                            <Label Content="Active Skills" />
+                            <Label Content="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" />
                             <WrapPanel Orientation="Horizontal">
                                 <WrapPanel.Resources>
                                     <DataTemplate x:Key="SkillTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">

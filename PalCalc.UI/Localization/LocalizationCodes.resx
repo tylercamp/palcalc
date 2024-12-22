@@ -706,4 +706,13 @@
   <data name="LC_SOLVER_RESUME" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_COMMON_ALL_ATTACK_SKILLS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_ATTACK_SKILLS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_EQUIPPED_ATTACK_SKILLS" xml:space="preserve">
+    <value />
+  </data>
 </root>
