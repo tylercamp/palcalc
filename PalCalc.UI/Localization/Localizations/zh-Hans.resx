@@ -316,7 +316,7 @@
     <value>帕鲁终端, 目录页{Tab} 在 横 竖 ({X},{Y})</value>
   </data>
   <data name="LC_LOC_COORD_PARTY" xml:space="preserve">
-    <value>公会, 插槽 {SlotNum}</value>
+    <value>队伍, 插槽 {SlotNum}</value>
   </data>
   <data name="LC_LOC_COORD_VIEWING_CAGE" xml:space="preserve">
     <value>观察笼位于 ({X},{Y})</value>
@@ -398,7 +398,7 @@
     <value>帕鲁终端</value>
   </data>
   <data name="LC_PAL_LOC_PARTY" xml:space="preserve">
-    <value>公会</value>
+    <value>队伍</value>
   </data>
   <data name="LC_PAL_LOC_VIEWING_CAGE" xml:space="preserve">
     <value>查看笼子</value>
@@ -453,10 +453,10 @@
     <value>IV 攻击</value>
   </data>
   <data name="LC_RESULT_IV_AVERAGE" xml:space="preserve">
-    <value>IV AVG</value>
+    <value>IV 平均</value>
   </data>
   <data name="LC_RESULT_IV_DEFENSE" xml:space="preserve">
-    <value>IV DEF</value>
+    <value>IV 防御</value>
   </data>
   <data name="LC_RESULT_IV_HP" xml:space="preserve">
     <value>IV 血量</value>
@@ -474,7 +474,7 @@
     <value># 步骤</value>
   </data>
   <data name="LC_RESULT_TIME_ESTIMATE" xml:space="preserve">
-    <value>Effort</value>
+    <value>耗时</value>
   </data>
   <data name="LC_SAVEINSPECT_CONTAINER_ID" xml:space="preserve">
     <value>ID:</value>
@@ -537,13 +537,13 @@
     <value>选定的保存文件无效!</value>
   </data>
   <data name="LC_SAVE_GAME_LBL" xml:space="preserve">
-    <value>{PlayerName} 在第 {PlayerLevel} 天 {WorldName} 达到 {DayNumber}等级</value>
+    <value>{PlayerName} 在 {WorldName} 第 {DayNumber} 天，等级 {PlayerLevel}</value>
   </data>
   <data name="LC_SAVE_GAME_LBL_NO_METADATA" xml:space="preserve">
     <value>{GameId} (无法读取元数据)</value>
   </data>
   <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve">
-    <value>{WorldName} 天 {DayNumber}</value>
+    <value>{WorldName} 第 {DayNumber} 天</value>
   </data>
   <data name="LC_SAVE_GAME_REMOVE_BTN_LABEL" xml:space="preserve">
     <value>删除</value>
@@ -685,7 +685,7 @@ Pal Calc 将检测是否需要额外的繁殖尝试，并可能在达到此限�
     <value>{NumRandom} 随机</value>
   </data>
   <data name="LC_TRAITS_COUNT_UNRECOGNIZED" xml:space="preserve">
-    <value>{NumUnrecognized} 被忽略的</value>
+    <value>{NumUnrecognized} 未识别的</value>
   </data>
   <data name="LC_TRAITS_PRESETS" xml:space="preserve">
     <value>预设</value>
