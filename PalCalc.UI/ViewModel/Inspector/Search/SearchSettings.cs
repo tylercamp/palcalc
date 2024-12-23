@@ -35,6 +35,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     SearchedPassive2 = null;
                     SearchedPassive3 = null;
                     SearchedPassive4 = null;
+                    SearchedSkill1 = null;
+                    SearchedSkill2 = null;
+                    SearchedSkill3 = null;
+                    SearchedSkill4 = null;
                     MinIVHP = 0;
                     MinIVAttack = 0;
                     MinIVDefense = 0;

@@ -107,7 +107,9 @@ namespace PalCalc.UI.ViewModel
                 Passive2?.ModelObject,
                 Passive3?.ModelObject,
                 Passive4?.ModelObject
-            }.SkipNull().Distinct().ToList()
+            }.SkipNull().Distinct().ToList(),
+            ActiveSkills = [],
+            EquippedActiveSkills = []
         };
     }
 }
