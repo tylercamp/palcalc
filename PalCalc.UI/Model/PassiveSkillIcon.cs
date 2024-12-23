@@ -40,6 +40,7 @@ namespace PalCalc.UI.Model
                     images.Add(1, IconImage("Passive_Positive_1_icon.png"));
                     images.Add(2, IconImage("Passive_Positive_2_icon.png"));
                     images.Add(3, IconImage("Passive_Positive_3_icon.png"));
+                    images.Add(4, IconImage("Passive_Positive_4_icon.png"));
                 }
 
                 return images;

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
+using Windows.UI.Notifications;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
@@ -23,6 +24,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             return MakeBrush((int)value switch
             {
                 < 0 => new Color() { R = 247, G = 63, B = 63, A = 255 },
+                4 => new Color() { R = 104, G = 255, B = 216, A = 255 },
                 > 1 => new Color() { R = 255, G = 221, B = 0, A = 255 },
                 _ => new Color() { R = 230, G = 231, B = 223, A = 255 },
             });

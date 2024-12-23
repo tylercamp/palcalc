@@ -35,7 +35,6 @@ namespace PalCalc.UI.Model
 
         public List<string> BannedBredPalInternalNames { get; set; } = [];
         public List<string> BannedWildPalInternalNames { get; set; } = [
-            "HerculesBeetle_Ground", // warsect terra, not released yet
             "PlantSlime_Flower", // flower gumoss
         ];
 
