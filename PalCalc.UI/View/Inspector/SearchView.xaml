@@ -66,7 +66,7 @@
                                             <Setter Property="ToolTip">
                                                 <Setter.Value>
                                                     <ToolTip>
-                                                        <vp:MapView DataContext="{Binding Coords}" Width="300" Height="300" />
+                                                        <vp:MapView DataContext="{Binding Coords}" Width="500" Height="500" />
                                                     </ToolTip>
                                                 </Setter.Value>
                                             </Setter>

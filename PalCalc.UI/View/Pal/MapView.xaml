@@ -4,11 +4,28 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View"
+      xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
+      xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              mc:Ignorable="d"
              d:DataContext="{x:Static mvm:MapCoordViewModel.DesignerInstance}"
              d:DesignHeight="400" d:DesignWidth="400">
-    
+
+    <Grid.Resources>
+        <c:SingleItemCollectionConverter x:Key="SICC" />
+    </Grid.Resources>
+
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="5*" />
+        <ColumnDefinition Width="45*" MinWidth="40" />
+        <ColumnDefinition Width="50*" />
+    </Grid.ColumnDefinitions>
+
+    <Grid.RowDefinitions>
+        <RowDefinition Height="95*" />
+        <RowDefinition Height="5*" />
+    </Grid.RowDefinitions>
+
     <!-- note:
     
     tried adding pan-and-zoom using the ZoomControl from GraphSharp, but there isn't a good way to
@@ -21,26 +38,28 @@
     
     -->
 
-    <Image Grid.ColumnSpan="100" Grid.RowSpan="100" Source="pack://application:,,,/PalCalc.UI;component/Resources/Map.jpeg" Stretch="Uniform" />
+    <vu:MapViewer
+        Grid.ColumnSpan="100"
+        Grid.RowSpan="100"
+        BackgroundImage="pack://application:,,,/PalCalc.UI;component/Resources/Map.jpeg"
+        ItemsSource="{Binding Converter={StaticResource SICC}}"
+    >
+        <vu:MapViewer.ItemContainerStyle>
+            <Style>
+                <Setter Property="vu:MapPanel.MapNormX" Value="{Binding NormalizedCoords.X}" />
+                <Setter Property="vu:MapPanel.MapNormY" Value="{Binding NormalizedCoords.Y}" />
+            </Style>
+        </vu:MapViewer.ItemContainerStyle>
+        <vu:MapViewer.ItemTemplate>
+            <DataTemplate>
+                <Border x:Name="IconHost" CornerRadius="9999" BorderThickness="2" BorderBrush="White">
+                    <Image Source="pack://application:,,,/PalCalc.UI;component/Resources/T_icon_compass_camp.png" />
+                </Border>
+            </DataTemplate>
+        </vu:MapViewer.ItemTemplate>
+    </vu:MapViewer>
 
-    <Border x:Name="IconHost" Grid.Column="1" Grid.Row="1" CornerRadius="9999" BorderThickness="2" BorderBrush="White">
-        <Image Source="pack://application:,,,/PalCalc.UI;component/Resources/T_icon_compass_camp.png" />
-    </Border>
-
-    <Grid Grid.RowSpan="100" Grid.ColumnSpan="100">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="5*" />
-            <ColumnDefinition Width="25*" MinWidth="40" />
-            <ColumnDefinition Width="70*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="95*" />
-            <RowDefinition Height="5*" />
-        </Grid.RowDefinitions>
-
-        <!-- resize text to fit -->
-        <Viewbox Grid.Row="0" Grid.Column="1" StretchDirection="DownOnly" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-            <TextBlock Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Text="{Binding DisplayCoordsText}" />
-        </Viewbox>
-    </Grid>
+    <Viewbox Grid.Column="1" StretchDirection="DownOnly" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+        <TextBlock Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="20" Text="{Binding DisplayCoordsText}" />
+    </Viewbox>
 </Grid>

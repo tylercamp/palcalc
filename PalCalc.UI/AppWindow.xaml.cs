@@ -42,8 +42,10 @@ namespace PalCalc.UI
     {
         public AppWindow()
         {
-            DataContext = new AppWindowViewModel(Dispatcher);
+            //DataContext = new AppWindowViewModel(Dispatcher);
             InitializeComponent();
+
+            new MapTestWindow().Show();
 
 #if DEBUG
             if (App.TranslationErrors.Count > 0)

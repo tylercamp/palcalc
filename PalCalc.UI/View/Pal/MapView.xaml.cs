@@ -23,24 +23,7 @@ namespace PalCalc.UI.View.Pal
     {
         public MapView()
         {
-            DataContextChanged += MapView_DataContextChanged;
-
             InitializeComponent();
-        }
-
-        private void MapView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            var newModel = e.NewValue as MapCoordViewModel;
-            if (newModel == null) return;
-
-            ColumnDefinitions.Clear();
-            RowDefinitions.Clear();
-
-            foreach (var cdef in newModel.GridColumns)
-                ColumnDefinitions.Add(new ColumnDefinition() { Width = cdef.Width });
-
-            foreach (var rdef in newModel.GridRows)
-                RowDefinitions.Add(new RowDefinition() { Height = rdef.Height });
         }
     }
 }

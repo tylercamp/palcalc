@@ -42,11 +42,25 @@ namespace PalCalc.Model
         // Used for calculating map coords from world coords
         //
         // (these values are fetched from game files and output at the end of `PalCalc.GenDB.BuildDBProgram`)
-        public static readonly double Map_MinX = -582888.0;
-        public static readonly double Map_MaxX = 335112.0;
 
-        public static readonly double Map_MinY = -301000.0;
-        public static readonly double Map_MaxY = 617000.0;
+        // transformation matrix converting world coords to in-game map UI coords (shown on bottom
+        // left of in-game Map)
+        public static readonly double[,] WorldToMapMatrix = new double[3, 3]
+        {
+            { -3.79519292446884E-07, 0.0021798096874746462, -344.34052549588256 },
+            { 0.0021767405112596513, -9.438090431935445E-07, 270.1383799358495 },
+            { 0, 0, 1 },
+        };
+
+        // transormation matrix converting world coords to normalized image coords within
+        // the world map texture, multiply the resulting coord by image size to get appropriate
+        // X/Y for placing things on the map image
+        public static readonly double[,] WorldToImageMatrix = new double[3, 3]
+        {
+            { 1.159760335217757E-09, 6.928117576533099E-07, 0.5102813537826183 },
+            { -6.890618703631407E-07, 6.348508350224871E-10, 0.30963301697476875 },
+            { 0, 0, 1 },
+        };
 
         /*
          * Outstanding questions:

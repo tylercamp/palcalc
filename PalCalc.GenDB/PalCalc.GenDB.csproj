@@ -17,4 +17,10 @@
     <ProjectReference Include="..\PalCalc.Model\PalCalc.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="coord-samples.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -56,33 +56,36 @@ namespace PalCalc.GenDB
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
-            return rawPals.Select(rawPal =>
-            {
-                var localizedNames = palNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetOneOf(rawPal.InternalName, rawPal.AlternativeInternalName));
-                var englishName = localizedNames["en"];
-
-                var minWildLevel = wildPalLevels.ContainsKey(rawPal.InternalName) ? (int?)wildPalLevels[rawPal.InternalName].Item1 : null;
-                var maxWildLevel = wildPalLevels.ContainsKey(rawPal.InternalName) ? (int?)wildPalLevels[rawPal.InternalName].Item2 : null;
-
-                return new Pal()
+            return rawPals
+                .Where(p => !p.InternalName.StartsWith("SUMMON_", StringComparison.InvariantCultureIgnoreCase))
+                .Where(p => !p.InternalName.EndsWith("_Oilrig", StringComparison.InvariantCultureIgnoreCase))
+                .Select(rawPal =>
                 {
-                    Id = new PalId()
-                    {
-                        PalDexNo = rawPal.PalDexNum,
-                        IsVariant = rawPal.PalDexNumSuffix != null && rawPal.PalDexNumSuffix.Length > 0,
-                    },
-                    BreedingPower = rawPal.BreedingPower,
-                    Price = (int)rawPal.Price,
-                    InternalIndex = rawPal.InternalIndex,
-                    InternalName = rawPal.InternalName,
-                    Name = englishName,
-                    LocalizedNames = localizedNames,
-                    MinWildLevel = minWildLevel,
-                    MaxWildLevel = maxWildLevel,
+                    var localizedNames = palNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetOneOf(rawPal.InternalName, rawPal.AlternativeInternalName));
+                    var englishName = localizedNames["en"];
 
-                    GuaranteedPassivesInternalIds = rawPal.GuaranteedPassives,
-                };
-            }).ToList();
+                    var minWildLevel = wildPalLevels.ContainsKey(rawPal.InternalName) ? (int?)wildPalLevels[rawPal.InternalName].Item1 : null;
+                    var maxWildLevel = wildPalLevels.ContainsKey(rawPal.InternalName) ? (int?)wildPalLevels[rawPal.InternalName].Item2 : null;
+
+                    return new Pal()
+                    {
+                        Id = new PalId()
+                        {
+                            PalDexNo = rawPal.PalDexNum,
+                            IsVariant = rawPal.PalDexNumSuffix != null && rawPal.PalDexNumSuffix.Length > 0,
+                        },
+                        BreedingPower = rawPal.BreedingPower,
+                        Price = (int)rawPal.Price,
+                        InternalIndex = rawPal.InternalIndex,
+                        InternalName = rawPal.InternalName,
+                        Name = englishName,
+                        LocalizedNames = localizedNames,
+                        MinWildLevel = minWildLevel,
+                        MaxWildLevel = maxWildLevel,
+
+                        GuaranteedPassivesInternalIds = rawPal.GuaranteedPassives,
+                    };
+                }).ToList();
         }
 
         private static List<PassiveSkill> BuildPassiveSkills(List<UPassiveSkill> rawPassiveSkills, Dictionary<string, Dictionary<string, string>> skillNames)
@@ -350,6 +353,8 @@ namespace PalCalc.GenDB
 
             ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_03.uasset"], "Passive_Positive_3_icon.png", NoOp);
             ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_03.uasset"], "Passive_Negative_3_icon.png", Flip);
+
+            ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_04.uasset"], "Passive_Positive_4_icon.png", NoOp);
         }
 
         private static void ExportPalIcons(List<Pal> pals, Dictionary<string, UTexture2D> palIcons, int iconSize)
@@ -473,34 +478,33 @@ namespace PalCalc.GenDB
             if (mapInfo != null)
             {
                 var rawData = mapInfo.MapTexture.Decode(ETexturePlatform.DesktopMobile);
-                var resized = rawData.Resize(new SKSizeI() { Width = 2048, Height = 2048 }, SKFilterQuality.High);
+                var resized = rawData.Resize(new SKSizeI() { Width = 4096, Height = 4096 }, SKFilterQuality.High);
 
-                // this image seems to have some extra margin with a vignette? this margin messes with coord calcs
-                // crop it just enough to remove that vignette
-                // (would prefer to properly read this info from game files but I can't find anything for it)
-                //var marginPercent = 0.05f;
-                //var resizedPM = new SKPixmap(resized.Info, resized.GetPixels());
-                //var cropped = resizedPM.ExtractSubset(
-                //    new SKRectI()
-                //    {
-                //        Left = (int)(resized.Width * marginPercent),
-                //        Top = (int)(resized.Height * marginPercent),
-                //        Right = (int)(resized.Width * (1 - marginPercent)),
-                //        Bottom = (int)(resized.Height * (1 - marginPercent))
-                //    }
-                //);
-                //
-                // (... BUT the general "Map Coord" -> "Image Position" calc is incomplete in general, and cropping
-                //  makes the issue worse, so leaving it uncropped for now)
-
-                var encoded = resized.Encode(SKEncodedImageFormat.Jpeg, 80);
+                var encoded = resized.Encode(SKEncodedImageFormat.Jpeg, 90);
 
                 using (var o = new FileStream("../PalCalc.UI/Resources/Map.jpeg", FileMode.Create))
                         encoded.SaveTo(o);
-
-                // Dimensions should be reflected in `PalCalc.Model.GameConstants`
-                logger.Information("Map dimensions:\nMin: {0} | {1}\nMax: {2} | {3}", mapInfo.MapMinX, mapInfo.MapMaxX, mapInfo.MapMinY, mapInfo.MapMaxY);
             }
+
+            // I can't find a reliable method for extracting the info tying the in-game map to game coordinates. Instead I gathered
+            // a bunch of samples of world coords (XYZ from game data), map coords (coords on in-game map), and image-pixel coords
+            // (x/y coords in the map image itself), and use those samples to solve for the transformation matrices we need.
+            //
+            // The output should be kept in sync with `GameConstants.WorldToMapMatrix` and `GameConstants.WorldToImageMatrix`
+            // (copy/paste and just insert braces and commas to make it compile)
+            //
+            // Sample data is based on spawners for overworld boss Pals like the Mammorest near the beginning. 
+            //
+            // Boss pal spawns are at:
+            // /Pal/Content/Pal/DataTable/UI/DT_BossSpawnerLoactionData.uasset
+            //
+            // ---
+            //
+            // `sampleMapTexSize` is the image size used when the "map pixel coordinates" were gathered
+            //
+            // I was using a 2048x2048 image at the time, this should only change if the `ImageCoords` in `coord-samples.json` are updated
+            // from a new image resolution
+            MapTransformSolver.Run("coord-samples.json", sampleMapTexSize: 2048);
         }
 
 

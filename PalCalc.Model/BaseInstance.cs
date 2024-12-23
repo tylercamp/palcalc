@@ -18,16 +18,27 @@ namespace PalCalc.Model
         public double X { get; set; }
         public double Y { get; set; }
 
+        static double[] ApplyMatrix(double[,] matrix, double x, double y)
+        {
+            // matrix is 3×3, point is [x, y, 1]
+            double xPrime = matrix[0, 0] * x + matrix[0, 1] * y + matrix[0, 2];
+            double yPrime = matrix[1, 0] * x + matrix[1, 1] * y + matrix[1, 2];
+            // In a pure 2D affine transform, the 3rd row always yields 1, so ignore it
+            return new double[] { xPrime, yPrime };
+        }
+
+
         /// <summary>
         /// Returns the world coords in normalized map coordinates (X and Y in range [0 1], used for UI position calcs in Pal Calc)
         /// </summary>
         public static MapCoord NormalizedFromWorldCoord(WorldCoord coord)
         {
-            // (X and Y world coords are swapped when presented as map coords; Z is unused)
+            var transformed = ApplyMatrix(GameConstants.WorldToImageMatrix, coord.X, coord.Y);
+
             return new MapCoord()
             {
-                X = (coord.Y - GameConstants.Map_MinY) / (GameConstants.Map_MaxY - GameConstants.Map_MinY),
-                Y = (coord.X - GameConstants.Map_MinX) / (GameConstants.Map_MaxX - GameConstants.Map_MinX)
+                X = transformed[0],
+                Y = transformed[1]
             };
         }
 
@@ -36,12 +47,12 @@ namespace PalCalc.Model
         /// </summary>
         public static MapCoord UIFromWorldCoord(WorldCoord coord)
         {
-            var norm = NormalizedFromWorldCoord(coord);
+            var transformed = ApplyMatrix(GameConstants.WorldToMapMatrix, coord.X, coord.Y);
 
             return new MapCoord()
             {
-                X = 1000 * (norm.X * 2 - 1),
-                Y = 1000 * (norm.Y * 2 - 1),
+                X = transformed[0],
+                Y = transformed[1]
             };
         }
     }
