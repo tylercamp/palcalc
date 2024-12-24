@@ -55,7 +55,7 @@
                         <TextBlock Text="{Binding Label.Value}" />
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                        <vu:PopupToolTipTrigger InitialShowDelay="200">
+                        <vu:PopupToolTipTrigger InitialShowDelay="500">
                             <vu:PopupToolTipTrigger.Style>
                                 <Style TargetType="vu:PopupToolTipTrigger">
                                     <Style.Triggers>
@@ -73,7 +73,7 @@
                                 </Style>
                             </vu:PopupToolTipTrigger.Style>
 
-                            <StackPanel Orientation="Horizontal" Background="White">
+                            <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Label.Value}" />
                                 <materialIcons:MaterialIcon Kind="Crosshairs" Height="12" Margin="5,0,0,0" Visibility="{Binding Coords, Converter={StaticResource VVC}}" />
                             </StackPanel>

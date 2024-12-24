@@ -246,6 +246,8 @@ namespace PalCalc.UI.View.Utils
             _lastMousePosition = e.GetPosition(this);
             _container.CaptureMouse();
 
+            Cursor = Cursors.SizeAll;
+
             e.Handled = true;
         }
 
@@ -255,6 +257,8 @@ namespace PalCalc.UI.View.Utils
 
             _isPanning = false;
             _container.ReleaseMouseCapture();
+
+            Cursor = null;
 
             e.Handled = true;
         }

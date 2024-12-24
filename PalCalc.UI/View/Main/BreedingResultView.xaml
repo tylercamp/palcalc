@@ -60,7 +60,6 @@
                                             </Setter.Value>
                                         </Setter>
                                         <Setter Property="Cursor" Value="Hand" />
-                                        <Setter Property="Background" Value="Black" />
                                         <Setter Property="InitialShowDelay" Value="200" />
                                     </DataTrigger>
                                 </Style.Triggers>

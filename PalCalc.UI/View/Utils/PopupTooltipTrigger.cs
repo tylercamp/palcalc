@@ -32,6 +32,8 @@ namespace PalCalc.UI.View.Utils
 
         public PopupToolTipTrigger()
         {
+            Background = Brushes.Transparent;
+
             _showTimer = new DispatcherTimer(DispatcherPriority.Normal);
             _showTimer.Tick += ShowTimer_Tick;
 
@@ -42,7 +44,6 @@ namespace PalCalc.UI.View.Utils
 
         private void PopupToolTipTrigger_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            logger.Information("PopupToolTipTrigger_MouseDown");
             _showTimer.Stop();
             HidePopup();
         }
@@ -88,7 +89,6 @@ namespace PalCalc.UI.View.Utils
         {
             if (_popup != null && !_showTimer.IsEnabled && !_popup.IsOpen)
             {
-                logger.Information("OnMouseEnter: starting show timer for {ms}ms", InitialShowDelay);
                 _showTimer.Interval = TimeSpan.FromMilliseconds(InitialShowDelay);
                 _showTimer.Start();
             }
@@ -96,31 +96,20 @@ namespace PalCalc.UI.View.Utils
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            logger.Information("OnMouseLeave: canceling show timer");
             if (_popup != null) _showTimer.Stop();
         }
 
         private void ShowTimer_Tick(object sender, EventArgs e)
         {
-            logger.Information("ShowTimer_Tick: stopping timer to show popup");
             _showTimer.Stop();
             if (_popup != null) ShowPopup();
         }
 
         private void ShowPopup()
         {
-            logger.Information("ShowPopup: showing popup");
-            if (_popup.IsOpen)
-            {
-                logger.Information("ShowPopup: popup was already open");
-                return;
-            }
+            if (_popup.IsOpen) return;
 
-            if (ActiveTrigger != null)
-            {
-                logger.Information("ShowPopup: hiding active trigger");
-                ActiveTrigger.HidePopup();
-            }
+            if (ActiveTrigger != null) ActiveTrigger.HidePopup();
             ActiveTrigger = this;
 
             _popup.IsOpen = true;
@@ -134,12 +123,7 @@ namespace PalCalc.UI.View.Utils
 
         private void HidePopup()
         {
-            logger.Information("HidePopup: hiding popup");
-            if (!_popup.IsOpen)
-            {
-                logger.Information("HidePopup: popup was already hidden");
-                return;
-            }
+            if (!_popup.IsOpen) return;
 
             if (ActiveTrigger == this) ActiveTrigger = null;
 
@@ -192,7 +176,7 @@ namespace PalCalc.UI.View.Utils
                 double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
 
                 // Close the popup if the distance exceeds the threshold
-                if (distance > 20)
+                if (distance > 15 && !this.IsMouseOver)
                 {
                     HidePopup();
                 }
