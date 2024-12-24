@@ -154,6 +154,11 @@ namespace PalCalc.SaveReader.FArchive.Custom
                     if (groupType == GroupType.Guild)
                     {
                         result.AdminPlayerUid = subReader.ReadGuid();
+
+                        // https://github.com/cheahjs/palworld-save-tools/issues/192
+                        subReader.ReadInt64();
+                        subReader.ReadInt64();
+
                         result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
                     }
 
