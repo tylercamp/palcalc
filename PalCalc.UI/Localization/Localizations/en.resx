@@ -263,6 +263,10 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve">
     <value>An error occurred when loading the save file.
 
+Save files from newer versions of Palworld may require updates to Pal Calc.
+
+Files from older versions may be unsupported, and an older version of Pal Calc might be needed.
+
 Please find the generated ZIP file to send with any support questions:
 
 {CrashlogPath}</value>
