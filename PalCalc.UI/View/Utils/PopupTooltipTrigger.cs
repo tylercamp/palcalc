@@ -34,8 +34,15 @@ namespace PalCalc.UI.View.Utils
             _showTimer = new DispatcherTimer();
             _showTimer.Tick += ShowTimer_Tick;
 
+            MouseDown += PopupToolTipTrigger_MouseDown;
             MouseEnter += OnMouseEnter;
             MouseLeave += OnMouseLeave;
+        }
+
+        private void PopupToolTipTrigger_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _showTimer.Stop();
+            HidePopup();
         }
 
         public PopupToolTipContent ToolTipContent
