@@ -114,6 +114,8 @@ namespace PalCalc.UI.View.Utils
             _transformGroup.Children.Add(_scaleTransform);
             _transformGroup.Children.Add(_translateTransform);
 
+            ClipToBounds = true;
+
             // We'll handle mouse events for panning/zooming
             this.Loaded += OnLoaded;
         }

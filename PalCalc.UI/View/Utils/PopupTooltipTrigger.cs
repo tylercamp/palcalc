@@ -72,14 +72,11 @@ namespace PalCalc.UI.View.Utils
                 Padding = new Thickness(5),
             };
 
-            var contentContainer = new Grid { ClipToBounds = true };
-
             var contentControl = new ContentControl();
             contentControl.SetBinding(ContentPresenter.DataContextProperty, new Binding(nameof(DataContext)) { Source = this });
             contentControl.SetBinding(ContentPresenter.ContentProperty, new Binding(nameof(TooltipContent)) { Source = this });
 
-            contentContainer.Children.Add(contentControl);
-            border.Child = contentContainer;
+            border.Child = contentControl;
             _popup.Child = border;
 
             _popup.MouseEnter += OnMouseEnter;
