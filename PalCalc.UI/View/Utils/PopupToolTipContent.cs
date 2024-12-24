@@ -10,13 +10,9 @@ namespace PalCalc.UI.View.Utils
 {
     public class PopupToolTipContent : Border
     {
-        public PopupToolTipContent()
+        static PopupToolTipContent()
         {
-            BorderThickness = new Thickness(1);
-            CornerRadius = new CornerRadius(2);
-            Background = SystemColors.ControlBrush;
-            BorderBrush = SystemColors.ControlDarkBrush;
-            Padding = new Thickness(5);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(PopupToolTipContent), new FrameworkPropertyMetadata(typeof(PopupToolTipContent)));
         }
     }
 }

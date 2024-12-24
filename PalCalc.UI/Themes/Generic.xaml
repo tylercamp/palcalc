@@ -34,4 +34,12 @@
         </Setter>
     </Style>
 
+    <Style TargetType="{x:Type local:PopupToolTipContent}">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="2" />
+        <Setter Property="Background" Value="{x:Static SystemColors.ControlBrush}" />
+        <Setter Property="BorderBrush" Value="{x:Static SystemColors.ControlDarkBrush}" />
+        <Setter Property="Padding" Value="5" />
+    </Style>
+
 </ResourceDictionary>

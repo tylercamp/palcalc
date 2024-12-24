@@ -39,26 +39,24 @@
                     <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="White" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
                     <StackPanel Orientation="Vertical">
                         <StackPanel.Resources>
-                            <!-- stack panels bound to a pal ref with map coords will get a tooltip -->
-                            <Style TargetType="vu:PopupToolTipTrigger" x:Key="LocationStyle">
+                            <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel" x:Key="LocationPopupContent">
+                                <vu:PopupToolTipContent Background="#040F15">
+                                    <StackPanel>
+                                        <!-- (some nodes, like composites, have styles which override text size - ensure consistent size in popups) -->
+                                        <StackPanel.Resources>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="FontSize" Value="13" />
+                                            </Style>
+                                        </StackPanel.Resources>
+                                        <vp:PalLocationView DataContext="{Binding MapLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" Width="300" Height="300" />
+                                        <vp:PalLocationView DataContext="{Binding ContainerLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" />
+                                    </StackPanel>
+                                </vu:PopupToolTipContent>
+                            </DataTemplate>
+
+                            <Style TargetType="vu:PopupToolTipTrigger" x:Key="LocationStyle" x:Shared="False">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding HasPreview, Converter={StaticResource VBC}, FallbackValue=False}" Value="True">
-                                        <Setter Property="ToolTipContent">
-                                            <Setter.Value>
-                                                <vu:PopupToolTipContent Background="#040F15">
-                                                    <StackPanel>
-                                                        <!-- (some nodes, like composites, have styles which override text size - ensure consistent size in popups) -->
-                                                        <StackPanel.Resources>
-                                                            <Style TargetType="TextBlock">
-                                                                <Setter Property="FontSize" Value="13" />
-                                                            </Style>
-                                                        </StackPanel.Resources>
-                                                        <vp:PalLocationView DataContext="{Binding MapLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" Width="300" Height="300" />
-                                                        <vp:PalLocationView DataContext="{Binding ContainerLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" />
-                                                    </StackPanel>
-                                                </vu:PopupToolTipContent>
-                                            </Setter.Value>
-                                        </Setter>
                                         <Setter Property="Cursor" Value="Hand" />
                                         <Setter Property="InitialShowDelay" Value="200" />
                                     </DataTrigger>
@@ -80,7 +78,7 @@
                             <ContentControl.Resources>
                                 <DataTemplate DataType="{x:Type mvm:SpecificPalRefLocationViewModel}">
                                     <Grid>
-                                        <vu:PopupToolTipTrigger Visibility="{Binding Visibility}" Style="{StaticResource LocationStyle}">
+                                        <vu:PopupToolTipTrigger Visibility="{Binding Visibility}" Style="{StaticResource LocationStyle}" ToolTipContentTemplate="{StaticResource LocationPopupContent}">
                                             <StackPanel Orientation="Horizontal">
                                                 <StackPanel Orientation="Vertical" DataContext="{Binding}">
                                                     <StackPanel.Resources>
@@ -107,30 +105,55 @@
                                             </Style>
                                         </StackPanel.Resources>
 
-                                        <vu:PopupToolTipTrigger DataContext="{Binding MaleViewModel}" Style="{StaticResource LocationStyle}">
-                                            <StackPanel Orientation="Horizontal" Grid.Column="0" MaxWidth="100">
-                                                <StackPanel Orientation="Vertical">
-                                                    <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_MALE}" />
-                                                    <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
-                                                    <TextBlock Text="{Binding LocationCoordDescription.Value}" />
-                                                </StackPanel>
-                                                <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                            </StackPanel>
-                                        </vu:PopupToolTipTrigger>
+                                        <ContentControl Content="{Binding MaleViewModel}">
+                                            <ContentControl.ContentTemplate>
+                                                <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel">
+                                                    <vu:PopupToolTipTrigger Style="{StaticResource LocationStyle}" ToolTipContentTemplate="{StaticResource ResourceKey=LocationPopupContent}">
+                                                        <StackPanel Orientation="Horizontal" Grid.Column="0" MaxWidth="100">
+                                                            <StackPanel.Resources>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="FontSize" Value="8" />
+                                                                    <Setter Property="Foreground" Value="White" />
+                                                                </Style>
+                                                            </StackPanel.Resources>
+                                                            <StackPanel Orientation="Vertical">
+                                                                <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_MALE}" />
+                                                                <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
+                                                                <TextBlock Text="{Binding LocationCoordDescription.Value}" />
+                                                            </StackPanel>
+                                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                                        </StackPanel>
+                                                    </vu:PopupToolTipTrigger>
+                                                </DataTemplate>
+                                            </ContentControl.ContentTemplate>
+                                        </ContentControl>
 
                                         <Border BorderBrush="White" Width="1" BorderThickness="1" Margin="10,5,10,5" Grid.Column="1" VerticalAlignment="Stretch" />
 
-                                        <vu:PopupToolTipTrigger DataContext="{Binding FemaleViewModel}" Style="{StaticResource LocationStyle}">
-                                            <StackPanel Orientation="Horizontal" Grid.Column="2" MaxWidth="100">
-                                                <StackPanel Orientation="Vertical">
-                                                    <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_FEMALE}" />
-                                                    <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
-                                                    <TextBlock Text="{Binding LocationCoordDescription.Value}" />
-                                                </StackPanel>
+                                        <ContentControl Content="{Binding FemaleViewModel}">
+                                            <ContentControl.ContentTemplate>
+                                                <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel">
+                                                    <vu:PopupToolTipTrigger Style="{StaticResource LocationStyle}" ToolTipContentTemplate="{StaticResource ResourceKey=LocationPopupContent}">
+                                                        <StackPanel Orientation="Horizontal" Grid.Column="2" MaxWidth="100">
+                                                            <StackPanel.Resources>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="FontSize" Value="8" />
+                                                                    <Setter Property="Foreground" Value="White" />
+                                                                </Style>
+                                                            </StackPanel.Resources>
+                                                            
+                                                            <StackPanel Orientation="Vertical">
+                                                                <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_FEMALE}" />
+                                                                <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
+                                                                <TextBlock Text="{Binding LocationCoordDescription.Value}" />
+                                                            </StackPanel>
 
-                                                <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                            </StackPanel>
-                                        </vu:PopupToolTipTrigger>
+                                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                                        </StackPanel>
+                                                    </vu:PopupToolTipTrigger>
+                                                </DataTemplate>
+                                            </ContentControl.ContentTemplate>
+                                        </ContentControl>
                                     </StackPanel>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type mvm:WildPalRefLocationViewModel}">

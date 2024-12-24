@@ -61,11 +61,13 @@
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Coords, Converter={StaticResource VBC}}" Value="True">
                                             <Setter Property="Cursor" Value="Hand" />
-                                            <Setter Property="ToolTipContent">
+                                            <Setter Property="ToolTipContentTemplate">
                                                 <Setter.Value>
-                                                    <vu:PopupToolTipContent>
-                                                        <vp:MapView DataContext="{Binding Coords}" Width="500" Height="500" />
-                                                    </vu:PopupToolTipContent>
+                                                    <DataTemplate>
+                                                        <vu:PopupToolTipContent>
+                                                            <vp:MapView DataContext="{Binding Coords}" Width="500" Height="500" />
+                                                        </vu:PopupToolTipContent>
+                                                    </DataTemplate>
                                                 </Setter.Value>
                                             </Setter>
                                         </DataTrigger>

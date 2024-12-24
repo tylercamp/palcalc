@@ -41,8 +41,11 @@
     <vu:MapViewer
         Grid.ColumnSpan="100"
         Grid.RowSpan="100"
-        BackgroundImage="pack://application:,,,/PalCalc.UI;component/Resources/Map.jpeg"
+        InitialZoom="3.5"
+        InitialX="{Binding NormalizedCoords.X}"
+        InitialY="{Binding NormalizedCoords.Y}"
         ItemsSource="{Binding Converter={StaticResource SICC}}"
+        BackgroundImage="pack://application:,,,/PalCalc.UI;component/Resources/Map.jpeg"
     >
         <vu:MapViewer.ItemContainerStyle>
             <Style>
@@ -52,7 +55,7 @@
         </vu:MapViewer.ItemContainerStyle>
         <vu:MapViewer.ItemTemplate>
             <DataTemplate>
-                <Border Width="50" x:Name="IconHost" CornerRadius="9999" BorderThickness="2" BorderBrush="White">
+                <Border Width="40" x:Name="IconHost" CornerRadius="9999" BorderThickness="2" BorderBrush="White">
                     <Image Source="pack://application:,,,/PalCalc.UI;component/Resources/T_icon_compass_camp.png" />
                 </Border>
             </DataTemplate>
@@ -60,6 +63,6 @@
     </vu:MapViewer>
 
     <Viewbox Grid.Column="1" StretchDirection="DownOnly" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-        <TextBlock Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="20" Text="{Binding DisplayCoordsText}" />
+        <TextBlock Background="{x:Null}" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="20" Text="{Binding DisplayCoordsText}" />
     </Viewbox>
 </Grid>

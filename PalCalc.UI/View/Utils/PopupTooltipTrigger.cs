@@ -17,8 +17,8 @@ namespace PalCalc.UI.View.Utils
         private Popup _popup;
         private DispatcherTimer _showTimer;
 
-        public static readonly DependencyProperty ToolTipContentProperty =
-            DependencyProperty.Register(nameof(ToolTipContent), typeof(PopupToolTipContent), typeof(PopupToolTipTrigger));
+        public static readonly DependencyProperty ToolTipContentTemplateProperty =
+            DependencyProperty.Register(nameof(ToolTipContentTemplate), typeof(DataTemplate), typeof(PopupToolTipTrigger));
 
         public static readonly DependencyProperty InitialShowDelayProperty =
             DependencyProperty.Register(nameof(InitialShowDelay), typeof(int), typeof(PopupToolTipTrigger), new PropertyMetadata(500));
@@ -48,10 +48,10 @@ namespace PalCalc.UI.View.Utils
             HidePopup();
         }
 
-        public PopupToolTipContent ToolTipContent
+        public DataTemplate ToolTipContentTemplate
         {
-            get => (PopupToolTipContent)GetValue(ToolTipContentProperty);
-            set => SetValue(ToolTipContentProperty, value);
+            get => (DataTemplate)GetValue(ToolTipContentTemplateProperty);
+            set => SetValue(ToolTipContentTemplateProperty, value);
         }
 
         public int InitialShowDelay
@@ -74,8 +74,16 @@ namespace PalCalc.UI.View.Utils
             };
 
             var contentControl = new ContentControl();
-            contentControl.SetBinding(ContentPresenter.DataContextProperty, new Binding(nameof(DataContext)) { Source = this });
-            contentControl.SetBinding(ContentPresenter.ContentProperty, new Binding(nameof(ToolTipContent)) { Source = this });
+            contentControl.SetBinding(ContentControl.ContentTemplateProperty, new Binding(nameof(ToolTipContentTemplate)) { Source = this });
+            contentControl.SetBinding(ContentControl.ContentProperty, new Binding(nameof(DataContext)) { Source = this });
+
+            // Optionally, bind the DataContext of the tooltip to the DataContext of the parent control
+            contentControl.SetBinding(ContentControl.DataContextProperty, new Binding
+            {
+                Source = this,
+                Path = new PropertyPath(nameof(DataContext)),
+                Mode = BindingMode.OneWay
+            });
 
             _popup.Child = contentControl;
 

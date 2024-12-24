@@ -97,7 +97,70 @@ namespace PalCalc.UI.View.Utils
                 typeof(MapViewer),
                 new PropertyMetadata(null));
 
+        public double InitialZoom
+        {
+            get => (double)GetValue(InitialZoomProperty);
+            set => SetValue(InitialZoomProperty, value);
+        }
+
+        public static readonly DependencyProperty InitialZoomProperty =
+            DependencyProperty.Register(nameof(InitialZoom), typeof(double), typeof(MapViewer),
+                new PropertyMetadata(1.0, OnInitialPropertyChanged));
+
+        private static void OnInitialPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is MapViewer viewer)
+            {
+                viewer.ApplyInitialState();
+            }
+        }
+
+        public double InitialX
+        {
+            get => (double)GetValue(InitialXProperty);
+            set => SetValue(InitialXProperty, value);
+        }
+
+        public static readonly DependencyProperty InitialXProperty =
+            DependencyProperty.Register(nameof(InitialX), typeof(double), typeof(MapViewer),
+                new PropertyMetadata(0.0, OnInitialPropertyChanged));
+
+        public double InitialY
+        {
+            get => (double)GetValue(InitialYProperty);
+            set => SetValue(InitialYProperty, value);
+        }
+
+        public static readonly DependencyProperty InitialYProperty =
+            DependencyProperty.Register(nameof(InitialY), typeof(double), typeof(MapViewer),
+                new PropertyMetadata(0.0, OnInitialPropertyChanged));
+
         #endregion
+
+        private void ApplyInitialState()
+        {
+            // Make sure we have a valid container & image size
+            if (_container == null || _container.ActualWidth == 0 || _container.ActualHeight == 0 || _imageNaturalSize.IsEmpty) return;
+
+            // Clamp the zoom to a desired range
+            double zoom = Math.Max(0.01, Math.Min(InitialZoom, 10.0));
+            _scaleTransform.ScaleX = zoom;
+            _scaleTransform.ScaleY = zoom;
+
+            double scaleX = _scaleTransform.ScaleX * (_container.ActualWidth / _imageNaturalSize.Width);
+            double scaleY = _scaleTransform.ScaleY * (_container.ActualHeight / _imageNaturalSize.Height);
+
+            double mapWidth = _imageNaturalSize.Width * scaleX;
+            double mapHeight = _imageNaturalSize.Height * scaleY;
+            double viewportWidth = _container.ActualWidth;
+            double viewportHeight = _container.ActualHeight;
+
+            _translateTransform.X = viewportWidth / 2 - (InitialX * mapWidth);
+            _translateTransform.Y = viewportHeight / 2 - (InitialY * mapHeight);
+
+            ClampTranslation();
+        }
+
 
         static MapViewer()
         {
@@ -141,6 +204,7 @@ namespace PalCalc.UI.View.Utils
             _container = GetTemplateChild(PartContainer) as FrameworkElement;
             if (_container != null)
             {
+                ApplyInitialState();
                 _container.RenderTransform = _transformGroup;
             }
         }
@@ -292,6 +356,8 @@ namespace PalCalc.UI.View.Utils
             }
         }
 
+        private static ILogger logger = Log.ForContext<MapViewer>();
+
         /// <summary>
         /// Prevents the user from panning the map outside the control’s visible area.
         /// (i.e., clamps the translation to keep the map image fully in view)
@@ -309,6 +375,9 @@ namespace PalCalc.UI.View.Utils
 
             double viewportWidth = _container.ActualWidth;
             double viewportHeight = _container.ActualHeight;
+
+            logger.Information("initial scaleTransform: {x} | {y}", _scaleTransform.ScaleX, _scaleTransform.ScaleY);
+            logger.Information("initial translateTransform: {x} | {y}", _translateTransform.X, _translateTransform.Y);
 
             // If the map is smaller than the viewport, center it
             // Otherwise, clamp so we don't drag outside
@@ -335,6 +404,9 @@ namespace PalCalc.UI.View.Utils
                 double maxY = 0;
                 _translateTransform.Y = Math.Min(Math.Max(_translateTransform.Y, minY), maxY);
             }
+
+            logger.Information("clamped scaleTransform: {x} | {y}", _scaleTransform.ScaleX, _scaleTransform.ScaleY);
+            logger.Information("clamped translateTransform: {x} | {y}", _translateTransform.X, _translateTransform.Y);
         }
 
         #endregion
@@ -348,8 +420,15 @@ namespace PalCalc.UI.View.Utils
             if (!size.IsEmpty && size != _imageNaturalSize)
             {
                 _imageNaturalSize = size;
-                ClampTranslation();
+                ApplyInitialState();
             }
         }
+
+        protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+        {
+            base.OnRenderSizeChanged(sizeInfo);
+            ApplyInitialState();
+        }
+
     }
 }
