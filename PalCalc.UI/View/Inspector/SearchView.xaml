@@ -63,7 +63,9 @@
                                             <Setter Property="Cursor" Value="Hand" />
                                             <Setter Property="TooltipContent">
                                                 <Setter.Value>
-                                                    <vp:MapView DataContext="{Binding Coords}" Width="500" Height="500" />
+                                                    <vu:PopupToolTipContainer>
+                                                        <vp:MapView DataContext="{Binding Coords}" Width="500" Height="500" />
+                                                    </vu:PopupToolTipContainer>
                                                 </Setter.Value>
                                             </Setter>
                                         </DataTrigger>

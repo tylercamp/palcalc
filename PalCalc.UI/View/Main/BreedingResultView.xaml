@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View"
              xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
+             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:gsvm="clr-namespace:PalCalc.UI.ViewModel.GraphSharp"
@@ -39,12 +40,12 @@
                     <StackPanel Orientation="Vertical">
                         <StackPanel.Resources>
                             <!-- stack panels bound to a pal ref with map coords will get a tooltip -->
-                            <Style TargetType="StackPanel" x:Key="LocationStyle">
+                            <Style TargetType="vu:PopupTooltipTrigger" x:Key="LocationStyle">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding HasPreview, Converter={StaticResource VBC}, FallbackValue=False}" Value="True">
-                                        <Setter Property="ToolTip">
+                                        <Setter Property="TooltipContent">
                                             <Setter.Value>
-                                                <ToolTip DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}" Background="#040F15">
+                                                <vu:PopupToolTipContainer Background="#040F15">
                                                     <StackPanel>
                                                         <!-- (some nodes, like composites, have styles which override text size - ensure consistent size in popups) -->
                                                         <StackPanel.Resources>
@@ -55,12 +56,12 @@
                                                         <vp:PalLocationView DataContext="{Binding MapLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" Width="300" Height="300" />
                                                         <vp:PalLocationView DataContext="{Binding ContainerLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" />
                                                     </StackPanel>
-                                                </ToolTip>
+                                                </vu:PopupToolTipContainer>
                                             </Setter.Value>
                                         </Setter>
                                         <Setter Property="Cursor" Value="Hand" />
                                         <Setter Property="Background" Value="Black" />
-                                        <Setter Property="ToolTipService.InitialShowDelay" Value="200" />
+                                        <Setter Property="InitialShowDelay" Value="200" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -80,20 +81,22 @@
                             <ContentControl.Resources>
                                 <DataTemplate DataType="{x:Type mvm:SpecificPalRefLocationViewModel}">
                                     <Grid>
-                                        <StackPanel Orientation="Horizontal" Visibility="{Binding Visibility}" Style="{StaticResource LocationStyle}">
-                                            <StackPanel Orientation="Vertical" DataContext="{Binding}">
-                                                <StackPanel.Resources>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="White"/>
-                                                    </Style>
-                                                </StackPanel.Resources>
+                                        <vu:PopupTooltipTrigger Visibility="{Binding Visibility}" Style="{StaticResource LocationStyle}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <StackPanel Orientation="Vertical" DataContext="{Binding}">
+                                                    <StackPanel.Resources>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="White"/>
+                                                        </Style>
+                                                    </StackPanel.Resources>
                                         
-                                                <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" Visibility="{Binding OwnerVisibility}"/>
-                                                <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" />
-                                            </StackPanel>
+                                                    <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" Visibility="{Binding OwnerVisibility}"/>
+                                                    <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" />
+                                                </StackPanel>
 
-                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                        </StackPanel>
+                                                <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                            </StackPanel>
+                                        </vu:PopupTooltipTrigger>
                                     </Grid>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type mvm:CompositePalRefLocationViewModel}">
@@ -104,26 +107,31 @@
                                                 <Setter Property="Foreground" Value="White" />
                                             </Style>
                                         </StackPanel.Resources>
-                                        <StackPanel Orientation="Horizontal" Grid.Column="0" MaxWidth="100" DataContext="{Binding MaleViewModel}" Style="{StaticResource LocationStyle}">
-                                            <StackPanel Orientation="Vertical">
-                                                <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_MALE}" />
-                                                <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
-                                                <TextBlock Text="{Binding LocationCoordDescription.Value}" />
-                                            </StackPanel>
-                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                        </StackPanel>
-                                
-                                        <Border BorderBrush="White" Width="1" BorderThickness="1" Margin="10,5,10,5" Grid.Column="1" VerticalAlignment="Stretch" />
-                                        
-                                        <StackPanel Orientation="Horizontal" Grid.Column="2" MaxWidth="100" DataContext="{Binding FemaleViewModel}" Style="{StaticResource LocationStyle}">
-                                            <StackPanel Orientation="Vertical">
-                                                <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_FEMALE}" />
-                                                <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
-                                                <TextBlock Text="{Binding LocationCoordDescription.Value}" />
-                                            </StackPanel>
 
-                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                        </StackPanel>
+                                        <vu:PopupTooltipTrigger DataContext="{Binding MaleViewModel}" Style="{StaticResource LocationStyle}">
+                                            <StackPanel Orientation="Horizontal" Grid.Column="0" MaxWidth="100">
+                                                <StackPanel Orientation="Vertical">
+                                                    <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_MALE}" />
+                                                    <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
+                                                    <TextBlock Text="{Binding LocationCoordDescription.Value}" />
+                                                </StackPanel>
+                                                <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                            </StackPanel>
+                                        </vu:PopupTooltipTrigger>
+
+                                        <Border BorderBrush="White" Width="1" BorderThickness="1" Margin="10,5,10,5" Grid.Column="1" VerticalAlignment="Stretch" />
+
+                                        <vu:PopupTooltipTrigger DataContext="{Binding FemaleViewModel}" Style="{StaticResource LocationStyle}">
+                                            <StackPanel Orientation="Horizontal" Grid.Column="2" MaxWidth="100">
+                                                <StackPanel Orientation="Vertical">
+                                                    <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_FEMALE}" />
+                                                    <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
+                                                    <TextBlock Text="{Binding LocationCoordDescription.Value}" />
+                                                </StackPanel>
+
+                                                <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Foreground="White" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                            </StackPanel>
+                                        </vu:PopupTooltipTrigger>
                                     </StackPanel>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type mvm:WildPalRefLocationViewModel}">

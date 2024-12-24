@@ -17,7 +17,7 @@ namespace PalCalc.UI.View.Utils
         private DispatcherTimer _showTimer;
 
         public static readonly DependencyProperty TooltipContentProperty =
-            DependencyProperty.Register(nameof(TooltipContent), typeof(object), typeof(PopupTooltipTrigger));
+            DependencyProperty.Register(nameof(TooltipContent), typeof(PopupToolTipContainer), typeof(PopupTooltipTrigger));
 
         public static readonly DependencyProperty InitialShowDelayProperty =
             DependencyProperty.Register(nameof(InitialShowDelay), typeof(int), typeof(PopupTooltipTrigger), new PropertyMetadata(500));
@@ -38,9 +38,9 @@ namespace PalCalc.UI.View.Utils
             MouseLeave += OnMouseLeave;
         }
 
-        public object TooltipContent
+        public PopupToolTipContainer TooltipContent
         {
-            get => GetValue(TooltipContentProperty);
+            get => (PopupToolTipContainer)GetValue(TooltipContentProperty);
             set => SetValue(TooltipContentProperty, value);
         }
 
@@ -63,21 +63,11 @@ namespace PalCalc.UI.View.Utils
                 PopupAnimation = PopupAnimation.Fade,
             };
 
-            var border = new Border
-            {
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(2),
-                Background = SystemColors.ControlBrush,
-                BorderBrush = SystemColors.ControlDarkBrush,
-                Padding = new Thickness(5),
-            };
-
             var contentControl = new ContentControl();
             contentControl.SetBinding(ContentPresenter.DataContextProperty, new Binding(nameof(DataContext)) { Source = this });
             contentControl.SetBinding(ContentPresenter.ContentProperty, new Binding(nameof(TooltipContent)) { Source = this });
 
-            border.Child = contentControl;
-            _popup.Child = border;
+            _popup.Child = contentControl;
 
             _popup.MouseEnter += OnMouseEnter;
             _popup.MouseLeave += OnMouseLeave;
