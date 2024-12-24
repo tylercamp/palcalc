@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows;
 using System.Globalization;
 using System.Windows.Data;
+using Serilog;
 
 namespace PalCalc.UI.View.Utils
 {
@@ -202,6 +203,8 @@ namespace PalCalc.UI.View.Utils
 
         private void OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
+            e.Handled = true;
+
             if (_container == null || _imageNaturalSize.IsEmpty)
                 return;
 
@@ -240,6 +243,8 @@ namespace PalCalc.UI.View.Utils
             _isPanning = true;
             _lastMousePosition = e.GetPosition(this);
             _container.CaptureMouse();
+
+            e.Handled = true;
         }
 
         private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -248,6 +253,8 @@ namespace PalCalc.UI.View.Utils
 
             _isPanning = false;
             _container.ReleaseMouseCapture();
+
+            e.Handled = true;
         }
 
         private void OnMouseMove(object sender, MouseEventArgs e)
