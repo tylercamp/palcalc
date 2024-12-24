@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -31,7 +32,7 @@ namespace PalCalc.UI.View.Utils
 
         public PopupToolTipTrigger()
         {
-            _showTimer = new DispatcherTimer();
+            _showTimer = new DispatcherTimer(DispatcherPriority.Normal);
             _showTimer.Tick += ShowTimer_Tick;
 
             MouseDown += PopupToolTipTrigger_MouseDown;
@@ -41,6 +42,7 @@ namespace PalCalc.UI.View.Utils
 
         private void PopupToolTipTrigger_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            logger.Information("PopupToolTipTrigger_MouseDown");
             _showTimer.Stop();
             HidePopup();
         }
@@ -80,10 +82,13 @@ namespace PalCalc.UI.View.Utils
             _popup.MouseLeave += OnMouseLeave;
         }
 
+        private ILogger logger = Log.ForContext<PopupToolTipTrigger>();
+
         private void OnMouseEnter(object sender, MouseEventArgs e)
         {
-            if (_popup != null)
+            if (_popup != null && !_showTimer.IsEnabled && !_popup.IsOpen)
             {
+                logger.Information("OnMouseEnter: starting show timer for {ms}ms", InitialShowDelay);
                 _showTimer.Interval = TimeSpan.FromMilliseconds(InitialShowDelay);
                 _showTimer.Start();
             }
@@ -91,20 +96,31 @@ namespace PalCalc.UI.View.Utils
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
+            logger.Information("OnMouseLeave: canceling show timer");
             if (_popup != null) _showTimer.Stop();
         }
 
         private void ShowTimer_Tick(object sender, EventArgs e)
         {
+            logger.Information("ShowTimer_Tick: stopping timer to show popup");
             _showTimer.Stop();
             if (_popup != null) ShowPopup();
         }
 
         private void ShowPopup()
         {
-            if (_popup.IsOpen) return;
+            logger.Information("ShowPopup: showing popup");
+            if (_popup.IsOpen)
+            {
+                logger.Information("ShowPopup: popup was already open");
+                return;
+            }
 
-            if (ActiveTrigger != null) ActiveTrigger.HidePopup();
+            if (ActiveTrigger != null)
+            {
+                logger.Information("ShowPopup: hiding active trigger");
+                ActiveTrigger.HidePopup();
+            }
             ActiveTrigger = this;
 
             _popup.IsOpen = true;
@@ -118,7 +134,12 @@ namespace PalCalc.UI.View.Utils
 
         private void HidePopup()
         {
-            if (!_popup.IsOpen) return;
+            logger.Information("HidePopup: hiding popup");
+            if (!_popup.IsOpen)
+            {
+                logger.Information("HidePopup: popup was already hidden");
+                return;
+            }
 
             if (ActiveTrigger == this) ActiveTrigger = null;
 
