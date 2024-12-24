@@ -11,25 +11,25 @@ namespace PalCalc.UI.View.Utils
 {
     // (thanks again chatgpt)
 
-    public class PopupTooltipTrigger : ContentControl
+    public class PopupToolTipTrigger : ContentControl
     {
         private Popup _popup;
         private DispatcherTimer _showTimer;
 
-        public static readonly DependencyProperty TooltipContentProperty =
-            DependencyProperty.Register(nameof(TooltipContent), typeof(PopupToolTipContainer), typeof(PopupTooltipTrigger));
+        public static readonly DependencyProperty ToolTipContentProperty =
+            DependencyProperty.Register(nameof(ToolTipContent), typeof(PopupToolTipContent), typeof(PopupToolTipTrigger));
 
         public static readonly DependencyProperty InitialShowDelayProperty =
-            DependencyProperty.Register(nameof(InitialShowDelay), typeof(int), typeof(PopupTooltipTrigger), new PropertyMetadata(500));
+            DependencyProperty.Register(nameof(InitialShowDelay), typeof(int), typeof(PopupToolTipTrigger), new PropertyMetadata(500));
 
-        static PopupTooltipTrigger()
+        static PopupToolTipTrigger()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(PopupTooltipTrigger), new FrameworkPropertyMetadata(typeof(PopupTooltipTrigger)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(PopupToolTipTrigger), new FrameworkPropertyMetadata(typeof(PopupToolTipTrigger)));
         }
 
-        static PopupTooltipTrigger ActiveTrigger;
+        static PopupToolTipTrigger ActiveTrigger;
 
-        public PopupTooltipTrigger()
+        public PopupToolTipTrigger()
         {
             _showTimer = new DispatcherTimer();
             _showTimer.Tick += ShowTimer_Tick;
@@ -38,10 +38,10 @@ namespace PalCalc.UI.View.Utils
             MouseLeave += OnMouseLeave;
         }
 
-        public PopupToolTipContainer TooltipContent
+        public PopupToolTipContent ToolTipContent
         {
-            get => (PopupToolTipContainer)GetValue(TooltipContentProperty);
-            set => SetValue(TooltipContentProperty, value);
+            get => (PopupToolTipContent)GetValue(ToolTipContentProperty);
+            set => SetValue(ToolTipContentProperty, value);
         }
 
         public int InitialShowDelay
@@ -65,7 +65,7 @@ namespace PalCalc.UI.View.Utils
 
             var contentControl = new ContentControl();
             contentControl.SetBinding(ContentPresenter.DataContextProperty, new Binding(nameof(DataContext)) { Source = this });
-            contentControl.SetBinding(ContentPresenter.ContentProperty, new Binding(nameof(TooltipContent)) { Source = this });
+            contentControl.SetBinding(ContentPresenter.ContentProperty, new Binding(nameof(ToolTipContent)) { Source = this });
 
             _popup.Child = contentControl;
 

@@ -8,9 +8,9 @@ using System.Windows.Controls;
 
 namespace PalCalc.UI.View.Utils
 {
-    public class PopupToolTipContainer : Border
+    public class PopupToolTipContent : Border
     {
-        public PopupToolTipContainer()
+        public PopupToolTipContent()
         {
             BorderThickness = new Thickness(1);
             CornerRadius = new CornerRadius(2);

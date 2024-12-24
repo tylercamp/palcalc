@@ -55,29 +55,29 @@
                         <TextBlock Text="{Binding Label.Value}" />
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type svm:BaseTreeNodeViewModel}" ItemsSource="{Binding Children}">
-                        <vu:PopupTooltipTrigger InitialShowDelay="200">
-                            <vu:PopupTooltipTrigger.Style>
-                                <Style TargetType="vu:PopupTooltipTrigger">
+                        <vu:PopupToolTipTrigger InitialShowDelay="200">
+                            <vu:PopupToolTipTrigger.Style>
+                                <Style TargetType="vu:PopupToolTipTrigger">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Coords, Converter={StaticResource VBC}}" Value="True">
                                             <Setter Property="Cursor" Value="Hand" />
-                                            <Setter Property="TooltipContent">
+                                            <Setter Property="ToolTipContent">
                                                 <Setter.Value>
-                                                    <vu:PopupToolTipContainer>
+                                                    <vu:PopupToolTipContent>
                                                         <vp:MapView DataContext="{Binding Coords}" Width="500" Height="500" />
-                                                    </vu:PopupToolTipContainer>
+                                                    </vu:PopupToolTipContent>
                                                 </Setter.Value>
                                             </Setter>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </vu:PopupTooltipTrigger.Style>
+                            </vu:PopupToolTipTrigger.Style>
 
                             <StackPanel Orientation="Horizontal" Background="White">
                                 <TextBlock Text="{Binding Label.Value}" />
                                 <materialIcons:MaterialIcon Kind="Crosshairs" Height="12" Margin="5,0,0,0" Visibility="{Binding Coords, Converter={StaticResource VVC}}" />
                             </StackPanel>
-                        </vu:PopupTooltipTrigger>
+                        </vu:PopupToolTipTrigger>
                     </HierarchicalDataTemplate>
 
                     <DataTemplate DataType="{x:Type svm:PlayerPalboxContainerViewModel}">

@@ -22,10 +22,10 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type local:PopupTooltipTrigger}">
+    <Style TargetType="{x:Type local:PopupToolTipTrigger}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:PopupTooltipTrigger}">
+                <ControlTemplate TargetType="{x:Type local:PopupToolTipTrigger}">
                     <Grid>
                         <ContentPresenter Content="{TemplateBinding Content}" />
                     </Grid>
