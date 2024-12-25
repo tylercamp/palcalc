@@ -254,6 +254,34 @@ namespace PalCalc.SaveReader.FArchive
                         return r;
                     }
 
+                case "FloatProperty":
+                    {
+                        var r = ReadFloat();
+                        foreach (var v in pathVisitors) v.VisitFloat(path, r);
+                        return r;
+                    }
+
+                case "UInt16Property":
+                    {
+                        var r = ReadUInt16();
+                        foreach (var v in pathVisitors) v.VisitUInt16(path, r);
+                        return r;
+                    }
+
+                case "UInt32Property":
+                    {
+                        var r = ReadUInt32();
+                        foreach (var v in pathVisitors) v.VisitUInt32(path, r);
+                        return r;
+                    }
+
+                case "Int64Property":
+                    {
+                        var r = ReadInt64();
+                        foreach (var v in pathVisitors) v.VisitInt64(path, r);
+                        return r;
+                    }
+
                 default: throw new Exception("Unrecognized type name: " + typeName);
             }
         }
