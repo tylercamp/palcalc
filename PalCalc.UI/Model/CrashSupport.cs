@@ -109,7 +109,7 @@ namespace PalCalc.UI.Model
                             foreach (var f in Directory.EnumerateFiles(save.BasePath, "*", SearchOption.AllDirectories))
                             {
                                 var relpath = f.Substring(save.BasePath.Length + 1).NormalizedPath();
-                                if (relpath.Contains("/backup/")) continue;
+                                if (relpath.Contains("backup/")) continue;
 
                                 try
                                 {
