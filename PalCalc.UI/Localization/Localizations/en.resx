@@ -139,7 +139,7 @@
     <value>Base ({BaseName})</value>
   </data>
   <data name="LC_BREEDING_TIME" xml:space="preserve">
-    <value>Breeding Time (Mins)</value>
+    <value>Breeding Time (Seconds)</value>
   </data>
   <data name="LC_BREEDING_TIME_DESC" xml:space="preserve">
     <value>The average time it takes to produce an egg. Used to estimate how long it will take to produce a pal with specific properties.

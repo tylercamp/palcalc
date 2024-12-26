@@ -23,7 +23,7 @@
             ToolTipService.ToolTip="{itl:LocalizedText LC_BREEDING_TIME_DESC}"
             ToolTipService.ShowOnDisabled="True"
             Grid.Column="1"
-            Value="{Binding BreedingTimeMinutes}"
+            Value="{Binding BreedingTimeSeconds}"
             MinValue="1"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"

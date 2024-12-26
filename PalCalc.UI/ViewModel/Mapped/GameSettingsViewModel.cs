@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
@@ -21,31 +22,42 @@ namespace PalCalc.UI.ViewModel.Mapped
         // for XAML designer view
         public GameSettingsViewModel()
         {
-            BreedingTimeMinutes = (int)new GameSettings().BreedingTime.TotalMinutes;
+            BreedingTimeSeconds = (int)new GameSettings().BreedingTime.TotalSeconds;
             MultipleBreedingFarms = true;
         }
 
         public GameSettingsViewModel(GameSettings modelObject)
         {
-            BreedingTimeMinutes = (int)modelObject.BreedingTime.TotalMinutes;
+            BreedingTimeSeconds = (int)modelObject.BreedingTime.TotalSeconds;
             MultipleBreedingFarms = modelObject.MultipleBreedingFarms;
         }
 
         [JsonIgnore]
         public GameSettings ModelObject => new GameSettings()
         {
-            BreedingTime = TimeSpan.FromMinutes(BreedingTimeMinutes),
+            BreedingTime = TimeSpan.FromSeconds(BreedingTimeSeconds),
             MultipleBreedingFarms = MultipleBreedingFarms,
         };
 
         [ObservableProperty]
-        private int breedingTimeMinutes;
+        private int breedingTimeSeconds;
 
         [ObservableProperty]
         private bool multipleBreedingFarms;
 
         public string ToJson() => JsonConvert.SerializeObject(this);
-        public static GameSettingsViewModel FromJson(string json) => JsonConvert.DeserializeObject<GameSettingsViewModel>(json);
+        public static GameSettingsViewModel FromJson(string json)
+        {
+            var parsedJson = JsonConvert.DeserializeObject<JToken>(json);
+
+            var result = parsedJson.ToObject<GameSettingsViewModel>();
+            if (parsedJson["BreedingTimeMinutes"] != null)
+            {
+                result.BreedingTimeSeconds = 60 * parsedJson["BreedingTimeMinutes"].ToObject<int>();
+            }
+
+            return result;
+        }
 
         public void Save(ISaveGame forSave)
         {

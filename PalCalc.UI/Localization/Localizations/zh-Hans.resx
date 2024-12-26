@@ -139,7 +139,7 @@
     <value>基地 ({BaseName})</value>
   </data>
   <data name="LC_BREEDING_TIME" xml:space="preserve">
-    <value>繁殖时间 (分钟)</value>
+    <value>繁殖时间（秒）</value>
   </data>
   <data name="LC_BREEDING_TIME_DESC" xml:space="preserve">
     <value>产生一个蛋所需的平均时间，用于估计生成具有特定属性的帕鲁需要多长时间。
