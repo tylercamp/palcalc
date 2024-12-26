@@ -61,6 +61,10 @@ namespace PalCalc.UI.ViewModel
             Passive2 = passiveVms.Skip(1).FirstOrDefault();
             Passive3 = passiveVms.Skip(2).FirstOrDefault();
             Passive4 = passiveVms.Skip(3).FirstOrDefault();
+
+            IvHp = instance.IV_HP;
+            IvAttack = instance.IV_Attack;
+            IvDefense = instance.IV_Defense;
         }
 
         public ImageSource Icon => Pal?.Icon ?? PalIcon.DefaultIcon;
@@ -89,6 +93,15 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private PassiveSkillViewModel passive4;
 
+        [ObservableProperty]
+        private int ivHp = 0;
+
+        [ObservableProperty]
+        private int ivAttack = 0;
+
+        [ObservableProperty]
+        private int ivDefense = 0;
+
         public bool IsValid => Pal != null;
 
         public PalInstance ModelObject => !IsValid ? null : new PalInstance()
@@ -108,6 +121,9 @@ namespace PalCalc.UI.ViewModel
                 Passive3?.ModelObject,
                 Passive4?.ModelObject
             }.SkipNull().Distinct().ToList(),
+            IV_HP = IvHp,
+            IV_Shot = IvAttack,
+            IV_Defense = IvDefense,
             ActiveSkills = [],
             EquippedActiveSkills = []
         };

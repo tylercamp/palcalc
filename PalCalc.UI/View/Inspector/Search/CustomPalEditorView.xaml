@@ -8,6 +8,7 @@
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              mc:Ignorable="d"
              d:Background="White"
              d:DataContext="{x:Static vm:CustomPalInstanceViewModel.DesignInstance}">
@@ -40,6 +41,38 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical">
+                <Label Content="{itl:LocalizedText Code=LC_COMMON_IVS}" />
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                    <StackPanel.Resources>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Margin" Value="0,0,15,0" />
+                        </Style>
+                        <Style TargetType="vu:IntegerTextBox">
+                            <Setter Property="MinValue" Value="0" />
+                            <Setter Property="MaxValue" Value="100" />
+                        </Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="0,2,6,3" />
+                        </Style>
+                    </StackPanel.Resources>
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_IV_HP}" />
+                        <vu:IntegerTextBox Value="{Binding IvHp}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK}" />
+                        <vu:IntegerTextBox Value="{Binding IvAttack}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0">
+                        <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE}" />
+                        <vu:IntegerTextBox Value="{Binding IvDefense}" />
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
 
             <StackPanel Orientation="Vertical">
