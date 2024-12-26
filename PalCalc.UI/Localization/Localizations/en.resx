@@ -483,6 +483,9 @@ This will not delete the save files from your computer.</value>
   <data name="LC_RESULT_LIST_TITLE_EMPTY" xml:space="preserve">
     <value>Results</value>
   </data>
+  <data name="LC_RESULT_NUM_CAKES" xml:space="preserve">
+    <value># Cakes</value>
+  </data>
   <data name="LC_RESULT_NUM_STEPS" xml:space="preserve">
     <value># Steps</value>
   </data>

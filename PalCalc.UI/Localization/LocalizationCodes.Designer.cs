@@ -529,6 +529,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_RESULT_NUM_CAKES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_RESULT_NUM_STEPS,
         /// <summary>
         ///   Looks up a localized string similar to .

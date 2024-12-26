@@ -173,6 +173,7 @@ namespace PalCalc.UI.ViewModel
         public bool NeedsRefresh => Graph?.NeedsRefresh ?? false;
         public int NumWildPals => DisplayedResult.NumWildPalParticipants();
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
+        public int NumEggs => DisplayedResult.NumTotalEggs;
 
         public IVSetViewModel IVs { get; }
         // (needed for BreedingResultListView which uses `util:GridViewSort.PropertyName`)

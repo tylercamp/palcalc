@@ -49,6 +49,8 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps => 0;
 
+        public int NumTotalEggs => 0;
+
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
             if (gender != Gender) throw new Exception("Cannot force a gender change for owned pals");

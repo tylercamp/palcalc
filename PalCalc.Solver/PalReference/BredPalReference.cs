@@ -119,6 +119,18 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
+        private int numTotalEggs = -1;
+        public int NumTotalEggs
+        {
+            get
+            {
+                if (numTotalEggs < 0)
+                    numTotalEggs = AvgRequiredBreedings + Parent1.NumTotalEggs + Parent2.NumTotalEggs;
+
+                return numTotalEggs;
+            }
+        }
+
         public List<PassiveSkill> EffectivePassives { get; }
 
         public int EffectivePassivesHash { get; }

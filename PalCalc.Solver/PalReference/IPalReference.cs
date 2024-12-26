@@ -32,6 +32,8 @@ namespace PalCalc.Solver.PalReference
 
         int NumTotalBreedingSteps { get; }
 
+        int NumTotalEggs { get; }
+
         /// <summary>
         /// Meant for `Philanthropist` passive, which halves the time required to produce a breeding result when this
         /// is used as a parent. These effects are multiplicative, e.g. 1 with Philanthropist gives 0.5x total factor,

@@ -54,6 +54,8 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps => 0;
 
+        public int NumTotalEggs => 0;
+
         public int EffectivePassivesHash { get; }
 
         private IPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)

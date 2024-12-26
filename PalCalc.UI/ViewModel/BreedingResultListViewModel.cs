@@ -30,6 +30,7 @@ namespace PalCalc.UI.ViewModel
                     OnPropertyChanged(nameof(NumStepsWidth));
                     OnPropertyChanged(nameof(LocationsWidth));
                     OnPropertyChanged(nameof(PassiveSkillsWidth));
+                    OnPropertyChanged(nameof(NumEggsWidth));
                     OnPropertyChanged(nameof(IVsWidth));
                 }
             }
@@ -55,6 +56,7 @@ namespace PalCalc.UI.ViewModel
         public double NumStepsWidth => HiddenIfRedundant(vm => vm.NumBreedingSteps);
         public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
         public double PassiveSkillsWidth => HiddenIfRedundant(vm => vm.EffectivePassives.Description);
+        public double NumEggsWidth => HiddenIfRedundant(vm => vm.NumEggs);
         public double IVsWidth
         {
             get

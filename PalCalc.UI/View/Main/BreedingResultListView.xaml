@@ -28,6 +28,11 @@
                                 Width="{Binding NumStepsWidth}"
                                 util:GridViewSort.PropertyName="NumBreedingSteps"
                                 />
+                <GridViewColumn Header="{itl:LocalizedText LC_RESULT_NUM_CAKES}"
+                                DisplayMemberBinding="{Binding NumEggs}"
+                                Width="{Binding NumEggsWidth}"
+                                util:GridViewSort.PropertyName="NumEggs"
+                                />
                 <GridViewColumn Header="{itl:LocalizedText LC_COMMON_TRAITS}"
                                 DisplayMemberBinding="{Binding EffectivePassives.Description.Value}"
                                 Width="{Binding PassiveSkillsWidth}"
