@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace PalCalc.Model
 {
@@ -39,6 +40,15 @@ namespace PalCalc.Model
             }
         }
 
+        public static int PreferredParallelBatchSize(this int collectionSize) =>
+            Math.Min(
+                100000,
+                (collectionSize / Environment.ProcessorCount) + 1
+            );
+
+        public static int PreferredParallelBatchSize<T>(this List<T> elements) =>
+            elements.Count.PreferredParallelBatchSize();
+
         public static IEnumerable<IEnumerable<T>> Batched<T>(this List<T> elements, int batchSize)
         {
             for (int i = 0; i < elements.Count / batchSize + 1 && elements.Count > 0; i++)
@@ -48,12 +58,7 @@ namespace PalCalc.Model
         }
 
         public static IEnumerable<IEnumerable<T>> BatchedForParallel<T>(this List<T> elements) =>
-            elements.Batched(
-                Math.Min(
-                    100000,
-                    (elements.Count / Environment.ProcessorCount) + 1
-                )
-            );
+            elements.Batched(elements.PreferredParallelBatchSize());
 
         public static IEnumerable<T> SkipNull<T>(this IEnumerable<T> elements) => elements.Where(v => v != null);
 

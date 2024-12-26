@@ -4,6 +4,7 @@ using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace PalCalc.Solver
 
         private SolverStateController controller;
         private PalPropertyGrouping content;
-        private List<(IPalReference, IPalReference)> remainingWork;
+        private ILazyCartesianProduct<IPalReference> remainingWork;
 
         int maxThreads;
         PalSpecifier target;
@@ -46,7 +47,8 @@ namespace PalCalc.Solver
 
             discoveredResults.AddRange(content.All.Where(target.IsSatisfiedBy));
 
-            remainingWork = initialContent.SelectMany(p1 => initialContent.Select(p2 => (p1, p2))).ToList();
+            var initialList = initialContent.ToList();
+            remainingWork = new LazyCartesianProduct<IPalReference>(initialList, initialList);
 
             if (maxThreads <= 0) maxThreads = Environment.ProcessorCount;
 
@@ -68,11 +70,12 @@ namespace PalCalc.Solver
         /// </summary>
         /// <param name="doWork"></param>
         /// <returns>Whether or not any changes were made by merging the current working set with the results of `doWork`.</returns>
-        public bool Process(Func<List<(IPalReference, IPalReference)>, IEnumerable<IPalReference>> doWork)
+        public bool Process(Func<ILazyCartesianProduct<IPalReference>, IEnumerable<IPalReference>> doWork)
         {
             if (remainingWork.Count == 0) return false;
 
             logger.Debug("beginning work processing");
+
             var newResults = doWork(remainingWork).ToList();
 
             // since we know the breeding effort of each potential instance, we can ignore new instances
@@ -153,38 +156,10 @@ namespace PalCalc.Solver
                 }
             }
 
-            /*
-             * Time spent trying to optimize this "work pre-allocation":
-             * 
-             * - 3 hours
-             * 
-             * ... in practice the final perf. bump we get from precomputing outweighs the up-front perf cost
-             * of preallocating. an alternative impl. may improve memory performance, but typically if the
-             * mem cost of allocating this is problematically high, the rest of the working set results will
-             * be catastrophically high
-             */
-            remainingWork.Clear();
-            var newCapacity = toAdd.Count * toAdd.Count + 2 * toAdd.Count * content.TotalCount;
-
-            // (can happen if the new work size is massive
-            if (newCapacity < 0)
-            {
-#if DEBUG
-                Debugger.Break();
-#endif
-                ulong requestedCapacity = (ulong)toAdd.Count * (ulong)toAdd.Count + 2 * (ulong)toAdd.Count * (ulong)content.TotalCount;
-                throw new Exception("Attempted to begin a solving step involving a massive work size: " + requestedCapacity);
-            }
-            remainingWork.EnsureCapacity(newCapacity);
-
-            remainingWork.AddRange(content.All
-                // need to check results between new and old content
-                .SelectMany(p1 => toAdd.Select(p2 => (p1, p2)))
-                // and check results within the new content
-                .Concat(toAdd.SelectMany(p1 => toAdd.Select(p2 => (p1, p2))))
-                .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)
-                .Tap(_ => controller.PauseIfRequested())
-            );
+            remainingWork = new ConcatenatedLazyCartesianProduct<IPalReference>([
+                (content.All.ToList(), toAdd),
+                (toAdd, toAdd)
+            ]);
 
             foreach (var ta in toAdd.TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested))
             {

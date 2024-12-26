@@ -395,7 +395,7 @@ namespace PalCalc.Solver
                     var progressTimer = new Timer(EmitProgressMsg, null, updateInterval, updateInterval);
 
                     var resEnum = work
-                        .BatchedForParallel()
+                        .Chunks(work.Count.PreferredParallelBatchSize())
                         .AsParallel()
                         .WithDegreeOfParallelism(maxThreads)
                         .SelectMany(workBatch =>
