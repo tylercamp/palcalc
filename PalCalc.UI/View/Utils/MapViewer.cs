@@ -282,7 +282,8 @@ namespace PalCalc.UI.View.Utils
                 : oldScale / zoomFactor;
 
             // Limit min/max scale if desired
-            newScale = Math.Max(1, Math.Min(newScale, 10.0));
+            var maxScale = Math.Min(_imageNaturalSize.Width / _container.ActualWidth, _imageNaturalSize.Height / _container.ActualHeight);
+            newScale = Math.Max(1, Math.Min(newScale, maxScale));
 
             // Adjust translation so that the point under the mouse stays in the same place
             var mousePos = e.GetPosition(_container);
@@ -376,9 +377,6 @@ namespace PalCalc.UI.View.Utils
             double viewportWidth = _container.ActualWidth;
             double viewportHeight = _container.ActualHeight;
 
-            logger.Information("initial scaleTransform: {x} | {y}", _scaleTransform.ScaleX, _scaleTransform.ScaleY);
-            logger.Information("initial translateTransform: {x} | {y}", _translateTransform.X, _translateTransform.Y);
-
             // If the map is smaller than the viewport, center it
             // Otherwise, clamp so we don't drag outside
             if (mapWidth <= viewportWidth)
@@ -404,9 +402,6 @@ namespace PalCalc.UI.View.Utils
                 double maxY = 0;
                 _translateTransform.Y = Math.Min(Math.Max(_translateTransform.Y, minY), maxY);
             }
-
-            logger.Information("clamped scaleTransform: {x} | {y}", _scaleTransform.ScaleX, _scaleTransform.ScaleY);
-            logger.Information("clamped translateTransform: {x} | {y}", _translateTransform.X, _translateTransform.Y);
         }
 
         #endregion
