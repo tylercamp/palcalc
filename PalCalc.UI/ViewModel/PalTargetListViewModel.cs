@@ -55,10 +55,10 @@ namespace PalCalc.UI.ViewModel
             targets[oldIndex] = newValue;
         }
 
-        public void RefreshWith(CachedSaveGame csg)
+        public void UpdateCachedData(CachedSaveGame csg)
         {
             foreach (var target in targets)
-                target.CurrentResults?.RefreshWith(csg);
+                target.CurrentResults?.UpdateCachedData(csg);
         }
     }
 }

@@ -97,7 +97,18 @@ namespace PalCalc.UI.Model
             {
                 try
                 {
-                    return JsonConvert.DeserializeObject<AppSettings>(File.ReadAllText(AppSettingsPath)) ?? new();
+                    var res = JsonConvert.DeserializeObject<AppSettings>(
+                        File.ReadAllText(AppSettingsPath),
+                        // `res.SolverSettings.BannedWildPalInternalNames` has a non-empty-list default value, base Newtonsoft JSON
+                        // behavior is to *MERGE* the deserialized list with the default value, leading to a bunch of duplicates.
+                        new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace }
+                    ) ?? new();
+
+                    // remove duplicates caused by missing `ObjectCreationHandling` in older versions
+                    res.SolverSettings.BannedBredPalInternalNames = res.SolverSettings.BannedBredPalInternalNames.Distinct().ToList();
+                    res.SolverSettings.BannedWildPalInternalNames = res.SolverSettings.BannedWildPalInternalNames.Distinct().ToList();
+
+                    return res;
                 }
                 catch (Exception e)
                 {

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.UI.Localization;
+using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -155,16 +156,35 @@ namespace PalCalc.UI.ViewModel.Mapped
         public PassiveSkillCollectionViewModel OptionalPassivesCollection => new PassiveSkillCollectionViewModel(OptionalPassives);
 
         [NotifyPropertyChangedFor(nameof(HasIVs))]
+        [NotifyPropertyChangedFor(nameof(Iv_HP_IsValid))]
         [ObservableProperty]
         private int minIv_HP;
 
         [NotifyPropertyChangedFor(nameof(HasIVs))]
+        [NotifyPropertyChangedFor(nameof(Iv_Attack_IsValid))]
         [ObservableProperty]
         private int minIv_Attack;
 
         [NotifyPropertyChangedFor(nameof(HasIVs))]
+        [NotifyPropertyChangedFor(nameof(Iv_Defense_IsValid))]
         [ObservableProperty]
         private int minIv_Defense;
+
+        [NotifyPropertyChangedFor(nameof(Iv_HP_IsValid))]
+        [ObservableProperty]
+        private int maxIv_HP;
+
+        [NotifyPropertyChangedFor(nameof(Iv_Attack_IsValid))]
+        [ObservableProperty]
+        private int maxIv_Attack;
+
+        [NotifyPropertyChangedFor(nameof(Iv_Defense_IsValid))]
+        [ObservableProperty]
+        private int maxIv_Defense;
+
+        public bool Iv_HP_IsValid => MinIv_HP <= MaxIv_HP;
+        public bool Iv_Attack_IsValid => MinIv_Attack <= MaxIv_Attack;
+        public bool Iv_Defense_IsValid => MinIv_Defense <= MaxIv_Defense;
 
         [ObservableProperty]
         private BreedingResultListViewModel currentResults;
@@ -187,6 +207,27 @@ namespace PalCalc.UI.ViewModel.Mapped
         public bool HasIVs => MinIv_HP > 0 || MinIv_Attack > 0 || MinIv_Defense > 0;
 
         public bool IsValid => TargetPal != null;
+
+        public void UpdateCachedData(CachedSaveGame csg)
+        {
+            CurrentResults?.UpdateCachedData(csg);
+        }
+
+        public void RefreshWith(IEnumerable<PalInstance> availablePals)
+        {
+            if (availablePals.Any())
+            {
+                MaxIv_HP = availablePals.Max(p => p.IV_HP);
+                MaxIv_Attack = availablePals.Max(p => p.IV_Attack);
+                MaxIv_Defense = availablePals.Max(p => p.IV_Defense);
+            }
+            else
+            {
+                MaxIv_HP = 0;
+                MaxIv_Attack = 0;
+                MaxIv_Defense = 0;
+            }
+        }
 
         private static ILocalizedText newTargetLabel;
         public ILocalizedText Label

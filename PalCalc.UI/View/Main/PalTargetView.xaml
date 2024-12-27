@@ -66,6 +66,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
+                <ColumnDefinition Width="40" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -75,14 +76,59 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
+            <Grid.Resources>
+                <Style TargetType="Label" x:Key="MaxIvLabel">
+                    <Setter Property="Foreground" Value="Gray" />
+                    <Setter Property="Grid.Column" Value="2" />
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    <Setter Property="ContentStringFormat" Value="({0})" />
+                </Style>
+            </Grid.Resources>
+
             <Label Grid.Row="0" Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_HP}" />
             <vu:IntegerTextBox Grid.Row="0" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_HP, Mode=TwoWay}" MinValue="0" MaxValue="100" />
+            <Label Grid.Row="0" Content="{Binding CurrentPalSpecifier.MaxIv_HP, FallbackValue=0}">
+                <Label.Style>
+                    <Style TargetType="Label" BasedOn="{StaticResource MaxIvLabel}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentPalSpecifier.Iv_HP_IsValid, FallbackValue=True}" Value="False">
+                                <Setter Property="Foreground" Value="IndianRed" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Label.Style>
+            </Label>
 
             <Label Grid.Row="2" Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK}" />
             <vu:IntegerTextBox Grid.Row="2" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_Attack, Mode=TwoWay}" MinValue="0" MaxValue="100" />
+            <Label Grid.Row="2" Content="{Binding CurrentPalSpecifier.MaxIv_Attack, FallbackValue=0}">
+                <Label.Style>
+                    <Style TargetType="Label" BasedOn="{StaticResource MaxIvLabel}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentPalSpecifier.Iv_Attack_IsValid, FallbackValue=True}" Value="False">
+                                <Setter Property="Foreground" Value="IndianRed" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Label.Style>
+            </Label>
 
             <Label Grid.Row="4" Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE}" />
             <vu:IntegerTextBox Grid.Row="4" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_Defense, Mode=TwoWay}" MinValue="0" MaxValue="100" />
+            <Label Grid.Row="4" Content="{Binding CurrentPalSpecifier.MaxIv_Defense, FallbackValue=0}">
+                <Label.Style>
+                    <Style TargetType="Label" BasedOn="{StaticResource MaxIvLabel}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentPalSpecifier.Iv_Defense_IsValid, FallbackValue=True}" Value="False">
+                                <Setter Property="Foreground" Value="IndianRed" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Label.Style>
+            </Label>
         </Grid>
     </GroupBox>
 </StackPanel>

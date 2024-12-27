@@ -161,7 +161,10 @@ namespace PalCalc.UI.ViewModel
                             try
                             {
 #endif
-                                return JsonConvert.DeserializeObject<PalTargetListViewModel>(File.ReadAllText(targetsFile), converter);
+                                var res = JsonConvert.DeserializeObject<PalTargetListViewModel>(File.ReadAllText(targetsFile), converter);
+                                //if (originalCachedSave != null)
+                                    //res.RefreshWith(originalCachedSave);
+                                return res;
 
 #if HANDLE_ERRORS
                             }
@@ -328,7 +331,7 @@ namespace PalCalc.UI.ViewModel
                 loadingSaveModal = null;
 
                 if (loaded != null && targetsBySaveFile.ContainsKey(obj))
-                    targetsBySaveFile[obj].RefreshWith(loaded);
+                    targetsBySaveFile[obj].UpdateCachedData(loaded);
             }
         }
 
@@ -381,7 +384,7 @@ namespace PalCalc.UI.ViewModel
         {
             if (PalTargetList?.SelectedTarget != null && SaveSelection.SelectedFullGame?.CachedValue != null)
             {
-                PalTarget = new PalTargetViewModel(SaveSelection.SelectedFullGame.CachedValue, PalTargetList.SelectedTarget, passivePresets);
+                PalTarget = new PalTargetViewModel(SaveSelection.SelectedFullGame, PalTargetList.SelectedTarget, passivePresets);
                 passivePresets.ActivePalTarget = PalTarget;
             }
             else
@@ -434,17 +437,8 @@ namespace PalCalc.UI.ViewModel
             var cachedData = selectedGame.CachedValue;
             if (cachedData == null) return;
 
-            var inputPals = PalTarget.PalSource.SelectedSource.Filter(cachedData);
-            if (!PalTarget.CurrentPalSpecifier.IncludeBasePals)
-                inputPals = inputPals.Where(p => p.Location.Type != LocationType.Base);
-
-            if (!PalTarget.CurrentPalSpecifier.IncludeCagedPals)
-                inputPals = inputPals.Where(p => p.Location.Type != LocationType.ViewingCage);
-
-            if (PalTarget.CurrentPalSpecifier.IncludeCustomPals)
-                inputPals = inputPals.Concat(selectedGame.Customizations.ModelObject.CustomContainers.SelectMany(c => c.Contents));
-
-            var solver = SolverControls.ConfiguredSolver(GameSettings.ModelObject, inputPals.ToList());
+            var inputPals = PalTarget.AvailablePals.ToList();
+            var solver = SolverControls.ConfiguredSolver(GameSettings.ModelObject, inputPals);
             solver.SolverStateUpdated += Solver_SolverStateUpdated;
 
             var solverThread = new Thread(() =>

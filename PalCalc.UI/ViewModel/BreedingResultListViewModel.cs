@@ -73,7 +73,12 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        public void RefreshWith(CachedSaveGame csg)
+        // breeding result data aren't serialized with all required info, namely player + guild names.
+        //
+        // they require a `CachedSaveGame` but this isn't always available when deserializing during
+        // app start-up, so they will accept a `null` CSG temporarily (in ctor) but must be updated
+        // before display
+        public void UpdateCachedData(CachedSaveGame csg)
         {
             Results = Results.Select(r => new BreedingResultViewModel(csg, r.DisplayedResult)).ToList();
         }

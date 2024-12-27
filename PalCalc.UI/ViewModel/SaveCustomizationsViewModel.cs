@@ -1,4 +1,5 @@
-﻿using PalCalc.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PalCalc.Model;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using Serilog;
@@ -50,7 +51,7 @@ namespace PalCalc.UI.ViewModel
     }
 
     // (Auto-saves any changes with debounce. There should only ever be one instance for each save file)
-    public partial class SaveCustomizationsViewModel : IDisposable
+    public partial class SaveCustomizationsViewModel : ObservableObject, IDisposable
     {
         private Debouncer saveAction;
 
@@ -104,12 +105,16 @@ namespace PalCalc.UI.ViewModel
         private void PalInst_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if ((sender as CustomPalInstanceViewModel).IsValid)
+            {
                 saveAction.Run();
+                OnPropertyChanged(nameof(CustomContainers));
+            }
         }
 
         private void Container_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             saveAction.Run();
+            OnPropertyChanged(nameof(CustomContainers));
         }
 
         private void ContainerContents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -121,6 +126,7 @@ namespace PalCalc.UI.ViewModel
                 p.PropertyChanged -= PalInst_PropertyChanged;
 
             saveAction.Run();
+            OnPropertyChanged(nameof(CustomContainers));
         }
 
         private void CustomContainers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -132,6 +138,7 @@ namespace PalCalc.UI.ViewModel
                 StopMonitorContainer(c);
 
             saveAction.Run();
+            OnPropertyChanged(nameof(CustomContainers));
         }
 
         private IEnumerable<T> AddedItems<T>(NotifyCollectionChangedEventArgs e)
