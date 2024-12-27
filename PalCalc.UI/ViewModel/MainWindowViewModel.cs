@@ -461,6 +461,12 @@ namespace PalCalc.UI.ViewModel
                         new MemoryMonitor(solverTokenSource2.Token) { PauseNotices = true }
                     );
 
+                    // NOTE
+                    //
+                    // memory monitor unnecessary after recent memory-usage optimizations, leaving code
+                    // just in case for later use, but disabling globally by disposing early
+                    currentJob.MemoryMonitor.Dispose();
+
                     // monitor memory usage and pause if we take up a significant amount
                     currentJob.MemoryMonitor.MemoryWarning += MemoryMonitor_MemoryWarning;
 
