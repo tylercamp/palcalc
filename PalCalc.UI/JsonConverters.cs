@@ -310,16 +310,23 @@ namespace PalCalc.UI
                 PalId = value.Pal.Id,
                 GuaranteedPassives = value.EffectivePassives.Where(t => t is not RandomPassiveSkill).ToList(),
                 NumPassives = value.EffectivePassives.Count(t => t is RandomPassiveSkill),
+                Gender = value.Gender,
             }, serializer);
         }
 
         internal override WildPalReference ReadRefJson(JToken token, Type objectType, WildPalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var pal = token["PalId"].ToObject<PalId>(serializer).ToPal(db);
-            var guaranteedPassives = (token["GuaranteedPassives"] ?? token["GuaranteedTraits"])?.ToObject<List<string>>()?.Select(s => s.InternalToPassive(db))?.ToList();
             var numPassives = (token["NumPassives"] ?? token["NumTraits"]).ToObject<int>();
+            var gender = token["Gender"]?.ToObject<PalGender>(serializer) ?? PalGender.WILDCARD;
 
-            return new WildPalReference(pal, guaranteedPassives ?? Enumerable.Empty<PassiveSkill>(), numPassives);
+            var guaranteedPassives = (token["GuaranteedPassives"] ?? token["GuaranteedTraits"])
+                ?.ToObject<List<string>>()
+                ?.Select(s => s.InternalToPassive(db))
+                ?.ToList()
+                ?? Enumerable.Empty<PassiveSkill>();
+
+            return (WildPalReference)new WildPalReference(pal, guaranteedPassives, numPassives).WithGuaranteedGender(db, gender);
         }
     }
 
