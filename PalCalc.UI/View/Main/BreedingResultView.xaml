@@ -35,9 +35,9 @@
                         <Setter Property="Padding" Value="0" />
                     </Style>
                 </StackPanel.Resources>
-                <StackPanel Orientation="Horizontal">
+                <DockPanel HorizontalAlignment="Stretch">
                     <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="White" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Stretch">
                         <StackPanel.Resources>
                             <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel" x:Key="LocationPopupContent">
                                 <vu:PopupToolTipContent Background="#040F15">
@@ -163,7 +163,7 @@
                         </ContentControl>
                         <vp:PalIVsView Foreground="White" FontSize="9" IV_HP="{Binding IVs.HP}" IV_Attack="{Binding IVs.Attack}" IV_Defense="{Binding IVs.Defense}" />
                     </StackPanel>
-                </StackPanel>
+                </DockPanel>
                 <Grid Visibility="{Binding PassiveSkillsVisibility}">
                     <vp:PassiveSkillCollectionView Margin="0,5,0,0" DataContext="{Binding PassiveSkillsCollection}" Width="Auto" Background="Black" />
                 </Grid>
