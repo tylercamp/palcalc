@@ -10,6 +10,11 @@ namespace PalCalc.Solver.Probabilities
 {
     public static class Passives
     {
+        // note:
+        //
+        // this could all be precomputed at startup into a lookup table, but from my testing it's faster to redo this calculation each time
+        // (likely memory bandwidth issue)
+
         // note: pascal's triangle is also 0-indexed! `0 choose 0` is a valid operation
         /// <summary>
         /// `n` Choose `k`

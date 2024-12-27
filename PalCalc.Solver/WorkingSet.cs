@@ -156,8 +156,11 @@ namespace PalCalc.Solver
                 }
             }
 
+            // (minor memory bandwidth improvement by minimizing how often we switch types of pals, hopefully
+            // keeps some pal-specific data like child pal + gender probabilities in CPU cache.)
+            toAdd = toAdd.OrderBy(p => p.Pal.Id).ToList();
             remainingWork = new ConcatenatedLazyCartesianProduct<IPalReference>([
-                (content.All.ToList(), toAdd),
+                (content.All.OrderBy(p => p.Pal.Id).ToList(), toAdd),
                 (toAdd, toAdd)
             ]);
 

@@ -72,6 +72,8 @@ namespace PalCalc.Model
 
         public static readonly int MaxTotalPassives = 4;
 
+        // (note: changing these from dictionaries to arrays has negligible impact on performance. dictionaries are more legible in this case)
+
         // probability of inheriting exactly N IVs from parents
         public static readonly Dictionary<int, float> IVProbabilityDirect = new()
         {

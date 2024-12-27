@@ -14,13 +14,36 @@ namespace PalCalc.Solver
 
     public class LazyCartesianProduct<T>(List<T> listA, List<T> listB) : ILazyCartesianProduct<T>
     {
-        private IEnumerable<T> SubList(List<T> l, int start, int end)
-        {
-            for (int i = start; i <= end; i++)
-                yield return l[i];
-        }
-
         public int Count { get; } = listA.Count * listB.Count;
+
+        private IEnumerable<(T, T)> ChunkAt(int chunkStart, int chunkEnd)
+        {
+            int aStartIndex = chunkStart / listB.Count;
+            int bStartIndex = chunkStart % listB.Count;
+
+            int aEndIndex = (chunkEnd / listB.Count);
+            int bEndIndex = (chunkEnd % listB.Count);
+
+            if (aStartIndex == aEndIndex)
+            {
+                var elemA = listA[aStartIndex];
+                for (int i = bStartIndex; i <= bEndIndex; i++)
+                    yield return (elemA, listB[i]);
+            }
+            else
+            {
+                for (int ia = aStartIndex; ia <= aEndIndex; ia++)
+                {
+                    var elemA = listA[ia];
+
+                    int ibStart = ia == aStartIndex ? bStartIndex : 0;
+                    int ibEnd = ia == aEndIndex ? bEndIndex : (listB.Count - 1);
+
+                    for (int ib = ibStart; ib <= ibEnd; ib++)
+                        yield return (elemA, listB[ib]);
+                }
+            }
+        }
 
         public IEnumerable<IEnumerable<(T, T)>> Chunks(int chunkSize)
         {
@@ -29,40 +52,7 @@ namespace PalCalc.Solver
             {
                 var curChunkEnd = Math.Min(Count - 1, curChunkStart + chunkSize);
 
-                IEnumerable<(T, T)> chunk = [];
-
-                int aStartIndex = curChunkStart / listB.Count;
-                int bStartIndex = curChunkStart % listB.Count;
-
-                int aEndIndex = (curChunkEnd / listB.Count);
-                int bEndIndex = (curChunkEnd % listB.Count);
-
-                if (aStartIndex == aEndIndex)
-                {
-                    var elemA = listA[aStartIndex];
-                    chunk = chunk.Concat(SubList(listB, bStartIndex, bEndIndex).Select(elemB => (elemA, elemB)));
-                }
-                else
-                {
-                    for (int ia = aStartIndex; ia <= aEndIndex; ia++)
-                    {
-                        var elemA = listA[ia];
-                        if (ia == aStartIndex)
-                        {
-                            chunk = chunk.Concat(listB.Skip(bStartIndex).Select(elemB => (elemA, elemB)));
-                        }
-                        else if (ia == aEndIndex)
-                        {
-                            chunk = chunk.Concat(SubList(listB, 0, bEndIndex).Select(elemB => (elemA, elemB)));
-                        }
-                        else
-                        {
-                            chunk = chunk.Concat(listB.Select(elemB => (elemA, elemB)));
-                        }
-                    }
-                }
-
-                yield return chunk;
+                yield return ChunkAt(curChunkStart, curChunkEnd);
 
                 curChunkStart = curChunkEnd + 1;
             }

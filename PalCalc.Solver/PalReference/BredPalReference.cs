@@ -119,17 +119,7 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
-        private int numTotalEggs = -1;
-        public int NumTotalEggs
-        {
-            get
-            {
-                if (numTotalEggs < 0)
-                    numTotalEggs = AvgRequiredBreedings + Parent1.NumTotalEggs + Parent2.NumTotalEggs;
-
-                return numTotalEggs;
-            }
-        }
+        public int NumTotalEggs => AvgRequiredBreedings + Parent1.NumTotalEggs + Parent2.NumTotalEggs;
 
         public List<PassiveSkill> EffectivePassives { get; }
 
@@ -182,7 +172,6 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
-        private ConcurrentDictionary<PalGender, IPalReference> cachedGuaranteedGenders = null;
         private IPalReference cachedOppositeWildcardRef;
         private IPalReference cachedMaleRef;
         private IPalReference cachedFemaleRef;
