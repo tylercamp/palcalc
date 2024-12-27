@@ -57,14 +57,14 @@ namespace PalCalc.UI.View.Utils
             set => SetValue(ValueProperty, value);
         }
 
+        private int ClampValue(int value) => Math.Clamp(value, MinValue, MaxValue);
+
         private static object CoerceValue(DependencyObject d, object value)
         {
             var itb = d as IntegerTextBox;
             var v = (int)value;
 
-            if (v < itb.MinValue) return itb.MinValue;
-            if (v > itb.MaxValue) return itb.MaxValue;
-            return v;
+            return itb.ClampValue(v);
         }
 
         private static void ValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -119,8 +119,8 @@ namespace PalCalc.UI.View.Utils
         {
             e.Handled = true;
 
-            if (e.Key == Key.Up) Value += 1;
-            else if (e.Key == Key.Down) Value -= 1;
+            if (e.Key == Key.Up) Value = ClampValue(Value + 1);
+            else if (e.Key == Key.Down) Value = ClampValue(Value - 1);
             else e.Handled = false;
         }
 
@@ -143,7 +143,7 @@ namespace PalCalc.UI.View.Utils
         {
             if (IsKeyboardFocusWithin && IsMouseOver)
             {
-                Value += Math.Clamp(e.Delta, -1, 1);
+                Value = ClampValue(Value + Math.Clamp(e.Delta, -1, 1));
                 e.Handled = true;
             }
         }
