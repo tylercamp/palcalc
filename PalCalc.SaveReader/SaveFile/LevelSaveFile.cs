@@ -233,6 +233,12 @@ namespace PalCalc.SaveReader.SaveFile
                         continue;
                     }
 
+                    if (gvasInstance.Gender == null)
+                    {
+                        logger.Warning("pal '{name}' instance '{palId}' in '{containerId}' at slot {containerSlot} is missing gender data, skipping", pal.Name, gvasInstance.CharacterId, gvasInstance.ContainerId, gvasInstance.SlotIndex);
+                        continue;
+                    }
+
                     var passives = gvasInstance.PassiveSkills
                         .Select(name =>
                         {
