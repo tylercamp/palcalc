@@ -619,7 +619,7 @@ namespace PalCalc.UI.ViewModel
         private int lastStepIndex = -1;
         private void Solver_SolverStateUpdated(SolverStatus obj)
         {
-            string FormatNum(int num) => num.ToString("#,##");
+            string FormatNum(long num) => num.ToString("#,##");
 
             dispatcher.BeginInvoke(() =>
             {

@@ -35,10 +35,10 @@ namespace PalCalc.Solver
         public bool Canceled { get; set; }
         public bool Paused { get; set; }
 
-        public int CurrentWorkSize { get; set; }
+        public long CurrentWorkSize { get; set; }
 
-        public int WorkProcessedCount { get; set; }
-        public int TotalWorkProcessedCount { get; set; }
+        public long WorkProcessedCount { get; set; }
+        public long TotalWorkProcessedCount { get; set; }
     }
 
     public class SolverStateController
@@ -57,7 +57,7 @@ namespace PalCalc.Solver
 
     class WorkBatchProgress
     {
-        public int NumProcessed;
+        public long NumProcessed;
     }
 
     public class BreedingSolver

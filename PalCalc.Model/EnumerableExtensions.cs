@@ -40,14 +40,14 @@ namespace PalCalc.Model
             }
         }
 
-        public static int PreferredParallelBatchSize(this int collectionSize) =>
-            Math.Min(
+        public static int PreferredParallelBatchSize(this long collectionSize) =>
+            (int)Math.Min(
                 100000,
                 (collectionSize / Environment.ProcessorCount) + 1
             );
 
         public static int PreferredParallelBatchSize<T>(this List<T> elements) =>
-            elements.Count.PreferredParallelBatchSize();
+            ((long)elements.Count).PreferredParallelBatchSize();
 
         public static IEnumerable<IEnumerable<T>> Batched<T>(this List<T> elements, int batchSize)
         {

@@ -8,21 +8,21 @@ namespace PalCalc.Solver
 {
     public interface ILazyCartesianProduct<T>
     {
-        int Count { get; }
+        long Count { get; }
         IEnumerable<IEnumerable<(T, T)>> Chunks(int chunkSize);
     }
 
     public class LazyCartesianProduct<T>(List<T> listA, List<T> listB) : ILazyCartesianProduct<T>
     {
-        public int Count { get; } = listA.Count * listB.Count;
+        public long Count { get; } = ((long)listA.Count) * ((long)listB.Count);
 
-        private IEnumerable<(T, T)> ChunkAt(int chunkStart, int chunkEnd)
+        private IEnumerable<(T, T)> ChunkAt(long chunkStart, long chunkEnd)
         {
-            int aStartIndex = chunkStart / listB.Count;
-            int bStartIndex = chunkStart % listB.Count;
+            int aStartIndex = (int)(chunkStart / listB.Count);
+            int bStartIndex = (int)(chunkStart % listB.Count);
 
-            int aEndIndex = (chunkEnd / listB.Count);
-            int bEndIndex = (chunkEnd % listB.Count);
+            int aEndIndex = (int)(chunkEnd / listB.Count);
+            int bEndIndex = (int)(chunkEnd % listB.Count);
 
             if (aStartIndex == aEndIndex)
             {
@@ -47,7 +47,7 @@ namespace PalCalc.Solver
 
         public IEnumerable<IEnumerable<(T, T)>> Chunks(int chunkSize)
         {
-            int curChunkStart = 0;
+            long curChunkStart = 0;
             while (curChunkStart < Count)
             {
                 var curChunkEnd = Math.Min(Count - 1, curChunkStart + chunkSize);
@@ -63,7 +63,7 @@ namespace PalCalc.Solver
     {
         private List<LazyCartesianProduct<T>> innerProducts = setPairs.Select(p => new LazyCartesianProduct<T>(p.Item1, p.Item2)).ToList();
 
-        public int Count => innerProducts.Sum(p => p.Count);
+        public long Count => innerProducts.Sum(p => p.Count);
 
         public IEnumerable<IEnumerable<(T, T)>> Chunks(int chunkSize)
         {
