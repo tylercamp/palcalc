@@ -1,38 +1,26 @@
 # Pal Calc
 
----
+https://github.com/user-attachments/assets/08106205-3ca1-4704-82de-c2662f4c3302
 
-Pal Calc is a breeding tool for Palworld which uses the data from your save file to automatically find the optimal breeding tree for any desired pal and passive skills.
-
-Pal Calc will find _the_ optimal path using your own pals, will tell you where to find those pals, and estimate how long each step will take.
-
-- Will auto-find and detect Steam and Xbox Game Pass saves
-- Server saves can be added manually after downloading the save files to your computer
-- If no save file is available, you can add "fake saves" to it and manually enter your pals using the built-in Save Inspector
-
-No more spreadsheets!
-
-No more fumbling between bases and sorting pals!
-
-No more effort spent manually building a breeding tree!
-
-**Spend less time planning your game and more time playing it!**
-
----
-
-![Pal Calc Screenshot](./docres/palcalc-screenshot.jpg)
-
-_v1.8.0 screenshot_
-
-![](./docres/Animation.gif)
-
-_v1.9.0 animation_
+_v1.10.4 recording_
 
 ---
 
 **[Click here to get the latest version.](https://github.com/tylercamp/palcalc/releases/latest)** (Expand "Assets" at the bottom, download `PalCalc.UI.exe`, place in its own folder and run.)
 
-**The Pal Calc wiki can be found [here.](https://github.com/tylercamp/palcalc/wiki)**
+<<< **The Pal Calc wiki can be found [here.](https://github.com/tylercamp/palcalc/wiki)** >>>
+
+---
+
+Pal Calc is a breeding solver for Palworld which uses the data from your save file to automatically find the optimal breeding tree for any desired pal, passive skills, and IVs. It will find _the_ optimal path using your own pals, tell you where to find those pals, and estimate how long each step will take.
+
+No more spreadsheets!
+
+No more fumbling between bases and sorting pals!
+
+Stop manually building breeding trees!
+
+**Spend less time planning your game and more time playing it!**
 
 ---
 
@@ -49,6 +37,7 @@ Full list of features
   - Gender probabilities
   - Probability of directly- and randomly-inserted passives
   - For directly-inherited passives, probability of getting the desired passives
+  - Probability of IV inheritance (if enabled)
 - Offers the optimal path
   - Determines "path efficiency" based on calculated probabilities, not just the total number of steps
   - Handles single-root paths, where you successively breed children with another pal you own (one "starting point")
@@ -65,8 +54,8 @@ Full list of features
   - Distributes path-solving work across all available CPU cores
 - Save Inspector
   - Lists all pal containers (palbox, viewing cages, etc.)
-  - Inspect pals to see IVs and passives
-  - Search for specific pals and/or pals with specific passives
+  - Inspect pals to see IVs, passives, and attack skills
+  - Search for specific pals and/or pals with specific IVs, passives, and attack skills
   - Manually add pals in custom containers for use in breeding calculations (does _not_ affect Palworld save data)
 - Multiple languages
   - Supports all languages in Palworld, pal and passives names imported from game files
