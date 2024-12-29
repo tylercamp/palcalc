@@ -166,15 +166,22 @@ namespace PalCalc.SaveReader.FArchive.Custom
 
                             result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
                         }
-                        catch (EndOfStreamException)
+                        catch (Exception e)
                         {
-                            logger.Debug("EndOfStreamException while reading guild data using Feybreak format, falling back to old format");
-                            byteStream.Seek(startPos, SeekOrigin.Begin);
+                            if (e is EndOfStreamException || e is ArgumentOutOfRangeException)
+                            {
+                                logger.Debug("EndOfStreamException while reading guild data using Feybreak format, falling back to old format");
+                                byteStream.Seek(startPos, SeekOrigin.Begin);
 
-                            // as a fallback, try parsing with the old format
-                            // parse using the new format
-                            result.AdminPlayerUid = subReader.ReadGuid();
-                            result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
+                                // as a fallback, try parsing with the old format
+                                // parse using the new format
+                                result.AdminPlayerUid = subReader.ReadGuid();
+                                result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
+                            }
+                            else
+                            {
+                                throw;
+                            }
                         }
                     }
 
