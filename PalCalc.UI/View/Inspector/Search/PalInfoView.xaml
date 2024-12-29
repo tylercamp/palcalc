@@ -28,7 +28,7 @@
                 <StackPanel Margin="10,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" />
-                        <vp:PalGenderView DataContext="{Binding PalInstance.Gender}" Height="16" />
+                        <vp:PalGenderView Foreground="White" DataContext="{Binding PalInstance.Gender}" Height="16" />
                     </StackPanel>
                     <TextBlock>
                         <Run Text="{itl:LocalizedText LC_COMMON_LEVEL}" />

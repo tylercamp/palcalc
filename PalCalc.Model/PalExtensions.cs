@@ -45,10 +45,10 @@ namespace PalCalc.Model
                 case PalGender.FEMALE: return PalGender.MALE;
                 case PalGender.WILDCARD: return PalGender.OPPOSITE_WILDCARD;
                 case PalGender.OPPOSITE_WILDCARD: return PalGender.WILDCARD;
+                case PalGender.NONE: throw new InvalidOperationException("'No gender' has no opposite gender");
                 default: throw new NotImplementedException();
             }
         }
-
 
         public static string PassiveSkillListToString(this IEnumerable<PassiveSkill> passives)
         {

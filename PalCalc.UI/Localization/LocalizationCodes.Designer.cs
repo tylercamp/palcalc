@@ -134,6 +134,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMMON_GENDER_NONE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMMON_GENDER_OPPOSITE_WILDCARD,
         /// <summary>
         ///   Looks up a localized string similar to .

@@ -27,8 +27,10 @@ namespace PalCalc.UI.ViewModel.Mapped
         public static PalGenderViewModel OppositeWildcard { get; } = new PalGenderViewModel(PalGender.OPPOSITE_WILDCARD);
         public static PalGenderViewModel Male { get; } = new PalGenderViewModel(PalGender.MALE);
         public static PalGenderViewModel Female { get; } = new PalGenderViewModel(PalGender.FEMALE);
+        public static PalGenderViewModel None { get; } = new PalGenderViewModel(PalGender.NONE);
 
-        public static List<PalGenderViewModel> All { get; } = [Wildcard, OppositeWildcard, Male, Female];
+        // TODO - All
+        public static List<PalGenderViewModel> AllValid { get; } = [Wildcard, OppositeWildcard, Male, Female];
         public static List<PalGenderViewModel> AllStandard { get; } = [Wildcard, Male, Female];
         public static List<PalGenderViewModel> AllSpecific { get; } = [Male, Female];
 
@@ -39,6 +41,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 PalGender.OPPOSITE_WILDCARD => OppositeWildcard,
                 PalGender.MALE => Male,
                 PalGender.FEMALE => Female,
+                PalGender.NONE => None,
                 _ => throw new NotImplementedException()
             };
     }

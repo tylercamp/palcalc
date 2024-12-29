@@ -106,7 +106,7 @@ namespace PalCalc.Solver
             this.gameSettings = gameSettings;
             this.db = db;
             this.pruningBuilder = pruningBuilder;
-            this.ownedPals = ownedPals;
+            this.ownedPals = ownedPals.Where(p => p.Gender != PalGender.NONE).ToList();
             this.maxBreedingSteps = maxBreedingSteps;
             this.maxSolverIterations = maxSolverIterations;
             this.allowedWildPals = allowedWildPals;

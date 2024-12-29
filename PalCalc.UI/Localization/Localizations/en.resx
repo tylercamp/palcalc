@@ -169,6 +169,9 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_COMMON_GENDER_MALE" xml:space="preserve">
     <value>Male</value>
   </data>
+  <data name="LC_COMMON_GENDER_NONE" xml:space="preserve">
+    <value>No Gender</value>
+  </data>
   <data name="LC_COMMON_GENDER_OPPOSITE_WILDCARD" xml:space="preserve">
     <value>Opposite Gender</value>
   </data>

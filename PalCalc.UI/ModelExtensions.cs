@@ -31,6 +31,7 @@ namespace PalCalc.UI
                 PalGender.MALE => LocalizationCodes.LC_COMMON_GENDER_MALE.Bind(),
                 PalGender.WILDCARD => LocalizationCodes.LC_COMMON_GENDER_WILDCARD.Bind(),
                 PalGender.OPPOSITE_WILDCARD => LocalizationCodes.LC_COMMON_GENDER_OPPOSITE_WILDCARD.Bind(),
+                PalGender.NONE => LocalizationCodes.LC_COMMON_GENDER_NONE.Bind(),
                 _ => throw new NotImplementedException()
             };
 

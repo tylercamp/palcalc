@@ -7,7 +7,7 @@
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              mc:Ignorable="d" 
-             d:DataContext="{x:Static mvm:PalGenderViewModel.OppositeWildcard}"
+             d:DataContext="{x:Static mvm:PalGenderViewModel.None}"
              d:DesignHeight="200" d:DesignWidth="800"
              HorizontalContentAlignment="Left"
              Cursor="Hand"
@@ -62,6 +62,18 @@
                                 <Setter.Value>
                                     <StackPanel>
                                         <materialIcons:MaterialIcon Kind="GenderFemale" Foreground="DeepPink" />
+                                    </StackPanel>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+
+                        <!-- No Gender -->
+                        <DataTrigger Binding="{Binding Value}" Value="NONE">
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialIcons:MaterialIcon Kind="GenderMaleFemale" />
+                                        <materialIcons:MaterialIcon Kind="QuestionMark" Foreground="OrangeRed" />
                                     </StackPanel>
                                 </Setter.Value>
                             </Setter>
