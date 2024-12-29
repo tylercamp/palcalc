@@ -153,13 +153,29 @@ namespace PalCalc.SaveReader.FArchive.Custom
 
                     if (groupType == GroupType.Guild)
                     {
-                        result.AdminPlayerUid = subReader.ReadGuid();
+                        var startPos = byteStream.Position;
 
-                        // https://github.com/cheahjs/palworld-save-tools/issues/192
-                        subReader.ReadInt64();
-                        subReader.ReadInt64();
+                        try
+                        {
+                            // parse using the new format
+                            result.AdminPlayerUid = subReader.ReadGuid();
 
-                        result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
+                            // https://github.com/cheahjs/palworld-save-tools/issues/192
+                            subReader.ReadInt64();
+                            subReader.ReadInt64();
+
+                            result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
+                        }
+                        catch (EndOfStreamException)
+                        {
+                            logger.Debug("EndOfStreamException while reading guild data using Feybreak format, falling back to old format");
+                            byteStream.Seek(startPos, SeekOrigin.Begin);
+
+                            // as a fallback, try parsing with the old format
+                            // parse using the new format
+                            result.AdminPlayerUid = subReader.ReadGuid();
+                            result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
+                        }
                     }
 
                     foreach (var v in visitors.Where(v => v.Matches(path)))
