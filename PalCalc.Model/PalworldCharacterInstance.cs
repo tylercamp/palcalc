@@ -67,6 +67,8 @@ namespace PalCalc.Model
         // https://www.reddit.com/r/Palworld/comments/1aedboa/partner_skill_upgrade_stats_exact_values_for_lv1/
         public int IV_Melee { get; set; }
 
+        public override bool Equals(object obj) => (obj as PalInstance)?.InstanceId == InstanceId;
+
         public override string ToString() => $"{Gender} {Pal} at {Location} with passive skills ({string.Join(", ", PassiveSkills)})";
 
         private int? hashCode;

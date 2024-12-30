@@ -283,7 +283,7 @@ namespace PalCalc.SaveReader.SaveFile
                         Gender = gvasInstance.Gender switch
                         {
                             null => PalGender.NONE,
-                            var g when g.Contains("FEMALE") => PalGender.FEMALE,
+                            var g when g.Contains("Female", StringComparison.InvariantCultureIgnoreCase) => PalGender.FEMALE,
                             _ => PalGender.MALE
                         },
                         PassiveSkills = passives,
