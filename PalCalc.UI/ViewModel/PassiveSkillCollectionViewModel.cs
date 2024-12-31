@@ -28,7 +28,7 @@ namespace PalCalc.UI.ViewModel
 
         public PassiveSkillCollectionViewModel(IEnumerable<PassiveSkillViewModel> passives)
         {
-            Passives = passives.OrderBy(t => t.ModelObject.InternalName).ToList();
+            Passives = passives.OrderBy(t => t.ModelObject is RandomPassiveSkill).ThenBy(t => t.ModelObject.InternalName).ToList();
 
             RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             for (int i = 1; i < NumRows; i++)
