@@ -16,6 +16,8 @@ namespace PalCalc.UI.View.Utils
     {
         private Popup _popup;
         private DispatcherTimer _showTimer;
+        private bool _isUnloaded;
+        private Window _boundWindow;
 
         public static readonly DependencyProperty ToolTipContentTemplateProperty =
             DependencyProperty.Register(nameof(ToolTipContentTemplate), typeof(DataTemplate), typeof(PopupToolTipTrigger));
@@ -40,10 +42,22 @@ namespace PalCalc.UI.View.Utils
             MouseDown += PopupToolTipTrigger_MouseDown;
             MouseEnter += OnMouseEnter;
             MouseLeave += OnMouseLeave;
+
+            _isUnloaded = false;
+            Unloaded += PopupToolTipTrigger_Unloaded;
+        }
+
+        private void PopupToolTipTrigger_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _isUnloaded = true;
+            _showTimer.Stop();
+            HidePopup();
         }
 
         private void PopupToolTipTrigger_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (_isUnloaded) return;
+
             _showTimer.Stop();
             HidePopup();
         }
@@ -95,6 +109,8 @@ namespace PalCalc.UI.View.Utils
 
         private void OnMouseEnter(object sender, MouseEventArgs e)
         {
+            if (_isUnloaded) return;
+
             if (_popup != null && !_showTimer.IsEnabled && !_popup.IsOpen)
             {
                 _showTimer.Interval = TimeSpan.FromMilliseconds(InitialShowDelay);
@@ -110,12 +126,12 @@ namespace PalCalc.UI.View.Utils
         private void ShowTimer_Tick(object sender, EventArgs e)
         {
             _showTimer.Stop();
-            if (_popup != null) ShowPopup();
+            if (!_isUnloaded && _popup != null) ShowPopup();
         }
 
         private void ShowPopup()
         {
-            if (_popup.IsOpen) return;
+            if (_isUnloaded || _popup.IsOpen) return;
 
             if (ActiveTrigger != null) ActiveTrigger.HidePopup();
             ActiveTrigger = this;
@@ -123,6 +139,8 @@ namespace PalCalc.UI.View.Utils
             _popup.IsOpen = true;
             if (Window.GetWindow(this) is Window parentWindow)
             {
+                _boundWindow = parentWindow;
+
                 parentWindow.MouseMove += ParentWindow_MouseMove;
                 parentWindow.Deactivated += ParentWindow_Deactivated;
                 _popup.MouseLeave += _popup_MouseLeave;
@@ -131,17 +149,20 @@ namespace PalCalc.UI.View.Utils
 
         private void HidePopup()
         {
-            if (!_popup.IsOpen) return;
+            if (_popup == null || !_popup.IsOpen) return;
 
             if (ActiveTrigger == this) ActiveTrigger = null;
 
             _popup.IsOpen = false;
-            if (Window.GetWindow(this) is Window parentWindow)
+            _popup.MouseLeave -= _popup_MouseLeave;
+
+            if (_boundWindow != null)
             {
-                parentWindow.MouseMove -= ParentWindow_MouseMove;
-                parentWindow.Deactivated -= ParentWindow_Deactivated;
-                _popup.MouseLeave -= _popup_MouseLeave;
+                _boundWindow.MouseMove -= ParentWindow_MouseMove;
+                _boundWindow.Deactivated -= ParentWindow_Deactivated;
             }
+
+            _boundWindow = null;
         }
 
         // (a few workarounds to close the popup when the mouse moves too far away)
@@ -150,7 +171,7 @@ namespace PalCalc.UI.View.Utils
         {
             // needed if we move the mouse off the popup but _not_ onto the parent window, meaning we wouldn't get further
             // mouse events. if it was on the parent window then we could do the "close if mouse moves far away" logic. 
-            if (!this.IsMouseOver && !Window.GetWindow(this).IsMouseOver)
+            if (!this.IsMouseOver && Window.GetWindow(this)?.IsMouseOver != true)
                 HidePopup();
         }
 
@@ -167,7 +188,7 @@ namespace PalCalc.UI.View.Utils
 
         private void ParentWindow_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_popup != null && _popup.Child is FrameworkElement popupContent)
+            if (!_isUnloaded && _popup != null && _popup.Child is FrameworkElement popupContent)
             {
                 // Get the mouse position in screen coordinates
                 Point mouseScreenPos = e.GetPosition(Application.Current.MainWindow);
