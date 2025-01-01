@@ -3,6 +3,7 @@ using Serilog;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -21,50 +22,18 @@ namespace PalCalc.Model
 
         public Dictionary<PalId, Pal> PalsById { get; set; }
 
-        // Map[ParentPal, Map[ChildPal, NumSteps]]
-        public Dictionary<Pal, Dictionary<Pal, int>> MinBreedingSteps { get; set; }
-
         public Dictionary<Pal, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
 
         public List<PassiveSkill> PassiveSkills { get; set; }
 
-        public List<BreedingResult> Breeding { get; set; }
-
         public List<PalElement> Elements { get; set; }
         public List<ActiveSkill> ActiveSkills { get; set; }
 
-
-
         public IEnumerable<Pal> Pals => PalsById.Values;
 
-        // Map[Parent1, Map[Parent2, BreedingResult]]
-        // 
-        // there can be multiple breeding results depending on the genders of the parents (namely for Wixen and Kativa)
-        private IReadOnlyDictionary<Pal, IReadOnlyDictionary<Pal, BreedingResult[]>> breedingByParent;
-        public IReadOnlyDictionary<Pal, IReadOnlyDictionary<Pal, BreedingResult[]>> BreedingByParent =>
-            breedingByParent ??= Breeding
-                .SelectMany(breed => breed.Parents.Select(parent1 => (parent1.Pal, breed))) // List<(parent, breeding)>
-                .GroupBy(p => p.Pal)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Distinct()
-                        .GroupBy(p => p.breed.OtherParent(g.Key).Pal)
-                        .ToDictionary(g2 => g2.Key, g2 => g2.Select(p => p.breed).ToArray())
-                        .ToFrozenDictionary() as IReadOnlyDictionary<Pal, BreedingResult[]>
-                );
-
-        // Map[Child, Map[Parent1, List<Parent2>]]
-        private Dictionary<Pal, Dictionary<GenderedPal, List<GenderedPal>>> breedingByChild;
-        public Dictionary<Pal, Dictionary<GenderedPal, List<GenderedPal>>> BreedingByChild =>
-            breedingByChild ??= Breeding
-                .GroupBy(b => b.Child)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.SelectMany(b => b.Parents.Select(p1 => (p1, b))).GroupBy(p => p.p1).ToDictionary(
-                        g => g.Key,
-                        g => g.Select(p => p.b.OtherParent(g.Key)).Distinct().ToList()
-                    )
-                );
+        private Dictionary<string, PassiveSkill> passiveSkillsByName;
+        public Dictionary<string, PassiveSkill> PassiveSkillsByName =>
+            passiveSkillsByName ??= PassiveSkills.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
 
         private Dictionary<Pal, PalGender> breedingMostLikelyGender;
         public Dictionary<Pal, PalGender> BreedingMostLikelyGender =>
@@ -95,11 +64,6 @@ namespace PalCalc.Model
                 }
             );
 
-
-        private Dictionary<string, PassiveSkill> passiveSkillsByName;
-        public Dictionary<string, PassiveSkill> PassiveSkillsByName =>
-            passiveSkillsByName ??= PassiveSkills.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
-
         private static ILogger logger = Log.ForContext<PalDB>();
 
         private static object loadEmbeddedLock = new object();
@@ -114,11 +78,12 @@ namespace PalCalc.Model
                 .GetExecutingAssembly()
                 .GetManifestResourceStream($"{name}.db.json")!;
 
+            var sw = Stopwatch.StartNew();
             PalDB result;
             using (var streamReader = new StreamReader(stream, Encoding.UTF8))
                 result = FromJson(streamReader.ReadToEnd());
 
-            logger.Information("Successfully loaded embedded pal DB");
+            logger.Information("Successfully loaded embedded pal DB in {ms}ms", sw.ElapsedMilliseconds);
             return result;
         }
 

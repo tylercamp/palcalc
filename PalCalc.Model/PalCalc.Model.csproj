@@ -11,10 +11,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
 
   <ItemGroup>
+    <None Remove="breeding.json" />
     <None Remove="db.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="breeding.json" />
     <EmbeddedResource Include="db.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>

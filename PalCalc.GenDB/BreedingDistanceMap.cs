@@ -13,7 +13,7 @@ namespace PalCalc.GenDB
         private static ILogger logger = Log.ForContext<BreedingDistanceMap>();
 
         // min. number of times you need to breed Key1 to get a Key2 (to prune out path checks between pals which would exceed the max breeding steps)
-        public static Dictionary<Pal, Dictionary<Pal, int>> CalcMinDistances(PalDB db)
+        public static Dictionary<Pal, Dictionary<Pal, int>> CalcMinDistances(PalDB db, PalBreedingDB breedingdb)
         {
             Logging.InitCommonFull();
 
@@ -37,7 +37,7 @@ namespace PalCalc.GenDB
                     var target = next.Item2;
 
                     // check if there's a direct way to breed from src to target
-                    if (db.BreedingByChild[target].Any(kvp => kvp.Key.Pal == src))
+                    if (breedingdb.BreedingByChild[target].Any(kvp => kvp.Key.Pal == src))
                     {
                         if (!palDistances[src].ContainsKey(target) || palDistances[src][target] != 1)
                         {
@@ -49,7 +49,7 @@ namespace PalCalc.GenDB
                     }
 
                     // check if there's a possible child of this `src` with known distance to target
-                    var childWithShortestDistance = db.BreedingByParent[src].Values
+                    var childWithShortestDistance = breedingdb.BreedingByParent[src].Values
                         .SelectMany(l => l.Select(b => b.Child))
                         .Where(child => palDistances[child].ContainsKey(target))
                         .OrderBy(child => palDistances[child][target])

@@ -250,6 +250,8 @@ namespace PalCalc.Solver
             };
             SolverStateUpdated?.Invoke(statusMsg);
 
+            var breedingdb = PalBreedingDB.LoadEmbedded(db);
+
             /* Build the initial list of pals to breed */
 
             // attempt to deduplicate pals and *intelligently* reduce the initial working set size
@@ -268,7 +270,7 @@ namespace PalCalc.Solver
             // different genders but otherwise have all the same properties)
             var allExceptGenderGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvRelevance);
 
-            bool WithinBreedingSteps(Pal pal, int maxSteps) => db.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
+            bool WithinBreedingSteps(Pal pal, int maxSteps) => breedingdb.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
             static IV_Range MakeIV(int minValue, int value) =>
                 new(
                     isRelevant: minValue != 0 && value >= minValue,
@@ -413,11 +415,11 @@ namespace PalCalc.Solver
                                 .Where(p => p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps < maxBreedingSteps)
                                 .Where(p =>
                                 {
-                                    var childPals = db.BreedingByParent[p.Item1.Pal][p.Item2.Pal].Select(br => br.Child);
+                                    var childPals = breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal].Select(br => br.Child);
 
                                     // don't bother checking any pals if it's impossible for them to reach the target within the remaining
                                     // number of iterations
-                                    return childPals.Any(c => db.MinBreedingSteps[c][spec.Pal] <= maxSolverIterations - s - 1);
+                                    return childPals.Any(c => breedingdb.MinBreedingSteps[c][spec.Pal] <= maxSolverIterations - s - 1);
                                 })
                                 .Where(p =>
                                 {
@@ -459,7 +461,7 @@ namespace PalCalc.Solver
                                         }
                                         else
                                         {
-                                            var withModifiedGenders = db.BreedingByParent[parent1.Pal][parent2.Pal].Select(br =>
+                                            var withModifiedGenders = breedingdb.BreedingByParent[parent1.Pal][parent2.Pal].Select(br =>
                                             {
                                                 return (
                                                     parent1.WithGuaranteedGender(db, br.RequiredGenderOf(parent1.Pal)),
@@ -580,7 +582,7 @@ namespace PalCalc.Solver
 
                                             var res = new BredPalReference(
                                                 gameSettings,
-                                                db.BreedingByParent[parent1.Pal][parent2.Pal]
+                                                breedingdb.BreedingByParent[parent1.Pal][parent2.Pal]
                                                     .Single(br => br.Matches(parent1.Pal, parent1.Gender, parent2.Pal, parent2.Gender))
                                                     .Child,
                                                 parent1,

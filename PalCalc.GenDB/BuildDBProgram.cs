@@ -52,7 +52,7 @@ namespace PalCalc.GenDB
         //
         // (should be a folder containing "Pal-Windows.pak")
         static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Content\Paks";
-        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
+        static string MappingsPath = @"C:\Users\algor\OneDrive\Desktop\Mappings.usmap";
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
@@ -444,8 +444,6 @@ namespace PalCalc.GenDB
             db.PassiveSkills = passives;
             db.ActiveSkills = attacks;
             db.Elements = elements;
-            db.Breeding = BuildAllBreedingResults(pals, breedingCalc);
-            db.MinBreedingSteps = BreedingDistanceMap.CalcMinDistances(db);
 
             var genderProbabilities = rawPals.ToDictionary(p => p.InternalName, p => new Dictionary<PalGender, float>()
             {
@@ -458,6 +456,12 @@ namespace PalCalc.GenDB
             );
 
             File.WriteAllText("../PalCalc.Model/db.json", db.ToJson());
+
+            var breedingdb = new PalBreedingDB(db);
+            breedingdb.Breeding = BuildAllBreedingResults(pals, breedingCalc);
+            breedingdb.MinBreedingSteps = BreedingDistanceMap.CalcMinDistances(db, breedingdb);
+
+            File.WriteAllText("../PalCalc.Model/breeding.json", breedingdb.ToJson());
 
             logger.Information("Scraping pal icons");
             ExportPalIcons(

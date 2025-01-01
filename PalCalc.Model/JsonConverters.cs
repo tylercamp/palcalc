@@ -140,10 +140,6 @@ namespace PalCalc.Model
             var attacks = asToken["ActiveSkills"].ToObject<List<ActiveSkill>>();
             var elements = asToken["Elements"].ToObject<List<PalElement>>();
             var breedingGenderProbability = asToken["BreedingGenderProbability"].ToObject<Dictionary<string, Dictionary<PalGender, float>>>();
-            var minBreedingSteps = asToken["MinBreedingSteps"].ToObject<Dictionary<string, Dictionary<string, int>>>();
-
-            serializer.Converters.Add(new BreedingResultJsonConverter(pals));
-            var breeding = asToken["Breeding"].ToObject<List<BreedingResult>>(serializer);
 
             foreach (var attack in attacks)
                 attack.Element = elements.Single(e => e.InternalName == attack.ElementInternalName);
@@ -155,15 +151,6 @@ namespace PalCalc.Model
                 PassiveSkills = passives,
                 ActiveSkills = attacks,
                 Elements = elements,
-                Breeding = breeding,
-
-                MinBreedingSteps = minBreedingSteps.ToDictionary(
-                    kvp => kvp.Key.InternalToPal(pals),
-                    kvp => kvp.Value.ToDictionary(
-                        ikvp => ikvp.Key.InternalToPal(pals),
-                        ikvp => ikvp.Value
-                    )
-                ),
 
                 BreedingGenderProbability = breedingGenderProbability.ToDictionary(
                     kvp => kvp.Key.InternalToPal(pals),
@@ -174,19 +161,52 @@ namespace PalCalc.Model
 
         public override void WriteJson(JsonWriter writer, PalDB value, JsonSerializer serializer)
         {
-            var breedingResultConverter = new BreedingResultJsonConverter(value.Pals);
+            JToken.FromObject(new
+            {
+                Version = value.Version,
+                Pals = value.Pals,
+                PassiveSkills = value.PassiveSkills,
+                ActiveSkills = value.ActiveSkills,
+                Elements = value.Elements,
+                BreedingGenderProbability = value.BreedingGenderProbability.ToDictionary(kvp => kvp.Key.InternalName, kvp => kvp.Value),
+            }).WriteTo(writer);
+        }
+    }
+
+    public class PalBreedingDBJsonConverter(PalDB paldb) : JsonConverter<PalBreedingDB>
+    {
+        public override PalBreedingDB ReadJson(JsonReader reader, Type objectType, PalBreedingDB existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var asToken = JToken.ReadFrom(reader);
+
+            var minBreedingSteps = asToken["MinBreedingSteps"].ToObject<Dictionary<string, Dictionary<string, int>>>();
+
+            serializer.Converters.Add(new BreedingResultJsonConverter(paldb.Pals));
+            var breeding = asToken["Breeding"].ToObject<List<BreedingResult>>(serializer);
+
+            return new PalBreedingDB(paldb)
+            {
+                Breeding = breeding,
+
+                MinBreedingSteps = minBreedingSteps.ToDictionary(
+                    kvp => kvp.Key.InternalToPal(paldb.Pals),
+                    kvp => kvp.Value.ToDictionary(
+                        ikvp => ikvp.Key.InternalToPal(paldb.Pals),
+                        ikvp => ikvp.Value
+                    )
+                ),
+            };
+        }
+
+        public override void WriteJson(JsonWriter writer, PalBreedingDB value, JsonSerializer serializer)
+        {
+            var breedingResultConverter = new BreedingResultJsonConverter(paldb.Pals);
             serializer.Converters.Add(breedingResultConverter);
 
             var breedingToken = JToken.FromObject(value.Breeding, serializer);
             JToken.FromObject(new
             {
-                Version = value.Version,
-                Pals = value.Pals,
                 Breeding = breedingToken,
-                PassiveSkills = value.PassiveSkills,
-                ActiveSkills = value.ActiveSkills,
-                Elements = value.Elements,
-                BreedingGenderProbability = value.BreedingGenderProbability.ToDictionary(kvp => kvp.Key.InternalName, kvp => kvp.Value),
                 MinBreedingSteps = value.MinBreedingSteps.ToDictionary(
                     kvp => kvp.Key.InternalName,
                     kvp => kvp.Value.ToDictionary(
