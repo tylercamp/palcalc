@@ -7,6 +7,7 @@
     <FileVersion></FileVersion>
 	<DisableFody Condition="'$(Configuration)' == 'Debug'">true</DisableFody>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<CETCompat>false</CETCompat> <!-- https://github.com/tylercamp/palcalc/issues/85 -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
