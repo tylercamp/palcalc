@@ -88,7 +88,7 @@ namespace PalCalc.Model
             {
                 if (embedded != null)
                 {
-                    logger.Verbose("Using previously-loaded pal DB");
+                    logger.Verbose("Using previously-loaded breeding DB");
                     return embedded;
                 }
 

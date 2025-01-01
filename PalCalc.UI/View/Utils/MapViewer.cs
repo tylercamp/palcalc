@@ -276,29 +276,41 @@ namespace PalCalc.UI.View.Utils
 
             // Zoom in or out
             const double zoomFactor = 1.2;
-            var oldScale = _scaleTransform.ScaleX; // uniform scale
-            var newScale = (e.Delta > 0)
+            double oldScale = _scaleTransform.ScaleX;
+            double newScale = (e.Delta > 0)
                 ? oldScale * zoomFactor
                 : oldScale / zoomFactor;
 
             // Limit min/max scale if desired
-            var maxScale = Math.Min(_imageNaturalSize.Width / _container.ActualWidth, _imageNaturalSize.Height / _container.ActualHeight);
+            double maxScale = Math.Min(
+                _imageNaturalSize.Width / _container.ActualWidth,
+                _imageNaturalSize.Height / _container.ActualHeight
+            );
             newScale = Math.Max(1, Math.Min(newScale, maxScale));
 
-            // Adjust translation so that the point under the mouse stays in the same place
-            var mousePos = e.GetPosition(_container);
-            double offsetX = mousePos.X - _translateTransform.X;
-            double offsetY = mousePos.Y - _translateTransform.Y;
+            // 1) Get mouse pos in the *parent's* coordinate space (e.g. MapViewer)
+            //    Instead of _container, so we're not affected by the container's own transform.
+            var parent = VisualTreeHelper.GetParent(_container) as FrameworkElement;
+            if (parent == null) return;
 
-            double scaleRatio = newScale / oldScale;
+            Point mousePosParent = e.GetPosition(parent);
 
-            // Update scale
+            // 2) Convert mousePosParent into the map coordinate system
+            //    by using the container's current transform to parent, then invert it.
+            var currentMatrix = _container.TransformToAncestor(parent);
+            Point mapPos = currentMatrix.Inverse.Transform(mousePosParent);
+
+            // 3) Update the scale
             _scaleTransform.ScaleX = newScale;
             _scaleTransform.ScaleY = newScale;
 
-            // Now shift so that map under cursor stays put
-            _translateTransform.X = mousePos.X - offsetX * scaleRatio;
-            _translateTransform.Y = mousePos.Y - offsetY * scaleRatio;
+            // 4) Get the new transform after scaling, then transform the same map point forward
+            var newMatrix = _container.TransformToAncestor(parent);
+            Point newMousePos = newMatrix.Transform(mapPos);
+
+            // 5) Offset the container so the mouse remains in the same on-screen position
+            _translateTransform.X += (mousePosParent.X - newMousePos.X);
+            _translateTransform.Y += (mousePosParent.Y - newMousePos.Y);
 
             ClampTranslation();
         }
