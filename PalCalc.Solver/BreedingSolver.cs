@@ -356,7 +356,7 @@ namespace PalCalc.Solver
                                         maxInputIrrelevantPassives - p.GuaranteedPassiveSkills(db).Except(spec.DesiredPassives).Count()
                                     )
                                 )
-                                .Select(numRandomPassives => new WildPalReference(p, p.GuaranteedPassiveSkills(db).Intersect(spec.DesiredPassives), numRandomPassives))
+                                .Select(numRandomPassives => new WildPalReference(p, p.GuaranteedPassiveSkills(db), numRandomPassives))
                         )
                         .Where(pi => pi.BreedingEffort <= maxEffort)
                 );
