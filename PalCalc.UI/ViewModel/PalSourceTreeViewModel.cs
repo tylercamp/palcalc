@@ -17,6 +17,8 @@ namespace PalCalc.UI.ViewModel
     public interface IPalSourceTreeNode
     {
         public ILocalizedText Label { get; }
+
+        public bool IsSelected { get; set; }
     }
 
     public interface IPalSource
@@ -30,7 +32,7 @@ namespace PalCalc.UI.ViewModel
     /// <summary>
     /// Filters pals based on the owner ID (for party/palbox pals) or the owner's guild ID (for base pals)
     /// </summary>
-    public class PlayerSourceTreeNodeViewModel : ObservableObject, IPalSourceTreeNode, IPalSource
+    public partial class PlayerSourceTreeNodeViewModel : ObservableObject, IPalSourceTreeNode, IPalSource
     {
         // TODO - handle serialization due to reference to `source` (e.g. `originalSource`)
         public PlayerSourceTreeNodeViewModel(PlayerInstance modelObject)
@@ -45,6 +47,9 @@ namespace PalCalc.UI.ViewModel
         public string Id => $"PLAYER={ModelObject.PlayerId}";
 
         public ILocalizedText Label { get; }
+
+        [ObservableProperty]
+        private bool isSelected;
 
         public IEnumerable<PalInstance> Filter(CachedSaveGame source)
         {
@@ -73,7 +78,7 @@ namespace PalCalc.UI.ViewModel
         }
     }
 
-    public class AnyPlayerInGuildSourceTreeNodeViewModel : ObservableObject, IPalSourceTreeNode, IPalSource
+    public partial class AnyPlayerInGuildSourceTreeNodeViewModel : ObservableObject, IPalSourceTreeNode, IPalSource
     {
         public AnyPlayerInGuildSourceTreeNodeViewModel(GuildInstance guild)
         {
@@ -86,6 +91,9 @@ namespace PalCalc.UI.ViewModel
 
         public ILocalizedText Label { get; } = LocalizationCodes.LC_PAL_SRC_ANY_GUILD_MEMBER.Bind();
 
+        [ObservableProperty]
+        private bool isSelected;
+
         public IEnumerable<PalInstance> Filter(CachedSaveGame source)
         {
             return source.OwnedPals.Where(p => source.GuildsByPlayerId[p.OwnerPlayerId].Id == ModelObject.Id);
@@ -93,7 +101,7 @@ namespace PalCalc.UI.ViewModel
     }
 
 
-    public class GuildSourceTreeNodeViewModel : ObservableObject, IPalSourceTreeNode
+    public partial class GuildSourceTreeNodeViewModel : ObservableObject, IPalSourceTreeNode
     {
         public GuildSourceTreeNodeViewModel(CachedSaveGame source, GuildInstance guild)
         {
@@ -110,13 +118,19 @@ namespace PalCalc.UI.ViewModel
         public List<IPalSource> Children { get; }
 
         public ILocalizedText Label { get; }
+
+        [ObservableProperty]
+        private bool isSelected;
     }
 
-    public class AnyPlayerInAnyGuildTreeNodeViewModel : ObservableObject, IPalSourceTreeNode, IPalSource
+    public partial class AnyPlayerInAnyGuildTreeNodeViewModel : ObservableObject, IPalSourceTreeNode, IPalSource
     {
         public string Id => "ANY";
 
         public ILocalizedText Label { get; } = LocalizationCodes.LC_PAL_SRC_ANY_PLAYER_GUILD.Bind();
+
+        [ObservableProperty]
+        private bool isSelected;
 
         public IEnumerable<PalInstance> Filter(CachedSaveGame source) => source.OwnedPals;
     }
@@ -165,10 +179,34 @@ namespace PalCalc.UI.ViewModel
             return res;
         }
 
-        [NotifyPropertyChangedFor(nameof(SelectedSource))]
-        [NotifyPropertyChangedFor(nameof(HasValidSource))]
-        [ObservableProperty]
         private IPalSourceTreeNode selectedNode;
+        public IPalSourceTreeNode SelectedNode
+        {
+            get => selectedNode;
+            set
+            {
+                var fixedValue = value switch
+                {
+                    null => RootNodes.FirstOrDefault(),
+                    GuildSourceTreeNodeViewModel g => g.Children.OfType<AnyPlayerInGuildSourceTreeNodeViewModel>().FirstOrDefault(),
+                    _ => value
+                };
+
+                var oldValue = selectedNode;
+                if (SetProperty(ref selectedNode, fixedValue))
+                {
+                    if (fixedValue != null && !fixedValue.IsSelected) fixedValue.IsSelected = true;
+
+                    OnPropertyChanged(nameof(SelectedSource));
+                    OnPropertyChanged(nameof(HasValidSource));
+                }
+                else if (value != null && value != fixedValue)
+                {
+                    if (selectedNode != null)
+                        selectedNode.IsSelected = true;
+                }
+            }
+        }
 
         public IPalSource SelectedSource => SelectedNode as IPalSource;
 

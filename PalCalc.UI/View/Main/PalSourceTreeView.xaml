@@ -14,6 +14,18 @@
         <TreeView.BorderBrush>
             <SolidColorBrush Color="White" Opacity="0" />
         </TreeView.BorderBrush>
+        <TreeView.ItemContainerStyle>
+            <Style TargetType="TreeViewItem">
+                <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                <Setter Property="IsExpanded" Value="True" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                        <Setter Property="FontWeight" Value="Bold" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </TreeView.ItemContainerStyle>
         <TreeView.Resources>
             <HierarchicalDataTemplate DataType="{x:Type vm:GuildSourceTreeNodeViewModel}" ItemsSource="{Binding Children}">
                 <TextBlock Text="{Binding Label.Value}" />
