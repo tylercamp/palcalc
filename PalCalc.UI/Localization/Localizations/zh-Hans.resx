@@ -227,7 +227,7 @@
     <value>自定义帕鲁盒</value>
   </data>
   <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve">
-    <value>内容修改自动保存在Pal Calc。自定义帕鲁盒不影响Palworld存档。</value>
+    <value>内容修改自动保存在Pal Calc。自定义帕鲁盒不会影响Palworld存档。</value>
   </data>
   <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve">
     <value>新建...</value>
@@ -356,7 +356,7 @@
     <value>选择文件夹中'Level.sav'存档文件</value>
   </data>
   <data name="LC_MEMORY_WARNING_MSG" xml:space="preserve">
-    <value>提示：由于系统内存不足，求解程序暂停。此消息关闭后，工作将恢复。
+    <value>注意：由于系统内存不足，求解程序暂停。此消息关闭后，工作将恢复。
 
 本次求解过程中，忽略剩余全部警告？</value>
   </data>
@@ -390,7 +390,7 @@
     <value>打开文件浏览器</value>
   </data>
   <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve">
-    <value>选配{TraitsList}</value>
+    <value>可选配{TraitsList}</value>
   </data>
   <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
     <value>搜索</value>
@@ -487,7 +487,7 @@
     <value>结果</value>
   </data>
   <data name="LC_RESULT_NUM_CAKES" xml:space="preserve">
-    <value>蛋糕数</value>
+    <value>蛋糕量</value>
   </data>
   <data name="LC_RESULT_NUM_STEPS" xml:space="preserve">
     <value>代数</value>
