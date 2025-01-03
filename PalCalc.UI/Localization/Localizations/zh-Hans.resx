@@ -426,7 +426,7 @@
     <value>任何公会中的任何玩家</value>
   </data>
   <data name="LC_PAL_TARGET_OPTIONAL_TRAITS" xml:space="preserve">
-    <value>可选的</value>
+    <value>可附带</value>
   </data>
   <data name="LC_PAL_TARGET_REQUIRED_TRAITS" xml:space="preserve">
     <value>必须包含</value>
@@ -728,13 +728,13 @@
     <value>命名</value>
   </data>
   <data name="LC_TRAITS_PRESETS_OVERWRITE_BTN_DESCRIPTION" xml:space="preserve">
-    <value>覆写预设</value>
+    <value>覆盖预设</value>
   </data>
   <data name="LC_TRAITS_PRESETS_OVERWRITE_MSG" xml:space="preserve">
-    <value>覆写预设'{PresetName}'更改为当前词条组合？</value>
+    <value>覆盖预设'{PresetName}'并改为目前选择的词条组合？</value>
   </data>
   <data name="LC_TRAITS_PRESETS_OVERWRITE_TITLE" xml:space="preserve">
-    <value>覆写预设</value>
+    <value>覆盖预设</value>
   </data>
   <data name="LC_TRAITS_PRESETS_RENAME_BTN_DESCRIPTION" xml:space="preserve">
     <value>重命名预设</value>
