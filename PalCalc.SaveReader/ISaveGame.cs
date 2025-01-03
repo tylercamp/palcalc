@@ -1,12 +1,7 @@
-﻿using PalCalc.SaveReader.FArchive;
-using PalCalc.SaveReader.GVAS;
-using PalCalc.SaveReader.SaveFile;
+﻿using PalCalc.SaveReader.SaveFile;
 using PalCalc.SaveReader.SaveFile.Virtual;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net;
+
 
 namespace PalCalc.SaveReader
 {
@@ -28,6 +23,9 @@ namespace PalCalc.SaveReader
 
         // (don't check `WorldOption`, not present for linux-based server saves)
         bool IsValid { get; }
+
+        // Flag to indicate if the save game is on the lcoal file system
+        bool IsLocal { get; }
 
         event Action<ISaveGame> Updated;
     }
@@ -54,6 +52,29 @@ namespace PalCalc.SaveReader
 
             if (Directory.Exists(basePath))
             {
+                IsLocal = true;
+                if (new Uri(basePath).IsUnc)
+                {
+                    try
+                    {
+                        IPAddress[] host;
+                        // get host addresses
+                        host = Dns.GetHostAddresses(basePath);
+                        // get local addresses
+                        IPAddress[] local = Dns.GetHostAddresses(Dns.GetHostName());
+                        // check if local
+                        if (!host.Any(hostAddress => IPAddress.IsLoopback(hostAddress) || local.Contains(hostAddress)))
+                        {
+                            IsLocal = false;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        IsLocal = false;
+                    }
+                }
+                
+
                 folderWatcher = new FileSystemWatcher(basePath);
                 folderWatcher.Changed += FolderWatcher_Updated;
                 folderWatcher.Created += FolderWatcher_Updated;
@@ -62,6 +83,10 @@ namespace PalCalc.SaveReader
 
                 folderWatcher.IncludeSubdirectories = true;
                 folderWatcher.EnableRaisingEvents = true;
+            }
+            else
+            {
+                IsLocal = false;
             }
         }
 
@@ -84,7 +109,7 @@ namespace PalCalc.SaveReader
             Updated?.Invoke(this);
         }
 
-        public string BasePath { get; }
+        public string BasePath { get; private set; }
 
         public string UserId => Path.GetFileName(Path.GetDirectoryName(BasePath));
         public string GameId => Path.GetFileName(BasePath);
@@ -106,6 +131,8 @@ namespace PalCalc.SaveReader
         public List<PlayersSaveFile> Players { get; }
 
         public bool IsValid => Level != null && Level.IsValid;
+
+        public bool IsLocal { get; private set; }
 
         public override string ToString() => FolderName;
     }
@@ -134,6 +161,35 @@ namespace PalCalc.SaveReader
             LocalData = localData;
             WorldOption = worldOption;
             Players = players;
+
+            if (Directory.Exists(userBasePath))
+            {
+                IsLocal = true;
+                if (new Uri(userBasePath).IsUnc)
+                {
+                    try
+                    {
+                        IPAddress[] host;
+                        // get host addresses
+                        host = Dns.GetHostAddresses(userBasePath);
+                        // get local addresses
+                        IPAddress[] local = Dns.GetHostAddresses(Dns.GetHostName());
+                        // check if local
+                        if (!host.Any(hostAddress => IPAddress.IsLoopback(hostAddress) || local.Contains(hostAddress)))
+                        {
+                            IsLocal = false;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        IsLocal = false;
+                    }
+                }
+            }
+            else
+            {
+                IsLocal = false;
+            }
 
             this.fileWatchers = fileWatchers.ToList();
 
@@ -183,6 +239,8 @@ namespace PalCalc.SaveReader
 
         public bool IsValid =>
             Level != null && Level.IsValid; // don't check for `LevelMeta` - may be temporarily missing for files with "wrapper" header
+
+        public bool IsLocal { get; private set; }
     }
 
     /// <summary>
@@ -232,6 +290,8 @@ namespace PalCalc.SaveReader
         public List<PlayersSaveFile> Players { get; }
 
         public bool IsValid => true;
+
+        public bool IsLocal => true;
 
         public event Action<ISaveGame> Updated;
     }

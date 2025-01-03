@@ -82,7 +82,10 @@ namespace PalCalc.UI.ViewModel.Mapped
                 App.Current.Dispatcher.BeginInvoke(() =>
                 {
                     ReadSaveDescription();
-                    HasChanges = false;
+                    if (changedSave.IsLocal)
+                        HasChanges = false;
+                    else 
+                        HasChanges = true;
                 });
             }
         }
