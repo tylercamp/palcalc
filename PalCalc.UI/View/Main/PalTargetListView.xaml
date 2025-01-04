@@ -6,11 +6,16 @@
          xmlns:local="clr-namespace:PalCalc.UI.View.Main"
          xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
          xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
          ItemsSource="{Binding Targets}" SelectedValue="{Binding SelectedTarget, Mode=TwoWay}"
          mc:Ignorable="d" 
          d:DataContext="{d:DesignInstance vm:PalTargetListViewModel, IsDesignTimeCreatable=True}"
          d:Background="White"
          d:DesignHeight="450" d:DesignWidth="800"
+         dd:DragDrop.IsDragSource="True"
+         dd:DragDrop.IsDropTarget="True"
+         dd:DragDrop.DragHandler="{Binding}"
+         dd:DragDrop.DropHandler="{Binding}"
          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
     <ListBox.ItemTemplate>
         <DataTemplate DataType="mvm:PalSpecifierViewModel">
@@ -19,6 +24,11 @@
     </ListBox.ItemTemplate>
     <ListBox.ItemContainerStyle>
         <Style TargetType="ListBoxItem">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsReadOnly}" Value="True">
+                    <Setter Property="dd:DragDrop.DragSourceIgnore" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
     </ListBox.ItemContainerStyle>

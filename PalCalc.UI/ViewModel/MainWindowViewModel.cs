@@ -195,6 +195,9 @@ namespace PalCalc.UI.ViewModel
             foreach (var target in targetsBySaveFile.Values.SelectMany(l => l.Targets).Where(t => !t.IsReadOnly))
                 target.DeleteCommand = deletePalTargetCommand;
 
+            foreach (var list in targetsBySaveFile.Values)
+                list.OrderChanged += SaveTargetList;
+
             Storage.SaveReloaded += Storage_SaveReloaded;
 
             dispatcher.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
@@ -353,7 +356,12 @@ namespace PalCalc.UI.ViewModel
 
         private void UpdateFromSaveProperties()
         {
-            if (PalTargetList != null) PalTargetList.PropertyChanged -= PalTargetList_PropertyChanged;
+            if (PalTargetList != null)
+            {
+                PalTargetList.PropertyChanged -= PalTargetList_PropertyChanged;
+                PalTargetList.OrderChanged -= SaveTargetList;
+            }
+
             if (GameSettings != null) GameSettings.PropertyChanged -= GameSettings_PropertyChanged;
 
             if (SaveSelection.SelectedFullGame?.Value == null)
@@ -371,6 +379,7 @@ namespace PalCalc.UI.ViewModel
 
                 PalTargetList = targetsBySaveFile[SaveSelection.SelectedFullGame.Value];
                 PalTargetList.PropertyChanged += PalTargetList_PropertyChanged;
+                PalTargetList.OrderChanged += SaveTargetList; // TODO - debounce
 
                 GameSettings = GameSettingsViewModel.Load(SaveSelection.SelectedFullGame.Value);
                 GameSettings.PropertyChanged += GameSettings_PropertyChanged;
