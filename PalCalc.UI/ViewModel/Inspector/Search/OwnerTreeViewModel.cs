@@ -242,6 +242,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
             {
                 string guildId = source.GuildsByContainerId.GetValueOrDefault(container.Id)?.Id;
 
+                if (guildId == null) continue;
+
                 if (!guildContainers.ContainsKey(guildId))
                     guildContainers.Add(guildId, []);
 
