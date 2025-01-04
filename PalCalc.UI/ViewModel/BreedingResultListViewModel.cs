@@ -102,10 +102,10 @@ namespace PalCalc.UI.ViewModel
                         Location = new PalLocation() { Index = 0, Type = LocationType.Palbox },
                         PassiveSkills = new List<PassiveSkill>()
                         {
-                            "Runner".ToPassive(PalDB.LoadEmbedded()),
+                            "Runner".ToStandardPassive(PalDB.LoadEmbedded()),
                         }
                     },
-                    new List<PassiveSkill>() { "Runner".ToPassive(PalDB.LoadEmbedded()) },
+                    new List<PassiveSkill>() { "Runner".ToStandardPassive(PalDB.LoadEmbedded()) },
                     new IV_Set()
                     {
                         HP = new IV_Range(true, 80, 90),

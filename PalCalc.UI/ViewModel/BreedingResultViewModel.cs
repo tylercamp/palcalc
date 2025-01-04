@@ -45,9 +45,9 @@ namespace PalCalc.UI.ViewModel
             {
                 Pal = "Galeclaw".ToPal(db),
                 RequiredPassives = new List<PassiveSkill> {
-                    "Swift".ToPassive(db),
-                    "Runner".ToPassive(db),
-                    "Nimble".ToPassive(db)
+                    "Swift".ToStandardPassive(db),
+                    "Runner".ToStandardPassive(db),
+                    "Nimble".ToStandardPassive(db)
                 },
             };
 

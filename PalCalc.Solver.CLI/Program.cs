@@ -23,9 +23,9 @@ internal class Program
             {
                 Gender = PalGender.MALE,
                 Pal = "Reptyro Cryst".ToPal(db),
-                PassiveSkills = ["Brave".ToPassive(db), "Workaholic".ToPassive(db), "Runner".ToPassive(db)]
+                PassiveSkills = ["Brave".ToStandardPassive(db), "Workaholic".ToStandardPassive(db), "Runner".ToStandardPassive(db)]
             },
-            ["Runner".ToPassive(db), new RandomPassiveSkill(), new RandomPassiveSkill()],
+            ["Runner".ToStandardPassive(db), new RandomPassiveSkill(), new RandomPassiveSkill()],
             new IV_Set()
         );
 
@@ -34,14 +34,14 @@ internal class Program
             {
                 Gender = PalGender.FEMALE,
                 Pal = "Wixen".ToPal(db),
-                PassiveSkills = ["Lucky".ToPassive(db), "Brave".ToPassive(db)]
+                PassiveSkills = ["Lucky".ToStandardPassive(db), "Brave".ToStandardPassive(db)]
             },
-            ["Lucky".ToPassive(db), "Brave".ToPassive(db)],
+            ["Lucky".ToStandardPassive(db), "Brave".ToStandardPassive(db)],
             new IV_Set()
         );
 
         var parentPassives = reptyro.ActualPassives.Concat(wixen.ActualPassives).Distinct().ToList();
-        var targetPassives = new List<PassiveSkill>() { "Lucky".ToPassive(db), "Runner".ToPassive(db) };
+        var targetPassives = new List<PassiveSkill>() { "Lucky".ToStandardPassive(db), "Runner".ToStandardPassive(db) };
         var numFinalPassives = 3;
 
         var prob = PalCalc.Solver.Probabilities.Passives.ProbabilityInheritedTargetPassives(parentPassives, targetPassives, numFinalPassives);
@@ -71,7 +71,7 @@ internal class Program
         var targetInstance = new PalSpecifier
         {
             Pal = "Ragnahawk".ToPal(db),
-            RequiredPassives = new List<PassiveSkill> { "Swift".ToPassive(db), "Runner".ToPassive(db), "Nimble".ToPassive(db) },
+            RequiredPassives = new List<PassiveSkill> { "Swift".ToStandardPassive(db), "Runner".ToStandardPassive(db), "Nimble".ToStandardPassive(db) },
         };
 
         var controller = new SolverStateController()

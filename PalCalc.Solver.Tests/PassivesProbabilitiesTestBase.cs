@@ -12,10 +12,10 @@ namespace PalCalc.Solver.Tests
     {
         protected PalDB db = PalDB.LoadEmbedded();
 
-        protected PassiveSkill Runner => "Runner".ToPassive(db);
-        protected PassiveSkill Swift => "Swift".ToPassive(db);
-        protected PassiveSkill Nimble => "Nimble".ToPassive(db);
-        protected PassiveSkill Lucky => "Lucky".ToPassive(db);
+        protected PassiveSkill Runner => "Runner".ToStandardPassive(db);
+        protected PassiveSkill Swift => "Swift".ToStandardPassive(db);
+        protected PassiveSkill Nimble => "Nimble".ToStandardPassive(db);
+        protected PassiveSkill Lucky => "Lucky".ToStandardPassive(db);
 
         private int irrelevantId = 0;
         protected PassiveSkill Irrelevant => new($"Irrelevant {irrelevantId}", $"Irrelevant {irrelevantId}", 1);

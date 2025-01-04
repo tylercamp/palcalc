@@ -275,10 +275,10 @@ namespace PalCalc.UI.ViewModel.Mapped
                 return new PalSpecifierViewModel(null)
                 {
                     TargetPal = PalViewModel.Make("Beakon".ToPal(db)),
-                    Passive1 = PassiveSkillViewModel.Make("Runner".ToPassive(db)),
-                    Passive2 = PassiveSkillViewModel.Make("Swift".ToPassive(db)),
+                    Passive1 = PassiveSkillViewModel.Make("Runner".ToStandardPassive(db)),
+                    Passive2 = PassiveSkillViewModel.Make("Swift".ToStandardPassive(db)),
 
-                    OptionalPassive1 = PassiveSkillViewModel.Make("Aggressive".ToPassive(db)),
+                    OptionalPassive1 = PassiveSkillViewModel.Make("Aggressive".ToStandardPassive(db)),
 
                     MinIv_Attack = 90,
                 };

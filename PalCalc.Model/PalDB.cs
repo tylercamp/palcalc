@@ -26,14 +26,18 @@ namespace PalCalc.Model
 
         public List<PassiveSkill> PassiveSkills { get; set; }
 
+        // passive skills which most users would expect, does *not* include passive effects
+        // from items, partner skills, etc.
+        public IEnumerable<PassiveSkill> StandardPassiveSkills => PassiveSkills.Where(p => p.IsStandardPassiveSkill);
+
         public List<PalElement> Elements { get; set; }
         public List<ActiveSkill> ActiveSkills { get; set; }
 
         public IEnumerable<Pal> Pals => PalsById.Values;
 
-        private Dictionary<string, PassiveSkill> passiveSkillsByName;
-        public Dictionary<string, PassiveSkill> PassiveSkillsByName =>
-            passiveSkillsByName ??= PassiveSkills.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
+        private Dictionary<string, PassiveSkill> standardPassiveSkillsByName;
+        public Dictionary<string, PassiveSkill> StandardPassiveSkillsByName =>
+            standardPassiveSkillsByName ??= StandardPassiveSkills.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
 
         private Dictionary<Pal, PalGender> breedingMostLikelyGender;
         public Dictionary<Pal, PalGender> BreedingMostLikelyGender =>

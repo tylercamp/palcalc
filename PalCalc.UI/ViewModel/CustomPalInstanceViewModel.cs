@@ -39,7 +39,7 @@ namespace PalCalc.UI.ViewModel
             {
                 Gender = PalGender.FEMALE,
                 Pal = PalDB.LoadEmbedded().Pals.First(),
-                PassiveSkills = [PalDB.LoadEmbedded().PassiveSkills.First()]
+                PassiveSkills = [PalDB.LoadEmbedded().StandardPassiveSkills.First()]
             }
         );
 

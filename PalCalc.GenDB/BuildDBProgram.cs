@@ -92,8 +92,11 @@ namespace PalCalc.GenDB
         {
             return rawPassiveSkills.Select(rawPassive =>
             {
-                var localizedNames = skillNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value[rawPassive.InternalName]);
-                var englishName = localizedNames["en"];
+                // (note: passive skills without translations are typically bound to partner skills)
+                var localizedNames = skillNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetValueOrDefault(rawPassive.InternalName));
+                if (localizedNames.All(kvp => kvp.Value == null)) localizedNames = null;
+
+                var englishName = localizedNames?.GetValueOrDefault("en") ?? rawPassive.InternalName;
 
                 string Strip(string internalName) => internalName.Replace("EPalPassiveSkillEffectType::", "").Replace("EPalPassiveSkillEffectTargetType::", "");
 
@@ -114,9 +117,10 @@ namespace PalCalc.GenDB
                     LocalizedNames = localizedNames,
                     RandomInheritanceAllowed = rawPassive.AddPal,
                     RandomInheritanceWeight = rawPassive.LotteryWeight,
-                    TrackedEffects = trackedEffects
+                    TrackedEffects = trackedEffects,
+                    IsStandardPassiveSkill = rawPassive.IsStandardPassiveSkill,
                 };
-            }).ToList();
+            }).SkipNull().ToList();
         }
 
         private static List<ActiveSkill> BuildActiveSkills(List<UActiveSkill> rawActiveSkills, List<PalElement> elements, Dictionary<string, Dictionary<string, string>> attackNames)

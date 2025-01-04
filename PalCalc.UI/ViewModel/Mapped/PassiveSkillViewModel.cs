@@ -54,7 +54,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
             if (instances == null)
             {
-                instances = PalDB.LoadEmbedded().PassiveSkills.ToDictionary(t => t, t => new PassiveSkillViewModel(t, NameLocalizer.Bind(t)));
+                instances = PalDB.LoadEmbedded().StandardPassiveSkills.ToDictionary(t => t, t => new PassiveSkillViewModel(t, NameLocalizer.Bind(t)));
             }
 
             if (passive is RandomPassiveSkill)
@@ -69,7 +69,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
         }
 
-        public static IReadOnlyList<PassiveSkillViewModel> All { get; } = PalDB.LoadEmbedded().PassiveSkills.Select(Make).OrderBy(p => p.Name.Value).ToList();
+        public static IReadOnlyList<PassiveSkillViewModel> All { get; } = PalDB.LoadEmbedded().StandardPassiveSkills.Select(Make).OrderBy(p => p.Name.Value).ToList();
 
         // for XAML designer view
         public PassiveSkillViewModel() : this(new PassiveSkill("Runner", "runner", 2), new HardCodedText("Runner"))

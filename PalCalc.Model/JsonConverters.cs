@@ -51,7 +51,7 @@ namespace PalCalc.Model
                 Pal = token["Id"].ToObject<PalId>().ToPal(db),
                 Location = token["Location"].ToObject<PalLocation>(),
                 Gender = token["Gender"].ToObject<PalGender>(),
-                PassiveSkills = passives.ToObject<List<string>>().Select(s => s.ToPassive(db)).ToList(),
+                PassiveSkills = passives.ToObject<List<string>>().Select(s => s.ToStandardPassive(db)).ToList(),
                 ActiveSkills = (token["ActiveSkills"]?.ToObject<List<string>>() ?? []).Select(s => s.ToActive(db)).ToList(),
                 EquippedActiveSkills = (token["EquippedActiveSkills"]?.ToObject<List<string>>() ?? []).Select(s => s.ToActive(db)).ToList(),
                 OwnerPlayerId = token["OwnerPlayerId"].ToObject<string>(),

@@ -49,6 +49,7 @@ namespace PalCalc.GenDB.GameDataReaders
 
         // (assigned manually)
         public string InternalName { get; set; }
+        public bool IsStandardPassiveSkill { get; set; }
     }
 
     internal class PassiveSkillsReader
@@ -64,7 +65,12 @@ namespace PalCalc.GenDB.GameDataReaders
             foreach (var row in rawPassives.RowMap)
             {
                 var skill = row.Value.ToObject<UPassiveSkill>();
-                if (!skill.AddPal && !skill.AddRarePal && !extraPassives.Contains(row.Key.Text)) continue;
+
+                skill.IsStandardPassiveSkill = (
+                    skill.AddPal ||
+                    skill.AddRarePal ||
+                    extraPassives.Contains(row.Key.Text)
+                );
 
                 skill.InternalName = row.Key.Text;
                 res.Add(skill);

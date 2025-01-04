@@ -25,15 +25,15 @@ namespace PalCalc.UI.ViewModel
             Label = new HardCodedText(content.Name);
 
             var db = PalDB.LoadEmbedded();
-            RequiredPassive1 = PassiveSkillViewModel.Make(content.Passive1InternalName.InternalToPassive(db));
-            RequiredPassive2 = PassiveSkillViewModel.Make(content.Passive2InternalName.InternalToPassive(db));
-            RequiredPassive3 = PassiveSkillViewModel.Make(content.Passive3InternalName.InternalToPassive(db));
-            RequiredPassive4 = PassiveSkillViewModel.Make(content.Passive4InternalName.InternalToPassive(db));
+            RequiredPassive1 = PassiveSkillViewModel.Make(content.Passive1InternalName.InternalToStandardPassive(db));
+            RequiredPassive2 = PassiveSkillViewModel.Make(content.Passive2InternalName.InternalToStandardPassive(db));
+            RequiredPassive3 = PassiveSkillViewModel.Make(content.Passive3InternalName.InternalToStandardPassive(db));
+            RequiredPassive4 = PassiveSkillViewModel.Make(content.Passive4InternalName.InternalToStandardPassive(db));
 
-            OptionalPassive1 = PassiveSkillViewModel.Make(content.OptionalPassive1InternalName.InternalToPassive(db));
-            OptionalPassive2 = PassiveSkillViewModel.Make(content.OptionalPassive2InternalName.InternalToPassive(db));
-            OptionalPassive3 = PassiveSkillViewModel.Make(content.OptionalPassive3InternalName.InternalToPassive(db));
-            OptionalPassive4 = PassiveSkillViewModel.Make(content.OptionalPassive4InternalName.InternalToPassive(db));
+            OptionalPassive1 = PassiveSkillViewModel.Make(content.OptionalPassive1InternalName.InternalToStandardPassive(db));
+            OptionalPassive2 = PassiveSkillViewModel.Make(content.OptionalPassive2InternalName.InternalToStandardPassive(db));
+            OptionalPassive3 = PassiveSkillViewModel.Make(content.OptionalPassive3InternalName.InternalToStandardPassive(db));
+            OptionalPassive4 = PassiveSkillViewModel.Make(content.OptionalPassive4InternalName.InternalToStandardPassive(db));
         }
 
         public PassiveSkillsPreset ModelObject { get; }

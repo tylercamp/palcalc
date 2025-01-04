@@ -94,7 +94,7 @@ namespace PalCalc.UI
             var token = JToken.ReadFrom(reader);
             var passiveInternalName = token.ToObject<string>();
             return passiveInternalName != null
-                ? passiveInternalName.InternalToPassive(db)
+                ? passiveInternalName.InternalToStandardPassive(db)
                 : null;
         }
 
@@ -322,7 +322,7 @@ namespace PalCalc.UI
 
             var guaranteedPassives = (token["GuaranteedPassives"] ?? token["GuaranteedTraits"])
                 ?.ToObject<List<string>>()
-                ?.Select(s => s.InternalToPassive(db))
+                ?.Select(s => s.InternalToStandardPassive(db))
                 ?.ToList()
                 ?? Enumerable.Empty<PassiveSkill>();
 

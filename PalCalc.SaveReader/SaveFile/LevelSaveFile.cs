@@ -236,7 +236,7 @@ namespace PalCalc.SaveReader.SaveFile
                     var passives = gvasInstance.PassiveSkills
                         .Select(name =>
                         {
-                            var passive = db.PassiveSkills.FirstOrDefault(t => t.InternalName == name);
+                            var passive = db.StandardPassiveSkills.FirstOrDefault(t => t.InternalName == name);
                             if (passive == null)
                             {
                                 logger.Warning("unrecognized passive skill '{internalName}' on pal {Pal}", name, gvasInstance.CharacterId);

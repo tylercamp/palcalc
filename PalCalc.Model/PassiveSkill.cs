@@ -21,6 +21,10 @@ namespace PalCalc.Model
         public string InternalName { get; }
         public int Rank { get; }
 
+        // whether this is a passive you would find on a pal's list of passives,
+        // rather than e.g. passive attached to a partner skill
+        public bool IsStandardPassiveSkill { get; set; } = true;
+
         // whether this passive can be chosen when a pal gets a random skill
         public bool RandomInheritanceAllowed { get; set; } = false;
 

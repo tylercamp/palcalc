@@ -37,7 +37,7 @@ namespace PalCalc.Model
         public int? MaxWildLevel { get; set; } = null;
         
         public List<string> GuaranteedPassivesInternalIds { get; set; } = new List<string>();
-        public IEnumerable<PassiveSkill> GuaranteedPassiveSkills(PalDB db) => GuaranteedPassivesInternalIds.Select(id => id.InternalToPassive(db));
+        public IEnumerable<PassiveSkill> GuaranteedPassiveSkills(PalDB db) => GuaranteedPassivesInternalIds.Select(id => id.InternalToStandardPassive(db));
 
         ////
 
