@@ -278,6 +278,8 @@ namespace PalCalc.SaveReader.SaveFile
                         IV_Shot = gvasInstance.TalentShot ?? 0,
                         IV_Defense = gvasInstance.TalentDefense ?? 0,
 
+                        Rank = gvasInstance.Rank ?? 1,
+
                         Level = gvasInstance.Level,
                         NickName = gvasInstance.NickName,
                         Gender = gvasInstance.Gender switch

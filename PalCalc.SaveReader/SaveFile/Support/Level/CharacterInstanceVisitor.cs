@@ -31,6 +31,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         public int? TalentMelee { get; set; }
         public int? TalentDefense { get; set; }
 
+        public int? Rank { get; set; }
+
         public List<string> PassiveSkills { get; set; }
 
         public List<string> ActiveSkills { get; set; }
@@ -65,6 +67,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         const string K_TALENT_SHOT          = ".Value.RawData.SaveParameter.Talent_Shot";
         const string K_TALENT_MELEE         = ".Value.RawData.SaveParameter.Talent_Melee";
         const string K_TALENT_DEFENSE       = ".Value.RawData.SaveParameter.Talent_Defense";
+        const string K_RANK                 = ".Value.RawData.SaveParameter.Rank";
 
         static readonly List<string> REQUIRED_PAL_PROPS = new List<string>()
         {
@@ -95,7 +98,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     K_TALENT_HP,
                     K_TALENT_SHOT,
                     K_TALENT_MELEE,
-                    K_TALENT_DEFENSE
+                    K_TALENT_DEFENSE,
+                    K_RANK
                 );
 
                 collectingVisitor.OnExit += (vals) =>
@@ -136,6 +140,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                         pendingInstance.TalentMelee = vals.ContainsKey(K_TALENT_MELEE) ? Convert.ToInt32(vals[K_TALENT_MELEE]) : null;
                         pendingInstance.TalentShot = vals.ContainsKey(K_TALENT_SHOT) ? Convert.ToInt32(vals[K_TALENT_SHOT]) : null;
                         pendingInstance.TalentDefense = vals.ContainsKey(K_TALENT_DEFENSE) ? Convert.ToInt32(vals[K_TALENT_DEFENSE]) : null;
+
+                        pendingInstance.Rank = vals.ContainsKey(K_RANK) ? Convert.ToInt32(vals[K_RANK]) : null;
                     }
                 };
 
