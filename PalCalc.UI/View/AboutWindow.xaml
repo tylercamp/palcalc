@@ -99,19 +99,21 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Border Grid.Column="1" Grid.RowSpan="999" Width="1" Margin="0,2,0,2" Background="Gray" />
+            <Border Grid.Column="1" Grid.RowSpan="999" Width="1" Margin="0,5,0,5" Background="Gray" />
 
             <!-- zh-Hans -->
-            <Label Grid.Row="0" Grid.Column="0">
+            <Label Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center">
                 中文 (简体) | zh-Hans
             </Label>
             <StackPanel Grid.Row="0" Grid.Column="2">
-                <Label>
-                    <TextBlock>
-                        在这251秒赌上我的一起
-                        <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/70" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
-                    </TextBlock>
-                </Label>
+                <TextBlock>
+                    在这251秒赌上我的一起
+                    <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/70" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
+                </TextBlock>
+                <TextBlock>
+                    Narugakuruga
+                    <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/87" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
+                </TextBlock>
             </StackPanel>
         </Grid>
     </StackPanel>
