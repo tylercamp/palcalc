@@ -21,6 +21,13 @@ namespace PalCalc.Model
         public string InternalName { get; }
         public int Rank { get; }
 
+        // whether this passive can be chosen when a pal gets a random skill
+        public bool RandomInheritanceAllowed { get; set; } = false;
+
+        public int RandomInheritanceWeight { get; set; } = 0;
+
+        public List<PassiveSkillEffect> TrackedEffects { get; set; } = [];
+
         public override string ToString() => Name;
 
         public override bool Equals(object obj) => (obj as PassiveSkill)?.InternalName == InternalName;

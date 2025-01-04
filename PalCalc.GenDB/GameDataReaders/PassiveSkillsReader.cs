@@ -21,6 +21,32 @@ namespace PalCalc.GenDB.GameDataReaders
         [FStructProperty]
         public bool AddRarePal { get; set; }
 
+        [FStructProperty]
+        public int LotteryWeight { get; set; }
+
+        #region Passive Skill Effects
+        [FStructProperty]
+        public string TargetType1 { get; set; }
+        [FStructProperty]
+        public string EffectType1 { get; set; }
+        [FStructProperty]
+        public float EffectValue1 { get; set; }
+
+        [FStructProperty]
+        public string TargetType2 { get; set; }
+        [FStructProperty]
+        public string EffectType2 { get; set; }
+        [FStructProperty]
+        public float EffectValue2 { get; set; }
+
+        [FStructProperty]
+        public string TargetType3 { get; set; }
+        [FStructProperty]
+        public string EffectType3 { get; set; }
+        [FStructProperty]
+        public float EffectValue3 { get; set; }
+        #endregion
+
         // (assigned manually)
         public string InternalName { get; set; }
     }

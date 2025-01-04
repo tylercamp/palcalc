@@ -95,9 +95,26 @@ namespace PalCalc.GenDB
                 var localizedNames = skillNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value[rawPassive.InternalName]);
                 var englishName = localizedNames["en"];
 
+                string Strip(string internalName) => internalName.Replace("EPalPassiveSkillEffectType::", "").Replace("EPalPassiveSkillEffectTargetType::", "");
+
+                var effects = (new[]
+                {
+                    (Strip(rawPassive.EffectType1), Strip(rawPassive.TargetType1), rawPassive.EffectValue1),
+                    (Strip(rawPassive.EffectType2), Strip(rawPassive.TargetType2), rawPassive.EffectValue2),
+                    (Strip(rawPassive.EffectType3), Strip(rawPassive.TargetType3), rawPassive.EffectValue3)
+                }).Where(t => t.Item1 != "EPalPassiveSkillEffectType::no");
+
+                var trackedEffects = effects
+                    .Where(t => PassiveSkillEffect.TrackedEffects.Contains(t.Item1))
+                    .Select(t => new PassiveSkillEffect() { InternalName = t.Item1, EffectStrength = t.Item3 })
+                    .ToList();
+
                 return new PassiveSkill(englishName, rawPassive.InternalName, rawPassive.Rank)
                 {
-                    LocalizedNames = localizedNames
+                    LocalizedNames = localizedNames,
+                    RandomInheritanceAllowed = rawPassive.AddPal,
+                    RandomInheritanceWeight = rawPassive.LotteryWeight,
+                    TrackedEffects = trackedEffects
                 };
             }).ToList();
         }

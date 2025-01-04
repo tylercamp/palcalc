@@ -30,15 +30,6 @@ namespace PalCalc.Model
             { LocationType.Custom, null },
         };
 
-        /// <summary>
-        /// Passive skills which affect breeding times
-        /// </summary>
-        public static readonly Dictionary<string, float> PassiveSkillTimeFactors = new()
-        {
-            // TODO - could this be scraped from game files?
-            { "Test_PalEgg_HatchingSpeed_Up", 0.5f }
-        };
-
         // Used for calculating map coords from world coords
         //
         // (these values are fetched from game files and output at the end of `PalCalc.GenDB.BuildDBProgram`)
@@ -52,7 +43,7 @@ namespace PalCalc.Model
             { 0, 0, 1 },
         };
 
-        // transormation matrix converting world coords to normalized image coords within
+        // transformation matrix converting world coords to normalized image coords within
         // the world map texture, multiply the resulting coord by image size to get appropriate
         // X/Y for placing things on the map image
         public static readonly double[,] WorldToImageMatrix = new double[3, 3]
