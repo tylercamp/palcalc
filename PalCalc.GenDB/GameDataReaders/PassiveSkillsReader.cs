@@ -24,6 +24,9 @@ namespace PalCalc.GenDB.GameDataReaders
         [FStructProperty]
         public int LotteryWeight { get; set; }
 
+        [FStructProperty]
+        public string Category { get; set; }
+
         #region Passive Skill Effects
         [FStructProperty]
         public string TargetType1 { get; set; }
@@ -66,11 +69,7 @@ namespace PalCalc.GenDB.GameDataReaders
             {
                 var skill = row.Value.ToObject<UPassiveSkill>();
 
-                skill.IsStandardPassiveSkill = (
-                    skill.AddPal ||
-                    skill.AddRarePal ||
-                    extraPassives.Contains(row.Key.Text)
-                );
+                skill.IsStandardPassiveSkill = skill.Category.Contains("SortDisplayable");
 
                 skill.InternalName = row.Key.Text;
                 res.Add(skill);

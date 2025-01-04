@@ -149,6 +149,28 @@ namespace PalCalc.GenDB
             }).SkipNull().ToList();
         }
 
+        public static Dictionary<Pal, PartnerSkill> BuildPartnerSkills(List<RawPartnerSkill> rawPartnerSkills, List<Pal> pals)
+        {
+            var res = new Dictionary<Pal, PartnerSkill>();
+
+            foreach (var s in rawPartnerSkills)
+            {
+                var pal = pals.FirstOrDefault(p => p.InternalName.Equals(s.BPClassName, StringComparison.InvariantCultureIgnoreCase));
+                if (pal == null)
+                {
+                    logger.Warning("Unrecognized pal {name} for partner skill, skipping", s.BPClassName);
+                    continue;
+                }
+
+                res.Add(pal, new PartnerSkill()
+                {
+                    RankEffects = s.RankEffects.Select(e => new PartnerSkill.RankEffect() { PassiveInternalNames = e.PassiveSkillInternalNames }).ToList()
+                });
+            }
+
+            return res;
+        }
+
         private static List<PalElement> BuildElements(Dictionary<string, Dictionary<string, string>> elementNames)
         {
             var elementTypes = elementNames.SelectMany(kvp => kvp.Value.Keys).Distinct().ToList();
@@ -443,6 +465,12 @@ namespace PalCalc.GenDB
                 skillNames: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadSkillNames(provider))
             );
 
+            var rawPartnerSkills = PartnerSkillReader.ReadPartnerSkills(provider);
+            var partnerSkills = BuildPartnerSkills(rawPartnerSkills, pals);
+
+            foreach (var kvp in partnerSkills)
+                kvp.Key.PartnerSkill = kvp.Value;
+
             var elements = BuildElements(localizations.ToDictionary(l => l.LanguageCode, l => l.ReadElementNames(provider)));
 
             var rawAttacks = ActiveSkillReader.ReadActiveSkills(provider);
@@ -459,7 +487,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v14");
+            var db = PalDB.MakeEmptyUnsafe("v15");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.PassiveSkills = passives;

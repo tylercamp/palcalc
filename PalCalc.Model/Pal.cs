@@ -39,6 +39,15 @@ namespace PalCalc.Model
         public List<string> GuaranteedPassivesInternalIds { get; set; } = new List<string>();
         public IEnumerable<PassiveSkill> GuaranteedPassiveSkills(PalDB db) => GuaranteedPassivesInternalIds.Select(id => id.InternalToStandardPassive(db));
 
+        public PartnerSkill PartnerSkill { get; set; } = null;
+
+        // (palRank is 1-5)
+        public IEnumerable<PassiveSkill> PartnerSkillPassives(PalDB db, int palRank) =>
+            PartnerSkill
+                ?.RankEffects
+                ?.ElementAt(palRank - 1)
+                ?.PassiveSkills(db);
+
         ////
 
         public override string ToString() => $"{Name} ({Id})";
