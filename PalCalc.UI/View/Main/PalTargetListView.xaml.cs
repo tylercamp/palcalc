@@ -23,6 +23,8 @@ namespace PalCalc.UI.View.Main
         public PalTargetListView()
         {
             InitializeComponent();
+
+            SetResourceReference(StyleProperty, typeof(ListBox));
         }
     }
 }

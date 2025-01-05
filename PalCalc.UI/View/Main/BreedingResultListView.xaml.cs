@@ -25,6 +25,8 @@ namespace PalCalc.UI.View.Main
         {
             InitializeComponent();
 
+            SetResourceReference(StyleProperty, typeof(ListView));
+
             Wpf.Util.GridViewSort.ApplySort(Items, nameof(BreedingResultViewModel.TimeEstimate));
         }
     }

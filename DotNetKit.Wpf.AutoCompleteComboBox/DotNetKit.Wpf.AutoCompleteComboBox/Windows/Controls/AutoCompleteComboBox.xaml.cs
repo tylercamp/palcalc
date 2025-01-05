@@ -27,6 +27,15 @@ namespace DotNetKit.Windows.Controls
 
         object lastValidSelectedItem;
 
+        public AutoCompleteComboBox()
+        {
+            InitializeComponent();
+
+            AddHandler(TextBoxBase.TextChangedEvent, new TextChangedEventHandler(OnTextChanged));
+
+            SetResourceReference(StyleProperty, typeof(ComboBox));
+        }
+
         public TextBox EditableTextBox
         {
             get
@@ -342,13 +351,6 @@ namespace DotNetKit.Windows.Controls
             return defaultItemsFilter != null
                 ? i => defaultItemsFilter(i) && filter(i)
                 : filter;
-        }
-
-        public AutoCompleteComboBox()
-        {
-            InitializeComponent();
-
-            AddHandler(TextBoxBase.TextChangedEvent, new TextChangedEventHandler(OnTextChanged));
         }
     }
 }

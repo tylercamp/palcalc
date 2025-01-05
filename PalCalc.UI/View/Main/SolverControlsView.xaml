@@ -20,10 +20,10 @@
             <Setter Property="Height" Value="20" />
             <Setter Property="HorizontalAlignment" Value="Right" />
         </Style>
-        <Style TargetType="{x:Type TextBlock}">
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
-        <Style TargetType="{x:Type Button}">
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Padding" Value="5,2,5,2" />
         </Style>
         <Style TargetType="{x:Type Grid}">
