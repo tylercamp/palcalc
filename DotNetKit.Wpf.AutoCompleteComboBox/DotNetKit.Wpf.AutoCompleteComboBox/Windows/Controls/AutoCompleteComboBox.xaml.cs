@@ -32,8 +32,6 @@ namespace DotNetKit.Windows.Controls
             InitializeComponent();
 
             AddHandler(TextBoxBase.TextChangedEvent, new TextChangedEventHandler(OnTextChanged));
-
-            SetResourceReference(StyleProperty, typeof(ComboBox));
         }
 
         public TextBox EditableTextBox

@@ -1,6 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:PalCalc.UI.View.Utils">
+                    xmlns:local="clr-namespace:PalCalc.UI.View.Utils"
+                    xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+                    >
     <Style TargetType="{x:Type local:MapViewer}">
         <Setter Property="Template">
             <Setter.Value>
