@@ -650,14 +650,19 @@ namespace PalCalc.Solver
             statusMsg.CurrentPhase = SolverPhase.Finished;
             SolverStateUpdated?.Invoke(statusMsg);
 
-            return workingSet.Result.Select(r =>
-            {
-                if (spec.RequiredGender != PalGender.WILDCARD)
-                    return r.WithGuaranteedGender(db, spec.RequiredGender);
-                else
-                    return r;
+            return workingSet
+                .Result
+                // the breeding logic will never emit pals which exceed this limit, but this isn't applied for owned pals
+                // which already satisfy the pal specifier
+                .Where(r => r.ActualPassives.Except(spec.DesiredPassives).Count() <= maxBredIrrelevantPassives)
+                .Select(r =>
+                {
+                    if (spec.RequiredGender != PalGender.WILDCARD)
+                        return r.WithGuaranteedGender(db, spec.RequiredGender);
+                    else
+                        return r;
 
-            }).ToList();
+                }).ToList();
         }
     }
 }
