@@ -52,7 +52,7 @@ namespace PalCalc.GenDB
         //
         // (should be a folder containing "Pal-Windows.pak")
         static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Content\Paks";
-        static string MappingsPath = @"C:\Users\algor\OneDrive\Desktop\Mappings.usmap";
+        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
@@ -558,6 +558,8 @@ namespace PalCalc.GenDB
             // I was using a 2048x2048 image at the time, this should only change if the `ImageCoords` in `coord-samples.json` are updated
             // from a new image resolution
             MapTransformSolver.Run("coord-samples.json", sampleMapTexSize: 2048);
+
+            CSVExport.Write("out-csv", db);
         }
 
 

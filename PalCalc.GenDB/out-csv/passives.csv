@@ -1,0 +1,601 @@
+Name,CodeName,Rank,IsPalPassive
+Otherworldly Cells,Alien,1,True
+Easygoing,CoolTimeReduction_Down_1,-1,True
+Serenity,CoolTimeReduction_Up_1,3,True
+Impatient,CoolTimeReduction_Up_2,1,True
+Clumsy,CraftSpeed_down1,-1,True
+Slacker,CraftSpeed_down2,-3,True
+Serious,CraftSpeed_up1,1,True
+Artisan,CraftSpeed_up2,3,True
+Remarkable Craftsmanship,CraftSpeed_up3,4,True
+Downtrodden,Deffence_down1,-1,True
+Brittle,Deffence_down2,-3,True
+Hard Skin,Deffence_up1,1,True
+Burly Body,Deffence_up2,3,True
+Diamond Body,Deffence_up3,4,True
+Hydromaniac,ElementBoost_Aqua_1_PAL,1,True
+Lord of the Sea,ElementBoost_Aqua_2_PAL,3,True
+Veil of Darkness,ElementBoost_Dark_1_PAL,1,True
+Lord of the Underworld,ElementBoost_Dark_2_PAL,3,True
+Blood of the Dragon,ElementBoost_Dragon_1_PAL,1,True
+Divine Dragon,ElementBoost_Dragon_2_PAL,3,True
+Power of Gaia,ElementBoost_Earth_1_PAL,1,True
+Earth Emperor,ElementBoost_Earth_2_PAL,3,True
+Pyromaniac,ElementBoost_Fire_1_PAL,1,True
+Flame Emperor,ElementBoost_Fire_2_PAL,3,True
+Coldblooded,ElementBoost_Ice_1_PAL,1,True
+Ice Emperor,ElementBoost_Ice_2_PAL,3,True
+Fragrant Foliage,ElementBoost_Leaf_1_PAL,1,True
+Spirit Emperor,ElementBoost_Leaf_2_PAL,3,True
+Zen Mind,ElementBoost_Normal_1_PAL,1,True
+Celestial Emperor,ElementBoost_Normal_2_PAL,3,True
+Capacitor,ElementBoost_Thunder_1_PAL,1,True
+Lord of Lightning,ElementBoost_Thunder_2_PAL,3,True
+Waterproof,ElementResist_Aqua_1_PAL,1,True
+Cheery,ElementResist_Dark_1_PAL,1,True
+Dragonkiller,ElementResist_Dragon_1_PAL,1,True
+Earthquake Resistant,ElementResist_Earth_1_PAL,1,True
+Suntan Lover,ElementResist_Fire_1_PAL,1,True
+Heated Body,ElementResist_Ice_1_PAL,1,True
+Botanical Barrier,ElementResist_Leaf_1_PAL,1,True
+Abnormal,ElementResist_Normal_1_PAL,1,True
+Insulated Body,ElementResist_Thunder_1_PAL,1,True
+Eternal Flame,EternalFlame,4,True
+Invader,Invader,4,True
+Legend,Legend,4,True
+Nimble,MoveSpeed_up_1,1,True
+Runner,MoveSpeed_up_2,3,True
+Swift,MoveSpeed_up_3,4,True
+Nocturnal,Nocturnal,1,True
+Mercy Hit,NonKilling,-1,True
+Musclehead,Noukin,2,True
+Coward,PAL_ALLAttack_down1,-1,True
+Pacifist,PAL_ALLAttack_down2,-3,True
+Brave,PAL_ALLAttack_up1,1,True
+Ferocious,PAL_ALLAttack_up2,3,True
+Demon God,PAL_ALLAttack_up3,4,True
+Conceited,PAL_conceited,1,True
+Work Slave,PAL_CorporateSlave,1,True
+Dainty Eater,PAL_FullStomach_Down_1,1,True
+Diet Lover,PAL_FullStomach_Down_2,3,True
+Mastery of Fasting,PAL_FullStomach_Down_3,4,True
+Glutton,PAL_FullStomach_Up_1,-1,True
+Bottomless Stomach,PAL_FullStomach_Up_2,-2,True
+Masochist,PAL_masochist,1,True
+Aggressive,PAL_oraora,1,True
+Hooligan,PAL_rude,1,True
+Sadist,PAL_sadist,1,True
+Positive Thinker,PAL_Sanity_Down_1,1,True
+Workaholic,PAL_Sanity_Down_2,3,True
+Heart of the Immovable King,PAL_Sanity_Down_3,4,True
+Unstable,PAL_Sanity_Up_1,-1,True
+Destructive,PAL_Sanity_Up_2,-2,True
+Lucky,Rare,4,True
+Shabby,SalePrice_Down_1,-1,True
+Noble,SalePrice_Up_1,3,True
+Fine Furs,SalePrice_Up_2,1,True
+Sickly,Stamina_Down_1,-1,True
+Infinite Stamina,Stamina_Up_1,3,True
+Fit as a Fiddle,Stamina_Up_2,1,True
+Eternal Engine,Stamina_Up_3,4,True
+Philanthropist,Test_PalEgg_HatchingSpeed_Up,3,True
+Vanguard,TrainerATK_UP_1,3,True
+Stronghold Strategist,TrainerDEF_UP_1,3,True
+Logging Foreman,TrainerLogging_up1,3,True
+Mine Foreman,TrainerMining_up1,3,True
+Motivational Leader,TrainerWorkSpeed_UP_1,3,True
+Vampiric,Vampire,4,True
+Siren of the Void,Witch,4,True
+en Text,AccuracyDecrease,1,False
+en Text,AccuracyIncrease,1,False
+en Text,AccuracySuperDecrease,1,False
+AddItemDrop_PartnerSkill_1,AddItemDrop_PartnerSkill_1,1,False
+AddItemDrop_PartnerSkill_2,AddItemDrop_PartnerSkill_2,1,False
+AddItemDrop_PartnerSkill_3,AddItemDrop_PartnerSkill_3,1,False
+AddItemDrop_PartnerSkill_4,AddItemDrop_PartnerSkill_4,1,False
+AddItemDrop_PartnerSkill_5,AddItemDrop_PartnerSkill_5,1,False
+AddItemDrop_PartnerSkill_GhostRabbit_Soul_1,AddItemDrop_PartnerSkill_GhostRabbit_Soul_1,1,False
+AddItemDrop_PartnerSkill_GhostRabbit_Soul_2,AddItemDrop_PartnerSkill_GhostRabbit_Soul_2,1,False
+AddItemDrop_PartnerSkill_GhostRabbit_Soul_3,AddItemDrop_PartnerSkill_GhostRabbit_Soul_3,1,False
+AddItemDrop_PartnerSkill_GhostRabbit_Soul_4,AddItemDrop_PartnerSkill_GhostRabbit_Soul_4,1,False
+AddItemDrop_PartnerSkill_GhostRabbit_Soul_5,AddItemDrop_PartnerSkill_GhostRabbit_Soul_5,1,False
+Aerial Dash +1,AirDash_1,1,False
+Aerial Dash +2,AirDash_2,1,False
+Aerial Dash +3,AirDash_3,1,False
+Aerial Dash +4,AirDash_4,1,False
+ATK_up_PartnerSkill_1,ATK_up_PartnerSkill_1,1,False
+ATK_up_PartnerSkill_2,ATK_up_PartnerSkill_2,1,False
+ATK_up_PartnerSkill_3,ATK_up_PartnerSkill_3,1,False
+ATK_up_PartnerSkill_4,ATK_up_PartnerSkill_4,1,False
+Attack Up Lv. 1,Attack_ACC_up1,1,False
+Attack_ACC_up1_Gorilla,Attack_ACC_up1_Gorilla,1,False
+Attack_ACC_up1_WingGolem,Attack_ACC_up1_WingGolem,1,False
+Attack Up Lv. 2,Attack_ACC_up2,2,False
+Attack_ACC_up2_Gorilla,Attack_ACC_up2_Gorilla,1,False
+Attack_ACC_up2_WingGolem,Attack_ACC_up2_WingGolem,1,False
+Attack Up Lv. 3,Attack_ACC_up3,3,False
+Attack_ACC_up3_Gorilla,Attack_ACC_up3_Gorilla,2,False
+Attack_ACC_up3_WingGolem,Attack_ACC_up3_WingGolem,2,False
+Attack_ACC_up4_Gorilla,Attack_ACC_up4_Gorilla,2,False
+Attack_ACC_up4_WingGolem,Attack_ACC_up4_WingGolem,2,False
+Attack_ACC_up5_Gorilla,Attack_ACC_up5_Gorilla,3,False
+Attack_ACC_up5_WingGolem,Attack_ACC_up5_WingGolem,3,False
+BaseCampPal_SAN_Down_1,BaseCampPal_SAN_Down_1,1,False
+BaseCampPal_SAN_Down_2,BaseCampPal_SAN_Down_2,1,False
+BaseCampPal_SAN_Down_3,BaseCampPal_SAN_Down_3,1,False
+BaseCampPal_SAN_Down_4,BaseCampPal_SAN_Down_4,1,False
+BaseCampPal_SAN_Down_5,BaseCampPal_SAN_Down_5,1,False
+en Text,BulletSpeed_H,1,False
+en Text,BulletSpeed_L,1,False
+Capture Strength +1,CaptureLevel_Up_1,1,False
+Capture Strength +2,CaptureLevel_Up_2,1,False
+Capture Strength +3,CaptureLevel_Up_3,1,False
+Capture Strength +4,CaptureLevel_Up_4,1,False
+Capture Strength +5,CaptureLevel_Up_5,1,False
+Capture Strength +6,CaptureLevel_Up_6,1,False
+en Text,CollectItem,1,False
+Berry Picker,CollectItem_Berries,1,False
+en Text,CollectItem_CuteFox,1,False
+Egg Layer,CollectItem_Egg,1,False
+Milk Maker,CollectItem_Milk,1,False
+Gold Digger,CollectItem_Money,1,False
+Confectioner,CollectItem_Sweets,1,False
+Wool Maker,CollectItem_Wool_Alpaca,1,False
+Wool Maker,CollectItem_Wool_SheepBall,1,False
+Silk Spinner,CollectItem_Wool_WhiteMoth,1,False
+CollectItemDrop_PartnerSkill_1,CollectItemDrop_PartnerSkill_1,1,False
+CollectItemDrop_PartnerSkill_2,CollectItemDrop_PartnerSkill_2,1,False
+CollectItemDrop_PartnerSkill_3,CollectItemDrop_PartnerSkill_3,1,False
+CollectItemDrop_PartnerSkill_4,CollectItemDrop_PartnerSkill_4,1,False
+CollectItemDrop_PartnerSkill_5,CollectItemDrop_PartnerSkill_5,1,False
+CollectItemDrop_PartnerSkill_Otomo_1,CollectItemDrop_PartnerSkill_Otomo_1,1,False
+CollectItemDrop_PartnerSkill_Otomo_2,CollectItemDrop_PartnerSkill_Otomo_2,1,False
+CollectItemDrop_PartnerSkill_Otomo_3,CollectItemDrop_PartnerSkill_Otomo_3,1,False
+CollectItemDrop_PartnerSkill_Otomo_4,CollectItemDrop_PartnerSkill_Otomo_4,1,False
+CollectItemDrop_PartnerSkill_Otomo_5,CollectItemDrop_PartnerSkill_Otomo_5,1,False
+CollectItemDrop_PartnerSkill_Ride_1,CollectItemDrop_PartnerSkill_Ride_1,1,False
+CollectItemDrop_PartnerSkill_Ride_2,CollectItemDrop_PartnerSkill_Ride_2,1,False
+CollectItemDrop_PartnerSkill_Ride_3,CollectItemDrop_PartnerSkill_Ride_3,1,False
+CollectItemDrop_PartnerSkill_Ride_4,CollectItemDrop_PartnerSkill_Ride_4,1,False
+CollectItemDrop_PartnerSkill_Ride_5,CollectItemDrop_PartnerSkill_Ride_5,1,False
+Tempest Fury,CoolTimeReduction_Up_3,4,False
+CraftSpeed_PartnerSkill_1,CraftSpeed_PartnerSkill_1,1,False
+CraftSpeed_PartnerSkill_2,CraftSpeed_PartnerSkill_2,1,False
+CraftSpeed_PartnerSkill_3,CraftSpeed_PartnerSkill_3,1,False
+CraftSpeed_PartnerSkill_4,CraftSpeed_PartnerSkill_4,1,False
+CraftSpeed_PartnerSkill_5,CraftSpeed_PartnerSkill_5,1,False
+en Text,CraftSpeed*3,9,False
+en Text,CraftSpeed*5,9,False
+Defense Up Lv. 1,defense_ACC_up1,1,False
+defense_ACC_up1_WingGolem,defense_ACC_up1_WingGolem,1,False
+Defense Up Lv. 2,defense_ACC_up2,2,False
+defense_ACC_up2_WingGolem,defense_ACC_up2_WingGolem,1,False
+Defense Up Lv. 3,defense_ACC_up3,3,False
+defense_ACC_up3_WingGolem,defense_ACC_up3_WingGolem,2,False
+defense_ACC_up4_WingGolem,defense_ACC_up4_WingGolem,2,False
+defense_ACC_up5_WingGolem,defense_ACC_up5_WingGolem,3,False
+ElementAddDrop_Aqua_1_PAL,ElementAddDrop_Aqua_1_PAL,1,False
+ElementAddDrop_Aqua_2_PAL,ElementAddDrop_Aqua_2_PAL,1,False
+ElementAddDrop_Aqua_3_PAL,ElementAddDrop_Aqua_3_PAL,1,False
+ElementAddDrop_Aqua_4_PAL,ElementAddDrop_Aqua_4_PAL,1,False
+ElementAddDrop_Aqua_5_PAL,ElementAddDrop_Aqua_5_PAL,1,False
+ElementAddDrop_Dark_1_PAL,ElementAddDrop_Dark_1_PAL,1,False
+ElementAddDrop_Dark_2_PAL,ElementAddDrop_Dark_2_PAL,1,False
+ElementAddDrop_Dark_3_PAL,ElementAddDrop_Dark_3_PAL,1,False
+ElementAddDrop_Dark_4_PAL,ElementAddDrop_Dark_4_PAL,1,False
+ElementAddDrop_Dark_5_PAL,ElementAddDrop_Dark_5_PAL,1,False
+ElementAddDrop_Dragon_1_PAL,ElementAddDrop_Dragon_1_PAL,1,False
+ElementAddDrop_Dragon_2_PAL,ElementAddDrop_Dragon_2_PAL,1,False
+ElementAddDrop_Dragon_3_PAL,ElementAddDrop_Dragon_3_PAL,1,False
+ElementAddDrop_Dragon_4_PAL,ElementAddDrop_Dragon_4_PAL,1,False
+ElementAddDrop_Dragon_5_PAL,ElementAddDrop_Dragon_5_PAL,1,False
+ElementAddDrop_Earth_1_PAL,ElementAddDrop_Earth_1_PAL,1,False
+ElementAddDrop_Earth_2_PAL,ElementAddDrop_Earth_2_PAL,1,False
+ElementAddDrop_Earth_3_PAL,ElementAddDrop_Earth_3_PAL,1,False
+ElementAddDrop_Earth_4_PAL,ElementAddDrop_Earth_4_PAL,1,False
+ElementAddDrop_Earth_5_PAL,ElementAddDrop_Earth_5_PAL,1,False
+ElementAddDrop_Fire_1_PAL,ElementAddDrop_Fire_1_PAL,1,False
+ElementAddDrop_Fire_2_PAL,ElementAddDrop_Fire_2_PAL,1,False
+ElementAddDrop_Fire_3_PAL,ElementAddDrop_Fire_3_PAL,1,False
+ElementAddDrop_Fire_4_PAL,ElementAddDrop_Fire_4_PAL,1,False
+ElementAddDrop_Fire_5_PAL,ElementAddDrop_Fire_5_PAL,1,False
+ElementAddDrop_Ice_1_PAL,ElementAddDrop_Ice_1_PAL,1,False
+ElementAddDrop_Ice_2_PAL,ElementAddDrop_Ice_2_PAL,1,False
+ElementAddDrop_Ice_3_PAL,ElementAddDrop_Ice_3_PAL,1,False
+ElementAddDrop_Ice_4_PAL,ElementAddDrop_Ice_4_PAL,1,False
+ElementAddDrop_Ice_5_PAL,ElementAddDrop_Ice_5_PAL,1,False
+ElementAddDrop_Leaf_1_PAL,ElementAddDrop_Leaf_1_PAL,1,False
+ElementAddDrop_Leaf_2_PAL,ElementAddDrop_Leaf_2_PAL,1,False
+ElementAddDrop_Leaf_3_PAL,ElementAddDrop_Leaf_3_PAL,1,False
+ElementAddDrop_Leaf_4_PAL,ElementAddDrop_Leaf_4_PAL,1,False
+ElementAddDrop_Leaf_5_PAL,ElementAddDrop_Leaf_5_PAL,1,False
+ElementAddDrop_Normal_1_PAL,ElementAddDrop_Normal_1_PAL,1,False
+ElementAddDrop_Normal_2_PAL,ElementAddDrop_Normal_2_PAL,1,False
+ElementAddDrop_Normal_3_PAL,ElementAddDrop_Normal_3_PAL,1,False
+ElementAddDrop_Normal_4_PAL,ElementAddDrop_Normal_4_PAL,1,False
+ElementAddDrop_Normal_5_PAL,ElementAddDrop_Normal_5_PAL,1,False
+ElementAddDrop_Thunder_1_PAL,ElementAddDrop_Thunder_1_PAL,1,False
+ElementAddDrop_Thunder_2_PAL,ElementAddDrop_Thunder_2_PAL,1,False
+ElementAddDrop_Thunder_3_PAL,ElementAddDrop_Thunder_3_PAL,1,False
+ElementAddDrop_Thunder_4_PAL,ElementAddDrop_Thunder_4_PAL,1,False
+ElementAddDrop_Thunder_5_PAL,ElementAddDrop_Thunder_5_PAL,1,False
+Dark Damage Enhancement (Small),ElementBoost_Dark_1_BossDefeat,1,False
+Dark Damage Enhancement (Medium),ElementBoost_Dark_2_BossDefeat,1,False
+Dark Damage Enhancement (Large),ElementBoost_Dark_3_BossDefeat,1,False
+ElementBoost_Dark_PAL_PartnerSKill_1,ElementBoost_Dark_PAL_PartnerSKill_1,1,False
+ElementBoost_Dark_PAL_PartnerSKill_2,ElementBoost_Dark_PAL_PartnerSKill_2,1,False
+ElementBoost_Dark_PAL_PartnerSKill_3,ElementBoost_Dark_PAL_PartnerSKill_3,1,False
+ElementBoost_Dark_PAL_PartnerSKill_4,ElementBoost_Dark_PAL_PartnerSKill_4,1,False
+ElementBoost_Dark_PAL_PartnerSKill_5,ElementBoost_Dark_PAL_PartnerSKill_5,1,False
+Dragon Damage Enhancement (Small),ElementBoost_Dragon_1_BossDefeat,1,False
+Dragon Damage Enhancement (Medium),ElementBoost_Dragon_2_BossDefeat,1,False
+Dragon Damage Enhancement (Large),ElementBoost_Dragon_3_BossDefeat,1,False
+ElementBoost_Dragon_PAL_PartnerSKill_1,ElementBoost_Dragon_PAL_PartnerSKill_1,1,False
+ElementBoost_Dragon_PAL_PartnerSKill_2,ElementBoost_Dragon_PAL_PartnerSKill_2,1,False
+ElementBoost_Dragon_PAL_PartnerSKill_3,ElementBoost_Dragon_PAL_PartnerSKill_3,1,False
+ElementBoost_Dragon_PAL_PartnerSKill_4,ElementBoost_Dragon_PAL_PartnerSKill_4,1,False
+ElementBoost_Dragon_PAL_PartnerSKill_5,ElementBoost_Dragon_PAL_PartnerSKill_5,1,False
+Ground Damage Enhancement (Small),ElementBoost_Earth_1_BossDefeat,1,False
+Ground Damage Enhancement (Medium),ElementBoost_Earth_2_BossDefeat,1,False
+Ground Damage Enhancement (Large),ElementBoost_Earth_3_BossDefeat,1,False
+Electric Damage Enhancement (Small),ElementBoost_Electricity_1_BossDefeat,1,False
+Electric Damage Enhancement (Medium),ElementBoost_Electricity_2_BossDefeat,1,False
+Electric Damage Enhancement (Large),ElementBoost_Electricity_3_BossDefeat,1,False
+ElementBoost_Electricity_PAL_PartnerSKill_1,ElementBoost_Electricity_PAL_PartnerSKill_1,1,False
+ElementBoost_Electricity_PAL_PartnerSKill_2,ElementBoost_Electricity_PAL_PartnerSKill_2,1,False
+ElementBoost_Electricity_PAL_PartnerSKill_3,ElementBoost_Electricity_PAL_PartnerSKill_3,1,False
+ElementBoost_Electricity_PAL_PartnerSKill_4,ElementBoost_Electricity_PAL_PartnerSKill_4,1,False
+ElementBoost_Electricity_PAL_PartnerSKill_5,ElementBoost_Electricity_PAL_PartnerSKill_5,1,False
+Fire Damage Enhancement (Small),ElementBoost_Fire_1_BossDefeat,1,False
+Fire Damage Enhancement (Medium),ElementBoost_Fire_2_BossDefeat,1,False
+Fire Damage Enhancement (Large),ElementBoost_Fire_3_BossDefeat,1,False
+ElementBoost_Fire_PAL_PartnerSKill_1,ElementBoost_Fire_PAL_PartnerSKill_1,1,False
+ElementBoost_Fire_PAL_PartnerSKill_2,ElementBoost_Fire_PAL_PartnerSKill_2,1,False
+ElementBoost_Fire_PAL_PartnerSKill_3,ElementBoost_Fire_PAL_PartnerSKill_3,1,False
+ElementBoost_Fire_PAL_PartnerSKill_4,ElementBoost_Fire_PAL_PartnerSKill_4,1,False
+ElementBoost_Fire_PAL_PartnerSKill_5,ElementBoost_Fire_PAL_PartnerSKill_5,1,False
+Ice Damage Enhancement (Small),ElementBoost_Ice_1_BossDefeat,1,False
+Ice Damage Enhancement (Medium),ElementBoost_Ice_2_BossDefeat,1,False
+Ice Damage Enhancement (Large),ElementBoost_Ice_3_BossDefeat,1,False
+ElementBoost_Ice_PAL_PartnerSKill_1,ElementBoost_Ice_PAL_PartnerSKill_1,1,False
+ElementBoost_Ice_PAL_PartnerSKill_2,ElementBoost_Ice_PAL_PartnerSKill_2,1,False
+ElementBoost_Ice_PAL_PartnerSKill_3,ElementBoost_Ice_PAL_PartnerSKill_3,1,False
+ElementBoost_Ice_PAL_PartnerSKill_4,ElementBoost_Ice_PAL_PartnerSKill_4,1,False
+ElementBoost_Ice_PAL_PartnerSKill_5,ElementBoost_Ice_PAL_PartnerSKill_5,1,False
+Grass Damage Enhancement (Small),ElementBoost_Leaf_1_BossDefeat,1,False
+Grass Damage Enhancement (Medium),ElementBoost_Leaf_2_BossDefeat,1,False
+Grass Damage Enhancement (Large),ElementBoost_Leaf_3_BossDefeat,1,False
+ElementBoost_Leaf_PAL_PartnerSKill_1,ElementBoost_Leaf_PAL_PartnerSKill_1,1,False
+ElementBoost_Leaf_PAL_PartnerSKill_2,ElementBoost_Leaf_PAL_PartnerSKill_2,1,False
+ElementBoost_Leaf_PAL_PartnerSKill_3,ElementBoost_Leaf_PAL_PartnerSKill_3,1,False
+ElementBoost_Leaf_PAL_PartnerSKill_4,ElementBoost_Leaf_PAL_PartnerSKill_4,1,False
+ElementBoost_Leaf_PAL_PartnerSKill_5,ElementBoost_Leaf_PAL_PartnerSKill_5,1,False
+Neutral Damage Enhancement (Small),ElementBoost_Normal_1_BossDefeat,1,False
+Neutral Damage Enhancement (Medium),ElementBoost_Normal_2_BossDefeat,1,False
+Neutral Damage Enhancement (Large),ElementBoost_Normal_3_BossDefeat,1,False
+ElementBoost_Normal_PAL_PartnerSKill_1,ElementBoost_Normal_PAL_PartnerSKill_1,1,False
+ElementBoost_Normal_PAL_PartnerSKill_2,ElementBoost_Normal_PAL_PartnerSKill_2,1,False
+ElementBoost_Normal_PAL_PartnerSKill_3,ElementBoost_Normal_PAL_PartnerSKill_3,1,False
+ElementBoost_Normal_PAL_PartnerSKill_4,ElementBoost_Normal_PAL_PartnerSKill_4,1,False
+ElementBoost_Normal_PAL_PartnerSKill_5,ElementBoost_Normal_PAL_PartnerSKill_5,1,False
+Water Damage Enhancement (Small),ElementBoost_Water_1_BossDefeat,1,False
+Water Damage Enhancement (Medium),ElementBoost_Water_2_BossDefeat,1,False
+Water Damage Enhancement (Large),ElementBoost_Water_3_BossDefeat,1,False
+ElementBoost_Water_PAL_PartnerSKill_1,ElementBoost_Water_PAL_PartnerSKill_1,1,False
+ElementBoost_Water_PAL_PartnerSKill_2,ElementBoost_Water_PAL_PartnerSKill_2,1,False
+ElementBoost_Water_PAL_PartnerSKill_3,ElementBoost_Water_PAL_PartnerSKill_3,1,False
+ElementBoost_Water_PAL_PartnerSKill_4,ElementBoost_Water_PAL_PartnerSKill_4,1,False
+ElementBoost_Water_PAL_PartnerSKill_5,ElementBoost_Water_PAL_PartnerSKill_5,1,False
+Water Damage Reduction Lv. 1,ElementResist_Aqua_1,1,False
+Water Damage Reduction Lv. 2,ElementResist_Aqua_2,2,False
+Water Damage Reduction Lv. 3,ElementResist_Aqua_3,3,False
+Dark Damage Reduction Lv. 1,ElementResist_Dark_1,1,False
+ElementResist_Dark_1_BossDefeat,ElementResist_Dark_1_BossDefeat,1,False
+Dark Damage Reduction Lv. 2,ElementResist_Dark_2,2,False
+Dark Damage Reduction Lv. 3,ElementResist_Dark_3,3,False
+Dragon Damage Reduction Lv. 1,ElementResist_Dragon_1,1,False
+ElementResist_Dragon_1_BossDefeat,ElementResist_Dragon_1_BossDefeat,1,False
+Dragon Damage Reduction Lv. 2,ElementResist_Dragon_2,2,False
+Dragon Damage Reduction Lv. 3,ElementResist_Dragon_3,3,False
+Earth Damage Reduction Lv. 1,ElementResist_Earth_1,1,False
+ElementResist_Earth_1_BossDefeat,ElementResist_Earth_1_BossDefeat,1,False
+Earth Damage Reduction Lv. 2,ElementResist_Earth_2,2,False
+Earth Damage Reduction Lv. 3,ElementResist_Earth_3,3,False
+ElementResist_Electricity_1_BossDefeat,ElementResist_Electricity_1_BossDefeat,1,False
+Fire Damage Reduction Lv. 1,ElementResist_Fire_1,1,False
+ElementResist_Fire_1_BossDefeat,ElementResist_Fire_1_BossDefeat,1,False
+Fire Damage Reduction Lv. 2,ElementResist_Fire_2,2,False
+Fire Damage Reduction Lv. 3,ElementResist_Fire_3,3,False
+Ice Damage Reduction Lv. 1,ElementResist_Ice_1,1,False
+ElementResist_Ice_1_BossDefeat,ElementResist_Ice_1_BossDefeat,1,False
+Ice Damage Reduction Lv. 2,ElementResist_Ice_2,2,False
+Ice Damage Reduction Lv. 3,ElementResist_Ice_3,3,False
+Grass Damage Reduction Lv. 1,ElementResist_Leaf_1,1,False
+ElementResist_Leaf_1_BossDefeat,ElementResist_Leaf_1_BossDefeat,1,False
+Grass Damage Reduction Lv. 2,ElementResist_Leaf_2,2,False
+Grass Damage Reduction Lv. 3,ElementResist_Leaf_3,3,False
+Neutral Damage Reduction Lv. 1,ElementResist_Normal_1,1,False
+ElementResist_Normal_1_BossDefeat,ElementResist_Normal_1_BossDefeat,1,False
+Neutral Damage Reduction Lv. 2,ElementResist_Normal_2,2,False
+Neutral Damage Reduction Lv. 3,ElementResist_Normal_3,3,False
+Electric Damage Reduction Lv. 1,ElementResist_Thunder_1,1,False
+Electric Damage Reduction Lv. 2,ElementResist_Thunder_2,2,False
+Electric Damage Reduction Lv. 3,ElementResist_Thunder_3,3,False
+ElementResist_Water_1_BossDefeat,ElementResist_Water_1_BossDefeat,1,False
+FarmCropGrowupSpeed_Up_1,FarmCropGrowupSpeed_Up_1,1,False
+FarmCropGrowupSpeed_Up_2,FarmCropGrowupSpeed_Up_2,1,False
+FarmCropGrowupSpeed_Up_3,FarmCropGrowupSpeed_Up_3,1,False
+FarmCropGrowupSpeed_Up_4,FarmCropGrowupSpeed_Up_4,1,False
+FarmCropGrowupSpeed_Up_5,FarmCropGrowupSpeed_Up_5,1,False
+FarmCropHarvestNumRate_01,FarmCropHarvestNumRate_01,1,False
+FarmCropHarvestNumRate_02,FarmCropHarvestNumRate_02,1,False
+FarmCropHarvestNumRate_03,FarmCropHarvestNumRate_03,1,False
+FarmCropHarvestNumRate_04,FarmCropHarvestNumRate_04,1,False
+FarmCropHarvestNumRate_05,FarmCropHarvestNumRate_05,1,False
+FullStomach_Down_1_BossDefeat,FullStomach_Down_1_BossDefeat,1,False
+en Text,GiveADark,1,False
+GiveADark_Ride,GiveADark_Ride,1,False
+en Text,GiveADragon,1,False
+GiveADragon_Ride,GiveADragon_Ride,1,False
+en Text,GiveAEarth,1,False
+GiveAEarth_Ride,GiveAEarth_Ride,1,False
+en Text,GiveAElectricity,1,False
+GiveAElectricity_Ride,GiveAElectricity_Ride,1,False
+en Text,GiveAFire,1,False
+GiveAFire_Ride,GiveAFire_Ride,1,False
+en Text,GiveAIce,1,False
+GiveAIce_Ride,GiveAIce_Ride,1,False
+en Text,GiveALeaf,1,False
+GiveALeaf_Ride,GiveALeaf_Ride,1,False
+en Text,GiveAWater,1,False
+GiveAWater_Ride,GiveAWater_Ride,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_1,GiveElement_TrainerATK_UP_PartnerSkill_1,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_2,GiveElement_TrainerATK_UP_PartnerSkill_2,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_3,GiveElement_TrainerATK_UP_PartnerSkill_3,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_4,GiveElement_TrainerATK_UP_PartnerSkill_4,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_5,GiveElement_TrainerATK_UP_PartnerSkill_5,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_Ride_1,GiveElement_TrainerATK_UP_PartnerSkill_Ride_1,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_Ride_2,GiveElement_TrainerATK_UP_PartnerSkill_Ride_2,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_Ride_3,GiveElement_TrainerATK_UP_PartnerSkill_Ride_3,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_Ride_4,GiveElement_TrainerATK_UP_PartnerSkill_Ride_4,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_Ride_5,GiveElement_TrainerATK_UP_PartnerSkill_Ride_5,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_1,GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_1,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_2,GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_2,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_3,GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_3,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_4,GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_4,1,False
+GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_5,GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_5,1,False
+Health Up Lv. 1,HP_ACC_up1,1,False
+Health Up Lv. 2,HP_ACC_up2,2,False
+Health Up Lv. 3,HP_ACC_up3,3,False
+ItemWeightReduction_CrudeOil_PartnerSkill_1,ItemWeightReduction_CrudeOil_PartnerSkill_1,1,False
+ItemWeightReduction_CrudeOil_PartnerSkill_2,ItemWeightReduction_CrudeOil_PartnerSkill_2,1,False
+ItemWeightReduction_CrudeOil_PartnerSkill_3,ItemWeightReduction_CrudeOil_PartnerSkill_3,1,False
+ItemWeightReduction_CrudeOil_PartnerSkill_4,ItemWeightReduction_CrudeOil_PartnerSkill_4,1,False
+ItemWeightReduction_CrudeOil_PartnerSkill_5,ItemWeightReduction_CrudeOil_PartnerSkill_5,1,False
+ItemWeightReduction_PartnerSkill_1,ItemWeightReduction_PartnerSkill_1,1,False
+ItemWeightReduction_PartnerSkill_2,ItemWeightReduction_PartnerSkill_2,1,False
+ItemWeightReduction_PartnerSkill_3,ItemWeightReduction_PartnerSkill_3,1,False
+ItemWeightReduction_PartnerSkill_4,ItemWeightReduction_PartnerSkill_4,1,False
+ItemWeightReduction_PartnerSkill_5,ItemWeightReduction_PartnerSkill_5,1,False
+Jump Count Increase +1,JumpCount_Increase1,1,False
+Jump Count Increase +2,JumpCount_Increase2,1,False
+Jump Count Increase +3,JumpCount_Increase3,1,False
+Jump Power Boost,JumpPower_Increase,1,False
+LifeSteal_1,LifeSteal_1,1,False
+LifeSteal_2,LifeSteal_2,2,False
+LifeSteal_3,LifeSteal_3,3,False
+LifeSteal_4,LifeSteal_4,4,False
+LifeSteal_5,LifeSteal_5,5,False
+en Text,Logging_up1,1,False
+en Text,Logging_up1_Otomo_only,1,False
+en Text,Logging_up2,2,False
+en Text,Logging_up2_Otomo_only,2,False
+en Text,Logging_up3,3,False
+Logging_up3_Otomo_only,Logging_up3_Otomo_only,2,False
+en Text,Logging_up4,4,False
+Logging_up4_Otomo_only,Logging_up4_Otomo_only,2,False
+en Text,Logging_up5,5,False
+Logging_up5_Otomo_only,Logging_up5_Otomo_only,2,False
+Logging_up6_Otomo_only,Logging_up6_Otomo_only,2,False
+Max Carrying Capacity Lv. 1,MaxInventoryWeight_up,1,False
+Max Carrying Capacity Lv. 1,MaxInventoryWeight_up_Equip_1,-1,False
+Max Carrying Capacity Lv. 2,MaxInventoryWeight_up_Equip_2,-1,False
+Max Carrying Capacity Lv. 3,MaxInventoryWeight_up_Equip_3,-1,False
+MaxInventoryWeight_up_Partnerskill_1,MaxInventoryWeight_up_Partnerskill_1,-1,False
+MaxInventoryWeight_up_Partnerskill_10,MaxInventoryWeight_up_Partnerskill_10,-1,False
+MaxInventoryWeight_up_Partnerskill_11,MaxInventoryWeight_up_Partnerskill_11,-1,False
+MaxInventoryWeight_up_Partnerskill_12,MaxInventoryWeight_up_Partnerskill_12,-1,False
+MaxInventoryWeight_up_Partnerskill_2,MaxInventoryWeight_up_Partnerskill_2,-1,False
+MaxInventoryWeight_up_Partnerskill_3,MaxInventoryWeight_up_Partnerskill_3,-1,False
+MaxInventoryWeight_up_Partnerskill_4,MaxInventoryWeight_up_Partnerskill_4,-1,False
+MaxInventoryWeight_up_Partnerskill_5,MaxInventoryWeight_up_Partnerskill_5,-1,False
+MaxInventoryWeight_up_Partnerskill_6,MaxInventoryWeight_up_Partnerskill_6,-1,False
+MaxInventoryWeight_up_Partnerskill_7,MaxInventoryWeight_up_Partnerskill_7,-1,False
+MaxInventoryWeight_up_Partnerskill_8,MaxInventoryWeight_up_Partnerskill_8,-1,False
+MaxInventoryWeight_up_Partnerskill_9,MaxInventoryWeight_up_Partnerskill_9,-1,False
+Max Carrying Capacity Lv. 2,MaxInventoryWeight_up2,1,False
+Max Carrying Capacity Lv. 3,MaxInventoryWeight_up3,3,False
+MeatCut_01,MeatCut_01,1,False
+MeatCut_02,MeatCut_02,1,False
+MeatCut_03,MeatCut_03,1,False
+MeatCut_04,MeatCut_04,1,False
+MeatCut_05,MeatCut_05,1,False
+en Text,MeleeAttack_down1,1,False
+en Text,MeleeAttack_down2,1,False
+en Text,MeleeAttack_up1,3,False
+en Text,MeleeAttack_up2,4,False
+Mining_up_PartnerSkill_DrillGame,Mining_up_PartnerSkill_DrillGame,1,False
+en Text,Mining_up1,1,False
+en Text,Mining_up1_Otomo_only,1,False
+Mining_up10,Mining_up10,5,False
+en Text,Mining_up2,2,False
+en Text,Mining_up2_Otomo_only,2,False
+en Text,Mining_up3,3,False
+Mining_up3_Otomo_only,Mining_up3_Otomo_only,2,False
+en Text,Mining_up4,4,False
+Mining_up4_Otomo_only,Mining_up4_Otomo_only,2,False
+en Text,Mining_up5,5,False
+Mining_up5_Otomo_only,Mining_up5_Otomo_only,2,False
+Mining_up6,Mining_up6,5,False
+Mining_up6_Otomo_only,Mining_up6_Otomo_only,2,False
+Mining_up7,Mining_up7,5,False
+Mining_up7_Otomo_only,Mining_up7_Otomo_only,2,False
+Mining_up8,Mining_up8,5,False
+Mining_up8_Otomo_only,Mining_up8_Otomo_only,2,False
+Mining_up9,Mining_up9,5,False
+MoveSpeed_Night_01,MoveSpeed_Night_01,1,False
+MoveSpeed_Night_02,MoveSpeed_Night_02,1,False
+MoveSpeed_Night_03,MoveSpeed_Night_03,1,False
+MoveSpeed_Night_04,MoveSpeed_Night_04,1,False
+MoveSpeed_Night_05,MoveSpeed_Night_05,1,False
+MoveSpeed_Up_GroundType_PartnerSkill_1,MoveSpeed_Up_GroundType_PartnerSkill_1,1,False
+MoveSpeed_Up_GroundType_PartnerSkill_2,MoveSpeed_Up_GroundType_PartnerSkill_2,1,False
+MoveSpeed_Up_GroundType_PartnerSkill_3,MoveSpeed_Up_GroundType_PartnerSkill_3,1,False
+MoveSpeed_Up_GroundType_PartnerSkill_4,MoveSpeed_Up_GroundType_PartnerSkill_4,1,False
+MoveSpeed_Up_GroundType_PartnerSkill_5,MoveSpeed_Up_GroundType_PartnerSkill_5,1,False
+MoveSpeed_up_PartnerSkill_1,MoveSpeed_up_PartnerSkill_1,1,False
+MoveSpeed_up_PartnerSkill_2,MoveSpeed_up_PartnerSkill_2,1,False
+MoveSpeed_up_PartnerSkill_3,MoveSpeed_up_PartnerSkill_3,1,False
+MoveSpeed_up_PartnerSkill_4,MoveSpeed_up_PartnerSkill_4,1,False
+MoveSpeed_up_PartnerSkill_5,MoveSpeed_up_PartnerSkill_5,1,False
+MoveSpeed_up_PartnerSkill_Ride_1,MoveSpeed_up_PartnerSkill_Ride_1,1,False
+MoveSpeed_up_PartnerSkill_Ride_2,MoveSpeed_up_PartnerSkill_Ride_2,1,False
+MoveSpeed_up_PartnerSkill_Ride_3,MoveSpeed_up_PartnerSkill_Ride_3,1,False
+MoveSpeed_up_PartnerSkill_Ride_4,MoveSpeed_up_PartnerSkill_Ride_4,1,False
+en Text,Mute_1,1,False
+en Text,Mute_2,2,False
+en Text,Mute_3,3,False
+en Text,Mute_4,4,False
+en Text,Mute_5,5,False
+PAL_ElementPassive_1,PAL_ElementPassive_1,1,False
+PAL_ElementPassive_2,PAL_ElementPassive_2,1,False
+PAL_ElementPassive_3,PAL_ElementPassive_3,1,False
+PAL_ElementPassive_4,PAL_ElementPassive_4,1,False
+en Text,PAL_ElementPassive_Test,1,False
+Mentally unstable,PAL_SpiritualInst,-1,False
+PAL_TribePassive_1,PAL_TribePassive_1,1,False
+PAL_TribePassive_2,PAL_TribePassive_2,1,False
+PAL_TribePassive_3,PAL_TribePassive_3,1,False
+PAL_TribePassive_4,PAL_TribePassive_4,1,False
+en Text,PAL_TribePassive_Test,1,False
+PalExp_Increase_1,PalExp_Increase_1,-1,False
+PalExp_Increase_2,PalExp_Increase_2,-1,False
+PalExp_Increase_3,PalExp_Increase_3,-1,False
+PalExp_Increase_4,PalExp_Increase_4,-1,False
+PalExp_Increase_5,PalExp_Increase_5,-1,False
+PalSP_Increase_1,PalSP_Increase_1,1,False
+PalSP_Increase_2,PalSP_Increase_2,2,False
+PalSP_Increase_3,PalSP_Increase_3,3,False
+en Text,RecoilDecrease,1,False
+en Text,RecoilIncrease,1,False
+RegeneHP_PartnerSkill_1,RegeneHP_PartnerSkill_1,1,False
+RegeneHP_PartnerSkill_2,RegeneHP_PartnerSkill_2,1,False
+RegeneHP_PartnerSkill_3,RegeneHP_PartnerSkill_3,1,False
+RegeneHP_PartnerSkill_4,RegeneHP_PartnerSkill_4,1,False
+RegeneHP_PartnerSkill_5,RegeneHP_PartnerSkill_5,1,False
+ShopBuyPrice_Money_Increase,ShopBuyPrice_Money_Increase,2,False
+ShopSellPrice_Money_Increase,ShopSellPrice_Money_Increase,2,False
+en Text,ShotAttack_down1,-1,False
+en Text,ShotAttack_down2,-3,False
+en Text,ShotAttack_up1,2,False
+en Text,ShotAttack_up2,3,False
+Sphere Curve +1,SphereModule_Curve,1,False
+Sphere Slider,SphereModule_Curve2,1,False
+Sphere Weight +1,SphereModule_Heavy,1,False
+Sphere Homing,SphereModule_Homing,1,False
+Sphere Range +1,SphereModule_Sniper,1,False
+Sphere Range +2,SphereModule_Sniper2,1,False
+en Text,StealExpert_1,1,False
+en Text,StealExpert_2,2,False
+en Text,StealExpert_3,3,False
+en Text,StealExpert_4,4,False
+en Text,Support_down1,-1,False
+en Text,Support_down2,-3,False
+en Text,Support_up1,2,False
+en Text,Support_up2,0,False
+SyncroPassiveWhenCapture_PartnerSkill_1,SyncroPassiveWhenCapture_PartnerSkill_1,1,False
+SyncroPassiveWhenCapture_PartnerSkill_2,SyncroPassiveWhenCapture_PartnerSkill_2,1,False
+SyncroPassiveWhenCapture_PartnerSkill_3,SyncroPassiveWhenCapture_PartnerSkill_3,1,False
+SyncroPassiveWhenCapture_PartnerSkill_4,SyncroPassiveWhenCapture_PartnerSkill_4,1,False
+SyncroPassiveWhenCapture_PartnerSkill_5,SyncroPassiveWhenCapture_PartnerSkill_5,1,False
+TemperatureInvalid_Cold,TemperatureInvalid_Cold,1,False
+TemperatureInvalid_Heat,TemperatureInvalid_Heat,1,False
+Cold Resistant Lv. 1,TemperatureResist_Cold1,1,False
+Cold Resistant Lv. 2,TemperatureResist_Cold2,2,False
+Cold Resistant Lv. 3,TemperatureResist_Cold3,3,False
+Heat Resistant Lv. 1,TemperatureResist_Heat1,1,False
+Heat Resistant Lv. 1 / Cold Resistant Lv. 1,TemperatureResist_Heat1Cold1,1,False
+Heat Resistant Lv. 2,TemperatureResist_Heat2,2,False
+Heat Resistant Lv. 2 / Cold Resistant Lv. 2,TemperatureResist_Heat2Cold2,2,False
+Heat Resistant Lv. 3,TemperatureResist_Heat3,3,False
+Heat Resistant Lv. 3 / Cold Resistant Lv. 3,TemperatureResist_Heat3Cold3,3,False
+Test_ActiveSkillCoolTime_Up,Test_ActiveSkillCoolTime_Up,1,False
+Test_BaseCampPal_Attack_UP_1,Test_BaseCampPal_Attack_UP_1,1,False
+Test_BaseCampPal_CraftSpeed_UP_1,Test_BaseCampPal_CraftSpeed_UP_1,1,False
+Test_BaseCampPal_Defense_UP_1,Test_BaseCampPal_Defense_UP_1,1,False
+Test_BaseCampPal_SAN_Down_1,Test_BaseCampPal_SAN_Down_1,1,False
+Test_BreedSpeed_Up,Test_BreedSpeed_Up,1,False
+Test_ElementCraftSpeed_Up,Test_ElementCraftSpeed_Up,1,False
+Test_FarmCropGrowupSpeed_Up,Test_FarmCropGrowupSpeed_Up,1,False
+Test_FarmCropHarvestNumRate,Test_FarmCropHarvestNumRate,1,False
+Test_MeatCut,Test_MeatCut,1,False
+Test_MoveSpeed_GroundType,Test_MoveSpeed_GroundType,1,False
+Test_MoveSpeed_Night,Test_MoveSpeed_Night,1,False
+Test_Trader,Test_Trader,3,False
+en Text,TestExplosive_H,1,False
+en Text,TestExplosive_L,1,False
+en Text,TestHoming_H,1,False
+en Text,TestHoming_L,1,False
+en Text,TestSkill1,1,False
+en Text,TestSkill2,1,False
+en Text,TestSkill3,1,False
+en Text,TestSkill4,1,False
+en Text,TestSkill5,1,False
+en Text,TestSkill6,1,False
+en Text,TestSkill7,1,False
+en Text,TestSkill8,1,False
+TrainerATK_UP_PartnerSkill_1,TrainerATK_UP_PartnerSkill_1,1,False
+TrainerATK_UP_PartnerSkill_2,TrainerATK_UP_PartnerSkill_2,1,False
+TrainerATK_UP_PartnerSkill_3,TrainerATK_UP_PartnerSkill_3,1,False
+TrainerATK_UP_PartnerSkill_4,TrainerATK_UP_PartnerSkill_4,1,False
+TrainerATK_UP_PartnerSkill_5,TrainerATK_UP_PartnerSkill_5,1,False
+TrainerDEF_UP_PartnerSkill_1,TrainerDEF_UP_PartnerSkill_1,1,False
+TrainerDEF_UP_PartnerSkill_2,TrainerDEF_UP_PartnerSkill_2,1,False
+TrainerDEF_UP_PartnerSkill_3,TrainerDEF_UP_PartnerSkill_3,1,False
+TrainerDEF_UP_PartnerSkill_4,TrainerDEF_UP_PartnerSkill_4,1,False
+TrainerDEF_UP_PartnerSkill_5,TrainerDEF_UP_PartnerSkill_5,1,False
+TrainerDEF_UP_PartnerSkill_6,TrainerDEF_UP_PartnerSkill_6,1,False
+TrainerDEF_UP_PartnerSkill_7,TrainerDEF_UP_PartnerSkill_7,1,False
+TrainerFireResist_UP_PartnerSkill_1,TrainerFireResist_UP_PartnerSkill_1,1,False
+TrainerFireResist_UP_PartnerSkill_2,TrainerFireResist_UP_PartnerSkill_2,1,False
+TrainerFireResist_UP_PartnerSkill_3,TrainerFireResist_UP_PartnerSkill_3,1,False
+TrainerFireResist_UP_PartnerSkill_4,TrainerFireResist_UP_PartnerSkill_4,1,False
+TrainerFireResist_UP_PartnerSkill_5,TrainerFireResist_UP_PartnerSkill_5,1,False
+TrainerLeafResist_UP_PartnerSkill_1,TrainerLeafResist_UP_PartnerSkill_1,1,False
+TrainerLeafResist_UP_PartnerSkill_2,TrainerLeafResist_UP_PartnerSkill_2,1,False
+TrainerLeafResist_UP_PartnerSkill_3,TrainerLeafResist_UP_PartnerSkill_3,1,False
+TrainerLeafResist_UP_PartnerSkill_4,TrainerLeafResist_UP_PartnerSkill_4,1,False
+TrainerLeafResist_UP_PartnerSkill_5,TrainerLeafResist_UP_PartnerSkill_5,1,False
+TrainerLogging_up_PartnerSkill_1,TrainerLogging_up_PartnerSkill_1,1,False
+TrainerLogging_up_PartnerSkill_2,TrainerLogging_up_PartnerSkill_2,1,False
+TrainerLogging_up_PartnerSkill_3,TrainerLogging_up_PartnerSkill_3,1,False
+TrainerLogging_up_PartnerSkill_4,TrainerLogging_up_PartnerSkill_4,1,False
+TrainerLogging_up_PartnerSkill_5,TrainerLogging_up_PartnerSkill_5,1,False
+TrainerMining_up_PartnerSkill_1,TrainerMining_up_PartnerSkill_1,3,False
+TrainerMining_up_PartnerSkill_2,TrainerMining_up_PartnerSkill_2,3,False
+TrainerMining_up_PartnerSkill_3,TrainerMining_up_PartnerSkill_3,3,False
+TrainerMining_up_PartnerSkill_4,TrainerMining_up_PartnerSkill_4,3,False
+TrainerMining_up_PartnerSkill_5,TrainerMining_up_PartnerSkill_5,3,False
+WeakDamage_ActiveOtomo,WeakDamage_ActiveOtomo,1,False
+WeakDamage_ActiveOtomo_1,WeakDamage_ActiveOtomo_1,1,False
+WeakDamage_ActiveOtomo_2,WeakDamage_ActiveOtomo_2,1,False
+WeakDamage_ActiveOtomo_3,WeakDamage_ActiveOtomo_3,1,False
+WeakDamage_ActiveOtomo_4,WeakDamage_ActiveOtomo_4,1,False
+WeakDamage_Riding,WeakDamage_Riding,1,False
+WeakDamage_Riding_1,WeakDamage_Riding_1,1,False
+WeakDamage_Riding_2,WeakDamage_Riding_2,1,False
+WeakDamage_Riding_3,WeakDamage_Riding_3,1,False
+WeakDamage_Riding_4,WeakDamage_Riding_4,1,False
+Speedy Worker Lv. 1,WorkSpeed_ACC_up1,1,False
+Speedy Worker Lv. 2,WorkSpeed_ACC_up2,2,False
+Speedy Worker Lv. 3,WorkSpeed_ACC_up3,3,False
