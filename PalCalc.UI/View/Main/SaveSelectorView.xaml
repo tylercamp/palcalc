@@ -9,6 +9,7 @@
             xmlns:local="clr-namespace:PalCalc.UI.View"
             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+            xmlns:u="clr-namespace:PalCalc.UI.View.Utils"
             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
             mc:Ignorable="d" 
             d:Background="White"
@@ -99,19 +100,16 @@
 
     </StackPanel>
 
-    <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
-        <Button Margin="0,0,5,0"
-                Command="{Binding ExportSaveCommand}"
+    <u:SpacedWrapPanel Orientation="Horizontal" HorizontalSpacing="5" VerticalSpacing="5" Margin="0,15,0,1">
+        <Button Command="{Binding ExportSaveCommand}"
                 ToolTip="{itl:LocalizedText LC_EXPORT_SAVE_DESCRIPTION}"
                 Content="{itl:LocalizedText LC_EXPORT_SAVE}" />
 
-        <Button Margin="0,0,5,0"
-                Command="{Binding ExportCrashLogCommand}"
+        <Button Command="{Binding ExportCrashLogCommand}"
                 ToolTip="{itl:LocalizedText LC_EXPORT_CRASH_LOG_DESCRIPTION}"
                 Content="{itl:LocalizedText LC_EXPORT_CRASH_LOG}" />
 
-        <Button Margin="0,0,5,0"
-                Command="{Binding InspectSaveCommand}"
+        <Button Command="{Binding InspectSaveCommand}"
                 Content="{itl:LocalizedText LC_INSPECT_SAVE}"
                 />
 
@@ -119,5 +117,5 @@
                 Visibility="{Binding DeleteSaveVisibility}"
                 Content="{itl:LocalizedText LC_SAVE_GAME_REMOVE_BTN_LABEL}"
                 />
-    </StackPanel>
+    </u:SpacedWrapPanel>
 </StackPanel>

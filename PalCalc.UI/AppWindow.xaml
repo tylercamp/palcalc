@@ -9,7 +9,9 @@
         Title="{itl:LocalizedText LC_WINDOW_TITLE}"
         Width="1280" Height="720"
         Content="{Binding Content}">
+    <!--
     <Window.Style>
         <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}" />
     </Window.Style>
+    -->
 </Window>
