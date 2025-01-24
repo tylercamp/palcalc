@@ -16,6 +16,7 @@
          dd:DragDrop.IsDropTarget="True"
          dd:DragDrop.DragHandler="{Binding}"
          dd:DragDrop.DropHandler="{Binding}"
+         Style="{StaticResource {x:Type ListBox}}"
          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
     <ListBox.ItemTemplate>
         <DataTemplate DataType="mvm:PalSpecifierViewModel">
@@ -23,7 +24,7 @@
         </DataTemplate>
     </ListBox.ItemTemplate>
     <ListBox.ItemContainerStyle>
-        <Style TargetType="ListBoxItem">
+        <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsReadOnly}" Value="True">
                     <Setter Property="dd:DragDrop.DragSourceIgnore" Value="True" />

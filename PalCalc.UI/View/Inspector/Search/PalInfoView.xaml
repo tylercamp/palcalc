@@ -14,10 +14,10 @@
              d:DataContext="{x:Type ivmg:ContainerGridPalSlotViewModel}"
              Background="#111">
     <UserControl.Resources>
-        <Style TargetType="TextBlock">
+        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="Foreground" Value="White" />
         </Style>
-        <Style TargetType="Label">
+        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
             <Setter Property="Foreground" Value="White" />
         </Style>
     </UserControl.Resources>
@@ -39,7 +39,7 @@
 
             <StackPanel Orientation="Vertical" Margin="0,0,25,0">
                 <StackPanel.Resources>
-                    <Style TargetType="Label">
+                    <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
                         <Setter Property="Padding" Value="1" />
                         <Setter Property="Foreground" Value="White" />
                     </Style>

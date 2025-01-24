@@ -14,6 +14,7 @@
           SelectedItem="{Binding SelectedResult, Mode=TwoWay}"
           IsSynchronizedWithCurrentItem="True"
           util:GridViewSort.AutoSort="True"
+          Style="{StaticResource {x:Type ListView}}"
           >
     <ListView.View>
         <GridView>

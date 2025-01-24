@@ -11,6 +11,7 @@
         xmlns:util="clr-namespace:Wpf.Util"
         WindowStyle="ToolWindow"
         WindowStartupLocation="CenterOwner"
+        Style="{StaticResource CustomWindowStyle}"
         Title="{Binding Title.Value}" Height="450" Width="330">
     <Grid>
         <Grid.RowDefinitions>

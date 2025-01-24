@@ -10,6 +10,7 @@
         WindowStartupLocation="CenterOwner"
         SizeToContent="Height"
         Title="SimpleTextInputWindow"
+        Style="{StaticResource CustomWindowStyle}"
         Height="Auto" Width="300">
     <Grid>
         <Grid.ColumnDefinitions>

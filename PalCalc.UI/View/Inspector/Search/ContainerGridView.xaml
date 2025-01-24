@@ -39,7 +39,7 @@
                 <KeyBinding Key="Delete" Command="{Binding DeleteSlotCommand}" CommandParameter="{Binding SelectedSlot}" />
             </ListView.InputBindings>
             <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}">
+                <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding CanInterract}" Value="False">
                             <Setter Property="IsEnabled" Value="False" />

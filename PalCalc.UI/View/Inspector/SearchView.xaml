@@ -38,7 +38,7 @@
                     <KeyBinding Key="Delete" Command="{Binding DeleteContainerCommand}" CommandParameter="{Binding OwnerTree.SelectedSource.Container}" />
                 </TreeView.InputBindings>
                 <TreeView.ItemContainerStyle>
-                    <Style TargetType="TreeViewItem">
+                    <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                         <!-- Expand all items by default -->
                         <Setter Property="IsExpanded" Value="True" />
                         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
@@ -160,7 +160,7 @@
 
                         <StackPanel Orientation="Vertical">
                             <StackPanel.Resources>
-                                <Style TargetType="dnkc:AutoCompleteComboBox">
+                                <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
                                     <Setter Property="Margin" Value="0,0,10,5" />
                                     <Setter Property="Width" Value="150" />
                                 </Style>
@@ -182,7 +182,7 @@
 
                         <StackPanel Orientation="Vertical">
                             <StackPanel.Resources>
-                                <Style TargetType="dnkc:AutoCompleteComboBox">
+                                <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
                                     <Setter Property="Margin" Value="0,0,10,5" />
                                     <Setter Property="Width" Value="150" />
                                 </Style>
@@ -206,7 +206,7 @@
                             <Label Content="{itl:LocalizedText LC_SAVESEARCH_SETTINGS_MIN_IVS}" />
                             <StackPanel Orientation="Horizontal">
                                 <StackPanel.Resources>
-                                    <Style TargetType="Label">
+                                    <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
                                         <Setter Property="Padding" Value="2" />
                                         <Setter Property="Margin" Value="0,0,5,0" />
                                     </Style>

@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Theme.WPF.Themes;
 
 namespace PalCalc.UI
 {
@@ -34,6 +35,11 @@ namespace PalCalc.UI
             var sw = Stopwatch.StartNew();
             DataContext = new MainWindowViewModel(Dispatcher);
             logger.Information("MainWindowViewModel took {ms}ms to start", sw.ElapsedMilliseconds);
+
+            Dispatcher.BeginInvoke(() =>
+            {
+                ThemesController.SetTheme(ThemesController.CurrentTheme);
+            }, System.Windows.Threading.DispatcherPriority.ContextIdle);
         }
 
         internal MainPage(MainWindowViewModel vm)

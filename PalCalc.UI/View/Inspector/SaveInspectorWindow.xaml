@@ -7,6 +7,7 @@
         xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Inspector"
         xmlns:itl="clr-namespace:PalCalc.UI.Localization"
         mc:Ignorable="d"
+        Style="{StaticResource CustomWindowStyle}"
         WindowStartupLocation="CenterOwner"
         d:DataContext="{x:Static svm:SaveInspectorWindowViewModel.DesignerInstance}"
         Title="{Binding WindowTitle.Value}" Height="550" Width="900">

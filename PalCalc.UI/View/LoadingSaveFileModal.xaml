@@ -12,6 +12,7 @@
         WindowStartupLocation="CenterOwner"
         WindowStyle="ToolWindow"
         SizeToContent="WidthAndHeight"
+        Style="{StaticResource CustomWindowStyle}"
         d:DataContext="{x:Type itl:ILocalizedText}"
         >
     <TextBlock Text="{Binding Value}" Margin="5,5,5,5" />

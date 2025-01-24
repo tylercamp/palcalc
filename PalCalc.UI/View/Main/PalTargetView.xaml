@@ -77,7 +77,8 @@
             </Grid.RowDefinitions>
 
             <Grid.Resources>
-                <Style TargetType="Label" x:Key="MaxIvLabel">
+                <Style TargetType="Label" x:Key="MaxIvLabel" BasedOn="{StaticResource {x:Type Label}}">
+                    <!-- TODO - Color -->
                     <Setter Property="Foreground" Value="Gray" />
                     <Setter Property="Grid.Column" Value="2" />
                     <Setter Property="HorizontalContentAlignment" Value="Center" />

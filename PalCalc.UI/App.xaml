@@ -7,28 +7,32 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                
-                <ResourceDictionary>
-                    <!--
-                    fix for XAML binding errors involving combobox
-                    https://gist.github.com/TobiasSekan/73a93c2dfea4a051ff72abb5218d6f8f
-                    -->
-                    <Style TargetType="ComboBoxItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Left" />
-                        <Setter Property="VerticalContentAlignment" Value="Center" />
-                    </Style>
-                    <!-- (same for TreeViewItem) -->
-                    <Style TargetType="TreeViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Left" />
-                        <Setter Property="VerticalContentAlignment" Value="Center" />
-                    </Style>
-                </ResourceDictionary>
-                
+
+                <ResourceDictionary Source="Themes/ColourDictionaries/DarkGreyTheme.xaml"/>
+                <ResourceDictionary Source="Themes/ControlColours.xaml"/>
+                <ResourceDictionary Source="Themes/Controls.xaml"/>
+
                 <!-- (not committing to a theme yet, but using this to test existing controls for any styling issues) -->
                 <!--
                 <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/Dark.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml"/>
                 -->
+
+                <ResourceDictionary>
+                    <!--
+                    fix for XAML binding errors involving combobox
+                    https://gist.github.com/TobiasSekan/73a93c2dfea4a051ff72abb5218d6f8f
+                    -->
+                    <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                    </Style>
+                    <!-- (same for TreeViewItem) -->
+                    <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                    </Style>
+                </ResourceDictionary>
 
                 <ResourceDictionary>
                     <Style TargetType="{x:Type dnkc:AutoCompleteComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />

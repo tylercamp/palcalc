@@ -9,19 +9,20 @@
         WindowStyle="ToolWindow"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
+        Style="{StaticResource CustomWindowStyle}"
         Title="About Pal Calc">
     <Window.DataContext>
         <local:AboutViewModel />
     </Window.DataContext>
     <StackPanel Orientation="Vertical" Margin="10,0,10,10">
         <StackPanel.Resources>
-            <Style TargetType="Label">
+            <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
                 <Setter Property="HorizontalAlignment" Value="Center" />
             </Style>
-            <Style TargetType="TextBlock">
+            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="HorizontalAlignment" Value="Center" />
             </Style>
-            <Style TargetType="Separator">
+            <Style TargetType="Separator" BasedOn="{StaticResource {x:Type Separator}}">
                 <Setter Property="Margin" Value="0,10,0,10" />
             </Style>
         </StackPanel.Resources>

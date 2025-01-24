@@ -14,8 +14,9 @@
         <TreeView.BorderBrush>
             <SolidColorBrush Color="White" Opacity="0" />
         </TreeView.BorderBrush>
+        <TreeView.InputBindings />
         <TreeView.ItemContainerStyle>
-            <Style TargetType="TreeViewItem">
+            <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                 <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                 <Setter Property="IsExpanded" Value="True" />
                 
