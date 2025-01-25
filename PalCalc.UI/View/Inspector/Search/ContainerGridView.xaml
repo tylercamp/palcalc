@@ -17,16 +17,38 @@
     <StackPanel>
         <Label Content="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}, FallbackValue=Collapsed}" FontWeight="Bold" />
         <ListView ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}" SelectionMode="Single">
-
+            <!--
+            Reapply control template with the default <Border> element, BUT without the <ScrollViewer>
+            (which caused scroll events to be eaten and prevent scrolling within the parent container)
+            -->
             <ListView.Template>
+                <!-- (base WPF template) -->
+                <!--
                 <ControlTemplate>
-                    <!--
-                    Reapply control template with the default <Border> element, BUT without the <ScrollViewer>
-                    (which caused scroll events to be eaten and prevent scrolling within the parent container)
-                    -->
                     <Border BorderBrush="#FFABADB3" BorderThickness="1" Background="White" Padding="1">
                         <ItemsPresenter />
                     </Border>
+                </ControlTemplate>
+                -->
+
+                <!-- (WPFDarkTheme template) -->
+                <ControlTemplate TargetType="{x:Type ListView}">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="0" SnapsToDevicePixels="True">
+                        <ItemsPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource ListBox.Disabled.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource ListBox.Disabled.Border}"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsGrouping" Value="true"/>
+                                <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </ListView.Template>
 
