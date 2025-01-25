@@ -64,11 +64,11 @@ namespace Theme.WPF.Themes
             // This seems to be faster than reloading the whole file, and it also seems to work
             if (clearTheme)
             {
-                merged.Insert(2, new ResourceDictionary() { Source = new Uri($"Themes/DefaultControls.xaml", UriKind.Relative) });
+                merged.Insert(2, new ResourceDictionary() { Source = new Uri($"Themes/WPFDarkTheme/DefaultControls.xaml", UriKind.Relative) });
             }
             else
             {
-                merged.Insert(2, new ResourceDictionary() { Source = new Uri($"Themes/Controls.xaml", UriKind.Relative) });
+                merged.Insert(2, new ResourceDictionary() { Source = new Uri($"Themes/WPFDarkTheme/Controls.xaml", UriKind.Relative) });
             }
 
             // If the above doesn't work then fall back to this
@@ -106,8 +106,8 @@ namespace Theme.WPF.Themes
             if (changedThemeType && !forceTheme) return false;
 
             CurrentTheme = theme;
-            ThemeDictionary = new ResourceDictionary() { Source = new Uri($"Themes/ColourDictionaries/{themeName}.xaml", UriKind.Relative) };
-            ControlColours = new ResourceDictionary() { Source = new Uri("Themes/ControlColours.xaml", UriKind.Relative) };
+            ThemeDictionary = new ResourceDictionary() { Source = new Uri($"Themes/WPFDarkTheme/ColourDictionaries/{themeName}.xaml", UriKind.Relative) };
+            ControlColours = new ResourceDictionary() { Source = new Uri("Themes/WPFDarkTheme/ControlColours.xaml", UriKind.Relative) };
 
             RefreshControls(clearTheme: theme == ThemeType.None);
 

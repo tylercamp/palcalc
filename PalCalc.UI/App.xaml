@@ -8,9 +8,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
 
-                <ResourceDictionary Source="Themes/ColourDictionaries/SoftDark.xaml"/>
-                <ResourceDictionary Source="Themes/ControlColours.xaml"/>
-                <ResourceDictionary Source="Themes/Controls.xaml"/>
+                <ResourceDictionary Source="Themes/WPFDarkTheme/ColourDictionaries/SoftDark.xaml"/>
+                <ResourceDictionary Source="Themes/WPFDarkTheme/ControlColours.xaml"/>
+                <ResourceDictionary Source="Themes/WPFDarkTheme/Controls.xaml"/>
 
                 <!-- (not committing to a theme yet, but using this to test existing controls for any styling issues) -->
                 <!--
