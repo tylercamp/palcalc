@@ -16,6 +16,52 @@
           util:GridViewSort.AutoSort="True"
           Style="{StaticResource {x:Type ListView}}"
           >
+    <ListView.ItemContainerStyle>
+        <!--
+        The WPFDarkTheme style for ListViewItem can't dynamically handle the use of `DataView` as the underlying ListView.View
+        
+        https://github.com/AngryCarrot789/WPFDarkTheme/issues/41
+        -->
+        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListViewItem}">
+                        <Border x:Name="Bd" Padding="2" SnapsToDevicePixels="true" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                            <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Bd" Value="{DynamicResource Item.MouseOver.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource Item.MouseOver.Border}"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                                    <Condition Property="IsSelected" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Bd" Value="{DynamicResource Item.SelectedInactive.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource Item.SelectedInactive.Border}"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Selector.IsSelectionActive" Value="True"/>
+                                    <Condition Property="IsSelected" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Bd" Value="{DynamicResource Item.SelectedActive.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource Item.SelectedActive.Border}"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource ABrush.Foreground.Disabled}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </ListView.ItemContainerStyle>
     <ListView.View>
         <GridView>
             <GridView.Columns>
