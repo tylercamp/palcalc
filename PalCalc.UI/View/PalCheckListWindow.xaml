@@ -33,6 +33,7 @@
         <ListView Grid.Row="1"
                   ItemsSource="{Binding VisibleEntries}"
                   util:GridViewSort.AutoSort="True"
+                  ItemContainerStyle="{StaticResource ListViewItem_DataViewItemContainerStyle}"
                   >
             <ListView.View>
                 <GridView>

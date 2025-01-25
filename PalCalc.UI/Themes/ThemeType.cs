@@ -10,6 +10,7 @@ namespace Theme.WPF.Themes
         GreyTheme,
         DarkGreyTheme,
         LightTheme,
+        None,
     }
 
     public static class ThemeTypeExtension
@@ -24,6 +25,7 @@ namespace Theme.WPF.Themes
                 case ThemeType.GreyTheme: return "GreyTheme";
                 case ThemeType.DarkGreyTheme: return "DarkGreyTheme";
                 case ThemeType.LightTheme: return "LightTheme";
+                case ThemeType.None: return "NoTheme";
                 default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }

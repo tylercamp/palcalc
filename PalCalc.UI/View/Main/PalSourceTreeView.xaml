@@ -16,6 +16,7 @@
         </TreeView.BorderBrush>
         <TreeView.InputBindings />
         <TreeView.ItemContainerStyle>
+            <!-- explicitly reference WPFDarkTheme style, doesn't work properly without this for some reason -->
             <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItemStyle}">
                 <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                 <Setter Property="IsExpanded" Value="True" />
