@@ -12,11 +12,36 @@ Logging.InitCommonFull();
 
 var db = PalDB.LoadEmbedded();
 
-//CompressedSAV.WithDecompressedSave(@"C:\Users\algor\Desktop\Wormhole PeQoN\Level.sav", stream =>
+//var locs = XboxSavesLocation.FindAll();
+
+//CompressedSAV.WithDecompressedSave(@"C:\Users\algor\AppData\Local\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData\wgs\0009000009374154_0000000000000000000000006B210A9C\9E4FC968024C4FF8989588B179E6E82F\DF1AB54D4A0B442C99F0D3790F50811A", s =>
 //{
-//    using (var f = new FileStream("decompressed", FileMode.Create))
-//        stream.CopyTo(f);
+//    using (var f = new FArchiveReader(s, PalWorldTypeHints.Hints))
+//    {
+//        var r = GvasFile.FromFArchive(f, []);
+//    }
+
 //});
+
+CompressedSAV.WithDecompressedAggregateSave(
+    [
+        @"C:\Users\algor\Downloads\palworld_2533274945012052_2025-01-25_16_45_56\F76A9C474B9CDEE155A6C6A38FCCBD39\Level\01.sav",
+        @"C:\Users\algor\Downloads\palworld_2533274945012052_2025-01-25_16_45_56\F76A9C474B9CDEE155A6C6A38FCCBD39\Level\02.sav"
+    ],
+    stream =>
+    {
+        using (var fa = new FArchiveReader(stream, PalWorldTypeHints.Hints, archivePreserve: true))
+        {
+            var gvas = GvasFile.FromFArchive(fa, []);
+        }
+    }
+);
+
+CompressedSAV.WithDecompressedSave(@"C:\Users\algor\Downloads\palworld_2533274945012052_2025-01-25_16_45_56\F76A9C474B9CDEE155A6C6A38FCCBD39\Level\01.sav", stream =>
+{
+    using (var f = new FileStream("decompressed", FileMode.Create))
+        stream.CopyTo(f);
+});
 var save3 = new StandardSaveGame(@"C:\Users\algor\OneDrive\Desktop\Palworld-000900000986B166_0000000000000000000000006B210A9C-F0CEFEA04271692EB202A78E57A3A40D");
 var v2 = new MapObjectVisitor(GvasMapObject.PalBoxObjectId, GvasMapObject.ViewingCageObjectId);
 var level3 = save3.Level.ParseGvas(true, v2);

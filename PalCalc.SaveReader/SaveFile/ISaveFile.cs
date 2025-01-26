@@ -23,7 +23,7 @@ namespace PalCalc.SaveReader.SaveFile
 
         public DateTime LastModified => File.GetLastWriteTime(FilePath);
 
-        protected void VisitGvas(params IVisitor[] visitors)
+        protected virtual void VisitGvas(params IVisitor[] visitors)
         {
             CompressedSAV.WithDecompressedSave(FilePath, stream =>
             {
@@ -43,7 +43,7 @@ namespace PalCalc.SaveReader.SaveFile
         /// </summary>
         /// <param name="preserveValues"></param>
         /// <returns>A `GvasFile` with a populated `Properties` field (if `preserveValues = true`)</returns>
-        public GvasFile ParseGvas(bool preserveValues, params IVisitor[] visitors)
+        public virtual GvasFile ParseGvas(bool preserveValues, params IVisitor[] visitors)
         {
             GvasFile result = null;
             CompressedSAV.WithDecompressedSave(FilePath, stream =>

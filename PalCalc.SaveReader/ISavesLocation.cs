@@ -132,8 +132,6 @@ namespace PalCalc.SaveReader
                             // all of the files are stored in their own folders, where the "real" file name is always just "Data"
                             if (saveFile.Name != "Data") continue;
 
-                            if (!CompressedSAV.IsValidSave(saveFile.Path)) continue;
-
                             collectedSaveFiles.Add(new XboxSaveFile() { FilePath = saveFile.Path, FileName = saveFileFolder.Name });
                         }
                     }
@@ -154,16 +152,16 @@ namespace PalCalc.SaveReader
                             // get `-1` appended (or the next number after that). sort by this last part and take the highest number
                             //
                             // TODO - not sure if this is the right approach, or if the `Level.sav` file is always the latest
-                            var levelFile = filesByType.GetValueOrDefault("Level")
-                                ?.OrderByDescending(l => int.Parse(l.FileName.Split('-').Skip(2).FirstOrDefault() ?? "0"))
-                                ?.FirstOrDefault();
+                            var levelFiles = filesByType
+                                .GetValueOrDefault("Level")
+                                ?.OrderBy(l => int.Parse(l.FileName.Split('-').Skip(2).FirstOrDefault() ?? "0"));
 
                             var watchers = new List<FileSystemWatcher>();
 
-                            if (levelFile != null)
+                            if (levelFiles != null)
                             {
-                                level = new LevelSaveFile(levelFile.FilePath);
-                                watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(levelFile.FilePath)));
+                                level = new AggregateLevelSaveFile(levelFiles.Select(f => new LevelSaveFile(f.FilePath)).ToArray());
+                                watchers.AddRange(levelFiles.Select(f => new FileSystemWatcher(Path.GetDirectoryName(f.FilePath))));
                             }
 
                             var levelMetaFile = filesByType.GetValueOrDefault("LevelMeta")?.FirstOrDefault();
