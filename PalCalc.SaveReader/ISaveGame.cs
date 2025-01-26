@@ -35,18 +35,47 @@ namespace PalCalc.SaveReader
         private FileSystemWatcher folderWatcher;
         public event Action<ISaveGame> Updated;
 
+        private string[] ResolvePaths(string basePath)
+        {
+            // when a save file is split across multiple files, detect those and return the appropriate paths
+            // (usually only happens when an Xbox save is exported)
+
+            var baseName = Path.GetFileNameWithoutExtension(basePath);
+            var baseExt = Path.GetExtension(basePath);
+
+            var matchingFiles = Directory
+                .EnumerateFiles(Path.GetDirectoryName(basePath))
+                .Where(p => Path.GetFileName(p).StartsWith(baseName))
+                .Where(p => Path.GetExtension(p) == baseExt)
+                .Where(p =>
+                {
+                    // (prevent `Level.sav` from matching `LevelMeta.sav`)
+                    var name = Path.GetFileNameWithoutExtension(p);
+                    if (name == baseName) return true;
+
+                    char[] allowedChars = ['-', '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+                    return allowedChars.Contains(name[baseName.Length]);
+                })
+                .OrderBy(Path.GetFileNameWithoutExtension)
+                .ToArray();
+
+            if (matchingFiles.Length == 0) return [basePath];
+            else return matchingFiles;
+        }
+
         public StandardSaveGame(string basePath)
         {
             BasePath = basePath;
 
-            Level = new LevelSaveFile(Path.Join(basePath, "Level.sav"));
-            LevelMeta = new LevelMetaSaveFile(Path.Join(basePath, "LevelMeta.sav"));
-            LocalData = new LocalDataSaveFile(Path.Join(basePath, "LocalData.sav"));
-            WorldOption = new WorldOptionSaveFile(Path.Join(basePath, "WorldOption.sav"));
+            Level = new LevelSaveFile(ResolvePaths(Path.Join(basePath, "Level.sav")));
+            LevelMeta = new LevelMetaSaveFile(ResolvePaths(Path.Join(basePath, "LevelMeta.sav")));
+            LocalData = new LocalDataSaveFile(ResolvePaths(Path.Join(basePath, "LocalData.sav")));
+            WorldOption = new WorldOptionSaveFile(ResolvePaths(Path.Join(basePath, "WorldOption.sav")));
 
             var playersPath = Path.Join(basePath, "Players");
             if (Directory.Exists(playersPath))
-                Players = Directory.EnumerateFiles(playersPath, "*.sav").Select(f => new PlayersSaveFile(f)).ToList();
+                Players = Directory.EnumerateFiles(playersPath, "*.sav").Select(f => new PlayersSaveFile([f])).ToList();
             else
                 Players = new List<PlayersSaveFile>();
 

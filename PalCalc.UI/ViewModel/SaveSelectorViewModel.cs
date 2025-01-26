@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
+using PalCalc.SaveReader.SaveFile;
 using PalCalc.SaveReader.SaveFile.Virtual;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
@@ -25,6 +26,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Windows.ApplicationModel.Background;
 using Windows.UI.WebUI;
 
 namespace PalCalc.UI.ViewModel
@@ -72,7 +74,7 @@ namespace PalCalc.UI.ViewModel
 
                     case NewManualSaveGameViewModel:
                         var ofd = new OpenFileDialog();
-                        ofd.Filter = LocalizationCodes.LC_MANUAL_SAVE_EXTENSION_LBL.Bind().Value + "|Level.sav";
+                        ofd.Filter = LocalizationCodes.LC_MANUAL_SAVE_EXTENSION_LBL.Bind().Value + "|Level*.sav";
                         ofd.Title = LocalizationCodes.LC_MANUAL_SAVE_SELECTOR_TITLE.Bind().Value;
 
                         if (true == ofd.ShowDialog(App.Current.MainWindow))
@@ -194,21 +196,45 @@ namespace PalCalc.UI.ViewModel
                         {
                             var save = SelectedFullGame.Value;
 
+                            void Export(ISaveFile file, string basePath)
+                            {
+                                if (file.FilePaths.Length == 1)
+                                {
+                                    archive.CreateEntryFromFile(file.FilePaths[0], $"{basePath}.sav");
+                                }
+                                else
+                                {
+                                    for (int i = 0; i < file.FilePaths.Length; i++)
+                                    {
+                                        archive.CreateEntryFromFile(file.FilePaths[i], $"{basePath}-{i}.sav");
+                                    }
+                                }
+                            }
+
                             if (save.Level != null && save.Level.Exists)
-                                archive.CreateEntryFromFile(save.Level.FilePath, "Level.sav");
+                                Export(save.Level, "Level");
 
                             if (save.LevelMeta != null && save.LevelMeta.Exists)
-                                archive.CreateEntryFromFile(save.LevelMeta.FilePath, "LevelMeta.sav");
+                                Export(save.LevelMeta, "LevelMeta");
 
                             if (save.WorldOption != null && save.WorldOption.Exists)
-                                archive.CreateEntryFromFile(save.WorldOption.FilePath, "WorldOption.sav");
+                                Export(save.WorldOption, "WorldOption");
 
                             if (save.LocalData != null && save.LocalData.Exists)
-                                archive.CreateEntryFromFile(save.LocalData.FilePath, "LocalData.sav");
+                                Export(save.LocalData, "LocalData");
 
                             foreach (var player in save.Players.Where(p => p.Exists))
                             {
-                                archive.CreateEntryFromFile(player.FilePath, $"Players/{Path.GetFileName(player.FilePath)}");
+                                string playerId;
+                                try
+                                {
+                                    playerId = player.ReadPlayerContent().PlayerId;
+                                }
+                                catch
+                                {
+                                    playerId = Path.GetFileNameWithoutExtension(player.FilePaths[0]);
+                                }
+                                Export(player, $"Players/{playerId}");
                             }
                         }
                     }

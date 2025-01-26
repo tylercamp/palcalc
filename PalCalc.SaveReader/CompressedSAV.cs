@@ -59,7 +59,7 @@ namespace PalCalc.SaveReader
             {
                 var res = new CompressedSAVHeader();
 
-                // TODO - seems incorrect when `WRAPPER_MAGIC_BYTES` matches, though this 8-byte offset is needed with/without that match
+                // TODO - seems incorrect when `HasGamePassMarker` matches, though this 8-byte offset is needed with/without that match
                 res.UncompressedLength = binaryReader.ReadInt32();
                 res.CompressedLength = binaryReader.ReadInt32();
 
@@ -75,7 +75,8 @@ namespace PalCalc.SaveReader
 
                     if (compressionFormat == null)
                     {
-                        // partial save files don't have the PLZ type marker, and the data starts immediately after CNK0.
+                        // XGP saves can be split across multiple files. Partial save files don't have the PlZ type marker,
+                        // and the data starts immediately after CNK0.
                         //
                         // reverse back to the start of the intended data block
                         stream.Seek(-12, SeekOrigin.Current);

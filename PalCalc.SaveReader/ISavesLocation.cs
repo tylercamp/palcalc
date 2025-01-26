@@ -160,28 +160,28 @@ namespace PalCalc.SaveReader
 
                             if (levelFiles != null)
                             {
-                                level = new AggregateLevelSaveFile(levelFiles.Select(f => new LevelSaveFile(f.FilePath)).ToArray());
+                                level = new LevelSaveFile(levelFiles.Select(f => f.FilePath).ToArray());
                                 watchers.AddRange(levelFiles.Select(f => new FileSystemWatcher(Path.GetDirectoryName(f.FilePath))));
                             }
 
                             var levelMetaFile = filesByType.GetValueOrDefault("LevelMeta")?.FirstOrDefault();
                             if (levelMetaFile != null)
                             {
-                                levelMeta = new LevelMetaSaveFile(levelMetaFile.FilePath);
+                                levelMeta = new LevelMetaSaveFile([levelMetaFile.FilePath]);
                                 watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(levelMetaFile.FilePath)));
                             }
 
                             var localDataFile = filesByType.GetValueOrDefault("LocalData")?.FirstOrDefault();
                             if (localDataFile != null)
                             {
-                                localData = new LocalDataSaveFile(localDataFile.FilePath);
+                                localData = new LocalDataSaveFile([localDataFile.FilePath]);
                                 watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(localDataFile.FilePath)));
                             }
 
                             var worldOptionFile = filesByType.GetValueOrDefault("WorldOption")?.FirstOrDefault();
                             if (worldOptionFile != null)
                             {
-                                worldOption = new WorldOptionSaveFile(worldOptionFile.FilePath);
+                                worldOption = new WorldOptionSaveFile([worldOptionFile.FilePath]);
                                 watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(worldOptionFile.FilePath)));
                             }
 
@@ -190,7 +190,7 @@ namespace PalCalc.SaveReader
                                 .Select(f =>
                                 {
                                     watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(f.FilePath)));
-                                    return new PlayersSaveFile(f.FilePath);
+                                    return new PlayersSaveFile([f.FilePath]);
                                 })
                                 .ToList();
 

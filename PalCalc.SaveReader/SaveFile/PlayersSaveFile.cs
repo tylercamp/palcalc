@@ -19,7 +19,7 @@ namespace PalCalc.SaveReader.SaveFile
 
     public class PlayersSaveFile : ISaveFile
     {
-        public PlayersSaveFile(string filePath) : base(filePath)
+        public PlayersSaveFile(string[] filePaths) : base(filePaths)
         {
         }
 
