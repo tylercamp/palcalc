@@ -16,22 +16,42 @@ using System.Threading.Tasks;
 // palsav.py
 namespace PalCalc.SaveReader
 {
+    public enum TypeMarker
+    {
+        PLZ1        = 0b0000_0001 | TYPE_PLZ,
+        PLZ2        = 0b0000_0010 | TYPE_PLZ,
+        PLZ_Unknown = 0b0000_0000 | TYPE_PLZ,
+        TYPE_PLZ    = 0b1000_0000,
+
+        CNK0        = 0b0000_0001 | TYPE_CNK,
+        CNK_Unknown = 0b0000_0000 | TYPE_CNK,
+        TYPE_CNK    = 0b0100_0000,
+    }
+
     public class CompressedSAVHeader
     {
-        public bool HasMagicBytes_Wrapper { get; set; }
-        public bool HasMagicBytes_Main { get; set; }
+        public bool HasGamePassMarker { get; set; }
+        public bool HasCompressionMarker { get; set; }
 
         public int UncompressedLength { get; set; }
         public int CompressedLength { get; set; }
 
-        public byte CompressionTypeId { get; set; }
+        public bool DoubleCompressed { get; set; }
 
-        // don't know what this is, but I've seen this in newer palworld saves from Game Pass. seems
-        // to clear itself up (back to normal format) after the game has been closed for a little while.
-        // likely an indicator of unsynced save or something like that.
-        static byte[] WRAPPER_MAGIC_BYTES = Encoding.ASCII.GetBytes("CNK");
+        private static TypeMarker? ParseTypeMarker(byte[] data) => Encoding.ASCII.GetString(data) switch
+        {
+            "PlZ1" => TypeMarker.PLZ1,
+            "PlZ2" => TypeMarker.PLZ2,
+            var s when s.StartsWith("PlZ") => TypeMarker.PLZ_Unknown,
 
-        static byte[] MAGIC_BYTES = Encoding.ASCII.GetBytes("PlZ");
+            // don't know what this is, but I've seen this in newer palworld saves from Game Pass. seems
+            // to clear itself up (back to normal format) after the game has been closed for a little while.
+            // likely an indicator of unsynced save or something like that.
+            "CNK0" => TypeMarker.CNK0,
+            var s when s.StartsWith("CNK") => TypeMarker.CNK_Unknown,
+
+            _ => null
+        };
 
         public static CompressedSAVHeader Read(Stream stream)
         {
@@ -43,19 +63,27 @@ namespace PalCalc.SaveReader
                 res.UncompressedLength = binaryReader.ReadInt32();
                 res.CompressedLength = binaryReader.ReadInt32();
 
-                var magicBytes = binaryReader.ReadBytes(3);
-                if (WRAPPER_MAGIC_BYTES.SequenceEqual(magicBytes))
+                var compressionFormat = ParseTypeMarker(binaryReader.ReadBytes(4));
+
+                if (compressionFormat != null && compressionFormat.Value.HasFlag(TypeMarker.TYPE_CNK))
                 {
-                    res.HasMagicBytes_Wrapper = true;
+                    res.HasGamePassMarker = true;
 
                     // unknown content
-                    binaryReader.ReadBytes(9);
+                    binaryReader.ReadBytes(8);
+                    compressionFormat = ParseTypeMarker(binaryReader.ReadBytes(4));
 
-                    magicBytes = binaryReader.ReadBytes(3);
+                    if (compressionFormat == null)
+                    {
+                        // partial save files don't have the PLZ type marker, and the data starts immediately after CNK0.
+                        //
+                        // reverse back to the start of the intended data block
+                        stream.Seek(-12, SeekOrigin.Current);
+                    }
                 }
 
-                res.HasMagicBytes_Main = MAGIC_BYTES.SequenceEqual(magicBytes);
-                res.CompressionTypeId = binaryReader.ReadByte();
+                res.HasCompressionMarker = compressionFormat != null;
+                res.DoubleCompressed = compressionFormat == TypeMarker.PLZ2;
 
                 return res;
             }
@@ -110,16 +138,10 @@ namespace PalCalc.SaveReader
 
                 using (var decompressed = new InflaterInputStream(fs))
                 {
-                    if (!header.HasMagicBytes_Main) throw new Exception("Magic bytes mismatch");
+                    if (!header.HasCompressionMarker)
+                        throw new Exception("Magic bytes mismatch");
 
-                    switch (header.CompressionTypeId)
-                    {
-                        case 0x31: break;
-                        case 0x32: break;
-                        default: throw new Exception("Unrecognized compression type");
-                    }
-
-                    if (header.CompressionTypeId == 0x32)
+                    if (header.DoubleCompressed)
                     {
                         using (var doubleDecompressed = new InflaterInputStream(decompressed))
                             action(doubleDecompressed);
@@ -142,16 +164,12 @@ namespace PalCalc.SaveReader
             {
                 using var fs = ReadFileNonLocking(file);
 
+                var header = CompressedSAVHeader.Read(fs);
+
                 if (firstFileHeader == null)
                 {
-                    var header = CompressedSAVHeader.Read(fs);
-
-                    if (!header.HasMagicBytes_Main) throw new Exception("Magic bytes mismatch");
+                    if (!header.HasCompressionMarker) throw new Exception("Magic bytes mismatch");
                     firstFileHeader = header;
-                }
-                else
-                {
-                    fs.Seek(12, SeekOrigin.Begin);
                 }
 
                 fs.CopyTo(combinedStream);
@@ -160,7 +178,7 @@ namespace PalCalc.SaveReader
             using (var readStream = new MemoryStream(combinedStream.ToArray()))
             using (var decompressed = new InflaterInputStream(readStream))
             {
-                if (firstFileHeader.CompressionTypeId == 0x32)
+                if (firstFileHeader.DoubleCompressed)
                 {
                     using (var doubleDecompressed = new InflaterInputStream(decompressed))
                         action(doubleDecompressed);
@@ -177,15 +195,7 @@ namespace PalCalc.SaveReader
             using (var fs = ReadFileNonLocking(filePath))
             using (var binaryReader = new BinaryReader(fs))
             {
-                var header = CompressedSAVHeader.Read(fs);
-                if (!header.HasMagicBytes_Main) return false;
-
-                switch (header.CompressionTypeId)
-                {
-                    case 0x31: return true;
-                    case 0x32: return true;
-                    default: return false;
-                }
+                return CompressedSAVHeader.Read(fs).HasCompressionMarker;
             }
         }
     }
