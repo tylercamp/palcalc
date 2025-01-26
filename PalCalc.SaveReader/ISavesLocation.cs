@@ -132,6 +132,8 @@ namespace PalCalc.SaveReader
                             // all of the files are stored in their own folders, where the "real" file name is always just "Data"
                             if (saveFile.Name != "Data") continue;
 
+                            if (!CompressedSAV.IsValidSave(saveFile.Path)) continue;
+
                             collectedSaveFiles.Add(new XboxSaveFile() { FilePath = saveFile.Path, FileName = saveFileFolder.Name });
                         }
                     }
