@@ -43,6 +43,12 @@ namespace Theme.WPF.Themes
             }
         }
 
+        public static bool IsNativeTheme =>
+            DesignerProperties.GetIsInDesignMode(new DependencyObject())
+                ? File.ReadAllText("PalCalc.UI/App.xaml").Contains("NoTheme")
+                : CurrentTheme == ThemeType.None;
+        public static bool IsCustomTheme => !IsNativeTheme;
+
         private static ResourceDictionary ThemeDictionary
         {
             get => Application.Current.Resources.MergedDictionaries[0];

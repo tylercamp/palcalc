@@ -1,6 +1,14 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox">
+    
+    <!--
+    these changes are reloaded after the WPFDarkTheme theme has been applied, since styles with `BasedOn`
+    won't update when the underlying `BasedOn` style changes - see App.xaml.cs
+    
+    (otherwise these would just be in App.xaml)
+    -->
+    
     <!--
     fix for XAML binding errors involving combobox
     https://gist.github.com/TobiasSekan/73a93c2dfea4a051ff72abb5218d6f8f

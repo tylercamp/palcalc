@@ -11,16 +11,33 @@
       xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
       xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
       mc:Ignorable="d"
-      d:Background="White"
       d:Width="1280" d:Height="720"
       xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
       xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
+      xmlns:thm="clr-namespace:Theme.WPF.Themes"
       d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Page.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
+
+        <Style TargetType="GroupBox" BasedOn="{StaticResource {x:Type GroupBox}}">
+            <Style.Triggers>
+                <thm:CustomThemeTrigger>
+                    <Setter Property="Padding" Value="3,3,3,5" />
+                </thm:CustomThemeTrigger>
+            </Style.Triggers>
+        </Style>
     </Page.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
+            <Menu.Style>
+                <Style TargetType="Menu" BasedOn="{StaticResource {x:Type Menu}}">
+                    <Style.Triggers>
+                        <thm:CustomThemeTrigger>
+                            <Setter Property="Padding" Value="1,5,1,1" />
+                        </thm:CustomThemeTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Menu.Style>
             <MenuItem Header="{itl:LocalizedText LC_LANGUAGE}" ItemsSource="{Binding Locales}">
                 <MenuItem.ItemTemplate>
                     <DataTemplate>
@@ -30,9 +47,8 @@
                 </MenuItem.ItemTemplate>
             </MenuItem>
 
-            <MenuItem Header="Themes">
-                <MenuItem Header="Avaliable Themes Below"/>
-                <MenuItem Header="Deep Dark" Click="ChangeTheme" Uid="0">
+            <MenuItem Header="Themes" IsEnabled="{Binding IsEditable}">
+                <MenuItem IsCheckable="True" Header="Deep Dark" Click="ChangeTheme" Uid="0" IsChecked="True">
                     <MenuItem.Icon>
                         <Rectangle Stroke="#FF232323" Fill="#FF1B1B1B" StrokeThickness="2" StrokeLineJoin="Round" />
                     </MenuItem.Icon>
