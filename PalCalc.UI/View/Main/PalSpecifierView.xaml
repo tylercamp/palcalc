@@ -10,7 +10,6 @@
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              mc:Ignorable="d" 
-             d:Background="White"
              d:DataContext="{x:Static mvm:PalSpecifierViewModel.DesignerInstance}">
     <UserControl.Resources>
         <c:CollectionVisibilityConverter x:Key="CVC" />

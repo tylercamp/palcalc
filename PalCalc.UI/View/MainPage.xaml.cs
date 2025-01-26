@@ -95,8 +95,6 @@ namespace PalCalc.UI
                             FileName = p.MainModule.FileName,
                             WorkingDirectory = Directory.GetCurrentDirectory(),
                         });
-
-                        
                     };
 
                     App.Current.Shutdown(0);

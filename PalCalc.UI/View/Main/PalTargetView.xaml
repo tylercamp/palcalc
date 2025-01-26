@@ -9,7 +9,6 @@
             xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
-            d:Background="White"
             mc:Ignorable="d" 
             d:DataContext="{d:DesignInstance vm:PalTargetViewModel, IsDesignTimeCreatable=True}"
             d:DesignHeight="401.428" d:DesignWidth="178.928">

@@ -107,10 +107,14 @@ namespace PalCalc.UI.ViewModel
             ResumeSolverCommand = new RelayCommand(ResumeSolver);
             CancelSolverCommand = new RelayCommand(CancelSolver);
 
-            App.Current.MainWindow.Closing += (o, e) =>
+            if (App.Current.MainWindow != null)
             {
-                CancelSolverCommand.Execute(null);
-            };
+                // (needed for XAML designer view)
+                App.Current.MainWindow.Closing += (o, e) =>
+                {
+                    CancelSolverCommand.Execute(null);
+                };
+            }
 
             SolverControls = new SolverControlsViewModel(
                 runSolverCommand: RunSolverCommand,
@@ -200,7 +204,7 @@ namespace PalCalc.UI.ViewModel
 
             Storage.SaveReloaded += Storage_SaveReloaded;
 
-            dispatcher.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
+            dispatcher?.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
 
             passivePresets.PresetSelected += selectedPreset =>
             {
@@ -795,7 +799,7 @@ namespace PalCalc.UI.ViewModel
                                 var latestVersion = VersionFromUrl(latestVersionUrl);
                                 if (latestVersion != App.Version)
                                 {
-                                    dispatcher.BeginInvoke(() => UpdatesMessageVisibility = Visibility.Visible);
+                                    dispatcher?.BeginInvoke(() => UpdatesMessageVisibility = Visibility.Visible);
                                 }
                             }
                             else

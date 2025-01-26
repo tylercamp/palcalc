@@ -4219,7 +4219,7 @@
                         <Border x:Name="Header" Grid.Column="1" Padding="3,1,3,0" Grid.Row="0" Grid.RowSpan="2">
                             <ContentPresenter VerticalAlignment="Center" ContentSource="Header" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                         </Border>
-                        <Border Background="Transparent" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Margin="0,-1,0,0" Grid.ColumnSpan="4" Grid.Row="2" Grid.RowSpan="2">
+                        <Border Background="Transparent" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Margin="0,-1,0,0" Grid.ColumnSpan="4" Grid.Row="2" Grid.RowSpan="2" Padding="{TemplateBinding Padding}">
                             <ContentPresenter x:Name="Contents" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                         </Border>
                     </Grid>
@@ -5374,6 +5374,14 @@
     </ControlTemplate>
 
     <Style x:Key="CustomWindowStyle" TargetType="{x:Type Window}">
+        <!-- CHANGED -->
+        <!-- https://github.com/AngryCarrot789/WPFDarkTheme/issues/40#issuecomment-2360946495 -->
+        <Style.Resources>
+            <Style TargetType="Border">
+                <Setter Property="Margin" Value="-1"/>
+            </Style>
+        </Style.Resources>
+        
         <Setter Property="Background" Value="{DynamicResource Window.Static.Background}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource Window.Static.Border}"/>
         <Setter Property="Foreground" Value="{DynamicResource Window.Static.Foreground}"/>
