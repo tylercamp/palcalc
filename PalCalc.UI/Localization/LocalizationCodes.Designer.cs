@@ -178,6 +178,18 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMMON_LOCATION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMMON_MAP_COORDS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMMON_OWNER,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMMON_PAL,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -267,6 +279,14 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_EXPORT_SAVE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_EXPORT_SAVE_CSV,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_EXPORT_SAVE_CSV_DESCRIPTION,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

@@ -721,6 +721,21 @@
   <data name="LC_COMMON_GENDER_NONE" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_COMMON_LOCATION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_MAP_COORDS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_OWNER" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_EXPORT_SAVE_CSV" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_EXPORT_SAVE_CSV_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
   <data name="LC_SETTINGS_PALBOX_TAB_SIZE" xml:space="preserve">
     <value />
   </data>

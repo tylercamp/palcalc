@@ -8,6 +8,7 @@ using PalCalc.SaveReader.SaveFile;
 using PalCalc.SaveReader.SaveFile.Virtual;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.Model.CSV;
 using PalCalc.UI.View;
 using PalCalc.UI.View.Inspector;
 using PalCalc.UI.View.Utils;
@@ -149,6 +150,7 @@ namespace PalCalc.UI.ViewModel
                     }
 
                     ExportSaveCommand?.NotifyCanExecuteChanged();
+                    ExportSaveCsvCommand?.NotifyCanExecuteChanged();
                     InspectSaveCommand?.NotifyCanExecuteChanged();
                 }
             }
@@ -242,6 +244,25 @@ namespace PalCalc.UI.ViewModel
                 canExecute: () => SelectedFullGame?.Value != null
             );
 
+            ExportSaveCsvCommand = new RelayCommand(
+                execute: () =>
+                {
+                    var sfd = new SaveFileDialog()
+                    {
+                        FileName = $"Pals.csv",
+                        Filter = "CSV | *.csv",
+                        AddExtension = true,
+                        DefaultExt = "csv"
+                    };
+
+                    if (sfd.ShowDialog() == true)
+                    {
+                        File.WriteAllText(sfd.FileName, PalCSVExporter.Export(SelectedFullGame.CachedValue, GameSettingsViewModel.Load(SelectedFullGame.Value).ModelObject));
+                    }
+                },
+                canExecute: () => SelectedFullGame?.Value != null
+            );
+
             ExportCrashLogCommand = new RelayCommand(
                 execute: () =>
                 {
@@ -310,6 +331,13 @@ namespace PalCalc.UI.ViewModel
         {
             get => exportSaveCommand;
             private set => SetProperty(ref exportSaveCommand, value);
+        }
+
+        private IRelayCommand exportSaveCsvCommand;
+        public IRelayCommand ExportSaveCsvCommand
+        {
+            get => exportSaveCsvCommand;
+            private set => SetProperty(ref exportSaveCsvCommand, value);
         }
 
         private IRelayCommand exportCrashLogCommand;

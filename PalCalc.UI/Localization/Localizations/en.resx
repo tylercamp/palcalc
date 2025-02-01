@@ -202,6 +202,15 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_COMMON_LEVEL" xml:space="preserve">
     <value>Level</value>
   </data>
+  <data name="LC_COMMON_LOCATION" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="LC_COMMON_MAP_COORDS" xml:space="preserve">
+    <value>Map Coords</value>
+  </data>
+  <data name="LC_COMMON_OWNER" xml:space="preserve">
+    <value>Owner</value>
+  </data>
   <data name="LC_COMMON_PAL" xml:space="preserve">
     <value>Pal</value>
   </data>
@@ -282,6 +291,12 @@ Please find the generated ZIP file to send with any support questions:
   </data>
   <data name="LC_EXPORT_SAVE" xml:space="preserve">
     <value>Export Save</value>
+  </data>
+  <data name="LC_EXPORT_SAVE_CSV" xml:space="preserve">
+    <value>Export Save CSV</value>
+  </data>
+  <data name="LC_EXPORT_SAVE_CSV_DESCRIPTION" xml:space="preserve">
+    <value>Exports all pals in your save file to a CSV spreadsheet.</value>
   </data>
   <data name="LC_EXPORT_SAVE_DESCRIPTION" xml:space="preserve">
     <value>Exports all known Palworld files for the selected save as a ZIP.</value>
