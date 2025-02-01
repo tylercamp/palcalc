@@ -30,6 +30,8 @@ namespace PalCalc.UI.ViewModel.Mapped
             MultipleBreedingFarms = modelObject.MultipleBreedingFarms;
             PalboxTabWidth = modelObject.LocationTypeGridWidths[LocationType.Palbox];
             PalboxTabHeight = modelObject.LocationTypeGridHeights[LocationType.Palbox].Value;
+
+            AppRestartRequired = false;
         }
 
         [JsonIgnore]
@@ -63,11 +65,35 @@ namespace PalCalc.UI.ViewModel.Mapped
         [ObservableProperty]
         private bool multipleBreedingFarms;
 
-        [ObservableProperty]
         private int palboxTabWidth;
+        public int PalboxTabWidth
+        {
+            get => palboxTabWidth;
+            set
+            {
+                if (SetProperty(ref palboxTabWidth, value))
+                {
+                    AppRestartRequired = true;
+                    OnPropertyChanged(nameof(AppRestartRequired));
+                }
+            }
+        }
 
-        [ObservableProperty]
         private int palboxTabHeight;
+        public int PalboxTabHeight
+        {
+            get => palboxTabHeight;
+            set
+            {
+                if (SetProperty(ref palboxTabHeight, value))
+                {
+                    AppRestartRequired = true;
+                    OnPropertyChanged(nameof(AppRestartRequired));
+                }
+            }
+        }
+
+        public bool AppRestartRequired { get; private set; } = false;
 
         public string ToJson() => JsonConvert.SerializeObject(this);
         public static GameSettingsViewModel FromJson(string json)
@@ -80,6 +106,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 result.BreedingTimeSeconds = 60 * parsedJson["BreedingTimeMinutes"].ToObject<int>();
             }
 
+            result.AppRestartRequired = false;
             return result;
         }
 

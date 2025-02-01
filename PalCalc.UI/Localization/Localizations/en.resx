@@ -320,7 +320,7 @@ Please find the generated ZIP file to send with any support questions:
     <value>Language</value>
   </data>
   <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
-    <value>Pal Calc must be restarted to finish applying the new language.</value>
+    <value>Pal Calc must be restarted for the new language to fully apply.</value>
   </data>
   <data name="LC_LIST_SEPARATOR" xml:space="preserve">
     <value>, </value>
