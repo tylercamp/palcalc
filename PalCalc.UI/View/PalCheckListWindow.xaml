@@ -52,8 +52,13 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="{itl:LocalizedText LC_COMMON_ENABLED}"
-                                        util:GridViewSort.PropertyName="IsEnabled">
+                        <GridViewColumn util:GridViewSort.PropertyName="IsEnabled">
+                            <GridViewColumn.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding AllItemsEnabled}" Margin="4,1,5,0" />
+                                    <TextBlock Text="{itl:LocalizedText LC_COMMON_ENABLED}" />
+                                </StackPanel>
+                            </GridViewColumn.Header>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <CheckBox IsChecked="{Binding IsEnabled}" />
