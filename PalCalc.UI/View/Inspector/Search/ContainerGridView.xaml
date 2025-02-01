@@ -21,11 +21,13 @@
             <ListView.Template>
                 <ControlTemplate>
                     <!--
-                    Reapply control template with the default <Border> element, BUT without the <ScrollViewer>
-                    (which caused scroll events to be eaten and prevent scrolling within the parent container)
-                    -->
+                        Reapply control template with the default <Border> element, BUT without the <ScrollViewer>
+                        (which caused scroll events to be eaten and prevent scrolling within the parent container)
+                        -->
                     <Border BorderBrush="#FFABADB3" BorderThickness="1" Background="White" Padding="1">
-                        <ItemsPresenter />
+                        <Viewbox StretchDirection="DownOnly">
+                            <ItemsPresenter />
+                        </Viewbox>
                     </Border>
                 </ControlTemplate>
             </ListView.Template>
@@ -46,7 +48,7 @@
                             <Setter Property="Opacity" Value="0.25" />
                         </DataTrigger>
                     </Style.Triggers>
-                    
+
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="VerticalContentAlignment" Value="Stretch" />
                 </Style>
@@ -57,8 +59,8 @@
                         <ContentControl.Resources>
                             <DataTemplate DataType="{x:Type sgvm:ContainerGridEmptySlotViewModel}">
                                 <TextBlock Text="{itl:LocalizedText Code=LC_SAVEINSPECT_SLOT_EMPTY}"
-                                           VerticalAlignment="Center" HorizontalAlignment="Center"
-                                           Margin="0,0,5,0" />
+                                               VerticalAlignment="Center" HorizontalAlignment="Center"
+                                               Margin="0,0,5,0" />
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type sgvm:ContainerGridPalSlotViewModel}">
                                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

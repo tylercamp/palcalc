@@ -35,6 +35,13 @@
                                 <UniformGrid Columns="{Binding NumCols}" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                                <Viewbox StretchDirection="DownOnly" Stretch="Uniform">
+                                    <ItemsPresenter />
+                                </Viewbox>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
                         <ItemsControl.Resources>
                             <Style TargetType="Border" x:Key="SlotStyle">
                                 <Setter Property="HorizontalAlignment" Value="Stretch" />
