@@ -45,7 +45,7 @@
                     </GroupBox>
 
                     <GroupBox Header="{itl:LocalizedText LC_GAME_SETTINGS}">
-                        <v:GameSettingsView DataContext="{Binding GameSettings}" />
+                        <v:GameSettingsView DataContext="{Binding SelectedGameSettings}" />
                     </GroupBox>
                 </StackPanel>
 

@@ -20,16 +20,16 @@ namespace PalCalc.UI.ViewModel.Mapped
         private static ILogger logger = Log.ForContext<GameSettingsViewModel>();
 
         // for XAML designer view
-        public GameSettingsViewModel()
+        public GameSettingsViewModel() : this(GameSettings.Defaults)
         {
-            BreedingTimeSeconds = (int)new GameSettings().BreedingTime.TotalSeconds;
-            MultipleBreedingFarms = true;
         }
 
         public GameSettingsViewModel(GameSettings modelObject)
         {
             BreedingTimeSeconds = (int)modelObject.BreedingTime.TotalSeconds;
             MultipleBreedingFarms = modelObject.MultipleBreedingFarms;
+            PalboxTabWidth = modelObject.LocationTypeGridWidths[LocationType.Palbox];
+            PalboxTabHeight = modelObject.LocationTypeGridHeights[LocationType.Palbox].Value;
         }
 
         [JsonIgnore]
@@ -37,6 +37,24 @@ namespace PalCalc.UI.ViewModel.Mapped
         {
             BreedingTime = TimeSpan.FromSeconds(BreedingTimeSeconds),
             MultipleBreedingFarms = MultipleBreedingFarms,
+            LocationTypeGridWidths = new()
+            {
+                { LocationType.Palbox, PalboxTabWidth },
+
+                { LocationType.PlayerParty, GameSettings.Defaults.LocationTypeGridWidths[LocationType.PlayerParty] },
+                { LocationType.ViewingCage, GameSettings.Defaults.LocationTypeGridWidths[LocationType.ViewingCage] },
+                { LocationType.Base, GameSettings.Defaults.LocationTypeGridWidths[LocationType.Base] },
+                { LocationType.Custom, GameSettings.Defaults.LocationTypeGridWidths[LocationType.Custom] },
+            },
+            LocationTypeGridHeights = new()
+            {
+                { LocationType.Palbox, PalboxTabHeight },
+
+                { LocationType.PlayerParty, GameSettings.Defaults.LocationTypeGridHeights[LocationType.PlayerParty] },
+                { LocationType.ViewingCage, GameSettings.Defaults.LocationTypeGridHeights[LocationType.ViewingCage] },
+                { LocationType.Base, GameSettings.Defaults.LocationTypeGridHeights[LocationType.Base] },
+                { LocationType.Custom, GameSettings.Defaults.LocationTypeGridHeights[LocationType.Custom] },
+            },
         };
 
         [ObservableProperty]
@@ -44,6 +62,12 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         [ObservableProperty]
         private bool multipleBreedingFarms;
+
+        [ObservableProperty]
+        private int palboxTabWidth;
+
+        [ObservableProperty]
+        private int palboxTabHeight;
 
         public string ToJson() => JsonConvert.SerializeObject(this);
         public static GameSettingsViewModel FromJson(string json)

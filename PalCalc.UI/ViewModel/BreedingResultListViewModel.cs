@@ -78,9 +78,9 @@ namespace PalCalc.UI.ViewModel
         // they require a `CachedSaveGame` but this isn't always available when deserializing during
         // app start-up, so they will accept a `null` CSG temporarily (in ctor) but must be updated
         // before display
-        public void UpdateCachedData(CachedSaveGame csg)
+        public void UpdateCachedData(CachedSaveGame csg, GameSettings settings)
         {
-            Results = Results.Select(r => new BreedingResultViewModel(csg, r.DisplayedResult)).ToList();
+            Results = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult)).ToList();
         }
 
         [JsonIgnore]
@@ -94,7 +94,7 @@ namespace PalCalc.UI.ViewModel
         {
             Results = new List<BreedingResultViewModel>()
             {
-                new BreedingResultViewModel(null, new OwnedPalReference(
+                new BreedingResultViewModel(null, GameSettings.Defaults, new OwnedPalReference(
                     new PalInstance()
                     {
                         Pal = "Beakon".ToPal(PalDB.LoadEmbedded()),

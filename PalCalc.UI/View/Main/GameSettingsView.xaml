@@ -15,30 +15,40 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="2" />
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Column="0" Content="{itl:LocalizedText LC_BREEDING_TIME}" HorizontalAlignment="Left" VerticalAlignment="Top" />
+        <Label Grid.Column="0" Content="{itl:LocalizedText LC_BREEDING_TIME}" HorizontalAlignment="Right" VerticalAlignment="Top" />
         <vu:IntegerTextBox
+            Grid.Column="2"
             ToolTipService.ToolTip="{itl:LocalizedText LC_BREEDING_TIME_DESC}"
             ToolTipService.ShowOnDisabled="True"
-            Grid.Column="1"
             Value="{Binding BreedingTimeSeconds}"
             MinValue="1"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
-            Margin="0,3,0,0"
+            Margin="0,4,0,0"
         />
 
-        <Label Grid.Column="0" Content="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS}" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="0,26,0,0" />
+        <Label Grid.Column="0" Content="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,26,0,0" />
         <CheckBox
+            Grid.Column="2"
             ToolTipService.ToolTip="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS_DESC}"
             ToolTipService.ShowOnDisabled="True"
-            Grid.Column="1"
             IsChecked="{Binding MultipleBreedingFarms}"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Margin="0,31,0,0"
         />
+
+        <!-- TODO ITL -->
+        <!-- TODO - Tooltip -->
+        <Label Grid.Column="0" Content="Palbox Tab Size" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,52,0,0"/>
+        <StackPanel Margin="0,56,0,0" Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Top">
+            <vu:IntegerTextBox VerticalAlignment="Top" MinValue="1" MaxValue="100" MinWidth="26" Value="{Binding PalboxTabWidth}" />
+            <TextBlock Margin="3,0,3,0">x</TextBlock>
+            <vu:IntegerTextBox VerticalAlignment="Top" MinValue="1" MaxValue="100" MinWidth="26" Value="{Binding PalboxTabHeight}" />
+        </StackPanel>
     </Grid>
 </UserControl>

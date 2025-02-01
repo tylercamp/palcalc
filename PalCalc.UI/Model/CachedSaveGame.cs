@@ -129,11 +129,11 @@ namespace PalCalc.UI.Model
                 DirectSavesLocation.AllLocal
                     .SelectMany(l => l.ValidSaveGames)
                     .OrderByDescending(g => g.LastModified)
-                    .Select(g => FromSaveGame(g, PalDB.LoadEmbedded()))
+                    .Select(g => FromSaveGame(g, PalDB.LoadEmbedded(), GameSettings.Defaults))
                     .First();
 
 
-        public static CachedSaveGame FromSaveGame(ISaveGame game, PalDB db)
+        public static CachedSaveGame FromSaveGame(ISaveGame game, PalDB db, GameSettings settings)
         {
             var isDesignMode = DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject());
             if (!isDesignMode) SaveFileLoadStart?.Invoke(game);
@@ -148,7 +148,7 @@ namespace PalCalc.UI.Model
                 // being able to load the data
                 try { meta = game.LevelMeta.ReadGameOptions(); } catch { }
                 
-                var charData = game.Level.ReadCharacterData(db, game.Players);
+                var charData = game.Level.ReadCharacterData(db, settings, game.Players);
                 result = new CachedSaveGame(game)
                 {
                     DatabaseVersion = db.Version,

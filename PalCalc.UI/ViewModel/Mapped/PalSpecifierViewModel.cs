@@ -208,11 +208,6 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public bool IsValid => TargetPal != null;
 
-        public void UpdateCachedData(CachedSaveGame csg)
-        {
-            CurrentResults?.UpdateCachedData(csg);
-        }
-
         public void RefreshWith(IEnumerable<PalInstance> availablePals)
         {
             if (availablePals.Any())
