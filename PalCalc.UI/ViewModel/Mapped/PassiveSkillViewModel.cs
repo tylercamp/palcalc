@@ -46,6 +46,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
         );
 
+        private static Dictionary<string, PassiveSkillViewModel> unrecognizedInstances = new();
         private static Dictionary<PassiveSkill, PassiveSkillViewModel> instances;
         private static ILocalizedText randomPassiveLabel;
         public static PassiveSkillViewModel Make(PassiveSkill passive)
@@ -62,6 +63,16 @@ namespace PalCalc.UI.ViewModel.Mapped
                 randomPassiveLabel ??= NameLocalizer.Bind(passive);
 
                 return new PassiveSkillViewModel(passive, randomPassiveLabel);
+            }
+            else if (passive is UnrecognizedPassiveSkill)
+            {
+                if (!unrecognizedInstances.ContainsKey(passive.InternalName))
+                {
+                    var name = LocalizationCodes.LC_TRAIT_LABEL_UNRECOGNIZED.Bind(passive.InternalName);
+                    unrecognizedInstances.Add(passive.InternalName, new PassiveSkillViewModel(passive, name));
+                }
+
+                return unrecognizedInstances[passive.InternalName];
             }
             else
             {

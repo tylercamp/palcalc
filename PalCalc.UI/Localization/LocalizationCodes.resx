@@ -730,4 +730,7 @@
   <data name="LC_SETTINGS_RESTART_REQUIRED_MSG" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_TRAIT_LABEL_UNRECOGNIZED" xml:space="preserve">
+    <value>InternalName</value>
+  </data>
 </root>

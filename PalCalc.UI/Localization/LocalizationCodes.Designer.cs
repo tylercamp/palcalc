@@ -799,6 +799,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_TARGET_PALS,
         /// <summary>
+        ///   Looks up a localized string similar to InternalName.
+        /// </summary>
+        LC_TRAIT_LABEL_UNRECOGNIZED,
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_TRAITS_COUNT_EMPTY,

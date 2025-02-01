@@ -755,6 +755,9 @@ Higher values linearly affect time required, depending on how many types of pals
   <data name="LC_TRAITS_PRESETS_RENAME_TITLE" xml:space="preserve">
     <value>Rename Preset '{PresetName}'</value>
   </data>
+  <data name="LC_TRAIT_LABEL_UNRECOGNIZED" xml:space="preserve">
+    <value>{InternalName} (Unrecognized)</value>
+  </data>
   <data name="LC_UNKNOWN_GUILD" xml:space="preserve">
     <value>Unknown Guild</value>
   </data>
