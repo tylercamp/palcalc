@@ -48,13 +48,27 @@
                 Margin="0,31,0,0"
             />
 
-            <!-- TODO ITL -->
-            <!-- TODO - Tooltip -->
-            <Label Grid.Column="0" Content="Palbox Tab Size" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,52,0,0"/>
+            <Label Grid.Column="0" Content="{itl:LocalizedText Code=LC_SETTINGS_PALBOX_TAB_SIZE}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,52,0,0"/>
             <StackPanel Margin="0,56,0,0" Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Top">
-                <vu:IntegerTextBox VerticalAlignment="Top" MinValue="1" MaxValue="100" MinWidth="26" Value="{Binding PalboxTabWidth}" />
+                <vu:IntegerTextBox
+                    VerticalAlignment="Top"
+                    MinWidth="26"
+                    MinValue="1" MaxValue="100"
+                    Value="{Binding PalboxTabWidth}"
+                    ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SETTINGS_PALBOX_TAB_SIZE_DESC}"
+                    ToolTipService.ShowOnDisabled="True"
+                />
+                
                 <TextBlock Margin="3,0,3,0">x</TextBlock>
-                <vu:IntegerTextBox VerticalAlignment="Top" MinValue="1" MaxValue="100" MinWidth="26" Value="{Binding PalboxTabHeight}" />
+                
+                <vu:IntegerTextBox
+                    VerticalAlignment="Top"
+                    MinWidth="26"
+                    MinValue="1" MaxValue="100"
+                    Value="{Binding PalboxTabHeight}"
+                    ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SETTINGS_PALBOX_TAB_SIZE_DESC}"
+                    ToolTipService.ShowOnDisabled="True"
+                />
             </StackPanel>
         </Grid>
 
@@ -65,9 +79,7 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <materialIcons:MaterialIcon Grid.Column="0" Kind="Warning" Foreground="Orange" Height="18" VerticalAlignment="Top" />
-                <TextBlock Grid.Column="1" Margin="5,0,0,0" VerticalAlignment="Center" TextWrapping="WrapWithOverflow">
-                        Some changes require a restart to take full effect.
-                </TextBlock>
+                <TextBlock Grid.Column="1" Margin="5,0,0,0" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Text="{itl:LocalizedText Code=LC_SETTINGS_RESTART_REQUIRED_MSG}" />
             </Grid>
         </Label>
     </StackPanel>

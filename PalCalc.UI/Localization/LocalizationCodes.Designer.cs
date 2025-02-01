@@ -689,6 +689,18 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SETTINGS_PALBOX_TAB_SIZE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SETTINGS_PALBOX_TAB_SIZE_DESC,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SETTINGS_RESTART_REQUIRED_MSG,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SOLVER_PAUSE,
         /// <summary>
         ///   Looks up a localized string similar to .
