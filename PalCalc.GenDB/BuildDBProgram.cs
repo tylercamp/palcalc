@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -52,7 +53,7 @@ namespace PalCalc.GenDB
         //
         // (should be a folder containing "Pal-Windows.pak")
         static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Content\Paks";
-        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
+        static string MappingsPath = @"C:\Users\algor\OneDrive\Desktop\Mappings.usmap";
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
@@ -88,7 +89,104 @@ namespace PalCalc.GenDB
                 }).ToList();
         }
 
-        private static List<PassiveSkill> BuildPassiveSkills(List<UPassiveSkill> rawPassiveSkills, Dictionary<string, Dictionary<string, string>> skillNames)
+        // descriptions may be formatted e.g.:
+        // - "{EffectValue1}% increase to movement speed."
+        // - "SAN drops <NumBlue_13>+20.0%</> slower."
+        // - "Absorbs a portion of the damage dealt to restore <uiCommon id=|COMMON_STATUS_HP|/>. \r\nDoes not sleep at night and continues to work."
+        //
+        // (there's also `<characterName />` but this is only used for attack skills)
+        private static string FormatPassiveDescriptionText(
+            UPassiveSkill rawPassive,
+            string description,
+            Dictionary<string, string> commonTexts
+        )
+        {
+            if (description == null) return null;
+
+            var formatArgs = new Dictionary<string, string>()
+            {
+                { "EffectValue1", rawPassive.EffectValue1.ToString() },
+                { "EffectValue2", rawPassive.EffectValue2.ToString() },
+                { "EffectValue3", rawPassive.EffectValue3.ToString() },
+            };
+
+            foreach (var kvp in formatArgs)
+                description = description.Replace($"{{{kvp.Key}}}", kvp.Value);
+
+            if (description.Contains("{"))
+            {
+                logger.Warning("Description contains leftover format params: {description}", description);
+            }
+
+            description = Regex.Replace(description, @"<(.+?)\s+id=\|(.+?)\|/>", match =>
+            {
+                var kind = match.Groups[1].Value;
+                var id = match.Groups[2].Value;
+
+                switch (kind)
+                {
+                    default: break;
+
+                    case "uiCommon":
+                        if (commonTexts != null && commonTexts.TryGetValue(id, out var itl))
+                            return itl;
+                        break;
+                }
+
+                logger.Warning("Unhandled format part {fmt} in {desc}", match.Value, description);
+
+                return match.Value;
+            });
+
+            return description.Replace("\r\n", "\n");
+        }
+
+        private static string BuildDefaultPassiveDescriptionText(
+            UPassiveSkill rawPassive,
+            Dictionary<string, string> commonTexts
+        )
+        {
+            string FormatEffect(string effect, float value)
+            {
+                var label = effect.Replace("EPalPassiveSkillEffectType::", "") switch
+                {
+                    "no" => null,
+
+                    "CraftSpeed" => commonTexts["COMMON_STATUS_SPEED"],
+                    "ShotAttack" => commonTexts["COMMON_STATUS_RANGE_ATTACK"],
+                    "Defense" => commonTexts["COMMON_STATUS_DEFENCE"],
+                    
+                    var raw => effect,
+                };
+
+                if (label == effect)
+                {
+                    logger.Warning("Unhandled effect type {effect}", effect);
+
+                    label = effect.Replace("EPalPassiveSkillEffectType::", "");
+                }
+
+                if (label != null) return $"{label} +{value}%";
+                else return null;
+            }
+
+            var parts = new List<string>()
+            {
+                FormatEffect(rawPassive.EffectType1, rawPassive.EffectValue1),
+                FormatEffect(rawPassive.EffectType2, rawPassive.EffectValue2),
+                FormatEffect(rawPassive.EffectType3, rawPassive.EffectValue3),
+            }.SkipNull().ToList();
+
+            if (parts.Count > 0) return string.Join('\n', parts);
+            else return null;
+        }
+
+        private static List<PassiveSkill> BuildPassiveSkills(
+            List<UPassiveSkill> rawPassiveSkills,
+            Dictionary<string, Dictionary<string, string>> commonTexts,
+            Dictionary<string, Dictionary<string, string>> skillNames,
+            Dictionary<string, Dictionary<string, string>> skillDescriptions
+        )
         {
             return rawPassiveSkills.Select(rawPassive =>
             {
@@ -97,6 +195,20 @@ namespace PalCalc.GenDB
                 if (localizedNames.All(kvp => kvp.Value == null)) localizedNames = null;
 
                 var englishName = localizedNames?.GetValueOrDefault("en") ?? rawPassive.InternalName;
+
+                var localizedDescriptions = !rawPassive.IsStandardPassiveSkill
+                    ? null
+                    : rawPassive.OverrideDescMsgID != null && rawPassive.OverrideDescMsgID != "None"
+                        ? skillDescriptions.ToDictionary(
+                            kvp => kvp.Key,
+                            kvp => FormatPassiveDescriptionText(rawPassive, kvp.Value.GetValueOrDefault(rawPassive.OverrideDescMsgID), commonTexts[kvp.Key])
+                        )
+                        : commonTexts.ToDictionary(
+                            kvp => kvp.Key,
+                            kvp => BuildDefaultPassiveDescriptionText(rawPassive, kvp.Value)
+                        );
+
+                var englishDescription = localizedDescriptions?.GetValueOrDefault("en");
 
                 string Strip(string internalName) => internalName.Replace("EPalPassiveSkillEffectType::", "").Replace("EPalPassiveSkillEffectTargetType::", "");
 
@@ -114,7 +226,10 @@ namespace PalCalc.GenDB
 
                 return new PassiveSkill(englishName, rawPassive.InternalName, rawPassive.Rank)
                 {
+                    Description = englishDescription,
+
                     LocalizedNames = localizedNames,
+                    LocalizedDescriptions = localizedDescriptions,
                     RandomInheritanceAllowed = rawPassive.AddPal,
                     RandomInheritanceWeight = rawPassive.LotteryWeight,
                     TrackedEffects = trackedEffects,
@@ -462,7 +577,9 @@ namespace PalCalc.GenDB
 
             var passives = BuildPassiveSkills(
                 rawPassiveSkills,
-                skillNames: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadSkillNames(provider))
+                commonTexts: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadCommonText(provider)),
+                skillNames: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadSkillNames(provider)),
+                skillDescriptions: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadSkillDescriptions(provider))
             );
 
             var rawPartnerSkills = PartnerSkillReader.ReadPartnerSkills(provider);
@@ -487,7 +604,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v15");
+            var db = PalDB.MakeEmptyUnsafe("v16");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.PassiveSkills = passives;

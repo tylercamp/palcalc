@@ -27,6 +27,9 @@ namespace PalCalc.GenDB.GameDataReaders
         [FStructProperty]
         public string Category { get; set; }
 
+        [FStructProperty]
+        public string OverrideDescMsgID { get; set; }
+
         #region Passive Skill Effects
         [FStructProperty]
         public string TargetType1 { get; set; }
