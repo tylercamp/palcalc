@@ -5,15 +5,27 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View.Pal"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              d:Width="80"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance mvm:PassiveSkillViewModel, IsDesignTimeCreatable=True}">
     <UserControl.Resources>
         <ResourceDictionary>
             <mvm:RankColorConverter x:Key="RCC" />
+            <c:ValueBoolConverter x:Key="VBC" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <local:SkillEntryView BorderBrush="{Binding Rank, Converter={StaticResource RCC}}">
+    <local:SkillEntryView Background="Transparent" BorderBrush="{Binding Rank, Converter={StaticResource RCC}}" ToolTipService.ToolTip="{Binding Description.Value}" ToolTipService.ShowOnDisabled="True">
+        <local:SkillEntryView.Style>
+            <Style TargetType="local:SkillEntryView">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Description, Converter={StaticResource VBC}}" Value="True">
+                        <Setter Property="Cursor" Value="Hand" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </local:SkillEntryView.Style>
+        
         <Grid Margin="0,2,2,2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
