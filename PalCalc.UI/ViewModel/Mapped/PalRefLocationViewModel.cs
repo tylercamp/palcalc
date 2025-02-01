@@ -22,12 +22,12 @@ namespace PalCalc.UI.ViewModel.Mapped
 
     public class CompositePalRefLocationViewModel : IPalRefLocationViewModel
     {
-        public CompositePalRefLocationViewModel(CachedSaveGame source, CompositeRefLocation location)
+        public CompositePalRefLocationViewModel(CachedSaveGame source, GameSettings settings, CompositeRefLocation location)
         {
             ModelObject = location;
 
-            MaleViewModel = new SpecificPalRefLocationViewModel(source, location.MaleLoc);
-            FemaleViewModel = new SpecificPalRefLocationViewModel(source, location.FemaleLoc);
+            MaleViewModel = new SpecificPalRefLocationViewModel(source, settings, location.MaleLoc);
+            FemaleViewModel = new SpecificPalRefLocationViewModel(source, settings, location.FemaleLoc);
         }
 
         public CompositeRefLocation ModelObject { get; }
@@ -47,7 +47,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             IsSinglePlayer = true;
         }
 
-        public SpecificPalRefLocationViewModel(CachedSaveGame source, IPalRefLocation location)
+        public SpecificPalRefLocationViewModel(CachedSaveGame source, GameSettings settings, IPalRefLocation location)
         {
             if (location is CompositeRefLocation) throw new InvalidOperationException();
 
@@ -116,7 +116,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 case LocationType.Base:
                     sourceBase = source?.Bases?.FirstOrDefault(b => b.Container?.Id == ownedLoc.Location.ContainerId);
 
-                    var baseCoord = PalDisplayCoord.FromLocation(ownedLoc.Location);
+                    var baseCoord = PalDisplayCoord.FromLocation(settings, ownedLoc.Location);
                     LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_BASE.Bind(
                         new
                         {
@@ -127,7 +127,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                     break;
 
                 case LocationType.Palbox:
-                    var pboxCoord = PalDisplayCoord.FromLocation(ownedLoc.Location);
+                    var pboxCoord = PalDisplayCoord.FromLocation(settings, ownedLoc.Location);
                     LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_PALBOX.Bind(
                         new
                         {
@@ -141,7 +141,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 case LocationType.ViewingCage:
                     sourceBase = source?.Bases?.FirstOrDefault(b => b.ViewingCages.Any(c => c.Id == ownedLoc.Location.ContainerId));
 
-                    var cageCoord = PalDisplayCoord.FromLocation(ownedLoc.Location);
+                    var cageCoord = PalDisplayCoord.FromLocation(settings, ownedLoc.Location);
                     LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_VIEWING_CAGE.Bind(
                         new
                         {
@@ -162,7 +162,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             if (mapCoord != null) MapLocationPreview = new MapLocationPreviewViewModel(mapCoord);
 
             if (ownedLoc.Location.Type != LocationType.Custom)
-                ContainerLocationPreview = new ContainerLocationPreviewViewModel(ownedLoc.Location);
+                ContainerLocationPreview = new ContainerLocationPreviewViewModel(settings, ownedLoc.Location);
         }
 
         public bool IsSinglePlayer { get; }

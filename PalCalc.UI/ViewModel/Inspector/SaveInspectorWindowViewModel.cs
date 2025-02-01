@@ -14,7 +14,7 @@ namespace PalCalc.UI.ViewModel.Inspector
     public class SaveInspectorWindowViewModel
     {
         private static SaveInspectorWindowViewModel designerInstance = null;
-        public static SaveInspectorWindowViewModel DesignerInstance => designerInstance ??= new SaveInspectorWindowViewModel(SaveGameViewModel.DesignerInstance);
+        public static SaveInspectorWindowViewModel DesignerInstance => designerInstance ??= new SaveInspectorWindowViewModel(SaveGameViewModel.DesignerInstance, GameSettings.Defaults);
 
         public SaveGameViewModel DisplayedSave { get; }
 
@@ -23,14 +23,14 @@ namespace PalCalc.UI.ViewModel.Inspector
 
         public ILocalizedText WindowTitle { get; }
 
-        public SaveInspectorWindowViewModel(SaveGameViewModel sgvm)
+        public SaveInspectorWindowViewModel(SaveGameViewModel sgvm, GameSettings settings)
         {
             DisplayedSave = sgvm;
 
             var rawData = sgvm.CachedValue.UnderlyingSave.Level.ReadRawCharacterData();
             var players = sgvm.Value.Players.Select(p => p.ReadPlayerContent()).ToList();
 
-            Search = new SearchViewModel(sgvm);
+            Search = new SearchViewModel(sgvm, settings);
             Details = new SaveDetailsViewModel(sgvm.CachedValue, rawData, players);
 
             WindowTitle = LocalizationCodes.LC_SAVEWINDOW_TITLE.Bind(sgvm.Label);

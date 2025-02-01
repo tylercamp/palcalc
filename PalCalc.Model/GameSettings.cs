@@ -9,6 +9,8 @@ namespace PalCalc.Model
 {
     public class GameSettings
     {
+        public static readonly GameSettings Defaults = new();
+
         // supposedly breeding time is a constant 5 minutes
         public TimeSpan BreedingTime { get; set; } = TimeSpan.FromMinutes(5);
 
@@ -22,5 +24,28 @@ namespace PalCalc.Model
         public TimeSpan AvgBreedingTime => BreedingTime * 2;
 
         public bool MultipleBreedingFarms { get; set; } = true;
+
+        public int PlayerPartySize { get; set; } = 5;
+
+        public Dictionary<LocationType, int> LocationTypeGridWidths { get; set; } = new()
+        {
+            { LocationType.PlayerParty, 5 },
+            { LocationType.Palbox, 6 },
+            { LocationType.Base, 5 },
+            { LocationType.ViewingCage, 6 },
+
+            // (not real, just so it's defined)
+            { LocationType.Custom, 8 },
+        };
+
+        public Dictionary<LocationType, int?> LocationTypeGridHeights { get; set; } = new()
+        {
+            { LocationType.Palbox, 5 },
+
+            { LocationType.PlayerParty, null },
+            { LocationType.Base, null },
+            { LocationType.ViewingCage, null },
+            { LocationType.Custom, null },
+        };
     }
 }

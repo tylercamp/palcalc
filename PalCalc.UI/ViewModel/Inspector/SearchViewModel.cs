@@ -26,7 +26,9 @@ namespace PalCalc.UI.ViewModel.Inspector
     public partial class SearchViewModel : ObservableObject
     {
         private static SearchViewModel designerInstance = null;
-        public static SearchViewModel DesignerInstance => designerInstance ??= new SearchViewModel(SaveGameViewModel.DesignerInstance);
+        public static SearchViewModel DesignerInstance => designerInstance ??= new SearchViewModel(SaveGameViewModel.DesignerInstance, GameSettings.Defaults);
+
+        private GameSettings settings;
 
         [ObservableProperty]
         private OwnerTreeViewModel ownerTree;
@@ -43,8 +45,10 @@ namespace PalCalc.UI.ViewModel.Inspector
         private static bool IsValidCustomLabel(SaveGameViewModel context, string label) =>
             label.Length > 0 && !context.Customizations.CustomContainers.Any(c => c.Label == label);
 
-        public SearchViewModel(SaveGameViewModel sgvm)
+        public SearchViewModel(SaveGameViewModel sgvm, GameSettings settings)
         {
+            this.settings = settings;
+
             newCustomContainerCommand = new RelayCommand(() =>
             {
                 var nameModal = new SimpleTextInputWindow()
@@ -129,11 +133,11 @@ namespace PalCalc.UI.ViewModel.Inspector
 
             var containers = csg.PalContainers
                 .Where(c => palsByContainerId.ContainsKey(c.Id))
-                .Select(c => new DefaultSearchableContainerViewModel(c, palsByContainerId[c.Id]))
+                .Select(c => new DefaultSearchableContainerViewModel(settings, c, palsByContainerId[c.Id]))
                 .Cast<ISearchableContainerViewModel>()
                 .Concat(
                     sgvm.Customizations.CustomContainers.Select(c =>
-                        new CustomSearchableContainerViewModel(c)
+                        new CustomSearchableContainerViewModel(settings, c)
                         {
                             RenameCommand = RenameContainerCommand,
                             DeleteCommand = DeleteContainerCommand,

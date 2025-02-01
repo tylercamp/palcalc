@@ -60,10 +60,10 @@ namespace PalCalc.UI.ViewModel
             targets[oldIndex] = newValue;
         }
 
-        public void UpdateCachedData(CachedSaveGame csg)
+        public void UpdateCachedData(CachedSaveGame csg, GameSettings settings)
         {
             foreach (var target in targets)
-                target.CurrentResults?.UpdateCachedData(csg);
+                target.CurrentResults?.UpdateCachedData(csg, settings);
         }
 
         public void DragOver(IDropInfo dropInfo)

@@ -8,37 +8,79 @@
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              mc:Ignorable="d" 
              d:Background="White"
              d:DataContext="{d:DesignInstance mvm:GameSettingsViewModel, IsDesignTimeCreatable=True}"
-             d:DesignHeight="146.283" d:DesignWidth="622.784">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+             d:DesignWidth="622.784">
+    <UserControl.Resources>
+        <c:ValueVisibilityConverter x:Key="VVC" />
+    </UserControl.Resources>
+    <StackPanel Orientation="Vertical">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="2" />
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <Label Grid.Column="0" Content="{itl:LocalizedText LC_BREEDING_TIME}" HorizontalAlignment="Left" VerticalAlignment="Top" />
-        <vu:IntegerTextBox
-            ToolTipService.ToolTip="{itl:LocalizedText LC_BREEDING_TIME_DESC}"
-            ToolTipService.ShowOnDisabled="True"
-            Grid.Column="1"
-            Value="{Binding BreedingTimeSeconds}"
-            MinValue="1"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="0,3,0,0"
-        />
+            <Label Grid.Column="0" Content="{itl:LocalizedText LC_BREEDING_TIME}" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <vu:IntegerTextBox
+                Grid.Column="2"
+                ToolTipService.ToolTip="{itl:LocalizedText LC_BREEDING_TIME_DESC}"
+                ToolTipService.ShowOnDisabled="True"
+                Value="{Binding BreedingTimeSeconds}"
+                MinValue="1"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="0,4,0,0"
+            />
 
-        <Label Grid.Column="0" Content="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS}" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="0,26,0,0" />
-        <CheckBox
-            ToolTipService.ToolTip="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS_DESC}"
-            ToolTipService.ShowOnDisabled="True"
-            Grid.Column="1"
-            IsChecked="{Binding MultipleBreedingFarms}"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="0,31,0,0"
-        />
-    </Grid>
+            <Label Grid.Column="0" Content="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,26,0,0" />
+            <CheckBox
+                Grid.Column="2"
+                ToolTipService.ToolTip="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS_DESC}"
+                ToolTipService.ShowOnDisabled="True"
+                IsChecked="{Binding MultipleBreedingFarms}"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="0,31,0,0"
+            />
+
+            <Label Grid.Column="0" Content="{itl:LocalizedText Code=LC_SETTINGS_PALBOX_TAB_SIZE}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,52,0,0"/>
+            <StackPanel Margin="0,56,0,0" Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Top">
+                <vu:IntegerTextBox
+                    VerticalAlignment="Top"
+                    MinWidth="26"
+                    MinValue="1" MaxValue="100"
+                    Value="{Binding PalboxTabWidth}"
+                    ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SETTINGS_PALBOX_TAB_SIZE_DESC}"
+                    ToolTipService.ShowOnDisabled="True"
+                />
+                
+                <TextBlock Margin="3,0,3,0">x</TextBlock>
+                
+                <vu:IntegerTextBox
+                    VerticalAlignment="Top"
+                    MinWidth="26"
+                    MinValue="1" MaxValue="100"
+                    Value="{Binding PalboxTabHeight}"
+                    ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SETTINGS_PALBOX_TAB_SIZE_DESC}"
+                    ToolTipService.ShowOnDisabled="True"
+                />
+            </StackPanel>
+        </Grid>
+
+        <Label Visibility="{Binding AppRestartRequired, Converter={StaticResource VVC}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <materialIcons:MaterialIcon Grid.Column="0" Kind="Warning" Foreground="Orange" Height="18" VerticalAlignment="Top" />
+                <TextBlock Grid.Column="1" Margin="5,0,0,0" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Text="{itl:LocalizedText Code=LC_SETTINGS_RESTART_REQUIRED_MSG}" />
+            </Grid>
+        </Label>
+    </StackPanel>
 </UserControl>

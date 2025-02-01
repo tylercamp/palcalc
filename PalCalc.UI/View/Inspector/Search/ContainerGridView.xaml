@@ -25,7 +25,9 @@
                     (which caused scroll events to be eaten and prevent scrolling within the parent container)
                     -->
                     <Border BorderBrush="#FFABADB3" BorderThickness="1" Background="White" Padding="1">
-                        <ItemsPresenter />
+                        <Viewbox StretchDirection="DownOnly">
+                            <ItemsPresenter />
+                        </Viewbox>
                     </Border>
                 </ControlTemplate>
             </ListView.Template>
@@ -46,7 +48,7 @@
                             <Setter Property="Opacity" Value="0.25" />
                         </DataTrigger>
                     </Style.Triggers>
-                    
+
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="VerticalContentAlignment" Value="Stretch" />
                 </Style>

@@ -62,7 +62,7 @@ namespace PalCalc.UI.ViewModel
         }
 
         private CachedSaveGame source;
-        public BreedingResultViewModel(CachedSaveGame source, IPalReference displayedResult)
+        public BreedingResultViewModel(CachedSaveGame source, GameSettings settings, IPalReference displayedResult)
         {
             this.source = source;
 
@@ -75,7 +75,7 @@ namespace PalCalc.UI.ViewModel
             else
             {
                 DisplayedResult = displayedResult;
-                Graph = BreedingGraph.FromPalReference(source, displayedResult);
+                Graph = BreedingGraph.FromPalReference(source, settings, displayedResult);
                 EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
 
                 IVs = IVSetViewModel.FromIVs(displayedResult.IVs);

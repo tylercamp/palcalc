@@ -59,6 +59,7 @@
                                     <DataTrigger Binding="{Binding HasPreview, Converter={StaticResource VBC}, FallbackValue=False}" Value="True">
                                         <Setter Property="Cursor" Value="Hand" />
                                         <Setter Property="InitialShowDelay" Value="200" />
+                                        <Setter Property="PopupAnimation" Value="None" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>

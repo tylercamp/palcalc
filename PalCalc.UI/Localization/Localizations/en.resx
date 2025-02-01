@@ -320,7 +320,7 @@ Please find the generated ZIP file to send with any support questions:
     <value>Language</value>
   </data>
   <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
-    <value>Pal Calc must be restarted to finish applying the new language.</value>
+    <value>Pal Calc must be restarted for the new language to fully apply.</value>
   </data>
   <data name="LC_LIST_SEPARATOR" xml:space="preserve">
     <value>, </value>
@@ -602,6 +602,19 @@ This will not delete the save files from your computer.</value>
   </data>
   <data name="LC_SAVE_WARNING" xml:space="preserve">
     <value>(!)</value>
+  </data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE" xml:space="preserve">
+    <value>Palbox Tab Size</value>
+  </data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE_DESC" xml:space="preserve">
+    <value>The size of a tab in your Palbox. This is used when displaying the locations of Pals in your Palbox.
+
+The default is 6x5. This shouldn't be changed unless you use a mod which changes the size of a Palbox tab.
+
+This setting requires a restart to fully apply.</value>
+  </data>
+  <data name="LC_SETTINGS_RESTART_REQUIRED_MSG" xml:space="preserve">
+    <value>Some changes require a restart to take full effect.</value>
   </data>
   <data name="LC_SOLVER_PAUSE" xml:space="preserve">
     <value>Pause</value>

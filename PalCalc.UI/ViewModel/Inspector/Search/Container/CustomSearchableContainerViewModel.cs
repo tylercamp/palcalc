@@ -13,7 +13,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
     public partial class CustomSearchableContainerViewModel : ISearchableContainerViewModel
     {
         private CustomContainerViewModel container;
-        public CustomSearchableContainerViewModel(CustomContainerViewModel container)
+        public CustomSearchableContainerViewModel(GameSettings settings, CustomContainerViewModel container) : base(settings)
         {
             this.container = container;
 

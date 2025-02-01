@@ -34,7 +34,7 @@ namespace PalCalc.Model
             }
             else
             {
-                var coord = PalDisplayCoord.FromLocation(this);
+                var coord = PalDisplayCoord.FromLocation(GameSettings.Defaults, this);
                 indexStr = coord.ToString();
             }
 
@@ -60,12 +60,12 @@ namespace PalCalc.Model
             else return $"Slot ({X},{Y})";
         }
 
-        public static PalDisplayCoord FromLocation(PalLocation loc) => FromLocation(loc.Type, loc.Index);
+        public static PalDisplayCoord FromLocation(GameSettings settings, PalLocation loc) => FromLocation(settings, loc.Type, loc.Index);
 
-        public static PalDisplayCoord FromLocation(LocationType type, int slotIndex)
+        public static PalDisplayCoord FromLocation(GameSettings settings, LocationType type, int slotIndex)
         {
-            var numCols = GameConstants.LocationTypeGridWidths[type];
-            var numRows = GameConstants.LocationTypeGridHeights[type];
+            var numCols = settings.LocationTypeGridWidths[type];
+            var numRows = settings.LocationTypeGridHeights[type];
 
             int? tab = null;
 

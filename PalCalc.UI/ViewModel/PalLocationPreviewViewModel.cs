@@ -26,27 +26,27 @@ namespace PalCalc.UI.ViewModel
     public class EmptyContainerLocationPreviewSlotViewModel : IContainerLocationPreviewSlotViewModel { }
     public class FocusedContainerLocationPreviewSlotViewModel : IContainerLocationPreviewSlotViewModel { }
 
-    public class ContainerLocationPreviewViewModel(PalLocation location) : IPalLocationPreviewViewModel
+    public class ContainerLocationPreviewViewModel(GameSettings settings, PalLocation location) : IPalLocationPreviewViewModel
     {
         public static ContainerLocationPreviewViewModel PartyDesignerInstance { get; } =
-            new ContainerLocationPreviewViewModel(new PalLocation() { Type = LocationType.PlayerParty, Index = 3 });
+            new ContainerLocationPreviewViewModel(GameSettings.Defaults, new PalLocation() { Type = LocationType.PlayerParty, Index = 3 });
 
         public static ContainerLocationPreviewViewModel PalboxDesignerInstance { get; } =
-            new ContainerLocationPreviewViewModel(new PalLocation() { Type = LocationType.Palbox, Index = 13 });
+            new ContainerLocationPreviewViewModel(GameSettings.Defaults, new PalLocation() { Type = LocationType.Palbox, Index = 13 });
 
         public static ContainerLocationPreviewViewModel BaseDesignerInstance { get; } =
-            new ContainerLocationPreviewViewModel(new PalLocation() { Type = LocationType.Base, Index = 9 });
+            new ContainerLocationPreviewViewModel(GameSettings.Defaults, new PalLocation() { Type = LocationType.Base, Index = 9 });
 
         public static ContainerLocationPreviewViewModel CageDesignerInstance { get; } =
-            new ContainerLocationPreviewViewModel(new PalLocation() { Type = LocationType.ViewingCage, Index = 7 });
+            new ContainerLocationPreviewViewModel(GameSettings.Defaults, new PalLocation() { Type = LocationType.ViewingCage, Index = 7 });
 
-        public PalDisplayCoord ContainerCoord { get; } = PalDisplayCoord.FromLocation(location);
+        public PalDisplayCoord ContainerCoord { get; } = PalDisplayCoord.FromLocation(settings, location);
 
-        public int NumCols => GameConstants.LocationTypeGridWidths[location.Type];
+        public int NumCols => settings.LocationTypeGridWidths[location.Type];
 
         // (if no specific row count exists, usually only shows as many rows as needed for the coord, but this looks weird
         // for bases if the pal is in the first row. force at least 3 rows for that case)
-        public int NumRows => GameConstants.LocationTypeGridHeights[location.Type] ?? (location.Type == LocationType.Base ? Math.Max(3, ContainerCoord.Row) : ContainerCoord.Row);
+        public int NumRows => settings.LocationTypeGridHeights[location.Type] ?? (location.Type == LocationType.Base ? Math.Max(3, ContainerCoord.Row) : ContainerCoord.Row);
 
         public bool HasTabs => ContainerCoord.Tab != null;
 
@@ -57,7 +57,7 @@ namespace PalCalc.UI.ViewModel
         public List<IContainerLocationPreviewSlotViewModel> SlotContents =>
             slotContents ??= Enumerable
                 .Range(0, NumCols * NumRows)
-                .Select(i => PalDisplayCoord.FromLocation(location.Type, i))
+                .Select(i => PalDisplayCoord.FromLocation(settings, location.Type, i))
                 .Select<PalDisplayCoord, IContainerLocationPreviewSlotViewModel>(c =>
                     (c.Row == ContainerCoord.Row && c.Column == ContainerCoord.Column)
                         ? new FocusedContainerLocationPreviewSlotViewModel()

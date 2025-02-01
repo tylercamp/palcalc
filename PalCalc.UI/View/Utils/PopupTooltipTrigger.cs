@@ -25,6 +25,9 @@ namespace PalCalc.UI.View.Utils
         public static readonly DependencyProperty InitialShowDelayProperty =
             DependencyProperty.Register(nameof(InitialShowDelay), typeof(int), typeof(PopupToolTipTrigger), new PropertyMetadata(500));
 
+        public static readonly DependencyProperty PopupAnimationProperty =
+            DependencyProperty.Register(nameof(PopupAnimation), typeof(PopupAnimation), typeof(PopupToolTipTrigger), new PropertyMetadata(PopupAnimation.Fade));
+
         static PopupToolTipTrigger()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(PopupToolTipTrigger), new FrameworkPropertyMetadata(typeof(PopupToolTipTrigger)));
@@ -74,6 +77,12 @@ namespace PalCalc.UI.View.Utils
             set => SetValue(InitialShowDelayProperty, value);
         }
 
+        public PopupAnimation PopupAnimation
+        {
+            get => (PopupAnimation)GetValue(PopupAnimationProperty);
+            set => SetValue(PopupAnimationProperty, value);
+        }
+
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -84,8 +93,9 @@ namespace PalCalc.UI.View.Utils
                 StaysOpen = true,
                 AllowsTransparency = true,
                 IsOpen = false,
-                PopupAnimation = PopupAnimation.Fade,
             };
+
+            _popup.SetBinding(Popup.PopupAnimationProperty, new Binding(nameof(PopupAnimation)) { Source = this });
 
             var contentControl = new ContentControl();
             contentControl.SetBinding(ContentControl.ContentTemplateProperty, new Binding(nameof(ToolTipContentTemplate)) { Source = this });
