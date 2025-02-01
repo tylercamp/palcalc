@@ -141,11 +141,13 @@ namespace PalCalc.UI.Model
             var filePath = CustomContainerPath(forSaveGame);
             if (!File.Exists(filePath)) return new SaveCustomizations();
 
+            SaveCustomizations res = null;
+
 #if HANDLE_ERRORS
             try
             {
 #endif
-                return JsonConvert.DeserializeObject<SaveCustomizations>(File.ReadAllText(filePath), new PalInstanceJsonConverter(db));
+                res = JsonConvert.DeserializeObject<SaveCustomizations>(File.ReadAllText(filePath), new PalInstanceJsonConverter(db));
 #if HANDLE_ERRORS
             }
             catch (Exception re)
@@ -159,10 +161,12 @@ namespace PalCalc.UI.Model
                 {
                     logger.Warning(fe, "failed to delete customizations file");
                 }
-
-                return new SaveCustomizations();
             }
 #endif
+
+            res ??= new SaveCustomizations();
+            res.CustomContainers ??= [];
+            return res;
         }
 
         public static void SaveCustomizations(ISaveGame forSaveGame, SaveCustomizations custom, PalDB db)
