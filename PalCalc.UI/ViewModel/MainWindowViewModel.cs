@@ -387,6 +387,16 @@ namespace PalCalc.UI.ViewModel
 
             UpdatePalTarget();
             UpdateSolverControls();
+
+            var csg = SaveSelection.SelectedFullGame?.CachedValue;
+            if (csg != null)
+            {
+                foreach (var passive in csg.OwnedPals.SelectMany(p => p.PassiveSkills).OfType<UnrecognizedPassiveSkill>())
+                {
+                    // preload any unrecognized passives so they appear in dropdowns
+                    PassiveSkillViewModel.Make(passive);
+                }
+            }
         }
 
         private void UpdatePalTarget()

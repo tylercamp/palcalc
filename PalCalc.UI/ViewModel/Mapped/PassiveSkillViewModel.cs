@@ -3,6 +3,7 @@ using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -66,13 +67,15 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
             else if (passive is UnrecognizedPassiveSkill)
             {
-                if (!unrecognizedInstances.ContainsKey(passive.InternalName))
+                if (!unrecognizedInstances.TryGetValue(passive.InternalName, out PassiveSkillViewModel value))
                 {
                     var name = LocalizationCodes.LC_TRAIT_LABEL_UNRECOGNIZED.Bind(passive.InternalName);
-                    unrecognizedInstances.Add(passive.InternalName, new PassiveSkillViewModel(passive, name));
+                    value = new PassiveSkillViewModel(passive, name); ;
+                    unrecognizedInstances.Add(passive.InternalName, value);
+                    allPassives.Add(value);
                 }
 
-                return unrecognizedInstances[passive.InternalName];
+                return value;
             }
             else
             {
@@ -80,7 +83,15 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
         }
 
-        public static IReadOnlyList<PassiveSkillViewModel> All { get; } = PalDB.LoadEmbedded().StandardPassiveSkills.Select(Make).OrderBy(p => p.Name.Value).ToList();
+        static PassiveSkillViewModel()
+        {
+            allPassives = new ObservableCollection<PassiveSkillViewModel>(PalDB.LoadEmbedded().StandardPassiveSkills.Select(Make).OrderBy(p => p.Name.Value));
+
+            All = new ReadOnlyObservableCollection<PassiveSkillViewModel>(allPassives);
+        }
+
+        private static ObservableCollection<PassiveSkillViewModel> allPassives;
+        public static ReadOnlyObservableCollection<PassiveSkillViewModel> All { get; }
 
         // for XAML designer view
         public PassiveSkillViewModel() : this(new PassiveSkill("Runner", "runner", 2), new HardCodedText("Runner"))
