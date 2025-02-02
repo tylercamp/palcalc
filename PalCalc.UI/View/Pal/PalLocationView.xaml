@@ -43,7 +43,7 @@
                             </ControlTemplate>
                         </ItemsControl.Template>
                         <ItemsControl.Resources>
-                            <Style TargetType="Border" x:Key="SlotStyle" BasedOn="{StaticResource {x:Type Border}}">
+                            <Style TargetType="Border" x:Key="SlotStyle">
                                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                                 <Setter Property="VerticalAlignment" Value="Stretch" />
 

@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Theme.WPF.Themes;
 
 namespace PalCalc.UI.Model
 {
@@ -48,32 +47,6 @@ namespace PalCalc.UI.Model
     public class AppSettings
     {
         public static AppSettings Current = null;
-
-        private static ThemeType DefaultTheme => ThemeType.None;
-        public string ThemeName { get; set; } = DefaultTheme.ToString();
-
-        // need to be careful to avoid breaking AppSettings deserialization if the theme name is unrecognized
-        [JsonIgnore]
-        public ThemeType Theme
-        {
-            get
-            {
-                if (Enum.TryParse<ThemeType>(ThemeName, out var theme))
-                {
-                    return theme;
-                }
-                else
-                {
-                    ThemeName = DefaultTheme.ToString();
-                    return DefaultTheme;
-                }
-            }
-
-            set
-            {
-                ThemeName = value.ToString();
-            }
-        }
 
         public List<string> ExtraSaveLocations { get; set; } = new List<string>();
 

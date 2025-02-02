@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdonisUI.Controls;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace PalCalc.UI.View
     /// <summary>
     /// Interaction logic for LoadingSaveFileModal.xaml
     /// </summary>
-    public partial class LoadingSaveFileModal : Window
+    public partial class LoadingSaveFileModal : AdonisWindow
     {
         // https://stackoverflow.com/a/73181682
         private static void AllowUIToUpdate()

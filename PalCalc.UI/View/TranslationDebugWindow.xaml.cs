@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdonisUI.Controls;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace PalCalc.UI.View
     /// <summary>
     /// Interaction logic for TranslationDebugWindow.xaml
     /// </summary>
-    public partial class TranslationDebugWindow : Window
+    public partial class TranslationDebugWindow : AdonisWindow
     {
         private void CheckOwner()
         {

@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AdonisUI.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -21,7 +22,7 @@ namespace PalCalc.UI.View.Utils
     /// Interaction logic for SimpleTextInputWindow.xaml
     /// </summary>
     [ObservableObject]
-    public partial class SimpleTextInputWindow : Window
+    public partial class SimpleTextInputWindow : AdonisWindow
     {
         public SimpleTextInputWindow() : this("") { }
 

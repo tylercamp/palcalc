@@ -1,4 +1,4 @@
-﻿<Window x:Class="PalCalc.UI.View.LoadingSaveFileModal"
+﻿<adonisControls:AdonisWindow x:Class="PalCalc.UI.View.LoadingSaveFileModal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,14 +6,17 @@
         xmlns:local="clr-namespace:PalCalc.UI.View"
         mc:Ignorable="d"
         xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+        xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
         Title="{itl:LocalizedText LC_POPUP_TITLE_LOADING_SAVE_FILE}"
         ShowInTaskbar="False"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         WindowStyle="ToolWindow"
         SizeToContent="WidthAndHeight"
-        Style="{StaticResource CustomWindowStyle}"
         d:DataContext="{x:Type itl:ILocalizedText}"
         >
+    <Window.Style>
+        <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}" />
+    </Window.Style>
     <TextBlock Text="{Binding Value}" Margin="5,5,5,5" />
-</Window>
+</adonisControls:AdonisWindow>

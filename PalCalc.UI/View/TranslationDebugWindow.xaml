@@ -1,4 +1,4 @@
-﻿<Window x:Class="PalCalc.UI.View.TranslationDebugWindow"
+﻿<adonisControls:AdonisWindow x:Class="PalCalc.UI.View.TranslationDebugWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,7 +8,7 @@
         xmlns:m="clr-namespace:PalCalc.UI.Localization"
         xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
         xmlns:util="clr-namespace:Wpf.Util"
-        Style="{StaticResource CustomWindowStyle}"
+        xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
         mc:Ignorable="d"
         d:DataContext="{x:Static vm:TranslationDebugViewModel.DesignerInstance}"
         util:GridViewSort.AutoSort="True"
@@ -16,6 +16,9 @@
     <Window.Resources>
         <c:CommaSeparatedListConverter x:Key="CSLC" Prefix="\{" Suffix="}" />
     </Window.Resources>
+    <Window.Style>
+        <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}" />
+    </Window.Style>
     <Grid>
         <TabControl ItemsSource="{Binding LocaleErrors}">
             <TabControl.ItemTemplate>
@@ -84,4 +87,4 @@
             </TabControl.ContentTemplate>
         </TabControl>
     </Grid>
-</Window>
+</adonisControls:AdonisWindow>

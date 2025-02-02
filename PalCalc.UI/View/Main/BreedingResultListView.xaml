@@ -15,7 +15,6 @@
           IsSynchronizedWithCurrentItem="True"
           util:GridViewSort.AutoSort="True"
           Style="{StaticResource {x:Type ListView}}"
-          ItemContainerStyle="{StaticResource ListViewItem_DataViewItemContainerStyle}"
           >
     <!--
     Re: `ItemContainerStyle`:

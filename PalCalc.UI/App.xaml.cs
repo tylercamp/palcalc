@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Theme.WPF.Themes;
 
 namespace PalCalc.UI
 {
@@ -55,19 +54,6 @@ namespace PalCalc.UI
 
             Translator.OnTranslationError += TranslationErrors.Add;
             Translator.Init();
-
-            var settings = Storage.LoadAppSettings();
-            ThemesController.SetTheme(settings.Theme, forceTheme: true);
-
-            // this XAML applies some default styles to certain controls, and it's already referenced in App.xaml,
-            // but once it's initialized it's never refreshed. i.e., changing the theme won't change the customized
-            // styles.
-            //
-            // remove + re-attach the dictionary to apply
-            Resources.MergedDictionaries.Remove(
-                Resources.MergedDictionaries.FirstOrDefault(d => d.Source.OriginalString.EndsWith("StyleAdjustments.xaml"))
-            );
-            Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri("Themes/StyleAdjustments.xaml", UriKind.Relative) });
 
             base.OnStartup(e);
         }

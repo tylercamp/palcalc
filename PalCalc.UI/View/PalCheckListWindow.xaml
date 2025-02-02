@@ -1,4 +1,4 @@
-﻿<Window x:Class="PalCalc.UI.View.PalCheckListWindow"
+﻿<adonisControls:AdonisWindow x:Class="PalCalc.UI.View.PalCheckListWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,12 +6,12 @@
         xmlns:local="clr-namespace:PalCalc.UI.View"
         xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
         xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+        xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
         d:DataContext="{x:Static vm:PalCheckListViewModel.DesignerInstance}"
         mc:Ignorable="d"
         xmlns:util="clr-namespace:Wpf.Util"
         WindowStyle="ToolWindow"
         WindowStartupLocation="CenterOwner"
-        Style="{StaticResource CustomWindowStyle}"
         Title="{Binding Title.Value}" Height="450" Width="330">
     <Grid>
         <Grid.RowDefinitions>
@@ -33,7 +33,6 @@
         <ListView Grid.Row="1"
                   ItemsSource="{Binding VisibleEntries}"
                   util:GridViewSort.AutoSort="True"
-                  ItemContainerStyle="{StaticResource ListViewItem_DataViewItemContainerStyle}"
                   >
             <ListView.View>
                 <GridView>
@@ -88,4 +87,4 @@
 
         </StackPanel>
     </Grid>
-</Window>
+</adonisControls:AdonisWindow>

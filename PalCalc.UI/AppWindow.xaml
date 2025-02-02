@@ -1,18 +1,16 @@
-﻿<Window x:Class="PalCalc.UI.AppWindow"
+﻿<adonisControls:AdonisWindow x:Class="PalCalc.UI.AppWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PalCalc.UI"
+        xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
         mc:Ignorable="d"
         xmlns:itl="clr-namespace:PalCalc.UI.Localization"
         Title="{itl:LocalizedText LC_WINDOW_TITLE}"
         Width="1280" Height="720"
-        Style="{StaticResource CustomWindowStyle}"
         Content="{Binding Content}">
-    <!--
     <Window.Style>
         <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}" />
     </Window.Style>
-    -->
-</Window>
+</adonisControls:AdonisWindow>
