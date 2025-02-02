@@ -9,6 +9,7 @@
             xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
+            xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
             d:Background="White"
             mc:Ignorable="d" 
             d:DataContext="{d:DesignInstance vm:PalTargetViewModel, IsDesignTimeCreatable=True}"
@@ -34,7 +35,15 @@
             </DataTemplate>
         </ComboBox.ItemTemplate>
     </ComboBox>
-    <GroupBox Header="{itl:LocalizedText LC_COMMON_TRAITS}">
+    <GroupBox>
+        <GroupBox.Header>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                <TextBlock Text="{itl:LocalizedText LC_COMMON_TRAITS}" />
+                <Button Margin="10,0,0,0" Padding="0" Height="16" Command="{Binding OpenPassivesSearchCommand}">
+                    <materialIcons:MaterialIcon Kind="Search" />
+                </Button>
+            </StackPanel>
+        </GroupBox.Header>
         <Grid>
             <TabControl>
                 <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_REQUIRED_TRAITS}">

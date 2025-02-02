@@ -885,6 +885,22 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_TRAITS_SEARCH_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_SEARCH_NAME,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_SEARCH_SEARCH,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_SEARCH_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_UNKNOWN_GUILD,
         /// <summary>
         ///   Looks up a localized string similar to .

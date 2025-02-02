@@ -748,4 +748,16 @@
   <data name="LC_TRAIT_LABEL_UNRECOGNIZED" xml:space="preserve">
     <value>InternalName</value>
   </data>
+  <data name="LC_TRAITS_SEARCH_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_SEARCH_NAME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_SEARCH_SEARCH" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_SEARCH_TITLE" xml:space="preserve">
+    <value />
+  </data>
 </root>
