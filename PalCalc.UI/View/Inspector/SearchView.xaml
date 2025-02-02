@@ -17,9 +17,9 @@
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              mc:Ignorable="d" 
              d:DataContext="{x:Static ivm:SearchViewModel.DesignerInstance}"
-             d:Background="White"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
@@ -32,16 +32,19 @@
             <ColumnDefinition Width="20*" MinWidth="100"/>
         </Grid.ColumnDefinitions>
 
-        <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_PAL_CONTAINERS}" Grid.Column="0" Margin="5">
+        <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_PAL_CONTAINERS}" Grid.Column="0">
             <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
+                <TreeView.Style>
+                    <Style TargetType="TreeView" BasedOn="{StaticResource {x:Type TreeView}}" />
+                </TreeView.Style>
                 <TreeView.InputBindings>
                     <KeyBinding Key="Delete" Command="{Binding DeleteContainerCommand}" CommandParameter="{Binding OwnerTree.SelectedSource.Container}" />
                 </TreeView.InputBindings>
                 <TreeView.ItemContainerStyle>
-                    <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                    <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItemStyle}">
                         <!-- Expand all items by default -->
                         <Setter Property="IsExpanded" Value="True" />
-                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                     </Style>
                 </TreeView.ItemContainerStyle>
                 <TreeView.Resources>
@@ -127,7 +130,7 @@
                 <RowDefinition Height="173*"/>
             </Grid.RowDefinitions>
 
-            <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_SEARCH_SETTINGS}" Grid.Row="0" Margin="5">
+            <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_SEARCH_SETTINGS}" Grid.Row="0" adonisExtensions:LayerExtension.IncreaseLayer="True">
                 <StackPanel Orientation="Vertical">
                     <WrapPanel Margin="5">
                         <WrapPanel.Resources>

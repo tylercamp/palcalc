@@ -24,12 +24,6 @@
                 <!-- (reapply fix for XAML binding errors from App.xaml) -->
                 <Setter Property="HorizontalContentAlignment" Value="Left" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
-
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                        <Setter Property="FontWeight" Value="Bold" />
-                    </DataTrigger>
-                </Style.Triggers>
             </Style>
         </TreeView.ItemContainerStyle>
         <TreeView.Resources>

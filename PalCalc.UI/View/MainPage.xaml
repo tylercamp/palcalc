@@ -10,6 +10,7 @@
       xmlns:itl="clr-namespace:PalCalc.UI.Localization"
       xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
       xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+      xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
       mc:Ignorable="d"
       d:Width="1280" d:Height="720"
       xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
@@ -17,6 +18,14 @@
       d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Page.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
+
+        <Style TargetType="GroupBox" BasedOn="{StaticResource {x:Type GroupBox}}">
+            <Setter Property="adonisExtensions:LayerExtension.IncreaseLayer" Value="False" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
+            <Setter Property="adonisExtensions:LayerExtension.IncreaseLayer" Value="False" />
+        </Style>
     </Page.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -60,11 +69,11 @@
 
                 <StackPanel DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
                     <Grid>
-                        <ProgressBar Value="{Binding SolverProgress}" />
+                        <ProgressBar Value="{Binding SolverProgress}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
                         <TextBlock Text="{Binding SolverStatusMsg.Value}" Margin="10,5,0,5" />
                     </Grid>
                     <Grid Margin="0,0,0,0">
-                        <ProgressBar Value="{Binding StepProgress}" />
+                        <ProgressBar Value="{Binding StepProgress}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
                         <TextBlock Text="{Binding StepStatusMsg.Value}" Margin="10,5,0,5" />
                     </Grid>
                 </StackPanel>
@@ -82,7 +91,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 
-                <GroupBox Header="{itl:LocalizedText LC_TARGET_PAL}" Grid.Row="0">
+                <GroupBox Header="{itl:LocalizedText LC_TARGET_PAL}" Grid.Row="0" adonisExtensions:LayerExtension.IncreaseLayer="True">
                     <v:PalTargetView DataContext="{Binding PalTarget}" />
                 </GroupBox>
 

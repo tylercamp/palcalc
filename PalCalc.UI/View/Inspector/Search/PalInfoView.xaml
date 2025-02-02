@@ -10,17 +10,20 @@
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:v="clr-namespace:PalCalc.UI.View"
              xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
+             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d"
-             d:DataContext="{x:Type ivmg:ContainerGridPalSlotViewModel}"
-             Background="#111">
+             Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}"
+             d:DataContext="{x:Type ivmg:ContainerGridPalSlotViewModel}">
     <UserControl.Resources>
-        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+        <!--<Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="Foreground" Value="White" />
         </Style>
         <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
             <Setter Property="Foreground" Value="White" />
-        </Style>
+        </Style>-->
     </UserControl.Resources>
+    <Grid adonisExtensions:LayerExtension.IncreaseLayer="True">
     <StackPanel Margin="10">
         <WrapPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
@@ -109,4 +112,5 @@
             </ItemsControl>
         </StackPanel>
     </StackPanel>
+    </Grid>
 </UserControl>

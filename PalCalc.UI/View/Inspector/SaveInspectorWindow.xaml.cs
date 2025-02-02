@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdonisUI.Controls;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace PalCalc.UI.View.Inspector
     /// <summary>
     /// Interaction logic for SaveInspectorWindow.xaml
     /// </summary>
-    public partial class SaveInspectorWindow : Window
+    public partial class SaveInspectorWindow : AdonisWindow
     {
         public SaveInspectorWindow()
         {
