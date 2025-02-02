@@ -4,9 +4,11 @@ using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
+using PalCalc.SaveReader.SaveFile;
 using PalCalc.SaveReader.SaveFile.Virtual;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.Model.CSV;
 using PalCalc.UI.View;
 using PalCalc.UI.View.Inspector;
 using PalCalc.UI.View.Utils;
@@ -25,6 +27,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Windows.ApplicationModel.Background;
 using Windows.UI.WebUI;
 
 namespace PalCalc.UI.ViewModel
@@ -72,7 +75,7 @@ namespace PalCalc.UI.ViewModel
 
                     case NewManualSaveGameViewModel:
                         var ofd = new OpenFileDialog();
-                        ofd.Filter = LocalizationCodes.LC_MANUAL_SAVE_EXTENSION_LBL.Bind().Value + "|Level.sav";
+                        ofd.Filter = LocalizationCodes.LC_MANUAL_SAVE_EXTENSION_LBL.Bind().Value + "|Level*.sav";
                         ofd.Title = LocalizationCodes.LC_MANUAL_SAVE_SELECTOR_TITLE.Bind().Value;
 
                         if (true == ofd.ShowDialog(App.Current.MainWindow))
@@ -147,6 +150,7 @@ namespace PalCalc.UI.ViewModel
                     }
 
                     ExportSaveCommand?.NotifyCanExecuteChanged();
+                    ExportSaveCsvCommand?.NotifyCanExecuteChanged();
                     InspectSaveCommand?.NotifyCanExecuteChanged();
                 }
             }
@@ -194,23 +198,66 @@ namespace PalCalc.UI.ViewModel
                         {
                             var save = SelectedFullGame.Value;
 
+                            void Export(ISaveFile file, string basePath)
+                            {
+                                if (file.FilePaths.Length == 1)
+                                {
+                                    archive.CreateEntryFromFile(file.FilePaths[0], $"{basePath}.sav");
+                                }
+                                else
+                                {
+                                    for (int i = 0; i < file.FilePaths.Length; i++)
+                                    {
+                                        archive.CreateEntryFromFile(file.FilePaths[i], $"{basePath}-{i}.sav");
+                                    }
+                                }
+                            }
+
                             if (save.Level != null && save.Level.Exists)
-                                archive.CreateEntryFromFile(save.Level.FilePath, "Level.sav");
+                                Export(save.Level, "Level");
 
                             if (save.LevelMeta != null && save.LevelMeta.Exists)
-                                archive.CreateEntryFromFile(save.LevelMeta.FilePath, "LevelMeta.sav");
+                                Export(save.LevelMeta, "LevelMeta");
 
                             if (save.WorldOption != null && save.WorldOption.Exists)
-                                archive.CreateEntryFromFile(save.WorldOption.FilePath, "WorldOption.sav");
+                                Export(save.WorldOption, "WorldOption");
 
                             if (save.LocalData != null && save.LocalData.Exists)
-                                archive.CreateEntryFromFile(save.LocalData.FilePath, "LocalData.sav");
+                                Export(save.LocalData, "LocalData");
 
                             foreach (var player in save.Players.Where(p => p.Exists))
                             {
-                                archive.CreateEntryFromFile(player.FilePath, $"Players/{Path.GetFileName(player.FilePath)}");
+                                string playerId;
+                                try
+                                {
+                                    playerId = player.ReadPlayerContent().PlayerId;
+                                }
+                                catch
+                                {
+                                    playerId = Path.GetFileNameWithoutExtension(player.FilePaths[0]);
+                                }
+                                Export(player, $"Players/{playerId}");
                             }
                         }
+                    }
+                },
+                canExecute: () => SelectedFullGame?.Value != null
+            );
+
+            ExportSaveCsvCommand = new RelayCommand(
+                execute: () =>
+                {
+                    var sfd = new SaveFileDialog()
+                    {
+                        FileName = $"Pals.csv",
+                        Filter = "CSV | *.csv",
+                        AddExtension = true,
+                        DefaultExt = "csv"
+                    };
+
+                    if (sfd.ShowDialog() == true)
+                    {
+                        File.WriteAllText(sfd.FileName, PalCSVExporter.Export(SelectedFullGame.CachedValue, GameSettingsViewModel.Load(SelectedFullGame.Value).ModelObject));
                     }
                 },
                 canExecute: () => SelectedFullGame?.Value != null
@@ -248,7 +295,7 @@ namespace PalCalc.UI.ViewModel
                     loadingModal.DataContext = LocalizationCodes.LC_SAVE_INSPECTOR_LOADING.Bind();
                     loadingModal.ShowSync();
 
-                    var vm = new SaveInspectorWindowViewModel(SelectedFullGame);
+                    var vm = new SaveInspectorWindowViewModel(SelectedFullGame, GameSettingsViewModel.Load(SelectedFullGame.Value).ModelObject);
 
                     loadingModal.Close();
 
@@ -284,6 +331,13 @@ namespace PalCalc.UI.ViewModel
         {
             get => exportSaveCommand;
             private set => SetProperty(ref exportSaveCommand, value);
+        }
+
+        private IRelayCommand exportSaveCsvCommand;
+        public IRelayCommand ExportSaveCsvCommand
+        {
+            get => exportSaveCsvCommand;
+            private set => SetProperty(ref exportSaveCsvCommand, value);
         }
 
         private IRelayCommand exportCrashLogCommand;

@@ -96,5 +96,8 @@ namespace PalCalc.Model
                 yield return r;
             }
         }
+
+        public static IEnumerable<KeyValuePair<KO, V>> MapKeys<KI, V, KO>(this IEnumerable<KeyValuePair<KI, V>> e, Func<KI, KO> map) =>
+            e.Select(kvp => KeyValuePair.Create(map(kvp.Key), kvp.Value));
     }
 }

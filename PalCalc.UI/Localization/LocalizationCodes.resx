@@ -721,4 +721,43 @@
   <data name="LC_COMMON_GENDER_NONE" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_COMMON_LOCATION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_MAP_COORDS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMMON_OWNER" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_EXPORT_SAVE_CSV" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_EXPORT_SAVE_CSV_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE_DESC" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SETTINGS_RESTART_REQUIRED_MSG" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAIT_LABEL_UNRECOGNIZED" xml:space="preserve">
+    <value>InternalName</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_SEARCH_NAME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_SEARCH_SEARCH" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TRAITS_SEARCH_TITLE" xml:space="preserve">
+    <value />
+  </data>
 </root>

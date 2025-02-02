@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search.Container
 {
-    public partial class DefaultSearchableContainerViewModel(IPalContainer sourceContainer, List<PalInstance> contents) : ISearchableContainerViewModel
+    public partial class DefaultSearchableContainerViewModel(GameSettings settings, IPalContainer sourceContainer, List<PalInstance> contents) : ISearchableContainerViewModel(settings)
     {
         override public string Id => sourceContainer.Id;
         override public LocationType DetectedType => sourceContainer.Type;
@@ -38,7 +38,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
                     }
                     else
                     {
-                        const int rowsPerPage = 5;
+                        var rowsPerPage = settings.LocationTypeGridHeights[DetectedType] ?? 5;
                         grids = SlotContents
                             .Batched(RowSize * rowsPerPage).ToList()
                             .ZipWithIndex()

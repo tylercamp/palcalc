@@ -1,0 +1,224 @@
+Name,CodeName
+,TestNPC
+Syndicate Gunner,Hunter_Rifle
+Syndicate Thug,Hunter_Handgun
+Syndicate Hunter,Hunter_Shotgun
+Syndicate Elite,Hunter_RocketLauncher
+Syndicate Interceptor,Hunter_MissileLauncher
+Syndicate Veteran,Hunter_GrenadeLauncher
+Syndicate Thug,Hunter_Bat
+Syndicate Grenadier,Hunter_Grenade
+Syndicate Cleaner,Hunter_FlameThrower
+Syndicate Crusher,Hunter_Fat_GatlingGun
+PIDF Infantry,Police_Rifle
+PIDF Guard,Police_Handgun
+PIDF Elite,Police_Shotgun
+Islander,MobuCitizen
+Villager,MobuVillager
+Quest Client,QuestMan
+Wandering Merchant,SalesPerson
+Visitor,VisitingMerchant
+Weapons Dealer,WeaponsDealer
+Pal Merchant,PalDealer
+Pal Merchant,Inspector
+Pal Merchant,PalTrader
+Pal Merchant,GoodwillAmbassador
+Pal Merchant,Robbery_Leader
+Pal Merchant,Robbery_Minion
+Guard,Guard_Rifle
+Guard,Guard_Shotgun
+,TestAssassin
+Syndicate Thug,Visitor_Hunter_Rifle
+Wandering Merchant,Visitor_Present
+Attack Chopper,SecurityDrone
+Brothers of the Eternal Pyre Martyr,FireCult_Rifle
+Brothers of the Eternal Pyre Martyr,FireCult_FlameThrower
+Free Pal Alliance Devout,Believer_Bat
+Free Pal Alliance Devout,Believer_CrossBow
+Villager,Male_People02
+Villager,Male_People03
+Villager,Female_People02
+Villager,Female_People03
+Villager,Male_Trader01
+Villager,Male_Trader02
+Villager,Male_Trader03
+Black Marketeer,Male_DarkTrader01
+Villager,Male_DesertPeople01
+Villager,Female_DesertPeople02
+Islander,MobuCitizen_Male
+Islander,Male_Soldier01
+Islander,Female_Soldier01
+Islander,Male_Police_old
+PAL Genetic Research Unit Executioner,Male_Scientist01_LaserRifle
+PAL Genetic Research Unit Executioner,Scientist_FlameThrower
+Wandering Merchant,SalesPerson_Desert
+Wandering Merchant,SalesPerson_Desert2
+Pal Merchant,PalDealer_Desert
+Wandering Merchant,SalesPerson_Volcano
+Wandering Merchant,SalesPerson_Volcano2
+Pal Merchant,PalDealer_Volcano
+Wandering Merchant,SalesPerson_Wander
+Pal Merchant,RandomEventShop
+Syndicate Gunner,Hunter_Rifle_Invader
+Syndicate Thug,Hunter_Handgun_Invader
+Syndicate Hunter,Hunter_Shotgun_Invader
+Syndicate Elite,Hunter_RocketLauncher_Invader
+Syndicate Thug,Hunter_Bat_Invader
+Syndicate Grenadier,Hunter_Grenade_Invader
+Syndicate Cleaner,Hunter_FlameThrower_Invader
+Syndicate Crusher,Hunter_Fat_GatlingGun_Invader
+Free Pal Alliance Devout,Believer_Bat_Invader
+Free Pal Alliance Devout,Believer_CrossBow_Invader
+Brothers of the Eternal Pyre Martyr,FireCult_Rifle_Invader
+Brothers of the Eternal Pyre Martyr,FireCult_FlameThrower_Invader
+PAL Genetic Research Unit Executioner,Male_Scientist01_LaserRifle_Invader
+PAL Genetic Research Unit Executioner,Scientist_FlameThrower_Invader
+Free Pal Alliance Judicator,Believer_Fat_GatlingGun
+Islander,Male_Soldier02
+Islander,Female_Soldier02
+Islander,Male_Soldier03
+Islander,Female_Soldier03
+Islander,Male_Soldier04
+Islander,Female_Soldier04
+Syndicate Gunner,Hunter_Rifle_Oilrig
+Syndicate Hunter,Hunter_Shotgun_Oilrig
+Syndicate Grenadier,Hunter_Grenade_Oilrig
+Syndicate Cleaner,Hunter_FlameThrower_Oilrig
+Syndicate Elite,Hunter_RocketLauncher_Oilrig
+Syndicate Veteran,Hunter_GrenadeLauncher_Oilrig
+Syndicate Interceptor,Hunter_MissileLauncher_Oilrig
+Syndicate Crusher,Hunter_Fat_GatlingGun_Oilrig
+Medal Merchant,Male_DarkTrader02
+Moonflower Genin,Male_Ninja01
+Moonflower Jonin,Male_NinjaElite01
+Syndicate Crusher,Hunter_Fat_GatlingGun_Tower
+Free Pal Alliance Devout,Believer_CrossBow_Tower
+Moonflower Genin,Ninja01_Tower
+Moonflower Jonin,NinjaElite01_Tower
+PIDF Infantry,Police_Rifle_Tower
+PIDF Elite,Police_Shotgun_Tower
+Hawk,BOSS_Hunter_Rifle
+Grill,BOSS_Hunter_Fat_GatlingGun
+Ego,BOSS_Believer_CrossBow
+Brick,BOSS_Believer_Fat_GiantClub
+Whip,BOSS_Police_Rifle
+Shadow,BOSS_FireCult_FlameThrower
+Whisk,BOSS_Scientist_LaserRifle
+Fumble,BOSS_Ninja
+Urchin,BOSS_Male_NinjaElite
+Gnaw,BOSS_Viking
+Cache,BOSS_VikingElite
+Jade,BOSS_Female_Soldier
+Dazzle,BOSS_Female_Soldier02
+Aloha,BOSS_Female_Soldier03
+Nimble,BOSS_Female_Soldier04
+Crash,BOSS_Male_Soldier
+Dart,BOSS_Male_Soldier02
+Clint,BOSS_Male_Soldier03
+Lasso,BOSS_Male_Soldier04
+Flare,BOSS_Female_People
+Siren,BOSS_Female_People02
+Turncoat,BOSS_Female_People03
+Dyna,BOSS_Male_People
+Mite,BOSS_Male_People2
+Quill,BOSS_Male_People02
+Scoot,BOSS_Male_People03
+Phantom,BOSS_Male_DesertPeople
+Whisper,BOSS_Female_DesertPeople
+Pinch,BOSS_Police_old
+Ram,BOSS_DarkTrader
+Skim,BOSS_Male_Trader01
+Mimic,BOSS_Male_Trader02
+Billy,BOSS_Male_Trader03
+Syndicate Thug,Hunter_Handgun_MiniOilrig
+Syndicate Gunner,Hunter_Rifle_MiniOilrig
+Syndicate Hunter,Hunter_Shotgun_MiniOilrig
+Syndicate Grenadier,Hunter_Grenade_MiniOilrig
+Syndicate Cleaner,Hunter_FlameThrower_MiiniOilrig
+Syndicate Elite,Hunter_RocketLauncher_MiniOilrig
+Syndicate Crusher,Hunter_Fat_GatlingGun_MiniOilrig
+Sturdy Mercenary,Male_Soldier01_EnemyGroup
+Sturdy Mercenary,Male_Soldier02_EnemyGroup
+Syndicate Laser Rifleman,Hunter_LaserRifle_Oilrig
+Syndicate Crossbowman,Hunter_BowGun_Oilrig
+Syndicate Swordsman,Hunter_Katana_Oilrig
+Syndicate Elite,Hunter_RocketLauncher_Oilrig_LD
+Syndicate Gunner,Hunter_Rifle_LargeOilrig
+Syndicate Hunter,Hunter_Shotgun_LargeOilrig
+Syndicate Grenadier,Hunter_Grenade_LargeOilrig
+Syndicate Cleaner,Hunter_FlameThrower_LargeOilrig
+Syndicate Elite,Hunter_RocketLauncher_LargeOilrig
+Syndicate Veteran,Hunter_GrenadeLauncher_LargeOilrig
+Syndicate Interceptor,Hunter_MissileLauncher_LargeOilrig
+Syndicate Crusher,Hunter_Fat_GatlingGun_LargeOilrig
+Feybreak Warrior,Viking
+Feybreak Berserker,Viking_Elite
+-,Visitor_Recruiter
+Free Pal Alliance Judicator,Believer_Fat_Cane
+,Emote_Tester
+Islander,Doctor
+Islander,PalPassive_Doctor
+Islander,Reward_Food
+Guard,Reward_Paldex
+Guard,Reward_BossDefeat
+Guard,Reward_PalCaptureCount
+Guard,Reward_PalDisplay_A_01
+Guard,Reward_PalDisplay_B_01
+Guard,Reward_PalDisplay_C_01
+Guard,Reward_PalDisplay_D_01
+Guard,Reward_PalDisplay_E_01
+Guard,Reward_PalDisplay_F_01
+Guard,Reward_PalDisplay_G_01
+Guard,Reward_PalDisplay_H_01
+Guard,Reward_PalDisplay_I_01
+Friendly Pal Tamer,Female_Presenter01
+Caravan Leader,CaravanLeader01
+Caravan Leader,CaravanLeader02
+Caravan Leader,CaravanLeader03
+Islander,NPC_FoodRequire_1
+Islander,NPC_PalDisplay_1
+Guard,BountyTrader
+Desert Town Ambassador,Ambassador01
+Blacksmith in Training,Blacksmith01
+Gourmet Hunter,Epicure01
+Bodyguard Mercenary,Escort_Warrior01
+Bodyguard Pal Tamer,Escort_PalTamer01
+Feybreak Warrior,Viking_Tower
+Feybreak Berserker,VikingElite_Tower
+Moonflower Jonin,Male_NinjaElite01_Invader
+Feybreak Berserker,Viking_Elite_Invader
+Fiery Pal Tamer,Male_Soldier02_Invader
+Gemini Tamers,Female_Soldier03_Invader
+Gemini Tamers,Female_Soldier04_Invader
+Islander,Yamishima_guide1
+Islander,Yamishima_guide2
+Islander,Yamishima_guide3
+Islander,Yamishima_guide4
+Bodyguard Mercenary,Yamishima_guide5
+Islander,Reward_Emote_A_01
+Islander,Reward_Emote_B_01
+Islander,Reward_Emote_C_01
+Islander,Reward_Emote_D_01
+Islander,Reward_Emote_E_01
+Islander,Reward_Emote_F_01
+Islander,Reward_Emote_G_01
+Islander,Reward_Emote_H_01
+Islander,Reward_Emote_I_01
+Islander,Emote_location_A_01
+Islander,Emote_location_A_02
+Islander,Emote_location_B_01
+Islander,Emote_location_B_02
+Islander,Emote_location_C_01
+Islander,Emote_location_C_02
+Islander,Emote_location_D_01
+Islander,Emote_location_D_02
+Islander,Emote_location_E_01
+Islander,Emote_location_E_02
+Islander,Emote_location_F_01
+Islander,Emote_location_F_02
+Islander,Emote_location_G_01
+Islander,Emote_location_G_02
+Islander,Emote_location_H_01
+Islander,Emote_location_H_02
+Islander,Emote_location_I_01
+Islander,Emote_location_I_02

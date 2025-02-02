@@ -178,6 +178,18 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMMON_LOCATION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMMON_MAP_COORDS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMMON_OWNER,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMMON_PAL,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -267,6 +279,14 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_EXPORT_SAVE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_EXPORT_SAVE_CSV,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_EXPORT_SAVE_CSV_DESCRIPTION,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -689,6 +709,18 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SETTINGS_PALBOX_TAB_SIZE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SETTINGS_PALBOX_TAB_SIZE_DESC,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SETTINGS_RESTART_REQUIRED_MSG,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SOLVER_PAUSE,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -787,6 +819,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_TARGET_PALS,
         /// <summary>
+        ///   Looks up a localized string similar to InternalName.
+        /// </summary>
+        LC_TRAIT_LABEL_UNRECOGNIZED,
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_TRAITS_COUNT_EMPTY,
@@ -846,6 +882,22 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to PresetName.
         /// </summary>
         LC_TRAITS_PRESETS_RENAME_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_SEARCH_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_SEARCH_NAME,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_SEARCH_SEARCH,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TRAITS_SEARCH_TITLE,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

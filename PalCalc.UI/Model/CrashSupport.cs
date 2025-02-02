@@ -120,22 +120,36 @@ namespace PalCalc.UI.Model
                         }
                         else
                         {
-                            void AddSaveFile(ISaveFile file)
+                            void AddSaveFile(ISaveFile file, string nameBase)
                             {
                                 try
                                 {
-                                    if (file.Exists) archive.CreateEntryFromFile(file.FilePath, $"save-{i}/{Path.GetFileName(file.FilePath)}");
+                                    if (file.Exists)
+                                    {
+                                        if (file.FilePaths.Length == 1)
+                                        {
+                                            archive.CreateEntryFromFile(file.FilePaths[0], $"save-{i}/{nameBase}.sav");
+                                        }
+                                        else
+                                        {
+                                            for (int fi = 0; fi <  file.FilePaths.Length; fi++)
+                                            {
+                                                if (File.Exists(file.FilePaths[fi]))
+                                                    archive.CreateEntryFromFile(file.FilePaths[fi], $"save-{i}/{nameBase}-{fi}.sav");
+                                            }
+                                        }
+                                    }
                                 }
                                 catch { }
                             }
 
-                            AddSaveFile(save.Level);
-                            AddSaveFile(save.LevelMeta);
-                            AddSaveFile(save.LocalData);
-                            AddSaveFile(save.WorldOption);
+                            AddSaveFile(save.Level, "Level");
+                            AddSaveFile(save.LevelMeta, "LevelMeta");
+                            AddSaveFile(save.LocalData, "LocalData");
+                            AddSaveFile(save.WorldOption, "WorldOption");
 
                             foreach (var p in save.Players.Where(p => p.Exists))
-                                archive.CreateEntryFromFile(p.FilePath, $"save-{i}/Players/{Path.GetFileName(p.FilePath)}");
+                                AddSaveFile(p, $"Players/{Path.GetFileName(p.FilePaths[0])}");
                         }
                     }
                     catch { }

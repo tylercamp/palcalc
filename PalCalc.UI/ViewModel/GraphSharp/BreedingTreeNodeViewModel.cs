@@ -19,7 +19,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 {
     public partial class BreedingTreeNodeViewModel : ObservableObject
     {
-        public BreedingTreeNodeViewModel(CachedSaveGame source, IBreedingTreeNode node)
+        public BreedingTreeNodeViewModel(CachedSaveGame source, GameSettings settings, IBreedingTreeNode node)
         {
             Value = node;
             Pal = PalViewModel.Make(node.PalRef.Pal);
@@ -29,7 +29,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             switch (node.PalRef.Location)
             {
                 case CompositeRefLocation crl:
-                    Location = new CompositePalRefLocationViewModel(source, crl);
+                    Location = new CompositePalRefLocationViewModel(source, settings, crl);
                     break;
 
                 case CapturedRefLocation carl:
@@ -37,7 +37,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
                     break;
 
                 default:
-                    Location = new SpecificPalRefLocationViewModel(source, node.PalRef.Location);
+                    Location = new SpecificPalRefLocationViewModel(source, settings, node.PalRef.Location);
                     break;
             }
 

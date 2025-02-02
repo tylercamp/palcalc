@@ -251,7 +251,7 @@ namespace PalCalc.UI.ViewModel
 
         private void SaveSelection_CustomSaveAdded(ManualSavesLocationViewModel manualSaves, ISaveGame save)
         {
-            if (Storage.LoadSave(save, db) == null)
+            if (Storage.LoadSave(save, db, GameSettings.Defaults) == null)
             {
                 SaveSelection.SelectedGame = null;
                 return;
@@ -338,7 +338,7 @@ namespace PalCalc.UI.ViewModel
                 loadingSaveModal = null;
 
                 if (loaded != null && targetsBySaveFile.ContainsKey(obj))
-                    targetsBySaveFile[obj].UpdateCachedData(loaded);
+                    targetsBySaveFile[obj].UpdateCachedData(loaded, GameSettingsViewModel.Load(obj).ModelObject);
             }
         }
 
@@ -366,13 +366,13 @@ namespace PalCalc.UI.ViewModel
                 PalTargetList.OrderChanged -= SaveTargetList;
             }
 
-            if (GameSettings != null) GameSettings.PropertyChanged -= GameSettings_PropertyChanged;
+            if (SelectedGameSettings != null) SelectedGameSettings.PropertyChanged -= GameSettings_PropertyChanged;
 
             if (SaveSelection.SelectedFullGame?.Value == null)
             {
                 PalTargetList = null;
                 PalTarget = null;
-                GameSettings = null;
+                SelectedGameSettings = null;
             }
             else
             {
@@ -385,12 +385,22 @@ namespace PalCalc.UI.ViewModel
                 PalTargetList.PropertyChanged += PalTargetList_PropertyChanged;
                 PalTargetList.OrderChanged += SaveTargetList; // TODO - debounce
 
-                GameSettings = GameSettingsViewModel.Load(SaveSelection.SelectedFullGame.Value);
-                GameSettings.PropertyChanged += GameSettings_PropertyChanged;
+                SelectedGameSettings = GameSettingsViewModel.Load(SaveSelection.SelectedFullGame.Value);
+                SelectedGameSettings.PropertyChanged += GameSettings_PropertyChanged;
             }
 
             UpdatePalTarget();
             UpdateSolverControls();
+
+            var csg = SaveSelection.SelectedFullGame?.CachedValue;
+            if (csg != null)
+            {
+                foreach (var passive in csg.OwnedPals.SelectMany(p => p.PassiveSkills).OfType<UnrecognizedPassiveSkill>())
+                {
+                    // preload any unrecognized passives so they appear in dropdowns
+                    PassiveSkillViewModel.Make(passive);
+                }
+            }
         }
 
         private void UpdatePalTarget()
@@ -451,7 +461,7 @@ namespace PalCalc.UI.ViewModel
             if (cachedData == null) return;
 
             var inputPals = PalTarget.AvailablePals.ToList();
-            var solver = SolverControls.ConfiguredSolver(GameSettings.ModelObject, inputPals);
+            var solver = SolverControls.ConfiguredSolver(SelectedGameSettings.ModelObject, inputPals);
             solver.SolverStateUpdated += Solver_SolverStateUpdated;
 
             var solverThread = new Thread(() =>
@@ -528,7 +538,10 @@ namespace PalCalc.UI.ViewModel
                     {
                         if (!currentJob.TokenSource.IsCancellationRequested)
                         {
-                            PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel() { Results = results.Select(r => new BreedingResultViewModel(cachedData, r)).ToList() };
+                            PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel()
+                            {
+                                Results = results.Select(r => new BreedingResultViewModel(cachedData, SelectedGameSettings.ModelObject, r)).ToList()
+                            };
                             if (PalTarget.InitialPalSpecifier == null)
                             {
                                 PalTarget.CurrentPalSpecifier.DeleteCommand = deletePalTargetCommand;
@@ -706,7 +719,7 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private SaveSelectorViewModel saveSelection;
         [ObservableProperty]
-        private GameSettingsViewModel gameSettings;
+        private GameSettingsViewModel selectedGameSettings;
         [ObservableProperty]
         private SolverControlsViewModel solverControls;
         [ObservableProperty]

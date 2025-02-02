@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search.Container
 {
-    public abstract class ISearchableContainerViewModel : ObservableObject
+    public abstract class ISearchableContainerViewModel(GameSettings settings) : ObservableObject
     {
         public abstract string Id { get; }
         public abstract LocationType DetectedType { get; }
 
-        public int RowSize => GameConstants.LocationTypeGridWidths[DetectedType];
+        public int RowSize => settings.LocationTypeGridWidths[DetectedType];
 
         public abstract List<IContainerGridViewModel> Grids { get; }
 

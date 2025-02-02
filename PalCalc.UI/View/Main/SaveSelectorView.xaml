@@ -104,6 +104,10 @@
                 ToolTip="{itl:LocalizedText LC_EXPORT_SAVE_DESCRIPTION}"
                 Content="{itl:LocalizedText LC_EXPORT_SAVE}" />
 
+        <Button Command="{Binding ExportSaveCsvCommand}"
+                ToolTip="{itl:LocalizedText LC_EXPORT_SAVE_CSV_DESCRIPTION}"
+                Content="{itl:LocalizedText LC_EXPORT_SAVE_CSV}" />
+
         <Button Command="{Binding ExportCrashLogCommand}"
                 ToolTip="{itl:LocalizedText LC_EXPORT_CRASH_LOG_DESCRIPTION}"
                 Content="{itl:LocalizedText LC_EXPORT_CRASH_LOG}" />

@@ -8,6 +8,6 @@ namespace PalCalc.SaveReader.SaveFile
 {
     public class LocalDataSaveFile : ISaveFile
     {
-        public LocalDataSaveFile(string filePath) : base(filePath) { }
+        public LocalDataSaveFile(string[] filePaths) : base(filePaths) { }
     }
 }

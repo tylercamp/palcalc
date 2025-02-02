@@ -21,6 +21,9 @@ namespace PalCalc.Model
         public string InternalName { get; }
         public int Rank { get; }
 
+        public string Description { get; set; }
+        public Dictionary<string, string> LocalizedDescriptions { get; set; }
+
         // whether this is a passive you would find on a pal's list of passives,
         // rather than e.g. passive attached to a partner skill
         public bool IsStandardPassiveSkill { get; set; } = true;

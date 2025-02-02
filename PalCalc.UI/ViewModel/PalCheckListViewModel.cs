@@ -115,6 +115,11 @@ namespace PalCalc.UI.ViewModel
             {
                 HasChanges = allEntries.Any(e => e.HasChanges);
             }
+
+            if (e.PropertyName == nameof(PalCheckListEntryViewModel.IsEnabled))
+            {
+                OnPropertyChanged(nameof(AllItemsEnabled));
+            }
         }
 
         private void DetachEvents()
@@ -129,5 +134,23 @@ namespace PalCalc.UI.ViewModel
         [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         [ObservableProperty]
         private bool hasChanges = false;
+
+        public bool? AllItemsEnabled
+        {
+            get
+            {
+                if (allEntries.All(e => e.IsEnabled)) return true;
+                if (allEntries.All(e => !e.IsEnabled)) return false;
+                return null;
+            }
+
+            set
+            {
+                if (value == null) return;
+
+                foreach (var e in allEntries)
+                    e.IsEnabled = value.Value;
+            }
+        }
     }
 }

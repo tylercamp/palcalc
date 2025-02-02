@@ -68,7 +68,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
             ReloadSaveCommand = new RelayCommand(() =>
             {
-                Storage.ReloadSave(value, PalDB.LoadEmbedded());
+                Storage.ReloadSave(value, PalDB.LoadEmbedded(), GameSettingsViewModel.Load(value).ModelObject);
             });
 
             Storage.SaveReloaded += RespondToChanges;
@@ -132,7 +132,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             private set => SetProperty(ref this.value, value);
         }
 
-        public CachedSaveGame CachedValue => Storage.LoadSave(Value, PalDB.LoadEmbedded());
+        public CachedSaveGame CachedValue => Storage.LoadSave(Value, PalDB.LoadEmbedded(), GameSettingsViewModel.Load(Value).ModelObject);
 
         private SaveCustomizationsViewModel customizations = null;
         public SaveCustomizationsViewModel Customizations => customizations ??= new SaveCustomizationsViewModel(this);

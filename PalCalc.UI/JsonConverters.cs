@@ -550,7 +550,7 @@ namespace PalCalc.UI
         protected override BreedingResultViewModel ReadTypeJson(JsonReader reader, Type objectType, BreedingResultViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var palRef = JToken.ReadFrom(reader).ToObject<IPalReference>(serializer);
-            return new BreedingResultViewModel(source, palRef);
+            return new BreedingResultViewModel(source, gameSettings, palRef);
         }
 
         protected override void WriteTypeJson(JsonWriter writer, BreedingResultViewModel value, JsonSerializer serializer)

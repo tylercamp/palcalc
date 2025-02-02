@@ -202,6 +202,15 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_COMMON_LEVEL" xml:space="preserve">
     <value>Level</value>
   </data>
+  <data name="LC_COMMON_LOCATION" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="LC_COMMON_MAP_COORDS" xml:space="preserve">
+    <value>Map Coords</value>
+  </data>
+  <data name="LC_COMMON_OWNER" xml:space="preserve">
+    <value>Owner</value>
+  </data>
   <data name="LC_COMMON_PAL" xml:space="preserve">
     <value>Pal</value>
   </data>
@@ -283,6 +292,12 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_EXPORT_SAVE" xml:space="preserve">
     <value>Export Save</value>
   </data>
+  <data name="LC_EXPORT_SAVE_CSV" xml:space="preserve">
+    <value>Export Save CSV</value>
+  </data>
+  <data name="LC_EXPORT_SAVE_CSV_DESCRIPTION" xml:space="preserve">
+    <value>Exports all pals in your save file to a CSV spreadsheet.</value>
+  </data>
   <data name="LC_EXPORT_SAVE_DESCRIPTION" xml:space="preserve">
     <value>Exports all known Palworld files for the selected save as a ZIP.</value>
   </data>
@@ -320,7 +335,7 @@ Please find the generated ZIP file to send with any support questions:
     <value>Language</value>
   </data>
   <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
-    <value>Pal Calc must be restarted to finish applying the new language.</value>
+    <value>Pal Calc must be restarted for the new language to fully apply.</value>
   </data>
   <data name="LC_LIST_SEPARATOR" xml:space="preserve">
     <value>, </value>
@@ -603,6 +618,19 @@ This will not delete the save files from your computer.</value>
   <data name="LC_SAVE_WARNING" xml:space="preserve">
     <value>(!)</value>
   </data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE" xml:space="preserve">
+    <value>Palbox Tab Size</value>
+  </data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE_DESC" xml:space="preserve">
+    <value>The size of a tab in your Palbox. This is used when displaying the locations of Pals in your Palbox.
+
+The default is 6x5. This shouldn't be changed unless you use a mod which changes the size of a Palbox tab.
+
+This setting requires a restart to fully apply.</value>
+  </data>
+  <data name="LC_SETTINGS_RESTART_REQUIRED_MSG" xml:space="preserve">
+    <value>Some changes require a restart to take full effect.</value>
+  </data>
   <data name="LC_SOLVER_PAUSE" xml:space="preserve">
     <value>Pause</value>
   </data>
@@ -741,6 +769,21 @@ Higher values linearly affect time required, depending on how many types of pals
   </data>
   <data name="LC_TRAITS_PRESETS_RENAME_TITLE" xml:space="preserve">
     <value>Rename Preset '{PresetName}'</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_DESCRIPTION" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_NAME" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_SEARCH" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_TITLE" xml:space="preserve">
+    <value>Search Passive Skills</value>
+  </data>
+  <data name="LC_TRAIT_LABEL_UNRECOGNIZED" xml:space="preserve">
+    <value>{InternalName} (Unrecognized)</value>
   </data>
   <data name="LC_UNKNOWN_GUILD" xml:space="preserve">
     <value>Unknown Guild</value>

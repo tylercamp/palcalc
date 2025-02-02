@@ -141,11 +141,13 @@ namespace PalCalc.UI.Model
             var filePath = CustomContainerPath(forSaveGame);
             if (!File.Exists(filePath)) return new SaveCustomizations();
 
+            SaveCustomizations res = null;
+
 #if HANDLE_ERRORS
             try
             {
 #endif
-                return JsonConvert.DeserializeObject<SaveCustomizations>(File.ReadAllText(filePath), new PalInstanceJsonConverter(db));
+                res = JsonConvert.DeserializeObject<SaveCustomizations>(File.ReadAllText(filePath), new PalInstanceJsonConverter(db));
 #if HANDLE_ERRORS
             }
             catch (Exception re)
@@ -159,10 +161,12 @@ namespace PalCalc.UI.Model
                 {
                     logger.Warning(fe, "failed to delete customizations file");
                 }
-
-                return new SaveCustomizations();
             }
 #endif
+
+            res ??= new SaveCustomizations();
+            res.CustomContainers ??= [];
+            return res;
         }
 
         public static void SaveCustomizations(ISaveGame forSaveGame, SaveCustomizations custom, PalDB db)
@@ -214,7 +218,7 @@ namespace PalCalc.UI.Model
         }
 
         // loads the cached save data and updates it if it's outdated or not yet cached
-        public static CachedSaveGame LoadSave(ISaveGame save, PalDB db)
+        public static CachedSaveGame LoadSave(ISaveGame save, PalDB db, GameSettings settings)
         {
             Init();
 
@@ -252,7 +256,7 @@ namespace PalCalc.UI.Model
                     if (res.IsOutdated(db))
                     {
                         File.Delete(path);
-                        return LoadSave(save, db);
+                        return LoadSave(save, db, settings);
                     }
 
                     InMemorySaves.Add(identifier, res);
@@ -260,7 +264,7 @@ namespace PalCalc.UI.Model
                 }
                 else
                 {
-                    var res = CachedSaveGame.FromSaveGame(save, db);
+                    var res = CachedSaveGame.FromSaveGame(save, db, settings);
                     if (res != null)
                     {
                         CrashSupport.ReferencedCachedSave(res);
@@ -288,7 +292,7 @@ namespace PalCalc.UI.Model
             ClearForSave(save);
         }
 
-        public static void ReloadSave(ISaveGame save, PalDB db)
+        public static void ReloadSave(ISaveGame save, PalDB db, GameSettings settings)
         {
             Init();
 
@@ -314,7 +318,7 @@ namespace PalCalc.UI.Model
                 if (wasStored)
                     File.Move(path, backupPath);
 
-                var newCachedSave = LoadSave(save, db);
+                var newCachedSave = LoadSave(save, db, settings);
 
                 if (newCachedSave == null)
                 {

@@ -10,22 +10,23 @@ namespace PalCalc.SaveReader.SaveFile
 {
     public abstract class ISaveFile
     {
-        public ISaveFile(string filePath)
+        public ISaveFile(string[] filePaths)
         {
-            FilePath = filePath;
+            FilePaths = filePaths;
         }
 
-        public string FilePath { get; }
-        public bool Exists => File.Exists(FilePath);
+        // ("Save Files" can sometimes be split across several actual files on disk)
+        public string[] FilePaths { get; }
+        public bool Exists => FilePaths.Any(File.Exists);
 
         private bool? isValid = null;
-        public bool IsValid => isValid ??= Exists && GvasFile.IsValidGvas(FilePath);
+        public bool IsValid => isValid ??= Exists && GvasFile.IsValidGvas(FilePaths[0]);
 
-        public DateTime LastModified => File.GetLastWriteTime(FilePath);
+        public DateTime LastModified => FilePaths.Select(File.GetLastWriteTime).Max();
 
-        protected void VisitGvas(params IVisitor[] visitors)
+        protected virtual void VisitGvas(params IVisitor[] visitors)
         {
-            CompressedSAV.WithDecompressedSave(FilePath, stream =>
+            CompressedSAV.WithDecompressedAggregateSave(FilePaths, stream =>
             {
                 using (var archiveReader = new FArchiveReader(stream, PalWorldTypeHints.Hints, false))
                     GvasFile.FromFArchive(archiveReader, visitors);
@@ -43,10 +44,10 @@ namespace PalCalc.SaveReader.SaveFile
         /// </summary>
         /// <param name="preserveValues"></param>
         /// <returns>A `GvasFile` with a populated `Properties` field (if `preserveValues = true`)</returns>
-        public GvasFile ParseGvas(bool preserveValues, params IVisitor[] visitors)
+        public virtual GvasFile ParseGvas(bool preserveValues, params IVisitor[] visitors)
         {
             GvasFile result = null;
-            CompressedSAV.WithDecompressedSave(FilePath, stream =>
+            CompressedSAV.WithDecompressedAggregateSave(FilePaths, stream =>
             {
                 using (var archiveReader = new FArchiveReader(stream, PalWorldTypeHints.Hints, preserveValues))
                     result = GvasFile.FromFArchive(archiveReader, visitors);

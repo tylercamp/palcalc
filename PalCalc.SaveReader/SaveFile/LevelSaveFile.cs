@@ -32,7 +32,7 @@ namespace PalCalc.SaveReader.SaveFile
     {
         private static ILogger logger = Log.ForContext<LevelSaveFile>();
 
-        public LevelSaveFile(string filePath) : base(filePath) { }
+        public LevelSaveFile(string[] filePaths) : base(filePaths) { }
 
         private Guid MostCommonOwner(RawPalContainerContents container, Dictionary<Guid, Guid> palOwnersByInstanceId) => container.Slots.GroupBy(s => palOwnersByInstanceId.GetValueOrElse(s.InstanceId, Guid.Empty)).MaxBy(g => g.Count())?.Key ?? Guid.Empty;
 
@@ -106,7 +106,7 @@ namespace PalCalc.SaveReader.SaveFile
             }).SkipNull().ToList();
         }
 
-        private List<IPalContainer> CollectContainers(RawLevelSaveData parsed, List<PlayerMeta> players)
+        private List<IPalContainer> CollectContainers(GameSettings settings, RawLevelSaveData parsed, List<PlayerMeta> players)
         {
             var instanceOwners = parsed.Characters.Where(c => c.OwnerPlayerId != null).ToDictionary(c => c.InstanceId, c => c.OwnerPlayerId.Value);
             var definiteContainers = CollectDefiniteContainers(parsed, players, instanceOwners);
@@ -127,7 +127,7 @@ namespace PalCalc.SaveReader.SaveFile
                 var possiblePalBoxOwners = allOwners.Where(id => !definiteContainers.OfType<PalboxPalContainer>().Any(c => c.PlayerId == id.ToString())).ToList();
 
                 var allowedTypes = new List<LocationType>();
-                if (unexpected.MaxEntries <= GameConstants.PlayerPartySize)
+                if (unexpected.MaxEntries <= settings.PlayerPartySize)
                 {
                     definiteContainers.Add(new PlayerPartyContainer()
                     {
@@ -135,7 +135,7 @@ namespace PalCalc.SaveReader.SaveFile
                         PlayerId = possiblePartyOwners.FirstOrDefault().ToString()
                     });
                 }
-                else if (possiblePalBoxOwners.Count > 0 && unexpected.MaxEntries > GameConstants.PlayerPartySize)
+                else if (possiblePalBoxOwners.Count > 0 && unexpected.MaxEntries > settings.PlayerPartySize)
                 {
                     definiteContainers.Add(new PalboxPalContainer()
                     {
@@ -157,12 +157,14 @@ namespace PalCalc.SaveReader.SaveFile
             return definiteContainers;
         }
 
-        public virtual LevelSaveData ReadCharacterData(PalDB db, List<PlayersSaveFile> playersFiles)
+        // note: `settings` only used for pal container sizes, in case player saves are unavailable and we need to
+        //       infer the container type based on their size
+        public virtual LevelSaveData ReadCharacterData(PalDB db, GameSettings settings, List<PlayersSaveFile> playersFiles)
         {
             var players = playersFiles.Select(pf => pf.ReadPlayerContent()).ToList();
             var parsed = ReadRawCharacterData();
 
-            var detectedContainers = CollectContainers(parsed, players);
+            var detectedContainers = CollectContainers(settings, parsed, players);
 
             var result = new LevelSaveData()
             {
@@ -205,6 +207,9 @@ namespace PalCalc.SaveReader.SaveFile
                 else
                 {
                     var sanitizedCharId = gvasInstance.CharacterId.Replace("Boss_", "", StringComparison.InvariantCultureIgnoreCase);
+
+                    if (db.Humans.Any(h => h.InternalName == sanitizedCharId)) continue;
+
                     var pal = db.Pals.FirstOrDefault(p => p.InternalName.ToLower() == sanitizedCharId.ToLower());
 
                     if (pal == null)

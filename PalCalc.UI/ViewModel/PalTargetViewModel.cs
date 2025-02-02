@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.UI.Model;
+using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
@@ -65,6 +66,8 @@ namespace PalCalc.UI.ViewModel
             OpenPresetsMenuCommand = new RelayCommand(() => PresetsMenuIsOpen = true);
 
             presets.PresetSelected += (_) => PresetsMenuIsOpen = false;
+
+            OpenPassivesSearchCommand = new RelayCommand(() => new PassivesSearchWindow().Show());
         }
 
         private void PalSource_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -157,5 +160,7 @@ namespace PalCalc.UI.ViewModel
         private bool presetsMenuIsOpen = false;
 
         public IRelayCommand OpenPresetsMenuCommand { get; }
+
+        public IRelayCommand OpenPassivesSearchCommand { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using PalCalc.Model;
+﻿using PalCalc.GenDB.GameDataReaders;
+using PalCalc.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -40,7 +41,14 @@ namespace PalCalc.GenDB
 
     internal class CSVExport
     {
-        public static void Write(string outDir, PalDB db)
+        private const string ExportLocale = "en";
+
+        public static void Write(
+            string outDir,
+            PalDB db,
+            List<UHumanInfo> humans,
+            Dictionary<string, Dictionary<string, string>> humanLocalizations
+        )
         {
             if (Directory.Exists(outDir))
                 Directory.Delete(outDir, true);
@@ -52,7 +60,7 @@ namespace PalCalc.GenDB
             {
                 foreach (var pal in db.Pals.OrderBy(p => p.Id.PalDexNo).ThenBy(p => p.Id.IsVariant))
                     palWriter.Write([
-                        ("Name", pal.Name),
+                        ("Name", pal.LocalizedNames?.GetValueOrDefault(ExportLocale) ?? pal.Name),
                         ("CodeName", pal.InternalName),
                         ("PalDexNo", pal.Id.PalDexNo),
                         ("IsVariant", pal.Id.IsVariant),
@@ -69,11 +77,23 @@ namespace PalCalc.GenDB
             using (var passiveWriter = new CSVWriter(f))
                 foreach (var passive in db.PassiveSkills.OrderByDescending(p => p.IsStandardPassiveSkill).ThenBy(p => p.InternalName))
                     passiveWriter.Write([
-                        ("Name", passive.Name),
+                        ("Name", passive?.LocalizedNames?.GetValueOrDefault(ExportLocale) ?? passive.Name),
                         ("CodeName", passive.InternalName),
                         ("Rank", passive.Rank),
                         ("IsPalPassive", passive.IsStandardPassiveSkill)
                     ]);
+
+            using (var f = File.OpenWrite($"{outDir}/humans.csv"))
+            using (var humanWriter = new CSVWriter(f))
+            {
+                foreach (var human in humans)
+                {
+                    humanWriter.Write([
+                        ("Name", humanLocalizations[ExportLocale].GetValueOrDefault(human.OverrideNameTextID)),
+                        ("CodeName", human.InternalName)
+                    ]);
+                }
+            }
         }
     }
 }
