@@ -19,6 +19,7 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -138,6 +139,9 @@ namespace PalCalc.GenDB
                 return match.Value;
             });
 
+
+            description = Regex.Replace(description, "<.+?>", "");
+
             return description.Replace("\r\n", "\n");
         }
 
@@ -155,8 +159,8 @@ namespace PalCalc.GenDB
                     "CraftSpeed" => commonTexts["COMMON_STATUS_SPEED"],
                     "ShotAttack" => commonTexts["COMMON_STATUS_RANGE_ATTACK"],
                     "Defense" => commonTexts["COMMON_STATUS_DEFENCE"],
-                    
-                    var raw => effect,
+
+                    _ => effect,
                 };
 
                 if (label == effect)
@@ -166,7 +170,7 @@ namespace PalCalc.GenDB
                     label = effect.Replace("EPalPassiveSkillEffectType::", "");
                 }
 
-                if (label != null) return $"{label} +{value}%";
+                if (label != null) return $"{label} {value.ToString("+0;-#")}%";
                 else return null;
             }
 
