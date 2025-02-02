@@ -207,6 +207,9 @@ namespace PalCalc.SaveReader.SaveFile
                 else
                 {
                     var sanitizedCharId = gvasInstance.CharacterId.Replace("Boss_", "", StringComparison.InvariantCultureIgnoreCase);
+
+                    if (db.Humans.Any(h => h.InternalName == sanitizedCharId)) continue;
+
                     var pal = db.Pals.FirstOrDefault(p => p.InternalName.ToLower() == sanitizedCharId.ToLower());
 
                     if (pal == null)

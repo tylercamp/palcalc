@@ -11,6 +11,7 @@ namespace PalCalc.GenDB.GameDataReaders
         public const string PASSIVE_SKILLS_PATH = "Pal/Content/Pal/DataTable/PassiveSkill/DT_PassiveSkill_Main";
         public const string PALS_PATH = "Pal/Content/Pal/DataTable/Character/DT_PalMonsterParameter";
         public const string PALS_UNIQUE_BREEDING_PATH = "Pal/Content/Pal/DataTable/Character/DT_PalCombiUnique";
+        public const string HUMANS_PATH = "Pal/Content/Pal/DataTable/Character/DT_PalHumanParameter";
 
         public const string PAL_BPS_BASE = "Pal/Content/Pal/Blueprint/Character/Monster/PalActorBP/";
 

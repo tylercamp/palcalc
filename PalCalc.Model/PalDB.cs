@@ -22,6 +22,8 @@ namespace PalCalc.Model
 
         public Dictionary<PalId, Pal> PalsById { get; set; }
 
+        public List<Human> Humans { get; set; }
+
         public Dictionary<Pal, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
 
         public List<PassiveSkill> PassiveSkills { get; set; }

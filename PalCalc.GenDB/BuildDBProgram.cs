@@ -53,7 +53,7 @@ namespace PalCalc.GenDB
         //
         // (should be a folder containing "Pal-Windows.pak")
         static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Content\Paks";
-        static string MappingsPath = @"C:\Users\algor\OneDrive\Desktop\Mappings.usmap";
+        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
@@ -568,6 +568,9 @@ namespace PalCalc.GenDB
                 palNames: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadPalNames(provider))
             );
 
+            var rawHumans = HumanReader.ReadHumans(provider);
+            var humans = rawHumans.Select(h => new Human(h.InternalName)).ToList();
+
             // (passives in game data may have "IsPal" or similar flags, which affect whether those passives can be
             //  obtained randomly, but this flag isn't set for passives which are pal-specific, e.g. Legend.)
             var rawPassiveSkills = PassiveSkillsReader.ReadPassiveSkills(
@@ -604,9 +607,10 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v16");
+            var db = PalDB.MakeEmptyUnsafe("v17");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
+            db.Humans = humans;
             db.PassiveSkills = passives;
             db.ActiveSkills = attacks;
             db.Elements = elements;
@@ -676,7 +680,12 @@ namespace PalCalc.GenDB
             // from a new image resolution
             MapTransformSolver.Run("coord-samples.json", sampleMapTexSize: 2048);
 
-            CSVExport.Write("out-csv", db);
+            CSVExport.Write(
+                outDir: "out-csv",
+                db: db,
+                humans: rawHumans,
+                humanLocalizations: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadHumanNames(provider))
+            );
         }
 
 

@@ -11,7 +11,14 @@ using System.Threading.Tasks;
 
 namespace PalCalc.GenDB.GameDataReaders
 {
-    class LocalizationInfo(string languageCode, string palNameTextPath, string skillNameTextPath, string skillDescriptionTextPath, string commonTextPath)
+    class LocalizationInfo(
+        string languageCode,
+        string palNameTextPath,
+        string skillNameTextPath,
+        string skillDescriptionTextPath,
+        string commonTextPath,
+        string humanNameTextPath
+    )
     {
         private static Regex DoubleWhitespacePattern = new Regex(@"\s+");
 
@@ -105,6 +112,15 @@ namespace PalCalc.GenDB.GameDataReaders
 
             return result.ToCaseInsensitive();
         }
+
+        public Dictionary<string, string> ReadHumanNames(IFileProvider provider)
+        {
+            var rawEntries = provider.LoadObject<UDataTable>(humanNameTextPath);
+            return rawEntries.RowMap.ToDictionary(
+                kvp => kvp.Key.Text,
+                kvp => kvp.Value.Get<FText>("TextData").Text.Trim()
+            );
+        }
     }
 
     internal class LocalizationsReader
@@ -124,7 +140,8 @@ namespace PalCalc.GenDB.GameDataReaders
                     palNameTextPath: $"{basePath}/DT_PalNameText",
                     skillNameTextPath: $"{basePath}/DT_SkillNameText",
                     skillDescriptionTextPath: $"{basePath}/DT_SkillDescText",
-                    commonTextPath: $"{basePath}/DT_UI_Common_Text"
+                    commonTextPath: $"{basePath}/DT_UI_Common_Text",
+                    humanNameTextPath: $"{basePath}/DT_HumanNameText"
                 ));
             }
 
@@ -133,7 +150,8 @@ namespace PalCalc.GenDB.GameDataReaders
                 palNameTextPath: "Pal/Content/Pal/DataTable/Text/DT_PalNameText",
                 skillNameTextPath: "Pal/Content/Pal/DataTable/Text/DT_SkillNameText",
                 skillDescriptionTextPath: "Pal/Content/Pal/DataTable/Text/DT_SkillDescText",
-                commonTextPath: "Pal/Content/Pal/DataTable/Text/DT_UI_Common_Text"
+                commonTextPath: "Pal/Content/Pal/DataTable/Text/DT_UI_Common_Text",
+                humanNameTextPath: "Pal/Content/Pal/DataTable/Text/DT_HumanNameText"
             ));
             return res;
         }

@@ -136,6 +136,7 @@ namespace PalCalc.Model
 
             var version = asToken["Version"]?.ToObject<string>();
             var pals = asToken["Pals"].ToObject<List<Pal>>();
+            var humans = asToken["Humans"].ToObject<List<string>>();
             var passives = asToken["PassiveSkills"].ToObject<List<PassiveSkill>>();
             var attacks = asToken["ActiveSkills"].ToObject<List<ActiveSkill>>();
             var elements = asToken["Elements"].ToObject<List<PalElement>>();
@@ -148,6 +149,7 @@ namespace PalCalc.Model
             {
                 Version = version,
                 PalsById = pals.ToDictionary(p => p.Id),
+                Humans = humans.Select(n => new Human(n)).ToList(),
                 PassiveSkills = passives,
                 ActiveSkills = attacks,
                 Elements = elements,
@@ -165,6 +167,7 @@ namespace PalCalc.Model
             {
                 Version = value.Version,
                 Pals = value.Pals,
+                Humans = value.Humans.Select(h => h.InternalName),
                 PassiveSkills = value.PassiveSkills,
                 ActiveSkills = value.ActiveSkills,
                 Elements = value.Elements,
