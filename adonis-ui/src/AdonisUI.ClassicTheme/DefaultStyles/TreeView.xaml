@@ -59,7 +59,7 @@
                                       Focusable="False"
                                       ClickMode="Press"
                                       Foreground="{TemplateBinding Foreground}"
-                                      IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                      IsChecked="{Binding IsExpanded, FallbackValue=False, RelativeSource={RelativeSource TemplatedParent}}"
                                       ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.Expander}}"
                                       RenderTransformOrigin="0.5, 0.5">
                             <ToggleButton.Template>
@@ -147,7 +147,7 @@
 
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding IsExpanded, RelativeSource={RelativeSource FindAncestor, AncestorType=TreeViewItem}}" Value="True" />
+                    <Condition Binding="{Binding IsExpanded, FallbackValue=False, RelativeSource={RelativeSource FindAncestor, AncestorType=TreeViewItem}}" Value="True" />
                     <Condition Binding="{Binding Items.Count, RelativeSource={RelativeSource FindAncestor, AncestorType=TreeViewItem}}" Value="1" />
                 </MultiDataTrigger.Conditions>
                 <MultiDataTrigger.Setters>

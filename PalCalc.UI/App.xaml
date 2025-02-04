@@ -9,7 +9,7 @@
             <ResourceDictionary.MergedDictionaries>
 
                 <!-- (not committing to a theme yet, but using this to test existing controls for any styling issues) -->
-                
+
                 <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/Dark.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml"/>
                 

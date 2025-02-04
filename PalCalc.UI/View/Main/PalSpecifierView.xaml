@@ -92,7 +92,7 @@
                         <materialIcons:MaterialIcon
                             Kind="Remove"
                             Width="15"
-                            Foreground="DarkRed"
+                            Foreground="Red"
                             />
                     </Button>
                 </Grid>

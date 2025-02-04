@@ -13,6 +13,8 @@
         xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
         WindowStartupLocation="CenterOwner"
         d:DataContext="{x:Static svm:SaveInspectorWindowViewModel.DesignerInstance}"
+                             IconVisibility="Collapsed"
+                             
         Title="{Binding WindowTitle.Value}" Height="550" Width="900">
     <adonisControls:AdonisWindow.Resources>
 

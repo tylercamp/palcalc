@@ -60,7 +60,7 @@ namespace AdonisUI.Extensions
             if (targetElement.IsLoaded)
                 SetComputedLayerOfChildren(targetElement, increasedLayer);
             else
-                targetElement.Loaded += (sender, args) => SetComputedLayerOfChildren(targetElement, increasedLayer);
+                targetElement.IsVisibleChanged += (sender, args) => SetComputedLayerOfChildren(targetElement, increasedLayer);
         }
 
         private static void OnIncreaseLayerPropertyChanged(DependencyObject depObj, DependencyPropertyChangedEventArgs eventArgs)
@@ -71,7 +71,7 @@ namespace AdonisUI.Extensions
             if (targetElement.IsLoaded)
                 SetComputedLayerOfChildren(targetElement, GetComputedLayer(targetElement) + 1);
             else
-                targetElement.Loaded += (sender, args) => SetComputedLayerOfChildren(targetElement, GetComputedLayer(targetElement) + 1);
+                targetElement.IsVisibleChanged += (sender, args) => SetComputedLayerOfChildren(targetElement, GetComputedLayer(targetElement) + 1);
         }
 
         private static void SetComputedLayerOfChildren(FrameworkElement element, int value)
