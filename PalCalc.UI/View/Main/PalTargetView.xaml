@@ -37,15 +37,20 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
     </StackPanel>
-    <GroupBox adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="Transparent" >
+    <GroupBox adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="Transparent" Margin="0,5,0,0">
         <GroupBox.Header>
-            <Grid Margin="8" adonisExtensions:LayerExtension.IncreaseLayer="False">
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-                    <TextBlock Text="{itl:LocalizedText LC_COMMON_TRAITS}" />
-                    <Button Margin="10,0,0,0" Padding="0" Height="16" Command="{Binding OpenPassivesSearchCommand}">
-                        <materialIcons:MaterialIcon Kind="Search" />
-                    </Button>
-                </StackPanel>
+            
+            <Grid adonisExtensions:LayerExtension.Layer="3">
+                <TextBlock Text="{itl:LocalizedText LC_COMMON_TRAITS}" Margin="8" />
+                <Grid HorizontalAlignment="Right">
+                    <Viewbox StretchDirection="DownOnly" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualHeight}">
+                        <Border Padding="3">
+                            <Button Command="{Binding OpenPassivesSearchCommand}" VerticalAlignment="Center" Height="Auto" HorizontalAlignment="Right" adonisExtensions:LayerExtension.Layer="2">
+                                <materialIcons:MaterialIcon Kind="Search" />
+                            </Button>
+                        </Border>
+                    </Viewbox>
+                </Grid>
             </Grid>
         </GroupBox.Header>
         <Grid>
@@ -74,7 +79,7 @@
             </Popup>
         </Grid>
     </GroupBox>
-    <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_IVS}" adonisExtensions:LayerExtension.IncreaseLayer="False" Background="Transparent">
+    <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_IVS}" adonisExtensions:LayerExtension.IncreaseLayer="False" Background="Transparent" Margin="0,5,0,0">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
