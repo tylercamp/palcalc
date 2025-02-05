@@ -9,12 +9,16 @@
         ResizeMode="NoResize"
         WindowStyle="ToolWindow"
         SizeToContent="WidthAndHeight"
+                             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+                             Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}"
         WindowStartupLocation="CenterOwner"
-        Title="About Pal Calc">
+                             PlaceTitleBarOverContent="True"
+                             IconVisibility="Collapsed"
+        >
     <Window.DataContext>
         <local:AboutViewModel />
     </Window.DataContext>
-    <StackPanel Orientation="Vertical" Margin="10,0,10,10">
+    <StackPanel Orientation="Vertical" Margin="10,10,10,10">
         <StackPanel.Resources>
             <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
                 <Setter Property="HorizontalAlignment" Value="Center" />

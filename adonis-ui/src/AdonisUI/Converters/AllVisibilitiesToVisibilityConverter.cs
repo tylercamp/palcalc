@@ -10,7 +10,7 @@ namespace AdonisUI.Converters
     /// Takes multiple Visibilities as input and returns a single Visibility of the same value if they are all equal
     /// or returns Visibility.Visible.
     /// </summary>
-    class AllVisibilitiesToVisibilityConverter
+    public class AllVisibilitiesToVisibilityConverter
         : IMultiValueConverter
     {
         public static AllVisibilitiesToVisibilityConverter Instance = new AllVisibilitiesToVisibilityConverter();

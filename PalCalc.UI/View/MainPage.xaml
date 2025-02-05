@@ -22,13 +22,15 @@
     </Page.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="{itl:LocalizedText LC_LANGUAGE}" ItemsSource="{Binding Locales}">
-                <MenuItem.ItemTemplate>
-                    <DataTemplate>
-                        <!-- note: for some reason a toggle-button is _always_ used to wrap the menu item content -->
-                        <MenuItem IsCheckable="True" IsChecked="{Binding IsSelected}" Header="{Binding Label}" />
-                    </DataTemplate>
-                </MenuItem.ItemTemplate>
+            <MenuItem Header="{itl:LocalizedText LC_LANGUAGE}" ItemsSource="{Binding Locales}" Padding="5">
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                        <Setter Property="Header" Value="{Binding Label}" />
+                        <Setter Property="IsCheckable" Value="True" />
+                        <Setter Property="IsChecked" Value="{Binding IsSelected}" />
+                        <Setter Property="Command" Value="{Binding SelectCommand}" />
+                    </Style>
+                </MenuItem.ItemContainerStyle>
             </MenuItem>
         </Menu>
         <Grid>

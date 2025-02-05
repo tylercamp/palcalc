@@ -31,7 +31,7 @@
         <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
     </Style>
 
-    <Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#206BD4</Color>
+    <!--<Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#206BD4</Color>
     <Color x:Key="{x:Static adonisUi:Colors.AlertColor}">#D49220</Color>
-    <Color x:Key="{x:Static adonisUi:Colors.ErrorColor}">#C22B2B</Color>
+    <Color x:Key="{x:Static adonisUi:Colors.ErrorColor}">#C22B2B</Color>-->
 </ResourceDictionary>
