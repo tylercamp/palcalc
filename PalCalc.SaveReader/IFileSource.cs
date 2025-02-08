@@ -31,8 +31,27 @@ namespace PalCalc.SaveReader
                 .OrderBy(Path.GetFileNameWithoutExtension);
     }
 
-    public class XboxFileSource(string containersIndexPath, string saveId, Func<string, bool> matcher) : IFileSource
+    public class XboxFileSource : IFileSource
     {
+        XboxSaveMonitor saveMonitor;
+        Func<string, bool> matcher;
+        List<string> cachedResults;
+
+        public XboxFileSource(XboxSaveMonitor saveMonitor, Func<string, bool> matcher)
+        {
+            this.saveMonitor = saveMonitor;
+            this.matcher = matcher;
+
+            saveMonitor.Updated += SaveMonitor_Updated;
+
+            this.cachedResults = null;
+        }
+
+        private void SaveMonitor_Updated()
+        {
+            cachedResults = null;
+        }
+
         protected class SaveEntry
         {
             public string FilePath { get; set; }
@@ -44,7 +63,7 @@ namespace PalCalc.SaveReader
         {
             get
             {
-                var dataContainer = Container.TryParse(containersIndexPath);
+                var dataContainer = Container.TryParse(saveMonitor.ContainerIndexPath);
 
                 // save files that are part of a single save are grouped by the first part of their name
 
@@ -56,19 +75,19 @@ namespace PalCalc.SaveReader
                         // all of the files are stored in their own folders, where the "real" file name is always just "Data"
                         if (saveFile.Name != "Data") continue;
 
-                        if (!saveFileFolder.Name.StartsWith($"{saveId}-")) continue;
+                        if (!saveFileFolder.Name.StartsWith($"{saveMonitor.SaveId}-")) continue;
 
                         if (File.Exists(saveFile.Path))
-                            yield return new SaveEntry() { FilePath = saveFile.Path, FileName = saveFileFolder.Name.Replace($"{saveId}-", "") };
+                            yield return new SaveEntry() { FilePath = saveFile.Path, FileName = saveFileFolder.Name.Replace($"{saveMonitor.SaveId}-", "") };
                     }
                 }
             }
         }
 
         public IEnumerable<string> Content =>
-            AllEntries
+            cachedResults ??= AllEntries
                 .Where(e => matcher(e.FileName))
                 .OrderBy(e => e.FileName.Contains('-') ? e.FileName.Split("-").Last() : "")
-                .Select(e => e.FilePath);
+                .Select(e => e.FilePath).ToList();
     }
 }

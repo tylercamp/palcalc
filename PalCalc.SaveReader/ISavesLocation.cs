@@ -147,6 +147,8 @@ namespace PalCalc.SaveReader
                         {
                             var saveId = g.Key;
 
+                            var saveMonitor = folderMonitor.GetSaveMonitor(g.Key);
+
                             LevelSaveFile level = null;
                             LevelMetaSaveFile levelMeta = null;
                             LocalDataSaveFile localData = null;
@@ -157,30 +159,30 @@ namespace PalCalc.SaveReader
 
                             if (filesByType.ContainsKey("Level"))
                             {
-                                level = new LevelSaveFile(new XboxFileSource(containersIndexPath, saveId, f => f.Split("-").First() == "Level"));
+                                level = new LevelSaveFile(new XboxFileSource(saveMonitor, f => f.Split("-").First() == "Level"));
                             }
 
                             if (filesByType.ContainsKey("LevelMeta"))
                             {
-                                levelMeta = new LevelMetaSaveFile(new XboxFileSource(containersIndexPath, saveId, f => f.Split("-").First() == "LevelMeta"));
+                                levelMeta = new LevelMetaSaveFile(new XboxFileSource(saveMonitor, f => f.Split("-").First() == "LevelMeta"));
                             }
 
                             if (filesByType.ContainsKey("LocalData"))
                             {
-                                localData = new LocalDataSaveFile(new XboxFileSource(containersIndexPath, saveId, f => f.Split("-").First() == "LocalData"));
+                                localData = new LocalDataSaveFile(new XboxFileSource(saveMonitor, f => f.Split("-").First() == "LocalData"));
                             }
 
                             if (filesByType.ContainsKey("WorldOption"))
                             {
-                                worldOption = new WorldOptionSaveFile(new XboxFileSource(containersIndexPath, saveId, f => f.Split("-").First() == "WorldOption"));
+                                worldOption = new WorldOptionSaveFile(new XboxFileSource(saveMonitor, f => f.Split("-").First() == "WorldOption"));
                             }
 
                             players = filesByType
                                 .GetValueOrElse("Players", new List<XboxSaveFile>())
-                                .Select(f => new PlayersSaveFile(new XboxFileSource(containersIndexPath, saveId, x => f.FileName == $"{saveId}-{x}")))
+                                .Select(f => new PlayersSaveFile(new XboxFileSource(saveMonitor, x => f.FileName == $"{saveId}-{x}")))
                                 .ToList();
 
-                            return new XboxSaveGame(userFolder, g.Key, level, levelMeta, localData, worldOption, players, folderMonitor.GetSaveMonitor(g.Key));
+                            return new XboxSaveGame(userFolder, g.Key, level, levelMeta, localData, worldOption, players, saveMonitor);
                         })
                         .ToList();
 

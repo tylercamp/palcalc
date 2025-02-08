@@ -7,8 +7,12 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile.Xbox
 {
-    public class XboxSaveMonitor
+    public class XboxSaveMonitor(string basePath, string saveId)
     {
+        public string UserBasePath => basePath;
+        public string ContainerIndexPath => $"{basePath}/containers.index";
+        public string SaveId => saveId;
+
         public event Action Updated;
 
         public void Notify() => Updated?.Invoke();
@@ -44,7 +48,7 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
         {
             if (saveMonitorsById.ContainsKey(saveId)) return saveMonitorsById[saveId];
 
-            var res = new XboxSaveMonitor();
+            var res = new XboxSaveMonitor(watcher.Path, saveId);
             saveMonitorsById.Add(saveId, res);
             return res;
         }
