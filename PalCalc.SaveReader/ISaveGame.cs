@@ -1,5 +1,6 @@
 ﻿using PalCalc.SaveReader.SaveFile;
 using PalCalc.SaveReader.SaveFile.Virtual;
+using PalCalc.SaveReader.SaveFile.Xbox;
 using System.Net;
 
 
@@ -35,47 +36,39 @@ namespace PalCalc.SaveReader
         private FileSystemWatcher folderWatcher;
         public event Action<ISaveGame> Updated;
 
-        private string[] ResolvePaths(string basePath)
+        private bool MatchesPath(string fileFullName, string baseFullName)
         {
-            // when a save file is split across multiple files, detect those and return the appropriate paths
-            // (usually only happens when an Xbox save is exported)
+            var baseName = Path.GetFileNameWithoutExtension(baseFullName);
+            var baseExt = Path.GetExtension(baseFullName);
 
-            var baseName = Path.GetFileNameWithoutExtension(basePath);
-            var baseExt = Path.GetExtension(basePath);
+            var fileName = Path.GetFileNameWithoutExtension(fileFullName);
 
-            var matchingFiles = Directory
-                .EnumerateFiles(Path.GetDirectoryName(basePath))
-                .Where(p => Path.GetFileName(p).StartsWith(baseName))
-                .Where(p => Path.GetExtension(p) == baseExt)
-                .Where(p =>
-                {
-                    // (prevent `Level.sav` from matching `LevelMeta.sav`)
-                    var name = Path.GetFileNameWithoutExtension(p);
-                    if (name == baseName) return true;
-
-                    char[] allowedChars = ['-', '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-
-                    return allowedChars.Contains(name[baseName.Length]);
-                })
-                .OrderBy(Path.GetFileNameWithoutExtension)
-                .ToArray();
-
-            if (matchingFiles.Length == 0) return [basePath];
-            else return matchingFiles;
+            char[] allowedChars = ['-', '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            return (
+                fileFullName.StartsWith(baseName) &&
+                Path.GetExtension(fileFullName) == baseExt &&
+                (
+                    fileName == baseName ||
+                    allowedChars.Contains(fileName[baseName.Length])
+                )
+            );
         }
 
         public StandardSaveGame(string basePath)
         {
             BasePath = basePath;
 
-            Level = new LevelSaveFile(ResolvePaths(Path.Join(basePath, "Level.sav")));
-            LevelMeta = new LevelMetaSaveFile(ResolvePaths(Path.Join(basePath, "LevelMeta.sav")));
-            LocalData = new LocalDataSaveFile(ResolvePaths(Path.Join(basePath, "LocalData.sav")));
-            WorldOption = new WorldOptionSaveFile(ResolvePaths(Path.Join(basePath, "WorldOption.sav")));
+            Level = new LevelSaveFile(new FilteredFileSource(basePath, f => MatchesPath(f, "Level.sav")));
+            LevelMeta = new LevelMetaSaveFile(new FilteredFileSource(basePath, f => MatchesPath(f, "LevelMeta.sav")));
+            LocalData = new LocalDataSaveFile(new FilteredFileSource(basePath, f => MatchesPath(f, "LocalData.sav")));
+            WorldOption = new WorldOptionSaveFile(new FilteredFileSource(basePath, f => MatchesPath(f, "WorldOption.sav")));
 
             var playersPath = Path.Join(basePath, "Players");
             if (Directory.Exists(playersPath))
-                Players = Directory.EnumerateFiles(playersPath, "*.sav").Select(f => new PlayersSaveFile([f])).ToList();
+                Players = Directory
+                    .EnumerateFiles(playersPath, "*.sav")
+                    .Select(f => new PlayersSaveFile(new SingleFileSource(f)))
+                    .ToList();
             else
                 Players = new List<PlayersSaveFile>();
 
@@ -147,10 +140,10 @@ namespace PalCalc.SaveReader
         public DateTime LastModified => new List<DateTime>()
         {
             Directory.GetLastWriteTime(BasePath),
-            Level.LastModified,
-            LevelMeta.LastModified,
-            LocalData.LastModified,
-            WorldOption.LastModified,
+            Level.Exists ? Level.LastModified : DateTime.MinValue,
+            LevelMeta.Exists ? LevelMeta.LastModified : DateTime.MinValue,
+            LocalData.Exists ? LocalData.LastModified : DateTime.MinValue,
+            WorldOption.Exists ? WorldOption.LastModified : DateTime.MinValue,
         }.Concat(Players.Select(p => p.LastModified)).Max();
 
         public LevelSaveFile Level { get; }
@@ -170,7 +163,7 @@ namespace PalCalc.SaveReader
     {
         public event Action<ISaveGame> Updated;
 
-        private List<FileSystemWatcher> fileWatchers;
+        private FileSystemWatcher fileWatchers;
 
         public XboxSaveGame(
             string userBasePath,
@@ -180,7 +173,7 @@ namespace PalCalc.SaveReader
             LocalDataSaveFile localData,
             WorldOptionSaveFile worldOption,
             List<PlayersSaveFile> players,
-            IEnumerable<FileSystemWatcher> fileWatchers
+            XboxSaveMonitor monitor
         )
         {
             BasePath = userBasePath;
@@ -191,66 +184,20 @@ namespace PalCalc.SaveReader
             WorldOption = worldOption;
             Players = players;
 
-            if (Directory.Exists(userBasePath))
-            {
-                IsLocal = true;
-                if (new Uri(userBasePath).IsUnc)
-                {
-                    try
-                    {
-                        IPAddress[] host;
-                        // get host addresses
-                        host = Dns.GetHostAddresses(userBasePath);
-                        // get local addresses
-                        IPAddress[] local = Dns.GetHostAddresses(Dns.GetHostName());
-                        // check if local
-                        if (!host.Any(hostAddress => IPAddress.IsLoopback(hostAddress) || local.Contains(hostAddress)))
-                        {
-                            IsLocal = false;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        IsLocal = false;
-                    }
-                }
-            }
-            else
-            {
-                IsLocal = false;
-            }
+            // note: no UNC path check, these should only be created for normal e.g. LocalAppData paths
+            IsLocal = true;
 
-            this.fileWatchers = fileWatchers.ToList();
-
-            foreach (var watcher in this.fileWatchers)
-            {
-                watcher.Changed += Watcher_Updated;
-                watcher.Created += Watcher_Updated;
-                watcher.Deleted += Watcher_Updated;
-                watcher.Renamed += Watcher_Updated;
-            }
+            monitor.Updated += () => Updated?.Invoke(this);
         }
 
         public void Dispose()
         {
             if (fileWatchers != null)
             {
-                foreach (var watcher in fileWatchers)
-                {
-                    watcher.Changed -= Watcher_Updated;
-                    watcher.Created -= Watcher_Updated;
-                    watcher.Deleted -= Watcher_Updated;
-                    watcher.Renamed -= Watcher_Updated;
-                    watcher.Dispose();
-                }
+                // TODO - dispose
 
                 fileWatchers = null;
             }
-        }
-
-        private void Watcher_Updated(object sender, FileSystemEventArgs e)
-        {
-            Updated?.Invoke(this);
         }
 
         public string BasePath { get; }

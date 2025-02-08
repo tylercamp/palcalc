@@ -8,19 +8,15 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile
 {
-    public abstract class ISaveFile
+    public abstract class ISaveFile(IFileSource files)
     {
-        public ISaveFile(string[] filePaths)
-        {
-            FilePaths = filePaths;
-        }
-
         // ("Save Files" can sometimes be split across several actual files on disk)
-        public string[] FilePaths { get; }
+        public IEnumerable<string> FilePaths => files.Content.ToList();
+
         public bool Exists => FilePaths.Any(File.Exists);
 
         private bool? isValid = null;
-        public bool IsValid => isValid ??= Exists && GvasFile.IsValidGvas(FilePaths[0]);
+        public bool IsValid => isValid ??= Exists && GvasFile.IsValidGvas(FilePaths.First());
 
         public DateTime LastModified => FilePaths.Select(File.GetLastWriteTime).Max();
 

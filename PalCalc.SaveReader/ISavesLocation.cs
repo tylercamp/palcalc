@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Windows.ApplicationModel.Email.DataProvider;
 using Windows.Management.Deployment;
 using Windows.Storage;
 
@@ -119,7 +120,8 @@ namespace PalCalc.SaveReader
             {
                 try
                 {
-                    var dataContainer = Container.TryParse(Path.Combine(userFolder, "containers.index"));
+                    var containersIndexPath = Path.Combine(userFolder, "containers.index");
+                    var dataContainer = Container.TryParse(containersIndexPath);
                     if (dataContainer == null) continue;
 
                     // save files that are part of a single save are grouped by the first part of their name
@@ -132,14 +134,19 @@ namespace PalCalc.SaveReader
                             // all of the files are stored in their own folders, where the "real" file name is always just "Data"
                             if (saveFile.Name != "Data") continue;
 
+                            logger.Information("Discovered {User} - {Folder} - {SaveName} ({SavePath})", userFolder, saveFileFolder.Id, saveFileFolder.Name, saveFile.Path);
                             collectedSaveFiles.Add(new XboxSaveFile() { FilePath = saveFile.Path, FileName = saveFileFolder.Name });
                         }
                     }
+
+                    var folderMonitor = new XboxFolderMonitor(userFolder);
 
                     var saveGames = collectedSaveFiles
                         .GroupBy(xsf => xsf.FileName.Split('-')[0])
                         .Select(g =>
                         {
+                            var saveId = g.Key;
+
                             LevelSaveFile level = null;
                             LevelMetaSaveFile levelMeta = null;
                             LocalDataSaveFile localData = null;
@@ -148,57 +155,36 @@ namespace PalCalc.SaveReader
 
                             var filesByType = g.GroupBy(f => f.FileName.Split('-')[1]).ToDictionary(g => g.Key, g => g.ToList());
 
-                            // there can be multiple `Level` files, supposedly when there's a new file format and the latest file
-                            // get `-1` appended (or the next number after that). sort by this last part and take the highest number
-                            //
-                            // TODO - not sure if this is the right approach, or if the `Level.sav` file is always the latest
-                            var levelFiles = filesByType
-                                .GetValueOrDefault("Level")
-                                ?.OrderBy(l => int.Parse(l.FileName.Split('-').Skip(2).FirstOrDefault() ?? "0"));
-
-                            var watchers = new List<FileSystemWatcher>();
-
-                            if (levelFiles != null)
+                            if (filesByType.ContainsKey("Level"))
                             {
-                                level = new LevelSaveFile(levelFiles.Select(f => f.FilePath).ToArray());
-                                watchers.AddRange(levelFiles.Select(f => new FileSystemWatcher(Path.GetDirectoryName(f.FilePath))));
+                                level = new LevelSaveFile(new XboxFileSource(containersIndexPath, saveId, f => f.Split("-").First() == "Level"));
                             }
 
-                            var levelMetaFile = filesByType.GetValueOrDefault("LevelMeta")?.FirstOrDefault();
-                            if (levelMetaFile != null)
+                            if (filesByType.ContainsKey("LevelMeta"))
                             {
-                                levelMeta = new LevelMetaSaveFile([levelMetaFile.FilePath]);
-                                watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(levelMetaFile.FilePath)));
+                                levelMeta = new LevelMetaSaveFile(new XboxFileSource(containersIndexPath, saveId, f => f.Split("-").First() == "LevelMeta"));
                             }
 
-                            var localDataFile = filesByType.GetValueOrDefault("LocalData")?.FirstOrDefault();
-                            if (localDataFile != null)
+                            if (filesByType.ContainsKey("LocalData"))
                             {
-                                localData = new LocalDataSaveFile([localDataFile.FilePath]);
-                                watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(localDataFile.FilePath)));
+                                localData = new LocalDataSaveFile(new XboxFileSource(containersIndexPath, saveId, f => f.Split("-").First() == "LocalData"));
                             }
 
-                            var worldOptionFile = filesByType.GetValueOrDefault("WorldOption")?.FirstOrDefault();
-                            if (worldOptionFile != null)
+                            if (filesByType.ContainsKey("WorldOption"))
                             {
-                                worldOption = new WorldOptionSaveFile([worldOptionFile.FilePath]);
-                                watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(worldOptionFile.FilePath)));
+                                worldOption = new WorldOptionSaveFile(new XboxFileSource(containersIndexPath, saveId, f => f.Split("-").First() == "WorldOption"));
                             }
 
                             players = filesByType
                                 .GetValueOrElse("Players", new List<XboxSaveFile>())
-                                .Select(f =>
-                                {
-                                    watchers.Add(new FileSystemWatcher(Path.GetDirectoryName(f.FilePath)));
-                                    return new PlayersSaveFile([f.FilePath]);
-                                })
+                                .Select(f => new PlayersSaveFile(new XboxFileSource(containersIndexPath, saveId, x => f.FileName == $"{saveId}-{x}")))
                                 .ToList();
 
-                            return new XboxSaveGame(userFolder, g.Key, level, levelMeta, localData, worldOption, players, watchers);
+                            return new XboxSaveGame(userFolder, g.Key, level, levelMeta, localData, worldOption, players, folderMonitor.GetSaveMonitor(g.Key));
                         })
                         .ToList();
 
-                    result.Add(new XboxSavesLocation(userFolder, saveGames));
+                    result.Add(new XboxSavesLocation(userFolder, saveGames, folderMonitor));
                 }
                 catch (Exception ex)
                 {
@@ -209,7 +195,8 @@ namespace PalCalc.SaveReader
             return result;
         }
 
-        private XboxSavesLocation(string userFolderPath, List<XboxSaveGame> saves)
+        private XboxFolderMonitor xfm;
+        private XboxSavesLocation(string userFolderPath, List<XboxSaveGame> saves, XboxFolderMonitor xfm)
         {
             try
             {
@@ -220,6 +207,8 @@ namespace PalCalc.SaveReader
             {
                 AllSaveGames = new List<ISaveGame>();
             }
+
+            this.xfm = xfm;
         }
 
         public XboxSavesLocation()
