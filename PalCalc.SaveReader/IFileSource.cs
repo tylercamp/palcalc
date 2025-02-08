@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader
 {
-    // TODO - make CompressedSAV accept these so we can more neatly handle file-change race conditions
     public interface IFileSource
     {
         IEnumerable<string> Content { get; }
@@ -16,6 +15,11 @@ namespace PalCalc.SaveReader
     public class SingleFileSource(string exactPath) : IFileSource
     {
         public IEnumerable<string> Content => [exactPath];
+    }
+
+    public class MultiFileSource(IEnumerable<string> paths) : IFileSource
+    {
+        public IEnumerable<string> Content => paths;
     }
 
     public class FilteredFileSource(string basePath, Func<string, bool> matcher) : IFileSource
@@ -35,6 +39,7 @@ namespace PalCalc.SaveReader
             public string FileName { get; set; }
         }
 
+        // TODO - cache results and refresh when save file changes
         private IEnumerable<SaveEntry> AllEntries
         {
             get

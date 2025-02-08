@@ -13,16 +13,16 @@ namespace PalCalc.SaveReader.SaveFile
         // ("Save Files" can sometimes be split across several actual files on disk)
         public IEnumerable<string> FilePaths => files.Content.ToList();
 
-        public bool Exists => FilePaths.Any(File.Exists);
+        public bool Exists => files.Content.Any(File.Exists);
 
         private bool? isValid = null;
-        public bool IsValid => isValid ??= Exists && GvasFile.IsValidGvas(FilePaths.First());
+        public bool IsValid => isValid ??= Exists && GvasFile.IsValidGvas(files);
 
-        public DateTime LastModified => FilePaths.Select(File.GetLastWriteTime).Max();
+        public DateTime LastModified => files.Content.Select(File.GetLastWriteTime).Max();
 
         protected virtual void VisitGvas(params IVisitor[] visitors)
         {
-            CompressedSAV.WithDecompressedAggregateSave(FilePaths, stream =>
+            CompressedSAV.WithDecompressedSave(files, stream =>
             {
                 using (var archiveReader = new FArchiveReader(stream, PalWorldTypeHints.Hints, false))
                     GvasFile.FromFArchive(archiveReader, visitors);
@@ -43,7 +43,7 @@ namespace PalCalc.SaveReader.SaveFile
         public virtual GvasFile ParseGvas(bool preserveValues, params IVisitor[] visitors)
         {
             GvasFile result = null;
-            CompressedSAV.WithDecompressedAggregateSave(FilePaths, stream =>
+            CompressedSAV.WithDecompressedSave(files, stream =>
             {
                 using (var archiveReader = new FArchiveReader(stream, PalWorldTypeHints.Hints, preserveValues))
                     result = GvasFile.FromFArchive(archiveReader, visitors);
