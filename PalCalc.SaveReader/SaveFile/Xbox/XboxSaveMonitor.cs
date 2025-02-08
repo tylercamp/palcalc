@@ -14,7 +14,7 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
         public void Notify() => Updated?.Invoke();
     }
 
-    public class XboxFolderMonitor
+    public class XboxFolderMonitor : IDisposable
     {
         private Dictionary<string, XboxSaveMonitor> saveMonitorsById;
 
@@ -48,5 +48,7 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
             saveMonitorsById.Add(saveId, res);
             return res;
         }
+
+        public void Dispose() => watcher?.Dispose();
     }
 }

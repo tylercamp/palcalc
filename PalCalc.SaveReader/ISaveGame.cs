@@ -163,7 +163,7 @@ namespace PalCalc.SaveReader
     {
         public event Action<ISaveGame> Updated;
 
-        private FileSystemWatcher fileWatchers;
+        private XboxSaveMonitor monitor;
 
         public XboxSaveGame(
             string userBasePath,
@@ -187,18 +187,13 @@ namespace PalCalc.SaveReader
             // note: no UNC path check, these should only be created for normal e.g. LocalAppData paths
             IsLocal = true;
 
-            monitor.Updated += () => Updated?.Invoke(this);
+            monitor.Updated += Monitor_Updated;
+            this.monitor = monitor;
         }
 
-        public void Dispose()
-        {
-            if (fileWatchers != null)
-            {
-                // TODO - dispose
+        private void Monitor_Updated() => Updated?.Invoke(this);
 
-                fileWatchers = null;
-            }
-        }
+        public void Dispose() => this.monitor.Updated -= Monitor_Updated;
 
         public string BasePath { get; }
 
