@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile
 {
-    public class LocalDataSaveFile : ISaveFile
+    public class LocalDataSaveFile(IFileSource files) : ISaveFile(files)
     {
-        public LocalDataSaveFile(string[] filePaths) : base(filePaths) { }
     }
 }

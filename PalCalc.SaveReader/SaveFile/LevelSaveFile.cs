@@ -28,11 +28,9 @@ namespace PalCalc.SaveReader.SaveFile
         public List<GvasMapObject> MapObjects { get; set; }
     }
 
-    public class LevelSaveFile : ISaveFile
+    public class LevelSaveFile(IFileSource files) : ISaveFile(files)
     {
         private static ILogger logger = Log.ForContext<LevelSaveFile>();
-
-        public LevelSaveFile(string[] filePaths) : base(filePaths) { }
 
         private Guid MostCommonOwner(RawPalContainerContents container, Dictionary<Guid, Guid> palOwnersByInstanceId) => container.Slots.GroupBy(s => palOwnersByInstanceId.GetValueOrElse(s.InstanceId, Guid.Empty)).MaxBy(g => g.Count())?.Key ?? Guid.Empty;
 

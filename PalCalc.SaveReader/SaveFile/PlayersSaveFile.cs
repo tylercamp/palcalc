@@ -17,12 +17,8 @@ namespace PalCalc.SaveReader.SaveFile
         public string PalboxContainerId { get; set; }
     }
 
-    public class PlayersSaveFile : ISaveFile
+    public class PlayersSaveFile(IFileSource files) : ISaveFile(files)
     {
-        public PlayersSaveFile(string[] filePaths) : base(filePaths)
-        {
-        }
-
         private const string K_PLAYER_UID = ".IndividualId.PlayerUId";
         private const string K_INSTANCE_ID = ".IndividualId.InstanceId";
         private const string K_PARTY_CONTAINER_ID = ".OtomoCharacterContainerId.ID";

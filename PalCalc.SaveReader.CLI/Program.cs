@@ -23,7 +23,7 @@ var db = PalDB.LoadEmbedded();
 
 //});
 
-CompressedSAV.WithDecompressedAggregateSave(
+CompressedSAV.WithDecompressedSave(
     [
         @"C:\Users\algor\Downloads\palworld_2533274945012052_2025-01-25_16_45_56\F76A9C474B9CDEE155A6C6A38FCCBD39\Level\01.sav",
         @"C:\Users\algor\Downloads\palworld_2533274945012052_2025-01-25_16_45_56\F76A9C474B9CDEE155A6C6A38FCCBD39\Level\02.sav"
