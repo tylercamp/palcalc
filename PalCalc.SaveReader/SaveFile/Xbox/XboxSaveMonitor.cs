@@ -13,6 +13,7 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
 
         public event Action Updated;
 
+        // TODO - eventually filter by affected save ID
         public void Notify() => Updated?.Invoke();
     }
 
