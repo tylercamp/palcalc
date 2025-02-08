@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile.Xbox
 {
-    public class XboxSaveMonitor(string basePath, string saveId)
+    public class XboxSaveMonitor(string saveId)
     {
-        public string UserBasePath => basePath;
-        public string ContainerIndexPath => $"{basePath}/containers.index";
         public string SaveId => saveId;
 
         public event Action Updated;
@@ -38,8 +36,12 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
             watcher.EnableRaisingEvents = true;
         }
 
+        public event Action Updated;
+
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
+            Updated?.Invoke();
+
             foreach (var monitor in saveMonitorsById.Values)
                 monitor.Notify();
         }
@@ -48,7 +50,7 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
         {
             if (saveMonitorsById.ContainsKey(saveId)) return saveMonitorsById[saveId];
 
-            var res = new XboxSaveMonitor(watcher.Path, saveId);
+            var res = new XboxSaveMonitor(saveId);
             saveMonitorsById.Add(saveId, res);
             return res;
         }

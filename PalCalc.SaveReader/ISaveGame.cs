@@ -1,4 +1,5 @@
-﻿using PalCalc.SaveReader.SaveFile;
+﻿using PalCalc.Model;
+using PalCalc.SaveReader.SaveFile;
 using PalCalc.SaveReader.SaveFile.Virtual;
 using PalCalc.SaveReader.SaveFile.Xbox;
 using System.Net;
@@ -166,29 +167,48 @@ namespace PalCalc.SaveReader
         private XboxSaveMonitor monitor;
 
         public XboxSaveGame(
-            string userBasePath,
-            string saveId,
-            LevelSaveFile level,
-            LevelMetaSaveFile levelMeta,
-            LocalDataSaveFile localData,
-            WorldOptionSaveFile worldOption,
-            List<PlayersSaveFile> players,
-            XboxSaveMonitor monitor
+            XboxWgsFolder wgsFolder,
+            string saveId
         )
         {
-            BasePath = userBasePath;
+            BasePath = wgsFolder.UserBasePath;
             GameId = saveId;
-            Level = level;
-            LevelMeta = levelMeta;
-            LocalData = localData;
-            WorldOption = worldOption;
-            Players = players;
 
             // note: no UNC path check, these should only be created for normal e.g. LocalAppData paths
             IsLocal = true;
 
+            var filesByType = wgsFolder
+                .Entries
+                .Where(e => e.FileName.StartsWith($"{saveId}-"))
+                .GroupBy(f => f.FileName.Split('-')[1]).ToDictionary(g => g.Key, g => g.ToList());
+
+            if (filesByType.ContainsKey("Level"))
+            {
+                Level = new LevelSaveFile(new XboxFileSource(wgsFolder, saveId, f => f.Split("-").First() == "Level"));
+            }
+
+            if (filesByType.ContainsKey("LevelMeta"))
+            {
+                LevelMeta = new LevelMetaSaveFile(new XboxFileSource(wgsFolder, saveId, f => f.Split("-").First() == "LevelMeta"));
+            }
+
+            if (filesByType.ContainsKey("LocalData"))
+            {
+                LocalData = new LocalDataSaveFile(new XboxFileSource(wgsFolder, saveId, f => f.Split("-").First() == "LocalData"));
+            }
+
+            if (filesByType.ContainsKey("WorldOption"))
+            {
+                WorldOption = new WorldOptionSaveFile(new XboxFileSource(wgsFolder, saveId, f => f.Split("-").First() == "WorldOption"));
+            }
+
+            Players = filesByType
+                .GetValueOrElse("Players", new List<XboxWgsEntry>())
+                .Select(f => new PlayersSaveFile(new XboxFileSource(wgsFolder, saveId, nameWithoutSaveId => f.FileName == $"{saveId}-{nameWithoutSaveId}")))
+                .ToList();
+
+            monitor = wgsFolder.Monitor.GetSaveMonitor(saveId);
             monitor.Updated += Monitor_Updated;
-            this.monitor = monitor;
         }
 
         private void Monitor_Updated() => Updated?.Invoke(this);
