@@ -9,6 +9,7 @@
         xmlns:itl="clr-namespace:PalCalc.UI.Localization"
         xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
         mc:Ignorable="d"
+        IconVisibility="Collapsed"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="{itl:LocalizedText Code=LC_TRAITS_SEARCH_TITLE}"
         Height="450" Width="800">

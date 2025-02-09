@@ -64,7 +64,11 @@
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
     </Style>
 
-    <!--<Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#206BD4</Color>
+    <Style x:Key="ComboBoxAlignedLabelStyle" TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+        <Setter Property="Padding" Value="7,0,0,4" />
+    </Style>
+
+    <Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#206BD4</Color>
     <Color x:Key="{x:Static adonisUi:Colors.AlertColor}">#D49220</Color>
-    <Color x:Key="{x:Static adonisUi:Colors.ErrorColor}">#C22B2B</Color>-->
+    <Color x:Key="{x:Static adonisUi:Colors.ErrorColor}">#C22B2B</Color>
 </ResourceDictionary>

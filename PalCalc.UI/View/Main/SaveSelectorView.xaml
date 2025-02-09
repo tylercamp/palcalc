@@ -11,72 +11,80 @@
             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
             xmlns:u="clr-namespace:PalCalc.UI.View.Utils"
             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+            xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+            u:StackPanelExtensions.Spacing="8"
             mc:Ignorable="d" 
             d:DataContext="{d:DesignInstance vm:SaveSelectorViewModel, IsDesignTimeCreatable=True}" d:DesignWidth="436.57">
     <StackPanel.Resources>
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BVC" />
+            <Style TargetType="Label" BasedOn="{StaticResource ComboBoxAlignedLabelStyle}" />
         </ResourceDictionary>
     </StackPanel.Resources>
-    <Label Content="{itl:LocalizedText LC_SAVE_LOCATION}" />
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="3" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <ComboBox Grid.Column="0" ItemsSource="{Binding SavesLocations}" SelectedItem="{Binding SelectedLocation}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="mvm:SavesLocationViewModel">
-                    <TextBlock Text="{Binding Label.Value}" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ComboBox>
-        <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SavesLocationsFolder_Click" IsEnabled="{Binding CanOpenSavesLocation}" ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
-            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
-        </Button>
-    </Grid>
-
-    <Label Content="{itl:LocalizedText LC_SAVE_GAME}" />
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="3" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableSaves}" SelectedItem="{Binding SelectedGame}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="mvm:SaveGameViewModel">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{itl:LocalizedText LC_SAVE_WARNING}" Visibility="{Binding HasWarnings, Converter={StaticResource BVC}}" Foreground="DarkRed" />
+    
+    <StackPanel Orientation="Vertical">
+        <Label Content="{itl:LocalizedText LC_SAVE_LOCATION}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox Grid.Column="0" ItemsSource="{Binding SavesLocations}" SelectedItem="{Binding SelectedLocation}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="mvm:SavesLocationViewModel">
                         <TextBlock Text="{Binding Label.Value}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ComboBox>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ComboBox>
+            <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Click="SavesLocationsFolder_Click" IsEnabled="{Binding CanOpenSavesLocation}" ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
+                <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
+            </Button>
+        </Grid>
+    </StackPanel>
 
-        <Button Grid.Column="2"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Stretch"
-                Click="SaveGameFolder_Click"
-                IsEnabled="{Binding CanOpenSaveFileLocation}"
-                ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
-            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
-        </Button>
+    <StackPanel>
+        <Label Content="{itl:LocalizedText LC_SAVE_GAME}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableSaves}" SelectedItem="{Binding SelectedGame}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="mvm:SaveGameViewModel">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{itl:LocalizedText LC_SAVE_WARNING}" Visibility="{Binding HasWarnings, Converter={StaticResource BVC}}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}" Margin="0,0,5,0" />
+                            <TextBlock Text="{Binding Label.Value}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ComboBox>
 
-        <Button Grid.Column="3"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Stretch"
-                Command="{Binding SelectedFullGame.ReloadSaveCommand}"
-                Visibility="{Binding SelectedFullGame.HasChanges, Converter={StaticResource BVC}, FallbackValue=Collapsed}"
-                ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SAVE_FILE_RELOAD_DESCRIPTION}"
-                Margin="3,0,0,0">
-            <materialIcons:MaterialIcon Kind="Reload" Width="18" />
-        </Button>
-    </Grid>
+            <Button Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Stretch"
+                    Click="SaveGameFolder_Click"
+                    IsEnabled="{Binding CanOpenSaveFileLocation}"
+                    ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
+                <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
+            </Button>
 
-    <StackPanel Margin="5,0,5,0">
+            <Button Grid.Column="3"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Stretch"
+                    Command="{Binding SelectedFullGame.ReloadSaveCommand}"
+                    Visibility="{Binding SelectedFullGame.HasChanges, Converter={StaticResource BVC}, FallbackValue=Collapsed}"
+                    ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SAVE_FILE_RELOAD_DESCRIPTION}"
+                    Margin="3,0,0,0">
+                <materialIcons:MaterialIcon Kind="Reload" Width="18" />
+            </Button>
+        </Grid>
+    </StackPanel>
+
+    <StackPanel>
         <StackPanel.Resources>
             <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="Margin" Value="0,5,0,0" />
@@ -93,9 +101,9 @@
             <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_3}" />
         </TextBlock>
 
-        <TextBlock Visibility="{Binding SelectedGame.HasWarnings, Converter={StaticResource BVC}, FallbackValue=Collapsed}" Foreground="DarkRed" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_INVALID}" />
+        <TextBlock Visibility="{Binding SelectedGame.HasWarnings, Converter={StaticResource BVC}, FallbackValue=Collapsed}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_INVALID}" />
 
-        <TextBlock Visibility="{Binding XboxIncompleteVisibility}" Foreground="DarkRed" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_XBOX_INCOMPLETE}" />
+        <TextBlock Visibility="{Binding XboxIncompleteVisibility}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_XBOX_INCOMPLETE}" />
 
     </StackPanel>
 

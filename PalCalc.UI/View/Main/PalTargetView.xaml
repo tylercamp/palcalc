@@ -11,6 +11,8 @@
             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+            xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+            vu:StackPanelExtensions.Spacing="8"
             mc:Ignorable="d" 
             d:DataContext="{d:DesignInstance vm:PalTargetViewModel, IsDesignTimeCreatable=True}"
             d:DesignHeight="401.428" d:DesignWidth="178.928">
@@ -19,17 +21,19 @@
             <TextBlock Text="{Binding Name.Value}" />
         </DataTemplate>
     </StackPanel.Resources>
-    <StackPanel adonisExtensions:LayerExtension.IncreaseLayer="False">
-        <Label Content="{itl:LocalizedText LC_COMMON_PAL}" Margin="5,0,0,0" />
-        <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PalViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.TargetPal, Mode=TwoWay}" TextSearch.TextPath="Label.Value" Margin="6,0,6,0">
+    <StackPanel>
+        <Label Content="{itl:LocalizedText LC_COMMON_PAL}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
+        <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PalViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.TargetPal, Mode=TwoWay}" TextSearch.TextPath="Label.Value">
             <dnkc:AutoCompleteComboBox.ItemTemplate>
                 <DataTemplate DataType="vm:PalViewModel">
                     <Label Content="{Binding Label.Value}" />
                 </DataTemplate>
             </dnkc:AutoCompleteComboBox.ItemTemplate>
         </dnkc:AutoCompleteComboBox>
-        <Label Content="{itl:LocalizedText Code=LC_COMMON_GENDER}" Margin="5,0,0,0" />
-        <ComboBox ItemsSource="{x:Static mvm:PalGenderViewModel.AllStandard}" SelectedValue="{Binding CurrentPalSpecifier.RequiredGender}" Margin="6,0,6,5">
+    </StackPanel>
+    <StackPanel>
+        <Label Content="{itl:LocalizedText Code=LC_COMMON_GENDER}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
+        <ComboBox ItemsSource="{x:Static mvm:PalGenderViewModel.AllStandard}" SelectedValue="{Binding CurrentPalSpecifier.RequiredGender}">
             <ComboBox.ItemTemplate>
                 <DataTemplate DataType="mvm:PalGenderViewModel">
                     <TextBlock Text="{Binding Label.Value}" />
@@ -95,9 +99,12 @@
             </Grid.RowDefinitions>
 
             <Grid.Resources>
+                <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+
                 <Style TargetType="Label" x:Key="MaxIvLabel" BasedOn="{StaticResource {x:Type Label}}">
-                    <!-- TODO - Color -->
-                    <Setter Property="Foreground" Value="Gray" />
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}" />
                     <Setter Property="Grid.Column" Value="2" />
                     <Setter Property="HorizontalContentAlignment" Value="Center" />
                     <Setter Property="ContentStringFormat" Value="({0})" />
