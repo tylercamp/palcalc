@@ -1,4 +1,6 @@
-﻿using PalCalc.Model;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel;
 using System;

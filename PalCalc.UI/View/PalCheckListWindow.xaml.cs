@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdonisUI.Controls;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace PalCalc.UI.View
     /// <summary>
     /// Interaction logic for PalCheckListWindow.xaml
     /// </summary>
-    public partial class PalCheckListWindow : Window
+    public partial class PalCheckListWindow : AdonisWindow
     {
         public PalCheckListWindow()
         {

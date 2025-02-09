@@ -55,7 +55,7 @@
                             <Setter Property="MinValue" Value="0" />
                             <Setter Property="MaxValue" Value="100" />
                         </Style>
-                        <Style TargetType="TextBlock">
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                             <Setter Property="Padding" Value="0,2,6,3" />
                         </Style>
                     </StackPanel.Resources>
@@ -77,7 +77,7 @@
 
             <StackPanel Orientation="Vertical">
                 <StackPanel.Resources>
-                    <Style TargetType="dnkc:AutoCompleteComboBox">
+                    <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
                         <Setter Property="Margin" Value="0,0,10,5" />
                         <Setter Property="Width" Value="150" />
                     </Style>

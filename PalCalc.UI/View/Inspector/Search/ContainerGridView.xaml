@@ -7,6 +7,10 @@
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+                     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+        xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
+        xmlns:adonisConverters="clr-namespace:AdonisUI.Converters;assembly=AdonisUI"
+        xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              mc:Ignorable="d" 
              d:DataContext="{x:Static sgvm:DefaultContainerGridViewModel.DesignerInstance}"
              Visibility="{Binding GridVisibility}"
@@ -18,18 +22,42 @@
         <Label Content="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}, FallbackValue=Collapsed}" FontWeight="Bold" />
         <ListView ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}" SelectionMode="Single">
 
+            <!--
+            Reapply control template with the default <Border> element, BUT without the <ScrollViewer>
+            (which caused scroll events to be eaten and prevent scrolling within the parent container)
+            -->
             <ListView.Template>
+                <!-- (base WPF template) -->
+                
                 <ControlTemplate>
-                    <!--
-                    Reapply control template with the default <Border> element, BUT without the <ScrollViewer>
-                    (which caused scroll events to be eaten and prevent scrolling within the parent container)
-                    -->
-                    <Border BorderBrush="#FFABADB3" BorderThickness="1" Background="White" Padding="1">
+                    <Border BorderBrush="#FFABADB3" BorderThickness="1" Padding="1">
                         <Viewbox StretchDirection="DownOnly">
                             <ItemsPresenter />
                         </Viewbox>
                     </Border>
                 </ControlTemplate>
+                
+
+                <!-- (WPFDarkTheme template) --><!--
+                <ControlTemplate TargetType="{x:Type ListView}">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="0" SnapsToDevicePixels="True">
+                        <ItemsPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource ListBox.Disabled.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource ListBox.Disabled.Border}"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsGrouping" Value="true"/>
+                                <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+                -->
             </ListView.Template>
 
             <ListView.ItemsPanel>
@@ -41,13 +69,40 @@
                 <KeyBinding Key="Delete" Command="{Binding DeleteSlotCommand}" CommandParameter="{Binding SelectedSlot}" />
             </ListView.InputBindings>
             <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}">
+                <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding CanInterract}" Value="False">
                             <Setter Property="IsEnabled" Value="False" />
                             <Setter Property="Opacity" Value="0.25" />
                         </DataTrigger>
                     </Style.Triggers>
+
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                <Grid>
+                                    <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding adonisExtensions:CornerRadiusExtension.CornerRadius}"/>
+
+                                    <Border x:Name="SpotlightLayer"
+                                Background="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BackgroundBrush}"
+                                BorderBrush="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding adonisExtensions:CornerRadiusExtension.CornerRadius}"
+                                adonisExtensions:CursorSpotlightExtension.MouseEventSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}"
+                                SnapsToDevicePixels="False"/>
+
+                                    <ContentPresenter Content="{TemplateBinding Content}"
+                                              Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
 
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="VerticalContentAlignment" Value="Stretch" />

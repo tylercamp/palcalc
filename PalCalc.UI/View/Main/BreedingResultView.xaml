@@ -17,6 +17,8 @@
              xmlns:ab="clr-namespace:GraphSharp.AttachedBehaviours;assembly=GraphSharp.Controls"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             TextOptions.TextFormattingMode="Ideal"
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance vm:BreedingResultViewModel, IsDesignTimeCreatable=True}"
              >
@@ -193,7 +195,7 @@
         </Style>
     </UserControl.Resources>
     <zoom:ZoomControl Grid.Column="1"
-                      Background="#606060"
+                      Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}"
                       Mode="Fill"
                       FillMarginPercent="0.05"
                       FillLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_FILL}"

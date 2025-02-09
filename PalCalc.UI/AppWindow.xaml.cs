@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AdonisUI.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel;
 using System;
@@ -38,7 +39,7 @@ namespace PalCalc.UI
     /// <summary>
     /// Interaction logic for AppWindow.xaml
     /// </summary>
-    public partial class AppWindow : Window
+    public partial class AppWindow : AdonisWindow
     {
         public AppWindow()
         {

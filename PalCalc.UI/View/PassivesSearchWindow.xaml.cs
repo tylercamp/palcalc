@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AdonisUI.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ using System.Windows.Shapes;
 namespace PalCalc.UI.View
 {
     [ObservableObject]
-    public partial class PassivesSearchWindow : Window
+    public partial class PassivesSearchWindow : AdonisWindow
     {
         [NotifyPropertyChangedFor(nameof(DisplayedOptions))]
         [ObservableProperty]

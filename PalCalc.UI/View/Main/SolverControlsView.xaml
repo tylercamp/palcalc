@@ -10,7 +10,7 @@
              mc:Ignorable="d" 
              d:DataContext="{x:Static vm:SolverControlsViewModel.DesignerInstance}"
              d:DesignWidth="1000.621">
-    <vu:SpacedWrapPanel Orientation="Horizontal" HorizontalSpacing="25" VerticalSpacing="15" HorizontalContentAlignment="{Binding RelativeSource={RelativeSource AncestorType=local:SolverControlsView}, Path=HorizontalContentAlignment}" d:Background="White">
+    <vu:SpacedWrapPanel Orientation="Horizontal" HorizontalSpacing="25" VerticalSpacing="15" HorizontalContentAlignment="{Binding RelativeSource={RelativeSource AncestorType=local:SolverControlsView}, Path=HorizontalContentAlignment}">
         <vu:SpacedWrapPanel.Resources>
             <GridLength x:Key="SepHeight">5</GridLength>
             <GridLength x:Key="SepWidth">10</GridLength>

@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <!-- Build Settings -->
+  <PropertyGroup>
+    <TargetFrameworks>net9.0-windows</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <UseWpf>true</UseWpf>
+  </PropertyGroup>
+
+  <!-- Package metadata -->
+  <PropertyGroup>
+    <Version>1.17.1</Version>
+    <Description>Core theme definitions for AdonisUI - a lightweight UI toolkit for WPF applications offering classic but enhanced windows visuals</Description>
+    <Company>benruehl</Company>
+    <Authors>benruehl</Authors>
+    <PackageId>AdonisUI</PackageId>
+    <Copyright>Copyright ©  2020 Benjamin Rühl</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/benruehl/adonis-ui</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/benruehl/adonis-ui.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>UI Styles Themes Templates Controls WPF XAML</PackageTags>
+    <PackageReleaseNotes>See release notes at https://github.com/benruehl/adonis-ui/releases </PackageReleaseNotes>
+    <NeutralLanguage>en</NeutralLanguage>
+  </PropertyGroup>
+
+  <!-- Package Icon -->
+  <ItemGroup>
+    <None Include="..\..\resources\img\favicon-256x256.png" Pack="true" Visible="false" PackagePath="\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PackageIcon>favicon-256x256.png</PackageIcon>
+  </PropertyGroup>
+
+  <!-- Project References -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net45'">
+    <PackageReference Include="System.Drawing.Common" Version="9.0.1" />
+  </ItemGroup>
+</Project>
