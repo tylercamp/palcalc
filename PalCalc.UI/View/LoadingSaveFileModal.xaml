@@ -73,7 +73,7 @@
 
                                         <DockPanel x:Name="PART_DragMoveThumb"
                                            LastChildFill="True"
-                                           Background="Transparent">
+                                           Background="{x:Null}">
 
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
@@ -154,7 +154,7 @@
                             <Trigger Property="PlaceTitleBarOverContent" Value="True">
                                 <Setter TargetName="WindowContent" Property="Grid.Row" Value="0" />
                                 <Setter TargetName="WindowContent" Property="Grid.RowSpan" Value="2" />
-                                <Setter Property="TitleBarBackground" Value="Transparent" />
+                                <Setter Property="TitleBarBackground" Value="{x:Null}" />
                             </Trigger>
 
                         </ControlTemplate.Triggers>

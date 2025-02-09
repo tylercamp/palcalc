@@ -22,7 +22,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
-                    <BulletDecorator Background="Transparent"
+                    <BulletDecorator Background="{x:Null}"
                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                      SnapsToDevicePixels="False">
                         <BulletDecorator.Bullet>

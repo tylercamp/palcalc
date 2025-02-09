@@ -55,7 +55,7 @@
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="ToggleButton">
-                                                    <Grid Background="Transparent">
+                                                    <Grid Background="{x:Null}">
                                                         <ContentPresenter x:Name="Content"
                                                                           Content="{TemplateBinding Content}"/>
                                                     </Grid>

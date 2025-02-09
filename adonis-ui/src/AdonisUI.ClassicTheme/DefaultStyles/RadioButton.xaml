@@ -16,7 +16,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
-                    <BulletDecorator Background="Transparent"
+                    <BulletDecorator Background="{x:Null}"
                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
                         <BulletDecorator.Bullet>
                             <Grid Width="14"

@@ -33,7 +33,7 @@
         </Grid.ColumnDefinitions>
 
         <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_PAL_CONTAINERS}" Grid.Column="0">
-            <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
+            <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="{x:Null}">
                 <TreeView.Style>
                     <Style TargetType="TreeView" BasedOn="{StaticResource {x:Type TreeView}}" />
                 </TreeView.Style>

@@ -124,7 +124,7 @@
         <Setter Property="BorderThickness"
                 Value="2" />
         <Setter Property="BorderBrush"
-                Value="Transparent" />
+                Value="{x:Null}" />
         <Style.Triggers>
             <Trigger Property="controls:GraphElementBehaviour.IsHighlighted"
                      Value="True">

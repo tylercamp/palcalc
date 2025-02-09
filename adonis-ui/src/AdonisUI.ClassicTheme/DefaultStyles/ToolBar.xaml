@@ -16,8 +16,8 @@
     <Style x:Key="{x:Static ToolBar.ButtonStyleKey}"
            BasedOn="{StaticResource {x:Type Button}}"
            TargetType="{x:Type Button}">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Background" Value="{x:Null}"/>
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="4, 2"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -25,7 +25,7 @@
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}"/>
-                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Background" Value="{x:Null}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -33,8 +33,8 @@
     <Style x:Key="{x:Static ToolBar.ToggleButtonStyleKey}"
            BasedOn="{StaticResource {x:Type ToggleButton}}"
            TargetType="{x:Type ToggleButton}">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Background" Value="{x:Null}"/>
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="4, 2"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -42,7 +42,7 @@
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}"/>
-                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Background" Value="{x:Null}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -50,14 +50,14 @@
     <Style x:Key="{x:Static ToolBar.CheckBoxStyleKey}"
            BasedOn="{StaticResource {x:Type CheckBox}}"
            TargetType="{x:Type CheckBox}">
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="{x:Null}"/>
         <Setter Property="Margin" Value="4, 2"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}"/>
-                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Background" Value="{x:Null}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -65,14 +65,14 @@
     <Style x:Key="{x:Static ToolBar.RadioButtonStyleKey}"
            BasedOn="{StaticResource {x:Type RadioButton}}"
            TargetType="{x:Type RadioButton}">
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="{x:Null}"/>
         <Setter Property="Margin" Value="4, 2"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}"/>
-                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Background" Value="{x:Null}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -80,8 +80,8 @@
     <Style x:Key="{x:Static ToolBar.TextBoxStyleKey}"
            BasedOn="{StaticResource {x:Type TextBox}}"
            TargetType="{x:Type TextBox}">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Background" Value="{x:Null}"/>
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="4, 2"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -89,7 +89,7 @@
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}"/>
-                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Background" Value="{x:Null}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -97,15 +97,15 @@
     <Style x:Key="{x:Static ToolBar.MenuStyleKey}"
            BasedOn="{StaticResource {x:Type Menu}}"
            TargetType="{x:Type Menu}">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Background" Value="{x:Null}"/>
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}"/>
-                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Background" Value="{x:Null}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -117,7 +117,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Border Background="Transparent"
+                    <Border Background="{x:Null}"
                             SnapsToDevicePixels="False">
                         <Rectangle Margin="{TemplateBinding Padding}">
                             <Rectangle.Fill>
@@ -153,8 +153,8 @@
     <Style x:Key="ToolBarOverflowButtonStyle"
            TargetType="{x:Type ToggleButton}"
            BasedOn="{StaticResource {x:Type ToggleButton}}">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Background" Value="{x:Null}"/>
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="2"/>
         <Setter Property="ContentTemplate">
@@ -174,7 +174,7 @@
 
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Background" Value="{x:Null}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -276,7 +276,7 @@
 
     <Style x:Key="{x:Type ToolBarTray}"
            TargetType="{x:Type ToolBarTray}">
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="{x:Null}"/>
     </Style>
 
 </ResourceDictionary>

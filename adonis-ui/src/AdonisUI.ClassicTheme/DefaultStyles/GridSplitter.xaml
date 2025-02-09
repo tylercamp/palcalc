@@ -5,7 +5,7 @@
 
     <Style x:Key="{x:Type GridSplitter}" TargetType="GridSplitter">
         <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}"/>
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="{x:Null}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="adonisExtensions:CornerRadiusExtension.CornerRadius" Value="{DynamicResource {x:Static adonisUi:Dimensions.CornerRadius}}"/>

@@ -60,7 +60,7 @@
                         </Border>
 
                         <Grid Name="TabPanel"
-                              Background="Transparent">
+                              Background="{x:Null}">
                             <ContentPresenter x:Name="ContentSite"
                                               VerticalAlignment="Center"
                                               HorizontalAlignment="Center"
@@ -148,8 +148,8 @@
 
             <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True" >
                 <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBrush}}"/>
-                <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="Transparent"/>
-                <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="Transparent"/>
+                <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{x:Null}"/>
+                <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{x:Null}"/>
             </DataTrigger>
 
             <MultiDataTrigger>
@@ -159,8 +159,8 @@
                 </MultiDataTrigger.Conditions>
                 <MultiDataTrigger.Setters>
                     <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer2HighlightBrush}}"/>
-                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="Transparent"/>
-                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="Transparent"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{x:Null}"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{x:Null}"/>
                 </MultiDataTrigger.Setters>
             </MultiDataTrigger>
 
@@ -171,8 +171,8 @@
                 </MultiDataTrigger.Conditions>
                 <MultiDataTrigger.Setters>
                     <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer3HighlightBrush}}"/>
-                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="Transparent"/>
-                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="Transparent"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{x:Null}"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{x:Null}"/>
                 </MultiDataTrigger.Setters>
             </MultiDataTrigger>
 
@@ -183,8 +183,8 @@
                 </MultiDataTrigger.Conditions>
                 <MultiDataTrigger.Setters>
                     <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer4HighlightBrush}}"/>
-                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="Transparent"/>
-                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="Transparent"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{x:Null}"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{x:Null}"/>
                 </MultiDataTrigger.Setters>
             </MultiDataTrigger>
 
@@ -215,7 +215,7 @@
                                   Panel.ZIndex="1"
                                   IsItemsHost="True"
                                   KeyboardNavigation.TabIndex="1"
-                                  Background="Transparent" />
+                                  Background="{x:Null}" />
                         
                         <Border x:Name="Border"
                                 Grid.Row="1"

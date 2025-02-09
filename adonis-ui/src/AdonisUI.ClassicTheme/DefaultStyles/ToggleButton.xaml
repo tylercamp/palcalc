@@ -39,7 +39,7 @@
                                 Opacity="0.5"
                                 ClipToBounds="True"
                                 Visibility="Hidden">
-                            <Border Background="Transparent"
+                            <Border Background="{x:Null}"
                                     BorderBrush="Black"
                                     BorderThickness="2, 10, 2, 1"
                                     Margin="-3, -11, -3, -3">

@@ -3,7 +3,7 @@
                     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI">
 
     <DataTemplate x:Key="{x:Static adonisUi:Templates.Expander}">
-        <Border Background="Transparent">
+        <Border Background="{x:Null}">
             <Viewbox x:Name="Arrow"
                      Width="6"
                      Stretch="Uniform">

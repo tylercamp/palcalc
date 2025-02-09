@@ -37,7 +37,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
     </StackPanel>
-    <GroupBox adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="Transparent" Margin="0,5,0,0">
+    <GroupBox adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="{x:Null}" Margin="0,5,0,0">
         <GroupBox.Header>
             
             <Grid adonisExtensions:LayerExtension.Layer="3">
@@ -54,7 +54,7 @@
             </Grid>
         </GroupBox.Header>
         <Grid>
-            <TabControl Margin="0" Padding="0" Background="Transparent">
+            <TabControl Margin="0" Padding="0" Background="{x:Null}">
                 <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_REQUIRED_TRAITS}" adonisExtensions:LayerExtension.IncreaseLayer="False">
                     <StackPanel adonisExtensions:LayerExtension.IncreaseLayer="False">
                         <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive1, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
@@ -79,7 +79,7 @@
             </Popup>
         </Grid>
     </GroupBox>
-    <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_IVS}" adonisExtensions:LayerExtension.IncreaseLayer="False" Background="Transparent" Margin="0,5,0,0">
+    <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_IVS}" adonisExtensions:LayerExtension.IncreaseLayer="False" Background="{x:Null}" Margin="0,5,0,0">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />

@@ -86,8 +86,8 @@
                         HorizontalAlignment="Right"
                         PreviewMouseDown="Image_PreviewMouseDown"
                         Cursor="Hand"
-                        Background="Transparent"
-                        BorderBrush="Transparent"
+                        Background="{x:Null}"
+                        BorderBrush="{x:Null}"
                         >
                         <materialIcons:MaterialIcon
                             Kind="Remove"

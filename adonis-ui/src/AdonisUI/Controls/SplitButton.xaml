@@ -7,8 +7,8 @@
 
     <Style x:Key="ButtonPartStyle" TargetType="Button">
         <Setter Property="OverridesDefaultStyle" Value="True"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Background" Value="{x:Null}"/>
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Margin" Value="0"/>
         <Setter Property="Template">
@@ -124,8 +124,8 @@
                                     HorizontalContentAlignment="Center"
                                     extensions:RippleExtension.FadeInDuration="0"
                                     extensions:RippleExtension.FadeOutDuration="0"
-                                    extensions:RippleExtension.BackgroundBrush="Transparent"
-                                    extensions:RippleExtension.BorderBrush="Transparent"
+                                    extensions:RippleExtension.BackgroundBrush="{x:Null}"
+                                    extensions:RippleExtension.BorderBrush="{x:Null}"
                                     extensions:RippleExtension.ForegroundBrush="{TemplateBinding Foreground}">
                                 <extensions:CornerRadiusExtension.CornerRadius>
                                     <MultiBinding Converter="{x:Static converters:ValuesToCornerRadiusConverter.Instance}">

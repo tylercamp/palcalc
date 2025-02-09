@@ -23,7 +23,7 @@
             <Rectangle x:Name="Corner"
                        Grid.Row="1"
                        Grid.Column="1"
-                       Fill="Transparent" />
+                       Fill="{x:Null}" />
 
             <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
                                     Grid.Row="0"

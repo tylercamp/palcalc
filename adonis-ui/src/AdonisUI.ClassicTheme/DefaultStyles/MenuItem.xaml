@@ -195,7 +195,7 @@
                         </Trigger>
 
                         <Trigger Property="Role" Value="TopLevelHeader">
-                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Background" Value="{x:Null}"/>
                             <Setter Property="Placement" TargetName="SubMenuPopup" Value="Bottom"/>
                             <Setter Property="Visibility" Value="Collapsed" TargetName="IconPresenter"/>
                             <Setter Property="Visibility" Value="Collapsed" TargetName="ArrowPresenter"/>

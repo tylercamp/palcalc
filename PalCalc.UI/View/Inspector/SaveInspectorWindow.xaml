@@ -33,7 +33,7 @@
                                   Panel.ZIndex="1"
                                   IsItemsHost="True"
                                   KeyboardNavigation.TabIndex="1"
-                                  Background="Transparent" />
+                                  Background="{x:Null}" />
 
                             <Border x:Name="Border"
                                 Grid.Row="1"

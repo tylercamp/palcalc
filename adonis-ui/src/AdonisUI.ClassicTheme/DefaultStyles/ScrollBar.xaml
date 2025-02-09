@@ -193,7 +193,7 @@
     <ControlTemplate x:Key="VerticalScrollBar" TargetType="{x:Type ScrollBar}">
         <Border x:Name="Border"
                 Margin="{TemplateBinding Padding}"
-                Background="Transparent">
+                Background="{x:Null}">
 
             <Grid>
                 <Grid.Margin>
@@ -417,7 +417,7 @@
     <ControlTemplate x:Key="HorizontalScrollBar" TargetType="{x:Type ScrollBar}">
         <Border x:Name="Border"
                 Margin="{TemplateBinding Padding}"
-                Background="Transparent">
+                Background="{x:Null}">
 
             <Grid>
                 <Grid.Margin>

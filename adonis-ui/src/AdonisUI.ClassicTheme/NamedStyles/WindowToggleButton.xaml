@@ -8,7 +8,7 @@
         <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.WindowButtonHighlightBrush}}" />
         <Setter Property="BorderThickness" Value="{DynamicResource {x:Static adonisUi:Dimensions.BorderThickness}}" />
         <Setter Property="adonisExtensions:CornerRadiusExtension.CornerRadius" Value="{DynamicResource {x:Static adonisUi:Dimensions.CornerRadius}}" />
-        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{x:Null}" />
         <Setter Property="Width" Value="45" />
         <Setter Property="Height" Value="30" />
         <Setter Property="Margin" Value="1,0,0,1" />
@@ -39,7 +39,7 @@
                                 Opacity="0.5"
                                 Visibility="Hidden">
                             <Border Margin="-3,-11,-3,-3"
-                                    Background="Transparent"
+                                    Background="{x:Null}"
                                     BorderBrush="Black"
                                     BorderThickness="2,10,2,1">
                                 <Border.Effect>

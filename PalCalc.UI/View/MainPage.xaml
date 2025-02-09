@@ -16,144 +16,148 @@
       d:Width="1280" d:Height="720"
       xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
       xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
+      VerticalAlignment="Stretch"
+      HorizontalAlignment="Stretch"
       d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Page.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
     </Page.Resources>
-    <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="{itl:LocalizedText LC_LANGUAGE}" ItemsSource="{Binding Locales}" Padding="5">
-                <MenuItem.ItemContainerStyle>
-                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
-                        <Setter Property="Header" Value="{Binding Label}" />
-                        <Setter Property="IsCheckable" Value="True" />
-                        <Setter Property="IsChecked" Value="{Binding IsSelected}" />
-                        <Setter Property="Command" Value="{Binding SelectCommand}" />
-                    </Style>
-                </MenuItem.ItemContainerStyle>
-            </MenuItem>
-        </Menu>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="220" Width="300"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="232*" />
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="80*" MinWidth="200"/>
-            </Grid.ColumnDefinitions>
-            <DockPanel Grid.Column="0" Margin="5" IsEnabled="{Binding IsEditable}">
-                <StackPanel DockPanel.Dock="Top">
-                    <GroupBox Header="{itl:LocalizedText LC_SAVE_FILE}">
-                        <v:SaveSelectorView DataContext="{Binding SaveSelection}" />
+    <Border Padding="5">
+        <DockPanel>
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="{itl:LocalizedText LC_LANGUAGE}" ItemsSource="{Binding Locales}" Padding="5">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                            <Setter Property="Header" Value="{Binding Label}" />
+                            <Setter Property="IsCheckable" Value="True" />
+                            <Setter Property="IsChecked" Value="{Binding IsSelected}" />
+                            <Setter Property="Command" Value="{Binding SelectCommand}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+            </Menu>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition MinWidth="220" Width="300"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="232*" />
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="80*" MinWidth="200"/>
+                </Grid.ColumnDefinitions>
+                <DockPanel Grid.Column="0" IsEnabled="{Binding IsEditable}">
+                    <StackPanel DockPanel.Dock="Top">
+                        <GroupBox Header="{itl:LocalizedText LC_SAVE_FILE}">
+                            <v:SaveSelectorView DataContext="{Binding SaveSelection}" />
+                        </GroupBox>
+
+                        <GroupBox Header="{itl:LocalizedText LC_GAME_SETTINGS}" Margin="0,5,0,0">
+                            <v:GameSettingsView DataContext="{Binding SelectedGameSettings}" />
+                        </GroupBox>
+                    </StackPanel>
+
+                    <GroupBox Header="{itl:LocalizedText LC_TARGET_PALS}" Margin="0,5,0,0">
+                        <v:PalTargetListView BorderThickness="0" DataContext="{Binding PalTargetList}" />
                     </GroupBox>
+                </DockPanel>
 
-                    <GroupBox Header="{itl:LocalizedText LC_GAME_SETTINGS}" Margin="0,5,0,0">
-                        <v:GameSettingsView DataContext="{Binding SelectedGameSettings}" />
-                    </GroupBox>
-                </StackPanel>
+                <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
-                <GroupBox Header="{itl:LocalizedText LC_TARGET_PALS}" Margin="0,5,0,0">
-                    <v:PalTargetListView BorderThickness="0" DataContext="{Binding PalTargetList}" />
-                </GroupBox>
-            </DockPanel>
+                <DockPanel Grid.Column="2">
+                    <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" Margin="0,0,0,5" Padding="5" HorizontalContentAlignment="Right" Background="{DynamicResource ResourceKey={x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" adonisExtensions:LayerExtension.IncreaseLayer="True" />
 
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
-
-            <DockPanel Grid.Column="2" Margin="0,0,0,0">
-                <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" Margin="0,5,0,5" Padding="5" HorizontalContentAlignment="Right" Background="{DynamicResource ResourceKey={x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" adonisExtensions:LayerExtension.IncreaseLayer="True" />
-
-                <StackPanel DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
-                    <Grid>
-                        <ProgressBar Value="{Binding SolverProgress}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
-                        <TextBlock Text="{Binding SolverStatusMsg.Value}" Margin="10,5,0,5" />
-                    </Grid>
-                    <Grid Margin="0,0,0,0">
-                        <ProgressBar Value="{Binding StepProgress}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
-                        <TextBlock Text="{Binding StepStatusMsg.Value}" Margin="10,5,0,5" />
-                    </Grid>
-                </StackPanel>
-
-                <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
-            </DockPanel>
-
-            <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
-
-            <Grid Grid.Column="4" IsEnabled="{Binding IsEditable}" Margin="5">
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                
-                <GroupBox Header="{itl:LocalizedText LC_TARGET_PAL}" Grid.Row="0">
-                    <v:PalTargetView DataContext="{Binding PalTarget}" />
-                </GroupBox>
-
-                <Grid Grid.Row="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30*" MinHeight="100" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="60*" MinHeight="100" />
-                    </Grid.RowDefinitions>
-                    
-                    <GroupBox Header="{itl:LocalizedText LC_SOURCE_PALS}" Grid.Row="0" Margin="0,5,0,0">
+                    <StackPanel DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
                         <Grid>
+                            <ProgressBar Value="{Binding SolverProgress}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
+                            <TextBlock Text="{Binding SolverStatusMsg.Value}" Margin="10,5,0,5" />
+                        </Grid>
+                        <Grid Margin="0,0,0,0">
+                            <ProgressBar Value="{Binding StepProgress}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
+                            <TextBlock Text="{Binding StepStatusMsg.Value}" Margin="10,5,0,5" />
+                        </Grid>
+                    </StackPanel>
+
+                    <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
+                </DockPanel>
+
+                <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+
+                <Grid Grid.Column="4" IsEnabled="{Binding IsEditable}">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                
+                    <GroupBox Header="{itl:LocalizedText LC_TARGET_PAL}" Grid.Row="0">
+                        <v:PalTargetView DataContext="{Binding PalTarget}" />
+                    </GroupBox>
+
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30*" MinHeight="100" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="60*" MinHeight="100" />
+                        </Grid.RowDefinitions>
+                    
+                        <GroupBox Header="{itl:LocalizedText LC_SOURCE_PALS}" Grid.Row="0" Margin="0,5,0,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <StackPanel Orientation="Vertical" Margin="0,5,0,5" Grid.Row="0">
+                                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeBasePals}">
+                                        <TextBlock Text="{itl:LocalizedText LC_INCLUDE_PALS_AT_BASE}" TextWrapping="Wrap" />
+                                    </CheckBox>
+
+                                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCagedPals}">
+                                        <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_IN_CAGES}" TextWrapping="Wrap" />
+                                    </CheckBox>
+
+                                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCustomPals}">
+                                        <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_CUSTOM_PALS}" TextWrapping="Wrap" />
+                                    </CheckBox>
+                                </StackPanel>
+
+                                <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}" Grid.Row="1" />
+                            </Grid>
+                        </GroupBox>
+
+                        <GridSplitter Grid.Row="1" Background="{x:Null}" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+
+                        <Grid Grid.Row="2">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <StackPanel Orientation="Vertical" Margin="0,5,0,5" Grid.Row="0">
-                                <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeBasePals}">
-                                    <TextBlock Text="{itl:LocalizedText LC_INCLUDE_PALS_AT_BASE}" TextWrapping="Wrap" />
-                                </CheckBox>
 
-                                <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCagedPals}">
-                                    <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_IN_CAGES}" TextWrapping="Wrap" />
-                                </CheckBox>
+                            <TextBlock TextWrapping="Wrap" Visibility="{Binding ShowNoResultsNotice, Converter={StaticResource VVC}, FallbackValue=Collapsed}" Grid.Row="0" Padding="5">
+                                <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_1}" />
+                                <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/wiki/Frequently-Asked-Questions#why-arent-i-getting-any-results"
+                                           RequestNavigate="Hyperlink_RequestNavigate">
+                                    <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_2}" />
+                                </Hyperlink>
+                                <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_3}" />
+                            </TextBlock>
 
-                                <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCustomPals}">
-                                    <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_CUSTOM_PALS}" TextWrapping="Wrap" />
-                                </CheckBox>
-                            </StackPanel>
-
-                            <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}" Grid.Row="1" />
+                            <GroupBox Header="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.ResultsHeading.Value}" Grid.Row="1">
+                                <v:BreedingResultListView BorderThickness="0" DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
+                            </GroupBox>
                         </Grid>
-                    </GroupBox>
-
-                    <GridSplitter Grid.Row="1" Background="Transparent" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
-
-                    <Grid Grid.Row="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <TextBlock TextWrapping="Wrap" Visibility="{Binding ShowNoResultsNotice, Converter={StaticResource VVC}, FallbackValue=Collapsed}" Grid.Row="0" Padding="5">
-                            <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_1}" />
-                            <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/wiki/Frequently-Asked-Questions#why-arent-i-getting-any-results"
-                                       RequestNavigate="Hyperlink_RequestNavigate">
-                                <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_2}" />
-                            </Hyperlink>
-                            <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_3}" />
-                        </TextBlock>
-
-                        <GroupBox Header="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.ResultsHeading.Value}" Grid.Row="1">
-                            <v:BreedingResultListView BorderThickness="0" DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
-                        </GroupBox>
                     </Grid>
-                </Grid>
 
-                <StackPanel Grid.Row="2">
-                    <Button Width="50" Click="AboutButton_Click" Margin="0,5,0,5" Content="{itl:LocalizedText LC_ABOUT_APP}" />
-                    <TextBlock Visibility="{Binding UpdatesMessageVisibility}" TextWrapping="Wrap" TextAlignment="Center" FontSize="20">
-                        <!-- NavigateUri unused, value must be set for event to trigger -->
-                        <Hyperlink NavigateUri="http://github.com" RequestNavigate="DownloadUpdateLink_RequestNavigate">
-                            <TextBlock Text="{itl:LocalizedText LC_UPDATE_AVAILABLE}" />
-                        </Hyperlink>
-                    </TextBlock>
-                </StackPanel>
+                    <StackPanel Grid.Row="2">
+                        <Button Width="50" Click="AboutButton_Click" Margin="0,5,0,5" Content="{itl:LocalizedText LC_ABOUT_APP}" />
+                        <TextBlock Visibility="{Binding UpdatesMessageVisibility}" TextWrapping="Wrap" TextAlignment="Center" FontSize="20">
+                            <!-- NavigateUri unused, value must be set for event to trigger -->
+                            <Hyperlink NavigateUri="http://github.com" RequestNavigate="DownloadUpdateLink_RequestNavigate">
+                                <TextBlock Text="{itl:LocalizedText LC_UPDATE_AVAILABLE}" />
+                            </Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
             </Grid>
-        </Grid>
-    </DockPanel>
+        </DockPanel>
+    </Border>
 </Page>
