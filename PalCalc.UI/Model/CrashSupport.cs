@@ -126,16 +126,17 @@ namespace PalCalc.UI.Model
                                 {
                                     if (file.Exists)
                                     {
-                                        if (file.FilePaths.Length == 1)
+                                        var filePaths = file.FilePaths.ToArray();
+                                        if (filePaths.Length == 1)
                                         {
-                                            archive.CreateEntryFromFile(file.FilePaths[0], $"save-{i}/{nameBase}.sav");
+                                            archive.CreateEntryFromFile(filePaths[0], $"save-{i}/{nameBase}.sav");
                                         }
                                         else
                                         {
-                                            for (int fi = 0; fi <  file.FilePaths.Length; fi++)
+                                            for (int fi = 0; fi <  filePaths.Length; fi++)
                                             {
-                                                if (File.Exists(file.FilePaths[fi]))
-                                                    archive.CreateEntryFromFile(file.FilePaths[fi], $"save-{i}/{nameBase}-{fi}.sav");
+                                                if (File.Exists(filePaths[fi]))
+                                                    archive.CreateEntryFromFile(filePaths[fi], $"save-{i}/{nameBase}-{fi}.sav");
                                             }
                                         }
                                     }
@@ -149,7 +150,7 @@ namespace PalCalc.UI.Model
                             AddSaveFile(save.WorldOption, "WorldOption");
 
                             foreach (var p in save.Players.Where(p => p.Exists))
-                                AddSaveFile(p, $"Players/{Path.GetFileName(p.FilePaths[0])}");
+                                AddSaveFile(p, $"Players/{Path.GetFileName(p.FilePaths.First())}");
                         }
                     }
                     catch { }

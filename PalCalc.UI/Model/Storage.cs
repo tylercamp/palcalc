@@ -316,7 +316,10 @@ namespace PalCalc.UI.Model
                 var backupPath = wasStored ? path + ".bak" : null;
 
                 if (wasStored)
+                {
+                    if (File.Exists(backupPath)) File.Delete(backupPath);
                     File.Move(path, backupPath);
+                }
 
                 var newCachedSave = LoadSave(save, db, settings);
 

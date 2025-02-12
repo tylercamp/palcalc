@@ -200,15 +200,16 @@ namespace PalCalc.UI.ViewModel
 
                             void Export(ISaveFile file, string basePath)
                             {
-                                if (file.FilePaths.Length == 1)
+                                var filePaths = file.FilePaths.ToArray();
+                                if (filePaths.Length == 1)
                                 {
-                                    archive.CreateEntryFromFile(file.FilePaths[0], $"{basePath}.sav");
+                                    archive.CreateEntryFromFile(filePaths[0], $"{basePath}.sav");
                                 }
                                 else
                                 {
-                                    for (int i = 0; i < file.FilePaths.Length; i++)
+                                    for (int i = 0; i < filePaths.Length; i++)
                                     {
-                                        archive.CreateEntryFromFile(file.FilePaths[i], $"{basePath}-{i}.sav");
+                                        archive.CreateEntryFromFile(filePaths[i], $"{basePath}-{i}.sav");
                                     }
                                 }
                             }
@@ -234,7 +235,7 @@ namespace PalCalc.UI.ViewModel
                                 }
                                 catch
                                 {
-                                    playerId = Path.GetFileNameWithoutExtension(player.FilePaths[0]);
+                                    playerId = Path.GetFileNameWithoutExtension(player.FilePaths.First());
                                 }
                                 Export(player, $"Players/{playerId}");
                             }

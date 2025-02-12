@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader.SaveFile
 {
-    public class WorldOptionSaveFile : ISaveFile
+    public class WorldOptionSaveFile(IFileSource files) : ISaveFile(files)
     {
-        public WorldOptionSaveFile(string[] filePaths) : base(filePaths) { }
     }
 }

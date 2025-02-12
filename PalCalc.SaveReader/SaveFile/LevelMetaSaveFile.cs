@@ -25,11 +25,9 @@ namespace PalCalc.SaveReader.SaveFile
             : $"{PlayerName} lv {PlayerLevel} in {WorldName} day {InGameDay}";
     }
 
-    public class LevelMetaSaveFile : ISaveFile
+    public class LevelMetaSaveFile(IFileSource files) : ISaveFile(files)
     {
         private static ILogger logger = Log.ForContext<LevelMetaSaveFile>();
-
-        public LevelMetaSaveFile(string[] filePaths) : base(filePaths) { }
 
         public virtual GameMeta ReadGameOptions()
         {
