@@ -8,6 +8,7 @@
         xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
         xmlns:itl="clr-namespace:PalCalc.UI.Localization"
         xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
+                             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
         mc:Ignorable="d"
         IconVisibility="Collapsed"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
@@ -18,6 +19,9 @@
     </Window.Style>
     <Window.Resources>
         <mvm:RankColorConverter x:Key="RCC" />
+        <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
+            <Setter Property="adonisExtensions:ScrollBarExtension.ExpansionMode" Value="AlwaysExpand" />
+        </Style>
     </Window.Resources>
     <DockPanel>
         <DockPanel DockPanel.Dock="Top" Margin="10,10">
