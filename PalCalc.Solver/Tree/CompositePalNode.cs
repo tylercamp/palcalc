@@ -24,9 +24,9 @@ namespace PalCalc.Solver.Tree
 
         public IEnumerable<IBreedingTreeNode> Children { get; } = Enumerable.Empty<IBreedingTreeNode>();
 
-        public IEnumerable<string> DescriptionLines => throw new NotImplementedException();
+        public IEnumerable<string> DescriptionLines => [Description];
 
-        public string Description => throw new NotImplementedException();
+        public string Description => "Composite";
 
         public IEnumerable<(IBreedingTreeNode, int)> TraversedTopDown(int currentDepth)
         {

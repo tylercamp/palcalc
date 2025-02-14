@@ -83,14 +83,17 @@ namespace PalCalc.Solver.Probabilities
         /// </summary>
         public static float ProbabilityInheritedTargetIVs(IV_Set a, IV_Set b)
         {
-            // (note: use of `.Count` and superficial array creation doesn't seem to be significant for perf)
-            IV_IValue[] hps = [a.HP, b.HP];
-            IV_IValue[] attacks = [a.Attack, b.Attack];
-            IV_IValue[] defenses = [a.Defense, b.Defense];
+            int numRelevantHP = 0;
+            if (a.HP.IsRelevant) numRelevantHP++;
+            if (b.HP.IsRelevant) numRelevantHP++;
 
-            int numRelevantHP = hps.Count(iv => iv.IsRelevant);
-            int numRelevantAttack = attacks.Count(iv => iv.IsRelevant);
-            int numRelevantDefense = defenses.Count(iv => iv.IsRelevant);
+            int numRelevantAttack = 0;
+            if (a.Attack.IsRelevant) numRelevantAttack++;
+            if (b.Attack.IsRelevant) numRelevantAttack++;
+
+            int numRelevantDefense = 0;
+            if (a.Defense.IsRelevant) numRelevantDefense++;
+            if (b.Defense.IsRelevant) numRelevantDefense++;
 
             int numRequiredIVs = 0;
             if (numRelevantHP > 0) numRequiredIVs++;

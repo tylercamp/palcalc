@@ -70,7 +70,7 @@ namespace PalCalc.Model
 
         public static V GetValueFromAny<K, V>(this IDictionary<K, V> dict, params K[] keys) => dict[keys.First(dict.ContainsKey)];
 
-        public static int SetHash<T>(this IEnumerable<T> elements)
+        public static int _SetHash<T>(this IEnumerable<T> elements)
         {
             var baseHash = 0;
             var total = 0;
@@ -81,6 +81,183 @@ namespace PalCalc.Model
                 total += count;
             }
 
+            return HashCode.Combine(baseHash, total);
+        }
+
+        public static int SetHash<T>(this IEnumerable<T> elements)
+        {
+            const int MaxSize = 8;
+
+            // Stack allocation: no heap allocations here
+            Span<int> buffer = stackalloc int[MaxSize];
+            int count = 0;
+
+            // Read hash codes into the buffer
+            foreach (var element in elements)
+            {
+                if (count == MaxSize)
+                    throw new InvalidOperationException("Too many elements in the set.");
+
+                buffer[count++] = element?.GetHashCode() ?? 0;
+            }
+
+            // In-place insertion sort on the small buffer
+            for (int i = 1; i < count; i++)
+            {
+                int key = buffer[i];
+                int j = i - 1;
+
+                // Move elements greater than 'key' one position ahead 
+                while (j >= 0 && buffer[j] > key)
+                {
+                    buffer[j + 1] = buffer[j];
+                    j--;
+                }
+
+                buffer[j + 1] = key;
+            }
+
+            // Now the span is sorted; group duplicates and combine hashes
+            int baseHash = 0;
+            int total = 0;
+
+            int idx = 0;
+            while (idx < count)
+            {
+                int currentHash = buffer[idx];
+                int freq = 1;
+                idx++;
+
+                // Count how many duplicates of currentHash
+                while (idx < count && buffer[idx] == currentHash)
+                {
+                    freq++;
+                    idx++;
+                }
+
+                baseHash = HashCode.Combine(baseHash, currentHash, freq);
+                total += freq;
+            }
+
+            // Final combine with total to avoid collisions from same frequency patterns
+            return HashCode.Combine(baseHash, total);
+        }
+
+        public static int SetHash<T, V>(this IEnumerable<T> elements, Func<T, V> selector)
+        {
+            const int MaxSize = 8;
+
+            // Stack allocation: no heap allocations here
+            Span<int> buffer = stackalloc int[MaxSize];
+            int count = 0;
+
+            // Read hash codes into the buffer
+            foreach (var element in elements)
+            {
+                if (count == MaxSize)
+                    throw new InvalidOperationException("Too many elements in the set.");
+
+                buffer[count++] = selector(element)?.GetHashCode() ?? 0;
+            }
+
+            // In-place insertion sort on the small buffer
+            for (int i = 1; i < count; i++)
+            {
+                int key = buffer[i];
+                int j = i - 1;
+
+                // Move elements greater than 'key' one position ahead 
+                while (j >= 0 && buffer[j] > key)
+                {
+                    buffer[j + 1] = buffer[j];
+                    j--;
+                }
+
+                buffer[j + 1] = key;
+            }
+
+            // Now the span is sorted; group duplicates and combine hashes
+            int baseHash = 0;
+            int total = 0;
+
+            int idx = 0;
+            while (idx < count)
+            {
+                int currentHash = buffer[idx];
+                int freq = 1;
+                idx++;
+
+                // Count how many duplicates of currentHash
+                while (idx < count && buffer[idx] == currentHash)
+                {
+                    freq++;
+                    idx++;
+                }
+
+                baseHash = HashCode.Combine(baseHash, currentHash, freq);
+                total += freq;
+            }
+
+            // Final combine with total to avoid collisions from same frequency patterns
+            return HashCode.Combine(baseHash, total);
+        }
+
+        public static int SetHash<T, V>(this List<T> elements, Func<T, V> selector)
+        {
+            const int MaxSize = 8;
+
+            // Stack allocation: no heap allocations here
+            Span<int> buffer = stackalloc int[MaxSize];
+            int count = 0;
+
+            // Read hash codes into the buffer
+            foreach (var element in elements)
+            {
+                if (count == MaxSize)
+                    throw new InvalidOperationException("Too many elements in the set.");
+
+                buffer[count++] = selector(element)?.GetHashCode() ?? 0;
+            }
+
+            // In-place insertion sort on the small buffer
+            for (int i = 1; i < count; i++)
+            {
+                int key = buffer[i];
+                int j = i - 1;
+
+                // Move elements greater than 'key' one position ahead 
+                while (j >= 0 && buffer[j] > key)
+                {
+                    buffer[j + 1] = buffer[j];
+                    j--;
+                }
+
+                buffer[j + 1] = key;
+            }
+
+            // Now the span is sorted; group duplicates and combine hashes
+            int baseHash = 0;
+            int total = 0;
+
+            int idx = 0;
+            while (idx < count)
+            {
+                int currentHash = buffer[idx];
+                int freq = 1;
+                idx++;
+
+                // Count how many duplicates of currentHash
+                while (idx < count && buffer[idx] == currentHash)
+                {
+                    freq++;
+                    idx++;
+                }
+
+                baseHash = HashCode.Combine(baseHash, currentHash, freq);
+                total += freq;
+            }
+
+            // Final combine with total to avoid collisions from same frequency patterns
             return HashCode.Combine(baseHash, total);
         }
 

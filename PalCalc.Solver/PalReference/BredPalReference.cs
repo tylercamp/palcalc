@@ -49,7 +49,7 @@ namespace PalCalc.Solver.PalReference
             IVs = ivs;
 
             EffectivePassives = passives;
-            EffectivePassivesHash = passives.Select(p => p.InternalName).SetHash();
+            EffectivePassivesHash = passives.SetHash(p => p.InternalName);
 
             parentBreedingEffort = gameSettings.MultipleBreedingFarms && Parent1 is BredPalReference && Parent2 is BredPalReference
                 ? Parent1.BreedingEffort > Parent2.BreedingEffort

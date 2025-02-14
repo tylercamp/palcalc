@@ -46,7 +46,7 @@ internal class Program
 
         var prob = PalCalc.Solver.Probabilities.Passives.ProbabilityInheritedTargetPassives(parentPassives, targetPassives, numFinalPassives);
 
-        var saveGame = DirectSavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LastModified);
+        var saveGame = DirectSavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LevelMeta.ReadGameOptions().PlayerLevel);
         Console.WriteLine("Using {0}", saveGame);
 
         var savedInstances = saveGame.Level.ReadCharacterData(db, GameSettings.Defaults, []).Pals;
@@ -65,13 +65,19 @@ internal class Program
             maxBredIrrelevantPassives: 0,
             maxInputIrrelevantPassives: 2,
             maxEffort: TimeSpan.FromDays(7),
-            maxThreads: 0
+            maxThreads: 1
         );
+
+        solver.SolverStateUpdateInterval = TimeSpan.FromSeconds(1);
+        solver.SolverStateUpdated += ev => Console.WriteLine($"{ev.CurrentPhase} ({ev.CurrentStepIndex}) - {ev.WorkProcessedCount} / {ev.CurrentWorkSize}");
 
         var targetInstance = new PalSpecifier
         {
-            Pal = "Ragnahawk".ToPal(db),
+            Pal = "Beakon".ToPal(db),
             RequiredPassives = new List<PassiveSkill> { "Swift".ToStandardPassive(db), "Runner".ToStandardPassive(db), "Nimble".ToStandardPassive(db) },
+            IV_Attack = 90,
+            IV_Defense = 90,
+            IV_HP = 90
         };
 
         var controller = new SolverStateController()
