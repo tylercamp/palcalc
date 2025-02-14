@@ -12,11 +12,16 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-/*
- * TODO
- * 
- * - Add warning when memory size likely exceeds system limits
- */
+// note:
+// A lot of this logic was originally written using LINQ. This was convenient and readable, but
+// there are a lot of hot-paths in this file, and the excessive LINQ iterator + enumerator instances
+// were causing lots of GC activity which added overhead and limited concurrency.
+//
+// Similarly, there are a number of places where an enumerator (i.e. `yield return`) would be easier
+// to understand + debug, but these have the same GC overhead issues.
+//
+// An object pool is being used for any types which were found to have excessive allocations
+// while profiling.
 
 namespace PalCalc.Solver
 {
