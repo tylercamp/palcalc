@@ -60,7 +60,7 @@
                         <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK}" />
                         <vu:IntegerTextBox Value="{Binding IvAttack}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" >
+                    <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE}" />
                         <vu:IntegerTextBox Value="{Binding IvDefense}" />
                     </StackPanel>

@@ -5,13 +5,6 @@
                     xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox">
     
     <!--
-    these changes are reloaded after the WPFDarkTheme theme has been applied, since styles with `BasedOn`
-    won't update when the underlying `BasedOn` style changes - see App.xaml.cs
-    
-    (otherwise these would just be in App.xaml)
-    -->
-    
-    <!--
     fix for XAML binding errors involving combobox
     https://gist.github.com/TobiasSekan/73a93c2dfea4a051ff72abb5218d6f8f
     -->
@@ -32,24 +25,25 @@
         <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
     </Style>
 
+    <!-- The default ListViewItem style from Adonis is specifically for GridView, this version works for normal ListView-like items -->
     <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}" x:Key="StandardListViewItemStyle">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListViewItem}">
                     <Grid>
                         <Border x:Name="Border"
-                Background="{TemplateBinding Background}"
-                BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}"
-                CornerRadius="{TemplateBinding adonisExtensions:CornerRadiusExtension.CornerRadius}"/>
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding adonisExtensions:CornerRadiusExtension.CornerRadius}"/>
 
                         <Border x:Name="SpotlightLayer"
-                Background="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BackgroundBrush}"
-                BorderBrush="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}"
-                CornerRadius="{TemplateBinding adonisExtensions:CornerRadiusExtension.CornerRadius}"
-                adonisExtensions:CursorSpotlightExtension.MouseEventSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}"
-                SnapsToDevicePixels="False"/>
+                                Background="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BackgroundBrush}"
+                                BorderBrush="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding adonisExtensions:CornerRadiusExtension.CornerRadius}"
+                                adonisExtensions:CursorSpotlightExtension.MouseEventSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}"
+                                SnapsToDevicePixels="False" />
 
                         <ContentPresenter
                               Margin="{TemplateBinding Padding}"
@@ -68,13 +62,7 @@
         <Setter Property="Padding" Value="7,0,0,4" />
     </Style>
 
-    <!--<Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#206BD4</Color>-->
     <Color x:Key="{x:Static adonisUi:Colors.AlertColor}">#D49220</Color>
     <Color x:Key="{x:Static adonisUi:Colors.ErrorColor}">#FF3939</Color>
-
-    <!-- ref -->
-    <!--<Color x:Key="{x:Static adonisUi:Colors.HyperlinkColor}">#3377c6</Color>-->
-
-
     <Color x:Key="{x:Static adonisUi:Colors.HyperlinkColor}">#5CA8FF</Color>
 </ResourceDictionary>

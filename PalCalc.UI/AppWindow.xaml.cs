@@ -28,19 +28,30 @@ namespace PalCalc.UI
 
             Task.Run(() =>
             {
-                var loadingVm = new LoadingPageViewModel();
-                // TODO - propagate errors to UI thread to prevent hanging + force crashlog
-                var vm = new MainWindowViewModel(dispatcher, progress =>
+                try
                 {
+                    var loadingVm = new LoadingPageViewModel();
+                    var vm = new MainWindowViewModel(dispatcher, progress =>
+                    {
+                        dispatcher.BeginInvoke(() =>
+                        {
+                            loadingVm.ProgressPercent = progress.ProgressPercent;
+
+                            if (loadingPage.DataContext == null)
+                                loadingPage.DataContext = loadingVm;
+                        });
+                    });
+
+                    dispatcher.BeginInvoke(() => Content = new MainPage(vm), DispatcherPriority.ContextIdle);
+                }
+                catch (Exception e)
+                {
+                    // (exceptions in Tasks are handled differently - re-send exceptions on UI Dispatcher so it gets handled like a normal error)
                     dispatcher.BeginInvoke(() =>
                     {
-                        loadingVm.ProgressPercent = progress.ProgressPercent;
-
-                        if (loadingPage.DataContext == null) loadingPage.DataContext = loadingVm;
+                        throw new Exception("An error occurred while loading the main window data", e);
                     });
-                });
-
-                dispatcher.BeginInvoke(() => Content = new MainPage(vm), DispatcherPriority.ContextIdle);
+                }
             });
         }
 
@@ -57,6 +68,8 @@ namespace PalCalc.UI
         {
             DataContext = new AppWindowViewModel(Dispatcher);
             InitializeComponent();
+
+            // (`Content` inherits the DataContext of the window, but we don't want `LoadingPage` to inherit that)
             (Content as LoadingPage).DataContext = null;
 
 #if DEBUG

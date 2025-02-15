@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
+using AdonisMessageBox = AdonisUI.Controls.MessageBox;
+
 namespace PalCalc.UI
 {
     /// <summary>
@@ -77,7 +79,7 @@ namespace PalCalc.UI
             }
             finally
             {
-                AdonisUI.Controls.MessageBox.Show(message, caption: "");
+                AdonisMessageBox.Show(message, caption: "");
             }
         }
     }

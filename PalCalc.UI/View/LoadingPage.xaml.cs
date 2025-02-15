@@ -30,13 +30,6 @@ namespace PalCalc.UI
         public LoadingPage()
         {
             InitializeComponent();
-
-            DataContextChanged += LoadingPage_DataContextChanged;
-        }
-
-        private void LoadingPage_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            //throw new NotImplementedException();
         }
     }
 }

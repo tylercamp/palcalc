@@ -44,7 +44,6 @@ namespace PalCalc.UI.ViewModel
         private static ILogger logger = Log.ForContext<MainWindowViewModel>();
         private static PalDB db = PalDB.LoadEmbedded();
         private Dictionary<ISaveGame, PalTargetListViewModel> targetsBySaveFile;
-        private LoadingSaveFileModal loadingSaveModal = null;
         private Dispatcher dispatcher;
         private AppSettings settings;
         private PassiveSkillsPresetCollectionViewModel passivePresets;
@@ -75,7 +74,6 @@ namespace PalCalc.UI.ViewModel
         {
             this.dispatcher = dispatcher ?? Dispatcher.CurrentDispatcher;
 
-            CachedSaveGame.SaveFileLoadStart += CachedSaveGame_SaveFileLoadStart;
             CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
             CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
@@ -344,29 +342,8 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        private void CachedSaveGame_SaveFileLoadStart(ISaveGame obj)
-        {
-            if (loadingSaveModal == null)
-            {
-                //loadingSaveModal = new LoadingSaveFileModal();
-                //loadingSaveModal.Owner = System.Windows.Application.Current.MainWindow;
-                //loadingSaveModal.DataContext = LocalizationCodes.LC_SAVE_FILE_RELOADING.Bind();
-
-                //loadingSaveModal.ShowDialog();
-
-                //loadingSaveModal.ShowSync();
-            }
-        }
-
         private void CachedSaveGame_SaveFileLoadEnd(ISaveGame obj, CachedSaveGame loaded)
         {
-            if (loadingSaveModal != null)
-            {
-                loadingSaveModal.Close();
-                loadingSaveModal = null;
-
-                
-            }
 
             if (loaded != null && targetsBySaveFile.ContainsKey(obj))
                 targetsBySaveFile[obj].UpdateCachedData(loaded, GameSettingsViewModel.Load(obj).ModelObject);
@@ -374,12 +351,6 @@ namespace PalCalc.UI.ViewModel
 
         private void CachedSaveGame_SaveFileLoadError(ISaveGame obj, Exception ex)
         {
-            if (loadingSaveModal != null)
-            {
-                loadingSaveModal.Close();
-                loadingSaveModal = null;
-            }
-
             logger.Error(ex, "error when parsing save file for {saveId}", CachedSaveGame.IdentifierFor(obj));
 
             var crashsupport = CrashSupport.PrepareSupportFile(specificSave: obj);

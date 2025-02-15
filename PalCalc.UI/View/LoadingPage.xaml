@@ -9,8 +9,6 @@
       xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
       mc:Ignorable="d" 
       d:Width="400" d:Height="200"
-
-      Cursor="Wait"
       Title="LoadingPage">
     <Page.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
@@ -29,14 +27,22 @@
         </Grid.RowDefinitions>
 
         <Viewbox StretchDirection="Both" Stretch="Uniform" MaxWidth="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <!-- https://benruehl.github.io/adonis-ui/docs/guides/loading/#loading-indicators -->
             <ContentControl ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.LoadingDots}}"
-                        Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
-                        Focusable="False"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        />
+                            Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                            Focusable="False"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            />
         </Viewbox>
 
-        <ProgressBar Visibility="{Binding Converter={StaticResource VVC}, FallbackValue=Collapsed}" VerticalAlignment="Bottom" Grid.RowSpan="99" Grid.ColumnSpan="99" Minimum="0" Maximum="100" Value="{Binding ProgressPercent, FallbackValue=0}" Height="15" />
+        <ProgressBar Visibility="{Binding Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                     VerticalAlignment="Bottom"
+                     Grid.RowSpan="99"
+                     Grid.ColumnSpan="99"
+                     Minimum="0" Maximum="100"
+                     Value="{Binding ProgressPercent, FallbackValue=0}"
+                     Height="15"
+                     />
     </Grid>
 </Page>

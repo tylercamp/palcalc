@@ -62,6 +62,7 @@ namespace PalCalc.UI.View
 
                 Task.Run(async () =>
                 {
+                    // (slight delay to give priority to WPF UI thread so it can render a bit quicker, hopefully reducing any window flickering)
                     await Task.Delay(500);
 
                     try { res = fn(); }

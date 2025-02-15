@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
 
@@ -142,10 +143,10 @@ namespace PalCalc.UI.Model
             var loadingModal = new LoadingSaveFileModal();
             loadingModal.DataContext = LocalizationCodes.LC_SAVE_FILE_RELOADING.Bind();
 
-            var isDesignMode = DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject());
+            var isDesignMode = DesignerProperties.GetIsInDesignMode(new DependencyObject());
             if (!isDesignMode)
             {
-                loadingModal.Owner = System.Windows.Application.Current.MainWindow;
+                loadingModal.Owner = Application.Current.MainWindow;
                 SaveFileLoadStart?.Invoke(game);
             }
 
