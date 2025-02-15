@@ -10,20 +10,10 @@
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:v="clr-namespace:PalCalc.UI.View"
              xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
-             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d"
              Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}"
              d:DataContext="{x:Type ivmg:ContainerGridPalSlotViewModel}">
-    <UserControl.Resources>
-        <!--<Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-            <Setter Property="Foreground" Value="White" />
-        </Style>
-        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
-            <Setter Property="Foreground" Value="White" />
-        </Style>-->
-    </UserControl.Resources>
-    <Grid adonisExtensions:LayerExtension.IncreaseLayer="True">
     <StackPanel Margin="10">
         <WrapPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
@@ -74,7 +64,7 @@
                 <ItemsControl ItemsSource="{Binding PalInstance.EquippedActiveSkills}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="mvm:ActiveSkillViewModel">
-                            <vp:ActiveSkillView DataContext="{Binding}" Margin="0,2,0,2" />
+                            <vp:ActiveSkillView DataContext="{Binding}" Width="175" Height="22" Margin="0,0,0,4" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -90,7 +80,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="mvm:PassiveSkillViewModel">
-                            <vp:PassiveSkillView DataContext="{Binding}" Width="125" Margin="0,0,5,5" />
+                            <vp:PassiveSkillView DataContext="{Binding}" Width="175" Margin="0,0,5,5" Height="22" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -106,11 +96,10 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="mvm:ActiveSkillViewModel">
-                        <vp:ActiveSkillView DataContext="{Binding}" Margin="2" />
+                        <vp:ActiveSkillView DataContext="{Binding}" Width="175" Height="22" Margin="2" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </StackPanel>
     </StackPanel>
-    </Grid>
 </UserControl>

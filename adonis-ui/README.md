@@ -1,3 +1,9 @@
+This is a slightly-modified copy of [Adonis UI](https://github.com/benruehl/adonis-ui) by `benruehl`.
+
+It has various tweaks specifically for Pal Calc's styling needs.
+
+---
+
 # ![Favicon](./resources/img/favicon-32x32.png) Adonis UI
 
 [![Build Status](https://dev.azure.com/devruehl/AdonisUI/_apis/build/status/benruehl.adonis-ui?branchName=master)](https://dev.azure.com/devruehl/AdonisUI/_build/latest?definitionId=1&branchName=master)

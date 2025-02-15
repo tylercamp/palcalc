@@ -95,85 +95,62 @@ namespace PalCalc.SaveReader
     {
         private static ILogger logger = Log.ForContext(typeof(CompressedSAV));
 
+        private const int MaxRetryAttempts = 3;
+
         // file operations can take a while, and they can happen while Palworld is running + saving file contents.
         // save files are relatively small (typically ~10MB at most), prefer loading the whole file into memory up
         // front so we can close the handle ASAP.
         private static Stream ReadFileNonLocking(string filePath)
         {
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+            using (var ms = new MemoryStream())
+            {
+                fs.CopyTo(ms);
+                return new MemoryStream(ms.ToArray());
+            }
+        }
+
+        public static void WithDecompressedSave(string filePath, Action<Stream> action) =>
+            WithDecompressedSave(new SingleFileSource(filePath), action);
+
+        public static void WithDecompressedSave(IEnumerable<string> orderedFilePartPaths, Action<Stream> action) =>
+            WithDecompressedSave(new MultiFileSource(orderedFilePartPaths), action);
+
+        public static void WithDecompressedSave(IFileSource fileSource, Action<Stream> action)
+        {
+            MemoryStream combinedStream = null;
+            CompressedSAVHeader firstFileHeader = null;
+
             // since the file can be moved or changed during the read op, auto-retry any failed attempts
 
-            byte[] fileBytes;
-
-            const int maxAttempts = 3;
-            for (int i = 1; i <= maxAttempts; i++)
+            for (int i = 1; i <= MaxRetryAttempts; i++)
             {
+                string lastFile = null;
+                combinedStream = new();
+                firstFileHeader = null;
+
                 try
                 {
-                    using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
-                    using (var ms = new MemoryStream())
+                    foreach (var file in fileSource.Content)
                     {
-                        fs.CopyTo(ms);
-                        fileBytes = ms.ToArray();
-                    }
+                        lastFile = file;
+                        using var fs = ReadFileNonLocking(file);
 
-                    return new MemoryStream(fileBytes);
-                }
-                catch (Exception e) when (i != maxAttempts)
-                {
-                    logger.Warning(e, "Error while reading {File}, retrying", filePath);
-                }
-            }
+                        var header = CompressedSAVHeader.Read(fs);
 
-            // (shouldn't happen, we should have returned a stream or thrown an exception by now)
-            throw new NotImplementedException();
-        }
+                        if (firstFileHeader == null)
+                        {
+                            if (!header.HasCompressionMarker) throw new Exception("Magic bytes mismatch");
+                            firstFileHeader = header;
+                        }
 
-        public static void WithDecompressedSave(string filePath, Action<Stream> action)
-        {
-            logger.Information("Loading {file} as GVAS", filePath);
-            
-            using (var fs = ReadFileNonLocking(filePath))
-            using (var binaryReader = new BinaryReader(fs))
-            {
-                var header = CompressedSAVHeader.Read(fs);
-
-                using (var decompressed = new InflaterInputStream(fs))
-                {
-                    if (!header.HasCompressionMarker)
-                        throw new Exception("Magic bytes mismatch");
-
-                    if (header.DoubleCompressed)
-                    {
-                        using (var doubleDecompressed = new InflaterInputStream(decompressed))
-                            action(doubleDecompressed);
-                    }
-                    else
-                    {
-                        action(decompressed);
+                        fs.CopyTo(combinedStream);
                     }
                 }
-            }
-            logger.Information("done");
-        }
-
-        public static void WithDecompressedAggregateSave(IEnumerable<string> filePaths, Action<Stream> action)
-        {
-            var combinedStream = new MemoryStream();
-
-            CompressedSAVHeader firstFileHeader = null;
-            foreach (var file in filePaths)
-            {
-                using var fs = ReadFileNonLocking(file);
-
-                var header = CompressedSAVHeader.Read(fs);
-
-                if (firstFileHeader == null)
+                catch (Exception e) when (i != MaxRetryAttempts)
                 {
-                    if (!header.HasCompressionMarker) throw new Exception("Magic bytes mismatch");
-                    firstFileHeader = header;
+                    logger.Warning(e, "Error while reading {File}, retrying", lastFile);
                 }
-
-                fs.CopyTo(combinedStream);
             }
 
             using (var readStream = new MemoryStream(combinedStream.ToArray()))
@@ -191,13 +168,28 @@ namespace PalCalc.SaveReader
             }
         }
 
-        public static bool IsValidSave(string filePath)
+        public static bool IsValidSave(IFileSource fileSource)
         {
-            using (var fs = ReadFileNonLocking(filePath))
-            using (var binaryReader = new BinaryReader(fs))
+            for (int i = 1; i <= MaxRetryAttempts; i++)
             {
-                return CompressedSAVHeader.Read(fs).HasCompressionMarker;
+                string firstFile = null;
+                try
+                {
+                    firstFile = fileSource.Content.First();
+                    using (var fs = ReadFileNonLocking(firstFile))
+                    using (var binaryReader = new BinaryReader(fs))
+                    {
+                        return CompressedSAVHeader.Read(fs).HasCompressionMarker;
+                    }
+                }
+                catch (Exception e) when (i != MaxRetryAttempts)
+                {
+                    logger.Warning(e, "Error while reading {File}, retrying", firstFile);
+                }
             }
+
+            // (shouldn't happen)
+            throw new NotImplementedException();
         }
     }
 }

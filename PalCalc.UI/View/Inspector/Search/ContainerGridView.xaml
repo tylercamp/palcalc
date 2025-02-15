@@ -7,19 +7,38 @@
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
-                     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
-        xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
-        xmlns:adonisConverters="clr-namespace:AdonisUI.Converters;assembly=AdonisUI"
-        xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
+             xmlns:adonisConverters="clr-namespace:AdonisUI.Converters;assembly=AdonisUI"
+             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              mc:Ignorable="d" 
              d:DataContext="{x:Static sgvm:DefaultContainerGridViewModel.DesignerInstance}"
              Visibility="{Binding GridVisibility}"
-             d:Background="White">
+             >
     <UserControl.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
+
+        <Style TargetType="Border" x:Key="GridSlotIconStyle">
+            <Setter Property="Width" Value="50" />
+            <Setter Property="Height" Value="50" />
+            <Setter Property="CornerRadius" Value="25" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+        </Style>
+
+        <Style TargetType="Border" x:Key="GridSlotBackgroundStyle">
+            <Setter Property="Width" Value="50" />
+            <Setter Property="Height" Value="50" />
+            <Setter Property="CornerRadius" Value="25" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{x:Null}" />
+            <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer4BackgroundBrush}}" />
+        </Style>
     </UserControl.Resources>
     <StackPanel>
-        <Label Content="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}, FallbackValue=Collapsed}" FontWeight="Bold" />
+        <Label Style="{StaticResource ComboBoxAlignedLabelStyle}" FontSize="13" Content="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}, FallbackValue=Collapsed}" FontWeight="Bold" />
         <ListView ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}" SelectionMode="Single">
 
             <!--
@@ -30,7 +49,10 @@
                 <!-- (base WPF template) -->
                 
                 <ControlTemplate>
-                    <Border BorderBrush="#FFABADB3" BorderThickness="1" Padding="1">
+                    <Border BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer2BorderBrush}}"
+                            Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}"
+                            BorderThickness="1"
+                            Padding="1">
                         <Viewbox StretchDirection="DownOnly">
                             <ItemsPresenter />
                         </Viewbox>
@@ -44,7 +66,6 @@
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding CanInterract}" Value="False">
                             <Setter Property="IsEnabled" Value="False" />
-                            <Setter Property="Opacity" Value="0.25" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -65,21 +86,23 @@
                             <DataTemplate DataType="{x:Type sgvm:ContainerGridEmptySlotViewModel}">
                                 <TextBlock Text="{itl:LocalizedText Code=LC_SAVEINSPECT_SLOT_EMPTY}"
                                            VerticalAlignment="Center" HorizontalAlignment="Center"
-                                           Margin="0,0,5,0" />
+                                           />
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type sgvm:ContainerGridPalSlotViewModel}">
-                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding Pal.IconBrush}" />
+                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent">
+                                    <Border Style="{StaticResource GridSlotBackgroundStyle}" />
+                                    <Border Style="{StaticResource GridSlotIconStyle}" Background="{Binding Pal.IconBrush}" />
                                 </Grid>
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type sgvm:ContainerGridCustomPalSlotViewModel}">
-                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding PalInstance.IconBrush}" />
+                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent">
+                                    <Border Style="{StaticResource GridSlotBackgroundStyle}" />
+                                    <Border Style="{StaticResource GridSlotIconStyle}" Background="{Binding PalInstance.IconBrush}" />
                                 </Grid>
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type sgvm:ContainerGridNewPalSlotViewModel}">
-                                <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="Black" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <materialIcons:MaterialIcon Kind="Add" Foreground="Black" />
+                                <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent">
+                                    <materialIcons:MaterialIcon Kind="Add" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
                                 </Border>
                             </DataTemplate>
                         </ContentControl.Resources>

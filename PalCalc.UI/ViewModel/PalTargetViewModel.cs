@@ -67,7 +67,7 @@ namespace PalCalc.UI.ViewModel
 
             presets.PresetSelected += (_) => PresetsMenuIsOpen = false;
 
-            OpenPassivesSearchCommand = new RelayCommand(() => new PassivesSearchWindow().Show());
+            OpenPassivesSearchCommand = new RelayCommand(() => new PassivesSearchWindow() { Owner = App.Current.MainWindow }.Show());
         }
 
         private void PalSource_PropertyChanged(object sender, PropertyChangedEventArgs e)

@@ -5,8 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View.Pal"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d"
              MinWidth="150"
+             Height="18"
+             TextOptions.TextFormattingMode="Ideal"
              d:DataContext="{x:Static mvm:ActiveSkillViewModel.DesignerInstance}"
              d:DesignWidth="100">
     <local:SkillEntryView>
@@ -15,12 +18,19 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="{Binding Name.Value}" FontSize="10" Foreground="White" />
+
+            <Viewbox Grid.Column="0" StretchDirection="Both" Stretch="Uniform" Margin="0,2,2,2" HorizontalAlignment="Left">
+                <TextBlock Text="{Binding Name.Value}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+            </Viewbox>
 
             <Grid Grid.Column="1">
-                <Image Source="{Binding SkillElementImage}" Height="15" />
+                <Viewbox StretchDirection="Both" Stretch="UniformToFill">
+                    <Image Source="{Binding SkillElementImage}" />
+                </Viewbox>
 
-                <TextBlock Text="{Binding ModelObject.Power}" Padding="0" Margin="0,-1,5,0" VerticalAlignment="Top" Foreground="White" HorizontalAlignment="Right" Width="13" />
+                <Viewbox HorizontalAlignment="Right" Margin="0,0,5,1">
+                    <TextBlock Text="{Binding ModelObject.Power}" Padding="0" VerticalAlignment="Center" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" HorizontalAlignment="Right" />
+                </Viewbox>
             </Grid>
         </Grid>
     </local:SkillEntryView>

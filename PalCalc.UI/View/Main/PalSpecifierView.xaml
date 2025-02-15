@@ -9,6 +9,7 @@
              xmlns:m="clr-namespace:PalCalc.UI.Model"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d" 
              d:DataContext="{x:Static mvm:PalSpecifierViewModel.DesignerInstance}">
     <UserControl.Resources>
@@ -92,7 +93,7 @@
                         <materialIcons:MaterialIcon
                             Kind="Remove"
                             Width="15"
-                            Foreground="Red"
+                            Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}"
                             />
                     </Button>
                 </Grid>

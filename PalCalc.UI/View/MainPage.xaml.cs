@@ -27,15 +27,12 @@ namespace PalCalc.UI
     /// </summary>
     public partial class MainPage : Page
     {
-        private ILogger logger = Log.ForContext<MainPage>();
-
         internal MainPage()
         {
             InitializeComponent();
 
             var sw = Stopwatch.StartNew();
-            DataContext = new MainWindowViewModel(Dispatcher);
-            logger.Information("MainWindowViewModel took {ms}ms to start", sw.ElapsedMilliseconds);
+            DataContext = new MainWindowViewModel(Dispatcher, null);
         }
 
         internal MainPage(MainWindowViewModel vm)

@@ -23,13 +23,36 @@ namespace PalCalc.UI
     {
         public AppWindowViewModel(Dispatcher dispatcher)
         {
-            Content = new LoadingPage();
+            var loadingPage = new LoadingPage();
+            Content = loadingPage;
 
-            dispatcher.BeginInvoke(() =>
+            Task.Run(() =>
             {
-                var vm = new MainWindowViewModel(dispatcher);
-                Content = new MainPage(vm);
-            }, DispatcherPriority.ContextIdle);
+                try
+                {
+                    var loadingVm = new LoadingPageViewModel();
+                    var vm = new MainWindowViewModel(dispatcher, progress =>
+                    {
+                        dispatcher.BeginInvoke(() =>
+                        {
+                            loadingVm.ProgressPercent = progress.ProgressPercent;
+
+                            if (loadingPage.DataContext == null)
+                                loadingPage.DataContext = loadingVm;
+                        });
+                    });
+
+                    dispatcher.BeginInvoke(() => Content = new MainPage(vm), DispatcherPriority.ContextIdle);
+                }
+                catch (Exception e)
+                {
+                    // (exceptions in Tasks are handled differently - re-send exceptions on UI Dispatcher so it gets handled like a normal error)
+                    dispatcher.BeginInvoke(() =>
+                    {
+                        throw new Exception("An error occurred while loading the main window data", e);
+                    });
+                }
+            });
         }
 
         [ObservableProperty]
@@ -45,6 +68,9 @@ namespace PalCalc.UI
         {
             DataContext = new AppWindowViewModel(Dispatcher);
             InitializeComponent();
+
+            // (`Content` inherits the DataContext of the window, but we don't want `LoadingPage` to inherit that)
+            (Content as LoadingPage).DataContext = null;
 
 #if DEBUG
             if (App.TranslationErrors.Count > 0)

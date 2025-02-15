@@ -6,8 +6,11 @@
              xmlns:local="clr-namespace:PalCalc.UI.View.Pal"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              d:Width="80"
              mc:Ignorable="d"
+             Height="18"
+             TextOptions.TextFormattingMode="Ideal"
              d:DataContext="{d:DesignInstance mvm:PassiveSkillViewModel, IsDesignTimeCreatable=True}">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -25,23 +28,25 @@
                 </Style.Triggers>
             </Style>
         </local:SkillEntryView.Style>
-        
-        <Grid Margin="0,2,2,2">
+
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Viewbox Grid.Column="0" StretchDirection="DownOnly" Stretch="Uniform" HorizontalAlignment="Left">
-                <TextBlock Text="{Binding Name.Value}" Height="14" FontSize="10" VerticalAlignment="Center" Foreground="White" />
+            <Viewbox Grid.Column="0" StretchDirection="Both" Stretch="Uniform" HorizontalAlignment="Left" Margin="0,2,2,2">
+                <TextBlock Text="{Binding Name.Value}" VerticalAlignment="Center" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
             </Viewbox>
             <Grid Grid.Column="2">
-                <Rectangle Width="12" Height="12" Fill="{Binding Rank, Converter={StaticResource RCC}}">
-                    <Rectangle.OpacityMask>
-                        <ImageBrush ImageSource="{Binding RankIcon}" />
-                    </Rectangle.OpacityMask>
-                </Rectangle>
+                <Viewbox Margin="1,2,3,2" Stretch="Uniform" VerticalAlignment="Stretch" StretchDirection="Both">
+                    <Rectangle Width="10" Height="10" Fill="{Binding Rank, Converter={StaticResource RCC}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="{Binding RankIcon}" />
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                </Viewbox>
             </Grid>
         </Grid>
     </local:SkillEntryView>
