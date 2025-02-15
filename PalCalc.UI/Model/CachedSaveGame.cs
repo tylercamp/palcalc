@@ -137,77 +137,57 @@ namespace PalCalc.UI.Model
                     .Select(g => FromSaveGame(g, PalDB.LoadEmbedded(), GameSettings.Defaults))
                     .First();
 
-        private static LoadingSaveFileModal loadingModal = null;
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-
         public static CachedSaveGame FromSaveGame(ISaveGame game, PalDB db, GameSettings settings)
         {
-            //var isDesignMode = DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject());
-            //if (!isDesignMode)
-            //{
-                SaveFileLoadStart?.Invoke(game);
-                loadingModal = new LoadingSaveFileModal();
-                loadingModal.Owner = System.Windows.Application.Current.MainWindow;
-                loadingModal.DataContext = LocalizationCodes.LC_SAVE_FILE_RELOADING.Bind();
-            //}
+            var loadingModal = new LoadingSaveFileModal();
+            loadingModal.DataContext = LocalizationCodes.LC_SAVE_FILE_RELOADING.Bind();
 
-            CachedSaveGame result = null;
-
-            loadingModal.IsVisibleChanged += (_, _) =>
+            var isDesignMode = DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject());
+            if (!isDesignMode)
             {
-                if (!loadingModal.IsVisible)
-                {
-                    return;
-                }
-                var modalHandle = new WindowInteropHelper(loadingModal).Handle;
+                loadingModal.Owner = System.Windows.Application.Current.MainWindow;
+                SaveFileLoadStart?.Invoke(game);
+            }
 
-                Task.Run(() =>
-                {
-#if HANDLE_ERRORS
-                    try
-                    {
-#endif
-                        GameMeta meta = null;
-                        // `LevelMeta` is sometimes unavailable for Xbox saves, which shouldn't prevent us from
-                        // being able to load the data
-                        try { meta = game.LevelMeta.ReadGameOptions(); } catch { }
-
-                        var charData = game.Level.ReadCharacterData(db, settings, game.Players);
-                        result = new CachedSaveGame(game)
-                        {
-                            DatabaseVersion = db.Version,
-                            LastModified = game.LastModified,
-                            OwnedPals = charData.Pals,
-                            Guilds = charData.Guilds,
-                            Players = charData.Players,
-                            Bases = charData.Bases,
-                            PalContainers = charData.PalContainers,
-                            PlayerLevel = meta?.PlayerLevel,
-                            PlayerName = meta?.PlayerName ?? "UNKNOWN",
-                            WorldName = meta?.WorldName ?? "UNKNOWN WORLD",
-                            InGameDay = meta?.InGameDay ?? 0,
-                        };
-
-                        // WM_CLOSE
-                        SendMessage(modalHandle, 0x0010, 0, 0);
+            CachedSaveGame result;
 
 #if HANDLE_ERRORS
-                    }
-                    catch (Exception ex)
-                    {
-                        SaveFileLoadError?.Invoke(game, ex);
-                        result = null;
-                    }
+            try
+            {
 #endif
+                result = loadingModal.ShowDialogDuring(() =>
+                {
+                    GameMeta meta = null;
+                    // `LevelMeta` is sometimes unavailable for Xbox saves, which shouldn't prevent us from
+                    // being able to load the data
+                    try { meta = game.LevelMeta.ReadGameOptions(); } catch { }
+
+                    var charData = game.Level.ReadCharacterData(db, settings, game.Players);
+                    return new CachedSaveGame(game)
+                    {
+                        DatabaseVersion = db.Version,
+                        LastModified = game.LastModified,
+                        OwnedPals = charData.Pals,
+                        Guilds = charData.Guilds,
+                        Players = charData.Players,
+                        Bases = charData.Bases,
+                        PalContainers = charData.PalContainers,
+                        PlayerLevel = meta?.PlayerLevel,
+                        PlayerName = meta?.PlayerName ?? "UNKNOWN",
+                        WorldName = meta?.WorldName ?? "UNKNOWN WORLD",
+                        InGameDay = meta?.InGameDay ?? 0,
+                    };
                 });
-            };
+#if HANDLE_ERRORS
+            }
+            catch (Exception ex)
+            {
+                SaveFileLoadError?.Invoke(game, ex);
+                return null;
+            }
+#endif
 
-            loadingModal.ShowDialog();
-
-            loadingModal = null;
-
-            //if (!isDesignMode) SaveFileLoadEnd?.Invoke(game, result);
+            if (!isDesignMode) SaveFileLoadEnd?.Invoke(game, result);
 
             return result;
         }

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PalCalc.UI.View"
+                             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
         mc:Ignorable="d"
         xmlns:itl="clr-namespace:PalCalc.UI.Localization"
         xmlns:adonisConverters="clr-namespace:AdonisUI.Converters;assembly=AdonisUI"
@@ -13,17 +14,15 @@
         ShowInTaskbar="False"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        WindowStyle="ToolWindow"
+        WindowStyle="None"
                              PlaceTitleBarOverContent="True"
                              TitleVisibility="Collapsed"
                              IconVisibility="Collapsed"
-        Width="300"
-                             Height="60"
+                             SizeToContent="WidthAndHeight"
         d:DataContext="{x:Type itl:ILocalizedText}"
         >
     <adonisControls:AdonisWindow.Style>
-        <Style TargetType="{x:Type adonisControls:AdonisWindow}"
-       BasedOn="{StaticResource {x:Type Window}}">
+        <Style TargetType="{x:Type adonisControls:AdonisWindow}">
             <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"/>
             <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}"/>
@@ -148,7 +147,7 @@
                             </MultiTrigger>
 
                             <Trigger Property="WindowStyle" Value="None">
-                                <Setter TargetName="TitleBar" Property="Visibility" Value="Collapsed"/>
+                                <Setter TargetName="TitleBar" Property="Visibility" Value="Visible"/>
                             </Trigger>
 
                             <Trigger Property="PlaceTitleBarOverContent" Value="True">
@@ -177,10 +176,14 @@
                 </Trigger>
 
                 <Trigger Property="WindowStyle" Value="None">
-                    <Setter Property="BorderThickness" Value="0"/>
+
                     <Setter Property="WindowChrome.WindowChrome">
                         <Setter.Value>
-                            <WindowChrome CaptionHeight="0"/>
+                            <WindowChrome ResizeBorderThickness="{Binding Source={x:Static SystemParameters.WindowResizeBorderThickness}}"
+          CaptionHeight="0"
+          CornerRadius="0"
+          GlassFrameThickness="1, 2, 1, 1"
+          NonClientFrameEdges="None"/>
                         </Setter.Value>
                     </Setter>
                 </Trigger>
@@ -188,5 +191,16 @@
             </Style.Triggers>
         </Style>
     </adonisControls:AdonisWindow.Style>
-    <TextBlock Text="{Binding Value}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,5,5,5" />
+    <StackPanel Orientation="Horizontal" vu:StackPanelExtensions.Spacing="10" Margin="15">
+        <TextBlock Text="{Binding Value}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+        <ContentControl ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.LoadingCircle}}"
+                        Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                        Width="20"
+                        Height="20"
+                        Focusable="False"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        />
+    </StackPanel>
 </adonisControls:AdonisWindow>

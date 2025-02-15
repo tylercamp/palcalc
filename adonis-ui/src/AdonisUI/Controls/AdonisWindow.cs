@@ -204,6 +204,20 @@ namespace AdonisUI.Controls
         {
             IconSource = GetApplicationIcon();
             MaximizeBorderThickness = GetSystemMaximizeBorderThickness();
+
+            Width = 0;
+            Height = 0;
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            if (SizeToContent == SizeToContent.WidthAndHeight)
+            {
+                Hide();
+                Dispatcher.InvokeAsync(() => Show(), DispatcherPriority.Background);
+            }
         }
 
         private BitmapSource GetApplicationIcon()
@@ -235,6 +249,8 @@ namespace AdonisUI.Controls
         /// <inheritdoc/>
         public override void OnApplyTemplate()
         {
+            BeginInit();
+
             base.OnApplyTemplate();
 
             HwndInterop = new HwndInterop(this);
@@ -470,13 +486,28 @@ namespace AdonisUI.Controls
         {
             if (SizeToContent == SizeToContent.WidthAndHeight)
             {
+                WindowState = WindowState.Minimized;
+
                 var previousSizeToContent = SizeToContent;
                 SizeToContent = SizeToContent.Manual;
 
                 Dispatcher?.BeginInvoke(DispatcherPriority.Loaded, (Action)(() =>
                 {
                     SizeToContent = previousSizeToContent;
+
+                    if (WindowStartupLocation == WindowStartupLocation.CenterOwner && Owner != null)
+                    {
+                        Top = Owner.Top + (Owner.Height - ActualHeight) / 2;
+                        Left = Owner.Left + (Owner.Width - ActualWidth) / 2;
+                    }
+
+                    WindowState = WindowState.Normal;
+                    EndInit();
                 }));
+            }
+            else
+            {
+                EndInit();
             }
         }
 
