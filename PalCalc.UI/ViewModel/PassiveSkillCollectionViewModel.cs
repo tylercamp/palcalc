@@ -30,22 +30,22 @@ namespace PalCalc.UI.ViewModel
         {
             Passives = passives.OrderBy(t => t.ModelObject is RandomPassiveSkill).ThenBy(t => t.ModelObject.InternalName).ToList();
 
-            RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            RowSizes.Add(GridLength.Auto);
             for (int i = 1; i < NumRows; i++)
             {
                 if (i % 2 == 1)
                 {
-                    RowDefinitions.Add(new RowDefinition() { Height = new GridLength(Spacing) });
+                    RowSizes.Add(new GridLength(Spacing));
                 }
                 else
                 {
-                    RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                    RowSizes.Add(GridLength.Auto);
                 }
             }
 
-            ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-            ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(Spacing) });
-            ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            ColumnSizes.Add(new GridLength(1, GridUnitType.Star));
+            ColumnSizes.Add(new GridLength(Spacing));
+            ColumnSizes.Add(new GridLength(1, GridUnitType.Star));
 
             if (!Passives.Any())
             {
@@ -96,8 +96,11 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        public List<RowDefinition> RowDefinitions { get; } = new List<RowDefinition>();
-        public List<ColumnDefinition> ColumnDefinitions { get; } = new List<ColumnDefinition>();
+        public List<GridLength> RowSizes { get; } = new List<GridLength>();
+        public List<GridLength> ColumnSizes { get; } = new List<GridLength>();
+
+        public List<RowDefinition> RowDefinitions => RowSizes.Select(s => new RowDefinition() { Height = s }).ToList();
+        public List<ColumnDefinition> ColumnDefinitions => ColumnSizes.Select(s => new ColumnDefinition() { Width = s }).ToList();
 
         public int RowIndexOf(PassiveSkillViewModel passive)
         {

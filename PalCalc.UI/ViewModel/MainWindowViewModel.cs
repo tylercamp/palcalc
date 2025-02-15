@@ -31,6 +31,14 @@ using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel
 {
+    internal class MainWindowViewModelLoadingProgress
+    {
+        public int LoadedSaves { get; set; }
+        public int TotalSaves { get; set; }
+
+        public double ProgressPercent => 100 * (TotalSaves > 0 ? (double)LoadedSaves / TotalSaves : 1);
+    }
+
     internal partial class MainWindowViewModel : ObservableObject
     {
         private static ILogger logger = Log.ForContext<MainWindowViewModel>();
@@ -60,10 +68,10 @@ namespace PalCalc.UI.ViewModel
                 .Select(l => new TranslationLocaleViewModel(l))
                 .ToList();
 
-        public MainWindowViewModel() : this(null) { }
+        public MainWindowViewModel() : this(null, null) { }
 
         // main app model
-        public MainWindowViewModel(Dispatcher dispatcher)
+        public MainWindowViewModel(Dispatcher dispatcher, Action<MainWindowViewModelLoadingProgress> progressHandler)
         {
             this.dispatcher = dispatcher ?? Dispatcher.CurrentDispatcher;
 
@@ -107,14 +115,17 @@ namespace PalCalc.UI.ViewModel
             ResumeSolverCommand = new RelayCommand(ResumeSolver);
             CancelSolverCommand = new RelayCommand(CancelSolver);
 
-            if (App.Current.MainWindow != null)
+            dispatcher.Invoke(() =>
             {
-                // (needed for XAML designer view)
-                App.Current.MainWindow.Closing += (o, e) =>
+                if (App.Current.MainWindow != null)
                 {
-                    CancelSolverCommand.Execute(null);
-                };
-            }
+                    // (needed for XAML designer view)
+                    App.Current.MainWindow.Closing += (o, e) =>
+                    {
+                        CancelSolverCommand.Execute(null);
+                    };
+                }
+            });
 
             SolverControls = new SolverControlsViewModel(
                 runSolverCommand: RunSolverCommand,
@@ -146,9 +157,17 @@ namespace PalCalc.UI.ViewModel
             var fakeSaves = settings.FakeSaveNames.Select(FakeSaveGame.Create).ToList();
             SaveSelection = new SaveSelectorViewModel(availableSavesLocations, manualSaves.Concat(fakeSaves));
 
-            targetsBySaveFile = SaveSelection.SavesLocations
+            var availableSaves = SaveSelection.SavesLocations
                 .SelectMany(l => l.SaveGames)
                 .OfType<SaveGameViewModel>()
+                .ToList();
+
+            var progress = new MainWindowViewModelLoadingProgress();
+            progress.TotalSaves = availableSaves.Count;
+            progress.LoadedSaves = 0;
+            progressHandler?.Invoke(progress);
+
+            targetsBySaveFile = availableSaves
                 .Select(sgvm => sgvm.Value)
                 .ToDictionary(
                     sg => sg,
@@ -166,8 +185,8 @@ namespace PalCalc.UI.ViewModel
                             {
 #endif
                                 var res = JsonConvert.DeserializeObject<PalTargetListViewModel>(File.ReadAllText(targetsFile), converter);
-                                //if (originalCachedSave != null)
-                                    //res.RefreshWith(originalCachedSave);
+                                progress.LoadedSaves++;
+                                progressHandler?.Invoke(progress);
                                 return res;
 
 #if HANDLE_ERRORS
@@ -176,12 +195,18 @@ namespace PalCalc.UI.ViewModel
                             {
                                 logger.Warning(ex, "an error occurred loading targets list for {saveId}, deleting the old file and resetting", CachedSaveGame.IdentifierFor(sg));
                                 File.Delete(targetsFile);
+
+                                progress.LoadedSaves++;
+                                progressHandler?.Invoke(progress);
                                 return new PalTargetListViewModel();
                             }
 #endif
                         }
                         else
                         {
+                            progress.LoadedSaves++;
+                            progressHandler?.Invoke(progress);
+
                             return new PalTargetListViewModel();
                         }
                     }

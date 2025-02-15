@@ -5,13 +5,38 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:itl="clr-namespace:PalCalc.UI.Localization" 
       xmlns:local="clr-namespace:PalCalc.UI"
-      d:Background="White"
+      xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+      xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
       mc:Ignorable="d" 
       d:Width="400" d:Height="200"
+
       Cursor="Wait"
       Title="LoadingPage">
+    <Page.Resources>
+        <c:ValueVisibilityConverter x:Key="VVC" />
+    </Page.Resources>
 
-    <StackPanel VerticalAlignment="Center">
-        <TextBlock HorizontalAlignment="Center" FontSize="20" Text="{itl:LocalizedText Code=LC_STARTUP_LOADING}" />
-    </StackPanel>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <Viewbox StretchDirection="Both" Stretch="Uniform" MaxWidth="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <ContentControl ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.LoadingDots}}"
+                        Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                        Focusable="False"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        />
+        </Viewbox>
+
+        <ProgressBar Visibility="{Binding Converter={StaticResource VVC}, FallbackValue=Collapsed}" VerticalAlignment="Bottom" Grid.RowSpan="99" Grid.ColumnSpan="99" Minimum="0" Maximum="100" Value="{Binding ProgressPercent, FallbackValue=0}" Height="15" />
+    </Grid>
 </Page>

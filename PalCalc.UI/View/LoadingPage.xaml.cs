@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,12 @@ using System.Windows.Shapes;
 
 namespace PalCalc.UI
 {
+    public partial class LoadingPageViewModel : ObservableObject
+    {
+        [ObservableProperty]
+        private double progressPercent = 0;
+    }
+
     /// <summary>
     /// Interaction logic for LoadingPage.xaml
     /// </summary>
@@ -23,6 +30,13 @@ namespace PalCalc.UI
         public LoadingPage()
         {
             InitializeComponent();
+
+            DataContextChanged += LoadingPage_DataContextChanged;
+        }
+
+        private void LoadingPage_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            //throw new NotImplementedException();
         }
     }
 }

@@ -56,7 +56,7 @@ namespace PalCalc.UI.View.Pal
             // (though we clear the set of row/column definitions, we can still get an exception due
             // to "reuse" of VM Row/ColumnDefinitions, so we make copies here instead of direct refs)
 
-            ColumnDefinitions.Clear();
+            ColumnDefinitions.Clear(); // TODO - columnDefeinitions unneeded
             foreach (var cdef in newModel.ColumnDefinitions)
                 ColumnDefinitions.Add(new ColumnDefinition() { Width = cdef.Width });
 

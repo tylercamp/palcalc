@@ -23,13 +23,25 @@ namespace PalCalc.UI
     {
         public AppWindowViewModel(Dispatcher dispatcher)
         {
-            Content = new LoadingPage();
+            var loadingPage = new LoadingPage();
+            Content = loadingPage;
 
-            dispatcher.BeginInvoke(() =>
+            Task.Run(() =>
             {
-                var vm = new MainWindowViewModel(dispatcher);
-                Content = new MainPage(vm);
-            }, DispatcherPriority.ContextIdle);
+                var loadingVm = new LoadingPageViewModel();
+                // TODO - propagate errors to UI thread to prevent hanging + force crashlog
+                var vm = new MainWindowViewModel(dispatcher, progress =>
+                {
+                    dispatcher.BeginInvoke(() =>
+                    {
+                        loadingVm.ProgressPercent = progress.ProgressPercent;
+
+                        if (loadingPage.DataContext == null) loadingPage.DataContext = loadingVm;
+                    });
+                });
+
+                dispatcher.BeginInvoke(() => Content = new MainPage(vm), DispatcherPriority.ContextIdle);
+            });
         }
 
         [ObservableProperty]
@@ -45,6 +57,7 @@ namespace PalCalc.UI
         {
             DataContext = new AppWindowViewModel(Dispatcher);
             InitializeComponent();
+            (Content as LoadingPage).DataContext = null;
 
 #if DEBUG
             if (App.TranslationErrors.Count > 0)
