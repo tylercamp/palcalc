@@ -43,10 +43,10 @@
             <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/releases" RequestNavigate="Hyperlink_RequestNavigate">Releases</Hyperlink>
         </TextBlock>
 
-        <TextBlock FontStyle="Italic" FontSize="10">
+        <TextBlock FontStyle="Italic" FontSize="11">
             Pal Calc is an independent project and is not affiliated with Palworld or Pocket Pair, Inc.
         </TextBlock>
-        <TextBlock FontStyle="Italic" FontSize="10">
+        <TextBlock FontStyle="Italic" FontSize="11">
             All Palworld assets are owned by Pocket Pair, Inc.
         </TextBlock>
 
@@ -73,6 +73,10 @@
         <Separator />
 
         <Label FontWeight="Bold" FontSize="12">Libraries</Label>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://github.com/benruehl/adonis-ui" RequestNavigate="Hyperlink_RequestNavigate">Adonis UI - Dark Theme by benruehl</Hyperlink>
+            (<Hyperlink NavigateUri="https://github.com/benruehl/adonis-ui/blob/master/LICENSE">MIT License</Hyperlink>)
+        </TextBlock>
         <TextBlock>
             <Hyperlink NavigateUri="https://github.com/serilog/serilog" RequestNavigate="Hyperlink_RequestNavigate">Serilog</Hyperlink>
             (<Hyperlink NavigateUri="https://github.com/serilog/serilog/blob/dev/LICENSE" RequestNavigate="Hyperlink_RequestNavigate">Apache 2 License</Hyperlink>)

@@ -119,9 +119,9 @@ namespace PalCalc.UI.ViewModel
 
             dispatcher.Invoke(() =>
             {
+                // (needed for XAML designer view)
                 if (App.Current.MainWindow != null)
                 {
-                    // (needed for XAML designer view)
                     App.Current.MainWindow.Closing += (o, e) =>
                     {
                         CancelSolverCommand.Execute(null);
@@ -348,7 +348,6 @@ namespace PalCalc.UI.ViewModel
 
         private void CachedSaveGame_SaveFileLoadEnd(ISaveGame obj, CachedSaveGame loaded)
         {
-
             if (loaded != null && targetsBySaveFile.ContainsKey(obj))
                 targetsBySaveFile[obj].UpdateCachedData(loaded, GameSettingsViewModel.Load(obj).ModelObject);
         }

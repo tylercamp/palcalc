@@ -99,9 +99,6 @@ namespace PalCalc.UI.ViewModel
         public List<GridLength> RowSizes { get; } = new List<GridLength>();
         public List<GridLength> ColumnSizes { get; } = new List<GridLength>();
 
-        public List<RowDefinition> RowDefinitions => RowSizes.Select(s => new RowDefinition() { Height = s }).ToList();
-        public List<ColumnDefinition> ColumnDefinitions => ColumnSizes.Select(s => new ColumnDefinition() { Width = s }).ToList();
-
         public int RowIndexOf(PassiveSkillViewModel passive)
         {
             var mainRow = Passives.IndexOf(passive) / EntriesPerRow;
