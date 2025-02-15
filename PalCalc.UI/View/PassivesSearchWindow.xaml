@@ -25,24 +25,34 @@
     </Window.Resources>
     <DockPanel>
         <DockPanel DockPanel.Dock="Top" Margin="10,10">
-            <TextBlock DockPanel.Dock="Left" Text="{itl:LocalizedText Code=LC_TRAITS_SEARCH_SEARCH}" Margin="0,2,8,0" />
+            <TextBlock DockPanel.Dock="Left" Text="{itl:LocalizedText Code=LC_TRAITS_SEARCH_SEARCH}" Margin="0,0,8,0" VerticalAlignment="Center" />
             
             <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
 
         <ListView ItemsSource="{Binding DisplayedOptions}" util:GridViewSort.AutoSort="True">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                    <Setter Property="Padding" Value="0,4" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
+                            <Setter Property="Padding" Value="6,2" />
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
                     <GridView.Columns>
                         <GridViewColumn Header="{itl:LocalizedText Code=LC_TRAITS_SEARCH_NAME}" util:GridViewSort.PropertyName="Name" Width="Auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate DataType="{x:Type mvm:PassiveSkillViewModel}">
                                     <StackPanel Orientation="Horizontal">
-                                        <Border Background="Black"
-                                                CornerRadius="99"
+                                        <Border CornerRadius="99"
                                                 Padding="2"
                                                 BorderThickness="0"
-                                                Margin="0,0,8,0"
+                                                Margin="0,0,4,0"
                                                 VerticalAlignment="Center"
                                                 >
                                             <Rectangle Width="15"

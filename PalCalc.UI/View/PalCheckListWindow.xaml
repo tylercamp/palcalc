@@ -7,40 +7,56 @@
         xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
         xmlns:itl="clr-namespace:PalCalc.UI.Localization"
         xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
+                             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
         d:DataContext="{x:Static vm:PalCheckListViewModel.DesignerInstance}"
         mc:Ignorable="d"
         xmlns:util="clr-namespace:Wpf.Util"
+                             IconVisibility="Collapsed"
         WindowStyle="ToolWindow"
         WindowStartupLocation="CenterOwner"
-        Title="{Binding Title.Value}" Height="450" Width="330">
+        Title="{Binding Title.Value}" Height="450" Width="400">
     <Grid>
+        <Grid.Resources>
+            <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
+                <Setter Property="adonisExtensions:ScrollBarExtension.ExpansionMode" Value="AlwaysExpand" />
+            </Style>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="40" />
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="5">
+        <Grid Grid.Row="0" Margin="10,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <Label Grid.Column="0" Content="{itl:LocalizedText LC_PAL_CHECKLIST_SEARCH}" VerticalContentAlignment="Center" />
-            <TextBox Height="20" Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Height="20" Grid.Column="2" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
 
         <ListView Grid.Row="1"
                   ItemsSource="{Binding VisibleEntries}"
+                  adonisExtensions:GridViewSortExtension.AutoSort="False"
                   util:GridViewSort.AutoSort="True"
+                  x:Name="m_ListView"
                   >
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                    <Setter Property="Padding" Value="2,3,0,3" />
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
                     <GridView.Columns>
                         <GridViewColumn Header="{itl:LocalizedText LC_COMMON_PALDEX_NUM_SHORT}"
                                         DisplayMemberBinding="{Binding PaldexNoDisplay}"
                                         util:GridViewSort.PropertyName="PaldexNoValue"
-                                        Width="40"/>
+                                        Width="40" />
                         <GridViewColumn Header="{itl:LocalizedText LC_COMMON_PAL}"
                                         util:GridViewSort.PropertyName="PalName.Value"
                                         Width="200">
@@ -48,7 +64,7 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <Image Source="{Binding Pal.Icon}" Width="24" Height="24" />
-                                        <Label Content="{Binding PalName.Value}" VerticalContentAlignment="Center"/>
+                                        <Label Margin="5,1" Content="{Binding PalName.Value}" VerticalContentAlignment="Center"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
@@ -71,20 +87,21 @@
             </ListView.View>
         </ListView>
 
-        <StackPanel Grid.Row="2" HorizontalAlignment="Right" Margin="5" Orientation="Horizontal">
-            <Button Width="45"
-                    Margin="5,0,5,0"
-                    Command="{Binding SaveCommand}"
-                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                    Content="{itl:LocalizedText LC_COMMON_SAVE}"
-            />
+        <UniformGrid Grid.Row="2" Columns="2" HorizontalAlignment="Right" Margin="5">
+            <Button
+                Margin="2,0"
+                Command="{Binding SaveCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                Content="{itl:LocalizedText LC_COMMON_SAVE}"
+                />
 
-            <Button Width="45"
-                    Command="{Binding CancelCommand}"
-                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                    Content="{itl:LocalizedText LC_COMMON_CANCEL}"
-            />
-
-        </StackPanel>
+            <Button
+                Margin="2,0"
+                MinWidth="60"
+                Command="{Binding CancelCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                Content="{itl:LocalizedText LC_COMMON_CANCEL}"
+                />
+        </UniformGrid>
     </Grid>
 </adonisControls:AdonisWindow>

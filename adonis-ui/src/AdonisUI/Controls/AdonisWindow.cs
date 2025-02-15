@@ -497,8 +497,8 @@ namespace AdonisUI.Controls
 
                     if (WindowStartupLocation == WindowStartupLocation.CenterOwner && Owner != null)
                     {
-                        Top = Owner.Top + (Owner.Height - ActualHeight) / 2;
-                        Left = Owner.Left + (Owner.Width - ActualWidth) / 2;
+                        Top = Owner.Top + (Owner.ActualHeight - ActualHeight) / 2;
+                        Left = Owner.Left + (Owner.ActualWidth - ActualWidth) / 2;
                     }
 
                     WindowState = WindowState.Normal;

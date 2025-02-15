@@ -39,7 +39,7 @@
                         <ContentControl.Resources>
                             <DataTemplate DataType="{x:Type vm:NewPassiveSkillsPresetViewModel}">
                                 <Grid>
-                                    <TextBlock FontStyle="Italic" Text="{Binding Label.Value}" />
+                                    <TextBlock Margin="5" FontStyle="Italic" Text="{Binding Label.Value}" />
                                 </Grid>
                             </DataTemplate>
 

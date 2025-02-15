@@ -1,4 +1,5 @@
 ﻿using AdonisUI.Controls;
+using PalCalc.UI.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static QuickGraph.Algorithms.AssigmentProblem.HungarianAlgorithm;
 
 namespace PalCalc.UI.View
 {
@@ -24,6 +26,8 @@ namespace PalCalc.UI.View
         public PalCheckListWindow()
         {
             InitializeComponent();
+
+            Wpf.Util.GridViewSort.ApplySort(m_ListView.Items, nameof(PalCheckListEntryViewModel.PaldexNoValue));
         }
     }
 }
