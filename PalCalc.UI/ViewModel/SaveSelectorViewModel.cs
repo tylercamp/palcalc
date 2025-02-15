@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AdonisUI.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
@@ -24,8 +25,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using Windows.ApplicationModel.Background;
 using Windows.UI.WebUI;
@@ -86,7 +87,7 @@ namespace PalCalc.UI.ViewModel
                                 var existingSaves = SavesLocations.SelectMany(l => l.SaveGames.OfType<SaveGameViewModel>().Select(vm => vm.Value)).SkipNull();
                                 if (existingSaves.Any(s => s.BasePath.PathEquals(asSaveGame.BasePath)))
                                 {
-                                    MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_ALREADY_REGISTERED.Bind().Value);
+                                    MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_ALREADY_REGISTERED.Bind().Value, caption: "");
                                 }
                                 else
                                 {
@@ -96,7 +97,7 @@ namespace PalCalc.UI.ViewModel
                             }
                             else
                             {
-                                MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_INCOMPLETE.Bind().Value);
+                                MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_INCOMPLETE.Bind().Value, caption: "");
                                 needsReset = true;
                             }
                         }
@@ -168,8 +169,8 @@ namespace PalCalc.UI.ViewModel
         public bool CanOpenSavesLocation => (SelectedLocation as StandardSavesLocationViewModel)?.Value?.FolderPath != null;
         public bool CanOpenSaveFileLocation => SelectedFullGame?.Value?.BasePath != null;
 
-        public Visibility NoXboxSavesMsgVisibility => (SelectedLocation as StandardSavesLocationViewModel)?.Value is XboxSavesLocation && !SelectedLocation.SaveGames.Any() ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility XboxIncompleteVisibility => SelectedFullGame != null && SelectedFullGame.Value is XboxSaveGame && (SelectedFullGame.Value as XboxSaveGame).LevelMeta?.IsValid != true ? Visibility.Visible : Visibility.Collapsed;
+        public System.Windows.Visibility NoXboxSavesMsgVisibility => (SelectedLocation as StandardSavesLocationViewModel)?.Value is XboxSavesLocation && !SelectedLocation.SaveGames.Any() ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+        public System.Windows.Visibility XboxIncompleteVisibility => SelectedFullGame != null && SelectedFullGame.Value is XboxSaveGame && (SelectedFullGame.Value as XboxSaveGame).LevelMeta?.IsValid != true ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
 
         public SaveSelectorViewModel(IEnumerable<ISavesLocation> savesLocations, IEnumerable<ISaveGame> manualSaves)
         {
@@ -281,7 +282,7 @@ namespace PalCalc.UI.ViewModel
                         catch (Exception e)
                         {
                             logger.Warning(e, "unexpected error when attempting to create crashlog file");
-                            MessageBox.Show(LocalizationCodes.LC_CRASHLOG_FAILED.Bind().Value);
+                            MessageBox.Show(LocalizationCodes.LC_CRASHLOG_FAILED.Bind().Value, caption: "");
                         }
                     }
                 }
@@ -293,11 +294,28 @@ namespace PalCalc.UI.ViewModel
                     var loadingModal = new LoadingSaveFileModal();
                     loadingModal.Owner = App.Current.MainWindow;
                     loadingModal.DataContext = LocalizationCodes.LC_SAVE_INSPECTOR_LOADING.Bind();
-                    loadingModal.ShowSync();
 
-                    var vm = new SaveInspectorWindowViewModel(SelectedFullGame, GameSettingsViewModel.Load(SelectedFullGame.Value).ModelObject);
+                    SaveInspectorWindowViewModel vm = null;
 
-                    loadingModal.Close();
+                    loadingModal.IsVisibleChanged += (_, _) =>
+                    {
+                        if (!loadingModal.IsVisible)
+                        {
+                            return;
+                        }
+                        var modalHandle = new WindowInteropHelper(loadingModal).Handle;
+
+                        Task.Run(() =>
+                        {
+                            vm = new SaveInspectorWindowViewModel(SelectedFullGame, GameSettingsViewModel.Load(SelectedFullGame.Value).ModelObject);
+                            // WM_CLOSE
+                            CachedSaveGame.SendMessage(modalHandle, 0x0010, 0, 0);
+                        });
+                    };
+
+                    loadingModal.ShowDialog();
+
+                    if (vm == null) throw new NotImplementedException();
 
                     var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
                     inspector.Show();
@@ -353,9 +371,9 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private IRelayCommand inspectSaveCommand;
 
-        public Visibility DeleteSaveVisibility =>
+        public System.Windows.Visibility DeleteSaveVisibility =>
             SelectedLocation is ManualSavesLocationViewModel && SelectedFullGame != null
-                ? Visibility.Visible
-                : Visibility.Collapsed;
+                ? System.Windows.Visibility.Visible
+                : System.Windows.Visibility.Collapsed;
     }
 }

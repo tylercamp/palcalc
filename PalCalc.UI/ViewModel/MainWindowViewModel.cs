@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AdonisUI.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using PalCalc.Model;
@@ -25,7 +26,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -294,7 +294,7 @@ namespace PalCalc.UI.ViewModel
 
                 foreach (var window in toClose)
                 {
-                    foreach (var child in window.OwnedWindows.OfType<Window>().ToList())
+                    foreach (var child in window.OwnedWindows.OfType<System.Windows.Window>().ToList())
                         child.Close();
 
                     window.Close();
@@ -323,10 +323,13 @@ namespace PalCalc.UI.ViewModel
         {
             if (loadingSaveModal == null)
             {
-                loadingSaveModal = new LoadingSaveFileModal();
-                loadingSaveModal.Owner = Application.Current.MainWindow;
-                loadingSaveModal.DataContext = LocalizationCodes.LC_SAVE_FILE_RELOADING.Bind();
-                loadingSaveModal.ShowSync();
+                //loadingSaveModal = new LoadingSaveFileModal();
+                //loadingSaveModal.Owner = System.Windows.Application.Current.MainWindow;
+                //loadingSaveModal.DataContext = LocalizationCodes.LC_SAVE_FILE_RELOADING.Bind();
+
+                //loadingSaveModal.ShowDialog();
+
+                //loadingSaveModal.ShowSync();
             }
         }
 
@@ -337,9 +340,11 @@ namespace PalCalc.UI.ViewModel
                 loadingSaveModal.Close();
                 loadingSaveModal = null;
 
-                if (loaded != null && targetsBySaveFile.ContainsKey(obj))
-                    targetsBySaveFile[obj].UpdateCachedData(loaded, GameSettingsViewModel.Load(obj).ModelObject);
+                
             }
+
+            if (loaded != null && targetsBySaveFile.ContainsKey(obj))
+                targetsBySaveFile[obj].UpdateCachedData(loaded, GameSettingsViewModel.Load(obj).ModelObject);
         }
 
         private void CachedSaveGame_SaveFileLoadError(ISaveGame obj, Exception ex)
@@ -353,7 +358,7 @@ namespace PalCalc.UI.ViewModel
             logger.Error(ex, "error when parsing save file for {saveId}", CachedSaveGame.IdentifierFor(obj));
 
             var crashsupport = CrashSupport.PrepareSupportFile(specificSave: obj);
-            MessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind(crashsupport).Value);
+            MessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind(crashsupport).Value, caption: "");
 
             SaveSelection.SelectedGame = null;
         }
@@ -595,9 +600,9 @@ namespace PalCalc.UI.ViewModel
             {
                 var response = MessageBox.Show(
                     owner: App.Current.MainWindow,
-                    messageBoxText: LocalizationCodes.LC_MEMORY_WARNING_MSG.Bind().Value,
+                    text: LocalizationCodes.LC_MEMORY_WARNING_MSG.Bind().Value,
                     caption: LocalizationCodes.LC_MEMORY_WARNING_TITLE.Bind().Value,
-                    button: MessageBoxButton.YesNoCancel
+                    buttons: MessageBoxButton.YesNoCancel
                 );
 
                 switch (response)
@@ -785,10 +790,10 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        public Visibility ProgressBarVisibility => SolverStatusMsg == null ? Visibility.Collapsed : Visibility.Visible;
+        public System.Windows.Visibility ProgressBarVisibility => SolverStatusMsg == null ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
 
         [ObservableProperty]
-        private Visibility updatesMessageVisibility = Visibility.Collapsed;
+        private System.Windows.Visibility updatesMessageVisibility = System.Windows.Visibility.Collapsed;
 
         private string VersionFromUrl(string url) => url.Split('/').Last();
         private string latestVersionUrl;
@@ -812,7 +817,7 @@ namespace PalCalc.UI.ViewModel
                                 var latestVersion = VersionFromUrl(latestVersionUrl);
                                 if (latestVersion != App.Version)
                                 {
-                                    dispatcher?.BeginInvoke(() => UpdatesMessageVisibility = Visibility.Visible);
+                                    dispatcher?.BeginInvoke(() => UpdatesMessageVisibility = System.Windows.Visibility.Visible);
                                 }
                             }
                             else
