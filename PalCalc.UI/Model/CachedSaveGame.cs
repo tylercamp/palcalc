@@ -134,7 +134,7 @@ namespace PalCalc.UI.Model
             sampleForDesignerView ??=
                 DirectSavesLocation.AllLocal
                     .SelectMany(l => l.ValidSaveGames)
-                    .OrderByDescending(g => g.LastModified)
+                    .OrderByDescending(g => g.LevelMeta.ReadGameOptions().PlayerLevel)
                     .Select(g => FromSaveGame(g, PalDB.LoadEmbedded(), GameSettings.Defaults))
                     .First();
 

@@ -34,10 +34,10 @@
             <Setter Property="WindowChrome.WindowChrome">
                 <Setter.Value>
                     <WindowChrome ResizeBorderThickness="{Binding Source={x:Static SystemParameters.WindowResizeBorderThickness}}"
-                          CaptionHeight="0"
-                          CornerRadius="0"
-                          GlassFrameThickness="1, 2, 1, 1"
-                          NonClientFrameEdges="None"/>
+                                  CaptionHeight="0"
+                                  CornerRadius="0"
+                                  GlassFrameThickness="1, 2, 1, 1"
+                                  NonClientFrameEdges="None"/>
                 </Setter.Value>
             </Setter>
             <Setter Property="Template">

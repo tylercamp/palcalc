@@ -10,10 +10,7 @@
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance vm:PalSourceTreeViewModel, IsDesignTimeCreatable=True}"
              >
-    <TreeView x:Name="m_TreeView" ItemsSource="{Binding RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged">
-        <TreeView.BorderBrush>
-            <SolidColorBrush Color="White" Opacity="0" />
-        </TreeView.BorderBrush>
+    <TreeView x:Name="m_TreeView" ItemsSource="{Binding RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="{x:Null}">
         <TreeView.ItemContainerStyle>
             <!-- explicitly reference Adonis style, doesn't work properly without this for some reason -->
             <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItemStyle}">

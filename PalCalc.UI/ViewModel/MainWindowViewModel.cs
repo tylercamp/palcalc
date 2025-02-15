@@ -1,5 +1,4 @@
-﻿using AdonisUI.Controls;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using PalCalc.Model;
@@ -26,8 +25,13 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+
+using AdonisMessageBox = AdonisUI.Controls.MessageBox;
+using AdonisMessageBoxButton = AdonisUI.Controls.MessageBoxButton;
+using AdonisMessageBoxResult = AdonisUI.Controls.MessageBoxResult;
 
 namespace PalCalc.UI.ViewModel
 {
@@ -263,7 +267,7 @@ namespace PalCalc.UI.ViewModel
             var title = LocalizationCodes.LC_DELETE_PAL_TARGET_TITLE.Bind().Value;
             var msg = LocalizationCodes.LC_DELETE_PAL_TARGET_MSG.Bind(spec.TargetPal.Name).Value;
 
-            if (MessageBox.Show(App.Current.MainWindow, msg, title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (AdonisMessageBox.Show(App.Current.MainWindow, msg, title, AdonisMessageBoxButton.YesNo) == AdonisMessageBoxResult.Yes)
             {
                 targetList.Remove(spec);
                 SaveTargetList(targetList);
@@ -301,14 +305,14 @@ namespace PalCalc.UI.ViewModel
         {
             var saveVm = manualSaves.SaveGames.OfType<SaveGameViewModel>().First(sg => sg.Value == saveGame);
 
-            var confirmation = MessageBox.Show(
+            var confirmation = AdonisMessageBox.Show(
                 App.ActiveWindow,
                 LocalizationCodes.LC_REMOVE_SAVE_DESCRIPTION.Bind(saveVm.Label).Value,
                 LocalizationCodes.LC_REMOVE_SAVE_TITLE.Bind().Value,
-                MessageBoxButton.YesNo
+                AdonisMessageBoxButton.YesNo
             );
 
-            if (confirmation == MessageBoxResult.Yes)
+            if (confirmation == AdonisMessageBoxResult.Yes)
             {
                 var toClose = App.Current.Windows
                     .OfType<SaveInspectorWindow>()
@@ -354,7 +358,7 @@ namespace PalCalc.UI.ViewModel
             logger.Error(ex, "error when parsing save file for {saveId}", CachedSaveGame.IdentifierFor(obj));
 
             var crashsupport = CrashSupport.PrepareSupportFile(specificSave: obj);
-            MessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind(crashsupport).Value, caption: "");
+            AdonisMessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind(crashsupport).Value, caption: "");
 
             SaveSelection.SelectedGame = null;
         }
@@ -594,22 +598,22 @@ namespace PalCalc.UI.ViewModel
 
             dispatcher.BeginInvoke(() =>
             {
-                var response = MessageBox.Show(
+                var response = AdonisMessageBox.Show(
                     owner: App.Current.MainWindow,
                     text: LocalizationCodes.LC_MEMORY_WARNING_MSG.Bind().Value,
                     caption: LocalizationCodes.LC_MEMORY_WARNING_TITLE.Bind().Value,
-                    buttons: MessageBoxButton.YesNoCancel
+                    buttons: AdonisMessageBoxButton.YesNoCancel
                 );
 
                 switch (response)
                 {
-                    case MessageBoxResult.Yes:
+                    case AdonisMessageBoxResult.Yes:
                         // stop the memory monitor entirely, it's still accessible but will no
                         // longer emit events regardless of `PauseNotices`
                         currentJob.MemoryMonitor.Dispose();
                         break;
 
-                    case MessageBoxResult.No:
+                    case AdonisMessageBoxResult.No:
                         break;
 
                     default:
@@ -786,10 +790,10 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        public System.Windows.Visibility ProgressBarVisibility => SolverStatusMsg == null ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+        public Visibility ProgressBarVisibility => SolverStatusMsg == null ? Visibility.Collapsed : Visibility.Visible;
 
         [ObservableProperty]
-        private System.Windows.Visibility updatesMessageVisibility = System.Windows.Visibility.Collapsed;
+        private Visibility updatesMessageVisibility = Visibility.Collapsed;
 
         private string VersionFromUrl(string url) => url.Split('/').Last();
         private string latestVersionUrl;
@@ -813,7 +817,7 @@ namespace PalCalc.UI.ViewModel
                                 var latestVersion = VersionFromUrl(latestVersionUrl);
                                 if (latestVersion != App.Version)
                                 {
-                                    dispatcher?.BeginInvoke(() => UpdatesMessageVisibility = System.Windows.Visibility.Visible);
+                                    dispatcher?.BeginInvoke(() => UpdatesMessageVisibility = Visibility.Visible);
                                 }
                             }
                             else

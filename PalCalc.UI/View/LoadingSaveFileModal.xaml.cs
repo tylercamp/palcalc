@@ -48,6 +48,11 @@ namespace PalCalc.UI.View
             base.OnClosing(e);
         }
 
+        /// <summary>
+        /// Presents this window as a dialog modal and begins the provided work `fn`.
+        /// 
+        /// The dialog closes automatically when `fn` completes.
+        /// </summary>
         public T ShowDialogDuring<T>(Func<T> fn)
         {
             var isDesignMode = DesignerProperties.GetIsInDesignMode(new DependencyObject());
@@ -63,7 +68,7 @@ namespace PalCalc.UI.View
                 Task.Run(async () =>
                 {
                     // (slight delay to give priority to WPF UI thread so it can render a bit quicker, hopefully reducing any window flickering)
-                    await Task.Delay(500);
+                    await Task.Delay(100);
 
                     try { res = fn(); }
                     catch (Exception e) { ex = e; }

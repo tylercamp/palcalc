@@ -43,13 +43,12 @@
     </StackPanel>
     <GroupBox adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="{x:Null}" Margin="0,5,0,0">
         <GroupBox.Header>
-            
             <Grid adonisExtensions:LayerExtension.Layer="3">
                 <TextBlock Text="{itl:LocalizedText LC_COMMON_TRAITS}" Margin="8" />
                 <Grid HorizontalAlignment="Right">
                     <Viewbox StretchDirection="DownOnly" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualHeight}">
                         <Border Padding="3">
-                            <Button Command="{Binding OpenPassivesSearchCommand}" VerticalAlignment="Center" Height="Auto" HorizontalAlignment="Right" adonisExtensions:LayerExtension.Layer="2">
+                            <Button Command="{Binding OpenPassivesSearchCommand}" VerticalAlignment="Center" HorizontalAlignment="Right" adonisExtensions:LayerExtension.Layer="2">
                                 <materialIcons:MaterialIcon Kind="Search" />
                             </Button>
                         </Border>
@@ -59,20 +58,28 @@
         </GroupBox.Header>
         <Grid>
             <TabControl Margin="0" Padding="0" Background="{x:Null}">
+                <TabControl.Resources>
+                    <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
+                        <Setter Property="ItemsSource" Value="{x:Static mvm:PassiveSkillViewModel.All}" />
+                        <Setter Property="ItemTemplate" Value="{StaticResource PassiveTemplate}" />
+                        <Setter Property="TextSearch.TextPath" Value="Name.Value" />
+                    </Style>
+                </TabControl.Resources>
+                
                 <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_REQUIRED_TRAITS}" adonisExtensions:LayerExtension.IncreaseLayer="False">
-                    <StackPanel adonisExtensions:LayerExtension.IncreaseLayer="False">
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive1, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive2, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive3, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive4, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                    <StackPanel vu:StackPanelExtensions.Spacing="5">
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive1, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive2, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive3, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive4, Mode=TwoWay}" />
                     </StackPanel>
                 </TabItem>
                 <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_OPTIONAL_TRAITS}"  adonisExtensions:LayerExtension.IncreaseLayer="False">
-                    <StackPanel adonisExtensions:LayerExtension.IncreaseLayer="False">
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive1, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive2, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive3, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive4, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                    <StackPanel vu:StackPanelExtensions.Spacing="5">
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive1, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive2, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive3, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive4, Mode=TwoWay}" />
                     </StackPanel>
                 </TabItem>
             </TabControl>
