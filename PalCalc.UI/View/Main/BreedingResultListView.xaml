@@ -10,11 +10,19 @@
           d:DesignHeight="450" d:DesignWidth="800"
           xmlns:util="clr-namespace:Wpf.Util"
           xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+          xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+          adonisExtensions:GridViewSortExtension.AutoSort="False"
           ItemsSource="{Binding Results}"
           SelectedItem="{Binding SelectedResult, Mode=TwoWay}"
           IsSynchronizedWithCurrentItem="True"
           util:GridViewSort.AutoSort="True"
+          Style="{StaticResource {x:Type ListView}}"
           >
+    <ListView.ItemContainerStyle>
+        <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+            <Setter Property="Padding" Value="0,4" />
+        </Style>
+    </ListView.ItemContainerStyle>
     <ListView.View>
         <GridView>
             <GridView.Columns>

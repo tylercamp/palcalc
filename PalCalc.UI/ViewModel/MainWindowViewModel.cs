@@ -29,14 +29,25 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using AdonisMessageBox = AdonisUI.Controls.MessageBox;
+using AdonisMessageBoxButton = AdonisUI.Controls.MessageBoxButton;
+using AdonisMessageBoxResult = AdonisUI.Controls.MessageBoxResult;
+
 namespace PalCalc.UI.ViewModel
 {
+    internal class MainWindowViewModelLoadingProgress
+    {
+        public int LoadedSaves { get; set; }
+        public int TotalSaves { get; set; }
+
+        public double ProgressPercent => 100 * (TotalSaves > 0 ? (double)LoadedSaves / TotalSaves : 1);
+    }
+
     internal partial class MainWindowViewModel : ObservableObject
     {
         private static ILogger logger = Log.ForContext<MainWindowViewModel>();
         private static PalDB db = PalDB.LoadEmbedded();
         private Dictionary<ISaveGame, PalTargetListViewModel> targetsBySaveFile;
-        private LoadingSaveFileModal loadingSaveModal = null;
         private Dispatcher dispatcher;
         private AppSettings settings;
         private PassiveSkillsPresetCollectionViewModel passivePresets;
@@ -60,14 +71,13 @@ namespace PalCalc.UI.ViewModel
                 .Select(l => new TranslationLocaleViewModel(l))
                 .ToList();
 
-        public MainWindowViewModel() : this(null) { }
+        public MainWindowViewModel() : this(null, null) { }
 
         // main app model
-        public MainWindowViewModel(Dispatcher dispatcher)
+        public MainWindowViewModel(Dispatcher dispatcher, Action<MainWindowViewModelLoadingProgress> progressHandler)
         {
             this.dispatcher = dispatcher ?? Dispatcher.CurrentDispatcher;
 
-            CachedSaveGame.SaveFileLoadStart += CachedSaveGame_SaveFileLoadStart;
             CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
             CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
@@ -107,10 +117,17 @@ namespace PalCalc.UI.ViewModel
             ResumeSolverCommand = new RelayCommand(ResumeSolver);
             CancelSolverCommand = new RelayCommand(CancelSolver);
 
-            App.Current.MainWindow.Closing += (o, e) =>
+            dispatcher.Invoke(() =>
             {
-                CancelSolverCommand.Execute(null);
-            };
+                // (needed for XAML designer view)
+                if (App.Current.MainWindow != null)
+                {
+                    App.Current.MainWindow.Closing += (o, e) =>
+                    {
+                        CancelSolverCommand.Execute(null);
+                    };
+                }
+            });
 
             SolverControls = new SolverControlsViewModel(
                 runSolverCommand: RunSolverCommand,
@@ -142,9 +159,17 @@ namespace PalCalc.UI.ViewModel
             var fakeSaves = settings.FakeSaveNames.Select(FakeSaveGame.Create).ToList();
             SaveSelection = new SaveSelectorViewModel(availableSavesLocations, manualSaves.Concat(fakeSaves));
 
-            targetsBySaveFile = SaveSelection.SavesLocations
+            var availableSaves = SaveSelection.SavesLocations
                 .SelectMany(l => l.SaveGames)
                 .OfType<SaveGameViewModel>()
+                .ToList();
+
+            var progress = new MainWindowViewModelLoadingProgress();
+            progress.TotalSaves = availableSaves.Count;
+            progress.LoadedSaves = 0;
+            progressHandler?.Invoke(progress);
+
+            targetsBySaveFile = availableSaves
                 .Select(sgvm => sgvm.Value)
                 .ToDictionary(
                     sg => sg,
@@ -162,8 +187,8 @@ namespace PalCalc.UI.ViewModel
                             {
 #endif
                                 var res = JsonConvert.DeserializeObject<PalTargetListViewModel>(File.ReadAllText(targetsFile), converter);
-                                //if (originalCachedSave != null)
-                                    //res.RefreshWith(originalCachedSave);
+                                progress.LoadedSaves++;
+                                progressHandler?.Invoke(progress);
                                 return res;
 
 #if HANDLE_ERRORS
@@ -172,12 +197,18 @@ namespace PalCalc.UI.ViewModel
                             {
                                 logger.Warning(ex, "an error occurred loading targets list for {saveId}, deleting the old file and resetting", CachedSaveGame.IdentifierFor(sg));
                                 File.Delete(targetsFile);
+
+                                progress.LoadedSaves++;
+                                progressHandler?.Invoke(progress);
                                 return new PalTargetListViewModel();
                             }
 #endif
                         }
                         else
                         {
+                            progress.LoadedSaves++;
+                            progressHandler?.Invoke(progress);
+
                             return new PalTargetListViewModel();
                         }
                     }
@@ -200,7 +231,7 @@ namespace PalCalc.UI.ViewModel
 
             Storage.SaveReloaded += Storage_SaveReloaded;
 
-            dispatcher.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
+            dispatcher?.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
 
             passivePresets.PresetSelected += selectedPreset =>
             {
@@ -236,7 +267,7 @@ namespace PalCalc.UI.ViewModel
             var title = LocalizationCodes.LC_DELETE_PAL_TARGET_TITLE.Bind().Value;
             var msg = LocalizationCodes.LC_DELETE_PAL_TARGET_MSG.Bind(spec.TargetPal.Name).Value;
 
-            if (MessageBox.Show(App.Current.MainWindow, msg, title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (AdonisMessageBox.Show(App.Current.MainWindow, msg, title, AdonisMessageBoxButton.YesNo) == AdonisMessageBoxResult.Yes)
             {
                 targetList.Remove(spec);
                 SaveTargetList(targetList);
@@ -274,14 +305,14 @@ namespace PalCalc.UI.ViewModel
         {
             var saveVm = manualSaves.SaveGames.OfType<SaveGameViewModel>().First(sg => sg.Value == saveGame);
 
-            var confirmation = MessageBox.Show(
+            var confirmation = AdonisMessageBox.Show(
                 App.ActiveWindow,
                 LocalizationCodes.LC_REMOVE_SAVE_DESCRIPTION.Bind(saveVm.Label).Value,
                 LocalizationCodes.LC_REMOVE_SAVE_TITLE.Bind().Value,
-                MessageBoxButton.YesNo
+                AdonisMessageBoxButton.YesNo
             );
 
-            if (confirmation == MessageBoxResult.Yes)
+            if (confirmation == AdonisMessageBoxResult.Yes)
             {
                 var toClose = App.Current.Windows
                     .OfType<SaveInspectorWindow>()
@@ -290,7 +321,7 @@ namespace PalCalc.UI.ViewModel
 
                 foreach (var window in toClose)
                 {
-                    foreach (var child in window.OwnedWindows.OfType<Window>().ToList())
+                    foreach (var child in window.OwnedWindows.OfType<System.Windows.Window>().ToList())
                         child.Close();
 
                     window.Close();
@@ -315,41 +346,18 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        private void CachedSaveGame_SaveFileLoadStart(ISaveGame obj)
-        {
-            if (loadingSaveModal == null)
-            {
-                loadingSaveModal = new LoadingSaveFileModal();
-                loadingSaveModal.Owner = Application.Current.MainWindow;
-                loadingSaveModal.DataContext = LocalizationCodes.LC_SAVE_FILE_RELOADING.Bind();
-                loadingSaveModal.ShowSync();
-            }
-        }
-
         private void CachedSaveGame_SaveFileLoadEnd(ISaveGame obj, CachedSaveGame loaded)
         {
-            if (loadingSaveModal != null)
-            {
-                loadingSaveModal.Close();
-                loadingSaveModal = null;
-
-                if (loaded != null && targetsBySaveFile.ContainsKey(obj))
-                    targetsBySaveFile[obj].UpdateCachedData(loaded, GameSettingsViewModel.Load(obj).ModelObject);
-            }
+            if (loaded != null && targetsBySaveFile.ContainsKey(obj))
+                targetsBySaveFile[obj].UpdateCachedData(loaded, GameSettingsViewModel.Load(obj).ModelObject);
         }
 
         private void CachedSaveGame_SaveFileLoadError(ISaveGame obj, Exception ex)
         {
-            if (loadingSaveModal != null)
-            {
-                loadingSaveModal.Close();
-                loadingSaveModal = null;
-            }
-
             logger.Error(ex, "error when parsing save file for {saveId}", CachedSaveGame.IdentifierFor(obj));
 
             var crashsupport = CrashSupport.PrepareSupportFile(specificSave: obj);
-            MessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind(crashsupport).Value);
+            AdonisMessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind(crashsupport).Value, caption: "");
 
             SaveSelection.SelectedGame = null;
         }
@@ -589,22 +597,22 @@ namespace PalCalc.UI.ViewModel
 
             dispatcher.BeginInvoke(() =>
             {
-                var response = MessageBox.Show(
+                var response = AdonisMessageBox.Show(
                     owner: App.Current.MainWindow,
-                    messageBoxText: LocalizationCodes.LC_MEMORY_WARNING_MSG.Bind().Value,
+                    text: LocalizationCodes.LC_MEMORY_WARNING_MSG.Bind().Value,
                     caption: LocalizationCodes.LC_MEMORY_WARNING_TITLE.Bind().Value,
-                    button: MessageBoxButton.YesNoCancel
+                    buttons: AdonisMessageBoxButton.YesNoCancel
                 );
 
                 switch (response)
                 {
-                    case MessageBoxResult.Yes:
+                    case AdonisMessageBoxResult.Yes:
                         // stop the memory monitor entirely, it's still accessible but will no
                         // longer emit events regardless of `PauseNotices`
                         currentJob.MemoryMonitor.Dispose();
                         break;
 
-                    case MessageBoxResult.No:
+                    case AdonisMessageBoxResult.No:
                         break;
 
                     default:
@@ -808,7 +816,7 @@ namespace PalCalc.UI.ViewModel
                                 var latestVersion = VersionFromUrl(latestVersionUrl);
                                 if (latestVersion != App.Version)
                                 {
-                                    dispatcher.BeginInvoke(() => UpdatesMessageVisibility = Visibility.Visible);
+                                    dispatcher?.BeginInvoke(() => UpdatesMessageVisibility = Visibility.Visible);
                                 }
                             }
                             else

@@ -17,9 +17,10 @@
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d" 
              d:DataContext="{x:Static ivm:SearchViewModel.DesignerInstance}"
-             d:Background="White"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
@@ -32,16 +33,19 @@
             <ColumnDefinition Width="20*" MinWidth="100"/>
         </Grid.ColumnDefinitions>
 
-        <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_PAL_CONTAINERS}" Grid.Column="0" Margin="5">
-            <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="Transparent">
+        <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_PAL_CONTAINERS}" Grid.Column="0">
+            <TreeView x:Name="m_TreeView" ItemsSource="{Binding OwnerTree.RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="{x:Null}">
+                <TreeView.Style>
+                    <Style TargetType="TreeView" BasedOn="{StaticResource {x:Type TreeView}}" />
+                </TreeView.Style>
                 <TreeView.InputBindings>
                     <KeyBinding Key="Delete" Command="{Binding DeleteContainerCommand}" CommandParameter="{Binding OwnerTree.SelectedSource.Container}" />
                 </TreeView.InputBindings>
                 <TreeView.ItemContainerStyle>
-                    <Style TargetType="TreeViewItem">
+                    <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItemStyle}">
                         <!-- Expand all items by default -->
                         <Setter Property="IsExpanded" Value="True" />
-                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                     </Style>
                 </TreeView.ItemContainerStyle>
                 <TreeView.Resources>
@@ -124,20 +128,15 @@
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="173*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_SEARCH_SETTINGS}" Grid.Row="0" Margin="5">
+            <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_SEARCH_SETTINGS}" Grid.Row="0" adonisExtensions:LayerExtension.IncreaseLayer="True">
                 <StackPanel Orientation="Vertical">
-                    <WrapPanel Margin="5">
-                        <WrapPanel.Resources>
-                            <Style TargetType="StackPanel">
-                                <Setter Property="Margin" Value="0,0,25,0" />
-                            </Style>
-                        </WrapPanel.Resources>
+                    <vu:SpacedWrapPanel Margin="5" HorizontalSpacing="25" VerticalSpacing="10">
 
                         <StackPanel Orientation="Vertical">
-                            <Label Content="{itl:LocalizedText LC_COMMON_PAL}" />
+                            <Label Content="{itl:LocalizedText LC_COMMON_PAL}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
                             <dnkc:AutoCompleteComboBox Width="180" ItemsSource="{x:Static mvm:PalViewModel.All}" SelectedValue="{Binding SearchSettings.SearchedPal}" TextSearch.TextPath="Label.Value">
                                 <dnkc:AutoCompleteComboBox.ItemTemplate>
                                     <DataTemplate DataType="mvm:PalViewModel">
@@ -148,7 +147,7 @@
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical">
-                            <Label Content="{itl:LocalizedText LC_COMMON_GENDER}" />
+                            <Label Content="{itl:LocalizedText LC_COMMON_GENDER}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
                             <ComboBox ItemsSource="{Binding SearchSettings.GenderOptions}" SelectedItem="{Binding SearchSettings.SearchedGender}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate DataType="{x:Type svm:GenderOption}">
@@ -160,12 +159,12 @@
 
                         <StackPanel Orientation="Vertical">
                             <StackPanel.Resources>
-                                <Style TargetType="dnkc:AutoCompleteComboBox">
+                                <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
                                     <Setter Property="Margin" Value="0,0,10,5" />
                                     <Setter Property="Width" Value="150" />
                                 </Style>
                             </StackPanel.Resources>
-                            <Label Content="{itl:LocalizedText LC_COMMON_TRAITS}" />
+                            <Label Content="{itl:LocalizedText LC_COMMON_TRAITS}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
                             <WrapPanel Orientation="Horizontal">
                                 <WrapPanel.Resources>
                                     <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
@@ -182,12 +181,12 @@
 
                         <StackPanel Orientation="Vertical">
                             <StackPanel.Resources>
-                                <Style TargetType="dnkc:AutoCompleteComboBox">
+                                <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
                                     <Setter Property="Margin" Value="0,0,10,5" />
                                     <Setter Property="Width" Value="150" />
                                 </Style>
                             </StackPanel.Resources>
-                            <Label Content="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" />
+                            <Label Content="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
                             <WrapPanel Orientation="Horizontal">
                                 <WrapPanel.Resources>
                                     <DataTemplate x:Key="SkillTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
@@ -203,10 +202,10 @@
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical">
-                            <Label Content="{itl:LocalizedText LC_SAVESEARCH_SETTINGS_MIN_IVS}" />
+                            <Label Content="{itl:LocalizedText LC_SAVESEARCH_SETTINGS_MIN_IVS}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
                             <StackPanel Orientation="Horizontal">
                                 <StackPanel.Resources>
-                                    <Style TargetType="Label">
+                                    <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
                                         <Setter Property="Padding" Value="2" />
                                         <Setter Property="Margin" Value="0,0,5,0" />
                                     </Style>
@@ -231,7 +230,7 @@
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
-                    </WrapPanel>
+                    </vu:SpacedWrapPanel>
 
                     <Button Width="80" Margin="5" HorizontalAlignment="Left" Command="{Binding SearchSettings.ResetCommand}" Content="{itl:LocalizedText LC_SAVESEARCH_SETTINGS_RESET}" />
                 </StackPanel>
@@ -248,24 +247,22 @@
                             <!-- note: putting the editor controls directly in this template causes a weird issue with AutoCompleteComboBox
                                  which clears out the VM values when the control is hidden. this leads to the custom pal being reset whenever
                                  you select a different container. -->
-                            <StackPanel>
+                            <StackPanel Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}">
                                 <!-- (GridSplitter not actually doing anything, just want visual consistency with the other borders) -->
                                 <GridSplitter HorizontalAlignment="Stretch" Height="5" IsEnabled="False" />
 
-                                <WrapPanel Orientation="Horizontal" Margin="10,8,10,15">
+                                <StackPanel Orientation="Vertical" Margin="10,8,10,15" vu:StackPanelExtensions.Spacing="10">
                                     <sv:CustomPalEditorView DataContext="{Binding PalInstance}" />
 
-                                    <Grid Margin="0,0,0,5">
+                                    <Grid>
                                         <Button HorizontalAlignment="Left"
-                                                VerticalAlignment="Bottom"
-                                                Padding="5,2"
                                                 Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=iv:SearchView}, Path=ViewModel.DeleteSlotCommand}"
                                                 CommandParameter="{Binding}"
                                         >
                                             Delete
                                         </Button>
                                     </Grid>
-                                </WrapPanel>
+                                </StackPanel>
 
                             </StackPanel>
                         </DataTemplate>
@@ -279,11 +276,11 @@
                     <vu:CachingContentPresenter Content="{Binding OwnerTree.SelectedSource}">
                         <vu:CachingContentPresenter.ContentTemplate>
                             <DataTemplate DataType="{x:Type svm:IContainerSource}">
-                                <ItemsControl ItemsSource="{Binding Container.Grids}" HorizontalAlignment="Center">
+                                <ItemsControl ItemsSource="{Binding Container.Grids}" HorizontalAlignment="Center" Margin="15">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <!-- Note: VirtualizingWrapPanel on NuGet doesn't seem to improve performance much and has gaps between empty tabs -->
-                                            <WrapPanel />
+                                            <vu:SpacedWrapPanel HorizontalSpacing="15" VerticalSpacing="15" />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
@@ -292,12 +289,12 @@
                                                 <ContentControl.Resources>
                                                     <!-- (same template for either one) -->
                                                     <DataTemplate DataType="{x:Type sgvm:DefaultContainerGridViewModel}">
-                                                        <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
+                                                        <sv:ContainerGridView DataContext="{Binding}"/>
                                                     </DataTemplate>
                                                     <DataTemplate DataType="{x:Type sgvm:CustomContainerGridViewModel}">
                                                         <StackPanel>
-                                                            <TextBlock HorizontalAlignment="Center" FontStyle="Italic" Text="{itl:LocalizedText LC_CUSTOM_CONTAINERS_DESCRIPTION}" />
-                                                            <sv:ContainerGridView DataContext="{Binding}" Margin="15" />
+                                                            <TextBlock HorizontalAlignment="Center" FontStyle="Italic" Padding="0,0,0,15" Text="{itl:LocalizedText LC_CUSTOM_CONTAINERS_DESCRIPTION}" />
+                                                            <sv:ContainerGridView DataContext="{Binding}" />
                                                         </StackPanel>
                                                     </DataTemplate>
                                                 </ContentControl.Resources>

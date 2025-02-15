@@ -2,13 +2,19 @@
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.SaveReader.SaveFile;
+using PalCalc.UI.Localization;
+using PalCalc.UI.View;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Threading;
 
 namespace PalCalc.UI.Model
 {
@@ -128,41 +134,51 @@ namespace PalCalc.UI.Model
             sampleForDesignerView ??=
                 DirectSavesLocation.AllLocal
                     .SelectMany(l => l.ValidSaveGames)
-                    .OrderByDescending(g => g.LastModified)
+                    .OrderByDescending(g => g.LevelMeta.ReadGameOptions().PlayerLevel)
                     .Select(g => FromSaveGame(g, PalDB.LoadEmbedded(), GameSettings.Defaults))
                     .First();
 
-
         public static CachedSaveGame FromSaveGame(ISaveGame game, PalDB db, GameSettings settings)
         {
-            var isDesignMode = DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject());
-            if (!isDesignMode) SaveFileLoadStart?.Invoke(game);
+            var loadingModal = new LoadingSaveFileModal();
+            loadingModal.DataContext = LocalizationCodes.LC_SAVE_FILE_RELOADING.Bind();
+
+            var isDesignMode = DesignerProperties.GetIsInDesignMode(new DependencyObject());
+            if (!isDesignMode)
+            {
+                loadingModal.Owner = Application.Current.MainWindow;
+                SaveFileLoadStart?.Invoke(game);
+            }
 
             CachedSaveGame result;
+
 #if HANDLE_ERRORS
             try
             {
 #endif
-                GameMeta meta = null;
-                // `LevelMeta` is sometimes unavailable for Xbox saves, which shouldn't prevent us from
-                // being able to load the data
-                try { meta = game.LevelMeta.ReadGameOptions(); } catch { }
-                
-                var charData = game.Level.ReadCharacterData(db, settings, game.Players);
-                result = new CachedSaveGame(game)
+                result = loadingModal.ShowDialogDuring(() =>
                 {
-                    DatabaseVersion = db.Version,
-                    LastModified = game.LastModified,
-                    OwnedPals = charData.Pals,
-                    Guilds = charData.Guilds,
-                    Players = charData.Players,
-                    Bases = charData.Bases,
-                    PalContainers = charData.PalContainers,
-                    PlayerLevel = meta?.PlayerLevel,
-                    PlayerName = meta?.PlayerName ?? "UNKNOWN",
-                    WorldName = meta?.WorldName ?? "UNKNOWN WORLD",
-                    InGameDay = meta?.InGameDay ?? 0,
-                };
+                    GameMeta meta = null;
+                    // `LevelMeta` is sometimes unavailable for Xbox saves, which shouldn't prevent us from
+                    // being able to load the data
+                    try { meta = game.LevelMeta.ReadGameOptions(); } catch { }
+
+                    var charData = game.Level.ReadCharacterData(db, settings, game.Players);
+                    return new CachedSaveGame(game)
+                    {
+                        DatabaseVersion = db.Version,
+                        LastModified = game.LastModified,
+                        OwnedPals = charData.Pals,
+                        Guilds = charData.Guilds,
+                        Players = charData.Players,
+                        Bases = charData.Bases,
+                        PalContainers = charData.PalContainers,
+                        PlayerLevel = meta?.PlayerLevel,
+                        PlayerName = meta?.PlayerName ?? "UNKNOWN",
+                        WorldName = meta?.WorldName ?? "UNKNOWN WORLD",
+                        InGameDay = meta?.InGameDay ?? 0,
+                    };
+                });
 #if HANDLE_ERRORS
             }
             catch (Exception ex)

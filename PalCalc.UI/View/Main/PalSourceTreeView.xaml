@@ -10,24 +10,16 @@
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance vm:PalSourceTreeViewModel, IsDesignTimeCreatable=True}"
              >
-    <TreeView x:Name="m_TreeView" ItemsSource="{Binding RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged">
-        <TreeView.BorderBrush>
-            <SolidColorBrush Color="White" Opacity="0" />
-        </TreeView.BorderBrush>
+    <TreeView x:Name="m_TreeView" ItemsSource="{Binding RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="{x:Null}">
         <TreeView.ItemContainerStyle>
-            <Style TargetType="TreeViewItem">
+            <!-- explicitly reference Adonis style, doesn't work properly without this for some reason -->
+            <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItemStyle}">
                 <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                 <Setter Property="IsExpanded" Value="True" />
                 
                 <!-- (reapply fix for XAML binding errors from App.xaml) -->
                 <Setter Property="HorizontalContentAlignment" Value="Left" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
-
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                        <Setter Property="FontWeight" Value="Bold" />
-                    </DataTrigger>
-                </Style.Triggers>
             </Style>
         </TreeView.ItemContainerStyle>
         <TreeView.Resources>

@@ -1,11 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
-using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.SaveReader.SaveFile;
-using PalCalc.SaveReader.SaveFile.Virtual;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.Model.CSV;
@@ -15,20 +13,16 @@ using PalCalc.UI.View.Utils;
 using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
 using Serilog;
-using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Threading;
-using Windows.ApplicationModel.Background;
-using Windows.UI.WebUI;
+
+using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 
 namespace PalCalc.UI.ViewModel
 {
@@ -86,7 +80,7 @@ namespace PalCalc.UI.ViewModel
                                 var existingSaves = SavesLocations.SelectMany(l => l.SaveGames.OfType<SaveGameViewModel>().Select(vm => vm.Value)).SkipNull();
                                 if (existingSaves.Any(s => s.BasePath.PathEquals(asSaveGame.BasePath)))
                                 {
-                                    MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_ALREADY_REGISTERED.Bind().Value);
+                                    AdonisMessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_ALREADY_REGISTERED.Bind().Value, caption: "");
                                 }
                                 else
                                 {
@@ -96,7 +90,7 @@ namespace PalCalc.UI.ViewModel
                             }
                             else
                             {
-                                MessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_INCOMPLETE.Bind().Value);
+                                AdonisMessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_INCOMPLETE.Bind().Value, caption: "");
                                 needsReset = true;
                             }
                         }
@@ -282,7 +276,7 @@ namespace PalCalc.UI.ViewModel
                         catch (Exception e)
                         {
                             logger.Warning(e, "unexpected error when attempting to create crashlog file");
-                            MessageBox.Show(LocalizationCodes.LC_CRASHLOG_FAILED.Bind().Value);
+                            AdonisMessageBox.Show(LocalizationCodes.LC_CRASHLOG_FAILED.Bind().Value, caption: "");
                         }
                     }
                 }
@@ -294,11 +288,10 @@ namespace PalCalc.UI.ViewModel
                     var loadingModal = new LoadingSaveFileModal();
                     loadingModal.Owner = App.Current.MainWindow;
                     loadingModal.DataContext = LocalizationCodes.LC_SAVE_INSPECTOR_LOADING.Bind();
-                    loadingModal.ShowSync();
 
-                    var vm = new SaveInspectorWindowViewModel(SelectedFullGame, GameSettingsViewModel.Load(SelectedFullGame.Value).ModelObject);
-
-                    loadingModal.Close();
+                    var vm = loadingModal.ShowDialogDuring(
+                        () => new SaveInspectorWindowViewModel(SelectedFullGame, GameSettingsViewModel.Load(SelectedFullGame.Value).ModelObject)
+                    );
 
                     var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
                     inspector.Show();

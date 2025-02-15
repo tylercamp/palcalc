@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
+using AdonisMessageBox = AdonisUI.Controls.MessageBox;
+
 namespace PalCalc.UI
 {
     /// <summary>
@@ -50,6 +52,10 @@ namespace PalCalc.UI
             logger = Log.ForContext<App>();
             logger.Information($"Pal Calc version {Version}");
 
+            // https://stackoverflow.com/a/78801712/2692629
+            // partial performance fix when app is maximized
+            CoreCompatibilityPreferences.EnableMultiMonitorDisplayClipping = true;
+
             PalDB.BeginLoadEmbedded();
 
             Translator.OnTranslationError += TranslationErrors.Add;
@@ -73,7 +79,7 @@ namespace PalCalc.UI
             }
             finally
             {
-                MessageBox.Show(message);
+                AdonisMessageBox.Show(message, caption: "");
             }
         }
     }

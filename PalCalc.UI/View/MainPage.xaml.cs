@@ -1,10 +1,12 @@
-﻿using PalCalc.UI.View;
+﻿using PalCalc.UI.Model;
+using PalCalc.UI.View;
 using PalCalc.UI.ViewModel;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,15 +27,12 @@ namespace PalCalc.UI
     /// </summary>
     public partial class MainPage : Page
     {
-        private ILogger logger = Log.ForContext<MainPage>();
-
         internal MainPage()
         {
             InitializeComponent();
 
             var sw = Stopwatch.StartNew();
-            DataContext = new MainWindowViewModel(Dispatcher);
-            logger.Information("MainWindowViewModel took {ms}ms to start", sw.ElapsedMilliseconds);
+            DataContext = new MainWindowViewModel(Dispatcher, null);
         }
 
         internal MainPage(MainWindowViewModel vm)

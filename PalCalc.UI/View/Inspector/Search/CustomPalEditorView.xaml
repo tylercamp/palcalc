@@ -14,15 +14,10 @@
              d:DataContext="{x:Static vm:CustomPalInstanceViewModel.DesignInstance}">
     <!-- (assignment from VM to AutoCompleteComboBox isn't reflected in designer view for some reason?) -->
     <Grid>
-        <WrapPanel>
-            <WrapPanel.Resources>
-                <Style TargetType="StackPanel">
-                    <Setter Property="Margin" Value="0,0,25,0" />
-                </Style>
-            </WrapPanel.Resources>
+        <vu:SpacedWrapPanel HorizontalSpacing="25" VerticalSpacing="15">
 
             <StackPanel Orientation="Vertical">
-                <Label Content="{itl:LocalizedText LC_COMMON_PAL}" />
+                <Label Content="{itl:LocalizedText LC_COMMON_PAL}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
                 <dnkc:AutoCompleteComboBox Width="180" SelectedItem="{Binding Pal}" ItemsSource="{x:Static mvm:PalViewModel.All}" TextSearch.TextPath="Label.Value">
                     <dnkc:AutoCompleteComboBox.ItemTemplate>
                         <DataTemplate DataType="mvm:PalViewModel">
@@ -33,8 +28,8 @@
             </StackPanel>
 
             <StackPanel Orientation="Vertical">
-                <Label Content="{itl:LocalizedText LC_COMMON_GENDER}" />
-                <ComboBox SelectedItem="{Binding Gender}" ItemsSource="{x:Static vm:CustomPalInstanceGender.Options}">
+                <Label Content="{itl:LocalizedText LC_COMMON_GENDER}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
+                <ComboBox SelectedItem="{Binding Gender}" ItemsSource="{x:Static vm:CustomPalInstanceGender.Options}" MinWidth="100">
                     <ComboBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:CustomPalInstanceGender}">
                             <TextBlock Text="{Binding Label.Value}" />
@@ -44,18 +39,15 @@
             </StackPanel>
 
             <StackPanel Orientation="Vertical">
-                <Label Content="{itl:LocalizedText Code=LC_COMMON_IVS}" />
+                <Label Content="{itl:LocalizedText Code=LC_COMMON_IVS}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
 
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <StackPanel Orientation="Horizontal" vu:StackPanelExtensions.Spacing="15">
                     <StackPanel.Resources>
-                        <Style TargetType="StackPanel">
-                            <Setter Property="Margin" Value="0,0,15,0" />
-                        </Style>
                         <Style TargetType="vu:IntegerTextBox">
                             <Setter Property="MinValue" Value="0" />
                             <Setter Property="MaxValue" Value="100" />
                         </Style>
-                        <Style TargetType="TextBlock">
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                             <Setter Property="Padding" Value="0,2,6,3" />
                         </Style>
                     </StackPanel.Resources>
@@ -68,7 +60,7 @@
                         <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK}" />
                         <vu:IntegerTextBox Value="{Binding IvAttack}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0">
+                    <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE}" />
                         <vu:IntegerTextBox Value="{Binding IvDefense}" />
                     </StackPanel>
@@ -77,12 +69,12 @@
 
             <StackPanel Orientation="Vertical">
                 <StackPanel.Resources>
-                    <Style TargetType="dnkc:AutoCompleteComboBox">
+                    <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
                         <Setter Property="Margin" Value="0,0,10,5" />
                         <Setter Property="Width" Value="150" />
                     </Style>
                 </StackPanel.Resources>
-                <Label Content="{itl:LocalizedText LC_COMMON_TRAITS}" />
+                <Label Content="{itl:LocalizedText LC_COMMON_TRAITS}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
                 <WrapPanel Orientation="Horizontal">
                     <WrapPanel.Resources>
                         <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
@@ -96,6 +88,6 @@
                     <dnkc:AutoCompleteComboBox SelectedItem="{Binding Passive4}" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
                 </WrapPanel>
             </StackPanel>
-        </WrapPanel>
+        </vu:SpacedWrapPanel>
     </Grid>
 </UserControl>

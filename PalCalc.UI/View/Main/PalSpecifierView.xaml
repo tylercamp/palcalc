@@ -9,15 +9,15 @@
              xmlns:m="clr-namespace:PalCalc.UI.Model"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d" 
-             d:Background="White"
              d:DataContext="{x:Static mvm:PalSpecifierViewModel.DesignerInstance}">
     <UserControl.Resources>
         <c:CollectionVisibilityConverter x:Key="CVC" />
         <c:IntToIVConverter x:Key="IIVC" />
         <BooleanToVisibilityConverter x:Key="BVC" />
 
-        <Style TargetType="{x:Type TextBlock}">
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="FontSize" Value="10" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
@@ -87,13 +87,13 @@
                         HorizontalAlignment="Right"
                         PreviewMouseDown="Image_PreviewMouseDown"
                         Cursor="Hand"
-                        Background="Transparent"
-                        BorderBrush="Transparent"
+                        Background="{x:Null}"
+                        BorderBrush="{x:Null}"
                         >
                         <materialIcons:MaterialIcon
                             Kind="Remove"
                             Width="15"
-                            Foreground="DarkRed"
+                            Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}"
                             />
                     </Button>
                 </Grid>
@@ -118,7 +118,7 @@
                     Visibility="{Binding HasIVs, Converter={StaticResource BVC}}"
                     >
                     <Grid.Resources>
-                        <Style TargetType="Label">
+                        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
                             <Setter Property="Padding" Value="0,0,5,0" />
                         </Style>
                     </Grid.Resources>

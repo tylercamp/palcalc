@@ -57,12 +57,12 @@ namespace PalCalc.UI.View.Pal
             // to "reuse" of VM Row/ColumnDefinitions, so we make copies here instead of direct refs)
 
             ColumnDefinitions.Clear();
-            foreach (var cdef in newModel.ColumnDefinitions)
-                ColumnDefinitions.Add(new ColumnDefinition() { Width = cdef.Width });
+            foreach (var size in newModel.ColumnSizes)
+                ColumnDefinitions.Add(new ColumnDefinition() { Width = size });
 
             RowDefinitions.Clear();
-            foreach (var rdef in newModel.RowDefinitions)
-                RowDefinitions.Add(new RowDefinition() { Height = rdef.Height });
+            foreach (var size in newModel.RowSizes)
+                RowDefinitions.Add(new RowDefinition() { Height = size });
 
             
 

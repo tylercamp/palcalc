@@ -163,7 +163,7 @@ namespace PalCalc.UI.View.Utils
             panelHeight += currentLineHeight;
 
             // Return the total measured size
-            return new Size(panelWidth, panelHeight);
+            return new Size(Math.Ceiling(panelWidth), Math.Ceiling(panelHeight));
         }
 
         private Size MeasureVertical(Size availableSize)

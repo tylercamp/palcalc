@@ -10,7 +10,9 @@
             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
-            d:Background="White"
+            xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+            xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+            vu:StackPanelExtensions.Spacing="8"
             mc:Ignorable="d" 
             d:DataContext="{d:DesignInstance vm:PalTargetViewModel, IsDesignTimeCreatable=True}"
             d:DesignHeight="401.428" d:DesignWidth="178.928">
@@ -19,58 +21,81 @@
             <TextBlock Text="{Binding Name.Value}" />
         </DataTemplate>
     </StackPanel.Resources>
-    <Label Content="{itl:LocalizedText LC_COMMON_PAL}" Margin="5,0,0,0" />
-    <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PalViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.TargetPal, Mode=TwoWay}" TextSearch.TextPath="Label.Value" Margin="6,0,6,0">
-        <dnkc:AutoCompleteComboBox.ItemTemplate>
-            <DataTemplate DataType="vm:PalViewModel">
-                <Label Content="{Binding Label.Value}" />
-            </DataTemplate>
-        </dnkc:AutoCompleteComboBox.ItemTemplate>
-    </dnkc:AutoCompleteComboBox>
-    <Label Content="{itl:LocalizedText Code=LC_COMMON_GENDER}" Margin="5,0,0,0" />
-    <ComboBox ItemsSource="{x:Static mvm:PalGenderViewModel.AllStandard}" SelectedValue="{Binding CurrentPalSpecifier.RequiredGender}" Margin="6,0,6,5">
-        <ComboBox.ItemTemplate>
-            <DataTemplate DataType="mvm:PalGenderViewModel">
-                <TextBlock Text="{Binding Label.Value}" />
-            </DataTemplate>
-        </ComboBox.ItemTemplate>
-    </ComboBox>
-    <GroupBox>
+    <StackPanel>
+        <Label Content="{itl:LocalizedText LC_COMMON_PAL}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
+        <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PalViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.TargetPal, Mode=TwoWay}" TextSearch.TextPath="Label.Value">
+            <dnkc:AutoCompleteComboBox.ItemTemplate>
+                <DataTemplate DataType="vm:PalViewModel">
+                    <TextBlock Text="{Binding Label.Value}" />
+                </DataTemplate>
+            </dnkc:AutoCompleteComboBox.ItemTemplate>
+        </dnkc:AutoCompleteComboBox>
+    </StackPanel>
+    <StackPanel>
+        <Label Content="{itl:LocalizedText Code=LC_COMMON_GENDER}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
+        <ComboBox ItemsSource="{x:Static mvm:PalGenderViewModel.AllStandard}" SelectedValue="{Binding CurrentPalSpecifier.RequiredGender}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate DataType="mvm:PalGenderViewModel">
+                    <TextBlock Text="{Binding Label.Value}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+    </StackPanel>
+    <GroupBox adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="{x:Null}" Margin="0,5,0,0">
         <GroupBox.Header>
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-                <TextBlock Text="{itl:LocalizedText LC_COMMON_TRAITS}" />
-                <Button Margin="10,0,0,0" Padding="0" Height="16" Command="{Binding OpenPassivesSearchCommand}">
-                    <materialIcons:MaterialIcon Kind="Search" />
-                </Button>
-            </StackPanel>
+            <Grid adonisExtensions:LayerExtension.Layer="3">
+                <TextBlock Text="{itl:LocalizedText LC_COMMON_TRAITS}" Margin="8" />
+                <Grid HorizontalAlignment="Right">
+                    <Viewbox StretchDirection="DownOnly" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualHeight}">
+                        <Border Padding="3">
+                            <Button Command="{Binding OpenPassivesSearchCommand}" VerticalAlignment="Center" HorizontalAlignment="Right" adonisExtensions:LayerExtension.Layer="2">
+                                <materialIcons:MaterialIcon Kind="Search" />
+                            </Button>
+                        </Border>
+                    </Viewbox>
+                </Grid>
+            </Grid>
         </GroupBox.Header>
         <Grid>
-            <TabControl>
-                <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_REQUIRED_TRAITS}">
-                    <StackPanel>
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive1, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive2, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive3, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.Passive4, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+            <TabControl Margin="0" Padding="0" Background="{x:Null}">
+                <TabControl.Resources>
+                    <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
+                        <Setter Property="ItemsSource" Value="{x:Static mvm:PassiveSkillViewModel.All}" />
+                        <Setter Property="ItemTemplate" Value="{StaticResource PassiveTemplate}" />
+                        <Setter Property="TextSearch.TextPath" Value="Name.Value" />
+                    </Style>
+                </TabControl.Resources>
+                
+                <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_REQUIRED_TRAITS}" adonisExtensions:LayerExtension.IncreaseLayer="False">
+                    <StackPanel vu:StackPanelExtensions.Spacing="5">
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive1, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive2, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive3, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive4, Mode=TwoWay}" />
                     </StackPanel>
                 </TabItem>
-                <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_OPTIONAL_TRAITS}">
-                    <StackPanel>
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive1, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive2, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox Margin="0,0,0,5" ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive3, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
-                        <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PassiveSkillViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive4, Mode=TwoWay}" TextSearch.TextPath="Name.Value" ItemTemplate="{StaticResource PassiveTemplate}" />
+                <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_OPTIONAL_TRAITS}"  adonisExtensions:LayerExtension.IncreaseLayer="False">
+                    <StackPanel vu:StackPanelExtensions.Spacing="5">
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive1, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive2, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive3, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive4, Mode=TwoWay}" />
                     </StackPanel>
                 </TabItem>
             </TabControl>
             <Button HorizontalAlignment="Right" VerticalAlignment="Top" Height="Auto" Content="{itl:LocalizedText Code=LC_TRAITS_PRESETS}" x:Name="PresetsButton" Command="{Binding OpenPresetsMenuCommand}" Margin="0,2,0,0">
             </Button>
             <Popup PlacementTarget="{Binding ElementName=PresetsButton}" x:Name="PresetsPopup" IsOpen="{Binding PresetsMenuIsOpen}" StaysOpen="False" MinWidth="200" MaxHeight="300">
-                <local:PassiveSkillsPresetCollectionView DataContext="{Binding Presets}" />
+                <local:PassiveSkillsPresetCollectionView DataContext="{Binding Presets}"
+                                                         Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"
+                                                         BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.AccentInteractionBorderBrush}}"
+                                                         BorderThickness="1"
+                                                         adonisExtensions:LayerExtension.Layer="1"
+                                                         />
             </Popup>
         </Grid>
     </GroupBox>
-    <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_IVS}">
+    <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_IVS}" adonisExtensions:LayerExtension.IncreaseLayer="False" Background="{x:Null}" Margin="0,5,0,0">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -86,8 +111,12 @@
             </Grid.RowDefinitions>
 
             <Grid.Resources>
-                <Style TargetType="Label" x:Key="MaxIvLabel">
-                    <Setter Property="Foreground" Value="Gray" />
+                <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+
+                <Style TargetType="Label" x:Key="MaxIvLabel" BasedOn="{StaticResource {x:Type Label}}">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}" />
                     <Setter Property="Grid.Column" Value="2" />
                     <Setter Property="HorizontalContentAlignment" Value="Center" />
                     <Setter Property="ContentStringFormat" Value="({0})" />

@@ -24,6 +24,7 @@ namespace PalCalc.UI.ViewModel
         }
 
         public string PaldexNoDisplay => Pal.ModelObject.Id.PalDexNo.ToString() + (Pal.ModelObject.Id.IsVariant ? "B" : "");
+        public double PaldexNoValue => Pal.ModelObject.Id.PalDexNo + (Pal.ModelObject.Id.IsVariant ? 0.1 : 0);
         public ILocalizedText PalName => Pal.Name;
 
         public PalViewModel Pal { get; }
