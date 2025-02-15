@@ -77,7 +77,7 @@ namespace PalCalc.UI
             }
             finally
             {
-                MessageBox.Show(message);
+                AdonisUI.Controls.MessageBox.Show(message, caption: "");
             }
         }
     }

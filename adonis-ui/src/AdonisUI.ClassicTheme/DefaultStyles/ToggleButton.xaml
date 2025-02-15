@@ -61,6 +61,7 @@
                         
                         <Trigger Property="IsChecked" Value="True">
                             <Setter Property="Visibility" TargetName="InnerShadowHost" Value="Visible"/>
+                            <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}" />
                         </Trigger>
 
                     </ControlTemplate.Triggers>

@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                     xmlns:local="clr-namespace:PalCalc.UI.View.Utils"
                     xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
                     >
@@ -39,9 +40,9 @@
     <Style TargetType="{x:Type local:PopupToolTipContent}">
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="2" />
-        <Setter Property="Background" Value="{x:Static SystemColors.ControlBrush}" />
-        <Setter Property="BorderBrush" Value="{x:Static SystemColors.ControlDarkBrush}" />
-        <Setter Property="Padding" Value="5" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBorderBrush}}" />
+        <Setter Property="Padding" Value="3" />
     </Style>
 
 </ResourceDictionary>

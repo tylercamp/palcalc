@@ -315,20 +315,18 @@
                         </Border>
                         <Border Padding="5" Margin="5"
                                 CornerRadius="5"
-                                Background="#88C0C0C0"
+                                Background="#55C0C0C0"
                                 Width="Auto"
                                 Height="Auto"
                                 VerticalAlignment="Bottom"
                                 HorizontalAlignment="Right">
                             <StackPanel Orientation="Vertical">
-                                <StackPanel Orientation="Horizontal" Height="30">
+                                <UniformGrid Columns="2" Height="30" MinWidth="110">
                                     <ToggleButton Content="{Binding RelativeSource={RelativeSource TemplatedParent},Path=FillLabel}"
-                                                  Width="55"
                                                   IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Mode,Converter={StaticResource EqualityConverter},ConverterParameter={x:Static zoom:ZoomControlModes.Fill}}" />
                                     <ToggleButton Content="{Binding RelativeSource={RelativeSource TemplatedParent},Path=CustomLabel}"
-                                                  Width="55"
                                                   IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Mode,Converter={StaticResource EqualityConverter},ConverterParameter={x:Static zoom:ZoomControlModes.Custom}}" />
-                                </StackPanel>
+                                </UniformGrid>
                                 <TextBlock HorizontalAlignment="Center" Margin="0,4,0,2">
                                     <Run Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=ZoomLabel}" />
                                     <Run Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Zoom,StringFormat='\{0:P0}'}" />

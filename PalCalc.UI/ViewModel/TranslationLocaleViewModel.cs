@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AdonisUI.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.UI.Localization;
 using System;
@@ -6,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace PalCalc.UI.ViewModel
 {
@@ -34,7 +34,7 @@ namespace PalCalc.UI.ViewModel
                 if (value == IsSelected) return;
 
                 Translator.CurrentLocale = Value;
-                MessageBox.Show(LocalizationCodes.LC_LANG_CHANGED_RESTART.Bind().Value);
+                MessageBox.Show(LocalizationCodes.LC_LANG_CHANGED_RESTART.Bind().Value, caption: "");
             }
         }
 

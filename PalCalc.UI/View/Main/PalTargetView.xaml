@@ -26,7 +26,7 @@
         <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PalViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.TargetPal, Mode=TwoWay}" TextSearch.TextPath="Label.Value">
             <dnkc:AutoCompleteComboBox.ItemTemplate>
                 <DataTemplate DataType="vm:PalViewModel">
-                    <Label Content="{Binding Label.Value}" />
+                    <TextBlock Text="{Binding Label.Value}" />
                 </DataTemplate>
             </dnkc:AutoCompleteComboBox.ItemTemplate>
         </dnkc:AutoCompleteComboBox>
@@ -79,7 +79,12 @@
             <Button HorizontalAlignment="Right" VerticalAlignment="Top" Height="Auto" Content="{itl:LocalizedText Code=LC_TRAITS_PRESETS}" x:Name="PresetsButton" Command="{Binding OpenPresetsMenuCommand}" Margin="0,2,0,0">
             </Button>
             <Popup PlacementTarget="{Binding ElementName=PresetsButton}" x:Name="PresetsPopup" IsOpen="{Binding PresetsMenuIsOpen}" StaysOpen="False" MinWidth="200" MaxHeight="300">
-                <local:PassiveSkillsPresetCollectionView DataContext="{Binding Presets}" />
+                <local:PassiveSkillsPresetCollectionView DataContext="{Binding Presets}"
+                                                         Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"
+                                                         BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.AccentInteractionBorderBrush}}"
+                                                         BorderThickness="1"
+                                                         adonisExtensions:LayerExtension.Layer="1"
+                                                         />
             </Popup>
         </Grid>
     </GroupBox>

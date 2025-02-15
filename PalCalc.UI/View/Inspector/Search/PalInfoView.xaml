@@ -74,7 +74,7 @@
                 <ItemsControl ItemsSource="{Binding PalInstance.EquippedActiveSkills}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="mvm:ActiveSkillViewModel">
-                            <vp:ActiveSkillView DataContext="{Binding}" Margin="0,2,0,2" />
+                            <vp:ActiveSkillView DataContext="{Binding}" Width="175" Height="22" Margin="0,0,0,4" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -90,7 +90,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="mvm:PassiveSkillViewModel">
-                            <vp:PassiveSkillView DataContext="{Binding}" Width="125" Margin="0,0,5,5" />
+                            <vp:PassiveSkillView DataContext="{Binding}" Width="175" Margin="0,0,5,5" Height="22" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -106,7 +106,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="mvm:ActiveSkillViewModel">
-                        <vp:ActiveSkillView DataContext="{Binding}" Margin="2" />
+                        <vp:ActiveSkillView DataContext="{Binding}" Width="175" Height="22" Margin="2" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

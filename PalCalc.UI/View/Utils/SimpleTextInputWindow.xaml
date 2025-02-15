@@ -4,12 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+                             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
         xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         WindowStyle="ToolWindow"
         WindowStartupLocation="CenterOwner"
         SizeToContent="Height"
+        IconVisibility="Collapsed"
         Title="SimpleTextInputWindow"
         Height="Auto" Width="300">
     <Window.Style>
@@ -27,9 +29,11 @@
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding InputLabel}" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Center"/>
         <TextBox x:Name="m_TextBox" PreviewKeyDown="m_TextBox_PreviewKeyDown" Margin="10,0,10,0" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Column="1" Text="{Binding Result, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        
-        <Button Grid.Column="1" Content="{itl:LocalizedText Code=LC_COMMON_CANCEL}" HorizontalAlignment="Right" Margin="10,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Command="{Binding CancelCommand}" />
-        <Button Grid.Column="1" Content="{itl:LocalizedText Code=LC_COMMON_SAVE}" HorizontalAlignment="Right" Margin="0,0,55,10" Grid.Row="1" VerticalAlignment="Bottom" Command="{Binding SaveCommand}" />
+
+        <StackPanel Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal" vu:StackPanelExtensions.Spacing="6" Margin="5,1,11,8">
+            <Button Content="{itl:LocalizedText Code=LC_COMMON_SAVE}" Command="{Binding SaveCommand}" />
+            <Button Content="{itl:LocalizedText Code=LC_COMMON_CANCEL}" Command="{Binding CancelCommand}" />
+        </StackPanel>
 
     </Grid>
 </adonisControls:AdonisWindow>

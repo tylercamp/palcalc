@@ -68,7 +68,13 @@
         <Setter Property="Padding" Value="7,0,0,4" />
     </Style>
 
-    <Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#206BD4</Color>
+    <!--<Color x:Key="{x:Static adonisUi:Colors.AccentColor}">#206BD4</Color>-->
     <Color x:Key="{x:Static adonisUi:Colors.AlertColor}">#D49220</Color>
-    <Color x:Key="{x:Static adonisUi:Colors.ErrorColor}">#C22B2B</Color>
+    <Color x:Key="{x:Static adonisUi:Colors.ErrorColor}">#FF3939</Color>
+
+    <!-- ref -->
+    <!--<Color x:Key="{x:Static adonisUi:Colors.HyperlinkColor}">#3377c6</Color>-->
+
+
+    <Color x:Key="{x:Static adonisUi:Colors.HyperlinkColor}">#5CA8FF</Color>
 </ResourceDictionary>
