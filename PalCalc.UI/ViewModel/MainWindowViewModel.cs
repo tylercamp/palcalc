@@ -157,7 +157,12 @@ namespace PalCalc.UI.ViewModel
 
             var manualSaves = settings.ExtraSaveLocations.Select(saveFolder => new StandardSaveGame(saveFolder)).ToList();
             var fakeSaves = settings.FakeSaveNames.Select(FakeSaveGame.Create).ToList();
-            SaveSelection = new SaveSelectorViewModel(availableSavesLocations, manualSaves.Concat(fakeSaves));
+
+            {
+                var sw = Stopwatch.StartNew();
+                SaveSelection = new SaveSelectorViewModel(availableSavesLocations, manualSaves.Concat(fakeSaves));
+                logger.Information("Loading save metadata took {ms}ms", sw.ElapsedMilliseconds);
+            }
 
             var availableSaves = SaveSelection.SavesLocations
                 .SelectMany(l => l.SaveGames)

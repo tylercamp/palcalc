@@ -97,19 +97,6 @@ namespace PalCalc.SaveReader
 
         private const int MaxRetryAttempts = 3;
 
-        // file operations can take a while, and they can happen while Palworld is running + saving file contents.
-        // save files are relatively small (typically ~10MB at most), prefer loading the whole file into memory up
-        // front so we can close the handle ASAP.
-        private static Stream ReadFileNonLocking(string filePath)
-        {
-            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
-            using (var ms = new MemoryStream())
-            {
-                fs.CopyTo(ms);
-                return new MemoryStream(ms.ToArray());
-            }
-        }
-
         public static void WithDecompressedSave(string filePath, Action<Stream> action) =>
             WithDecompressedSave(new SingleFileSource(filePath), action);
 
@@ -134,7 +121,7 @@ namespace PalCalc.SaveReader
                     foreach (var file in fileSource.Content)
                     {
                         lastFile = file;
-                        using var fs = ReadFileNonLocking(file);
+                        using var fs = FileUtil.ReadFileNonLocking(file);
 
                         var header = CompressedSAVHeader.Read(fs);
 
@@ -142,6 +129,7 @@ namespace PalCalc.SaveReader
                         {
                             if (!header.HasCompressionMarker) throw new Exception("Magic bytes mismatch");
                             firstFileHeader = header;
+                            fs.Seek(0, SeekOrigin.Begin);
                         }
 
                         fs.CopyTo(combinedStream);
@@ -153,10 +141,21 @@ namespace PalCalc.SaveReader
                 }
             }
 
-            using (var readStream = new MemoryStream(combinedStream.ToArray()))
-            using (var decompressed = new InflaterInputStream(readStream))
+            combinedStream.Seek(0, SeekOrigin.Begin);
+
+            using (combinedStream)
             {
-                if (firstFileHeader.DoubleCompressed)
+                WithDecompressedSave(combinedStream, action);
+            }
+        }
+
+        public static void WithDecompressedSave(Stream inputStream, Action<Stream> action)
+        {
+            var header = CompressedSAVHeader.Read(inputStream);
+
+            using (var decompressed = new InflaterInputStream(inputStream))
+            {
+                if (header.DoubleCompressed)
                 {
                     using (var doubleDecompressed = new InflaterInputStream(decompressed))
                         action(doubleDecompressed);
@@ -168,7 +167,9 @@ namespace PalCalc.SaveReader
             }
         }
 
-        public static bool IsValidSave(IFileSource fileSource)
+        public static bool HasSaveCompression(Stream stream) => CompressedSAVHeader.Read(stream).HasCompressionMarker;
+
+        public static bool HasSaveCompression(IFileSource fileSource)
         {
             for (int i = 1; i <= MaxRetryAttempts; i++)
             {
@@ -176,11 +177,8 @@ namespace PalCalc.SaveReader
                 try
                 {
                     firstFile = fileSource.Content.First();
-                    using (var fs = ReadFileNonLocking(firstFile))
-                    using (var binaryReader = new BinaryReader(fs))
-                    {
-                        return CompressedSAVHeader.Read(fs).HasCompressionMarker;
-                    }
+                    using (var fs = FileUtil.ReadFileNonLocking(firstFile))
+                        return HasSaveCompression(fs);
                 }
                 catch (Exception e) when (i != MaxRetryAttempts)
                 {

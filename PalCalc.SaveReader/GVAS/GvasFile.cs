@@ -111,19 +111,22 @@ namespace PalCalc.SaveReader.GVAS
 
         public static bool IsValidGvas(IFileSource fileSource)
         {
-            if (CompressedSAV.IsValidSave(fileSource))
+            using (var stream = FileUtil.ReadFileNonLocking(fileSource.Content.First(), maxLength: 16 * (1024 * 1024)))
             {
-                var isValid = false;
-                CompressedSAV.WithDecompressedSave(fileSource, stream =>
+                var isCompressed = CompressedSAV.HasSaveCompression(stream);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                if (isCompressed)
                 {
-                    using (var reader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
-                        isValid = IsValidGvas(reader);
-                });
-                return isValid;
-            }
-            else
-            {
-                using (var stream = new FileStream(fileSource.Content.First(), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    var isValid = false;
+                    CompressedSAV.WithDecompressedSave(stream, decompressed =>
+                    {
+                        using (var reader = new FArchiveReader(decompressed, PalWorldTypeHints.Hints))
+                            isValid = IsValidGvas(reader);
+                    });
+                    return isValid;
+                }
+                else
                 {
                     using (var reader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
                         return IsValidGvas(reader);

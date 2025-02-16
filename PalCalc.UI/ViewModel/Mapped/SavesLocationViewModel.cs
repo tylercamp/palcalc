@@ -25,11 +25,15 @@ namespace PalCalc.UI.ViewModel.Mapped
 
             var isXbox = sl is XboxSavesLocation;
 
+            SaveGames = new ReadOnlyObservableCollection<ISaveGameViewModel>(
+                new ObservableCollection<ISaveGameViewModel>(sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sg)))
+            );
+
             if (sl.FolderPath == null)
             {
                 Label = isXbox
                     ? LocalizationCodes.LC_SAVE_LOCATION_XBOX_EMPTY.Bind()
-                    : LocalizationCodes.LC_SAVE_LOCATION_STEAM_EMPTY.Bind(); ;
+                    : LocalizationCodes.LC_SAVE_LOCATION_STEAM_EMPTY.Bind();
             }
             else
             {
@@ -39,14 +43,11 @@ namespace PalCalc.UI.ViewModel.Mapped
 
                 Label = baseText.Bind(new {
                     UserId = sl.FolderName.LimitLength(12),
-                    NumValidSaves = sl.ValidSaveGames.Count(),
+                    NumValidSaves = SaveGames.Count,
                 });
             }
             
-            SaveGames = new ReadOnlyObservableCollection<ISaveGameViewModel>(
-                new ObservableCollection<ISaveGameViewModel>(sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sg)))
-            );
-            LastModified = sl.ValidSaveGames.OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
+            LastModified = SaveGames.OfType<SaveGameViewModel>().OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
         }
 
         public ISavesLocation Value { get; }
