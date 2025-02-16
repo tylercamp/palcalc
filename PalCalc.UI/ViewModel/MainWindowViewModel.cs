@@ -82,7 +82,7 @@ namespace PalCalc.UI.ViewModel
             CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
             AppSettings.Current = settings = Storage.LoadAppSettings();
-            settings.SolverSettings ??= new SolverSettings();
+            settings.SolverSettings ??= new SerializableSolverSettings();
             passivePresets = new PassiveSkillsPresetCollectionViewModel(settings.PassiveSkillsPresets);
 
             Translator.CurrentLocale = settings.Locale;

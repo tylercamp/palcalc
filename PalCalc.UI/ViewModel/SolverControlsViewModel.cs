@@ -155,22 +155,24 @@ namespace PalCalc.UI.ViewModel
         private List<Pal> bannedWildPals = new List<Pal>();
 
         public BreedingSolver ConfiguredSolver(GameSettings gameSettings, List<PalInstance> pals) => new BreedingSolver(
-            gameSettings: gameSettings,
-            db: PalDB.LoadEmbedded(),
-            pruningBuilder: PruningRulesBuilder.Default,
-            ownedPals: pals,
-            maxBreedingSteps: MaxBreedingSteps,
-            maxSolverIterations: MaxSolverIterations,
-            maxWildPals: MaxWildPals,
-            allowedWildPals: PalDB.LoadEmbedded().Pals.Except(BannedWildPals).ToList(),
-            bannedBredPals: BannedBredPals,
-            maxInputIrrelevantPassives: MaxInputIrrelevantPassives,
-            maxBredIrrelevantPassives: MaxBredIrrelevantPassives,
-            maxEffort: TimeSpan.MaxValue,
-            maxThreads: MaxThreads
+            new SolverSettings(
+                db: PalDB.LoadEmbedded(),
+                gameSettings: gameSettings,
+                pruningBuilder: PruningRulesBuilder.Default,
+                ownedPals: pals,
+                maxBreedingSteps: MaxBreedingSteps,
+                maxSolverIterations: MaxSolverIterations,
+                maxWildPals: MaxWildPals,
+                allowedWildPals: PalDB.LoadEmbedded().Pals.Except(BannedWildPals).ToList(),
+                bannedBredPals: BannedBredPals,
+                maxInputIrrelevantPassives: MaxInputIrrelevantPassives,
+                maxBredIrrelevantPassives: MaxBredIrrelevantPassives,
+                maxEffort: TimeSpan.MaxValue,
+                maxThreads: MaxThreads
+            )
         );
 
-        public SolverSettings AsModel => new SolverSettings()
+        public SerializableSolverSettings AsModel => new SerializableSolverSettings()
         {
             MaxBreedingSteps = MaxBreedingSteps,
             MaxSolverIterations = MaxSolverIterations,
@@ -182,7 +184,7 @@ namespace PalCalc.UI.ViewModel
             BannedWildPalInternalNames = BannedWildPals.Select(p => p.InternalName).ToList(),
         };
 
-        public void CopyFrom(SolverSettings model)
+        public void CopyFrom(SerializableSolverSettings model)
         {
             MaxBreedingSteps = model.MaxBreedingSteps;
             MaxSolverIterations = model.MaxSolverIterations;

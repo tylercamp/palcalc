@@ -65,63 +65,53 @@ namespace PalCalc.Solver
         public long NumProcessed;
     }
 
-    public class BreedingSolver
+    public class SolverSettings(
+        PalDB db,
+        GameSettings gameSettings,
+        List<PalInstance> ownedPals,
+
+        PruningRulesBuilder pruningBuilder,
+        
+        int maxBreedingSteps,
+        int maxSolverIterations,
+        int maxWildPals,
+
+        List<Pal> allowedWildPals,
+        List<Pal> bannedBredPals,
+
+        int maxInputIrrelevantPassives,
+        int maxBredIrrelevantPassives,
+
+        TimeSpan maxEffort,
+        int maxThreads
+    )
+    {
+        public PalDB DB => db;
+        public GameSettings GameSettings => gameSettings;
+        public List<PalInstance> OwnedPals { get; } = ownedPals.Where(p => p.Gender != PalGender.NONE).ToList();
+
+        public PruningRulesBuilder PruningBuilder => pruningBuilder;
+
+        public int MaxBreedingSteps => maxBreedingSteps;
+        public int MaxSolverIterations => maxSolverIterations;
+        public int MaxWildPals => maxWildPals;
+
+        public List<Pal> AllowedWildPals => allowedWildPals;
+        public List<Pal> BannedBredPals => bannedBredPals;
+
+        public int MaxInputIrrelevantPassives { get; } = Math.Min(3, maxInputIrrelevantPassives);
+        public int MaxBredIrrelevantPassives { get; } = Math.Min(3, maxBredIrrelevantPassives);
+
+
+        public TimeSpan MaxEffort => maxEffort;
+        public int MaxThreads { get; } = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
+    }
+
+    public class BreedingSolver(SolverSettings settings)
     {
         private static ILogger logger = Log.ForContext<BreedingSolver>();
 
-        GameSettings gameSettings;
-        PalDB db;
-        List<PalInstance> ownedPals;
-
-        List<Pal> allowedWildPals;
-        List<Pal> bannedBredPals;
-        int maxBreedingSteps, maxSolverIterations, maxWildPals, maxBredIrrelevantPassives, maxInputIrrelevantPassives;
-        TimeSpan maxEffort;
-        PruningRulesBuilder pruningBuilder;
-        int maxThreads;
-
-        /// <param name="db"></param>
-        /// <param name="ownedPals"></param>
-        /// <param name="maxBreedingSteps"></param>
-        /// <param name="maxWildPals"></param>
-        /// <param name="maxIrrelevantPassives">
-        ///     Max number of irrelevant passive skills from any parents or children involved in the final breeding steps (including target pal)
-        ///     (Lower value runs faster, but considers fewer possibilities)
-        /// </param>
-        /// <param name="maxEffort">
-        ///     Effort in estimated time to get the desired pal with the given passive skills. Goes by constant breeding time, ignores hatching
-        ///     time, and roughly estimates time to catch wild pals (with increasing time based on paldex number).
-        /// </param>
-        public BreedingSolver(
-            GameSettings gameSettings,
-            PalDB db,
-            PruningRulesBuilder pruningBuilder,
-            List<PalInstance> ownedPals,
-            int maxBreedingSteps,
-            int maxSolverIterations,
-            int maxWildPals,
-            List<Pal> allowedWildPals,
-            List<Pal> bannedBredPals,
-            int maxInputIrrelevantPassives,
-            int maxBredIrrelevantPassives,
-            TimeSpan maxEffort,
-            int maxThreads
-        )
-        {
-            this.gameSettings = gameSettings;
-            this.db = db;
-            this.pruningBuilder = pruningBuilder;
-            this.ownedPals = ownedPals.Where(p => p.Gender != PalGender.NONE).ToList();
-            this.maxBreedingSteps = maxBreedingSteps;
-            this.maxSolverIterations = maxSolverIterations;
-            this.allowedWildPals = allowedWildPals;
-            this.bannedBredPals = bannedBredPals;
-            this.maxWildPals = maxWildPals;
-            this.maxInputIrrelevantPassives = Math.Min(3, maxInputIrrelevantPassives);
-            this.maxBredIrrelevantPassives = Math.Min(3, maxBredIrrelevantPassives);
-            this.maxEffort = maxEffort;
-            this.maxThreads = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
-        }
+        private PalDB db = settings.DB;
 
         public event Action<SolverStatus> SolverStateUpdated;
         public TimeSpan SolverStateUpdateInterval { get; set; } = TimeSpan.FromMilliseconds(100);
@@ -187,7 +177,7 @@ namespace PalCalc.Solver
         static TimeSpan MultiFarmCombinedEffort(IPalReference p1, IPalReference p2) => p1.BreedingEffort > p2.BreedingEffort ? p1.BreedingEffort : p2.BreedingEffort;
         static TimeSpan SingleFarmCombinedEffort(IPalReference p1, IPalReference p2) => p1.BreedingEffort + p2.BreedingEffort;
 
-        TimeSpan CombinedEffort(IPalReference p1, IPalReference p2) => gameSettings.MultipleBreedingFarms ? MultiFarmCombinedEffort(p1, p2) : SingleFarmCombinedEffort(p1, p2);
+        TimeSpan CombinedEffort(IPalReference p1, IPalReference p2) => settings.GameSettings.MultipleBreedingFarms ? MultiFarmCombinedEffort(p1, p2) : SingleFarmCombinedEffort(p1, p2);
 
         // we have two parents but don't necessarily have definite genders for them, figure out which parent should have which
         // gender (if they're wild/bred pals) for the least overall effort (different pals have different gender probabilities)
@@ -253,46 +243,6 @@ namespace PalCalc.Solver
             }
         }
 
-        class LocalListPool<T>(int initialCapacity)
-        {
-            private Queue<List<T>> pool = new(initialCapacity);
-
-            public List<T> Borrow()
-            {
-                if (pool.Count == 0) return new List<T>(capacity: 8);
-                else return pool.Dequeue();
-            }
-
-            public List<T> BorrowWith(IEnumerable<T> initialValues)
-            {
-                var res = Borrow();
-                res.AddRange(initialValues);
-                return res;
-            }
-
-            public void Return(List<T> value)
-            {
-                value.Clear();
-                pool.Enqueue(value);
-            }
-        }
-
-        class LocalObjectPool<T>(int initialCapacity) where T : new()
-        {
-            private Queue<T> pool = new(initialCapacity);
-
-            public T Borrow()
-            {
-                if (pool.Count == 0) return new T();
-                else return pool.Dequeue();
-            }
-
-            public void Return(T value)
-            {
-                pool.Enqueue(value);
-            }
-        }
-
         IEnumerable<(IPalReference, IPalReference)> ExpandGendersByChildren(PalBreedingDB breedingdb, (IPalReference, IPalReference) p)
         {
             var (parent1, parent2) = p;
@@ -337,27 +287,31 @@ namespace PalCalc.Solver
                 _ => throw new NotImplementedException()
             };
 
-        IEnumerable<IPalReference> DoWork(
-            int s,
+        // (actual method which processes parent pairs and collects their children)
+        IEnumerable<IPalReference> ProcessBatch(
+            int stepIndex,
             SolverStateController controller,
             IEnumerable<(IPalReference, IPalReference)> workBatch,
             WorkBatchProgress progress,
-            LocalListPool<PassiveSkill> passiveListPool,
-            LocalObjectPool<IV_Set> ivSetPool,
+            ObjectPoolFactory poolFactory,
             PalSpecifier spec,
-            PalBreedingDB breedingdb,
             FrozenDictionary<PalId, ConcurrentDictionary<int, TimeSpan>> wotByPalId,
             WorkingSet workingSet
         )
         {
+            var breedingdb = PalBreedingDB.LoadEmbedded(db);
+
+            var passiveListPool = poolFactory.GetListPool<PassiveSkill>();
+            var ivSetPool = poolFactory.GetObjectPool<IV_Set>();
+
             foreach (var p in workBatch)
             {
                 controller.PauseIfRequested();
                 if (controller.CancellationToken.IsCancellationRequested) yield break;
 
                 if (!p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
-                if (p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() > maxWildPals) continue;
-                if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= maxBreedingSteps) continue;
+                if (p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() > settings.MaxWildPals) continue;
+                if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= settings.MaxBreedingSteps) continue;
 
                 {
                     // don't bother checking any pals if it's impossible for them to reach the target within the remaining
@@ -367,35 +321,32 @@ namespace PalCalc.Solver
 
                     for (int i = 0; i < childPals.Length; i++)
                     {
-                        if (breedingdb.MinBreedingSteps[childPals[i].Child][spec.Pal] <= maxSolverIterations - s - 1)
+                        if (breedingdb.MinBreedingSteps[childPals[i].Child][spec.Pal] <= settings.MaxSolverIterations - stepIndex - 1)
                             canReach = true;
                     }
 
                     if (!canReach) continue;
                 }
 
+                // if we disallow any irrelevant passives, neither parents have a useful passive, and at least 1 parent
+                // has an irrelevant passive, then it's impossible to breed a child with zero total passives
+                //
+                // (child would need to have zero since there's nothing useful to inherit and we disallow irrelevant passives,
+                //  impossible to have zero since a child always inherits at least 1 direct passive if possible)
+                if (settings.MaxBredIrrelevantPassives == 0)
                 {
-                    // if we disallow any irrelevant passives, neither parents have a useful passive, and at least 1 parent
-                    // has an irrelevant passive, then it's impossible to breed a child with zero total passives
-                    //
-                    // (child would need to have zero since there's nothing useful to inherit and we disallow irrelevant passives,
-                    //  impossible to have zero since a child always inherits at least 1 direct passive if possible)
-                    if (maxBredIrrelevantPassives == 0)
+                    bool HasValidPassives(IPalReference parent)
                     {
-
-                        bool HasValidPassives(IPalReference parent)
+                        for (int i = 0; i < parent.EffectivePassives.Count; i++)
                         {
-                            for (int i = 0; i < parent.EffectivePassives.Count; i++)
-                            {
-                                if (spec.RequiredPassives.Contains(parent.EffectivePassives[i])) return true;
-                            }
-
-                            return parent.EffectivePassives.Count == 0;
+                            if (spec.RequiredPassives.Contains(parent.EffectivePassives[i])) return true;
                         }
 
-                        if (!HasValidPassives(p.Item1) && !HasValidPassives(p.Item2))
-                            continue;
+                        return parent.EffectivePassives.Count == 0;
                     }
+
+                    if (!HasValidPassives(p.Item1) && !HasValidPassives(p.Item2))
+                        continue;
                 }
 
                 var ivsProbability = Probabilities.IVs.ProbabilityInheritedTargetIVs(p.Item1.IVs, p.Item2.IVs);
@@ -406,16 +357,15 @@ namespace PalCalc.Solver
                 finalIVs.Defense = MergeIVs(p.Item1.IVs.Defense, p.Item2.IVs.Defense);
 
                 var parentPassives = passiveListPool.BorrowWith(p.Item1.ActualPassives);
-                for (int i = 0; i < p.Item2.ActualPassives.Count; i++)
-                    if (!parentPassives.Contains(p.Item2.ActualPassives[i]))
-                        parentPassives.Add(p.Item2.ActualPassives[i]);
+                foreach (var passive in p.Item2.ActualPassives)
+                    if (!parentPassives.Contains(passive))
+                        parentPassives.Add(passive);
 
                 var availableRequiredPassives = passiveListPool.Borrow();
                 var availableOptionalPassives = passiveListPool.Borrow();
-                for (int i = 0; i < parentPassives.Count; i++)
-                {
-                    var passive = parentPassives[i];
 
+                foreach (var passive in parentPassives)
+                {
                     if (spec.RequiredPassives.Contains(passive))
                         availableRequiredPassives.Add(passive);
 
@@ -485,7 +435,7 @@ namespace PalCalc.Solver
                         // option represents the likelyhood of getting all desired passives + up to some number of irrelevant passives
                         var probabilityForUpToNumPassives = 0.0f;
 
-                        for (int numFinalPassives = targetPassives.Count; numFinalPassives <= Math.Min(GameConstants.MaxTotalPassives, targetPassives.Count + maxBredIrrelevantPassives); numFinalPassives++)
+                        for (int numFinalPassives = targetPassives.Count; numFinalPassives <= Math.Min(GameConstants.MaxTotalPassives, targetPassives.Count + settings.MaxBredIrrelevantPassives); numFinalPassives++)
                         {
 #if DEBUG && DEBUG_CHECKS
                             float initialProbability = probabilityForUpToNumPassives;
@@ -508,7 +458,7 @@ namespace PalCalc.Solver
                                 newPassives.Add(new RandomPassiveSkill());
 
                             var res = new BredPalReference(
-                                gameSettings,
+                                settings.GameSettings,
                                 childPalType,
                                 parent1,
                                 parent2,
@@ -521,10 +471,10 @@ namespace PalCalc.Solver
                             var workingOptimalTimes = wotByPalId[res.Pal.Id];
 
                             var added = false;
-                            if (!bannedBredPals.Contains(res.Pal))
+                            if (!settings.BannedBredPals.Contains(res.Pal))
                             {
                                 var effort = res.BreedingEffort;
-                                if (effort <= maxEffort && (spec.IsSatisfiedBy(res) || workingSet.IsOptimal(res)))
+                                if (effort <= settings.MaxEffort && (spec.IsSatisfiedBy(res) || workingSet.IsOptimal(res)))
                                 {
                                     var resultId = WorkingSet.DefaultGroupFn(res);
 
@@ -537,7 +487,7 @@ namespace PalCalc.Solver
                                         updated = workingOptimalTimes.TryUpdate(resultId, effort, v);
                                     }
 
-                                    if (updated && res.BreedingEffort <= maxEffort)
+                                    if (updated && res.BreedingEffort <= settings.MaxEffort)
                                     {
                                         yield return res;
                                         createdResult = true;
@@ -579,7 +529,7 @@ namespace PalCalc.Solver
             {
                 CurrentPhase = SolverPhase.Initializing,
                 CurrentStepIndex = 0,
-                TargetSteps = maxSolverIterations,
+                TargetSteps = settings.MaxSolverIterations,
                 Canceled = controller.CancellationToken.IsCancellationRequested,
                 Paused = controller.IsPaused,
             };
@@ -612,11 +562,11 @@ namespace PalCalc.Solver
                     value: value
                 );
 
-            var initialContent = ownedPals
+            var initialContent = settings.OwnedPals
                 // skip pals if they can't be used to reach the desired pals (e.g. Jetragon can only be bred from other Jetragons)
-                .Where(p => WithinBreedingSteps(p.Pal, maxBreedingSteps))
+                .Where(p => WithinBreedingSteps(p.Pal, settings.MaxBreedingSteps))
                 // apply "Max Input Irrelevant Passives" setting
-                .Where(p => p.PassiveSkills.Except(spec.DesiredPassives).Count() <= maxInputIrrelevantPassives)
+                .Where(p => p.PassiveSkills.Except(spec.DesiredPassives).Count() <= settings.MaxInputIrrelevantPassives)
                 // convert from Model to Solver repr
                 .Select(p => new OwnedPalReference( 
                     instance: p,
@@ -674,13 +624,13 @@ namespace PalCalc.Solver
                 })
                 .ToList();
 
-            if (maxWildPals > 0)
+            if (settings.MaxWildPals > 0)
             {
                 // add wild pals with varying number of random passives
                 initialContent.AddRange(
-                    allowedWildPals
-                        .Where(p => !ownedPals.Any(i => i.Pal == p))
-                        .Where(p => WithinBreedingSteps(p, maxBreedingSteps))
+                    settings.AllowedWildPals
+                        .Where(p => !settings.OwnedPals.Any(i => i.Pal == p))
+                        .Where(p => WithinBreedingSteps(p, settings.MaxBreedingSteps))
                         .SelectMany(p =>
                             Enumerable
                                 .Range(
@@ -688,20 +638,19 @@ namespace PalCalc.Solver
                                     // number of "effectively random" passives should exclude guaranteed passives which are part of the desired list of passives
                                     Math.Max(
                                         0,
-                                        maxInputIrrelevantPassives - p.GuaranteedPassiveSkills(db).Except(spec.DesiredPassives).Count()
+                                        settings.MaxInputIrrelevantPassives - p.GuaranteedPassiveSkills(db).Except(spec.DesiredPassives).Count()
                                     )
                                 )
                                 .Select(numRandomPassives => new WildPalReference(p, p.GuaranteedPassiveSkills(db), numRandomPassives))
                         )
-                        .Where(pi => pi.BreedingEffort <= maxEffort)
+                        .Where(pi => pi.BreedingEffort <= settings.MaxEffort)
                 );
             }
 
-            var workingSet = new WorkingSet(spec, pruningBuilder, initialContent, maxThreads, controller);
-            var tlPassiveListPool = new ThreadLocal<LocalListPool<PassiveSkill>>(() => new LocalListPool<PassiveSkill>(16));
-            var tlIvSetPool = new ThreadLocal<LocalObjectPool<IV_Set>>(() => new LocalObjectPool<IV_Set>(16));
+            var workingSet = new WorkingSet(spec, settings.PruningBuilder, initialContent, settings.MaxThreads, controller);
+            var tlPoolFactory = new ThreadLocal<ObjectPoolFactory>(() => new ObjectPoolFactory());
 
-            for (int s = 0; s < maxSolverIterations; s++)
+            for (int s = 0; s < settings.MaxSolverIterations; s++)
             {
                 if (controller.CancellationToken.IsCancellationRequested) break;
 
@@ -735,16 +684,14 @@ namespace PalCalc.Solver
                     var resEnum = work
                         .Chunks(work.Count.PreferredParallelBatchSize())
                         .AsParallel()
-                        .WithDegreeOfParallelism(maxThreads)
+                        .WithDegreeOfParallelism(settings.MaxThreads)
                         .SelectMany(workBatch =>
                         {
                             var progress = new WorkBatchProgress();
                             lock (progressEntries)
                                 progressEntries.Add(progress);
 
-                            var passiveListPool = tlPassiveListPool.Value;
-
-                            return DoWork(s, controller, workBatch, progress, passiveListPool, tlIvSetPool.Value, spec, breedingdb, wotByPalId, workingSet);
+                            return ProcessBatch(s, controller, workBatch, progress, tlPoolFactory.Value, spec, wotByPalId, workingSet);
                         });
 
                     var res = resEnum.ToList();
@@ -775,7 +722,7 @@ namespace PalCalc.Solver
                 .Result
                 // the breeding logic will never emit pals which exceed this limit, but this isn't applied for owned pals
                 // which already satisfy the pal specifier
-                .Where(r => r.ActualPassives.Except(spec.DesiredPassives).Count() <= maxBredIrrelevantPassives)
+                .Where(r => r.ActualPassives.Except(spec.DesiredPassives).Count() <= settings.MaxBredIrrelevantPassives)
                 .Select(r =>
                 {
                     if (spec.RequiredGender != PalGender.WILDCARD)
