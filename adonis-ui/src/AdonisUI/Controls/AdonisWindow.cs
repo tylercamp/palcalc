@@ -497,8 +497,12 @@ namespace AdonisUI.Controls
 
                     if (WindowStartupLocation == WindowStartupLocation.CenterOwner && Owner != null)
                     {
-                        Top = Owner.Top + (Owner.ActualHeight - ActualHeight) / 2;
-                        Left = Owner.Left + (Owner.ActualWidth - ActualWidth) / 2;
+                        // (Owner.Left/.Right don't work correctly when maximized)
+                        var transform = PresentationSource.FromVisual(Owner).CompositionTarget.TransformFromDevice;
+                        var parentPos = transform.Transform(Owner.PointToScreen(new Point(0, 0)));
+
+                        Top = parentPos.Y + (Owner.ActualHeight - ActualHeight) / 2;
+                        Left = parentPos.X + (Owner.ActualWidth - ActualWidth) / 2;
                     }
 
                     WindowState = WindowState.Normal;
