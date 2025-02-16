@@ -70,7 +70,7 @@ namespace PalCalc.Solver
         /// </summary>
         /// <param name="doWork"></param>
         /// <returns>Whether or not any changes were made by merging the current working set with the results of `doWork`.</returns>
-        public bool Process(Func<ILazyCartesianProduct<IPalReference>, IEnumerable<IPalReference>> doWork)
+        public bool UpdateContents(Func<ILazyCartesianProduct<IPalReference>, IEnumerable<IPalReference>> doWork)
         {
             if (remainingWork.Count == 0) return false;
 

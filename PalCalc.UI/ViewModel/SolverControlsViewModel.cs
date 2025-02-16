@@ -155,7 +155,7 @@ namespace PalCalc.UI.ViewModel
         private List<Pal> bannedWildPals = new List<Pal>();
 
         public BreedingSolver ConfiguredSolver(GameSettings gameSettings, List<PalInstance> pals) => new BreedingSolver(
-            new SolverSettings(
+            new BreedingSolverSettings(
                 db: PalDB.LoadEmbedded(),
                 gameSettings: gameSettings,
                 pruningBuilder: PruningRulesBuilder.Default,

@@ -26,7 +26,7 @@ namespace PalCalc.UI.ViewModel
             var saveGame = CachedSaveGame.SampleForDesignerView;
 
             var solver = new Solver.BreedingSolver(
-                new SolverSettings(
+                new BreedingSolverSettings(
                     gameSettings: new GameSettings(),
                     db: db,
                     pruningBuilder: PruningRulesBuilder.Default,
