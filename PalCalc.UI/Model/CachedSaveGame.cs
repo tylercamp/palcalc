@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
@@ -140,6 +141,16 @@ namespace PalCalc.UI.Model
 
         public static CachedSaveGame FromSaveGame(ISaveGame game, PalDB db, GameSettings settings)
         {
+            // save-load may start from anywhere, and Dispatcher.Current isn't guaranteed to
+            // match the UI thread
+            if (Application.Current.Dispatcher.Thread != Thread.CurrentThread)
+            {
+                return Application.Current.Dispatcher.Invoke(() =>
+                {
+                    return FromSaveGame(game, db, settings);
+                });
+            }
+
             var loadingModal = new LoadingSaveFileModal();
             loadingModal.DataContext = LocalizationCodes.LC_SAVE_FILE_RELOADING.Bind();
 
