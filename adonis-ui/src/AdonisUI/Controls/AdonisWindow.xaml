@@ -20,7 +20,7 @@
                               CaptionHeight="0"
                               CornerRadius="0"
                               GlassFrameThickness="1, 2, 1, 1"
-                              NonClientFrameEdges="Right"/>
+                              NonClientFrameEdges="None"/>
             </Setter.Value>
         </Setter>
         <Setter Property="Template">
@@ -250,7 +250,7 @@
                                       CaptionHeight="0"
                                       CornerRadius="0"
                                       GlassFrameThickness="0"
-                                      NonClientFrameEdges="Right"/>
+                                      NonClientFrameEdges="None"/>
                     </Setter.Value>
                 </Setter>
             </Trigger>
