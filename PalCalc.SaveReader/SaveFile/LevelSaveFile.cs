@@ -260,14 +260,17 @@ namespace PalCalc.SaveReader.SaveFile
 
                     string FormatSkillName(string skillId) => skillId.Replace("EPalWazaID::", "");
 
-                    var activeSkills = gvasInstance.ActiveSkills
+                    var equippedActiveSkills = gvasInstance.EquippedActiveSkills
                         .Select(FormatSkillName)
                         .Select(MakeActiveSkill)
                         .ToList();
 
-                    var equippedActiveSkills = gvasInstance.EquippedActiveSkills
+                    var activeSkills = gvasInstance.ActiveSkills
                         .Select(FormatSkillName)
                         .Select(MakeActiveSkill)
+                        // for some reason the equipped skills won't always show in the available list of skills
+                        .Concat(equippedActiveSkills)
+                        .Distinct()
                         .ToList();
 
                     result.Pals.Add(new PalInstance()
