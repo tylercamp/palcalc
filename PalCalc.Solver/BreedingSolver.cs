@@ -182,10 +182,10 @@ namespace PalCalc.Solver
                 if (controller.CancellationToken.IsCancellationRequested) break;
 
                 var stepState = new BreedingSolverStepState(
-                    stepIndex: s,
-                    spec: spec,
-                    workingSet: workingSet,
-                    wotByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, TimeSpan>())
+                    StepIndex: s,
+                    Spec: spec,
+                    WorkingSet: workingSet,
+                    WorkingOptimalTimesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, TimeSpan>())
                 );
                 List<WorkBatchProgress> progressEntries = [];
 

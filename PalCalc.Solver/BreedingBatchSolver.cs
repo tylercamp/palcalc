@@ -21,16 +21,31 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver
 {
+    /// <summary>
+    /// Stores the work progress of a single BreedingBatchSolver.
+    /// </summary>
     internal class WorkBatchProgress
     {
         public long NumProcessed;
     }
 
+    /// <summary>
+    /// Represents the shared state of a single solver iteration.
+    /// </summary>
+    /// <param name="StepIndex">The current step num. being processed</param>
+    /// <param name="Spec">The target pal being solved for</param>
+    /// <param name="WorkingSet">The current set of finalized optimal pals</param>
+    /// <param name="WorkingOptimalTimesByPalId">
+    /// A rough map of pals and their properties, to the fastest time seen for that pair during this step.
+    /// 
+    /// While the `WorkingSet` has the final say in which "optimal" pals are kept, this acts as an extra "soft"
+    /// set of optimal times to reduce the number results returned to the working set for processing.
+    /// </param>
     internal record class BreedingSolverStepState(
-        int stepIndex,
-        PalSpecifier spec,
-        WorkingSet workingSet,
-        FrozenDictionary<PalId, ConcurrentDictionary<int, TimeSpan>> wotByPalId
+        int StepIndex,
+        PalSpecifier Spec,
+        WorkingSet WorkingSet,
+        FrozenDictionary<PalId, ConcurrentDictionary<int, TimeSpan>> WorkingOptimalTimesByPalId
     );
 
     /// <summary>
@@ -228,14 +243,14 @@ namespace PalCalc.Solver
                 if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= settings.MaxBreedingSteps) continue;
 
                 {
-                    // don't bother checking any pals if it's impossible for them to reach the target within the remaining
+                    // don't bother checking the child pal if it's impossible for them to reach the target within the remaining
                     // number of iterations
-                    var childPals = breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal];
+                    var breedingResults = breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal];
                     bool canReach = false;
 
-                    for (int i = 0; i < childPals.Length; i++)
+                    foreach (var result in breedingResults)
                     {
-                        if (breedingdb.MinBreedingSteps[childPals[i].Child][state.spec.Pal] <= settings.MaxSolverIterations - state.stepIndex - 1)
+                        if (breedingdb.MinBreedingSteps[result.Child][state.Spec.Pal] <= settings.MaxSolverIterations - state.StepIndex - 1)
                             canReach = true;
                     }
 
@@ -251,9 +266,9 @@ namespace PalCalc.Solver
                 {
                     bool HasValidPassives(IPalReference parent)
                     {
-                        for (int i = 0; i < parent.EffectivePassives.Count; i++)
+                        foreach (var passive in parent.EffectivePassives)
                         {
-                            if (state.spec.RequiredPassives.Contains(parent.EffectivePassives[i])) return true;
+                            if (state.Spec.RequiredPassives.Contains(passive)) return true;
                         }
 
                         return parent.EffectivePassives.Count == 0;
@@ -280,10 +295,10 @@ namespace PalCalc.Solver
 
                 foreach (var passive in parentPassives)
                 {
-                    if (state.spec.RequiredPassives.Contains(passive))
+                    if (state.Spec.RequiredPassives.Contains(passive))
                         availableRequiredPassives.Add(passive);
 
-                    if (state.spec.OptionalPassives.Contains(passive))
+                    if (state.Spec.OptionalPassives.Contains(passive))
                         availableOptionalPassives.Add(passive);
                 }
 
@@ -302,10 +317,8 @@ namespace PalCalc.Solver
                     }
                     else
                     {
-                        var brg = breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal];
-                        for (int i = 0; i < brg.Length; i++)
+                        foreach (var br in breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal])
                         {
-                            var br = brg[i];
                             expandedGendersByChildren.Add((
                                 p.Item1.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item1.Pal)),
                                 p.Item2.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item2.Pal))
@@ -408,13 +421,13 @@ namespace PalCalc.Solver
                                 ivsProbability
                             );
 
-                            var workingOptimalTimes = state.wotByPalId[res.Pal.Id];
+                            var workingOptimalTimes = state.WorkingOptimalTimesByPalId[res.Pal.Id];
 
                             var added = false;
                             if (!settings.BannedBredPals.Contains(res.Pal))
                             {
                                 var effort = res.BreedingEffort;
-                                if (effort <= settings.MaxEffort && (state.spec.IsSatisfiedBy(res) || state.workingSet.IsOptimal(res)))
+                                if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
                                 {
                                     var resultId = WorkingSet.DefaultGroupFn(res);
 
