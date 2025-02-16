@@ -145,15 +145,18 @@
 
         <Style.Triggers>
 
+            <!-- This seems to cause noisy binding warnings when the component mounts, commenting this out has no apparent effect on Pal Calc -->
+            <!--
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding IsExpanded, FallbackValue=False, RelativeSource={RelativeSource FindAncestor, AncestorType=TreeViewItem}}" Value="True" />
+                    <Condition Binding="{Binding Path=IsExpanded, FallbackValue=False, RelativeSource={RelativeSource FindAncestor, AncestorType=TreeViewItem}}" Value="True" />
                     <Condition Binding="{Binding Items.Count, RelativeSource={RelativeSource FindAncestor, AncestorType=TreeViewItem}}" Value="1" />
                 </MultiDataTrigger.Conditions>
                 <MultiDataTrigger.Setters>
                     <Setter Property="IsExpanded" Value="True"/>
                 </MultiDataTrigger.Setters>
             </MultiDataTrigger>
+            -->
 
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
