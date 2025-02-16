@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using AdonisUI.Helpers;
+using ControlzEx;
 using Brush = System.Windows.Media.Brush;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
@@ -28,7 +29,7 @@ namespace AdonisUI.Controls
     [TemplatePart(Name = PART_MaximizeRestoreButton, Type = typeof(Button))]
     [TemplatePart(Name = PART_CloseButton, Type = typeof(Button))]
     public class AdonisWindow
-        : Window
+        : WindowChromeWindow
     {
         private const string PART_DragMoveThumb = "PART_DragMoveThumb";
         private const string PART_IconPresenter = "PART_IconPresenter";
@@ -151,6 +152,12 @@ namespace AdonisUI.Controls
             set => SetValue(PlaceTitleBarOverContentProperty, value);
         }
 
+        public bool ShowCloseButton
+        {
+            get => (bool)GetValue(ShowCloseButtonProperty);
+            set => SetValue(ShowCloseButtonProperty, value);
+        }
+
         public static readonly DependencyProperty IconVisibilityProperty = DependencyProperty.Register("IconVisibility", typeof(Visibility), typeof(AdonisWindow), new PropertyMetadata(Visibility.Visible));
 
         protected internal static readonly DependencyProperty IconSourceProperty = DependencyProperty.Register("IconSource", typeof(ImageSource), typeof(AdonisWindow), new PropertyMetadata(null));
@@ -176,6 +183,7 @@ namespace AdonisUI.Controls
         public static readonly DependencyProperty ShrinkTitleBarWhenMaximizedProperty = DependencyProperty.Register("ShrinkTitleBarWhenMaximized", typeof(bool), typeof(AdonisWindow), new PropertyMetadata(false));
 
         public static readonly DependencyProperty PlaceTitleBarOverContentProperty = DependencyProperty.Register("PlaceTitleBarOverContent", typeof(bool), typeof(AdonisWindow), new PropertyMetadata(false));
+        public static readonly DependencyProperty ShowCloseButtonProperty = DependencyProperty.Register("ShowCloseButton", typeof(bool), typeof(AdonisWindow), new PropertyMetadata(true));
 
         static AdonisWindow()
         {
@@ -216,7 +224,6 @@ namespace AdonisUI.Controls
             if (SizeToContent == SizeToContent.WidthAndHeight)
             {
                 Hide();
-                Dispatcher.InvokeAsync(() => Show(), DispatcherPriority.Background);
             }
         }
 
@@ -249,9 +256,9 @@ namespace AdonisUI.Controls
         /// <inheritdoc/>
         public override void OnApplyTemplate()
         {
-            BeginInit();
-
             base.OnApplyTemplate();
+
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, () => Show());
 
             HwndInterop = new HwndInterop(this);
 
@@ -272,7 +279,6 @@ namespace AdonisUI.Controls
             if (CloseButton != null)
                 InitCloseButton(CloseButton);
 
-            UpdateLayoutForSizeToContent();
             HwndInterop.PositionChanging += DisableSizeToContentWhenMaximizing;
             HandleTitleBarActualHeightChanged();
         }
@@ -474,45 +480,6 @@ namespace AdonisUI.Controls
         protected virtual void OpenSystemContextMenu(Point positionInWindow)
         {
             SystemContextMenuInterop.OpenSystemContextMenu(this, positionInWindow);
-        }
-
-        /// <summary>
-        /// When using <see cref="SizeToContent.WidthAndHeight"/> the layout might not be calculated correctly
-        /// which can result in the window being too large and having large black borders filling the remaining space.
-        /// This method can be used to force a layout update again to recalculate the window size correctly.
-        /// See https://social.msdn.microsoft.com/Forums/vstudio/en-US/89fe6959-ce1a-4064-bdde-94151df7dc01/gradient-style-issue-when-sizetocontentheightandwidth-with-customchrome?forum=wpf
-        /// </summary>
-        private void UpdateLayoutForSizeToContent()
-        {
-            if (SizeToContent == SizeToContent.WidthAndHeight)
-            {
-                WindowState = WindowState.Minimized;
-
-                var previousSizeToContent = SizeToContent;
-                SizeToContent = SizeToContent.Manual;
-
-                Dispatcher?.BeginInvoke(DispatcherPriority.Loaded, (Action)(() =>
-                {
-                    SizeToContent = previousSizeToContent;
-
-                    if (WindowStartupLocation == WindowStartupLocation.CenterOwner && Owner != null)
-                    {
-                        // (Owner.Left/.Right don't work correctly when maximized)
-                        var transform = PresentationSource.FromVisual(Owner).CompositionTarget.TransformFromDevice;
-                        var parentPos = transform.Transform(Owner.PointToScreen(new Point(0, 0)));
-
-                        Top = parentPos.Y + (Owner.ActualHeight - ActualHeight) / 2;
-                        Left = parentPos.X + (Owner.ActualWidth - ActualWidth) / 2;
-                    }
-
-                    WindowState = WindowState.Normal;
-                    EndInit();
-                }));
-            }
-            else
-            {
-                EndInit();
-            }
         }
 
         /// <summary>

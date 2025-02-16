@@ -3,10 +3,11 @@
                     xmlns:local="clr-namespace:AdonisUI.Controls"
                     xmlns:extensions="clr-namespace:AdonisUI.Extensions"
                     xmlns:adonisUi="clr-namespace:AdonisUI"
-                    xmlns:adonisConverters="clr-namespace:AdonisUI.Converters">
+                    xmlns:adonisConverters="clr-namespace:AdonisUI.Converters"
+                    xmlns:ezc="urn:controlzex"
+                    xmlns:i="http://schemas.microsoft.com/xaml/behaviors">
 
-    <Style TargetType="{x:Type local:AdonisWindow}"
-           BasedOn="{StaticResource {x:Type Window}}">
+    <Style TargetType="{x:Type local:AdonisWindow}">
         <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"/>
         <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}"/>
@@ -14,6 +15,9 @@
         <Setter Property="TitleBarForeground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"/>
         <Setter Property="TitleBarBackground" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}"/>
         <Setter Property="WindowButtonHighlightBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.WindowButtonHighlightBrush}}"/>
+        <Setter Property="CornerPreference" Value="Round" />
+        <Setter Property="NCNonActiveBrush" Value="Black" />
+        <Setter Property="NCNonActiveBrush" Value="Black" />
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
                 <WindowChrome ResizeBorderThickness="{Binding Source={x:Static SystemParameters.WindowResizeBorderThickness}}"
@@ -57,7 +61,7 @@
                                     <DockPanel x:Name="PART_DragMoveThumb"
                                                LastChildFill="True"
                                                Background="Transparent">
-                                        
+
                                         <Grid DockPanel.Dock="Right">
                                             <!-- Note: Defined grid rows are used to align buttons to top because VerticalAlignment="Top" makes them shrink. -->
                                             <Grid.RowDefinitions>
@@ -182,9 +186,6 @@
                         </Trigger>
 
                         <Trigger Property="WindowState" Value="Maximized">
-                            <Setter Property="BorderThickness"
-                                    TargetName="Border"
-                                    Value="{Binding MaximizeBorderThickness, RelativeSource={RelativeSource TemplatedParent}}"/>
                             <Setter Property="BorderBrush"
                                     TargetName="Border"
                                     Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"/>
@@ -228,6 +229,10 @@
 
                         <Trigger Property="WindowStyle" Value="None">
                             <Setter TargetName="TitleBar" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+
+                        <Trigger Property="ShowCloseButton" Value="False">
+                            <Setter TargetName="PART_CloseButton" Property="Visibility" Value="Collapsed" />
                         </Trigger>
 
                         <Trigger Property="PlaceTitleBarOverContent" Value="True">

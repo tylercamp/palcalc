@@ -33,21 +33,6 @@ namespace PalCalc.UI.View
             InitializeComponent();
         }
 
-        protected override void OnContentRendered(EventArgs e)
-        {
-            base.OnContentRendered(e);
-
-            // hackfix
-            // style is set to `None` in XAML and set to the desired value here, avoids flickering when the
-            // window appears. (doesn't work for the About window)
-            WindowStyle = WindowStyle.ToolWindow;
-        }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            base.OnClosing(e);
-        }
-
         /// <summary>
         /// Presents this window as a dialog modal and begins the provided work `fn`.
         /// 

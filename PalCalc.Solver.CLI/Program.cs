@@ -53,19 +53,21 @@ internal class Program
         Console.WriteLine("Loaded save game");
 
         var solver = new BreedingSolver(
-            gameSettings: new GameSettings(),
-            db: db,
-            pruningBuilder: PruningRulesBuilder.Default,
-            ownedPals: savedInstances,
-            maxBreedingSteps: 20,
-            maxSolverIterations: 20,
-            maxWildPals: 1,
-            allowedWildPals: db.Pals.ToList(),
-            bannedBredPals: new List<Pal>(),
-            maxBredIrrelevantPassives: 0,
-            maxInputIrrelevantPassives: 2,
-            maxEffort: TimeSpan.FromDays(7),
-            maxThreads: 1
+            new BreedingSolverSettings(
+                gameSettings: new GameSettings(),
+                db: db,
+                pruningBuilder: PruningRulesBuilder.Default,
+                ownedPals: savedInstances,
+                maxBreedingSteps: 20,
+                maxSolverIterations: 20,
+                maxWildPals: 1,
+                allowedWildPals: db.Pals.ToList(),
+                bannedBredPals: new List<Pal>(),
+                maxBredIrrelevantPassives: 0,
+                maxInputIrrelevantPassives: 2,
+                maxEffort: TimeSpan.FromDays(7),
+                maxThreads: 1
+            )
         );
 
         solver.SolverStateUpdateInterval = TimeSpan.FromSeconds(1);

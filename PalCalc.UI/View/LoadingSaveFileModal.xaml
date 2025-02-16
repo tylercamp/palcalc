@@ -13,16 +13,16 @@
                              Title="{itl:LocalizedText LC_POPUP_TITLE_LOADING_SAVE_FILE}"
                              ShowInTaskbar="False"
                              ResizeMode="NoResize"
+                             WindowStyle="ToolWindow"
                              WindowStartupLocation="CenterOwner"
-                             WindowStyle="None"
                              PlaceTitleBarOverContent="True"
                              TitleVisibility="Collapsed"
                              IconVisibility="Collapsed"
                              SizeToContent="WidthAndHeight"
+                             ShowCloseButton="False"
                              d:DataContext="{x:Type itl:ILocalizedText}"
                              >
-    <adonisControls:AdonisWindow.Style>
-        <!-- Copy of the default AdonisWindow style/template with the title bar removed entirely -->
+    <!--<adonisControls:AdonisWindow.Style>
         <Style TargetType="{x:Type adonisControls:AdonisWindow}">
             <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"/>
             <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"/>
@@ -188,7 +188,7 @@
 
             </Style.Triggers>
         </Style>
-    </adonisControls:AdonisWindow.Style>
+    </adonisControls:AdonisWindow.Style>-->
     <StackPanel Orientation="Horizontal" vu:StackPanelExtensions.Spacing="10" Margin="15">
         <TextBlock Text="{Binding Value}" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
