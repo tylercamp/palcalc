@@ -90,9 +90,11 @@ namespace PalCalc.UI.View.Utils
             _popup = new Popup
             {
                 Placement = PlacementMode.MousePoint,
+                PlacementTarget = this,
                 StaysOpen = true,
                 AllowsTransparency = true,
                 IsOpen = false,
+                UseLayoutRounding = true,
             };
 
             _popup.SetBinding(Popup.PopupAnimationProperty, new Binding(nameof(PopupAnimation)) { Source = this });
