@@ -348,6 +348,9 @@ namespace PalCalc.Solver
                     if (childPalType == null)
                         throw new NotImplementedException(); // shouldn't happen
 
+                    if (settings.BannedBredPals.Contains(childPalType))
+                        continue;
+
 #if DEBUG && DEBUG_CHECKS
                     if (
                         // if either parent is a wildcard
@@ -424,28 +427,25 @@ namespace PalCalc.Solver
                             var workingOptimalTimes = state.WorkingOptimalTimesByPalId[res.Pal.Id];
 
                             var added = false;
-                            if (!settings.BannedBredPals.Contains(res.Pal))
+                            var effort = res.BreedingEffort;
+                            if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
                             {
-                                var effort = res.BreedingEffort;
-                                if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
+                                var resultId = WorkingSet.DefaultGroupFn(res);
+
+                                bool updated = workingOptimalTimes.TryAdd(resultId, effort);
+                                while (!updated)
                                 {
-                                    var resultId = WorkingSet.DefaultGroupFn(res);
+                                    var v = workingOptimalTimes[resultId];
+                                    if (v < effort) break;
 
-                                    bool updated = workingOptimalTimes.TryAdd(resultId, effort);
-                                    while (!updated)
-                                    {
-                                        var v = workingOptimalTimes[resultId];
-                                        if (v < effort) break;
+                                    updated = workingOptimalTimes.TryUpdate(resultId, effort, v);
+                                }
 
-                                        updated = workingOptimalTimes.TryUpdate(resultId, effort, v);
-                                    }
-
-                                    if (updated && res.BreedingEffort <= settings.MaxEffort)
-                                    {
-                                        yield return res;
-                                        createdResult = true;
-                                        added = true;
-                                    }
+                                if (updated && res.BreedingEffort <= settings.MaxEffort)
+                                {
+                                    yield return res;
+                                    createdResult = true;
+                                    added = true;
                                 }
                             }
 
