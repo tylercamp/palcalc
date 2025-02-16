@@ -48,6 +48,12 @@ namespace PalCalc.UI.View.Utils
 
             _isUnloaded = false;
             Unloaded += PopupToolTipTrigger_Unloaded;
+            Loaded += PopupToolTipTrigger_Loaded;
+        }
+
+        private void PopupToolTipTrigger_Loaded(object sender, RoutedEventArgs e)
+        {
+            _isUnloaded = false;
         }
 
         private void PopupToolTipTrigger_Unloaded(object sender, RoutedEventArgs e)
