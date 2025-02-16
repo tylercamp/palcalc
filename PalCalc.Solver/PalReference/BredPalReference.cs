@@ -49,7 +49,7 @@ namespace PalCalc.Solver.PalReference
             IVs = ivs;
 
             EffectivePassives = passives;
-            EffectivePassivesHash = passives.Select(p => p.InternalName).SetHash();
+            EffectivePassivesHash = passives.SetHash(p => p.InternalName);
 
             parentBreedingEffort = gameSettings.MultipleBreedingFarms && Parent1 is BredPalReference && Parent2 is BredPalReference
                 ? Parent1.BreedingEffort > Parent2.BreedingEffort
@@ -101,11 +101,30 @@ namespace PalCalc.Solver.PalReference
 
         public float TimeFactor { get; }
 
-        public int AvgRequiredBreedings { get; private set; }
-        public TimeSpan SelfBreedingEffort => AvgRequiredBreedings * gameSettings.AvgBreedingTime * Parent1.TimeFactor * Parent2.TimeFactor;
+        private int _avgRequiredBreedings;
+        public int AvgRequiredBreedings
+        {
+            get => _avgRequiredBreedings;
+            set
+            {
+                _avgRequiredBreedings = value;
+                SelfBreedingEffort = _avgRequiredBreedings * gameSettings.AvgBreedingTime * Parent1.TimeFactor * Parent2.TimeFactor;
+            }
+        }
+
+        private TimeSpan _selfBreedingEffort;
+        public TimeSpan SelfBreedingEffort
+        {
+            get => _selfBreedingEffort;
+            private set
+            {
+                _selfBreedingEffort = value;
+                BreedingEffort = _selfBreedingEffort + parentBreedingEffort;
+            }
+        }
 
         private TimeSpan parentBreedingEffort;
-        public TimeSpan BreedingEffort => SelfBreedingEffort + parentBreedingEffort;
+        public TimeSpan BreedingEffort { get; private set; }
 
         private int numTotalBreedingSteps = -1;
         public int NumTotalBreedingSteps

@@ -208,7 +208,7 @@ namespace PalCalc.SaveReader.SaveFile
 
                     if (db.Humans.Any(h => h.InternalName == sanitizedCharId)) continue;
 
-                    var pal = db.Pals.FirstOrDefault(p => p.InternalName.ToLower() == sanitizedCharId.ToLower());
+                    var pal = db.Pals.FirstOrDefault(p => p.InternalName.Equals(sanitizedCharId, StringComparison.OrdinalIgnoreCase));
 
                     if (pal == null)
                     {

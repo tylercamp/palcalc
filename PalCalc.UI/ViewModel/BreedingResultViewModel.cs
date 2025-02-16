@@ -26,19 +26,21 @@ namespace PalCalc.UI.ViewModel
             var saveGame = CachedSaveGame.SampleForDesignerView;
 
             var solver = new Solver.BreedingSolver(
-                gameSettings: new GameSettings(),
-                db: db,
-                pruningBuilder: PruningRulesBuilder.Default,
-                ownedPals: saveGame.OwnedPals,
-                maxBreedingSteps: 3,
-                maxSolverIterations: 5,
-                maxWildPals: 0,
-                allowedWildPals: PalDB.LoadEmbedded().Pals.ToList(),
-                bannedBredPals: new List<Pal>(),
-                maxInputIrrelevantPassives: 2,
-                maxBredIrrelevantPassives: 0,
-                maxEffort: TimeSpan.FromHours(8),
-                maxThreads: 0
+                new BreedingSolverSettings(
+                    gameSettings: new GameSettings(),
+                    db: db,
+                    pruningBuilder: PruningRulesBuilder.Default,
+                    ownedPals: saveGame.OwnedPals,
+                    maxBreedingSteps: 3,
+                    maxSolverIterations: 5,
+                    maxWildPals: 0,
+                    allowedWildPals: PalDB.LoadEmbedded().Pals.ToList(),
+                    bannedBredPals: new List<Pal>(),
+                    maxInputIrrelevantPassives: 2,
+                    maxBredIrrelevantPassives: 0,
+                    maxEffort: TimeSpan.FromHours(8),
+                    maxThreads: 0
+                )
             );
 
             var targetInstance = new PalSpecifier

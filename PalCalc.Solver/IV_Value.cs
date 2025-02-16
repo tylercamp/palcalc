@@ -37,22 +37,10 @@ namespace PalCalc.Solver
 
         public bool Satisfies(int minValue) => Min >= minValue;
 
-        public static IV_Range Merge(params IV_Range[] ranges)
+        public static IV_Range Merge(IV_Range a, IV_Range b)
         {
-            var first = ranges[0];
-
-            int xmin = first.Min;
-            int xmax = first.Max;
-            bool isRelevant = first.IsRelevant;
-
-            for (int i = 1; i < ranges.Length; i++)
-            {
-                var range = ranges[i];
-                xmin = Math.Min(range.Min, xmin);
-                xmax = Math.Max(range.Max, xmax);
-            }
-
-            return new IV_Range(isRelevant, xmin, xmax);
+            if (a == b) return a;
+            else return new IV_Range(a.IsRelevant, Math.Min(a.Min, b.Min), Math.Max(a.Max, b.Max));
         }
 
         public override string ToString() => Min == Max ? Min.ToString() : $"{Min}-{Max}";

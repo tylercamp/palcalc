@@ -20,7 +20,7 @@ namespace PalCalc.UI.Model
         public string OptionalPassive4InternalName { get; set; }
     }
 
-    public class SolverSettings
+    public class SerializableSolverSettings
     {
         public int MaxBreedingSteps { get; set; } = 10;
         public int MaxSolverIterations { get; set; } = 20;
@@ -46,7 +46,7 @@ namespace PalCalc.UI.Model
 
         public List<string> FakeSaveNames { get; set; } = new List<string>();
 
-        public SolverSettings SolverSettings { get; set; } = new SolverSettings();
+        public SerializableSolverSettings SolverSettings { get; set; } = new SerializableSolverSettings();
 
         public List<PassiveSkillsPreset> PassiveSkillsPresets { get; set; } = new List<PassiveSkillsPreset>();
 

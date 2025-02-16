@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -20,7 +21,7 @@ namespace PalCalc.UI
     /// </summary>
     public partial class App : Application
     {
-        public static string Version => "v1.11.1-beta1";
+        public static string Version => "v1.12.0-beta1";
         public static string RepositoryUrl => "https://github.com/tylercamp/palcalc/";
 
         private static ILogger logger;

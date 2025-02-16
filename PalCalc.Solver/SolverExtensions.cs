@@ -2,6 +2,7 @@
 using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,17 +39,22 @@ namespace PalCalc.Solver
                 .ToList();
         }
 
-        // TODO - atm only Philanthropist affects breeding time. if another is added, how do they interact if both are on a given pal?
-        public static float ToTimeFactor(this IEnumerable<PassiveSkill> passives) =>
-            passives
-                .SelectMany(p => p.TrackedEffects)
-                .Where(p => p.InternalName == PassiveSkillEffect.BreedSpeed)
-                // value of '100' will halve the breeding time. '100' also seems to be a sort
-                // of "default" for a bunch of other passives, so idk if the value is actually
-                // being used or if it's just checked as a flag. will treat as a flag for now
-                .Select(p => 0.5f)
-                .DefaultIfEmpty(1.0f)
-                .Min();
+        public static float ToTimeFactor(this List<PassiveSkill> passives)
+        {
+            var timeFactor = 1.0f;
+
+            // TODO - atm only Philanthropist affects breeding time. if another is added, how do they interact if both are on a given pal?
+            foreach (var p in passives)
+            {
+                foreach (var e in p.TrackedEffects)
+                {
+                    if (e.InternalName == PassiveSkillEffect.BreedSpeed)
+                        timeFactor = 0.5f;
+                }
+            }
+
+            return timeFactor;
+        }
 
         public static IEnumerable<IPalReference> AllReferences(this IPalReference pref)
         {
