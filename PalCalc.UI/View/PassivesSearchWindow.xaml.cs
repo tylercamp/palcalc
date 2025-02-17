@@ -1,5 +1,6 @@
 ﻿using AdonisUI.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
+using FuzzySharp;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
@@ -24,11 +25,13 @@ namespace PalCalc.UI.View
         [ObservableProperty]
         private string searchText;
 
+        private bool Matches(string text) => text.Contains(SearchText, StringComparison.OrdinalIgnoreCase) || Fuzz.WeightedRatio(SearchText, text) > 70;
+
         public List<PassiveSkillViewModel> DisplayedOptions =>
             PassiveSkillViewModel.All.Where(p =>
                 string.IsNullOrEmpty(SearchText) ||
-                p.Name.Value.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                p.Description.Value.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+                Matches(p.Name.Value) ||
+                Matches(p.Description.Value)
             ).ToList();
 
         public PassivesSearchWindow()
