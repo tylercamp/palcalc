@@ -26,6 +26,12 @@
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CanInterract}" Value="False">
+                    <Setter Property="Opacity" Value="0.25" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
 
         <Style TargetType="Border" x:Key="GridSlotBackgroundStyle">
