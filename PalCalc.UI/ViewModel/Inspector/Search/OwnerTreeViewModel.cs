@@ -97,7 +97,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
         public BaseTreeNodeViewModel(BaseInstance baseInst, DefaultSearchableContainerViewModel baseContainer, List<DefaultSearchableContainerViewModel> viewingCageContainers)
         {
-            Label = LocalizationCodes.LC_BASE_LABEL.Bind(baseInst.Id.Split('-')[0]);
+            var baseMapCoords = MapCoord.UIFromWorldCoord(baseInst.Position);
+            Label = LocalizationCodes.LC_BASE_LABEL.Bind($"{baseMapCoords.X:N0},{baseMapCoords.Y:N0}");
             Children = [];
 
             if (baseContainer != null)
@@ -157,7 +158,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 .ToList();
 
             var baseNodes = source.BasesByGuildId[guild.Id]
-                .OrderBy(b => b.Id)
+                .OrderBy(b => MapCoord.UIFromWorldCoord(b.Position).X)
+                .ThenBy(b => MapCoord.UIFromWorldCoord(b.Position).Y)
                 .Select(b =>
                 {
                     var baseContainer = relevantContainers.Where(r => r.DetectedType == LocationType.Base && r.Id == b.Container.Id).FirstOrDefault();
