@@ -250,51 +250,53 @@
                                                                          DockPanel.Dock="Left"
                                                                          Margin="0, 0, 4, 0"/>
 
-                                <ContentPresenter x:Name="ContentSite" 
-                                                  IsHitTestVisible="False"
-                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                  Content="{TemplateBinding ComboBox.SelectionBoxItem}" 
-                                                  ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}"
-                                                  ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
+                                <Grid Background="{x:Null}">
+                                    <ContentPresenter x:Name="ContentSite" 
+                                                      IsHitTestVisible="False"
+                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                      Content="{TemplateBinding ComboBox.SelectionBoxItem}" 
+                                                      ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}"
+                                                      ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
 
 
-                                <TextBox x:Name="PART_EditableTextBox"
-                                         IsReadOnly="{TemplateBinding IsReadOnly}"
-                                         Background="{TemplateBinding Background}"
-                                         Foreground="{TemplateBinding Foreground}"
-                                         Visibility="Hidden" 
-                                         HorizontalAlignment="Stretch"
-                                         VerticalAlignment="Stretch"
-                                         HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                         VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                         Focusable="True">
-                                    <TextBox.Template>
-                                        <ControlTemplate TargetType="TextBox" >
-                                            <Grid>
-                                                <ContentPresenter x:Name="PlaceholderHost"
-                                                                  Content="{Binding Path=(adonisExtensions:WatermarkExtension.Watermark), RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}}"
-                                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                  Opacity="0.5"
-                                                                  IsHitTestVisible="False"
-                                                                  Visibility="Collapsed"/>
+                                    <TextBox x:Name="PART_EditableTextBox"
+                                             IsReadOnly="{TemplateBinding IsReadOnly}"
+                                             Background="{TemplateBinding Background}"
+                                             Foreground="{TemplateBinding Foreground}"
+                                             Visibility="Hidden" 
+                                             HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Stretch"
+                                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                             VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                             Focusable="True">
+                                        <TextBox.Template>
+                                            <ControlTemplate TargetType="TextBox" >
+                                                <Grid>
+                                                    <ContentPresenter x:Name="PlaceholderHost"
+                                                                      Content="{Binding Path=(adonisExtensions:WatermarkExtension.Watermark), RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}}"
+                                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                      Opacity="0.5"
+                                                                      IsHitTestVisible="False"
+                                                                      Visibility="Collapsed"/>
 
-                                                <ScrollViewer Name="PART_ContentHost"
-                                                              Focusable="False"
-                                                              HorizontalScrollBarVisibility="Hidden"
-                                                              VerticalScrollBarVisibility="Hidden"
-                                                              Template="{StaticResource TextBoxScrollViewerTemplate}"/>
-                                            </Grid>
+                                                    <ScrollViewer Name="PART_ContentHost"
+                                                                  Focusable="False"
+                                                                  HorizontalScrollBarVisibility="Hidden"
+                                                                  VerticalScrollBarVisibility="Hidden"
+                                                                  Template="{StaticResource TextBoxScrollViewerTemplate}"/>
+                                                </Grid>
 
-                                            <ControlTemplate.Triggers>
-                                                <DataTrigger Binding="{Binding Path=(adonisExtensions:WatermarkExtension.IsWatermarkVisible), RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}}" Value="True">
-                                                    <Setter Property="Visibility" TargetName="PlaceholderHost" Value="Visible"/>
-                                                </DataTrigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </TextBox.Template>
-                                </TextBox>
+                                                <ControlTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding Path=(adonisExtensions:WatermarkExtension.IsWatermarkVisible), RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}}" Value="True">
+                                                        <Setter Property="Visibility" TargetName="PlaceholderHost" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </TextBox.Template>
+                                    </TextBox>
+                                </Grid>
                             </DockPanel>
                         </Border>
 
@@ -344,7 +346,7 @@
                         <Trigger Property="IsEditable" Value="True">
                             <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
                             <Setter Property="UIElement.Visibility" TargetName="PART_EditableTextBox" Value="Visible"/>
-                            <Setter Property="UIElement.Visibility" TargetName="ContentSite" Value="Collapsed"/>
+                            <Setter Property="UIElement.Visibility" TargetName="ContentSite" Value="Hidden"/>
                             <Setter Property="HorizontalAlignment" TargetName="ToggleButton" Value="Right"/>
                             <Setter Property="HorizontalAlignment" TargetName="ToggleButton" Value="Right"/>
                         </Trigger>
