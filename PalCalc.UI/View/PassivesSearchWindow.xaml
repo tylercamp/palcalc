@@ -10,6 +10,7 @@
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
                              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
                              mc:Ignorable="d"
+                             WindowStartupLocation="CenterOwner"
                              IconVisibility="Collapsed"
                              DataContext="{Binding RelativeSource={RelativeSource Self}}"
                              Title="{itl:LocalizedText Code=LC_TRAITS_SEARCH_TITLE}"
@@ -28,7 +29,7 @@
         <DockPanel DockPanel.Dock="Top" Margin="10,10">
             <TextBlock DockPanel.Dock="Left" Text="{itl:LocalizedText Code=LC_TRAITS_SEARCH_SEARCH}" Margin="0,0,8,0" VerticalAlignment="Center" />
             
-            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox x:Name="m_TextBox" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
         </DockPanel>
 
         <ListView ItemsSource="{Binding DisplayedOptions}" util:GridViewSort.AutoSort="True">

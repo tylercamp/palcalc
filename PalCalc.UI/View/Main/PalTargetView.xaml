@@ -21,26 +21,33 @@
             <TextBlock Text="{Binding Name.Value}" />
         </DataTemplate>
     </StackPanel.Resources>
-    <StackPanel>
-        <Label Content="{itl:LocalizedText LC_COMMON_PAL}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
-        <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PalViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.TargetPal, Mode=TwoWay}" TextSearch.TextPath="Label.Value">
-            <dnkc:AutoCompleteComboBox.ItemTemplate>
-                <DataTemplate DataType="vm:PalViewModel">
-                    <TextBlock Text="{Binding Label.Value}" />
-                </DataTemplate>
-            </dnkc:AutoCompleteComboBox.ItemTemplate>
-        </dnkc:AutoCompleteComboBox>
-    </StackPanel>
-    <StackPanel>
-        <Label Content="{itl:LocalizedText Code=LC_COMMON_GENDER}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
-        <ComboBox ItemsSource="{x:Static mvm:PalGenderViewModel.AllStandard}" SelectedValue="{Binding CurrentPalSpecifier.RequiredGender}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate DataType="mvm:PalGenderViewModel">
-                    <TextBlock Text="{Binding Label.Value}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-    </StackPanel>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" MinWidth="150" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="1*" MinWidth="100" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0">
+            <Label Content="{itl:LocalizedText LC_COMMON_PAL}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
+            <dnkc:AutoCompleteComboBox ItemsSource="{x:Static mvm:PalViewModel.All}" SelectedValue="{Binding CurrentPalSpecifier.TargetPal, Mode=TwoWay}" TextSearch.TextPath="Label.Value">
+                <dnkc:AutoCompleteComboBox.ItemTemplate>
+                    <DataTemplate DataType="vm:PalViewModel">
+                        <TextBlock Text="{Binding Label.Value}" />
+                    </DataTemplate>
+                </dnkc:AutoCompleteComboBox.ItemTemplate>
+            </dnkc:AutoCompleteComboBox>
+        </StackPanel>
+        <StackPanel Grid.Column="2">
+            <Label Content="{itl:LocalizedText Code=LC_COMMON_GENDER}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
+            <ComboBox ItemsSource="{x:Static mvm:PalGenderViewModel.AllStandard}" SelectedValue="{Binding CurrentPalSpecifier.RequiredGender}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="mvm:PalGenderViewModel">
+                        <TextBlock Text="{Binding Label.Value}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+    </Grid>
     <GroupBox adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="{x:Null}" Margin="0,5,0,0">
         <GroupBox.Header>
             <Grid adonisExtensions:LayerExtension.Layer="3">

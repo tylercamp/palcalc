@@ -34,6 +34,8 @@ namespace PalCalc.UI.View
         public PassivesSearchWindow()
         {
             InitializeComponent();
+
+            Loaded += (_, _) => m_TextBox.Focus();
         }
     }
 }
