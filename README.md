@@ -1,6 +1,6 @@
 # Pal Calc
 
-https://github.com/user-attachments/assets/08106205-3ca1-4704-82de-c2662f4c3302
+https://github.com/user-attachments/assets/2ededad9-4f0a-47b1-a460-b553be46bdd4
 
 _v1.12.1 recording_
 
