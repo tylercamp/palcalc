@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                     xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
-                    xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox">
+                    xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
+                    xmlns:vm="clr-namespace:PalCalc.UI.ViewModel">
     
     <!--
     fix for XAML binding errors involving combobox
@@ -18,7 +19,9 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
-    <Style TargetType="{x:Type dnkc:AutoCompleteComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />
+    <Style TargetType="{x:Type dnkc:AutoCompleteComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="Setting" Value="{x:Static vm:AutoCompleteComboBoxSearchSettings.Instance}" />
+    </Style>
 
     <!-- fixes general text bluriness -->
     <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}">
