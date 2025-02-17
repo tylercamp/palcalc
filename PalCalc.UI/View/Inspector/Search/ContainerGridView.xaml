@@ -13,7 +13,6 @@
              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              mc:Ignorable="d" 
              d:DataContext="{x:Static sgvm:DefaultContainerGridViewModel.DesignerInstance}"
-             Visibility="{Binding GridVisibility}"
              >
     <UserControl.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />

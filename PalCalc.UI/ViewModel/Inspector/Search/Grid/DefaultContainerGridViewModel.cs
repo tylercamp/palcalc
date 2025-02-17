@@ -47,7 +47,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Grid
                 {
                     var c = CachedSaveGame.SampleForDesignerView.OwnedPals.GroupBy(p => p.Location.ContainerId).First();
 
-                    designerInstance = new DefaultContainerGridViewModel(c.ToList())
+                    designerInstance = new DefaultContainerGridViewModel(c.Take(20).ToList())
                     {
                         Title = new HardCodedText("Tab 1"),
                         RowSize = 5

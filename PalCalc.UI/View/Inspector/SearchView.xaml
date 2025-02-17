@@ -283,6 +283,11 @@
                                             <vu:SpacedWrapPanel HorizontalSpacing="15" VerticalSpacing="15" />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="Visibility" Value="{Binding GridVisibility}" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <ContentControl Content="{Binding}">

@@ -128,6 +128,7 @@ namespace PalCalc.UI.View.Utils
             foreach (UIElement child in InternalChildren)
             {
                 if (child == null) continue;
+                if (child.Visibility == Visibility.Collapsed) continue;
 
                 // Measure child with the full available width 
                 // (we'll break lines manually as needed).
@@ -207,6 +208,7 @@ namespace PalCalc.UI.View.Utils
             foreach (UIElement child in InternalChildren)
             {
                 if (child == null) continue;
+                if (child.Visibility == Visibility.Collapsed) continue;
 
                 Size childDesired = child.DesiredSize;
 
