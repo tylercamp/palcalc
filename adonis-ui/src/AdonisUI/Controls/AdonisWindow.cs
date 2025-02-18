@@ -258,7 +258,12 @@ namespace AdonisUI.Controls
         {
             base.OnApplyTemplate();
 
-            Dispatcher.BeginInvoke(DispatcherPriority.Background, () => Show());
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+            {
+                // (might fail if the window was already closed by the time this ran)
+                try { Show(); }
+                catch { }
+            });
 
             HwndInterop = new HwndInterop(this);
 
