@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FuzzySharp;
 using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
@@ -67,7 +68,7 @@ namespace PalCalc.UI.ViewModel
                 {
                     if (value.Trim().Length > 0)
                     {
-                        VisibleEntries = allEntries.Where(e => e.PalName.Value.Contains(value, StringComparison.CurrentCultureIgnoreCase)).ToList();
+                        VisibleEntries = allEntries.Where(e => e.PalName.Value.Contains(value, StringComparison.CurrentCultureIgnoreCase) || Fuzz.PartialRatio(value.ToLower(), searchText.ToLower()) > 80).ToList();
                     }
                     else
                     {

@@ -20,9 +20,9 @@ namespace PalCalc.UI.ViewModel
             return obj =>
             {
                 var s = stringFromItem(obj);
-                var weight = Fuzz.WeightedRatio(query, stringFromItem(obj));
+                var weight = Fuzz.PartialRatio(query.ToLower(), stringFromItem(obj).ToLower());
 
-                return stringFromItem(obj).Contains(query, StringComparison.InvariantCultureIgnoreCase) || weight > 60;
+                return stringFromItem(obj).Contains(query, StringComparison.InvariantCultureIgnoreCase) || weight > 80;
             };
         }
     }

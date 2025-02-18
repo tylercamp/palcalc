@@ -25,7 +25,7 @@ namespace PalCalc.UI.View
         [ObservableProperty]
         private string searchText;
 
-        private bool Matches(string text) => text.Contains(SearchText, StringComparison.OrdinalIgnoreCase) || Fuzz.WeightedRatio(SearchText, text) > 70;
+        private bool Matches(string text) => text.Contains(SearchText, StringComparison.OrdinalIgnoreCase) || Fuzz.WeightedRatio(SearchText.ToLower(), text.ToLower()) > 70;
 
         public List<PassiveSkillViewModel> DisplayedOptions =>
             PassiveSkillViewModel.All.Where(p =>
