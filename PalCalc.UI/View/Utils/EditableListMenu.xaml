@@ -1,0 +1,105 @@
+﻿<UserControl x:Class="PalCalc.UI.View.Utils.EditableListMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PalCalc.UI.View.Utils"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <CollectionViewSource x:Key="MainItemsSource" Source="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=ItemsSource}" />
+
+        <DataTemplate x:Key="NewItemDataTemplate" DataType="{x:Type local:CreateNewItemEntry}">
+            <ContentControl>
+                <ContentControl.Content>
+                    <Binding RelativeSource="{RelativeSource AncestorType=local:EditableListMenu}" Path="NewItemContent">
+                        <Binding.FallbackValue>
+                            <TextBlock>
+                                Add New Item
+                            </TextBlock>
+                        </Binding.FallbackValue>
+                        <Binding.TargetNullValue>
+                            <TextBlock>
+                                Add New Item
+                            </TextBlock>
+                        </Binding.TargetNullValue>
+                    </Binding>
+                </ContentControl.Content>
+            </ContentControl>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ItemDataTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="2" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="15" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="15" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Click="RenameButton_Click" ToolTip="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=RenameButtonTooltip}">
+                    <materialIcons:MaterialIcon Kind="Rename" Foreground="Goldenrod" />
+                </Button>
+                <Button Grid.Column="2" Click="OverwriteButton_Click" ToolTip="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=OverwriteButtonTooltip}">
+                    <materialIcons:MaterialIcon Kind="FileReplace" Foreground="SteelBlue" />
+                </Button>
+
+                <ContentControl Grid.Column="4" Content="{Binding}">
+                    <ContentControl.ContentTemplate>
+                        <Binding RelativeSource="{RelativeSource AncestorType=local:EditableListMenu}" Path="ItemContentTemplate">
+                            <Binding.TargetNullValue>
+                                <DataTemplate DataType="{x:Type local:IEditableListItem}">
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </Binding.TargetNullValue>
+                        </Binding>
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
+
+                <Button Grid.Column="6" Click="DeleteButton_Click" ToolTip="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=DeleteButtonTooltip}">
+                    <materialIcons:MaterialIcon Kind="Delete" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}" />
+                </Button>
+            </Grid>
+        </DataTemplate>
+
+    </UserControl.Resources>
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="materialIcons:MaterialIcon">
+                <Setter Property="VerticalAlignment" Value="Stretch" />
+                <Setter Property="Height" Value="18" />
+            </Style>
+            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+        </Grid.Resources>
+
+        <ListBox x:Name="m_ListBox"
+                 SelectionChanged="ListBox_SelectionChanged"
+                 ItemTemplateSelector="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=ItemTemplateSelector}"
+                 >
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Padding" Value="5" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemsSource>
+                <CompositeCollection>
+                    <CollectionContainer Collection="{x:Static local:CreateNewItemEntry.AsList}" />
+                    <CollectionContainer Collection="{Binding Source={StaticResource MainItemsSource}}" />
+                </CompositeCollection>
+            </ListBox.ItemsSource>
+        </ListBox>
+    </Grid>
+</UserControl>

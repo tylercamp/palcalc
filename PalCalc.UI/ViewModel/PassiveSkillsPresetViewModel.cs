@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.View.Utils;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
@@ -12,12 +13,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel
 {
-    public interface IPassiveSkillsPresetViewModel
-    {
-        ILocalizedText Label { get; }
-    }
-
-    public partial class PassiveSkillsPresetViewModel : ObservableObject, IPassiveSkillsPresetViewModel
+    public partial class PassiveSkillsPresetViewModel : ObservableObject, IEditableListItem
     {
         public PassiveSkillsPresetViewModel(PassiveSkillsPreset content)
         {
@@ -51,6 +47,14 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private ILocalizedText label;
 
+        public string Name => Label.Value;
+        public string DeleteConfirmTitle => LocalizationCodes.LC_TRAITS_PRESETS_DELETE_TITLE.Bind().Value;
+        public string DeleteConfirmMessage => LocalizationCodes.LC_TRAITS_PRESETS_DELETE_MSG.Bind(Label).Value;
+        public string OverwriteConfirmTitle => LocalizationCodes.LC_TRAITS_PRESETS_OVERWRITE_TITLE.Bind(Label).Value;
+        public string OverwriteConfirmMessage => LocalizationCodes.LC_TRAITS_PRESETS_OVERWRITE_MSG.Bind(Label).Value;
+        public string RenamePopupTitle => LocalizationCodes.LC_TRAITS_PRESETS_RENAME_TITLE.Bind(Label).Value;
+        public string RenamePopupInputLabel => LocalizationCodes.LC_TRAITS_PRESETS_NAME.Bind().Value;
+
         public void ApplyTo(PalSpecifierViewModel spec)
         {
             spec.Passive1 = RequiredPassive1;
@@ -63,18 +67,5 @@ namespace PalCalc.UI.ViewModel
             spec.OptionalPassive3 = OptionalPassive3;
             spec.OptionalPassive4 = OptionalPassive4;
         }
-    }
-
-    public class NewPassiveSkillsPresetViewModel : IPassiveSkillsPresetViewModel
-    {
-        public ILocalizedText Label { get; private set; }
-
-        public static NewPassiveSkillsPresetViewModel Instance { get; } =
-            new NewPassiveSkillsPresetViewModel()
-            {
-                Label = LocalizationCodes.LC_TRAITS_PRESETS_ADD.Bind()
-            };
-
-        private NewPassiveSkillsPresetViewModel() { }
     }
 }

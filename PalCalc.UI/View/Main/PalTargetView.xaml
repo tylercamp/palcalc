@@ -92,13 +92,40 @@
             </TabControl>
             <Button HorizontalAlignment="Right" VerticalAlignment="Top" Height="Auto" Content="{itl:LocalizedText Code=LC_TRAITS_PRESETS}" x:Name="PresetsButton" Command="{Binding OpenPresetsMenuCommand}" Margin="0,2,0,0">
             </Button>
-            <Popup PlacementTarget="{Binding ElementName=PresetsButton}" x:Name="PresetsPopup" IsOpen="{Binding PresetsMenuIsOpen}" StaysOpen="False" MinWidth="200" MaxHeight="300">
-                <local:PassiveSkillsPresetCollectionView DataContext="{Binding Presets}"
-                                                         Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"
-                                                         BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.AccentInteractionBorderBrush}}"
-                                                         BorderThickness="1"
-                                                         adonisExtensions:LayerExtension.Layer="1"
-                                                         />
+            <Popup PlacementTarget="{Binding ElementName=PresetsButton}"
+                   x:Name="PresetsPopup"
+                   IsOpen="{Binding PresetsMenuIsOpen}"
+                   StaysOpen="False"
+                   MinWidth="200"
+                   MaxHeight="300"
+                   >
+                <vu:EditableListMenu DataContext="{Binding Presets}"
+                                     CreateCommand="{Binding CreatePresetCommand}"
+                                     DeleteCommand="{Binding DeletePresetCommand}"
+                                     RenameCommand="{Binding RenamePresetCommand}"
+                                     OverwriteCommand="{Binding OverwritePresetCommand}"
+                                     SelectCommand="{Binding SelectPresetCommand}"
+                                     
+                                     DeleteButtonTooltip="{itl:LocalizedText Code=LC_TRAITS_PRESETS_DELETE_BTN_DESCRIPTION}"
+                                     RenameButtonTooltip="{itl:LocalizedText Code=LC_TRAITS_PRESETS_RENAME_BTN_DESCRIPTION}"
+                                     OverwriteButtonTooltip="{itl:LocalizedText Code=LC_TRAITS_PRESETS_OVERWRITE_BTN_DESCRIPTION}"
+                                     
+                                     CreatePopupTitle="{itl:LocalizedText Code=LC_TRAITS_PRESETS_ADD_TITLE}"
+                                     CreatePopupInputLabel="{itl:LocalizedText Code=LC_TRAITS_PRESETS_NAME}"
+                                     
+                                     ItemsSource="{Binding Options}"
+                                     
+                                     Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"
+                                     BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.AccentInteractionBorderBrush}}"
+                                     BorderThickness="1"
+                                     adonisExtensions:LayerExtension.Layer="1"
+                                     >
+                    <vu:EditableListMenu.NewItemContent>
+                        <Grid>
+                            <TextBlock Margin="5" FontStyle="Italic" Text="{itl:LocalizedText Code=LC_TRAITS_PRESETS_ADD}" />
+                        </Grid>
+                    </vu:EditableListMenu.NewItemContent>
+                </vu:EditableListMenu>
             </Popup>
         </Grid>
     </GroupBox>
