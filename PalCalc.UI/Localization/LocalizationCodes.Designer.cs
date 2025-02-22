@@ -441,6 +441,54 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_PAL_LIST_PRESETS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LIST_PRESETS_ADD,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LIST_PRESETS_ADD_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LIST_PRESETS_DELETE_BTN_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to PresetName.
+        /// </summary>
+        LC_PAL_LIST_PRESETS_DELETE_MSG,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LIST_PRESETS_DELETE_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LIST_PRESETS_NAME,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LIST_PRESETS_OVERWRITE_BTN_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to PresetName.
+        /// </summary>
+        LC_PAL_LIST_PRESETS_OVERWRITE_MSG,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LIST_PRESETS_OVERWRITE_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LIST_PRESETS_RENAME_BTN_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to PresetName.
+        /// </summary>
+        LC_PAL_LIST_PRESETS_RENAME_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_PAL_LOC_BASE,
         /// <summary>
         ///   Looks up a localized string similar to .

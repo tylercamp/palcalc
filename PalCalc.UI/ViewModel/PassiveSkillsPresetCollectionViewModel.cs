@@ -54,7 +54,7 @@ namespace PalCalc.UI.ViewModel
                     newPreset.Name = ev.NewName;
 
                     // insert alphabetically
-                    var previous = Options.FirstOrDefault(o => o is PassiveSkillsPresetViewModel && o.Label.Value.CompareTo(ev.NewName) > 0);
+                    var previous = Options.FirstOrDefault(o => o.Label.Value.CompareTo(ev.NewName) > 0);
                     options.Insert(
                         previous != null ? options.IndexOf(previous) : options.Count,
                         new PassiveSkillsPresetViewModel(newPreset)
@@ -95,7 +95,7 @@ namespace PalCalc.UI.ViewModel
 
                     options.Remove(presetVm);
                     // insert alphabetically
-                    var previous = Options.FirstOrDefault(o => o is PassiveSkillsPresetViewModel && o.Label.Value.CompareTo(newName) > 0);
+                    var previous = Options.FirstOrDefault(o => o.Label.Value.CompareTo(newName) > 0);
                     options.Insert(
                         previous != null ? options.IndexOf(previous) : options.Count,
                         new PassiveSkillsPresetViewModel(preset)

@@ -3,7 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using FuzzySharp;
 using PalCalc.Model;
 using PalCalc.UI.Localization;
+using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
+using QuickGraph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,12 +48,14 @@ namespace PalCalc.UI.ViewModel
 
         public static PalCheckListViewModel DesignerInstance { get; } =
             new PalCheckListViewModel(
-                null, null,
+                null, null, null,
                 new Dictionary<Pal, bool>()
                 {
                     { PalDB.LoadEmbedded().Pals.First(), true }
                 }
             );
+
+        public PalListPresetCollectionViewModel Presets { get; }
 
         private List<PalCheckListEntryViewModel> allEntries;
 
@@ -78,7 +82,7 @@ namespace PalCalc.UI.ViewModel
             }
         }
         
-        public PalCheckListViewModel(Action onCancel, Action<Dictionary<Pal, bool>> onSave, Dictionary<Pal, bool> initialState)
+        public PalCheckListViewModel(PalListPresetCollectionViewModel presets, Action onCancel, Action<Dictionary<Pal, bool>> onSave, Dictionary<Pal, bool> initialState)
         {
             allEntries = initialState
                 .Select(kvp => new PalCheckListEntryViewModel(PalViewModel.Make(kvp.Key), kvp.Value))
@@ -86,6 +90,10 @@ namespace PalCalc.UI.ViewModel
                 .ToList();
 
             VisibleEntries = allEntries;
+            Presets = presets;
+
+            if (Presets != null)
+                Presets.ActivePalSelections = allEntries.Where(e => e.IsEnabled).Select(e => e.Pal.ModelObject).ToList();
 
             foreach (var e in allEntries)
                 e.PropertyChanged += EntryPropertyChanged;
@@ -109,6 +117,20 @@ namespace PalCalc.UI.ViewModel
                 },
                 canExecute: (_) => true
             );
+
+            OpenPresetsMenuCommand = new RelayCommand(() => PresetsMenuIsOpen = true);
+            if (presets != null)
+                presets.PresetSelected += Presets_PresetSelected;
+        }
+
+        private void Presets_PresetSelected(PalListPresetViewModel preset)
+        {
+            foreach (var e in allEntries)
+            {
+                e.IsEnabled = preset.Pals.Contains(e.Pal.ModelObject);
+            }
+
+            PresetsMenuIsOpen = false;
         }
 
         private void EntryPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -121,6 +143,9 @@ namespace PalCalc.UI.ViewModel
             if (e.PropertyName == nameof(PalCheckListEntryViewModel.IsEnabled))
             {
                 OnPropertyChanged(nameof(AllItemsEnabled));
+
+                if (Presets != null)
+                    Presets.ActivePalSelections = allEntries.Where(e => e.IsEnabled).Select(e => e.Pal.ModelObject).ToList();
             }
         }
 
@@ -154,5 +179,10 @@ namespace PalCalc.UI.ViewModel
                     e.IsEnabled = value.Value;
             }
         }
+
+        [ObservableProperty]
+        private bool presetsMenuIsOpen = false;
+
+        public IRelayCommand OpenPresetsMenuCommand { get; }
     }
 }

@@ -760,4 +760,40 @@
   <data name="LC_TRAITS_SEARCH_TITLE" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_PAL_LIST_PRESETS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_ADD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_ADD_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_BTN_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_MSG" xml:space="preserve">
+    <value>PresetName</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_NAME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_BTN_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_MSG" xml:space="preserve">
+    <value>PresetName</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_RENAME_BTN_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_RENAME_TITLE" xml:space="preserve">
+    <value>PresetName</value>
+  </data>
 </root>

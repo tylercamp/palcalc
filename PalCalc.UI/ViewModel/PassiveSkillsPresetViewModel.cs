@@ -50,7 +50,7 @@ namespace PalCalc.UI.ViewModel
         public string Name => Label.Value;
         public string DeleteConfirmTitle => LocalizationCodes.LC_TRAITS_PRESETS_DELETE_TITLE.Bind().Value;
         public string DeleteConfirmMessage => LocalizationCodes.LC_TRAITS_PRESETS_DELETE_MSG.Bind(Label).Value;
-        public string OverwriteConfirmTitle => LocalizationCodes.LC_TRAITS_PRESETS_OVERWRITE_TITLE.Bind(Label).Value;
+        public string OverwriteConfirmTitle => LocalizationCodes.LC_TRAITS_PRESETS_OVERWRITE_TITLE.Bind().Value;
         public string OverwriteConfirmMessage => LocalizationCodes.LC_TRAITS_PRESETS_OVERWRITE_MSG.Bind(Label).Value;
         public string RenamePopupTitle => LocalizationCodes.LC_TRAITS_PRESETS_RENAME_TITLE.Bind(Label).Value;
         public string RenamePopupInputLabel => LocalizationCodes.LC_TRAITS_PRESETS_NAME.Bind().Value;

@@ -20,6 +20,13 @@ namespace PalCalc.UI.Model
         public string OptionalPassive4InternalName { get; set; }
     }
 
+    public class PalListPreset
+    {
+        public string Name { get; set; }
+
+        public List<string> PalInternalNames { get; set; }
+    }
+
     public class SerializableSolverSettings
     {
         public int MaxBreedingSteps { get; set; } = 10;
@@ -42,13 +49,15 @@ namespace PalCalc.UI.Model
     {
         public static AppSettings Current = null;
 
-        public List<string> ExtraSaveLocations { get; set; } = new List<string>();
+        public List<string> ExtraSaveLocations { get; set; } = [];
 
-        public List<string> FakeSaveNames { get; set; } = new List<string>();
+        public List<string> FakeSaveNames { get; set; } = [];
 
-        public SerializableSolverSettings SolverSettings { get; set; } = new SerializableSolverSettings();
+        public SerializableSolverSettings SolverSettings { get; set; } = new();
 
-        public List<PassiveSkillsPreset> PassiveSkillsPresets { get; set; } = new List<PassiveSkillsPreset>();
+        public List<PassiveSkillsPreset> PassiveSkillsPresets { get; set; } = [];
+
+        public List<PalListPreset> PalListPresets { get; set; } = [];
 
         public string SelectedGameIdentifier { get; set; } = null;
 

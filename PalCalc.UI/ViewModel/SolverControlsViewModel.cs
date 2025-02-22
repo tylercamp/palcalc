@@ -26,6 +26,8 @@ namespace PalCalc.UI.ViewModel
     {
         public static SolverControlsViewModel DesignerInstance { get; } = new SolverControlsViewModel(null, null, null, null);
 
+        private PalListPresetCollectionViewModel PalListPresets => new(AppSettings.Current?.PalListPresets);
+
         public SolverControlsViewModel(
             ICommand runSolverCommand,
             ICommand cancelSolverCommand,
@@ -42,6 +44,7 @@ namespace PalCalc.UI.ViewModel
             {
                 var window = new PalCheckListWindow();
                 window.DataContext = new PalCheckListViewModel(
+                    presets: PalListPresets,
                     onCancel: null,
                     onSave: (palSelections) => BannedBredPals = palSelections.Where(kvp => !kvp.Value).Select(kvp => kvp.Key).ToList(),
                     initialState: PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => !BannedBredPals.Contains(p))
@@ -57,6 +60,7 @@ namespace PalCalc.UI.ViewModel
             {
                 var window = new PalCheckListWindow();
                 window.DataContext = new PalCheckListViewModel(
+                    presets: PalListPresets,
                     onCancel: null,
                     onSave: (palSelections) => BannedWildPals = palSelections.Where(kvp => !kvp.Value).Select(kvp => kvp.Key).ToList(),
                     initialState: PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => !BannedWildPals.Contains(p))

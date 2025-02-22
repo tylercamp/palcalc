@@ -8,7 +8,9 @@
                              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
                              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+                             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                              xmlns:util="clr-namespace:Wpf.Util"
+                             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
                              mc:Ignorable="d"
                              d:DataContext="{x:Static vm:PalCheckListViewModel.DesignerInstance}"
                              IconVisibility="Collapsed"
@@ -34,10 +36,48 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Content="{itl:LocalizedText LC_PAL_CHECKLIST_SEARCH}" VerticalContentAlignment="Center" />
-            <TextBox Height="20" Grid.Column="2" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+            <Label Grid.Column="0" Content="{itl:LocalizedText LC_PAL_CHECKLIST_SEARCH}" VerticalAlignment="Center" VerticalContentAlignment="Center" />
+            
+            <TextBox VerticalAlignment="Center" Grid.Column="2" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+            
+            <Button Grid.Column="4" Height="Auto" VerticalAlignment="Center" Content="{itl:LocalizedText Code=LC_PAL_LIST_PRESETS}" x:Name="PresetsButton" Command="{Binding OpenPresetsMenuCommand}" />
+            <Popup PlacementTarget="{Binding ElementName=PresetsButton}"
+                   IsOpen="{Binding PresetsMenuIsOpen}"
+                   StaysOpen="False"
+                   MinWidth="300"
+                   MaxHeight="300"
+                   >
+                <vu:EditableListMenu DataContext="{Binding Presets}"
+                                     ItemsSource="{Binding Options}"
+                                     
+                                     CreateCommand="{Binding CreateCommand}"
+                                     DeleteCommand="{Binding DeleteCommand}"
+                                     OverwriteCommand="{Binding OverwriteCommand}"
+                                     RenameCommand="{Binding RenameCommand}"
+                                     SelectCommand="{Binding SelectCommand}"
+                                     
+                                     CreatePopupTitle="{itl:LocalizedText Code=LC_PAL_LIST_PRESETS_ADD_TITLE}"
+                                     CreatePopupInputLabel="{itl:LocalizedText Code=LC_PAL_LIST_PRESETS_NAME}"
+                                     
+                                     DeleteButtonTooltip="{itl:LocalizedText Code=LC_PAL_LIST_PRESETS_DELETE_BTN_DESCRIPTION}"
+                                     RenameButtonTooltip="{itl:LocalizedText Code=LC_PAL_LIST_PRESETS_RENAME_BTN_DESCRIPTION}"
+                                     OverwriteButtonTooltip="{itl:LocalizedText Code=LC_PAL_LIST_PRESETS_OVERWRITE_BTN_DESCRIPTION}"
+                                     
+                                     Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"
+                                     BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.AccentInteractionBorderBrush}}"
+                                     BorderThickness="1"
+                                     >
+                    <vu:EditableListMenu.NewItemContent>
+                        <Grid>
+                            <TextBlock Margin="5" FontStyle="Italic" Text="{itl:LocalizedText Code=LC_PAL_LIST_PRESETS_ADD}" />
+                        </Grid>
+                    </vu:EditableListMenu.NewItemContent>
+                </vu:EditableListMenu>
+            </Popup>
         </Grid>
 
         <ListView Grid.Row="1"
