@@ -58,7 +58,11 @@ namespace PalCalc.UI.ViewModel.Solver
         public SolverState CurrentState
         {
             get => currentState;
-            private set => SetProperty(ref currentState, value);
+            private set
+            {
+                if (SetProperty(ref currentState, value))
+                    OnPropertyChanged(nameof(IsActive));
+            }
         }
 
         private double solverProgress;
@@ -88,6 +92,8 @@ namespace PalCalc.UI.ViewModel.Solver
             get => stepStatusMessage;
             private set => SetProperty(ref stepStatusMessage, value);
         }
+
+        public bool IsActive => CurrentState != SolverState.Idle;
 
         public List<IPalReference> Results { get; private set; }
 

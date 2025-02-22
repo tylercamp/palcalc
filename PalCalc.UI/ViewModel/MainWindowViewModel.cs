@@ -479,7 +479,10 @@ namespace PalCalc.UI.ViewModel
                 currentSpec
             );
 
+            var selectedTarget = PalTargetList.SelectedTarget;
+
             PalTarget.CurrentPalSpecifier.LatestJob = currentJob;
+            selectedTarget.LatestJob = currentJob;
 
             currentJob.PropertyChanged += (s, e) =>
             {
@@ -489,9 +492,6 @@ namespace PalCalc.UI.ViewModel
 
                     IsEditable = currentJob.CurrentState == SolverState.Idle;
                 }
-
-                if (e.PropertyName == nameof(currentJob.SolverStatusMessage))
-                    OnPropertyChanged(nameof(ProgressBarVisibility));
             };
 
             currentJob.JobCancelled += () =>
@@ -603,13 +603,10 @@ namespace PalCalc.UI.ViewModel
             {
                 if (SetProperty(ref isEditable, value))
                 {
-                    OnPropertyChanged(nameof(ProgressBarVisibility));
                     UpdateSolverControls();
                 }
             }
         }
-
-        public Visibility ProgressBarVisibility => currentJob?.SolverStatusMessage == null ? Visibility.Collapsed : Visibility.Visible;
 
         [ObservableProperty]
         private Visibility updatesMessageVisibility = Visibility.Collapsed;
