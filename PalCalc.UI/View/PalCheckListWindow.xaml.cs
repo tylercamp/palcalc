@@ -29,5 +29,31 @@ namespace PalCalc.UI.View
 
             Wpf.Util.GridViewSort.ApplySort(m_ListView.Items, nameof(PalCheckListEntryViewModel.PaldexNoValue));
         }
+
+        protected PalCheckListViewModel ViewModel => DataContext as PalCheckListViewModel;
+
+        private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var senderElem = sender as FrameworkElement;
+            var senderVm = senderElem.DataContext as PalCheckListEntryViewModel;
+
+            senderVm.IsEnabled = !senderVm.IsEnabled;
+        }
+
+        private void m_ListView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                var items = m_ListView.SelectedItems.OfType<PalCheckListEntryViewModel>();
+                var shouldEnable = items.Any(i => !i.IsEnabled);
+
+                foreach (var item in items)
+                {
+                    item.IsEnabled = shouldEnable;
+                }
+
+                e.Handled = true;
+            }
+        }
     }
 }

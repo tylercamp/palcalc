@@ -85,11 +85,14 @@
                   adonisExtensions:GridViewSortExtension.AutoSort="False"
                   util:GridViewSort.AutoSort="True"
                   x:Name="m_ListView"
+                  PreviewKeyDown="m_ListView_KeyDown"
                   >
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
                     <Setter Property="VerticalContentAlignment" Value="Center" />
                     <Setter Property="Padding" Value="2,3,0,3" />
+
+                    <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.View>
