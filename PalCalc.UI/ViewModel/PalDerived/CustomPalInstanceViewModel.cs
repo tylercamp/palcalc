@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI.ViewModel.PalDerived
 {
     public class CustomPalInstanceGender
     {

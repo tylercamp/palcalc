@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI.ViewModel.Presets
 {
     public partial class PalListPresetCollectionViewModel : ObservableObject
     {

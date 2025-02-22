@@ -6,6 +6,7 @@ using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
+using PalCalc.UI.ViewModel.Presets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI.ViewModel.Solver
 {
     public enum SolverState
     {

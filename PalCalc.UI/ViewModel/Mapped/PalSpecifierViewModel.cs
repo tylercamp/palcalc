@@ -4,6 +4,8 @@ using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.PalDerived;
+using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
 using System.Linq;

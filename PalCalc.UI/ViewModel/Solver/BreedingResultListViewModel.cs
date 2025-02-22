@@ -5,6 +5,7 @@ using PalCalc.Solver.PalReference;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI.ViewModel.Solver
 {
     public partial class BreedingResultListViewModel : ObservableObject
     {

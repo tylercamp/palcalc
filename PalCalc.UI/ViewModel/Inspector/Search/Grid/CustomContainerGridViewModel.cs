@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.PalDerived;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
