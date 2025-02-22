@@ -242,6 +242,9 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
         }
 
+        [ObservableProperty]
+        private SolverJobViewModel latestJob;
+
         public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(
             new PalSpecifier()
             {
@@ -260,6 +263,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             IncludeCustomPals = IncludeCustomPals,
             IncludeCagedPals = IncludeCagedPals,
             DeleteCommand = DeleteCommand,
+            LatestJob = LatestJob,
         };
 
         public static readonly PalSpecifierViewModel New = new PalSpecifierViewModel(null, true);

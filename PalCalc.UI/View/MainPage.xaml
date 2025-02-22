@@ -66,14 +66,16 @@
                 <DockPanel Grid.Column="2">
                     <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" Margin="0,0,0,5" Padding="5" HorizontalContentAlignment="Right" Background="{DynamicResource ResourceKey={x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" adonisExtensions:LayerExtension.IncreaseLayer="True" />
 
-                    <StackPanel DockPanel.Dock="Bottom" Visibility="{Binding ProgressBarVisibility}">
+                    <StackPanel DockPanel.Dock="Bottom"
+                                Visibility="{Binding PalTarget.CurrentPalSpecifier.LatestJob, Converter={StaticResource VVC}, FallbackValue=Collapsed, Mode=OneWay}"
+                                >
                         <Grid>
-                            <ProgressBar Value="{Binding SolverProgress}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
-                            <TextBlock Text="{Binding SolverStatusMsg.Value}" Margin="10,5,0,5" />
+                            <ProgressBar Value="{Binding PalTarget.CurrentPalSpecifier.LatestJob.SolverProgress, Mode=OneWay}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
+                            <TextBlock Text="{Binding PalTarget.CurrentPalSpecifier.LatestJob.SolverStatusMessage.Value}" Margin="10,5,0,5" />
                         </Grid>
                         <Grid Margin="0,0,0,0">
-                            <ProgressBar Value="{Binding StepProgress}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
-                            <TextBlock Text="{Binding StepStatusMsg.Value}" Margin="10,5,0,5" />
+                            <ProgressBar Value="{Binding PalTarget.CurrentPalSpecifier.LatestJob.StepProgress, Mode=OneWay}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
+                            <TextBlock Text="{Binding PalTarget.CurrentPalSpecifier.LatestJob.StepStatusMessage.Value}" Margin="10,5,0,5" />
                         </Grid>
                     </StackPanel>
 

@@ -479,6 +479,8 @@ namespace PalCalc.UI.ViewModel
                 currentSpec
             );
 
+            PalTarget.CurrentPalSpecifier.LatestJob = currentJob;
+
             currentJob.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(currentJob.CurrentState))
@@ -490,6 +492,13 @@ namespace PalCalc.UI.ViewModel
 
                 if (e.PropertyName == nameof(currentJob.SolverStatusMessage))
                     OnPropertyChanged(nameof(ProgressBarVisibility));
+            };
+
+            currentJob.JobCancelled += () =>
+            {
+                SolverControls.CurrentSolverState = SolverState.Idle;
+                IsEditable = true;
+                PalTarget.CurrentPalSpecifier.LatestJob = null;
             };
 
             currentJob.JobCompleted += () =>

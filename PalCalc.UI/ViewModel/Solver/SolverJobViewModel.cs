@@ -18,11 +18,13 @@ using Windows.Devices.Geolocation;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
-    class SolverJobViewModel : ObservableObject, IDisposable
+    public class SolverJobViewModel : ObservableObject, IDisposable
     {
         private Thread thread;
         private Stopwatch sw;
 
+        // (dispatcher.HasShutdownStarted checks added in case a job fails, causes UI shutdown, and remaining
+        // jobs continue due to Dispose but throw more errors due to UI env. shutdown)
         private Dispatcher dispatcher;
         private BreedingSolver solver;
         private CancellationTokenSource tokenSource;
@@ -34,6 +36,8 @@ namespace PalCalc.UI.ViewModel.Solver
 
         protected override void OnPropertyChanging(PropertyChangingEventArgs e)
         {
+            if (dispatcher.HasShutdownStarted) return;
+
             if (Thread.CurrentThread == dispatcher.Thread)
                 base.OnPropertyChanging(e);
             else
@@ -42,6 +46,8 @@ namespace PalCalc.UI.ViewModel.Solver
 
         protected override void OnPropertyChanged(PropertyChangedEventArgs e)
         {
+            if (dispatcher.HasShutdownStarted) return;
+
             if (Thread.CurrentThread == dispatcher.Thread)
                 base.OnPropertyChanged(e);
             else
@@ -162,6 +168,8 @@ namespace PalCalc.UI.ViewModel.Solver
                     results = [];
                 }
 
+                if (dispatcher.HasShutdownStarted) return;
+
                 // general simplification pass, get the best result for each potentially
                 // interesting combination of result properties
                 var resultsTable = new PalPropertyGrouping(PalProperty.Combine(
@@ -222,6 +230,8 @@ namespace PalCalc.UI.ViewModel.Solver
 
         private void Solver_SolverStateUpdated(SolverStatus obj)
         {
+            if (dispatcher.HasShutdownStarted) return;
+
             string FormatNum(long num) => num.ToString("#,##");
 
             dispatcher.BeginInvoke(() =>
