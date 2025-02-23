@@ -511,11 +511,13 @@ namespace PalCalc.UI.ViewModel
                 currentSpec.LatestJob = null;
             };
 
+            job.Run();
+            job.Pause();
+
             // TODO - comment
             initialSpec.LatestJob = job;
             currentSpec.LatestJob = job;
 
-            job.Run();
             SolverQueue.Add(currentSpec);
         }
 

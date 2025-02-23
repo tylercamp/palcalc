@@ -7,6 +7,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
@@ -37,32 +39,76 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public void Add(PalSpecifierViewModel item)
         {
-            if (item.LatestJob == null)
+            var job = item.LatestJob;
+
+            if (job == null)
                 throw new InvalidOperationException();
 
             if (!orderedPendingTargets.Any(t => t.LatestJob.CurrentState == SolverState.Running))
-                item.LatestJob.Run();
+                job.Run();
             else
-                item.LatestJob.Pause();
+                job.Pause();
             
             orderedPendingTargets.Add(item);
 
-            item.LatestJob.JobStopped += () =>
+            // TODO - event listener leaks
+            job.JobStopped += () =>
             {
                 orderedPendingTargets.Remove(item);
+            };
+
+            job.PropertyChanged += (_, ev) =>
+            {
+                if (ev.PropertyName == nameof(job.CurrentState) && job.CurrentState == SolverState.Running)
+                {
+                    var othersRunning = orderedPendingTargets.Where(t => t.LatestJob.CurrentState == SolverState.Running && t != item).ToList();
+                    foreach (var other in othersRunning)
+                        other.LatestJob.Pause();
+
+                    Dispatcher.CurrentDispatcher.BeginInvoke(
+                        () => orderedPendingTargets.Move(orderedPendingTargets.IndexOf(item), 0)
+                    );
+                }
             };
         }
 
         public void DragOver(IDropInfo dropInfo)
         {
-            // TODO
-            throw new NotImplementedException();
+            if (!dropInfo.IsSameDragDropContextAsSource)
+                return;
+
+            var sourceItem = dropInfo.Data as PalSpecifierViewModel;
+            var targetItem = dropInfo.TargetItem as PalSpecifierViewModel;
+
+            if (
+                sourceItem != null &&
+                targetItem != null &&
+                sourceItem != targetItem &&
+                !targetItem.IsReadOnly &&
+                QueuedItems.Contains(sourceItem)
+            )
+            {
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
+                dropInfo.Effects = DragDropEffects.Move;
+            }
         }
 
         public void Drop(IDropInfo dropInfo)
         {
-            // TODO
-            throw new NotImplementedException();
+            var sourceItem = dropInfo.Data as PalSpecifierViewModel;
+            var targetItem = dropInfo.TargetItem as PalSpecifierViewModel;
+
+            if (!QueuedItems.Contains(sourceItem) || !QueuedItems.Contains(targetItem)) return;
+
+            var sourceIndex = QueuedItems.IndexOf(sourceItem);
+            var targetIndex = QueuedItems.IndexOf(targetItem);
+
+            int newIndex = dropInfo.InsertIndex;
+            if (sourceIndex < targetIndex) newIndex -= 1;
+
+            if (sourceIndex == newIndex) return;
+
+            orderedPendingTargets.Move(QueuedItems.IndexOf(sourceItem), Math.Clamp(newIndex, 0, QueuedItems.Count - 1));
         }
     }
 }

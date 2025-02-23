@@ -145,6 +145,7 @@
                         Background="{x:Null}"
                         BorderBrush="{x:Null}"
                         IsEnabled="{Binding LatestJob.IsInactive, FallbackValue=True}"
+                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:PalSpecifierView}, Path=IncludeDeleteButton, Converter={StaticResource BVC}}"
                         >
                         <materialIcons:MaterialIcon
                             Kind="Remove"
