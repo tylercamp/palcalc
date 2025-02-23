@@ -43,7 +43,14 @@ namespace PalCalc.UI.ViewModel
             else
             {
                 InitialPalSpecifier = initial;
-                CurrentPalSpecifier = initial.Copy();
+                if (initial.LatestJob != null && initial.LatestJob.CurrentState != SolverState.Idle)
+                {
+                    CurrentPalSpecifier = initial.LatestJob.Specifier;
+                }
+                else
+                {
+                    CurrentPalSpecifier = initial.Copy();
+                }
 
                 PalSource = new PalSourceTreeViewModel(sourceSave.CachedValue);
             }
@@ -100,6 +107,7 @@ namespace PalCalc.UI.ViewModel
 
                     value.PropertyChanged += CurrentSpec_PropertyChanged;
                     OnPropertyChanged(nameof(IsValid));
+                    OnPropertyChanged(nameof(CurrentLatestJob));
 
                     if (value != null)
                     {
@@ -109,12 +117,18 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
+        public SolverJobViewModel CurrentLatestJob => CurrentPalSpecifier?.LatestJob;
+
         private void CurrentSpec_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
                 case nameof(CurrentPalSpecifier.IsValid):
                     OnPropertyChanged(nameof(IsValid));
+                    break;
+
+                case nameof(CurrentPalSpecifier.LatestJob):
+                    OnPropertyChanged(nameof(CurrentLatestJob));
                     break;
 
                 case nameof(CurrentPalSpecifier.IncludeBasePals):

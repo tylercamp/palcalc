@@ -4,6 +4,7 @@ using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Localization;
+using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace PalCalc.UI.ViewModel.Solver
         private CancellationTokenSource tokenSource;
         private SolverStateController solverController;
 
-        private PalSpecifier spec;
+        public PalSpecifierViewModel Specifier { get; }
 
         private int lastStepIndex = -1;
 
@@ -104,12 +105,13 @@ namespace PalCalc.UI.ViewModel.Solver
         public SolverJobViewModel(
             Dispatcher dispatcher,
             BreedingSolver solver,
-            PalSpecifier spec
+            PalSpecifierViewModel spec
         )
         {
             this.dispatcher = dispatcher;
             this.solver = solver;
-            this.spec = spec;
+
+            Specifier = spec;
 
             tokenSource = new CancellationTokenSource();
             solverController = new SolverStateController()
@@ -126,7 +128,7 @@ namespace PalCalc.UI.ViewModel.Solver
         {
             if (thread == null)
             {
-                thread = new Thread(() => RunSolver(spec));
+                thread = new Thread(() => RunSolver(Specifier.ModelObject));
 
                 thread.Priority = ThreadPriority.BelowNormal;
                 thread.Start();

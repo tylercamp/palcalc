@@ -178,13 +178,13 @@
 
                     <Style x:Key="ContentPresenterTemplate" TargetType="ContentPresenter">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding CurrentSolverState}" Value="Idle">
+                            <DataTrigger Binding="{Binding CurrentJob.CurrentState, FallbackValue=Idle}" Value="Idle">
                                 <Setter Property="ContentTemplate" Value="{StaticResource RunButtonTemplate}" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding CurrentSolverState}" Value="Running">
+                            <DataTrigger Binding="{Binding CurrentJob.CurrentState, FallbackValue=Idle}" Value="Running">
                                 <Setter Property="ContentTemplate" Value="{StaticResource PauseButtonTemplate}" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding CurrentSolverState}" Value="Paused">
+                            <DataTrigger Binding="{Binding CurrentJob.CurrentState, FallbackValue=Idle}" Value="Paused">
                                 <Setter Property="ContentTemplate" Value="{StaticResource ResumeButtonTemplate}" />
                             </DataTrigger>
                         </Style.Triggers>
