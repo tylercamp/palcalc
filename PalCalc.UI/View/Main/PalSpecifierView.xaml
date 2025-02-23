@@ -144,12 +144,23 @@
                         Cursor="Hand"
                         Background="{x:Null}"
                         BorderBrush="{x:Null}"
+                        IsEnabled="{Binding LatestJob.IsInactive, FallbackValue=True}"
                         >
                         <materialIcons:MaterialIcon
                             Kind="Remove"
                             Width="15"
                             Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}"
-                            />
+                            >
+                            <materialIcons:MaterialIcon.Style>
+                                <Style TargetType="materialIcons:MaterialIcon">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding LatestJob.IsInactive, FallbackValue=True}" Value="False">
+                                            <Setter Property="Opacity" Value="0.5" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </materialIcons:MaterialIcon.Style>
+                        </materialIcons:MaterialIcon>
                     </Button>
                 </Grid>
 

@@ -9,6 +9,7 @@ using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Presets;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Printing;
 using System.Text;
@@ -145,7 +146,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public SolverJobViewModel CurrentJob
         {
             get => currentJob;
-            set
+            private set
             {
                 if (currentJob != null && currentJob != value)
                 {
@@ -154,7 +155,6 @@ namespace PalCalc.UI.ViewModel.Solver
 
                 if (SetProperty(ref currentJob, value))
                 {
-
                     if (currentJob != null)
                     {
                         currentJob.PropertyChanged += CurrentJob_PropertyChanged;
@@ -185,7 +185,7 @@ namespace PalCalc.UI.ViewModel.Solver
                     if (currentTarget != null)
                     {
                         currentTarget.PropertyChanged += CurrentTarget_PropertyChanged;
-                        CurrentJob = currentTarget.InitialPalSpecifier?.LatestJob;
+                        CurrentJob = currentTarget.CurrentLatestJob;
                     }
                     else
                     {

@@ -57,10 +57,6 @@ namespace PalCalc.UI.ViewModel
         private PassiveSkillsPresetCollectionViewModel passivePresets;
         private IRelayCommand<PalSpecifierViewModel> deletePalTargetCommand;
 
-        private List<SolverJobViewModel> pendingJobs = [];
-
-        private SolverJobViewModel currentJob;
-
         public ICommand RunSolverCommand { get; }
         public ICommand PauseSolverCommand { get; }
         public ICommand ResumeSolverCommand { get; }
@@ -145,7 +141,6 @@ namespace PalCalc.UI.ViewModel
                 var inputPals = PalTarget.AvailablePals.ToList();
 
                 var job = RunSolver(cachedData, currentSpec, inputPals);
-                currentJob = job;
 
                 job.JobCompleted += () =>
                 {
@@ -545,17 +540,17 @@ namespace PalCalc.UI.ViewModel
 
         private void CancelSolver()
         {
-            currentJob?.Cancel();
+            PalTargetList.SelectedTarget?.LatestJob?.Cancel();
         }
 
         private void PauseSolver()
         {
-            currentJob?.Pause();
+            PalTargetList.SelectedTarget?.LatestJob?.Pause();
         }
 
         private void ResumeSolver()
         {
-            currentJob?.Run();
+            PalTargetList.SelectedTarget?.LatestJob?.Run();
         }
 
         [ObservableProperty]
@@ -590,19 +585,6 @@ namespace PalCalc.UI.ViewModel
                 }
             }
         }
-
-        //private bool isEditable = true;
-        //public bool IsEditable
-        //{
-        //    get => isEditable;
-        //    set
-        //    {
-        //        if (SetProperty(ref isEditable, value))
-        //        {
-        //            UpdateSolverControls();
-        //        }
-        //    }
-        //}
 
         [ObservableProperty]
         private Visibility updatesMessageVisibility = Visibility.Collapsed;

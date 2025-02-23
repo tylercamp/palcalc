@@ -62,7 +62,10 @@ namespace PalCalc.UI.ViewModel.Solver
             private set
             {
                 if (SetProperty(ref currentState, value))
+                {
                     OnPropertyChanged(nameof(IsActive));
+                    OnPropertyChanged(nameof(IsInactive));
+                }
             }
         }
 
@@ -95,6 +98,7 @@ namespace PalCalc.UI.ViewModel.Solver
         }
 
         public bool IsActive => CurrentState != SolverState.Idle;
+        public bool IsInactive => !IsActive;
 
         public List<IPalReference> Results { get; private set; }
 
