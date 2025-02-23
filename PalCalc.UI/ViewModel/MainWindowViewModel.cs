@@ -529,19 +529,6 @@ namespace PalCalc.UI.ViewModel
                 currentSpec
             );
 
-            job.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(job.CurrentState))
-                {
-                    IsEditable = job.CurrentState == SolverState.Idle;
-                }
-            };
-
-            job.JobCancelled += () =>
-            {
-                IsEditable = true;
-            };
-
             job.JobCompleted += () =>
             {
                 var results = job.Results;
@@ -549,11 +536,6 @@ namespace PalCalc.UI.ViewModel
                 {
                     Results = results.Select(r => new BreedingResultViewModel(cachedData, SelectedGameSettings.ModelObject, r)).ToList()
                 };
-            };
-
-            job.JobStopped += () =>
-            {
-                IsEditable = true;
             };
 
             job.Run();
@@ -609,18 +591,18 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
-        private bool isEditable = true;
-        public bool IsEditable
-        {
-            get => isEditable;
-            set
-            {
-                if (SetProperty(ref isEditable, value))
-                {
-                    UpdateSolverControls();
-                }
-            }
-        }
+        //private bool isEditable = true;
+        //public bool IsEditable
+        //{
+        //    get => isEditable;
+        //    set
+        //    {
+        //        if (SetProperty(ref isEditable, value))
+        //        {
+        //            UpdateSolverControls();
+        //        }
+        //    }
+        //}
 
         [ObservableProperty]
         private Visibility updatesMessageVisibility = Visibility.Collapsed;

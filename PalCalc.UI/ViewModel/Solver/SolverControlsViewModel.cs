@@ -147,7 +147,7 @@ namespace PalCalc.UI.ViewModel.Solver
             get => currentJob;
             set
             {
-                if (currentJob != null)
+                if (currentJob != null && currentJob != value)
                 {
                     currentJob.PropertyChanged -= CurrentJob_PropertyChanged;
                 }
@@ -211,9 +211,9 @@ namespace PalCalc.UI.ViewModel.Solver
         public ICommand PauseSolverCommand { get; }
         public ICommand ResumeSolverCommand { get; }
 
-        public bool CanRunSolver => CurrentTarget?.IsValid == true && (CurrentJob == null || CurrentJob.CurrentState == SolverState.Idle);
-        public bool CanCancelSolver => CurrentJob != null && CurrentJob.CurrentState != SolverState.Idle;
-        public bool CanEditSettings => CurrentJob == null || CurrentJob.CurrentState == SolverState.Idle;
+        public bool CanRunSolver => CurrentTarget?.IsValid == true && CurrentJob?.IsActive != true;
+        public bool CanCancelSolver => CurrentJob?.IsActive == true;
+        public bool CanEditSettings => CurrentJob?.IsActive != true;
 
         public IRelayCommand ChangeBredPals { get; }
         public IRelayCommand ChangeWildPals { get; }

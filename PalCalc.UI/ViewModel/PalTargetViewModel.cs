@@ -91,6 +91,37 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
+        private SolverJobViewModel currentLatestJob;
+        public SolverJobViewModel CurrentLatestJob
+        {
+            get => currentLatestJob;
+            private set
+            {
+                if (currentLatestJob != null && currentLatestJob != value)
+                {
+                    currentLatestJob.PropertyChanged -= CurrentLatestJob_PropertyChanged;
+                }
+
+                if (SetProperty(ref currentLatestJob, value))
+                {
+                    OnPropertyChanged(nameof(CanEdit));
+
+                    if (value != null)
+                    {
+                        value.PropertyChanged += CurrentLatestJob_PropertyChanged;
+                    }
+                }
+            }
+        }
+
+        private void CurrentLatestJob_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(CurrentLatestJob.IsActive))
+                OnPropertyChanged(nameof(CanEdit));
+        }
+
+        public bool CanEdit => CurrentLatestJob == null || !CurrentLatestJob.IsActive;
+
         [ObservableProperty]
         private PalSpecifierViewModel initialPalSpecifier;
 
@@ -107,7 +138,9 @@ namespace PalCalc.UI.ViewModel
 
                     value.PropertyChanged += CurrentSpec_PropertyChanged;
                     OnPropertyChanged(nameof(IsValid));
-                    OnPropertyChanged(nameof(CurrentLatestJob));
+                    OnPropertyChanged(nameof(CanEdit));
+
+                    CurrentLatestJob = value?.LatestJob;
 
                     if (value != null)
                     {
@@ -116,8 +149,6 @@ namespace PalCalc.UI.ViewModel
                 }
             }
         }
-
-        public SolverJobViewModel CurrentLatestJob => CurrentPalSpecifier?.LatestJob;
 
         private void CurrentSpec_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -128,7 +159,7 @@ namespace PalCalc.UI.ViewModel
                     break;
 
                 case nameof(CurrentPalSpecifier.LatestJob):
-                    OnPropertyChanged(nameof(CurrentLatestJob));
+                    CurrentLatestJob = CurrentPalSpecifier.LatestJob;
                     break;
 
                 case nameof(CurrentPalSpecifier.IncludeBasePals):
