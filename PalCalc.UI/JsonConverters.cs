@@ -573,7 +573,10 @@ namespace PalCalc.UI
 
         protected override BreedingResultListViewModel ReadTypeJson(JsonReader reader, Type objectType, BreedingResultListViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            var resultsToken = JToken.ReadFrom(reader)["Results"];
+            var fullToken = JToken.ReadFrom(reader);
+            if (fullToken.Type == JTokenType.Null) return new BreedingResultListViewModel();
+
+            var resultsToken = fullToken["Results"];
             return new BreedingResultListViewModel() { Results = resultsToken.ToObject<List<BreedingResultViewModel>>(serializer) };
         }
 

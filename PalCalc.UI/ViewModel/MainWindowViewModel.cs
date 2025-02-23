@@ -463,18 +463,27 @@ namespace PalCalc.UI.ViewModel
 
         private void RunSolver()
         {
-            var currentSpec = PalTarget?.CurrentPalSpecifier?.ModelObject;
-            if (currentSpec == null) return;
+            var currentSpec = PalTarget?.CurrentPalSpecifier;
+            if (currentSpec?.ModelObject == null) return;
 
             var selectedGame = SaveSelection.SelectedFullGame;
             var cachedData = selectedGame.CachedValue;
             if (cachedData == null) return;
 
-            if (PalTarget.InitialPalSpecifier == null)
+            var initialSpec = PalTarget.InitialPalSpecifier;
+
+            if (initialSpec == null)
             {
-                PalTarget.CurrentPalSpecifier.DeleteCommand = deletePalTargetCommand;
-                PalTargetList.Add(PalTarget.CurrentPalSpecifier);
-                PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
+                initialSpec = currentSpec;
+                initialSpec.DeleteCommand = deletePalTargetCommand;
+
+                PalTargetList.Add(initialSpec);
+                PalTargetList.SelectedTarget = initialSpec;
+                SaveTargetList(PalTargetList);
+
+                UpdatePalTarget();
+
+                currentSpec = PalTarget.CurrentPalSpecifier;
             }
 
             var inputPals = PalTarget.AvailablePals.ToList();
@@ -483,13 +492,12 @@ namespace PalCalc.UI.ViewModel
             currentJob = new SolverJobViewModel(
                 dispatcher,
                 solver,
-                currentSpec
+                currentSpec.ModelObject
             );
 
-            var selectedTarget = PalTargetList.SelectedTarget;
-
-            PalTarget.CurrentPalSpecifier.LatestJob = currentJob;
-            selectedTarget.LatestJob = currentJob;
+            // TODO - comment
+            initialSpec.LatestJob = currentJob;
+            currentSpec.LatestJob = currentJob;
 
             currentJob.PropertyChanged += (s, e) =>
             {
@@ -505,27 +513,33 @@ namespace PalCalc.UI.ViewModel
             {
                 SolverControls.CurrentSolverState = SolverState.Idle;
                 IsEditable = true;
-                PalTarget.CurrentPalSpecifier.LatestJob = null;
+                initialSpec.LatestJob = null;
+                currentSpec.LatestJob = null;
             };
 
             currentJob.JobCompleted += () =>
             {
                 var results = currentJob.Results;
 
-                PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel()
+                currentSpec.CurrentResults = new BreedingResultListViewModel()
                 {
                     Results = results.Select(r => new BreedingResultViewModel(cachedData, SelectedGameSettings.ModelObject, r)).ToList()
                 };
-                
-                var updatedSpec = PalTarget.CurrentPalSpecifier;
-                PalTargetList.Replace(PalTarget.InitialPalSpecifier, updatedSpec);
-                PalTargetList.SelectedTarget = updatedSpec;
 
-                ShowNoResultsNotice = (results.Count == 0);
+                var shouldUpdateTarget = PalTargetList.SelectedTarget == initialSpec;
+
+                PalTargetList.Replace(initialSpec, currentSpec);
+
+                if (shouldUpdateTarget)
+                {
+                    PalTargetList.SelectedTarget = currentSpec;
+
+                    ShowNoResultsNotice = (results.Count == 0);
+
+                    UpdatePalTarget();
+                }
 
                 SaveTargetList(PalTargetList);
-
-                UpdatePalTarget();
             };
 
             currentJob.JobStopped += () =>
@@ -582,7 +596,7 @@ namespace PalCalc.UI.ViewModel
                     if (value != null) value.PropertyChanged += PalTarget_PropertyChanged;
 
                     var currentResults = PalTarget?.CurrentPalSpecifier?.CurrentResults;
-                    ShowNoResultsNotice = currentResults != null && currentResults.Results.Count == 0;
+                    ShowNoResultsNotice = currentResults != null && currentResults.Results?.Count == 0;
 
                     UpdateSolverControls();
                 }
