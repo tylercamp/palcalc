@@ -93,10 +93,24 @@ namespace PalCalc.UI
         protected override PassiveSkill ReadTypeJson(JsonReader reader, Type objectType, PassiveSkill existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var token = JToken.ReadFrom(reader);
-            var passiveInternalName = token.ToObject<string>();
-            return passiveInternalName != null
-                ? passiveInternalName.InternalToStandardPassive(db)
-                : null;
+            if (token.Type == JTokenType.Null)
+            {
+                return null;
+            }
+            else if (token.Type == JTokenType.String)
+            {
+                var passiveInternalName = token.ToObject<string>();
+                return passiveInternalName != null
+                    ? passiveInternalName.InternalToStandardPassive(db)
+                    : null;
+            }
+            else
+            {
+                // (Some converters were missing this as a dependency and wound up serializing the whole object
+                // structure of PassiveSkill instead of just storing the internal-name string)
+                var asDirectPassive = token.ToObject<PassiveSkill>();
+                return asDirectPassive.InternalName.InternalToStandardPassive(db);
+            }
         }
 
         protected override void WriteTypeJson(JsonWriter writer, PassiveSkill value, JsonSerializer serializer)
@@ -201,6 +215,7 @@ namespace PalCalc.UI
             dependencyConverters = new JsonConverter[]
             {
                 new IV_IValueConverter(),
+                new PassiveSkillConverter(db, gameSettings),
                 new PalInstanceJsonConverter(db),
                 new ILocalizedTextConverter(db, gameSettings),
             };
@@ -301,6 +316,7 @@ namespace PalCalc.UI
         {
             dependencyConverters = [
                 new ILocalizedTextConverter(db, gameSettings),
+                new PassiveSkillConverter(db, gameSettings),
             ];
         }
 
@@ -322,8 +338,7 @@ namespace PalCalc.UI
             var gender = token["Gender"]?.ToObject<PalGender>(serializer) ?? PalGender.WILDCARD;
 
             var guaranteedPassives = (token["GuaranteedPassives"] ?? token["GuaranteedTraits"])
-                ?.ToObject<List<string>>()
-                ?.Select(s => s.InternalToStandardPassive(db))
+                ?.ToObject<List<PassiveSkill>>(serializer)
                 ?.ToList()
                 ?? Enumerable.Empty<PassiveSkill>();
 
