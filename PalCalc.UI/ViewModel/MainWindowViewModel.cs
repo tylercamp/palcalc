@@ -470,6 +470,13 @@ namespace PalCalc.UI.ViewModel
             var cachedData = selectedGame.CachedValue;
             if (cachedData == null) return;
 
+            if (PalTarget.InitialPalSpecifier == null)
+            {
+                PalTarget.CurrentPalSpecifier.DeleteCommand = deletePalTargetCommand;
+                PalTargetList.Add(PalTarget.CurrentPalSpecifier);
+                PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
+            }
+
             var inputPals = PalTarget.AvailablePals.ToList();
             var solver = SolverControls.ConfiguredSolver(SelectedGameSettings.ModelObject, inputPals);
 
@@ -509,18 +516,10 @@ namespace PalCalc.UI.ViewModel
                 {
                     Results = results.Select(r => new BreedingResultViewModel(cachedData, SelectedGameSettings.ModelObject, r)).ToList()
                 };
-                if (PalTarget.InitialPalSpecifier == null)
-                {
-                    PalTarget.CurrentPalSpecifier.DeleteCommand = deletePalTargetCommand;
-                    PalTargetList.Add(PalTarget.CurrentPalSpecifier);
-                    PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
-                }
-                else
-                {
-                    var updatedSpec = PalTarget.CurrentPalSpecifier;
-                    PalTargetList.Replace(PalTarget.InitialPalSpecifier, updatedSpec);
-                    PalTargetList.SelectedTarget = updatedSpec;
-                }
+                
+                var updatedSpec = PalTarget.CurrentPalSpecifier;
+                PalTargetList.Replace(PalTarget.InitialPalSpecifier, updatedSpec);
+                PalTargetList.SelectedTarget = updatedSpec;
 
                 ShowNoResultsNotice = (results.Count == 0);
 
