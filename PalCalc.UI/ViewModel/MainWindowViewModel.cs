@@ -3,18 +3,13 @@ using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using PalCalc.Model;
 using PalCalc.SaveReader;
-using PalCalc.Solver;
-using PalCalc.Solver.PalReference;
-using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
-using PalCalc.UI.View;
 using PalCalc.UI.View.Inspector;
 using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Presets;
 using PalCalc.UI.ViewModel.Solver;
-using QuickGraph;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -24,8 +19,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -113,63 +106,7 @@ namespace PalCalc.UI.ViewModel
             ResumeSolverCommand = new RelayCommand(ResumeSolver);
             CancelSolverCommand = new RelayCommand(CancelSolver);
 
-            RunSolverCommand = new RelayCommand(() =>
-            {
-                var currentSpec = PalTarget?.CurrentPalSpecifier;
-                if (currentSpec?.ModelObject == null) return;
-
-                var selectedGame = SaveSelection.SelectedFullGame;
-                var cachedData = selectedGame.CachedValue;
-                if (cachedData == null) return;
-
-                var initialSpec = PalTarget.InitialPalSpecifier;
-
-                if (initialSpec == null)
-                {
-                    initialSpec = currentSpec;
-                    initialSpec.DeleteCommand = deletePalTargetCommand;
-
-                    PalTargetList.Add(initialSpec);
-                    PalTargetList.SelectedTarget = initialSpec;
-                    SaveTargetList(PalTargetList);
-
-                    UpdatePalTarget();
-
-                    currentSpec = PalTarget.CurrentPalSpecifier;
-                }
-
-                var inputPals = PalTarget.AvailablePals.ToList();
-
-                var job = RunSolver(cachedData, currentSpec, inputPals);
-
-                job.JobCompleted += () =>
-                {
-                    var shouldUpdateTarget = PalTargetList.SelectedTarget == initialSpec;
-
-                    PalTargetList.Replace(initialSpec, currentSpec);
-
-                    if (shouldUpdateTarget)
-                    {
-                        PalTargetList.SelectedTarget = currentSpec;
-
-                        ShowNoResultsNotice = (job.Results.Count == 0);
-
-                        UpdatePalTarget();
-                    }
-
-                    SaveTargetList(PalTargetList);
-                };
-
-                job.JobCancelled += () =>
-                {
-                    initialSpec.LatestJob = null;
-                    currentSpec.LatestJob = null;
-                };
-
-                // TODO - comment
-                initialSpec.LatestJob = job;
-                currentSpec.LatestJob = job;
-            });
+            RunSolverCommand = new RelayCommand(RunSolver);
 
             dispatcher.Invoke(() =>
             {
@@ -178,7 +115,8 @@ namespace PalCalc.UI.ViewModel
                 {
                     App.Current.MainWindow.Closing += (o, e) =>
                     {
-                        CancelSolverCommand.Execute(null);
+                        foreach (var target in SolverQueue.QueuedItems)
+                            target.LatestJob.Cancel();
                     };
                 }
             });
@@ -514,28 +452,71 @@ namespace PalCalc.UI.ViewModel
             File.WriteAllText(outputFile, JsonConvert.SerializeObject(list, converter));
         }
 
-        private SolverJobViewModel RunSolver(CachedSaveGame cachedData, PalSpecifierViewModel currentSpec, List<PalInstance> inputPals)
+        private void RunSolver()
         {
-            var solver = SolverControls.ConfiguredSolver(SelectedGameSettings.ModelObject, inputPals);
+            var currentSpec = PalTarget?.CurrentPalSpecifier;
+            if (currentSpec?.ModelObject == null) return;
+
+            var selectedGame = SaveSelection.SelectedFullGame;
+            var cachedData = selectedGame.CachedValue;
+            if (cachedData == null) return;
+
+            var initialSpec = PalTarget.InitialPalSpecifier;
+
+            if (initialSpec == null)
+            {
+                initialSpec = currentSpec;
+                initialSpec.DeleteCommand = deletePalTargetCommand;
+
+                PalTargetList.Add(initialSpec);
+                PalTargetList.SelectedTarget = initialSpec;
+                SaveTargetList(PalTargetList);
+
+                UpdatePalTarget();
+
+                currentSpec = PalTarget.CurrentPalSpecifier;
+            }
 
             var job = new SolverJobViewModel(
                 dispatcher,
-                solver,
+                SolverControls.ConfiguredSolver(SelectedGameSettings.ModelObject, PalTarget.AvailablePals.ToList()),
                 currentSpec
             );
 
             job.JobCompleted += () =>
             {
-                var results = job.Results;
                 currentSpec.CurrentResults = new BreedingResultListViewModel()
                 {
-                    Results = results.Select(r => new BreedingResultViewModel(cachedData, SelectedGameSettings.ModelObject, r)).ToList()
+                    Results = job.Results.Select(r => new BreedingResultViewModel(cachedData, SelectedGameSettings.ModelObject, r)).ToList()
                 };
+
+                var shouldUpdateTarget = PalTargetList.SelectedTarget == initialSpec;
+
+                PalTargetList.Replace(initialSpec, currentSpec);
+
+                if (shouldUpdateTarget)
+                {
+                    PalTargetList.SelectedTarget = currentSpec;
+                    ShowNoResultsNotice = (job.Results.Count == 0);
+
+                    UpdatePalTarget();
+                }
+
+                SaveTargetList(PalTargetList);
             };
 
-            job.Run();
+            job.JobCancelled += () =>
+            {
+                initialSpec.LatestJob = null;
+                currentSpec.LatestJob = null;
+            };
 
-            return job;
+            // TODO - comment
+            initialSpec.LatestJob = job;
+            currentSpec.LatestJob = job;
+
+            job.Run();
+            SolverQueue.Add(currentSpec);
         }
 
         private void CancelSolver()
@@ -585,6 +566,8 @@ namespace PalCalc.UI.ViewModel
                 }
             }
         }
+
+        public SolverQueueViewModel SolverQueue { get; } = new SolverQueueViewModel();
 
         [ObservableProperty]
         private Visibility updatesMessageVisibility = Visibility.Collapsed;
