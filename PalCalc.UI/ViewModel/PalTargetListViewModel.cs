@@ -68,6 +68,9 @@ namespace PalCalc.UI.ViewModel
 
         public void DragOver(IDropInfo dropInfo)
         {
+            if (!dropInfo.IsSameDragDropContextAsSource)
+                return;
+
             var sourceItem = dropInfo.Data as PalSpecifierViewModel;
             var targetItem = dropInfo.TargetItem as PalSpecifierViewModel;
 

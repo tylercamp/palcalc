@@ -265,6 +265,15 @@ namespace DotNetKit.Windows.Controls
                 return;
             }
 
+            var matchingItem = ItemsSource.Cast<object>().Where(i => TextFromItem(i) == Text).FirstOrDefault();
+            if (matchingItem != SelectedItem)
+            {
+                using (new TextBoxStatePreserver(EditableTextBox))
+                {
+                    SelectedItem = matchingItem;
+                }
+            }
+
             disposable.Content =
                 new Timer(
                     state =>

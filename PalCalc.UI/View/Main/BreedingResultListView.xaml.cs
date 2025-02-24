@@ -1,4 +1,4 @@
-﻿using PalCalc.UI.ViewModel;
+﻿using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
 using System.Linq;

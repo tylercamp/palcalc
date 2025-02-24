@@ -10,6 +10,7 @@ using PalCalc.UI.ViewModel.Inspector.Search;
 using PalCalc.UI.ViewModel.Inspector.Search.Container;
 using PalCalc.UI.ViewModel.Inspector.Search.Grid;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.PalDerived;
 using QuickGraph.Graphviz;
 using QuickGraph.Serialization;
 using System;

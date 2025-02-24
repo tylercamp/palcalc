@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI.ViewModel.PalDerived
 {
     public partial class PassiveSkillCollectionViewModel : ObservableObject, IComparable
     {

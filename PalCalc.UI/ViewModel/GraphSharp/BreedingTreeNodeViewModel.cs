@@ -7,6 +7,7 @@ using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.PalDerived;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

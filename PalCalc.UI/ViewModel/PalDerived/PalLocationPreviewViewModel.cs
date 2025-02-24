@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI.ViewModel.PalDerived
 {
     public interface IPalLocationPreviewViewModel
     {
@@ -59,7 +59,7 @@ namespace PalCalc.UI.ViewModel
                 .Range(0, NumCols * NumRows)
                 .Select(i => PalDisplayCoord.FromLocation(settings, location.Type, i))
                 .Select<PalDisplayCoord, IContainerLocationPreviewSlotViewModel>(c =>
-                    (c.Row == ContainerCoord.Row && c.Column == ContainerCoord.Column)
+                    c.Row == ContainerCoord.Row && c.Column == ContainerCoord.Column
                         ? new FocusedContainerLocationPreviewSlotViewModel()
                         : new EmptyContainerLocationPreviewSlotViewModel()
                 )

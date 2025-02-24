@@ -54,6 +54,12 @@ namespace PalCalc.UI
             logger.Information($"Pal Calc version {Version}");
 
             PalDB.BeginLoadEmbedded();
+            Task.Run(() =>
+            {
+                // start loading breeding DB early as well, reduces "Initializing" step when solver first runs
+                var db = PalDB.LoadEmbedded();
+                PalBreedingDB.BeginLoadEmbedded(db);
+            });
 
             Translator.OnTranslationError += TranslationErrors.Add;
             Translator.Init();

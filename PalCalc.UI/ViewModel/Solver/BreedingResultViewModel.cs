@@ -8,6 +8,7 @@ using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.GraphSharp;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.PalDerived;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI.ViewModel.Solver
 {
     public class BreedingResultViewModel : ObservableObject
     {
@@ -25,7 +26,7 @@ namespace PalCalc.UI.ViewModel
             var db = PalDB.LoadEmbedded();
             var saveGame = CachedSaveGame.SampleForDesignerView;
 
-            var solver = new Solver.BreedingSolver(
+            var solver = new BreedingSolver(
                 new BreedingSolverSettings(
                     gameSettings: new GameSettings(),
                     db: db,

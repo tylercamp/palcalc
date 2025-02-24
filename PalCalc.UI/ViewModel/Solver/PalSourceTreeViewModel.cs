@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI.ViewModel.Solver
 {
     public interface IPalSourceTreeNode
     {

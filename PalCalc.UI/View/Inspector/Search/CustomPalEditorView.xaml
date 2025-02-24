@@ -5,13 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View.Inspector"
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:vmpd="clr-namespace:PalCalc.UI.ViewModel.PalDerived"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              mc:Ignorable="d"
              d:Background="White"
-             d:DataContext="{x:Static vm:CustomPalInstanceViewModel.DesignInstance}">
+             d:DataContext="{x:Static vmpd:CustomPalInstanceViewModel.DesignInstance}">
     <!-- (assignment from VM to AutoCompleteComboBox isn't reflected in designer view for some reason?) -->
     <Grid>
         <vu:SpacedWrapPanel HorizontalSpacing="25" VerticalSpacing="15">
@@ -29,9 +30,9 @@
 
             <StackPanel Orientation="Vertical">
                 <Label Content="{itl:LocalizedText LC_COMMON_GENDER}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
-                <ComboBox SelectedItem="{Binding Gender}" ItemsSource="{x:Static vm:CustomPalInstanceGender.Options}" MinWidth="100">
+                <ComboBox SelectedItem="{Binding Gender}" ItemsSource="{x:Static vmpd:CustomPalInstanceGender.Options}" MinWidth="100">
                     <ComboBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type vm:CustomPalInstanceGender}">
+                        <DataTemplate DataType="{x:Type vmpd:CustomPalInstanceGender}">
                             <TextBlock Text="{Binding Label.Value}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>

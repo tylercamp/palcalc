@@ -15,7 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Media;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI.ViewModel.Presets
 {
     public partial class PassiveSkillsPresetCollectionViewModel : ObservableObject
     {

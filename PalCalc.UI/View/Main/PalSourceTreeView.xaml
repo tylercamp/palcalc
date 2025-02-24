@@ -5,10 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View"
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:vms="clr-namespace:PalCalc.UI.ViewModel.Solver"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance vm:PalSourceTreeViewModel, IsDesignTimeCreatable=True}"
+             d:DataContext="{d:DesignInstance vms:PalSourceTreeViewModel, IsDesignTimeCreatable=True}"
              >
     <TreeView x:Name="m_TreeView" ItemsSource="{Binding RootNodes}" SelectedItemChanged="TreeView_SelectedItemChanged" BorderBrush="{x:Null}">
         <TreeView.ItemContainerStyle>
@@ -23,17 +24,17 @@
             </Style>
         </TreeView.ItemContainerStyle>
         <TreeView.Resources>
-            <HierarchicalDataTemplate DataType="{x:Type vm:GuildSourceTreeNodeViewModel}" ItemsSource="{Binding Children}">
+            <HierarchicalDataTemplate DataType="{x:Type vms:GuildSourceTreeNodeViewModel}" ItemsSource="{Binding Children}">
                 <TextBlock Text="{Binding Label.Value}" />
             </HierarchicalDataTemplate>
 
-            <DataTemplate DataType="{x:Type vm:AnyPlayerInGuildSourceTreeNodeViewModel}">
+            <DataTemplate DataType="{x:Type vms:AnyPlayerInGuildSourceTreeNodeViewModel}">
                 <TextBlock Text="{Binding Label.Value}" />
             </DataTemplate>
-            <DataTemplate DataType="{x:Type vm:AnyPlayerInAnyGuildTreeNodeViewModel}">
+            <DataTemplate DataType="{x:Type vms:AnyPlayerInAnyGuildTreeNodeViewModel}">
                 <TextBlock Text="{Binding Label.Value}" />
             </DataTemplate>
-            <DataTemplate DataType="{x:Type vm:PlayerSourceTreeNodeViewModel}">
+            <DataTemplate DataType="{x:Type vms:PlayerSourceTreeNodeViewModel}">
                 <TextBlock Text="{Binding Label.Value}" />
             </DataTemplate>
         </TreeView.Resources>

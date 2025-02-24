@@ -5,6 +5,7 @@ using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.Presets;
 using QuickGraph;
 using System;
 using System.Collections.Generic;

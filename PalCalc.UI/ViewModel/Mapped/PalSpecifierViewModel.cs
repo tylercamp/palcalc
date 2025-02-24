@@ -4,6 +4,8 @@ using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.PalDerived;
+using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -240,6 +242,9 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
         }
 
+        [ObservableProperty]
+        private SolverJobViewModel latestJob;
+
         public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(
             new PalSpecifier()
             {
@@ -258,6 +263,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             IncludeCustomPals = IncludeCustomPals,
             IncludeCagedPals = IncludeCagedPals,
             DeleteCommand = DeleteCommand,
+            LatestJob = LatestJob,
         };
 
         public static readonly PalSpecifierViewModel New = new PalSpecifierViewModel(null, true);

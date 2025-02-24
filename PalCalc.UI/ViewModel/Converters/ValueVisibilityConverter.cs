@@ -15,6 +15,7 @@ namespace PalCalc.UI.ViewModel.Converters
         {
             if (value == null) return Visibility.Collapsed;
             else if (value is bool v) return v ? Visibility.Visible : Visibility.Collapsed;
+            else if (value is int i) return i != 0 ? Visibility.Visible : Visibility.Collapsed;
             else return Visibility.Visible;
         }
 

@@ -2,6 +2,7 @@
 using PalCalc.Model;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.PalDerived;
 using Serilog;
 using System;
 using System.Collections.Generic;
