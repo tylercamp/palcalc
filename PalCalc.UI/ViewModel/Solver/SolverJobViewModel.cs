@@ -125,7 +125,7 @@ namespace PalCalc.UI.ViewModel.Solver
 
             solver.SolverStateUpdated += Solver_SolverStateUpdated;
 
-            CurrentState = SolverState.Idle;
+            CurrentState = SolverState.Paused;
         }
 
         public void Run()
@@ -303,7 +303,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 }
 
                 SolverProgress = 100 * overallStep / numTotalSteps;
-            }).Wait();
+            }, DispatcherPriority.Send);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using GongSolutions.Wpf.DragDrop;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
@@ -12,10 +13,13 @@ using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
-    class SolverQueueViewModel : ObservableObject, IDropTarget
+    partial class SolverQueueViewModel : ObservableObject, IDropTarget
     {
         private ObservableCollection<PalSpecifierViewModel> orderedPendingTargets;
         public ReadOnlyObservableCollection<PalSpecifierViewModel> QueuedItems { get; }
+
+        [ObservableProperty]
+        private IRelayCommand<PalSpecifierViewModel> selectItemCommand;
 
         public SolverQueueViewModel()
         {
@@ -44,11 +48,8 @@ namespace PalCalc.UI.ViewModel.Solver
             if (job == null)
                 throw new InvalidOperationException();
 
-            if (!orderedPendingTargets.Any(t => t.LatestJob.CurrentState == SolverState.Running))
-                job.Run();
-            else
-                job.Pause();
-            
+            var shouldStart = orderedPendingTargets.Count == 0;
+
             orderedPendingTargets.Add(item);
 
             // TODO - event listener leaks
@@ -59,17 +60,24 @@ namespace PalCalc.UI.ViewModel.Solver
 
             job.PropertyChanged += (_, ev) =>
             {
+                if (!orderedPendingTargets.Contains(item)) return;
+
                 if (ev.PropertyName == nameof(job.CurrentState) && job.CurrentState == SolverState.Running)
                 {
                     var othersRunning = orderedPendingTargets.Where(t => t.LatestJob.CurrentState == SolverState.Running && t != item).ToList();
                     foreach (var other in othersRunning)
                         other.LatestJob.Pause();
 
-                    Dispatcher.CurrentDispatcher.BeginInvoke(
-                        () => orderedPendingTargets.Move(orderedPendingTargets.IndexOf(item), 0)
-                    );
+                    Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+                    {
+                        if (orderedPendingTargets.Contains(item))
+                            orderedPendingTargets.Move(orderedPendingTargets.IndexOf(item), 0);
+                    });
                 }
             };
+
+            if (shouldStart)
+                job.Run();
         }
 
         public void DragOver(IDropInfo dropInfo)

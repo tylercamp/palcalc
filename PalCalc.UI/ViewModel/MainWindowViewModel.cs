@@ -236,6 +236,8 @@ namespace PalCalc.UI.ViewModel
                 if (spec != null) selectedPreset.ApplyTo(spec);
             };
 
+            SolverQueue.SelectItemCommand = new RelayCommand<PalSpecifierViewModel>(vm => PalTargetList.SelectedTarget = PalTargetList.Targets.FirstOrDefault(t => t.LatestJob == vm.LatestJob));
+
             CheckForUpdates();
         }
 
@@ -510,9 +512,6 @@ namespace PalCalc.UI.ViewModel
                 initialSpec.LatestJob = null;
                 currentSpec.LatestJob = null;
             };
-
-            job.Run();
-            job.Pause();
 
             // TODO - comment
             initialSpec.LatestJob = job;

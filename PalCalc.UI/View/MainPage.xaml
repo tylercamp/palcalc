@@ -95,6 +95,9 @@
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="mvm:PalSpecifierViewModel">
                                                 <Border Padding="5" HorizontalAlignment="Stretch" BorderThickness="1" Cursor="Hand">
+                                                    <Border.InputBindings>
+                                                        <MouseBinding Gesture="LeftClick" Command="{Binding RelativeSource={RelativeSource AncestorType=ItemsControl}, Path=DataContext.SolverQueue.SelectItemCommand}" CommandParameter="{Binding}" />
+                                                    </Border.InputBindings>
                                                     <Border.Style>
                                                         <Style TargetType="Border">
                                                             <Setter Property="Background" Value="Transparent" />

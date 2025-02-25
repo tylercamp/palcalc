@@ -26,6 +26,8 @@ namespace PalCalc.Solver
 
         public long WorkProcessedCount { get; set; }
         public long TotalWorkProcessedCount { get; set; }
+
+        public override int GetHashCode() => HashCode.Combine(CurrentPhase, CurrentStepIndex, Canceled, Paused, CurrentWorkSize, WorkProcessedCount);
     }
 
     public class BreedingSolver(BreedingSolverSettings settings)
@@ -200,6 +202,7 @@ namespace PalCalc.Solver
                     statusMsg.WorkProcessedCount = 0;
                     SolverStateUpdated?.Invoke(statusMsg);
 
+                    int lastMsgHash = 0;
                     void EmitProgressMsg(object _)
                     {
                         lock (progressEntries)
@@ -208,26 +211,58 @@ namespace PalCalc.Solver
                             statusMsg.WorkProcessedCount = progress;
                         }
                         statusMsg.Paused = controller.IsPaused;
-                        SolverStateUpdated?.Invoke(statusMsg);
+
+                        if (lastMsgHash == 0 || lastMsgHash != statusMsg.GetHashCode())
+                        {
+                            lastMsgHash = statusMsg.GetHashCode();
+                            SolverStateUpdated?.Invoke(statusMsg);
+                        }
                     }
 
                     var progressTimer = new Timer(EmitProgressMsg, null, (int)SolverStateUpdateInterval.TotalMilliseconds, (int)SolverStateUpdateInterval.TotalMilliseconds);
 
-                    var resEnum = work
-                        .Chunks(work.Count.PreferredParallelBatchSize())
-                        .AsParallel()
-                        .WithDegreeOfParallelism(settings.MaxThreads)
-                        .SelectMany(workBatch =>
+                    var chunksEnumerator = work.Chunks(work.Count.PreferredParallelBatchSize()).GetEnumerator();
+                    var results = new ConcurrentBag<List<IPalReference>>();
+
+                    // specifically avoiding AsParallel so we don't congest the default threadpool and so we can
+                    // set a lower priority for these threads
+                    var workThreads = Enumerable
+                        .Range(0, settings.MaxThreads)
+                        .Select(_ => new Thread(() =>
                         {
-                            var progress = new WorkBatchProgress();
-                            lock (progressEntries)
-                                progressEntries.Add(progress);
+                            while (true)
+                            {
+                                IEnumerable<(IPalReference, IPalReference)> batch = null;
+                                lock(chunksEnumerator)
+                                {
+                                    if (!chunksEnumerator.MoveNext())
+                                        break;
 
-                            var batchSolver = new BreedingBatchSolver(controller, settings, tlPoolFactory.Value);
-                            return batchSolver.ProcessBatch(workBatch, progress, stepState);
-                        });
+                                    batch = chunksEnumerator.Current;
+                                }
 
-                    var res = resEnum.ToList();
+                                var progress = new WorkBatchProgress();
+                                lock (progressEntries)
+                                    progressEntries.Add(progress);
+
+                                var batchSolver = new BreedingBatchSolver(controller, settings, tlPoolFactory.Value);
+                                results.Add(batchSolver.ProcessBatch(batch, progress, stepState).ToList());
+                            }
+                        }))
+                        .ToList();
+
+                    foreach (var thread in workThreads)
+                    {
+                        thread.Priority = ThreadPriority.BelowNormal;
+                        thread.Start();
+                    }
+
+                    foreach (var thread in workThreads)
+                    {
+                        thread.Join();
+                    }
+
+                    var res = results.SelectMany(l => l).ToList();
                     progressTimer.Dispose();
 
                     return res;
