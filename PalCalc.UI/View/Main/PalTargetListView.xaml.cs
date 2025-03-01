@@ -26,5 +26,12 @@ namespace PalCalc.UI.View.Main
 
             SetResourceReference(StyleProperty, typeof(ListBox));
         }
+
+        protected override void OnSelectionChanged(SelectionChangedEventArgs e)
+        {
+            base.OnSelectionChanged(e);
+
+            ScrollIntoView(SelectedItem);
+        }
     }
 }

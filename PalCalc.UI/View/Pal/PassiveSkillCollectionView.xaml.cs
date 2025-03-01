@@ -1,4 +1,5 @@
 ﻿using PalCalc.UI.ViewModel;
+using PalCalc.UI.ViewModel.PalDerived;
 using QuickGraph;
 using System;
 using System.Collections.Generic;

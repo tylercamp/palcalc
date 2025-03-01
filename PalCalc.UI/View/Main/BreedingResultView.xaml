@@ -7,6 +7,7 @@
              xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:vms="clr-namespace:PalCalc.UI.ViewModel.Solver"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:gsvm="clr-namespace:PalCalc.UI.ViewModel.GraphSharp"
              xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
@@ -20,7 +21,7 @@
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              TextOptions.TextFormattingMode="Ideal"
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance vm:BreedingResultViewModel, IsDesignTimeCreatable=True}"
+             d:DataContext="{d:DesignInstance vms:BreedingResultViewModel, IsDesignTimeCreatable=True}"
              >
     <UserControl.Resources>
         <c:ValueBoolConverter x:Key="VBC" />

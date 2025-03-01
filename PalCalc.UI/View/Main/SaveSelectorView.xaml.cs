@@ -23,6 +23,14 @@ namespace PalCalc.UI.View.Main
     /// </summary>
     public partial class SaveSelectorView : StackPanel
     {
+        public static readonly DependencyProperty AllowNavigationProperty = DependencyProperty.Register(nameof(AllowNavigation), typeof(bool), typeof(SaveSelectorView), new PropertyMetadata(true));
+
+        public bool AllowNavigation
+        {
+            get => (bool)GetValue(AllowNavigationProperty);
+            set => SetValue(AllowNavigationProperty, value);
+        }
+
         public SaveSelectorView()
         {
             InitializeComponent();

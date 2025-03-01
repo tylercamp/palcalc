@@ -3,16 +3,13 @@ using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using PalCalc.Model;
 using PalCalc.SaveReader;
-using PalCalc.Solver;
-using PalCalc.Solver.PalReference;
-using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
-using PalCalc.UI.View;
 using PalCalc.UI.View.Inspector;
 using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
-using QuickGraph;
+using PalCalc.UI.ViewModel.Presets;
+using PalCalc.UI.ViewModel.Solver;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -22,8 +19,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -43,6 +38,8 @@ namespace PalCalc.UI.ViewModel
         public double ProgressPercent => 100 * (TotalSaves > 0 ? (double)LoadedSaves / TotalSaves : 1);
     }
 
+    
+
     internal partial class MainWindowViewModel : ObservableObject
     {
         private static ILogger logger = Log.ForContext<MainWindowViewModel>();
@@ -52,13 +49,6 @@ namespace PalCalc.UI.ViewModel
         private AppSettings settings;
         private PassiveSkillsPresetCollectionViewModel passivePresets;
         private IRelayCommand<PalSpecifierViewModel> deletePalTargetCommand;
-        private SolverJob currentJob;
-
-        private record class SolverJob(
-            CancellationTokenSource TokenSource,
-            SolverStateController SolverController,
-            MemoryMonitor MemoryMonitor
-        );
 
         public ICommand RunSolverCommand { get; }
         public ICommand PauseSolverCommand { get; }
@@ -112,19 +102,34 @@ namespace PalCalc.UI.ViewModel
 
             Storage.SaveAppSettings(settings);
 
-            RunSolverCommand = new RelayCommand(RunSolver);
             PauseSolverCommand = new RelayCommand(PauseSolver);
             ResumeSolverCommand = new RelayCommand(ResumeSolver);
             CancelSolverCommand = new RelayCommand(CancelSolver);
+
+            RunSolverCommand = new RelayCommand(RunSolver);
 
             dispatcher.Invoke(() =>
             {
                 // (needed for XAML designer view)
                 if (App.Current.MainWindow != null)
                 {
+                    App.Current.Exit += (o, e) =>
+                    {
+                        foreach (var target in SolverQueue.QueuedItems)
+                            target.LatestJob.Cancel();
+                    };
+
                     App.Current.MainWindow.Closing += (o, e) =>
                     {
-                        CancelSolverCommand.Execute(null);
+                        if (SolverQueue.QueuedItems.Count == 0)
+                            return;
+
+                        var title = LocalizationCodes.LC_JOB_QUEUE_CLOSING_TITLE.Bind().Value;
+                        var msg = LocalizationCodes.LC_JOB_QUEUE_CLOSING_MSG.Bind().Value;
+                        if (AdonisMessageBox.Show(App.Current.MainWindow, msg, title, AdonisMessageBoxButton.YesNo) == AdonisMessageBoxResult.No)
+                        {
+                            e.Cancel = true;
+                        }
                     };
                 }
             });
@@ -243,6 +248,8 @@ namespace PalCalc.UI.ViewModel
                 var spec = PalTarget?.CurrentPalSpecifier;
                 if (spec != null) selectedPreset.ApplyTo(spec);
             };
+
+            SolverQueue.SelectItemCommand = new RelayCommand<PalSpecifierViewModel>(vm => PalTargetList.SelectedTarget = PalTargetList.Targets.FirstOrDefault(t => t.LatestJob == vm.LatestJob));
 
             CheckForUpdates();
         }
@@ -462,267 +469,92 @@ namespace PalCalc.UI.ViewModel
 
         private void RunSolver()
         {
-            var currentSpec = PalTarget?.CurrentPalSpecifier?.ModelObject;
-            if (currentSpec == null) return;
+            var currentSpec = PalTarget?.CurrentPalSpecifier;
+            if (currentSpec?.ModelObject == null) return;
 
             var selectedGame = SaveSelection.SelectedFullGame;
             var cachedData = selectedGame.CachedValue;
             if (cachedData == null) return;
 
-            var inputPals = PalTarget.AvailablePals.ToList();
-            var solver = SolverControls.ConfiguredSolver(SelectedGameSettings.ModelObject, inputPals);
-            solver.SolverStateUpdated += Solver_SolverStateUpdated;
+            var initialSpec = PalTarget.InitialPalSpecifier;
 
-            var solverThread = new Thread(() =>
+            if (initialSpec == null)
             {
-                try
-                {
-                    dispatcher.Invoke(() =>
-                    {
-                        IsEditable = false;
-                        SolverControls.CurrentSolverState = SolverState.Running;
-                    });
+                initialSpec = currentSpec.Copy();
+                initialSpec.DeleteCommand = deletePalTargetCommand;
 
-                    var solverTokenSource2 = new CancellationTokenSource();
+                PalTargetList.Add(initialSpec);
+                PalTargetList.SelectedTarget = initialSpec;
+                SaveTargetList(PalTargetList);
 
-                    currentJob = new SolverJob(
-                        solverTokenSource2,
-                        new SolverStateController() { CancellationToken = solverTokenSource2.Token },
-                        // start the monitor paused - race condition in `MemoryMonitor_MemoryWarning` callback
-                        // when accessing `currentJob`. will be unpaused in `Solver_SolverStateUpdated`
-                        new MemoryMonitor(solverTokenSource2.Token) { PauseNotices = true }
-                    );
+                UpdatePalTarget();
+                currentSpec = PalTarget.CurrentPalSpecifier;
+            }
 
-                    // NOTE
-                    //
-                    // memory monitor unnecessary after recent memory-usage optimizations, leaving code
-                    // just in case for later use, but disabling globally by disposing early
-                    currentJob.MemoryMonitor.Dispose();
+            var originalGameSettings = SelectedGameSettings.ModelObject;
+            var job = new SolverJobViewModel(
+                dispatcher,
+                SolverControls.ConfiguredSolver(originalGameSettings, PalTarget.AvailablePals.ToList()),
+                currentSpec,
+                cachedData.StateId
+            );
 
-                    // monitor memory usage and pause if we take up a significant amount
-                    currentJob.MemoryMonitor.MemoryWarning += MemoryMonitor_MemoryWarning;
-
-                    List<IPalReference> results;
-                    try
-                    {
-                        results = solver.SolveFor(currentSpec, currentJob.SolverController);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        results = [];
-                    }
-
-                    // general simplification pass, get the best result for each potentially
-                    // interesting combination of result properties
-                    var resultsTable = new PalPropertyGrouping(PalProperty.Combine(
-                        PalProperty.EffectivePassives,
-                        PalProperty.NumBreedingSteps,
-                        p => p.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
-                    ));
-                    resultsTable.AddRange(results);
-                    resultsTable.FilterAll(PruningRulesBuilder.Default, currentJob.TokenSource.Token);
-
-                    // final simplification pass, ignore any results which are over 2x the effort of the fastest option
-                    resultsTable = resultsTable.BuildNew(PalProperty.Combine(
-                        PalProperty.EffectivePassives
-                    ));
-                    resultsTable.FilterAll(g =>
-                    {
-                        // (though if "the fastest option" is just a pal we already own with 0 effort, don't count that)
-                        var nonZero = g.Where(r => r.BreedingEffort > TimeSpan.Zero).ToList();
-                        if (nonZero.Count != 0)
-                        {
-                            var fastest = g.Where(r => r.BreedingEffort > TimeSpan.Zero).Min(r => r.BreedingEffort);
-                            return g.Where(r => r.BreedingEffort <= fastest * 2);
-                        }
-                        else
-                        {
-                            return g.Take(1);
-                        }
-                    });
-
-                    results = resultsTable.All.ToList();
-
-                    dispatcher.Invoke(() =>
-                    {
-                        if (!currentJob.TokenSource.IsCancellationRequested)
-                        {
-                            PalTarget.CurrentPalSpecifier.CurrentResults = new BreedingResultListViewModel()
-                            {
-                                Results = results.Select(r => new BreedingResultViewModel(cachedData, SelectedGameSettings.ModelObject, r)).ToList()
-                            };
-                            if (PalTarget.InitialPalSpecifier == null)
-                            {
-                                PalTarget.CurrentPalSpecifier.DeleteCommand = deletePalTargetCommand;
-                                PalTargetList.Add(PalTarget.CurrentPalSpecifier);
-                                PalTargetList.SelectedTarget = PalTarget.CurrentPalSpecifier;
-                            }
-                            else
-                            {
-                                var updatedSpec = PalTarget.CurrentPalSpecifier;
-                                PalTargetList.Replace(PalTarget.InitialPalSpecifier, updatedSpec);
-                                PalTargetList.SelectedTarget = updatedSpec;
-                            }
-
-                            ShowNoResultsNotice = (results.Count == 0);
-
-                            SaveTargetList(PalTargetList);
-
-                            UpdatePalTarget();
-                        }
-
-                        currentJob.TokenSource.Dispose();
-                        currentJob?.MemoryMonitor?.Dispose();
-                        currentJob = null;
-
-                        SolverControls.CurrentSolverState = SolverState.Idle;
-                        IsEditable = true;
-                    });
-                }
-                catch (Exception e)
-                {
-                    dispatcher.BeginInvoke(() =>
-                    {
-                        // re-throw on UI thread so the app crashes (instead of hangs) with proper error handling
-                        throw new Exception("Unhandled error during solver operation", e);
-                    });
-                }
-            });
-
-            solverThread.Priority = ThreadPriority.BelowNormal;
-            solverThread.Start();
-        }
-
-        private void MemoryMonitor_MemoryWarning()
-        {
-            currentJob.SolverController.Pause();
-            // (regardless of the user's selection, notices will be paused until the end of the current
-            // breeding step. notices will resume once the next step starts)
-            currentJob.MemoryMonitor.PauseNotices = true;
-
-            dispatcher.BeginInvoke(() =>
+            job.JobCompleted += (job) =>
             {
-                var response = AdonisMessageBox.Show(
-                    owner: App.Current.MainWindow,
-                    text: LocalizationCodes.LC_MEMORY_WARNING_MSG.Bind().Value,
-                    caption: LocalizationCodes.LC_MEMORY_WARNING_TITLE.Bind().Value,
-                    buttons: AdonisMessageBoxButton.YesNoCancel
-                );
-
-                switch (response)
+                currentSpec.CurrentResults = new BreedingResultListViewModel()
                 {
-                    case AdonisMessageBoxResult.Yes:
-                        // stop the memory monitor entirely, it's still accessible but will no
-                        // longer emit events regardless of `PauseNotices`
-                        currentJob.MemoryMonitor.Dispose();
-                        break;
+                    Results = job.Results.Select(r => new BreedingResultViewModel(cachedData, originalGameSettings, r)).ToList()
+                };
 
-                    case AdonisMessageBoxResult.No:
-                        break;
-
-                    default:
-                        CancelSolver();
-                        break;
+                if (job.SaveStateId != cachedData.StateId)
+                {
+                    var latestGameSettings = GameSettingsViewModel.Load(selectedGame.Value).ModelObject;
+                    currentSpec.CurrentResults.UpdateCachedData(cachedData, latestGameSettings);
                 }
 
-                currentJob?.SolverController?.Resume();
-            });
+                var shouldUpdateTarget = PalTargetList.SelectedTarget == initialSpec;
+
+                PalTargetList.Replace(initialSpec, currentSpec);
+
+                if (shouldUpdateTarget)
+                {
+                    PalTargetList.SelectedTarget = currentSpec;
+                    ShowNoResultsNotice = (job.Results.Count == 0);
+
+                    UpdatePalTarget();
+                }
+
+                SaveTargetList(PalTargetList);
+            };
+
+            job.JobCancelled += (job) =>
+            {
+                initialSpec.LatestJob = null;
+                currentSpec.LatestJob = null;
+            };
+
+            // initialSpec is the original target stored in the pal target list; assign latest job so it can show busy/paused/idle state
+            initialSpec.LatestJob = job;
+            // currentSpec is the currently-configured target; if/when it completes it should keep a copy of its job so the run info
+            // can be displayed (progress bar, "total breeding pairs processed" info, etc.)
+            currentSpec.LatestJob = job;
+
+            SolverQueue.Run(currentSpec);
         }
 
         private void CancelSolver()
         {
-            currentJob?.TokenSource?.Cancel();
-            currentJob?.SolverController?.Resume();
+            PalTargetList.SelectedTarget?.LatestJob?.Cancel();
         }
 
         private void PauseSolver()
         {
-            currentJob?.SolverController?.Pause();
-
-            // we'd prefer to get the current state from the solver's update events,
-            // but not everything is wired up to emit those events (namely `WorkingSet`)
-            SolverControls.CurrentSolverState = SolverState.Paused;
+            PalTargetList.SelectedTarget?.LatestJob?.Pause();
         }
 
         private void ResumeSolver()
         {
-            currentJob?.SolverController?.Resume();
-            SolverControls.CurrentSolverState = SolverState.Running;
-        }
-
-        private Stopwatch solverStopwatch = null;
-        private int lastStepIndex = -1;
-        private void Solver_SolverStateUpdated(SolverStatus obj)
-        {
-            string FormatNum(long num) => num.ToString("#,##");
-
-            dispatcher.BeginInvoke(() =>
-            {
-                SolverControls.CurrentSolverState = obj.Paused ? SolverState.Paused : SolverState.Running;
-
-                var numTotalSteps = (double)(1 + obj.TargetSteps);
-                int overallStep = 0;
-                switch (obj.CurrentPhase)
-                {
-                    case SolverPhase.Initializing:
-                        solverStopwatch = Stopwatch.StartNew();
-                        SolverStatusMsg = LocalizationCodes.LV_SOLVER_STATUS_INITIALIZING.Bind();
-                        overallStep = 0;
-                        lastStepIndex = -1;
-
-                        // monitor starts paused to avoid an init race condition, resume it once
-                        // solver inits
-                        currentJob.MemoryMonitor.PauseNotices = false;
-
-                        StepProgress = 0;
-                        StepStatusMsg = null;
-                        break;
-
-                    case SolverPhase.Breeding:
-                        SolverStatusMsg = LocalizationCodes.LC_SOLVER_STATUS_BREEDING.Bind(
-                            new
-                            {
-                                StepNum = obj.CurrentStepIndex + 1,
-                                WorkSize = FormatNum(obj.CurrentWorkSize),
-                            }
-                        );
-                        overallStep = 1 + obj.CurrentStepIndex;
-
-                        StepProgress = 100 * (obj.WorkProcessedCount / (double)obj.CurrentWorkSize);
-                        StepStatusMsg = LocalizationCodes.LC_SOLVER_STEP_STATUS_BREEDING.Bind(
-                            new { NumProcessed = FormatNum(obj.WorkProcessedCount), WorkSize = FormatNum(obj.CurrentWorkSize) }
-                        );
-
-                        if (obj.CurrentStepIndex != lastStepIndex)
-                        {
-                            // resume the memory monitor whenever the current step changes. the user might've
-                            // ignored the warning during the previous step, but the new step may have so much
-                            // extra data that they might change their mind.
-                            //
-                            // this has no effect if `currentJob.MemoryMonitor.Dispose()` was called at any point
-                            // (see `MemoryMonitor_MemoryWarning` callback)
-                            currentJob.MemoryMonitor.PauseNotices = false;
-                            lastStepIndex = obj.CurrentStepIndex;
-                        }
-                        break;
-
-                    case SolverPhase.Finished:
-                        if (obj.Canceled)
-                        {
-                            SolverStatusMsg = null;
-                        }
-                        else
-                        {
-                            SolverStatusMsg = LocalizationCodes.LC_SOLVER_STATUS_FINISHED.Bind(solverStopwatch.Elapsed.TimeSpanSecondsStr());
-                            overallStep = (int)numTotalSteps;
-                            StepProgress = 100;
-                            StepStatusMsg = LocalizationCodes.LC_SOLVER_STEP_STATUS_DONE.Bind(FormatNum(obj.TotalWorkProcessedCount));
-                        }
-                        break;
-                }
-
-                SolverProgress = 100 * overallStep / numTotalSteps;
-            }).Wait();
+            PalTargetList.SelectedTarget?.LatestJob?.Run();
         }
 
         [ObservableProperty]
@@ -738,7 +570,7 @@ namespace PalCalc.UI.ViewModel
         private bool showNoResultsNotice = false;
         private void UpdateSolverControls()
         {
-            SolverControls.IsValidConfig = PalTarget?.IsValid == true;
+            SolverControls.CurrentTarget = PalTarget;
         }
 
         private PalTargetViewModel palTarget;
@@ -750,51 +582,15 @@ namespace PalCalc.UI.ViewModel
                 var oldValue = PalTarget;
                 if (SetProperty(ref palTarget, value))
                 {
-                    if (oldValue != null) oldValue.PropertyChanged -= PalTarget_PropertyChanged;
-
-                    if (value != null) value.PropertyChanged += PalTarget_PropertyChanged;
-
                     var currentResults = PalTarget?.CurrentPalSpecifier?.CurrentResults;
-                    ShowNoResultsNotice = currentResults != null && currentResults.Results.Count == 0;
+                    ShowNoResultsNotice = currentResults != null && currentResults.Results?.Count == 0;
 
-                    UpdateSolverControls();
+                    SolverControls.CurrentTarget = palTarget;
                 }
             }
         }
 
-        private void PalTarget_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(PalTarget.IsValid)) UpdateSolverControls();
-        }
-
-        [ObservableProperty]
-        private double solverProgress;
-
-        [ObservableProperty]
-        private double stepProgress;
-
-        [NotifyPropertyChangedFor(nameof(ProgressBarVisibility))]
-        [ObservableProperty]
-        private ILocalizedText solverStatusMsg;
-
-        [ObservableProperty]
-        private ILocalizedText stepStatusMsg;
-
-        private bool isEditable = true;
-        public bool IsEditable
-        {
-            get => isEditable;
-            set
-            {
-                if (SetProperty(ref isEditable, value))
-                {
-                    OnPropertyChanged(nameof(ProgressBarVisibility));
-                    UpdateSolverControls();
-                }
-            }
-        }
-
-        public Visibility ProgressBarVisibility => SolverStatusMsg == null ? Visibility.Collapsed : Visibility.Visible;
+        public SolverQueueViewModel SolverQueue { get; } = new SolverQueueViewModel();
 
         [ObservableProperty]
         private Visibility updatesMessageVisibility = Visibility.Collapsed;

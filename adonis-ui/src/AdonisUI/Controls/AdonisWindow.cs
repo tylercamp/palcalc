@@ -217,16 +217,6 @@ namespace AdonisUI.Controls
             Height = 0;
         }
 
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            base.OnSourceInitialized(e);
-
-            if (SizeToContent == SizeToContent.WidthAndHeight)
-            {
-                Hide();
-            }
-        }
-
         private BitmapSource GetApplicationIcon()
         {
             string appFilePath = Process.GetCurrentProcess().MainModule.FileName;
@@ -257,13 +247,6 @@ namespace AdonisUI.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-
-            Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
-            {
-                // (might fail if the window was already closed by the time this ran)
-                try { Show(); }
-                catch { }
-            });
 
             HwndInterop = new HwndInterop(this);
 

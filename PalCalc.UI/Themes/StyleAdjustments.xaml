@@ -68,4 +68,6 @@
     <Color x:Key="{x:Static adonisUi:Colors.AlertColor}">#D49220</Color>
     <Color x:Key="{x:Static adonisUi:Colors.ErrorColor}">#FF3939</Color>
     <Color x:Key="{x:Static adonisUi:Colors.HyperlinkColor}">#5CA8FF</Color>
+
+    <Color x:Key="{x:Static adonisUi:Colors.Layer0HighlightBorderColor}">#425595</Color>
 </ResourceDictionary>

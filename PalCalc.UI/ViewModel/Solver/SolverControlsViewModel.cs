@@ -6,14 +6,19 @@ using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
+using PalCalc.UI.ViewModel.Presets;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Printing;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI.ViewModel.Solver
 {
     public enum SolverState
     {
@@ -130,24 +135,85 @@ namespace PalCalc.UI.ViewModel
             set => SetProperty(ref maxSolverIterations, Math.Clamp(value, 1, 99));
         }
 
-        [NotifyPropertyChangedFor(nameof(CanRunSolver))]
-        [ObservableProperty]
-        private bool isValidConfig;
+        private void OnStatePropertiesChanged()
+        {
+            OnPropertyChanged(nameof(CanRunSolver));
+            OnPropertyChanged(nameof(CanCancelSolver));
+            OnPropertyChanged(nameof(CanEditSettings));
+        }
 
-        [NotifyPropertyChangedFor(nameof(CanRunSolver))]
-        [NotifyPropertyChangedFor(nameof(CanCancelSolver))]
-        [NotifyPropertyChangedFor(nameof(CanEditSettings))]
-        [ObservableProperty]
-        private SolverState currentSolverState;
+        private SolverJobViewModel currentJob;
+        public SolverJobViewModel CurrentJob
+        {
+            get => currentJob;
+            private set
+            {
+                if (currentJob != null && currentJob != value)
+                {
+                    currentJob.PropertyChanged -= CurrentJob_PropertyChanged;
+                }
+
+                if (SetProperty(ref currentJob, value))
+                {
+                    if (currentJob != null)
+                    {
+                        currentJob.PropertyChanged += CurrentJob_PropertyChanged;
+                    }
+
+                    OnStatePropertiesChanged();
+                }
+            }
+        }
+
+        private void CurrentJob_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(CurrentJob.CurrentState))
+                OnStatePropertiesChanged();
+        }
+
+        private PalTargetViewModel currentTarget;
+        public PalTargetViewModel CurrentTarget
+        {
+            get => currentTarget;
+            set
+            {
+                if (currentTarget != value && currentTarget != null)
+                    currentTarget.PropertyChanged -= CurrentTarget_PropertyChanged;
+
+                if (SetProperty(ref currentTarget, value))
+                {
+                    if (currentTarget != null)
+                    {
+                        currentTarget.PropertyChanged += CurrentTarget_PropertyChanged;
+                        CurrentJob = currentTarget.CurrentLatestJob;
+                    }
+                    else
+                    {
+                        CurrentJob = null;
+                    }
+
+                    OnStatePropertiesChanged();
+                }
+            }
+        }
+
+        private void CurrentTarget_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(currentTarget.IsValid))
+                OnPropertyChanged(nameof(CanRunSolver));
+
+            if (e.PropertyName == nameof(currentTarget.CurrentLatestJob))
+                CurrentJob = currentTarget.CurrentLatestJob;
+        }
 
         public ICommand RunSolverCommand { get; }
         public ICommand CancelSolverCommand { get; }
         public ICommand PauseSolverCommand { get; }
         public ICommand ResumeSolverCommand { get; }
 
-        public bool CanRunSolver => IsValidConfig && CurrentSolverState == SolverState.Idle;
-        public bool CanCancelSolver => CurrentSolverState != SolverState.Idle;
-        public bool CanEditSettings => CurrentSolverState == SolverState.Idle;
+        public bool CanRunSolver => CurrentTarget?.IsValid == true && CurrentJob?.IsActive != true;
+        public bool CanCancelSolver => CurrentJob?.IsActive == true;
+        public bool CanEditSettings => CurrentJob?.IsActive != true;
 
         public IRelayCommand ChangeBredPals { get; }
         public IRelayCommand ChangeWildPals { get; }

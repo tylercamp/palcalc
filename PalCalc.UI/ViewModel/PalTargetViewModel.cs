@@ -4,6 +4,8 @@ using PalCalc.Model;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.Presets;
+using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -41,7 +43,14 @@ namespace PalCalc.UI.ViewModel
             else
             {
                 InitialPalSpecifier = initial;
-                CurrentPalSpecifier = initial.Copy();
+                if (initial.LatestJob != null && initial.LatestJob.Results == null && initial.LatestJob.CurrentState != SolverState.Idle)
+                {
+                    CurrentPalSpecifier = initial.LatestJob.Specifier;
+                }
+                else
+                {
+                    CurrentPalSpecifier = initial.Copy();
+                }
 
                 PalSource = new PalSourceTreeViewModel(sourceSave.CachedValue);
             }
@@ -82,6 +91,37 @@ namespace PalCalc.UI.ViewModel
             }
         }
 
+        private SolverJobViewModel currentLatestJob;
+        public SolverJobViewModel CurrentLatestJob
+        {
+            get => currentLatestJob;
+            private set
+            {
+                if (currentLatestJob != null && currentLatestJob != value)
+                {
+                    currentLatestJob.PropertyChanged -= CurrentLatestJob_PropertyChanged;
+                }
+
+                if (SetProperty(ref currentLatestJob, value))
+                {
+                    OnPropertyChanged(nameof(CanEdit));
+
+                    if (value != null)
+                    {
+                        value.PropertyChanged += CurrentLatestJob_PropertyChanged;
+                    }
+                }
+            }
+        }
+
+        private void CurrentLatestJob_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(CurrentLatestJob.IsActive))
+                OnPropertyChanged(nameof(CanEdit));
+        }
+
+        public bool CanEdit => CurrentLatestJob == null || !CurrentLatestJob.IsActive;
+
         [ObservableProperty]
         private PalSpecifierViewModel initialPalSpecifier;
 
@@ -98,6 +138,9 @@ namespace PalCalc.UI.ViewModel
 
                     value.PropertyChanged += CurrentSpec_PropertyChanged;
                     OnPropertyChanged(nameof(IsValid));
+                    OnPropertyChanged(nameof(CanEdit));
+
+                    CurrentLatestJob = value?.LatestJob;
 
                     if (value != null)
                     {
@@ -113,6 +156,10 @@ namespace PalCalc.UI.ViewModel
             {
                 case nameof(CurrentPalSpecifier.IsValid):
                     OnPropertyChanged(nameof(IsValid));
+                    break;
+
+                case nameof(CurrentPalSpecifier.LatestJob):
+                    CurrentLatestJob = CurrentPalSpecifier.LatestJob;
                     break;
 
                 case nameof(CurrentPalSpecifier.IncludeBasePals):

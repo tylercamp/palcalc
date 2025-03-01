@@ -337,6 +337,18 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_JOB_QUEUE_CLOSING_MSG,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_JOB_QUEUE_CLOSING_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_JOB_QUEUE_HEADER,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_LANG_CHANGED_RESTART,
         /// <summary>
         ///   Looks up a localized string similar to .

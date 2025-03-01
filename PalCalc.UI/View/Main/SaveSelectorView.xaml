@@ -6,7 +6,7 @@
             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
             xmlns:m="clr-namespace:PalCalc.UI.Model"
             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
-            xmlns:local="clr-namespace:PalCalc.UI.View"
+            xmlns:local="clr-namespace:PalCalc.UI.View.Main"
             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
             xmlns:u="clr-namespace:PalCalc.UI.View.Utils"
@@ -30,7 +30,7 @@
                 <ColumnDefinition Width="3" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <ComboBox Grid.Column="0" ItemsSource="{Binding SavesLocations}" SelectedItem="{Binding SelectedLocation}">
+            <ComboBox Grid.Column="0" ItemsSource="{Binding SavesLocations}" SelectedItem="{Binding SelectedLocation}" IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:SaveSelectorView}, Path=AllowNavigation}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="mvm:SavesLocationViewModel">
                         <TextBlock Text="{Binding Label.Value}" />
@@ -52,7 +52,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableSaves}" SelectedItem="{Binding SelectedGame}">
+            <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableSaves}" SelectedItem="{Binding SelectedGame}" IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:SaveSelectorView}, Path=AllowNavigation}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="mvm:SaveGameViewModel">
                         <StackPanel Orientation="Horizontal">

@@ -27,30 +27,48 @@ namespace PalCalc.UI.Model
         {
             UnderlyingSave = underlyingSave;
             ReaderVersion = SaveReaderVersion;
+            StateId = 0;
         }
 
-        public DateTime LastModified { get; set; }
+        [JsonProperty]
+        public DateTime LastModified { get; private set; }
 
-        public bool IsServerSave { get; set; }
+        [JsonProperty]
+        public bool IsServerSave { get; private set; }
 
-        public string WorldName { get; set; }
-        public string PlayerName { get; set; }
-        public int? PlayerLevel { get; set; }
-        public int InGameDay { get; set; }
+        [JsonProperty]
+        public string WorldName { get; private set; }
+        [JsonProperty]
+        public string PlayerName { get; private set; }
+        [JsonProperty]
+        public int? PlayerLevel { get; private set; }
+        [JsonProperty]
+        public int InGameDay { get; private set; }
 
-        public string DatabaseVersion { get; set; }
-        public string ReaderVersion { get; set; }
+        [JsonProperty]
+        public string DatabaseVersion { get; private set; }
+        [JsonProperty]
+        public string ReaderVersion { get; private set; }
 
-        public List<PlayerInstance> Players { get; set; }
-        public List<GuildInstance> Guilds { get; set; }
-        public List<PalInstance> OwnedPals { get; set; }
+        [JsonProperty]
+        public List<PlayerInstance> Players { get; private set; }
+        [JsonProperty]
+        public List<GuildInstance> Guilds { get; private set; }
+        [JsonProperty]
+        public List<PalInstance> OwnedPals { get; private set; }
 
         // note: `OwnedPals` is the primary source of pal info, `Bases` and `PalContainers` are
         //       just used for supplemental info like which bases belong to which guild, which
         //       viewing cages belong to bases, world coordinates of bases, etc.
 
-        public List<BaseInstance> Bases { get; set; }
-        public List<IPalContainer> PalContainers { get; set; }
+        [JsonProperty]
+        public List<BaseInstance> Bases { get; private set; }
+        [JsonProperty]
+        public List<IPalContainer> PalContainers { get; private set; }
+
+        // (more accurate name would be "NumRefreshes")
+        [JsonIgnore]
+        public int StateId { get; private set; }
 
         private Dictionary<string, PlayerInstance> playersByName;
         [JsonIgnore]
@@ -104,16 +122,16 @@ namespace PalCalc.UI.Model
             playersByName = null;
             playerGuilds = null;
             basesByGuild = null;
+
+            StateId += 1;
         }
 
         [JsonIgnore]
-        public ISaveGame UnderlyingSave { get; set; }
+        public ISaveGame UnderlyingSave { get; internal set; }
 
         public bool IsValid => UnderlyingSave.IsValid;
 
         public bool IsOutdated(PalDB currentDb) => LastModified != UnderlyingSave.LastModified || DatabaseVersion != currentDb.Version || ReaderVersion != SaveReaderVersion;
-
-        public string StateId => $"{IdentifierFor(UnderlyingSave)}-{LastModified.Ticks}";
 
         public static event Action<ISaveGame> SaveFileLoadStart;
         public static event Action<ISaveGame, CachedSaveGame> SaveFileLoadEnd;

@@ -1,5 +1,4 @@
-﻿using PalCalc.UI.ViewModel.Solver;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,17 +16,13 @@ using System.Windows.Shapes;
 namespace PalCalc.UI.View.Main
 {
     /// <summary>
-    /// Interaction logic for BreedingResultListView.xaml
+    /// Interaction logic for SolverQueueView.xaml
     /// </summary>
-    public partial class BreedingResultListView : ListView
+    public partial class SolverQueueView : UserControl
     {
-        public BreedingResultListView()
+        public SolverQueueView()
         {
             InitializeComponent();
-
-            SetResourceReference(StyleProperty, typeof(ListView));
-
-            Wpf.Util.GridViewSort.ApplySort(Items, nameof(BreedingResultViewModel.TimeEstimate));
         }
     }
 }

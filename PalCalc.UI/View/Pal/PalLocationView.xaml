@@ -5,20 +5,21 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PalCalc.UI.View.Pal"
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:vmpd="clr-namespace:PalCalc.UI.ViewModel.PalDerived"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              mc:Ignorable="d"
-             d:DataContext="{x:Static vm:ContainerLocationPreviewViewModel.PalboxDesignerInstance}">
+             d:DataContext="{x:Static vmpd:ContainerLocationPreviewViewModel.PalboxDesignerInstance}">
     <UserControl.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
     </UserControl.Resources>
     <ContentPresenter Content="{Binding}">
         <ContentPresenter.Resources>
-            <DataTemplate DataType="{x:Type vm:MapLocationPreviewViewModel}">
+            <DataTemplate DataType="{x:Type vmpd:MapLocationPreviewViewModel}">
                 <local:MapView DataContext="{Binding MapCoord}" />
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type vm:ContainerLocationPreviewViewModel}">
+            <DataTemplate DataType="{x:Type vmpd:ContainerLocationPreviewViewModel}">
                 <StackPanel Background="#040F15" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Label Foreground="White"
                            FontSize="16"
@@ -65,13 +66,13 @@
                                         </Style>
                                     </ContentControl.Style>
                                     <ContentControl.Resources>
-                                        <DataTemplate DataType="{x:Type vm:EmptyContainerLocationPreviewSlotViewModel}">
+                                        <DataTemplate DataType="{x:Type vmpd:EmptyContainerLocationPreviewSlotViewModel}">
                                             <Border Style="{StaticResource SlotStyle}">
                                                 <Grid />
                                             </Border>
                                         </DataTemplate>
 
-                                        <DataTemplate DataType="{x:Type vm:FocusedContainerLocationPreviewSlotViewModel}">
+                                        <DataTemplate DataType="{x:Type vmpd:FocusedContainerLocationPreviewSlotViewModel}">
                                             <Border Style="{StaticResource SlotStyle}">
                                                 <Grid>
                                                     <materialIcons:MaterialIcon Kind="HighlightOff" Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />

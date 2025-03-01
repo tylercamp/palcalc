@@ -22,6 +22,7 @@ namespace AdonisUI
 
         public static ComponentResourceKey Layer0BackgroundBrush => new ComponentResourceKey(typeof(Brushes), "Layer0BackgroundBrush");
         public static ComponentResourceKey Layer0BorderBrush => new ComponentResourceKey(typeof(Brushes), "Layer0BorderBrush");
+        public static ComponentResourceKey Layer0HighlightBorderBrush => new ComponentResourceKey(typeof(Brushes), "Layer0HighlightBorderBrush");
 
         public static ComponentResourceKey Layer1BackgroundBrush => new ComponentResourceKey(typeof(Brushes), "Layer1BackgroundBrush");
         public static ComponentResourceKey Layer1BorderBrush => new ComponentResourceKey(typeof(Brushes), "Layer1BorderBrush");

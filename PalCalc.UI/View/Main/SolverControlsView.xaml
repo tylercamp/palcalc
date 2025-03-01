@@ -4,11 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:vms="clr-namespace:PalCalc.UI.ViewModel.Solver"
              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:local="clr-namespace:PalCalc.UI.View.Main"
              mc:Ignorable="d" 
-             d:DataContext="{x:Static vm:SolverControlsViewModel.DesignerInstance}"
+             d:DataContext="{x:Static vms:SolverControlsViewModel.DesignerInstance}"
              d:DesignWidth="1000.621">
     <vu:SpacedWrapPanel Orientation="Horizontal" HorizontalSpacing="25" VerticalSpacing="15" HorizontalContentAlignment="{Binding RelativeSource={RelativeSource AncestorType=local:SolverControlsView}, Path=HorizontalContentAlignment}">
         <vu:SpacedWrapPanel.Resources>
@@ -177,13 +178,13 @@
 
                     <Style x:Key="ContentPresenterTemplate" TargetType="ContentPresenter">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding CurrentSolverState}" Value="Idle">
+                            <DataTrigger Binding="{Binding CurrentJob.CurrentState, FallbackValue=Idle}" Value="Idle">
                                 <Setter Property="ContentTemplate" Value="{StaticResource RunButtonTemplate}" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding CurrentSolverState}" Value="Running">
+                            <DataTrigger Binding="{Binding CurrentJob.CurrentState, FallbackValue=Idle}" Value="Running">
                                 <Setter Property="ContentTemplate" Value="{StaticResource PauseButtonTemplate}" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding CurrentSolverState}" Value="Paused">
+                            <DataTrigger Binding="{Binding CurrentJob.CurrentState, FallbackValue=Idle}" Value="Paused">
                                 <Setter Property="ContentTemplate" Value="{StaticResource ResumeButtonTemplate}" />
                             </DataTrigger>
                         </Style.Triggers>
