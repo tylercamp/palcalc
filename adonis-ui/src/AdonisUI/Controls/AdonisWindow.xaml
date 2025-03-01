@@ -15,14 +15,14 @@
         <Setter Property="TitleBarForeground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"/>
         <Setter Property="TitleBarBackground" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"/>
         <Setter Property="WindowButtonHighlightBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.WindowButtonHighlightBrush}}"/>
-        <Setter Property="CornerPreference" Value="Default" />
+        <Setter Property="CornerPreference" Value="DoNotRound" />
         <Setter Property="NCNonActiveBrush" Value="Black" />
         <Setter Property="NCNonActiveBrush" Value="Black" />
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
                 <WindowChrome ResizeBorderThickness="{Binding Source={x:Static SystemParameters.WindowResizeBorderThickness}}"
                               CaptionHeight="0"
-                              GlassFrameThickness="1, 2, 1, 1"
+                              CornerRadius="0"
                               NonClientFrameEdges="None"/>
             </Setter.Value>
         </Setter>
@@ -34,6 +34,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="0"
                                 UseLayoutRounding="True">
 
                             <Grid>
@@ -257,7 +258,6 @@
                         <WindowChrome ResizeBorderThickness="0"
                                       CaptionHeight="0"
                                       CornerRadius="0"
-                                      GlassFrameThickness="0"
                                       NonClientFrameEdges="None"/>
                     </Setter.Value>
                 </Setter>
