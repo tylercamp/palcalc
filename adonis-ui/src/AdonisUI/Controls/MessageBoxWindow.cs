@@ -135,7 +135,7 @@ namespace AdonisUI.Controls
         /// </summary>
         public MessageBoxWindow()
         {
-            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            WindowStartupLocation = WindowStartupLocation.CenterOwner;
             Loaded += OnLoaded;
             Closing += OnClosing;
             DataContextChanged += OnDataContextChanged;
