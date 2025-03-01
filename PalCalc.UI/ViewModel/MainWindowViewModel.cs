@@ -113,10 +113,21 @@ namespace PalCalc.UI.ViewModel
                 // (needed for XAML designer view)
                 if (App.Current.MainWindow != null)
                 {
-                    App.Current.MainWindow.Closing += (o, e) =>
+                    App.Current.Exit += (o, e) =>
                     {
                         foreach (var target in SolverQueue.QueuedItems)
                             target.LatestJob.Cancel();
+                    };
+
+                    App.Current.MainWindow.Closing += (o, e) =>
+                    {
+                        if (SolverQueue.QueuedItems.Count == 0)
+                            return;
+
+                        if (AdonisMessageBox.Show(App.Current.MainWindow, "Closing Pal Calc will cancel any remaining jobs. Are you sure you want to quit?", "Pending Jobs", AdonisMessageBoxButton.YesNo) == AdonisMessageBoxResult.No)
+                        {
+                            e.Cancel = true;
+                        }
                     };
                 }
             });
