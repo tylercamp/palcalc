@@ -90,7 +90,7 @@ namespace AdonisUI.Controls
         /// <returns>An instance of <see cref="IMessageBoxButtonModel"/>.</returns>
         public static IMessageBoxButtonModel Ok(string label = null)
         {
-            return new MessageBoxButtonModel(label ?? "OK", MessageBoxResult.OK) { IsDefault = true };
+            return new MessageBoxButtonModel(label ?? MessageBoxButtonLabels.Ok, MessageBoxResult.OK) { IsDefault = true };
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace AdonisUI.Controls
         /// <returns>An instance of <see cref="IMessageBoxButtonModel"/>.</returns>
         public static IMessageBoxButtonModel Yes(string label = null)
         {
-            return new MessageBoxButtonModel(label ?? "Yes", MessageBoxResult.Yes) { IsDefault = true };
+            return new MessageBoxButtonModel(label ?? MessageBoxButtonLabels.Yes, MessageBoxResult.Yes) { IsDefault = true };
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace AdonisUI.Controls
         /// <returns>An instance of <see cref="IMessageBoxButtonModel"/>.</returns>
         public static IMessageBoxButtonModel No(string label = null)
         {
-            return new MessageBoxButtonModel(label ?? "No", MessageBoxResult.No);
+            return new MessageBoxButtonModel(label ?? MessageBoxButtonLabels.No, MessageBoxResult.No);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace AdonisUI.Controls
         /// <returns>An instance of <see cref="IMessageBoxButtonModel"/>.</returns>
         public static IMessageBoxButtonModel Cancel(string label = null)
         {
-            return new MessageBoxButtonModel(label ?? "Cancel", MessageBoxResult.Cancel) { IsCancel = true };
+            return new MessageBoxButtonModel(label ?? MessageBoxButtonLabels.Cancel, MessageBoxResult.Cancel) { IsCancel = true };
         }
 
         /// <summary>
