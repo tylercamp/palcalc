@@ -499,7 +499,7 @@ namespace PalCalc.UI.ViewModel
                 cachedData.StateId
             );
 
-            job.JobCompleted += () =>
+            job.JobCompleted += (job) =>
             {
                 currentSpec.CurrentResults = new BreedingResultListViewModel()
                 {
@@ -527,14 +527,16 @@ namespace PalCalc.UI.ViewModel
                 SaveTargetList(PalTargetList);
             };
 
-            job.JobCancelled += () =>
+            job.JobCancelled += (job) =>
             {
                 initialSpec.LatestJob = null;
                 currentSpec.LatestJob = null;
             };
 
-            // TODO - comment
+            // initialSpec is the original target stored in the pal target list; assign latest job so it can show busy/paused/idle state
             initialSpec.LatestJob = job;
+            // currentSpec is the currently-configured target; if/when it completes it should keep a copy of its job so the run info
+            // can be displayed (progress bar, "total breeding pairs processed" info, etc.)
             currentSpec.LatestJob = job;
 
             SolverQueue.Run(currentSpec);

@@ -43,10 +43,6 @@ namespace PalCalc.UI.ViewModel.Solver
         [ObservableProperty]
         private IRelayCommand<PalSpecifierViewModel> selectItemCommand;
 
-        // TODO - is this used?
-        [ObservableProperty]
-        private bool paused = false;
-
         public SolverQueueViewModel()
         {
             orderedPendingTargets = new ObservableCollection<PalSpecifierViewModel>();
@@ -124,32 +120,39 @@ namespace PalCalc.UI.ViewModel.Solver
             if (job == null)
                 throw new InvalidOperationException();
 
-            // TODO - event listener leaks
-            job.JobStopped += () =>
-            {
-                orderedPendingTargets.Remove(item);
-            };
-
-            job.PropertyChanged += (_, e) =>
-            {
-                if (e.PropertyName != nameof(job.CurrentState))
-                    return;
-
-                if (job.CurrentState != SolverState.Running)
-                    return;
-
-                Dispatcher.CurrentDispatcher.BeginInvoke(() =>
-                {
-                    if (!orderedPendingTargets.Contains(item))
-                        return;
-
-                    if (job.CurrentState == SolverState.Running && orderedPendingTargets[0] != item)
-                        orderedPendingTargets.Move(orderedPendingTargets.IndexOf(item), 0);
-                });
-            };
+            job.JobStopped += Job_JobStopped;
+            job.PropertyChanged += Job_PropertyChanged;
 
             itemJobs.Add(item, item.LatestJob);
             orderedPendingTargets.Insert(0, item);
+        }
+
+        private void Job_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var job = sender as SolverJobViewModel;
+            var item = job.Specifier;
+            if (e.PropertyName != nameof(job.CurrentState))
+                return;
+
+            if (job.CurrentState != SolverState.Running)
+                return;
+
+            Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+            {
+                if (!orderedPendingTargets.Contains(item))
+                    return;
+
+                if (job.CurrentState == SolverState.Running && orderedPendingTargets[0] != item)
+                    orderedPendingTargets.Move(orderedPendingTargets.IndexOf(item), 0);
+            });
+        }
+
+        private void Job_JobStopped(SolverJobViewModel obj)
+        {
+            orderedPendingTargets.Remove(obj.Specifier);
+
+            obj.PropertyChanged -= Job_PropertyChanged;
+            obj.JobStopped -= Job_JobStopped;
         }
 
         public void DragOver(IDropInfo dropInfo)

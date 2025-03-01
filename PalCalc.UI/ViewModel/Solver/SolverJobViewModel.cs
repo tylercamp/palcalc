@@ -107,9 +107,9 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public List<IPalReference> Results { get; private set; }
 
-        public event Action JobStopped;
-        public event Action JobCompleted;
-        public event Action JobCancelled;
+        public event Action<SolverJobViewModel> JobStopped;
+        public event Action<SolverJobViewModel> JobCompleted;
+        public event Action<SolverJobViewModel> JobCancelled;
 
         public SolverJobViewModel(
             Dispatcher dispatcher,
@@ -164,8 +164,8 @@ namespace PalCalc.UI.ViewModel.Solver
         {
             if (thread == null)
             {
-                JobCancelled?.Invoke();
-                JobStopped?.Invoke();
+                JobCancelled?.Invoke(this);
+                JobStopped?.Invoke(this);
                 CurrentState = SolverState.Idle;
             }
             else
@@ -234,14 +234,14 @@ namespace PalCalc.UI.ViewModel.Solver
                     if (!tokenSource.IsCancellationRequested)
                     {
                         Results = results;
-                        JobCompleted?.Invoke();
+                        JobCompleted?.Invoke(this);
                     }
                     else
                     {
-                        JobCancelled?.Invoke();
+                        JobCancelled?.Invoke(this);
                     }
 
-                    JobStopped?.Invoke();
+                    JobStopped?.Invoke(this);
 
                     CurrentState = SolverState.Idle;
                 });
@@ -305,8 +305,6 @@ namespace PalCalc.UI.ViewModel.Solver
                         break;
 
                     case SolverPhase.Finished:
-                        //CurrentState = SolverState.Idle; // TODO - does enabling this break anything?
-
                         if (obj.Canceled)
                         {
                             SolverStatusMessage = null;
