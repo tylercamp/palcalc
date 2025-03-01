@@ -15,6 +15,7 @@
 
     <Color x:Key="{x:Static adonisUi:Colors.Layer0BackgroundColor}">#2A2B34</Color>
     <Color x:Key="{x:Static adonisUi:Colors.Layer0BorderColor}">#2A2B34</Color>
+    <Color x:Key="{x:Static adonisUi:Colors.Layer0HighlightBorderColor}">#2A2B34</Color>
 
     <Color x:Key="{x:Static adonisUi:Colors.Layer1BackgroundColor}">#3D3D4C</Color>
     <Color x:Key="{x:Static adonisUi:Colors.Layer1BorderColor}">#4A4A5E</Color>
@@ -82,6 +83,7 @@
 
     <SolidColorBrush x:Key="{x:Static adonisUi:Brushes.Layer0BackgroundBrush}" Color="{DynamicResource {x:Static adonisUi:Colors.Layer0BackgroundColor}}" presentationOptions:Freeze="True"/>
     <SolidColorBrush x:Key="{x:Static adonisUi:Brushes.Layer0BorderBrush}" Color="{DynamicResource {x:Static adonisUi:Colors.Layer0BorderColor}}" presentationOptions:Freeze="True"/>
+    <SolidColorBrush x:Key="{x:Static adonisUi:Brushes.Layer0HighlightBorderBrush}" Color="{DynamicResource {x:Static adonisUi:Colors.Layer0HighlightBorderColor}}" presentationOptions:Freeze="True"/>
 
     <SolidColorBrush x:Key="{x:Static adonisUi:Brushes.Layer1BackgroundBrush}" Color="{DynamicResource {x:Static adonisUi:Colors.Layer1BackgroundColor}}" presentationOptions:Freeze="True"/>
     <SolidColorBrush x:Key="{x:Static adonisUi:Brushes.Layer1BorderBrush}" Color="{DynamicResource {x:Static adonisUi:Colors.Layer1BorderColor}}" presentationOptions:Freeze="True"/>

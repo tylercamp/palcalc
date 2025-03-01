@@ -15,6 +15,7 @@
       xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
       xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
       xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+      xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
       mc:Ignorable="d"
       d:Width="1280" d:Height="720"
       xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
@@ -25,6 +26,7 @@
     <Page.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
         <c:CollectionVisibilityConverter x:Key="CVC" />
+        <c:IntToIVConverter x:Key="IIVC" />
     </Page.Resources>
     <Border Padding="5">
         <DockPanel>
@@ -121,17 +123,41 @@
                                                             <ColumnDefinition Width="*" />
                                                         </Grid.ColumnDefinitions>
 
-                                                        <Image Source="{Binding TargetPal.Icon}" Height="48" Grid.Column="0" VerticalAlignment="Center" />
-                                                        <StackPanel HorizontalAlignment="Stretch" Grid.Column="2">
-                                                            <Label Content="{Binding TargetPal.Name.Value}" />
-
+                                                        <Image Source="{Binding TargetPal.Icon}" Height="32" Grid.Column="0" VerticalAlignment="Center" />
+                                                        <StackPanel HorizontalAlignment="Stretch" Grid.Column="2" vu:StackPanelExtensions.Spacing="5">
+                                                            <StackPanel.Resources>
+                                                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                                    <Setter Property="FontSize" Value="11" />
+                                                                    <Setter Property="Padding" Value="0" />
+                                                                    <Setter Property="Margin" Value="0" />
+                                                                </Style>
+                                                                <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                                                                    <Setter Property="FontSize" Value="11" />
+                                                                    <Setter Property="Padding" Value="0" />
+                                                                    <Setter Property="Margin" Value="0" />
+                                                                </Style>
+                                                                <Style TargetType="vp:PalIVsView">
+                                                                    <Setter Property="FontSize" Value="11" />
+                                                                    <!--<Setter Property="MinWidth" Value="150" />-->
+                                                                </Style>
+                                                            </StackPanel.Resources>
+                                                            
                                                             <vu:SpacedWrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" HorizontalSpacing="15">
-                                                                <TextBlock Text="{Binding RequiredPassivesCollection.RequiredDescription.Value}" />
+                                                                <Label Content="{Binding TargetPal.Name.Value}" />
+
+                                                                <vp:PalIVsView IV_HP="{Binding MinIv_HP, Converter={StaticResource IIVC}}"
+                                                                               IV_Attack="{Binding MinIv_Attack, Converter={StaticResource IIVC}}"
+                                                                               IV_Defense="{Binding MinIv_Defense, Converter={StaticResource IIVC}}"
+                                                                               Visibility="{Binding HasIVs, Converter={StaticResource VVC}}"
+                                                                               Orientation="Horizontal"
+                                                                               />
+
+                                                                <TextBlock Text="{Binding RequiredPassivesCollection.RequiredDescription.Value}" FontSize="11" />
 
                                                                 <TextBlock Text="{Binding OptionalPassivesCollection.OptionalDescription.Value}" Visibility="{Binding OptionalPassivesCollection.Passives, Converter={StaticResource CVC}}" />
                                                             </vu:SpacedWrapPanel>
 
-                                                            <StackPanel vu:StackPanelExtensions.Spacing="1">
+                                                            <StackPanel vu:StackPanelExtensions.Spacing="2">
                                                                 <StackPanel.Resources>
                                                                     <Style TargetType="ProgressBar" BasedOn="{StaticResource {x:Type ProgressBar}}">
                                                                         <Setter Property="Minimum" Value="0" />
@@ -139,19 +165,21 @@
                                                                         <Setter Property="adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled" Value="False" />
                                                                         <Setter Property="Opacity" Value="0.5" />
                                                                         <Setter Property="IsHitTestVisible" Value="False" />
+                                                                        <Setter Property="Height" Value="5" />
 
                                                                         <Style.Triggers>
                                                                             <DataTrigger Binding="{Binding LatestJob.CurrentState}" Value="Running">
                                                                                 <Setter Property="adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled" Value="True" />
                                                                                 <Setter Property="Opacity" Value="1" />
+                                                                                <Setter Property="Height" Value="10" />
                                                                             </DataTrigger>
                                                                         </Style.Triggers>
                                                                     </Style>
                                                                 </StackPanel.Resources>
 
-                                                                <ProgressBar Value="{Binding LatestJob.SolverProgress, Mode=OneWay}" Height="10" />
+                                                                <ProgressBar Value="{Binding LatestJob.SolverProgress, Mode=OneWay}" />
 
-                                                                <ProgressBar Value="{Binding LatestJob.StepProgress, Mode=OneWay}" Height="10" />
+                                                                <ProgressBar Value="{Binding LatestJob.StepProgress, Mode=OneWay}" />
                                                             </StackPanel>
                                                         </StackPanel>
                                                     </Grid>

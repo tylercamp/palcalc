@@ -7,10 +7,15 @@
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              mc:Ignorable="d" 
              d:DesignHeight="208.272" d:DesignWidth="766.148">
     <UserControl.Resources>
         <c:IVRelevanceToOpacityConverter x:Key="RTOC" />
+
+        <Thickness x:Key="SpacingMargin" Left="0" Top="0" Right="5" Bottom="0" />
+        <Thickness x:Key="GapMargin" Left="0" Top="0" Right="15" Bottom="0" />
+
         <DataTemplate DataType="{x:Type mvm:IVAnyValueViewModel}">
             <TextBlock>-</TextBlock>
         </DataTemplate>
@@ -22,16 +27,21 @@
         <DataTemplate DataType="{x:Type mvm:IVDirectValueViewModel}">
             <TextBlock Text="{Binding Value, Mode=OneWay}" />
         </DataTemplate>
+
+        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+            <Setter Property="Padding" Value="0" />
+        </Style>
     </UserControl.Resources>
     <UniformGrid Columns="3">
         <StackPanel
             Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
             Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Converter={StaticResource RTOC}}"
         >
-            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_HP_SHORT}" />
+            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_HP_SHORT}" Margin="{StaticResource SpacingMargin}" />
             <ContentPresenter
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Mode=OneWay}"
                 VerticalAlignment="Center"
+                Margin="{StaticResource GapMargin}"
             />
         </StackPanel>
 
@@ -39,10 +49,11 @@
             Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
             Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Converter={StaticResource RTOC}}"
         >
-            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK_SHORT}" />
+            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK_SHORT}" Margin="{StaticResource SpacingMargin}" />
             <ContentPresenter
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Mode=OneWay}"
                 VerticalAlignment="Center"
+                Margin="{StaticResource GapMargin}"
             />
         </StackPanel>
 
@@ -50,7 +61,7 @@
             Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
             Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Converter={StaticResource RTOC}}"
         >
-            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE_SHORT}" />
+            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE_SHORT}" Margin="{StaticResource SpacingMargin}" />
             <ContentPresenter
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Mode=OneWay}"
                 VerticalAlignment="Center"

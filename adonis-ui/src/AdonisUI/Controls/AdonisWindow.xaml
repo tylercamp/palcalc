@@ -10,19 +10,18 @@
     <Style TargetType="{x:Type local:AdonisWindow}">
         <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"/>
         <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0HighlightBorderBrush}}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="TitleBarForeground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"/>
-        <Setter Property="TitleBarBackground" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}"/>
+        <Setter Property="TitleBarBackground" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"/>
         <Setter Property="WindowButtonHighlightBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.WindowButtonHighlightBrush}}"/>
-        <Setter Property="CornerPreference" Value="Round" />
+        <Setter Property="CornerPreference" Value="Default" />
         <Setter Property="NCNonActiveBrush" Value="Black" />
         <Setter Property="NCNonActiveBrush" Value="Black" />
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
                 <WindowChrome ResizeBorderThickness="{Binding Source={x:Static SystemParameters.WindowResizeBorderThickness}}"
                               CaptionHeight="0"
-                              CornerRadius="0"
                               GlassFrameThickness="1, 2, 1, 1"
                               NonClientFrameEdges="None"/>
             </Setter.Value>
@@ -183,6 +182,10 @@
                             <Setter Property="Foreground"
                                     TargetName="PART_CloseButton"
                                     Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}"/>
+                            <Setter Property="BorderBrush"
+                                    TargetName="Border"
+                                    Value="{DynamicResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}"
+                                    />
                         </Trigger>
 
                         <Trigger Property="WindowState" Value="Maximized">
