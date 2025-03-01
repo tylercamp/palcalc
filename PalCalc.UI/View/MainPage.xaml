@@ -139,7 +139,6 @@
                                                                 </Style>
                                                                 <Style TargetType="vp:PalIVsView">
                                                                     <Setter Property="FontSize" Value="11" />
-                                                                    <!--<Setter Property="MinWidth" Value="150" />-->
                                                                 </Style>
                                                             </StackPanel.Resources>
                                                             

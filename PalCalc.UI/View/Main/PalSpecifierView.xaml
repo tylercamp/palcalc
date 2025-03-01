@@ -29,6 +29,10 @@
             <Setter Property="MinWidth" Value="200" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
+
+        <DataTemplate x:Key="PausedItemTemplate">
+            <materialIcons:MaterialIcon Kind="Pause" />
+        </DataTemplate>
     </UserControl.Resources>
     <Grid>
         <TextBlock
@@ -51,61 +55,36 @@
             
             <Grid Grid.Column="0">
                 <Image Source="{Binding TargetPal.Icon}" Stretch="Uniform" />
-                <ContentControl>
-                    <ContentControl.Style>
-                        <Style TargetType="ContentControl">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding LatestJob.IsActive, FallbackValue=False}" Value="True">
-                                    <Setter Property="Content">
-                                        <Setter.Value>
-                                            <Grid>
-                                                <Border CornerRadius="99"
-                                                        Width="40"
-                                                        Height="40"
-                                                        Padding="5">
-                                                    <Border.Background>
-                                                        <SolidColorBrush Color="{DynamicResource {x:Static adonisUi:Colors.Layer0BackgroundColor}}" Opacity="0.85" />
-                                                    </Border.Background>
+                <Border CornerRadius="99"
+                        Width="40"
+                        Height="40"
+                        Padding="5"
+                        Visibility="{Binding LatestJob.IsActive, FallbackValue=Collapsed, Converter={StaticResource BVC}}">
+                    <Border.Background>
+                        <SolidColorBrush Color="{DynamicResource {x:Static adonisUi:Colors.Layer0BackgroundColor}}" Opacity="0.85" />
+                    </Border.Background>
 
+                    <ContentControl Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                                    Focusable="False"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    >
+                        <ContentControl.Style>
+                            <Style TargetType="ContentControl">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding LatestJob.CurrentState}" Value="Running">
+                                        <Setter Property="ContentTemplate" Value="{DynamicResource {x:Static adonisUi:Templates.LoadingCircle}}" />
+                                    </DataTrigger>
 
-                                                    <ContentControl Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
-                                                                    Focusable="False"
-                                                                    HorizontalAlignment="Center"
-                                                                    VerticalAlignment="Center"
-                                                                    >
+                                    <DataTrigger Binding="{Binding LatestJob.CurrentState}" Value="Paused">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource PausedItemTemplate}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ContentControl.Style>
 
-                                                        <ContentControl.Style>
-                                                            <Style TargetType="ContentControl">
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding LatestJob.CurrentState}" Value="Running">
-                                                                        <Setter Property="ContentTemplate" Value="{DynamicResource {x:Static adonisUi:Templates.LoadingCircle}}" />
-                                                                    </DataTrigger>
-
-                                                                    <DataTrigger Binding="{Binding LatestJob.CurrentState}" Value="Paused">
-                                                                        <Setter Property="ContentTemplate">
-                                                                            <Setter.Value>
-                                                                                <DataTemplate>
-                                                                                    <Grid>
-                                                                                        <materialIcons:MaterialIcon Kind="Pause" />
-                                                                                    </Grid>
-                                                                                </DataTemplate>
-                                                                            </Setter.Value>
-                                                                        </Setter>
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </ContentControl.Style>
-                                                        
-                                                    </ContentControl>
-                                                </Border>
-                                            </Grid>
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ContentControl.Style>
-                </ContentControl>
+                    </ContentControl>
+                </Border>
             </Grid>
             
             <Grid Grid.Column="2">
@@ -144,24 +123,21 @@
                         Cursor="Hand"
                         Background="{x:Null}"
                         BorderBrush="{x:Null}"
-                        IsEnabled="{Binding LatestJob.IsInactive, FallbackValue=True}"
-                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:PalSpecifierView}, Path=IncludeDeleteButton, Converter={StaticResource BVC}}"
                         >
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding LatestJob.IsActive}" Value="True">
+                                        <Setter Property="Visibility" Value="Hidden" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
                         <materialIcons:MaterialIcon
                             Kind="Remove"
                             Width="15"
                             Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}"
-                            >
-                            <materialIcons:MaterialIcon.Style>
-                                <Style TargetType="materialIcons:MaterialIcon">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding LatestJob.IsInactive, FallbackValue=True}" Value="False">
-                                            <Setter Property="Opacity" Value="0.5" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </materialIcons:MaterialIcon.Style>
-                        </materialIcons:MaterialIcon>
+                            />
                     </Button>
                 </Grid>
 

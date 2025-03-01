@@ -28,14 +28,6 @@ namespace PalCalc.UI.View.Main
 
         public PalSpecifierViewModel ViewModel => DataContext as PalSpecifierViewModel;
 
-        public static readonly DependencyProperty IncludeDeleteButtonProperty = DependencyProperty.Register(nameof(IncludeDeleteButton), typeof(bool), typeof(PalSpecifierView), new PropertyMetadata(true));
-
-        public bool IncludeDeleteButton
-        {
-            get => (bool)GetValue(IncludeDeleteButtonProperty);
-            set => SetValue(IncludeDeleteButtonProperty, value);
-        }
-
         private void Image_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             ViewModel?.DeleteCommand?.Execute(ViewModel);
