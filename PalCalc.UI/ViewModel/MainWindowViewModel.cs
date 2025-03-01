@@ -478,7 +478,7 @@ namespace PalCalc.UI.ViewModel
 
             if (initialSpec == null)
             {
-                initialSpec = currentSpec;
+                initialSpec = currentSpec.Copy();
                 initialSpec.DeleteCommand = deletePalTargetCommand;
 
                 PalTargetList.Add(initialSpec);
@@ -486,7 +486,6 @@ namespace PalCalc.UI.ViewModel
                 SaveTargetList(PalTargetList);
 
                 UpdatePalTarget();
-
                 currentSpec = PalTarget.CurrentPalSpecifier;
             }
 

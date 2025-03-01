@@ -43,7 +43,7 @@ namespace PalCalc.UI.ViewModel
             else
             {
                 InitialPalSpecifier = initial;
-                if (initial.LatestJob != null && initial.LatestJob.CurrentState != SolverState.Idle)
+                if (initial.LatestJob != null && initial.LatestJob.Results == null && initial.LatestJob.CurrentState != SolverState.Idle)
                 {
                     CurrentPalSpecifier = initial.LatestJob.Specifier;
                 }
