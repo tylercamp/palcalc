@@ -13,7 +13,7 @@
                              Title="{itl:LocalizedText LC_POPUP_TITLE_LOADING_SAVE_FILE}"
                              ShowInTaskbar="False"
                              ResizeMode="NoResize"
-                             WindowStyle="SingleBorderWindow"
+                             WindowStyle="ToolWindow"
                              WindowStartupLocation="CenterOwner"
                              PlaceTitleBarOverContent="True"
                              TitleVisibility="Collapsed"
