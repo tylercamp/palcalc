@@ -26,6 +26,7 @@ namespace PalCalc.UI.ViewModel.Solver
         [ObservableProperty]
         private IRelayCommand<PalSpecifierViewModel> selectItemCommand;
 
+        // TODO - is this used?
         [ObservableProperty]
         private bool paused = false;
 

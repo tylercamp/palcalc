@@ -27,6 +27,7 @@
         <c:ValueVisibilityConverter x:Key="VVC" />
         <c:CollectionVisibilityConverter x:Key="CVC" />
         <c:IntToIVConverter x:Key="IIVC" />
+        <c:ValueBoolConverter x:Key="NegatedVBC" Negate="True" />
     </Page.Resources>
     <Border Padding="5">
         <DockPanel>
@@ -53,7 +54,7 @@
                 <DockPanel Grid.Column="0">
                     <StackPanel DockPanel.Dock="Top">
                         <GroupBox Header="{itl:LocalizedText LC_SAVE_FILE}">
-                            <v:SaveSelectorView DataContext="{Binding SaveSelection}" />
+                            <v:SaveSelectorView DataContext="{Binding SaveSelection}" AllowNavigation="{Binding RelativeSource={RelativeSource AncestorType=local:MainPage}, Path=DataContext.SolverQueue.QueuedItems.Count, Converter={StaticResource NegatedVBC}}" />
                         </GroupBox>
 
                         <GroupBox Header="{itl:LocalizedText LC_GAME_SETTINGS}" Margin="0,5,0,0">
