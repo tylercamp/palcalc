@@ -331,6 +331,15 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_ITL_LABEL" xml:space="preserve">
     <value>English</value>
   </data>
+  <data name="LC_JOB_QUEUE_CLOSING_MSG" xml:space="preserve">
+    <value>Closing Pal Calc will cancel any remaining jobs. Are you sure you want to quit?</value>
+  </data>
+  <data name="LC_JOB_QUEUE_CLOSING_TITLE" xml:space="preserve">
+    <value>Pending Jobs</value>
+  </data>
+  <data name="LC_JOB_QUEUE_HEADER" xml:space="preserve">
+    <value>Jobs</value>
+  </data>
   <data name="LC_LANGUAGE" xml:space="preserve">
     <value>Language</value>
   </data>

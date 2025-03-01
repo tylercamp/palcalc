@@ -71,8 +71,7 @@
 
                             <GridSplitter Grid.Row="0" Background="{x:Null}" Height="5" ResizeBehavior="CurrentAndNext" />
 
-                            <!-- TODO ITL -->
-                            <GroupBox Header="Jobs"
+                            <GroupBox Header="{itl:LocalizedText Code=LC_JOB_QUEUE_HEADER}"
                                       Grid.Row="1"
                                       Visibility="{Binding SolverQueue.QueuedItems.Count, Converter={StaticResource VVC}}"
                                       MinHeight="100"

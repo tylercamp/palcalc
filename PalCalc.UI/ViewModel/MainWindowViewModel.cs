@@ -124,7 +124,9 @@ namespace PalCalc.UI.ViewModel
                         if (SolverQueue.QueuedItems.Count == 0)
                             return;
 
-                        if (AdonisMessageBox.Show(App.Current.MainWindow, "Closing Pal Calc will cancel any remaining jobs. Are you sure you want to quit?", "Pending Jobs", AdonisMessageBoxButton.YesNo) == AdonisMessageBoxResult.No)
+                        var title = LocalizationCodes.LC_JOB_QUEUE_CLOSING_TITLE.Bind().Value;
+                        var msg = LocalizationCodes.LC_JOB_QUEUE_CLOSING_MSG.Bind().Value;
+                        if (AdonisMessageBox.Show(App.Current.MainWindow, msg, title, AdonisMessageBoxButton.YesNo) == AdonisMessageBoxResult.No)
                         {
                             e.Cancel = true;
                         }

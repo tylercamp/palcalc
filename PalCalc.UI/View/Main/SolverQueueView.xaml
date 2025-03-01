@@ -81,11 +81,11 @@
                                 <Label Content="{Binding TargetPal.Name.Value}" />
 
                                 <vp:PalIVsView IV_HP="{Binding MinIv_HP, Converter={StaticResource IIVC}}"
-                                           IV_Attack="{Binding MinIv_Attack, Converter={StaticResource IIVC}}"
-                                           IV_Defense="{Binding MinIv_Defense, Converter={StaticResource IIVC}}"
-                                           Visibility="{Binding HasIVs, Converter={StaticResource VVC}}"
-                                           Orientation="Horizontal"
-                                           />
+                                               IV_Attack="{Binding MinIv_Attack, Converter={StaticResource IIVC}}"
+                                               IV_Defense="{Binding MinIv_Defense, Converter={StaticResource IIVC}}"
+                                               Visibility="{Binding HasIVs, Converter={StaticResource VVC}}"
+                                               Orientation="Horizontal"
+                                               />
 
                                 <TextBlock Text="{Binding RequiredPassivesCollection.RequiredDescription.Value}" FontSize="11" />
 
@@ -113,7 +113,6 @@
                                 </StackPanel.Resources>
 
                                 <ProgressBar Value="{Binding LatestJob.SolverProgress, Mode=OneWay}" />
-
                                 <ProgressBar Value="{Binding LatestJob.StepProgress, Mode=OneWay}" />
                             </StackPanel>
                         </StackPanel>
