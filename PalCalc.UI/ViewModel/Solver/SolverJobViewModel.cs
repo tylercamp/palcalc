@@ -6,6 +6,7 @@ using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
+using QuickGraph.Algorithms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -100,6 +101,10 @@ namespace PalCalc.UI.ViewModel.Solver
         public bool IsActive => CurrentState != SolverState.Idle;
         public bool IsInactive => !IsActive;
 
+        // state ID associated with the save when this job was created, used to determine whether
+        // the results need to be refreshed once the solver completes
+        public int SaveStateId { get; }
+
         public List<IPalReference> Results { get; private set; }
 
         public event Action JobStopped;
@@ -109,7 +114,8 @@ namespace PalCalc.UI.ViewModel.Solver
         public SolverJobViewModel(
             Dispatcher dispatcher,
             BreedingSolver solver,
-            PalSpecifierViewModel spec
+            PalSpecifierViewModel spec,
+            int saveStateId
         )
         {
             this.dispatcher = dispatcher;
@@ -125,6 +131,7 @@ namespace PalCalc.UI.ViewModel.Solver
 
             solver.SolverStateUpdated += Solver_SolverStateUpdated;
 
+            SaveStateId = saveStateId;
             CurrentState = SolverState.Paused;
         }
 

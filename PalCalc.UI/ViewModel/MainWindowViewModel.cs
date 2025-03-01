@@ -479,18 +479,26 @@ namespace PalCalc.UI.ViewModel
                 currentSpec = PalTarget.CurrentPalSpecifier;
             }
 
+            var originalGameSettings = SelectedGameSettings.ModelObject;
             var job = new SolverJobViewModel(
                 dispatcher,
-                SolverControls.ConfiguredSolver(SelectedGameSettings.ModelObject, PalTarget.AvailablePals.ToList()),
-                currentSpec
+                SolverControls.ConfiguredSolver(originalGameSettings, PalTarget.AvailablePals.ToList()),
+                currentSpec,
+                cachedData.StateId
             );
 
             job.JobCompleted += () =>
             {
                 currentSpec.CurrentResults = new BreedingResultListViewModel()
                 {
-                    Results = job.Results.Select(r => new BreedingResultViewModel(cachedData, SelectedGameSettings.ModelObject, r)).ToList()
+                    Results = job.Results.Select(r => new BreedingResultViewModel(cachedData, originalGameSettings, r)).ToList()
                 };
+
+                if (job.SaveStateId != cachedData.StateId)
+                {
+                    var latestGameSettings = GameSettingsViewModel.Load(selectedGame.Value).ModelObject;
+                    currentSpec.CurrentResults.UpdateCachedData(cachedData, latestGameSettings);
+                }
 
                 var shouldUpdateTarget = PalTargetList.SelectedTarget == initialSpec;
 
