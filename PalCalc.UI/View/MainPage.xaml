@@ -6,27 +6,18 @@
       xmlns:local="clr-namespace:PalCalc.UI"
       xmlns:v="clr-namespace:PalCalc.UI.View.Main"
       xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
-      xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
-      xmlns:m="clr-namespace:PalCalc.UI.Model"
       xmlns:itl="clr-namespace:PalCalc.UI.Localization"
-      xmlns:sm="clr-namespace:PalCalc.Solver;assembly=PalCalc.Solver"
       xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
       xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
       xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
       xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
-      xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
-      xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
       mc:Ignorable="d"
       d:Width="1280" d:Height="720"
-      xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
-      xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
       VerticalAlignment="Stretch"
       HorizontalAlignment="Stretch"
       d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Page.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
-        <c:CollectionVisibilityConverter x:Key="CVC" />
-        <c:IntToIVConverter x:Key="IIVC" />
         <c:ValueBoolConverter x:Key="NegatedVBC" Negate="True" />
     </Page.Resources>
     <Border Padding="5">
@@ -87,106 +78,7 @@
                                       MinHeight="100"
                                       >
                                 <ScrollViewer>
-                                    <ItemsControl ItemsSource="{Binding SolverQueue.QueuedItems}"
-                                                  dd:DragDrop.IsDragSource="True"
-                                                  dd:DragDrop.IsDropTarget="True"
-                                                  dd:DragDrop.DragHandler="{Binding SolverQueue}"
-                                                  dd:DragDrop.DropHandler="{Binding SolverQueue}"
-                                                  dd:DragDrop.DragDropContext="JobsList"
-                                                  Padding="0"
-                                                  >
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate DataType="mvm:PalSpecifierViewModel">
-                                                <Border Padding="5" HorizontalAlignment="Stretch" BorderThickness="1" Cursor="Hand">
-                                                    <Border.InputBindings>
-                                                        <MouseBinding Gesture="LeftClick" Command="{Binding RelativeSource={RelativeSource AncestorType=ItemsControl}, Path=DataContext.SolverQueue.SelectItemCommand}" CommandParameter="{Binding}" />
-                                                    </Border.InputBindings>
-                                                    <Border.Style>
-                                                        <Style TargetType="Border">
-                                                            <Setter Property="Background" Value="Transparent" />
-
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding LatestJob.CurrentState}" Value="Running">
-                                                                    <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBrush}}" />
-                                                                </DataTrigger>
-
-                                                                <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBorderBrush}}" />
-                                                                </Trigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Border.Style>
-
-                                                    <Grid HorizontalAlignment="Stretch">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" />
-                                                            <ColumnDefinition Width="10" />
-                                                            <ColumnDefinition Width="*" />
-                                                        </Grid.ColumnDefinitions>
-
-                                                        <Image Source="{Binding TargetPal.Icon}" Height="32" Grid.Column="0" VerticalAlignment="Center" />
-                                                        <StackPanel HorizontalAlignment="Stretch" Grid.Column="2" vu:StackPanelExtensions.Spacing="5">
-                                                            <StackPanel.Resources>
-                                                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                                                    <Setter Property="FontSize" Value="11" />
-                                                                    <Setter Property="Padding" Value="0" />
-                                                                    <Setter Property="Margin" Value="0" />
-                                                                </Style>
-                                                                <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
-                                                                    <Setter Property="FontSize" Value="11" />
-                                                                    <Setter Property="Padding" Value="0" />
-                                                                    <Setter Property="Margin" Value="0" />
-                                                                </Style>
-                                                                <Style TargetType="vp:PalIVsView">
-                                                                    <Setter Property="FontSize" Value="11" />
-                                                                </Style>
-                                                            </StackPanel.Resources>
-                                                            
-                                                            <vu:SpacedWrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" HorizontalSpacing="15">
-                                                                <Label Content="{Binding TargetPal.Name.Value}" />
-
-                                                                <vp:PalIVsView IV_HP="{Binding MinIv_HP, Converter={StaticResource IIVC}}"
-                                                                               IV_Attack="{Binding MinIv_Attack, Converter={StaticResource IIVC}}"
-                                                                               IV_Defense="{Binding MinIv_Defense, Converter={StaticResource IIVC}}"
-                                                                               Visibility="{Binding HasIVs, Converter={StaticResource VVC}}"
-                                                                               Orientation="Horizontal"
-                                                                               />
-
-                                                                <TextBlock Text="{Binding RequiredPassivesCollection.RequiredDescription.Value}" FontSize="11" />
-
-                                                                <TextBlock Text="{Binding OptionalPassivesCollection.OptionalDescription.Value}" Visibility="{Binding OptionalPassivesCollection.Passives, Converter={StaticResource CVC}}" />
-                                                            </vu:SpacedWrapPanel>
-
-                                                            <StackPanel vu:StackPanelExtensions.Spacing="2">
-                                                                <StackPanel.Resources>
-                                                                    <Style TargetType="ProgressBar" BasedOn="{StaticResource {x:Type ProgressBar}}">
-                                                                        <Setter Property="Minimum" Value="0" />
-                                                                        <Setter Property="Maximum" Value="100" />
-                                                                        <Setter Property="adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled" Value="False" />
-                                                                        <Setter Property="Opacity" Value="0.5" />
-                                                                        <Setter Property="IsHitTestVisible" Value="False" />
-                                                                        <Setter Property="Height" Value="5" />
-
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding LatestJob.CurrentState}" Value="Running">
-                                                                                <Setter Property="adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled" Value="True" />
-                                                                                <Setter Property="Opacity" Value="1" />
-                                                                                <Setter Property="Height" Value="10" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </StackPanel.Resources>
-
-                                                                <ProgressBar Value="{Binding LatestJob.SolverProgress, Mode=OneWay}" />
-
-                                                                <ProgressBar Value="{Binding LatestJob.StepProgress, Mode=OneWay}" />
-                                                            </StackPanel>
-                                                        </StackPanel>
-                                                    </Grid>
-                                                </Border>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+                                    <v:SolverQueueView DataContext="{Binding SolverQueue}" />
                                 </ScrollViewer>
                             </GroupBox>
                         </Grid>

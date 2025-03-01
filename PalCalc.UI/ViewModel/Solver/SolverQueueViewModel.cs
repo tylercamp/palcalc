@@ -2,10 +2,12 @@
 using CommunityToolkit.Mvvm.Input;
 using GongSolutions.Wpf.DragDrop;
 using PalCalc.UI.ViewModel.Mapped;
+using QuickGraph;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +19,21 @@ namespace PalCalc.UI.ViewModel.Solver
 {
     partial class SolverQueueViewModel : ObservableObject, IDropTarget
     {
+        private static SolverQueueViewModel designInstance;
+        public static SolverQueueViewModel DesignInstance
+        {
+            get
+            {
+                if (designInstance == null)
+                {
+                    designInstance = new SolverQueueViewModel();
+                    designInstance.Run(PalSpecifierViewModel.DesignerInstance);
+                }
+
+                return designInstance;
+            }
+        }
+
         private ObservableCollection<PalSpecifierViewModel> orderedPendingTargets;
         public ReadOnlyObservableCollection<PalSpecifierViewModel> QueuedItems { get; }
 
@@ -38,8 +55,11 @@ namespace PalCalc.UI.ViewModel.Solver
             orderedPendingTargets.CollectionChanged += OrderedPendingTargets_CollectionChanged;
         }
 
+        private static bool IsDesignerView = DesignerProperties.GetIsInDesignMode(new DependencyObject());
         private void OrderedPendingTargets_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (IsDesignerView) return;
+
             foreach (var vm in orderedPendingTargets.Where(t => !itemJobs.ContainsKey(t)))
                 itemJobs.Add(vm, vm.LatestJob);
 
@@ -93,6 +113,12 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public void Run(PalSpecifierViewModel item)
         {
+            if (IsDesignerView)
+            {
+                orderedPendingTargets.Add(item);
+                return;
+            }
+
             var job = item.LatestJob;
 
             if (job == null)
