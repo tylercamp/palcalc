@@ -5,11 +5,13 @@ using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Windows.ApplicationModel.Contacts;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
@@ -18,8 +20,14 @@ namespace PalCalc.UI.ViewModel.Solver
         private ObservableCollection<PalSpecifierViewModel> orderedPendingTargets;
         public ReadOnlyObservableCollection<PalSpecifierViewModel> QueuedItems { get; }
 
+        // (jobs may be cleared from a PalSpecifierViewModel when they're cancelled, track them here)
+        private Dictionary<PalSpecifierViewModel, SolverJobViewModel> itemJobs = new();
+
         [ObservableProperty]
         private IRelayCommand<PalSpecifierViewModel> selectItemCommand;
+
+        [ObservableProperty]
+        private bool paused = false;
 
         public SolverQueueViewModel()
         {
@@ -29,28 +37,65 @@ namespace PalCalc.UI.ViewModel.Solver
             orderedPendingTargets.CollectionChanged += OrderedPendingTargets_CollectionChanged;
         }
 
-        private void OrderedPendingTargets_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void OrderedPendingTargets_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (orderedPendingTargets.Any(t => t.LatestJob.CurrentState == SolverState.Running))
-                return;
+            foreach (var vm in orderedPendingTargets.Where(t => !itemJobs.ContainsKey(t)))
+                itemJobs.Add(vm, vm.LatestJob);
 
-            if (orderedPendingTargets.Count == 0)
-                return;
+            // note: events are raised by SolverJobViewModel *before* job state is changed
+            var wasRunning = orderedPendingTargets
+                .Concat(e.NewItems?.Cast<PalSpecifierViewModel>() ?? [])
+                .Concat(e.OldItems?.Cast<PalSpecifierViewModel>() ?? [])
+                .Any(t => itemJobs.GetValueOrDefault(t)?.CurrentState == SolverState.Running);
 
-            var nextItem = orderedPendingTargets.First();
-            nextItem.LatestJob.Run();
+            var runningTargets = orderedPendingTargets.Where(t => itemJobs[t].CurrentState == SolverState.Running).ToList();
+            var firstItem = orderedPendingTargets.FirstOrDefault();
+
+            void RunFirstInQueue()
+            {
+                foreach (var job in runningTargets.Where(j => j != firstItem && itemJobs[j].CurrentState == SolverState.Running))
+                    itemJobs[job].Pause();
+
+                itemJobs[firstItem].Run();
+            }
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RunFirstInQueue();
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    foreach (var target in runningTargets)
+                        itemJobs[target].Cancel();
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    if (wasRunning && orderedPendingTargets.Count > 0)
+                        RunFirstInQueue();
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    if (e.OldStartingIndex == 0 || e.NewStartingIndex == 0 && wasRunning)
+                        RunFirstInQueue();
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    if (e.OldStartingIndex == 0 || e.NewStartingIndex == 0 && wasRunning)
+                        RunFirstInQueue();
+                    break;
+            }
+
+            foreach (var key in itemJobs.Keys.Where(k => !orderedPendingTargets.Contains(k)).ToList())
+                itemJobs.Remove(key);
         }
 
-        public void Add(PalSpecifierViewModel item)
+        public void Run(PalSpecifierViewModel item)
         {
             var job = item.LatestJob;
 
             if (job == null)
                 throw new InvalidOperationException();
-
-            var shouldStart = orderedPendingTargets.Count == 0;
-
-            orderedPendingTargets.Add(item);
 
             // TODO - event listener leaks
             job.JobStopped += () =>
@@ -58,26 +103,26 @@ namespace PalCalc.UI.ViewModel.Solver
                 orderedPendingTargets.Remove(item);
             };
 
-            job.PropertyChanged += (_, ev) =>
+            job.PropertyChanged += (_, e) =>
             {
-                if (!orderedPendingTargets.Contains(item)) return;
+                if (e.PropertyName != nameof(job.CurrentState))
+                    return;
 
-                if (ev.PropertyName == nameof(job.CurrentState) && job.CurrentState == SolverState.Running)
+                if (job.CurrentState != SolverState.Running)
+                    return;
+
+                Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                 {
-                    var othersRunning = orderedPendingTargets.Where(t => t.LatestJob.CurrentState == SolverState.Running && t != item).ToList();
-                    foreach (var other in othersRunning)
-                        other.LatestJob.Pause();
+                    if (!orderedPendingTargets.Contains(item))
+                        return;
 
-                    Dispatcher.CurrentDispatcher.BeginInvoke(() =>
-                    {
-                        if (orderedPendingTargets.Contains(item))
-                            orderedPendingTargets.Move(orderedPendingTargets.IndexOf(item), 0);
-                    });
-                }
+                    if (job.CurrentState == SolverState.Running && orderedPendingTargets[0] != item)
+                        orderedPendingTargets.Move(orderedPendingTargets.IndexOf(item), 0);
+                });
             };
 
-            if (shouldStart)
-                job.Run();
+            itemJobs.Add(item, item.LatestJob);
+            orderedPendingTargets.Insert(0, item);
         }
 
         public void DragOver(IDropInfo dropInfo)

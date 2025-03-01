@@ -517,7 +517,7 @@ namespace PalCalc.UI.ViewModel
             initialSpec.LatestJob = job;
             currentSpec.LatestJob = job;
 
-            SolverQueue.Add(currentSpec);
+            SolverQueue.Run(currentSpec);
         }
 
         private void CancelSolver()

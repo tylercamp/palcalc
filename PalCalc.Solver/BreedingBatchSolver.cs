@@ -238,6 +238,8 @@ namespace PalCalc.Solver
                 controller.PauseIfRequested();
                 if (controller.CancellationToken.IsCancellationRequested) yield break;
 
+                progress.NumProcessed++;
+
                 if (!p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
                 if (p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() > settings.MaxWildPals) continue;
                 if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= settings.MaxBreedingSteps) continue;
@@ -465,8 +467,6 @@ namespace PalCalc.Solver
                 passiveListPool.Return(parentPassives);
                 passiveListPool.Return(availableRequiredPassives);
                 passiveListPool.Return(availableOptionalPassives);
-
-                progress.NumProcessed++;
             }
         }
     }

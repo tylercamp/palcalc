@@ -211,6 +211,7 @@ namespace PalCalc.Solver
                             statusMsg.WorkProcessedCount = progress;
                         }
                         statusMsg.Paused = controller.IsPaused;
+                        statusMsg.Canceled = controller.CancellationToken.IsCancellationRequested;
 
                         if (lastMsgHash == 0 || lastMsgHash != statusMsg.GetHashCode())
                         {
@@ -265,15 +266,17 @@ namespace PalCalc.Solver
                     var res = results.SelectMany(l => l).ToList();
                     progressTimer.Dispose();
 
+                    lock (progressEntries)
+                        statusMsg.WorkProcessedCount = progressEntries.Sum(e => e.NumProcessed);
+
+                    statusMsg.TotalWorkProcessedCount += statusMsg.WorkProcessedCount;
+                    statusMsg.Canceled = controller.CancellationToken.IsCancellationRequested;
+                    SolverStateUpdated?.Invoke(statusMsg);
+
                     return res;
                 });
 
                 if (controller.CancellationToken.IsCancellationRequested) break;
-
-                lock(progressEntries)
-                    statusMsg.WorkProcessedCount = progressEntries.Sum(e => e.NumProcessed);
-
-                statusMsg.TotalWorkProcessedCount += statusMsg.WorkProcessedCount;
 
                 if (!didUpdate)
                 {

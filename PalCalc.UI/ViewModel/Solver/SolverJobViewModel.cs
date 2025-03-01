@@ -155,8 +155,17 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public void Cancel()
         {
-            tokenSource?.Cancel();
-            solverController?.Resume();
+            if (thread == null)
+            {
+                JobCancelled?.Invoke();
+                JobStopped?.Invoke();
+                CurrentState = SolverState.Idle;
+            }
+            else
+            {
+                tokenSource?.Cancel();
+                solverController?.Resume();
+            }
         }
 
         public void Dispose()
@@ -246,16 +255,19 @@ namespace PalCalc.UI.ViewModel.Solver
 
             string FormatNum(long num) => num.ToString("#,##");
 
+            if (sw == null)
+                sw = Stopwatch.StartNew();
+
             dispatcher.BeginInvoke(() =>
             {
-                CurrentState = obj.Paused ? SolverState.Paused : SolverState.Running;
+                if (!obj.Canceled)
+                    CurrentState = obj.Paused ? SolverState.Paused : SolverState.Running;
 
                 var numTotalSteps = (double)(1 + obj.TargetSteps);
                 int overallStep = 0;
                 switch (obj.CurrentPhase)
                 {
                     case SolverPhase.Initializing:
-                        sw = Stopwatch.StartNew();
                         SolverStatusMessage = LocalizationCodes.LV_SOLVER_STATUS_INITIALIZING.Bind();
                         overallStep = 0;
                         lastStepIndex = -1;
