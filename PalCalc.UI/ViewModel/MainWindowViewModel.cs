@@ -243,7 +243,7 @@ namespace PalCalc.UI.ViewModel
 
             Storage.SaveReloaded += Storage_SaveReloaded;
 
-            dispatcher?.BeginInvoke(UpdateFromSaveProperties, DispatcherPriority.Background);
+            dispatcher.Invoke(UpdateFromSaveProperties);
 
             passivePresets.PresetSelected += selectedPreset =>
             {
