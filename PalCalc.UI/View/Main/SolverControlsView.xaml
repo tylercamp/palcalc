@@ -17,8 +17,7 @@
             <GridLength x:Key="SepWidth">10</GridLength>
 
             <Style TargetType="{x:Type vu:IntegerTextBox}">
-                <Setter Property="Width" Value="20" />
-                <Setter Property="Height" Value="20" />
+                <Setter Property="Width" Value="25" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
             </Style>
             <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">

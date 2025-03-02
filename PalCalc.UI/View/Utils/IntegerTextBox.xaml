@@ -16,7 +16,7 @@
         HorizontalContentAlignment="Right"
         PreviewMouseDown="textBox_PreviewMouseDown"
         PreviewMouseWheel="textBox_PreviewMouseWheel"
-        Padding="3"
+        Padding="5,3"
         IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:IntegerTextBox}, Path=IsEnabled}"
         />
 </UserControl>
