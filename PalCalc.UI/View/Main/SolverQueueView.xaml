@@ -78,7 +78,13 @@
                             </StackPanel.Resources>
 
                             <vu:SpacedWrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" HorizontalSpacing="15">
-                                <Label Content="{Binding TargetPal.Name.Value}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="{Binding TargetPal.Name.Value}" />
+                                    <vp:PalGenderView DataContext="{Binding RequiredGender}"
+                                                      Visibility="{Binding IsSpecific, Converter={StaticResource VVC}}"
+                                                      Height="14"
+                                                      />
+                                </StackPanel>
 
                                 <vp:PalIVsView IV_HP="{Binding MinIv_HP, Converter={StaticResource IIVC}}"
                                                IV_Attack="{Binding MinIv_Attack, Converter={StaticResource IIVC}}"
