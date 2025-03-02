@@ -112,11 +112,15 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public void Save(ISaveGame forSave)
         {
+            if (Storage.DEBUG_DisableStorage) return;
+
             File.WriteAllText(Storage.GameSettingsPath(forSave), ToJson());
         }
 
         public static GameSettingsViewModel Load(ISaveGame forSave)
         {
+            if (Storage.DEBUG_DisableStorage) return new GameSettingsViewModel();
+
             var path = Storage.GameSettingsPath(forSave);
             if (File.Exists(path))
             {

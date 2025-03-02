@@ -18,6 +18,9 @@ namespace PalCalc.UI.Model
 
         public static event Action<ISaveGame> SaveReloaded;
 
+        // (debug-only setting)
+        public static readonly bool DEBUG_DisableStorage = false;
+
         public static string CachePath => "cache";
         public static string SaveCachePath => $"{CachePath}/saves";
         public static string DataPath => "data";
@@ -93,6 +96,8 @@ namespace PalCalc.UI.Model
 
         public static AppSettings LoadAppSettings()
         {
+            if (DEBUG_DisableStorage) return new();
+
             if (File.Exists(AppSettingsPath))
             {
                 try
@@ -138,6 +143,8 @@ namespace PalCalc.UI.Model
 
         public static SaveCustomizations LoadSaveCustomizations(ISaveGame forSaveGame, PalDB db)
         {
+            if (DEBUG_DisableStorage) return new SaveCustomizations();
+
             var filePath = CustomContainerPath(forSaveGame);
             if (!File.Exists(filePath)) return new SaveCustomizations();
 
@@ -171,6 +178,8 @@ namespace PalCalc.UI.Model
 
         public static void SaveCustomizations(ISaveGame forSaveGame, SaveCustomizations custom, PalDB db)
         {
+            if (DEBUG_DisableStorage) return;
+
             File.WriteAllText(
                 CustomContainerPath(forSaveGame),
                 JsonConvert.SerializeObject(custom, new PalInstanceJsonConverter(db))
@@ -187,6 +196,8 @@ namespace PalCalc.UI.Model
             Init();
 
             CrashSupport.ReferencedSave(save);
+
+            if (DEBUG_DisableStorage) return null;
 
             var path = SaveCachePathFor(save);
             if (File.Exists(path))
@@ -227,7 +238,7 @@ namespace PalCalc.UI.Model
             var path = SaveCachePathFor(save);
             if (!save.IsValid)
             {
-                if (File.Exists(path))
+                if (!DEBUG_DisableStorage && File.Exists(path))
                 {
                     logger.Warning("cached save available but the save-game itself is invalid, deleting cached save for {savePath}", save.BasePath);
                     File.Delete(path);
@@ -241,7 +252,7 @@ namespace PalCalc.UI.Model
             {
                 if (InMemorySaves.ContainsKey(identifier)) return InMemorySaves[identifier];
 
-                if (File.Exists(path))
+                if (!DEBUG_DisableStorage && File.Exists(path))
                 {
                     var res = LoadSaveFromCache(save, db);
 
@@ -268,7 +279,9 @@ namespace PalCalc.UI.Model
                     if (res != null)
                     {
                         CrashSupport.ReferencedCachedSave(res);
-                        File.WriteAllText(path, res.ToJson(db));
+
+                        if (!DEBUG_DisableStorage)
+                            File.WriteAllText(path, res.ToJson(db));
                     }
 
                     // TODO - adding `null` entries will prevent re-adding a save at the same path until the app is restarted
@@ -312,7 +325,7 @@ namespace PalCalc.UI.Model
                 }
 
                 var path = SaveCachePathFor(save);
-                var wasStored = File.Exists(path);
+                var wasStored = !DEBUG_DisableStorage && File.Exists(path);
                 var backupPath = wasStored ? path + ".bak" : null;
 
                 if (wasStored)
@@ -325,7 +338,7 @@ namespace PalCalc.UI.Model
 
                 if (newCachedSave == null)
                 {
-                    if (wasStored)
+                    if (!DEBUG_DisableStorage && wasStored)
                     {
                         if (File.Exists(path)) File.Delete(path);
 
@@ -336,7 +349,7 @@ namespace PalCalc.UI.Model
                 }
                 else
                 {
-                    if (wasStored) File.Delete(backupPath);
+                    if (!DEBUG_DisableStorage && wasStored) File.Delete(backupPath);
 
                     if (originalCachedSave != null)
                         originalCachedSave.CopyFrom(newCachedSave);

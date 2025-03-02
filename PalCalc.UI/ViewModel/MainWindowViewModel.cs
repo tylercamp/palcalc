@@ -185,6 +185,8 @@ namespace PalCalc.UI.ViewModel
                     sg => sg,
                     sg =>
                     {
+                        if (Storage.DEBUG_DisableStorage) return new PalTargetListViewModel();
+
                         var saveTargetsLocation = Storage.SaveFileDataPath(sg);
                         var targetsFile = Path.Join(saveTargetsLocation, "pal-targets.json");
                         if (File.Exists(targetsFile))
@@ -458,6 +460,8 @@ namespace PalCalc.UI.ViewModel
 
         private void SaveTargetList(PalTargetListViewModel list)
         {
+            if (Storage.DEBUG_DisableStorage) return;
+
             var outputFolder = Storage.SaveFileDataPath(SaveSelection.SelectedFullGame.Value);
             if (!Directory.Exists(outputFolder))
                 Directory.CreateDirectory(outputFolder);
