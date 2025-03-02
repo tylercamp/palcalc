@@ -30,9 +30,6 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                <Setter Property="Padding" Value="5,2,5,2" />
-            </Style>
             <Style TargetType="{x:Type Grid}">
                 <Setter Property="VerticalAlignment" Value="Top" />
             </Style>
