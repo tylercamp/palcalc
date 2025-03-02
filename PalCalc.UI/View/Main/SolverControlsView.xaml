@@ -8,6 +8,7 @@
              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:local="clr-namespace:PalCalc.UI.View.Main"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d" 
              d:DataContext="{x:Static vms:SolverControlsViewModel.DesignerInstance}"
              d:DesignWidth="1000.621">
@@ -22,6 +23,12 @@
             </Style>
             <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="VerticalAlignment" Value="Center" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding CanEditSettings}" Value="False">
+                        <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}" />
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
                 <Setter Property="Padding" Value="5,2,5,2" />
