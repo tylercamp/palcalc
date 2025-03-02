@@ -349,10 +349,13 @@ namespace PalCalc.UI.Model
                 }
                 else
                 {
-                    if (!DEBUG_DisableStorage && wasStored) File.Delete(backupPath);
+                    if (!DEBUG_DisableStorage)
+                    {
+                        if (wasStored) File.Delete(backupPath);
 
-                    if (originalCachedSave != null)
-                        originalCachedSave.CopyFrom(newCachedSave);
+                        if (originalCachedSave != null)
+                            originalCachedSave.CopyFrom(newCachedSave);
+                    }
 
                     InMemorySaves[identifier] = originalCachedSave ?? newCachedSave;
 
