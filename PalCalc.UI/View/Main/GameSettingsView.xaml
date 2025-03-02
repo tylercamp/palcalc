@@ -24,8 +24,17 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Content="{itl:LocalizedText LC_BREEDING_TIME}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,3,0,0" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Content="{itl:LocalizedText LC_BREEDING_TIME}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <vu:IntegerTextBox
+                Grid.Row="0"
                 Grid.Column="2"
                 ToolTipService.ToolTip="{itl:LocalizedText LC_BREEDING_TIME_DESC}"
                 ToolTipService.ShowOnDisabled="True"
@@ -36,19 +45,19 @@
 
             />
 
-            <Label Grid.Column="0" Content="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,30,0,0" />
+            <Label Grid.Row="2" Grid.Column="0" Content="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS}" HorizontalAlignment="Left" VerticalAlignment="Center" />
             <CheckBox
+                Grid.Row="2"
                 Grid.Column="2"
                 ToolTipService.ToolTip="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS_DESC}"
                 ToolTipService.ShowOnDisabled="True"
                 IsChecked="{Binding MultipleBreedingFarms}"
                 HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Margin="0,31,0,0"
+                VerticalAlignment="Center"
             />
 
-            <Label Grid.Column="0" Content="{itl:LocalizedText Code=LC_SETTINGS_PALBOX_TAB_SIZE}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,57,0,0"/>
-            <StackPanel Margin="0,55,0,0" Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Top">
+            <Label Grid.Row="4" Grid.Column="0" Content="{itl:LocalizedText Code=LC_SETTINGS_PALBOX_TAB_SIZE}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <StackPanel Grid.Row="4" Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Top">
                 <vu:IntegerTextBox
                     VerticalAlignment="Top"
                     MinWidth="26"
