@@ -23,8 +23,13 @@ namespace PalCalc.UI.View.Utils
         public IntegerTextBox()
         {
             InitializeComponent();
+        }
 
-            textBox.Text = Value.ToString();
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            if (textBox.Text.Length == 0) textBox.Text = Value.ToString();
         }
 
         public static readonly DependencyProperty MinValueProperty = DependencyProperty.Register(
