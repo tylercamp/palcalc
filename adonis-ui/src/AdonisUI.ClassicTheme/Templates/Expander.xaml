@@ -5,7 +5,7 @@
     <DataTemplate x:Key="{x:Static adonisUi:Templates.Expander}">
         <Border Background="{x:Null}">
             <Viewbox x:Name="Arrow"
-                     Width="6"
+                     Width="8"
                      Stretch="Uniform">
                 <Path Data="M 0 0 L 8 0 L 4 4 Z"
                       Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Control}}"
