@@ -23,7 +23,7 @@
     </StackPanel.Resources>
     
     <StackPanel Orientation="Vertical">
-        <Label Content="{itl:LocalizedText LC_SAVE_LOCATION}" />
+        <Label Content="{itl:LocalizedText LC_SAVE_LOCATION}" IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:SaveSelectorView}, Path=AllowNavigation}" />
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -44,7 +44,7 @@
     </StackPanel>
 
     <StackPanel>
-        <Label Content="{itl:LocalizedText LC_SAVE_GAME}" />
+        <Label Content="{itl:LocalizedText LC_SAVE_GAME}" IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:SaveSelectorView}, Path=AllowNavigation}" />
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
