@@ -273,42 +273,54 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
-                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
-                        <Grid SnapsToDevicePixels="False">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="19"/>
-                            </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}" />
+                        <Border x:Name="SpotlightLayer"
+                                Background="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BackgroundBrush}"
+                                BorderBrush="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BorderBrush}"
+                                adonisExtensions:CursorSpotlightExtension.MouseEventSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ToggleButton}}"
+Panel.ZIndex="1"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                            />
 
-                            <ContentPresenter Grid.Column="0"
-                                              HorizontalAlignment="Left"
-                                              Margin="0,0,4,0"
-                                              RecognizesAccessKey="True"
-                                              SnapsToDevicePixels="True"
-                                              VerticalAlignment="Center"/>
+                        <Border Padding="{TemplateBinding Padding}" Panel.ZIndex="1">
+                            <Grid SnapsToDevicePixels="False">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="19"/>
+                                </Grid.ColumnDefinitions>
 
-                            <Ellipse x:Name="Circle"
-                                     Stroke="{TemplateBinding BorderBrush}"
-                                     HorizontalAlignment="Center"
-                                     VerticalAlignment="Center"
-                                     Grid.Column="1"
-                                     Height="19"
-                                     Width="19"/>
+                                <ContentPresenter Grid.Column="0"
+                                                  HorizontalAlignment="Left"
+                                                  Margin="0,0,4,0"
+                                                  RecognizesAccessKey="True"
+                                                  SnapsToDevicePixels="True"
+                                                  VerticalAlignment="Center"/>
 
-                            <ContentControl x:Name="Arrow"
-                                            ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.Expander}}"
-                                            Foreground="{TemplateBinding BorderBrush}"
-                                            Grid.Column="1"
-                                            Focusable="False"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            RenderTransformOrigin="0.5 0.35">
-                                <ContentControl.RenderTransform>
-                                    <RotateTransform Angle="0"/>
-                                </ContentControl.RenderTransform>
-                            </ContentControl>
-                        </Grid>
-                    </Border>
+                                <Ellipse x:Name="Circle"
+                                         Stroke="{TemplateBinding BorderBrush}"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         Grid.Column="1"
+                                         Height="19"
+                                         Width="19"/>
+
+                                <ContentControl x:Name="Arrow"
+                                                ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.Expander}}"
+                                                Foreground="{TemplateBinding BorderBrush}"
+                                                Grid.Column="1"
+                                                Focusable="False"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                RenderTransformOrigin="0.5 0.35"
+                                                >
+                                    <ContentControl.RenderTransform>
+                                        <RotateTransform Angle="0"/>
+                                    </ContentControl.RenderTransform>
+                                </ContentControl>
+                            </Grid>
+                        </Border>
+                    </Grid>
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
@@ -343,6 +355,9 @@
         <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"/>
         <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
         <Setter Property="adonisExtensions:GroupBoxExtension.HeaderBackground" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" />
+        <Setter Property="adonisExtensions:RippleExtension.BackgroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1InteractionBrush}}"/>
+        <Setter Property="adonisExtensions:RippleExtension.BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1InteractionBorderBrush}}"/>
+        <Setter Property="adonisExtensions:RippleExtension.ForegroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1InteractionForegroundBrush}}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"/>
         <Setter Property="BorderThickness" Value="{DynamicResource {x:Static adonisUi:Dimensions.BorderThickness}}"/>
         <Setter Property="Padding" Value="{adonisUi:Space 1, 1}" />
@@ -370,6 +385,7 @@
                                           VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                           IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                           BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
                                           Padding="{adonisUi:Space 1, 1}"
                                           Style="{StaticResource ExpanderDownHeaderStyle}"/>
 
@@ -550,7 +566,9 @@
                         </Trigger>
 
                         <Trigger Property="IsMouseOver" SourceName="HeaderSite" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.AccentIntenseHighlightBorderBrush}}"/>
+                            <Setter Property="adonisExtensions:GroupBoxExtension.HeaderBackground" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBrush}}" />
+                            <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBrush}}"/>
+                            <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"/>
                         </Trigger>
 
                     </ControlTemplate.Triggers>
@@ -574,6 +592,42 @@
                 <Setter Property="adonisExtensions:GroupBoxExtension.HeaderBackground" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer4BorderBrush}}" />
                 <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer4BackgroundBrush}}"/>
             </DataTrigger>
+
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Path=(adonisExtensions:LayerExtension.ComputedLayer), RelativeSource={RelativeSource Self}}" Value="2"/>
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter Property="adonisExtensions:GroupBoxExtension.HeaderBackground" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer2HighlightBrush}}"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer2IntenseHighlightBrush}}"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer2IntenseHighlightBorderBrush}}"/>
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
+
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Path=(adonisExtensions:LayerExtension.ComputedLayer), RelativeSource={RelativeSource Self}}" Value="3"/>
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter Property="adonisExtensions:GroupBoxExtension.HeaderBackground" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer3HighlightBrush}}"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer3IntenseHighlightBrush}}"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer3IntenseHighlightBorderBrush}}"/>
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
+
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Path=(adonisExtensions:LayerExtension.ComputedLayer), RelativeSource={RelativeSource Self}}" Value="4"/>
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter Property="adonisExtensions:GroupBoxExtension.HeaderBackground" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer4HighlightBrush}}"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer4IntenseHighlightBrush}}"/>
+                    <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer4IntenseHighlightBorderBrush}}"/>
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
 
             <Trigger Property="IsFocused" Value="True">
                 <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}"/>
