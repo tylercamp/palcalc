@@ -45,14 +45,14 @@
                     <ColumnDefinition Width="80*" MinWidth="280"/>
                 </Grid.ColumnDefinitions>
                 <DockPanel Grid.Column="0">
-                    <StackPanel DockPanel.Dock="Top">
-                        <GroupBox Header="{itl:LocalizedText LC_SAVE_FILE}">
+                    <StackPanel DockPanel.Dock="Top" vu:StackPanelExtensions.Spacing="5">
+                        <Expander Header="{itl:LocalizedText LC_SAVE_FILE}" IsExpanded="True" adonisExtensions:LayerExtension.IncreaseLayer="True">
                             <v:SaveSelectorView DataContext="{Binding SaveSelection}" AllowNavigation="{Binding RelativeSource={RelativeSource AncestorType=local:MainPage}, Path=DataContext.SolverQueue.QueuedItems.Count, Converter={StaticResource NegatedVBC}}" />
-                        </GroupBox>
+                        </Expander>
 
-                        <GroupBox Header="{itl:LocalizedText LC_GAME_SETTINGS}" Margin="0,5,0,0">
+                        <Expander Header="{itl:LocalizedText LC_GAME_SETTINGS}" IsExpanded="True" adonisExtensions:LayerExtension.IncreaseLayer="True">
                             <v:GameSettingsView DataContext="{Binding SelectedGameSettings}" />
-                        </GroupBox>
+                        </Expander>
                     </StackPanel>
 
                     <Grid Margin="0,5,0,0">
