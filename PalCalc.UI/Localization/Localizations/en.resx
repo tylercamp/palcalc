@@ -338,7 +338,7 @@ Please find the generated ZIP file to send with any support questions:
     <value>Pending Jobs</value>
   </data>
   <data name="LC_JOB_QUEUE_HEADER" xml:space="preserve">
-    <value>Jobs</value>
+    <value>Jobs ({Count})</value>
   </data>
   <data name="LC_LANGUAGE" xml:space="preserve">
     <value>Language</value>

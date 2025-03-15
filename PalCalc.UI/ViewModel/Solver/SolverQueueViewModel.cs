@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GongSolutions.Wpf.DragDrop;
+using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
 using System;
@@ -40,6 +41,13 @@ namespace PalCalc.UI.ViewModel.Solver
         // (jobs may be cleared from a PalSpecifierViewModel when they're cancelled, track them here)
         private Dictionary<PalSpecifierViewModel, SolverJobViewModel> itemJobs = new();
 
+        private ILocalizedText sectionTitleWithCount;
+        public ILocalizedText SectionTitleWithCount
+        {
+            get => sectionTitleWithCount;
+            private set => SetProperty(ref sectionTitleWithCount, value);
+        }
+
         [ObservableProperty]
         private IRelayCommand<PalSpecifierViewModel> selectItemCommand;
 
@@ -49,6 +57,8 @@ namespace PalCalc.UI.ViewModel.Solver
             QueuedItems = new ReadOnlyObservableCollection<PalSpecifierViewModel>(orderedPendingTargets);
 
             orderedPendingTargets.CollectionChanged += OrderedPendingTargets_CollectionChanged;
+
+            SectionTitleWithCount = LocalizationCodes.LC_JOB_QUEUE_HEADER.Bind(0);
         }
 
         private static bool IsDesignerView = DesignerProperties.GetIsInDesignMode(new DependencyObject());
@@ -105,6 +115,8 @@ namespace PalCalc.UI.ViewModel.Solver
 
             foreach (var key in itemJobs.Keys.Where(k => !orderedPendingTargets.Contains(k)).ToList())
                 itemJobs.Remove(key);
+
+            SectionTitleWithCount = LocalizationCodes.LC_JOB_QUEUE_HEADER.Bind(QueuedItems.Count);
         }
 
         public void Run(PalSpecifierViewModel item)

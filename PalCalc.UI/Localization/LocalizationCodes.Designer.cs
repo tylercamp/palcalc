@@ -343,7 +343,7 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_JOB_QUEUE_CLOSING_TITLE,
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Count.
         /// </summary>
         LC_JOB_QUEUE_HEADER,
         /// <summary>

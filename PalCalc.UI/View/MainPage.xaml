@@ -73,16 +73,19 @@
 
                             <GridSplitter Grid.Row="0" Background="{x:Null}" Height="5" ResizeBehavior="CurrentAndNext" />
 
-                            <Expander Header="{itl:LocalizedText Code=LC_JOB_QUEUE_HEADER}"
+                            <Expander Header="{Binding SolverQueue.SectionTitleWithCount.Value}"
                                       Grid.Row="1"
                                       Visibility="{Binding SolverQueue.QueuedItems.Count, Converter={StaticResource VVC}}"
                                       IsExpanded="True"
                                       VerticalContentAlignment="Stretch"
+                                      adonisExtensions:LayerExtension.IncreaseLayer="True"
                                       >
                                 <i:Interaction.Behaviors>
                                     <b:ExpanderGridRowResetBehavior TargetGridRowIndex="1" ExpandedMinHeight="100" />
                                 </i:Interaction.Behaviors>
-                                <v:SolverQueueView DataContext="{Binding SolverQueue}" />
+                                <ScrollViewer>
+                                    <v:SolverQueueView DataContext="{Binding SolverQueue}" />
+                                </ScrollViewer>
                             </Expander>
                         </Grid>
                     </Grid>
@@ -136,7 +139,7 @@
                             <RowDefinition Height="60*" MinHeight="150" />
                         </Grid.RowDefinitions>
 
-                        <Expander Header="{itl:LocalizedText LC_SOURCE_PALS}" Grid.Row="0" Margin="0,5,0,0" IsExpanded="True" Name="SourcePalsExpander" VerticalContentAlignment="Stretch">
+                        <Expander Header="{itl:LocalizedText LC_SOURCE_PALS}" Grid.Row="0" Margin="0,5,0,0" IsExpanded="True" Name="SourcePalsExpander" VerticalContentAlignment="Stretch" adonisExtensions:LayerExtension.IncreaseLayer="True">
                             <i:Interaction.Behaviors>
                                 <b:ExpanderGridRowResetBehavior TargetGridRowIndex="0" ExpandedMinHeight="180" />
                             </i:Interaction.Behaviors>

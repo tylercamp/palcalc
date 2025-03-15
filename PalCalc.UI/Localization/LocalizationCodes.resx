@@ -803,6 +803,6 @@
     <value />
   </data>
   <data name="LC_JOB_QUEUE_HEADER" xml:space="preserve">
-    <value />
+    <value>Count</value>
   </data>
 </root>
