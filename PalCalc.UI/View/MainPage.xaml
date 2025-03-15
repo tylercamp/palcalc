@@ -68,20 +68,22 @@
                         <Grid Visibility="{Binding SolverQueue.QueuedItems.Count, Converter={StaticResource VVC}}" Grid.Row="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition />
-                                <RowDefinition Height="Auto" MinHeight="100" />
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
                             <GridSplitter Grid.Row="0" Background="{x:Null}" Height="5" ResizeBehavior="CurrentAndNext" />
 
-                            <GroupBox Header="{itl:LocalizedText Code=LC_JOB_QUEUE_HEADER}"
+                            <Expander Header="{itl:LocalizedText Code=LC_JOB_QUEUE_HEADER}"
                                       Grid.Row="1"
                                       Visibility="{Binding SolverQueue.QueuedItems.Count, Converter={StaticResource VVC}}"
-                                      MinHeight="100"
+                                      IsExpanded="True"
+                                      VerticalContentAlignment="Stretch"
                                       >
-                                <ScrollViewer>
-                                    <v:SolverQueueView DataContext="{Binding SolverQueue}" />
-                                </ScrollViewer>
-                            </GroupBox>
+                                <i:Interaction.Behaviors>
+                                    <b:ExpanderGridRowResetBehavior TargetGridRowIndex="1" ExpandedMinHeight="100" />
+                                </i:Interaction.Behaviors>
+                                <v:SolverQueueView DataContext="{Binding SolverQueue}" />
+                            </Expander>
                         </Grid>
                     </Grid>
                 </DockPanel>

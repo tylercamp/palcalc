@@ -79,20 +79,29 @@ namespace PalCalc.UI.ViewModel.Behaviors
 
         private void _minHeightApplyTimer_Tick(object sender, EventArgs e)
         {
+            var defaultLength = new GridLength(1, GridUnitType.Star);
+
             // GridSplitter resizing on Auto converts to a plain pixel size instead of star-lengths, which breaks MinHeight constraint
             //
-            // reapply star-lengths so MinHeight is still obeyed; 
+            // reapply star-lengths so MinHeight is still obeyed
+            var hasStarLengths = false;
             for (int i = 0; i < _parentGrid.RowDefinitions.Count; i++)
             {
                 var def = _parentGrid.RowDefinitions[i];
 
                 if (i == TargetGridRowIndex)
                 {
-                    _parentGrid.RowDefinitions[i].Height = new GridLength(def.ActualHeight, GridUnitType.Star);
+                    // 2nd one is the main case; 1st handles "Jobs" panel edge-case
+
+                    if (i == _parentGrid.RowDefinitions.Count - 1 && !hasStarLengths)
+                        _parentGrid.RowDefinitions[i].Height = GridLength.Auto;
+                    else
+                        _parentGrid.RowDefinitions[i].Height = new GridLength(def.ActualHeight, GridUnitType.Star);
                 }
-                else if (def.Height.IsStar)
+                else if (def.Height.IsStar && def.Height != defaultLength)
                 {
                     _parentGrid.RowDefinitions[i].Height = new GridLength(def.ActualHeight, GridUnitType.Star);
+                    hasStarLengths = true;
                 }
             }
 
