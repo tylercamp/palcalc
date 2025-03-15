@@ -71,7 +71,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <GridSplitter Grid.Row="0" Background="{x:Null}" Height="5" ResizeBehavior="CurrentAndNext" />
+                            <GridSplitter Grid.Row="0" Background="{x:Null}" Height="5" ResizeBehavior="CurrentAndNext" IsEnabled="{Binding ElementName=JobQueueExpander, Path=IsExpanded}" />
 
                             <Expander Header="{Binding SolverQueue.SectionTitleWithCount.Value}"
                                       Grid.Row="1"
@@ -79,6 +79,7 @@
                                       IsExpanded="True"
                                       VerticalContentAlignment="Stretch"
                                       adonisExtensions:LayerExtension.IncreaseLayer="True"
+                                      Name="JobQueueExpander"
                                       >
                                 <i:Interaction.Behaviors>
                                     <b:ExpanderGridRowResetBehavior TargetGridRowIndex="1" ExpandedMinHeight="100" />
