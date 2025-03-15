@@ -383,12 +383,6 @@
                                               Padding="0"
                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               >
-                                    <ScrollViewer.Height>
-                                        <MultiBinding Converter="{adonisConverters:MathConverter}" ConverterParameter="x*y">
-                                            <Binding Path="ActualHeight" ElementName="ExpandSite"/>
-                                            <Binding Path="Tag" RelativeSource="{RelativeSource Self}"/>
-                                        </MultiBinding>
-                                    </ScrollViewer.Height>
                                     <ScrollViewer.Tag>
                                         <system:Double>0.0</system:Double>
                                     </ScrollViewer.Tag>
@@ -458,19 +452,28 @@
                             </Setter>
                         </Trigger>
 
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="ExpandDirection" Value="Down"/>
-                                <Condition Property="VerticalContentAlignment" Value="Stretch"/>
-                            </MultiTrigger.Conditions>
+                        <Trigger Property="ExpandDirection" Value="Down">
                             <Setter Property="Height" TargetName="ExpandSiteContainer">
                                 <Setter.Value>
                                     <MultiBinding Converter="{adonisConverters:MathConverter}" ConverterParameter="x*y">
-                                        <Binding Path="ActualHeight" ElementName="ExpandSiteContainerWrapper"/>
+                                        <Binding Path="ActualHeight" ElementName="ExpandSite"/>
                                         <Binding Path="Tag" RelativeSource="{RelativeSource Self}" />
                                     </MultiBinding>
                                 </Setter.Value>
                             </Setter>
+                        </Trigger>
+
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="ExpandDirection" Value="Down" />
+                                <Condition Property="Tag" SourceName="ExpandSiteContainer">
+                                    <Condition.Value>
+                                        <system:Double>1.0</system:Double>
+                                    </Condition.Value>
+                                </Condition>
+                            </MultiTrigger.Conditions>
+
+                            <Setter Property="Height" TargetName="ExpandSiteContainer" Value="Auto" />
                         </MultiTrigger>
 
                         <MultiTrigger>
@@ -483,6 +486,7 @@
                                     <MultiBinding Converter="{adonisConverters:MathConverter}" ConverterParameter="x*y">
                                         <Binding Path="ActualHeight" ElementName="ExpandSiteContainerWrapper"/>
                                         <Binding Path="Tag" RelativeSource="{RelativeSource Self}" />
+                                        <Binding Path="ActualWidth" ElementName="ExpandSiteContainerWrapper" />
                                     </MultiBinding>
                                 </Setter.Value>
                             </Setter>
