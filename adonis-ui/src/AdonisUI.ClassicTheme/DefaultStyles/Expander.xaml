@@ -375,17 +375,14 @@
 
                             <Border x:Name="ExpandSiteContainerWrapper"
                                     DockPanel.Dock="Bottom"
+                                    Background="{TemplateBinding Background}"
                                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
 
                                 <ScrollViewer x:Name="ExpandSiteContainer"
                                               Padding="0"
                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                              HorizontalContentAlignment="Stretch"
-                                              VerticalContentAlignment="Bottom"
-                                              VerticalScrollBarVisibility="Hidden"
-                                              HorizontalScrollBarVisibility="Hidden">
+                                              >
                                     <ScrollViewer.Height>
                                         <MultiBinding Converter="{adonisConverters:MathConverter}" ConverterParameter="x*y">
                                             <Binding Path="ActualHeight" ElementName="ExpandSite"/>
@@ -395,6 +392,19 @@
                                     <ScrollViewer.Tag>
                                         <system:Double>0.0</system:Double>
                                     </ScrollViewer.Tag>
+                                    <ScrollViewer.Style>
+                                        <Style TargetType="ScrollViewer">
+                                            <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
+                                            <Style.Triggers>
+                                                <Trigger Property="Tag">
+                                                    <Trigger.Value>
+                                                        <system:Double>1.0</system:Double>
+                                                    </Trigger.Value>
+                                                    <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ScrollViewer.Style>
 
                                     <Border x:Name="ExpandSite"
                                             Padding="{TemplateBinding Padding}"

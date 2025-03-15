@@ -8,14 +8,16 @@
       xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
       xmlns:itl="clr-namespace:PalCalc.UI.Localization"
       xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+      xmlns:b="clr-namespace:PalCalc.UI.ViewModel.Behaviors"
       xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
       xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
       xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
       mc:Ignorable="d"
       d:Width="1280" d:Height="720"
       VerticalAlignment="Stretch"
       HorizontalAlignment="Stretch"
-      d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}">
+      d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}" d:DesignHeight="1351" d:DesignWidth="1659">
     <Page.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
         <c:ValueBoolConverter x:Key="NegatedVBC" Negate="True" />
@@ -58,7 +60,7 @@
                             <RowDefinition MinHeight="100" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        
+
                         <GroupBox Header="{itl:LocalizedText LC_TARGET_PALS}" Grid.Row="0">
                             <v:PalTargetListView BorderThickness="0" DataContext="{Binding PalTargetList}" />
                         </GroupBox>
@@ -114,20 +116,30 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                
-                    <GroupBox Header="{itl:LocalizedText LC_TARGET_PAL}" Grid.Row="0" IsEnabled="{Binding PalTarget.CanEdit}">
-                        <v:PalTargetView DataContext="{Binding PalTarget}" />
-                    </GroupBox>
+
+                    <Expander Header="{itl:LocalizedText LC_TARGET_PAL}"
+                              Grid.Row="0"
+                              IsExpanded="True"
+                              adonisExtensions:LayerExtension.IncreaseLayer="True"
+                              >
+                        <Border IsEnabled="{Binding PalTarget.CanEdit}">
+                            <v:PalTargetView DataContext="{Binding PalTarget}" />
+                        </Border>
+                    </Expander>
 
                     <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="30*" MinHeight="180" />
+                            <RowDefinition Height="30*" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="60*" MinHeight="150" />
                         </Grid.RowDefinitions>
 
-                        <GroupBox Header="{itl:LocalizedText LC_SOURCE_PALS}" Grid.Row="0" Margin="0,5,0,0" IsEnabled="{Binding PalTarget.CanEdit}">
-                            <Grid>
+                        <Expander Header="{itl:LocalizedText LC_SOURCE_PALS}" Grid.Row="0" Margin="0,5,0,0" IsExpanded="True" Name="SourcePalsExpander" VerticalContentAlignment="Stretch">
+                            <i:Interaction.Behaviors>
+                                <b:ExpanderGridRowResetBehavior TargetGridRowIndex="0" ExpandedMinHeight="180" />
+                            </i:Interaction.Behaviors>
+
+                            <Grid IsEnabled="{Binding PalTarget.CanEdit}" VerticalAlignment="Stretch">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
@@ -151,9 +163,9 @@
 
                                 <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}" Grid.Row="2" />
                             </Grid>
-                        </GroupBox>
+                        </Expander>
 
-                        <GridSplitter Grid.Row="1" Background="{x:Null}" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                        <GridSplitter IsEnabled="{Binding ElementName=SourcePalsExpander, Path=IsExpanded}" Grid.Row="1" Background="{x:Null}" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
 
                         <Grid Grid.Row="2">
                             <Grid.RowDefinitions>
