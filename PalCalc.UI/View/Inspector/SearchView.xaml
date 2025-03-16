@@ -131,7 +131,12 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <GroupBox Header="{itl:LocalizedText LC_SAVESEARCH_GRP_SEARCH_SETTINGS}" Grid.Row="0" adonisExtensions:LayerExtension.IncreaseLayer="True">
+            <Expander Header="{itl:LocalizedText LC_SAVESEARCH_GRP_SEARCH_SETTINGS}" Grid.Row="0" adonisExtensions:LayerExtension.IncreaseLayer="True">
+                <Expander.Style>
+                    <Style TargetType="Expander" BasedOn="{StaticResource {x:Type Expander}}">
+                        <Setter Property="IsExpanded" Value="True" />
+                    </Style>
+                </Expander.Style>
                 <StackPanel Orientation="Vertical">
                     <vu:SpacedWrapPanel Margin="5" HorizontalSpacing="25" VerticalSpacing="10">
 
@@ -234,7 +239,7 @@
 
                     <Button Width="80" Margin="5" HorizontalAlignment="Left" Command="{Binding SearchSettings.ResetCommand}" Content="{itl:LocalizedText LC_SAVESEARCH_SETTINGS_RESET}" />
                 </StackPanel>
-            </GroupBox>
+            </Expander>
 
             <DockPanel Grid.Row="1">
                 <ContentControl DockPanel.Dock="Bottom"
