@@ -21,28 +21,25 @@ namespace PalCalc.UI.ViewModel.Presets
             Label = new HardCodedText(content.Name);
 
             var db = PalDB.LoadEmbedded();
-            RequiredPassive1 = PassiveSkillViewModel.Make(content.Passive1InternalName.InternalToStandardPassive(db));
-            RequiredPassive2 = PassiveSkillViewModel.Make(content.Passive2InternalName.InternalToStandardPassive(db));
-            RequiredPassive3 = PassiveSkillViewModel.Make(content.Passive3InternalName.InternalToStandardPassive(db));
-            RequiredPassive4 = PassiveSkillViewModel.Make(content.Passive4InternalName.InternalToStandardPassive(db));
+            RequiredPassives = new([
+                content.Passive1InternalName.InternalToStandardPassive(db),
+                content.Passive2InternalName.InternalToStandardPassive(db),
+                content.Passive3InternalName.InternalToStandardPassive(db),
+                content.Passive4InternalName.InternalToStandardPassive(db),
+            ]);
 
-            OptionalPassive1 = PassiveSkillViewModel.Make(content.OptionalPassive1InternalName.InternalToStandardPassive(db));
-            OptionalPassive2 = PassiveSkillViewModel.Make(content.OptionalPassive2InternalName.InternalToStandardPassive(db));
-            OptionalPassive3 = PassiveSkillViewModel.Make(content.OptionalPassive3InternalName.InternalToStandardPassive(db));
-            OptionalPassive4 = PassiveSkillViewModel.Make(content.OptionalPassive4InternalName.InternalToStandardPassive(db));
+            OptionalPassives = new([
+                content.OptionalPassive1InternalName.InternalToStandardPassive(db),
+                content.OptionalPassive2InternalName.InternalToStandardPassive(db),
+                content.OptionalPassive3InternalName.InternalToStandardPassive(db),
+                content.OptionalPassive4InternalName.InternalToStandardPassive(db),
+            ]);
         }
 
         public PassiveSkillsPreset ModelObject { get; }
 
-        public PassiveSkillViewModel RequiredPassive1 { get; }
-        public PassiveSkillViewModel RequiredPassive2 { get; }
-        public PassiveSkillViewModel RequiredPassive3 { get; }
-        public PassiveSkillViewModel RequiredPassive4 { get; }
-
-        public PassiveSkillViewModel OptionalPassive1 { get; }
-        public PassiveSkillViewModel OptionalPassive2 { get; }
-        public PassiveSkillViewModel OptionalPassive3 { get; }
-        public PassiveSkillViewModel OptionalPassive4 { get; }
+        public PalSpecifierPassiveSkillCollectionViewModel RequiredPassives { get; }
+        public PalSpecifierPassiveSkillCollectionViewModel OptionalPassives { get; }
 
         [ObservableProperty]
         private ILocalizedText label;
@@ -57,15 +54,8 @@ namespace PalCalc.UI.ViewModel.Presets
 
         public void ApplyTo(PalSpecifierViewModel spec)
         {
-            spec.Passive1 = RequiredPassive1;
-            spec.Passive2 = RequiredPassive2;
-            spec.Passive3 = RequiredPassive3;
-            spec.Passive4 = RequiredPassive4;
-
-            spec.OptionalPassive1 = OptionalPassive1;
-            spec.OptionalPassive2 = OptionalPassive2;
-            spec.OptionalPassive3 = OptionalPassive3;
-            spec.OptionalPassive4 = OptionalPassive4;
+            spec.RequiredPassives.CopyFrom(RequiredPassives);
+            spec.OptionalPassives.CopyFrom(OptionalPassives);
         }
     }
 }

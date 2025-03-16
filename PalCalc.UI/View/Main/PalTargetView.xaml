@@ -76,18 +76,18 @@
                 
                 <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_REQUIRED_TRAITS}" adonisExtensions:LayerExtension.IncreaseLayer="False">
                     <StackPanel vu:StackPanelExtensions.Spacing="5">
-                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive1, Mode=TwoWay}" />
-                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive2, Mode=TwoWay}" />
-                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive3, Mode=TwoWay}" />
-                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.Passive4, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredPassives.Passive1, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredPassives.Passive2, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredPassives.Passive3, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredPassives.Passive4, Mode=TwoWay}" />
                     </StackPanel>
                 </TabItem>
                 <TabItem Header="{itl:LocalizedText LC_PAL_TARGET_OPTIONAL_TRAITS}"  adonisExtensions:LayerExtension.IncreaseLayer="False">
                     <StackPanel vu:StackPanelExtensions.Spacing="5">
-                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive1, Mode=TwoWay}" />
-                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive2, Mode=TwoWay}" />
-                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive3, Mode=TwoWay}" />
-                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassive4, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassives.Passive1, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassives.Passive2, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassives.Passive3, Mode=TwoWay}" />
+                        <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.OptionalPassives.Passive4, Mode=TwoWay}" />
                     </StackPanel>
                 </TabItem>
             </TabControl>

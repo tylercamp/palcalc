@@ -78,7 +78,9 @@ namespace PalCalc.UI.ViewModel.PalDerived
 
         public ILocalizedText Description { get; }
 
+        // description of these passives, assuming they're *required* (e.g. With X, Y, Z)
         public ILocalizedText RequiredDescription { get; }
+        // same description, assuming they're *optional* (e.g. Optionally with X, Y, Z)
         public ILocalizedText OptionalDescription { get; }
 
         public List<PassiveSkillViewModel> Passives { get; }

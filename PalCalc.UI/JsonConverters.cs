@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.Probabilities;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel;
@@ -500,17 +501,26 @@ namespace PalCalc.UI
         protected override PalSpecifierViewModel ReadTypeJson(JsonReader reader, Type objectType, PalSpecifierViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var obj = JToken.ReadFrom(reader);
-            return new PalSpecifierViewModel(null)
+
+            var modelSpecifier = new PalSpecifier()
             {
-                TargetPal = obj["TargetPal"].ToObject<PalViewModel>(serializer),
-                Passive1 = (obj["Passive1"] ?? obj["Trait1"]).ToObject<PassiveSkillViewModel>(serializer),
-                Passive2 = (obj["Passive2"] ?? obj["Trait2"]).ToObject<PassiveSkillViewModel>(serializer),
-                Passive3 = (obj["Passive3"] ?? obj["Trait3"]).ToObject<PassiveSkillViewModel>(serializer),
-                Passive4 = (obj["Passive4"] ?? obj["Trait4"]).ToObject<PassiveSkillViewModel>(serializer),
-                OptionalPassive1 = (obj["OptionalPassive1"] ?? obj["OptionalTrait1"])?.ToObject<PassiveSkillViewModel>(serializer),
-                OptionalPassive2 = (obj["OptionalPassive2"] ?? obj["OptionalTrait2"])?.ToObject<PassiveSkillViewModel>(serializer),
-                OptionalPassive3 = (obj["OptionalPassive3"] ?? obj["OptionalTrait3"])?.ToObject<PassiveSkillViewModel>(serializer),
-                OptionalPassive4 = (obj["OptionalPassive4"] ?? obj["OptionalTrait4"])?.ToObject<PassiveSkillViewModel>(serializer),
+                Pal = obj["TargetPal"].ToObject<PalViewModel>(serializer).ModelObject,
+                RequiredPassives = [
+                    (obj["Passive1"] ?? obj["Trait1"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
+                    (obj["Passive2"] ?? obj["Trait2"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
+                    (obj["Passive3"] ?? obj["Trait3"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
+                    (obj["Passive4"] ?? obj["Trait4"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
+                ],
+                OptionalPassives = [
+                    (obj["OptionalPassive1"] ?? obj["OptionalTrait1"])?.ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
+                    (obj["OptionalPassive2"] ?? obj["OptionalTrait2"]) ?.ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
+                    (obj["OptionalPassive3"] ?? obj["OptionalTrait3"]) ?.ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
+                    (obj["OptionalPassive4"] ?? obj["OptionalTrait4"])?.ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
+                ]
+            };
+
+            return new PalSpecifierViewModel(modelSpecifier)
+            {
                 MinIv_HP = obj["MinIV_HP"]?.ToObject<int>() ?? 0,
                 MinIv_Attack = obj["MinIV_Attack"]?.ToObject<int>() ?? 0,
                 MinIv_Defense = obj["MinIV_Defense"]?.ToObject<int>() ?? 0,
@@ -528,14 +538,14 @@ namespace PalCalc.UI
             JToken.FromObject(new
             {
                 TargetPal = value.TargetPal,
-                Passive1 = value.Passive1,
-                Passive2 = value.Passive2,
-                Passive3 = value.Passive3,
-                Passive4 = value.Passive4,
-                OptionalPassive1 = value.OptionalPassive1,
-                OptionalPassive2 = value.OptionalPassive2,
-                OptionalPassive3 = value.OptionalPassive3,
-                OptionalPassive4 = value.OptionalPassive4,
+                Passive1 = value.RequiredPassives.Passive1,
+                Passive2 = value.RequiredPassives.Passive2,
+                Passive3 = value.RequiredPassives.Passive3,
+                Passive4 = value.RequiredPassives.Passive4,
+                OptionalPassive1 = value.OptionalPassives.Passive1,
+                OptionalPassive2 = value.OptionalPassives.Passive2,
+                OptionalPassive3 = value.OptionalPassives.Passive3,
+                OptionalPassive4 = value.OptionalPassives.Passive4,
                 MinIV_HP = value.MinIv_HP,
                 MinIV_Attack = value.MinIv_Attack,
                 MinIV_Defense = value.MinIv_Defense,

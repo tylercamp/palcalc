@@ -142,17 +142,17 @@
                 </Grid>
 
                 <TextBlock
-                    Text="{Binding RequiredPassivesCollection.RequiredDescription.Value}"
+                    Text="{Binding RequiredPassives.FixedViewModel.RequiredDescription.Value}"
                     TextWrapping="Wrap"
                     FontWeight="Bold"
                     Grid.Row="1"
                     />
 
                 <TextBlock
-                    Text="{Binding OptionalPassivesCollection.OptionalDescription.Value}"
+                    Text="{Binding OptionalPassives.FixedViewModel.OptionalDescription.Value}"
                     TextWrapping="Wrap"
                     FontStyle="Italic"
-                    Visibility="{Binding OptionalPassivesCollection.Passives, Converter={StaticResource CVC}}"
+                    Visibility="{Binding OptionalPassives.HasItems, Converter={StaticResource BVC}}"
                     Grid.Row="2"
                     />
 
