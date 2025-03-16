@@ -431,6 +431,12 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   <data name="LC_PAL_LIST_PRESETS_ADD_TITLE" xml:space="preserve">
     <value>New Preset Name</value>
   </data>
+  <data name="LC_PAL_LIST_PRESETS_BUILTIN_NOT_OWNED" xml:space="preserve">
+    <value>Pals Not Owned</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_BUILTIN_OWNED" xml:space="preserve">
+    <value>Owned Pals</value>
+  </data>
   <data name="LC_PAL_LIST_PRESETS_DELETE_BTN_DESCRIPTION" xml:space="preserve">
     <value>Delete Preset</value>
   </data>

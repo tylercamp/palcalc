@@ -31,6 +31,11 @@ namespace PalCalc.UI.View.Utils
         public string RenamePopupInputLabel { get; }
     }
 
+    public interface IFixedListItem
+    {
+        string Name { get; }
+    }
+
     /// <summary>
     /// Interaction logic for EditableListMenu.xaml
     /// </summary>
@@ -45,6 +50,7 @@ namespace PalCalc.UI.View.Utils
         public static readonly DependencyProperty NewItemContentProperty = DependencyProperty.Register(nameof(NewItemContent), typeof(FrameworkElement), typeof(EditableListMenu));
         public static readonly DependencyProperty ItemContentTemplateProperty = DependencyProperty.Register(nameof(ItemContentTemplate), typeof(DataTemplate), typeof(EditableListMenu));
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable<IEditableListItem>), typeof(EditableListMenu));
+        public static readonly DependencyProperty FixedItemsSourceProperty = DependencyProperty.Register(nameof(FixedItemsSource), typeof(IEnumerable<IFixedListItem>), typeof(EditableListMenu));
         public static readonly DependencyProperty SelectCommandProperty = DependencyProperty.Register(nameof(SelectCommand), typeof(IRelayCommand<SelectCommandArgs>), typeof(EditableListMenu));
         public static readonly DependencyProperty CreateCommandProperty = DependencyProperty.Register(nameof(CreateCommand), typeof(IRelayCommand<CreateCommandArgs>), typeof(EditableListMenu));
         public static readonly DependencyProperty DeleteCommandProperty = DependencyProperty.Register(nameof(DeleteCommand), typeof(IRelayCommand<DeleteCommandArgs>), typeof(EditableListMenu));
@@ -74,6 +80,12 @@ namespace PalCalc.UI.View.Utils
         {
             get => (IEnumerable<IEditableListItem>)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
+        }
+
+        public IEnumerable<IFixedListItem> FixedItemsSource
+        {
+            get => (IEnumerable<IFixedListItem>)GetValue(FixedItemsSourceProperty);
+            set => SetValue(FixedItemsSourceProperty, value);
         }
 
         public IRelayCommand<SelectCommandArgs> SelectCommand
@@ -168,6 +180,11 @@ namespace PalCalc.UI.View.Utils
             }
         }
 
+        private void m_FixedListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
         public IRelayCommand<OverwriteCommandArgs> OverwriteCommand
         {
             get => (IRelayCommand<OverwriteCommandArgs>)GetValue(OverwriteCommandProperty);
@@ -198,9 +215,10 @@ namespace PalCalc.UI.View.Utils
 
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (m_ListBox.SelectedItem != null)
+            var lb = sender as ListBox;
+            if (lb.SelectedItem != null)
             {
-                switch (m_ListBox.SelectedItem)
+                switch (lb.SelectedItem)
                 {
                     case CreateNewItemEntry:
                         var existingOptions = ItemsSource.Select(i => i.Name).ToList();
@@ -222,11 +240,11 @@ namespace PalCalc.UI.View.Utils
                         break;
 
                     default:
-                        SelectCommand?.Execute(new SelectCommandArgs(m_ListBox.SelectedItem));
+                        SelectCommand?.Execute(new SelectCommandArgs(lb.SelectedItem));
                         break;
                 }
 
-                m_ListBox.SelectedItem = null;
+                lb.SelectedItem = null;
             }
         }
     }

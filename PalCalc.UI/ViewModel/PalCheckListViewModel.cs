@@ -124,7 +124,7 @@ namespace PalCalc.UI.ViewModel
                 presets.PresetSelected += Presets_PresetSelected;
         }
 
-        private void Presets_PresetSelected(PalListPresetViewModel preset)
+        private void Presets_PresetSelected(IPalListPresetViewModel preset)
         {
             foreach (var e in allEntries)
             {

@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.UI.Model;
 using PalCalc.UI.View.Utils;
+using PalCalc.UI.ViewModel.Presets.BuiltIn.PalList;
+using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,9 +14,14 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Presets
 {
+    public interface IPalListPresetViewModel
+    {
+        public List<Pal> Pals { get; }
+    }
+
     public partial class PalListPresetCollectionViewModel : ObservableObject
     {
-        public event Action<PalListPresetViewModel> PresetSelected;
+        public event Action<IPalListPresetViewModel> PresetSelected;
 
         public List<Pal> ActivePalSelections { get; set; }
 
@@ -24,9 +31,10 @@ namespace PalCalc.UI.ViewModel.Presets
         public IRelayCommand<EditableListMenu.RenameCommandArgs> RenameCommand { get; set; }
         public IRelayCommand<EditableListMenu.SelectCommandArgs> SelectCommand { get; set; }
 
-        public ObservableCollection<PalListPresetViewModel> Options { get; }
+        public ObservableCollection<CustomPalListPresetViewModel> Options { get; }
+        public ObservableCollection<BuiltInPalListPresetViewModel> BuiltInOptions { get; }
 
-        private void InsertOption(PalListPresetViewModel option)
+        private void InsertOption(CustomPalListPresetViewModel option)
         {
             // insert alphabetically
             var previous = Options.FirstOrDefault(o => o.Name.CompareTo(option.Name) > 0);
@@ -36,16 +44,18 @@ namespace PalCalc.UI.ViewModel.Presets
             );
         }
 
-        public PalListPresetCollectionViewModel(IEnumerable<PalListPreset> initialOptions)
+        public PalListPresetCollectionViewModel(CachedSaveGame context, IPalSource availablePalFilter, IEnumerable<PalListPreset> initialOptions)
         {
-            Options = new ObservableCollection<PalListPresetViewModel>(
-                (initialOptions ?? []).Select(p => new PalListPresetViewModel(p)).OrderBy(o => o.Name)
+            Options = new ObservableCollection<CustomPalListPresetViewModel>(
+                (initialOptions ?? []).Select(p => new CustomPalListPresetViewModel(p)).OrderBy(o => o.Name)
             );
+
+            BuiltInOptions = new ObservableCollection<BuiltInPalListPresetViewModel>(BuiltInPalListPresetViewModel.BuildAll(context, availablePalFilter));
 
             CreateCommand = new RelayCommand<EditableListMenu.CreateCommandArgs>(
                 (ev) =>
                 {
-                    var newPreset = new PalListPresetViewModel()
+                    var newPreset = new CustomPalListPresetViewModel()
                     {
                         Name = ev.NewName,
                         Pals = ActivePalSelections
@@ -61,7 +71,7 @@ namespace PalCalc.UI.ViewModel.Presets
             DeleteCommand = new RelayCommand<EditableListMenu.DeleteCommandArgs>(
                 (ev) =>
                 {
-                    var vm = ev.Item as PalListPresetViewModel;
+                    var vm = ev.Item as CustomPalListPresetViewModel;
                     Options.Remove(vm);
                     AppSettings.Current.PalListPresets.RemoveAll(p => p.Name == vm.Name);
                     Storage.SaveAppSettings(AppSettings.Current);
@@ -71,7 +81,7 @@ namespace PalCalc.UI.ViewModel.Presets
             OverwriteCommand = new RelayCommand<EditableListMenu.OverwriteCommandArgs>(
                 (ev) =>
                 {
-                    var vm = ev.Item as PalListPresetViewModel;
+                    var vm = ev.Item as CustomPalListPresetViewModel;
 
                     vm.Pals = ActivePalSelections;
 
@@ -85,7 +95,7 @@ namespace PalCalc.UI.ViewModel.Presets
             RenameCommand = new RelayCommand<EditableListMenu.RenameCommandArgs>(
                 (ev) =>
                 {
-                    var vm = ev.Item as PalListPresetViewModel;
+                    var vm = ev.Item as CustomPalListPresetViewModel;
                     Options.Remove(vm);
 
                     AppSettings.Current.PalListPresets.Find(p => p.Name == vm.Name).Name = ev.NewName;
@@ -97,7 +107,7 @@ namespace PalCalc.UI.ViewModel.Presets
             );
 
             SelectCommand = new RelayCommand<EditableListMenu.SelectCommandArgs>(
-                (ev) => PresetSelected?.Invoke(ev.Item as PalListPresetViewModel)
+                (ev) => PresetSelected?.Invoke(ev.Item as IPalListPresetViewModel)
             );
         }
     }

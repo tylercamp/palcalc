@@ -145,8 +145,11 @@ namespace PalCalc.UI.ViewModel.Solver
 
         }
 
+        public CachedSaveGame Save { get; }
+
         public PalSourceTreeViewModel(CachedSaveGame save)
         {
+            Save = save;
             AvailableGuilds = new List<GuildViewModel>()
             {
                 GuildViewModel.Any

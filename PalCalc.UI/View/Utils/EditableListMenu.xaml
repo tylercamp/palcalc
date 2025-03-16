@@ -4,12 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PalCalc.UI.View.Utils"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             Grid.IsSharedSizeScope="True"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <c:CollectionVisibilityConverter x:Key="CVC" />
+
         <CollectionViewSource x:Key="MainItemsSource" Source="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=ItemsSource}" />
 
         <DataTemplate x:Key="NewItemDataTemplate" DataType="{x:Type local:CreateNewItemEntry}">
@@ -31,12 +35,27 @@
             </ContentControl>
         </DataTemplate>
 
+        <DataTemplate x:Key="FixedItemDataTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="RenameButton" />
+                    <ColumnDefinition Width="2" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="OverwriteButton" />
+                    <ColumnDefinition Width="15" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="15" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="4" Text="{Binding Name}" HorizontalAlignment="Left" />
+            </Grid>
+        </DataTemplate>
+
         <DataTemplate x:Key="ItemDataTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="RenameButton" />
                     <ColumnDefinition Width="2" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="OverwriteButton" />
                     <ColumnDefinition Width="15" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="15" />
@@ -69,8 +88,8 @@
         </DataTemplate>
 
     </UserControl.Resources>
-    <Grid>
-        <Grid.Resources>
+    <StackPanel>
+        <StackPanel.Resources>
             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                 <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
@@ -82,18 +101,22 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalAlignment" Value="Center" />
             </Style>
-        </Grid.Resources>
+            <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Padding" Value="5" />
+                            <Setter Property="MinHeight" Value="28" />
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </StackPanel.Resources>
 
-        <ListBox x:Name="m_ListBox"
-                 SelectionChanged="ListBox_SelectionChanged"
+        <ListBox SelectionChanged="ListBox_SelectionChanged"
                  ItemTemplateSelector="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=ItemTemplateSelector}"
                  >
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="Padding" Value="5" />
-                </Style>
-            </ListBox.ItemContainerStyle>
             <ListBox.ItemsSource>
                 <CompositeCollection>
                     <CollectionContainer Collection="{x:Static local:CreateNewItemEntry.AsList}" />
@@ -101,5 +124,14 @@
                 </CompositeCollection>
             </ListBox.ItemsSource>
         </ListBox>
-    </Grid>
+
+        <StackPanel Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=FixedItemsSource, Converter={StaticResource CVC}}">
+            <Separator Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2HighlightBorderBrush}}" Margin="0,5,0,5" />
+            <ListBox SelectionChanged="ListBox_SelectionChanged"
+                     ItemTemplate="{StaticResource FixedItemDataTemplate}"
+                     ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=FixedItemsSource}"
+                     >
+            </ListBox>
+        </StackPanel>
+    </StackPanel>
 </UserControl>

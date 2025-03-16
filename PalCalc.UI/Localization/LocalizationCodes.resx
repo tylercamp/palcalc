@@ -805,4 +805,10 @@
   <data name="LC_JOB_QUEUE_HEADER" xml:space="preserve">
     <value>Count</value>
   </data>
+  <data name="LC_PAL_LIST_PRESETS_BUILTIN_NOT_OWNED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_BUILTIN_OWNED" xml:space="preserve">
+    <value />
+  </data>
 </root>

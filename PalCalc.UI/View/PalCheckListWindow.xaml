@@ -53,6 +53,7 @@
                    >
                 <vu:EditableListMenu DataContext="{Binding Presets}"
                                      ItemsSource="{Binding Options}"
+                                     FixedItemsSource="{Binding BuiltInOptions}"
                                      
                                      CreateCommand="{Binding CreateCommand}"
                                      DeleteCommand="{Binding DeleteCommand}"

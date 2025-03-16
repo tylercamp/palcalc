@@ -11,16 +11,16 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Presets
 {
-    public partial class PalListPresetViewModel : ObservableObject, IEditableListItem
+    public partial class CustomPalListPresetViewModel : ObservableObject, IPalListPresetViewModel, IEditableListItem
     {
         private PalDB db = PalDB.LoadEmbedded();
 
-        public PalListPresetViewModel()
+        public CustomPalListPresetViewModel()
         {
             
         }
 
-        public PalListPresetViewModel(PalListPreset modelObject)
+        public CustomPalListPresetViewModel(PalListPreset modelObject)
         {
             Name = modelObject.Name;
             Pals = modelObject.PalInternalNames.Select(p => p.InternalToPal(db)).ToList();
@@ -31,7 +31,7 @@ namespace PalCalc.UI.ViewModel.Presets
 
         public List<Pal> Pals { get; set; }
 
-        public PalListPreset AsModelObject => new PalListPreset() { Name = Name, PalInternalNames = Pals.Select(p => p.InternalName).ToList() };
+        public virtual PalListPreset AsModelObject => new PalListPreset() { Name = Name, PalInternalNames = Pals.Select(p => p.InternalName).ToList() };
 
         public string DeleteConfirmTitle => LocalizationCodes.LC_PAL_LIST_PRESETS_DELETE_TITLE.Bind().Value;
         public string DeleteConfirmMessage => LocalizationCodes.LC_PAL_LIST_PRESETS_DELETE_MSG.Bind(Name).Value;

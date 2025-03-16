@@ -465,6 +465,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_PAL_LIST_PRESETS_BUILTIN_NOT_OWNED,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LIST_PRESETS_BUILTIN_OWNED,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_PAL_LIST_PRESETS_DELETE_BTN_DESCRIPTION,
         /// <summary>
         ///   Looks up a localized string similar to PresetName.
