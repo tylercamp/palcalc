@@ -78,6 +78,7 @@ namespace PalCalc.GenDB
                         },
                         BreedingPower = rawPal.BreedingPower,
                         Price = (int)rawPal.Price,
+                        Rarity = rawPal.Rarity,
                         InternalIndex = rawPal.InternalIndex,
                         InternalName = rawPal.InternalName,
                         Name = englishName,
@@ -611,7 +612,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v17");
+            var db = PalDB.MakeEmptyUnsafe("v18");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.Humans = humans;

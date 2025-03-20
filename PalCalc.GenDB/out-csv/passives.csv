@@ -109,12 +109,15 @@ ATK_up_PartnerSkill_3,ATK_up_PartnerSkill_3,1,False
 ATK_up_PartnerSkill_4,ATK_up_PartnerSkill_4,1,False
 Attack Up Lv. 1,Attack_ACC_up1,1,False
 Attack_ACC_up1_Gorilla,Attack_ACC_up1_Gorilla,1,False
+Attack_ACC_up1_Otomo_Only_Equip,Attack_ACC_up1_Otomo_Only_Equip,1,False
 Attack_ACC_up1_WingGolem,Attack_ACC_up1_WingGolem,1,False
 Attack Up Lv. 2,Attack_ACC_up2,2,False
 Attack_ACC_up2_Gorilla,Attack_ACC_up2_Gorilla,1,False
+Attack_ACC_up2_Otomo_Only_Equip,Attack_ACC_up2_Otomo_Only_Equip,2,False
 Attack_ACC_up2_WingGolem,Attack_ACC_up2_WingGolem,1,False
 Attack Up Lv. 3,Attack_ACC_up3,3,False
 Attack_ACC_up3_Gorilla,Attack_ACC_up3_Gorilla,2,False
+Attack_ACC_up3_Otomo_Only_Equip,Attack_ACC_up3_Otomo_Only_Equip,3,False
 Attack_ACC_up3_WingGolem,Attack_ACC_up3_WingGolem,2,False
 Attack_ACC_up4_Gorilla,Attack_ACC_up4_Gorilla,2,False
 Attack_ACC_up4_WingGolem,Attack_ACC_up4_WingGolem,2,False
@@ -125,6 +128,74 @@ BaseCampPal_SAN_Down_2,BaseCampPal_SAN_Down_2,1,False
 BaseCampPal_SAN_Down_3,BaseCampPal_SAN_Down_3,1,False
 BaseCampPal_SAN_Down_4,BaseCampPal_SAN_Down_4,1,False
 BaseCampPal_SAN_Down_5,BaseCampPal_SAN_Down_5,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_AmaterasuWolf_Dark,1,False
+Ground Damage Enhancement (Small),BossDefeatReward_Anubis,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_BadCatgirl,1,False
+Grass Damage Enhancement (Medium),BossDefeatReward_BerryGoat_Dark,1,False
+Dragon Damage Enhancement (Medium),BossDefeatReward_BlackMetalDragon,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_BlackPuppy,1,False
+Grass Damage Enhancement (Medium),BossDefeatReward_BlueberryFairy,1,False
+Water Damage Enhancement (Small),BossDefeatReward_BlueDragon,1,False
+Electric Damage Enhancement (Medium),BossDefeatReward_BlueThunderHorse,1,False
+Water Damage Enhancement (Small),BossDefeatReward_CaptainPenguin,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_CatMage,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_CatVampire,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_DarkScorpion,1,False
+Ground Damage Enhancement (Small),BossDefeatReward_DarkScorpion_Ground,1,False
+Dragon Damage Enhancement (Small),BossDefeatReward_FairyDragon,1,False
+Neutral Damage Enhancement (Small),BossDefeatReward_FengyunDeeper,1,False
+Electric Damage Enhancement (Medium),BossDefeatReward_FengyunDeeper_Electric,1,False
+Electric Damage Enhancement (Small),BossDefeatReward_FlowerDinosaur_Electric,1,False
+Grass Damage Enhancement (Small),BossDefeatReward_FlowerDoll,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_GhostRabbit,1,False
+Ground Damage Enhancement (Medium),BossDefeatReward_GoldenHorse,1,False
+Grass Damage Enhancement (Medium),BossDefeatReward_GrassMammoth,1,False
+Electric Damage Enhancement (Small),BossDefeatReward_GrassPanda_Electric,1,False
+Grass Damage Enhancement (Small),BossDefeatReward_GrassRabbitMan,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_GrimGirl,1,False
+Neutral Damage Enhancement (Small),BossDefeatReward_HawkBird,1,False
+Ground Damage Enhancement (Small),BossDefeatReward_HerculesBeetle,1,False
+Ground Damage Enhancement (Medium),BossDefeatReward_HerculesBeetle_Ground,1,False
+Water Damage Enhancement (Medium),BossDefeatReward_Horus_Water,1,False
+Ice Damage Enhancement (Large),BossDefeatReward_IceHorse,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_IceHorse_Dark,1,False
+Dragon Damage Enhancement (Large),BossDefeatReward_JetDragon,1,False
+Neutral Damage Enhancement (Small),BossDefeatReward_KingAlpaca,1,False
+Ice Damage Enhancement (Medium),BossDefeatReward_KingAlpaca_Ice,1,False
+Fire Damage Enhancement (Large),BossDefeatReward_KingBahamut,1,False
+Electric Damage Enhancement (Small),BossDefeatReward_Kirin,1,False
+Ice Damage Enhancement (Large),BossDefeatReward_Kitsunebi_Ice,1,False
+Ground Damage Enhancement (Small),BossDefeatReward_LazyCatfish,1,False
+Dragon Damage Enhancement (Small),BossDefeatReward_LazyDragon_Electric,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_LilyQueen_Dark,1,False
+Ice Damage Enhancement (Small),BossDefeatReward_MopKing,1,False
+Neutral Damage Enhancement (Small),BossDefeatReward_Mutant,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_MysteryMask,1,False
+Neutral Damage Enhancement (Small),BossDefeatReward_NaughtyCat,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_NightBlueHorse,1,False
+Grass Damage Enhancement (Medium),BossDefeatReward_PinkRabbit_Grass,1,False
+Ground Damage Enhancement (Small),BossDefeatReward_PlantSlime,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_PurpleSpider,1,False
+Grass Damage Enhancement (Small),BossDefeatReward_QueenBee,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_RaijinDaughter_Water,1,False
+Fire Damage Enhancement (Medium),BossDefeatReward_Ronin,1,False
+Neutral Damage Enhancement (Large),BossDefeatReward_SaintCentaur_1,1,False
+Dark Damage Enhancement (Small),BossDefeatReward_SaintCentaur_2,1,False
+Grass Damage Enhancement (Small),BossDefeatReward_SakuraSaurus,1,False
+Water Damage Enhancement (Small),BossDefeatReward_SakuraSaurus_Water,1,False
+Dragon Damage Enhancement (Small),BossDefeatReward_SkyDragon,1,False
+Fire Damage Enhancement (Large),BossDefeatReward_Suzaku,1,False
+Electric Damage Enhancement (Small),BossDefeatReward_ThunderBird,1,False
+Water Damage Enhancement (Medium),BossDefeatReward_Umihebi,1,False
+Grass Damage Enhancement (Medium),BossDefeatReward_VioletFairy,1,False
+Ice Damage Enhancement (Small),BossDefeatReward_WeaselDragon,1,False
+Ice Damage Enhancement (Large),BossDefeatReward_Werewolf_Ice,1,False
+Neutral Damage Enhancement (Medium),BossDefeatReward_WhiteDeer,1,False
+Ice Damage Enhancement (Small),BossDefeatReward_WhiteMoth,1,False
+Dragon Damage Enhancement (Medium),BossDefeatReward_WhiteShieldDragon,1,False
+Ground Damage Enhancement (Medium),BossDefeatReward_WhiteTiger_Ground,1,False
+Ground Damage Enhancement (Small),BossDefeatReward_WingGolem,1,False
+Grass Damage Enhancement (Small),BossDefeatReward_Yeti_Grass,1,False
 en Text,BulletSpeed_H,1,False
 en Text,BulletSpeed_L,1,False
 Capture Strength +1,CaptureLevel_Up_1,1,False
@@ -167,10 +238,13 @@ CraftSpeed_PartnerSkill_5,CraftSpeed_PartnerSkill_5,1,False
 en Text,CraftSpeed*3,9,False
 en Text,CraftSpeed*5,9,False
 Defense Up Lv. 1,defense_ACC_up1,1,False
+Defense_ACC_up1_Otomo_Only_Equip,Defense_ACC_up1_Otomo_Only_Equip,1,False
 defense_ACC_up1_WingGolem,defense_ACC_up1_WingGolem,1,False
 Defense Up Lv. 2,defense_ACC_up2,2,False
+Defense_ACC_up2_Otomo_Only_Equip,Defense_ACC_up2_Otomo_Only_Equip,2,False
 defense_ACC_up2_WingGolem,defense_ACC_up2_WingGolem,1,False
 Defense Up Lv. 3,defense_ACC_up3,3,False
+Defense_ACC_up3_Otomo_Only_Equip,Defense_ACC_up3_Otomo_Only_Equip,3,False
 defense_ACC_up3_WingGolem,defense_ACC_up3_WingGolem,2,False
 defense_ACC_up4_WingGolem,defense_ACC_up4_WingGolem,2,False
 defense_ACC_up5_WingGolem,defense_ACC_up5_WingGolem,3,False
@@ -220,67 +294,94 @@ ElementAddDrop_Thunder_3_PAL,ElementAddDrop_Thunder_3_PAL,1,False
 ElementAddDrop_Thunder_4_PAL,ElementAddDrop_Thunder_4_PAL,1,False
 ElementAddDrop_Thunder_5_PAL,ElementAddDrop_Thunder_5_PAL,1,False
 Dark Damage Enhancement (Small),ElementBoost_Dark_1_BossDefeat,1,False
+ElementBoost_Dark_1_Otomo_Only_Equip,ElementBoost_Dark_1_Otomo_Only_Equip,1,False
 Dark Damage Enhancement (Medium),ElementBoost_Dark_2_BossDefeat,1,False
+ElementBoost_Dark_2_Otomo_Only_Equip,ElementBoost_Dark_2_Otomo_Only_Equip,2,False
 Dark Damage Enhancement (Large),ElementBoost_Dark_3_BossDefeat,1,False
+ElementBoost_Dark_3_Otomo_Only_Equip,ElementBoost_Dark_3_Otomo_Only_Equip,3,False
 ElementBoost_Dark_PAL_PartnerSKill_1,ElementBoost_Dark_PAL_PartnerSKill_1,1,False
 ElementBoost_Dark_PAL_PartnerSKill_2,ElementBoost_Dark_PAL_PartnerSKill_2,1,False
 ElementBoost_Dark_PAL_PartnerSKill_3,ElementBoost_Dark_PAL_PartnerSKill_3,1,False
 ElementBoost_Dark_PAL_PartnerSKill_4,ElementBoost_Dark_PAL_PartnerSKill_4,1,False
 ElementBoost_Dark_PAL_PartnerSKill_5,ElementBoost_Dark_PAL_PartnerSKill_5,1,False
 Dragon Damage Enhancement (Small),ElementBoost_Dragon_1_BossDefeat,1,False
+ElementBoost_Dragon_1_Otomo_Only_Equip,ElementBoost_Dragon_1_Otomo_Only_Equip,1,False
 Dragon Damage Enhancement (Medium),ElementBoost_Dragon_2_BossDefeat,1,False
+ElementBoost_Dragon_2_Otomo_Only_Equip,ElementBoost_Dragon_2_Otomo_Only_Equip,2,False
 Dragon Damage Enhancement (Large),ElementBoost_Dragon_3_BossDefeat,1,False
+ElementBoost_Dragon_3_Otomo_Only_Equip,ElementBoost_Dragon_3_Otomo_Only_Equip,3,False
 ElementBoost_Dragon_PAL_PartnerSKill_1,ElementBoost_Dragon_PAL_PartnerSKill_1,1,False
 ElementBoost_Dragon_PAL_PartnerSKill_2,ElementBoost_Dragon_PAL_PartnerSKill_2,1,False
 ElementBoost_Dragon_PAL_PartnerSKill_3,ElementBoost_Dragon_PAL_PartnerSKill_3,1,False
 ElementBoost_Dragon_PAL_PartnerSKill_4,ElementBoost_Dragon_PAL_PartnerSKill_4,1,False
 ElementBoost_Dragon_PAL_PartnerSKill_5,ElementBoost_Dragon_PAL_PartnerSKill_5,1,False
 Ground Damage Enhancement (Small),ElementBoost_Earth_1_BossDefeat,1,False
+ElementBoost_Earth_1_Otomo_Only_Equip,ElementBoost_Earth_1_Otomo_Only_Equip,1,False
 Ground Damage Enhancement (Medium),ElementBoost_Earth_2_BossDefeat,1,False
+ElementBoost_Earth_2_Otomo_Only_Equip,ElementBoost_Earth_2_Otomo_Only_Equip,2,False
 Ground Damage Enhancement (Large),ElementBoost_Earth_3_BossDefeat,1,False
+ElementBoost_Earth_3_Otomo_Only_Equip,ElementBoost_Earth_3_Otomo_Only_Equip,3,False
 Electric Damage Enhancement (Small),ElementBoost_Electricity_1_BossDefeat,1,False
+ElementBoost_Electricity_1_Otomo_Only_Equip,ElementBoost_Electricity_1_Otomo_Only_Equip,1,False
 Electric Damage Enhancement (Medium),ElementBoost_Electricity_2_BossDefeat,1,False
+ElementBoost_Electricity_2_Otomo_Only_Equip,ElementBoost_Electricity_2_Otomo_Only_Equip,2,False
 Electric Damage Enhancement (Large),ElementBoost_Electricity_3_BossDefeat,1,False
+ElementBoost_Electricity_3_Otomo_Only_Equip,ElementBoost_Electricity_3_Otomo_Only_Equip,3,False
 ElementBoost_Electricity_PAL_PartnerSKill_1,ElementBoost_Electricity_PAL_PartnerSKill_1,1,False
 ElementBoost_Electricity_PAL_PartnerSKill_2,ElementBoost_Electricity_PAL_PartnerSKill_2,1,False
 ElementBoost_Electricity_PAL_PartnerSKill_3,ElementBoost_Electricity_PAL_PartnerSKill_3,1,False
 ElementBoost_Electricity_PAL_PartnerSKill_4,ElementBoost_Electricity_PAL_PartnerSKill_4,1,False
 ElementBoost_Electricity_PAL_PartnerSKill_5,ElementBoost_Electricity_PAL_PartnerSKill_5,1,False
 Fire Damage Enhancement (Small),ElementBoost_Fire_1_BossDefeat,1,False
+ElementBoost_Fire_1_Otomo_Only_Equip,ElementBoost_Fire_1_Otomo_Only_Equip,1,False
 Fire Damage Enhancement (Medium),ElementBoost_Fire_2_BossDefeat,1,False
+ElementBoost_Fire_2_Otomo_Only_Equip,ElementBoost_Fire_2_Otomo_Only_Equip,2,False
 Fire Damage Enhancement (Large),ElementBoost_Fire_3_BossDefeat,1,False
+ElementBoost_Fire_3_Otomo_Only_Equip,ElementBoost_Fire_3_Otomo_Only_Equip,3,False
 ElementBoost_Fire_PAL_PartnerSKill_1,ElementBoost_Fire_PAL_PartnerSKill_1,1,False
 ElementBoost_Fire_PAL_PartnerSKill_2,ElementBoost_Fire_PAL_PartnerSKill_2,1,False
 ElementBoost_Fire_PAL_PartnerSKill_3,ElementBoost_Fire_PAL_PartnerSKill_3,1,False
 ElementBoost_Fire_PAL_PartnerSKill_4,ElementBoost_Fire_PAL_PartnerSKill_4,1,False
 ElementBoost_Fire_PAL_PartnerSKill_5,ElementBoost_Fire_PAL_PartnerSKill_5,1,False
 Ice Damage Enhancement (Small),ElementBoost_Ice_1_BossDefeat,1,False
+ElementBoost_Ice_1_Otomo_Only_Equip,ElementBoost_Ice_1_Otomo_Only_Equip,1,False
 Ice Damage Enhancement (Medium),ElementBoost_Ice_2_BossDefeat,1,False
+ElementBoost_Ice_2_Otomo_Only_Equip,ElementBoost_Ice_2_Otomo_Only_Equip,2,False
 Ice Damage Enhancement (Large),ElementBoost_Ice_3_BossDefeat,1,False
+ElementBoost_Ice_3_Otomo_Only_Equip,ElementBoost_Ice_3_Otomo_Only_Equip,3,False
 ElementBoost_Ice_PAL_PartnerSKill_1,ElementBoost_Ice_PAL_PartnerSKill_1,1,False
 ElementBoost_Ice_PAL_PartnerSKill_2,ElementBoost_Ice_PAL_PartnerSKill_2,1,False
 ElementBoost_Ice_PAL_PartnerSKill_3,ElementBoost_Ice_PAL_PartnerSKill_3,1,False
 ElementBoost_Ice_PAL_PartnerSKill_4,ElementBoost_Ice_PAL_PartnerSKill_4,1,False
 ElementBoost_Ice_PAL_PartnerSKill_5,ElementBoost_Ice_PAL_PartnerSKill_5,1,False
 Grass Damage Enhancement (Small),ElementBoost_Leaf_1_BossDefeat,1,False
+ElementBoost_Leaf_1_Otomo_Only_Equip,ElementBoost_Leaf_1_Otomo_Only_Equip,1,False
 Grass Damage Enhancement (Medium),ElementBoost_Leaf_2_BossDefeat,1,False
+ElementBoost_Leaf_2_Otomo_Only_Equip,ElementBoost_Leaf_2_Otomo_Only_Equip,2,False
 Grass Damage Enhancement (Large),ElementBoost_Leaf_3_BossDefeat,1,False
+ElementBoost_Leaf_3_Otomo_Only_Equip,ElementBoost_Leaf_3_Otomo_Only_Equip,3,False
 ElementBoost_Leaf_PAL_PartnerSKill_1,ElementBoost_Leaf_PAL_PartnerSKill_1,1,False
 ElementBoost_Leaf_PAL_PartnerSKill_2,ElementBoost_Leaf_PAL_PartnerSKill_2,1,False
 ElementBoost_Leaf_PAL_PartnerSKill_3,ElementBoost_Leaf_PAL_PartnerSKill_3,1,False
 ElementBoost_Leaf_PAL_PartnerSKill_4,ElementBoost_Leaf_PAL_PartnerSKill_4,1,False
 ElementBoost_Leaf_PAL_PartnerSKill_5,ElementBoost_Leaf_PAL_PartnerSKill_5,1,False
 Neutral Damage Enhancement (Small),ElementBoost_Normal_1_BossDefeat,1,False
+ElementBoost_Normal_1_Otomo_Only_Equip,ElementBoost_Normal_1_Otomo_Only_Equip,1,False
 Neutral Damage Enhancement (Medium),ElementBoost_Normal_2_BossDefeat,1,False
+ElementBoost_Normal_2_Otomo_Only_Equip,ElementBoost_Normal_2_Otomo_Only_Equip,2,False
 Neutral Damage Enhancement (Large),ElementBoost_Normal_3_BossDefeat,1,False
+ElementBoost_Normal_3_Otomo_Only_Equip,ElementBoost_Normal_3_Otomo_Only_Equip,3,False
 ElementBoost_Normal_PAL_PartnerSKill_1,ElementBoost_Normal_PAL_PartnerSKill_1,1,False
 ElementBoost_Normal_PAL_PartnerSKill_2,ElementBoost_Normal_PAL_PartnerSKill_2,1,False
 ElementBoost_Normal_PAL_PartnerSKill_3,ElementBoost_Normal_PAL_PartnerSKill_3,1,False
 ElementBoost_Normal_PAL_PartnerSKill_4,ElementBoost_Normal_PAL_PartnerSKill_4,1,False
 ElementBoost_Normal_PAL_PartnerSKill_5,ElementBoost_Normal_PAL_PartnerSKill_5,1,False
 Water Damage Enhancement (Small),ElementBoost_Water_1_BossDefeat,1,False
+ElementBoost_Water_1_Otomo_Only_Equip,ElementBoost_Water_1_Otomo_Only_Equip,1,False
 Water Damage Enhancement (Medium),ElementBoost_Water_2_BossDefeat,1,False
+ElementBoost_Water_2_Otomo_Only_Equip,ElementBoost_Water_2_Otomo_Only_Equip,2,False
 Water Damage Enhancement (Large),ElementBoost_Water_3_BossDefeat,1,False
+ElementBoost_Water_3_Otomo_Only_Equip,ElementBoost_Water_3_Otomo_Only_Equip,3,False
 ElementBoost_Water_PAL_PartnerSKill_1,ElementBoost_Water_PAL_PartnerSKill_1,1,False
 ElementBoost_Water_PAL_PartnerSKill_2,ElementBoost_Water_PAL_PartnerSKill_2,1,False
 ElementBoost_Water_PAL_PartnerSKill_3,ElementBoost_Water_PAL_PartnerSKill_3,1,False
@@ -448,6 +549,7 @@ MoveSpeed_Night_02,MoveSpeed_Night_02,1,False
 MoveSpeed_Night_03,MoveSpeed_Night_03,1,False
 MoveSpeed_Night_04,MoveSpeed_Night_04,1,False
 MoveSpeed_Night_05,MoveSpeed_Night_05,1,False
+MoveSpeed_up_1_Otomo_Only_Equip,MoveSpeed_up_1_Otomo_Only_Equip,1,False
 MoveSpeed_Up_GroundType_PartnerSkill_1,MoveSpeed_Up_GroundType_PartnerSkill_1,1,False
 MoveSpeed_Up_GroundType_PartnerSkill_2,MoveSpeed_Up_GroundType_PartnerSkill_2,1,False
 MoveSpeed_Up_GroundType_PartnerSkill_3,MoveSpeed_Up_GroundType_PartnerSkill_3,1,False
@@ -479,8 +581,11 @@ PAL_TribePassive_3,PAL_TribePassive_3,1,False
 PAL_TribePassive_4,PAL_TribePassive_4,1,False
 en Text,PAL_TribePassive_Test,1,False
 PalExp_Increase_1,PalExp_Increase_1,-1,False
+PalExp_Increase_1_Otomo_Only_Equip,PalExp_Increase_1_Otomo_Only_Equip,1,False
 PalExp_Increase_2,PalExp_Increase_2,-1,False
+PalExp_Increase_2_Otomo_Only_Equip,PalExp_Increase_2_Otomo_Only_Equip,2,False
 PalExp_Increase_3,PalExp_Increase_3,-1,False
+PalExp_Increase_3_Otomo_Only_Equip,PalExp_Increase_3_Otomo_Only_Equip,3,False
 PalExp_Increase_4,PalExp_Increase_4,-1,False
 PalExp_Increase_5,PalExp_Increase_5,-1,False
 PalSP_Increase_1,PalSP_Increase_1,1,False

@@ -8,6 +8,15 @@ namespace PalCalc.Model
 {
     public static class GameConstants
     {
+        public static readonly Dictionary<EggSize, int> EggSizeMinRarity = new()
+        {
+            // couldn't find this info when scraping through game data, found by checking against https://paldb.cc/en/Eggs
+            // and saw that Rarity correlates with egg size
+            { EggSize.Normal, 0 },
+            { EggSize.Large, 5 },
+            { EggSize.Huge, 8 },
+        };
+
         // Used for calculating map coords from world coords
         //
         // (these values are fetched from game files and output at the end of `PalCalc.GenDB.BuildDBProgram`)

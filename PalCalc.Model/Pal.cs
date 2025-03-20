@@ -41,12 +41,18 @@ namespace PalCalc.Model
 
         public PartnerSkill PartnerSkill { get; set; } = null;
 
+        public int Rarity { get; set; } = 0;
+
         // (palRank is 1-5)
         public IEnumerable<PassiveSkill> PartnerSkillPassives(PalDB db, int palRank) =>
             PartnerSkill
                 ?.RankEffects
                 ?.ElementAt(palRank - 1)
                 ?.PassiveSkills(db);
+
+        private EggSize? eggSize;
+        [JsonIgnore]
+        public EggSize EggSize => eggSize ??= GameConstants.EggSizeMinRarity.OrderBy(kvp => kvp.Value).First(kvp => kvp.Value <= Rarity).Key;
 
         ////
 
