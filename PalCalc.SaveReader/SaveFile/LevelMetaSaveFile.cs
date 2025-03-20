@@ -32,7 +32,7 @@ namespace PalCalc.SaveReader.SaveFile
         public virtual GameMeta ReadGameOptions()
         {
             logger.Debug("parsing content");
-            var valuesVisitor = new ValueCollectingVisitor(".SaveData", ".WorldName", ".HostPlayerName", ".HostPlayerLevel", ".InGameDay");
+            var valuesVisitor = new ValueCollectingVisitor(".SaveData", isCaseSensitive: true, ".WorldName", ".HostPlayerName", ".HostPlayerLevel", ".InGameDay");
             VisitGvas(valuesVisitor);
 
             bool isServerSave = !valuesVisitor.Result.ContainsKey(".HostPlayerName");

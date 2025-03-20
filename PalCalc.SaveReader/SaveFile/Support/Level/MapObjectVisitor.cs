@@ -132,7 +132,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
             pendingEntry = new GvasMapObject();
 
-            yield return new ValueCollectingVisitor(this, K_MAP_OBJECT_ID, K_WORLD_LOCATION, K_MAP_OBJECT_INSTANCE_ID, K_MAP_OBJECT_CONCRETE_INSTANCE_ID)
+            yield return new ValueCollectingVisitor(this, isCaseSensitive: false, K_MAP_OBJECT_ID, K_WORLD_LOCATION, K_MAP_OBJECT_INSTANCE_ID, K_MAP_OBJECT_CONCRETE_INSTANCE_ID)
                 .WithOnExit(values =>
                 {
                     pendingEntry.ObjectId = values.GetValueOrDefault(K_MAP_OBJECT_ID) as string;
@@ -141,7 +141,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     pendingEntry.ConcreteModelInstanceId = (Guid)values.GetValueOrElse(K_MAP_OBJECT_CONCRETE_INSTANCE_ID, Guid.Empty);
                 });
 
-            yield return new PropertyEmittingVisitor<MapModelDataProperty>(this, ".MapObjectSaveData.Model.RawData")
+            yield return new PropertyEmittingVisitor<MapModelDataProperty>(this, isCaseSensitive: true, ".MapObjectSaveData.Model.RawData")
                 .WithOnValue((path, prop) =>
                 {
                     pendingEntry.OwnerBaseId = prop.BaseCampIdBelongTo;

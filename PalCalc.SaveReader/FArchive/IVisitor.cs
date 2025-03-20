@@ -138,17 +138,24 @@ namespace PalCalc.SaveReader.FArchive
     {
         private static ILogger logger = Log.ForContext<ValueCollectingVisitor>();
 
+        StringComparer pathStringComparer;
+        StringComparison pathStringComparison;
         string[] propertiesToCollect;
-        Dictionary<string, object> collectedValues = new Dictionary<string, object>();
+        Dictionary<string, object> collectedValues;
 
-        public ValueCollectingVisitor(IVisitor parent, params string[] propertySubPaths) : this(parent.MatchedPath, propertySubPaths)
+        public ValueCollectingVisitor(IVisitor parent, bool isCaseSensitive, params string[] propertySubPaths) : this(parent.MatchedPath, isCaseSensitive, propertySubPaths)
         {
         }
 
-        public ValueCollectingVisitor(string basePath, params string[] propertySubPaths) : base(basePath)
+        public ValueCollectingVisitor(string basePath, bool isCaseSensitive, params string[] propertySubPaths) : base(basePath)
         {
             logger.Verbose("init");
             propertiesToCollect = propertySubPaths;
+
+            pathStringComparer = isCaseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+            pathStringComparison = isCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+            collectedValues = new Dictionary<string, object>(pathStringComparer);
         }
 
         public event Action<Dictionary<string, object>> OnExit;
@@ -158,14 +165,14 @@ namespace PalCalc.SaveReader.FArchive
             return this;
         }
 
-        public override bool Matches(string path) => path.StartsWith(MatchedBasePath);
+        public override bool Matches(string path) => path.StartsWith(MatchedBasePath, pathStringComparison);
 
         public Dictionary<string, object> Result => collectedValues;
 
         private void VisitValue(string path, object value)
         {
             var propPart = path.Substring(MatchedBasePath.Length);
-            if (propertiesToCollect.Length > 0 && !propertiesToCollect.Contains(propPart)) return;
+            if (propertiesToCollect.Length > 0 && !propertiesToCollect.Contains(propPart, pathStringComparer)) return;
 
             logger.Verbose("collected {value} at {path}", value, path);
             if (collectedValues.ContainsKey(propPart))
@@ -209,15 +216,20 @@ namespace PalCalc.SaveReader.FArchive
         private static ILogger logger = Log.ForContext<ValueEmittingVisitor>();
 
         string[] propertiesToEmit;
+        StringComparer pathStringComparer;
+        StringComparison pathStringComparison;
 
-        public ValueEmittingVisitor(IVisitor parent, params string[] propertySubPaths) : this(parent.MatchedPath, propertySubPaths)
+        public ValueEmittingVisitor(IVisitor parent, bool isCaseSensitive, params string[] propertySubPaths) : this(parent.MatchedPath, isCaseSensitive, propertySubPaths)
         {
         }
 
-        public ValueEmittingVisitor(string basePath, params string[] propertySubPaths) : base(basePath)
+        public ValueEmittingVisitor(string basePath, bool isCaseSensitive, params string[] propertySubPaths) : base(basePath)
         {
             logger.Verbose("init");
             propertiesToEmit = propertySubPaths;
+
+            pathStringComparer = isCaseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+            pathStringComparison = isCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
         }
 
         public event Action<string, object> OnValue;
@@ -234,12 +246,12 @@ namespace PalCalc.SaveReader.FArchive
             return this;
         }
 
-        public override bool Matches(string path) => path.StartsWith(MatchedBasePath);
+        public override bool Matches(string path) => path.StartsWith(MatchedBasePath, pathStringComparison);
 
         private void VisitValue(string path, object value)
         {
             var propPart = path.Substring(MatchedBasePath.Length);
-            if (propertiesToEmit.Length > 0 && !propertiesToEmit.Contains(propPart)) return;
+            if (propertiesToEmit.Length > 0 && !propertiesToEmit.Contains(propPart, pathStringComparer)) return;
 
             logger.Verbose("emitting {value} from path {path}", value, path);
             OnValue?.Invoke(propPart, value);
@@ -268,14 +280,19 @@ namespace PalCalc.SaveReader.FArchive
     public class PropertyEmittingVisitor<T> : IVisitor where T : class, ICustomProperty
     {
         string[] propertiesToEmit;
+        StringComparer pathStringComparer;
+        StringComparison pathStringComparison;
 
-        public PropertyEmittingVisitor(IVisitor parent, params string[] propertySubPaths) : this(parent.MatchedPath, propertySubPaths)
+        public PropertyEmittingVisitor(IVisitor parent, bool isCaseSensitive, params string[] propertySubPaths) : this(parent.MatchedPath, isCaseSensitive, propertySubPaths)
         {
         }
 
-        public PropertyEmittingVisitor(string basePath, params string[] propertySubPaths) : base(basePath)
+        public PropertyEmittingVisitor(string basePath, bool isCaseSensitive, params string[] propertySubPaths) : base(basePath)
         {
             propertiesToEmit = propertySubPaths;
+
+            pathStringComparer = isCaseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+            pathStringComparison = isCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
         }
 
         public event Action<string, T> OnValue;
@@ -292,12 +309,12 @@ namespace PalCalc.SaveReader.FArchive
             return this;
         }
 
-        public override bool Matches(string path) => path.StartsWith(MatchedBasePath);
+        public override bool Matches(string path) => path.StartsWith(MatchedBasePath, pathStringComparison);
 
         private void VisitValue<V>(string path, V value) where V : class, ICustomProperty
         {
             var propPart = path.Substring(MatchedBasePath.Length);
-            if (propertiesToEmit.Length > 0 && !propertiesToEmit.Contains(propPart)) return;
+            if (propertiesToEmit.Length > 0 && !propertiesToEmit.Contains(propPart, pathStringComparer)) return;
             if (value is not T) return;
 
             OnValue?.Invoke(path, value as T);

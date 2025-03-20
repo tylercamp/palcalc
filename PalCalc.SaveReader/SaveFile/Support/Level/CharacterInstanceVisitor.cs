@@ -84,7 +84,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             pendingInstance = new GvasCharacterInstance();
 
             {
-                var collectingVisitor = new ValueCollectingVisitor(this,
+                var collectingVisitor = new ValueCollectingVisitor(this, isCaseSensitive: false,
                     K_PLAYER_ID,
                     K_INSTANCE_ID,
                     K_NICKNAME,
@@ -150,7 +150,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
             {
                 List<string> passives = new List<string>();
-                var passiveSkillVisitor = new ValueEmittingVisitor(this, K_PASSIVE_SKILL_LIST);
+                var passiveSkillVisitor = new ValueEmittingVisitor(this, isCaseSensitive: false, K_PASSIVE_SKILL_LIST);
                 passiveSkillVisitor.OnValue += (_, v) =>
                 {
                     logger.Verbose("Storing passive skill value {name}", v);
@@ -167,7 +167,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
             {
                 List<string> activeSkills = [];
-                var activeSkillsVisitor = new ValueEmittingVisitor(this, K_ACTIVE_SKILL_LIST);
+                var activeSkillsVisitor = new ValueEmittingVisitor(this, isCaseSensitive: false, K_ACTIVE_SKILL_LIST);
                 activeSkillsVisitor.OnValue += (_, v) =>
                 {
                     logger.Verbose("Storing active skill value {name}", v);
@@ -184,7 +184,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
             {
                 List<string> equippedSkills = [];
-                var equippedSkillsVisitor = new ValueEmittingVisitor(this, K_ACTIVE_SKILL_USED_LIST);
+                var equippedSkillsVisitor = new ValueEmittingVisitor(this, isCaseSensitive: false, K_ACTIVE_SKILL_USED_LIST);
                 equippedSkillsVisitor.OnValue += (_, v) =>
                 {
                     logger.Verbose("Storing equipped skill value {name}", v);
@@ -201,7 +201,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
             {
                 List<Guid> oldOwnerIds = new List<Guid>();
-                var oldOwnersVisitor = new ValueEmittingVisitor(this, K_OLD_OWNER_PLAYER_IDS);
+                var oldOwnersVisitor = new ValueEmittingVisitor(this, isCaseSensitive: false, K_OLD_OWNER_PLAYER_IDS);
                 oldOwnersVisitor.OnValue += (_, v) =>
                 {
                     oldOwnerIds.Add((Guid)v);

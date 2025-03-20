@@ -75,7 +75,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     pendingSlot = new PalContainerSlot();
                     pendingSlot.SlotIndex = -1;
 
-                    var vev = new ValueEmittingVisitor(this, ".Slots.SlotIndex");
+                    var vev = new ValueEmittingVisitor(this, isCaseSensitive: true, ".Slots.SlotIndex");
                     vev.OnValue += (_, v) => pendingSlot.SlotIndex = Convert.ToInt32(v);
                     yield return vev;
                 }
@@ -113,7 +113,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
             workingContainer = new RawPalContainerContents() { Slots = new List<PalContainerSlot>() };
 
-            var keyIdCollector = new ValueCollectingVisitor(this, ".Key.ID", ".Value.SlotNum");
+            var keyIdCollector = new ValueCollectingVisitor(this, isCaseSensitive: true, ".Key.ID", ".Value.SlotNum");
             keyIdCollector.OnExit += v =>
             {
                 workingContainer.Id = v[".Key.ID"].ToString();

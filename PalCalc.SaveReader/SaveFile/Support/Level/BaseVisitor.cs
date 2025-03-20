@@ -65,14 +65,14 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
             pendingInstance = new GvasBaseInstance();
 
-            yield return new ValueEmittingVisitor(this, ".Key")
+            yield return new ValueEmittingVisitor(this, isCaseSensitive: true, ".Key")
                 .WithOnValue((path, value) =>
                 {
                     pendingInstance.Id = value.ToString();
                     pendingInstance.DataSources |= BaseDataSource.Key;
                 });
 
-            yield return new PropertyEmittingVisitor<BaseCampDataProperty>(this, ".Value.RawData")
+            yield return new PropertyEmittingVisitor<BaseCampDataProperty>(this, isCaseSensitive: true, ".Value.RawData")
                 .WithOnValue((path, value) =>
                 {
                     pendingInstance.Position = value.Transform.Translation;
@@ -82,7 +82,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     pendingInstance.DataSources |= BaseDataSource.BaseData;
                 });
 
-            yield return new PropertyEmittingVisitor<WorkerDirectorDataProperty>(this, ".Value.WorkerDirector.RawData")
+            yield return new PropertyEmittingVisitor<WorkerDirectorDataProperty>(this, isCaseSensitive: true, ".Value.WorkerDirector.RawData")
                 .WithOnValue((path, value) =>
                 {
                     pendingInstance.ContainerId = value.ContainerId;
