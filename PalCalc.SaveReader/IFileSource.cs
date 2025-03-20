@@ -25,10 +25,13 @@ namespace PalCalc.SaveReader
     public class FilteredFileSource(string basePath, Func<string, bool> matcher) : IFileSource
     {
         public IEnumerable<string> Content =>
-            Directory
-                .EnumerateFiles(basePath)
-                .Where(p => matcher(Path.GetFileName(p)))
-                .OrderBy(Path.GetFileNameWithoutExtension);
+            // (throws DirectoryNotFoundException if path is missing)
+            Directory.Exists(basePath)
+                ? Directory
+                    .EnumerateFiles(basePath)
+                    .Where(p => matcher(Path.GetFileName(p)))
+                    .OrderBy(Path.GetFileNameWithoutExtension)
+                : [];
     }
 
     public class XboxFileSource(XboxWgsFolder saveFolder, string saveId, Func<string, bool> matcher) : IFileSource
