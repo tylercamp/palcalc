@@ -93,9 +93,9 @@
                                                Orientation="Horizontal"
                                                />
 
-                                <TextBlock Text="{Binding RequiredPassivesCollection.RequiredDescription.Value}" FontSize="11" />
+                                <TextBlock Text="{Binding RequiredPassives.FixedViewModel.RequiredDescription.Value}" FontSize="11" />
 
-                                <TextBlock Text="{Binding OptionalPassivesCollection.OptionalDescription.Value}" Visibility="{Binding OptionalPassivesCollection.Passives, Converter={StaticResource CVC}}" />
+                                <TextBlock Text="{Binding OptionalPassives.FixedViewModel.OptionalDescription.Value}" Visibility="{Binding OptionalPassives.HasItems, Converter={StaticResource VVC}}" />
                             </vu:SpacedWrapPanel>
 
                             <StackPanel vu:StackPanelExtensions.Spacing="2">
