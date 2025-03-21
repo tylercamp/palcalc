@@ -4,6 +4,7 @@ using PalCalc.SaveReader;
 using PalCalc.SaveReader.FArchive;
 using PalCalc.SaveReader.FArchive.Custom;
 using PalCalc.SaveReader.GVAS;
+using PalCalc.SaveReader.SaveFile;
 using PalCalc.SaveReader.SaveFile.Support.Level;
 using System.Diagnostics;
 using System.Net.Http.Headers;
@@ -23,25 +24,30 @@ var db = PalDB.LoadEmbedded();
 
 //});
 
-CompressedSAV.WithDecompressedSave(
-    [
-        @"C:\Users\algor\Downloads\palworld_2533274945012052_2025-01-25_16_45_56\F76A9C474B9CDEE155A6C6A38FCCBD39\Level\01.sav",
-        @"C:\Users\algor\Downloads\palworld_2533274945012052_2025-01-25_16_45_56\F76A9C474B9CDEE155A6C6A38FCCBD39\Level\02.sav"
-    ],
-    stream =>
-    {
-        using (var fa = new FArchiveReader(stream, PalWorldTypeHints.Hints, archivePreserve: true))
-        {
-            var gvas = GvasFile.FromFArchive(fa, []);
-        }
-    }
-);
+//CompressedSAV.WithDecompressedSave(
+//    [
+//        @"C:\Users\algor\Downloads\palworld_2533274945012052_2025-01-25_16_45_56\F76A9C474B9CDEE155A6C6A38FCCBD39\Level\01.sav",
+//        @"C:\Users\algor\Downloads\palworld_2533274945012052_2025-01-25_16_45_56\F76A9C474B9CDEE155A6C6A38FCCBD39\Level\02.sav"
+//    ],
+//    stream =>
+//    {
+//        using (var fa = new FArchiveReader(stream, PalWorldTypeHints.Hints, archivePreserve: true))
+//        {
+//            var gvas = GvasFile.FromFArchive(fa, []);
+//        }
+//    }
+//);
 
-CompressedSAV.WithDecompressedSave(@"C:\Users\algor\Downloads\palworld_2533274945012052_2025-01-25_16_45_56\F76A9C474B9CDEE155A6C6A38FCCBD39\Level\01.sav", stream =>
+CompressedSAV.WithDecompressedSave(@"C:\Users\algor\Downloads\CRASHLOG(6)\save-0\Level.sav", stream =>
 {
     using (var f = new FileStream("decompressed", FileMode.Create))
         stream.CopyTo(f);
 });
+var save4 = new StandardSaveGame(@"C:\Users\algor\Downloads\CRASHLOG(6)\save-0");
+var level4 = save4.Level.ParseGvas(true);
+
+Environment.Exit(0);
+
 var save3 = new StandardSaveGame(@"C:\Users\algor\OneDrive\Desktop\Palworld-000900000986B166_0000000000000000000000006B210A9C-F0CEFEA04271692EB202A78E57A3A40D");
 var v2 = new MapObjectVisitor(GvasMapObject.PalBoxObjectId, GvasMapObject.ViewingCageObjectId);
 var level3 = save3.Level.ParseGvas(true, v2);

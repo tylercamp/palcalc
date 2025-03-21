@@ -641,6 +641,64 @@ namespace PalCalc.SaveReader.FArchive
                         }
                     }
 
+                case "SetProperty":
+                    {
+                        // note: found independently, not in palworld-save-tools
+                        var subType = ReadString();
+                        var id = ReadOptionalGuid();
+
+                        ReadUInt32(); // ?
+                        var count = ReadUInt32();
+
+                        if (subType == "StructProperty")
+                        {
+                            var meta = new SetPropertyMeta
+                            {
+                                Path = path,
+                                Id = id,
+                                ItemType = subType,
+                            };
+
+                            var extraVisitors = pathVisitors.SelectMany(v => v.VisitSetPropertyBegin(path, meta)).ToArray();
+                            var newVisitors = visitors.Concat(extraVisitors);
+
+                            var values = Enumerable.Range(0, (int)count).Select(i =>
+                            {
+                                var extraEntryVisitors = newVisitors.Where(v => v.Matches(path)).SelectMany(v => v.VisitSetEntryBegin(path, i, meta)).ToList();
+                                var newEntryVisitors = newVisitors.Concat(extraEntryVisitors);
+
+                                // note: typically `StructProperty` wouldn't be passed as the `structType`, but it's all we've got
+                                // note: no sub-path to append here
+                                var r = ReadStructValue(subType, path, newEntryVisitors);
+
+                                foreach (var v in extraEntryVisitors) v.Exit();
+                                foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitSetEntryEnd(path, i, meta);
+
+                                return r;
+                            });
+
+                            foreach (var v in extraVisitors) v.Exit();
+                            foreach (var v in pathVisitors) v.VisitSetPropertyEnd(path, meta);
+
+                            if (archivePreserve)
+                            {
+                                return new SetProperty
+                                {
+                                    TypedMeta = meta,
+                                    Value = values
+                                };
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+                        else
+                        {
+                            throw new NotImplementedException($"Unexpected SetProperty sub-type '{subType}'");
+                        }
+                    }
+
                 default: throw new Exception("Unrecognized type name: " + typeName);
             }
         }

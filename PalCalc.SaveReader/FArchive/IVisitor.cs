@@ -67,26 +67,30 @@ namespace PalCalc.SaveReader.FArchive
 
         public virtual void VisitLiteralProperty(string path, LiteralProperty prop) { }
 
-        public virtual IEnumerable<IVisitor> VisitEnumPropertyBegin(string path, EnumPropertyMeta meta) => Enumerable.Empty<IVisitor>();
-        public virtual IEnumerable<IVisitor> VisitStructPropertyBegin(string path, StructPropertyMeta meta) => Enumerable.Empty<IVisitor>();
-        public virtual IEnumerable<IVisitor> VisitArrayPropertyBegin(string path, ArrayPropertyMeta meta) => Enumerable.Empty<IVisitor>();
-        public virtual IEnumerable<IVisitor> VisitMapPropertyBegin(string path, MapPropertyMeta meta) => Enumerable.Empty<IVisitor>();
+        public virtual IEnumerable<IVisitor> VisitEnumPropertyBegin(string path, EnumPropertyMeta meta) => [];
+        public virtual IEnumerable<IVisitor> VisitStructPropertyBegin(string path, StructPropertyMeta meta) => [];
+        public virtual IEnumerable<IVisitor> VisitArrayPropertyBegin(string path, ArrayPropertyMeta meta) => [];
+        public virtual IEnumerable<IVisitor> VisitMapPropertyBegin(string path, MapPropertyMeta meta) => [] ;
+        public virtual IEnumerable<IVisitor> VisitSetPropertyBegin(string path, SetPropertyMeta meta) => [];
 
         // meta is at the end
-        public virtual IEnumerable<IVisitor> VisitCharacterPropertyBegin(string path) => Enumerable.Empty<IVisitor>();
+        public virtual IEnumerable<IVisitor> VisitCharacterPropertyBegin(string path) => [] ;
 
-        public virtual IEnumerable<IVisitor> VisitArrayEntryBegin(string path, int index, ArrayPropertyMeta meta) => Enumerable.Empty<IVisitor>();
-        public virtual IEnumerable<IVisitor> VisitMapEntryBegin(string path, int index, MapPropertyMeta meta) => Enumerable.Empty<IVisitor>();
+        public virtual IEnumerable<IVisitor> VisitArrayEntryBegin(string path, int index, ArrayPropertyMeta meta) => [];
+        public virtual IEnumerable<IVisitor> VisitMapEntryBegin(string path, int index, MapPropertyMeta meta) => [];
+        public virtual IEnumerable<IVisitor> VisitSetEntryBegin(string path, int index, SetPropertyMeta meta) => [];
 
         public virtual void VisitEnumPropertyEnd(string path, EnumPropertyMeta meta) { }
         public virtual void VisitStructPropertyEnd(string path, StructPropertyMeta meta) { }
         public virtual void VisitArrayPropertyEnd(string path, ArrayPropertyMeta meta) { }
         public virtual void VisitMapPropertyEnd(string path, MapPropertyMeta meta) { }
+        public virtual void VisitSetPropertyEnd(string path, SetPropertyMeta meta) { }
 
         public virtual void VisitCharacterPropertyEnd(string path, CharacterDataPropertyMeta meta) { }
 
         public virtual void VisitArrayEntryEnd(string path, int index, ArrayPropertyMeta meta) { }
         public virtual void VisitMapEntryEnd(string path, int index, MapPropertyMeta meta) { }
+        public virtual void VisitSetEntryEnd(string path, int index, SetPropertyMeta meta) { }
 
         // no start/end, these are custom-serialized types without any property name dictionaries, so they're
         // deserialized as a whole

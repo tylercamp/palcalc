@@ -220,4 +220,30 @@ namespace PalCalc.SaveReader.FArchive
             }
         }
     }
+
+    public class SetPropertyMeta : BasicPropertyMeta
+    {
+        public string ItemType { get; set; }
+    }
+
+    public class SetProperty : IProperty
+    {
+        public IPropertyMeta Meta => TypedMeta;
+        public SetPropertyMeta TypedMeta { get; set; }
+
+        public object Value { get; set; }
+
+        public T[] Values<T>() => Value as T[];
+
+        public void Traverse(Action<IProperty> action)
+        {
+            if (TypedMeta.ItemType == "StructProperty")
+            {
+                foreach (var val in Values<object>())
+                {
+                    StructProperty.TryTraverse(val, TypedMeta.ItemType, action);
+                }
+            }
+        }
+    }
 }
