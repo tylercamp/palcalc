@@ -68,6 +68,7 @@ namespace PalCalc.SaveReader
             if (Directory.Exists(playersPath))
                 Players = Directory
                     .EnumerateFiles(playersPath, "*.sav")
+                    .Where(f => !Path.GetFileNameWithoutExtension(f).EndsWith("_dps"))
                     .Select(f => new PlayersSaveFile(new SingleFileSource(f)))
                     .ToList();
             else
