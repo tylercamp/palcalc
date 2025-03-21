@@ -36,7 +36,7 @@ namespace PalCalc.UI.ViewModel.Inspector
                     designerInstance = new SaveDetailsViewModel(
                         save,
                         save.UnderlyingSave.Level.ReadRawCharacterData(),
-                        save.UnderlyingSave.Players.Select(p => p.ReadPlayerContent()).ToList()
+                        save.UnderlyingSave.Players.Select(p => p.ReadPlayerContent()).SkipNull().ToList()
                     );
                 }
                 return designerInstance;

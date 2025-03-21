@@ -159,7 +159,7 @@ namespace PalCalc.SaveReader.SaveFile
         //       infer the container type based on their size
         public virtual LevelSaveData ReadCharacterData(PalDB db, GameSettings settings, List<PlayersSaveFile> playersFiles)
         {
-            var players = playersFiles.Select(pf => pf.ReadPlayerContent()).ToList();
+            var players = playersFiles.Select(pf => pf.ReadPlayerContent()).SkipNull().ToList();
             var parsed = ReadRawCharacterData();
 
             var detectedContainers = CollectContainers(settings, parsed, players);

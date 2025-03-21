@@ -28,7 +28,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             DisplayedSave = sgvm;
 
             var rawData = sgvm.CachedValue.UnderlyingSave.Level.ReadRawCharacterData();
-            var players = sgvm.Value.Players.Select(p => p.ReadPlayerContent()).ToList();
+            var players = sgvm.Value.Players.Select(p => p.ReadPlayerContent()).SkipNull().ToList();
 
             Search = new SearchViewModel(sgvm, settings);
             Details = new SaveDetailsViewModel(sgvm.CachedValue, rawData, players);
