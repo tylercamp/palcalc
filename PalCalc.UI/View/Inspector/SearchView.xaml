@@ -123,7 +123,7 @@
             </TreeView>
         </GroupBox>
 
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" />
 
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
