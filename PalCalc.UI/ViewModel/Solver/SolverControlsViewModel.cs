@@ -32,8 +32,8 @@ namespace PalCalc.UI.ViewModel.Solver
         public static SolverControlsViewModel DesignerInstance { get; } = new SolverControlsViewModel(null, null, null, null);
 
         private PalListPresetCollectionViewModel PalListPresets => new(
-            CurrentTarget.PalSource.Save,
-            CurrentTarget.PalSource.SelectedSource,
+            CurrentTarget?.PalSource?.Save,
+            CurrentTarget?.PalSource?.SelectedSource,
             AppSettings.Current?.PalListPresets
         );
 

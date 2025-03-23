@@ -21,9 +21,12 @@ namespace PalCalc.UI.ViewModel.Presets.BuiltIn.PalList
             this.availablePalFilter = availablePalFilter;
         }
 
-        public override List<Pal> Pals => PalDB.LoadEmbedded().Pals
-            .Except(availablePalFilter.Filter(context).Select(p => p.Pal))
-            .Distinct()
-            .ToList();
+        public override List<Pal> Pals =>
+            availablePalFilter == null
+                ? []
+                : PalDB.LoadEmbedded().Pals
+                    .Except(availablePalFilter.Filter(context).Select(p => p.Pal))
+                    .Distinct()
+                    .ToList();
     }
 }
