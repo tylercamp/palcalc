@@ -340,6 +340,17 @@ namespace PalCalc.SaveReader.FArchive
                         return res;
                     }
 
+                case "UInt64Property":
+                    {
+                        var res = LiteralProperty.Create(path, ReadOptionalGuid(), ReadUInt64());
+                        foreach (var v in pathVisitors)
+                        {
+                            v.VisitLiteralProperty(path, res);
+                            v.VisitUInt64(path, (UInt64)res.Value);
+                        }
+                        return res;
+                    }
+
                 case "FixedPoint64Property":
                     {
                         var res = LiteralProperty.Create(path, ReadOptionalGuid(), ReadInt32()); // ?????????????
