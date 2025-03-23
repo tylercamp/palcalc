@@ -71,7 +71,8 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">
                                 <Run Text="{Binding AvgRequiredAttemptsDescription.Value, Mode=OneWay}" />
-                                <Run Text=" - " />
+                                <!-- Note: The text between <Run /> elements seems to be interpreted as a space, so we don't need a space before the "-" below -->
+                                <Run Text="- " />
                             </TextBlock>
                             <TextBlock Text="{Binding Effort}" FontSize="10" Visibility="{Binding EffortVisibility}" />
                         </StackPanel>
