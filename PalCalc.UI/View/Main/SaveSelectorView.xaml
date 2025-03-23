@@ -17,6 +17,7 @@
             d:DataContext="{d:DesignInstance vm:SaveSelectorViewModel, IsDesignTimeCreatable=True}" d:DesignWidth="436.57">
     <StackPanel.Resources>
         <ResourceDictionary>
+            <c:ValueVisibilityConverter x:Key="NVVC" Negate="True" />
             <BooleanToVisibilityConverter x:Key="BVC" />
             <Style TargetType="Label" BasedOn="{StaticResource ComboBoxAlignedLabelStyle}" />
         </ResourceDictionary>
@@ -84,13 +85,7 @@
         </Grid>
     </StackPanel>
 
-    <StackPanel>
-        <StackPanel.Resources>
-            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                <Setter Property="Margin" Value="0,5,0,0" />
-            </Style>
-        </StackPanel.Resources>
-        
+    <StackPanel u:StackPanelExtensions.Spacing="5">
         <TextBlock TextWrapping="Wrap" Visibility="{Binding NoXboxSavesMsgVisibility}" FontStyle="Italic">
             <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_1}" />
             
@@ -104,6 +99,8 @@
         <TextBlock Visibility="{Binding SelectedGame.HasWarnings, Converter={StaticResource BVC}, FallbackValue=Collapsed}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_INVALID}" />
 
         <TextBlock Visibility="{Binding XboxIncompleteVisibility}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_SAVE_GAME_XBOX_INCOMPLETE}" />
+
+        <TextBlock Visibility="{Binding SelectedGame, Converter={StaticResource NVVC}, FallbackValue=Collapsed}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}" TextWrapping="Wrap" Text="{itl:LocalizedText Code=LC_SAVE_GAME_ERROR}" />
 
     </StackPanel>
 

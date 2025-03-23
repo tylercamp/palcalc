@@ -811,4 +811,7 @@
   <data name="LC_PAL_LIST_PRESETS_BUILTIN_OWNED" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SAVE_GAME_ERROR" xml:space="preserve">
+    <value />
+  </data>
 </root>

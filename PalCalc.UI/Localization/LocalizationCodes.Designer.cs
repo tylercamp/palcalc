@@ -649,6 +649,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SAVE_GAME_ERROR,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SAVE_GAME_INVALID,
         /// <summary>
         ///   Looks up a localized string similar to PlayerName | PlayerLevel | DayNumber | WorldName.

@@ -618,6 +618,9 @@ This will not delete the save files from your computer.</value>
   <data name="LC_SAVE_GAME" xml:space="preserve">
     <value>Game</value>
   </data>
+  <data name="LC_SAVE_GAME_ERROR" xml:space="preserve">
+    <value>No save is selected or the selected save could not be loaded! If you don't have a save file, consider selecting "Location: Manually Added" and "Game: Add a fake save...". Use the "Inspect" button and Custom Containers to manually add pals.</value>
+  </data>
   <data name="LC_SAVE_GAME_INVALID" xml:space="preserve">
     <value>The selected save file is invalid!</value>
   </data>
