@@ -99,7 +99,7 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public IEnumerable<PalInstance> Filter(CachedSaveGame source)
         {
-            return source.OwnedPals.Where(p => source.GuildsByPlayerId[p.OwnerPlayerId].Id == ModelObject.Id);
+            return source.OwnedPals.Where(p => source.GuildsByPlayerId.GetValueOrDefault(p.OwnerPlayerId)?.Id == ModelObject.Id);
         }
     }
 

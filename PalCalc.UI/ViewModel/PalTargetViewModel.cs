@@ -63,11 +63,17 @@ namespace PalCalc.UI.ViewModel
             if (PalSource.SelectedSource != null)
                 CurrentPalSpecifier.RefreshWith(AvailablePals);
 
-            PropertyChangedEventManager.AddHandler(
-                sourceSave.Customizations,
-                (_, _) => CurrentPalSpecifier?.RefreshWith(AvailablePals),
-                nameof(sourceSave.Customizations.CustomContainers)
-            );
+            void RefreshOnChange(object sender, PropertyChangedEventArgs ev)
+            {
+                CurrentPalSpecifier?.RefreshWith(AvailablePals);
+            }
+
+            PropertyChangedEventManager.AddHandler(sourceSave.Customizations, RefreshOnChange, nameof(sourceSave.Customizations.CustomContainers));
+
+            PropertyChangedEventManager.AddHandler(CurrentPalSpecifier, RefreshOnChange, nameof(CurrentPalSpecifier.IncludeCagedPals));
+            PropertyChangedEventManager.AddHandler(CurrentPalSpecifier, RefreshOnChange, nameof(CurrentPalSpecifier.IncludeBasePals));
+            PropertyChangedEventManager.AddHandler(CurrentPalSpecifier, RefreshOnChange, nameof(CurrentPalSpecifier.IncludeCustomPals));
+            PropertyChangedEventManager.AddHandler(CurrentPalSpecifier, RefreshOnChange, nameof(CurrentPalSpecifier.IncludeGlobalStoragePals));
 
             PalSource.PropertyChanged += PalSource_PropertyChanged;
             
