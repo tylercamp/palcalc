@@ -37,12 +37,14 @@ namespace PalCalc.SaveReader.SaveFile
         public virtual RawLevelSaveData ReadRawCharacterData()
         {
             var containerVisitor = new PalContainerVisitor();
-            var instanceVisitor = new CharacterInstanceVisitor();
+            var instanceVisitor = new WorldSaveData_CharacterInstanceVisitor();
             var groupVisitor = new GroupVisitor();
             var baseVisitor = new BaseVisitor();
             var mapObjectVisitor = new MapObjectVisitor(
                 GvasMapObject.PalBoxObjectId,
-                GvasMapObject.ViewingCageObjectId
+                GvasMapObject.ViewingCageObjectId,
+                GvasMapObject.GlobalPalBoxObjectId,
+                GvasMapObject.DimensionalPalStorageObjectId
             );
             VisitGvas(containerVisitor, instanceVisitor, groupVisitor, baseVisitor, mapObjectVisitor);
 
@@ -204,19 +206,6 @@ namespace PalCalc.SaveReader.SaveFile
                 }
                 else
                 {
-                    var sanitizedCharId = gvasInstance.CharacterId.Replace("Boss_", "", StringComparison.InvariantCultureIgnoreCase);
-
-                    if (db.Humans.Any(h => h.InternalName == sanitizedCharId)) continue;
-
-                    var pal = db.Pals.FirstOrDefault(p => p.InternalName.Equals(sanitizedCharId, StringComparison.OrdinalIgnoreCase));
-
-                    if (pal == null)
-                    {
-                        // skip unrecognized pals
-                        logger.Warning("unrecognized pal '{name}', skipping", sanitizedCharId);
-                        continue;
-                    }
-
                     if (!containerTypeById.ContainsKey(gvasInstance.ContainerId?.ToString()))
                     {
                         // Level.sav contains a list of all known containers, but there are some cases where a pal
@@ -236,74 +225,9 @@ namespace PalCalc.SaveReader.SaveFile
                         continue;
                     }
 
-                    var passives = gvasInstance.PassiveSkills
-                        .Select(name =>
-                        {
-                            var passive = db.StandardPassiveSkills.FirstOrDefault(t => t.InternalName == name);
-                            if (passive == null)
-                            {
-                                logger.Warning("unrecognized passive skill '{internalName}' on pal {Pal}", name, gvasInstance.CharacterId);
-                            }
-                            return passive ?? new UnrecognizedPassiveSkill(name);
-                        })
-                        .ToList();
-
-                    ActiveSkill MakeActiveSkill(string name)
-                    {
-                        var activeSkill = db.ActiveSkills.FirstOrDefault(t => t.InternalName == name);
-                        if (activeSkill == null)
-                        {
-                            logger.Warning("unrecognized active skill '{internalName}' on pal {Pal}", name, gvasInstance.CharacterId);
-                        }
-                        return activeSkill ?? new UnrecognizedActiveSkill(name);
-                    }
-
-                    string FormatSkillName(string skillId) => skillId.Replace("EPalWazaID::", "");
-
-                    var equippedActiveSkills = gvasInstance.EquippedActiveSkills
-                        .Select(FormatSkillName)
-                        .Select(MakeActiveSkill)
-                        .ToList();
-
-                    var activeSkills = gvasInstance.ActiveSkills
-                        .Select(FormatSkillName)
-                        .Select(MakeActiveSkill)
-                        // for some reason the equipped skills won't always show in the available list of skills
-                        .Concat(equippedActiveSkills)
-                        .Distinct()
-                        .ToList();
-
-                    result.Pals.Add(new PalInstance()
-                    {
-                        Pal = pal,
-                        InstanceId = gvasInstance.InstanceId.ToString(),
-                        OwnerPlayerId = gvasInstance.OwnerPlayerId?.ToString() ?? gvasInstance.OldOwnerPlayerIds.First().ToString(),
-
-                        IV_HP = gvasInstance.TalentHp ?? 0,
-                        IV_Melee = gvasInstance.TalentMelee ?? 0,
-                        IV_Shot = gvasInstance.TalentShot ?? 0,
-                        IV_Defense = gvasInstance.TalentDefense ?? 0,
-
-                        Rank = gvasInstance.Rank ?? 1,
-
-                        Level = gvasInstance.Level,
-                        NickName = gvasInstance.NickName,
-                        Gender = gvasInstance.Gender switch
-                        {
-                            null => PalGender.NONE,
-                            var g when g.Contains("Female", StringComparison.InvariantCultureIgnoreCase) => PalGender.FEMALE,
-                            _ => PalGender.MALE
-                        },
-                        PassiveSkills = passives,
-                        ActiveSkills = activeSkills,
-                        EquippedActiveSkills = equippedActiveSkills,
-                        Location = new PalLocation()
-                        {
-                            ContainerId = gvasInstance.ContainerId.ToString(),
-                            Type = containerTypeById[gvasInstance.ContainerId.ToString()],
-                            Index = gvasInstance.SlotIndex,
-                        }
-                    });
+                    var pal = gvasInstance.ToPalInstance(db, containerTypeById[gvasInstance.ContainerId.ToString()]);
+                    if (pal != null)
+                        result.Pals.Add(pal);
                 }
             }
 

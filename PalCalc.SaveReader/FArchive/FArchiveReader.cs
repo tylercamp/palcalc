@@ -686,7 +686,7 @@ namespace PalCalc.SaveReader.FArchive
                                 foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitSetEntryEnd(path, i, meta);
 
                                 return r;
-                            });
+                            }).ToArray();
 
                             foreach (var v in extraVisitors) v.Exit();
                             foreach (var v in pathVisitors) v.VisitSetPropertyEnd(path, meta);

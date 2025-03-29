@@ -32,6 +32,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
         public static readonly string PalBoxObjectId = "PalBoxV2";
         public static readonly string ViewingCageObjectId = "DisplayCharacter";
+        public static readonly string GlobalPalBoxObjectId = "GlobalPalStorage";
+        public static readonly string DimensionalPalStorageObjectId = "DimensionPalStorage";
     }
 
     class MapContainerCollectingVisitor : IVisitor
@@ -150,7 +152,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     pendingEntry.CurrentHP = prop.CurrentHp;
                     pendingEntry.MaxHP = prop.MaxHp;
                 });
-
+              
             yield return new MapContainerCollectingVisitor()
                 .WithOnExit(containerId => pendingEntry.PalContainerId = containerId);
         }

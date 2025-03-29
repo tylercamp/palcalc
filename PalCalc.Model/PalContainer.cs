@@ -49,4 +49,15 @@ namespace PalCalc.Model
         [JsonIgnore]
         public LocationType Type => LocationType.ViewingCage;
     }
+
+    public class DimensionalPalStorageContainer : IPalContainer
+    {
+        // note: doesn't actually have an ID, but need _something_ for properly tracking container membership. this can be
+        //       based on player ID, main requirement is just consistency throughout the app
+        public string Id { get; set; }
+        public string PlayerId { get; set; }
+
+        [JsonIgnore]
+        public LocationType Type => LocationType.DimensionalPalStorage;
+    }
 }

@@ -66,13 +66,23 @@ namespace PalCalc.SaveReader
 
             var playersPath = Path.Join(basePath, "Players");
             if (Directory.Exists(playersPath))
+            {
                 Players = Directory
                     .EnumerateFiles(playersPath, "*.sav")
                     .Where(f => !Path.GetFileNameWithoutExtension(f).EndsWith("_dps"))
-                    .Select(f => new PlayersSaveFile(new SingleFileSource(f)))
+                    .Select(f =>
+                    {
+                        var baseName = Path.GetFileNameWithoutExtension(f);
+                        var dpsPath = $"{playersPath}/{baseName}_dps.sav";
+                        var dpsFile = File.Exists(dpsPath) ? new PlayersDpsSaveFile(new SingleFileSource(dpsPath), baseName) : null;
+                        return new PlayersSaveFile(new SingleFileSource(f), dpsFile);
+                    })
                     .ToList();
+            }
             else
+            {
                 Players = new List<PlayersSaveFile>();
+            }
 
             if (Directory.Exists(basePath))
             {
@@ -205,7 +215,8 @@ namespace PalCalc.SaveReader
 
             Players = filesByType
                 .GetValueOrElse("Players", new List<XboxWgsEntry>())
-                .Select(f => new PlayersSaveFile(new XboxFileSource(wgsFolder, saveId, nameWithoutSaveId => f.FileName == $"{saveId}-{nameWithoutSaveId}")))
+                // TODO - _dps files
+                .Select(f => new PlayersSaveFile(new XboxFileSource(wgsFolder, saveId, nameWithoutSaveId => f.FileName == $"{saveId}-{nameWithoutSaveId}"), null))
                 .ToList();
 
             monitor = wgsFolder.Monitor.GetSaveMonitor(saveId);

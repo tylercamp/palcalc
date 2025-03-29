@@ -38,20 +38,31 @@ var db = PalDB.LoadEmbedded();
 //    }
 //);
 
-CompressedSAV.WithDecompressedSave(@"C:\Users\algor\Downloads\CRASHLOG(6)\save-0\Level.sav", stream =>
-{
-    using (var f = new FileStream("decompressed", FileMode.Create))
-        stream.CopyTo(f);
-});
-var save4 = new StandardSaveGame(@"C:\Users\algor\Downloads\CRASHLOG(6)\save-0");
-var level4 = save4.Level.ParseGvas(true);
+//CompressedSAV.WithDecompressedSave(@"C:\Users\algor\Downloads\CRASHLOG(6)\save-0\Level.sav", stream =>
+//{
+//    using (var f = new FileStream("decompressed", FileMode.Create))
+//        stream.CopyTo(f);
+//});
+//var save4 = new StandardSaveGame(@"C:\Users\algor\Downloads\CRASHLOG(6)\save-0");
+//var level4 = save4.Level.ParseGvas(true);
 
-Environment.Exit(0);
+//Environment.Exit(0);
 
-var save3 = new StandardSaveGame(@"C:\Users\algor\OneDrive\Desktop\Palworld-000900000986B166_0000000000000000000000006B210A9C-F0CEFEA04271692EB202A78E57A3A40D");
-var v2 = new MapObjectVisitor(GvasMapObject.PalBoxObjectId, GvasMapObject.ViewingCageObjectId);
+var save3 = new StandardSaveGame(@"C:\Users\algor\AppData\Local\Pal\Saved\SaveGames\76561198963790804\095144A9430A880B9D995A8C8777547F");
+var v2 = new MapObjectVisitor(GvasMapObject.GlobalPalBoxObjectId, GvasMapObject.DimensionalPalStorageObjectId);
 var level3 = save3.Level.ParseGvas(true, v2);
 var dataLevel3 = save3.Level.ReadCharacterData(db, GameSettings.Defaults, save3.Players);
+var rawDataLevel3 = save3.Level.ReadRawCharacterData();
+
+foreach (var pl in save3.Players)
+{
+    if (pl.DimensionalPalStorageSaveFile != null)
+    {
+        var plgvas = pl.ParseGvas(true);
+        var dps = pl.DimensionalPalStorageSaveFile.ParseGvas(true);
+        var dpsChars = pl.DimensionalPalStorageSaveFile.ReadRawCharacters();
+    }
+}
 
 var d = level3.Dynamic;
 var t = d.worldSaveData.MapObjectSaveData[0].ConcreteModel;

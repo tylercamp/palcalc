@@ -16,6 +16,7 @@ namespace PalCalc.Model
         Base,
         ViewingCage,
         Custom,
+        DimensionalPalStorage,
     }
 
     public class PalLocation

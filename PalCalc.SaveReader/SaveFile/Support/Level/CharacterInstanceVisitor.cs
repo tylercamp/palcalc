@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using PalCalc.SaveReader.FArchive;
 using Serilog;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,37 +38,130 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
         public List<string> ActiveSkills { get; set; }
         public List<string> EquippedActiveSkills { get; set; }
-    }
 
+        private static ILogger logger = Log.ForContext<GvasCharacterInstance>();
+
+        public PalInstance ToPalInstance(PalDB db, LocationType locationType)
+        {
+            var sanitizedCharId = CharacterId.Replace("Boss_", "", StringComparison.InvariantCultureIgnoreCase);
+
+            if (db.Humans.Any(h => h.InternalName == sanitizedCharId)) return null;
+
+            var pal = db.Pals.FirstOrDefault(p => p.InternalName.Equals(sanitizedCharId, StringComparison.OrdinalIgnoreCase));
+
+            if (pal == null)
+            {
+                // skip unrecognized pals
+                logger.Warning("unrecognized pal '{name}', skipping", sanitizedCharId);
+                return null;
+            }
+
+            var passives = PassiveSkills
+                .Select(name =>
+                {
+                    var passive = db.StandardPassiveSkills.FirstOrDefault(t => t.InternalName == name);
+                    if (passive == null)
+                    {
+                        logger.Warning("unrecognized passive skill '{internalName}' on pal {Pal}", name, CharacterId);
+                    }
+                    return passive ?? new UnrecognizedPassiveSkill(name);
+                })
+                .ToList();
+
+            ActiveSkill MakeActiveSkill(string name)
+            {
+                var activeSkill = db.ActiveSkills.FirstOrDefault(t => t.InternalName == name);
+                if (activeSkill == null)
+                {
+                    logger.Warning("unrecognized active skill '{internalName}' on pal {Pal}", name, CharacterId);
+                }
+                return activeSkill ?? new UnrecognizedActiveSkill(name);
+            }
+
+            string FormatSkillName(string skillId) => skillId.Replace("EPalWazaID::", "");
+
+            var equippedActiveSkills = EquippedActiveSkills
+                .Select(FormatSkillName)
+                .Select(MakeActiveSkill)
+                .ToList();
+
+            var activeSkills = ActiveSkills
+                .Select(FormatSkillName)
+                .Select(MakeActiveSkill)
+                // for some reason the equipped skills won't always show in the available list of skills
+                .Concat(equippedActiveSkills)
+                .Distinct()
+                .ToList();
+
+            return new PalInstance()
+            {
+                Pal = pal,
+                InstanceId = InstanceId.ToString(),
+                OwnerPlayerId = OwnerPlayerId?.ToString() ?? OldOwnerPlayerIds.First().ToString(),
+
+                IV_HP = TalentHp ?? 0,
+                IV_Melee = TalentMelee ?? 0,
+                IV_Shot = TalentShot ?? 0,
+                IV_Defense = TalentDefense ?? 0,
+
+                Rank = Rank ?? 1,
+
+                Level = Level,
+                NickName = NickName,
+                Gender = Gender switch
+                {
+                    null => PalGender.NONE,
+                    var g when g.Contains("Female", StringComparison.InvariantCultureIgnoreCase) => PalGender.FEMALE,
+                    _ => PalGender.MALE
+                },
+                PassiveSkills = passives,
+                ActiveSkills = activeSkills,
+                EquippedActiveSkills = equippedActiveSkills,
+                Location = new PalLocation()
+                {
+                    ContainerId = ContainerId.ToString(),
+                    Type = locationType,
+                    Index = SlotIndex,
+                }
+            };
+        }
+    }
+    
     class CharacterInstanceVisitor : IVisitor
     {
         private static ILogger logger = Log.ForContext<CharacterInstanceVisitor>();
 
-        public CharacterInstanceVisitor() : base(".worldSaveData.CharacterSaveParameterMap") { }
+        public CharacterInstanceVisitor(string basePath) : base(basePath) { }
 
-        public List<GvasCharacterInstance> Result = new List<GvasCharacterInstance>();
+        public GvasCharacterInstance Result { get; private set; } = null;
+
+        public event Action<GvasCharacterInstance> OnExit;
+
+        public override void Exit()
+        {
+            base.Exit();
+            OnExit?.Invoke(Result);
+        }
 
         GvasCharacterInstance pendingInstance = null;
 
-        const string K_INSTANCE_ID          = ".Key.InstanceId";
-        const string K_PLAYER_ID            = ".Key.PlayerUId";
-        const string K_NICKNAME             = ".Value.RawData.SaveParameter.NickName";
-        const string K_LEVEL                = ".Value.RawData.SaveParameter.Level";
-        const string K_CHARACTER_ID         = ".Value.RawData.SaveParameter.CharacterID";
-        const string K_IS_PLAYER            = ".Value.RawData.SaveParameter.IsPlayer";
-        const string K_GENDER               = ".Value.RawData.SaveParameter.Gender";
-        const string K_CONTAINER_ID         = ".Value.RawData.SaveParameter.SlotID.ContainerId.ID";
-        const string K_CONTAINER_SLOT_INDEX = ".Value.RawData.SaveParameter.SlotID.SlotIndex";
-        const string K_PASSIVE_SKILL_LIST   = ".Value.RawData.SaveParameter.PassiveSkillList";
-        const string K_ACTIVE_SKILL_LIST    = ".Value.RawData.SaveParameter.MasteredWaza";
-        const string K_ACTIVE_SKILL_USED_LIST = ".Value.RawData.SaveParameter.EquipWaza";
-        const string K_OWNER_PLAYER_ID      = ".Value.RawData.SaveParameter.OwnerPlayerUId";
-        const string K_OLD_OWNER_PLAYER_IDS = ".Value.RawData.SaveParameter.OldOwnerPlayerUIds.OldOwnerPlayerUIds";
-        const string K_TALENT_HP            = ".Value.RawData.SaveParameter.Talent_HP";
-        const string K_TALENT_SHOT          = ".Value.RawData.SaveParameter.Talent_Shot";
-        const string K_TALENT_MELEE         = ".Value.RawData.SaveParameter.Talent_Melee";
-        const string K_TALENT_DEFENSE       = ".Value.RawData.SaveParameter.Talent_Defense";
-        const string K_RANK                 = ".Value.RawData.SaveParameter.Rank";
+        const string K_NICKNAME             = ".NickName";
+        const string K_LEVEL                = ".Level";
+        const string K_CHARACTER_ID         = ".CharacterID";
+        const string K_IS_PLAYER            = ".IsPlayer";
+        const string K_GENDER               = ".Gender";
+        const string K_CONTAINER_ID         = ".SlotID.ContainerId.ID";
+        const string K_CONTAINER_SLOT_INDEX = ".SlotID.SlotIndex";
+        const string K_PASSIVE_SKILL_LIST   = ".PassiveSkillList";
+        const string K_ACTIVE_SKILL_LIST    = ".MasteredWaza";
+        const string K_ACTIVE_SKILL_USED_LIST = ".EquipWaza";
+        const string K_OWNER_PLAYER_ID      = ".OwnerPlayerUId";
+        const string K_OLD_OWNER_PLAYER_IDS = ".OldOwnerPlayerUIds.OldOwnerPlayerUIds";
+        const string K_TALENT_HP            = ".Talent_HP";
+        const string K_TALENT_SHOT          = ".Talent_Shot";
+        const string K_TALENT_MELEE         = ".Talent_Melee";
+        const string K_TALENT_DEFENSE       = ".Talent_Defense";
+        const string K_RANK                 = ".Rank";
 
         static readonly List<string> REQUIRED_PAL_PROPS = new List<string>()
         {
@@ -76,17 +170,14 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             K_CONTAINER_SLOT_INDEX,
         };
 
-        public override IEnumerable<IVisitor> VisitMapEntryBegin(string path, int index, MapPropertyMeta meta)
+        public IEnumerable<IVisitor> VisitCharacterBegin()
         {
             logger.Verbose("Beginning object read");
-            base.VisitMapEntryBegin(path, index, meta);
 
             pendingInstance = new GvasCharacterInstance();
 
             {
                 var collectingVisitor = new ValueCollectingVisitor(this, isCaseSensitive: false,
-                    K_PLAYER_ID,
-                    K_INSTANCE_ID,
                     K_NICKNAME,
                     K_LEVEL,
                     K_CHARACTER_ID,
@@ -106,7 +197,6 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                 {
                     logger.Verbose("property collector exited with values for {fieldNames}", string.Join(", ", vals.Keys));
 
-                    pendingInstance.InstanceId = (Guid)vals[K_INSTANCE_ID];
                     pendingInstance.IsPlayer = (bool)vals.GetValueOrElse(K_IS_PLAYER, false);
 
                     // level 1 (i.e. "default level") instances don't have a Level property
@@ -114,7 +204,6 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
                     if (pendingInstance.IsPlayer)
                     {
-                        pendingInstance.PlayerId = (Guid?)vals[K_PLAYER_ID];
                         pendingInstance.NickName = (string)vals[K_NICKNAME];
                     }
                     else
@@ -215,16 +304,141 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             }
         }
 
-        public override void VisitMapEntryEnd(string path, int index, MapPropertyMeta meta)
+        public void VisitCharacterEnd()
         {
             logger.Verbose("Ending object read");
             if (pendingInstance != null)
             {
                 logger.Verbose("Generated valid character instance");
-                Result.Add(pendingInstance);
+                Result = pendingInstance;
             }
 
             pendingInstance = null;
+        }
+    }
+
+    class WorldSaveData_CharacterInstanceVisitor : IVisitor
+    {
+        private static ILogger logger = Log.ForContext<WorldSaveData_CharacterInstanceVisitor>();
+
+        public WorldSaveData_CharacterInstanceVisitor() : base(".worldSaveData.CharacterSaveParameterMap") { }
+
+        public List<GvasCharacterInstance> Result = new List<GvasCharacterInstance>();
+
+        private Dictionary<string, object> pendingProperties;
+        private CharacterInstanceVisitor pendingCharacterVisitor;
+
+        const string K_INSTANCE_ID = ".Key.InstanceId";
+        const string K_PLAYER_ID = ".Key.PlayerUId";
+
+
+        public override IEnumerable<IVisitor> VisitMapEntryBegin(string path, int index, MapPropertyMeta meta)
+        {
+            logger.Verbose("Beginning object read");
+            base.VisitMapEntryBegin(path, index, meta);
+
+            {
+                var pendingIdVisitor = new ValueCollectingVisitor(this, isCaseSensitive: false,
+                    K_PLAYER_ID,
+                    K_INSTANCE_ID
+                );
+                pendingIdVisitor.WithOnExit(values => pendingProperties = values);
+
+                yield return pendingIdVisitor;
+            }
+
+            {
+                pendingCharacterVisitor = new CharacterInstanceVisitor($"{MatchedPath}.Value.RawData.SaveParameter");
+
+                foreach (var v in pendingCharacterVisitor.VisitCharacterBegin())
+                    yield return v;
+
+                yield return pendingCharacterVisitor;
+            }
+        }
+
+        public override void VisitMapEntryEnd(string path, int index, MapPropertyMeta meta)
+        {
+            logger.Verbose("Ending object read");
+            pendingCharacterVisitor.VisitCharacterEnd();
+
+            if (pendingCharacterVisitor.Result != null)
+            {
+                logger.Verbose("Generated valid character instance");
+                var instance = pendingCharacterVisitor.Result;
+
+                instance.InstanceId = (Guid)pendingProperties[K_INSTANCE_ID];
+                instance.PlayerId = (Guid?)pendingProperties[K_PLAYER_ID];
+
+                Result.Add(instance);
+            }
+
+            pendingCharacterVisitor = null;
+            pendingProperties = null;
+        }
+    }
+
+    // ".SaveParameterArray.SaveParameterArray.SaveParameter.Gender"
+    // ".SaveParameterArray.SaveParameterArray.InstanceId.InstanceId"
+
+    class DimensionalPalStorage_CharacterInstanceVisitor : IVisitor
+    {
+        private static ILogger logger = Log.ForContext<CharacterInstanceVisitor>();
+
+        public DimensionalPalStorage_CharacterInstanceVisitor() : base(".SaveParameterArray") { }
+
+        public List<GvasCharacterInstance> Result = new List<GvasCharacterInstance>();
+
+        private Dictionary<string, object> pendingProperties;
+        private CharacterInstanceVisitor pendingCharacterVisitor;
+
+        const string K_INSTANCE_ID = ".SaveParameterArray.InstanceId.InstanceId";
+        const string K_PLAYER_ID = ".SaveParameterArray.InstanceId.PlayerUId";
+
+
+        public override IEnumerable<IVisitor> VisitArrayEntryBegin(string path, int index, ArrayPropertyMeta meta)
+        {
+            logger.Verbose("Beginning object read");
+            base.VisitArrayEntryBegin(path, index, meta);
+
+            {
+                var pendingIdVisitor = new ValueCollectingVisitor(this, isCaseSensitive: false,
+                    K_PLAYER_ID,
+                    K_INSTANCE_ID
+                );
+                pendingIdVisitor.WithOnExit(values => pendingProperties = values);
+
+                yield return pendingIdVisitor;
+            }
+
+            {
+                pendingCharacterVisitor = new CharacterInstanceVisitor($"{MatchedPath}.SaveParameterArray.SaveParameter");
+
+                foreach (var v in pendingCharacterVisitor.VisitCharacterBegin())
+                    yield return v;
+
+                yield return pendingCharacterVisitor;
+            }
+        }
+
+        public override void VisitArrayEntryEnd(string path, int index, ArrayPropertyMeta meta)
+        {
+            logger.Verbose("Ending object read");
+            pendingCharacterVisitor.VisitCharacterEnd();
+
+            if (pendingCharacterVisitor.Result != null)
+            {
+                logger.Verbose("Generated valid character instance");
+                var instance = pendingCharacterVisitor.Result;
+
+                instance.InstanceId = (Guid)pendingProperties[K_INSTANCE_ID];
+                instance.PlayerId = (Guid?)pendingProperties[K_PLAYER_ID];
+
+                Result.Add(instance);
+            }
+
+            pendingCharacterVisitor = null;
+            pendingProperties = null;
         }
     }
 }
