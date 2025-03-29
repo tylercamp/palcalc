@@ -88,6 +88,11 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
     }
 
+    public class GlobalPalStorageContainerViewModel(DefaultSearchableContainerViewModel container) :
+        IContainerSource(LocalizationCodes.LC_PAL_LOC_GPS_FULL.Bind(), container)
+    {
+    }
+
     public class BaseAssignedPalsTreeNodeViewModel(DefaultSearchableContainerViewModel baseContainer) :
         IContainerSource(LocalizationCodes.LC_BASE_ASSIGNED_LABEL.Bind(), baseContainer)
     {
@@ -260,6 +265,11 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 guildContainers[guildId].Add(container);
             }
 
+            var gpsContainer = containers.OfType<DefaultSearchableContainerViewModel>().FirstOrDefault(c => c.DetectedType == LocationType.GlobalPalStorage);
+            var gpsNode = gpsContainer == null ? null : (
+                new GlobalPalStorageContainerViewModel(gpsContainer)
+            );
+
             var standardNodes = source.Guilds
                 .Select(guild => new GuildTreeNodeViewModel(source, guild, guildContainers.GetValueOrElse(guild.Id, [])))
                 .Cast<IOwnerTreeNode>();
@@ -271,7 +281,12 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     .ToList()
             );
 
-            RootNodes = standardNodes.Append(customNode).ToList();
+            RootNodes = [
+                gpsNode,
+                .. standardNodes,
+                customNode
+            ];
+            RootNodes.RemoveAll(n => n == null);
         }
 
         private IOwnerTreeNode selectedNode;
@@ -316,6 +331,6 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
         public ICommand CreateCustomContainerCommand { get; set; }
 
         public IEnumerable<IContainerSource> AllContainerSources =>
-            RootNodes.SelectMany(n => n.AllChildren).OfType<IContainerSource>();
+            RootNodes.Concat(RootNodes.SelectMany(n => n.AllChildren)).OfType<IContainerSource>();
     }
 }

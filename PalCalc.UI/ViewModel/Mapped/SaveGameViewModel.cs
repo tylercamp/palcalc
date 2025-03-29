@@ -52,11 +52,12 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         private static SaveGameViewModel designerInstance;
         public static SaveGameViewModel DesignerInstance =>
-            designerInstance ??= new SaveGameViewModel(CachedSaveGame.SampleForDesignerView.UnderlyingSave);
+            designerInstance ??= new SaveGameViewModel(null, CachedSaveGame.SampleForDesignerView.UnderlyingSave);
 
-        public SaveGameViewModel(ISaveGame value)
+        public SaveGameViewModel(ISavesLocation containerLocation, ISaveGame value)
         {
             Value = value;
+            ContainerLocation = containerLocation;
 
             ReadSaveDescription();
 
@@ -68,7 +69,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
             ReloadSaveCommand = new RelayCommand(() =>
             {
-                Storage.ReloadSave(value, PalDB.LoadEmbedded(), GameSettingsViewModel.Load(value).ModelObject);
+                Storage.ReloadSave(containerLocation, value, PalDB.LoadEmbedded(), GameSettingsViewModel.Load(value).ModelObject);
             });
 
             Storage.SaveReloaded += RespondToChanges;
@@ -132,7 +133,14 @@ namespace PalCalc.UI.ViewModel.Mapped
             private set => SetProperty(ref this.value, value);
         }
 
-        public CachedSaveGame CachedValue => Storage.LoadSave(Value, PalDB.LoadEmbedded(), GameSettingsViewModel.Load(Value).ModelObject);
+        private ISavesLocation containerLocation;
+        public ISavesLocation ContainerLocation
+        {
+            get => containerLocation;
+            private set => SetProperty(ref this.containerLocation, value);
+        }
+
+        public CachedSaveGame CachedValue => Storage.LoadSave(ContainerLocation, Value, PalDB.LoadEmbedded(), GameSettingsViewModel.Load(Value).ModelObject);
 
         private SaveCustomizationsViewModel customizations = null;
         public SaveCustomizationsViewModel Customizations => customizations ??= new SaveCustomizationsViewModel(this);

@@ -21,6 +21,7 @@ namespace PalCalc.Model
                 case LocationType.PlayerParty: return token.ToObject<PlayerPartyContainer>();
                 case LocationType.ViewingCage: return token.ToObject<ViewingCageContainer>();
                 case LocationType.DimensionalPalStorage: return token.ToObject<DimensionalPalStorageContainer>();
+                case LocationType.GlobalPalStorage: return token.ToObject<GlobalPalStorageContainer>();
                 default: throw new NotImplementedException();
             }
         }

@@ -322,6 +322,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_INCLUDE_PALS_GPS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_INCLUDE_PALS_IN_CAGES,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -366,6 +370,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to Tab | X | Y.
         /// </summary>
         LC_LOC_COORD_DPS,
+        /// <summary>
+        ///   Looks up a localized string similar to Tab | X | Y.
+        /// </summary>
+        LC_LOC_COORD_GPS,
         /// <summary>
         ///   Looks up a localized string similar to Tab | X | Y.
         /// </summary>
@@ -534,6 +542,14 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_PAL_LOC_DPS_SHORT,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LOC_GPS_FULL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LOC_GPS_SHORT,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -879,6 +895,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_SOLVER_STATUS_FINISHED,
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_STATUS_INITIALIZING,
+        /// <summary>
         ///   Looks up a localized string similar to NumProcessed | WorkSize.
         /// </summary>
         LC_SOLVER_STEP_STATUS_BREEDING,
@@ -1002,10 +1022,6 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_WINDOW_TITLE,
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        LV_SOLVER_STATUS_INITIALIZING,
     }
 
 }

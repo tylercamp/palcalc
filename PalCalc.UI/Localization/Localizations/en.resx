@@ -322,6 +322,9 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_INCLUDE_PALS_AT_BASE" xml:space="preserve">
     <value>Include Pals at Base</value>
   </data>
+  <data name="LC_INCLUDE_PALS_GPS" xml:space="preserve">
+    <value>Include Pals in Global Pal Storage</value>
+  </data>
   <data name="LC_INCLUDE_PALS_IN_CAGES" xml:space="preserve">
     <value>Include Pals in Viewing Cages</value>
   </data>
@@ -354,6 +357,9 @@ Please find the generated ZIP file to send with any support questions:
   </data>
   <data name="LC_LOC_COORD_DPS" xml:space="preserve">
     <value>Dim. storage, tab {Tab} at ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_COORD_GPS" xml:space="preserve">
+    <value>Global storage, tab {Tab} at ({X},{Y})</value>
   </data>
   <data name="LC_LOC_COORD_PALBOX" xml:space="preserve">
     <value>Palbox, tab {Tab} at ({X},{Y})</value>
@@ -484,6 +490,12 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   </data>
   <data name="LC_PAL_LOC_DPS_SHORT" xml:space="preserve">
     <value>Dim. Storage</value>
+  </data>
+  <data name="LC_PAL_LOC_GPS_FULL" xml:space="preserve">
+    <value>Global Pal Storage</value>
+  </data>
+  <data name="LC_PAL_LOC_GPS_SHORT" xml:space="preserve">
+    <value>Global Storage</value>
   </data>
   <data name="LC_PAL_LOC_PALBOX" xml:space="preserve">
     <value>Palbox</value>
@@ -770,6 +782,9 @@ Higher values linearly affect time required, depending on how many types of pals
   <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve">
     <value>Finished (took {Duration})</value>
   </data>
+  <data name="LC_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
+    <value>Initializing</value>
+  </data>
   <data name="LC_SOLVER_STEP_STATUS_BREEDING" xml:space="preserve">
     <value>Processed {NumProcessed} / {WorkSize} breeding pairs</value>
   </data>
@@ -862,8 +877,5 @@ Higher values linearly affect time required, depending on how many types of pals
   </data>
   <data name="LC_WINDOW_TITLE" xml:space="preserve">
     <value>Pal Calc</value>
-  </data>
-  <data name="LV_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
-    <value>Initializing</value>
   </data>
 </root>

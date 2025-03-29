@@ -22,6 +22,7 @@ namespace PalCalc.UI
                 LocationType.ViewingCage => LocalizationCodes.LC_PAL_LOC_VIEWING_CAGE.Bind(),
                 LocationType.Custom => LocalizationCodes.LC_PAL_LOC_CUSTOM.Bind(),
                 LocationType.DimensionalPalStorage => LocalizationCodes.LC_PAL_LOC_DPS_SHORT.Bind(),
+                LocationType.GlobalPalStorage => LocalizationCodes.LC_PAL_LOC_GPS_SHORT.Bind(),
                 _ => throw new NotImplementedException()
             };
 
@@ -34,6 +35,7 @@ namespace PalCalc.UI
                 LocationType.ViewingCage => LocalizationCodes.LC_PAL_LOC_VIEWING_CAGE.Bind(),
                 LocationType.Custom => LocalizationCodes.LC_PAL_LOC_CUSTOM.Bind(),
                 LocationType.DimensionalPalStorage => LocalizationCodes.LC_PAL_LOC_DPS_FULL.Bind(),
+                LocationType.GlobalPalStorage => LocalizationCodes.LC_PAL_LOC_GPS_FULL.Bind(),
                 _ => throw new NotImplementedException()
             };
 

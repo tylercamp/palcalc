@@ -49,7 +49,7 @@ internal class Program
         var saveGame = DirectSavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LevelMeta.ReadGameOptions().PlayerLevel);
         Console.WriteLine("Using {0}", saveGame);
 
-        var savedInstances = saveGame.Level.ReadCharacterData(db, GameSettings.Defaults, []).Pals;
+        var savedInstances = saveGame.Level.ReadCharacterData(db, GameSettings.Defaults, [], null).Pals;
         Console.WriteLine("Loaded save game");
 
         var solver = new BreedingSolver(

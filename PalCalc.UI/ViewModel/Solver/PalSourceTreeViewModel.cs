@@ -74,6 +74,8 @@ namespace PalCalc.UI.ViewModel.Solver
                     LocationType.ViewingCage => cageContainerIds.Contains(p.Location.ContainerId),
                     // (Pals in custom containers aren't expected to have an "owner", and are handled separately in MainWindowViewModel anyway)
                     LocationType.Custom => false,
+                    // (Mostly the same content for GPS; the original pal owner might not even be in this save file)
+                    LocationType.GlobalPalStorage => false,
                     _ => throw new NotImplementedException()
                 });
         }

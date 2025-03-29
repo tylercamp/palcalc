@@ -275,7 +275,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 switch (obj.CurrentPhase)
                 {
                     case SolverPhase.Initializing:
-                        SolverStatusMessage = LocalizationCodes.LV_SOLVER_STATUS_INITIALIZING.Bind();
+                        SolverStatusMessage = LocalizationCodes.LC_SOLVER_STATUS_INITIALIZING.Bind();
                         overallStep = 0;
                         lastStepIndex = -1;
 

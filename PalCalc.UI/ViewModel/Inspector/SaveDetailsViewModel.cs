@@ -72,7 +72,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             Containers = rawData.ContainerContents.Select(c =>
             {
                 var containedPals = c.Slots
-                    .Select(s => csg.OwnedPals.SingleOrDefault(p => p.InstanceId == s.InstanceId.ToString()))
+                    .Select(s => csg.OwnedPals.SingleOrDefault(p => p.InstanceId == s.InstanceId.ToString() && p.Location.ContainerId == c.Id))
                     .SkipNull()
                     .ToList();
 

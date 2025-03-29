@@ -56,7 +56,7 @@ var save3 = new StandardSaveGame(@"C:\Users\algor\AppData\Local\Pal\Saved\SaveGa
 
 var v2 = new MapObjectVisitor(GvasMapObject.GlobalPalBoxObjectId, GvasMapObject.DimensionalPalStorageObjectId);
 var level3 = save3.Level.ParseGvas(true, v2);
-var dataLevel3 = save3.Level.ReadCharacterData(db, GameSettings.Defaults, save3.Players);
+var dataLevel3 = save3.Level.ReadCharacterData(db, GameSettings.Defaults, save3.Players, dsl.GlobalPalStorage);
 var rawDataLevel3 = save3.Level.ReadRawCharacterData();
 
 foreach (var pl in save3.Players)
@@ -134,7 +134,7 @@ foreach (var kvp in containersGvas)
     }
 }
 
-var chars = save2.Level.ReadCharacterData(PalDB.LoadEmbedded(), GameSettings.Defaults, save2.Players);
+var chars = save2.Level.ReadCharacterData(PalDB.LoadEmbedded(), GameSettings.Defaults, save2.Players, null);
 var p = chars.Pals.Where(p => p.Pal.Name == "Jetragon" && p.PassiveSkills.Select(t => t.Name).Intersect(new string[] { "Legend", "Nimble", "Runner", "Swift" }).Count() == 4).Single();
 
 return;
@@ -158,7 +158,7 @@ foreach (var gameFolder in saveFolders)
         var localgvas = save.LocalData.ParseGvas(true);
 
         var meta = save.LevelMeta.ReadGameOptions();
-        var characters = save.Level.ReadCharacterData(db, GameSettings.Defaults, save.Players);
+        var characters = save.Level.ReadCharacterData(db, GameSettings.Defaults, save.Players, gameFolder.GlobalPalStorage);
         var gvas = save.Level.ParseGvas(true);
 
         var visitor = new ReferenceCollectingVisitor();

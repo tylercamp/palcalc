@@ -34,6 +34,7 @@ namespace PalCalc.Model
             { LocationType.Base, 5 },
             { LocationType.ViewingCage, 6 },
             { LocationType.DimensionalPalStorage, 6 },
+            { LocationType.GlobalPalStorage, 6 },
 
             // (not real, just so it's defined)
             { LocationType.Custom, 8 },
@@ -43,6 +44,7 @@ namespace PalCalc.Model
         {
             { LocationType.Palbox, 5 },
             { LocationType.DimensionalPalStorage, 5 },
+            { LocationType.GlobalPalStorage, 5 },
 
             { LocationType.PlayerParty, null },
             { LocationType.Base, null },

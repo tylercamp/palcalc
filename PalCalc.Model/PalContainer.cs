@@ -60,4 +60,13 @@ namespace PalCalc.Model
         [JsonIgnore]
         public LocationType Type => LocationType.DimensionalPalStorage;
     }
+
+    public class GlobalPalStorageContainer : IPalContainer
+    {
+        public string Id { get; set; }
+        public string PlayerId { get; set; }
+
+        [JsonIgnore]
+        public LocationType Type => LocationType.GlobalPalStorage;
+    }
 }

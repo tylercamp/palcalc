@@ -679,6 +679,9 @@
   <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve">
     <value>已完成 (用时{Duration})</value>
   </data>
+  <data name="LC_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
+    <value>初始化中</value>
+  </data>
   <data name="LC_SOLVER_STEP_STATUS_BREEDING" xml:space="preserve">
     <value>已遍历{NumProcessed} / {WorkSize}对配种组合</value>
   </data>
@@ -756,8 +759,5 @@
   </data>
   <data name="LC_WINDOW_TITLE" xml:space="preserve">
     <value>Pal Calc</value>
-  </data>
-  <data name="LV_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
-    <value>初始化中</value>
   </data>
 </root>

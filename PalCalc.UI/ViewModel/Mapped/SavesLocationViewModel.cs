@@ -26,7 +26,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             var isXbox = sl is XboxSavesLocation;
 
             SaveGames = new ReadOnlyObservableCollection<ISaveGameViewModel>(
-                new ObservableCollection<ISaveGameViewModel>(sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sg)))
+                new ObservableCollection<ISaveGameViewModel>(sl.ValidSaveGames.Select(sg => new SaveGameViewModel(sl, sg)))
             );
 
             if (sl.FolderPath == null)
@@ -63,7 +63,7 @@ namespace PalCalc.UI.ViewModel.Mapped
     {
         public ManualSavesLocationViewModel(IEnumerable<ISaveGame> initialManualSaves)
         {
-            saveGames = new ObservableCollection<ISaveGameViewModel>(initialManualSaves.Select(s => new SaveGameViewModel(s)).OrderByDescending(vm => vm.LastModified));
+            saveGames = new ObservableCollection<ISaveGameViewModel>(initialManualSaves.Select(s => new SaveGameViewModel(null, s)).OrderByDescending(vm => vm.LastModified));
             saveGames.Add(new NewManualSaveGameViewModel());
             saveGames.Add(new NewFakeSaveGameViewModel());
 
@@ -81,7 +81,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         // assume `path` has already been validated
         public SaveGameViewModel Add(ISaveGame saveGame)
         {
-            var vm = new SaveGameViewModel(saveGame);
+            var vm = new SaveGameViewModel(null, saveGame);
             var orderedIndex = saveGames
                 .OfType<SaveGameViewModel>()
                 .Append(vm)

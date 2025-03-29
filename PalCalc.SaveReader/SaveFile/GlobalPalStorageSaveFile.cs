@@ -29,7 +29,7 @@ namespace PalCalc.SaveReader.SaveFile
         {
             var db = PalDB.LoadEmbedded();
             var pals = ReadRawCharacters()
-                .Select(c => c.ToPalInstance(db, LocationType.DimensionalPalStorage))
+                .Select(c => c.ToPalInstance(db, LocationType.GlobalPalStorage))
                 .ZipWithIndex()
                 .Select(p =>
                 {

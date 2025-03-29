@@ -595,7 +595,7 @@
   <data name="LC_WINDOW_TITLE" xml:space="preserve">
     <value />
   </data>
-  <data name="LV_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
+  <data name="LC_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
     <value />
   </data>
   <data name="LC_CUSTOM_CONTAINERS" xml:space="preserve">
@@ -822,5 +822,17 @@
   </data>
   <data name="LC_LOC_COORD_DPS" xml:space="preserve">
     <value>Tab | X | Y</value>
+  </data>
+  <data name="LC_INCLUDE_PALS_GPS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LOC_COORD_GPS" xml:space="preserve">
+    <value>Tab | X | Y</value>
+  </data>
+  <data name="LC_PAL_LOC_GPS_FULL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LOC_GPS_SHORT" xml:space="preserve">
+    <value />
   </data>
 </root>

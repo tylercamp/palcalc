@@ -125,8 +125,8 @@ namespace PalCalc.UI.ViewModel.Solver
                             case CompositeOwnedPalReference corl:
                                 return new List<PalLocation>()
                                 {
-                                                corl.Male.UnderlyingInstance.Location,
-                                                corl.Female.UnderlyingInstance.Location
+                                    corl.Male.UnderlyingInstance.Location,
+                                    corl.Female.UnderlyingInstance.Location
                                 };
 
                             default:
@@ -141,7 +141,8 @@ namespace PalCalc.UI.ViewModel.Solver
                         LocationType.Base => 2,
                         LocationType.ViewingCage => 3,
                         LocationType.PlayerParty => 4,
-                        LocationType.Custom => 5,
+                        LocationType.GlobalPalStorage => 5,
+                        LocationType.Custom => 6,
                         _ => throw new NotImplementedException()
                     })
                     .Select(g => LocalizationCodes.LC_PAL_LOC_COUNT.Bind(

@@ -106,10 +106,18 @@ namespace PalCalc.SaveReader.SaveFile
             }).SkipNull().ToList();
         }
 
-        private List<IPalContainer> CollectContainers(GameSettings settings, RawLevelSaveData parsed, List<PlayerMeta> players, IEnumerable<DimensionalPalStorageContainer> dpsContainers)
+        private List<IPalContainer> CollectContainers(
+            GameSettings settings,
+            RawLevelSaveData parsed,
+            List<PlayerMeta> players,
+            IEnumerable<DimensionalPalStorageContainer> dpsContainers,
+            GlobalPalStorageContainer gpsContainer
+        )
         {
             var instanceOwners = parsed.Characters.Where(c => c.OwnerPlayerId != null).ToDictionary(c => c.InstanceId, c => c.OwnerPlayerId.Value);
             var definiteContainers = CollectDefiniteContainers(parsed, players, instanceOwners).Concat(dpsContainers).ToList();
+
+            if (gpsContainer != null) definiteContainers.Add(gpsContainer);
 
             int numImpliedBases = 0;
 
@@ -159,7 +167,7 @@ namespace PalCalc.SaveReader.SaveFile
 
         // note: `settings` only used for pal container sizes, in case player saves are unavailable and we need to
         //       infer the container type based on their size
-        public virtual LevelSaveData ReadCharacterData(PalDB db, GameSettings settings, List<PlayersSaveFile> playersFiles)
+        public virtual LevelSaveData ReadCharacterData(PalDB db, GameSettings settings, List<PlayersSaveFile> playersFiles, GlobalPalStorageSaveFile gpsFile)
         {
             var players = new List<PlayerMeta>();
             var dpsData = new List<DimensionalPalStorageData>();
@@ -185,9 +193,17 @@ namespace PalCalc.SaveReader.SaveFile
                 }
             }
 
+            var gpsData = gpsFile?.ReadPals("GLOBAL_PAL_STORAGE");
+            var gpsContainer = gpsData == null ? null : new GlobalPalStorageContainer()
+            {
+                Id = gpsData.ContainerId,
+                // the first listed player should be the owner of the save file, and the save's owner has the global pal storage
+                PlayerId = players.First().PlayerId,
+            };
+
             var parsed = ReadRawCharacterData();
 
-            var detectedContainers = CollectContainers(settings, parsed, players, dpsContainerByPlayerId.Values);
+            var detectedContainers = CollectContainers(settings, parsed, players, dpsContainerByPlayerId.Values, gpsContainer);
 
             var result = new LevelSaveData()
             {
@@ -256,11 +272,13 @@ namespace PalCalc.SaveReader.SaveFile
             }
 
             result.Pals.AddRange(dpsData.SelectMany(d => d.Pals));
+            if (gpsData != null)
+                result.Pals.AddRange(gpsData.Pals);
 
             var validPlayerIds = result.Players.Select(p => p.PlayerId);
             var allPlayerIds = validPlayerIds
                 .Concat(result.Guilds.SelectMany(g => g.MemberIds))
-                .Concat(result.Pals.Select(p => p.OwnerPlayerId))
+                .Concat(result.Pals.Where(p => p.Location.Type != LocationType.GlobalPalStorage).Select(p => p.OwnerPlayerId))
                 .Distinct()
                 .ToList();
 

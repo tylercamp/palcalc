@@ -21,7 +21,7 @@ namespace PalCalc.UI.Model
 {
     public class CachedSaveGame
     {
-        private static readonly string SaveReaderVersion = "v30";
+        private static readonly string SaveReaderVersion = "v34";
 
         public CachedSaveGame(ISaveGame underlyingSave)
         {
@@ -155,10 +155,10 @@ namespace PalCalc.UI.Model
                 DirectSavesLocation.AllLocal
                     .SelectMany(l => l.ValidSaveGames)
                     .OrderByDescending(g => g.LevelMeta.ReadGameOptions().PlayerLevel)
-                    .Select(g => FromSaveGame(g, PalDB.LoadEmbedded(), GameSettings.Defaults))
+                    .Select(g => FromSaveGame(null, g, PalDB.LoadEmbedded(), GameSettings.Defaults))
                     .First();
 
-        public static CachedSaveGame FromSaveGame(ISaveGame game, PalDB db, GameSettings settings)
+        public static CachedSaveGame FromSaveGame(ISavesLocation containerLocation, ISaveGame game, PalDB db, GameSettings settings)
         {
             // save-load may start from anywhere, and Dispatcher.Current isn't guaranteed to
             // match the UI thread
@@ -166,7 +166,7 @@ namespace PalCalc.UI.Model
             {
                 return Application.Current.Dispatcher.Invoke(() =>
                 {
-                    return FromSaveGame(game, db, settings);
+                    return FromSaveGame(containerLocation, game, db, settings);
                 });
             }
 
@@ -193,7 +193,7 @@ namespace PalCalc.UI.Model
                     // being able to load the data
                     try { meta = game.LevelMeta.ReadGameOptions(); } catch { }
 
-                    var charData = game.Level.ReadCharacterData(db, settings, game.Players);
+                    var charData = game.Level.ReadCharacterData(db, settings, game.Players, containerLocation?.GlobalPalStorage);
 
                     return new CachedSaveGame(game)
                     {

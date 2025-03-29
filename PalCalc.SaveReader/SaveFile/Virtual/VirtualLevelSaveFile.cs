@@ -25,7 +25,7 @@ namespace PalCalc.SaveReader.SaveFile.Virtual
             };
         }
 
-        public override LevelSaveData ReadCharacterData(PalDB db, GameSettings settings, List<PlayersSaveFile> playersFiles)
+        public override LevelSaveData ReadCharacterData(PalDB db, GameSettings settings, List<PlayersSaveFile> playersFiles, GlobalPalStorageSaveFile gpsFile)
         {
             return new LevelSaveData()
             {

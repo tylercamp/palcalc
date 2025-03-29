@@ -184,12 +184,23 @@ namespace PalCalc.UI.ViewModel
                 {
                     foreach (var pal in PalSource.SelectedSource.Filter(sourceSave.CachedValue))
                     {
+                        if (pal.Location.Type == LocationType.GlobalPalStorage)
+                            continue;
+
                         if (!CurrentPalSpecifier.IncludeBasePals && pal.Location.Type == LocationType.Base)
                             continue;
 
                         if (!CurrentPalSpecifier.IncludeCagedPals && pal.Location.Type == LocationType.ViewingCage)
                             continue;
 
+                        yield return pal;
+                    }
+                }
+
+                if (CurrentPalSpecifier.IncludeGlobalStoragePals)
+                {
+                    foreach (var pal in sourceSave.CachedValue.OwnedPals.Where(p => p.Location.Type == LocationType.GlobalPalStorage))
+                    {
                         yield return pal;
                     }
                 }

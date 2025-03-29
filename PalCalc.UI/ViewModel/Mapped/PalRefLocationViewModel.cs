@@ -69,7 +69,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 IsSinglePlayer = source == null || source.Players.Count == 1;
 
-                if (ownedLoc.Location.Type != LocationType.Custom)
+                if (ownedLoc.Location.Type != LocationType.Custom && ownedLoc.Location.Type != LocationType.GlobalPalStorage)
                 {
                     var rawOwnerName = source?.PlayersById?.GetValueOrDefault(ownedLoc.OwnerId)?.Name;
 
@@ -160,6 +160,18 @@ namespace PalCalc.UI.ViewModel.Mapped
                             Tab = dpsCoord.Tab,
                             X = dpsCoord.X,
                             Y = dpsCoord.Y
+                        }
+                    );
+                    break;
+
+                case LocationType.GlobalPalStorage:
+                    var gpsCoord = PalDisplayCoord.FromLocation(settings, ownedLoc.Location);
+                    LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_GPS.Bind(
+                        new
+                        {
+                            Tab = gpsCoord.Tab,
+                            X = gpsCoord.X,
+                            Y = gpsCoord.Y
                         }
                     );
                     break;
