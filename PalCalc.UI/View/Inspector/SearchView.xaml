@@ -92,6 +92,9 @@
                     <DataTemplate DataType="{x:Type svm:PlayerPartyContainerViewModel}">
                         <TextBlock Text="{Binding SearchedLabel.Value}" />
                     </DataTemplate>
+                    <DataTemplate DataType="{x:Type svm:PlayerDimensionalPalStorageContainerViewModel}">
+                        <TextBlock Text="{Binding SearchedLabel.Value}" />
+                    </DataTemplate>
                     <DataTemplate DataType="{x:Type svm:BaseAssignedPalsTreeNodeViewModel}">
                         <TextBlock Text="{Binding SearchedLabel.Value}" />
                     </DataTemplate>

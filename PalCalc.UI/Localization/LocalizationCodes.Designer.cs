@@ -525,6 +525,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_PAL_LOC_DPS_FULL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PAL_LOC_DPS_SHORT,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_PAL_LOC_PALBOX,
         /// <summary>
         ///   Looks up a localized string similar to .

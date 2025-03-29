@@ -814,4 +814,10 @@
   <data name="LC_SAVE_GAME_ERROR" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_PAL_LOC_DPS_FULL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PAL_LOC_DPS_SHORT" xml:space="preserve">
+    <value />
+  </data>
 </root>

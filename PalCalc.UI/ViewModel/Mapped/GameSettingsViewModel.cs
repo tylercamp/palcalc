@@ -43,6 +43,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 { LocationType.Palbox, PalboxTabWidth },
 
+                { LocationType.DimensionalPalStorage, GameSettings.Defaults.LocationTypeGridWidths[LocationType.DimensionalPalStorage] },
                 { LocationType.PlayerParty, GameSettings.Defaults.LocationTypeGridWidths[LocationType.PlayerParty] },
                 { LocationType.ViewingCage, GameSettings.Defaults.LocationTypeGridWidths[LocationType.ViewingCage] },
                 { LocationType.Base, GameSettings.Defaults.LocationTypeGridWidths[LocationType.Base] },
@@ -52,6 +53,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 { LocationType.Palbox, PalboxTabHeight },
 
+                { LocationType.DimensionalPalStorage, GameSettings.Defaults.LocationTypeGridHeights[LocationType.DimensionalPalStorage] },
                 { LocationType.PlayerParty, GameSettings.Defaults.LocationTypeGridHeights[LocationType.PlayerParty] },
                 { LocationType.ViewingCage, GameSettings.Defaults.LocationTypeGridHeights[LocationType.ViewingCage] },
                 { LocationType.Base, GameSettings.Defaults.LocationTypeGridHeights[LocationType.Base] },

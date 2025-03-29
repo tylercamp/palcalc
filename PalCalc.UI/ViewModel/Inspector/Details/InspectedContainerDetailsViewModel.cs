@@ -38,7 +38,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
 
         public string Id => rawContainer.Id;
         public OwnerViewModel Owner => owner;
-        public ILocalizedText Type { get; } = locationType?.Label() ?? LocalizationCodes.LC_COMMON_UNKNOWN.Bind();
+        public ILocalizedText Type { get; } = locationType?.FullLabel() ?? LocalizationCodes.LC_COMMON_UNKNOWN.Bind();
 
         public MapCoordViewModel Coord { get; } = MapCoordViewModel.FromCoord(position);
     }

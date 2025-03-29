@@ -85,7 +85,7 @@ namespace PalCalc.SaveReader
                     {
                         var baseName = Path.GetFileNameWithoutExtension(f);
                         var dpsPath = $"{playersPath}/{baseName}_dps.sav";
-                        var dpsFile = File.Exists(dpsPath) ? new PlayersDpsSaveFile(new SingleFileSource(dpsPath), baseName) : null;
+                        var dpsFile = File.Exists(dpsPath) ? new PlayersDpsSaveFile(new SingleFileSource(dpsPath)) : null;
                         return new PlayersSaveFile(new SingleFileSource(f), dpsFile);
                     })
                     .ToList();

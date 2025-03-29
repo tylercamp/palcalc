@@ -23,6 +23,7 @@ namespace PalCalc.Model
 
         public string PartyContainerId { get; set; }
         public string PalboxContainerId { get; set; }
+        public string DimensionalPalStorageContainerId { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

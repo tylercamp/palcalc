@@ -147,7 +147,7 @@ namespace PalCalc.UI.ViewModel.Solver
                         new
                         {
                             Count = g.Count(),
-                            LocType = g.Key.Label(),
+                            LocType = g.Key.ShortLabel(),
                         }
                     ))
                     .ToList();

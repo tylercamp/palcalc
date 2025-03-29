@@ -476,6 +476,12 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
   <data name="LC_PAL_LOC_CUSTOM" xml:space="preserve">
     <value>(Custom)</value>
   </data>
+  <data name="LC_PAL_LOC_DPS_FULL" xml:space="preserve">
+    <value>Dimensional Pal Storage</value>
+  </data>
+  <data name="LC_PAL_LOC_DPS_SHORT" xml:space="preserve">
+    <value>Dim. Storage</value>
+  </data>
   <data name="LC_PAL_LOC_PALBOX" xml:space="preserve">
     <value>Palbox</value>
   </data>

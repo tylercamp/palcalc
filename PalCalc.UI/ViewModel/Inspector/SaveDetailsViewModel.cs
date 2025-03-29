@@ -65,6 +65,8 @@ namespace PalCalc.UI.ViewModel.Inspector
             var ownerPlayers = rawPlayers.Select(p => new OwnerViewModel(OwnerType.Player, new HardCodedText(playerNamesById[p.PlayerId]), p.PlayerId)).ToList();
             var ownerGuilds = rawData.Groups.Select(g => new OwnerViewModel(OwnerType.Guild, new HardCodedText(g.Name), g.Id)).ToList();
 
+            var groups = csg.OwnedPals.GroupBy(p => p.InstanceId).Select(g => g.ToList()).ToList().Where(g => g.Count > 1).ToList();
+
             var ownersById = (ownerPlayers.Concat(ownerGuilds)).ToDictionary(o => o.Id);
 
             Containers = rawData.ContainerContents.Select(c =>

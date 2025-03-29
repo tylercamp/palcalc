@@ -45,6 +45,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         {
             var sanitizedCharId = CharacterId.Replace("Boss_", "", StringComparison.InvariantCultureIgnoreCase);
 
+            if (sanitizedCharId == "None") return null;
             if (db.Humans.Any(h => h.InternalName == sanitizedCharId)) return null;
 
             var pal = db.Pals.FirstOrDefault(p => p.InternalName.Equals(sanitizedCharId, StringComparison.OrdinalIgnoreCase));

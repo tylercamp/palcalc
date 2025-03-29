@@ -68,6 +68,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 .Where(p => p.Location.Type switch
                 {
                     LocationType.PlayerParty => p.OwnerPlayerId == ModelObject.PlayerId,
+                    LocationType.DimensionalPalStorage => p.Location.ContainerId == ModelObject.DimensionalPalStorageContainerId,
                     LocationType.Palbox => p.OwnerPlayerId == ModelObject.PlayerId,
                     LocationType.Base => baseContainerIds.Contains(p.Location.ContainerId),
                     LocationType.ViewingCage => cageContainerIds.Contains(p.Location.ContainerId),

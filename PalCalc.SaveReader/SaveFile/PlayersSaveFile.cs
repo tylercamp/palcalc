@@ -13,12 +13,13 @@ namespace PalCalc.SaveReader.SaveFile
 {
     public class DimensionalPalStorageData
     {
-        public IPalContainer Container { get; internal set; }
+        public string ContainerId { get; internal set; }
         public List<PalInstance> Pals { get; internal set; }
     }
 
     public class PlayerMeta
     {
+        public string SaveFileId { get; set; }
         public string PlayerId { get; set; }
         public string InstanceId { get; set; }
 
@@ -27,7 +28,7 @@ namespace PalCalc.SaveReader.SaveFile
     }
 
     // Files in the `Players/` folder may also have a `_dps.sav` file, which stores the player's pals in Dimensional Pal Storage
-    public class PlayersDpsSaveFile(IFileSource files, string playerId) : ISaveFile(files)
+    public class PlayersDpsSaveFile(IFileSource files) : ISaveFile(files)
     {
         public virtual List<GvasCharacterInstance> ReadRawCharacters()
         {
@@ -36,10 +37,9 @@ namespace PalCalc.SaveReader.SaveFile
             return v.Result;
         }
 
-        public virtual DimensionalPalStorageData ReadPals()
+        public virtual DimensionalPalStorageData ReadPals(string containerId)
         {
             var db = PalDB.LoadEmbedded();
-            var containerId = $"{playerId}_DPS";
             var pals = ReadRawCharacters()
                 .Select(c => c.ToPalInstance(db, LocationType.DimensionalPalStorage))
                 .ZipWithIndex()
@@ -48,6 +48,8 @@ namespace PalCalc.SaveReader.SaveFile
                     // (`_dps` file has a plain, fixed array of entries. SlotIndex info seems to be the original loc the pal was stored before
                     // it was moved to DPS - ignore it)
                     var (c, i) = p;
+                    if (c == null) return null;
+
                     c.Location.Index = i;
                     c.Location.ContainerId = containerId;
                     return c;
@@ -57,11 +59,7 @@ namespace PalCalc.SaveReader.SaveFile
 
             return new()
             {
-                Container = new DimensionalPalStorageContainer()
-                {
-                    Id = containerId,
-                    PlayerId = playerId,
-                },
+                ContainerId = containerId,
                 Pals = pals,
             };
         }

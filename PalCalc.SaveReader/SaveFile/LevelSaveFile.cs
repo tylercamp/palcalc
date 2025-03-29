@@ -106,10 +106,10 @@ namespace PalCalc.SaveReader.SaveFile
             }).SkipNull().ToList();
         }
 
-        private List<IPalContainer> CollectContainers(GameSettings settings, RawLevelSaveData parsed, List<PlayerMeta> players)
+        private List<IPalContainer> CollectContainers(GameSettings settings, RawLevelSaveData parsed, List<PlayerMeta> players, IEnumerable<DimensionalPalStorageContainer> dpsContainers)
         {
             var instanceOwners = parsed.Characters.Where(c => c.OwnerPlayerId != null).ToDictionary(c => c.InstanceId, c => c.OwnerPlayerId.Value);
-            var definiteContainers = CollectDefiniteContainers(parsed, players, instanceOwners);
+            var definiteContainers = CollectDefiniteContainers(parsed, players, instanceOwners).Concat(dpsContainers).ToList();
 
             int numImpliedBases = 0;
 
@@ -161,10 +161,33 @@ namespace PalCalc.SaveReader.SaveFile
         //       infer the container type based on their size
         public virtual LevelSaveData ReadCharacterData(PalDB db, GameSettings settings, List<PlayersSaveFile> playersFiles)
         {
-            var players = playersFiles.Select(pf => pf.ReadPlayerContent()).SkipNull().ToList();
+            var players = new List<PlayerMeta>();
+            var dpsData = new List<DimensionalPalStorageData>();
+            var dpsContainerByPlayerId = new Dictionary<string, DimensionalPalStorageContainer>();
+
+            foreach (var pf in playersFiles)
+            {
+                var playerData = pf.ReadPlayerContent();
+                if (playerData == null) continue;
+
+                var dpsContainerId = $"{playerData.PlayerId}_DPS";
+                var dps = pf.DimensionalPalStorageSaveFile?.ReadPals(dpsContainerId);
+
+                players.Add(playerData);
+                if (dps != null)
+                {
+                    dpsData.Add(dps);
+                    dpsContainerByPlayerId.Add(playerData.PlayerId, new DimensionalPalStorageContainer()
+                    {
+                        PlayerId = playerData.PlayerId,
+                        Id = dpsContainerId,
+                    });
+                }
+            }
+
             var parsed = ReadRawCharacterData();
 
-            var detectedContainers = CollectContainers(settings, parsed, players);
+            var detectedContainers = CollectContainers(settings, parsed, players, dpsContainerByPlayerId.Values);
 
             var result = new LevelSaveData()
             {
@@ -202,6 +225,7 @@ namespace PalCalc.SaveReader.SaveFile
                         Level = gvasInstance.Level,
                         PalboxContainerId = detectedContainers.OfType<PalboxPalContainer>().FirstOrDefault(c => c.PlayerId == gvasInstance.PlayerId.ToString())?.Id,
                         PartyContainerId = detectedContainers.OfType<PlayerPartyContainer>().FirstOrDefault(c => c.PlayerId == gvasInstance.PlayerId.ToString())?.Id,
+                        DimensionalPalStorageContainerId = dpsContainerByPlayerId.GetValueOrDefault(gvasInstance.PlayerId.ToString())?.Id,
                     });
                 }
                 else
@@ -231,6 +255,8 @@ namespace PalCalc.SaveReader.SaveFile
                 }
             }
 
+            result.Pals.AddRange(dpsData.SelectMany(d => d.Pals));
+
             var validPlayerIds = result.Players.Select(p => p.PlayerId);
             var allPlayerIds = validPlayerIds
                 .Concat(result.Guilds.SelectMany(g => g.MemberIds))
@@ -248,7 +274,8 @@ namespace PalCalc.SaveReader.SaveFile
                     Name = $"Unknown ({unknownId[..8]}) (#{idx + 1})",
                     PlayerId = unknownId,
                     PalboxContainerId = detectedContainers.OfType<PalboxPalContainer>().FirstOrDefault(c => c.PlayerId == unknownId)?.Id,
-                    PartyContainerId = detectedContainers.OfType<PlayerPartyContainer>().FirstOrDefault(c => c.PlayerId == unknownId)?.Id
+                    PartyContainerId = detectedContainers.OfType<PlayerPartyContainer>().FirstOrDefault(c => c.PlayerId == unknownId)?.Id,
+                    DimensionalPalStorageContainerId = null,
                 });
             }
 

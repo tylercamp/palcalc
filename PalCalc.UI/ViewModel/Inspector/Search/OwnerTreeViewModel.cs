@@ -83,6 +83,11 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     {
     }
 
+    public class PlayerDimensionalPalStorageContainerViewModel(DefaultSearchableContainerViewModel container) :
+        IContainerSource(LocalizationCodes.LC_PAL_LOC_DPS_FULL.Bind(), container)
+    {
+    }
+
     public class BaseAssignedPalsTreeNodeViewModel(DefaultSearchableContainerViewModel baseContainer) :
         IContainerSource(LocalizationCodes.LC_BASE_ASSIGNED_LABEL.Bind(), baseContainer)
     {
@@ -122,14 +127,16 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
     public partial class PlayerTreeNodeViewModel(
         PlayerInstance player,
         DefaultSearchableContainerViewModel party,
-        DefaultSearchableContainerViewModel palbox
+        DefaultSearchableContainerViewModel palbox,
+        DefaultSearchableContainerViewModel dps
     ) : ObservableObject, IOwnerTreeNode
     {
         public ILocalizedText Label { get; } = LocalizationCodes.LC_PLAYER_LABEL.Bind(player.Name);
 
         public List<IOwnerTreeNode> Children { get; } = ((List<IOwnerTreeNode>)[
             party != null ? new PlayerPartyContainerViewModel(party) : null,
-            palbox != null ? new PlayerPalboxContainerViewModel(palbox) : null
+            palbox != null ? new PlayerPalboxContainerViewModel(palbox) : null,
+            dps != null ? new PlayerDimensionalPalStorageContainerViewModel(dps) : null,
         ]).SkipNull().ToList();
 
         [ObservableProperty]
@@ -151,7 +158,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     return new PlayerTreeNodeViewModel(
                         player: player,
                         party: relevantContainers.SingleOrDefault(c => c.Id == player.PartyContainerId),
-                        palbox: relevantContainers.SingleOrDefault(c => c.Id == player.PalboxContainerId)
+                        palbox: relevantContainers.SingleOrDefault(c => c.Id == player.PalboxContainerId),
+                        dps: relevantContainers.SingleOrDefault(c => c.Id == player.DimensionalPalStorageContainerId)
                     );
                 })
                 .Where(n => n.Children.Any())

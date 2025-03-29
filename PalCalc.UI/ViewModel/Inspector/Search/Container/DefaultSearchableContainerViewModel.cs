@@ -32,13 +32,14 @@ namespace PalCalc.UI.ViewModel.Inspector.Search.Container
             {
                 if (grids == null)
                 {
-                    if (DetectedType != LocationType.Palbox)
+                    var gridHeight = settings.LocationTypeGridHeights[DetectedType];
+                    if (gridHeight == null)
                     {
                         grids = [new DefaultContainerGridViewModel(SlotContents) { RowSize = RowSize }];
                     }
                     else
                     {
-                        var rowsPerPage = settings.LocationTypeGridHeights[DetectedType] ?? 5;
+                        var rowsPerPage = gridHeight.Value;
                         grids = SlotContents
                             .Batched(RowSize * rowsPerPage).ToList()
                             .ZipWithIndex()

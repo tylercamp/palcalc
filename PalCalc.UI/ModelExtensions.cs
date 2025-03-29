@@ -13,7 +13,7 @@ namespace PalCalc.UI
 {
     internal static class ModelExtensions
     {
-        public static ILocalizedText Label(this LocationType locType) =>
+        public static ILocalizedText ShortLabel(this LocationType locType) =>
             locType switch
             {
                 LocationType.Palbox => LocalizationCodes.LC_PAL_LOC_PALBOX.Bind(),
@@ -21,6 +21,19 @@ namespace PalCalc.UI
                 LocationType.PlayerParty => LocalizationCodes.LC_PAL_LOC_PARTY.Bind(),
                 LocationType.ViewingCage => LocalizationCodes.LC_PAL_LOC_VIEWING_CAGE.Bind(),
                 LocationType.Custom => LocalizationCodes.LC_PAL_LOC_CUSTOM.Bind(),
+                LocationType.DimensionalPalStorage => LocalizationCodes.LC_PAL_LOC_DPS_SHORT.Bind(),
+                _ => throw new NotImplementedException()
+            };
+
+        public static ILocalizedText FullLabel(this LocationType locType) =>
+            locType switch
+            {
+                LocationType.Palbox => LocalizationCodes.LC_PAL_LOC_PALBOX.Bind(),
+                LocationType.Base => LocalizationCodes.LC_PAL_LOC_BASE.Bind(),
+                LocationType.PlayerParty => LocalizationCodes.LC_PAL_LOC_PARTY.Bind(),
+                LocationType.ViewingCage => LocalizationCodes.LC_PAL_LOC_VIEWING_CAGE.Bind(),
+                LocationType.Custom => LocalizationCodes.LC_PAL_LOC_CUSTOM.Bind(),
+                LocationType.DimensionalPalStorage => LocalizationCodes.LC_PAL_LOC_DPS_FULL.Bind(),
                 _ => throw new NotImplementedException()
             };
 

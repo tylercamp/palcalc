@@ -33,6 +33,7 @@ namespace PalCalc.Model
             { LocationType.Palbox, 6 },
             { LocationType.Base, 5 },
             { LocationType.ViewingCage, 6 },
+            { LocationType.DimensionalPalStorage, 6 },
 
             // (not real, just so it's defined)
             { LocationType.Custom, 8 },
@@ -41,6 +42,7 @@ namespace PalCalc.Model
         public Dictionary<LocationType, int?> LocationTypeGridHeights { get; set; } = new()
         {
             { LocationType.Palbox, 5 },
+            { LocationType.DimensionalPalStorage, 5 },
 
             { LocationType.PlayerParty, null },
             { LocationType.Base, null },
