@@ -19,6 +19,7 @@ namespace PalCalc.Solver.ResultPruning
         public static int LocationOrderingOf(LocationType type) => type switch
         {
             LocationType.Palbox => 0,
+            LocationType.DimensionalPalStorage => 1,
 
             LocationType.Base => 100,
             LocationType.ViewingCage => 100,
@@ -36,6 +37,7 @@ namespace PalCalc.Solver.ResultPruning
                 var countsByLocationType = new Dictionary<LocationType, int>
                 {
                     { LocationType.Palbox, 0 },
+                    { LocationType.DimensionalPalStorage, 0 },
                     { LocationType.Base, 0 },
                     { LocationType.PlayerParty, 0 },
                     { LocationType.ViewingCage, 0 },
@@ -63,6 +65,7 @@ namespace PalCalc.Solver.ResultPruning
 
                 return
                     countsByLocationType[LocationType.Palbox] * LocationOrderingOf(LocationType.Palbox) +
+                    countsByLocationType[LocationType.DimensionalPalStorage] * LocationOrderingOf(LocationType.DimensionalPalStorage) +
                     countsByLocationType[LocationType.Base] * LocationOrderingOf(LocationType.Base) +
                     countsByLocationType[LocationType.PlayerParty] * LocationOrderingOf(LocationType.PlayerParty) +
                     countsByLocationType[LocationType.ViewingCage] * LocationOrderingOf(LocationType.ViewingCage) +

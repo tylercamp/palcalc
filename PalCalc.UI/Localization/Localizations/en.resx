@@ -352,6 +352,9 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_LOC_COORD_BASE" xml:space="preserve">
     <value>A base, slot ({X},{Y})</value>
   </data>
+  <data name="LC_LOC_COORD_DPS" xml:space="preserve">
+    <value>Dim. storage, tab {Tab} at ({X},{Y})</value>
+  </data>
   <data name="LC_LOC_COORD_PALBOX" xml:space="preserve">
     <value>Palbox, tab {Tab} at ({X},{Y})</value>
   </data>

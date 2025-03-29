@@ -820,4 +820,7 @@
   <data name="LC_PAL_LOC_DPS_SHORT" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_LOC_COORD_DPS" xml:space="preserve">
+    <value>Tab | X | Y</value>
+  </data>
 </root>

@@ -152,6 +152,18 @@ namespace PalCalc.UI.ViewModel.Mapped
                     );
                     break;
 
+                case LocationType.DimensionalPalStorage:
+                    var dpsCoord = PalDisplayCoord.FromLocation(settings, ownedLoc.Location);
+                    LocationCoordDescription = LocalizationCodes.LC_LOC_COORD_DPS.Bind(
+                        new
+                        {
+                            Tab = dpsCoord.Tab,
+                            X = dpsCoord.X,
+                            Y = dpsCoord.Y
+                        }
+                    );
+                    break;
+
                 default:
                     throw new NotImplementedException();
             }

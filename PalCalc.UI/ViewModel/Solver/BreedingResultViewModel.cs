@@ -137,10 +137,11 @@ namespace PalCalc.UI.ViewModel.Solver
                     .OrderBy(g => g.Key switch
                     {
                         LocationType.Palbox => 0,
-                        LocationType.Base => 1,
-                        LocationType.ViewingCage => 2,
-                        LocationType.PlayerParty => 3,
-                        LocationType.Custom => 4,
+                        LocationType.DimensionalPalStorage => 1,
+                        LocationType.Base => 2,
+                        LocationType.ViewingCage => 3,
+                        LocationType.PlayerParty => 4,
+                        LocationType.Custom => 5,
                         _ => throw new NotImplementedException()
                     })
                     .Select(g => LocalizationCodes.LC_PAL_LOC_COUNT.Bind(

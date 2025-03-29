@@ -365,6 +365,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to Tab | X | Y.
         /// </summary>
+        LC_LOC_COORD_DPS,
+        /// <summary>
+        ///   Looks up a localized string similar to Tab | X | Y.
+        /// </summary>
         LC_LOC_COORD_PALBOX,
         /// <summary>
         ///   Looks up a localized string similar to SlotNum.
