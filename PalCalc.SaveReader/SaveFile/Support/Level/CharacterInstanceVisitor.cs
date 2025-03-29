@@ -379,9 +379,6 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         }
     }
 
-    // ".SaveParameterArray.SaveParameterArray.SaveParameter.Gender"
-    // ".SaveParameterArray.SaveParameterArray.InstanceId.InstanceId"
-
     class DimensionalPalStorage_CharacterInstanceVisitor : IVisitor
     {
         private static ILogger logger = Log.ForContext<CharacterInstanceVisitor>();

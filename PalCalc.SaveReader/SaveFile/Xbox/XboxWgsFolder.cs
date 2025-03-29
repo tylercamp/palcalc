@@ -21,6 +21,8 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
         /// The proper, readable name of the file according to the Xbox save container index
         /// </summary>
         public string FileName { get; set; }
+
+        public override string ToString() => $"{FileName} @ {FilePath}";
     }
 
     public class XboxWgsFolder
@@ -56,13 +58,16 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
 
                 // save files that are part of a single save are grouped by the first part of their name
 
-                foreach (var saveFileFolder in dataContainer.Folders.Where(f => f.Name.Count(c => c == '-') != 0))
+                foreach (var saveFileFolder in dataContainer.Folders)
                 {
                     var saveGameFiles = ContainerFile.TryParse(saveFileFolder);
                     foreach (var saveFile in saveGameFiles.Where(f => File.Exists(f.Path)))
                     {
                         // all of the files are stored in their own folders, where the "real" file name is always just "Data"
-                        if (saveFile.Name != "Data") continue;
+                        if (saveFile.Name != "Data")
+                        {
+                            continue;
+                        }
 
                         if (File.Exists(saveFile.Path))
                             yield return new XboxWgsEntry() { FilePath = saveFile.Path, FileName = saveFileFolder.Name };

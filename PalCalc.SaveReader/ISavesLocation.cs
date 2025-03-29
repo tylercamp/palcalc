@@ -24,6 +24,8 @@ namespace PalCalc.SaveReader
 
         public IEnumerable<ISaveGame> AllSaveGames { get; }
         public IEnumerable<ISaveGame> ValidSaveGames => AllSaveGames.Where(g => g.IsValid);
+
+        public GlobalPalStorageSaveFile GlobalPalStorage { get; }
     }
 
     public class DirectSavesLocation : ISavesLocation
@@ -33,6 +35,8 @@ namespace PalCalc.SaveReader
         public DirectSavesLocation(string folderPath)
         {
             FolderPath = folderPath;
+
+            GlobalPalStorage = new GlobalPalStorageSaveFile(new SingleFileSource(Path.Join(folderPath, "GlobalPalStorage.sav")));
         }
 
         public string FolderPath { get; }
@@ -41,6 +45,7 @@ namespace PalCalc.SaveReader
         public IEnumerable<ISaveGame> AllSaveGames => Directory.EnumerateDirectories(FolderPath).Select(d => new StandardSaveGame(d));
         public IEnumerable<ISaveGame> ValidSaveGames => AllSaveGames.Where(g => g.IsValid);
 
+        public GlobalPalStorageSaveFile GlobalPalStorage { get; }
 
         private static List<DirectSavesLocation> FindAllForWindows()
         {
@@ -93,17 +98,17 @@ namespace PalCalc.SaveReader
                     var allSaveFiles = wgsFolder.Entries.ToList();
 
                     var saveGames = allSaveFiles
+                        .Where(xsf => xsf.FileName.Contains('-'))
                         .GroupBy(xsf => xsf.FileName.Split('-')[0])
-                        .Select(g =>
-                        {
-                            var saveId = g.Key;
-                            return new XboxSaveGame(wgsFolder, g.Key);
-                        })
+                        .Select(g => new XboxSaveGame(wgsFolder, g.Key))
                         .ToList();
 
                     if (saveGames.Count == 0) continue;
 
-                    result.Add(new XboxSavesLocation(wgsFolder.UserBasePath, saveGames));
+                    var gpsFile = new XboxFileSource(wgsFolder, n => n == "GlobalPalStorage");
+                    var gpsSave = new GlobalPalStorageSaveFile(gpsFile);
+
+                    result.Add(new XboxSavesLocation(wgsFolder.UserBasePath, gpsSave, saveGames));
                 }
                 catch (Exception ex)
                 {
@@ -114,11 +119,12 @@ namespace PalCalc.SaveReader
             return result;
         }
 
-        private XboxSavesLocation(string userFolderPath, List<XboxSaveGame> saves)
+        private XboxSavesLocation(string userFolderPath, GlobalPalStorageSaveFile gpsSave, List<XboxSaveGame> saves)
         {
             try
             {
                 FolderPath = userFolderPath;
+                GlobalPalStorage = gpsSave;
                 AllSaveGames = saves;
             }
             catch
@@ -132,6 +138,8 @@ namespace PalCalc.SaveReader
             AllSaveGames = new List<ISaveGame>();
             FolderPath = null;
         }
+
+        public GlobalPalStorageSaveFile GlobalPalStorage { get; }
 
         public string FolderPath { get; }
 

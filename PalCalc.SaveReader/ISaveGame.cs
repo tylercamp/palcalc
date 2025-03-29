@@ -37,9 +37,10 @@ namespace PalCalc.SaveReader
         // (don't check `WorldOption`, not present for linux-based server saves)
         bool IsValid { get; }
 
-        // Flag to indicate if the save game is on the lcoal file system
+        // Flag to indicate if the save game is on the local file system (affects whether `Updated` get used)
         bool IsLocal { get; }
 
+        // note: won't be invoked for changes to Global Pal Storage, which isn't tied to any specific save
         event Action<ISaveGame> Updated;
     }
 
@@ -219,22 +220,22 @@ namespace PalCalc.SaveReader
 
             if (filesByType.ContainsKey("Level"))
             {
-                Level = new LevelSaveFile(new XboxFileSource(wgsFolder, saveId, f => f.Split("-").First() == "Level"));
+                Level = new LevelSaveFile(new XboxGameFileSource(wgsFolder, saveId, f => f.Split("-").First() == "Level"));
             }
 
             if (filesByType.ContainsKey("LevelMeta"))
             {
-                LevelMeta = new LevelMetaSaveFile(new XboxFileSource(wgsFolder, saveId, f => f.Split("-").First() == "LevelMeta"));
+                LevelMeta = new LevelMetaSaveFile(new XboxGameFileSource(wgsFolder, saveId, f => f.Split("-").First() == "LevelMeta"));
             }
 
             if (filesByType.ContainsKey("LocalData"))
             {
-                LocalData = new LocalDataSaveFile(new XboxFileSource(wgsFolder, saveId, f => f.Split("-").First() == "LocalData"));
+                LocalData = new LocalDataSaveFile(new XboxGameFileSource(wgsFolder, saveId, f => f.Split("-").First() == "LocalData"));
             }
 
             if (filesByType.ContainsKey("WorldOption"))
             {
-                WorldOption = new WorldOptionSaveFile(new XboxFileSource(wgsFolder, saveId, f => f.Split("-").First() == "WorldOption"));
+                WorldOption = new WorldOptionSaveFile(new XboxGameFileSource(wgsFolder, saveId, f => f.Split("-").First() == "WorldOption"));
             }
 
             var playersFiles = filesByType.GetValueOrElse("Players", new List<XboxWgsEntry>());
@@ -242,8 +243,8 @@ namespace PalCalc.SaveReader
                 .Where(f => !f.FileName.EndsWith("_dps"))
                 .Select(f =>
                 {
-                    var mainSource = new XboxFileSource(wgsFolder, saveId, nameWithoutSaveId => f.FileName == $"{saveId}-{nameWithoutSaveId}");
-                    var dpsSource = new XboxFileSource(wgsFolder, saveId, nameWithoutSaveId => $"{f.FileName}_dps" == $"{saveId}-{nameWithoutSaveId}");
+                    var mainSource = new XboxGameFileSource(wgsFolder, saveId, nameWithoutSaveId => f.FileName == $"{saveId}-{nameWithoutSaveId}");
+                    var dpsSource = new XboxGameFileSource(wgsFolder, saveId, nameWithoutSaveId => $"{f.FileName}_dps" == $"{saveId}-{nameWithoutSaveId}");
                     var dpsFile = dpsSource.Content.Any() ? new PlayersDpsSaveFile(dpsSource) : null;
                     return new PlayersSaveFile(mainSource, dpsFile);
                 })
@@ -271,7 +272,7 @@ namespace PalCalc.SaveReader
         public List<PlayersSaveFile> Players { get; }
 
         public IEnumerable<SaveFileLocation> RawFiles =>
-            new XboxFileSource(wgsFolder, GameId, _ => true)
+            new XboxGameFileSource(wgsFolder, GameId, _ => true)
                 .XboxContent
                 // "SlotX-..." files are backups
                 .Where(f => !f.FileName.Contains("Slot"))

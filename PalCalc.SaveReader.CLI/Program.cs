@@ -48,7 +48,12 @@ var db = PalDB.LoadEmbedded();
 
 //Environment.Exit(0);
 
+var dsl = new DirectSavesLocation(@"C:\Users\algor\AppData\Local\Pal\Saved\SaveGames\76561198963790804");
+var gps = dsl.GlobalPalStorage.ParseGvas(true);
+var gps2 = dsl.GlobalPalStorage.ReadPals("GPS");
+
 var save3 = new StandardSaveGame(@"C:\Users\algor\AppData\Local\Pal\Saved\SaveGames\76561198963790804\095144A9430A880B9D995A8C8777547F");
+
 var v2 = new MapObjectVisitor(GvasMapObject.GlobalPalBoxObjectId, GvasMapObject.DimensionalPalStorageObjectId);
 var level3 = save3.Level.ParseGvas(true, v2);
 var dataLevel3 = save3.Level.ReadCharacterData(db, GameSettings.Defaults, save3.Players);

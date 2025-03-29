@@ -34,13 +34,21 @@ namespace PalCalc.SaveReader
                 : [];
     }
 
-    public class XboxFileSource(XboxWgsFolder saveFolder, string saveId, Func<string, bool> matcher) : IFileSource
+    public class XboxFileSource(XboxWgsFolder saveFolder, Func<string, bool> matcher) : IFileSource
+    {
+        public IEnumerable<XboxWgsEntry> XboxContent => saveFolder.Entries.Where(xbf => matcher(xbf.FileName)).ToList();
+
+        public IEnumerable<string> Content => XboxContent.Select(xbf => xbf.FilePath).ToList();
+    }
+
+    public class XboxGameFileSource(XboxWgsFolder saveFolder, string saveId, Func<string, bool> matcher) : IFileSource
     {
         public IEnumerable<XboxWgsEntry> XboxContent =>
             saveFolder.Entries
                 .Where(e => e.FileName.StartsWith($"{saveId}-"))
                 .Where(e => matcher(e.FileName.Replace($"{saveId}-", "")))
-                .OrderBy(e => e.FileName.Contains('-') ? e.FileName.Split("-").Last() : "");
+                .OrderBy(e => e.FileName.Contains('-') ? e.FileName.Split("-").Last() : "")
+                .ToList();
 
         public IEnumerable<string> Content => XboxContent.Select(e => e.FilePath).ToList();
     }
