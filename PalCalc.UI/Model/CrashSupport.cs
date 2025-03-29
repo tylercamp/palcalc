@@ -66,7 +66,7 @@ namespace PalCalc.UI.Model
                     count++;
                 } catch { }
 
-                if (count > 1000 || totalSize > 100 * MB) return false;
+                if (count > 1000 || totalSize > 30 * MB) return false;
             }
 
             return true;
@@ -144,6 +144,18 @@ namespace PalCalc.UI.Model
                                 catch { }
                             }
 
+                            void AddRawSaveFile(SaveFileLocation rawFile)
+                            {
+                                try
+                                {
+                                    if (Path.Exists(rawFile.ActualPath))
+                                    {
+                                        archive.CreateEntryFromFile(rawFile.ActualPath, $"save-{i}-raw/{rawFile.NormalizedPath}");
+                                    }
+                                }
+                                catch { }
+                            }
+
                             AddSaveFile(save.Level, "Level");
                             AddSaveFile(save.LevelMeta, "LevelMeta");
                             AddSaveFile(save.LocalData, "LocalData");
@@ -151,6 +163,9 @@ namespace PalCalc.UI.Model
 
                             foreach (var p in save.Players.Where(p => p.Exists))
                                 AddSaveFile(p, $"Players/{Path.GetFileName(p.FilePaths.First())}");
+
+                            foreach (var r in save.RawFiles)
+                                AddRawSaveFile(r);
                         }
                     }
                     catch { }

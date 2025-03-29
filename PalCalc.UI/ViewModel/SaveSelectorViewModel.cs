@@ -208,6 +208,11 @@ namespace PalCalc.UI.ViewModel
                                 }
                             }
 
+                            void ExportRaw(SaveFileLocation rawFile)
+                            {
+                                archive.CreateEntryFromFile(rawFile.ActualPath, $"_raw_/{rawFile.NormalizedPath}");
+                            }
+
                             if (save.Level != null && save.Level.Exists)
                                 Export(save.Level, "Level");
 
@@ -233,6 +238,9 @@ namespace PalCalc.UI.ViewModel
                                 }
                                 Export(player, $"Players/{playerId}");
                             }
+
+                            foreach (var rawFile in save.RawFiles)
+                                ExportRaw(rawFile);
                         }
                     }
                 },

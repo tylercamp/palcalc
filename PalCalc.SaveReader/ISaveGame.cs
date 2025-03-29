@@ -7,6 +7,15 @@ using System.Net;
 
 namespace PalCalc.SaveReader
 {
+    public class SaveFileLocation
+    {
+        // path to use when displaying or storing in a ZIP; Xbox save files have UUID-like names on disk
+        public string NormalizedPath { get; set; }
+
+        // actual file path
+        public string ActualPath { get; set; }
+    }
+
     public interface ISaveGame : IDisposable
     {
         string BasePath { get; }
@@ -22,6 +31,8 @@ namespace PalCalc.SaveReader
         WorldOptionSaveFile WorldOption { get; }
 
         List<PlayersSaveFile> Players { get; }
+
+        IEnumerable<SaveFileLocation> RawFiles { get; }
 
         // (don't check `WorldOption`, not present for linux-based server saves)
         bool IsValid { get; }
@@ -107,7 +118,7 @@ namespace PalCalc.SaveReader
                         IsLocal = false;
                     }
                 }
-                
+
 
                 folderWatcher = new FileSystemWatcher(basePath);
                 folderWatcher.Changed += FolderWatcher_Updated;
@@ -164,6 +175,16 @@ namespace PalCalc.SaveReader
         public WorldOptionSaveFile WorldOption { get; }
         public List<PlayersSaveFile> Players { get; }
 
+        public IEnumerable<SaveFileLocation> RawFiles => !Path.Exists(BasePath) ? [] : (
+            Directory
+                .EnumerateFiles(BasePath, "*.sav", SearchOption.AllDirectories)
+                .Where(p =>
+                {
+                    return !p.Substring(BasePath.Length).Replace('\\', '/').StartsWith("/backup");
+                })
+                .Select(p => new SaveFileLocation() { ActualPath = p, NormalizedPath = p.Substring(BasePath.Length + 1) })
+        );
+
         public bool IsValid => Level != null && Level.IsValid;
 
         public bool IsLocal { get; private set; }
@@ -176,6 +197,7 @@ namespace PalCalc.SaveReader
         public event Action<ISaveGame> Updated;
 
         private XboxSaveMonitor monitor;
+        private XboxWgsFolder wgsFolder;
 
         public XboxSaveGame(
             XboxWgsFolder wgsFolder,
@@ -184,6 +206,8 @@ namespace PalCalc.SaveReader
         {
             BasePath = wgsFolder.UserBasePath;
             GameId = saveId;
+
+            this.wgsFolder = wgsFolder;
 
             // note: no UNC path check, these should only be created for normal e.g. LocalAppData paths
             IsLocal = true;
@@ -240,6 +264,17 @@ namespace PalCalc.SaveReader
         public WorldOptionSaveFile WorldOption { get; }
         public List<PlayersSaveFile> Players { get; }
 
+        public IEnumerable<SaveFileLocation> RawFiles =>
+            new XboxFileSource(wgsFolder, GameId, _ => true)
+                .XboxContent
+                // "SlotX-..." files are backups
+                .Where(f => !f.FileName.Contains("Slot"))
+                .Select(f => new SaveFileLocation()
+                {
+                    ActualPath = f.FilePath,
+                    NormalizedPath = f.FileName.Replace($"{GameId}-", "") + ".sav"
+                });
+
         public bool IsValid =>
             Level != null && Level.IsValid; // don't check for `LevelMeta` - may be temporarily missing for files with "wrapper" header
 
@@ -291,6 +326,8 @@ namespace PalCalc.SaveReader
         public WorldOptionSaveFile WorldOption { get; }
 
         public List<PlayersSaveFile> Players { get; }
+
+        public IEnumerable<SaveFileLocation> RawFiles => [];
 
         public bool IsValid => true;
 

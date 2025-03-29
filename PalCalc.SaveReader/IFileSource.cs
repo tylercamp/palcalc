@@ -36,11 +36,12 @@ namespace PalCalc.SaveReader
 
     public class XboxFileSource(XboxWgsFolder saveFolder, string saveId, Func<string, bool> matcher) : IFileSource
     {
-        public IEnumerable<string> Content =>
+        public IEnumerable<XboxWgsEntry> XboxContent =>
             saveFolder.Entries
                 .Where(e => e.FileName.StartsWith($"{saveId}-"))
                 .Where(e => matcher(e.FileName.Replace($"{saveId}-", "")))
-                .OrderBy(e => e.FileName.Contains('-') ? e.FileName.Split("-").Last() : "")
-                .Select(e => e.FilePath).ToList();
+                .OrderBy(e => e.FileName.Contains('-') ? e.FileName.Split("-").Last() : "");
+
+        public IEnumerable<string> Content => XboxContent.Select(e => e.FilePath).ToList();
     }
 }
