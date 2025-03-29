@@ -237,10 +237,16 @@ namespace PalCalc.SaveReader
                 WorldOption = new WorldOptionSaveFile(new XboxFileSource(wgsFolder, saveId, f => f.Split("-").First() == "WorldOption"));
             }
 
-            Players = filesByType
-                .GetValueOrElse("Players", new List<XboxWgsEntry>())
-                // TODO - _dps files
-                .Select(f => new PlayersSaveFile(new XboxFileSource(wgsFolder, saveId, nameWithoutSaveId => f.FileName == $"{saveId}-{nameWithoutSaveId}"), null))
+            var playersFiles = filesByType.GetValueOrElse("Players", new List<XboxWgsEntry>());
+            Players = playersFiles
+                .Where(f => !f.FileName.EndsWith("_dps"))
+                .Select(f =>
+                {
+                    var mainSource = new XboxFileSource(wgsFolder, saveId, nameWithoutSaveId => f.FileName == $"{saveId}-{nameWithoutSaveId}");
+                    var dpsSource = new XboxFileSource(wgsFolder, saveId, nameWithoutSaveId => $"{f.FileName}_dps" == $"{saveId}-{nameWithoutSaveId}");
+                    var dpsFile = dpsSource.Content.Any() ? new PlayersDpsSaveFile(dpsSource) : null;
+                    return new PlayersSaveFile(mainSource, dpsFile);
+                })
                 .ToList();
 
             monitor = wgsFolder.Monitor.GetSaveMonitor(saveId);
