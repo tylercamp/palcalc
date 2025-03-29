@@ -156,7 +156,6 @@
                    IsOpen="{Binding PresetsMenuIsOpen}"
                    StaysOpen="False"
                    MinWidth="200"
-                   MaxHeight="300"
                    >
                 <vu:EditableListMenu DataContext="{Binding Presets}"
                                      CreateCommand="{Binding CreatePresetCommand}"

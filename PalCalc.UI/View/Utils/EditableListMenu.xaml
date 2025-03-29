@@ -16,6 +16,16 @@
 
         <CollectionViewSource x:Key="MainItemsSource" Source="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=ItemsSource}" />
 
+        <ControlTemplate x:Key="NonScrollingListBoxTemplate" TargetType="ListBox">
+            <Border Name="Border"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Padding="{TemplateBinding Padding}">
+                <ItemsPresenter />
+            </Border>
+        </ControlTemplate>
+
         <DataTemplate x:Key="NewItemDataTemplate" DataType="{x:Type local:CreateNewItemEntry}">
             <ContentControl>
                 <ContentControl.Content>
@@ -88,50 +98,54 @@
         </DataTemplate>
 
     </UserControl.Resources>
-    <StackPanel>
-        <StackPanel.Resources>
-            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                <Setter Property="VerticalAlignment" Value="Center" />
-            </Style>
-            <Style TargetType="materialIcons:MaterialIcon">
-                <Setter Property="VerticalAlignment" Value="Stretch" />
-                <Setter Property="Height" Value="18" />
-            </Style>
-            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-                <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="HorizontalAlignment" Value="Center" />
-            </Style>
-            <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
-                <Setter Property="ItemContainerStyle">
-                    <Setter.Value>
-                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="Padding" Value="5" />
-                            <Setter Property="MinHeight" Value="28" />
-                        </Style>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-        </StackPanel.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+            <StackPanel.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+                <Style TargetType="materialIcons:MaterialIcon">
+                    <Setter Property="VerticalAlignment" Value="Stretch" />
+                    <Setter Property="Height" Value="18" />
+                </Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                </Style>
+                <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+                    <Setter Property="ItemContainerStyle">
+                        <Setter.Value>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="5" />
+                                <Setter Property="MinHeight" Value="28" />
+                            </Style>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </StackPanel.Resources>
 
-        <ListBox SelectionChanged="ListBox_SelectionChanged"
-                 ItemTemplateSelector="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=ItemTemplateSelector}"
-                 >
-            <ListBox.ItemsSource>
-                <CompositeCollection>
-                    <CollectionContainer Collection="{x:Static local:CreateNewItemEntry.AsList}" />
-                    <CollectionContainer Collection="{Binding Source={StaticResource MainItemsSource}}" />
-                </CompositeCollection>
-            </ListBox.ItemsSource>
-        </ListBox>
-
-        <StackPanel Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=FixedItemsSource, Converter={StaticResource CVC}}">
-            <Separator Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2HighlightBorderBrush}}" Margin="0,5,0,5" />
             <ListBox SelectionChanged="ListBox_SelectionChanged"
-                     ItemTemplate="{StaticResource FixedItemDataTemplate}"
-                     ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=FixedItemsSource}"
+                     ItemTemplateSelector="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=ItemTemplateSelector}"
+                     Template="{StaticResource NonScrollingListBoxTemplate}"
                      >
+                <ListBox.ItemsSource>
+                    <CompositeCollection>
+                        <CollectionContainer Collection="{x:Static local:CreateNewItemEntry.AsList}" />
+                        <CollectionContainer Collection="{Binding Source={StaticResource MainItemsSource}}" />
+                    </CompositeCollection>
+                </ListBox.ItemsSource>
             </ListBox>
+
+            <StackPanel Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=FixedItemsSource, Converter={StaticResource CVC}}">
+                <Separator Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2HighlightBorderBrush}}" Margin="0,5,0,5" />
+                <ListBox SelectionChanged="ListBox_SelectionChanged"
+                         ItemTemplate="{StaticResource FixedItemDataTemplate}"
+                         ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=FixedItemsSource}"
+                         Template="{StaticResource NonScrollingListBoxTemplate}"
+                         >
+                </ListBox>
+            </StackPanel>
         </StackPanel>
-    </StackPanel>
+    </ScrollViewer>
 </UserControl>
