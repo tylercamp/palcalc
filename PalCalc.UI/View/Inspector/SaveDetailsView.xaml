@@ -12,6 +12,7 @@
              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:vwp="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
              mc:Ignorable="d" 
              d:DataContext="{x:Static ivm:SaveDetailsViewModel.DesignerInstance}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -114,12 +115,12 @@
                               >
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel />
+                                <vwp:VirtualizingWrapPanel SpacingMode="Uniform" />
                             </ItemsPanelTemplate>
                         </ListView.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <ContentControl Content="{Binding}" Margin="5">
+                                <ContentControl Content="{Binding}">
                                     <ContentControl.Resources>
                                         <DataTemplate DataType="{x:Type dvm:EmptyPalContainerSlotDetailsViewModel}">
                                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{itl:LocalizedText LC_SAVEINSPECT_SLOT_EMPTY}" />
