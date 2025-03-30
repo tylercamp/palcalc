@@ -32,15 +32,20 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="300*" MinWidth="100" MaxWidth="600" />
         </Grid.ColumnDefinitions>
-        <ListBox Grid.Column="0" ItemsSource="{Binding Source={StaticResource GroupedContainers}}" SelectedItem="{Binding SelectedContainer}" IsSynchronizedWithCurrentItem="True" adonisExtensions:ScrollViewerExtension.VerticalScrollBarExpansionMode="AlwaysExpand">
+        <ListBox Grid.Column="0" ItemsSource="{Binding Source={StaticResource GroupedContainers}}" SelectedItem="{Binding SelectedContainer}" IsSynchronizedWithCurrentItem="True" adonisExtensions:ScrollViewerExtension.VerticalScrollBarExpansionMode="AlwaysExpand" HorizontalContentAlignment="Stretch">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="dvm:InspectedContainerDetailsViewModel">
-                    <StackPanel>
-                        <TextBlock>
+                    <StackPanel HorizontalAlignment="Stretch">
+                        <TextBlock HorizontalAlignment="Stretch">
                             <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_TYPE}" />
                             <Run Text="{Binding Type.Value, Mode=OneTime}" />
                         </TextBlock>
-                        <TextBlock>
+                        <TextBlock Visibility="{Binding Owner, Mode=OneTime, Converter={StaticResource VVC}}">
                             <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_OWNER}" />
                             <Run Text="{Binding Owner.Name.Value, Mode=OneTime}" />
                         </TextBlock>
@@ -50,7 +55,7 @@
                             <Run Text="{Binding TotalSlots, Mode=OneTime}" />
                             <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_SLOTS_USED}" />
                         </TextBlock>
-                        <TextBlock Visibility="{Binding Id, Converter={StaticResource VVC}}">
+                        <TextBlock Visibility="{Binding Id, Mode=OneTime, Converter={StaticResource VVC}}">
                             <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_ID}" />
                             <Run Text="{Binding Id, Mode=OneTime}" />
                         </TextBlock>
@@ -75,7 +80,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
-                                        <StackPanel>
+                                        <StackPanel Margin="0,0,1,5">
                                             <Label Content="{Binding Name}">
                                                 <Label.Style>
                                                     <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
@@ -85,7 +90,7 @@
                                                 </Label.Style>
                                             </Label>
 
-                                            <ItemsPresenter />
+                                            <ItemsPresenter HorizontalAlignment="Stretch" />
                                         </StackPanel>
                                     </ControlTemplate>
                                 </Setter.Value>
