@@ -115,12 +115,12 @@
                               >
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <vwp:VirtualizingWrapPanel SpacingMode="Uniform" />
+                                <vwp:VirtualizingWrapPanel SpacingMode="None" StretchItems="False" AllowDifferentSizedItems="True" />
                             </ItemsPanelTemplate>
                         </ListView.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <ContentControl Content="{Binding}">
+                                <ContentControl Content="{Binding}" Margin="5">
                                     <ContentControl.Resources>
                                         <DataTemplate DataType="{x:Type dvm:EmptyPalContainerSlotDetailsViewModel}">
                                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{itl:LocalizedText LC_SAVEINSPECT_SLOT_EMPTY}" />
@@ -128,7 +128,7 @@
                                         <DataTemplate DataType="{x:Type dvm:PalContainerSlotDetailsViewModel}">
                                             <StackPanel Orientation="Vertical">
                                                 <Image Source="{Binding Icon}" Width="50" Height="50" Margin="0,0,5,0" />
-                                                <TextBlock Text="{Binding DisplayName.Value}" HorizontalAlignment="Center" />
+                                                <TextBlock Text="{Binding DisplayName.Value}" HorizontalAlignment="Center" TextWrapping="Wrap" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </ContentControl.Resources>
