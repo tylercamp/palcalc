@@ -10,21 +10,29 @@
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:v="clr-namespace:PalCalc.UI.View"
              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
+             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d" 
              d:DataContext="{x:Static ivm:SaveDetailsViewModel.DesignerInstance}"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.Resources>
             <c:ValueVisibilityConverter x:Key="VVC" />
+
+            <CollectionViewSource x:Key="GroupedContainers" Source="{Binding Containers}">
+                <CollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription PropertyName="DisplayGroupName" />
+                </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="149*" MaxWidth="300" />
+            <ColumnDefinition Width="149*" MinWidth="100" MaxWidth="400" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="651*" />
+            <ColumnDefinition Width="651*" MinWidth="100" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="300*" />
+            <ColumnDefinition Width="300*" MinWidth="100" MaxWidth="600" />
         </Grid.ColumnDefinitions>
-        <ListBox Grid.Column="0" ItemsSource="{Binding Containers}" SelectedItem="{Binding SelectedContainer}" IsSynchronizedWithCurrentItem="True">
+        <ListBox Grid.Column="0" ItemsSource="{Binding Source={StaticResource GroupedContainers}}" SelectedItem="{Binding SelectedContainer}" IsSynchronizedWithCurrentItem="True" adonisExtensions:ScrollViewerExtension.VerticalScrollBarExpansionMode="AlwaysExpand">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="dvm:InspectedContainerDetailsViewModel">
                     <StackPanel>
@@ -42,7 +50,7 @@
                             <Run Text="{Binding TotalSlots, Mode=OneTime}" />
                             <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_SLOTS_USED}" />
                         </TextBlock>
-                        <TextBlock>
+                        <TextBlock Visibility="{Binding Id, Converter={StaticResource VVC}}">
                             <Run Text="{itl:LocalizedText LC_SAVEINSPECT_CONTAINER_ID}" />
                             <Run Text="{Binding Id, Mode=OneTime}" />
                         </TextBlock>
@@ -60,9 +68,35 @@
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+            <ListBox.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="GroupItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <StackPanel>
+                                            <Label Content="{Binding Name}">
+                                                <Label.Style>
+                                                    <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                                                        <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer2BorderBrush}}" />
+                                                        <Setter Property="Padding" Value="{adonisUi:Space 1,1}" />
+                                                    </Style>
+                                                </Label.Style>
+                                            </Label>
+
+                                            <ItemsPresenter />
+                                        </StackPanel>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </ListBox.GroupStyle>
         </ListBox>
 
-        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" />
+        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" />
 
         <vu:CachingContentPresenter Grid.Column="2" Content="{Binding SelectedContainer}">
             <vu:CachingContentPresenter.ContentTemplate>
@@ -100,7 +134,7 @@
             </vu:CachingContentPresenter.ContentTemplate>
         </vu:CachingContentPresenter>
 
-        <GridSplitter Grid.Column="3" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" />
+        <GridSplitter Grid.Column="3" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" />
 
         <Grid Grid.Column="4">
             <Grid.RowDefinitions>

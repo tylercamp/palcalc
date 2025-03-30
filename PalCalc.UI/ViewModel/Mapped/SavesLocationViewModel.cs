@@ -15,6 +15,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         ReadOnlyObservableCollection<ISaveGameViewModel> SaveGames { get; }
         ILocalizedText Label { get; }
         DateTime? LastModified { get; }
+
+        ISavesLocation Value { get; }
     }
 
     public partial class StandardSavesLocationViewModel : ObservableObject, ISavesLocationViewModel
@@ -77,6 +79,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         public ILocalizedText Label { get; } = LocalizationCodes.LC_SAVE_LOCATION_MANUAL.Bind();
 
         public DateTime? LastModified => saveGames.OfType<SaveGameViewModel>().OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
+
+        public ISavesLocation Value => null;
 
         // assume `path` has already been validated
         public SaveGameViewModel Add(ISaveGame saveGame)

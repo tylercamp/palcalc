@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 namespace PalCalc.UI.ViewModel.Inspector.Details
 {
     public partial class InspectedContainerDetailsViewModel(
+        string groupName,
         OwnerViewModel owner,
         List<PalInstance> containedPals,
         List<GvasCharacterInstance> containedRawPals,
@@ -32,6 +33,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
                 return new PalContainerSlotDetailsViewModel(s.InstanceId.ToString(), rawPal, rawChar);
             })
             .ToList();
+
+        public string DisplayGroupName => groupName;
 
         public int TotalSlots => rawContainer.MaxEntries;
         public int UsedSlots => rawContainer.NumEntries;

@@ -16,6 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation;
+using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace PalCalc.UI.ViewModel.Inspector
@@ -31,13 +32,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             {
                 if (designerInstance == null)
                 {
-                    var save = CachedSaveGame.SampleForDesignerView;
-
-                    designerInstance = new SaveDetailsViewModel(
-                        save,
-                        save.UnderlyingSave.Level.ReadRawCharacterData(),
-                        save.UnderlyingSave.Players.Select(p => p.ReadPlayerContent()).SkipNull().ToList()
-                    );
+                    designerInstance = new SaveDetailsViewModel(null, CachedSaveGame.SampleForDesignerView);
                 }
                 return designerInstance;
             }
@@ -58,8 +53,116 @@ namespace PalCalc.UI.ViewModel.Inspector
             _ => null
         };
 
-        public SaveDetailsViewModel(CachedSaveGame csg, RawLevelSaveData rawData, List<PlayerMeta> rawPlayers)
+        private IEnumerable<(PlayerMeta, List<GvasCharacterInstance>)> ReadAllPlayerData(List<PlayersSaveFile> files)
         {
+            foreach (var psf in files)
+            {
+                var playerData = psf.ReadPlayerContent();
+                if (playerData == null) continue;
+
+                if (psf.DimensionalPalStorageSaveFile?.IsValid == true)
+                    yield return (playerData, psf.DimensionalPalStorageSaveFile.ReadRawCharacters());
+                else
+                    yield return (playerData, null);
+            }
+        }
+
+        public SaveDetailsViewModel(ISavesLocation containerLocation, CachedSaveGame csg)
+        {
+            var rawLevelData = csg.UnderlyingSave.Level.ReadRawCharacterData();
+            var rawPlayers = ReadAllPlayerData(csg.UnderlyingSave.Players).ToList();
+            var rawGpsPals = containerLocation?.GlobalPalStorage?.IsValid == true ? containerLocation.GlobalPalStorage?.ReadRawCharacters() : null;
+
+            Containers = [
+                ..CollectGlobalPalStorageContainers(csg, rawGpsPals),
+                ..CollectDimensionalPalStorageContainers(csg, rawLevelData, rawPlayers),
+                ..CollectNativeContainers(csg, rawLevelData, rawPlayers.Select(p => p.Item1).ToList()),
+            ];
+
+            SelectedContainer = Containers.FirstOrDefault();
+            SelectedSlot = SelectedContainer?.Slots?.FirstOrDefault();
+        }
+
+        private List<InspectedContainerDetailsViewModel> CollectGlobalPalStorageContainers(CachedSaveGame csg, List<GvasCharacterInstance> rawGpsPals)
+        {
+            if (rawGpsPals == null) return [];
+
+            var containedPals = rawGpsPals.Select(r => csg.OwnedPals.SingleOrDefault(p => p.Location.Type == LocationType.GlobalPalStorage && p.InstanceId == r.InstanceId.ToString())).SkipNull().ToList();
+
+            var rawContainer = new RawPalContainerContents()
+            {
+                Id = null,
+                MaxEntries = rawGpsPals.Count,
+                Slots = rawGpsPals.ZipWithIndex().Select(pair =>
+                {
+                    return new PalContainerSlot()
+                    {
+                        InstanceId = pair.Item1?.InstanceId ?? Guid.Empty,
+                        PlayerId = Guid.Empty,
+                        SlotIndex = pair.Item2
+                    };
+                }).ToList()
+            };
+
+            return [
+                new InspectedContainerDetailsViewModel(
+                    "Global Pal Storage",
+                    null,
+                    containedPals,
+                    rawGpsPals,
+                    rawContainer,
+                    LocationType.GlobalPalStorage,
+                    null
+                )
+            ];
+        }
+
+        private List<InspectedContainerDetailsViewModel> CollectDimensionalPalStorageContainers(CachedSaveGame csg, RawLevelSaveData rawLevelData, List<(PlayerMeta, List<GvasCharacterInstance>)> rawDpsData)
+        {
+            var displayGroupName = $"Dimensional Pal Storage ({rawDpsData.Count})";
+
+            var playerNamesById = rawLevelData.Characters.Where(c => c.IsPlayer).ToDictionary(c => c.PlayerId.ToString(), c => c.NickName);
+            var ownerPlayers = rawDpsData.Select(p => p.Item1).Select(p => new OwnerViewModel(OwnerType.Player, new HardCodedText(playerNamesById[p.PlayerId]), p.PlayerId)).ToList();
+            var ownersById = ownerPlayers.ToDictionary(p => p.Id);
+
+            var dpsPals = csg.OwnedPals.Where(p => p.Location.Type == LocationType.DimensionalPalStorage);
+
+            return rawDpsData.Where(p => p.Item2 != null).Select(pair =>
+            {
+                var (player, rawPals) = pair;
+                var containedPals = rawPals.Select(r => dpsPals.SingleOrDefault(o => r.InstanceId.ToString() == o.InstanceId)).SkipNull().ToList();
+
+                var rawContainer = new RawPalContainerContents()
+                {
+                    Id = null,
+                    MaxEntries = rawPals.Count,
+                    Slots = rawPals.ZipWithIndex().Select(p =>
+                    {
+                        return new PalContainerSlot()
+                        {
+                            InstanceId = p.Item1.InstanceId,
+                            PlayerId = Guid.Empty,
+                            SlotIndex = p.Item2,
+                        };
+                    }).ToList()
+                };
+
+                return new InspectedContainerDetailsViewModel(
+                    displayGroupName,
+                    ownersById[pair.Item1.PlayerId],
+                    containedPals,
+                    rawPals,
+                    rawContainer,
+                    LocationType.DimensionalPalStorage,
+                    null
+                );
+            }).ToList();
+        }
+
+        private List<InspectedContainerDetailsViewModel> CollectNativeContainers(CachedSaveGame csg, RawLevelSaveData rawData, List<PlayerMeta> rawPlayers)
+        {
+            var displayGroupName = $"Standard Pal Containers ({rawData.ContainerContents.Count})";
+
             var playerNamesById = rawData.Characters.Where(c => c.IsPlayer).ToDictionary(c => c.PlayerId.ToString(), c => c.NickName);
 
             var ownerPlayers = rawPlayers.Select(p => new OwnerViewModel(OwnerType.Player, new HardCodedText(playerNamesById[p.PlayerId]), p.PlayerId)).ToList();
@@ -69,7 +172,7 @@ namespace PalCalc.UI.ViewModel.Inspector
 
             var ownersById = (ownerPlayers.Concat(ownerGuilds)).ToDictionary(o => o.Id);
 
-            Containers = rawData.ContainerContents.Select(c =>
+            return rawData.ContainerContents.Select(c =>
             {
                 var containedPals = c.Slots
                     .Select(s => csg.OwnedPals.SingleOrDefault(p => p.InstanceId == s.InstanceId.ToString() && p.Location.ContainerId == c.Id))
@@ -84,12 +187,12 @@ namespace PalCalc.UI.ViewModel.Inspector
                 if (rawPlayers.Any(p => p.PartyContainerId == c.Id))
                 {
                     var owner = ownersById[rawPlayers.Single(p => p.PartyContainerId == c.Id).PlayerId];
-                    return new InspectedContainerDetailsViewModel(owner, containedPals, containedRawPals, c, LocationType.PlayerParty, null);
+                    return new InspectedContainerDetailsViewModel(displayGroupName, owner, containedPals, containedRawPals, c, LocationType.PlayerParty, null);
                 }
                 else if (rawPlayers.Any(p => p.PalboxContainerId == c.Id))
                 {
                     var owner = ownersById[rawPlayers.Single(p => p.PalboxContainerId == c.Id).PlayerId];
-                    return new InspectedContainerDetailsViewModel(owner, containedPals, containedRawPals, c, LocationType.Palbox, null);
+                    return new InspectedContainerDetailsViewModel(displayGroupName, owner, containedPals, containedRawPals, c, LocationType.Palbox, null);
                 }
                 else
                 {
@@ -139,6 +242,7 @@ namespace PalCalc.UI.ViewModel.Inspector
                         : ownersById.GetValueOrElse(ownerId, OwnerViewModel.UnknownWithId(ownerId));
 
                     return new InspectedContainerDetailsViewModel(
+                        displayGroupName,
                         owner,
                         containedPals,
                         containedRawPals,
@@ -153,9 +257,6 @@ namespace PalCalc.UI.ViewModel.Inspector
                     );
                 }
             }).ToList();
-
-            SelectedContainer = Containers.FirstOrDefault();
-            SelectedSlot = SelectedContainer?.Slots?.FirstOrDefault();
         }
     }
 }
