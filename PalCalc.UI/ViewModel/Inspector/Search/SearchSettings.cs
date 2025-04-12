@@ -12,6 +12,20 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Inspector.Search
 {
+    public enum IVFilterMode
+    {
+        MinIVs,
+        MaxIVs,
+    }
+    public class IVFilterModeOption(IVFilterMode value)
+    {
+        public IVFilterMode Value => value;
+        public ILocalizedText Label { get; } = (value == IVFilterMode.MinIVs ? LocalizationCodes.LC_SAVESEARCH_SETTINGS_MIN_IVS : LocalizationCodes.LC_SAVESEARCH_SETTINGS_MAX_IVS).Bind();
+
+        public static IVFilterModeOption MinIVs { get; } = new IVFilterModeOption(IVFilterMode.MinIVs);
+        public static IVFilterModeOption MaxIVs { get; } = new IVFilterModeOption(IVFilterMode.MaxIVs);
+    }
+
     public class GenderOption(PalGender value)
     {
         public PalGender Value => value;
@@ -39,9 +53,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                     SearchedSkill2 = null;
                     SearchedSkill3 = null;
                     SearchedSkill4 = null;
-                    MinIVHP = 0;
-                    MinIVAttack = 0;
-                    MinIVDefense = 0;
+                    IvFilterMode = IVFilterModeOption.MinIVs;
+                    FilterIVHP = 0;
+                    FilterIVAttack = 0;
+                    FilterIVDefense = 0;
                 }
             );
         }
@@ -88,20 +103,29 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
         [NotifyPropertyChangedFor(nameof(AsCriteria))]
         [ObservableProperty]
-        private int minIVHP = 0;
+        private IVFilterModeOption ivFilterMode = IVFilterModeOption.MinIVs;
 
         [NotifyPropertyChangedFor(nameof(AsCriteria))]
         [ObservableProperty]
-        private int minIVAttack = 0;
+        private int filterIVHP = 0;
 
         [NotifyPropertyChangedFor(nameof(AsCriteria))]
         [ObservableProperty]
-        private int minIVDefense = 0;
+        private int filterIVAttack = 0;
+
+        [NotifyPropertyChangedFor(nameof(AsCriteria))]
+        [ObservableProperty]
+        private int filterIVDefense = 0;
 
         public List<GenderOption> GenderOptions { get; } = [
             GenderOption.AnyGender,
             GenderOption.Male,
             GenderOption.Female,
+        ];
+
+        public List<IVFilterModeOption> IVFilterOptions { get; } = [
+            IVFilterModeOption.MinIVs,
+            IVFilterModeOption.MaxIVs,
         ];
 
         public ISearchCriteria AsCriteria
@@ -122,9 +146,20 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
                 if (SearchedSkill3 != null) criteria.Add(new ActiveSkillSearchCriteria(SearchedSkill3.ModelObject));
                 if (SearchedSkill4 != null) criteria.Add(new ActiveSkillSearchCriteria(SearchedSkill4.ModelObject));
 
-                criteria.Add(new CustomSearchCriteria(p => p.IV_HP >= MinIVHP));
-                criteria.Add(new CustomSearchCriteria(p => p.IV_Attack >= MinIVAttack));
-                criteria.Add(new CustomSearchCriteria(p => p.IV_Defense >= MinIVDefense));
+                switch (IvFilterMode.Value)
+                {
+                    case IVFilterMode.MinIVs:
+                        criteria.Add(new CustomSearchCriteria(p => p.IV_HP >= FilterIVHP));
+                        criteria.Add(new CustomSearchCriteria(p => p.IV_Attack >= FilterIVAttack));
+                        criteria.Add(new CustomSearchCriteria(p => p.IV_Defense >= FilterIVDefense));
+                        break;
+
+                    case IVFilterMode.MaxIVs:
+                        criteria.Add(new CustomSearchCriteria(p => p.IV_HP <= FilterIVHP));
+                        criteria.Add(new CustomSearchCriteria(p => p.IV_Attack <= FilterIVAttack));
+                        criteria.Add(new CustomSearchCriteria(p => p.IV_Defense <= FilterIVDefense));
+                        break;
+                }
 
                 return new AllOfSearchCriteria(criteria);
             }

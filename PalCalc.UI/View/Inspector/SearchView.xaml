@@ -213,7 +213,14 @@
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical">
-                            <Label Content="{itl:LocalizedText LC_SAVESEARCH_SETTINGS_MIN_IVS}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
+                            <ComboBox ItemsSource="{Binding SearchSettings.IVFilterOptions}" Width="Auto" HorizontalAlignment="Left" SelectedItem="{Binding SearchSettings.IvFilterMode}" Margin="0,0,0,4">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type svm:IVFilterModeOption}">
+                                        <Label Content="{Binding Label.Value}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <!--<Label Content="{itl:LocalizedText LC_SAVESEARCH_SETTINGS_MIN_IVS}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />-->
                             <StackPanel Orientation="Horizontal">
                                 <StackPanel.Resources>
                                     <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
@@ -227,17 +234,17 @@
                                 
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="{itl:LocalizedText LC_COMMON_IV_HP}" />
-                                    <vu:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.MinIVHP}" />
+                                    <vu:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.FilterIVHP}" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="{itl:LocalizedText LC_COMMON_IV_ATTACK}" />
-                                    <vu:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.MinIVAttack}" />
+                                    <vu:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.FilterIVAttack}" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="{itl:LocalizedText LC_COMMON_IV_DEFENSE}" />
-                                    <vu:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.MinIVDefense}" />
+                                    <vu:IntegerTextBox MinValue="0" MaxValue="100" Value="{Binding SearchSettings.FilterIVDefense}" />
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>

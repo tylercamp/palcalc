@@ -612,6 +612,9 @@ This will not delete the save files from your computer.</value>
   <data name="LC_SAVESEARCH_GRP_SEARCH_SETTINGS" xml:space="preserve">
     <value>Search Settings</value>
   </data>
+  <data name="LC_SAVESEARCH_SETTINGS_MAX_IVS" xml:space="preserve">
+    <value>Max IVs</value>
+  </data>
   <data name="LC_SAVESEARCH_SETTINGS_MIN_IVS" xml:space="preserve">
     <value>Min IVs</value>
   </data>

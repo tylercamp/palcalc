@@ -789,6 +789,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SAVESEARCH_SETTINGS_MAX_IVS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SAVESEARCH_SETTINGS_MIN_IVS,
         /// <summary>
         ///   Looks up a localized string similar to .
