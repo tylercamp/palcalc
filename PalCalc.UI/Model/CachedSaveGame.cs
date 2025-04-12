@@ -180,46 +180,42 @@ namespace PalCalc.UI.Model
                 SaveFileLoadStart?.Invoke(game);
             }
 
-            CachedSaveGame result;
-
-#if HANDLE_ERRORS
-            try
-            {
-#endif
-                result = loadingModal.ShowDialogDuring(() =>
+            CachedSaveGame result = PCDebug.HandleErrors(
+                action: () =>
                 {
-                    GameMeta meta = null;
-                    // `LevelMeta` is sometimes unavailable for Xbox saves, which shouldn't prevent us from
-                    // being able to load the data
-                    try { meta = game.LevelMeta.ReadGameOptions(); } catch { }
-
-                    var charData = game.Level.ReadCharacterData(db, settings, game.Players, containerLocation?.GlobalPalStorage);
-
-                    return new CachedSaveGame(game)
+                    return loadingModal.ShowDialogDuring(() =>
                     {
-                        DatabaseVersion = db.Version,
-                        LastModified = game.LastModified,
-                        OwnedPals = charData.Pals,
-                        Guilds = charData.Guilds,
-                        Players = charData.Players,
-                        Bases = charData.Bases,
-                        PalContainers = charData.PalContainers,
-                        PlayerLevel = meta?.PlayerLevel,
-                        PlayerName = meta?.PlayerName ?? "UNKNOWN",
-                        WorldName = meta?.WorldName ?? "UNKNOWN WORLD",
-                        InGameDay = meta?.InGameDay ?? 0,
-                    };
-                });
-#if HANDLE_ERRORS
-            }
-            catch (Exception ex)
-            {
-                SaveFileLoadError?.Invoke(game, ex);
-                return null;
-            }
-#endif
+                        GameMeta meta = null;
+                        // `LevelMeta` is sometimes unavailable for Xbox saves, which shouldn't prevent us from
+                        // being able to load the data
+                        try { meta = game.LevelMeta.ReadGameOptions(); } catch { }
 
-            if (!isDesignMode) SaveFileLoadEnd?.Invoke(game, result);
+                        var charData = game.Level.ReadCharacterData(db, settings, game.Players, containerLocation?.GlobalPalStorage);
+
+                        return new CachedSaveGame(game)
+                        {
+                            DatabaseVersion = db.Version,
+                            LastModified = game.LastModified,
+                            OwnedPals = charData.Pals,
+                            Guilds = charData.Guilds,
+                            Players = charData.Players,
+                            Bases = charData.Bases,
+                            PalContainers = charData.PalContainers,
+                            PlayerLevel = meta?.PlayerLevel,
+                            PlayerName = meta?.PlayerName ?? "UNKNOWN",
+                            WorldName = meta?.WorldName ?? "UNKNOWN WORLD",
+                            InGameDay = meta?.InGameDay ?? 0,
+                        };
+                    });
+                },
+                handleErr: (ex) =>
+                {
+                    SaveFileLoadError?.Invoke(game, ex);
+                    return null;
+                }
+            );
+
+            if (result != null && !isDesignMode) SaveFileLoadEnd?.Invoke(game, result);
 
             return result;
         }

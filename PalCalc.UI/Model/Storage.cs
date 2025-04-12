@@ -150,28 +150,22 @@ namespace PalCalc.UI.Model
             var filePath = CustomContainerPath(forSaveGame);
             if (!File.Exists(filePath)) return new SaveCustomizations();
 
-            SaveCustomizations res = null;
-
-#if HANDLE_ERRORS
-            try
-            {
-#endif
-                res = JsonConvert.DeserializeObject<SaveCustomizations>(File.ReadAllText(filePath), new PalInstanceJsonConverter(db));
-#if HANDLE_ERRORS
-            }
-            catch (Exception re)
-            {
-                logger.Warning(re, "failed to load save customizations for {label}, clearing", CachedSaveGame.IdentifierFor(forSaveGame));
-                try
+            SaveCustomizations res = PCDebug.HandleErrors(
+                action: () => JsonConvert.DeserializeObject<SaveCustomizations>(File.ReadAllText(filePath), new PalInstanceJsonConverter(db)),
+                handleErr: (re) =>
                 {
-                    File.Delete(filePath);
+                    logger.Warning(re, "failed to load save customizations for {label}, clearing", CachedSaveGame.IdentifierFor(forSaveGame));
+                    try
+                    {
+                        File.Delete(filePath);
+                    }
+                    catch (Exception fe)
+                    {
+                        logger.Warning(fe, "failed to delete customizations file");
+                    }
+                    return null;
                 }
-                catch (Exception fe)
-                {
-                    logger.Warning(fe, "failed to delete customizations file");
-                }
-            }
-#endif
+            );
 
             res ??= new SaveCustomizations();
             res.CustomContainers ??= [];
@@ -204,23 +198,22 @@ namespace PalCalc.UI.Model
             var path = SaveCachePathFor(save);
             if (File.Exists(path))
             {
-                CachedSaveGame res;
-#if HANDLE_ERRORS
-                try
-                {
-#endif
-                    res = CachedSaveGame.FromJson(File.ReadAllText(path), db);
-                    res.UnderlyingSave = save;
-#if HANDLE_ERRORS
-                }
-                catch (Exception e)
-                {
-                    logger.Error(e, "failed to load cached save-game data, clearing");
+                CachedSaveGame res = PCDebug.HandleErrors(
+                    action: () =>
+                    {
+                        var csg = CachedSaveGame.FromJson(File.ReadAllText(path), db);
+                        csg.UnderlyingSave = save;
+                        return csg;
+                    },
+                    handleErr: (ex) =>
+                    {
+                        logger.Error(ex, "failed to load cached save-game data, clearing");
 
-                    File.Delete(path);
-                    res = null;
-                }
-#endif
+                        File.Delete(path);
+                        return null;
+                    }
+                );
+
                 CrashSupport.ReferencedCachedSave(res);
                 return res;
             }

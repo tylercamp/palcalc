@@ -188,15 +188,7 @@ namespace PalCalc.UI.ViewModel
                     {
                         if (Storage.DEBUG_DisableStorage) return new PalTargetListViewModel();
 
-                        T CatchErrors<T>(Func<T> action, Func<Exception, T> handleErr)
-                        {
-#if HANDLE_ERRORS
-                            try { return action(); }
-                            catch (Exception ex) { return handleErr(ex); }
-#else
-                            return action();
-#endif
-                        }
+
 
                         var gameSettings = GameSettingsViewModel.Load(sg).ModelObject;
                         var originalCachedSave = Storage.LoadSaveFromCache(sg, db);
@@ -206,7 +198,7 @@ namespace PalCalc.UI.ViewModel
                         PalTargetListViewModel result = null;
                         if (File.Exists(Path.Join(dataPath, "pal-targets.json")))
                         {
-                            result = CatchErrors(
+                            result = PCDebug.HandleErrors(
                                 action: () =>
                                 {
                                     // old format where pal targets were all stored in a single file, split into multiple files instead
@@ -239,7 +231,7 @@ namespace PalCalc.UI.ViewModel
                         }
                         else if (File.Exists(Path.Join(dataPath, "pal-target-ids.json")))
                         {
-                            result = CatchErrors(
+                            result = PCDebug.HandleErrors(
                                 action: () =>
                                 {
                                     var targetFiles = Directory.Exists(targetsFolder) ? Directory.EnumerateFiles(targetsFolder) : [];
@@ -247,7 +239,7 @@ namespace PalCalc.UI.ViewModel
                                     var entryConverter = new PalSpecifierViewModelConverter(db, gameSettings, originalCachedSave);
                                     var targetEntries = targetFiles.Select(f =>
                                     {
-                                        return CatchErrors(
+                                        return PCDebug.HandleErrors(
                                             action: () => JsonConvert.DeserializeObject<PalSpecifierViewModel>(File.ReadAllText(f), entryConverter),
                                             handleErr: (ex) =>
                                             {
