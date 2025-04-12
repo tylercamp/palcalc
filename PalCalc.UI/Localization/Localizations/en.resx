@@ -323,7 +323,7 @@ Please find the generated ZIP file to send with any support questions:
     <value>Include Pals at Base</value>
   </data>
   <data name="LC_INCLUDE_PALS_GPS" xml:space="preserve">
-    <value>Include Pals in Global Pal Storage</value>
+    <value>Include Pals in Global Palbox</value>
   </data>
   <data name="LC_INCLUDE_PALS_IN_CAGES" xml:space="preserve">
     <value>Include Pals in Viewing Cages</value>
@@ -359,7 +359,7 @@ Please find the generated ZIP file to send with any support questions:
     <value>Dim. storage, tab {Tab} at ({X},{Y})</value>
   </data>
   <data name="LC_LOC_COORD_GPS" xml:space="preserve">
-    <value>Global storage, tab {Tab} at ({X},{Y})</value>
+    <value>Global palbox, tab {Tab} at ({X},{Y})</value>
   </data>
   <data name="LC_LOC_COORD_PALBOX" xml:space="preserve">
     <value>Palbox, tab {Tab} at ({X},{Y})</value>
@@ -492,10 +492,10 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
     <value>Dim. Storage</value>
   </data>
   <data name="LC_PAL_LOC_GPS_FULL" xml:space="preserve">
-    <value>Global Pal Storage</value>
+    <value>Global Palbox</value>
   </data>
   <data name="LC_PAL_LOC_GPS_SHORT" xml:space="preserve">
-    <value>Global Storage</value>
+    <value>Global Palbox</value>
   </data>
   <data name="LC_PAL_LOC_PALBOX" xml:space="preserve">
     <value>Palbox</value>

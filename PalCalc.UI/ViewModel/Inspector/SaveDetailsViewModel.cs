@@ -106,7 +106,7 @@ namespace PalCalc.UI.ViewModel.Inspector
 
             return [
                 new InspectedContainerDetailsViewModel(
-                    "Global Pal Storage",
+                    "Global Palbox",
                     null,
                     containedPals,
                     rawGpsPals,
