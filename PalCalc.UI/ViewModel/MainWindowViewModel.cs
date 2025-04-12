@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Localization;
@@ -187,42 +188,93 @@ namespace PalCalc.UI.ViewModel
                     {
                         if (Storage.DEBUG_DisableStorage) return new PalTargetListViewModel();
 
-                        var saveTargetsLocation = Storage.SaveFileDataPath(sg);
-                        var targetsFile = Path.Join(saveTargetsLocation, "pal-targets.json");
-                        if (File.Exists(targetsFile))
+                        T CatchErrors<T>(Func<T> action, Func<Exception, T> handleErr)
                         {
-                            var originalCachedSave = Storage.LoadSaveFromCache(sg, db);
-
-                            var converter = new PalTargetListViewModelConverter(db, GameSettingsViewModel.Load(sg).ModelObject, originalCachedSave);
 #if HANDLE_ERRORS
-                            try
-                            {
+                            try { return action(); }
+                            catch (Exception ex) { return handleErr(ex); }
+#else
+                            return action();
 #endif
-                                var res = JsonConvert.DeserializeObject<PalTargetListViewModel>(File.ReadAllText(targetsFile), converter);
-                                progress.LoadedSaves++;
-                                progressHandler?.Invoke(progress);
-                                return res;
+                        }
 
-#if HANDLE_ERRORS
-                            }
-                            catch (Exception ex)
-                            {
-                                logger.Warning(ex, "an error occurred loading targets list for {saveId}, deleting the old file and resetting", CachedSaveGame.IdentifierFor(sg));
-                                File.Delete(targetsFile);
+                        var gameSettings = GameSettingsViewModel.Load(sg).ModelObject;
+                        var originalCachedSave = Storage.LoadSaveFromCache(sg, db);
+                        var dataPath = Storage.SaveFileDataPath(sg);
 
-                                progress.LoadedSaves++;
-                                progressHandler?.Invoke(progress);
-                                return new PalTargetListViewModel();
-                            }
-#endif
+                        var targetsFolder = Storage.SaveFileTargetsDataPath(sg);
+                        PalTargetListViewModel result = null;
+                        if (File.Exists(Path.Join(dataPath, "pal-targets.json")))
+                        {
+                            result = CatchErrors(
+                                action: () =>
+                                {
+                                    // old format where pal targets were all stored in a single file, split into multiple files instead
+                                    Directory.CreateDirectory(targetsFolder);
+
+                                    var vmEntryConverter = new PalSpecifierViewModelConverter(db, gameSettings, originalCachedSave);
+                                    var oldData = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(Path.Join(dataPath, "pal-targets.json")));
+                                    var oldTargets = oldData["Targets"]?.ToObject<List<PalSpecifierViewModel>>(JsonSerializer.Create(new JsonSerializerSettings() { Converters = [vmEntryConverter] }));
+
+                                    foreach (var target in oldTargets)
+                                    {
+                                        File.WriteAllText(Path.Join(targetsFolder, $"{target.Id}.json"), JsonConvert.SerializeObject(target, vmEntryConverter));
+                                    }
+
+                                    var res = new PalTargetListViewModel(oldTargets);
+                                    File.WriteAllText(
+                                        Path.Join(dataPath, "pal-target-ids.json"),
+                                        JsonConvert.SerializeObject(res, new PalTargetListViewModelConverter(db, gameSettings, originalCachedSave, oldTargets.ToDictionary(t => t.Id)))
+                                    );
+
+                                    File.Delete(Path.Join(dataPath, "pal-targets.json"));
+                                    return res;
+                                },
+                                handleErr: (ex) =>
+                                {
+                                    logger.Warning(ex, "an error occurred loading the old targets list for {saveId}, skipping", CachedSaveGame.IdentifierFor(sg));
+                                    return new PalTargetListViewModel();
+                                }
+                            );
+                        }
+                        else if (File.Exists(Path.Join(dataPath, "pal-target-ids.json")))
+                        {
+                            result = CatchErrors(
+                                action: () =>
+                                {
+                                    var targetFiles = Directory.Exists(targetsFolder) ? Directory.EnumerateFiles(targetsFolder) : [];
+
+                                    var entryConverter = new PalSpecifierViewModelConverter(db, gameSettings, originalCachedSave);
+                                    var targetEntries = targetFiles.Select(f =>
+                                    {
+                                        return CatchErrors(
+                                            action: () => JsonConvert.DeserializeObject<PalSpecifierViewModel>(File.ReadAllText(f), entryConverter),
+                                            handleErr: (ex) =>
+                                            {
+                                                logger.Warning(ex, "an error occurred loading target for {saveId} at {path}, skipping", CachedSaveGame.IdentifierFor(sg), f);
+                                                return null;
+                                            }
+                                        );
+                                    }).SkipNull().ToList();
+
+                                    var converter = new PalTargetListViewModelConverter(db, GameSettingsViewModel.Load(sg).ModelObject, originalCachedSave, targetEntries.ToDictionary(e => e.Id));
+                                    return JsonConvert.DeserializeObject<PalTargetListViewModel>(File.ReadAllText(Path.Join(dataPath, "pal-target-ids.json")), [converter]);
+                                },
+                                handleErr: (ex) =>
+                                {
+                                    logger.Warning(ex, "an error occurred loading targets list for {saveId}, skipping", CachedSaveGame.IdentifierFor(sg));
+                                    return new PalTargetListViewModel();
+                                }
+                            );
                         }
                         else
                         {
-                            progress.LoadedSaves++;
-                            progressHandler?.Invoke(progress);
-
-                            return new PalTargetListViewModel();
+                            result = new PalTargetListViewModel();
                         }
+
+                        progress.LoadedSaves++;
+                        progressHandler?.Invoke(progress);
+                        return result;
                     }
                 );
 
@@ -285,6 +337,9 @@ namespace PalCalc.UI.ViewModel
             {
                 targetList.Remove(spec);
                 SaveTargetList(targetList);
+                var dataPath = Path.Join(Storage.SaveFileTargetsDataPath(SaveSelection.SelectedFullGame.Value), $"{spec.Id}.json");
+                if (File.Exists(dataPath))
+                    File.Delete(dataPath);
 
                 UpdatePalTarget();
             }
@@ -466,9 +521,22 @@ namespace PalCalc.UI.ViewModel
             if (!Directory.Exists(outputFolder))
                 Directory.CreateDirectory(outputFolder);
 
-            var outputFile = Path.Join(outputFolder, "pal-targets.json");
-            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedFullGame.CachedValue);
+            var outputFile = Path.Join(outputFolder, "pal-target-ids.json");
+            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), SaveSelection.SelectedFullGame.CachedValue, list.Targets.Where(t => !t.IsReadOnly).ToDictionary(t => t.Id));
             File.WriteAllText(outputFile, JsonConvert.SerializeObject(list, converter));
+        }
+
+        public void SaveTarget(PalSpecifierViewModel item)
+        {
+            if (Storage.DEBUG_DisableStorage) return;
+
+            var outputFolder = Storage.SaveFileTargetsDataPath(SaveSelection.SelectedFullGame.Value);
+            if (!Directory.Exists(outputFolder))
+                Directory.CreateDirectory(outputFolder);
+
+            var outputFile = Path.Join(outputFolder, $"{item.Id}.json");
+            var converter = new PalSpecifierViewModelConverter(db, SelectedGameSettings.ModelObject, SaveSelection.SelectedFullGame.CachedValue);
+            File.WriteAllText(outputFile, JsonConvert.SerializeObject(item, converter));
         }
 
         private void RunSolver()
@@ -490,6 +558,7 @@ namespace PalCalc.UI.ViewModel
                 PalTargetList.Add(initialSpec);
                 PalTargetList.SelectedTarget = initialSpec;
                 SaveTargetList(PalTargetList);
+                SaveTarget(initialSpec);
 
                 UpdatePalTarget();
                 currentSpec = PalTarget.CurrentPalSpecifier;
@@ -528,6 +597,7 @@ namespace PalCalc.UI.ViewModel
                     UpdatePalTarget();
                 }
 
+                SaveTarget(currentSpec);
                 SaveTargetList(PalTargetList);
             };
 

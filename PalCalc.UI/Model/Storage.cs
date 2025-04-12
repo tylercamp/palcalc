@@ -50,6 +50,8 @@ namespace PalCalc.UI.Model
             return path;
         }
 
+        public static string SaveFileTargetsDataPath(ISaveGame forSaveFile) => Path.Join(SaveFileDataPath(forSaveFile), "targets");
+
         // path for storing game-specific game settings (breeding time, etc.)
         public static string GameSettingsPath(ISaveGame forSaveFile)
         {

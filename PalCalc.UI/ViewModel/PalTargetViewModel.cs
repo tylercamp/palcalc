@@ -36,7 +36,7 @@ namespace PalCalc.UI.ViewModel
             if (initial.IsReadOnly)
             {
                 InitialPalSpecifier = null;
-                CurrentPalSpecifier = new PalSpecifierViewModel(null);
+                CurrentPalSpecifier = new PalSpecifierViewModel(Guid.NewGuid().ToString(), null);
 
                 PalSource = new PalSourceTreeViewModel(sourceSave.CachedValue);
             }

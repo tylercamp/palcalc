@@ -519,7 +519,9 @@ namespace PalCalc.UI
                 ]
             };
 
-            return new PalSpecifierViewModel(modelSpecifier)
+            // null-coalesce for backwards compatibility with older saves
+            var id = obj["Id"]?.ToObject<string>() ?? Guid.NewGuid().ToString();
+            return new PalSpecifierViewModel(id, modelSpecifier)
             {
                 MinIv_HP = obj["MinIV_HP"]?.ToObject<int>() ?? 0,
                 MinIv_Attack = obj["MinIV_Attack"]?.ToObject<int>() ?? 0,
@@ -538,6 +540,7 @@ namespace PalCalc.UI
         {
             JToken.FromObject(new
             {
+                Id = value.Id,
                 TargetPal = value.TargetPal,
                 Passive1 = value.RequiredPassives.Passive1,
                 Passive2 = value.RequiredPassives.Passive2,
@@ -615,8 +618,11 @@ namespace PalCalc.UI
 
     internal class PalTargetListViewModelConverter : PalConverterBase<PalTargetListViewModel>
     {
-        public PalTargetListViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source) : base(db, gameSettings)
+        private Dictionary<string, PalSpecifierViewModel> expectedSpecifiers;
+
+        public PalTargetListViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source, Dictionary<string, PalSpecifierViewModel> specifiersById) : base(db, gameSettings)
         {
+            expectedSpecifiers = specifiersById;
             dependencyConverters = new JsonConverter[]
             {
                 new PalSpecifierViewModelConverter(db, gameSettings, source),
@@ -626,14 +632,14 @@ namespace PalCalc.UI
 
         protected override PalTargetListViewModel ReadTypeJson(JsonReader reader, Type objectType, PalTargetListViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            var specifiers = JToken.ReadFrom(reader)["Targets"].ToObject<List<PalSpecifierViewModel>>(serializer);
-            return new PalTargetListViewModel(specifiers);
+            var orderedIds = JToken.ReadFrom(reader)["OrderedTargetIds"].ToObject<List<string>>();
+            return new PalTargetListViewModel(expectedSpecifiers.Values.OrderBy(s => orderedIds.Contains(s.Id) ? orderedIds.IndexOf(s.Id) : int.MaxValue));
         }
 
         protected override void WriteTypeJson(JsonWriter writer, PalTargetListViewModel value, JsonSerializer serializer)
         {
             JToken
-                .FromObject(new { Targets = value.Targets.Where(t => !t.IsReadOnly).ToList() }, serializer)
+                .FromObject(new { OrderedTargetIds = value.Targets.Where(t => !t.IsReadOnly).Select(t => t.Id).ToList() }, serializer)
                 .WriteTo(writer, dependencyConverters);
         }
     }

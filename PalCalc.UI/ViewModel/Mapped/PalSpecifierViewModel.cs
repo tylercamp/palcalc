@@ -17,9 +17,10 @@ namespace PalCalc.UI.ViewModel.Mapped
 {
     public partial class PalSpecifierViewModel : ObservableObject
     {
-        public PalSpecifierViewModel(PalSpecifier underlyingSpec)
+        public PalSpecifierViewModel(string id, PalSpecifier underlyingSpec)
         {
             IsReadOnly = false;
+            Id = id;
 
             if (underlyingSpec == null)
             {
@@ -49,7 +50,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
         }
 
-        private PalSpecifierViewModel(PalSpecifier underlyingSpec, bool isReadOnly) : this(underlyingSpec)
+        private PalSpecifierViewModel(string id, PalSpecifier underlyingSpec, bool isReadOnly) : this(id, underlyingSpec)
         {
             IsReadOnly = isReadOnly;
 
@@ -65,6 +66,8 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public bool IsReadOnly { get; }
         public bool IsDynamic => !IsReadOnly;
+
+        public string Id { get; }
 
         public PalSpecifier ModelObject => TargetPal != null
             ? new PalSpecifier()
@@ -183,6 +186,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         private SolverJobViewModel latestJob;
 
         public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(
+            IsReadOnly ? Guid.NewGuid().ToString() : Id,
             new PalSpecifier()
             {
                 Pal = TargetPal.ModelObject,
@@ -204,7 +208,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             LatestJob = LatestJob,
         };
 
-        public static readonly PalSpecifierViewModel New = new PalSpecifierViewModel(null, true);
+        public static readonly PalSpecifierViewModel New = new PalSpecifierViewModel(null, null, true);
 
         public static PalSpecifierViewModel DesignerInstance
         {
@@ -212,6 +216,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 var db = PalDB.LoadEmbedded();
                 return new PalSpecifierViewModel(
+                    Guid.NewGuid().ToString(),
                     new PalSpecifier()
                     {
                         Pal = "Beakon".ToPal(db),
