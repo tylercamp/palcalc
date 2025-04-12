@@ -32,6 +32,8 @@ namespace PalCalc.Model
 
         public bool CanInherit { get; set; }
 
+        public bool HasSkillFruit { get; set; }
+
         public int Power { get; set; }
         public float CooldownSeconds { get; set; }
 

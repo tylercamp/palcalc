@@ -243,7 +243,7 @@ namespace PalCalc.GenDB
             }).SkipNull().ToList();
         }
 
-        private static List<ActiveSkill> BuildActiveSkills(List<UActiveSkill> rawActiveSkills, List<PalElement> elements, Dictionary<string, Dictionary<string, string>> attackNames)
+        private static List<ActiveSkill> BuildActiveSkills(List<UActiveSkill> rawActiveSkills, List<PalElement> elements, List<UItem> allItems, Dictionary<string, Dictionary<string, string>> attackNames)
         {
             return rawActiveSkills.Where(s => !s.DisabledData).Select(rawAttack =>
             {
@@ -263,8 +263,9 @@ namespace PalCalc.GenDB
                 {
                     CooldownSeconds = rawAttack.CoolTime,
                     CanInherit = !rawAttack.IgnoreRandomInherit,
+                    HasSkillFruit = allItems.Any(i => i.TypeB == "EPalItemTypeB::ConsumeWazaMachine" && i.WazaID == rawAttack.WazaType),
                     Power = rawAttack.Power,
-                    LocalizedNames = localizedNames
+                    LocalizedNames = localizedNames,
                 };
             }).SkipNull().ToList();
         }
@@ -599,10 +600,12 @@ namespace PalCalc.GenDB
             var elements = BuildElements(localizations.ToDictionary(l => l.LanguageCode, l => l.ReadElementNames(provider)));
 
             var rawAttacks = ActiveSkillReader.ReadActiveSkills(provider);
+            var rawItems = ItemReader.ReadItems(provider);
 
             var attacks = BuildActiveSkills(
                 rawAttacks,
                 elements,
+                rawItems,
                 localizations.ToDictionary(l => l.LanguageCode, l => l.ReadAttackNames(provider))
             );
 

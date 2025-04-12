@@ -1,0 +1,200 @@
+Name,CodeName,Element,Power,CooldownSeconds,CanInherit,HasSkillFruit
+Acid Rain,AcidRain,Water,80,18,True,True
+Air Blade,AirBlade,Neutral,85,20,True,True
+Air Cannon,AirCanon,Neutral,25,2,True,True
+Apocalypse,Apocalypse,Dark,110,55,True,True
+Hydro Jet,AquaJet,Water,30,2,True,True
+Beam Slicer,BeamSlicer,Dragon,130,45,True,True
+Blast Cannon,BlastCanon,Dragon,100,30,True,True
+Iceberg,BlizzardLance,Ice,70,15,True,True
+Bubble Blast,BubbleShot,Water,65,13,True,True
+Poison Shower,BubbleShower,Dark,90,22,True,False
+Charge Cannon,ChargeCanon,Dragon,140,50,True,False
+Comet Strike,Commet,Dragon,110,35,True,True
+Meteorain,CommetRain,Dragon,160,55,True,False
+Dark Arrow,DarkArrow,Dark,65,10,True,True
+Dark Ball,DarkBall,Dark,40,4,True,False
+Dark Cannon,DarkCanon,Dark,50,2,True,True
+Dark Laser,DarkLaser,Dark,150,55,True,True
+Dark Whisp,DarkLegion,Dark,160,45,True,False
+Umbral Surge,DarkPulse,Dark,40,2,True,True
+Shadow Burst,DarkWave,Dark,55,10,True,True
+Diamond Rain,DiamondFall,Ice,160,60,True,True
+Double Blizzard Spike,DoubleIcicleThrow,Ice,200,60,True,False
+Draconic Breath,DragonBreath,Dragon,70,15,True,True
+Dragon Cannon,DragonCanon,Dragon,30,2,True,True
+Dragon Meteor,DragonMeteor,Dragon,150,55,True,True
+Dragon Burst,DragonWave,Dragon,55,10,True,True
+Shockwave,ElecWave,Electric,40,4,True,True
+Volcanic Rain,Eruption,Fire,130,45,True,True
+Fire Ball,FireBall,Fire,150,55,True,True
+Ignis Blast,FireBlast,Fire,30,2,True,True
+Spirit Fire,FireSeed,Fire,45,7,True,True
+Flame Funnel,FlameFunnel,Fire,120,40,True,True
+Ignis Breath,Flamethrower,Fire,70,15,True,True
+Flame Wall,FlameWall,Fire,100,30,True,True
+Flare Arrow,FlareArrow,Fire,55,10,True,True
+Flare Storm,FlareTornado,Fire,80,18,True,True
+Crystal Breath,FrostBreath,Ice,90,22,True,True
+Spirit Flame,GhostFlame,Dark,75,16,True,True
+Grass Tornado,GrassTornado,Grass,80,18,True,True
+Holy Burst,HolyBlast,Neutral,120,30,True,True
+Hydro Laser,HydroPump,Water,150,55,True,True
+Pal Blast,HyperBeam,Neutral,150,55,True,True
+Absolute Frost,IceAge,Ice,140,50,True,False
+Icicle Cutter,IceBlade,Ice,55,10,True,True
+Ice Missile,IceMissile,Ice,30,3,True,True
+Icicle Line,IcicleLine,Ice,120,40,True,True
+Icicle Bullet,IciclePierce,Ice,110,35,True,False
+Blizzard Spike,IcicleThrow,Ice,130,45,True,True
+Ignis Rage,Inferno,Fire,120,40,True,True
+Lightning Strike,LightningStrike,Electric,120,40,True,True
+Splash,LineGeyser,Water,90,22,True,True
+Lightning Streak,LineThunder,Electric,75,16,True,True
+Lock-on Laser,LockonLaser,Electric,70,15,True,True
+Bog Blast,MudShot,Ground,40,4,True,True
+Poison Fog,PoisonFog,Dark,0,30,True,False
+Poison Blast,PoisonShot,Dark,30,2,True,True
+Power Bomb,PowerBall,Neutral,70,15,True,True
+Power Shot,PowerShot,Neutral,35,4,True,True
+Predator Blast,PredatorBeam,Neutral,200,20,False,False
+Predator Mark,PredatorLockon,Neutral,180,20,False,False
+Predator Surge,PredatorWave,Neutral,100,20,False,False
+Raid Cutter,RaidCutter,Grass,110,35,True,False
+Thunder Rail,Railbolt,Electric,200,60,True,False
+All Range Thunder,RangeThunder,Electric,125,40,True,False
+Stone Beat,RockBeat,Ground,170,60,True,False
+Rock Lance,RockLance,Ground,150,55,True,True
+Spine Vine,RootAttack,Grass,95,25,True,True
+Circle Vine,RootLance,Grass,120,40,True,True
+Sand Tornado,SandTornado,Ground,80,18,True,True
+Sand Twister,SandTwister,Ground,160,60,True,True
+Seed Machine Gun,SeedMachinegun,Grass,50,9,True,True
+Seed Mine,SeedMine,Grass,65,13,True,True
+Implode,SelfDestruct,Neutral,230,55,True,True
+Bee Quiet,SelfDestruct_Bee,Grass,250,55,False,False
+Megaton Implode,SelfExplosion,Neutral,500,55,True,False
+Nightmare Ball,ShadowBall,Dark,100,30,True,True
+Lethal Laser,ShokeiLaser,Electric,170,50,True,False
+Solar Blast,SolarBeam,Grass,150,55,True,True
+Multicutter,SpecialCutter,Grass,60,12,True,True
+Spark Blast,SpreadPulse,Electric,30,2,True,True
+Star Mine,StarMine,Neutral,110,55,False,False
+Stone Blast,StoneShotgun,Ground,55,10,True,True
+Comet Barrage,ThreeCommet,Dragon,120,40,True,False
+Tri-Lightning,ThreeThunder,Electric,90,22,True,True
+Stone Cannon,ThrowRock,Ground,70,15,True,True
+Electric Ball,ThunderBall,Electric,50,9,True,True
+Lightning Bolt,Thunderbolt,Electric,150,55,True,True
+Plasma Funnel,ThunderFunnel,Electric,65,13,True,True
+Thunder Rain,ThunderRain,Electric,135,45,True,True
+Thunderstorm,ThunderStorm,Electric,160,60,True,True
+Rockburst,Tremor,Ground,130,35,True,True
+TriSpark,TriSpark,Electric,110,35,True,True
+Fluffy Tackle,Unique_Alpaca_Tackle,Neutral,40,4,False,False
+Daring Shadowstorm,Unique_AmaterasuWolf_Dark_DarkCharge,Dark,75,10,False,False
+Daring Flames,Unique_AmaterasuWolf_FireCharge,Fire,75,10,False,False
+Ground Smash,Unique_Anubis_GroundPunch,Ground,140,35,False,False
+Spinning Roundhouse,Unique_Anubis_LowRoundKick,Ground,100,21,False,False
+Forceful Charge,Unique_Anubis_Tackle,Ground,120,28,False,False
+Hellfire Claw,Unique_Baphomet_SwallowKite,Fire,70,10,False,False
+Flame Breath,Unique_BirdDragon_FireBreath,Fire,90,15,False,False
+Tempest Blizzard,Unique_BirdDragon_Ice_IceBreath,Ice,90,15,False,False
+Twin Spears,Unique_BlackCentaur_TwoSpearRushes,Dark,120,40,False,False
+Divine Disaster,Unique_BlackGriffon_TackleLaser,Dark,160,45,False,False
+Divine Disaster II,Unique_BlackGriffon_TackleLaser2,Dark,170,45,False,False
+Firefist Breathstorm,Unique_BlackMetalDragon_FirePunch,Dragon,130,30,False,False
+Bolt Blink,Unique_BlueThunderHorse_FlashDash,Electric,200,45,False,False
+Reckless Charge,Unique_Boar_Tackle,Neutral,55,2,False,False
+Emperor Slide,Unique_CaptainPenguin_BodySlide,Ice,70,10,False,False
+Chicken Rush,Unique_ChickenPal_ChickenPeck,Neutral,30,1,False,False
+Evil Slash,Unique_DarkAlien_JumpScractch,Dark,95,17,False,False
+Phantom Peck,Unique_DarkCrow_TelePoke,Dark,55,7,False,False
+Beam Slash,Unique_DarkMechaDragon_BeamSlash,Dragon,120,28,False,False
+Astral Ray,Unique_DarkMechaDragon_ConvergentBeam,Dark,170,45,False,False
+Omega Laser,Unique_DarkMechaDragon_FunnelLaser,Dragon,200,55,False,False
+Satellite Bit,Unique_DarkMechaDragon_SetFunnel,Dragon,80,12,False,False
+Cosmic Meteor,Unique_DarkMechaDragon_WarpComet,Dragon,180,50,False,False
+Jumping Stinger,Unique_DarkScorpion_Pierce,Ground,110,24,False,False
+Antler Uppercut,Unique_Deer_PushupHorn,Neutral,50,5,False,False
+Shell Spin,Unique_DrillGame_ShellAttack,Ground,65,9,False,False
+Gale Claw,Unique_Eagle_GlidingNail,Neutral,60,8,False,False
+Lightning Claw,Unique_ElecPanda_ElecScratch,Electric,90,22,False,False
+Heavy Thunder Tank,Unique_ElecPanda_GatlingAttack,Electric,160,42,False,False
+Mystic Whirlwind,Unique_FairyDragon_FairyTornado,Dragon,70,10,False,False
+Earth Dash,Unique_FeatherOstrich_Tossin,Ground,100,21,False,False
+Cloud Tempest,Unique_FengyunDeeper_CloudTempest,Neutral,90,15,False,False
+Thunder Tempest,Unique_FengyunDeeper_Electric_ThunderTempest,Electric,90,15,False,False
+Dark Charge,Unique_FireKirin_Dark_DarkTossin,Dark,85,14,False,False
+Ignis Charge,Unique_FireKirin_Tackle,Fire,85,14,False,False
+Blazing Horn,Unique_FlameBuffalo_FlameHorn,Fire,50,9,False,False
+Botanical Smash,Unique_FlowerDinosaur_Whip,Grass,60,8,False,False
+Fierce Fang,Unique_Garm_Bite,Neutral,45,2,False,False
+Spirit Dash,Unique_GhostBeast_Tossin,Dark,90,15,False,False
+Crash Dash,Unique_GoldenHorse_StoneDash,Ground,120,28,False,False
+Ground Pound,Unique_Gorilla_GroundPunch,Neutral,85,14,False,False
+Earth Impact,Unique_Grassmammoth_Earthquake,Ground,100,30,False,False
+Blast Punch,Unique_GrassPanda_Electric_ElectricPunch,Electric,85,14,False,False
+Crushing Punch,Unique_GrassPanda_MusclePunch,Grass,85,18,False,False
+Spinning Roundhouse,Unique_GrassRabbitMan_GrassRoundKick,Grass,90,15,False,False
+Grudge Barrage,Unique_GrimGirl_BrutalMachete,Dark,130,31,False,False
+Tornado Attack,Unique_HawkBird_Storm,Neutral,65,13,False,False
+Giga Horn,Unique_HerculesBeetle_BeetleTackle,Ground,75,11,False,False
+Phoenix Flare,Unique_Horus_FlareBird,Fire,135,28,False,False
+Raging Flame Wave,Unique_Horus_PerfectStorm,Fire,145,38,False,False
+Phoenix Tide,Unique_Horus_Water_AquaStorm,Water,135,28,False,False
+Freezing Charge,Unique_IceDeer_IceHorn,Ice,65,9,False,False
+Crystal Wing,Unique_IceHorse_IceBladeAttack,Ice,110,24,False,False
+Beam Comet,Unique_JetDragon_JumpBeam,Dragon,140,50,False,False
+Kingly Slam,Unique_KingAlpaca_BodyPress,Neutral,100,21,False,False
+Magna Crush,Unique_KingBahamut_AirCrash,Dragon,160,42,False,False
+Brawn Impact,Unique_KingBahamut_ArmSmash,Fire,150,38,False,False
+Lightning Gale,Unique_Kirin_LightningTackle,Electric,60,8,False,False
+Bountiful Protection,Unique_LilyQueen_LilyHealing,Grass,0,240,False,False
+Volcanic Fang,Unique_Manticore_InfernoStrike,Fire,125,30,False,False
+Seigetsu Flash,Unique_MoonQueen_IceMoonBlade,Neutral,110,24,False,False
+Moonlight Beam,Unique_MoonQueen_MoonBeam,Neutral,170,40,False,False
+Seigetsu Blade,Unique_MoonQueen_MoonBlade,Neutral,110,24,False,False
+Soul Drain,Unique_MysteryMask_LifeSteal,Dark,100,30,False,False
+Cat Press,Unique_NaughtyCat_CatPress,Neutral,60,9,False,False
+Lethal Step,Unique_NightBlueHorse_DeathStep,Dark,140,35,False,False
+Flame Waltz,Unique_NightLady_FlameNightmare,Dark,130,45,False,False
+Nightmare Bloom,Unique_NightLady_WarpBeam,Dark,160,50,False,False
+Nightmare Ray,Unique_NightLady_WarpBeam_Straight,Dark,140,50,False,False
+Punch Flurry,Unique_PinkCat_CatPunch,Neutral,40,1,False,False
+Webstrike Impact,Unique_PurpleSpider_SpiderRaid,Dark,85,14,False,False
+Spinning Staff,Unique_QueenBee_SpinLance,Grass,70,9,False,False
+Rush Beak,Unique_RedArmorBird_TriplePeck,Fire,85,14,False,False
+Focus Shot,Unique_RobinHood_BowSnipe,Grass,65,9,False,False
+Iaigiri,Unique_Ronin_Iai,Fire,65,9,False,False
+Spear Thrust,Unique_SaintCentaur_OneSpearRushes,Neutral,120,40,False,False
+Muscle Slam,Unique_SakuraSaurus_SideTackle,Neutral,80,12,False,False
+Upper Smash,Unique_ScorpionMan_Uppercut,Dark,110,24,False,False
+Roly Poly,Unique_SheepBall_Roll,Neutral,35,1,False,False
+Wholehearted Stance,Unique_SifuDog_Counter,Neutral,170,30,False,False
+Glacial Impact,Unique_SnowTigerBeastman_SnowImpact,Ice,190,52,False,False
+Frost Talon,Unique_SnowTigerBeastman_TrampleSlash,Ice,95,17,False,False
+Needle Spear,Unique_SoldierBee_NeedleLance,Grass,55,7,False,False
+Lightning Dive,Unique_ThunderBird_ThunderStorm,Electric,80,12,False,False
+Beckon Lightning,Unique_ThunderDog_InazumaShorai,Electric,65,9,False,False
+Polykeraunos,Unique_ThunderDragonMan_NumerousSwordAttack,Electric,180,50,False,False
+Kerauno,Unique_ThunderDragonMan_ThunderSwordAttack,Electric,100,30,False,False
+Magma Serpent,Unique_Umihebi_Fire_FireWindingTackle,Fire,145,30,False,False
+Slither Slam,Unique_Umihebi_WindingTackle,Water,145,30,False,False
+Frost Burst,Unique_VolcanicMonster_Ice_IceAttack,Ice,100,45,False,False
+Volcanic Burst,Unique_VolcanicMonster_MagmaAttack,Fire,100,45,False,False
+Rocket Slam,Unique_WeaselDragon_FlyingTackle,Dragon,50,6,False,False
+Snow Claw,Unique_Werewolf_Ice_SnowScratch,Ice,55,7,False,False
+Jumping Claw,Unique_Werewolf_Scratch,Dark,55,7,False,False
+Holy Nova,Unique_WhiteDeer_HolyPillar,Neutral,200,45,False,False
+Aegis Charge,Unique_WhiteShieldDragon_ShieldTackle,Dragon,170,50,False,False
+Stone Claw,Unique_WhiteTiger_Ground_IronScratch,Ground,95,17,False,False
+Blizzard Claw,Unique_WhiteTiger_IceScratch,Ice,85,14,False,False
+Ground Cutter,Unique_WingGolem_RoundCutter,Ground,145,35,False,False
+Lawn Bowling,Unique_Yeti_Grass_GrassBall,Grass,100,20,False,False
+Snow Bowling,Unique_Yeti_SnowBall,Ice,100,20,False,False
+Curtain Splash,WallSplash,Water,120,40,True,True
+Aqua Burst,WaterBall,Water,100,30,True,True
+Aqua Gun,WaterGun,Water,40,4,True,True
+Wind Cutter,WindCutter,Grass,30,2,True,True
+Wind Edge,WindEdge,Grass,90,22,True,False

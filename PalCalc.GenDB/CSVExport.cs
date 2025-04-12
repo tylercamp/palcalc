@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -81,6 +82,19 @@ namespace PalCalc.GenDB
                         ("CodeName", passive.InternalName),
                         ("Rank", passive.Rank),
                         ("IsPalPassive", passive.IsStandardPassiveSkill)
+                    ]);
+
+            using (var f = File.OpenWrite($"{outDir}/attacks.csv"))
+            using (var attackWriter = new CSVWriter(f))
+                foreach (var attack in db.ActiveSkills.OrderBy(a => a.InternalName))
+                    attackWriter.Write([
+                        ("Name", attack.LocalizedNames?.GetValueOrDefault(ExportLocale) ?? attack.Name),
+                        ("CodeName", attack.InternalName),
+                        ("Element", attack.Element.Name),
+                        ("Power", attack.Power),
+                        ("CooldownSeconds", attack.CooldownSeconds),
+                        ("CanInherit", attack.CanInherit),
+                        ("HasSkillFruit", attack.HasSkillFruit),
                     ]);
 
             using (var f = File.OpenWrite($"{outDir}/humans.csv"))
