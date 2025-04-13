@@ -108,7 +108,34 @@ namespace PalCalc.Solver.PalReference
             set
             {
                 _avgRequiredBreedings = value;
-                SelfBreedingEffort = _avgRequiredBreedings * gameSettings.AvgBreedingTime * Parent1.TimeFactor * Parent2.TimeFactor;
+
+                var timePerBreed = gameSettings.AvgBreedingTime * Parent1.TimeFactor * Parent2.TimeFactor;
+                var totalBreedingTime = _avgRequiredBreedings * timePerBreed;
+
+                var incubationTime = Pal.EggSize.IncubationTime(gameSettings);
+                var totalIncubationTime = _avgRequiredBreedings * incubationTime;
+
+                if (gameSettings.MultipleIncubators)
+                {
+                    // time to get the desired pal is just time to produce the egg + time to incubate it
+                    SelfBreedingEffort = totalBreedingTime + incubationTime;
+                }
+                else
+                {
+                    // either breeding time will outweigh incubation time, or vice-versa. regardless of which part
+                    // is the bottleneck, we'll always need to do the other part at least once.
+                    //
+                    // (though, realistically, incubation will always take longer than breeding, unless incubation
+                    // time is turned off entirely)
+
+                    var allIncubationWithBreeding = totalIncubationTime + timePerBreed;
+                    var allBreedingWithIncubation = totalBreedingTime + incubationTime;
+
+                    if (allIncubationWithBreeding > allBreedingWithIncubation)
+                        SelfBreedingEffort = allIncubationWithBreeding;
+                    else
+                        SelfBreedingEffort = allBreedingWithIncubation;
+                }
             }
         }
 

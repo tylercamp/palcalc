@@ -696,6 +696,12 @@ This will not delete the save files from your computer.</value>
   <data name="LC_SAVE_WARNING" xml:space="preserve">
     <value>(!)</value>
   </data>
+  <data name="LC_SETTINGS_MASSIVE_EGG_INCUBATION" xml:space="preserve">
+    <value>Massive Egg Incubation Time (Minutes)</value>
+  </data>
+  <data name="LC_SETTINGS_MASSIVE_EGG_INCUBATION_DESC" xml:space="preserve">
+    <value>How long it takes to incubate a massive egg without any bonuses (temperature modifiers).</value>
+  </data>
   <data name="LC_SETTINGS_PALBOX_TAB_SIZE" xml:space="preserve">
     <value>Palbox Tab Size</value>
   </data>

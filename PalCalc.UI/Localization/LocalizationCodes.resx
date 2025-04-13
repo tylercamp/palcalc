@@ -838,4 +838,10 @@
   <data name="LC_SAVESEARCH_SETTINGS_MAX_IVS" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SETTINGS_MASSIVE_EGG_INCUBATION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SETTINGS_MASSIVE_EGG_INCUBATION_DESC" xml:space="preserve">
+    <value />
+  </data>
 </root>

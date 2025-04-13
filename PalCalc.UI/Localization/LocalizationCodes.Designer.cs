@@ -813,6 +813,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SETTINGS_MASSIVE_EGG_INCUBATION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SETTINGS_MASSIVE_EGG_INCUBATION_DESC,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SETTINGS_PALBOX_TAB_SIZE,
         /// <summary>
         ///   Looks up a localized string similar to .

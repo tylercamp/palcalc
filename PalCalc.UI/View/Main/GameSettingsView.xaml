@@ -19,9 +19,9 @@
     <StackPanel Orientation="Vertical">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="10" />
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
@@ -30,9 +30,11 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="8" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Content="{itl:LocalizedText LC_BREEDING_TIME}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Label Grid.Row="0" Content="{itl:LocalizedText LC_BREEDING_TIME}" HorizontalAlignment="Left" VerticalAlignment="Center" />
             <vu:IntegerTextBox
                 Grid.Row="0"
                 Grid.Column="2"
@@ -42,12 +44,25 @@
                 MinValue="1"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
-
             />
 
-            <Label Grid.Row="2" Grid.Column="0" Content="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS}" HorizontalAlignment="Left" VerticalAlignment="Center" />
-            <CheckBox
+            <Label Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                <TextBlock TextWrapping="Wrap" Text="{itl:LocalizedText Code=LC_SETTINGS_MASSIVE_EGG_INCUBATION}" />
+            </Label>
+            <vu:IntegerTextBox
                 Grid.Row="2"
+                Grid.Column="2"
+                ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SETTINGS_MASSIVE_EGG_INCUBATION_DESC}"
+                ToolTipService.ShowOnDisabled="True"
+                Value="{Binding MassiveEggIncubationTimeMinutes}"
+                MinValue="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+            />
+
+            <Label Grid.Row="4" Grid.Column="0" Content="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <CheckBox
+                Grid.Row="4"
                 Grid.Column="2"
                 ToolTipService.ToolTip="{itl:LocalizedText LC_MULTIPLE_BREEDING_FARMS_DESC}"
                 ToolTipService.ShowOnDisabled="True"
@@ -56,8 +71,8 @@
                 VerticalAlignment="Center"
             />
 
-            <Label Grid.Row="4" Grid.Column="0" Content="{itl:LocalizedText Code=LC_SETTINGS_PALBOX_TAB_SIZE}" HorizontalAlignment="Left" VerticalAlignment="Center" />
-            <StackPanel Grid.Row="4" Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Top">
+            <Label Grid.Row="6" Grid.Column="0" Content="{itl:LocalizedText Code=LC_SETTINGS_PALBOX_TAB_SIZE}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <StackPanel Grid.Row="6" Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Top">
                 <vu:IntegerTextBox
                     VerticalAlignment="Top"
                     MinWidth="26"

@@ -65,5 +65,20 @@ namespace PalCalc.Model
 
             return string.Join(", ", parts);
         }
+
+        public static TimeSpan IncubationTime(this EggSize eggSize, GameSettings settings)
+        {
+            // https://palworld.fandom.com/wiki/Egg_Incubator
+
+            var modifier = eggSize switch
+            {
+                EggSize.Normal => 12,
+                EggSize.Large => 2,
+                EggSize.Huge => 1,
+                _ => throw new NotImplementedException(),
+            };
+
+            return settings.MassiveEggIncubationTime / modifier;
+        }
     }
 }

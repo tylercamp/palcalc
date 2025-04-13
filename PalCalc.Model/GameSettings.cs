@@ -25,6 +25,11 @@ namespace PalCalc.Model
 
         public bool MultipleBreedingFarms { get; set; } = true;
 
+        // base time for incubating a massive egg without any e.g. temperature buffs
+        public TimeSpan MassiveEggIncubationTime { get; set; } = TimeSpan.FromHours(2);
+
+        public bool MultipleIncubators { get; set; } = true;
+
         public int PlayerPartySize { get; set; } = 5;
 
         public Dictionary<LocationType, int> LocationTypeGridWidths { get; set; } = new()

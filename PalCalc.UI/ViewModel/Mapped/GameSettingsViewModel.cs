@@ -27,6 +27,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         public GameSettingsViewModel(GameSettings modelObject)
         {
             BreedingTimeSeconds = (int)modelObject.BreedingTime.TotalSeconds;
+            MassiveEggIncubationTimeMinutes = (int)modelObject.MassiveEggIncubationTime.TotalMinutes;
             MultipleBreedingFarms = modelObject.MultipleBreedingFarms;
             PalboxTabWidth = modelObject.LocationTypeGridWidths[LocationType.Palbox];
             PalboxTabHeight = modelObject.LocationTypeGridHeights[LocationType.Palbox].Value;
@@ -38,6 +39,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         public GameSettings ModelObject => new GameSettings()
         {
             BreedingTime = TimeSpan.FromSeconds(BreedingTimeSeconds),
+            MassiveEggIncubationTime = TimeSpan.FromMinutes(MassiveEggIncubationTimeMinutes),
             MultipleBreedingFarms = MultipleBreedingFarms,
             LocationTypeGridWidths = new()
             {
@@ -65,6 +67,9 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         [ObservableProperty]
         private int breedingTimeSeconds;
+
+        [ObservableProperty]
+        private int massiveEggIncubationTimeMinutes;
 
         [ObservableProperty]
         private bool multipleBreedingFarms;
@@ -108,6 +113,13 @@ namespace PalCalc.UI.ViewModel.Mapped
             if (parsedJson["BreedingTimeMinutes"] != null)
             {
                 result.BreedingTimeSeconds = 60 * parsedJson["BreedingTimeMinutes"].ToObject<int>();
+            }
+
+            // if we're missing this field, then the data was made before we accounted for incubation times,
+            // which is the same as setting to 0
+            if (parsedJson["MassiveEggIncubationTimeMinutes"] == null)
+            {
+                result.MassiveEggIncubationTimeMinutes = 0;
             }
 
             result.AppRestartRequired = false;
