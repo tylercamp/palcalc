@@ -164,6 +164,8 @@ namespace PalCalc.UI.Model
                             foreach (var p in save.Players.Where(p => p.Exists))
                                 AddSaveFile(p, $"Players/{Path.GetFileName(p.FilePaths.First())}");
 
+                            // TODO - also need to store GlobalPalbox and DimensionalPalStorage
+
                             foreach (var r in save.RawFiles)
                                 AddRawSaveFile(r);
                         }

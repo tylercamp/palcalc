@@ -20,6 +20,9 @@ namespace PalCalc.SaveReader.SaveFile
 
         public virtual List<GvasCharacterInstance> ReadRawCharacters()
         {
+            if (!files.Content.Any(File.Exists))
+                return null;
+
             var v = new DimensionalPalStorage_CharacterInstanceVisitor();
             ParseGvas(v);
             return v.Result;
@@ -28,7 +31,11 @@ namespace PalCalc.SaveReader.SaveFile
         public virtual GlobalPalStorageData ReadPals(string containerId)
         {
             var db = PalDB.LoadEmbedded();
-            var pals = ReadRawCharacters()
+            var rawPals = ReadRawCharacters();
+            if (rawPals == null)
+                return null;
+
+            var pals = rawPals
                 .Select(c => c.ToPalInstance(db, LocationType.GlobalPalStorage))
                 .ZipWithIndex()
                 .Select(p =>
