@@ -44,12 +44,15 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="80*" MinWidth="280"/>
                 </Grid.ColumnDefinitions>
+                <!-- Left-hand Pane -->
                 <DockPanel Grid.Column="0">
                     <StackPanel DockPanel.Dock="Top" vu:StackPanelExtensions.Spacing="5">
+                        <!-- "Save File" section -->
                         <Expander Header="{itl:LocalizedText LC_SAVE_FILE}" IsExpanded="True" adonisExtensions:LayerExtension.IncreaseLayer="True">
                             <v:SaveSelectorView DataContext="{Binding SaveSelection}" AllowNavigation="{Binding RelativeSource={RelativeSource AncestorType=local:MainPage}, Path=DataContext.SolverQueue.QueuedItems.Count, Converter={StaticResource NegatedVBC}}" />
                         </Expander>
 
+                        <!-- "Game Settings" section -->
                         <Expander Header="{itl:LocalizedText LC_GAME_SETTINGS}" IsExpanded="True" adonisExtensions:LayerExtension.IncreaseLayer="True">
                             <v:GameSettingsView DataContext="{Binding SelectedGameSettings}" />
                         </Expander>
@@ -61,6 +64,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
+                        <!-- "Target Pals" section -->
                         <GroupBox Header="{itl:LocalizedText LC_TARGET_PALS}" Grid.Row="0">
                             <v:PalTargetListView BorderThickness="0" DataContext="{Binding PalTargetList}" />
                         </GroupBox>
@@ -73,6 +77,7 @@
 
                             <GridSplitter Grid.Row="0" Background="{x:Null}" Height="5" ResizeBehavior="CurrentAndNext" IsEnabled="{Binding ElementName=JobQueueExpander, Path=IsExpanded}" />
 
+                            <!-- "Jobs" section -->
                             <Expander Header="{Binding SolverQueue.SectionTitleWithCount.Value}"
                                       Grid.Row="1"
                                       Visibility="{Binding SolverQueue.QueuedItems.Count, Converter={StaticResource VVC}}"
@@ -94,9 +99,12 @@
 
                 <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
+                <!-- Center Pane -->
                 <DockPanel Grid.Column="2">
+                    <!-- Solver controls at the top -->
                     <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" Margin="0,0,0,5" Padding="5" HorizontalContentAlignment="Right" Background="{DynamicResource ResourceKey={x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" adonisExtensions:LayerExtension.IncreaseLayer="True" />
 
+                    <!-- Progress bar at the bottom -->
                     <StackPanel DockPanel.Dock="Bottom"
                                 Visibility="{Binding PalTarget.CurrentPalSpecifier.LatestJob, Converter={StaticResource VVC}, FallbackValue=Collapsed, Mode=OneWay}"
                                 >
@@ -110,11 +118,13 @@
                         </Grid>
                     </StackPanel>
 
+                    <!-- Graph view -->
                     <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
                 </DockPanel>
 
                 <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
+                <!-- Right-hand Pane -->
                 <Grid Grid.Column="4">
 
                     <Grid.RowDefinitions>
@@ -123,6 +133,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
+                    <!-- "Target Pal" section -->
                     <Expander Header="{itl:LocalizedText LC_TARGET_PAL}"
                               Grid.Row="0"
                               IsExpanded="True"
@@ -140,39 +151,69 @@
                             <RowDefinition Height="60*" MinHeight="150" />
                         </Grid.RowDefinitions>
 
+                        <!-- "Source Pals" section -->
                         <Expander Header="{itl:LocalizedText LC_SOURCE_PALS}" Grid.Row="0" Margin="0,5,0,0" IsExpanded="True" Name="SourcePalsExpander" VerticalContentAlignment="Stretch" adonisExtensions:LayerExtension.IncreaseLayer="True">
                             <i:Interaction.Behaviors>
-                                <b:ExpanderGridRowResetBehavior TargetGridRowIndex="0" ExpandedMinHeight="180" />
+                                <b:ExpanderGridRowResetBehavior TargetGridRowIndex="0" ExpandedMinHeight="220" />
                             </i:Interaction.Behaviors>
 
-                            <Grid IsEnabled="{Binding PalTarget.CanEdit}" VerticalAlignment="Stretch">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-                                <StackPanel vu:StackPanelExtensions.Spacing="5" Orientation="Vertical" Grid.Row="0">
-                                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeGlobalStoragePals}">
-                                        <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_GPS}" TextWrapping="Wrap" />
-                                    </CheckBox>
+                            <ScrollViewer>
+                                <Grid IsEnabled="{Binding PalTarget.CanEdit}" VerticalAlignment="Stretch">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" vu:StackPanelExtensions.Spacing="8">
+                                        <!-- TODO ITL -->
+                                        <Label Content="Filters" />
+                                        <StackPanel vu:StackPanelExtensions.Spacing="5">
+                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeGlobalStoragePals}">
+                                                <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_GPS}" TextWrapping="Wrap" />
+                                            </CheckBox>
                                     
-                                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeBasePals}">
-                                        <TextBlock Text="{itl:LocalizedText LC_INCLUDE_PALS_AT_BASE}" TextWrapping="Wrap" />
-                                    </CheckBox>
+                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeBasePals}">
+                                                <TextBlock Text="{itl:LocalizedText LC_INCLUDE_PALS_AT_BASE}" TextWrapping="Wrap" />
+                                            </CheckBox>
 
-                                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCagedPals}">
-                                        <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_IN_CAGES}" TextWrapping="Wrap" />
-                                    </CheckBox>
+                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCagedPals}">
+                                                <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_IN_CAGES}" TextWrapping="Wrap" />
+                                            </CheckBox>
 
-                                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCustomPals}">
-                                        <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_CUSTOM_PALS}" TextWrapping="Wrap" />
-                                    </CheckBox>
-                                </StackPanel>
+                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCustomPals}">
+                                                <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_CUSTOM_PALS}" TextWrapping="Wrap" />
+                                            </CheckBox>
+                                        </StackPanel>
+                                    </StackPanel>
 
-                                <Separator Grid.Row="1" Margin="0,10,0,10" />
+                                    <Separator Grid.Row="1" Visibility="Hidden" Margin="0,10,0,10" />
 
-                                <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}" Grid.Row="2" />
-                            </Grid>
+                                    <StackPanel Grid.Row="2" vu:StackPanelExtensions.Spacing="5">
+                                        <!-- TODO ITL -->
+                                        <Label Content="Guilds and Players" />
+                                        <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}">
+                                            <v:PalSourceTreeView.Resources>
+                                                <Style TargetType="TreeView" BasedOn="{StaticResource {x:Type TreeView}}">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="TreeView">
+                                                                <Border Background="{TemplateBinding Background}"
+                                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                                            CornerRadius="{TemplateBinding adonisExtensions:CornerRadiusExtension.CornerRadius}"
+                                                                            Padding="{TemplateBinding Padding}">
+                                                                    <!-- Remove ScrollViewer that normally wraps this, so it doesn't interfere with the ScrollViewer containing this whole section -->
+                                                                    <ItemsPresenter />
+                                                                </Border>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </v:PalSourceTreeView.Resources>
+                                        </v:PalSourceTreeView>
+                                    </StackPanel>
+                                </Grid>
+                            </ScrollViewer>
                         </Expander>
 
                         <GridSplitter IsEnabled="{Binding ElementName=SourcePalsExpander, Path=IsExpanded}" Grid.Row="1" Background="{x:Null}" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
@@ -192,12 +233,14 @@
                                 <Run Text="{itl:LocalizedText Code=LC_NO_RESULTS_FAQ_3}" />
                             </TextBlock>
 
+                            <!-- Solver Results -->
                             <GroupBox Header="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.ResultsHeading.Value, FallbackValue=''}" Grid.Row="1">
                                 <v:BreedingResultListView BorderThickness="0" DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults}" />
                             </GroupBox>
                         </Grid>
                     </Grid>
 
+                    <!-- About button / Update Notice -->
                     <StackPanel Grid.Row="2">
                         <Button Width="50" Click="AboutButton_Click" Margin="0,5,0,5" Content="{itl:LocalizedText LC_ABOUT_APP}" />
                         <TextBlock Visibility="{Binding UpdatesMessageVisibility}" TextWrapping="Wrap" TextAlignment="Center" FontSize="20">
