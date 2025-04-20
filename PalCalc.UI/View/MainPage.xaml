@@ -152,13 +152,13 @@
                         </Grid.RowDefinitions>
 
                         <!-- "Source Pals" section -->
-                        <Expander Header="{itl:LocalizedText LC_SOURCE_PALS}" Grid.Row="0" Margin="0,5,0,0" IsExpanded="True" Name="SourcePalsExpander" VerticalContentAlignment="Stretch" adonisExtensions:LayerExtension.IncreaseLayer="True">
+                        <Expander Header="{itl:LocalizedText LC_SOURCE_PALS}" Grid.Row="0" Margin="0,5,0,0" Padding="0" IsExpanded="True" Name="SourcePalsExpander" VerticalContentAlignment="Stretch" adonisExtensions:LayerExtension.IncreaseLayer="True">
                             <i:Interaction.Behaviors>
                                 <b:ExpanderGridRowResetBehavior TargetGridRowIndex="0" ExpandedMinHeight="220" />
                             </i:Interaction.Behaviors>
 
-                            <ScrollViewer>
-                                <Grid IsEnabled="{Binding PalTarget.CanEdit}" VerticalAlignment="Stretch">
+                            <ScrollViewer Padding="0">
+                                <Grid IsEnabled="{Binding PalTarget.CanEdit}" VerticalAlignment="Stretch" Margin="{adonisUi:Space 1, 1}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
