@@ -925,6 +925,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SOURCE_PALS_FILTERS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOURCE_PALS_PLAYERS_AND_GUILDS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_STARTUP_LOADING,
         /// <summary>
         ///   Looks up a localized string similar to .

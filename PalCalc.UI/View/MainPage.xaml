@@ -165,8 +165,7 @@
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
                                     <StackPanel Grid.Row="0" vu:StackPanelExtensions.Spacing="8">
-                                        <!-- TODO ITL -->
-                                        <Label Content="Filters" />
+                                        <Label Content="{itl:LocalizedText Code=LC_SOURCE_PALS_FILTERS}" />
                                         <StackPanel vu:StackPanelExtensions.Spacing="5">
                                             <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeGlobalStoragePals}">
                                                 <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_GPS}" TextWrapping="Wrap" />
@@ -189,8 +188,7 @@
                                     <Separator Grid.Row="1" Visibility="Hidden" Margin="0,10,0,10" />
 
                                     <StackPanel Grid.Row="2" vu:StackPanelExtensions.Spacing="5">
-                                        <!-- TODO ITL -->
-                                        <Label Content="Guilds and Players" />
+                                        <Label Content="{itl:LocalizedText Code=LC_SOURCE_PALS_PLAYERS_AND_GUILDS}" />
                                         <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}">
                                             <v:PalSourceTreeView.Resources>
                                                 <Style TargetType="TreeView" BasedOn="{StaticResource {x:Type TreeView}}">
