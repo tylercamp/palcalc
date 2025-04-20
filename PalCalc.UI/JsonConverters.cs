@@ -487,8 +487,12 @@ namespace PalCalc.UI
 
     internal class PalSpecifierViewModelConverter : PalConverterBase<PalSpecifierViewModel>
     {
+        private CachedSaveGame source;
+
         public PalSpecifierViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source) : base(db, gameSettings)
         {
+            this.source = source;
+
             dependencyConverters = new JsonConverter[]
             {
                 new PalViewModelConverter(db, gameSettings),
@@ -519,6 +523,23 @@ namespace PalCalc.UI
                 ]
             };
 
+            List<IPalSourceTreeSelection> palSourceSelections;
+
+            if (obj["PalSourceId"] != null)
+            {
+                var selectionId = obj["PalSourceId"].ToObject<string>();
+                if (selectionId != null) palSourceSelections = [IPalSourceTreeSelection.SingleFromId(source, selectionId)];
+                else palSourceSelections = [new SourceTreeAllSelection()];
+            }
+            else
+            {
+                palSourceSelections = obj["PalSourceSelections"]
+                    .ToObject<List<string>>()
+                    .Select(id => IPalSourceTreeSelection.SingleFromId(source, id))
+                    .SkipNull()
+                    .ToList();
+            }
+
             // null-coalesce for backwards compatibility with older saves
             var id = obj["Id"]?.ToObject<string>() ?? Guid.NewGuid().ToString();
             return new PalSpecifierViewModel(id, modelSpecifier)
@@ -526,7 +547,7 @@ namespace PalCalc.UI
                 MinIv_HP = obj["MinIV_HP"]?.ToObject<int>() ?? 0,
                 MinIv_Attack = obj["MinIV_Attack"]?.ToObject<int>() ?? 0,
                 MinIv_Defense = obj["MinIV_Defense"]?.ToObject<int>() ?? 0,
-                PalSourceId = obj["PalSourceId"]?.ToObject<string>(),
+                PalSourceSelections = palSourceSelections,
                 RequiredGender = PalGenderViewModel.Make(obj["RequiredGender"]?.ToObject<PalGender>() ?? PalGender.WILDCARD),
                 IncludeBasePals = obj["IncludeBasePals"]?.ToObject<bool>() ?? true,
                 IncludeCustomPals = obj["IncludeCustomPals"]?.ToObject<bool>() ?? true,
@@ -553,7 +574,7 @@ namespace PalCalc.UI
                 MinIV_HP = value.MinIv_HP,
                 MinIV_Attack = value.MinIv_Attack,
                 MinIV_Defense = value.MinIv_Defense,
-                PalSourceId = value.PalSourceId,
+                PalSourceSelections = value.PalSourceSelections.Select(s => s.SerializedId),
                 RequiredGender = value.RequiredGender?.Value ?? PalGender.WILDCARD,
                 IncludeBasePals = value.IncludeBasePals,
                 IncludeCustomPals = value.IncludeCustomPals,

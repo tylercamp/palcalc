@@ -9,6 +9,8 @@ using System.Windows;
 
 namespace PalCalc.UI.ViewModel
 {
+    // TODO - Add a util for tracking whether a given itlcode is used
+
     public partial class TranslationLocaleDebugViewModel(TranslationLocale locale, List<ITranslationError> errors) : ObservableObject
     {
         public string TabTitle { get; } =

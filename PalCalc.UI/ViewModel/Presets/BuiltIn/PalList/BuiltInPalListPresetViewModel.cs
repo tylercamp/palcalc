@@ -31,10 +31,10 @@ namespace PalCalc.UI.ViewModel.Presets.BuiltIn.PalList
 
         public abstract List<Pal> Pals { get; }
 
-        public static List<BuiltInPalListPresetViewModel> BuildAll(CachedSaveGame context, IPalSource availablePalFilter) =>
+        public static List<BuiltInPalListPresetViewModel> BuildAll(CachedSaveGame context, List<IPalSourceTreeSelection> sourceSelections) =>
         [
-            new OwnedPalListPresetViewModel(context, availablePalFilter),
-            new NotOwnedPalListPresetViewModel(context, availablePalFilter),
+            new OwnedPalListPresetViewModel(context, sourceSelections),
+            new NotOwnedPalListPresetViewModel(context, sourceSelections),
         ];
     }
 }

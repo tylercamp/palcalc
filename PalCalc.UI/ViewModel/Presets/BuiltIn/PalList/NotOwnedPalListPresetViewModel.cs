@@ -13,19 +13,19 @@ namespace PalCalc.UI.ViewModel.Presets.BuiltIn.PalList
     public class NotOwnedPalListPresetViewModel : BuiltInPalListPresetViewModel
     {
         private CachedSaveGame context;
-        private IPalSource availablePalFilter;
+        private List<IPalSourceTreeSelection> selections;
 
-        public NotOwnedPalListPresetViewModel(CachedSaveGame context, IPalSource availablePalFilter) : base(LocalizationCodes.LC_PAL_LIST_PRESETS_BUILTIN_NOT_OWNED.Bind())
+        public NotOwnedPalListPresetViewModel(CachedSaveGame context, List<IPalSourceTreeSelection> selections) : base(LocalizationCodes.LC_PAL_LIST_PRESETS_BUILTIN_NOT_OWNED.Bind())
         {
             this.context = context;
-            this.availablePalFilter = availablePalFilter;
+            this.selections = selections;
         }
 
         public override List<Pal> Pals =>
-            availablePalFilter == null
+            selections == null
                 ? []
                 : PalDB.LoadEmbedded().Pals
-                    .Except(availablePalFilter.Filter(context).Select(p => p.Pal))
+                    .Except(context.OwnedPals.Where(p => selections.Any(s => s.Matches(context, p))).Select(p => p.Pal))
                     .Distinct()
                     .ToList();
     }

@@ -28,16 +28,48 @@ namespace PalCalc.UI.View.Main
             InitializeComponent();
         }
 
-        public PalSourceTreeViewModel ViewModel => DataContext as PalSourceTreeViewModel;
+        /* You can click on a checkbox and you can click on individual TreeViewItems, but the entry will
+         * only be toggled by clicking on the checkbox
+         * 
+         * Capture TreeViewItem clicks and emulate that toggle behavior manually
+         */
 
-
-        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void TreeViewItem_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (ViewModel == null) return;
+            var tvi = sender as TreeViewItem;
+            tvi.PreviewMouseUp += Tvi_PreviewMouseUp;
+            tvi.CaptureMouse();
 
-            if (e.NewValue != null && e.NewValue is not IPalSourceTreeNode) throw new InvalidOperationException();
+            e.Handled = true;
+        }
 
-            ViewModel.SelectedNode = e.NewValue as IPalSourceTreeNode;
+        private void Tvi_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var tvi = sender as TreeViewItem;
+            tvi.ReleaseMouseCapture();
+            tvi.PreviewMouseUp -= Tvi_PreviewMouseUp;
+
+            if (tvi.IsMouseOver)
+            {
+                var n = tvi.DataContext as IPalSourceTreeNode;
+                if (n != null)
+                {
+                    switch (n.IsChecked)
+                    {
+                        case true: n.IsChecked = false; break;
+                        case false: n.IsChecked = true; break;
+                        case null: n.IsChecked = false; break;
+                    }
+                }
+            }
+
+            e.Handled = true;
+        }
+
+        private void TreeViewItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount > 1)
+                e.Handled = true;
         }
     }
 }

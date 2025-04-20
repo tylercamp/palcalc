@@ -55,12 +55,12 @@ namespace PalCalc.UI.ViewModel
                 PalSource = new PalSourceTreeViewModel(sourceSave.CachedValue);
             }
 
-            if (CurrentPalSpecifier.PalSourceId != null)
+            if (CurrentPalSpecifier.PalSourceSelections?.Any() == true)
             {
-                PalSource.SelectedNode = PalSource.FindById(CurrentPalSpecifier.PalSourceId) as IPalSourceTreeNode;
+                PalSource.Selections = CurrentPalSpecifier.PalSourceSelections;
             }
 
-            if (PalSource.SelectedSource != null)
+            if (PalSource.Selections != null)
                 CurrentPalSpecifier.RefreshWith(AvailablePals);
 
             void RefreshOnChange(object sender, PropertyChangedEventArgs ev)
@@ -90,9 +90,9 @@ namespace PalCalc.UI.ViewModel
             if (e.PropertyName == nameof(PalSource.HasValidSource))
                 OnPropertyChanged(nameof(IsValid));
 
-            if (e.PropertyName == nameof(PalSource.SelectedSource) && PalSource.SelectedSource != null)
+            if (e.PropertyName == nameof(PalSource.Selections) && PalSource.Selections?.Any() == true)
             {
-                CurrentPalSpecifier.PalSourceId = PalSource.SelectedSource.Id;
+                CurrentPalSpecifier.PalSourceSelections = PalSource.Selections;
                 CurrentPalSpecifier?.RefreshWith(AvailablePals);
             }
         }
@@ -186,10 +186,15 @@ namespace PalCalc.UI.ViewModel
         {
             get
             {
-                if (PalSource?.SelectedSource != null)
+                if (PalSource?.Selections != null)
                 {
-                    foreach (var pal in PalSource.SelectedSource.Filter(sourceSave.CachedValue))
+                    var cachedSave = sourceSave.CachedValue;
+                    var selections = PalSource.Selections;
+                    foreach (var pal in cachedSave.OwnedPals)
                     {
+                        if (!selections.Any(s => s.Matches(cachedSave, pal)))
+                            continue;
+
                         if (pal.Location.Type == LocationType.GlobalPalStorage)
                             continue;
 
