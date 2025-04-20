@@ -9,9 +9,9 @@
                              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
                              xmlns:util="clr-namespace:Wpf.Util"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
+                             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
                              mc:Ignorable="d"
                              d:DataContext="{x:Static vm:TranslationDebugViewModel.DesignerInstance}"
-                             util:GridViewSort.AutoSort="True"
                              Title="TranslationDebugWindow"
                              Height="450" Width="800"
                              >
@@ -22,71 +22,84 @@
         <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}" />
     </Window.Style>
     <Grid>
-        <TabControl ItemsSource="{Binding LocaleErrors}">
-            <TabControl.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding TabTitle}" />
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-            <TabControl.ContentTemplate>
-                <DataTemplate>
-                    <DataGrid ItemsSource="{Binding Errors}" AutoGenerateColumns="False" IsReadOnly="True">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="Auto" />
-                            <DataGridTemplateColumn Header="Message">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ContentControl Content="{Binding}">
-                                            <ContentControl.Resources>
-                                                <DataTemplate DataType="{x:Type m:MissingTranslationError}">
-                                                    <TextBlock>Translation missing</TextBlock>
+        <TabControl>
+            <TabItem Header="Translation Errors">
+                <TabControl ItemsSource="{Binding LocaleErrors}">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding TabTitle}" />
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <DataTemplate>
+                            <Grid adonisExtensions:LayerExtension.IncreaseLayer="False">
+                                <DataGrid ItemsSource="{Binding Errors}" AutoGenerateColumns="False" IsReadOnly="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="Auto" />
+                                        <DataGridTemplateColumn Header="Message">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ContentControl Content="{Binding}">
+                                                        <ContentControl.Resources>
+                                                            <DataTemplate DataType="{x:Type m:MissingTranslationError}">
+                                                                <TextBlock>Translation missing</TextBlock>
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="{x:Type m:UnexpectedTranslationError}">
+                                                                <TextBlock>Unexpected translation (invalid code)</TextBlock>
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="{x:Type m:MissingArgumentError}">
+                                                                <TextBlock>
+                                                                <Run>Missing arguments:</Run>
+                                                                <Run Text="{Binding MissingArgs, Mode=OneTime, Converter={StaticResource CSLC}}" />
+                                                                </TextBlock>
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="{x:Type m:UnexpectedArgumentError}">
+                                                                <TextBlock>
+                                                                <Run>Unexpected (invalid) arguments:</Run>
+                                                                <Run Text="{Binding ExtraArgs, Mode=OneTime, Converter={StaticResource CSLC}}" />
+                                                                </TextBlock>
+                                                            </DataTemplate>
+                                                        </ContentControl.Resources>
+                                                    </ContentControl>
                                                 </DataTemplate>
-                                                <DataTemplate DataType="{x:Type m:UnexpectedTranslationError}">
-                                                    <TextBlock>Unexpected translation (invalid code)</TextBlock>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="Sample Text">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ContentControl Content="{Binding}">
+                                                        <ContentControl.Resources>
+                                                            <DataTemplate DataType="{x:Type m:MissingTranslationError}">
+                                                                <TextBlock Text="{Binding ReferenceText}" />
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="{x:Type m:UnexpectedTranslationError}">
+                                                                <TextBlock />
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="{x:Type m:MissingArgumentError}">
+                                                                <TextBlock Text="{Binding ReferenceText}" />
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="{x:Type m:UnexpectedArgumentError}">
+                                                                <TextBlock Text="{Binding ReferenceText}" />
+                                                            </DataTemplate>
+                                                        </ContentControl.Resources>
+                                                    </ContentControl>
                                                 </DataTemplate>
-                                                <DataTemplate DataType="{x:Type m:MissingArgumentError}">
-                                                    <TextBlock>
-                                                        <Run>Missing arguments:</Run>
-                                                        <Run Text="{Binding MissingArgs, Mode=OneTime, Converter={StaticResource CSLC}}" />
-                                                    </TextBlock>
-                                                </DataTemplate>
-                                                <DataTemplate DataType="{x:Type m:UnexpectedArgumentError}">
-                                                    <TextBlock>
-                                                        <Run>Unexpected (invalid) arguments:</Run>
-                                                        <Run Text="{Binding ExtraArgs, Mode=OneTime, Converter={StaticResource CSLC}}" />
-                                                    </TextBlock>
-                                                </DataTemplate>
-                                            </ContentControl.Resources>
-                                        </ContentControl>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Sample Text">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ContentControl Content="{Binding}">
-                                            <ContentControl.Resources>
-                                                <DataTemplate DataType="{x:Type m:MissingTranslationError}">
-                                                    <TextBlock Text="{Binding ReferenceText}" />
-                                                </DataTemplate>
-                                                <DataTemplate DataType="{x:Type m:UnexpectedTranslationError}">
-                                                    <TextBlock />
-                                                </DataTemplate>
-                                                <DataTemplate DataType="{x:Type m:MissingArgumentError}">
-                                                    <TextBlock Text="{Binding ReferenceText}" />
-                                                </DataTemplate>
-                                                <DataTemplate DataType="{x:Type m:UnexpectedArgumentError}">
-                                                    <TextBlock Text="{Binding ReferenceText}" />
-                                                </DataTemplate>
-                                            </ContentControl.Resources>
-                                        </ContentControl>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </DataTemplate>
-            </TabControl.ContentTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+            </TabItem>
+
+            <TabItem Header="ITL__CODE References">
+                <Grid>
+                    <DataGrid ItemsSource="{Binding ItlCodeReferenceCounts}" />
+                    <Button HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="Auto" Content="Refresh" Command="{Binding RefreshCountsCommand}" Margin="0,0,25,10" />
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </adonisControls:AdonisWindow>

@@ -154,7 +154,7 @@
                         <!-- "Source Pals" section -->
                         <Expander Header="{itl:LocalizedText LC_SOURCE_PALS}" Grid.Row="0" Margin="0,5,0,0" Padding="0" IsExpanded="True" Name="SourcePalsExpander" VerticalContentAlignment="Stretch" adonisExtensions:LayerExtension.IncreaseLayer="True">
                             <i:Interaction.Behaviors>
-                                <b:ExpanderGridRowResetBehavior TargetGridRowIndex="0" ExpandedMinHeight="220" />
+                                <b:ExpanderGridRowResetBehavior TargetGridRowIndex="0" ExpandedMinHeight="180" />
                             </i:Interaction.Behaviors>
 
                             <ScrollViewer Padding="0">
