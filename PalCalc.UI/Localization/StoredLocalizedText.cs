@@ -24,6 +24,9 @@ namespace PalCalc.UI.Localization
         {
             get
             {
+                lock (Translator.ItlCodeUsage)
+                    Translator.ItlCodeUsage[src.Code] += 1;
+
                 if (Translator.DEBUG_DISABLE_TRANSLATIONS)
                     return src.Code.ToString();
 

@@ -8,6 +8,7 @@ using PalCalc.UI.ViewModel.PalDerived;
 using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -132,7 +133,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         private PalGenderViewModel requiredGender;
 
         [ObservableProperty]
-        private string palSourceId;
+        private List<IPalSourceTreeSelection> palSourceSelections;
 
         [ObservableProperty]
         private bool includeBasePals = true;
@@ -199,7 +200,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
         ) {
             CurrentResults = CurrentResults,
-            PalSourceId = PalSourceId,
+            PalSourceSelections = PalSourceSelections,
             IncludeBasePals = IncludeBasePals,
             IncludeCustomPals = IncludeCustomPals,
             IncludeCagedPals = IncludeCagedPals,

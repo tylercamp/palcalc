@@ -7,6 +7,7 @@ using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,134 +15,168 @@ using System.Windows.Controls;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
-    public interface IPalSourceTreeNode
+    public interface IPalSourceTreeNode : INotifyPropertyChanged
     {
         public ILocalizedText Label { get; }
 
-        public bool IsSelected { get; set; }
+        public bool? IsChecked { get; set; }
+
+        public IEnumerable<IPalSourceTreeNode> Children { get; }
+
+        /// <summary>
+        /// Returns the current state of this node as a selection, which will also encompass any child-node selections.
+        /// </summary>
+        public List<IPalSourceTreeSelection> AsSelection { get; }
+
+        /// <summary>
+        /// Updates the state of this node, and its children, so it matches the given selections.
+        /// </summary>
+        public void ReadFromSelections(List<IPalSourceTreeSelection> selections);
     }
 
-    public interface IPalSource
+    
+    public partial class PlayerSourceTreeNodeViewModel(PlayerInstance player) : ObservableObject, IPalSourceTreeNode
     {
-        // a unique ID to associate solver results with a given pal source
-        string Id { get; }
+        public PlayerInstance ModelObject => player;
 
-        public IEnumerable<PalInstance> Filter(CachedSaveGame source);
-    }
+        public ILocalizedText Label { get; } = new HardCodedText(player.Name);
 
-    /// <summary>
-    /// Filters pals based on the owner ID (for party/palbox pals) or the owner's guild ID (for base pals)
-    /// </summary>
-    public partial class PlayerSourceTreeNodeViewModel : ObservableObject, IPalSourceTreeNode, IPalSource
-    {
-        // TODO - handle serialization due to reference to `source` (e.g. `originalSource`)
-        public PlayerSourceTreeNodeViewModel(PlayerInstance modelObject)
-        {
-            ModelObject = modelObject;
-
-            Label = new HardCodedText(modelObject.Name);
-        }
-
-        public PlayerInstance ModelObject { get; }
-
-        public string Id => $"PLAYER={ModelObject.PlayerId}";
-
-        public ILocalizedText Label { get; }
+        public IEnumerable<IPalSourceTreeNode> Children => [];
 
         [ObservableProperty]
-        private bool isSelected;
+        private bool? isChecked = true;
 
-        public IEnumerable<PalInstance> Filter(CachedSaveGame source)
+        public List<IPalSourceTreeSelection> AsSelection => IsChecked == true ? [new SourceTreePlayerSelection(player)] : [];
+
+        public void ReadFromSelections(List<IPalSourceTreeSelection> selections)
         {
-            var guildId = source.GuildsByPlayerId[ModelObject.PlayerId]?.Id;
+            var directSelection = selections.OfType<SourceTreePlayerSelection>().Any(s => s.ModelObject.PlayerId == player.PlayerId);
+            var allItemsSelection = selections.OfType<SourceTreeAllSelection>().Any();
 
-            var bases = source.BasesByGuildId.GetValueOrDefault(guildId, []);
-
-            var baseContainerIds = bases.Select(b => b.Container.Id).ToList();
-            var cageContainerIds = source.PalContainers
-                .OfType<ViewingCageContainer>()
-                .Where(c => bases.Any(b => b.Id == c.BaseId))
-                .Select(c => c.Id)
-                .ToList();
-
-            return source.OwnedPals
-                .Where(p => p.Location.Type switch
-                {
-                    LocationType.PlayerParty => p.OwnerPlayerId == ModelObject.PlayerId,
-                    LocationType.DimensionalPalStorage => p.Location.ContainerId == ModelObject.DimensionalPalStorageContainerId,
-                    LocationType.Palbox => p.OwnerPlayerId == ModelObject.PlayerId,
-                    LocationType.Base => baseContainerIds.Contains(p.Location.ContainerId),
-                    LocationType.ViewingCage => cageContainerIds.Contains(p.Location.ContainerId),
-                    // (Pals in custom containers aren't expected to have an "owner", and are handled separately in MainWindowViewModel anyway)
-                    LocationType.Custom => false,
-                    // (Mostly the same content for GPS; the original pal owner might not even be in this save file)
-                    LocationType.GlobalPalStorage => false,
-                    _ => throw new NotImplementedException()
-                });
-        }
-    }
-
-    public partial class AnyPlayerInGuildSourceTreeNodeViewModel : ObservableObject, IPalSourceTreeNode, IPalSource
-    {
-        public AnyPlayerInGuildSourceTreeNodeViewModel(GuildInstance guild)
-        {
-            ModelObject = guild;
-        }
-
-        public GuildInstance ModelObject { get; }
-
-        public string Id => $"GUILD={ModelObject.Id}";
-
-        public ILocalizedText Label { get; } = LocalizationCodes.LC_PAL_SRC_ANY_GUILD_MEMBER.Bind();
-
-        [ObservableProperty]
-        private bool isSelected;
-
-        public IEnumerable<PalInstance> Filter(CachedSaveGame source)
-        {
-            return source.OwnedPals.Where(p => source.GuildsByPlayerId.GetValueOrDefault(p.OwnerPlayerId)?.Id == ModelObject.Id);
+            IsChecked = directSelection || allItemsSelection;
         }
     }
 
 
     public partial class GuildSourceTreeNodeViewModel : ObservableObject, IPalSourceTreeNode
     {
+        private int suppressSelectionCount = 0;
+        private void SuppressSelectionChangedDuring(Action fn)
+        {
+            suppressSelectionCount++;
+            try { fn(); }
+            finally { --suppressSelectionCount; }
+        }
+
         public GuildSourceTreeNodeViewModel(CachedSaveGame source, GuildInstance guild)
         {
             ModelObject = guild;
+            Label = new HardCodedText(guild.Name);
+            PlayerNodes = guild.MemberIds
+                .Select(pid => new PlayerSourceTreeNodeViewModel(source.PlayersById[pid]))
+                .OrderBy(n => n.ModelObject.Name)
+                .ToList();
 
-            Children = new List<IPalSource>() { new AnyPlayerInGuildSourceTreeNodeViewModel(guild) };
-            Children.AddRange(guild.MemberIds.Select(pid => new PlayerSourceTreeNodeViewModel(source.PlayersById[pid])).OrderBy(n => n.ModelObject.Name));
+            Children = PlayerNodes.OfType<IPalSourceTreeNode>().ToList();
 
-            Label = new HardCodedText(ModelObject.Name);
+            foreach (var c in PlayerNodes)
+            {
+                PropertyChangedEventManager.AddHandler(c, MemberPlayer_CheckedPropertyChanged, nameof(c.IsChecked));
+            }
+        }
+
+        private void MemberPlayer_CheckedPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            SuppressSelectionChangedDuring(() =>
+            {
+                if (Children.All(c => c.IsChecked == true))
+                    IsChecked = true;
+                else if (Children.All(c => c.IsChecked == false))
+                    IsChecked = false;
+                else
+                    IsChecked = null;
+            });
+
+            if (suppressSelectionCount == 0)
+            {
+                OnPropertyChanged(nameof(AsSelection));
+                OnPropertyChanged(nameof(IsChecked));
+            }
         }
 
         public GuildInstance ModelObject { get; }
 
-        public List<IPalSource> Children { get; }
-
         public ILocalizedText Label { get; }
 
-        [ObservableProperty]
-        private bool isSelected;
+        public List<PlayerSourceTreeNodeViewModel> PlayerNodes { get; }
+        public IEnumerable<IPalSourceTreeNode> Children { get; }
+
+        private bool? isChecked = true;
+        public bool? IsChecked
+        {
+            get => isChecked;
+            set
+            {
+                if (SetProperty(ref isChecked, value))
+                {
+                    SuppressSelectionChangedDuring(() =>
+                    {
+                        if (value == true)
+                        {
+                            foreach (var c in PlayerNodes)
+                                c.IsChecked = true;
+                        }
+                        else if (value == false)
+                        {
+                            foreach (var c in PlayerNodes)
+                                c.IsChecked = false;
+                        }
+                    });
+
+                    if (suppressSelectionCount == 0)
+                    {
+                        OnPropertyChanged(nameof(AsSelection));
+                    }
+                }
+            }
+        }
+
+        public List<IPalSourceTreeSelection> AsSelection =>
+            Children.All(c => c.IsChecked == true)
+                ? [new SourceTreeGuildSelection(ModelObject)]
+                : Children.SelectMany(c => c.AsSelection).SkipNull().ToList();
+
+        public void ReadFromSelections(List<IPalSourceTreeSelection> selections)
+        {
+            SuppressSelectionChangedDuring(() =>
+            {
+                if (selections.OfType<SourceTreeGuildSelection>().Any(s => s.ModelObject.Id == ModelObject.Id))
+                {
+                    foreach (var c in PlayerNodes)
+                        c.IsChecked = true;
+                }
+                else
+                {
+                    foreach (var c in Children)
+                        c.ReadFromSelections(selections);
+                }
+            });
+
+            OnPropertyChanged(nameof(AsSelection));
+        }
     }
-
-    public partial class AnyPlayerInAnyGuildTreeNodeViewModel : ObservableObject, IPalSourceTreeNode, IPalSource
-    {
-        public string Id => "ANY";
-
-        public ILocalizedText Label { get; } = LocalizationCodes.LC_PAL_SRC_ANY_PLAYER_GUILD.Bind();
-
-        [ObservableProperty]
-        private bool isSelected;
-
-        public IEnumerable<PalInstance> Filter(CachedSaveGame source) => source.OwnedPals;
-    }
-
 
 
     public partial class PalSourceTreeViewModel : ObservableObject
     {
+        private bool suppressSelectionChanged = false;
+        private void SuppressSelectionChangedDuring(Action fn)
+        {
+            suppressSelectionChanged = true;
+            try { fn(); }
+            finally { suppressSelectionChanged = false; }
+        }
+
         // for XAML designer view
         public PalSourceTreeViewModel() : this(CachedSaveGame.SampleForDesignerView)
         {
@@ -153,73 +188,80 @@ namespace PalCalc.UI.ViewModel.Solver
         public PalSourceTreeViewModel(CachedSaveGame save)
         {
             Save = save;
-            AvailableGuilds = new List<GuildViewModel>()
+
+            RootNodes = save.Guilds
+                .OrderBy(g => g.Name)
+                .Select(g => new GuildSourceTreeNodeViewModel(save, g))
+                .OfType<IPalSourceTreeNode>()
+                .ToList();
+
+            // only subscribe to changes in root nodes for raising change-events, try to avoid massive event
+            // cascades/re-triggering
+            //
+            // assume root nodes will raise events appropriately if children change
+            foreach (var node in RootNodes)
             {
-                GuildViewModel.Any
-            };
-
-            AvailableGuilds.AddRange(save.Guilds.Select(g => new GuildViewModel(save, g)));
-
-            var anySource = new AnyPlayerInAnyGuildTreeNodeViewModel();
-            RootNodes = new List<IPalSourceTreeNode>() { anySource };
-            RootNodes.AddRange(save.Guilds.Select(g => new GuildSourceTreeNodeViewModel(save, g)));
-
-            SelectedNode = anySource;
-        }
-
-        private void TraverseSources(IPalSourceTreeNode node, Action<IPalSource> action)
-        {
-            switch (node)
-            {
-                case GuildSourceTreeNodeViewModel guildNode: guildNode.Children.ForEach(action); break;
-                case IPalSource palSource: action(palSource); break;
-                default: throw new InvalidOperationException();
+                PropertyChangedEventManager.AddHandler(node, Node_SelectionPropertyChanged, nameof(node.AsSelection));
             }
         }
 
-        public IPalSource FindById(string id)
+        private void Node_SelectionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            IPalSource res = null;
-            foreach (var n in RootNodes)
-                TraverseSources(n, s => { if (s.Id == id) res = s; });
-            return res;
+            if (!suppressSelectionChanged)
+            {
+                OnPropertyChanged(nameof(Selections));
+                OnPropertyChanged(nameof(HasValidSource));
+            }
         }
 
-        private IPalSourceTreeNode selectedNode;
-        public IPalSourceTreeNode SelectedNode
+        public List<IPalSourceTreeSelection> Selections
         {
-            get => selectedNode;
+            get
+            {
+                return AllNodes.All(n => n.IsChecked == true)
+                    ? [new SourceTreeAllSelection()]
+                    : RootNodes.SelectMany(n => n.AsSelection).ToList();
+            }
             set
             {
-                var fixedValue = value switch
+                SuppressSelectionChangedDuring(() =>
                 {
-                    null => RootNodes.FirstOrDefault(),
-                    GuildSourceTreeNodeViewModel g => g.Children.OfType<AnyPlayerInGuildSourceTreeNodeViewModel>().FirstOrDefault(),
-                    _ => value
-                };
-
-                var oldValue = selectedNode;
-                if (SetProperty(ref selectedNode, fixedValue))
-                {
-                    if (fixedValue != null && !fixedValue.IsSelected) fixedValue.IsSelected = true;
-
-                    OnPropertyChanged(nameof(SelectedSource));
-                    OnPropertyChanged(nameof(HasValidSource));
-                }
-                else if (value != null && value != fixedValue)
-                {
-                    if (selectedNode != null)
-                        selectedNode.IsSelected = true;
-                }
+                    if (value.OfType<SourceTreeAllSelection>().Any())
+                    {
+                        foreach (var node in AllNodes)
+                            node.IsChecked = true;
+                    }
+                    else
+                    {
+                        foreach (var node in RootNodes)
+                            node.ReadFromSelections(value);
+                    }
+                });
+                OnPropertyChanged(nameof(Selections));
+                OnPropertyChanged(nameof(HasValidSource));
             }
         }
 
-        public IPalSource SelectedSource => SelectedNode as IPalSource;
-
-        public bool HasValidSource => SelectedNode is IPalSource;
+        public bool HasValidSource => Selections.Any();
 
         public List<IPalSourceTreeNode> RootNodes { get; }
 
-        public List<GuildViewModel> AvailableGuilds { get; }
+        private IEnumerable<IPalSourceTreeNode> AllNodes
+        {
+            get
+            {
+                IEnumerable<IPalSourceTreeNode> Enumerate(IPalSourceTreeNode node)
+                {
+                    yield return node;
+
+                    foreach (var child in node.Children.SelectMany(Enumerate))
+                    {
+                        yield return child;
+                    }
+                }
+
+                return RootNodes.SelectMany(Enumerate);
+            }
+        }
     }
 }

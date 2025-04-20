@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.UI.Localization;
 using System;
 using System.Collections.Generic;
@@ -6,9 +7,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Animation;
 
 namespace PalCalc.UI.ViewModel
 {
+    public class TranslationCodeUsageDebugViewModel(LocalizationCodes code) : ObservableObject
+    {
+        public LocalizationCodes Code => code;
+
+        private int count = Translator.WithCodeUsage(c => c[code]);
+        public int Count
+        {
+            get => count;
+            private set => SetProperty(ref count, value);
+        }
+
+        public void Refresh()
+        {
+            Count = Translator.WithCodeUsage(c => c[code]);
+        }
+    }
+
     public partial class TranslationLocaleDebugViewModel(TranslationLocale locale, List<ITranslationError> errors) : ObservableObject
     {
         public string TabTitle { get; } =
@@ -21,7 +40,7 @@ namespace PalCalc.UI.ViewModel
         public List<ITranslationError> Errors { get; } = errors.OrderBy(e => e.GetType().Name).ThenBy(e => e.Message).ToList();
     }
 
-    public partial class TranslationDebugViewModel(List<ITranslationError> translationErrors) : ObservableObject
+    public partial class TranslationDebugViewModel : ObservableObject
     {
         public static TranslationDebugViewModel DesignerInstance { get; } =
             new TranslationDebugViewModel([
@@ -31,10 +50,29 @@ namespace PalCalc.UI.ViewModel
                 new UnexpectedTranslationError(TranslationLocale.fr, "FOO"),
             ]);
 
-        public List<TranslationLocaleDebugViewModel> LocaleErrors { get; } =
-            translationErrors
+        List<ITranslationError> translationErrors;
+        public TranslationDebugViewModel(List<ITranslationError> translationErrors)
+        {
+            this.translationErrors = translationErrors;
+
+            LocaleErrors = translationErrors
                 .GroupBy(e => e.Locale)
                 .Select(g => new TranslationLocaleDebugViewModel(g.Key, g.ToList()))
                 .ToList();
+
+            ItlCodeReferenceCounts = Translator.CodeToArgs.Keys.Select(code => new TranslationCodeUsageDebugViewModel(code)).OrderBy(u => u.Code.ToString()).ToList();
+
+            RefreshCountsCommand = new RelayCommand(() =>
+            {
+                foreach (var item in ItlCodeReferenceCounts)
+                    item.Refresh();
+            });
+        }
+
+        public List<TranslationLocaleDebugViewModel> LocaleErrors { get; }
+
+        public List<TranslationCodeUsageDebugViewModel> ItlCodeReferenceCounts { get; }
+
+        public IRelayCommand RefreshCountsCommand { get; }
     }
 }

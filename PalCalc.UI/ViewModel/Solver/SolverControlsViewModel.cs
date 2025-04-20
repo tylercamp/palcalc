@@ -33,7 +33,7 @@ namespace PalCalc.UI.ViewModel.Solver
 
         private PalListPresetCollectionViewModel PalListPresets => new(
             CurrentTarget?.PalSource?.Save,
-            CurrentTarget?.PalSource?.SelectedSource,
+            CurrentTarget?.PalSource?.Selections,
             AppSettings.Current?.PalListPresets
         );
 

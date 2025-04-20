@@ -844,4 +844,10 @@
   <data name="LC_SETTINGS_MASSIVE_EGG_INCUBATION_DESC" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SOURCE_PALS_FILTERS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOURCE_PALS_PLAYERS_AND_GUILDS" xml:space="preserve">
+    <value />
+  </data>
 </root>

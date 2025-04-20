@@ -803,6 +803,12 @@ Higher values linearly affect time required, depending on how many types of pals
   <data name="LC_SOURCE_PALS" xml:space="preserve">
     <value>Source Pals</value>
   </data>
+  <data name="LC_SOURCE_PALS_FILTERS" xml:space="preserve">
+    <value>Filters</value>
+  </data>
+  <data name="LC_SOURCE_PALS_PLAYERS_AND_GUILDS" xml:space="preserve">
+    <value>Guild and Players</value>
+  </data>
   <data name="LC_STARTUP_LOADING" xml:space="preserve">
     <value>Loading...</value>
   </data>
