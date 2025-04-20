@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using PalCalc.UI.Model;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,31 +15,40 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public bool Matches(CachedSaveGame source, PalInstance pal);
 
-        public static IPalSourceTreeSelection SingleFromId(CachedSaveGame source, string id)
+        private static ILogger logger = Log.ForContext<IPalSourceTreeSelection>();
+        public static IPalSourceTreeSelection SingleFromId(CachedSaveGame source, string serializedId)
         {
-            if (id.Split("=") is [var type, var value])
+            if (serializedId.Split("=") is [var type, var value])
             {
                 switch (type)
                 {
                     case "PLAYER":
-                        // TODO log
                         var player = source.PlayersById.GetValueOrDefault(value);
-                        if (player == null) return null;
-                        else return new SourceTreePlayerSelection(player);
+                        if (player == null)
+                        {
+                            logger.Warning("Unrecognized player with ID '{PlayerID}' from selection serialized-id '{RawID}'", value, serializedId);
+                            return null;
+                        }
+                        
+                        return new SourceTreePlayerSelection(player);
 
                     case "GUILD":
-                        // TODO log
                         var guild = source.Guilds.FirstOrDefault(g => g.Id == value);
-                        if (guild == null) return null;
-                        else return new SourceTreeGuildSelection(guild);
+                        if (guild == null)
+                        {
+                            logger.Warning("Unrecognized guild with ID '{GuildID}' from selection serialized-id '{RawID}'", value, serializedId);
+                            return null;
+                        }
+
+                        return new SourceTreeGuildSelection(guild);
                 }
             }
-            else if (id == "ANY")
+            else if (serializedId == "ANY")
             {
                 return new SourceTreeAllSelection();
             }
 
-            // TODO log
+            logger.Warning("Unrecognized pal source tree serialized-id format: '{id}'", serializedId);
 
             return null;
         }

@@ -11,7 +11,7 @@
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance vms:PalSourceTreeViewModel, IsDesignTimeCreatable=True}"
              >
-    <TreeView x:Name="m_TreeView" ItemsSource="{Binding RootNodes}" BorderBrush="{x:Null}" HorizontalContentAlignment="Stretch">
+    <TreeView ItemsSource="{Binding RootNodes}" BorderBrush="{x:Null}">
         <TreeView.ItemContainerStyle>
             <!-- explicitly reference Adonis style, doesn't work properly without this for some reason -->
             <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItemStyle}">
@@ -19,7 +19,7 @@
                 <Setter Property="Focusable" Value="False" />
 
                 <!-- (reapply fix for XAML binding errors from App.xaml) -->
-                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
 
                 <EventSetter Event="MouseDown" Handler="TreeViewItem_MouseDown" />
