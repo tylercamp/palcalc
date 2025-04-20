@@ -114,5 +114,4 @@ The Community Toolkit library is used for the viewmodels, which provides the `Ob
 - Option to auto-recalc all target pals when changes are detected
 - Allow specifying custom db.json
 - Attack skill inheritance + solving
-- Allow solving for multiple pals at once
 - Implement proper graph diffing for the built in GraphSharp animations
