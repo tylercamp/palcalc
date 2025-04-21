@@ -5,15 +5,20 @@
     <TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <FileVersion></FileVersion>
-	<DisableFody Condition="'$(Configuration)' == 'Debug'">true</DisableFody>
+	<DisableFody Condition="'$(Configuration)' != 'Release'">true</DisableFody>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<CETCompat>false</CETCompat> <!-- https://github.com/tylercamp/palcalc/issues/85 -->
 	<ApplicationManifest>app.manifest</ApplicationManifest>
+	<Configurations>Debug;Release;Release (NoBundle)</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants);HANDLE_ERRORS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (NoBundle)|AnyCPU'">
     <DefineConstants>$(DefineConstants);HANDLE_ERRORS</DefineConstants>
   </PropertyGroup>
 
