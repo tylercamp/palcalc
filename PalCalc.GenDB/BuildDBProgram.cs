@@ -86,6 +86,38 @@ namespace PalCalc.GenDB
                         MinWildLevel = minWildLevel,
                         MaxWildLevel = maxWildLevel,
 
+                        Size = Enum.Parse<PalSize>(rawPal.Size.Replace("EPalSizeType::", "")),
+                        Hp = rawPal.Hp,
+                        Defense = rawPal.Defense,
+                        Attack = rawPal.ShotAttack,
+
+                        WalkSpeed = rawPal.WalkSpeed,
+                        RunSpeed = rawPal.RunSpeed,
+                        RideSprintSpeed = rawPal.RideSprintSpeed,
+                        TransportSpeed = rawPal.TransportSpeed,
+                        Stamina = rawPal.Stamina,
+
+                        MaxFullStomach = rawPal.MaxFullStomach,
+                        FoodAmount = rawPal.FoodAmount,
+
+                        Nocturnal = rawPal.Nocturnal,
+
+                        WorkSuitability = new()
+                        {
+                            { WorkType.Kindling, rawPal.WorkSuitability_EmitFlame },
+                            { WorkType.Watering, rawPal.WorkSuitability_Watering },
+                            { WorkType.Planting, rawPal.WorkSuitability_Seeding },
+                            { WorkType.GenerateElectricity, rawPal.WorkSuitability_GenerateElectricity },
+                            { WorkType.Handiwork, rawPal.WorkSuitability_Handcraft },
+                            { WorkType.Gathering, rawPal.WorkSuitability_Collection },
+                            { WorkType.Lumbering, rawPal.WorkSuitability_Deforest },
+                            { WorkType.Mining, rawPal.WorkSuitability_Mining },
+                            { WorkType.MedicineProduction, rawPal.WorkSuitability_ProductMedicine },
+                            { WorkType.Cooling, rawPal.WorkSuitability_Cool },
+                            { WorkType.Transporting, rawPal.WorkSuitability_Transport },
+                            { WorkType.Farming, rawPal.WorkSuitability_MonsterFarm },
+                        },
+
                         GuaranteedPassivesInternalIds = rawPal.GuaranteedPassives,
                     };
                 }).ToList();
@@ -521,6 +553,63 @@ namespace PalCalc.GenDB
             ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_04.uasset"], "Passive_Positive_4_icon.png", NoOp);
         }
 
+        public static void ExportWorkSuitabilityIcons(Dictionary<string, UTexture2D> workIcons)
+        {
+            logger.Information("Exporting work suitability icons...");
+
+            var fileNames = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                { "T_icon_palwork_00.uasset", "Kindling.png" },
+                { "T_icon_palwork_01.uasset", "Watering.png" },
+                { "T_icon_palwork_02.uasset", "Planting.png" },
+                { "T_icon_palwork_03.uasset", "ElectricityGeneration.png" },
+                { "T_icon_palwork_04.uasset", "Handiwork.png" },
+                { "T_icon_palwork_05.uasset", "Gathering.png" },
+                { "T_icon_palwork_06.uasset", "Lumbering.png" },
+                { "T_icon_palwork_07.uasset", "Mining.png" },
+                { "T_icon_palwork_08.uasset", "MedicineProduction.png" },
+                //{ "T_icon_palwork_09.uasset", "" },
+                { "T_icon_palwork_10.uasset", "Cooling.png" },
+                { "T_icon_palwork_11.uasset", "Transporting.png" },
+                { "T_icon_palwork_12.uasset", "Farming.png" },
+                //{ "T_icon_palwork_13.uasset", "" },
+            };
+
+            foreach (var mapping in fileNames)
+                ExportImage(workIcons[mapping.Key], $"../PalCalc.UI/Resources/{mapping.Value}", SKEncodedImageFormat.Png);
+        }
+
+        public static void ExportStatusIcons(Dictionary<string, UTexture2D> statusIcons)
+        {
+            logger.Information("Exporting status icons...");
+
+            var fileNames = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                { "T_icon_status_00.uasset", "Health.png" },
+                //{ "T_icon_status_01.uasset", "" },
+                { "T_icon_status_02.uasset", "Attack.png" },
+                { "T_icon_status_03.uasset", "Defense.png" },
+                { "T_icon_status_04.uasset", "Weight.png" },
+                { "T_icon_status_05.uasset", "WorkSpeed.png" },
+                //{ "T_icon_status_06.uasset", "" },
+                //{ "T_icon_status_07.uasset", "" },
+            };
+
+            foreach (var mapping in fileNames)
+                ExportImage(statusIcons[mapping.Key], $"../PalCalc.UI/Resources/{mapping.Value}", SKEncodedImageFormat.Png);
+        }
+
+        public static void ExportMiscIcons(OtherIcons icons)
+        {
+            logger.Information("Exporting misc. icons...");
+
+            ExportImage(icons.DayIcon, "../PalCalc.UI/Resources/Day.png", SKEncodedImageFormat.Png);
+            ExportImage(icons.NightIcon, "../PalCalc.UI/Resources/Night.png", SKEncodedImageFormat.Png);
+            ExportImage(icons.FoodIconOff, "../PalCalc.UI/Resources/FoodOff.png", SKEncodedImageFormat.Png);
+            ExportImage(icons.FoodIconOn, "../PalCalc.UI/Resources/FoodOn.png", SKEncodedImageFormat.Png);
+            ExportImage(icons.TimerIcon, "../PalCalc.UI/Resources/Timer.png", SKEncodedImageFormat.Png);
+        }
+
         private static void ExportPalIcons(List<Pal> pals, Dictionary<string, UTexture2D> palIcons, int iconSize)
         {
             logger.Information("Exporting pal icons...");
@@ -615,7 +704,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v18");
+            var db = PalDB.MakeEmptyUnsafe("v19");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.Humans = humans;
@@ -653,6 +742,9 @@ namespace PalCalc.GenDB
             ExportElementIcons(otherIcons.ElementIcons);
             ExportSkillElementIcons(otherIcons.SkillElementIcons);
             ExportSkillRankIcons(otherIcons.SkillRankIcons);
+            ExportWorkSuitabilityIcons(otherIcons.WorkSuitabilityIcons);
+            ExportStatusIcons(otherIcons.StatusIcons);
+            ExportMiscIcons(otherIcons);
 
             logger.Information("Scraping map data");
             var mapInfo = MapReader.ReadMapInfo(provider);

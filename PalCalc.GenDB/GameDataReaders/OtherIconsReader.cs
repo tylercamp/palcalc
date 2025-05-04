@@ -17,6 +17,18 @@ namespace PalCalc.GenDB.GameDataReaders
         public Dictionary<string, UTexture2D> SkillElementIcons { get; set; }
 
         public Dictionary<string, UTexture2D> SkillRankIcons { get; set; }
+
+        public Dictionary<string, UTexture2D> WorkSuitabilityIcons { get; set; }
+
+        public Dictionary<string, UTexture2D> StatusIcons { get; set; }
+
+        public UTexture2D FoodIconOff { get; set; }
+        public UTexture2D FoodIconOn { get; set; }
+
+
+        public UTexture2D TimerIcon { get; set; }
+        public UTexture2D DayIcon { get; set; }
+        public UTexture2D NightIcon { get; set; }
     }
 
     internal class OtherIconsReader
@@ -37,17 +49,27 @@ namespace PalCalc.GenDB.GameDataReaders
                     var fullName = f.Key.SubstringBeforeLast('.') + '.' + f.Value.NameWithoutExtension;
                     provider.TryLoadObject<UTexture2D>(fullName, out var tex);
                     return tex;
-                }
+                },
+                StringComparer.InvariantCultureIgnoreCase
             );
         }
 
         public static OtherIcons ReadIcons(IFileProvider provider)
         {
+            logger.Information("Reading other/misc. icon data");
             var result = new OtherIcons();
 
             result.ElementIcons = ReadIconsLike(provider, AssetPaths.ELEMENT_ICONS_BASE);
             result.SkillElementIcons = ReadIconsLike(provider, AssetPaths.SKILL_ELEMENT_ICONS_BASE);
             result.SkillRankIcons = ReadIconsLike(provider, AssetPaths.SKILL_RANK_ICONS_BASE);
+            result.WorkSuitabilityIcons = ReadIconsLike(provider, AssetPaths.WORK_SUITABILITY_ICONS_BASE);
+            result.StatusIcons = ReadIconsLike(provider, AssetPaths.STATUS_ICONS_BASE);
+
+            result.FoodIconOn = provider.LoadObject<UTexture2D>(AssetPaths.FOOD_ICON_ON_PATH);
+            result.FoodIconOff = provider.LoadObject<UTexture2D>(AssetPaths.FOOD_ICON_OFF_PATH);
+            result.TimerIcon = provider.LoadObject<UTexture2D>(AssetPaths.TIMER_ICON_PATH);
+            result.DayIcon = provider.LoadObject<UTexture2D>(AssetPaths.DAY_ICON_PATH);
+            result.NightIcon = provider.LoadObject<UTexture2D>(AssetPaths.NIGHT_ICON_PATH);
 
             return result;
         }

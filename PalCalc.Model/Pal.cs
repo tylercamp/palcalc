@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Model
 {
+    // TODO - not used yet, was previously a basic field in the pal data, now I'm not sure how this is
+    //        meant to be scraped
     [JsonConverter(typeof(StringEnumConverter))]
     public enum MountType
     {
@@ -16,6 +18,35 @@ namespace PalCalc.Model
         Swim,
         Fly,
         FlyLand,
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum PalSize
+    {
+        None,
+        XS,
+        S,
+        M,
+        L,
+        XL,
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum WorkType
+    {
+        Kindling,
+        Watering,
+        Planting,
+        GenerateElectricity,
+        Handiwork,
+        Gathering,
+        Lumbering,
+        Mining,
+        // OilExtraction, // in the data files but not actually used?
+        MedicineProduction,
+        Cooling,
+        Transporting,
+        Farming,
     }
 
     public class Pal
@@ -53,6 +84,29 @@ namespace PalCalc.Model
         private EggSize? eggSize;
         [JsonIgnore]
         public EggSize EggSize => eggSize ??= GameConstants.EggSizeMinRarity.OrderBy(kvp => kvp.Value).First(kvp => kvp.Value <= Rarity).Key;
+
+        public PalSize Size { get; set; } = PalSize.None;
+
+        public bool Nocturnal { get; set; } = false;
+
+        public int CraftSpeed { get; set; } = 0;
+
+        public int Hp { get; set; } = 0;
+        public int Defense { get; set; } = 0;
+        //public int Support { get; set; } = 0; // ?
+        public int Attack { get; set; } = 0;
+
+        public int WalkSpeed { get; set; } = 0;
+        public int RunSpeed { get; set; } = 0;
+        public int RideSprintSpeed { get; set; } = 0;
+        public int TransportSpeed { get; set; } = 0;
+        public int MaxFullStomach { get; set; } = 0;
+        public int FoodAmount { get; set; } = 0;
+        public int Stamina { get; set; } = 0;
+
+        public Dictionary<WorkType, int> WorkSuitability { get; set; } = null;
+
+
 
         ////
 

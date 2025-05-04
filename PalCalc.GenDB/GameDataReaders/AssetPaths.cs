@@ -20,6 +20,13 @@ namespace PalCalc.GenDB.GameDataReaders
         public const string ELEMENT_ICONS_BASE = "Pal/Content/Pal/Texture/UI/InGame/T_Icon_element_s";
         public const string SKILL_ELEMENT_ICONS_BASE = "Pal/Content/Pal/Texture/UI/Main_Menu/T_prt_pal_skill_base_element";
         public const string SKILL_RANK_ICONS_BASE = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_skillstatus_rank_arrow";
+        public const string WORK_SUITABILITY_ICONS_BASE = "Pal/Content/Pal/Texture/UI/InGame/T_icon_palwork";
+        public const string STATUS_ICONS_BASE = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_status";
+        public const string FOOD_ICON_ON_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_Icon_foodamount_on";
+        public const string FOOD_ICON_OFF_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_Icon_foodamount_off";
+        public const string TIMER_ICON_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_Icon_PalSkillCoolTime";
+        public const string DAY_ICON_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_timezone_daytime";
+        public const string NIGHT_ICON_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_timezone_night";
 
         public const string ACTIVE_SKILLS_PATH = "Pal/Content/Pal/DataTable/Waza/DT_WazaDataTable";
         public const string ACTIVE_SKILLS_PAL_LEVEL_PATH = "Pal/Content/Pal/DataTable/Waza/DT_WazaMasterLevel";

@@ -62,6 +62,66 @@ namespace PalCalc.GenDB.GameDataReaders
         public bool IsRaidBoss { get; set; }
 
         [FStructProperty]
+        public string Size { get; set; }
+
+        [FStructProperty]
+        public int CraftSpeed { get; set; }
+
+        [FStructProperty]
+        public int Hp { get; set; }
+        [FStructProperty]
+        public int Defense { get; set; }
+        [FStructProperty]
+        public int Support { get; set; }
+        [FStructProperty]
+        public int ShotAttack { get; set; }
+        [FStructProperty]
+        public int WalkSpeed { get; set; }
+        [FStructProperty]
+        public int RunSpeed { get; set; }
+        [FStructProperty]
+        public int RideSprintSpeed { get; set; }
+        [FStructProperty]
+        public int TransportSpeed { get; set; }
+        [FStructProperty]
+        public int MaxFullStomach { get; set; }
+        [FStructProperty]
+        public int FoodAmount { get; set; }
+
+        [FStructProperty]
+        public bool Nocturnal { get; set; }
+
+        [FStructProperty]
+        public int Stamina { get; set; }
+
+        [FStructProperty]
+        public int WorkSuitability_EmitFlame { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_Watering { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_Seeding { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_GenerateElectricity { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_Handcraft { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_Collection { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_Deforest { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_Mining { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_OilExtraction { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_ProductMedicine { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_Cool { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_Transport { get; set; }
+        [FStructProperty]
+        public int WorkSuitability_MonsterFarm { get; set; }
+
+        [FStructProperty]
         public string OverrideNameTextId { get; set; }
 
         public string AlternativeInternalName => OverrideNameTextId.Replace("PAL_NAME_", "", StringComparison.InvariantCultureIgnoreCase);
