@@ -121,7 +121,8 @@ namespace PalCalc.UI.ViewModel.Inspector
         {
             var displayGroupName = $"Dimensional Pal Storage ({rawDpsData.Count})";
 
-            var playerNamesById = rawLevelData.Characters.Where(c => c.IsPlayer).ToDictionary(c => c.PlayerId.ToString(), c => c.NickName);
+            // (need to `.GroupBy` and `.First` since players can sometimes have duplicate entries in the character list for some reason)
+            var playerNamesById = rawLevelData.Characters.Where(c => c.IsPlayer).GroupBy(c => c.PlayerId.ToString()).ToDictionary(g => g.Key, g => g.First().NickName);
             var ownerPlayers = rawDpsData.Select(p => p.Item1).Select(p => new OwnerViewModel(OwnerType.Player, new HardCodedText(playerNamesById[p.PlayerId]), p.PlayerId)).ToList();
             var ownersById = ownerPlayers.ToDictionary(p => p.Id);
 
@@ -163,7 +164,7 @@ namespace PalCalc.UI.ViewModel.Inspector
         {
             var displayGroupName = $"Standard Pal Containers ({rawData.ContainerContents.Count})";
 
-            var playerNamesById = rawData.Characters.Where(c => c.IsPlayer).ToDictionary(c => c.PlayerId.ToString(), c => c.NickName);
+            var playerNamesById = rawData.Characters.Where(c => c.IsPlayer).GroupBy(c => c.PlayerId.ToString()).ToDictionary(g => g.Key, g => g.First().NickName);
 
             var ownerPlayers = rawPlayers.Select(p => new OwnerViewModel(OwnerType.Player, new HardCodedText(playerNamesById[p.PlayerId]), p.PlayerId)).ToList();
             var ownerGuilds = rawData.Groups.Select(g => new OwnerViewModel(OwnerType.Guild, new HardCodedText(g.Name), g.Id)).ToList();

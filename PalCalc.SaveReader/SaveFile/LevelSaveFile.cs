@@ -3,6 +3,7 @@ using PalCalc.SaveReader.SaveFile.Support.Level;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -233,6 +234,12 @@ namespace PalCalc.SaveReader.SaveFile
             {
                 if (gvasInstance.IsPlayer)
                 {
+                    if (result.Players.Any(p => p.PlayerId == gvasInstance.PlayerId.ToString()))
+                    {
+                        logger.Warning("Found duplicate character instance for Player '{name}', skipping", gvasInstance.NickName);
+                        continue;
+                    }
+
                     result.Players.Add(new PlayerInstance()
                     {
                         PlayerId = gvasInstance.PlayerId.ToString(),
