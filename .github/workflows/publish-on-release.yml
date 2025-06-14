@@ -17,8 +17,8 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Restore dependencies (with win-x64)
-        run: dotnet restore --runtime win-x64
+      - name: Restore dependencies (with win-x64 and ReadyToRun)
+        run: dotnet restore --runtime win-x64 /p:PublishReadyToRun=true
 
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
