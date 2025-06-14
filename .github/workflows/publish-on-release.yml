@@ -24,7 +24,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Publish Bundled profile (single EXE)
-        run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release /p:PublishProfile=Properties/PublishProfiles/Bundled.pubxml --output publish/Bundled --no-build
+        run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release /p:PublishProfile=Properties/PublishProfiles/Bundled.pubxml --output publish/Bundled
 
       - name: Upload Bundled EXE
         uses: actions/upload-artifact@v4
@@ -34,7 +34,7 @@ jobs:
             publish/Bundled/*.exe
 
       - name: Publish NonBundled profile (multiple files)
-        run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release /p:PublishProfile=Properties/PublishProfiles/NonBundled.pubxml --output publish/NonBundled --no-build
+        run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release /p:PublishProfile=Properties/PublishProfiles/NonBundled.pubxml --output publish/NonBundled
 
       - name: Zip NonBundled output
         run: Compress-Archive -Path publish/NonBundled/* -DestinationPath publish/PalCalc.UI_NonBundled.zip
