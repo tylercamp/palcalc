@@ -10,6 +10,7 @@
 	<CETCompat>false</CETCompat> <!-- https://github.com/tylercamp/palcalc/issues/85 -->
 	<ApplicationManifest>app.manifest</ApplicationManifest>
 	<Configurations>Debug;Release;Release (NoBundle)</Configurations>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
