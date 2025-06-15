@@ -28,7 +28,9 @@ namespace PalCalc.UI.Localization
                     Translator.ItlCodeUsage[src.Code] += 1;
 
                 if (Translator.DEBUG_DISABLE_TRANSLATIONS)
+#pragma warning disable CS0162 // Unreachable code detected
                     return src.Code.ToString();
+#pragma warning restore CS0162 // Unreachable code detected
 
                 var result = src.BaseLocalizedText;
                 foreach (var p in src.Parameters)

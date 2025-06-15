@@ -36,7 +36,7 @@ namespace AdonisUI.Helpers
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
         public static extern bool GetCursorPos([In, Out] POINT pt);
 
-        public static HandleRef NullHandleRef;
+        public static readonly HandleRef NullHandleRef = new HandleRef();
 
         public delegate bool MonitorEnumProc(IntPtr monitor, IntPtr hdc, IntPtr lprcMonitor, IntPtr lParam);
 

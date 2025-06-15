@@ -68,9 +68,9 @@ namespace GraphSharp.Algorithms.Layout.Simple.Hierarchical
             public readonly double[] Shifts = new double[4] { double.PositiveInfinity, double.PositiveInfinity, double.PositiveInfinity, double.PositiveInfinity };
         }
 
-        protected abstract class SugiVertex<TVertex> : Data
+        protected abstract class SugiVertex<_TVertex> : Data
         {
-            public TVertex OriginalVertex;
+            public _TVertex OriginalVertex;
             public VertexTypes Type;
             public Segment Segment;
             public int LayerIndex { get; set; }
@@ -78,7 +78,7 @@ namespace GraphSharp.Algorithms.Layout.Simple.Hierarchical
 
             public SugiVertex() { }
 
-            public SugiVertex(TVertex originalVertex)
+            public SugiVertex(_TVertex originalVertex)
             {
                 OriginalVertex = originalVertex;
                 Type = VertexTypes.Original;

@@ -9,7 +9,9 @@
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<CETCompat>false</CETCompat> <!-- https://github.com/tylercamp/palcalc/issues/85 -->
 	<ApplicationManifest>app.manifest</ApplicationManifest>
-	<Configurations>Debug;Release;Release (NoBundle)</Configurations>
+	<Configurations>Debug;Release;Release_NoBundle</Configurations>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	<NoWarn>9107</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
@@ -18,7 +20,7 @@
     <DefineConstants>$(DefineConstants);HANDLE_ERRORS</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (NoBundle)|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_NoBundle|AnyCPU'">
     <DefineConstants>$(DefineConstants);HANDLE_ERRORS</DefineConstants>
   </PropertyGroup>
 

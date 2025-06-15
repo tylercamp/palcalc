@@ -7,6 +7,7 @@
     <Nullable>disable</Nullable>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
 	<CETCompat>false</CETCompat> <!-- https://github.com/tylercamp/palcalc/issues/85 -->
+	<NoWarn>0067,9107</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

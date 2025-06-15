@@ -35,12 +35,12 @@ namespace GraphSharp.Algorithms.Layout.Compound.FDP
         private readonly IList<HashSet<TVertex>> _levels =
             new List<HashSet<TVertex>>();
 
-        private class RemovedTreeNodeData<TVertex, TEdge>
+        private class RemovedTreeNodeData<_TVertex, _TEdge>
         {
-            public readonly TVertex Vertex;
-            public readonly TEdge Edge;
+            public readonly _TVertex Vertex;
+            public readonly _TEdge Edge;
 
-            public RemovedTreeNodeData(TVertex vertex, TEdge edge)
+            public RemovedTreeNodeData(_TVertex vertex, _TEdge edge)
             {
                 Vertex = vertex;
                 Edge = edge;

@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace PalCalc.GenDB.GameDataReaders
 {
-    class FStructPropertyAttribute(string? propName = null) : Attribute
+    class FStructPropertyAttribute(string propName = null) : Attribute
     {
-        public string? PropName => propName;
+        public string PropName => propName;
     }
 
     static class FStructExtensions

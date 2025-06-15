@@ -43,9 +43,6 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
                     buff.Add(currentBytes[1]);
                 }
             }
-
-            // Go back to a position after reading a empty byte
-            reader.BaseStream.Position--;
         }
     }
 }

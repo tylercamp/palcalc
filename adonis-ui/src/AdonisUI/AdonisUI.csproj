@@ -6,6 +6,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <UseWpf>true</UseWpf>
+
+	<NoWarn>1591</NoWarn>
   </PropertyGroup>
 
   <!-- Package metadata -->

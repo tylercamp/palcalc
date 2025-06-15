@@ -38,9 +38,6 @@ namespace PalCalc.UI.View.Utils
                 typeof(MapPanel),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
-        // We'll maintain a single ImageDrawing for performance (optional)
-        private ImageDrawing _imageDrawing;
-
         protected override Size MeasureOverride(Size availableSize)
         {
             // Measure children (no constraints).

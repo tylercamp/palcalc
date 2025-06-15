@@ -84,13 +84,13 @@ namespace PalCalc.UI.View.Utils
         /// An optional property to set the ItemTemplate for all items.
         /// Alternatively, you could use ItemTemplateSelector or custom logic.
         /// </summary>
-        public DataTemplate ItemTemplate
+        new public DataTemplate ItemTemplate
         {
             get => (DataTemplate)GetValue(ItemTemplateProperty);
             set => SetValue(ItemTemplateProperty, value);
         }
 
-        public static readonly DependencyProperty ItemTemplateProperty =
+        new public static readonly DependencyProperty ItemTemplateProperty =
             DependencyProperty.Register(
                 nameof(ItemTemplate),
                 typeof(DataTemplate),

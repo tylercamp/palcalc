@@ -19,7 +19,7 @@ namespace GraphSharp.Serialization
                     return xs.Deserialize(stream) as T;
                 }
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 // do nothing
             }

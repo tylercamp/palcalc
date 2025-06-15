@@ -40,7 +40,8 @@ namespace PalCalc.GenDB.GameDataReaders
             {
                 "EPalGenderType::None" => null,
                 "EPalGenderType::Male" => PalGender.MALE,
-                "EPalGenderType::Female" => PalGender.FEMALE
+                "EPalGenderType::Female" => PalGender.FEMALE,
+                _ => throw new ArgumentException($"Unknown gender type: {gender}")
             };
 
             List<((string, PalGender?), (string, PalGender?), string)> result = [];

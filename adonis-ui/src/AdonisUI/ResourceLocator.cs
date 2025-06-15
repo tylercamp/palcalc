@@ -42,7 +42,7 @@ namespace AdonisUI
         }
 
         /// <summary>
-        /// Adds a resource dictionary with the specified uri to the MergedDictionaries collection of the <see cref="rootResourceDictionary"/>.
+        /// Adds a resource dictionary with the specified uri to the MergedDictionaries collection of the rootResourceDictionary.
         /// Additionally all child ResourceDictionaries are traversed recursively to find the current color scheme which is removed if found.
         /// </summary>
         /// <param name="rootResourceDictionary">The resource dictionary containing the currently active color scheme. It will receive the new color scheme in its MergedDictionaries. Expected are the resource dictionaries of the app or window.</param>

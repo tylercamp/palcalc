@@ -1,0 +1,59 @@
+# This workflow builds and publishes artifacts when a release (or pre-release) is published
+name: Publish on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies (with win-x64 and ReadyToRun)
+        run: dotnet restore --runtime win-x64 /p:PublishReadyToRun=true
+
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish Bundled profile (single EXE)
+        run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release /p:PublishProfile=Properties/PublishProfiles/Bundled.pubxml --output publish/Bundled
+
+      - name: Upload release asset for Bundled EXE
+        uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: publish/Bundled/PalCalc.UI.exe
+
+      - name: Upload Bundled EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: PalCalc.UI_Bundled_EXE
+          path: |
+            publish/Bundled/*.exe
+
+      - name: Publish NonBundled profile (multiple files)
+        run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release_NoBundle /p:PublishProfile=Properties/PublishProfiles/NonBundled.pubxml --output publish/NonBundled
+
+      - name: Zip NonBundled output
+        run: Compress-Archive -Path publish/NonBundled/* -DestinationPath publish/PalCalc-NoBundle.zip
+        shell: pwsh
+
+      - name: Upload NonBundled ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: PalCalc-NoBundle.zip
+          path: publish/PalCalc-NoBundle.zip
+
+      - name: Upload release asset for Non-Bundled EXE
+        uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: publish/PalCalc-NoBundle.zip
