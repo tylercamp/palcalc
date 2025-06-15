@@ -194,15 +194,15 @@ namespace PalCalc.SaveReader.SaveFile
                 }
             }
 
+            var parsed = ReadRawCharacterData();
+
             var gpsData = gpsFile?.ReadPals("GLOBAL_PAL_STORAGE");
             var gpsContainer = gpsData == null ? null : new GlobalPalStorageContainer()
             {
                 Id = gpsData.ContainerId,
                 // the first listed player should be the owner of the save file, and the save's owner has the global pal storage
-                PlayerId = players.First().PlayerId,
+                PlayerId = players.FirstOrDefault()?.PlayerId ?? parsed.Characters.FirstOrDefault(c => c.IsPlayer)?.PlayerId?.ToString() ?? "<NO-ID>",
             };
-
-            var parsed = ReadRawCharacterData();
 
             var detectedContainers = CollectContainers(settings, parsed, players, dpsContainerByPlayerId.Values, gpsContainer);
 
