@@ -31,10 +31,7 @@
                         <Run Text="{itl:LocalizedText LC_COMMON_LEVEL}" />
                         <Run Text="{Binding PalInstance.ModelObject.Level}" />
                     </TextBlock>
-                    <!-- TODO ITL -->
-                    <TextBlock Visibility="{Binding PalInstance.ModelObject.IsOnExpedition, Converter={StaticResource VVC}}">
-                        On Expedition
-                    </TextBlock>
+                    <TextBlock Visibility="{Binding PalInstance.ModelObject.IsOnExpedition, Converter={StaticResource VVC}}" Text="{itl:LocalizedText LC_SAVEINSPECT_ON_EXPEDITION}" />
                 </StackPanel>
             </StackPanel>
 

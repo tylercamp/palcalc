@@ -850,4 +850,10 @@
   <data name="LC_SOURCE_PALS_PLAYERS_AND_GUILDS" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_INCLUDE_PALS_ON_EXPEDITIONS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVEINSPECT_ON_EXPEDITION" xml:space="preserve">
+    <value />
+  </data>
 </root>

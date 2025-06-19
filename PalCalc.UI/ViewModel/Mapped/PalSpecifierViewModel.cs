@@ -147,6 +147,9 @@ namespace PalCalc.UI.ViewModel.Mapped
         [ObservableProperty]
         private bool includeGlobalStoragePals = true;
 
+        [ObservableProperty]
+        private bool includeExpeditionPals = true;
+
         public bool HasIVs => MinIv_HP > 0 || MinIv_Attack > 0 || MinIv_Defense > 0;
 
         public bool IsValid => TargetPal != null;
@@ -205,6 +208,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             IncludeCustomPals = IncludeCustomPals,
             IncludeCagedPals = IncludeCagedPals,
             IncludeGlobalStoragePals = IncludeGlobalStoragePals,
+            IncludeExpeditionPals = IncludeExpeditionPals,
             DeleteCommand = DeleteCommand,
             LatestJob = LatestJob,
         };

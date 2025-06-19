@@ -328,6 +328,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_INCLUDE_PALS_ON_EXPEDITIONS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_INSPECT_SAVE,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -764,6 +768,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEINSPECT_DETECTED_PROPERTIES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVEINSPECT_ON_EXPEDITION,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

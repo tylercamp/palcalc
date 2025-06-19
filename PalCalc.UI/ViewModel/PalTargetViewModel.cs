@@ -204,6 +204,9 @@ namespace PalCalc.UI.ViewModel
                         if (!CurrentPalSpecifier.IncludeCagedPals && pal.Location.Type == LocationType.ViewingCage)
                             continue;
 
+                        if (!CurrentPalSpecifier.IncludeExpeditionPals && pal.IsOnExpedition)
+                            continue;
+
                         yield return pal;
                     }
                 }

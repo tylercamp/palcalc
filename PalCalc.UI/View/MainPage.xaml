@@ -182,6 +182,10 @@
                                             <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCustomPals}">
                                                 <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_CUSTOM_PALS}" TextWrapping="Wrap" />
                                             </CheckBox>
+
+                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeExpeditionPals}">
+                                                <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_ON_EXPEDITIONS}" TextWrapping="Wrap" />
+                                            </CheckBox>
                                         </StackPanel>
                                     </StackPanel>
 

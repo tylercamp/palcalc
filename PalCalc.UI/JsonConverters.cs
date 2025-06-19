@@ -553,7 +553,8 @@ namespace PalCalc.UI
                 IncludeCustomPals = obj["IncludeCustomPals"]?.ToObject<bool>() ?? true,
                 IncludeCagedPals = obj["IncludeCagedPals"]?.ToObject<bool>() ?? true,
                 IncludeGlobalStoragePals = obj["IncludeGlobalStoragePals"]?.ToObject<bool>() ?? true,
-                CurrentResults = obj["CurrentResults"].ToObject<BreedingResultListViewModel>(serializer)
+                IncludeExpeditionPals = obj["IncludeExpeditionPals"]?.ToObject<bool>() ?? true,
+                CurrentResults = obj["CurrentResults"].ToObject<BreedingResultListViewModel>(serializer),
             };
         }
 
@@ -580,6 +581,7 @@ namespace PalCalc.UI
                 IncludeCustomPals = value.IncludeCustomPals,
                 IncludeCagedPals = value.IncludeCagedPals,
                 IncludeGlobalStoragePals = value.IncludeGlobalStoragePals,
+                IncludeExpeditionPals = value.IncludeExpeditionPals,
                 CurrentResults = value.CurrentResults
             }, serializer).WriteTo(writer, dependencyConverters);
         }
