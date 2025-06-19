@@ -27,6 +27,7 @@ namespace PalCalc.GenDB.GameDataReaders
         public const string TIMER_ICON_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_Icon_PalSkillCoolTime";
         public const string DAY_ICON_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_timezone_daytime";
         public const string NIGHT_ICON_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_timezone_night";
+        public const string DUNGEON_ICON_SMALL_PATH = "Pal/Content/Pal/Texture/UI/IngameMenu/T_icon_dungeon_S";
 
         public const string ACTIVE_SKILLS_PATH = "Pal/Content/Pal/DataTable/Waza/DT_WazaDataTable";
         public const string ACTIVE_SKILLS_PAL_LEVEL_PATH = "Pal/Content/Pal/DataTable/Waza/DT_WazaMasterLevel";

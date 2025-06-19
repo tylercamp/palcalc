@@ -25,6 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\DungeonSmall.png" />
     <None Remove="Resources\Elements\Dark.png" />
     <None Remove="Resources\Elements\Dragon.png" />
     <None Remove="Resources\Elements\Earth.png" />
@@ -272,6 +273,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\DungeonSmall.png" />
     <Resource Include="Resources\Elements\Dark.png" />
     <Resource Include="Resources\Elements\Dragon.png" />
     <Resource Include="Resources\Elements\Earth.png" />

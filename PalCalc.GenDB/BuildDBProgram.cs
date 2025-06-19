@@ -608,6 +608,8 @@ namespace PalCalc.GenDB
             ExportImage(icons.FoodIconOff, "../PalCalc.UI/Resources/FoodOff.png", SKEncodedImageFormat.Png);
             ExportImage(icons.FoodIconOn, "../PalCalc.UI/Resources/FoodOn.png", SKEncodedImageFormat.Png);
             ExportImage(icons.TimerIcon, "../PalCalc.UI/Resources/Timer.png", SKEncodedImageFormat.Png);
+
+            ExportImage(icons.DungeonIconSmall, "../PalCalc.UI/Resources/DungeonSmall.png", SKEncodedImageFormat.Png);
         }
 
         private static void ExportPalIcons(List<Pal> pals, Dictionary<string, UTexture2D> palIcons, int iconSize)

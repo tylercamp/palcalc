@@ -29,6 +29,8 @@ namespace PalCalc.GenDB.GameDataReaders
         public UTexture2D TimerIcon { get; set; }
         public UTexture2D DayIcon { get; set; }
         public UTexture2D NightIcon { get; set; }
+
+        public UTexture2D DungeonIconSmall { get; set; }
     }
 
     internal class OtherIconsReader
@@ -70,6 +72,8 @@ namespace PalCalc.GenDB.GameDataReaders
             result.TimerIcon = provider.LoadObject<UTexture2D>(AssetPaths.TIMER_ICON_PATH);
             result.DayIcon = provider.LoadObject<UTexture2D>(AssetPaths.DAY_ICON_PATH);
             result.NightIcon = provider.LoadObject<UTexture2D>(AssetPaths.NIGHT_ICON_PATH);
+
+            result.DungeonIconSmall = provider.LoadObject<UTexture2D>(AssetPaths.DUNGEON_ICON_SMALL_PATH);
 
             return result;
         }
