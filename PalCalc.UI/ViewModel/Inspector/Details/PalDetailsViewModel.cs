@@ -26,6 +26,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
                 ( "Paldex Is Variant", pal.Pal.Id.IsVariant ),
                 ( "Gender", pal.Gender ),
                 ( "Detected Owner ID", pal.OwnerPlayerId ),
+                ( "On Expedition", pal.IsOnExpedition ),
                 .. pal.PassiveSkills.ZipWithIndex().Select(p => ($"Passive Skill {p.Item2+1}", p.Item1.Name)),
                 .. pal.EquippedActiveSkills.ZipWithIndex().Select(s => ($"Equipped Active Skill {s.Item2+1}", s.Item1.Name)),
                 .. pal.ActiveSkills.ZipWithIndex().Select(s => ($"Active Skill {s.Item2+1}", s.Item1.Name)),
@@ -53,6 +54,8 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
                 ( "TalentShot", rawData.TalentShot ),
                 ( "TalentMelee", rawData.TalentMelee ),
                 ( "TalentDefense", rawData.TalentDefense ),
+
+                ( "ExpeditionMapObjectId", rawData.ExpeditionMapObjectId ),
 
                 .. rawData.PassiveSkills.ZipWithIndex().Select(p => ($"Passive Skill {p.Item2+1}", p.Item1)),
                 .. rawData.EquippedActiveSkills.ZipWithIndex().Select(s => ($"Equipped Active Skill {s.Item2+1}", s.Item1)),
