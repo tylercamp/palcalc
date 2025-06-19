@@ -59,6 +59,12 @@ var level3 = save3.Level.ParseGvas(true, v2);
 var dataLevel3 = save3.Level.ReadCharacterData(db, GameSettings.Defaults, save3.Players, dsl.GlobalPalStorage);
 var rawDataLevel3 = save3.Level.ReadRawCharacterData();
 
+(level3.Properties["worldSaveData"] as StructProperty).Traverse(p =>
+{
+    if (p.Meta.Path.Contains("MapObjectConcreteInstanceIdAssignedToExpedition"))
+        Debugger.Break();
+});
+
 foreach (var pl in save3.Players)
 {
     if (pl.DimensionalPalStorageSaveFile != null)

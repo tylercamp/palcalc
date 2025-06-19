@@ -32,6 +32,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         public int? TalentMelee { get; set; }
         public int? TalentDefense { get; set; }
 
+        public string ExpeditionMapObjectId { get; set; }
+
         public int? Rank { get; set; }
 
         public List<string> PassiveSkills { get; set; }
@@ -123,7 +125,10 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     ContainerId = ContainerId.ToString(),
                     Type = locationType,
                     Index = SlotIndex,
-                }
+                },
+                // map object ID may be assigned for dimensional storage and global palbox pals, but the expedition interface
+                // itself only lets you select from your normal palbox
+                IsOnExpedition = locationType == LocationType.Palbox && ExpeditionMapObjectId != null,
             };
         }
     }
@@ -163,6 +168,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         const string K_TALENT_MELEE         = ".Talent_Melee";
         const string K_TALENT_DEFENSE       = ".Talent_Defense";
         const string K_RANK                 = ".Rank";
+        const string K_EXPEDITION_OBJ_ID    = ".MapObjectConcreteInstanceIdAssignedToExpedition";
 
         static readonly List<string> REQUIRED_PAL_PROPS = new List<string>()
         {
@@ -191,7 +197,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     K_TALENT_SHOT,
                     K_TALENT_MELEE,
                     K_TALENT_DEFENSE,
-                    K_RANK
+                    K_RANK,
+                    K_EXPEDITION_OBJ_ID
                 );
 
                 collectingVisitor.OnExit += (vals) =>
@@ -230,6 +237,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                         pendingInstance.TalentMelee = vals.ContainsKey(K_TALENT_MELEE) ? Convert.ToInt32(vals[K_TALENT_MELEE]) : null;
                         pendingInstance.TalentShot = vals.ContainsKey(K_TALENT_SHOT) ? Convert.ToInt32(vals[K_TALENT_SHOT]) : null;
                         pendingInstance.TalentDefense = vals.ContainsKey(K_TALENT_DEFENSE) ? Convert.ToInt32(vals[K_TALENT_DEFENSE]) : null;
+
+                        pendingInstance.ExpeditionMapObjectId = vals.GetValueOrDefault(K_EXPEDITION_OBJ_ID)?.ToString();
 
                         pendingInstance.Rank = vals.ContainsKey(K_RANK) ? Convert.ToInt32(vals[K_RANK]) : null;
                     }

@@ -59,6 +59,8 @@ namespace PalCalc.Model
         public List<ActiveSkill> ActiveSkills { get; set; }
         public List<ActiveSkill> EquippedActiveSkills { get; set; }
 
+        public bool IsOnExpedition { get; set; }
+
         public int IV_HP { get; set; }
         public int IV_Shot { get; set; }
         public int IV_Defense { get; set; }
