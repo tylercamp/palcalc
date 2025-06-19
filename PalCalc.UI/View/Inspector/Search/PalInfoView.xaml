@@ -11,9 +11,13 @@
              xmlns:v="clr-namespace:PalCalc.UI.View"
              xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              mc:Ignorable="d"
              Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}"
              d:DataContext="{x:Type ivmg:ContainerGridPalSlotViewModel}">
+    <UserControl.Resources>
+        <c:ValueVisibilityConverter x:Key="VVC" />
+    </UserControl.Resources>
     <StackPanel Margin="10">
         <WrapPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
@@ -26,6 +30,10 @@
                     <TextBlock>
                         <Run Text="{itl:LocalizedText LC_COMMON_LEVEL}" />
                         <Run Text="{Binding PalInstance.ModelObject.Level}" />
+                    </TextBlock>
+                    <!-- TODO ITL -->
+                    <TextBlock Visibility="{Binding PalInstance.ModelObject.IsOnExpedition, Converter={StaticResource VVC}}">
+                        On Expedition
                     </TextBlock>
                 </StackPanel>
             </StackPanel>
@@ -50,7 +58,7 @@
 
                 <StackPanel>
                     <Label Width="60" Content="{itl:LocalizedText LC_COMMON_IV_ATTACK}" />
-                    <Label Content="{Binding PalInstance.ModelObject.IV_Shot}" />
+                    <Label Content="{Binding PalInstance.ModelObject.IV_Attack}" />
                 </StackPanel>
 
                 <StackPanel>

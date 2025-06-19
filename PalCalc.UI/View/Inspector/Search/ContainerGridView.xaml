@@ -97,6 +97,7 @@
                                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent">
                                     <Border Style="{StaticResource GridSlotBackgroundStyle}" />
                                     <Border Style="{StaticResource GridSlotIconStyle}" Background="{Binding Pal.IconBrush}" />
+                                    <Image Source="/Resources/DungeonSmall.png" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Bottom" Visibility="{Binding PalInstance.ModelObject.IsOnExpedition, Converter={StaticResource VVC}}" />
                                 </Grid>
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type sgvm:ContainerGridCustomPalSlotViewModel}">
