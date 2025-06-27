@@ -41,6 +41,7 @@
     <None Remove="Resources\Pals\Arsox.png" />
     <None Remove="Resources\Pals\Astegon.png" />
     <None Remove="Resources\Pals\Azurmane.png" />
+    <None Remove="Resources\Pals\Azurobe Cryst.png" />
     <None Remove="Resources\Pals\Azurobe.png" />
     <None Remove="Resources\Pals\Bastigor.png" />
     <None Remove="Resources\Pals\Beakon.png" />
@@ -51,6 +52,7 @@
     <None Remove="Resources\Pals\Blazamut.png" />
     <None Remove="Resources\Pals\Blazehowl Noct.png" />
     <None Remove="Resources\Pals\Blazehowl.png" />
+    <None Remove="Resources\Pals\Braloha.png" />
     <None Remove="Resources\Pals\Bristla.png" />
     <None Remove="Resources\Pals\Broncherry Aqua.png" />
     <None Remove="Resources\Pals\Broncherry.png" />
@@ -60,6 +62,7 @@
     <None Remove="Resources\Pals\Caprity.png" />
     <None Remove="Resources\Pals\Cattiva.png" />
     <None Remove="Resources\Pals\Cawgnito.png" />
+    <None Remove="Resources\Pals\Celaray Lux.png" />
     <None Remove="Resources\Pals\Celaray.png" />
     <None Remove="Resources\Pals\Celesdir.png" />
     <None Remove="Resources\Pals\Chikipi.png" />
@@ -67,6 +70,7 @@
     <None Remove="Resources\Pals\Chillet.png" />
     <None Remove="Resources\Pals\Cinnamoth.png" />
     <None Remove="Resources\Pals\Cremis.png" />
+    <None Remove="Resources\Pals\Croajiro Noct.png" />
     <None Remove="Resources\Pals\Croajiro.png" />
     <None Remove="Resources\Pals\Cryolinx Terra.png" />
     <None Remove="Resources\Pals\Cryolinx.png" />
@@ -80,6 +84,7 @@
     <None Remove="Resources\Pals\Dinossom.png" />
     <None Remove="Resources\Pals\Direhowl.png" />
     <None Remove="Resources\Pals\Dogen.png" />
+    <None Remove="Resources\Pals\Dumud Gild.png" />
     <None Remove="Resources\Pals\Dumud.png" />
     <None Remove="Resources\Pals\Eikthyrdeer Terra.png" />
     <None Remove="Resources\Pals\Eikthyrdeer.png" />
@@ -91,6 +96,8 @@
     <None Remove="Resources\Pals\Felbat.png" />
     <None Remove="Resources\Pals\Fenglope Lux.png" />
     <None Remove="Resources\Pals\Fenglope.png" />
+    <None Remove="Resources\Pals\Finsider Ignis.png" />
+    <None Remove="Resources\Pals\Finsider.png" />
     <None Remove="Resources\Pals\Flambelle.png" />
     <None Remove="Resources\Pals\Flopie.png" />
     <None Remove="Resources\Pals\Foxcicle.png" />
@@ -98,10 +105,15 @@
     <None Remove="Resources\Pals\Foxparks.png" />
     <None Remove="Resources\Pals\Frostallion Noct.png" />
     <None Remove="Resources\Pals\Frostallion.png" />
+    <None Remove="Resources\Pals\Frostplume.png" />
+    <None Remove="Resources\Pals\Fuack Ignis.png" />
     <None Remove="Resources\Pals\Fuack.png" />
     <None Remove="Resources\Pals\Fuddler.png" />
     <None Remove="Resources\Pals\Galeclaw.png" />
+    <None Remove="Resources\Pals\Ghangler Ignis.png" />
+    <None Remove="Resources\Pals\Ghangler.png" />
     <None Remove="Resources\Pals\Gildane.png" />
+    <None Remove="Resources\Pals\Gloopie.png" />
     <None Remove="Resources\Pals\Gobfin Ignis.png" />
     <None Remove="Resources\Pals\Gobfin.png" />
     <None Remove="Resources\Pals\Gorirat Terra.png" />
@@ -113,10 +125,14 @@
     <None Remove="Resources\Pals\Hangyu.png" />
     <None Remove="Resources\Pals\Helzephyr Lux.png" />
     <None Remove="Resources\Pals\Helzephyr.png" />
+    <None Remove="Resources\Pals\Herbil.png" />
     <None Remove="Resources\Pals\Hoocrates.png" />
     <None Remove="Resources\Pals\Human.png" />
+    <None Remove="Resources\Pals\Icelyn.png" />
     <None Remove="Resources\Pals\Incineram Noct.png" />
     <None Remove="Resources\Pals\Incineram.png" />
+    <None Remove="Resources\Pals\Jelliette.png" />
+    <None Remove="Resources\Pals\Jellroy.png" />
     <None Remove="Resources\Pals\Jetragon.png" />
     <None Remove="Resources\Pals\Jolthog Cryst.png" />
     <None Remove="Resources\Pals\Jolthog.png" />
@@ -127,6 +143,7 @@
     <None Remove="Resources\Pals\Kelpsea Ignis.png" />
     <None Remove="Resources\Pals\Kelpsea.png" />
     <None Remove="Resources\Pals\Kikit.png" />
+    <None Remove="Resources\Pals\Killamari Primo.png" />
     <None Remove="Resources\Pals\Killamari.png" />
     <None Remove="Resources\Pals\Kingpaca Cryst.png" />
     <None Remove="Resources\Pals\Kingpaca.png" />
@@ -156,7 +173,9 @@
     <None Remove="Resources\Pals\Mossanda Lux.png" />
     <None Remove="Resources\Pals\Mossanda.png" />
     <None Remove="Resources\Pals\Mozzarina.png" />
+    <None Remove="Resources\Pals\Munchill.png" />
     <None Remove="Resources\Pals\Necromus.png" />
+    <None Remove="Resources\Pals\Neptilius.png" />
     <None Remove="Resources\Pals\Nitemary.png" />
     <None Remove="Resources\Pals\Nitewing.png" />
     <None Remove="Resources\Pals\Nox.png" />
@@ -164,9 +183,13 @@
     <None Remove="Resources\Pals\Omascul.png" />
     <None Remove="Resources\Pals\Orserk.png" />
     <None Remove="Resources\Pals\Paladius.png" />
+    <None Remove="Resources\Pals\Palumba.png" />
+    <None Remove="Resources\Pals\Pengullet Lux.png" />
     <None Remove="Resources\Pals\Pengullet.png" />
+    <None Remove="Resources\Pals\Penking Lux.png" />
     <None Remove="Resources\Pals\Penking.png" />
     <None Remove="Resources\Pals\Petallia.png" />
+    <None Remove="Resources\Pals\Polapup.png" />
     <None Remove="Resources\Pals\Prixter.png" />
     <None Remove="Resources\Pals\Prunelia.png" />
     <None Remove="Resources\Pals\Pyrin Noct.png" />
@@ -208,6 +231,8 @@
     <None Remove="Resources\Pals\Teafant.png" />
     <None Remove="Resources\Pals\Tocotoco.png" />
     <None Remove="Resources\Pals\Tombat.png" />
+    <None Remove="Resources\Pals\Turtacle Terra.png" />
+    <None Remove="Resources\Pals\Turtacle.png" />
     <None Remove="Resources\Pals\Univolt.png" />
     <None Remove="Resources\Pals\Vaelet.png" />
     <None Remove="Resources\Pals\Vanwyrm Cryst.png" />
@@ -216,6 +241,8 @@
     <None Remove="Resources\Pals\Vixy.png" />
     <None Remove="Resources\Pals\Warsect Terra.png" />
     <None Remove="Resources\Pals\Warsect.png" />
+    <None Remove="Resources\Pals\Whalaska Ignis.png" />
+    <None Remove="Resources\Pals\Whalaska.png" />
     <None Remove="Resources\Pals\Wixen Noct.png" />
     <None Remove="Resources\Pals\Wixen.png" />
     <None Remove="Resources\Pals\Woolipop.png" />
@@ -289,6 +316,7 @@
     <Resource Include="Resources\Pals\Arsox.png" />
     <Resource Include="Resources\Pals\Astegon.png" />
     <Resource Include="Resources\Pals\Azurmane.png" />
+    <Resource Include="Resources\Pals\Azurobe Cryst.png" />
     <Resource Include="Resources\Pals\Azurobe.png" />
     <Resource Include="Resources\Pals\Bastigor.png" />
     <Resource Include="Resources\Pals\Beakon.png" />
@@ -299,6 +327,7 @@
     <Resource Include="Resources\Pals\Blazamut.png" />
     <Resource Include="Resources\Pals\Blazehowl Noct.png" />
     <Resource Include="Resources\Pals\Blazehowl.png" />
+    <Resource Include="Resources\Pals\Braloha.png" />
     <Resource Include="Resources\Pals\Bristla.png" />
     <Resource Include="Resources\Pals\Broncherry Aqua.png" />
     <Resource Include="Resources\Pals\Broncherry.png" />
@@ -308,6 +337,7 @@
     <Resource Include="Resources\Pals\Caprity.png" />
     <Resource Include="Resources\Pals\Cattiva.png" />
     <Resource Include="Resources\Pals\Cawgnito.png" />
+    <Resource Include="Resources\Pals\Celaray Lux.png" />
     <Resource Include="Resources\Pals\Celaray.png" />
     <Resource Include="Resources\Pals\Celesdir.png" />
     <Resource Include="Resources\Pals\Chikipi.png" />
@@ -315,6 +345,7 @@
     <Resource Include="Resources\Pals\Chillet.png" />
     <Resource Include="Resources\Pals\Cinnamoth.png" />
     <Resource Include="Resources\Pals\Cremis.png" />
+    <Resource Include="Resources\Pals\Croajiro Noct.png" />
     <Resource Include="Resources\Pals\Croajiro.png" />
     <Resource Include="Resources\Pals\Cryolinx Terra.png" />
     <Resource Include="Resources\Pals\Cryolinx.png" />
@@ -328,6 +359,7 @@
     <Resource Include="Resources\Pals\Dinossom.png" />
     <Resource Include="Resources\Pals\Direhowl.png" />
     <Resource Include="Resources\Pals\Dogen.png" />
+    <Resource Include="Resources\Pals\Dumud Gild.png" />
     <Resource Include="Resources\Pals\Dumud.png" />
     <Resource Include="Resources\Pals\Eikthyrdeer Terra.png" />
     <Resource Include="Resources\Pals\Eikthyrdeer.png" />
@@ -339,6 +371,8 @@
     <Resource Include="Resources\Pals\Felbat.png" />
     <Resource Include="Resources\Pals\Fenglope Lux.png" />
     <Resource Include="Resources\Pals\Fenglope.png" />
+    <Resource Include="Resources\Pals\Finsider Ignis.png" />
+    <Resource Include="Resources\Pals\Finsider.png" />
     <Resource Include="Resources\Pals\Flambelle.png" />
     <Resource Include="Resources\Pals\Flopie.png" />
     <Resource Include="Resources\Pals\Foxcicle.png" />
@@ -346,10 +380,15 @@
     <Resource Include="Resources\Pals\Foxparks.png" />
     <Resource Include="Resources\Pals\Frostallion Noct.png" />
     <Resource Include="Resources\Pals\Frostallion.png" />
+    <Resource Include="Resources\Pals\Frostplume.png" />
+    <Resource Include="Resources\Pals\Fuack Ignis.png" />
     <Resource Include="Resources\Pals\Fuack.png" />
     <Resource Include="Resources\Pals\Fuddler.png" />
     <Resource Include="Resources\Pals\Galeclaw.png" />
+    <Resource Include="Resources\Pals\Ghangler Ignis.png" />
+    <Resource Include="Resources\Pals\Ghangler.png" />
     <Resource Include="Resources\Pals\Gildane.png" />
+    <Resource Include="Resources\Pals\Gloopie.png" />
     <Resource Include="Resources\Pals\Gobfin Ignis.png" />
     <Resource Include="Resources\Pals\Gobfin.png" />
     <Resource Include="Resources\Pals\Gorirat Terra.png" />
@@ -361,10 +400,14 @@
     <Resource Include="Resources\Pals\Hangyu.png" />
     <Resource Include="Resources\Pals\Helzephyr Lux.png" />
     <Resource Include="Resources\Pals\Helzephyr.png" />
+    <Resource Include="Resources\Pals\Herbil.png" />
     <Resource Include="Resources\Pals\Hoocrates.png" />
     <Resource Include="Resources\Pals\Human.png" />
+    <Resource Include="Resources\Pals\Icelyn.png" />
     <Resource Include="Resources\Pals\Incineram Noct.png" />
     <Resource Include="Resources\Pals\Incineram.png" />
+    <Resource Include="Resources\Pals\Jelliette.png" />
+    <Resource Include="Resources\Pals\Jellroy.png" />
     <Resource Include="Resources\Pals\Jetragon.png" />
     <Resource Include="Resources\Pals\Jolthog Cryst.png" />
     <Resource Include="Resources\Pals\Jolthog.png" />
@@ -375,6 +418,7 @@
     <Resource Include="Resources\Pals\Kelpsea Ignis.png" />
     <Resource Include="Resources\Pals\Kelpsea.png" />
     <Resource Include="Resources\Pals\Kikit.png" />
+    <Resource Include="Resources\Pals\Killamari Primo.png" />
     <Resource Include="Resources\Pals\Killamari.png" />
     <Resource Include="Resources\Pals\Kingpaca Cryst.png" />
     <Resource Include="Resources\Pals\Kingpaca.png" />
@@ -404,7 +448,9 @@
     <Resource Include="Resources\Pals\Mossanda Lux.png" />
     <Resource Include="Resources\Pals\Mossanda.png" />
     <Resource Include="Resources\Pals\Mozzarina.png" />
+    <Resource Include="Resources\Pals\Munchill.png" />
     <Resource Include="Resources\Pals\Necromus.png" />
+    <Resource Include="Resources\Pals\Neptilius.png" />
     <Resource Include="Resources\Pals\Nitemary.png" />
     <Resource Include="Resources\Pals\Nitewing.png" />
     <Resource Include="Resources\Pals\Nox.png" />
@@ -412,9 +458,13 @@
     <Resource Include="Resources\Pals\Omascul.png" />
     <Resource Include="Resources\Pals\Orserk.png" />
     <Resource Include="Resources\Pals\Paladius.png" />
+    <Resource Include="Resources\Pals\Palumba.png" />
+    <Resource Include="Resources\Pals\Pengullet Lux.png" />
     <Resource Include="Resources\Pals\Pengullet.png" />
+    <Resource Include="Resources\Pals\Penking Lux.png" />
     <Resource Include="Resources\Pals\Penking.png" />
     <Resource Include="Resources\Pals\Petallia.png" />
+    <Resource Include="Resources\Pals\Polapup.png" />
     <Resource Include="Resources\Pals\Prixter.png" />
     <Resource Include="Resources\Pals\Prunelia.png" />
     <Resource Include="Resources\Pals\Pyrin Noct.png" />
@@ -456,6 +506,8 @@
     <Resource Include="Resources\Pals\Teafant.png" />
     <Resource Include="Resources\Pals\Tocotoco.png" />
     <Resource Include="Resources\Pals\Tombat.png" />
+    <Resource Include="Resources\Pals\Turtacle Terra.png" />
+    <Resource Include="Resources\Pals\Turtacle.png" />
     <Resource Include="Resources\Pals\Univolt.png" />
     <Resource Include="Resources\Pals\Vaelet.png" />
     <Resource Include="Resources\Pals\Vanwyrm Cryst.png" />
@@ -464,6 +516,8 @@
     <Resource Include="Resources\Pals\Vixy.png" />
     <Resource Include="Resources\Pals\Warsect Terra.png" />
     <Resource Include="Resources\Pals\Warsect.png" />
+    <Resource Include="Resources\Pals\Whalaska Ignis.png" />
+    <Resource Include="Resources\Pals\Whalaska.png" />
     <Resource Include="Resources\Pals\Wixen Noct.png" />
     <Resource Include="Resources\Pals\Wixen.png" />
     <Resource Include="Resources\Pals\Woolipop.png" />

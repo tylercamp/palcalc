@@ -137,11 +137,11 @@ namespace PalCalc.GenDB.GameDataReaders
                 var basePath = $"{AssetPaths.LOCALIZATIONS_BASE}/{lang}/Pal/DataTable/Text";
                 res.Add(new LocalizationInfo(
                     languageCode: lang,
-                    palNameTextPath: $"{basePath}/DT_PalNameText",
-                    skillNameTextPath: $"{basePath}/DT_SkillNameText",
-                    skillDescriptionTextPath: $"{basePath}/DT_SkillDescText",
-                    commonTextPath: $"{basePath}/DT_UI_Common_Text",
-                    humanNameTextPath: $"{basePath}/DT_HumanNameText"
+                    palNameTextPath: $"{basePath}/DT_PalNameText_Common",
+                    skillNameTextPath: $"{basePath}/DT_SkillNameText_Common",
+                    skillDescriptionTextPath: $"{basePath}/DT_SkillDescText_Common",
+                    commonTextPath: $"{basePath}/DT_UI_Common_Text_Common",
+                    humanNameTextPath: $"{basePath}/DT_HumanNameText_Common"
                 ));
             }
 

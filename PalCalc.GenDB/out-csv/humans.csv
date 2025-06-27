@@ -153,7 +153,7 @@ Syndicate Interceptor,Hunter_MissileLauncher_LargeOilrig
 Syndicate Crusher,Hunter_Fat_GatlingGun_LargeOilrig
 Feybreak Warrior,Viking
 Feybreak Berserker,Viking_Elite
--,Visitor_Recruiter
+Pal Recruiter,Visitor_Recruiter
 Free Pal Alliance Judicator,Believer_Fat_Cane
 ,Emote_Tester
 Islander,Doctor
@@ -228,3 +228,85 @@ Islander,Help03
 Islander,Help04
 Veteran Pal Tamer,DeathPenalty_guide
 Friendly Pal Tamer,Respawn_guide
+PIDF Infantry,Police_TreasureGuard_NarrowSite
+PIDF Infantry,Police_Vigilance
+PIDF Infantry,Police_BowGun
+Syndicate Thug,Hunter_Prisoner
+Free Pal Alliance Devout,Believer_Prisoner
+Brothers of the Eternal Pyre Martyr,FireCult_Prisoner
+Jailed Ex-Chief,Police_old_Prisoner
+PAL Genetic Research Unit Executioner,Scientist_Prisoner
+Moonflower Genin,Ninja_Prisoner
+Feybreak Warrior,Viking_Prisoner
+Free Pal Alliance Judicator,Believer_Fat_Prisoner
+Syndicate Crusher,Hunter_Fat_Prisoner
+,Police_Chief
+Brothers of the Eternal Pyre Martyr,FireCult_Rifle_Relax
+Brothers of the Eternal Pyre Martyr,FireCult_FlameThrower_Relax
+Syndicate Laser Rifleman,Hunter_LaserRifle
+Syndicate Crossbowman,Hunter_BowGun
+Syndicate Swordsman,Hunter_Katana
+Moonflower Genin,Ninja_NoEquip
+Moonflower Jonin,NinjaElite_NoEquip
+Moonflower Genin,Ninja_Bowgun
+Moonflower Jonin,NinjaElite_Bowgun
+Zoe,GrassBoss
+,ForestBoss
+,DesertBoss
+,ElectricBoss
+,SnowBoss
+,SakurajimaBoss
+,VikingBoss
+,ArenaShop
+Newbie Pal Tamer,Arena_Male_Soldier02
+Up-and-Coming Pal Tamer,Arena_Female_Soldier02
+Cruel Pal Tamer,Arena_Male_Soldier03
+Veteran Pal Tamer,Arena_Female_Soldier03
+Sturdy Mercenary,Arena_Soldier
+Syndicate Crusher,Arena_Hunter_Fat_GatlingGun
+Brothers of the Eternal Pyre Martyr,Arena_FireCult_FlameThrower
+Moonflower Genin,Arena_Ninja
+Messenger of Love,Arena_Reward_Emote
+PAL Genetic Research Unit Executioner,Arena_Scientist_LaserRifle
+Feybreak Warrior,Arena_Viking
+Vigorous Pal Tamer,Arena_Male_Soldier04
+Pal Ecological Researcher,Arena_Reward_Paldex
+Sweet-Smelling Hunter,Arena_Ranger04
+Reincarnated Guy,Arena_Male_Police_old
+Friendly Pal Tamer,Arena_Female_Presenter
+Dr. Brawn,Arena_PalPassive_Doctor
+Medal Merchant,Arena_Male_DarkTrader02
+Master Pal Tamer,Arena_Female_Soldier04
+Fiery Pal Tamer,Arena_Male_Soldier02_Invader
+Moonflower Jonin,Arena_NinjaElite
+Feybreak Berserker,Arena_VikingElite
+Legend-Loving Researcher,Arena_Scholar01
+Veteran Hunter,Arena_BossDefeat
+Black Marketeer,Arena_DarkTrader
+Islander,Female_Farmer01_v01
+Islander,Female_Farmer01_v02
+Islander,Female_Farmer01_v03
+Islander,Female_Farmer01_v04
+Islander,Male_Scholar01_v01
+Islander,Male_Scholar01_v02
+Islander,Male_Scholar01_v03
+Islander,Male_Scholar01_v04
+Islander,Male_Breeder01_v01
+Islander,Male_Breeder01_v02
+Islander,Male_Breeder01_v03
+Islander,Male_Breeder01_v04
+Islander,Female_Ranger01_v01
+Islander,Female_Ranger01_v02
+Islander,Female_Ranger01_v03
+Islander,Female_Ranger01_v04
+Islander,Female_Nomad01_v01
+Islander,Female_Nomad01_v02
+Islander,Female_Nomad01_v03
+Islander,Female_Nomad01_v04
+Islander,Male_Angler01_v01
+Syndicate Swordsman,Quest_Hunter_Katana01
+Syndicate Elite,Quest_Hunter_RocketLauncher01
+Syndicate Crusher,Quest_Hunter_Fat_GatlingGun01
+Syndicate Cleaner,Quest_Hunter_FlameThrower
+Free Pal Alliance Devout,Believer_Bat_Camp02
+Free Pal Alliance Devout,Believer_CrossBow_Camp02

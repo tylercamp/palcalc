@@ -3,6 +3,7 @@ using CUE4Parse.UE4.Assets.Exports.Engine;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -156,7 +157,8 @@ namespace PalCalc.GenDB.GameDataReaders
                 if (
                     palData.IsPal &&
                     palData.PalDexNum >= 0 &&
-                    !(palData.IsBoss || palData.IsRaidBoss || palData.IsTowerBoss)
+                    !(palData.IsBoss || palData.IsRaidBoss || palData.IsTowerBoss) &&
+                    !key.Text.StartsWith("Quest_")
                 )
                 {
                     palData.InternalName = key.Text;

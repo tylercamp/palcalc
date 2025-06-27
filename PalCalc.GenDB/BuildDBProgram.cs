@@ -7,6 +7,7 @@ using CUE4Parse.UE4.Objects.Core.i18N;
 using CUE4Parse.UE4.Objects.UObject;
 using CUE4Parse.UE4.Versions;
 using CUE4Parse_Conversion;
+using CUE4Parse_Conversion.Animations.PSA;
 using CUE4Parse_Conversion.Textures;
 using PalCalc.GenDB.GameDataReaders;
 using PalCalc.Model;
@@ -183,6 +184,7 @@ namespace PalCalc.GenDB
             Dictionary<string, string> commonTexts
         )
         {
+            var k = commonTexts.Keys.ToList();
             string FormatEffect(string effect, float value)
             {
                 var label = effect.Replace("EPalPassiveSkillEffectType::", "") switch
@@ -192,6 +194,7 @@ namespace PalCalc.GenDB
                     "CraftSpeed" => commonTexts["COMMON_STATUS_SPEED"],
                     "ShotAttack" => commonTexts["COMMON_STATUS_RANGE_ATTACK"],
                     "Defense" => commonTexts["COMMON_STATUS_DEFENCE"],
+                    "MoveSpeed" => commonTexts["MONITORING_EFFECT_MOVESPEED"],
 
                     _ => effect,
                 };
@@ -206,6 +209,9 @@ namespace PalCalc.GenDB
                 if (label != null) return $"{label} {value.ToString("+0;-#")}%";
                 else return null;
             }
+
+            var s = k.Where(v => v.Contains("SPEED"));
+            var m = k.Where(v => v.Contains("MOVE"));
 
             var parts = new List<string>()
             {
@@ -706,7 +712,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v19");
+            var db = PalDB.MakeEmptyUnsafe("v20");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.Humans = humans;
