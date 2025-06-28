@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -27,6 +29,8 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
 
     public class XboxWgsFolder
     {
+        private static ILogger logger = Log.ForContext<XboxWgsFolder>();
+
         public string UserBasePath { get; }
         public string ContainerIndexPath { get; }
 
@@ -78,34 +82,45 @@ namespace PalCalc.SaveReader.SaveFile.Xbox
 
         public static IEnumerable<XboxWgsFolder> FindAll()
         {
-            var LocalPackagesPath = Path.Combine(UserDataPaths.GetDefault().LocalAppData, "Packages");
-            var pm = new PackageManager();
-
-            string pkgDir = null;
-            Package palworldPkg = null;
-
-            // Logo = {file:///C:/Program Files/WindowsApps/Resources/PocketpairInc.Palworld_0.0.51499.0_x64__ad4psfrxyesvt/Resources/StoreLogo.png}
-
-            foreach (var packageDir in Directory.EnumerateDirectories(LocalPackagesPath))
+            try
             {
-                if (!Directory.Exists(Path.Join(packageDir, "SystemAppData\\wgs"))) continue;
+                var LocalPackagesPath = Path.Combine(UserDataPaths.GetDefault().LocalAppData, "Packages");
+                var pm = new PackageManager();
 
-                // note: Xbox-Live-Save-Exporter checks `package.DisplayName`, which is a more accurate way of checking the app name,
-                //       but the `.DisplayName` call seems to take forever. The directory for palworld data should also contain the
-                //       "Palworld" string, so this should be fine
-                if (!Path.GetFileName(packageDir).Contains("Palworld", StringComparison.InvariantCultureIgnoreCase)) continue;
+                string pkgDir = null;
+                Package palworldPkg = null;
 
-                var package = pm.FindPackagesForUser(null, Path.GetFileName(packageDir))?.FirstOrDefault();
+                // Logo = {file:///C:/Program Files/WindowsApps/Resources/PocketpairInc.Palworld_0.0.51499.0_x64__ad4psfrxyesvt/Resources/StoreLogo.png}
 
-                palworldPkg = package;
-                pkgDir = packageDir;
-                break;
+                foreach (var packageDir in Directory.EnumerateDirectories(LocalPackagesPath))
+                {
+                    if (!Directory.Exists(Path.Join(packageDir, "SystemAppData\\wgs"))) continue;
+
+                    // note: Xbox-Live-Save-Exporter checks `package.DisplayName`, which is a more accurate way of checking the app name,
+                    //       but the `.DisplayName` call seems to take forever. The directory for palworld data should also contain the
+                    //       "Palworld" string, so this should be fine
+                    if (!Path.GetFileName(packageDir).Contains("Palworld", StringComparison.InvariantCultureIgnoreCase)) continue;
+
+                    var package = pm.FindPackagesForUser(null, Path.GetFileName(packageDir))?.FirstOrDefault();
+
+                    palworldPkg = package;
+                    pkgDir = packageDir;
+                    break;
+                }
+
+                if (palworldPkg == null)
+                {
+                    logger.Information("Unable to find Xbox save data package, skipping");
+                    return [];
+                }
+
+                return Directory.EnumerateDirectories(Path.Combine(pkgDir, "SystemAppData\\wgs")).Select(f => new XboxWgsFolder(f));
             }
-
-            if (palworldPkg == null) yield break;
-
-            foreach (var userFolder in Directory.EnumerateDirectories(Path.Combine(pkgDir, "SystemAppData\\wgs")))
-                yield return new XboxWgsFolder(userFolder);
+            catch (COMException ex)
+            {
+                logger.Information(ex, "Unable to detect Xbox save package, skipping");
+                return [];
+            }
         }
     }
 }
