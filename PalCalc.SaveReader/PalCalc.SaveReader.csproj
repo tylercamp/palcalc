@@ -27,4 +27,10 @@
     <ProjectReference Include="..\PalCalc.Model\PalCalc.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="libooz.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

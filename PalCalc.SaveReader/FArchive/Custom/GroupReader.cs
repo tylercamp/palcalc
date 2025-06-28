@@ -132,12 +132,14 @@ namespace PalCalc.SaveReader.FArchive.Custom
 
                     if (GroupType.Mask_HasBaseIds.HasFlag(groupType))
                     {
+                        subReader.ReadInt32(); // ? NEW
                         result.OrgType = subReader.ReadByte();
                         result.BaseIds = subReader.ReadArray(r => r.ReadGuid());
                     }
 
                     if (GroupType.Mask_HasGuildName.HasFlag(groupType))
                     {
+                        subReader.ReadInt32(); // ? NEW
                         result.BaseCampLevel = subReader.ReadInt32();
                         result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
                         result.GuildName = subReader.ReadString();
@@ -163,6 +165,8 @@ namespace PalCalc.SaveReader.FArchive.Custom
                             // https://github.com/cheahjs/palworld-save-tools/issues/192
                             subReader.ReadInt64();
                             subReader.ReadInt64();
+
+                            subReader.ReadInt32(); // ? NEW
 
                             result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
                         }

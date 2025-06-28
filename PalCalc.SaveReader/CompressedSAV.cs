@@ -1,4 +1,5 @@
-﻿using ICSharpCode.SharpZipLib.Zip;
+﻿using ABI.Windows.Security.Authentication.Web.Provider;
+using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Serilog;
 using System;
@@ -26,6 +27,17 @@ namespace PalCalc.SaveReader
         CNK0        = 0b0000_0001 | TYPE_CNK,
         CNK_Unknown = 0b0000_0000 | TYPE_CNK,
         TYPE_CNK    = 0b0100_0000,
+
+        PLM1        = 0b0000_0001 | TYPE_PLM,
+        PLM_Unknown = 0b0000_0000 | TYPE_PLM,
+        TYPE_PLM    = 0b0010_0000,
+    }
+
+    public enum SaveCompressionType
+    {
+        Oodle,
+        SingleDeflate,
+        DoubleDeflate,
     }
 
     public class CompressedSAVHeader
@@ -36,7 +48,7 @@ namespace PalCalc.SaveReader
         public int UncompressedLength { get; set; }
         public int CompressedLength { get; set; }
 
-        public bool DoubleCompressed { get; set; }
+        public SaveCompressionType CompressionType { get; set; }
 
         private static TypeMarker? ParseTypeMarker(byte[] data) => Encoding.ASCII.GetString(data) switch
         {
@@ -49,6 +61,9 @@ namespace PalCalc.SaveReader
             // likely an indicator of unsynced save or something like that.
             "CNK0" => TypeMarker.CNK0,
             var s when s.StartsWith("CNK") => TypeMarker.CNK_Unknown,
+
+            "PlM1" => TypeMarker.PLM1,
+            var s when s.StartsWith("PlM") => TypeMarker.PLM_Unknown,
 
             _ => null
         };
@@ -84,7 +99,10 @@ namespace PalCalc.SaveReader
                 }
 
                 res.HasCompressionMarker = compressionFormat != null;
-                res.DoubleCompressed = compressionFormat == TypeMarker.PLZ2;
+
+                if (compressionFormat == TypeMarker.PLZ2) res.CompressionType = SaveCompressionType.DoubleDeflate;
+                else if (compressionFormat == TypeMarker.PLM1) res.CompressionType = SaveCompressionType.Oodle;
+                else res.CompressionType = SaveCompressionType.SingleDeflate;
 
                 return res;
             }
@@ -153,17 +171,35 @@ namespace PalCalc.SaveReader
         {
             var header = CompressedSAVHeader.Read(inputStream);
 
-            using (var decompressed = new InflaterInputStream(inputStream))
+            switch (header.CompressionType)
             {
-                if (header.DoubleCompressed)
-                {
-                    using (var doubleDecompressed = new InflaterInputStream(decompressed))
-                        action(doubleDecompressed);
-                }
-                else
-                {
-                    action(decompressed);
-                }
+                case SaveCompressionType.Oodle:
+                    using (var br = new BinaryReader(inputStream))
+                    {
+                        byte[] compressed = br.ReadBytes(header.CompressedLength);
+                        byte[] decompressed = new byte[header.UncompressedLength + 128]; // (+128 to account for `SAFE_SPACE` constant)
+
+                        int res = LibOoz.Ooz_Decompress(srcBuf: compressed, dstBuf: decompressed);
+
+                        using (var ds = new MemoryStream(decompressed, 0, header.UncompressedLength))
+                            action(ds);
+                    }
+                    break;
+
+                case SaveCompressionType.SingleDeflate:
+                    {
+                        using (var decompressed = new InflaterInputStream(inputStream))
+                            action(decompressed);
+                        break;
+                    }
+
+                case SaveCompressionType.DoubleDeflate:
+                    {
+                        using (var decompressed = new InflaterInputStream(inputStream))
+                        using (var doubleDecompressed = new InflaterInputStream(decompressed))
+                            action(doubleDecompressed);
+                        break;
+                    }
             }
         }
 
