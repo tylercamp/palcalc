@@ -8,9 +8,9 @@ namespace PalCalc.UI.Localization
 {
     public enum TranslationLocale
     {
-        // list of localizations supported by Palworld (at time of writing 07/2025), any key in Pal.LocalizedNames should
+        // list of localizations supported by Palworld (at time of writing 06/2025), any key in Pal.LocalizedNames should
         // also appear here
-        de, en, es, fr, it, ja, ko, pt_BR, ru, zh_Hans, zh_Hant
+        de, en, es_MX, es, fr, id, it, ja, ko, pl, pt_BR, ru, th, tr, vi, zh_Hans, zh_Hant
     }
 
     public static class TranslationLocaleExtensions

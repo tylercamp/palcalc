@@ -558,7 +558,13 @@
     <EmbeddedResource Update="Localization\Localizations\es.resx">
       <Generator></Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\es-MX.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Localization\Localizations\fr.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\id.resx">
       <Generator></Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Localization\Localizations\it.resx">
@@ -570,10 +576,22 @@
     <EmbeddedResource Update="Localization\Localizations\ko.resx">
       <Generator></Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\pl.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Localization\Localizations\pt-BR.resx">
       <Generator></Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Localization\Localizations\ru.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\th.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\tr.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Localizations\vi.resx">
       <Generator></Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Localization\Localizations\zh-Hans.resx">

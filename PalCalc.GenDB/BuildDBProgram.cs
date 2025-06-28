@@ -662,6 +662,8 @@ namespace PalCalc.GenDB
             logger.Information("Reading localizations, pals, and passives...");
             var localizations = LocalizationsReader.FetchLocalizations(provider);
 
+            logger.Information("Found language codes: {codes}", localizations.Select(l => l.LanguageCode));
+
             var rawPals = PalReader.ReadPals(provider);
             var wildPalLevels = PalSpawnerReader.ReadWildLevelRanges(provider);
 
