@@ -11,17 +11,18 @@
 		<NoWarn>0067,9107</NoWarn>
 		<DisableFody Condition="'$(Configuration)' != 'Release'">true</DisableFody>
 		<Configurations>Debug;Release;Release_NoBundle</Configurations>
+		<Platforms>x64</Platforms>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	  <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DefineConstants>$(DefineConstants)TRACE</DefineConstants>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	  <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_NoBundle|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_NoBundle|x64'">
 	  <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
 	</PropertyGroup>
 

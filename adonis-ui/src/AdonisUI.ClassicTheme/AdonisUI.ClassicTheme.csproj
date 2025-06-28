@@ -6,6 +6,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <UseWpf>true</UseWpf>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
 
   <!-- Package metadata -->

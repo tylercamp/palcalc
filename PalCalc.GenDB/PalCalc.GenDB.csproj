@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <StartupObject>PalCalc.GenDB.BuildDBProgram</StartupObject>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

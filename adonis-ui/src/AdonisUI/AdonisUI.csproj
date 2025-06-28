@@ -8,6 +8,8 @@
     <UseWpf>true</UseWpf>
 
 	<NoWarn>1591</NoWarn>
+
+	<Platforms>x64</Platforms>
   </PropertyGroup>
 
   <!-- Package metadata -->

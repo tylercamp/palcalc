@@ -52,7 +52,10 @@ var dsl = new DirectSavesLocation(@"C:\Users\algor\AppData\Local\Pal\Saved\SaveG
 var gps = dsl.GlobalPalStorage.ParseGvas(true);
 var gps2 = dsl.GlobalPalStorage.ReadPals("GPS");
 
-var save3 = new StandardSaveGame(@"C:\Users\algor\AppData\Local\Pal\Saved\SaveGames\76561198963790804\095144A9430A880B9D995A8C8777547F");
+var save3 = new StandardSaveGame(
+    @"C:\Users\algor\AppData\Local\Pal\Saved\SaveGames\76561198963790804\F0CEFEA04271692EB202A78E57A3A40D"
+    //@"C:\Users\algor\AppData\Local\Pal\Saved\SaveGames\76561198963790804\F0CEFEA04271692EB202A78E57A3A40D\backup\world\2025.03.19-14.25.24"
+);
 
 var v2 = new MapObjectVisitor(GvasMapObject.GlobalPalBoxObjectId, GvasMapObject.DimensionalPalStorageObjectId);
 var level3 = save3.Level.ParseGvas(true, v2);

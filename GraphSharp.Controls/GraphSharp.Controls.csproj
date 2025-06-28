@@ -6,6 +6,7 @@
     <UseWPF>true</UseWPF>
 	<CETCompat>false</CETCompat> <!-- https://github.com/tylercamp/palcalc/issues/85 -->
 	<Nullable>disable</Nullable>
+	<Platforms>x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

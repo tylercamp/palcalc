@@ -12,15 +12,14 @@
 	<Configurations>Debug;Release;Release_NoBundle</Configurations>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	<NoWarn>9107</NoWarn>
+	<Platforms>x64</Platforms>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DefineConstants>$(DefineConstants);HANDLE_ERRORS</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_NoBundle|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_NoBundle|x64'">
     <DefineConstants>$(DefineConstants);HANDLE_ERRORS</DefineConstants>
   </PropertyGroup>
 
