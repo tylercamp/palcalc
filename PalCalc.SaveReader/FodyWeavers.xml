@@ -1,0 +1,6 @@
+﻿<Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
+	<!-- (we only want to bundle the libooz DLL; IncludeAssemblies="" prevents other DLLs from being packaged) -->
+	<Costura IncludeAssemblies="" DisableCompression="true">
+		<Unmanaged64Assemblies>libooz</Unmanaged64Assemblies>
+	</Costura>
+</Weavers>

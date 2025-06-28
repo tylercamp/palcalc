@@ -67,8 +67,8 @@ Global
 		{92892830-FC2F-40E6-8CD1-021E692F2A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92892830-FC2F-40E6-8CD1-021E692F2A1C}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{92892830-FC2F-40E6-8CD1-021E692F2A1C}.Debug|x86.Build.0 = Debug|Any CPU
-		{92892830-FC2F-40E6-8CD1-021E692F2A1C}.Release_NoBundle|Any CPU.ActiveCfg = Release|Any CPU
-		{92892830-FC2F-40E6-8CD1-021E692F2A1C}.Release_NoBundle|Any CPU.Build.0 = Release|Any CPU
+		{92892830-FC2F-40E6-8CD1-021E692F2A1C}.Release_NoBundle|Any CPU.ActiveCfg = Release_NoBundle|Any CPU
+		{92892830-FC2F-40E6-8CD1-021E692F2A1C}.Release_NoBundle|Any CPU.Build.0 = Release_NoBundle|Any CPU
 		{92892830-FC2F-40E6-8CD1-021E692F2A1C}.Release_NoBundle|x86.ActiveCfg = Release|Any CPU
 		{92892830-FC2F-40E6-8CD1-021E692F2A1C}.Release_NoBundle|x86.Build.0 = Release|Any CPU
 		{92892830-FC2F-40E6-8CD1-021E692F2A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -221,7 +221,7 @@ Global
 		{D76C3C76-1021-40F9-8079-F122819F69E9} = {CAC9B710-E909-47A6-B7C5-5906AD0EA76A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		RESX_ShowErrorsInErrorList = False
 		SolutionGuid = {0171AB8C-D344-4A9B-BE99-146E847BFEFB}
+		RESX_ShowErrorsInErrorList = False
 	EndGlobalSection
 EndGlobal
