@@ -120,82 +120,171 @@ namespace PalCalc.SaveReader.FArchive.Custom
                     _ => GroupType.Unrecognized
                 };
 
-                using (var byteStream = new MemoryStream(rawDataBytes))
-                using (var subReader = reader.Derived(byteStream))
+                List<Func<GroupType, FArchiveReader, GroupDataProperty>> parsers = [
+                    ParseStream_V3_TidesOfTerraria,
+                    ParseStream_V2_Feybreak,
+                    ParseStream_V1,
+                ];
+
+                foreach (var parser in parsers)
                 {
-                    var result = new GroupDataProperty() { TypedMeta = new GroupDataPropertyMeta() { Path = path } };
-
-                    result.TypedMeta.Id = subReader.ReadGuid();
-                    result.GroupType = groupType;
-                    result.GroupName = subReader.ReadString();
-                    result.CharacterHandleIds = subReader.ReadArray(r => new EntityInstanceId() { Guid = r.ReadGuid(), InstanceId = r.ReadGuid() });
-
-                    if (GroupType.Mask_HasBaseIds.HasFlag(groupType))
+                    GroupDataProperty result = null;
+                    try
                     {
-                        subReader.ReadInt32(); // ? NEW
-                        result.OrgType = subReader.ReadByte();
-                        result.BaseIds = subReader.ReadArray(r => r.ReadGuid());
-                    }
-
-                    if (GroupType.Mask_HasGuildName.HasFlag(groupType))
-                    {
-                        subReader.ReadInt32(); // ? NEW
-                        result.BaseCampLevel = subReader.ReadInt32();
-                        result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
-                        result.GuildName = subReader.ReadString();
-                    }
-
-                    if (groupType == GroupType.IndependentGuild)
-                    {
-                        result.PlayerUid = subReader.ReadGuid();
-                        result.GuildName2 = subReader.ReadString();
-                        result.PlayerLastOnlineRealTime = subReader.ReadInt64();
-                        result.PlayerName = subReader.ReadString();
-                    }
-
-                    if (groupType == GroupType.Guild)
-                    {
-                        var startPos = byteStream.Position;
-
-                        try
+                        using (var byteStream = new MemoryStream(rawDataBytes))
+                        using (var subReader = reader.Derived(byteStream))
                         {
-                            // parse using the new format
-                            result.AdminPlayerUid = subReader.ReadGuid();
-
-                            // https://github.com/cheahjs/palworld-save-tools/issues/192
-                            subReader.ReadInt64();
-                            subReader.ReadInt64();
-
-                            subReader.ReadInt32(); // ? NEW
-
-                            result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
-                        }
-                        catch (Exception e)
-                        {
-                            if (e is EndOfStreamException || e is ArgumentOutOfRangeException)
-                            {
-                                logger.Debug("EndOfStreamException while reading guild data using Feybreak format, falling back to old format");
-                                byteStream.Seek(startPos, SeekOrigin.Begin);
-
-                                // as a fallback, try parsing with the old format
-                                // parse using the new format
-                                result.AdminPlayerUid = subReader.ReadGuid();
-                                result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
-                            }
-                            else
-                            {
-                                throw;
-                            }
+                            result = parser(groupType, subReader);
+                            result.TypedMeta.Path = path;
                         }
                     }
+                    catch {}
 
-                    foreach (var v in visitors.Where(v => v.Matches(path)))
-                        v.VisitCharacterGroupProperty(path, result);
+                    if (result != null)
+                    {
+                        foreach (var v in visitors.Where(v => v.Matches(path)))
+                            v.VisitCharacterGroupProperty(path, result);
 
-                    logger.Verbose("done");
-                    return result;
+                        logger.Verbose("done");
+                        return result;
+                    }
                 }
+
+                throw new Exception("All attempts to parse guild data failed!");
             });
+        }
+
+        private static GroupDataProperty ParseStream_V1(GroupType groupType, FArchiveReader subReader)
+        {
+            var result = new GroupDataProperty() { TypedMeta = new GroupDataPropertyMeta() };
+
+            result.TypedMeta.Id = subReader.ReadGuid();
+            result.GroupType = groupType;
+            result.GroupName = subReader.ReadString();
+            result.CharacterHandleIds = subReader.ReadArray(r => new EntityInstanceId() { Guid = r.ReadGuid(), InstanceId = r.ReadGuid() });
+
+            if (GroupType.Mask_HasBaseIds.HasFlag(groupType))
+            {
+                result.OrgType = subReader.ReadByte();
+                result.BaseIds = subReader.ReadArray(r => r.ReadGuid());
+            }
+
+            if (GroupType.Mask_HasGuildName.HasFlag(groupType))
+            {
+                result.BaseCampLevel = subReader.ReadInt32();
+                result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
+                result.GuildName = subReader.ReadString();
+            }
+
+            if (groupType == GroupType.IndependentGuild)
+            {
+                result.PlayerUid = subReader.ReadGuid();
+                result.GuildName2 = subReader.ReadString();
+                result.PlayerLastOnlineRealTime = subReader.ReadInt64();
+                result.PlayerName = subReader.ReadString();
+            }
+
+            if (groupType == GroupType.Guild)
+            {
+                // parse using the new format
+                result.AdminPlayerUid = subReader.ReadGuid();
+                result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
+            }
+
+            return result;
+        }
+
+        private static GroupDataProperty ParseStream_V2_Feybreak(GroupType groupType, FArchiveReader subReader)
+        {
+            var result = new GroupDataProperty() { TypedMeta = new GroupDataPropertyMeta() };
+
+            result.TypedMeta.Id = subReader.ReadGuid();
+            result.GroupType = groupType;
+            result.GroupName = subReader.ReadString();
+            result.CharacterHandleIds = subReader.ReadArray(r => new EntityInstanceId() { Guid = r.ReadGuid(), InstanceId = r.ReadGuid() });
+
+            if (GroupType.Mask_HasBaseIds.HasFlag(groupType))
+            {
+                result.OrgType = subReader.ReadByte();
+                result.BaseIds = subReader.ReadArray(r => r.ReadGuid());
+            }
+
+            if (GroupType.Mask_HasGuildName.HasFlag(groupType))
+            {
+                result.BaseCampLevel = subReader.ReadInt32();
+                result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
+                result.GuildName = subReader.ReadString();
+            }
+
+            if (groupType == GroupType.IndependentGuild)
+            {
+                result.PlayerUid = subReader.ReadGuid();
+                result.GuildName2 = subReader.ReadString();
+                result.PlayerLastOnlineRealTime = subReader.ReadInt64();
+                result.PlayerName = subReader.ReadString();
+            }
+
+            if (groupType == GroupType.Guild)
+            {
+                result.AdminPlayerUid = subReader.ReadGuid();
+
+                // https://github.com/cheahjs/palworld-save-tools/issues/192
+                subReader.ReadInt64();
+                subReader.ReadInt64();
+
+                result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
+            }
+
+            return result;
+        }
+
+        private static GroupDataProperty ParseStream_V3_TidesOfTerraria(GroupType groupType, FArchiveReader subReader)
+        {
+            var result = new GroupDataProperty() { TypedMeta = new GroupDataPropertyMeta() };
+
+            result.TypedMeta.Id = subReader.ReadGuid();
+            result.GroupType = groupType;
+            result.GroupName = subReader.ReadString();
+            result.CharacterHandleIds = subReader.ReadArray(r => new EntityInstanceId() { Guid = r.ReadGuid(), InstanceId = r.ReadGuid() });
+
+            if (GroupType.Mask_HasBaseIds.HasFlag(groupType))
+            {
+                subReader.ReadInt32(); // ? NEW
+                result.OrgType = subReader.ReadByte();
+                result.BaseIds = subReader.ReadArray(r => r.ReadGuid());
+            }
+
+            if (GroupType.Mask_HasGuildName.HasFlag(groupType))
+            {
+                subReader.ReadInt32(); // ? NEW
+                result.BaseCampLevel = subReader.ReadInt32();
+                result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
+                result.GuildName = subReader.ReadString();
+            }
+
+            if (groupType == GroupType.IndependentGuild)
+            {
+                result.PlayerUid = subReader.ReadGuid();
+                result.GuildName2 = subReader.ReadString();
+                result.PlayerLastOnlineRealTime = subReader.ReadInt64();
+                result.PlayerName = subReader.ReadString();
+            }
+
+            if (groupType == GroupType.Guild)
+            {
+                // parse using the new format
+                result.AdminPlayerUid = subReader.ReadGuid();
+
+                // https://github.com/cheahjs/palworld-save-tools/issues/192
+                subReader.ReadInt64();
+                subReader.ReadInt64();
+
+                subReader.ReadInt32(); // ? NEW
+
+                result.Members = subReader.ReadArray(PlayerReference.ReadFrom);
+            }
+
+            return result;
         }
     }
 }
