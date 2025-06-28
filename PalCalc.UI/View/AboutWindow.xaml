@@ -94,6 +94,10 @@
             (<Hyperlink NavigateUri="https://github.com/YaccConstructor/QuickGraph/blob/master/LICENSE.txt" RequestNavigate="Hyperlink_RequestNavigate">Ms-PL License</Hyperlink>)
             (<Hyperlink NavigateUri="https://github.com/deepakkumar1984/QuickGraph.NETStandard" RequestNavigate="Hyperlink_RequestNavigate">.NET Standard Port</Hyperlink>)
         </TextBlock>
+        <TextBlock>
+            <Hyperlink NavigateUri="https://github.com/zao/ooz" RequestNavigate="Hyperlink_RequestNavigate">ooz/libooz by zao/rarten</Hyperlink>
+            (No license stated)
+        </TextBlock>
 
         <Separator />
 

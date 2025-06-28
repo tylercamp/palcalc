@@ -10,6 +10,7 @@ namespace PalCalc.SaveReader
     public class LibOoz
     {
         // https://github.com/zao/ooz
+
         [DllImport("libooz.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int Ooz_Decompress(
             byte[] src_buf,
