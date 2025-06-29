@@ -9,6 +9,7 @@ namespace PalCalc.Model
     public enum EggSize : int
     {
         // values 2 and 4 seem to be unused
+        None = 0,
         Normal = 1,
         Large = 3,
         Huge = 5,

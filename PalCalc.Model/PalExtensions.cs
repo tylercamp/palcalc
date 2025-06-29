@@ -72,6 +72,8 @@ namespace PalCalc.Model
 
             var modifier = eggSize switch
             {
+                // No egg size, i.e. can't hatch
+                EggSize.None => 0.000001,
                 EggSize.Normal => 12,
                 EggSize.Large => 2,
                 EggSize.Huge => 1,
