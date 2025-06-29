@@ -177,9 +177,7 @@ namespace PalCalc.SaveReader
                     using (var br = new BinaryReader(inputStream))
                     {
                         byte[] compressed = br.ReadBytes(header.CompressedLength);
-                        byte[] decompressed = new byte[header.UncompressedLength + 128]; // (+128 to account for `SAFE_SPACE` constant)
-
-                        int res = LibOoz.Ooz_Decompress(srcBuf: compressed, dstBuf: decompressed);
+                        byte[] decompressed = LibOoz.Ooz_Decompress(srcBuf: compressed, decompressedSize: header.UncompressedLength);
 
                         using (var ds = new MemoryStream(decompressed, 0, header.UncompressedLength))
                             action(ds);

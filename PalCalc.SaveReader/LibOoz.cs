@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -7,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace PalCalc.SaveReader
 {
-    public class LibOoz
+    public static class LibOoz
     {
+        private static ILogger logger = Log.ForContext(typeof(LibOoz));
+
         // https://github.com/zao/ooz
 
         [DllImport("libooz.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -29,6 +32,13 @@ namespace PalCalc.SaveReader
             int u10
         );
 
-        public static int Ooz_Decompress(byte[] srcBuf, byte[] dstBuf) => Ooz_Decompress(srcBuf, srcBuf.Length, dstBuf, (ulong)dstBuf.Length, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        public static byte[] Ooz_Decompress(byte[] srcBuf, int decompressedSize)
+        {
+            var resBuf = new byte[decompressedSize + 128]; // (+128 to account for `SAFE_SPACE` constant)
+            var res = Ooz_Decompress(srcBuf, srcBuf.Length, resBuf, (ulong)decompressedSize, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+            if (res < 0)
+                logger.Warning("LibOoz reported a decompression error!");
+            return resBuf;
+        }
     }
 }
