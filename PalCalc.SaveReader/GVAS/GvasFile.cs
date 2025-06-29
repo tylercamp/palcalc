@@ -32,10 +32,10 @@ namespace PalCalc.SaveReader.GVAS
             var result = new GvasHeader();
 
             result.Magic = reader.ReadInt32();
-            if (result.Magic != 0x53415647) throw new Exception();
+            if (result.Magic != 0x53415647) throw new Exception($"Incorrect magic bytes - expected {0x53415647}, got {result.Magic}");
 
             result.SaveGameVersion = reader.ReadInt32();
-            if (result.SaveGameVersion != 3) throw new Exception();
+            if (result.SaveGameVersion != 3) throw new Exception($"Unexpected SaveGameVersion - expected 3, got {result.SaveGameVersion}");
 
             result.PackageFileVersionUE4 = reader.ReadInt32();
             result.PackageFileVersionUE5 = reader.ReadInt32();
@@ -48,7 +48,7 @@ namespace PalCalc.SaveReader.GVAS
             result.EngineVersionBranch = reader.ReadString();
             result.CustomVersionFormat = reader.ReadInt32();
 
-            if (result.CustomVersionFormat != 3) throw new Exception();
+            if (result.CustomVersionFormat != 3) throw new Exception($"Unexpected CustomVersionFormat - expected 3, got {result.CustomVersionFormat}");
 
             result.CustomVersions = reader.ReadArray(r => (r.ReadGuid(), r.ReadInt32())).ToList();
             result.SaveGameClassName = reader.ReadString();
@@ -111,7 +111,7 @@ namespace PalCalc.SaveReader.GVAS
 
         public static bool IsValidGvas(IFileSource fileSource)
         {
-            using (var stream = FileUtil.ReadFileNonLocking(fileSource.Content.First(), maxLength: 16 * (1024 * 1024)))
+            using (var stream = FileUtil.ReadFileNonLocking(fileSource.Content.First()))
             {
                 var isCompressed = CompressedSAV.HasSaveCompression(stream);
                 stream.Seek(0, SeekOrigin.Begin);
