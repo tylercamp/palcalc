@@ -72,9 +72,9 @@ namespace PalCalc.GenDB.GameDataReaders
             {
                 var skill = row.Value.ToObject<UPassiveSkill>();
 
-                skill.IsStandardPassiveSkill = skill.Category.Contains("SortDisplayable");
-
                 skill.InternalName = row.Key.Text;
+                skill.IsStandardPassiveSkill = skill.Category.Contains("SortDisplayable") && !skill.InternalName.StartsWith("GYM_");
+
                 res.Add(skill);
             }
 

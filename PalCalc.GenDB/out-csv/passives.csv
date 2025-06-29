@@ -41,13 +41,6 @@ Botanical Barrier,ElementResist_Leaf_1_PAL,1,True
 Abnormal,ElementResist_Normal_1_PAL,1,True
 Insulated Body,ElementResist_Thunder_1_PAL,1,True
 Eternal Flame,EternalFlame,4,True
-PIDF Officer,GYM_NAME_Desert,3,True
-Free Pal Alliance Founder,GYM_NAME_Forest,3,True
-Rayne Syndicate Officer,GYM_NAME_Meadow,3,True
-Leader of the Moonflowers,GYM_NAME_Sakurajima,3,True
-PAL Genetic Research Unit Commander,GYM_NAME_Snow,3,True
-Jarl of Feybreak,GYM_NAME_Viking,3,True
-Brothers of the Eternal Pyre Soul Leader,GYM_NAME_Volcano,3,True
 Invader,Invader,4,True
 Legend,Legend,4,True
 Nimble,MoveSpeed_up_1,1,True
@@ -536,6 +529,13 @@ GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_2,GiveElement_TrainerATK_UP_P
 GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_3,GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_3,1,False
 GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_4,GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_4,1,False
 GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_5,GiveElement_TrainerATK_UP_PartnerSkill_Ride_Legend_5,1,False
+PIDF Officer,GYM_NAME_Desert,3,False
+Free Pal Alliance Founder,GYM_NAME_Forest,3,False
+Rayne Syndicate Officer,GYM_NAME_Meadow,3,False
+Leader of the Moonflowers,GYM_NAME_Sakurajima,3,False
+PAL Genetic Research Unit Commander,GYM_NAME_Snow,3,False
+Jarl of Feybreak,GYM_NAME_Viking,3,False
+Brothers of the Eternal Pyre Soul Leader,GYM_NAME_Volcano,3,False
 Health Up Lv. 1,HP_ACC_up1,1,False
 Health Up Lv. 2,HP_ACC_up2,2,False
 Health Up Lv. 3,HP_ACC_up3,3,False
