@@ -386,7 +386,7 @@ Please find the generated ZIP file to send with any support questions:
     <value>Level save file</value>
   </data>
   <data name="LC_MANUAL_SAVE_INCOMPLETE" xml:space="preserve">
-    <value>The selected file is not in a complete save-game folder.</value>
+    <value>The selected file is invalid or not in a complete save-game folder.</value>
   </data>
   <data name="LC_MANUAL_SAVE_SELECTOR_TITLE" xml:space="preserve">
     <value>Select the 'Level.sav' file in your save folder</value>
