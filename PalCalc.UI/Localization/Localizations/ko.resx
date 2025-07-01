@@ -118,9 +118,791 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LC_ITL_LABEL" xml:space="preserve">
-    <value>한국어 (한국말)</value>
+    <value>한국어</value>
   </data>
   <data name="LC_LANGUAGE" xml:space="preserve">
     <value>언어</value>
+  </data>
+  <data name="LC_ABOUT_APP" xml:space="preserve">
+    <value>정보</value>
+  </data>
+  <data name="LC_ADD_FAKE_SAVE" xml:space="preserve">
+    <value>가짜 저장 파일 추가...</value>
+  </data>
+  <data name="LC_ADD_NEW_SAVE" xml:space="preserve">
+    <value>새 저장 파일 추가...</value>
+  </data>
+  <data name="LC_ANY_GUILD" xml:space="preserve">
+    <value>아무 길드</value>
+  </data>
+  <data name="LC_ANY_PLAYER" xml:space="preserve">
+    <value>아무 플레이어</value>
+  </data>
+  <data name="LC_BASE_ASSIGNED_LABEL" xml:space="preserve">
+    <value>기지에 할당됨</value>
+  </data>
+  <data name="LC_BASE_LABEL" xml:space="preserve">
+    <value>기지 ({BaseName})</value>
+  </data>
+  <data name="LC_BREEDING_TIME" xml:space="preserve">
+    <value>교배 시간 (초)</value>
+  </data>
+  <data name="LC_BREEDING_TIME_DESC" xml:space="preserve">
+    <value>알을 낳는 데 걸리는 평균 시간입니다. 특정 특성을 가진 팰을 생산하는 데 걸리는 시간을 추정하는 데 사용됩니다.
+이 값은 밤에 팰이 비활성 상태인 것을 고려하여 내부적으로 두 배가 됩니다.</value>
+  </data>
+  <data name="LC_COMMON_ALL_ATTACK_SKILLS" xml:space="preserve">
+    <value>모든 액티브 스킬</value>
+  </data>
+  <data name="LC_COMMON_ATTACK_SKILLS" xml:space="preserve">
+    <value>액티브 스킬</value>
+  </data>
+  <data name="LC_COMMON_CANCEL" xml:space="preserve">
+    <value>취소</value>
+  </data>
+  <data name="LC_COMMON_ENABLED" xml:space="preserve">
+    <value>활성화됨</value>
+  </data>
+  <data name="LC_COMMON_EQUIPPED_ATTACK_SKILLS" xml:space="preserve">
+    <value>장착된 액티브 스킬</value>
+  </data>
+  <data name="LC_COMMON_GENDER" xml:space="preserve">
+    <value>성별</value>
+  </data>
+  <data name="LC_COMMON_GENDER_FEMALE" xml:space="preserve">
+    <value>암컷</value>
+  </data>
+  <data name="LC_COMMON_GENDER_MALE" xml:space="preserve">
+    <value>수컷</value>
+  </data>
+  <data name="LC_COMMON_GENDER_NONE" xml:space="preserve">
+    <value>성별 없음</value>
+  </data>
+  <data name="LC_COMMON_GENDER_OPPOSITE_WILDCARD" xml:space="preserve">
+    <value>반대 성별</value>
+  </data>
+  <data name="LC_COMMON_GENDER_WILDCARD" xml:space="preserve">
+    <value>아무 성별</value>
+  </data>
+  <data name="LC_COMMON_IVS" xml:space="preserve">
+    <value>개체값</value>
+  </data>
+  <data name="LC_COMMON_IV_ATTACK" xml:space="preserve">
+    <value>공격</value>
+  </data>
+  <data name="LC_COMMON_IV_ATTACK_SHORT" xml:space="preserve">
+    <value>공격</value>
+  </data>
+  <data name="LC_COMMON_IV_DEFENSE" xml:space="preserve">
+    <value>방어</value>
+  </data>
+  <data name="LC_COMMON_IV_DEFENSE_SHORT" xml:space="preserve">
+    <value>방어</value>
+  </data>
+  <data name="LC_COMMON_IV_HP" xml:space="preserve">
+    <value>HP</value>
+  </data>
+  <data name="LC_COMMON_IV_HP_SHORT" xml:space="preserve">
+    <value>HP</value>
+  </data>
+  <data name="LC_COMMON_LEVEL" xml:space="preserve">
+    <value>레벨</value>
+  </data>
+  <data name="LC_COMMON_LOCATION" xml:space="preserve">
+    <value>위치</value>
+  </data>
+  <data name="LC_COMMON_MAP_COORDS" xml:space="preserve">
+    <value>지도 좌표</value>
+  </data>
+  <data name="LC_COMMON_OWNER" xml:space="preserve">
+    <value>소유자</value>
+  </data>
+  <data name="LC_COMMON_PAL" xml:space="preserve">
+    <value>팰</value>
+  </data>
+  <data name="LC_COMMON_PALDEX_NUM_SHORT" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="LC_COMMON_SAVE" xml:space="preserve">
+    <value>저장</value>
+  </data>
+  <data name="LC_COMMON_TRAITS" xml:space="preserve">
+    <value>특성 스킬</value>
+  </data>
+  <data name="LC_COMMON_UNKNOWN" xml:space="preserve">
+    <value>알 수 없음</value>
+  </data>
+  <data name="LC_CRASHLOG_FAILED" xml:space="preserve">
+    <value>충돌 로그 파일을 생성할 수 없습니다.</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER" xml:space="preserve">
+    <value>{Label} (사용자 지정)</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINERS" xml:space="preserve">
+    <value>사용자 지정 컨테이너</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve">
+    <value>변경 사항은 Pal Calc에 자동으로 저장됩니다. 사용자 지정 컨테이너는 Palworld 저장 파일에 영향을 주지 않습니다.</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve">
+    <value>새로 추가...</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_FIELD" xml:space="preserve">
+    <value>이름</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_TITLE" xml:space="preserve">
+    <value>새 사용자 지정 컨테이너</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_FIELD" xml:space="preserve">
+    <value>이름</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_TITLE" xml:space="preserve">
+    <value>사용자 지정 컨테이너 이름 바꾸기</value>
+  </data>
+  <data name="LC_CUSTOM_SAVE_GAME_NAME" xml:space="preserve">
+    <value>새 저장 이름</value>
+  </data>
+  <data name="LC_CUSTOM_SAVE_GAME_NAME_LABEL" xml:space="preserve">
+    <value>이름</value>
+  </data>
+  <data name="LC_DELETE_PAL_TARGET_MSG" xml:space="preserve">
+    <value>{PalName}의 이 항목을 삭제하시겠습니까?</value>
+  </data>
+  <data name="LC_DELETE_PAL_TARGET_TITLE" xml:space="preserve">
+    <value>팰 대상 삭제</value>
+  </data>
+  <data name="LC_ERROR_HARD_CRASH" xml:space="preserve">
+    <value>처리되지 않은 오류가 발생했습니다.
+
+지원 문의 시 함께 보낼 수 있도록 생성된 ZIP 파일을 확인해 주세요:
+
+{CrashlogPath}</value>
+  </data>
+  <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve">
+    <value>저장 파일을 로드하는 중 오류가 발생했습니다.
+
+최신 버전의 Palworld 저장 파일은 Pal Calc 업데이트가 필요할 수 있습니다.
+
+이전 버전의 파일은 지원되지 않을 수 있으며 이전 버전의 Pal Calc가 필요할 수 있습니다.
+
+지원 질문과 함께 보낼 생성된 ZIP 파일을 찾아주세요:
+
+{CrashlogPath}</value>
+  </data>
+  <data name="LC_EXPORT_CRASH_LOG" xml:space="preserve">
+    <value>충돌 로그 내보내기</value>
+  </data>
+  <data name="LC_EXPORT_CRASH_LOG_DESCRIPTION" xml:space="preserve">
+    <value>최근에 참조된 저장 파일, 캐시 데이터 및 설정을 ZIP으로 내보냅니다.</value>
+  </data>
+  <data name="LC_EXPORT_SAVE" xml:space="preserve">
+    <value>저장</value>
+  </data>
+  <data name="LC_EXPORT_SAVE_CSV" xml:space="preserve">
+    <value>CSV 저장하기</value>
+  </data>
+  <data name="LC_EXPORT_SAVE_CSV_DESCRIPTION" xml:space="preserve">
+    <value>저장 파일의 모든 팰을 CSV 스프레드시트로 내보냅니다.</value>
+  </data>
+  <data name="LC_EXPORT_SAVE_DESCRIPTION" xml:space="preserve">
+    <value>선택한 저장에 대해 알려진 모든 Palworld 파일을 ZIP으로 내보냅니다.</value>
+  </data>
+  <data name="LC_GAME_SETTINGS" xml:space="preserve">
+    <value>게임 설정</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_CUSTOM" xml:space="preserve">
+    <value>사용자 지정</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_FILL" xml:space="preserve">
+    <value>채우기</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_PERCENT" xml:space="preserve">
+    <value>확대/축소:</value>
+  </data>
+  <data name="LC_GUILD_LABEL" xml:space="preserve">
+    <value>길드 '{GuildName}'</value>
+  </data>
+  <data name="LC_INCLUDE_CUSTOM_PALS" xml:space="preserve">
+    <value>사용자 지정 컨테이너의 팰 포함</value>
+  </data>
+  <data name="LC_INCLUDE_PALS_AT_BASE" xml:space="preserve">
+    <value>기지의 팰 포함</value>
+  </data>
+  <data name="LC_INCLUDE_PALS_GPS" xml:space="preserve">
+    <value>글로벌 팰 상자의 팰 포함</value>
+  </data>
+  <data name="LC_INCLUDE_PALS_IN_CAGES" xml:space="preserve">
+    <value>관람용 케이지의 팰 포함</value>
+  </data>
+  <data name="LC_INCLUDE_PALS_ON_EXPEDITIONS" xml:space="preserve">
+    <value>원정 중인 팰 포함</value>
+  </data>
+  <data name="LC_INSPECT_SAVE" xml:space="preserve">
+    <value>검사</value>
+  </data>
+  <data name="LC_ITL_LABEL" xml:space="preserve">
+    <value>한국어</value>
+  </data>
+  <data name="LC_JOB_QUEUE_CLOSING_MSG" xml:space="preserve">
+    <value>Pal Calc를 닫으면 남은 모든 작업이 취소됩니다. 종료하시겠습니까?</value>
+  </data>
+  <data name="LC_JOB_QUEUE_CLOSING_TITLE" xml:space="preserve">
+    <value>대기 중인 작업</value>
+  </data>
+  <data name="LC_JOB_QUEUE_HEADER" xml:space="preserve">
+    <value>작업 ({Count})</value>
+  </data>
+  <data name="LC_LANGUAGE" xml:space="preserve">
+    <value>언어</value>
+  </data>
+  <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
+    <value>새 언어가 완전히 적용되려면 Pal Calc를 다시 시작해야 합니다.</value>
+  </data>
+  <data name="LC_LIST_SEPARATOR" xml:space="preserve">
+    <value>, </value>
+  </data>
+  <data name="LC_LOC_COORD_BASE" xml:space="preserve">
+    <value>기지, 슬롯 ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_COORD_DPS" xml:space="preserve">
+    <value>차원 저장소, 탭 {Tab} 위치 ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_COORD_GPS" xml:space="preserve">
+    <value>글로벌 팰 상자, 탭 {Tab} 위치 ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_COORD_PALBOX" xml:space="preserve">
+    <value>팰 상자, 탭 {Tab} 위치 ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_COORD_PARTY" xml:space="preserve">
+    <value>파티, 슬롯 {SlotNum}</value>
+  </data>
+  <data name="LC_LOC_COORD_VIEWING_CAGE" xml:space="preserve">
+    <value>관람용 케이지 위치 ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_OWNED_BY" xml:space="preserve">
+    <value>{Owner} 소유</value>
+  </data>
+  <data name="LC_LOC_PALBOX_TAB" xml:space="preserve">
+    <value>탭 {Tab}</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_ALREADY_REGISTERED" xml:space="preserve">
+    <value>선택한 파일이 이미 등록되었습니다.</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_EXTENSION_LBL" xml:space="preserve">
+    <value>레벨 저장 파일</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_INCOMPLETE" xml:space="preserve">
+    <value>선택한 파일이 유효하지 않거나 완전한 저장 게임 폴더에 없습니다.</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_SELECTOR_TITLE" xml:space="preserve">
+    <value>저장 폴더에서 'Level.sav' 파일을 선택하세요</value>
+  </data>
+  <data name="LC_MEMORY_WARNING_MSG" xml:space="preserve">
+    <value>알림: 시스템 메모리가 부족하여 연산이 일시적으로 중지되었습니다. 이 메시지를 닫으면 작업이 재개됩니다.
+
+이번 실행에서는 향후 경고를 무시하시겠습니까?</value>
+  </data>
+  <data name="LC_MEMORY_WARNING_TITLE" xml:space="preserve">
+    <value>메모리 경고!</value>
+  </data>
+  <data name="LC_MULTIPLE_BREEDING_FARMS" xml:space="preserve">
+    <value>여러 교배 목장</value>
+  </data>
+  <data name="LC_MULTIPLE_BREEDING_FARMS_DESC" xml:space="preserve">
+    <value>여러 교배 목장을 사용할지 여부입니다.
+활성화하면 다른 두 교배된 팰에서 팰을 교배하는 시간은 부모 간의 가장 긴 교배 시간을 기준으로 합니다.
+비활성화하면 팰을 교배하는 시간은 항상 부모에게 필요한 시간의 합계를 기준으로 합니다.</value>
+  </data>
+  <data name="LC_NEW_TARGET_PAL" xml:space="preserve">
+    <value>새로 만들기</value>
+  </data>
+  <data name="LC_NO_RESULTS_FAQ_1" xml:space="preserve">
+    <value>결과가 없나요? 확인하세요</value>
+  </data>
+  <data name="LC_NO_RESULTS_FAQ_2" xml:space="preserve">
+    <value>FAQ</value>
+  </data>
+  <data name="LC_NO_RESULTS_FAQ_3" xml:space="preserve">
+    <value>에서 가능한 원인을 찾아보세요.</value>
+  </data>
+  <data name="LC_NO_TRAITS" xml:space="preserve">
+    <value>패시브 없음</value>
+  </data>
+  <data name="LC_OPEN_IN_FILE_EXPLORER" xml:space="preserve">
+    <value>탐색기에서 열기</value>
+  </data>
+  <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve">
+    <value>선택적으로 {TraitsList} 포함</value>
+  </data>
+  <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
+    <value>검색</value>
+  </data>
+  <data name="LC_PAL_LABEL" xml:space="preserve">
+    <value>{PalName} (#{PaldexNum})</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS" xml:space="preserve">
+    <value>프리셋</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_ADD" xml:space="preserve">
+    <value>팰을 새 프리셋으로 저장...</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_ADD_TITLE" xml:space="preserve">
+    <value>새 프리셋 이름</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_BUILTIN_NOT_OWNED" xml:space="preserve">
+    <value>소유하지 않은 팰</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_BUILTIN_OWNED" xml:space="preserve">
+    <value>소유한 팰</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_BTN_DESCRIPTION" xml:space="preserve">
+    <value>프리셋 삭제</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_MSG" xml:space="preserve">
+    <value>'{PresetName}' 프리셋을 삭제하시겠습니까?</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_TITLE" xml:space="preserve">
+    <value>프리셋 삭제</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_NAME" xml:space="preserve">
+    <value>이름</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_BTN_DESCRIPTION" xml:space="preserve">
+    <value>프리셋 덮어쓰기</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_MSG" xml:space="preserve">
+    <value>현재 선택된 팰로 '{PresetName}' 프리셋을 덮어쓰시겠습니까?</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_TITLE" xml:space="preserve">
+    <value>프리셋 덮어쓰기</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_RENAME_BTN_DESCRIPTION" xml:space="preserve">
+    <value>프리셋 이름 바꾸기</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_RENAME_TITLE" xml:space="preserve">
+    <value>'{PresetName}' 프리셋 이름 바꾸기</value>
+  </data>
+  <data name="LC_PAL_LOC_BASE" xml:space="preserve">
+    <value>기지</value>
+  </data>
+  <data name="LC_PAL_LOC_CAPTURED" xml:space="preserve">
+    <value>포획됨</value>
+  </data>
+  <data name="LC_PAL_LOC_COUNT" xml:space="preserve">
+    <value>{LocType}에 {Count}개</value>
+  </data>
+  <data name="LC_PAL_LOC_CUSTOM" xml:space="preserve">
+    <value>(사용자 지정)</value>
+  </data>
+  <data name="LC_PAL_LOC_DPS_FULL" xml:space="preserve">
+    <value>차원 팰 저장소</value>
+  </data>
+  <data name="LC_PAL_LOC_DPS_SHORT" xml:space="preserve">
+    <value>차원 저장소</value>
+  </data>
+  <data name="LC_PAL_LOC_GPS_FULL" xml:space="preserve">
+    <value>글로벌 팰 상자</value>
+  </data>
+  <data name="LC_PAL_LOC_GPS_SHORT" xml:space="preserve">
+    <value>글로벌 팰 상자</value>
+  </data>
+  <data name="LC_PAL_LOC_PALBOX" xml:space="preserve">
+    <value>팰 상자</value>
+  </data>
+  <data name="LC_PAL_LOC_PARTY" xml:space="preserve">
+    <value>파티</value>
+  </data>
+  <data name="LC_PAL_LOC_VIEWING_CAGE" xml:space="preserve">
+    <value>관람용 케이지</value>
+  </data>
+  <data name="LC_PAL_SRC_ANY_GUILD_MEMBER" xml:space="preserve">
+    <value>아무 길드원</value>
+  </data>
+  <data name="LC_PAL_SRC_ANY_PLAYER_GUILD" xml:space="preserve">
+    <value>아무 길드의 아무 플레이어</value>
+  </data>
+  <data name="LC_PAL_TARGET_OPTIONAL_TRAITS" xml:space="preserve">
+    <value>선택</value>
+  </data>
+  <data name="LC_PAL_TARGET_REQUIRED_TRAITS" xml:space="preserve">
+    <value>필수</value>
+  </data>
+  <data name="LC_PAL_WILD_COUNT" xml:space="preserve">
+    <value>야생 {NumWild}마리</value>
+  </data>
+  <data name="LC_PLAYER_LABEL" xml:space="preserve">
+    <value>플레이어 '{PlayerName}'</value>
+  </data>
+  <data name="LC_POPUP_TITLE_LOADING_SAVE_FILE" xml:space="preserve">
+    <value>저장 파일 로드 중</value>
+  </data>
+  <data name="LC_RANDOM_TRAIT" xml:space="preserve">
+    <value>(랜덤)</value>
+  </data>
+  <data name="LC_REMOVE_CUSTOM_CONTAINER_DESCRIPTION" xml:space="preserve">
+    <value>사용자 지정 컨테이너 '{Label}'이(가) 제거됩니다.</value>
+  </data>
+  <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve">
+    <value>Pal Calc에서 이 저장을 제거하시겠습니까?
+
+{SaveLabel}
+
+이렇게 해도 컴퓨터에서 저장 파일이 삭제되지는 않습니다.</value>
+  </data>
+  <data name="LC_REMOVE_SAVE_TITLE" xml:space="preserve">
+    <value>수동 저장 제거?</value>
+  </data>
+  <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve">
+    <value>{TraitsList} 포함</value>
+  </data>
+  <data name="LC_RESULT_BREEDING_ATTEMPTS" xml:space="preserve">
+    <value>평균 {AvgAttempts}회 시도</value>
+  </data>
+  <data name="LC_RESULT_INPUT_LOCS" xml:space="preserve">
+    <value>팰 위치</value>
+  </data>
+  <data name="LC_RESULT_IV_ATTACK" xml:space="preserve">
+    <value>공격</value>
+  </data>
+  <data name="LC_RESULT_IV_AVERAGE" xml:space="preserve">
+    <value>평균</value>
+  </data>
+  <data name="LC_RESULT_IV_DEFENSE" xml:space="preserve">
+    <value>방어</value>
+  </data>
+  <data name="LC_RESULT_IV_HP" xml:space="preserve">
+    <value>HP</value>
+  </data>
+  <data name="LC_RESULT_LABEL" xml:space="preserve">
+    <value>{PalName}, {TraitsList} 포함, 약 {TimeEstimate} 소요</value>
+  </data>
+  <data name="LC_RESULT_LIST_TITLE_COUNT" xml:space="preserve">
+    <value>결과 {NumResults}개</value>
+  </data>
+  <data name="LC_RESULT_LIST_TITLE_EMPTY" xml:space="preserve">
+    <value>결과</value>
+  </data>
+  <data name="LC_RESULT_NUM_CAKES" xml:space="preserve">
+    <value>케이크</value>
+  </data>
+  <data name="LC_RESULT_NUM_STEPS" xml:space="preserve">
+    <value>단계</value>
+  </data>
+  <data name="LC_RESULT_TIME_ESTIMATE" xml:space="preserve">
+    <value>소요시간</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_ID" xml:space="preserve">
+    <value>ID:</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_OWNER" xml:space="preserve">
+    <value>소유자:</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_SLOTS_USED" xml:space="preserve">
+    <value>슬롯 사용됨</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_TYPE" xml:space="preserve">
+    <value>유형:</value>
+  </data>
+  <data name="LC_SAVEINSPECT_DETECTED_PROPERTIES" xml:space="preserve">
+    <value>감지된 속성</value>
+  </data>
+  <data name="LC_SAVEINSPECT_ON_EXPEDITION" xml:space="preserve">
+    <value>원정 중</value>
+  </data>
+  <data name="LC_SAVEINSPECT_RAW_PROPERTIES" xml:space="preserve">
+    <value>원본 속성</value>
+  </data>
+  <data name="LC_SAVEINSPECT_SLOT_EMPTY" xml:space="preserve">
+    <value>비어 있음</value>
+  </data>
+  <data name="LC_SAVESEARCH_CONTAINER_LABEL" xml:space="preserve">
+    <value>{Label} ({NumMatches}개 일치)</value>
+  </data>
+  <data name="LC_SAVESEARCH_GRP_PAL_CONTAINERS" xml:space="preserve">
+    <value>팰 컨테이너</value>
+  </data>
+  <data name="LC_SAVESEARCH_GRP_SEARCH_SETTINGS" xml:space="preserve">
+    <value>검색 설정</value>
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_MAX_IVS" xml:space="preserve">
+    <value>최대 개체값</value>
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_MIN_IVS" xml:space="preserve">
+    <value>최소 개체값</value>
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_RESET" xml:space="preserve">
+    <value>초기화</value>
+  </data>
+  <data name="LC_SAVEWINDOW_TAB_DETAILS" xml:space="preserve">
+    <value>세부 정보</value>
+  </data>
+  <data name="LC_SAVEWINDOW_TAB_SEARCH" xml:space="preserve">
+    <value>검색</value>
+  </data>
+  <data name="LC_SAVEWINDOW_TITLE" xml:space="preserve">
+    <value>저장 검사기 - {SaveLabel}</value>
+  </data>
+  <data name="LC_SAVE_FILE" xml:space="preserve">
+    <value>저장 파일</value>
+  </data>
+  <data name="LC_SAVE_FILE_RELOADING" xml:space="preserve">
+    <value>저장 파일이 아직 캐시되지 않았거나 캐시가 오래되어 내용을 읽는 중...</value>
+  </data>
+  <data name="LC_SAVE_FILE_RELOAD_DESCRIPTION" xml:space="preserve">
+    <value>이 저장의 일부 파일이 변경되었습니다. 최신 데이터를 다시 로드하려면 클릭하세요.</value>
+  </data>
+  <data name="LC_SAVE_GAME" xml:space="preserve">
+    <value>게임</value>
+  </data>
+  <data name="LC_SAVE_GAME_ERROR" xml:space="preserve">
+    <value>선택된 저장이 없거나 선택된 저장을 로드할 수 없습니다! 저장 파일이 없는 경우 "위치: 수동 추가됨" 및 "게임: 가짜 저장 파일 추가..."를 선택하는 것을 고려해 보세요. "검사" 버튼과 사용자 지정 컨테이너를 사용하여 수동으로 팰을 추가하세요.</value>
+  </data>
+  <data name="LC_SAVE_GAME_INVALID" xml:space="preserve">
+    <value>선택한 저장 파일이 유효하지 않습니다!</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL" xml:space="preserve">
+    <value>{PlayerName} 레벨 {PlayerLevel}, {WorldName} 세계, {DayNumber}일차</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL_NO_METADATA" xml:space="preserve">
+    <value>{GameId} (메타데이터를 읽을 수 없음)</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve">
+    <value>{WorldName} 세계, {DayNumber}일차</value>
+  </data>
+  <data name="LC_SAVE_GAME_REMOVE_BTN_LABEL" xml:space="preserve">
+    <value>제거</value>
+  </data>
+  <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
+    <value>Xbox 저장 파일이 불완전하지만 기능은 계속 작동합니다. Palworld를 몇 분 동안 닫고 Pal Calc를 다시 시작하면 자동으로 해결됩니다.</value>
+  </data>
+  <data name="LC_SAVE_INSPECTOR_LOADING" xml:space="preserve">
+    <value>원본 저장 데이터 읽는 중...</value>
+  </data>
+  <data name="LC_SAVE_LOCATION" xml:space="preserve">
+    <value>위치</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_LBL_STEAM" xml:space="preserve">
+    <value>Steam 사용자 {UserId} - 유효한 저장 {NumValidSaves}개</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_LBL_XBOX" xml:space="preserve">
+    <value>Xbox 사용자 {UserId} - 유효한 저장 {NumValidSaves}개</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_MANUAL" xml:space="preserve">
+    <value>수동으로 추가됨</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_STEAM_EMPTY" xml:space="preserve">
+    <value>Steam</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_EMPTY" xml:space="preserve">
+    <value>Xbox</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_1" xml:space="preserve">
+    <value>Xbox 저장을 찾을 수 없습니다. Palworld는</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_2" xml:space="preserve">
+    <value>Xbox 앱 / Game Pass를 통해 PC에 설치해야 합니다.</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_3" xml:space="preserve">
+    <value>게임을 실행하면 저장 파일이 PC에 동기화됩니다.</value>
+  </data>
+  <data name="LC_SAVE_WARNING" xml:space="preserve">
+    <value>(!)</value>
+  </data>
+  <data name="LC_SETTINGS_MASSIVE_EGG_INCUBATION" xml:space="preserve">
+    <value>거대한 알 부화 시간 (분)</value>
+  </data>
+  <data name="LC_SETTINGS_MASSIVE_EGG_INCUBATION_DESC" xml:space="preserve">
+    <value>보너스(온도 조절기) 없이 거대한 알을 부화하는 데 걸리는 시간입니다.</value>
+  </data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE" xml:space="preserve">
+    <value>팰 상자 탭 크기</value>
+  </data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE_DESC" xml:space="preserve">
+    <value>팰 상자의 탭 크기입니다. 팰 상자에 있는 팰의 위치를 표시할 때 사용됩니다.
+
+기본값은 6x5입니다. 팰 상자 탭의 크기를 변경하는 모드를 사용하지 않는 한 이 설정은 변경해서는 안 됩니다.
+
+이 설정이 완전히 적용되려면 다시 시작해야 합니다.</value>
+  </data>
+  <data name="LC_SETTINGS_RESTART_REQUIRED_MSG" xml:space="preserve">
+    <value>일부 변경 사항은 완전히 적용되려면 다시 시작해야 합니다.</value>
+  </data>
+  <data name="LC_SOLVER_PAUSE" xml:space="preserve">
+    <value>일시 중지</value>
+  </data>
+  <data name="LC_SOLVER_RESUME" xml:space="preserve">
+    <value>재개</value>
+  </data>
+  <data name="LC_SOLVER_RUN" xml:space="preserve">
+    <value>실행</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS" xml:space="preserve">
+    <value>허용된 교배 팰</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS" xml:space="preserve">
+    <value>허용된 야생 팰</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS" xml:space="preserve">
+    <value>번식과 관련 없는 특성 최대</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
+    <value>최종 교배 결과를 포함하여 모든 교배된 팰에 허용되는 최대 무관 패시브 스킬 수입니다.
+
+값이 '1'보다 높으면 일반적으로 최종 팰에 사용되지 않은 패시브 스킬 슬롯이 있는 경우 더 짧은 교배 경로가 추가됩니다.
+
+값이 높을수록 필요한 시간에 기하급수적으로 영향을 미칩니다.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS" xml:space="preserve">
+    <value>최대 교배 단계</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION" xml:space="preserve">
+    <value>목표 팔(Pal)에 도달하기 위한 최대 교배 단계 수입니다.
+
+(이 값은 일반적으로 "최대 탐색 단계 수"보다 작아야 합니다.)
+
+값이 클수록 Pal Calc는 더 많은 선택지를 고려하며, 계산 시간에 선형적으로 영향을 미칩니다.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve">
+    <value>최대 CPU</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION" xml:space="preserve">
+    <value>연산에 사용할 수 있는 CPU 수입니다. 0이면 모든 CPU가 사용됩니다.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS" xml:space="preserve">
+    <value>입력과 관련 없는 특성 최대</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
+    <value>부모로 사용되는 모든 소유 팰에 허용되는 최대 무관 패시브 스킬 수입니다.
+
+값이 낮을수록 일부 유용한 경로를 놓칠 위험을 감수하면서 처리를 다소 줄일 수 있습니다.
+
+값이 높을수록 계산 시간에 선형적으로 영향을 미칩니다.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS" xml:space="preserve">
+    <value>최대 연산 단계</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION" xml:space="preserve">
+    <value>교배 연산자가 실행될 최대 횟수입니다. 값이 클수록 Pal Calc가 최적의 교배 경로를 검색할 때 더 많은 옵션을 찾을 수 있습니다.
+
+(Pal Calc는 추가 교배 시도가 필요한지 감지하고 이 제한에 도달하기 전에 중지할 수 있습니다.)
+
+(이 값은 일반적으로 "최대 교배 단계"와 같거나 커야 합니다.)
+
+값이 높을수록 계산 시간에 선형적으로 영향을 미칩니다.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS" xml:space="preserve">
+    <value>최대 야생 팰</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION" xml:space="preserve">
+    <value>교배 경로에서 허용할 최대 야생 팰 수입니다.
+소유한 팰의 종류에 따라 값이 높을수록 필요한 시간에 선형적으로 영향을 미칩니다.</value>
+  </data>
+  <data name="LC_SOLVER_STATUS_BREEDING" xml:space="preserve">
+    <value>교배 단계 {StepNum}, {WorkSize} 쌍의 자식 팰 및 확률 계산 중</value>
+  </data>
+  <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve">
+    <value>완료됨 ({Duration} 소요)</value>
+  </data>
+  <data name="LC_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
+    <value>초기화 중</value>
+  </data>
+  <data name="LC_SOLVER_STEP_STATUS_BREEDING" xml:space="preserve">
+    <value>처리된 교배 쌍 {NumProcessed} / {WorkSize}개</value>
+  </data>
+  <data name="LC_SOLVER_STEP_STATUS_DONE" xml:space="preserve">
+    <value>총 {TotalSize}개의 교배 쌍 처리됨</value>
+  </data>
+  <data name="LC_SOURCE_PALS" xml:space="preserve">
+    <value>재료 팰</value>
+  </data>
+  <data name="LC_SOURCE_PALS_FILTERS" xml:space="preserve">
+    <value>필터</value>
+  </data>
+  <data name="LC_SOURCE_PALS_PLAYERS_AND_GUILDS" xml:space="preserve">
+    <value>길드 및 플레이어</value>
+  </data>
+  <data name="LC_STARTUP_LOADING" xml:space="preserve">
+    <value>로드 중...</value>
+  </data>
+  <data name="LC_TARGET_PAL" xml:space="preserve">
+    <value>대상 팰</value>
+  </data>
+  <data name="LC_TARGET_PALS" xml:space="preserve">
+    <value>대상 팰</value>
+  </data>
+  <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">
+    <value>패시브 없음</value>
+  </data>
+  <data name="LC_TRAITS_COUNT_RANDOM" xml:space="preserve">
+    <value>랜덤 {NumRandom}개</value>
+  </data>
+  <data name="LC_TRAITS_COUNT_UNRECOGNIZED" xml:space="preserve">
+    <value>인식할 수 없는 {NumUnrecognized}개</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS" xml:space="preserve">
+    <value>프리셋</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_ADD" xml:space="preserve">
+    <value>패시브를 새 프리셋으로 저장...</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_ADD_TITLE" xml:space="preserve">
+    <value>새 프리셋 이름</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_BTN_DESCRIPTION" xml:space="preserve">
+    <value>프리셋 삭제</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_MSG" xml:space="preserve">
+    <value>'{PresetName}' 프리셋을 삭제하시겠습니까?</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_TITLE" xml:space="preserve">
+    <value>프리셋 삭제</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_NAME" xml:space="preserve">
+    <value>이름</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_BTN_DESCRIPTION" xml:space="preserve">
+    <value>프리셋 덮어쓰기</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_MSG" xml:space="preserve">
+    <value>현재 선택된 필수 및 선택 패시브 스킬로 '{PresetName}' 프리셋을 덮어쓰시겠습니까?</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_TITLE" xml:space="preserve">
+    <value>프리셋 덮어쓰기</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_RENAME_BTN_DESCRIPTION" xml:space="preserve">
+    <value>프리셋 이름 바꾸기</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_RENAME_TITLE" xml:space="preserve">
+    <value>'{PresetName}' 프리셋 이름 바꾸기</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_DESCRIPTION" xml:space="preserve">
+    <value>설명</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_NAME" xml:space="preserve">
+    <value>이름</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_SEARCH" xml:space="preserve">
+    <value>검색</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_TITLE" xml:space="preserve">
+    <value>패시브 스킬 검색</value>
+  </data>
+  <data name="LC_TRAIT_LABEL_UNRECOGNIZED" xml:space="preserve">
+    <value>{InternalName} (인식할 수 없음)</value>
+  </data>
+  <data name="LC_UNKNOWN_GUILD" xml:space="preserve">
+    <value>알 수 없는 길드</value>
+  </data>
+  <data name="LC_UNKNOWN_PLAYER" xml:space="preserve">
+    <value>알 수 없는 플레이어</value>
+  </data>
+  <data name="LC_UPDATE_AVAILABLE" xml:space="preserve">
+    <value>업데이트가 있습니다!</value>
+  </data>
+  <data name="LC_VIEWING_CAGE_LABEL" xml:space="preserve">
+    <value>관람용 케이지 ({CageId})</value>
+  </data>
+  <data name="LC_WINDOW_TITLE" xml:space="preserve">
+    <value>팰 계산기</value>
   </data>
 </root>
