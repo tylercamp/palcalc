@@ -150,6 +150,8 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
+        public int TotalCost => Parent1.TotalCost + Parent2.TotalCost;
+
         private TimeSpan parentBreedingEffort;
         public TimeSpan BreedingEffort { get; private set; }
 

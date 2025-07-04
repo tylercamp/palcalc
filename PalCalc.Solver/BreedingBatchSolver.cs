@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -135,7 +136,7 @@ namespace PalCalc.Solver
                     parentPairOptions.Add((
                         parent1.WithGuaranteedGender(db, PalGender.MALE),
                         parent2.WithGuaranteedGender(db, PalGender.FEMALE)
-                    ));
+                    )); 
                     parentPairOptions.Add((
                         parent1.WithGuaranteedGender(db, PalGender.FEMALE),
                         parent2.WithGuaranteedGender(db, PalGender.MALE)
@@ -243,6 +244,7 @@ namespace PalCalc.Solver
                 if (!p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
                 if (p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() > settings.MaxWildPals) continue;
                 if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= settings.MaxBreedingSteps) continue;
+                if (p.Item1.TotalCost + p.Item2.TotalCost > settings.MaxSurgeryCost) continue;
 
                 {
                     // don't bother checking the child pal if it's impossible for them to reach the target within the remaining
@@ -310,7 +312,7 @@ namespace PalCalc.Solver
                 {
 #if DEBUG && DEBUG_CHECKS
                     // (shouldn't happen)
-                    if (parent1.Gender == PalGender.OPPOSITE_WILDCARD || parent2.Gender == PalGender.OPPOSITE_WILDCARD)
+                    if (p.Item1.Gender == PalGender.OPPOSITE_WILDCARD || p.Item2.Gender == PalGender.OPPOSITE_WILDCARD)
                         Debugger.Break();
 #endif
                     if (p.Item1.Gender != PalGender.WILDCARD || p.Item2.Gender != PalGender.WILDCARD)

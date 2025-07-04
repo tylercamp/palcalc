@@ -47,6 +47,8 @@ namespace PalCalc.Solver.PalReference
         public TimeSpan BreedingEffort => TimeSpan.Zero;
         public TimeSpan SelfBreedingEffort => TimeSpan.Zero;
 
+        public int TotalCost => 0;
+
         public int NumTotalBreedingSteps => 0;
 
         public int NumTotalEggs => 0;

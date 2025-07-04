@@ -59,9 +59,19 @@ namespace PalCalc.Solver
         }
     }
 
-    public class ConcatenatedLazyCartesianProduct<T>(IEnumerable<(List<T>, List<T>)> setPairs) : ILazyCartesianProduct<T>
+    public class ConcatenatedLazyCartesianProduct<T> : ILazyCartesianProduct<T>
     {
-        private List<LazyCartesianProduct<T>> innerProducts = setPairs.Select(p => new LazyCartesianProduct<T>(p.Item1, p.Item2)).ToList();
+        private List<ILazyCartesianProduct<T>> innerProducts;
+
+        public ConcatenatedLazyCartesianProduct(IEnumerable<(List<T>, List<T>)> setPairs)
+        {
+            innerProducts = setPairs.Select(p => (ILazyCartesianProduct<T>)new LazyCartesianProduct<T>(p.Item1, p.Item2)).ToList();
+        }
+
+        public ConcatenatedLazyCartesianProduct(IEnumerable<ILazyCartesianProduct<T>> products)
+        {
+            innerProducts = products.ToList();
+        }
 
         public long Count => innerProducts.Sum(p => p.Count);
 

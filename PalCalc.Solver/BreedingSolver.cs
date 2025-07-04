@@ -4,6 +4,7 @@ using PalCalc.Solver.ResultPruning;
 using Serilog;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
+using System.Diagnostics;
 
 namespace PalCalc.Solver
 {
@@ -191,7 +192,8 @@ namespace PalCalc.Solver
                 );
                 List<WorkBatchProgress> progressEntries = [];
 
-                bool didUpdate = workingSet.UpdateContents(work =>
+                // Phase 1: Breeding pairs (existing logic)
+                bool didBreed = workingSet.UpdateByPairs(work =>
                 {
                     logger.Debug("Performing breeding step {step} with {numWork} work items", s+1, work.Count);
 
@@ -276,9 +278,72 @@ namespace PalCalc.Solver
                     return res;
                 });
 
+                // Phase 2: Surgery additions
+                bool didSurgery = false;
+                var surgeryCompatiblePassives = spec.DesiredPassives.Where(p => p.SupportsSurgery).Where(settings.SurgeryPassives.Contains).ToList();
+                if (surgeryCompatiblePassives.Any() && !controller.CancellationToken.IsCancellationRequested)
+                {
+                    // TODO - sort out gender-swap options?
+
+                    didSurgery = workingSet.UpdateBySingle(palRefs =>
+                    {
+                        return palRefs
+                            .Where(r =>
+                                // there's room for a new passive
+                                r.EffectivePassives.Count < GameConstants.MaxTotalPassives ||
+                                // there's a replaceable passive
+                                r.EffectivePassives.Any(p => p is RandomPassiveSkill)
+                            )
+                            .SelectMany(r =>
+                            {
+                                // TODO: atm won't consider replacing Optional passives, even though they're technically not Required
+
+                                var missingPassives = surgeryCompatiblePassives.Except(r.EffectivePassives).ToList();
+                                var maxNewPassives = GameConstants.MaxTotalPassives - r.EffectivePassives.Count(p => p is not RandomPassiveSkill);
+
+                                var res = new List<IPalReference>();
+
+                                // consider all ways we could add these desired passives
+                                foreach (var passives in missingPassives.Combinations(maxNewPassives).Where(o => o.Any()).Select(c => c.ToList()))
+                                {
+                                    if (r.TotalCost + passives.Sum(p => p.SurgeryCost) > settings.MaxSurgeryCost)
+                                        continue;
+
+                                    var removable = new Queue<PassiveSkill>(r.EffectivePassives.OfType<RandomPassiveSkill>());
+                                    var ops = new List<ISurgeryOperation>();
+                                    for (int i = 0; i < passives.Count; i++)
+                                    {
+                                        // adding this would go over the total passive limit, use a Replacement operation
+                                        if (r.EffectivePassives.Count + i >= GameConstants.MaxTotalPassives)
+                                        {
+                                            if (!removable.Any())
+                                            {
+#if DEBUG_CHECKS
+                                                Debugger.Break();
+#endif
+                                                break;
+                                            }
+
+                                            var toRemove = removable.Dequeue();
+                                            ops.Add(new ReplacePassiveSurgeryOperation(toRemove, passives[i]));
+                                        }
+                                        else // there's space for another passive, use an Add operation
+                                        {
+                                            ops.Add(new AddPassiveSurgeryOperation(passives[i]));
+                                        }
+                                    }
+
+                                    res.Add(new SurgeryTablePalReference(r, ops));
+                                }
+
+                                return res;
+                            });
+                    });
+                }
+
                 if (controller.CancellationToken.IsCancellationRequested) break;
 
-                if (!didUpdate)
+                if (!didBreed && !didSurgery)
                 {
                     logger.Debug("Last pass found no new useful options, stopping iteration early");
                     break;

@@ -66,7 +66,9 @@ internal class Program
                 maxBredIrrelevantPassives: 0,
                 maxInputIrrelevantPassives: 2,
                 maxEffort: TimeSpan.FromDays(7),
-                maxThreads: 1
+                maxThreads: 16,
+                maxSurgeryCost: 100_000,
+                allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList()
             )
         );
 
@@ -77,9 +79,9 @@ internal class Program
         {
             Pal = "Beakon".ToPal(db),
             RequiredPassives = new List<PassiveSkill> { "Swift".ToStandardPassive(db), "Runner".ToStandardPassive(db), "Nimble".ToStandardPassive(db) },
-            IV_Attack = 90,
-            IV_Defense = 90,
-            IV_HP = 90
+            //IV_Attack = 90,
+            //IV_Defense = 90,
+            //IV_HP = 90
         };
 
         var controller = new SolverStateController()

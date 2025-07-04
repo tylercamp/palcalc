@@ -47,6 +47,7 @@ namespace PalCalc.Solver.PalReference
 
         TimeSpan BreedingEffort { get; }
         TimeSpan SelfBreedingEffort { get; }
+        int TotalCost { get; }
 
         IPalReference WithGuaranteedGender(PalDB db, PalGender gender);
 

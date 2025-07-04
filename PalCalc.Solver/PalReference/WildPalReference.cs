@@ -52,6 +52,8 @@ namespace PalCalc.Solver.PalReference
         // used as the effort required to catch one
         public TimeSpan SelfBreedingEffort { get; private set; }
 
+        public int TotalCost => 0;
+
         public int NumTotalBreedingSteps => 0;
 
         public int NumTotalEggs => 0;
