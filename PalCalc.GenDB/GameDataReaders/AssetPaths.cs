@@ -17,6 +17,8 @@ namespace PalCalc.GenDB.GameDataReaders
 
         public const string ITEM_DATA_TABLE_PATH = "Pal/Content/Pal/DataTable/Item/DT_ItemDataTable";
 
+        public const string OPERATING_TABLE_PASSIVES_PATH = "Pal/Content/Pal/DataTable/MapObject/DT_OperatingTablePassiveSkillDataTable";
+
         public const string ELEMENT_ICONS_BASE = "Pal/Content/Pal/Texture/UI/InGame/T_Icon_element_s";
         public const string SKILL_ELEMENT_ICONS_BASE = "Pal/Content/Pal/Texture/UI/Main_Menu/T_prt_pal_skill_base_element";
         public const string SKILL_RANK_ICONS_BASE = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_skillstatus_rank_arrow";

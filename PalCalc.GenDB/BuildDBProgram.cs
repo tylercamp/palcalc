@@ -1,32 +1,14 @@
 ﻿using CUE4Parse.FileProvider;
 using CUE4Parse.MappingsProvider;
-using CUE4Parse.UE4.Assets.Exports.Engine;
 using CUE4Parse.UE4.Assets.Exports.Texture;
-using CUE4Parse.UE4.Assets.Objects;
-using CUE4Parse.UE4.Objects.Core.i18N;
-using CUE4Parse.UE4.Objects.UObject;
 using CUE4Parse.UE4.Versions;
-using CUE4Parse_Conversion;
-using CUE4Parse_Conversion.Animations.PSA;
 using CUE4Parse_Conversion.Textures;
 using PalCalc.GenDB.GameDataReaders;
 using PalCalc.Model;
 using Serilog;
 using SkiaSharp;
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Dynamic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 /*
  * To get the latest usmap file:
@@ -226,6 +208,7 @@ namespace PalCalc.GenDB
 
         private static List<PassiveSkill> BuildPassiveSkills(
             List<UPassiveSkill> rawPassiveSkills,
+            List<USurgeryPassive> rawSurgeryPassives,
             Dictionary<string, Dictionary<string, string>> commonTexts,
             Dictionary<string, Dictionary<string, string>> skillNames,
             Dictionary<string, Dictionary<string, string>> skillDescriptions
@@ -267,6 +250,8 @@ namespace PalCalc.GenDB
                     .Select(t => new PassiveSkillEffect() { InternalName = t.Item1, EffectStrength = t.Item3 })
                     .ToList();
 
+                var surgeryData = rawSurgeryPassives.FirstOrDefault(p => p.PassiveSkill == rawPassive.InternalName);
+
                 return new PassiveSkill(englishName, rawPassive.InternalName, rawPassive.Rank)
                 {
                     Description = englishDescription,
@@ -277,6 +262,8 @@ namespace PalCalc.GenDB
                     RandomInheritanceWeight = rawPassive.LotteryWeight,
                     TrackedEffects = trackedEffects,
                     IsStandardPassiveSkill = rawPassive.IsStandardPassiveSkill,
+                    SurgeryCost = surgeryData?.Price ?? 0,
+                    SurgeryRequiredItem = surgeryData?.RequireItemId,
                 };
             }).SkipNull().ToList();
         }
@@ -683,8 +670,11 @@ namespace PalCalc.GenDB
                 extraPassives: pals.SelectMany(p => p.GuaranteedPassivesInternalIds).Distinct().ToList()
             );
 
+            var rawSurgeryPassives = SurgeryTableReader.ReadSurgeryPassives(provider);
+
             var passives = BuildPassiveSkills(
                 rawPassiveSkills,
+                rawSurgeryPassives,
                 commonTexts: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadCommonText(provider)),
                 skillNames: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadSkillNames(provider)),
                 skillDescriptions: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadSkillDescriptions(provider))
@@ -714,7 +704,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v20");
+            var db = PalDB.MakeEmptyUnsafe("v21");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.Humans = humans;
