@@ -162,6 +162,7 @@ namespace PalCalc.UI
         WildPalReferenceConverter wprc;
         BredPalReferenceConverter bprc;
         CompositePalReferenceConverter cprc;
+        SurgeryPalReferenceConverter sprc;
 
         public PalReferenceConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
         {
@@ -169,6 +170,7 @@ namespace PalCalc.UI
             this.wprc = new WildPalReferenceConverter(db, gameSettings);
             this.bprc = new BredPalReferenceConverter(db, gameSettings, this);
             this.cprc = new CompositePalReferenceConverter(db, gameSettings);
+            this.sprc = new SurgeryPalReferenceConverter(db, gameSettings, this);
         }
 
         public static string ReadWrappedTypeLabel(JToken wrapperToken) => wrapperToken["RefType"].ToObject<string>();
@@ -192,6 +194,7 @@ namespace PalCalc.UI
             if (type == wprc.TypeLabel) return wprc.ReadRefJson(wrappedContent, objectType, existingValue as WildPalReference, hasExistingValue, serializer);
             if (type == bprc.TypeLabel) return bprc.ReadRefJson(wrappedContent, objectType, existingValue as BredPalReference, hasExistingValue, serializer);
             if (type == cprc.TypeLabel) return cprc.ReadRefJson(wrappedContent, objectType, existingValue as CompositeOwnedPalReference, hasExistingValue, serializer);
+            if (type == sprc.TypeLabel) return sprc.ReadRefJson(wrappedContent, objectType, existingValue as SurgeryTablePalReference, hasExistingValue, serializer);
 
             throw new Exception($"Unhandled IPalReference type label {type}");
         }
@@ -204,6 +207,7 @@ namespace PalCalc.UI
                 case WildPalReference wpr: wprc.WriteJson(writer, wpr, serializer); break;
                 case BredPalReference bpr: bprc.WriteJson(writer, bpr, serializer); break;
                 case CompositeOwnedPalReference cpr: cprc.WriteJson(writer, cpr, serializer); break;
+                case SurgeryTablePalReference spr: sprc.WriteJson(writer, spr, serializer); break;
                 default: throw new Exception($"Unhandled IPalReference type {value?.GetType()?.Name}");
             }
         }
@@ -344,6 +348,113 @@ namespace PalCalc.UI
                 ?? Enumerable.Empty<PassiveSkill>();
 
             return (WildPalReference)new WildPalReference(pal, guaranteedPassives, numPassives).WithGuaranteedGender(db, gender);
+        }
+    }
+
+    internal class SurgeryOperationConverter : PalConverterBase<ISurgeryOperation>
+    {
+        public SurgeryOperationConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        {
+            dependencyConverters = [
+                new PassiveSkillConverter(db, gameSettings),
+                new ILocalizedTextConverter(db, gameSettings)
+            ];
+        }
+
+        protected override ISurgeryOperation ReadTypeJson(JsonReader reader, Type objectType, ISurgeryOperation existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var token = JToken.ReadFrom(reader);
+            var operationType = token["Type"].ToObject<string>();
+            switch (operationType)
+            {
+                case "ADD_PASSIVE":
+                    return new AddPassiveSurgeryOperation(token["AddedPassive"].ToObject<PassiveSkill>(serializer));
+
+                case "REPLACE_PASSIVE":
+                    return new ReplacePassiveSurgeryOperation(
+                        removedPassive: token["RemovedPassive"].ToObject<PassiveSkill>(serializer),
+                        addedPassive: token["AddedPassive"].ToObject<PassiveSkill>(serializer)
+                    );
+
+                case "CHANGE_GENDER":
+                    return new ChangeGenderSurgeryOperation(token["NewGender"].ToObject<PalGender>(serializer));
+
+                default:
+                    throw new Exception($"Unrecognized ISurgeryOperation type: {operationType}");
+            }
+        }
+
+        protected override void WriteTypeJson(JsonWriter writer, ISurgeryOperation value, JsonSerializer serializer)
+        {
+            switch (value)
+            {
+                case AddPassiveSurgeryOperation apso:
+                    JToken.FromObject(
+                        new
+                        {
+                            Type = "ADD_PASSIVE",
+                            AddedPassive = apso.AddedPassive
+                        },
+                        serializer
+                    ).WriteTo(writer, dependencyConverters);
+                    break;
+
+                case ReplacePassiveSurgeryOperation rpso:
+                    JToken.FromObject(
+                        new
+                        {
+                            Type = "REPLACE_PASSIVE",
+                            RemovedPassive = rpso.RemovedPassive,
+                            AddedPassive = rpso.AddedPassive,
+                        },
+                        serializer
+                    ).WriteTo(writer, dependencyConverters);
+                    break;
+
+                case ChangeGenderSurgeryOperation cgso:
+                    JToken.FromObject(
+                        new
+                        {
+                            Type = "CHANGE_GENDER",
+                            NewGender = cgso.NewGender,
+                        },
+                        serializer
+                    ).WriteTo(writer, dependencyConverters);
+                    break;
+
+                default:
+                    throw new Exception($"Missing serialization for ISurgeryOperation type {value?.GetType()?.Name}");
+            }
+        }
+    }
+
+    internal class SurgeryPalReferenceConverter : IPalReferenceConverterBase<SurgeryTablePalReference>
+    {
+        public SurgeryPalReferenceConverter(PalDB db, GameSettings gameSettings, PalReferenceConverter genericConverter) : base(db, gameSettings, "SURGERY_PAL")
+        {
+            dependencyConverters = [
+                genericConverter,
+                new ILocalizedTextConverter(db, gameSettings),
+                new PassiveSkillConverter(db, gameSettings),
+                new SurgeryOperationConverter(db, gameSettings),
+            ];
+        }
+
+        internal override JToken MakeRefJson(SurgeryTablePalReference value, JsonSerializer serializer)
+        {
+            return JToken.FromObject(new
+            {
+                Input = value.Input,
+                Operations = value.Operations
+            }, serializer);
+        }
+
+        internal override SurgeryTablePalReference ReadRefJson(JToken token, Type objectType, SurgeryTablePalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            return new SurgeryTablePalReference(
+                input: token["Input"].ToObject<IPalReference>(serializer),
+                operations: token["Operations"].ToObject<List<ISurgeryOperation>>(serializer)
+            );
         }
     }
 
