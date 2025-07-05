@@ -18,9 +18,9 @@ using System.Windows;
 
 namespace PalCalc.UI.ViewModel.GraphSharp
 {
-    public partial class BreedingTreeNodeViewModel : ObservableObject
+    public partial class StandardBreedingTreeNodeViewModel : ObservableObject, IBreedingTreeNodeViewModel, IRefreshableNode
     {
-        public BreedingTreeNodeViewModel(CachedSaveGame source, GameSettings settings, IBreedingTreeNode node)
+        public StandardBreedingTreeNodeViewModel(CachedSaveGame source, GameSettings settings, IBreedingTreeNode node)
         {
             Value = node;
             Pal = PalViewModel.Make(node.PalRef.Pal);

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.GraphSharp
 {
-    internal class SpecificLayoutAlgorithmFactory : ILayoutAlgorithmFactory<BreedingTreeNodeViewModel, BreedingEdge, BreedingGraph>
+    internal class SpecificLayoutAlgorithmFactory : ILayoutAlgorithmFactory<IBreedingTreeNodeViewModel, BreedingEdge, BreedingGraph>
     {
         public SpecificLayoutAlgorithmFactory()
         {
@@ -19,7 +19,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
         public IEnumerable<string> AlgorithmTypes { get; private set; }
 
-        public ILayoutAlgorithm<BreedingTreeNodeViewModel, BreedingEdge, BreedingGraph> CreateAlgorithm(string newAlgorithmType, ILayoutContext<BreedingTreeNodeViewModel, BreedingEdge, BreedingGraph> context, ILayoutParameters parameters)
+        public ILayoutAlgorithm<IBreedingTreeNodeViewModel, BreedingEdge, BreedingGraph> CreateAlgorithm(string newAlgorithmType, ILayoutContext<IBreedingTreeNodeViewModel, BreedingEdge, BreedingGraph> context, ILayoutParameters parameters)
         {
             return new BreedingTreeLayoutAlgorithm(
                 context.Graph,
@@ -34,7 +34,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             return oldParameters.CreateNewParameter<BreedingTreeLayoutAlgorithmParameters>();
         }
 
-        public string GetAlgorithmType(ILayoutAlgorithm<BreedingTreeNodeViewModel, BreedingEdge, BreedingGraph> algorithm)
+        public string GetAlgorithmType(ILayoutAlgorithm<IBreedingTreeNodeViewModel, BreedingEdge, BreedingGraph> algorithm)
         {
             return "Custom";
         }

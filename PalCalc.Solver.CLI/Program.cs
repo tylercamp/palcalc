@@ -93,7 +93,7 @@ internal class Program
         Console.WriteLine("Took {0}", TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds));
 
         Console.WriteLine("\n\nRESULTS:");
-        foreach (var match in matches)
+        foreach (var match in matches.OrderBy(m => m.BreedingEffort))
         {
             var tree = new BreedingTree(match);
             tree.Print();

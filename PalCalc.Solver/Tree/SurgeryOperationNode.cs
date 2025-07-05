@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.Tree
 {
-    public class SurgeryPalNode(SurgeryTablePalReference pref, IBreedingTreeNode inputNode) : IBreedingTreeNode
+    public class SurgeryOperationNode(SurgeryTablePalReference pref) : IBreedingTreeNode
     {
-        public IPalReference PalRef => pref;
+        public IPalReference PalRef => null;
 
-        public IEnumerable<IBreedingTreeNode> Children => [inputNode];
+        public IEnumerable<IBreedingTreeNode> Children => [];
 
         public IEnumerable<string> DescriptionLines => [
-            $"Surgery on {PalRef.Pal.Name}",
-            .. ((SurgeryTablePalReference)PalRef).Operations.Select(op => op.ToString()),
+            $"Surgery on {pref.Pal.Name}",
+            .. pref.Operations.Select(op => op.ToString()),
             $"Costs {pref.Operations.Sum(op => op.GoldCost)}"
         ];
 
@@ -24,9 +24,6 @@ namespace PalCalc.Solver.Tree
         public IEnumerable<(IBreedingTreeNode, int)> TraversedTopDown(int currentDepth)
         {
             yield return (this, currentDepth);
-
-            foreach (var n in inputNode.TraversedTopDown(currentDepth + 1))
-                yield return n;
         }
     }
 }

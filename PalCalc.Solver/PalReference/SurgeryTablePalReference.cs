@@ -19,7 +19,7 @@ namespace PalCalc.Solver.PalReference
 
         public override int GetHashCode() => HashCode.Combine(nameof(AddPassiveSurgeryOperation), AddedPassive);
 
-        public override string ToString() => $"AddPassive({AddedPassive.InternalName})";
+        public override string ToString() => $"AddPassive({AddedPassive.Name})";
     }
 
     public class ReplacePassiveSurgeryOperation(PassiveSkill removedPassive, PassiveSkill addedPassive) : ISurgeryOperation
@@ -31,7 +31,7 @@ namespace PalCalc.Solver.PalReference
 
         public override int GetHashCode() => HashCode.Combine(nameof(ReplacePassiveSurgeryOperation), AddedPassive, RemovedPassive);
 
-        public override string ToString() => $"ReplacePassive(rem: {RemovedPassive.InternalName}, add: {AddedPassive.InternalName})";
+        public override string ToString() => $"ReplacePassive(rem: {RemovedPassive.Name}, add: {AddedPassive.Name})";
     }
 
     public class ChangeGenderSurgeryOperation(PalGender newGender) : ISurgeryOperation
@@ -149,7 +149,7 @@ namespace PalCalc.Solver.PalReference
         public int NumTotalBreedingSteps => Input.NumTotalBreedingSteps;
         public int NumTotalEggs => Input.NumTotalEggs;
 
-        public IPalRefLocation Location => Input.Location;
+        public IPalRefLocation Location => SurgeryRefLocation.Instance;
 
         public float TimeFactor { get; }
         public TimeSpan BreedingEffort => Input.BreedingEffort;
@@ -161,7 +161,9 @@ namespace PalCalc.Solver.PalReference
 
             if (ReferenceEquals(newParent, Input)) return this;
 
-            // Composite references may resolve to a pal with fewer (but never more) passives than the original Input
+            // Composite references may resolve to a pal with fewer (but never more) passives than the original Input,
+            // causing some ReplacePassive operations to lose their "removed" passive and freeing up a space that could
+            // be used by an AddPassive operation instead.
             if (newParent.EffectivePassives.Count < Input.EffectivePassives.Count)
             {
                 var newOperations = new List<ISurgeryOperation>();
