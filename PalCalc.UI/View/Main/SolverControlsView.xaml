@@ -47,6 +47,38 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
+            <!-- TODO - ITL -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="TODO Max Gold Cost"/>
+            <vu:IntegerTextBox
+                Grid.Row="0" Grid.Column="2"
+                Value="{Binding MaxGoldCost}"
+                IsEnabled="{Binding CanEditSettings}"
+                MinValue="0" MaxValue="1000000"
+                ToolTipService.ToolTip="TODO"
+                ToolTipService.ShowOnDisabled="True"
+                MinWidth="60"
+            />
+
+            <Button Grid.Row="2"
+                    Grid.ColumnSpan="99"
+                    Command="{Binding ChangeSurgeryPassives}"
+                    IsEnabled="{Binding CanEditSettings}"
+                    Content="TODO Allowed Surgery Passives"
+            />
+        </Grid>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="{StaticResource SepHeight}" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="{StaticResource SepWidth}" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
             <TextBlock Grid.Row="0" Grid.Column="0" Text="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS}"/>
             <vu:IntegerTextBox
                 Grid.Row="0" Grid.Column="2"
