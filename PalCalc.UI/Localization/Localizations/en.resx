@@ -818,6 +818,15 @@ Higher values linearly affect time required, depending on how many types of pals
   <data name="LC_STARTUP_LOADING" xml:space="preserve">
     <value>Loading...</value>
   </data>
+  <data name="LC_SURGERY_ADD_PASSIVE" xml:space="preserve">
+    <value>Add {AddedPassive}</value>
+  </data>
+  <data name="LC_SURGERY_CHANGE_GENDER" xml:space="preserve">
+    <value>Change gender to {NewGender}</value>
+  </data>
+  <data name="LC_SURGERY_REPLACE_PASSIVE" xml:space="preserve">
+    <value>Replace {RemovedPassive} with {AddedPassive}</value>
+  </data>
   <data name="LC_TARGET_PAL" xml:space="preserve">
     <value>Target Pal</value>
   </data>

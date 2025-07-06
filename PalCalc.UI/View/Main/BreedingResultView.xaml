@@ -32,8 +32,27 @@
             <Setter Property="Padding" Value="0" />
         </Style>
 
-        <DataTemplate x:Key="DT" DataType="{x:Type gsvm:SurgeryOperationViewModel}">
-            <Label Content="{Binding Description}" />
+        <DataTemplate DataType="{x:Type gsvm:AddPassiveSurgeryOperationViewModel}">
+            <vu:LocalizedEmbeddedText Code="LC_SURGERY_ADD_PASSIVE">
+                <vu:EmbeddedParam Key="AddedPassive">
+                    <vp:PassiveSkillView DataContext="{Binding AddedPassive}" />
+                </vu:EmbeddedParam>
+            </vu:LocalizedEmbeddedText>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type gsvm:ReplacePassiveSurgeryOperationViewModel}">
+            <vu:LocalizedEmbeddedText Code="LC_SURGERY_REPLACE_PASSIVE">
+                <vu:EmbeddedParam Key="AddedPassive">
+                    <vp:PassiveSkillView DataContext="{Binding AddedPassive}" />
+                </vu:EmbeddedParam>
+                <vu:EmbeddedParam Key="RemovedPassive">
+                    <vp:PassiveSkillView DataContext="{Binding RemovedPassive}" />
+                </vu:EmbeddedParam>
+            </vu:LocalizedEmbeddedText>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type gsvm:ChangeGenderSurgeryOperationViewModel}">
+            <Label Content="TODO Gender" />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type gsvm:SurgeryBreedingTreeNodeViewModel}">
@@ -50,13 +69,12 @@
 
                 <StackPanel>
                     <Label>Surgery</Label>
-                    <ItemsControl ItemsSource="{Binding Operations}" ItemTemplate="{StaticResource DT}">
+                    <ItemsControl ItemsSource="{Binding Operations}">
                         <ItemsControl.Resources>
                             <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
                                 <Setter Property="FontSize" Value="10" />
                             </Style>
                         </ItemsControl.Resources>
-
                     </ItemsControl>
                 </StackPanel>
             </StackPanel>

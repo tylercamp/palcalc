@@ -1,5 +1,6 @@
 ﻿using PalCalc.Solver.PalReference;
 using PalCalc.Solver.Tree;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,40 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.GraphSharp
 {
-    public class SurgeryOperationViewModel(ISurgeryOperation op)
+    public interface ISurgeryOperationViewModel
     {
-        public string Description => op.ToString(); // TODO - itl
+        ISurgeryOperation ModelObject { get; }
+
+        static ISurgeryOperationViewModel FromModelObject(ISurgeryOperation modelObject) =>
+            modelObject switch
+            {
+                AddPassiveSurgeryOperation apso => new AddPassiveSurgeryOperationViewModel(apso),
+                ReplacePassiveSurgeryOperation rpso => new ReplacePassiveSurgeryOperationViewModel(rpso),
+                ChangeGenderSurgeryOperation cgso => new ChangeGenderSurgeryOperationViewModel(cgso),
+                _ => throw new NotImplementedException($"VM creation not handled for surgery type: {modelObject?.GetType()?.Name}")
+            };
+    }
+
+    public class AddPassiveSurgeryOperationViewModel(AddPassiveSurgeryOperation op) : ISurgeryOperationViewModel
+    {
+        public ISurgeryOperation ModelObject => op;
+
+        public PassiveSkillViewModel AddedPassive { get; } = PassiveSkillViewModel.Make(op.AddedPassive);
+    }
+
+    public class ReplacePassiveSurgeryOperationViewModel(ReplacePassiveSurgeryOperation op) : ISurgeryOperationViewModel
+    {
+        public ISurgeryOperation ModelObject => op;
+
+        public PassiveSkillViewModel AddedPassive { get; } = PassiveSkillViewModel.Make(op.AddedPassive);
+        public PassiveSkillViewModel RemovedPassive { get; } = PassiveSkillViewModel.Make(op.RemovedPassive);
+    }
+
+    public class ChangeGenderSurgeryOperationViewModel(ChangeGenderSurgeryOperation op) : ISurgeryOperationViewModel
+    {
+        public ISurgeryOperation ModelObject => op;
+
+        public PalGenderViewModel NewGender { get; } = PalGenderViewModel.Make(op.NewGender);
     }
 
     // (note: this node just represents the breeding table itself, the result pal is a separate (parent) node)
@@ -21,7 +53,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             pref = node.PalRef as SurgeryTablePalReference;
 
             Value = node;
-            Operations = pref.Operations.Select(op => new SurgeryOperationViewModel(op)).ToList();
+            Operations = pref.Operations.Select(ISurgeryOperationViewModel.FromModelObject).ToList();
             GoldCost = pref.Operations.Sum(op => op.GoldCost);
         }
 
@@ -29,7 +61,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
         public IBreedingTreeNode Value { get; }
 
-        public List<SurgeryOperationViewModel> Operations { get; }
+        public List<ISurgeryOperationViewModel> Operations { get; }
 
         public int GoldCost { get; }
     }
