@@ -27,14 +27,31 @@
         <c:ValueBoolConverter x:Key="VBC" />
         <c:ValueVisibilityConverter x:Key="VVC" />
 
-        <DataTemplate x:Key="DemoTemplate" DataType="{x:Type gsvm:BreedingTreeNodeViewModel}">
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+
+        <DataTemplate x:Key="DT" DataType="{x:Type gsvm:SurgeryOperationViewModel}">
+            <Label Content="{Binding Description}" />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type gsvm:SurgeryBreedingTreeNodeViewModel}">
+            <StackPanel Margin="5">
+                <Label>Surgery</Label>
+                <ItemsControl ItemsSource="{Binding Operations}" ItemTemplate="{StaticResource DT}">
+                    <ItemsControl.Resources>
+                        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                            <Setter Property="FontSize" Value="10" />
+                        </Style>
+                    </ItemsControl.Resources>
+
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type gsvm:StandardBreedingTreeNodeViewModel}">
             <StackPanel Orientation="Vertical" Margin="5" MinWidth="180" UseLayoutRounding="True">
-                <StackPanel.Resources>
-                    <Style TargetType="Label">
-                        <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
-                        <Setter Property="Padding" Value="0" />
-                    </Style>
-                </StackPanel.Resources>
                 <DockPanel HorizontalAlignment="Stretch">
                     <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
                     <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Stretch">
@@ -173,8 +190,7 @@
                                 BorderThickness="2"
                                 CornerRadius="10,10,10,10"
                                 Padding="{TemplateBinding Padding}">
-                            <ContentPresenter Content="{TemplateBinding Vertex}" 
-                                              ContentTemplate="{StaticResource DemoTemplate}"/>
+                            <ContentPresenter Content="{TemplateBinding Vertex}" />
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>

@@ -9,7 +9,7 @@ namespace PalCalc.Solver.Tree
 {
     public class SurgeryOperationNode(SurgeryTablePalReference pref) : IBreedingTreeNode
     {
-        public IPalReference PalRef => null;
+        public IPalReference PalRef => pref;
 
         public IEnumerable<IBreedingTreeNode> Children => [];
 

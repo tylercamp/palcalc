@@ -30,6 +30,11 @@ namespace PalCalc.Solver
         public long NumProcessed;
     }
 
+    internal record class BreedingSolverEfficiencyMetric(
+        TimeSpan Effort,
+        int GoldCost
+    );
+
     /// <summary>
     /// Represents the shared state of a single solver iteration.
     /// </summary>
@@ -46,7 +51,7 @@ namespace PalCalc.Solver
         int StepIndex,
         PalSpecifier Spec,
         WorkingSet WorkingSet,
-        FrozenDictionary<PalId, ConcurrentDictionary<int, TimeSpan>> WorkingOptimalTimesByPalId
+        FrozenDictionary<PalId, ConcurrentDictionary<int, BreedingSolverEfficiencyMetric>> WorkingOptimalTimesByPalId
     );
 
     /// <summary>
@@ -432,17 +437,19 @@ namespace PalCalc.Solver
 
                             var added = false;
                             var effort = res.BreedingEffort;
+                            var cost = res.TotalCost;
+                            var efficiency = new BreedingSolverEfficiencyMetric(effort, cost);
                             if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
                             {
                                 var resultId = WorkingSet.DefaultGroupFn(res);
 
-                                bool updated = workingOptimalTimes.TryAdd(resultId, effort);
+                                bool updated = workingOptimalTimes.TryAdd(resultId, efficiency);
                                 while (!updated)
                                 {
                                     var v = workingOptimalTimes[resultId];
-                                    if (v < effort) break;
+                                    if (v.Effort < effort || (v.Effort == effort && v.GoldCost < cost)) break;
 
-                                    updated = workingOptimalTimes.TryUpdate(resultId, effort, v);
+                                    updated = workingOptimalTimes.TryUpdate(resultId, efficiency, v);
                                 }
 
                                 if (updated && res.BreedingEffort <= settings.MaxEffort)

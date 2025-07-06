@@ -12,6 +12,9 @@ namespace PalCalc.Solver.ResultPruning
         public MinimumCostPruning(CancellationToken token) : base(token) { }
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r => r.TotalCost);
+            FirstGroupOf(
+                input: FirstGroupOf(results, r => r.TotalCost),
+                grouping: r => r.NumTotalSurgerySteps
+            );
     }
 }

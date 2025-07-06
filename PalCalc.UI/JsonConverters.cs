@@ -34,6 +34,8 @@ namespace PalCalc.UI
             dependencyConverters = Array.Empty<JsonConverter>();
         }
 
+        public IEnumerable<JsonConverter> DependencyConverters => dependencyConverters;
+
         protected void InjectDependencyConverters(JsonSerializer serializer)
         {
             if (dependencyConverters == null) return;
@@ -171,6 +173,14 @@ namespace PalCalc.UI
             this.bprc = new BredPalReferenceConverter(db, gameSettings, this);
             this.cprc = new CompositePalReferenceConverter(db, gameSettings);
             this.sprc = new SurgeryPalReferenceConverter(db, gameSettings, this);
+
+            dependencyConverters = [
+                ..oprc.DependencyConverters,
+                ..wprc.DependencyConverters,
+                ..bprc.DependencyConverters,
+                ..cprc.DependencyConverters,
+                ..sprc.DependencyConverters
+            ];
         }
 
         public static string ReadWrappedTypeLabel(JToken wrapperToken) => wrapperToken["RefType"].ToObject<string>();

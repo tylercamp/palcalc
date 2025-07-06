@@ -40,7 +40,9 @@ namespace PalCalc.UI.ViewModel.Solver
                     maxInputIrrelevantPassives: 2,
                     maxBredIrrelevantPassives: 0,
                     maxEffort: TimeSpan.FromHours(8),
-                    maxThreads: 0
+                    maxThreads: 0,
+                    maxSurgeryCost: 0,
+                    allowedSurgeryPassives: []
                 )
             );
 

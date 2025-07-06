@@ -148,6 +148,7 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps => Input.NumTotalBreedingSteps;
         public int NumTotalEggs => Input.NumTotalEggs;
+        public int NumTotalSurgerySteps => 1 + Input.NumTotalSurgerySteps;
 
         public IPalRefLocation Location => SurgeryRefLocation.Instance;
 
@@ -155,11 +156,15 @@ namespace PalCalc.Solver.PalReference
         public TimeSpan BreedingEffort => Input.BreedingEffort;
         public TimeSpan SelfBreedingEffort => Input.SelfBreedingEffort;
 
+        Dictionary<PalGender, IPalReference> cachedGenders = null;
+
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
-            var newParent = Input.WithGuaranteedGender(db, gender);
+            cachedGenders ??= [];
+            if (cachedGenders.ContainsKey(gender)) return cachedGenders[gender];
 
-            if (ReferenceEquals(newParent, Input)) return this;
+            IPalReference result;
+            var newParent = Input.WithGuaranteedGender(db, gender);
 
             // Composite references may resolve to a pal with fewer (but never more) passives than the original Input,
             // causing some ReplacePassive operations to lose their "removed" passive and freeing up a space that could
@@ -181,12 +186,16 @@ namespace PalCalc.Solver.PalReference
                     }
                 }
 
-                return new SurgeryTablePalReference(newParent, newOperations);
+                result = new SurgeryTablePalReference(newParent, newOperations);
             }
             else
             {
-                return new SurgeryTablePalReference(newParent, Operations);
+                result = new SurgeryTablePalReference(newParent, Operations);
             }
+
+            cachedGenders[gender] = result;
+
+            return result;
         }
 
         // ---------------------------------------------------------------------------------

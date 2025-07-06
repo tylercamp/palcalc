@@ -242,7 +242,11 @@ namespace PalCalc.UI.ViewModel.Solver
                 maxInputIrrelevantPassives: MaxInputIrrelevantPassives,
                 maxBredIrrelevantPassives: MaxBredIrrelevantPassives,
                 maxEffort: TimeSpan.MaxValue,
-                maxThreads: MaxThreads
+                maxThreads: MaxThreads,
+
+                // TODO
+                maxSurgeryCost: 1_000_000,
+                allowedSurgeryPassives: PalDB.LoadEmbedded().PassiveSkills.Where(p => p.SupportsSurgery).ToList()
             )
         );
 

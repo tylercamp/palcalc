@@ -188,7 +188,7 @@ namespace PalCalc.Solver
                     StepIndex: s,
                     Spec: spec,
                     WorkingSet: workingSet,
-                    WorkingOptimalTimesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, TimeSpan>())
+                    WorkingOptimalTimesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, BreedingSolverEfficiencyMetric>())
                 );
                 List<WorkBatchProgress> progressEntries = [];
 
@@ -304,7 +304,7 @@ namespace PalCalc.Solver
                                 var res = new List<IPalReference>();
 
                                 // consider all ways we could add these desired passives
-                                foreach (var passives in missingPassives.Combinations(maxNewPassives).Where(o => o.Any()).Select(c => c.ToList()))
+                                foreach (var passives in missingPassives.Combinations(maxNewPassives).ToList().OrderByDescending(c => c.Count()).Where(o => o.Any()).Select(c => c.ToList()))
                                 {
                                     if (r.TotalCost + passives.Sum(p => p.SurgeryCost) > settings.MaxSurgeryCost)
                                         continue;

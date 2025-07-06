@@ -66,7 +66,7 @@ namespace PalCalc.Solver
             var match = content[p]?.FirstOrDefault();
             if (match == null) return true;
 
-            return match == null || p.BreedingEffort < match.BreedingEffort;
+            return match == null || p.BreedingEffort < match.BreedingEffort || (p.BreedingEffort == match.BreedingEffort && p.TotalCost < match.TotalCost);
         }
 
         /// <summary>

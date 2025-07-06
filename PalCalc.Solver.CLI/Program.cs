@@ -67,7 +67,7 @@ internal class Program
                 maxInputIrrelevantPassives: 2,
                 maxEffort: TimeSpan.FromDays(7),
                 maxThreads: 16,
-                maxSurgeryCost: 100_000,
+                maxSurgeryCost: 1_000_000,
                 allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList()
             )
         );

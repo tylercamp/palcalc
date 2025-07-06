@@ -32,6 +32,8 @@ namespace PalCalc.Solver.PalReference
 
         int NumTotalBreedingSteps { get; }
 
+        int NumTotalSurgerySteps { get; }
+
         int NumTotalEggs { get; }
 
         /// <summary>
