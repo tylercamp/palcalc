@@ -67,6 +67,10 @@ namespace PalCalc.Solver
                     foreach (var r in bpr.Parent1.AllReferences()) yield return r;
                     foreach (var r in bpr.Parent2.AllReferences()) yield return r;
                     break;
+
+                case SurgeryTablePalReference stpr:
+                    foreach (var r in stpr.Input.AllReferences()) yield return r;
+                    break;
             }
         }
     }
