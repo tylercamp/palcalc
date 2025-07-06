@@ -37,16 +37,28 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type gsvm:SurgeryBreedingTreeNodeViewModel}">
-            <StackPanel Margin="5">
-                <Label>Surgery</Label>
-                <ItemsControl ItemsSource="{Binding Operations}" ItemTemplate="{StaticResource DT}">
-                    <ItemsControl.Resources>
-                        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
-                            <Setter Property="FontSize" Value="10" />
-                        </Style>
-                    </ItemsControl.Resources>
+            <StackPanel Margin="5" Orientation="Horizontal">
+                <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0">
+                    <Border.Background>
+                        <ImageBrush>
+                            <ImageBrush.ImageSource>
+                                <BitmapImage UriSource="pack://application:,,,/PalCalc.UI;component/Resources/SurgeryTable.png" />
+                            </ImageBrush.ImageSource>
+                        </ImageBrush>
+                    </Border.Background>
+                </Border>
 
-                </ItemsControl>
+                <StackPanel>
+                    <Label>Surgery</Label>
+                    <ItemsControl ItemsSource="{Binding Operations}" ItemTemplate="{StaticResource DT}">
+                        <ItemsControl.Resources>
+                            <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                                <Setter Property="FontSize" Value="10" />
+                            </Style>
+                        </ItemsControl.Resources>
+
+                    </ItemsControl>
+                </StackPanel>
             </StackPanel>
         </DataTemplate>
 
