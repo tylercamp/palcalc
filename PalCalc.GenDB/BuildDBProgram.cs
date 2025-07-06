@@ -263,7 +263,8 @@ namespace PalCalc.GenDB
                     TrackedEffects = trackedEffects,
                     IsStandardPassiveSkill = rawPassive.IsStandardPassiveSkill,
                     SurgeryCost = surgeryData?.Price ?? 0,
-                    SurgeryRequiredItem = surgeryData?.RequireItemId,
+                    // ("no required item" is indicated as a value of "None", but handle nullability just in case that changes)
+                    SurgeryRequiredItem = (surgeryData?.RequireItemId ?? "None") == "None" ? null : surgeryData.RequireItemId,
                 };
             }).SkipNull().ToList();
         }
@@ -704,7 +705,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v21");
+            var db = PalDB.MakeEmptyUnsafe("v22");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.Humans = humans;
