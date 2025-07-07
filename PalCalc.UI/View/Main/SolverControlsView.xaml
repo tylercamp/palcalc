@@ -38,6 +38,25 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="{StaticResource SepWidth}" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- TODO - ITL -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Eager Pruning"/>
+            <CheckBox Grid.Row="0" Grid.Column="2"
+                      IsChecked="{Binding EagerPruning}"
+                      ToolTipService.ToolTip="TODO"
+                      ToolTipService.ShowOnDisabled="True"
+                      />
+        </Grid>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
                 <RowDefinition Height="{StaticResource SepHeight}" />
                 <RowDefinition />
             </Grid.RowDefinitions>

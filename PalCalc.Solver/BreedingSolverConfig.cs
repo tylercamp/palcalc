@@ -43,7 +43,9 @@ namespace PalCalc.Solver
         int maxThreads,
 
         int maxSurgeryCost,
-        List<PassiveSkill> allowedSurgeryPassives
+        List<PassiveSkill> allowedSurgeryPassives,
+
+        bool eagerPruning
     )
     {
         public PalDB DB => db;
@@ -62,6 +64,7 @@ namespace PalCalc.Solver
         public int MaxInputIrrelevantPassives { get; } = Math.Min(3, maxInputIrrelevantPassives);
         public int MaxBredIrrelevantPassives { get; } = Math.Min(3, maxBredIrrelevantPassives);
 
+        public bool EagerPruning => eagerPruning;
 
         public TimeSpan MaxEffort => maxEffort;
         public int MaxThreads { get; } = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);

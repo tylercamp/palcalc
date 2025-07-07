@@ -42,7 +42,8 @@ namespace PalCalc.UI.ViewModel.Solver
                     maxEffort: TimeSpan.FromHours(8),
                     maxThreads: 0,
                     maxSurgeryCost: 0,
-                    allowedSurgeryPassives: []
+                    allowedSurgeryPassives: [],
+                    eagerPruning: true
                 )
             );
 

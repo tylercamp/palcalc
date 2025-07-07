@@ -433,35 +433,43 @@ namespace PalCalc.Solver
                                 ivsProbability
                             );
 
-                            var workingOptimalTimes = state.WorkingOptimalTimesByPalId[res.Pal.Id];
-
-                            var added = false;
-                            var effort = res.BreedingEffort;
-                            var cost = res.TotalCost;
-                            var efficiency = new BreedingSolverEfficiencyMetric(effort, cost);
-                            if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
+                            if (settings.EagerPruning)
                             {
-                                var resultId = WorkingSet.DefaultGroupFn(res);
+                                var workingOptimalTimes = state.WorkingOptimalTimesByPalId[res.Pal.Id];
 
-                                bool updated = workingOptimalTimes.TryAdd(resultId, efficiency);
-                                while (!updated)
+                                var added = false;
+                                var effort = res.BreedingEffort;
+                                var cost = res.TotalCost;
+                                var efficiency = new BreedingSolverEfficiencyMetric(effort, cost);
+                                if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
                                 {
-                                    var v = workingOptimalTimes[resultId];
-                                    if (v.Effort < effort || (v.Effort == effort && v.GoldCost < cost)) break;
+                                    var resultId = WorkingSet.DefaultGroupFn(res);
 
-                                    updated = workingOptimalTimes.TryUpdate(resultId, efficiency, v);
+                                    bool updated = workingOptimalTimes.TryAdd(resultId, efficiency);
+                                    while (!updated)
+                                    {
+                                        var v = workingOptimalTimes[resultId];
+                                        if (v.Effort < effort || (v.Effort == effort && v.GoldCost < cost)) break;
+
+                                        updated = workingOptimalTimes.TryUpdate(resultId, efficiency, v);
+                                    }
+
+                                    if (updated && res.BreedingEffort <= settings.MaxEffort)
+                                    {
+                                        yield return res;
+                                        createdResult = true;
+                                        added = true;
+                                    }
                                 }
 
-                                if (updated && res.BreedingEffort <= settings.MaxEffort)
-                                {
-                                    yield return res;
-                                    createdResult = true;
-                                    added = true;
-                                }
+                                if (!added)
+                                    passiveListPool.Return(newPassives);
                             }
-
-                            if (!added)
-                                passiveListPool.Return(newPassives);
+                            else if (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res))
+                            {
+                                createdResult = true;
+                                yield return res;
+                            }
                         }
 
                         passiveListPool.Return(targetPassives);

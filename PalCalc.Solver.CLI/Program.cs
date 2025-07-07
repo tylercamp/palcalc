@@ -68,7 +68,8 @@ internal class Program
                 maxEffort: TimeSpan.FromDays(7),
                 maxThreads: 16,
                 maxSurgeryCost: 1_000_000,
-                allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList()
+                allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
+                eagerPruning: true
             )
         );
 

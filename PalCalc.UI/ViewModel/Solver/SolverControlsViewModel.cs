@@ -162,6 +162,9 @@ namespace PalCalc.UI.ViewModel.Solver
             set => SetProperty(ref maxGoldCost, Math.Max(value, 0));
         }
 
+        [ObservableProperty]
+        private bool eagerPruning;
+
         private void OnStatePropertiesChanged()
         {
             OnPropertyChanged(nameof(CanRunSolver));
@@ -272,7 +275,8 @@ namespace PalCalc.UI.ViewModel.Solver
                 maxThreads: MaxThreads,
 
                 maxSurgeryCost: MaxGoldCost,
-                allowedSurgeryPassives: PalDB.LoadEmbedded().SurgeryPassiveSkills.Except(BannedSurgeryPassives).ToList()
+                allowedSurgeryPassives: PalDB.LoadEmbedded().SurgeryPassiveSkills.Except(BannedSurgeryPassives).ToList(),
+                eagerPruning: EagerPruning
             )
         );
 
@@ -288,6 +292,7 @@ namespace PalCalc.UI.ViewModel.Solver
             BannedWildPalInternalNames = BannedWildPals.Select(p => p.InternalName).ToList(),
             BannedSurgeryPassiveInternalNames = BannedSurgeryPassives.Select(p => p.InternalName).ToList(),
             MaxGoldCost = MaxGoldCost,
+            EagerPruning = EagerPruning,
         };
 
         public void CopyFrom(SerializableSolverSettings model)
@@ -299,6 +304,7 @@ namespace PalCalc.UI.ViewModel.Solver
             MaxBredIrrelevantPassives = model.MaxBredIrrelevantPassives;
             MaxThreads = model.MaxThreads;
             MaxGoldCost = model.MaxGoldCost;
+            EagerPruning = model.EagerPruning;
 
             BannedBredPals = model.BannedBredPals(PalDB.LoadEmbedded());
             BannedWildPals = model.BannedWildPals(PalDB.LoadEmbedded());
