@@ -38,6 +38,8 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition />
+                <RowDefinition Height="{StaticResource SepHeight}" />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -49,6 +51,13 @@
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Eager Pruning"/>
             <CheckBox Grid.Row="0" Grid.Column="2"
                       IsChecked="{Binding EagerPruning}"
+                      ToolTipService.ToolTip="TODO"
+                      ToolTipService.ShowOnDisabled="True"
+                      />
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Optimize Init"/>
+            <CheckBox Grid.Row="2" Grid.Column="2"
+                      IsChecked="{Binding OptimizeInitStep}"
                       ToolTipService.ToolTip="TODO"
                       ToolTipService.ShowOnDisabled="True"
                       />

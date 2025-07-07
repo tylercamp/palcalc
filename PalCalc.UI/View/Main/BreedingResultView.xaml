@@ -73,7 +73,7 @@
                         <ItemsControl.Resources>
                             <Style TargetType="vu:LocalizedEmbeddedText">
                                 <Setter Property="Margin" Value="0,5,0,0" />
-                                <Setter Property="FontSize" Value="12" />
+                                <Setter Property="FontSize" Value="10" />
                             </Style>
                         </ItemsControl.Resources>
                     </ItemsControl>

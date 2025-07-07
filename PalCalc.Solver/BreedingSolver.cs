@@ -132,6 +132,19 @@ namespace PalCalc.Solver
                 })
                 .ToList();
 
+            if (!settings.OptimizeInitStep)
+            {
+                initialContent = initialContent.Concat(
+                    settings.OwnedPals.Select(
+                        p => new OwnedPalReference(
+                            p,
+                            p.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives),
+                            new IV_Set() { HP = MakeIV(spec.IV_HP, p.IV_HP), Attack = MakeIV(spec.IV_Attack, p.IV_Attack), Defense = MakeIV(spec.IV_Defense, p.IV_Defense) }
+                        )
+                    )
+                ).Distinct().ToList();
+            }
+
             if (settings.MaxWildPals > 0)
             {
                 // add wild pals with varying number of random passives

@@ -43,9 +43,11 @@ namespace PalCalc.Solver
         int maxThreads,
 
         int maxSurgeryCost,
+        int maxSurgeryReversers,
         List<PassiveSkill> allowedSurgeryPassives,
 
-        bool eagerPruning
+        bool eagerPruning,
+        bool optimizeInitStep
     )
     {
         public PalDB DB => db;
@@ -65,12 +67,14 @@ namespace PalCalc.Solver
         public int MaxBredIrrelevantPassives { get; } = Math.Min(3, maxBredIrrelevantPassives);
 
         public bool EagerPruning => eagerPruning;
+        public bool OptimizeInitStep => optimizeInitStep;
 
         public TimeSpan MaxEffort => maxEffort;
         public int MaxThreads { get; } = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
 
         // Surgery settings
         public int MaxSurgeryCost => maxSurgeryCost;
+        public int MaxSurgeryReversers => maxSurgeryReversers; // gender-swap required item
         public List<PassiveSkill> SurgeryPassives => allowedSurgeryPassives ?? [];
     }
 }
