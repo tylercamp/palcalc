@@ -1,5 +1,6 @@
 using PalCalc.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -156,7 +157,7 @@ namespace PalCalc.Solver.PalReference
         public TimeSpan BreedingEffort => Input.BreedingEffort;
         public TimeSpan SelfBreedingEffort => Input.SelfBreedingEffort;
 
-        Dictionary<PalGender, IPalReference> cachedGenders = null;
+        ConcurrentDictionary<PalGender, IPalReference> cachedGenders = null;
 
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
