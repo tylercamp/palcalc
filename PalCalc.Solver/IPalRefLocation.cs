@@ -30,6 +30,13 @@ namespace PalCalc.Solver
         public static IPalRefLocation Instance { get; } = new BredRefLocation();
     }
 
+    public class SurgeryRefLocation : IPalRefLocation
+    {
+        public override string ToString() => "(Surgery Result)";
+
+        public static IPalRefLocation Instance { get; } = new SurgeryRefLocation();
+    };
+
     public class CompositeRefLocation : IPalRefLocation
     {
         public CompositeRefLocation(IPalRefLocation maleLoc, IPalRefLocation femaleLoc)

@@ -30,6 +30,8 @@ namespace PalCalc.Solver.ResultPruning
                     new OptimalIVsPruning(token, maxIvDifference: 10),
                     new MinimumBreedingStepsPruning(token),
                     new PreferredLocationPruning(token),
+                    new MinimumGenderReversersPruning(token),
+                    new MinimumCostPruning(token),
                     new MinimumReusePruning(token),
                     new MinimumWildPalsPruning(token),
                     new MinimumReferencedPlayersPruning(token),

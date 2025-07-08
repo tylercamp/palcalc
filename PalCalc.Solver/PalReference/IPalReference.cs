@@ -32,6 +32,9 @@ namespace PalCalc.Solver.PalReference
 
         int NumTotalBreedingSteps { get; }
 
+        int NumTotalSurgerySteps { get; }
+        int NumTotalGenderReversers { get; }
+
         int NumTotalEggs { get; }
 
         /// <summary>
@@ -47,6 +50,7 @@ namespace PalCalc.Solver.PalReference
 
         TimeSpan BreedingEffort { get; }
         TimeSpan SelfBreedingEffort { get; }
+        int TotalCost { get; }
 
         IPalReference WithGuaranteedGender(PalDB db, PalGender gender);
 

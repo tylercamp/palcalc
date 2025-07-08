@@ -17,6 +17,8 @@ namespace PalCalc.GenDB.GameDataReaders
 
         public const string ITEM_DATA_TABLE_PATH = "Pal/Content/Pal/DataTable/Item/DT_ItemDataTable";
 
+        public const string OPERATING_TABLE_PASSIVES_PATH = "Pal/Content/Pal/DataTable/MapObject/DT_OperatingTablePassiveSkillDataTable";
+
         public const string ELEMENT_ICONS_BASE = "Pal/Content/Pal/Texture/UI/InGame/T_Icon_element_s";
         public const string SKILL_ELEMENT_ICONS_BASE = "Pal/Content/Pal/Texture/UI/Main_Menu/T_prt_pal_skill_base_element";
         public const string SKILL_RANK_ICONS_BASE = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_skillstatus_rank_arrow";
@@ -28,6 +30,8 @@ namespace PalCalc.GenDB.GameDataReaders
         public const string DAY_ICON_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_timezone_daytime";
         public const string NIGHT_ICON_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_timezone_night";
         public const string DUNGEON_ICON_SMALL_PATH = "Pal/Content/Pal/Texture/UI/IngameMenu/T_icon_dungeon_S";
+
+        public const string SURGERY_TABLE_ICON_PATH = "Pal/Content/Pal/Texture/BuildObject/PNG/T_icon_buildObject_OperatingTable";
 
         public const string ACTIVE_SKILLS_PATH = "Pal/Content/Pal/DataTable/Waza/DT_WazaDataTable";
         public const string ACTIVE_SKILLS_PAL_LEVEL_PATH = "Pal/Content/Pal/DataTable/Waza/DT_WazaMasterLevel";

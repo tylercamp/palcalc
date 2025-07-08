@@ -19,6 +19,7 @@ namespace PalCalc.Solver
                 case OwnedPalReference opr: return 0;
                 case WildPalReference wpr: return 1;
                 case CompositeOwnedPalReference c: return 0;
+                case SurgeryTablePalReference str: return NumWildPalParticipants(str.Input);
                 default: throw new Exception($"Unhandled pal reference type {pref.GetType()}");
             }
         }
@@ -65,6 +66,10 @@ namespace PalCalc.Solver
                 case BredPalReference bpr:
                     foreach (var r in bpr.Parent1.AllReferences()) yield return r;
                     foreach (var r in bpr.Parent2.AllReferences()) yield return r;
+                    break;
+
+                case SurgeryTablePalReference stpr:
+                    foreach (var r in stpr.Input.AllReferences()) yield return r;
                     break;
             }
         }

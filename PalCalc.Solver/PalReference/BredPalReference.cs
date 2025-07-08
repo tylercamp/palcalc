@@ -150,6 +150,8 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
+        public int TotalCost => Parent1.TotalCost + Parent2.TotalCost;
+
         private TimeSpan parentBreedingEffort;
         public TimeSpan BreedingEffort { get; private set; }
 
@@ -164,6 +166,10 @@ namespace PalCalc.Solver.PalReference
                 return numTotalBreedingSteps;
             }
         }
+
+        public int NumTotalSurgerySteps => Parent1.NumTotalSurgerySteps + Parent2.NumTotalSurgerySteps;
+
+        public int NumTotalGenderReversers => Parent1.NumTotalGenderReversers + Parent2.NumTotalGenderReversers;
 
         public int NumTotalEggs => AvgRequiredBreedings + Parent1.NumTotalEggs + Parent2.NumTotalEggs;
 

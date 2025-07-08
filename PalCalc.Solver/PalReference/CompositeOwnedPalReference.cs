@@ -75,6 +75,10 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps { get; } = 0;
 
+        public int NumTotalSurgerySteps { get; } = 0;
+
+        public int NumTotalGenderReversers { get; } = 0;
+
         public int NumTotalEggs { get; } = 0;
 
         public IPalRefLocation Location { get; }
@@ -84,6 +88,8 @@ namespace PalCalc.Solver.PalReference
         public TimeSpan BreedingEffort { get; } = TimeSpan.Zero;
 
         public TimeSpan SelfBreedingEffort { get; } = TimeSpan.Zero;
+
+        public int TotalCost => 0;
 
         private CompositeOwnedPalReference oppositeWildcardReference;
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)

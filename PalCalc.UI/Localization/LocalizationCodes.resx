@@ -856,4 +856,13 @@
   <data name="LC_SAVEINSPECT_ON_EXPEDITION" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SURGERY_ADD_PASSIVE" xml:space="preserve">
+    <value>AddedPassive</value>
+  </data>
+  <data name="LC_SURGERY_CHANGE_GENDER" xml:space="preserve">
+    <value>NewGender</value>
+  </data>
+  <data name="LC_SURGERY_REPLACE_PASSIVE" xml:space="preserve">
+    <value>AddedPassive | RemovedPassive</value>
+  </data>
 </root>

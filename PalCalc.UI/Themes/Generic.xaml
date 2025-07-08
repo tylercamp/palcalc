@@ -45,4 +45,14 @@
         <Setter Property="Padding" Value="3" />
     </Style>
 
+    <Style TargetType="{x:Type local:LocalizedEmbeddedText}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:LocalizedEmbeddedText}">
+                    <TextBlock x:Name="PART_TextBlock" TextWrapping="Wrap" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
