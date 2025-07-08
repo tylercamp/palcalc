@@ -33,6 +33,7 @@ namespace PalCalc.Solver.PalReference
         int NumTotalBreedingSteps { get; }
 
         int NumTotalSurgerySteps { get; }
+        int NumTotalGenderReversers { get; }
 
         int NumTotalEggs { get; }
 

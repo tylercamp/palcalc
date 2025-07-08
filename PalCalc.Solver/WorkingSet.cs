@@ -64,9 +64,19 @@ namespace PalCalc.Solver
         public bool IsOptimal(IPalReference p)
         {
             var match = content[p]?.FirstOrDefault();
-            if (match == null) return true;
 
-            return match == null || p.BreedingEffort < match.BreedingEffort || (p.BreedingEffort == match.BreedingEffort && p.TotalCost < match.TotalCost);
+            if (match == null) return true;
+            if (p.BreedingEffort > match.BreedingEffort) return false;
+            if (p.BreedingEffort < match.BreedingEffort) return true;
+
+            if (p.NumTotalGenderReversers > match.NumTotalGenderReversers) return false;
+            if (p.NumTotalGenderReversers < match.NumTotalGenderReversers) return true;
+
+            if (p.TotalCost > match.TotalCost) return false;
+            if (p.TotalCost <  match.TotalCost) return true;
+
+            // all important measures are equal, this is as good as (but not more optimal than) what we've already stored
+            return false;
         }
 
         /// <summary>

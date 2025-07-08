@@ -53,6 +53,8 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalSurgerySteps => 0;
 
+        public int NumTotalGenderReversers => 0;
+
         public int NumTotalEggs => 0;
 
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)

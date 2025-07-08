@@ -11,12 +11,14 @@ namespace PalCalc.Solver.PalReference
     public interface ISurgeryOperation
     {
         int GoldCost { get; }
+        int NumGenderReversers { get; }
     }
 
     public class AddPassiveSurgeryOperation(PassiveSkill addedPassive) : ISurgeryOperation
     {
         public PassiveSkill AddedPassive => addedPassive;
         public int GoldCost => addedPassive.SurgeryCost;
+        public int NumGenderReversers => 0;
 
         public override int GetHashCode() => HashCode.Combine(nameof(AddPassiveSurgeryOperation), AddedPassive);
 
@@ -29,6 +31,7 @@ namespace PalCalc.Solver.PalReference
         public PassiveSkill AddedPassive => addedPassive;
 
         public int GoldCost => AddedPassive.SurgeryCost;
+        public int NumGenderReversers => 0;
 
         public override int GetHashCode() => HashCode.Combine(nameof(ReplacePassiveSurgeryOperation), AddedPassive, RemovedPassive);
 
@@ -39,6 +42,7 @@ namespace PalCalc.Solver.PalReference
     {
         public PalGender NewGender => newGender;
         public int GoldCost => 0;
+        public int NumGenderReversers => 1;
 
         public override int GetHashCode() => HashCode.Combine(nameof(ChangeGenderSurgeryOperation), NewGender);
 
@@ -138,6 +142,9 @@ namespace PalCalc.Solver.PalReference
             EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
 
             TimeFactor = EffectivePassives.ToTimeFactor();
+
+            NumTotalSurgerySteps = 1 + Input.NumTotalSurgerySteps;
+            NumTotalGenderReversers = Operations.Sum(op => op.NumGenderReversers) + Input.NumTotalGenderReversers;
         }
 
         // ---------------------------------------------------------------------------------
@@ -149,7 +156,8 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps => Input.NumTotalBreedingSteps;
         public int NumTotalEggs => Input.NumTotalEggs;
-        public int NumTotalSurgerySteps => 1 + Input.NumTotalSurgerySteps;
+        public int NumTotalSurgerySteps { get; }
+        public int NumTotalGenderReversers { get; }
 
         public IPalRefLocation Location => SurgeryRefLocation.Instance;
 

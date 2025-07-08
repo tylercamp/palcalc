@@ -32,7 +32,8 @@ namespace PalCalc.Solver
 
     internal record class BreedingSolverEfficiencyMetric(
         TimeSpan Effort,
-        int GoldCost
+        int GoldCost,
+        int NumGenderReversers
     );
 
     /// <summary>
@@ -435,23 +436,27 @@ namespace PalCalc.Solver
 
                             if (settings.EagerPruning)
                             {
-                                var workingOptimalTimes = state.WorkingOptimalTimesByPalId[res.Pal.Id];
+                                var workingOptimalResults = state.WorkingOptimalTimesByPalId[res.Pal.Id];
 
                                 var added = false;
                                 var effort = res.BreedingEffort;
                                 var cost = res.TotalCost;
-                                var efficiency = new BreedingSolverEfficiencyMetric(effort, cost);
+                                var reversers = res.NumTotalGenderReversers;
+                                var efficiency = new BreedingSolverEfficiencyMetric(effort, cost, reversers);
                                 if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
                                 {
                                     var resultId = WorkingSet.DefaultGroupFn(res);
 
-                                    bool updated = workingOptimalTimes.TryAdd(resultId, efficiency);
+                                    bool updated = workingOptimalResults.TryAdd(resultId, efficiency);
                                     while (!updated)
                                     {
-                                        var v = workingOptimalTimes[resultId];
-                                        if (v.Effort < effort || (v.Effort == effort && v.GoldCost < cost)) break;
+                                        var v = workingOptimalResults[resultId];
 
-                                        updated = workingOptimalTimes.TryUpdate(resultId, efficiency, v);
+                                        if (v.Effort < effort) break;
+                                        if (v.NumGenderReversers < reversers) break;
+                                        if (v.GoldCost < cost) break;
+
+                                        updated = workingOptimalResults.TryUpdate(resultId, efficiency, v);
                                     }
 
                                     if (updated && res.BreedingEffort <= settings.MaxEffort)
