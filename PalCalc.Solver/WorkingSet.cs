@@ -34,9 +34,6 @@ namespace PalCalc.Solver
         private List<IPalReference> discoveredResults = new List<IPalReference>();
         public IEnumerable<IPalReference> Result => discoveredResults.Distinct().GroupBy(r => r.BreedingEffort).SelectMany(PruningFunc);
         
-        /// <summary>
-        /// Access to current working set content for surgery generation
-        /// </summary>
         public IEnumerable<IPalReference> CurrentContent => content.All;
 
         Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>> PruningFunc;
@@ -104,7 +101,7 @@ namespace PalCalc.Solver
 
             discoveredResults.AddRange(
                 newResults
-                    .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)
+                    .TakeUntilCancelled(controller.CancellationToken)
                     .Tap(_ => controller.PauseIfRequested())
                     .Where(target.IsSatisfiedBy)
             );
@@ -180,7 +177,7 @@ namespace PalCalc.Solver
                 (toAdd, toAdd)
             ]);
 
-            foreach (var ta in toAdd.TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested))
+            foreach (var ta in toAdd.TakeUntilCancelled(controller.CancellationToken))
             {
                 controller.PauseIfRequested();
                 content.Add(ta);
@@ -190,10 +187,10 @@ namespace PalCalc.Solver
         }
 
         /// <summary>
-        /// Merges new single-parent results (e.g., from surgery) with the current working set.
-        /// Updates remainingWork to include pairs between existing content and new items, plus new-item pairs.
+        /// Uses the provided `doWork` function to produce results for each individual `IPalReference`. The results
+        /// returned by `doWork` are merged with the current working set of results and the next set of work
+        /// is updated.
         /// </summary>
-        /// <param name="newItems">New IPalReference items to merge</param>
         /// <returns>Whether any changes were made</returns>
         public bool UpdateBySingle(Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>> doWork)
         {
@@ -205,7 +202,7 @@ namespace PalCalc.Solver
             // Reuse the same pruning/merging logic from UpdateByPairs
             discoveredResults.AddRange(
                 newItems
-                    .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)
+                    .TakeUntilCancelled(controller.CancellationToken)
                     .Tap(_ => controller.PauseIfRequested())
                     .Where(target.IsSatisfiedBy)
             );
@@ -222,6 +219,7 @@ namespace PalCalc.Solver
             logger.Debug("merging");
             var changed = false;
             var toAdd = new List<IPalReference>();
+            var allRemoved = new List<IPalReference>();
 
             foreach (var newInstances in pruned.GroupBy(i => DefaultGroupFn(i)).Select(g => g.ToList()).ToList())
             {
@@ -260,6 +258,8 @@ namespace PalCalc.Solver
                         foreach (var r in removed.ToList())
                             content.Remove(r);
                         changed = true;
+
+                        allRemoved.AddRange(removed);
                     }
                 }
                 else
@@ -274,12 +274,12 @@ namespace PalCalc.Solver
             var existingContent = content.All.OrderBy(p => p.Pal.Id).ToList();
 
             remainingParentPairs = new ConcatenatedLazyCartesianProduct<IPalReference>([
-                remainingParentPairs,
+                remainingParentPairs.Where(parent => !allRemoved.Contains(parent), controller.CancellationToken),
                 new LazyCartesianProduct<IPalReference>(toAdd, existingContent),
                 new LazyCartesianProduct<IPalReference>(toAdd, toAdd)
             ]);
 
-            foreach (var ta in toAdd.TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested))
+            foreach (var ta in toAdd.TakeUntilCancelled(controller.CancellationToken))
             {
                 controller.PauseIfRequested();
                 content.Add(ta);
@@ -292,7 +292,7 @@ namespace PalCalc.Solver
         // reference for each instance spec (gender, passives, etc.)
         private IEnumerable<IPalReference> PruneCollection(IEnumerable<IPalReference> refs) =>
             refs
-                .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)
+                .TakeUntilCancelled(controller.CancellationToken)
                 .Tap(_ => controller.PauseIfRequested())
                 .GroupBy(pref => DefaultGroupFn(pref))
                 .SelectMany(g => PruningFunc(g.Distinct()));

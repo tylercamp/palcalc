@@ -10,6 +10,12 @@ namespace PalCalc.Solver
     {
         long Count { get; }
         IEnumerable<IEnumerable<(T, T)>> Chunks(int chunkSize);
+
+        /// <summary>
+        /// Creates a new ILazyCartesianProduct containing pairs where both items
+        /// satisfy `predicate`.
+        /// </summary>
+        ILazyCartesianProduct<T> Where(Func<T, bool> predicate, CancellationToken token);
     }
 
     public class LazyCartesianProduct<T>(List<T> listA, List<T> listB) : ILazyCartesianProduct<T>
@@ -57,6 +63,12 @@ namespace PalCalc.Solver
                 curChunkStart = curChunkEnd + 1;
             }
         }
+
+        public ILazyCartesianProduct<T> Where(Func<T, bool> predicate, CancellationToken token) =>
+            new LazyCartesianProduct<T>(
+                listA.Where(predicate).TakeUntilCancelled(token).ToList(),
+                listB.Where(predicate).TakeUntilCancelled(token).ToList()
+            );
     }
 
     public class ConcatenatedLazyCartesianProduct<T> : ILazyCartesianProduct<T>
@@ -81,5 +93,8 @@ namespace PalCalc.Solver
                 foreach (var chunk in p.Chunks(chunkSize))
                     yield return chunk;
         }
+
+        public ILazyCartesianProduct<T> Where(Func<T, bool> predicate, CancellationToken token) =>
+            new ConcatenatedLazyCartesianProduct<T>(innerProducts.Select(ip => ip.Where(predicate, token)).ToList());
     }
 }

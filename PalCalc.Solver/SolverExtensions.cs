@@ -73,5 +73,8 @@ namespace PalCalc.Solver
                     break;
             }
         }
+
+        public static IEnumerable<T> TakeUntilCancelled<T>(this IEnumerable<T> e, CancellationToken token) =>
+            e.TakeWhile(_ => !token.IsCancellationRequested);
     }
 }
