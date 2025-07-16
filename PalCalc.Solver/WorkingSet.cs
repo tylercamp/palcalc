@@ -87,9 +87,76 @@ namespace PalCalc.Solver
         {
             if (remainingParentPairs.Count == 0) return false;
 
-            logger.Debug("beginning work processing");
+            logger.Debug("beginning pairs processing");
 
             var newResults = doWork(remainingParentPairs).ToList();
+
+            var existingContent = content.All.OrderBy(p => p.Pal.Id).ToList();
+            var changeset = MergeWithResults(newResults);
+            existingContent.RemoveAll(changeset.Removed.Contains);
+            
+            remainingParentPairs = new ConcatenatedLazyCartesianProduct<IPalReference>([
+                (content.All.OrderBy(p => p.Pal.Id).ToList(), changeset.Added),
+                (changeset.Added, changeset.Added)
+            ]);
+
+            foreach (var ta in changeset.Added.TakeUntilCancelled(controller.CancellationToken))
+            {
+                controller.PauseIfRequested();
+                content.Add(ta);
+            }
+
+            return changeset.Changed;
+        }
+
+        /// <summary>
+        /// Uses the provided `doWork` function to produce results for each individual `IPalReference`. The results
+        /// returned by `doWork` are merged with the current working set of results and the next set of work
+        /// is updated.
+        /// </summary>
+        /// <returns>Whether any changes were made</returns>
+        public bool UpdateBySingle(Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>> doWork)
+        {
+            logger.Debug("beginning single-item processing");
+
+            var newItems = doWork(content.All).ToList();
+            if (!newItems.Any()) return false;
+
+            var existingContent = content.All.OrderBy(p => p.Pal.Id).ToList();
+            var changeset = MergeWithResults(newItems);
+            existingContent.RemoveAll(changeset.Removed.Contains);
+
+            remainingParentPairs = new ConcatenatedLazyCartesianProduct<IPalReference>([
+                remainingParentPairs.Where(parent => !changeset.Removed.Contains(parent), controller.CancellationToken),
+                new LazyCartesianProduct<IPalReference>(changeset.Added, existingContent),
+                new LazyCartesianProduct<IPalReference>(changeset.Added, changeset.Added)
+            ]);
+
+            foreach (var ta in changeset.Added.TakeUntilCancelled(controller.CancellationToken))
+            {
+                controller.PauseIfRequested();
+                content.Add(ta);
+            }
+
+            return changeset.Changed;
+        }
+
+        // gives a new, reduced collection which only includes the "most optimal" / lowest-effort
+        // reference for each instance spec (gender, passives, etc.)
+        private IEnumerable<IPalReference> PruneCollection(IEnumerable<IPalReference> refs) =>
+            refs
+                .TakeUntilCancelled(controller.CancellationToken)
+                .Tap(_ => controller.PauseIfRequested())
+                .GroupBy(pref => DefaultGroupFn(pref))
+                .SelectMany(g => PruningFunc(g.Distinct()));
+
+        private record class MergeChangeset(bool Changed, List<IPalReference> Added, HashSet<IPalReference> Removed);
+
+        private MergeChangeset MergeWithResults(List<IPalReference> newResults)
+        {
+            var changed = false;
+            var allAdded = new List<IPalReference>();
+            var allRemoved = new List<IPalReference>();
 
             // since we know the breeding effort of each potential instance, we can ignore new instances
             // with higher effort than existing known instances
@@ -106,7 +173,7 @@ namespace PalCalc.Solver
                     .Where(target.IsSatisfiedBy)
             );
 
-            logger.Debug("performing pre-prune");
+            logger.Debug("performing pre-prune on {count} items", newResults.Count);
             var pruned = PruneCollection(
                 newResults.BatchedForParallel()
                     .AsParallel()
@@ -116,12 +183,10 @@ namespace PalCalc.Solver
             );
 
             logger.Debug("merging");
-            var changed = false;
-            var toAdd = new List<IPalReference>();
 
             foreach (var newInstances in pruned.GroupBy(i => DefaultGroupFn(i)).Select(g => g.ToList()).ToList())
             {
-                if (controller.CancellationToken.IsCancellationRequested) return changed;
+                if (controller.CancellationToken.IsCancellationRequested) return new MergeChangeset(changed, [], []);
                 controller.PauseIfRequested();
 
                 var refNewInst = newInstances.First();
@@ -151,150 +216,32 @@ namespace PalCalc.Solver
 
                     if (added.Any())
                     {
-                        toAdd.AddRange(added);
+                        allAdded.AddRange(added);
                         changed = true;
                     }
 
                     if (removed.Any())
                     {
                         foreach (var r in removed.ToList())
+                        {
                             content.Remove(r);
+                            allRemoved.Add(r);
+                        }
                         changed = true;
                     }
                 }
                 else
                 {
-                    toAdd.AddRange(newInstances);
+                    allAdded.AddRange(newInstances);
                     changed = true;
                 }
             }
 
             // (minor memory bandwidth improvement by minimizing how often we switch types of pals, hopefully
             // keeps some pal-specific data like child pal + gender probabilities in CPU cache.)
-            toAdd = toAdd.OrderBy(p => p.Pal.Id).ToList();
-            remainingParentPairs = new ConcatenatedLazyCartesianProduct<IPalReference>([
-                (content.All.OrderBy(p => p.Pal.Id).ToList(), toAdd),
-                (toAdd, toAdd)
-            ]);
+            allAdded = allAdded.OrderBy(p => p.Pal.Id).ToList();
 
-            foreach (var ta in toAdd.TakeUntilCancelled(controller.CancellationToken))
-            {
-                controller.PauseIfRequested();
-                content.Add(ta);
-            }
-
-            return changed;
+            return new MergeChangeset(changed, allAdded, new HashSet<IPalReference>(allRemoved));
         }
-
-        /// <summary>
-        /// Uses the provided `doWork` function to produce results for each individual `IPalReference`. The results
-        /// returned by `doWork` are merged with the current working set of results and the next set of work
-        /// is updated.
-        /// </summary>
-        /// <returns>Whether any changes were made</returns>
-        public bool UpdateBySingle(Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>> doWork)
-        {
-            var newItems = doWork(content.All).ToList();
-            if (!newItems.Any()) return false;
-
-            logger.Debug("beginning single-item processing with {count} items", newItems.Count);
-
-            // Reuse the same pruning/merging logic from UpdateByPairs
-            discoveredResults.AddRange(
-                newItems
-                    .TakeUntilCancelled(controller.CancellationToken)
-                    .Tap(_ => controller.PauseIfRequested())
-                    .Where(target.IsSatisfiedBy)
-            );
-
-            logger.Debug("performing pre-prune");
-            var pruned = PruneCollection(
-                newItems.BatchedForParallel()
-                    .AsParallel()
-                    .WithDegreeOfParallelism(maxThreads)
-                    .SelectMany(batch => PruneCollection(batch).ToList())
-                    .ToList()
-            );
-
-            logger.Debug("merging");
-            var changed = false;
-            var toAdd = new List<IPalReference>();
-            var allRemoved = new List<IPalReference>();
-
-            foreach (var newInstances in pruned.GroupBy(i => DefaultGroupFn(i)).Select(g => g.ToList()).ToList())
-            {
-                if (controller.CancellationToken.IsCancellationRequested) return changed;
-                controller.PauseIfRequested();
-
-                var refNewInst = newInstances.First();
-
-                // Same logic as UpdateByPairs for skipping completed results
-                if ((refNewInst is BredPalReference || refNewInst is SurgeryTablePalReference) && target.IsSatisfiedBy(refNewInst))
-                {
-                    if (
-                        refNewInst.EffectivePassives.Count(t => t is not RandomPassiveSkill) == GameConstants.MaxTotalPassives ||
-                        !target.OptionalPassives.Except(refNewInst.EffectivePassives).Any()
-                    ) continue;
-                }
-
-                var existingInstances = content[refNewInst];
-                var refInst = existingInstances?.FirstOrDefault();
-
-                if (refInst != null)
-                {
-                    var newSelection = PruningFunc(existingInstances.Concat(newInstances));
-
-                    var added = newInstances.Intersect(newSelection);
-                    var removed = existingInstances.Except(newSelection);
-
-                    if (added.Any())
-                    {
-                        toAdd.AddRange(added);
-                        changed = true;
-                    }
-
-                    if (removed.Any())
-                    {
-                        foreach (var r in removed.ToList())
-                            content.Remove(r);
-                        changed = true;
-
-                        allRemoved.AddRange(removed);
-                    }
-                }
-                else
-                {
-                    toAdd.AddRange(newInstances);
-                    changed = true;
-                }
-            }
-
-            // Update remainingWork with both (existing, new) and (new, new) pairs
-            toAdd = toAdd.OrderBy(p => p.Pal.Id).ToList();
-            var existingContent = content.All.OrderBy(p => p.Pal.Id).ToList();
-
-            remainingParentPairs = new ConcatenatedLazyCartesianProduct<IPalReference>([
-                remainingParentPairs.Where(parent => !allRemoved.Contains(parent), controller.CancellationToken),
-                new LazyCartesianProduct<IPalReference>(toAdd, existingContent),
-                new LazyCartesianProduct<IPalReference>(toAdd, toAdd)
-            ]);
-
-            foreach (var ta in toAdd.TakeUntilCancelled(controller.CancellationToken))
-            {
-                controller.PauseIfRequested();
-                content.Add(ta);
-            }
-
-            return changed;
-        }
-
-        // gives a new, reduced collection which only includes the "most optimal" / lowest-effort
-        // reference for each instance spec (gender, passives, etc.)
-        private IEnumerable<IPalReference> PruneCollection(IEnumerable<IPalReference> refs) =>
-            refs
-                .TakeUntilCancelled(controller.CancellationToken)
-                .Tap(_ => controller.PauseIfRequested())
-                .GroupBy(pref => DefaultGroupFn(pref))
-                .SelectMany(g => PruningFunc(g.Distinct()));
     }
 }
