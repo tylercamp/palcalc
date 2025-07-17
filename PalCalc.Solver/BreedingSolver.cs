@@ -307,7 +307,12 @@ namespace PalCalc.Solver
                                 // there's a replaceable passive
                                 r.EffectivePassives.Any(p => p is RandomPassiveSkill)
                             )
-                            .SelectMany(r =>
+                            .ToList()
+                            .BatchedForParallel()
+                            // (this should be relatively quick, will just use normal AsParallel)
+                            .AsParallel()
+                            .WithDegreeOfParallelism(settings.MaxThreads)
+                            .SelectMany(batch => batch.SelectMany(r =>
                             {
                                 // TODO: atm won't consider replacing Optional passives, even though they're technically not Required
 
@@ -317,8 +322,11 @@ namespace PalCalc.Solver
                                 var res = new List<IPalReference>();
 
                                 // consider all ways we could add these desired passives
-                                foreach (var passives in missingPassives.Combinations(maxNewPassives).ToList().OrderByDescending(c => c.Count()).Where(o => o.Any()).Select(c => c.ToList()))
+                                foreach (var passives in missingPassives.Combinations(maxNewPassives).Select(c => c.ToList()).ToList().OrderByDescending(c => c.Count))
                                 {
+                                    if (passives.Count == 0)
+                                        continue;
+
                                     if (r.TotalCost + passives.Sum(p => p.SurgeryCost) > settings.MaxSurgeryCost)
                                         continue;
 
@@ -350,7 +358,7 @@ namespace PalCalc.Solver
                                 }
 
                                 return res;
-                            });
+                            }));
                     });
                 }
 
