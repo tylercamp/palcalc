@@ -322,7 +322,7 @@ namespace PalCalc.Solver
                                 var res = new List<IPalReference>();
 
                                 // consider all ways we could add these desired passives
-                                foreach (var passives in missingPassives.Combinations(maxNewPassives).Select(c => c.ToList()).ToList().OrderByDescending(c => c.Count))
+                                foreach (var passives in missingPassives.Combinations(maxNewPassives).Select(c => c.ToList()).Where(c => c.Count > 0).ToList().OrderByDescending(c => c.Count))
                                 {
                                     if (passives.Count == 0)
                                         continue;
@@ -346,18 +346,18 @@ namespace PalCalc.Solver
                                             }
 
                                             var toRemove = removable.Dequeue();
-                                            ops.Add(new ReplacePassiveSurgeryOperation(toRemove, passives[i]));
+                                            ops.Add(ReplacePassiveSurgeryOperation.NewCached(toRemove, passives[i]));
                                         }
                                         else // there's space for another passive, use an Add operation
                                         {
-                                            ops.Add(new AddPassiveSurgeryOperation(passives[i]));
+                                            ops.Add(AddPassiveSurgeryOperation.NewCached(passives[i]));
                                         }
                                     }
 
-                                    res.Add(new SurgeryTablePalReference(r, ops));
+                                    res.Add(SurgeryTablePalReference.NewCached(r, ref ops));
                                 }
 
-                                return res;
+                                return res.Where(re => re != r);
                             }));
                     });
                 }

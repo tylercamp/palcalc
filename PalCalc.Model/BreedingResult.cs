@@ -50,15 +50,15 @@ namespace PalCalc.Model
             if (Parent1.Pal == parent1 && Parent2.Pal == parent2)
             {
                 return (
-                    (Parent1.Gender == PalGender.WILDCARD || Parent1.Gender == parent1Gender) &&
-                    (Parent2.Gender == PalGender.WILDCARD || Parent2.Gender == parent2Gender)
+                    (Parent1.Gender == PalGender.WILDCARD || Parent1.Gender == PalGender.OPPOSITE_WILDCARD || Parent1.Gender == parent1Gender) &&
+                    (Parent2.Gender == PalGender.WILDCARD || Parent2.Gender == PalGender.OPPOSITE_WILDCARD || Parent2.Gender == parent2Gender)
                 );
             }
             else if (Parent1.Pal == parent2 && Parent2.Pal == parent1)
             {
                 return (
-                    (Parent1.Gender == PalGender.WILDCARD || Parent1.Gender == parent2Gender) &&
-                    (Parent2.Gender == PalGender.WILDCARD || Parent2.Gender == parent1Gender)
+                    (Parent1.Gender == PalGender.WILDCARD || Parent1.Gender == PalGender.OPPOSITE_WILDCARD || Parent1.Gender == parent2Gender) &&
+                    (Parent2.Gender == PalGender.WILDCARD || Parent2.Gender == PalGender.OPPOSITE_WILDCARD || Parent2.Gender == parent1Gender)
                 );
             }
             else

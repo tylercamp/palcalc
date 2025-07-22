@@ -36,6 +36,7 @@ namespace PalCalc.UI.Model
         public int MaxBredIrrelevantPassives { get; set; } = 1;
         public int MaxThreads { get; set; } = 0;
         public int MaxGoldCost { get; set; } = 0;
+        public int MaxGenderReversers { get; set; } = 0;
         public bool EagerPruning { get; set; } = true;
         public bool OptimizeInitStep { get; set; } = true;
 

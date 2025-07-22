@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,7 @@ namespace PalCalc.Solver.PalReference
     /// - Conversely, if one pal has a desired passive, both pals will have that desired passive.
     /// - The passives for this reference will match whichever pal has the most passives.
     /// </summary>
-    public class CompositeOwnedPalReference : IPalReference
+    public class CompositeOwnedPalReference : IPalReference, ISurgeryCachingPalReference
     {
         private static IV_IValue PropagateIVs(IV_IValue a, IV_IValue b)
         {
@@ -107,6 +108,9 @@ namespace PalCalc.Solver.PalReference
                 default: throw new NotImplementedException();
             }
         }
+
+        private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
+        public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();
 
         // TODO - maybe just use Pal, PassivesHash, Gender, IVs? don't need hashes specific to the instances chosen?
         public override int GetHashCode() =>

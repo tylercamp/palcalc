@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.PalReference
 {
-    public class WildPalReference : IPalReference
+    public class WildPalReference : IPalReference, ISurgeryCachingPalReference
     {
         public WildPalReference(Pal pal, IEnumerable<PassiveSkill> guaranteedPassives, int numPassives)
         {
@@ -108,6 +109,9 @@ namespace PalCalc.Solver.PalReference
 
             return cachedGuaranteedGenders[gender];
         }
+
+        private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
+        public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();
 
         public override string ToString() => $"Captured {Gender} {Pal} w/ up to {EffectivePassives.Count} random passive skills";
 

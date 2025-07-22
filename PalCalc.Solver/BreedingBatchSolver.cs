@@ -30,7 +30,7 @@ namespace PalCalc.Solver
         public long NumProcessed;
     }
 
-    internal record class BreedingSolverEfficiencyMetric(
+    internal record struct BreedingSolverEfficiencyMetric(
         TimeSpan Effort,
         int GoldCost,
         int NumGenderReversers
@@ -247,7 +247,7 @@ namespace PalCalc.Solver
 
                 progress.NumProcessed++;
 
-                if (!p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
+                if (settings.MaxSurgeryReversers == 0 && !p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
                 if (p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() > settings.MaxWildPals) continue;
                 if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= settings.MaxBreedingSteps) continue;
                 if (p.Item1.TotalCost + p.Item2.TotalCost > settings.MaxSurgeryCost) continue;
@@ -312,9 +312,17 @@ namespace PalCalc.Solver
                         availableOptionalPassives.Add(passive);
                 }
 
+                // arbitrary reordering of (p1, p2) to prevent duplicate results from swapped pairs
+                // (though this shouldn't be necessary if the `IResultPruning` impls are working right?)
+                (IPalReference, IPalReference) ReorderPair((IPalReference, IPalReference) p) =>
+                    p.Item1.GetHashCode() > p.Item2.GetHashCode()
+                        ? (p.Item2, p.Item1)
+                        : p;
+
+                var genderedParentPairs = palPairListPool.Borrow();
+
                 // if both parents are wildcards, go through the list of possible gender-specific breeding results
                 // and modify the parent genders to cover each possible child
-                var expandedGendersByChildren = palPairListPool.Borrow();
                 {
 #if DEBUG && DEBUG_CHECKS
                     // (shouldn't happen)
@@ -323,32 +331,55 @@ namespace PalCalc.Solver
 #endif
                     if (p.Item1.Gender != PalGender.WILDCARD || p.Item2.Gender != PalGender.WILDCARD)
                     {
-                        expandedGendersByChildren.Add(p);
+                        genderedParentPairs.Add(PreferredParentsGenders(ReorderPair(p)));
                     }
                     else
                     {
                         foreach (var br in breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal])
                         {
-                            expandedGendersByChildren.Add((
+                            genderedParentPairs.Add(PreferredParentsGenders(ReorderPair((
                                 p.Item1.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item1.Pal)),
                                 p.Item2.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item2.Pal))
-                            ));
+                            ))));
                         }
                     }
                 }
 
-                bool createdResult = false;
-                foreach (var expanded in expandedGendersByChildren)
+                if (settings.MaxSurgeryReversers > 0)
                 {
-                    // arbitrary reordering of (p1, p2) to prevent duplicate results from swapped pairs
-                    // (though this shouldn't be necessary if the `IResultPruning` impls are working right?)
-                    var reexpanded = expanded.Item1.GetHashCode() > expanded.Item2.GetHashCode()
-                        ? (expanded.Item2, expanded.Item1)
-                        : expanded;
+                    var remainingReversers = settings.MaxSurgeryReversers - (p.Item1.NumTotalGenderReversers + p.Item2.NumTotalGenderReversers);
 
-                    var pg = PreferredParentsGenders(reexpanded);
+                    if (remainingReversers > 0)
+                    {
+                        genderedParentPairs.Add(ReorderPair((
+                            p.Item1,
+                            SurgeryTablePalReference.EnforceGender(p.Item2, p.Item1.Gender.OppositeGender())
+                        )));
 
-                    var (parent1, parent2) = pg;
+                        genderedParentPairs.Add(ReorderPair((
+                            SurgeryTablePalReference.EnforceGender(p.Item1, p.Item2.Gender.OppositeGender()),
+                            p.Item2
+                        )));
+                    }
+
+                    if (remainingReversers > 1)
+                    {
+                        genderedParentPairs.Add(ReorderPair((
+                            SurgeryTablePalReference.EnforceGender(p.Item1, PalGender.MALE),
+                            SurgeryTablePalReference.EnforceGender(p.Item2, PalGender.FEMALE)
+                        )));
+
+                        genderedParentPairs.Add(ReorderPair((
+                            SurgeryTablePalReference.EnforceGender(p.Item1, PalGender.FEMALE),
+                            SurgeryTablePalReference.EnforceGender(p.Item2, PalGender.MALE)
+                        )));
+                    }
+                }
+
+                bool createdResult = false;
+                foreach (var expanded in genderedParentPairs)
+                {
+                    var (parent1, parent2) = expanded;
 
                     Pal childPalType = null;
                     foreach (var br in breedingdb.BreedingByParent[parent1.Pal][parent2.Pal])
@@ -356,7 +387,8 @@ namespace PalCalc.Solver
                             childPalType = br.Child;
 
                     if (childPalType == null)
-                        throw new NotImplementedException(); // shouldn't happen
+                        continue; // should only happen if there are gender-specific breeding paths and wildcard gender is used
+                        //throw new NotImplementedException(); // shouldn't happen
 
                     if (settings.BannedBredPals.Contains(childPalType))
                         continue;
@@ -481,7 +513,7 @@ namespace PalCalc.Solver
                     }
                 }
 
-                palPairListPool.Return(expandedGendersByChildren);
+                palPairListPool.Return(genderedParentPairs);
 
                 if (!createdResult)
                     ivSetPool.Return(finalIVs);

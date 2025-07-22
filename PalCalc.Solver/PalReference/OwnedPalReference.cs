@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.PalReference
 {
-    public class OwnedPalReference : IPalReference
+    public class OwnedPalReference : IPalReference, ISurgeryCachingPalReference
     {
         PalInstance instance;
 
@@ -56,6 +57,9 @@ namespace PalCalc.Solver.PalReference
         public int NumTotalGenderReversers => 0;
 
         public int NumTotalEggs => 0;
+
+        private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
+        public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();
 
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {

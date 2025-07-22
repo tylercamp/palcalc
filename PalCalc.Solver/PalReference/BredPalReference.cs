@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.PalReference
 {
-    public class BredPalReference : IPalReference
+    public class BredPalReference : IPalReference, ISurgeryCachingPalReference
     {
         private GameSettings gameSettings;
 
@@ -241,6 +241,10 @@ namespace PalCalc.Solver.PalReference
                 default: throw new NotImplementedException();
             }
         }
+
+
+        private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
+        public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();
 
         public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectivePassives.PassiveSkillListToString()})";
 

@@ -461,9 +461,10 @@ namespace PalCalc.UI
 
         internal override SurgeryTablePalReference ReadRefJson(JToken token, Type objectType, SurgeryTablePalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
+            var ops = token["Operations"].ToObject<List<ISurgeryOperation>>(serializer);
             return new SurgeryTablePalReference(
                 input: token["Input"].ToObject<IPalReference>(serializer),
-                operations: token["Operations"].ToObject<List<ISurgeryOperation>>(serializer)
+                rawOperations: ref ops
             );
         }
     }

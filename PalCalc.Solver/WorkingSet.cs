@@ -21,7 +21,8 @@ namespace PalCalc.Solver
             PalProperty.Pal,
             PalProperty.Gender,
             PalProperty.EffectivePassives,
-            PalProperty.IvRelevance
+            PalProperty.IvRelevance,
+            PalProperty.GenderReversers
             //PalProperty.GoldCost
         );
 
@@ -209,7 +210,7 @@ namespace PalCalc.Solver
 
                 if (refInst != null)
                 {
-                    var newSelection = PruningFunc(existingInstances.Concat(newInstances));
+                    var newSelection = PruningFunc(existingInstances.Concat(newInstances.Except(existingInstances)));
 
                     var added = newInstances.Intersect(newSelection);
                     var removed = existingInstances.Except(newSelection);
