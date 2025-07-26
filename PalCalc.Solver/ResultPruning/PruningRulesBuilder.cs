@@ -32,6 +32,7 @@ namespace PalCalc.Solver.ResultPruning
                     new PreferredLocationPruning(token),
                     new MinimumGenderReversersPruning(token),
                     new MinimumCostPruning(token),
+                    new MinimumSurgeriesPruning(token),
                     new MinimumReusePruning(token),
                     new MinimumWildPalsPruning(token),
                     new MinimumReferencedPlayersPruning(token),
