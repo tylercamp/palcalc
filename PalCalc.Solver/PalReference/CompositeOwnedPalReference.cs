@@ -112,6 +112,14 @@ namespace PalCalc.Solver.PalReference
         private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
         public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();
 
+        public override bool Equals(object obj)
+        {
+            var asComposite = obj as CompositeOwnedPalReference;
+            if (ReferenceEquals(asComposite, null)) return false;
+
+            return GetHashCode() == obj.GetHashCode();
+        }
+
         // TODO - maybe just use Pal, PassivesHash, Gender, IVs? don't need hashes specific to the instances chosen?
         public override int GetHashCode() =>
             HashCode.Combine(

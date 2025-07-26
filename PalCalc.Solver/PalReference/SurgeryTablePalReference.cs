@@ -22,6 +22,8 @@ namespace PalCalc.Solver.PalReference
 
         public override int GetHashCode() => HashCode.Combine(nameof(AddPassiveSurgeryOperation), AddedPassive);
 
+        public override bool Equals(object obj) => obj?.GetHashCode() == GetHashCode();
+
         public override string ToString() => $"AddPassive({AddedPassive.Name})";
 
         private static ConcurrentDictionary<PassiveSkill, AddPassiveSurgeryOperation> cachedOps = [];
@@ -48,6 +50,7 @@ namespace PalCalc.Solver.PalReference
         public int NumGenderReversers => 0;
 
         public override int GetHashCode() => HashCode.Combine(nameof(ReplacePassiveSurgeryOperation), AddedPassive, RemovedPassive);
+        public override bool Equals(object obj) => obj?.GetHashCode() == GetHashCode();
 
         public override string ToString() => $"ReplacePassive(rem: {RemovedPassive.Name}, add: {AddedPassive.Name})";
 
@@ -83,6 +86,7 @@ namespace PalCalc.Solver.PalReference
         public int NumGenderReversers => 1;
 
         public override int GetHashCode() => HashCode.Combine(nameof(ChangeGenderSurgeryOperation), NewGender);
+        public override bool Equals(object obj) => obj?.GetHashCode() == GetHashCode();
 
         public override string ToString() => $"ChangeGender({NewGender})";
 
@@ -343,6 +347,14 @@ namespace PalCalc.Solver.PalReference
 
         // ---------------------------------------------------------------------------------
         public override string ToString() => $"Surgery on {{{Input}}} : {string.Join("; ", Operations)}";
+
+        public override bool Equals(object obj)
+        {
+            var asSurgery = obj as SurgeryTablePalReference;
+            if (ReferenceEquals(asSurgery, null)) return false;
+
+            return GetHashCode() == obj.GetHashCode();
+        }
 
         public override int GetHashCode() =>
             HashCode.Combine(nameof(SurgeryTablePalReference), Input.GetHashCode(), operationsHash);

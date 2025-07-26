@@ -113,6 +113,14 @@ namespace PalCalc.Solver.PalReference
         private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
         public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();
 
+        public override bool Equals(object obj)
+        {
+            var asWild = obj as WildPalReference;
+            if (ReferenceEquals(asWild, null)) return false;
+
+            return GetHashCode() == obj.GetHashCode();
+        }
+
         public override string ToString() => $"Captured {Gender} {Pal} w/ up to {EffectivePassives.Count} random passive skills";
 
         public override int GetHashCode() => HashCode.Combine(nameof(WildPalReference), Pal, Gender, EffectivePassivesHash);

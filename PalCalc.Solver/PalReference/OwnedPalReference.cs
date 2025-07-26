@@ -67,6 +67,14 @@ namespace PalCalc.Solver.PalReference
             return this;
         }
 
+        public override bool Equals(object obj)
+        {
+            var asOwned = obj as OwnedPalReference;
+            if (ReferenceEquals(asOwned, null)) return false;
+
+            return GetHashCode() == obj.GetHashCode();
+        }
+
         public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({EffectivePassives.PassiveSkillListToString()}) in {Location}";
 
         public override int GetHashCode() => HashCode.Combine(nameof(OwnedPalReference), UnderlyingInstance.GetHashCode());
