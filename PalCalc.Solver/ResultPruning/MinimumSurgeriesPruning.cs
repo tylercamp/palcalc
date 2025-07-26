@@ -11,7 +11,9 @@ namespace PalCalc.Solver.ResultPruning
     {
         public MinimumSurgeriesPruning(CancellationToken token) : base(token) { }
 
+        int NumSurgeries(IPalReference r) => r.NumTotalSurgerySteps;
+
         protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r => r.NumTotalSurgerySteps);
+            MinGroupOf(results, NumSurgeries);
     }
 }

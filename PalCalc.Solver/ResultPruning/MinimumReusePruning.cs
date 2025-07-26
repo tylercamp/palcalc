@@ -15,7 +15,7 @@ namespace PalCalc.Solver.ResultPruning
         }
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r =>
+            MinGroupOf(results, r =>
             {
                 var observed = r.AllReferences().ToList();
                 return -(observed.Count - observed.Distinct().Count());

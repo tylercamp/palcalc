@@ -14,7 +14,9 @@ namespace PalCalc.Solver.ResultPruning
         {
         }
 
+        private static TimeSpan BreedingEffort(IPalReference r) => r.BreedingEffort;
+
         protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r => r.BreedingEffort);
+            MinGroupOf(results, BreedingEffort);
     }
 }

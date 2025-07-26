@@ -11,7 +11,9 @@ namespace PalCalc.Solver.ResultPruning
     {
         public MinimumGenderReversersPruning(CancellationToken token) : base(token) { }
 
+        private static int NumGenderReversers(IPalReference r) => r.NumTotalGenderReversers;
+
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r => r.NumTotalGenderReversers);
+            MinGroupOf(results, NumGenderReversers);
     }
 }

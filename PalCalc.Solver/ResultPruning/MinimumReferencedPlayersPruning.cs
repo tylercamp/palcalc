@@ -14,24 +14,39 @@ namespace PalCalc.Solver.ResultPruning
         {
         }
 
-        private static IEnumerable<string> PlayerIdsOf(IPalReference pref)
+        private static int NumReferencedPlayers(IPalReference r)
         {
-            switch (pref)
-            {
-                case OwnedPalReference opr:
-                    yield return opr.UnderlyingInstance.OwnerPlayerId;
-                    break;
+            List<string> playerIds = [];
 
-                case CompositeOwnedPalReference copr:
-                    // TODO - this will end up avoiding results which use composite refs; construction of composites
-                    //        has no way to know which player to "prefer" for selection
-                    yield return copr.Male.UnderlyingInstance.OwnerPlayerId;
-                    yield return copr.Female.UnderlyingInstance.OwnerPlayerId;
-                    break;
+            foreach (var p in r.AllReferences())
+            {
+                switch (p)
+                {
+                    case OwnedPalReference opr:
+                        var pid = opr.UnderlyingInstance.OwnerPlayerId;
+                        if (!playerIds.Contains(pid))
+                            playerIds.Add(pid);
+                        break;
+
+                    case CompositeOwnedPalReference copr:
+                        // TODO - this will end up avoiding results which use composite refs; construction of composites
+                        //        has no way to know which player to "prefer" for selection
+                        var mpid = copr.Male.UnderlyingInstance.OwnerPlayerId;
+                        if (!playerIds.Contains(mpid))
+                            playerIds.Add(mpid);
+
+                        var fpid = copr.Female.UnderlyingInstance.OwnerPlayerId;
+                        if (!playerIds.Contains(fpid))
+                            playerIds.Add(fpid);
+
+                        break;
+                }
             }
+
+            return playerIds.Count;
         }
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r => r.AllReferences().SelectMany(PlayerIdsOf).Distinct().Count());
+            MinGroupOf(results, NumReferencedPlayers);
     }
 }

@@ -13,12 +13,27 @@ namespace PalCalc.Solver.ResultPruning
         {
         }
 
+        private static int NumBreedingSteps(IPalReference r)
+        {
+            int count = 0;
+            var observedRefs = new HashSet<int>();
+            foreach (var p in r.AllReferences())
+            {
+                if (p is BredPalReference)
+                {
+                    var hash = p.GetHashCode();
+                    if (!observedRefs.Contains(hash))
+                    {
+                        observedRefs.Add(hash);
+                        count++;
+                    }
+                }
+            }
+
+            return count;
+        }
+
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r =>
-                r.AllReferences()
-                    .Where(r => r is BredPalReference)
-                    .Distinct()
-                    .Count()
-            );
+            MinGroupOf(results, NumBreedingSteps);
     }
 }

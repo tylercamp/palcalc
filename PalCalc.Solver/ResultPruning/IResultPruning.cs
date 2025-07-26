@@ -23,30 +23,49 @@ namespace PalCalc.Solver.ResultPruning
         public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results);
 
         protected static readonly IEnumerable<IPalReference> Empty = Enumerable.Empty<IPalReference>();
-        protected IEnumerable<IPalReference> FirstGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)
+        protected IEnumerable<IPalReference> MinGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)
         {
+            var comp = Comparer<T>.Default;
             try
             {
                 if (token.IsCancellationRequested)
                     return Empty;
 
-                var resultGroup = input
-                    .TakeWhile(_ => !token.IsCancellationRequested)
-                    .GroupBy(grouping)
-                    .OrderBy(g => g.Key)
-                    .FirstOrDefault();
+                var res = new List<IPalReference>();
+                var minEval = default(T);
 
-                if (token.IsCancellationRequested)
-                    return Empty;
+                foreach (var r in input)
+                {
+                    if (token.IsCancellationRequested)
+                        return Empty;
 
-                return resultGroup.ToList();
+                    if (res.Count == 0)
+                    {
+                        res.Add(r);
+                        minEval = grouping(r);
+                    }
+                    else
+                    {
+                        var eval = grouping(r);
+                        var comparison = comp.Compare(eval, minEval);
+                        if (comparison < 0)
+                        {
+                            res.Clear();
+                            res.Add(r);
+                            minEval = eval;
+                        }
+                        else if (comparison == 0)
+                        {
+                            res.Add(r);
+                        }
+                    }
+                }
+
+                return res;
             }
-            catch (Exception)
+            catch (Exception) when (token.IsCancellationRequested)
             {
-                if (token.IsCancellationRequested)
-                    return input;
-                else
-                    throw;
+                return input;
             }
         }
 

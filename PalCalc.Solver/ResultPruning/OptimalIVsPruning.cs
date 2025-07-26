@@ -21,6 +21,14 @@ namespace PalCalc.Solver.ResultPruning
                 _ => throw new NotImplementedException()
             };
 
+        static int SelectValue(IV_IValue value) =>
+            ValueOf(value, 0, r => r.Max);
+
+        static int TotalIVs(IV_Set ivs) =>
+            SelectValue(ivs.HP) + SelectValue(ivs.Attack) + SelectValue(ivs.Defense);
+
+        static int TotalIVs(IPalReference r) => TotalIVs(r.IVs);
+
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results)
         {
             // note: all pals within a group being pruned should:
@@ -40,21 +48,15 @@ namespace PalCalc.Solver.ResultPruning
             // IVs doesn't affect whether we get a relevant result (see above), so we'll instead
             // try to maximize the highest possible value
 
-            int SelectValue(IV_IValue value) =>
-                ValueOf(value, 0, r => r.Max);
-
-            int TotalIVs(IV_Set ivs) =>
-                SelectValue(ivs.HP) + SelectValue(ivs.Attack) + SelectValue(ivs.Defense);
-
             if (token.IsCancellationRequested) return results;
 
             // could multiply maxIvDifference by the number of relevant IV types, but this
             // just further prunes results, and I'd prefer to give later pruning steps an
             // opportunity to apply their pruning
-            var bestValue = results.Max(r => TotalIVs(r.IVs));
+            var bestValue = results.Max(TotalIVs);
             var threshold = bestValue - maxIvDifference * 3;
 
-            return results.Where(p => TotalIVs(p.IVs) >= threshold).ToList();
+            return results.Where(p => TotalIVs(p.IVs) >= threshold);
         }
     }
 }

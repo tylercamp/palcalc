@@ -7,7 +7,9 @@ namespace PalCalc.Solver.ResultPruning
     {
         public MinimumCostPruning(CancellationToken token) : base(token) { }
 
+        private static int TotalCost(IPalReference r) => r.TotalCost;
+
         protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r => r.TotalCost);
+            MinGroupOf(results, TotalCost);
     }
 }
