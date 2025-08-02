@@ -1,0 +1,107 @@
+{
+    "AdditionalInventory_001": {
+        "FloatValue1": 3.0
+    },
+    "AdditionalInventory_002": {
+        "FloatValue1": 6.0
+    },
+    "AdditionalInventory_003": {
+        "FloatValue1": 9.0
+    },
+    "AdditionalInventory_004": {
+        "FloatValue1": 12.0
+    },
+    "Chromium": {
+        "Rank": 3
+    },
+    "RainbowCrystal": {
+        "Rank": 3
+    },
+    "ManganeseOre": {
+        "Rank": 3
+    },
+    "PalSphere": {
+        "Price": 100
+    },
+    "PalSphere_Mega": {
+        "Price": 300
+    },
+    "PalSphere_Giga": {
+        "Price": 500
+    },
+    "PalSphere_Tera": {
+        "Price": 700
+    },
+    "PalSphere_Master": {
+        "Price": 900
+    },
+    "PalSphere_Legend": {
+        "Price": 1100
+    },
+    "PalSphere_Ultimate": {
+        "Price": 1400
+    },
+    "PalSphere_Exotic": {
+        "Price": 1600
+    },
+    "ExplosiveBullet": {
+        "Price": 1000
+    },
+    "TreasureBoxKey01": {
+        "Price": 1000
+    },
+    "TreasureBoxKey02": {
+        "Price": 2000
+    },
+    "TreasureBoxKey03": {
+        "Price": 3000
+    },
+    "Herbs": {
+        "Price": 150
+    },
+    "Medicines": {
+        "Price": 300
+    },
+    "LuxuryMedicines": {
+        "Price": 450
+    },
+    "MindControlDrug": {
+        "Price": 600
+    },
+    "Arrow": {
+        "Price": 5
+    },
+    "Arrow_Poison": {
+        "Price": 10
+    },
+    "Arrow_Fire": {
+        "Price": 10
+    },
+    "RoughBullet": {
+        "Price": 100
+    },
+    "HandgunBullet": {
+        "Price": 100
+    },
+    "RifleBullet": {
+        "Price": 150
+    },
+    "ShotgunBullet": {
+        "Price": 150
+    },
+    "AssaultRifleBullet": {
+        "Price": 150
+    },
+    "FlamethrowerBullet": {
+        "Price": 200
+    },
+    "MissileBullet": {
+        "Price": 2500
+    },
+    "GrenadeBullet": {
+        "Price": 1000
+    },
+    "GatlingBullet": {
+        "Price": 500
+    }
+}
