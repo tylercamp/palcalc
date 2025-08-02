@@ -1,0 +1,863 @@
+{
+  "DT_PalMonsterParameter": {
+    "Baphomet": {
+      "WorkSuitability_EmitFlame": 2
+    },
+    "Boar": {
+      "RunSpeed": 675,
+      "RideSprintSpeed": 1050,
+      "WorkSuitability_Mining": 2
+    },
+    "Alpaca": {
+      "RunSpeed": 690,
+      "RideSprintSpeed": 1200
+    },
+    "Garm": {
+      "RunSpeed": 960,
+      "RideSprintSpeed": 1260
+    },
+    "Serpent": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 975
+    },
+    "Deer": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "Deer_Ground": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "Naughtycat": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "WeaselDragon": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "WeaselDragon_Fire": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "MopKing": {
+      "RunSpeed": 450,
+      "RideSprintSpeed": 750
+    },
+    "Kirin": {
+      "RunSpeed": 1080,
+      "RideSprintSpeed": 1650
+    },
+    "HawkBird": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1125,
+      "WorkSuitability_Transport": 2
+    },
+    "FlameBuffalo": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "FlowerDinosaur": {
+      "RunSpeed": 825,
+      "RideSprintSpeed": 1050
+    },
+    "FairyDragon": {
+      "RunSpeed": 945,
+      "RideSprintSpeed": 1200
+    },
+    "FairyDragon_Water": {
+      "RunSpeed": 945,
+      "RideSprintSpeed": 1200
+    },
+    "BirdDragon": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1275,
+      "WorkSuitability_EmitFlame": 2
+    },
+    "BirdDragon_Ice": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1275
+    },
+    "SakuraSaurus": {
+      "RunSpeed": 525,
+      "RideSprintSpeed": 750
+    },
+    "SakuraSaurus_Water": {
+      "RunSpeed": 525,
+      "RideSprintSpeed": 750
+    },
+    "KingAlpaca": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1050
+    },
+    "KingAlpaca_Ice": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1050
+    },
+    "FeatherOstrich": {
+      "RunSpeed": 600,
+      "RideSprintSpeed": 1000
+    },
+    "TropicalOstrich": {
+      "RunSpeed": 600,
+      "RideSprintSpeed": 1000
+    },
+    "IceSeal": {
+      "RunSpeed": 600,
+      "RideSprintSpeed": 1000
+    },
+    "BlueDragon": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "GhostBeast": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "GrassPanda": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1050
+    },
+    "GrassPanda_Electric": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1050
+    },
+    "FengyunDeeper_Electric": {
+      "RunSpeed": 1125,
+      "RideSprintSpeed": 1575
+    },
+    "ThunderDog": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1725
+    },
+    "PurpleSpider": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1125
+    },
+    "IceDeer": {
+      "RunSpeed": 825,
+      "RideSprintSpeed": 1050
+    },
+    "GrassMammoth": {
+      "RunSpeed": 645,
+      "RideSprintSpeed": 900
+    },
+    "GrassMammoth_Ice": {
+      "RunSpeed": 645,
+      "RideSprintSpeed": 900
+    },
+    "FireKirin": {
+      "RunSpeed": 1275,
+      "RideSprintSpeed": 1950
+    },
+    "FireKirin_Dark": {
+      "RunSpeed": 1275,
+      "RideSprintSpeed": 1950
+    },
+    "AmaterasuWolf": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "VolcanicMonster": {
+      "RunSpeed": 585,
+      "RideSprintSpeed": 825
+    },
+    "VolcanicMonster_Ice": {
+      "RunSpeed": 585,
+      "RideSprintSpeed": 825
+    },
+    "Manticore": {
+      "RunSpeed": 1125,
+      "RideSprintSpeed": 1350
+    },
+    "Manticore_Dark": {
+      "RunSpeed": 1125,
+      "RideSprintSpeed": 1350
+    },
+    "HadesBird": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1650
+    },
+    "HadesBird_Electric": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1650
+    },
+    "ThunderBird": {
+      "RunSpeed": 1125,
+      "RideSprintSpeed": 1800
+    },
+    "SkyDragon": {
+      "RunSpeed": 1200,
+      "RideSprintSpeed": 1425
+    },
+    "SkyDragon_Grass": {
+      "RunSpeed": 1200,
+      "RideSprintSpeed": 1425
+    },
+    "RedArmorBird": {
+      "RunSpeed": 1200,
+      "RideSprintSpeed": 1950
+    },
+    "Horus": {
+      "RunSpeed": 1500,
+      "RideSprintSpeed": 2100,
+      "WorkSuitability_EmitFlame": 4
+    },
+    "Horus_Water": {
+      "RunSpeed": 1500,
+      "RideSprintSpeed": 2100
+    },
+    "KingBahamut": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "KingBahamut_Dragon": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "Umihebi": {
+      "RunSpeed": 787,
+      "RideSprintSpeed": 1050
+    },
+    "Umihebi_Fire": {
+      "RunSpeed": 787,
+      "RideSprintSpeed": 1050
+    },
+    "Suzaku": {
+      "RunSpeed": 1275,
+      "RideSprintSpeed": 1650
+    },
+    "Suzaku_Water": {
+      "RunSpeed": 1275,
+      "RideSprintSpeed": 1650
+    },
+    "ElecPanda": {
+      "RunSpeed": 705,
+      "RideSprintSpeed": 825
+    },
+    "GuardianDog": {
+      "RunSpeed": 740,
+      "RideSprintSpeed": 1040
+    },
+    "LazyDragon": {
+      "RunSpeed": 975,
+      "RideSprintSpeed": 1200
+    },
+    "LazyDragon_Electric": {
+      "RunSpeed": 975,
+      "RideSprintSpeed": 1200
+    },
+    "Yeti": {
+      "RunSpeed": 547,
+      "RideSprintSpeed": 825
+    },
+    "Yeti_Grass": {
+      "RunSpeed": 547,
+      "RideSprintSpeed": 825
+    },
+    "MushroomDragon": {
+      "RunSpeed": 600,
+      "RideSprintSpeed": 1050
+    },
+    "MushroomDragon_Dark": {
+      "RunSpeed": 600,
+      "RideSprintSpeed": 1050
+    },
+    "BlackMetalDragon": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "BlackGriffon": {
+      "RunSpeed": 1275,
+      "RideSprintSpeed": 1800
+    },
+    "IceHorse": {
+      "RunSpeed": 1500,
+      "RideSprintSpeed": 2250
+    },
+    "SaintCentaur": {
+      "RunSpeed": 1200,
+      "RideSprintSpeed": 2100
+    },
+    "BlackCentaur": {
+      "RunSpeed": 1350,
+      "RideSprintSpeed": 2400
+    },
+    "JetDragon": {
+      "RunSpeed": 1700,
+      "RideSprintSpeed": 3300
+    },
+    "WhiteAlienDragon": {
+      "RunSpeed": 1185,
+      "RideSprintSpeed": 1800
+    },
+    "MoonQueen": {
+      "RunSpeed": 1350,
+      "RideSprintSpeed": 1650
+    },
+    "GoldenHorse": {
+      "RunSpeed": 1185,
+      "RideSprintSpeed": 1890
+    },
+    "BlueThunderHorse": {
+      "RunSpeed": 1350,
+      "RideSprintSpeed": 1890
+    },
+    "NightBlueHorse": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "WhiteShieldDragon": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1125
+    },
+    "WhiteDeer": {
+      "RunSpeed": 1200,
+      "RideSprintSpeed": 1800
+    },
+    "SnowTigerBeastman": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "DarkMechaDragon": {
+      "RunSpeed": 1500,
+      "RideSprintSpeed": 3000
+    },
+    "IceNarwhal": {
+      "RunSpeed": 820,
+      "RideSprintSpeed": 990
+    },
+    "IceNarwhal_Fire": {
+      "RunSpeed": 820,
+      "RideSprintSpeed": 990
+    },
+    "Plesiosaur": {
+      "RunSpeed": 800,
+      "RideSprintSpeed": 1300
+    },
+    "BOSS_Baphomet": {
+      "WorkSuitability_EmitFlame": 2
+    },
+    "BOSS_Boar": {
+      "RunSpeed": 675,
+      "RideSprintSpeed": 1050,
+      "WorkSuitability_Mining": 2
+    },
+    "BOSS_Alpaca": {
+      "RunSpeed": 690,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_Garm": {
+      "RunSpeed": 960,
+      "RideSprintSpeed": 1260
+    },
+    "BOSS_Serpent": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 975
+    },
+    "BOSS_Deer": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "BOSS_Deer_Ground": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "BOSS_Naughtycat": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_WeaselDragon": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_WeaselDragon_Fire": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_MopKing": {
+      "RunSpeed": 450,
+      "RideSprintSpeed": 750
+    },
+    "BOSS_Kirin": {
+      "RunSpeed": 1080,
+      "RideSprintSpeed": 1650
+    },
+    "BOSS_HawkBird": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1125,
+      "WorkSuitability_Transport": 2
+    },
+    "BOSS_FlameBuffalo": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_FlowerDinosaur": {
+      "RunSpeed": 825,
+      "RideSprintSpeed": 1050
+    },
+    "BOSS_FairyDragon": {
+      "RunSpeed": 945,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_FairyDragon_Water": {
+      "RunSpeed": 945,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_BirdDragon": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1275,
+      "WorkSuitability_EmitFlame": 2
+    },
+    "BOSS_BirdDragon_Ice": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1275
+    },
+    "BOSS_SakuraSaurus": {
+      "RunSpeed": 525,
+      "RideSprintSpeed": 750
+    },
+    "BOSS_SakuraSaurus_Water": {
+      "RunSpeed": 525,
+      "RideSprintSpeed": 750
+    },
+    "BOSS_KingAlpaca": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1050
+    },
+    "BOSS_KingAlpaca_Ice": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1050
+    },
+    "BOSS_FeatherOstrich": {
+      "RunSpeed": 600,
+      "RideSprintSpeed": 1000
+    },
+    "BOSS_TropicalOstrich": {
+      "RunSpeed": 600,
+      "RideSprintSpeed": 1000
+    },
+    "BOSS_IceSeal": {
+      "RunSpeed": 600,
+      "RideSprintSpeed": 1000
+    },
+    "BOSS_BlueDragon": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_GhostBeast": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_GrassPanda": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1050
+    },
+    "BOSS_GrassPanda_Electric": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1050
+    },
+    "BOSS_FengyunDeeper_Electric": {
+      "RunSpeed": 1125,
+      "RideSprintSpeed": 1575
+    },
+    "BOSS_ThunderDog": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1725
+    },
+    "BOSS_PurpleSpider": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1125
+    },
+    "BOSS_IceDeer": {
+      "RunSpeed": 825,
+      "RideSprintSpeed": 1050
+    },
+    "BOSS_GrassMammoth": {
+      "RunSpeed": 645,
+      "RideSprintSpeed": 900
+    },
+    "BOSS_GrassMammoth_Ice": {
+      "RunSpeed": 645,
+      "RideSprintSpeed": 900
+    },
+    "BOSS_FireKirin": {
+      "RunSpeed": 1275,
+      "RideSprintSpeed": 1950
+    },
+    "BOSS_FireKirin_Dark": {
+      "RunSpeed": 1275,
+      "RideSprintSpeed": 1950
+    },
+    "BOSS_AmaterasuWolf": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "BOSS_VolcanicMonster": {
+      "RunSpeed": 585,
+      "RideSprintSpeed": 825
+    },
+    "BOSS_VolcanicMonster_Ice": {
+      "RunSpeed": 585,
+      "RideSprintSpeed": 825
+    },
+    "BOSS_Manticore": {
+      "RunSpeed": 1125,
+      "RideSprintSpeed": 1350
+    },
+    "BOSS_Manticore_Dark": {
+      "RunSpeed": 1125,
+      "RideSprintSpeed": 1350
+    },
+    "BOSS_HadesBird": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1650
+    },
+    "BOSS_HadesBird_Electric": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1650
+    },
+    "BOSS_ThunderBird": {
+      "RunSpeed": 1125,
+      "RideSprintSpeed": 1800
+    },
+    "BOSS_SkyDragon": {
+      "RunSpeed": 1200,
+      "RideSprintSpeed": 1425
+    },
+    "BOSS_SkyDragon_Grass": {
+      "RunSpeed": 1200,
+      "RideSprintSpeed": 1425
+    },
+    "BOSS_RedArmorBird": {
+      "RunSpeed": 1200,
+      "RideSprintSpeed": 1950
+    },
+    "BOSS_Horus": {
+      "RunSpeed": 1500,
+      "RideSprintSpeed": 2100,
+      "WorkSuitability_EmitFlame": 4
+    },
+    "BOSS_Horus_Water": {
+      "RunSpeed": 1500,
+      "RideSprintSpeed": 2100
+    },
+    "BOSS_KingBahamut": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "BOSS_KingBahamut_Dragon": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "BOSS_Umihebi": {
+      "RunSpeed": 787,
+      "RideSprintSpeed": 1050
+    },
+    "BOSS_Umihebi_Fire": {
+      "RunSpeed": 787,
+      "RideSprintSpeed": 1050
+    },
+    "BOSS_Suzaku": {
+      "RunSpeed": 1275,
+      "RideSprintSpeed": 1650
+    },
+    "BOSS_Suzaku_Water": {
+      "RunSpeed": 1275,
+      "RideSprintSpeed": 1650
+    },
+    "BOSS_ElecPanda": {
+      "RunSpeed": 705,
+      "RideSprintSpeed": 825
+    },
+    "BOSS_GuardianDog": {
+      "RunSpeed": 740,
+      "RideSprintSpeed": 1040
+    },
+    "BOSS_LazyDragon": {
+      "RunSpeed": 975,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_LazyDragon_Electric": {
+      "RunSpeed": 975,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_Yeti": {
+      "RunSpeed": 547,
+      "RideSprintSpeed": 825
+    },
+    "BOSS_Yeti_Grass": {
+      "RunSpeed": 547,
+      "RideSprintSpeed": 825
+    },
+    "BOSS_MushroomDragon": {
+      "RunSpeed": 600,
+      "RideSprintSpeed": 1050
+    },
+    "BOSS_MushroomDragon_Dark": {
+      "RunSpeed": 600,
+      "RideSprintSpeed": 1050
+    },
+    "BOSS_BlackMetalDragon": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_BlackGriffon": {
+      "RunSpeed": 1275,
+      "RideSprintSpeed": 1800
+    },
+    "BOSS_IceHorse": {
+      "RunSpeed": 1500,
+      "RideSprintSpeed": 2250
+    },
+    "BOSS_SaintCentaur": {
+      "RunSpeed": 1200,
+      "RideSprintSpeed": 2100
+    },
+    "BOSS_BlackCentaur": {
+      "RunSpeed": 1350,
+      "RideSprintSpeed": 2400
+    },
+    "BOSS_JetDragon": {
+      "RunSpeed": 1700,
+      "RideSprintSpeed": 3300
+    },
+    "BOSS_WhiteAlienDragon": {
+      "RunSpeed": 1185,
+      "RideSprintSpeed": 1800
+    },
+    "BOSS_MoonQueen": {
+      "RunSpeed": 1350,
+      "RideSprintSpeed": 1650
+    },
+    "BOSS_GoldenHorse": {
+      "RunSpeed": 1185,
+      "RideSprintSpeed": 1890
+    },
+    "BOSS_BlueThunderHorse": {
+      "RunSpeed": 1350,
+      "RideSprintSpeed": 1890
+    },
+    "BOSS_NightBlueHorse": {
+      "RunSpeed": 900,
+      "RideSprintSpeed": 1200
+    },
+    "BOSS_WhiteShieldDragon": {
+      "RunSpeed": 750,
+      "RideSprintSpeed": 1125
+    },
+    "BOSS_WhiteDeer": {
+      "RunSpeed": 1200,
+      "RideSprintSpeed": 1800
+    },
+    "BOSS_SnowTigerBeastman": {
+      "RunSpeed": 1050,
+      "RideSprintSpeed": 1350
+    },
+    "BOSS_DarkMechaDragon": {
+      "RunSpeed": 1500,
+      "RideSprintSpeed": 3000
+    },
+    "BOSS_IceNarwhal": {
+      "RunSpeed": 820,
+      "RideSprintSpeed": 990
+    },
+    "BOSS_IceNarwhal_Fire": {
+      "RunSpeed": 820,
+      "RideSprintSpeed": 990
+    },
+    "BOSS_Plesiosaur": {
+      "RunSpeed": 800,
+      "RideSprintSpeed": 1300
+    },
+    "WingGolem_Oilrig": {
+      "EnemyMaxHPRate": 5.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 2.0
+    },
+    "DarkAlien_Oilrig": {
+      "EnemyMaxHPRate": 5.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 2.0
+    },
+    "Horus_Oilrig": {
+      "EnemyMaxHPRate": 5.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 2.0
+    },
+    "Baphomet_Dark_Oilrig": {
+      "EnemyMaxHPRate": 5.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 2.0
+    },
+    "HadesBird_Oilrig": {
+      "EnemyMaxHPRate": 5.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 2.0
+    },
+    "LizardMan_Oilrig": {
+      "EnemyMaxHPRate": 5.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 2.0
+    },
+    "RAID_NightLady": {
+      "EnemyMaxHPRate": 120.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 1.5
+    },
+    "RAID_NightLady_Dark": {
+      "EnemyMaxHPRate": 120.0,
+      "EnemyReceiveDamageRate": 0.4,
+      "EnemyInflictDamageRate": 2.0
+    },
+    "RAID_NightLady_Dark_2": {
+      "EnemyMaxHPRate": 240.0,
+      "EnemyReceiveDamageRate": 0.25,
+      "EnemyInflictDamageRate": 3.0
+    },
+    "RAID_KingBahamut_Dragon": {
+      "EnemyMaxHPRate": 140.0,
+      "EnemyReceiveDamageRate": 0.4,
+      "EnemyInflictDamageRate": 2.0
+    },
+    "RAID_KingBahamut_Dragon_2": {
+      "EnemyMaxHPRate": 280.0,
+      "EnemyReceiveDamageRate": 0.3,
+      "EnemyInflictDamageRate": 3.2
+    },
+    "RAID_DarkMechaDragon": {
+      "EnemyMaxHPRate": 280.0,
+      "EnemyReceiveDamageRate": 0.35,
+      "EnemyInflictDamageRate": 5.0
+    },
+    "RAID_DarkMechaDragon_2": {
+      "EnemyMaxHPRate": 420.0,
+      "EnemyReceiveDamageRate": 0.24,
+      "EnemyInflictDamageRate": 13.0
+    },
+    "RAID_YakushimaBoss001_Green": {
+      "EnemyMaxHPRate": 1.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 1.0
+    },
+    "RAID_YakushimaBoss002": {
+      "EnemyMaxHPRate": 130.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 1.0
+    },
+    "RAID_YakushimaBoss002_Hand_Left": {
+      "EnemyMaxHPRate": 20.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 1.0
+    },
+    "RAID_YakushimaBoss002_Hand_Right": {
+      "EnemyMaxHPRate": 20.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 1.0
+    },
+    "RAID_YakushimaBoss002_Head": {
+      "EnemyMaxHPRate": 40.0,
+      "EnemyReceiveDamageRate": 1.0,
+      "EnemyInflictDamageRate": 1.0
+    }
+  },
+
+
+
+  // Humans
+  "DT_PalHumanParameter": {
+    "SecurityDrone": {
+      "EnemyMaxHPRate": 100.0,
+      "EnemyInflictDamageRate": 1.0
+    },
+    "Hunter_Rifle_LargeOilrig": {
+      "EnemyMaxHPRate": 4.0,
+      "EnemyInflictDamageRate": 8.0
+    },
+    "Hunter_Shotgun_LargeOilrig": {
+      "EnemyMaxHPRate": 4.0,
+      "EnemyInflictDamageRate": 8.0
+    },
+    "Hunter_Grenade_LargeOilrig": {
+      "EnemyMaxHPRate": 4.0,
+      "EnemyInflictDamageRate": 8.0
+    },
+    "Hunter_FlameThrower_LargeOilrig": {
+      "EnemyMaxHPRate": 4.0,
+      "EnemyInflictDamageRate": 8.0
+    },
+    "Hunter_Fat_GatlingGun_LargeOilrig": {
+      "EnemyMaxHPRate": 4.0,
+      "EnemyInflictDamageRate": 8.0
+    },
+    "Hunter_RocketLauncher_LargeOilrig": {
+      "EnemyMaxHPRate": 4.0,
+      "EnemyInflictDamageRate": 4.0
+    },
+    "Hunter_GrenadeLauncher_LargeOilrig": {
+      "EnemyMaxHPRate": 4.0,
+      "EnemyInflictDamageRate": 4.0
+    },
+    "Hunter_MissileLauncher_LargeOilrig": {
+      "EnemyMaxHPRate": 4.0,
+      "EnemyInflictDamageRate": 4.0
+    },
+
+
+
+    "Hunter_Shotgun_Oilrig": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 4.0
+    },
+    "Hunter_FlameThrower_Oilrig": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 4.0
+    },
+    "Hunter_Fat_GatlingGun_Oilrig": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 4.0
+    },
+    "Hunter_LaserRifle_Oilrig": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 4.0
+    },
+    "Hunter_BowGun_Oilrig": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 4.0
+    },
+    "Hunter_Katana_Oilrig": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 4.0
+    },
+    "Hunter_Rifle_Oilrig": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 4.0
+    },
+    "Hunter_Grenade_Oilrig": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 4.0
+    },
+    "Hunter_MissileLauncher_Oilrig": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 2.0
+    },
+    "Hunter_GrenadeLauncher_Oilrig": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 2.0
+    },
+    "Hunter_RocketLauncher_Oilrig_LD": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 2.0
+    },
+    "Hunter_RocketLauncher_Oilrig": {
+      "EnemyMaxHPRate": 2.0,
+      "EnemyInflictDamageRate": 2.0
+    }
+  },
+  // Player
+  "DT_PalPlayerParameter": {
+    "*": {
+      "CraftSpeed": 500
+    }
+  }
+}

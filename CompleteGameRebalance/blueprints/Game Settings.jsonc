@@ -1,0 +1,206 @@
+{
+    "BP_PalGameSetting_C": {
+        "MaxUseablePoint_SumStatusPointAndExStatusPoint_PerParameter": 9999.0,
+        "AddMaxHPPerStatusPoint": 100.0,
+        "AddMaxSPPerStatusPoint": 10.0,
+        "AddPowerPerStatusPoint": 5.0,
+        "AddMaxInventoryWeightPerStatusPoint": 100.0,
+        "AddWorkSpeedPerStatusPoint": 100.0,
+        "DefaultMaxInventoryWeight": 500.0,
+        "AddMaxHPPerHPRank": 0.05,
+        "AddAttackPerAttackRank": 0.05,
+        "AddDefencePerDefenceRank": 0.05,
+        "AddWorkSpeedPerWorkSpeedRank": 0.05,
+        "OverWeightMinSpeed": 300,
+        "SellPalRate": 0.15,
+        "SellItemRate": 0.15,
+        "PalBoxReviveTime": 2.5,
+        "GuildChestSlotNum": 300,
+        "RarePal_AppearanceProbability": 0.2,
+        "RarePal_LevelMultiply": 1.0,
+        "BossOrRarePal_TalentMin": 100,
+        "AutoHPRegene_Percent_perSecond": 2.0,
+        "StaminaRecover_PercentPerSecond": 50.0,
+        "worldmapUIMaskClearSize": 100.0,
+        "LongPressInterval_GetHatchedPal": 0,
+        "LongPressInterval_EnemyCampCage": 2.0,
+        "FriendshipRank_AutoFavorite": 999999,
+        "InvadeProbability": 0.5,
+        "VisitorNPCProbability": 99.0,
+        // Pal Eggs Incubation Time
+        "PalEggRankInfoArray": [
+            {
+                "PalRarity": 2,
+                "EggScale": 0.7,
+                "HatchingSpeedDivisionRate": 10.0
+            },
+            {
+                "PalRarity": 4,
+                "EggScale": 0.9,
+                "HatchingSpeedDivisionRate": 10.0
+            },
+            {
+                "PalRarity": 6,
+                "EggScale": 1.1,
+                "HatchingSpeedDivisionRate": 8.0
+            },
+            {
+                "PalRarity": 7,
+                "EggScale": 1.5,
+                "HatchingSpeedDivisionRate": 8.0
+            },
+            {
+                "PalRarity": 99,
+                "EggScale": 2.0,
+                "HatchingSpeedDivisionRate": 6.0
+            }
+        ],
+        // Breeding inheritances
+        "Combi_BossPalRate": 0.15,
+        "Combi_TalentInheritNum": [
+            0.0,
+            0.0,
+            1.0
+        ],
+        "Combi_PassiveInheritNum": [
+            1.0,
+            2.0,
+            3.0,
+            4.0
+        ],
+        "Combi_PassiveRandomAddNum": [
+            4.0,
+            3.0,
+            2.0,
+            1.0
+        ],
+        // Pal Work Priority
+        "WorkTypeAssignPriorityOrder": [
+            {
+                "WorkTypes": [
+                    "EPalWorkType::Defense"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::ReviveCharacter",
+                    "EPalWorkType::ExtinguishBurn"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::Architecture"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::DedicatedWork01"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::MonsterFarm"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::LabResearch"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::GenerateEnergy"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::RepairBuildObject"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::Cooking"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::Smelting",
+                    "EPalWorkType::Ignition"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::ProductMedicine",
+                    "EPalWorkType::Watering"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::FarmHarvest",
+                    "EPalWorkType::TransportFoodItemInBaseCamp"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::Seeding",
+                    "EPalWorkType::Watering_Farm"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::ConvertItem",
+                    "EPalWorkType::ProductItem"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::Cool"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::ProductResource_Mining_OnFacility",
+                    "EPalWorkType::ProductResource_Deforest_OnFacility"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::ProductResource_Mining",
+                    "EPalWorkType::ProductResource_Deforest"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::TransportDisposableItemInBaseCamp"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::TransportItemInBaseCamp"
+                ]
+            },
+            {
+                "WorkTypes": [
+                    "EPalWorkType::CollectResourcePickable",
+                    "EPalWorkType::HarvestLevelObject"
+                ]
+            }
+        ]
+    },
+    //Fishing
+    "BP_PalFishingSystem_C": {
+        "CatchBattleParameter": {
+            "DefaultProgressAmount": 300.0,
+            "SuccessFightCatchAmount": 200.0,
+            "MissFightCatchAmount": 80.0
+        }
+    },
+    // Short buttom press for Junk piles
+    "BP_MapObject_TreasureBox_RequiredLongHold_Junk_C": {
+        "LongHoldInteractDuration": 1.5
+    },
+    // Short buttom press for Golden chests
+    "BP_MapObject_TreasureBox_OilrigGoal_C": {
+        "LongHoldInteractDuration": 4.0
+    }
+}
