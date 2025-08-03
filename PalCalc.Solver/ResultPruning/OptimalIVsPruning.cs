@@ -29,7 +29,7 @@ namespace PalCalc.Solver.ResultPruning
 
         static int TotalIVs(IPalReference r) => TotalIVs(r.IVs);
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results)
+        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData)
         {
             // note: all pals within a group being pruned should:
             //

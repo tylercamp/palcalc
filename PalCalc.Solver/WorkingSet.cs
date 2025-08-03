@@ -33,11 +33,17 @@ namespace PalCalc.Solver
         int maxThreads;
         PalSpecifier target;
         private List<IPalReference> discoveredResults = new List<IPalReference>();
-        public IEnumerable<IPalReference> Result => discoveredResults.Distinct().GroupBy(r => r.BreedingEffort).SelectMany(PruningFunc);
+        public IEnumerable<IPalReference> Result
+        {
+            get
+            {
+                return discoveredResults.Distinct().GroupBy(r => r.BreedingEffort).SelectMany(g => PruningFunc(g, new CachedResultData(g)));
+            }
+        }
         
         public IEnumerable<IPalReference> CurrentContent => content.All;
 
-        Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>> PruningFunc;
+        Func<IEnumerable<IPalReference>, CachedResultData, IEnumerable<IPalReference>> PruningFunc;
 
         public WorkingSet(PalSpecifier target, PruningRulesBuilder pruningRulesBuilder, IEnumerable<IPalReference> initialContent, int maxThreads, SolverStateController controller)
         {
@@ -149,7 +155,8 @@ namespace PalCalc.Solver
                 .TakeUntilCancelled(controller.CancellationToken)
                 .Tap(_ => controller.PauseIfRequested())
                 .GroupBy(pref => DefaultGroupFn(pref))
-                .SelectMany(g => PruningFunc(g.Distinct()));
+                .Select(g => g.Distinct())
+                .SelectMany(g => PruningFunc(g, new CachedResultData(g)));
 
         private record class MergeChangeset(bool Changed, List<IPalReference> Added, HashSet<IPalReference> Removed);
 
@@ -213,7 +220,8 @@ namespace PalCalc.Solver
 
                 if (refInst != null)
                 {
-                    var newSelection = PruningFunc(existingInstances.Concat(newInstances.Except(existingInstances)));
+                    var allInstances = existingInstances.Concat(newInstances.Except(existingInstances));
+                    var newSelection = PruningFunc(allInstances, new CachedResultData(allInstances));
 
                     var added = newInstances.Intersect(newSelection).Except(existingInstances);
                     var removed = existingInstances.Except(newSelection);

@@ -14,11 +14,11 @@ namespace PalCalc.Solver.ResultPruning
         {
         }
 
-        private static int NumReferencedPlayers(IPalReference r)
+        private static int NumReferencedPlayers(IPalReference r, CachedResultData cachedData)
         {
             List<string> playerIds = [];
 
-            foreach (var p in r.AllReferences())
+            foreach (var p in cachedData.InnerReferences[r])
             {
                 switch (p)
                 {
@@ -46,7 +46,7 @@ namespace PalCalc.Solver.ResultPruning
             return playerIds.Count;
         }
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            MinGroupOf(results, NumReferencedPlayers);
+        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
+            MinGroupOf(results, r => NumReferencedPlayers(r, cachedData));
     }
 }

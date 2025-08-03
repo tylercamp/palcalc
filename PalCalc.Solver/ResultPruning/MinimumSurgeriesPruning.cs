@@ -13,7 +13,7 @@ namespace PalCalc.Solver.ResultPruning
 
         int NumSurgeries(IPalReference r) => r.NumTotalSurgerySteps;
 
-        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results) =>
+        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
             MinGroupOf(results, NumSurgeries);
     }
 }

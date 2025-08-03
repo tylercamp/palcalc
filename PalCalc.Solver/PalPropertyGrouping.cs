@@ -86,7 +86,7 @@ namespace PalCalc.Solver
         {
             var pruner = prb.BuildAggregate(token);
             foreach (var group in content.Keys.TakeWhile(_ => !token.IsCancellationRequested))
-                content[group] = pruner.Apply(content[group]).ToList();
+                content[group] = pruner.Apply(content[group], new CachedResultData(content[group])).ToList();
         }
 
         public void Filter(int key, FilterFunc filterFn)

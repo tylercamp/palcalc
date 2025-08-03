@@ -12,6 +12,11 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.ResultPruning
 {
+    public class CachedResultData(IEnumerable<IPalReference> results)
+    {
+        public Dictionary<IPalReference, List<IPalReference>> InnerReferences { get; } = results.ToDictionary(r => r, r => r.AllReferences().ToList());
+    }
+
     public abstract class IResultPruning
     {
         protected CancellationToken token;
@@ -20,7 +25,7 @@ namespace PalCalc.Solver.ResultPruning
             this.token = token;
         }
 
-        public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results);
+        public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData);
 
         protected static readonly IEnumerable<IPalReference> Empty = Enumerable.Empty<IPalReference>();
         protected IEnumerable<IPalReference> MinGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)
@@ -75,10 +80,10 @@ namespace PalCalc.Solver.ResultPruning
             {
             }
 
-            public sealed override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-                ApplyNonDeterministic(results.OrderBy(r => r.GetHashCode()));
+            public sealed override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
+                ApplyNonDeterministic(results.OrderBy(r => r.GetHashCode()), cachedData);
 
-            protected abstract IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results);
+            protected abstract IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results, CachedResultData cachedData);
         }
     }
 }

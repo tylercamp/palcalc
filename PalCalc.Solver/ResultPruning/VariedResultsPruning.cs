@@ -24,11 +24,11 @@ namespace PalCalc.Solver.ResultPruning
         private static K KvpKey<K, V>(KeyValuePair<K, V> kvp) => kvp.Key;
         private static V KvpValue<K, V>(KeyValuePair<K, V> kvp) => kvp.Value;
 
-        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results)
+        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results, CachedResultData cachedData)
         {
             var palOccurrences = results.ToDictionary(Identity, r =>
             {
-                return r.AllReferences().GroupBy(ir => ir.Pal).ToDictionary(GroupKeyOf, g => g.Count());
+                return cachedData.InnerReferences[r].GroupBy(ir => ir.Pal).ToDictionary(GroupKeyOf, g => g.Count());
             });
 
             var totalPalOccurrences = new Dictionary<Pal, int>();

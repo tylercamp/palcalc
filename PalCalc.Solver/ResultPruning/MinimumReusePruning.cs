@@ -14,10 +14,10 @@ namespace PalCalc.Solver.ResultPruning
         {
         }
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
+        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
             MinGroupOf(results, r =>
             {
-                var observed = r.AllReferences().ToList();
+                var observed = cachedData.InnerReferences[r];
                 return -(observed.Count - observed.Distinct().Count());
             });
     }

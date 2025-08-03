@@ -13,7 +13,7 @@ namespace PalCalc.Solver.ResultPruning
 
         private static int NumGenderReversers(IPalReference r) => r.NumTotalGenderReversers;
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
+        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
             MinGroupOf(results, NumGenderReversers);
     }
 }

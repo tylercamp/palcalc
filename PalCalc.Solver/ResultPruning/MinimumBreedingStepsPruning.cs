@@ -15,7 +15,7 @@ namespace PalCalc.Solver.ResultPruning
 
         private static int NumBreedingSteps(IPalReference r) => r.NumTotalBreedingSteps;
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
+        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
             MinGroupOf(results, NumBreedingSteps);
     }
 }

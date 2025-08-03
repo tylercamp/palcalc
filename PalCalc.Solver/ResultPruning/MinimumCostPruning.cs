@@ -9,7 +9,7 @@ namespace PalCalc.Solver.ResultPruning
 
         private static int TotalCost(IPalReference r) => r.TotalCost;
 
-        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results) =>
+        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
             MinGroupOf(results, TotalCost);
     }
 }
