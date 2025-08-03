@@ -377,8 +377,7 @@ namespace PalCalc.GenDB
                 .Distinct()
                 // (the `.Child` calc takes a while, parallelize that part)
                 .ToList()
-                .BatchedForParallel()
-                .AsParallel()
+                .BatchedAsParallel()
                 .SelectMany(batch =>
                     batch
                         .SelectMany(pair => new[] {

@@ -237,7 +237,7 @@ namespace PalCalc.Solver
 
                     var progressTimer = new Timer(EmitProgressMsg, null, (int)SolverStateUpdateInterval.TotalMilliseconds, (int)SolverStateUpdateInterval.TotalMilliseconds);
 
-                    var chunksEnumerator = work.Chunks(work.Count.PreferredParallelBatchSize()).GetEnumerator();
+                    var chunksEnumerator = work.Chunks(work.Count.PreferredParallelBatchSize()).TakeUntilCancelled(controller.CancellationToken).GetEnumerator();
                     var results = new ConcurrentBag<List<IPalReference>>();
 
                     // specifically avoiding AsParallel so we don't congest the default threadpool and so we can
@@ -307,10 +307,11 @@ namespace PalCalc.Solver
                                 // there's a replaceable passive
                                 r.EffectivePassives.Any(p => p is RandomPassiveSkill)
                             )
+                            .TakeUntilCancelled(controller.CancellationToken)
                             .ToList()
-                            .BatchedForParallel()
                             // (this should be relatively quick, will just use normal AsParallel)
-                            .AsParallel()
+                            .BatchedAsParallel()
+                            .WithCancellation(controller.CancellationToken)
                             .WithDegreeOfParallelism(settings.MaxThreads)
                             .SelectMany(batch => batch.SelectMany(r =>
                             {
@@ -354,7 +355,8 @@ namespace PalCalc.Solver
                                         }
                                     }
 
-                                    res.Add(SurgeryTablePalReference.NewCached(r, ref ops));
+                                    SurgeryTablePalReference.NewCached(r, ref ops, out var newRes);
+                                    res.Add(newRes);
                                 }
 
                                 return res.Where(re => re != r);

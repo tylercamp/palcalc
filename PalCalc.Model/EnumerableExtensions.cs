@@ -57,8 +57,8 @@ namespace PalCalc.Model
             }
         }
 
-        public static IEnumerable<IEnumerable<T>> BatchedForParallel<T>(this List<T> elements) =>
-            elements.Batched(elements.PreferredParallelBatchSize());
+        public static ParallelQuery<IEnumerable<T>> BatchedAsParallel<T>(this List<T> elements) =>
+            elements.Batched(elements.PreferredParallelBatchSize()).AsParallel();
 
         public static IEnumerable<T> SkipNull<T>(this IEnumerable<T> elements) => elements.Where(v => v != null);
 

@@ -70,6 +70,7 @@ namespace PalCalc.Solver
     {
         private PalDB db = settings.DB;
 
+        private LocalListPool<IEnumerable<PassiveSkill>> passiveMultiListPool = poolFactory.GetListPool<IEnumerable<PassiveSkill>>();
         private LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();
         private LocalListPool<(IPalReference, IPalReference)> palPairListPool = poolFactory.GetListPool<(IPalReference, IPalReference)>();
         private LocalObjectPool<IV_Set> ivSetPool = poolFactory.GetObjectPool<IV_Set>();
@@ -96,7 +97,7 @@ namespace PalCalc.Solver
         /// <param name="requiredPassives">The list of passives that will be contained in all permutations.</param>
         /// <param name="optionalPassives">The list of passives that will appear at least once across the permutations, if possible.</param>
         /// <returns></returns>
-        static IEnumerable<IEnumerable<PassiveSkill>> PassiveSkillPermutations(List<PassiveSkill> requiredPassives, List<PassiveSkill> optionalPassives)
+        List<IEnumerable<PassiveSkill>> PassiveSkillPermutations(List<PassiveSkill> requiredPassives, List<PassiveSkill> optionalPassives)
         {
 #if DEBUG && DEBUG_CHECKS
             if (
@@ -107,19 +108,22 @@ namespace PalCalc.Solver
             ) Debugger.Break();
 #endif
 
+            var res = passiveMultiListPool.Borrow();
+
             // can't add any optional passives, just return required passives
             if (optionalPassives.Count == 0 || requiredPassives.Count == GameConstants.MaxTotalPassives)
             {
-                yield return requiredPassives;
-                yield break;
+                res.Add(requiredPassives);
+                return res;
             }
 
-            var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count();
+            var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count;
             foreach (var optional in optionalPassives.Combinations(maxOptionalPassives))
             {
-                var res = requiredPassives.Concat(optional);
-                yield return res;
+                res.Add(requiredPassives.Concat(optional));
             }
+
+            return res;
         }
 
         TimeSpan CombinedEffort(IPalReference p1, IPalReference p2) =>
@@ -351,28 +355,40 @@ namespace PalCalc.Solver
 
                     if (remainingReversers > 0)
                     {
-                        genderedParentPairs.Add(ReorderPair((
-                            p.Item1,
-                            SurgeryTablePalReference.EnforceGender(p.Item2, p.Item1.Gender.OppositeGender())
-                        )));
+                        if (p.Item2.Gender != p.Item1.Gender.OppositeGender())
+                        {
+                            genderedParentPairs.AddIfMissing(ReorderPair((
+                                p.Item1,
+                                SurgeryTablePalReference.EnforceGender(db, p.Item2, p.Item1.Gender.OppositeGender(), poolFactory)
+                            )));
+                        }
 
-                        genderedParentPairs.Add(ReorderPair((
-                            SurgeryTablePalReference.EnforceGender(p.Item1, p.Item2.Gender.OppositeGender()),
-                            p.Item2
-                        )));
+                        if (p.Item1.Gender != p.Item2.Gender.OppositeGender())
+                        {
+                            genderedParentPairs.AddIfMissing(ReorderPair((
+                                SurgeryTablePalReference.EnforceGender(db, p.Item1, p.Item2.Gender.OppositeGender(), poolFactory),
+                                p.Item2
+                            )));
+                        }
                     }
 
                     if (remainingReversers > 1)
                     {
-                        genderedParentPairs.Add(ReorderPair((
-                            SurgeryTablePalReference.EnforceGender(p.Item1, PalGender.MALE),
-                            SurgeryTablePalReference.EnforceGender(p.Item2, PalGender.FEMALE)
-                        )));
+                        if (p.Item1.Gender != PalGender.MALE || p.Item2.Gender != PalGender.FEMALE)
+                        {
+                            genderedParentPairs.AddIfMissing(ReorderPair((
+                                SurgeryTablePalReference.EnforceGender(db, p.Item1, PalGender.MALE, poolFactory),
+                                SurgeryTablePalReference.EnforceGender(db, p.Item2, PalGender.FEMALE, poolFactory)
+                            )));
+                        }
 
-                        genderedParentPairs.Add(ReorderPair((
-                            SurgeryTablePalReference.EnforceGender(p.Item1, PalGender.FEMALE),
-                            SurgeryTablePalReference.EnforceGender(p.Item2, PalGender.MALE)
-                        )));
+                        if (p.Item1.Gender != PalGender.FEMALE || p.Item2.Gender != PalGender.MALE)
+                        {
+                            genderedParentPairs.AddIfMissing(ReorderPair((
+                                SurgeryTablePalReference.EnforceGender(db, p.Item1, PalGender.FEMALE, poolFactory),
+                                SurgeryTablePalReference.EnforceGender(db, p.Item2, PalGender.MALE, poolFactory)
+                            )));
+                        }
                     }
                 }
 
@@ -422,7 +438,8 @@ namespace PalCalc.Solver
                     // so we'd end up overestimating the effort of parents which have the same (but irrelevant)
                     // passives.
 
-                    foreach (var rawTargetPassives in PassiveSkillPermutations(availableRequiredPassives, availableOptionalPassives))
+                    var passivePerms = PassiveSkillPermutations(availableRequiredPassives, availableOptionalPassives);
+                    foreach (var rawTargetPassives in passivePerms)
                     {
                         var targetPassives = passiveListPool.BorrowWith(rawTargetPassives);
 
@@ -511,6 +528,7 @@ namespace PalCalc.Solver
 
                         passiveListPool.Return(targetPassives);
                     }
+                    passiveMultiListPool.Return(passivePerms);
                 }
 
                 palPairListPool.Return(genderedParentPairs);

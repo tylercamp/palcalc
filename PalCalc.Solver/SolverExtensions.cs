@@ -74,7 +74,31 @@ namespace PalCalc.Solver
             }
         }
 
+        internal static void AddAllReferences(this IPalReference pref, List<IPalReference> target)
+        {
+            target.Add(pref);
+
+            switch (pref)
+            {
+                case BredPalReference bpr:
+
+                    bpr.Parent1.AddAllReferences(target);
+                    bpr.Parent2.AddAllReferences(target);
+                    break;
+
+                case SurgeryTablePalReference stpr:
+                    stpr.Input.AddAllReferences(target);
+                    break;
+            }
+        }
+
         public static IEnumerable<T> TakeUntilCancelled<T>(this IEnumerable<T> e, CancellationToken token) =>
             e.TakeWhile(_ => !token.IsCancellationRequested);
+
+        internal static void AddIfMissing<T>(this List<T> l, T value)
+        {
+            if (!l.Contains(value))
+                l.Add(value);
+        }
     }
 }

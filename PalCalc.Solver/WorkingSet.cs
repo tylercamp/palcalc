@@ -173,15 +173,18 @@ namespace PalCalc.Solver
                     .Tap(_ => controller.PauseIfRequested())
                     .Where(target.IsSatisfiedBy)
             );
+            if (controller.CancellationToken.IsCancellationRequested) return new MergeChangeset(false, [], []);
 
             logger.Debug("performing pre-prune on {count} items", newResults.Count);
             var pruned = PruneCollection(
-                newResults.BatchedForParallel()
-                    .AsParallel()
+                newResults
+                    .BatchedAsParallel()
+                    .WithCancellation(controller.CancellationToken)
                     .WithDegreeOfParallelism(maxThreads)
                     .SelectMany(batch => PruneCollection(batch).ToList())
                     .ToList()
             );
+            if (controller.CancellationToken.IsCancellationRequested) return new MergeChangeset(false, [], []);
 
             logger.Debug("merging");
 
@@ -212,7 +215,7 @@ namespace PalCalc.Solver
                 {
                     var newSelection = PruningFunc(existingInstances.Concat(newInstances.Except(existingInstances)));
 
-                    var added = newInstances.Intersect(newSelection);
+                    var added = newInstances.Intersect(newSelection).Except(existingInstances);
                     var removed = existingInstances.Except(newSelection);
 
                     if (added.Any())

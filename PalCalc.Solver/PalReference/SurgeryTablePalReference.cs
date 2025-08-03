@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Transactions;
 
 namespace PalCalc.Solver.PalReference
 {
@@ -123,6 +124,7 @@ namespace PalCalc.Solver.PalReference
         public int TotalCost { get; }
 
         private int operationsHash;
+        private int inputHash;
 
         // primarily handles multiple gender-change ops, takes the last gender-change op
         // (`ref` param isn't functionally required, but meant to indicate that the list contents will change)
@@ -166,6 +168,7 @@ namespace PalCalc.Solver.PalReference
             TotalCost = input.TotalCost;
 
             operationsHash = Operations.ListSetHash();
+            inputHash = Input.GetHashCode();
 
 #if DEBUG_CHECKS
             if (
@@ -284,14 +287,14 @@ namespace PalCalc.Solver.PalReference
                     }
                 }
 
-                result = SurgeryTablePalReference.NewCached(newParent, ref newOperations);
+                SurgeryTablePalReference.NewCached(newParent, ref newOperations, out result);
             }
             else
             {
                 // NewCached takes `ref` since it will modify and try to optimize the list of operations, but `Operations` should have
                 // already been optimized, so it should no-op
                 var selfOps = Operations;
-                result = SurgeryTablePalReference.NewCached(newParent, ref selfOps);
+                SurgeryTablePalReference.NewCached(newParent, ref selfOps, out result);
             }
 
             cachedGenders[gender] = result;
@@ -299,9 +302,11 @@ namespace PalCalc.Solver.PalReference
             return result;
         }
 
-        public static IPalReference EnforceGender(IPalReference r, PalGender gender)
+        internal static IPalReference EnforceGender(PalDB db, IPalReference r, PalGender gender, ObjectPoolFactory objectFactory)
         {
             if (r.Gender == gender) return r;
+
+            if (r is CompositeOwnedPalReference) return r.WithGuaranteedGender(db, gender);
 
 #if DEBUG && DEBUG_CHECKS
             // this is *technically* OK, but there's no valid reason for this to happen, which suggests
@@ -309,24 +314,42 @@ namespace PalCalc.Solver.PalReference
             if (gender == PalGender.WILDCARD) Debugger.Break();
 #endif
 
+            var listPool = objectFactory.GetListPool<ISurgeryOperation>();
             List<ISurgeryOperation> newOps;
 
             if (r is SurgeryTablePalReference stpr)
             {
-                newOps = new List<ISurgeryOperation>(stpr.Operations.Count + 1);
+                if (objectFactory != null) newOps = listPool.Borrow();
+                else newOps = new List<ISurgeryOperation>(stpr.Operations.Count + 1);
+
                 newOps.AddRange(stpr.Operations);
                 newOps.Add(ChangeGenderSurgeryOperation.NewCached(gender));
-                return NewCached(stpr.Input, ref newOps);
+                var madeNew = NewCached(stpr.Input, ref newOps, out var result);
+
+                if (!madeNew)
+                {
+                    listPool?.Return(newOps);
+                }
+                return result;
             }
             else
             {
-                newOps = new List<ISurgeryOperation>(1);
+                if (objectFactory != null) newOps = listPool.Borrow();
+                else newOps = new List<ISurgeryOperation>(1);
+
                 newOps.Add(ChangeGenderSurgeryOperation.NewCached(gender));
-                return NewCached(r, ref newOps);
+                var madeNew = NewCached(r, ref newOps, out var result);
+
+                if (!madeNew)
+                {
+                    listPool?.Return(newOps);
+                }
+                return result;
             }
         }
 
-        public static IPalReference NewCached(IPalReference r, ref List<ISurgeryOperation> rawOperations)
+        /// <returns>Whether `result` is a newly-created (not previously-cached) instance.</returns>
+        public static bool NewCached(IPalReference r, ref List<ISurgeryOperation> rawOperations, out IPalReference result)
         {
             if (r is ISurgeryCachingPalReference cachingRef)
             {
@@ -334,14 +357,17 @@ namespace PalCalc.Solver.PalReference
                 var opsHash = rawOperations.ListSetHash();
 
                 var cache = cachingRef.SurgeryResultCache;
-                if (!cache.ContainsKey(opsHash))
+                var wasCached = cache.ContainsKey(opsHash);
+                if (!wasCached)
                     cache.TryAdd(opsHash, rawOperations.Count == 0 ? r : new SurgeryTablePalReference(r, ref rawOperations));
 
-                return cache[opsHash];
+                result = cache[opsHash];
+                return !wasCached;
             }
             else
             {
-                return new SurgeryTablePalReference(r, ref rawOperations);
+                result = new SurgeryTablePalReference(r, ref rawOperations);
+                return false;
             }
         }
 
@@ -357,6 +383,6 @@ namespace PalCalc.Solver.PalReference
         }
 
         public override int GetHashCode() =>
-            HashCode.Combine(nameof(SurgeryTablePalReference), Input.GetHashCode(), operationsHash);
+            HashCode.Combine(nameof(SurgeryTablePalReference), inputHash, operationsHash);
     }
 }
