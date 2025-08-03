@@ -22,6 +22,74 @@ namespace PalCalc.Solver.PalReference
             IV_Set ivs
         )
         {
+            InternalInit(gameSettings, pal, parent1, parent2, passives, ivs);
+        }
+
+        /// <summary>
+        /// WARNING - This constructor should only be used by the object-pool
+        /// </summary>
+        public BredPalReference()
+        {
+        }
+
+        public BredPalReference(
+            GameSettings gameSettings,
+            Pal pal,
+            IPalReference parent1,
+            IPalReference parent2,
+            List<PassiveSkill> passives,
+            float passivesProbability,
+            IV_Set ivs,
+            float ivsProbability
+        )
+        {
+            Init(gameSettings, pal, parent1, parent2, passives, passivesProbability, ivs, ivsProbability);
+        }
+
+        internal void Init(
+            GameSettings gameSettings,
+            Pal pal,
+            IPalReference parent1,
+            IPalReference parent2,
+            List<PassiveSkill> passives,
+            float passivesProbability,
+            IV_Set ivs,
+            float ivsProbability
+        )
+        {
+            InternalInit(gameSettings, pal, parent1, parent2, passives, ivs);
+
+            Gender = PalGender.WILDCARD;
+            if (passivesProbability <= 0 || ivsProbability <= 0)
+            {
+                // don't think this is actually needed anymore, keeping just in case
+#if DEBUG
+                Debugger.Break();
+#endif
+                AvgRequiredBreedings = int.MaxValue;
+            }
+            else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / (passivesProbability * ivsProbability));
+
+            PassivesProbability = passivesProbability;
+            IVsProbability = ivsProbability;
+        }
+
+        private void InternalInit(
+            GameSettings gameSettings,
+            Pal pal,
+            IPalReference parent1,
+            IPalReference parent2,
+            List<PassiveSkill> passives,
+            IV_Set ivs
+        )
+        {
+            // reset any cached values
+            this.numTotalBreedingSteps = -1;
+            this.cachedMaleRef = null;
+            this.cachedFemaleRef = null;
+            this.cachedOppositeWildcardRef = null;
+            this.surgeryResultCache = null;
+
             this.gameSettings = gameSettings;
 
             Pal = pal;
@@ -60,32 +128,6 @@ namespace PalCalc.Solver.PalReference
             TimeFactor = EffectivePassives.ToTimeFactor();
         }
 
-        public BredPalReference(
-            GameSettings gameSettings,
-            Pal pal,
-            IPalReference parent1,
-            IPalReference parent2,
-            List<PassiveSkill> passives,
-            float passivesProbability,
-            IV_Set ivs,
-            float ivsProbability
-        ) : this(gameSettings, pal, parent1, parent2, passives, ivs)
-        {
-            Gender = PalGender.WILDCARD;
-            if (passivesProbability <= 0 || ivsProbability <= 0)
-            {
-                // don't think this is actually needed anymore, keeping just in case
-#if DEBUG
-                Debugger.Break();
-#endif
-                AvgRequiredBreedings = int.MaxValue;
-            }
-            else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / (passivesProbability * ivsProbability));
-
-            PassivesProbability = passivesProbability;
-            IVsProbability = ivsProbability;
-        }
-
         public float PassivesProbability { get; private set; }
 
         public Pal Pal { get; private set; }
@@ -99,7 +141,7 @@ namespace PalCalc.Solver.PalReference
         public IV_Set IVs { get; private set; }
         public float IVsProbability { get; private set; }
 
-        public float TimeFactor { get; }
+        public float TimeFactor { get; private set; }
 
         private int _avgRequiredBreedings;
         public int AvgRequiredBreedings
@@ -173,9 +215,9 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalEggs => AvgRequiredBreedings + Parent1.NumTotalEggs + Parent2.NumTotalEggs;
 
-        public List<PassiveSkill> EffectivePassives { get; }
+        public List<PassiveSkill> EffectivePassives { get; private set; }
 
-        public int EffectivePassivesHash { get; }
+        public int EffectivePassivesHash { get; private set; }
 
         public List<PassiveSkill> ActualPassives => EffectivePassives;
 

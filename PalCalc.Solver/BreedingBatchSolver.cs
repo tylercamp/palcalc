@@ -74,6 +74,7 @@ namespace PalCalc.Solver
         private LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();
         private LocalListPool<(IPalReference, IPalReference)> palPairListPool = poolFactory.GetListPool<(IPalReference, IPalReference)>();
         private LocalObjectPool<IV_Set> ivSetPool = poolFactory.GetObjectPool<IV_Set>();
+        private LocalObjectPool<BredPalReference> bredPalsPool = poolFactory.GetObjectPool<BredPalReference>();
 
         // TODO - should be able to use an object pool for IV_Range
         static IV_IValue MergeIVs(IV_IValue a, IV_IValue b) =>
@@ -472,7 +473,8 @@ namespace PalCalc.Solver
                             while (newPassives.Count < numFinalPassives)
                                 newPassives.Add(new RandomPassiveSkill());
 
-                            var res = new BredPalReference(
+                            var res = bredPalsPool.Borrow();
+                            res.Init(
                                 settings.GameSettings,
                                 childPalType,
                                 parent1,
@@ -517,12 +519,20 @@ namespace PalCalc.Solver
                                 }
 
                                 if (!added)
+                                {
+                                    bredPalsPool.Return(res);
                                     passiveListPool.Return(newPassives);
+                                }
                             }
                             else if (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res))
                             {
                                 createdResult = true;
                                 yield return res;
+                            }
+                            else
+                            {
+                                bredPalsPool.Return(res);
+                                passiveListPool.Return(newPassives);
                             }
                         }
 
