@@ -135,12 +135,26 @@ namespace PalCalc.UI.Model
 
         public static void ClearForSave(ISaveGame save)
         {
-            var cachePath = SaveCachePathFor(save);
-            if (File.Exists(cachePath)) File.Delete(cachePath);
+            try
+            {
+                var cachePath = SaveCachePathFor(save);
+                if (File.Exists(cachePath)) File.Delete(cachePath);
+            }
+            catch (Exception ex)
+            {
+                logger.Warning(ex, "Unable to delete cache-file for {saveId}", save.GameId);
+            }
 
-            var dataPath = SaveFileDataPath(save);
-            if (Directory.Exists(dataPath))
-                Directory.Delete(dataPath, true);
+            try
+            {
+                var dataPath = SaveFileDataPath(save);
+                if (Directory.Exists(dataPath))
+                    Directory.Delete(dataPath, true);
+            }
+            catch (Exception ex)
+            {
+                logger.Warning(ex, "Unable to delete data-folder for {saveId}", save.GameId);
+            }
         }
 
         public static SaveCustomizations LoadSaveCustomizations(ISaveGame forSaveGame, PalDB db)
