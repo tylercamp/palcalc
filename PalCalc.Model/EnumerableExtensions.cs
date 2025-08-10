@@ -154,7 +154,7 @@ namespace PalCalc.Model
         }
 
         // (copy of above impl. with slightly different signature to avoid need for iterator in a Solver hotpath)
-        public static int SetHash<T, V>(this List<T> elements, Func<T, V> selector)
+        public static int SetHash<T, V>(this IReadOnlyList<T> elements, Func<T, V> selector)
         {
             // Stack allocation: no heap allocations here
             Span<int> buffer = stackalloc int[SetHashMaxSize];
@@ -212,7 +212,7 @@ namespace PalCalc.Model
         }
 
         // (copy of above impl. with slightly different signature to avoid need for iterator in a Solver hotpath)
-        public static int ListSetHash<T>(this List<T> elements)
+        public static int ListSetHash<T>(this IReadOnlyList<T> elements)
         {
             // Stack allocation: no heap allocations here
             Span<int> buffer = stackalloc int[SetHashMaxSize];

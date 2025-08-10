@@ -350,6 +350,8 @@ namespace PalCalc.Solver
                     }
                 }
 
+                // TODO - Currently won't handle e.g. "breed pal with 1 desired, 2 undesired passives, replace undesired with desired"
+
                 if (settings.MaxSurgeryReversers > 0)
                 {
                     var remainingReversers = settings.MaxSurgeryReversers - (p.Item1.NumTotalGenderReversers + p.Item2.NumTotalGenderReversers);
