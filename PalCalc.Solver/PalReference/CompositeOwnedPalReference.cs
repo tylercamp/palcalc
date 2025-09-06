@@ -77,6 +77,8 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalEggs { get; } = 0;
 
+        public int NumTotalWildPals { get; } = 0;
+
         public IPalRefLocation Location { get; }
 
         public float TimeFactor { get; }

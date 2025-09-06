@@ -30,10 +30,6 @@ namespace PalCalc.Solver.PalReference
 
         PalGender Gender { get; }
 
-        int NumTotalBreedingSteps { get; }
-
-        int NumTotalEggs { get; }
-
         /// <summary>
         /// Meant for `Philanthropist` passive, which halves the time required to produce a breeding result when this
         /// is used as a parent. These effects are multiplicative, e.g. 1 with Philanthropist gives 0.5x total factor,
@@ -51,5 +47,14 @@ namespace PalCalc.Solver.PalReference
         IPalReference WithGuaranteedGender(PalDB db, PalGender gender);
 
         bool IsCompatibleGender(PalGender otherGender) => Gender == PalGender.WILDCARD || Gender != otherGender;
+
+
+
+        /* Small, pre-computed properties used for result pruning (try and minimize calls to `.AllReferences()` ext. method */
+        int NumTotalBreedingSteps { get; }
+
+        int NumTotalEggs { get; }
+
+        int NumTotalWildPals { get; }
     }
 }

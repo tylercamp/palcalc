@@ -332,6 +332,8 @@ namespace PalCalc.Solver
                 bool createdResult = false;
                 foreach (var expanded in expandedGendersByChildren)
                 {
+                    if (controller.CancellationToken.IsCancellationRequested) yield break;
+
                     // arbitrary reordering of (p1, p2) to prevent duplicate results from swapped pairs
                     // (though this shouldn't be necessary if the `IResultPruning` impls are working right?)
                     var reexpanded = expanded.Item1.GetHashCode() > expanded.Item2.GetHashCode()

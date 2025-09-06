@@ -15,6 +15,6 @@ namespace PalCalc.Solver.ResultPruning
         }
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r => r.BreedingEffort);
+            MinGroupOf(results, r => r.BreedingEffort);
     }
 }

@@ -167,6 +167,8 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalEggs => AvgRequiredBreedings + Parent1.NumTotalEggs + Parent2.NumTotalEggs;
 
+        public int NumTotalWildPals => Parent1.NumTotalWildPals + Parent2.NumTotalWildPals;
+
         public List<PassiveSkill> EffectivePassives { get; }
 
         public int EffectivePassivesHash { get; }

@@ -88,7 +88,7 @@ namespace PalCalc.Solver
 
             discoveredResults.AddRange(
                 newResults
-                    .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)
+                    .TakeUntilCancelled(controller.CancellationToken)
                     .Tap(_ => controller.PauseIfRequested())
                     .Where(target.IsSatisfiedBy)
             );
@@ -164,7 +164,7 @@ namespace PalCalc.Solver
                 (toAdd, toAdd)
             ]);
 
-            foreach (var ta in toAdd.TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested))
+            foreach (var ta in toAdd.TakeUntilCancelled(controller.CancellationToken))
             {
                 controller.PauseIfRequested();
                 content.Add(ta);
@@ -177,7 +177,7 @@ namespace PalCalc.Solver
         // reference for each instance spec (gender, passives, etc.)
         private IEnumerable<IPalReference> PruneCollection(IEnumerable<IPalReference> refs) =>
             refs
-                .TakeWhile(_ => !controller.CancellationToken.IsCancellationRequested)
+                .TakeUntilCancelled(controller.CancellationToken)
                 .Tap(_ => controller.PauseIfRequested())
                 .GroupBy(pref => DefaultGroupFn(pref))
                 .SelectMany(g => PruningFunc(g.Distinct()));

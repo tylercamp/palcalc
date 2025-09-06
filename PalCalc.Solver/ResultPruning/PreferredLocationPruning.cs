@@ -34,7 +34,7 @@ namespace PalCalc.Solver.ResultPruning
         };
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r =>
+            MinGroupOf(results, r =>
             {
                 var countsByLocationType = new Dictionary<LocationType, int>
                 {

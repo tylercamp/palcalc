@@ -14,11 +14,6 @@ namespace PalCalc.Solver.ResultPruning
         }
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r =>
-                r.AllReferences()
-                    .Where(r => r is BredPalReference)
-                    .Distinct()
-                    .Count()
-            );
+            MinGroupOf(results, r => r.NumTotalBreedingSteps);
     }
 }

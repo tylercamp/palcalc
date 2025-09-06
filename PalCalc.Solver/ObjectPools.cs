@@ -8,12 +8,12 @@ namespace PalCalc.Solver
 {
     class LocalListPool<T>(int initialCapacity)
     {
-        private Queue<List<T>> pool = new(initialCapacity);
+        private Stack<List<T>> pool = new(initialCapacity);
 
         public List<T> Borrow()
         {
             if (pool.Count == 0) return new List<T>(capacity: 8);
-            else return pool.Dequeue();
+            else return pool.Pop();
         }
 
         public List<T> BorrowWith(IEnumerable<T> initialValues)
@@ -26,23 +26,23 @@ namespace PalCalc.Solver
         public void Return(List<T> value)
         {
             value.Clear();
-            pool.Enqueue(value);
+            pool.Push(value);
         }
     }
 
     class LocalObjectPool<T>(int initialCapacity) where T : new()
     {
-        private Queue<T> pool = new(initialCapacity);
+        private Stack<T> pool = new(initialCapacity);
 
         public T Borrow()
         {
             if (pool.Count == 0) return new T();
-            else return pool.Dequeue();
+            else return pool.Pop();
         }
 
         public void Return(T value)
         {
-            pool.Enqueue(value);
+            pool.Push(value);
         }
     }
 

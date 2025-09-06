@@ -222,7 +222,7 @@ namespace PalCalc.Solver
 
                     var progressTimer = new Timer(EmitProgressMsg, null, (int)SolverStateUpdateInterval.TotalMilliseconds, (int)SolverStateUpdateInterval.TotalMilliseconds);
 
-                    var chunksEnumerator = work.Chunks(work.Count.PreferredParallelBatchSize()).GetEnumerator();
+                    var chunksEnumerator = work.Chunks(work.Count.PreferredParallelBatchSize()).TakeUntilCancelled(controller.CancellationToken).GetEnumerator();
                     var results = new ConcurrentBag<List<IPalReference>>();
 
                     // specifically avoiding AsParallel so we don't congest the default threadpool and so we can

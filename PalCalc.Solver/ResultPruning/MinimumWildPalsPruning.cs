@@ -14,6 +14,6 @@ namespace PalCalc.Solver.ResultPruning
         }
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r => r.AllReferences().Count(p => p is WildPalReference));
+            MinGroupOf(results, r => r.NumTotalWildPals);
     }
 }
