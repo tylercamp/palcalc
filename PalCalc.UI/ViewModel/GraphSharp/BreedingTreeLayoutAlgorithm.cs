@@ -33,26 +33,26 @@ namespace PalCalc.UI.ViewModel.GraphSharp
     }
 
     // currently assuming left-to-right layout
-    internal class BreedingTreeLayoutAlgorithm : DefaultParameterizedLayoutAlgorithmBase<BreedingTreeNodeViewModel, BreedingEdge, BreedingGraph, BreedingTreeLayoutAlgorithmParameters>
+    internal class BreedingTreeLayoutAlgorithm : DefaultParameterizedLayoutAlgorithmBase<IBreedingTreeNodeViewModel, BreedingEdge, BreedingGraph, BreedingTreeLayoutAlgorithmParameters>
     {
-        private Dictionary<BreedingTreeNodeViewModel, Size> _sizes;
-        private Dictionary<IBreedingTreeNode, BreedingTreeNodeViewModel> _viewmodels;
-        private Dictionary<BreedingTreeNodeViewModel, Size> _fullSizes = new Dictionary<BreedingTreeNodeViewModel, Size>();
-        private Dictionary<BreedingTreeNodeViewModel, Node> _nodesByVm;
+        private Dictionary<IBreedingTreeNodeViewModel, Size> _sizes;
+        private Dictionary<IBreedingTreeNode, IBreedingTreeNodeViewModel> _viewmodels;
+        private Dictionary<IBreedingTreeNodeViewModel, Size> _fullSizes = new Dictionary<IBreedingTreeNodeViewModel, Size>();
+        private Dictionary<IBreedingTreeNodeViewModel, Node> _nodesByVm;
         private Dictionary<IBreedingTreeNode, Node> _nodesByModel;
 
         private class Node
         {
             private BreedingTreeLayoutAlgorithm algo;
 
-            public Node(BreedingTreeLayoutAlgorithm algo, BreedingTreeNodeViewModel asViewModel, IBreedingTreeNode asModel)
+            public Node(BreedingTreeLayoutAlgorithm algo, IBreedingTreeNodeViewModel asViewModel, IBreedingTreeNode asModel)
             {
                 this.algo = algo;
                 AsViewModel = asViewModel;
                 AsModel = asModel;
             }
 
-            public BreedingTreeNodeViewModel AsViewModel { get; }
+            public IBreedingTreeNodeViewModel AsViewModel { get; }
             public IBreedingTreeNode AsModel { get; }
 
             public Point SelfCenter
@@ -90,14 +90,14 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             public double FullBottomY => SelfCenter.Y + FullSize.Height / 2;
         }
 
-        public BreedingTreeLayoutAlgorithm(BreedingGraph visitedGraph, IDictionary<BreedingTreeNodeViewModel, Point> vertexPositions, IDictionary<BreedingTreeNodeViewModel, Size> vertexSizes, BreedingTreeLayoutAlgorithmParameters parameters)
+        public BreedingTreeLayoutAlgorithm(BreedingGraph visitedGraph, IDictionary<IBreedingTreeNodeViewModel, Point> vertexPositions, IDictionary<IBreedingTreeNodeViewModel, Size> vertexSizes, BreedingTreeLayoutAlgorithmParameters parameters)
             : base(visitedGraph, vertexPositions, parameters)
         {
-            _sizes = new Dictionary<BreedingTreeNodeViewModel, Size>(vertexSizes);
+            _sizes = new Dictionary<IBreedingTreeNodeViewModel, Size>(vertexSizes);
             _viewmodels = visitedGraph.Vertices.ToDictionary(vm => vm.Value);
 
             _nodesByModel = new Dictionary<IBreedingTreeNode, Node>();
-            _nodesByVm = new Dictionary<BreedingTreeNodeViewModel, Node>();
+            _nodesByVm = new Dictionary<IBreedingTreeNodeViewModel, Node>();
             foreach (var vm in _viewmodels.Values)
             {
                 var node = new Node(this, vm, vm.Value);
@@ -106,7 +106,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             }
         }
 
-        private Size FullSizeWithChildren(BreedingTreeNodeViewModel node)
+        private Size FullSizeWithChildren(IBreedingTreeNodeViewModel node)
         {
             if (_fullSizes.ContainsKey(node)) return _fullSizes[node];
 

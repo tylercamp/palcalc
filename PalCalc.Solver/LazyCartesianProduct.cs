@@ -10,6 +10,12 @@ namespace PalCalc.Solver
     {
         long Count { get; }
         IEnumerable<IEnumerable<(T, T)>> Chunks(int chunkSize);
+
+        /// <summary>
+        /// Creates a new ILazyCartesianProduct containing pairs where both items
+        /// satisfy `predicate`.
+        /// </summary>
+        ILazyCartesianProduct<T> Where(Func<T, bool> predicate, CancellationToken token);
     }
 
     public class LazyCartesianProduct<T>(List<T> listA, List<T> listB) : ILazyCartesianProduct<T>
@@ -57,11 +63,27 @@ namespace PalCalc.Solver
                 curChunkStart = curChunkEnd + 1;
             }
         }
+
+        public ILazyCartesianProduct<T> Where(Func<T, bool> predicate, CancellationToken token) =>
+            new LazyCartesianProduct<T>(
+                listA.Where(predicate).TakeUntilCancelled(token).ToList(),
+                listB.Where(predicate).TakeUntilCancelled(token).ToList()
+            );
     }
 
-    public class ConcatenatedLazyCartesianProduct<T>(IEnumerable<(List<T>, List<T>)> setPairs) : ILazyCartesianProduct<T>
+    public class ConcatenatedLazyCartesianProduct<T> : ILazyCartesianProduct<T>
     {
-        private List<LazyCartesianProduct<T>> innerProducts = setPairs.Select(p => new LazyCartesianProduct<T>(p.Item1, p.Item2)).ToList();
+        private List<ILazyCartesianProduct<T>> innerProducts;
+
+        public ConcatenatedLazyCartesianProduct(IEnumerable<(List<T>, List<T>)> setPairs)
+        {
+            innerProducts = setPairs.Select(p => (ILazyCartesianProduct<T>)new LazyCartesianProduct<T>(p.Item1, p.Item2)).ToList();
+        }
+
+        public ConcatenatedLazyCartesianProduct(IEnumerable<ILazyCartesianProduct<T>> products)
+        {
+            innerProducts = products.ToList();
+        }
 
         public long Count => innerProducts.Sum(p => p.Count);
 
@@ -71,5 +93,8 @@ namespace PalCalc.Solver
                 foreach (var chunk in p.Chunks(chunkSize))
                     yield return chunk;
         }
+
+        public ILazyCartesianProduct<T> Where(Func<T, bool> predicate, CancellationToken token) =>
+            new ConcatenatedLazyCartesianProduct<T>(innerProducts.Select(ip => ip.Where(predicate, token)).ToList());
     }
 }

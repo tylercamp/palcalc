@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,7 @@ namespace PalCalc.Solver.PalReference
     /// - Conversely, if one pal has a desired passive, both pals will have that desired passive.
     /// - The passives for this reference will match whichever pal has the most passives.
     /// </summary>
-    public class CompositeOwnedPalReference : IPalReference
+    public class CompositeOwnedPalReference : IPalReference, ISurgeryCachingPalReference
     {
         private static IV_IValue PropagateIVs(IV_IValue a, IV_IValue b)
         {
@@ -75,6 +76,10 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps { get; } = 0;
 
+        public int NumTotalSurgerySteps { get; } = 0;
+
+        public int NumTotalGenderReversers { get; } = 0;
+
         public int NumTotalEggs { get; } = 0;
 
         public IPalRefLocation Location { get; }
@@ -84,6 +89,8 @@ namespace PalCalc.Solver.PalReference
         public TimeSpan BreedingEffort { get; } = TimeSpan.Zero;
 
         public TimeSpan SelfBreedingEffort { get; } = TimeSpan.Zero;
+
+        public int TotalCost => 0;
 
         private CompositeOwnedPalReference oppositeWildcardReference;
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
@@ -100,6 +107,17 @@ namespace PalCalc.Solver.PalReference
 
                 default: throw new NotImplementedException();
             }
+        }
+
+        private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
+        public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();
+
+        public override bool Equals(object obj)
+        {
+            var asComposite = obj as CompositeOwnedPalReference;
+            if (ReferenceEquals(asComposite, null)) return false;
+
+            return GetHashCode() == obj.GetHashCode();
         }
 
         // TODO - maybe just use Pal, PassivesHash, Gender, IVs? don't need hashes specific to the instances chosen?

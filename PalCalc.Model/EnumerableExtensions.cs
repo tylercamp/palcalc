@@ -57,8 +57,8 @@ namespace PalCalc.Model
             }
         }
 
-        public static IEnumerable<IEnumerable<T>> BatchedForParallel<T>(this List<T> elements) =>
-            elements.Batched(elements.PreferredParallelBatchSize());
+        public static ParallelQuery<IEnumerable<T>> BatchedAsParallel<T>(this List<T> elements) =>
+            elements.Batched(elements.PreferredParallelBatchSize()).AsParallel();
 
         public static IEnumerable<T> SkipNull<T>(this IEnumerable<T> elements) => elements.Where(v => v != null);
 
@@ -154,7 +154,7 @@ namespace PalCalc.Model
         }
 
         // (copy of above impl. with slightly different signature to avoid need for iterator in a Solver hotpath)
-        public static int SetHash<T, V>(this List<T> elements, Func<T, V> selector)
+        public static int SetHash<T, V>(this IReadOnlyList<T> elements, Func<T, V> selector)
         {
             // Stack allocation: no heap allocations here
             Span<int> buffer = stackalloc int[SetHashMaxSize];
@@ -167,6 +167,64 @@ namespace PalCalc.Model
                     throw new InvalidOperationException("Too many elements in the set.");
 
                 buffer[count++] = selector(element)?.GetHashCode() ?? 0;
+            }
+
+            // In-place insertion sort on the small buffer
+            for (int i = 1; i < count; i++)
+            {
+                int key = buffer[i];
+                int j = i - 1;
+
+                // Move elements greater than 'key' one position ahead 
+                while (j >= 0 && buffer[j] > key)
+                {
+                    buffer[j + 1] = buffer[j];
+                    j--;
+                }
+
+                buffer[j + 1] = key;
+            }
+
+            // Now the span is sorted; group duplicates and combine hashes
+            int baseHash = 0;
+            int total = 0;
+
+            int idx = 0;
+            while (idx < count)
+            {
+                int currentHash = buffer[idx];
+                int freq = 1;
+                idx++;
+
+                // Count how many duplicates of currentHash
+                while (idx < count && buffer[idx] == currentHash)
+                {
+                    freq++;
+                    idx++;
+                }
+
+                baseHash = HashCode.Combine(baseHash, currentHash, freq);
+                total += freq;
+            }
+
+            // Final combine with total to avoid collisions from same frequency patterns
+            return HashCode.Combine(baseHash, total);
+        }
+
+        // (copy of above impl. with slightly different signature to avoid need for iterator in a Solver hotpath)
+        public static int ListSetHash<T>(this IReadOnlyList<T> elements)
+        {
+            // Stack allocation: no heap allocations here
+            Span<int> buffer = stackalloc int[SetHashMaxSize];
+            int count = 0;
+
+            // Read hash codes into the buffer
+            foreach (var element in elements)
+            {
+                if (count == SetHashMaxSize)
+                    throw new InvalidOperationException("Too many elements in the set.");
+
+                buffer[count++] = element?.GetHashCode() ?? 0;
             }
 
             // In-place insertion sort on the small buffer

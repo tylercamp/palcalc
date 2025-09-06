@@ -15,7 +15,7 @@ namespace PalCalc.Solver.ResultPruning
             this.maxResults = maxResults;
         }
 
-        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results) =>
-            results.TakeWhile(_ => !token.IsCancellationRequested).Take(maxResults);
+        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
+            results.TakeUntilCancelled(token).Take(maxResults);
     }
 }

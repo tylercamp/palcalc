@@ -19,6 +19,7 @@ namespace PalCalc.Solver
                 case OwnedPalReference opr: return 0;
                 case WildPalReference wpr: return 1;
                 case CompositeOwnedPalReference c: return 0;
+                case SurgeryTablePalReference str: return NumWildPalParticipants(str.Input);
                 default: throw new Exception($"Unhandled pal reference type {pref.GetType()}");
             }
         }
@@ -66,7 +67,38 @@ namespace PalCalc.Solver
                     foreach (var r in bpr.Parent1.AllReferences()) yield return r;
                     foreach (var r in bpr.Parent2.AllReferences()) yield return r;
                     break;
+
+                case SurgeryTablePalReference stpr:
+                    foreach (var r in stpr.Input.AllReferences()) yield return r;
+                    break;
             }
+        }
+
+        internal static void AddAllReferences(this IPalReference pref, List<IPalReference> target)
+        {
+            target.Add(pref);
+
+            switch (pref)
+            {
+                case BredPalReference bpr:
+
+                    bpr.Parent1.AddAllReferences(target);
+                    bpr.Parent2.AddAllReferences(target);
+                    break;
+
+                case SurgeryTablePalReference stpr:
+                    stpr.Input.AddAllReferences(target);
+                    break;
+            }
+        }
+
+        public static IEnumerable<T> TakeUntilCancelled<T>(this IEnumerable<T> e, CancellationToken token) =>
+            e.TakeWhile(_ => !token.IsCancellationRequested);
+
+        internal static void AddIfMissing<T>(this List<T> l, T value)
+        {
+            if (!l.Contains(value))
+                l.Add(value);
         }
     }
 }

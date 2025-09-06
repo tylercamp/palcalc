@@ -1,0 +1,454 @@
+{
+  "DT_PassiveSkill_Main": {
+    // Base Work
+    "CraftSpeed_up1": {
+      "EffectValue1": 40.0,
+      "EffectType2": "EPalPassiveSkillEffectType::MoveSpeed",
+      "EffectValue2": 20.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "OverrideDescMsgID": "PASSIVE_PAL_CraftSpeed_up1"
+    },
+    "CraftSpeed_up2": {
+      "EffectValue1": 60.0,
+      "EffectType2": "EPalPassiveSkillEffectType::MoveSpeed",
+      "EffectValue2": 30.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "OverrideDescMsgID": "PASSIVE_PAL_CraftSpeed_up2"
+    },
+    "CraftSpeed_up3": {
+      "LotteryWeight": 50,
+      "EffectValue1": 80.0,
+      "EffectType2": "EPalPassiveSkillEffectType::MoveSpeed",
+      "EffectValue2": 40.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "OverrideDescMsgID": "PASSIVE_PAL_CraftSpeed_up3"
+    },
+    "PAL_FullStomach_Down_1": {
+      "EffectValue1": -30.0,
+      "OverrideDescMsgID": "PASSIVE_PAL_FullStomach_Down_1"
+    },
+    "PAL_FullStomach_Down_2": {
+      "EffectValue1": -40.0,
+      "OverrideDescMsgID": "PASSIVE_PAL_FullStomach_Down_2"
+    },
+    "PAL_FullStomach_Down_3": {
+      "EffectValue1": -50.0,
+      "LotteryWeight": 50,
+      "OverrideDescMsgID": "PASSIVE_PAL_FullStomach_Down_3"
+    },
+    "PAL_Sanity_Down_1": {
+      "EffectValue1": -30.0,
+      "OverrideDescMsgID": "PASSIVE_PAL_Sanity_Down_1"
+    },
+    "PAL_Sanity_Down_2": {
+      "EffectValue1": -40.0,
+      "OverrideDescMsgID": "PASSIVE_PAL_Sanity_Down_2"
+    },
+    "PAL_Sanity_Down_3": {
+      "EffectValue1": -50.0,
+      "LotteryWeight": 50,
+      "OverrideDescMsgID": "PASSIVE_PAL_Sanity_Down_3"
+    },
+    "PAL_CorporateSlave": {
+      "EffectType1": "EPalPassiveSkillEffectType::CraftSpeed",
+      "EffectValue1": 40.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType2": "EPalPassiveSkillEffectType::ShotAttack",
+      "EffectValue2": -60.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType3": "EPalPassiveSkillEffectType::Nocturnal",
+      "EffectValue3": 0.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "OverrideDescMsgID": "PASSIVE_PAL_CorporateSlave"
+    },
+    "PAL_conceited": {
+      "EffectType1": "EPalPassiveSkillEffectType::CraftSpeed",
+      "EffectValue1": 20.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType2": "EPalPassiveSkillEffectType::Sanity_Decrease",
+      "EffectValue2": -10.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType3": "EPalPassiveSkillEffectType::FullStomatch_Decrease",
+      "EffectValue3": -10.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "OverrideDescMsgID": "PASSIVE_PAL_conceited"
+    },
+    "Rare": {
+      "EffectType1": "EPalPassiveSkillEffectType::CraftSpeed",
+      "EffectValue1": 40.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType2": "EPalPassiveSkillEffectType::Sanity_Decrease",
+      "EffectValue2": -30.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType3": "EPalPassiveSkillEffectType::FullStomatch_Decrease",
+      "EffectValue3": -30.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "OverrideDescMsgID": "PASSIVE_PAL_Rare"
+    },
+    // Travel
+    "MoveSpeed_up_1": {
+      "EffectValue1": 40.0
+    },
+    "MoveSpeed_up_2": {
+      "EffectValue1": 50.0
+    },
+    "MoveSpeed_up_3": {
+      "LotteryWeight": 50,
+      "EffectValue1": 60.0
+    },
+    "SwimSpeed_up_1": {
+      "EffectValue1": 40.0
+    },
+    "SwimSpeed_up_2": {
+      "EffectValue1": 50.0
+    },
+    "SwimSpeed_up_3": {
+      "LotteryWeight": 50,
+      "EffectValue1": 60.0
+    },
+    "Stamina_Up_3": {
+      "LotteryWeight": 50
+    },
+    "TrainerMaster_up1": {
+      "Rank": 4,
+      "LotteryWeight": 50,
+      "OverrideDescMsgID": "PASSIVE_PAL_TrainerMaster_up1",
+      "TargetElementType": "EPalElementType::None",
+      "EffectType1": "EPalPassiveSkillEffectType::Logging",
+      "EffectValue1": 25.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToTrainer",
+      "EffectType2": "EPalPassiveSkillEffectType::Mining",
+      "EffectValue2": 25.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToTrainer",
+      "EffectType3": "EPalPassiveSkillEffectType::MoveSpeed",
+      "EffectValue3": 30.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToTrainer",
+      "InvokeActiveOtomo": false,
+      "InvokeWorker": false,
+      "InvokeRiding": false,
+      "InvokeReserve": false,
+      "InvokeInOtomo": false,
+      "InvokeAlways": true,
+      "InvokeInBaseCamp": false,
+      "AddPal": true,
+      "AddRarePal": false,
+      "AddShotWeapon": false,
+      "AddMeleeWeapon": false,
+      "AddArmor": false,
+      "AddAccessory": false,
+      "OverrideNameTextID": "PASSIVE_PAL_TrainerMaster_up1",
+      "OverrideSummaryTextId": "PASSIVE_PAL_TrainerMaster_up1",
+      "Category": "EPalPassiveCategory::SortDisplayable"
+    },
+    "SalePrice_Up_2": {
+      "Rank": 2,
+      "LotteryWeight": 100,
+      "EffectType1": "EPalPassiveSkillEffectType::ShopSellPrice_Money_Increase",
+      "EffectValue1": 5.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType2": "EPalPassiveSkillEffectType::ShopBuyPrice_Money_Increase",
+      "EffectValue2": -5.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType3": "EPalPassiveSkillEffectType::GainItemDrop",
+      "EffectValue3": 10.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToSelfAndTrainer"
+    },
+    "SalePrice_Up_1": {
+      "Rank": 4,
+      "LotteryWeight": 50,
+      "EffectType1": "EPalPassiveSkillEffectType::ShopSellPrice_Money_Increase",
+      "EffectValue1": 10.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType2": "EPalPassiveSkillEffectType::ShopBuyPrice_Money_Increase",
+      "EffectValue2": -10.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType3": "EPalPassiveSkillEffectType::GainItemDrop",
+      "EffectValue3": 20.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToSelfAndTrainer"
+    },
+    // Combat
+    "Deffence_up3": {
+      "LotteryWeight": 50,
+      "EffectType2": "EPalPassiveSkillEffectType::ShotAttack",
+      "EffectValue2": 10.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "OverrideDescMsgID": "PASSIVE_PAL_Deffence_up3"
+    },
+    "PAL_AllAttack_up3": {
+      "LotteryWeight": 50,
+      "EffectValue2": 10.0
+    },
+    "Legend": {
+      "EffectValue1": 30.0,
+      "EffectValue2": 30.0,
+      "EffectValue3": 30.0
+    },
+    "CoolTimeReduction_Up_2": {
+      "OverrideDescMsgID": "PASSIVE_PAL_CoolTimeReduction_Up_2",
+      "EffectType1": "EPalPassiveSkillEffectType::ActiveSkillCoolTime_Decrease",
+      "EffectValue1": 15.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType2": "EPalPassiveSkillEffectType::ShotAttack",
+      "EffectValue2": 10.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType3": "EPalPassiveSkillEffectType::Defense",
+      "EffectValue3": 10.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToSelf"
+    },
+    "CoolTimeReduction_Up_1": {
+      "OverrideDescMsgID": "PASSIVE_PAL_CoolTimeReduction_Up_1",
+      "EffectType1": "EPalPassiveSkillEffectType::ActiveSkillCoolTime_Decrease",
+      "EffectValue1": 30.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType2": "EPalPassiveSkillEffectType::ShotAttack",
+      "EffectValue2": 15.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType3": "EPalPassiveSkillEffectType::Defense",
+      "EffectValue3": 15.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToSelf"
+    },
+    "CoolTimeReduction_Up_3": {
+      "Rank": 4,
+      "LotteryWeight": 50,
+      "OverrideDescMsgID": "PASSIVE_PAL_CoolTimeReduction_Up_3",
+      "TargetElementType": "EPalElementType::None",
+      "EffectType1": "EPalPassiveSkillEffectType::ActiveSkillCoolTime_Decrease",
+      "EffectValue1": 45.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType2": "EPalPassiveSkillEffectType::ShotAttack",
+      "EffectValue2": 20.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType3": "EPalPassiveSkillEffectType::Defense",
+      "EffectValue3": 20.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "InvokeActiveOtomo": false,
+      "InvokeWorker": false,
+      "InvokeRiding": false,
+      "InvokeReserve": false,
+      "InvokeInOtomo": false,
+      "InvokeAlways": true,
+      "InvokeInBaseCamp": false,
+      "AddPal": true,
+      "AddRarePal": false,
+      "AddShotWeapon": false,
+      "AddMeleeWeapon": false,
+      "AddArmor": false,
+      "AddAccessory": false,
+      "OverrideNameTextID": "PASSIVE_PAL_CoolTimeReduction_Up_3",
+      "OverrideSummaryTextId": "PASSIVE_PAL_CoolTimeReduction_Up_3",
+      "Category": "EPalPassiveCategory::SortDisplayable"
+    },
+    "Vampire": {
+      "Rank": 2,
+      "EffectType1": "EPalPassiveSkillEffectType::LifeSteal",
+      "EffectValue1": 10.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelfAndTrainer",
+      "EffectType2": "EPalPassiveSkillEffectType::Nocturnal",
+      "EffectValue2": 0.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType3": "EPalPassiveSkillEffectType::no",
+      "EffectValue3": 0.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "OverrideDescMsgID": "PASSIVE_PAL_Vampire",
+      "InvokeActiveOtomo": true,
+      "InvokeAlways": false
+    },
+    "Nosferatu": {
+      "Rank": 4,
+      "LotteryWeight": 50,
+      "OverrideDescMsgID": "PASSIVE_PAL_Nosferatu",
+      "TargetElementType": "EPalElementType::None",
+      "EffectType1": "EPalPassiveSkillEffectType::LifeSteal",
+      "EffectValue1": 20.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelfAndTrainer",
+      "EffectType2": "EPalPassiveSkillEffectType::Nocturnal",
+      "EffectValue2": 0.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType3": "EPalPassiveSkillEffectType::no",
+      "EffectValue3": 0.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "InvokeActiveOtomo": true,
+      "InvokeWorker": false,
+      "InvokeRiding": false,
+      "InvokeReserve": false,
+      "InvokeInOtomo": false,
+      "InvokeAlways": false,
+      "InvokeInBaseCamp": false,
+      "AddPal": true,
+      "AddRarePal": false,
+      "AddShotWeapon": false,
+      "AddMeleeWeapon": false,
+      "AddArmor": false,
+      "AddAccessory": false,
+      "OverrideNameTextID": "PASSIVE_PAL_Nosferatu",
+      "OverrideSummaryTextId": "PASSIVE_PAL_Nosferatu",
+      "Category": "EPalPassiveCategory::SortDisplayable"
+    },
+    "PAL_sadist": {
+      "EffectType1": "EPalPassiveSkillEffectType::ShotAttack",
+      "EffectValue1": 20.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType2": "EPalPassiveSkillEffectType::Defense",
+      "EffectValue2": -10.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf"
+    },
+    "Noukin": {
+      "OverrideDescMsgID": "PASSIVE_PAL_Noukin",
+      "EffectType1": "EPalPassiveSkillEffectType::ShotAttack",
+      "EffectValue1": 40.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType2": "EPalPassiveSkillEffectType::Defense",
+      "EffectValue2": -20.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf"
+    },
+    "Berserker": {
+      "Rank": 4,
+      "LotteryWeight": 50,
+      "OverrideDescMsgID": "PASSIVE_PAL_Berserker",
+      "TargetElementType": "EPalElementType::None",
+      "EffectType1": "EPalPassiveSkillEffectType::ShotAttack",
+      "EffectValue1": 60.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType2": "EPalPassiveSkillEffectType::Defense",
+      "EffectValue2": -30.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "EffectType3": "EPalPassiveSkillEffectType::no",
+      "EffectValue3": 0.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToSelf",
+      "InvokeActiveOtomo": false,
+      "InvokeWorker": false,
+      "InvokeRiding": false,
+      "InvokeReserve": false,
+      "InvokeInOtomo": false,
+      "InvokeAlways": true,
+      "InvokeInBaseCamp": false,
+      "AddPal": true,
+      "AddRarePal": false,
+      "AddShotWeapon": false,
+      "AddMeleeWeapon": false,
+      "AddArmor": false,
+      "AddAccessory": false,
+      "OverrideNameTextID": "PASSIVE_PAL_Berserker",
+      "OverrideSummaryTextId": "PASSIVE_PAL_Berserker",
+      "Category": "EPalPassiveCategory::SortDisplayable"
+    },
+    "TrainerWorkSpeed_UP_1": {
+      "Rank": 4,
+      "LotteryWeight": 50,
+      "OverrideDescMsgID": "PASSIVE_TrainerWorkSpeed_UP_1",
+      "TargetElementType": "EPalElementType::None",
+      "EffectType1": "EPalPassiveSkillEffectType::ShotAttack",
+      "EffectValue1": 10.0,
+      "TargetType1": "EPalPassiveSkillEffectTargetType::ToTrainer",
+      "EffectType2": "EPalPassiveSkillEffectType::Defense",
+      "EffectValue2": 10.0,
+      "TargetType2": "EPalPassiveSkillEffectTargetType::ToTrainer",
+      "EffectType3": "EPalPassiveSkillEffectType::ReloadSpeedUp",
+      "EffectValue3": 20.0,
+      "TargetType3": "EPalPassiveSkillEffectTargetType::ToTrainer"
+    },
+
+
+    // Pal's Partner Skills
+    "Plesiosaur_PartnerSkill_1": {
+      "EffectValue1": 100.0
+    },
+    "Plesiosaur_PartnerSkill_2": {
+      "EffectValue1": 125.0
+    },
+    "Plesiosaur_PartnerSkill_3": {
+      "EffectValue1": 150.0
+    },
+    "Plesiosaur_PartnerSkill_4": {
+      "EffectValue1": 175.0
+    },
+    "Plesiosaur_PartnerSkill_5": {
+      "EffectValue1": 200.0
+    },
+    "LifeSteal_1": {
+      "EffectValue1": 5.0
+    },
+    "LifeSteal_2": {
+      "EffectValue1": 6.0
+    },
+    "LifeSteal_3": {
+      "EffectValue1": 7.0
+    },
+    "LifeSteal_4": {
+      "EffectValue1": 8.0
+    },
+    "LifeSteal_5": {
+      "EffectValue1": 10.0
+    },
+    "MoveSpeed_Up_GroundType_PartnerSkill_1": {
+      "EffectValue1": 10.0
+    },
+    "MoveSpeed_Up_GroundType_PartnerSkill_2": {
+      "EffectValue1": 20.0
+    },
+    "MoveSpeed_Up_GroundType_PartnerSkill_3": {
+      "EffectValue1": 30.0
+    },
+    "MoveSpeed_Up_GroundType_PartnerSkill_4": {
+      "EffectValue1": 40.0
+    },
+    "MoveSpeed_Up_GroundType_PartnerSkill_5": {
+      "EffectValue1": 50.0
+    },
+    "MoveSpeed_Up_GrassType_PartnerSkill_1": {
+      "EffectValue1": 10.0
+    },
+    "MoveSpeed_Up_GrassType_PartnerSkill_2": {
+      "EffectValue1": 20.0
+    },
+    "MoveSpeed_Up_GrassType_PartnerSkill_3": {
+      "EffectValue1": 30.0
+    },
+    "MoveSpeed_Up_GrassType_PartnerSkill_4": {
+      "EffectValue1": 40.0
+    },
+    "MoveSpeed_Up_GrassType_PartnerSkill_5": {
+      "EffectValue1": 50.0
+    },
+    "MoveSpeed_Up_SnowType_PartnerSkill_IceSeal_1": {
+      "EffectValue1": 10.0
+    },
+    "MoveSpeed_Up_SnowType_PartnerSkill_IceSeal_2": {
+      "EffectValue1": 20.0
+    },
+    "MoveSpeed_Up_SnowType_PartnerSkill_IceSeal_3": {
+      "EffectValue1": 30.0
+    },
+    "MoveSpeed_Up_SnowType_PartnerSkill_IceSeal_4": {
+      "EffectValue1": 40.0
+    },
+    "MoveSpeed_Up_SnowType_PartnerSkill_IceSeal_5": {
+      "EffectValue1": 50.0
+    },
+    "SyncroPassiveWhenCapture_PartnerSkill_1": {
+      "EffectValue1": 40.0,
+      "InvokeActiveOtomo": false,
+      "InvokeAlways": true
+    },
+    "SyncroPassiveWhenCapture_PartnerSkill_2": {
+      "EffectValue1": 50.0,
+      "InvokeActiveOtomo": false,
+      "InvokeAlways": true
+    },
+    "SyncroPassiveWhenCapture_PartnerSkill_3": {
+      "EffectValue1": 60.0,
+      "InvokeActiveOtomo": false,
+      "InvokeAlways": true
+    },
+    "SyncroPassiveWhenCapture_PartnerSkill_4": {
+      "EffectValue1": 70.0,
+      "InvokeActiveOtomo": false,
+      "InvokeAlways": true
+    },
+    "SyncroPassiveWhenCapture_PartnerSkill_5": {
+      "EffectValue1": 80.0,
+      "InvokeActiveOtomo": false,
+      "InvokeAlways": true
+    }
+  }
+}

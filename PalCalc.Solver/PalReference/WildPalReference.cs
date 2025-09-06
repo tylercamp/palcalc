@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.PalReference
 {
-    public class WildPalReference : IPalReference
+    public class WildPalReference : IPalReference, ISurgeryCachingPalReference
     {
         public WildPalReference(Pal pal, IEnumerable<PassiveSkill> guaranteedPassives, int numPassives)
         {
@@ -52,7 +53,13 @@ namespace PalCalc.Solver.PalReference
         // used as the effort required to catch one
         public TimeSpan SelfBreedingEffort { get; private set; }
 
+        public int TotalCost => 0;
+
         public int NumTotalBreedingSteps => 0;
+
+        public int NumTotalSurgerySteps => 0;
+
+        public int NumTotalGenderReversers => 0;
 
         public int NumTotalEggs => 0;
 
@@ -101,6 +108,17 @@ namespace PalCalc.Solver.PalReference
             }
 
             return cachedGuaranteedGenders[gender];
+        }
+
+        private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
+        public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();
+
+        public override bool Equals(object obj)
+        {
+            var asWild = obj as WildPalReference;
+            if (ReferenceEquals(asWild, null)) return false;
+
+            return GetHashCode() == obj.GetHashCode();
         }
 
         public override string ToString() => $"Captured {Gender} {Pal} w/ up to {EffectivePassives.Count} random passive skills";

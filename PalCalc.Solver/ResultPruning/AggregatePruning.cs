@@ -16,7 +16,7 @@ namespace PalCalc.Solver.ResultPruning
             this.contents = contents.ToList();
         }
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            contents.Aggregate(results, (r, p) => p.Apply(r));
+        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
+            contents.Aggregate(results, (r, p) => p.Apply(r, cachedData));
     }
 }

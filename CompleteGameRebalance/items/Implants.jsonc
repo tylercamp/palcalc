@@ -1,0 +1,713 @@
+{
+  // Vanilla Implants, color and property change.
+  "PalPassiveSkillChange_CraftSpeed_up1": {
+    "Rarity": 1,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_CraftSpeed_up2": {
+    "Rarity": 2,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_CraftSpeed_up3": {
+    "Rarity": 3,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_Deffence_up1": {
+    "Rarity": 1,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_Deffence_up2": {
+    "Rarity": 2,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_Deffence_up3": {
+    "Rarity": 3,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_PAL_ALLAttack_up1": {
+    "Rarity": 1,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_PAL_ALLAttack_up2": {
+    "Rarity": 2,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_PAL_ALLAttack_up3": {
+    "Rarity": 3,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_PAL_FullStomach_Down_1": {
+    "Rarity": 1,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_PAL_FullStomach_Down_2": {
+    "Rarity": 2,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_PAL_FullStomach_Down_3": {
+    "Rarity": 3,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_PAL_Sanity_Down_1": {
+    "Rarity": 1,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_PAL_Sanity_Down_2": {
+    "Rarity": 2,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_PAL_Sanity_Down_3": {
+    "Rarity": 3,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_MoveSpeed_up_1": {
+    "Rarity": 1,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_MoveSpeed_up_2": {
+    "Rarity": 2,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_MoveSpeed_up_3": {
+    "Rarity": 3,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_Stamina_Up_2": {
+    "Rarity": 1,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_Stamina_Up_1": {
+    "Rarity": 2,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_Stamina_Up_3": {
+    "Rarity": 3,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_CoolTimeReduction_Up_2": {
+    "Rarity": 1,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_CoolTimeReduction_Up_1": {
+    "Rarity": 2,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_Nocturnal": {
+    "Rarity": 1,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_NonKilling": {
+    "Rarity": 1,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_HatchingSpeed_Up": {
+    "Rarity": 2,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  "PalPassiveSkillChange_Noukin": {
+    "Rarity": 2,
+    "TypeB": "EPalItemTypeB::Essential_PalGear"
+  },
+  // CGR New Implants
+  "PalPassiveSkillChange_CGRSleekStroke": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Sleek Stroke",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 1,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRAceSwimmer": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Ace Swimmer",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 2,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRKingoftheWaves": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: King of the Waves",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRVampiric": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Vampiric",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 2,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRVanguard": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Vanguard",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 2,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRStrongholdStrategist": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Stronghold Strategist",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 2,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRMineForeman": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Mine Foreman",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 2,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRLoggingForeman": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Logging Foreman",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 2,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRAggressive": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Aggressive",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 1,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRSadist": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Sadist",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 1,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRHooligan": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Hooligan",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 1,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRConceited": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Conceited",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 1,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRMasochist": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Masochist",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 1,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRWorkSlave": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Work Slave",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 1,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRLucky": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Lucky",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRLegend": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Legend",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 4,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGROtherworldlyCells": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Otherworldly Cells",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRCelestialEmperor": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Celestial Emperor",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRFlameEmperor": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Flame Emperor",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRLordoftheSea": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Lord of the Sea",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRLordofLightning": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Lord of Lightning",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRSpiritEmperor": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Spirit Emperor",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRIceEmperor": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Ice Emperor",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGREarthEmperor": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Earth Emperor",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRLordoftheUnderworld": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Lord of the Underworld",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRDivineDragon": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Divine Dragon",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRSirenoftheVoid": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Siren of the Void",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 4,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGREternalFlame": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Eternal Flame",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 4,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRInvader": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Invader",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 4,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRLunker": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Lunker",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 4,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRBerserker": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Berserker",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRPerfectHarmony": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Perfect Harmony",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRNosferatu": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Nosferatu",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRMotivationalLeader": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Motivational Leader",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+  "PalPassiveSkillChange_CGRMasterForeman": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Master Foreman",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+
+
+  "PalPassiveSkillChange_CGRFineFurs": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Fine Furs",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 2,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  },
+
+
+  "PalPassiveSkillChange_CGRNoble": {
+    "Type": "PalStaticItemDataBase",
+    "Name": "Implant: Noble",
+    "Outer": "DA_StaticItemDataAsset",
+    "Class": "UScriptClass'PalStaticItemDataBase'",
+    "Flags": "RF_WasLoaded | RF_LoadCompleted",
+    "IconTexture": "/Game/Others/InventoryItemIcon/Texture/T_itemicon_Material_PalPassiveSkillChange.T_itemicon_Material_PalPassiveSkillChange",
+    "TypeA": "EPalItemTypeA::Essential",
+    "TypeB": "EPalItemTypeB::Essential_PalGear",
+    "Rank": 4,
+    "Rarity": 3,
+    "Price": 1,
+    "MaxStackCount": 9999,
+    "SortID": 1,
+    "OverrideDescMsgID": "ITEM_DESC_PalPassiveSkillChange"
+  }
+
+
+
+
+
+}

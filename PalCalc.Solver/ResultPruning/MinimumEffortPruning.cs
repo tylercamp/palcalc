@@ -8,13 +8,15 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.ResultPruning
 {
     // main default pruning
-    public class MinimumEffortPruning : IResultPruning
+    public class MinimumEffortPruning : IResultPruning.ForceDeterministic
     {
         public MinimumEffortPruning(CancellationToken token) : base(token)
         {
         }
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-            FirstGroupOf(results, r => r.BreedingEffort);
+        private static TimeSpan BreedingEffort(IPalReference r) => r.BreedingEffort;
+
+        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
+            MinGroupOf(results, BreedingEffort);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.PalReference
 {
-    public class OwnedPalReference : IPalReference
+    public class OwnedPalReference : IPalReference, ISurgeryCachingPalReference
     {
         PalInstance instance;
 
@@ -47,14 +48,31 @@ namespace PalCalc.Solver.PalReference
         public TimeSpan BreedingEffort => TimeSpan.Zero;
         public TimeSpan SelfBreedingEffort => TimeSpan.Zero;
 
+        public int TotalCost => 0;
+
         public int NumTotalBreedingSteps => 0;
 
+        public int NumTotalSurgerySteps => 0;
+
+        public int NumTotalGenderReversers => 0;
+
         public int NumTotalEggs => 0;
+
+        private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
+        public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();
 
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
         {
             if (gender != Gender) throw new Exception("Cannot force a gender change for owned pals");
             return this;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var asOwned = obj as OwnedPalReference;
+            if (ReferenceEquals(asOwned, null)) return false;
+
+            return GetHashCode() == obj.GetHashCode();
         }
 
         public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({EffectivePassives.PassiveSkillListToString()}) in {Location}";

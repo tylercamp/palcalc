@@ -4,6 +4,7 @@ using PalCalc.Solver.ResultPruning;
 using Serilog;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
+using System.Diagnostics;
 
 namespace PalCalc.Solver
 {
@@ -131,6 +132,19 @@ namespace PalCalc.Solver
                 })
                 .ToList();
 
+            if (!settings.OptimizeInitStep)
+            {
+                initialContent = initialContent.Concat(
+                    settings.OwnedPals.Select(
+                        p => new OwnedPalReference(
+                            p,
+                            p.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives),
+                            new IV_Set() { HP = MakeIV(spec.IV_HP, p.IV_HP), Attack = MakeIV(spec.IV_Attack, p.IV_Attack), Defense = MakeIV(spec.IV_Defense, p.IV_Defense) }
+                        )
+                    )
+                ).Distinct().ToList();
+            }
+
             if (settings.MaxWildPals > 0)
             {
                 // add wild pals with varying number of random passives
@@ -187,11 +201,12 @@ namespace PalCalc.Solver
                     StepIndex: s,
                     Spec: spec,
                     WorkingSet: workingSet,
-                    WorkingOptimalTimesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, TimeSpan>())
+                    WorkingOptimalTimesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, BreedingSolverEfficiencyMetric>())
                 );
                 List<WorkBatchProgress> progressEntries = [];
 
-                bool didUpdate = workingSet.UpdateContents(work =>
+                // Phase 1: Breeding pairs (existing logic)
+                bool didBreed = workingSet.UpdateByPairs(work =>
                 {
                     logger.Debug("Performing breeding step {step} with {numWork} work items", s+1, work.Count);
 
@@ -222,7 +237,7 @@ namespace PalCalc.Solver
 
                     var progressTimer = new Timer(EmitProgressMsg, null, (int)SolverStateUpdateInterval.TotalMilliseconds, (int)SolverStateUpdateInterval.TotalMilliseconds);
 
-                    var chunksEnumerator = work.Chunks(work.Count.PreferredParallelBatchSize()).GetEnumerator();
+                    var chunksEnumerator = work.Chunks(work.Count.PreferredParallelBatchSize()).TakeUntilCancelled(controller.CancellationToken).GetEnumerator();
                     var results = new ConcurrentBag<List<IPalReference>>();
 
                     // specifically avoiding AsParallel so we don't congest the default threadpool and so we can
@@ -276,9 +291,82 @@ namespace PalCalc.Solver
                     return res;
                 });
 
+                // Phase 2: Surgery additions
+                bool didSurgery = false;
+                var surgeryCompatiblePassives = spec.DesiredPassives.Where(p => p.SupportsSurgery).Where(settings.SurgeryPassives.Contains).ToList();
+                if (surgeryCompatiblePassives.Any() && !controller.CancellationToken.IsCancellationRequested)
+                {
+                    // TODO - sort out gender-swap options?
+
+                    didSurgery = workingSet.UpdateBySingle(palRefs =>
+                    {
+                        return palRefs
+                            .Where(r =>
+                                // there's room for a new passive
+                                r.EffectivePassives.Count < GameConstants.MaxTotalPassives ||
+                                // there's a replaceable passive
+                                r.EffectivePassives.Any(p => p is RandomPassiveSkill)
+                            )
+                            .TakeUntilCancelled(controller.CancellationToken)
+                            .ToList()
+                            // (this should be relatively quick, will just use normal AsParallel)
+                            .BatchedAsParallel()
+                            .WithCancellation(controller.CancellationToken)
+                            .WithDegreeOfParallelism(settings.MaxThreads)
+                            .SelectMany(batch => batch.SelectMany(r =>
+                            {
+                                // TODO: atm won't consider replacing Optional passives, even though they're technically not Required
+
+                                var missingPassives = surgeryCompatiblePassives.Except(r.EffectivePassives).ToList();
+                                var maxNewPassives = GameConstants.MaxTotalPassives - r.EffectivePassives.Count(p => p is not RandomPassiveSkill);
+
+                                var res = new List<IPalReference>();
+
+                                // consider all ways we could add these desired passives
+                                foreach (var passives in missingPassives.Combinations(maxNewPassives).Select(c => c.ToList()).Where(c => c.Count > 0).ToList().OrderByDescending(c => c.Count))
+                                {
+                                    if (passives.Count == 0)
+                                        continue;
+
+                                    if (r.TotalCost + passives.Sum(p => p.SurgeryCost) > settings.MaxSurgeryCost)
+                                        continue;
+
+                                    var removable = new Queue<PassiveSkill>(r.EffectivePassives.OfType<RandomPassiveSkill>());
+                                    var ops = new List<ISurgeryOperation>();
+                                    for (int i = 0; i < passives.Count; i++)
+                                    {
+                                        // adding this would go over the total passive limit, use a Replacement operation
+                                        if (r.EffectivePassives.Count + i >= GameConstants.MaxTotalPassives)
+                                        {
+                                            if (!removable.Any())
+                                            {
+#if DEBUG_CHECKS
+                                                Debugger.Break();
+#endif
+                                                break;
+                                            }
+
+                                            var toRemove = removable.Dequeue();
+                                            ops.Add(ReplacePassiveSurgeryOperation.NewCached(toRemove, passives[i]));
+                                        }
+                                        else // there's space for another passive, use an Add operation
+                                        {
+                                            ops.Add(AddPassiveSurgeryOperation.NewCached(passives[i]));
+                                        }
+                                    }
+
+                                    SurgeryTablePalReference.NewCached(r, ref ops, out var newRes);
+                                    res.Add(newRes);
+                                }
+
+                                return res.Where(re => re != r);
+                            }));
+                    });
+                }
+
                 if (controller.CancellationToken.IsCancellationRequested) break;
 
-                if (!didUpdate)
+                if (!didBreed && !didSurgery)
                 {
                     logger.Debug("Last pass found no new useful options, stopping iteration early");
                     break;

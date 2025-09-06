@@ -941,6 +941,18 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_STARTUP_LOADING,
         /// <summary>
+        ///   Looks up a localized string similar to AddedPassive.
+        /// </summary>
+        LC_SURGERY_ADD_PASSIVE,
+        /// <summary>
+        ///   Looks up a localized string similar to NewGender.
+        /// </summary>
+        LC_SURGERY_CHANGE_GENDER,
+        /// <summary>
+        ///   Looks up a localized string similar to AddedPassive | RemovedPassive.
+        /// </summary>
+        LC_SURGERY_REPLACE_PASSIVE,
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_TARGET_PAL,

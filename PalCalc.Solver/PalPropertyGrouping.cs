@@ -24,6 +24,8 @@ namespace PalCalc.Solver
         public static GroupIdFn LocationType = p => p.Location.GetType().GetHashCode();
         public static GroupIdFn IvRelevance = p => HashCode.Combine(p.IVs.HP.IsRelevant, p.IVs.Attack.IsRelevant, p.IVs.Defense.IsRelevant);
         public static GroupIdFn IvExact = p => HashCode.Combine(p.IVs.HP, p.IVs.Attack, p.IVs.Defense);
+        public static GroupIdFn GoldCost = p => p.TotalCost;
+        public static GroupIdFn GenderReversers = p => p.NumTotalGenderReversers;
 
         /// <summary>
         /// Makes a grouping function based on the result of applying `mainFn` to all
@@ -84,7 +86,7 @@ namespace PalCalc.Solver
         {
             var pruner = prb.BuildAggregate(token);
             foreach (var group in content.Keys.TakeWhile(_ => !token.IsCancellationRequested))
-                content[group] = pruner.Apply(content[group]).ToList();
+                content[group] = pruner.Apply(content[group], new CachedResultData(content[group])).ToList();
         }
 
         public void Filter(int key, FilterFunc filterFn)

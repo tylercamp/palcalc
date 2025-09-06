@@ -12,6 +12,11 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.ResultPruning
 {
+    public class CachedResultData(IEnumerable<IPalReference> results)
+    {
+        public Dictionary<IPalReference, List<IPalReference>> InnerReferences { get; } = results.ToDictionary(r => r, r => r.AllReferences().ToList());
+    }
+
     public abstract class IResultPruning
     {
         protected CancellationToken token;
@@ -20,33 +25,52 @@ namespace PalCalc.Solver.ResultPruning
             this.token = token;
         }
 
-        public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results);
+        public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData);
 
         protected static readonly IEnumerable<IPalReference> Empty = Enumerable.Empty<IPalReference>();
-        protected IEnumerable<IPalReference> FirstGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)
+        protected IEnumerable<IPalReference> MinGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)
         {
+            var comp = Comparer<T>.Default;
             try
             {
                 if (token.IsCancellationRequested)
                     return Empty;
 
-                var resultGroup = input
-                    .TakeWhile(_ => !token.IsCancellationRequested)
-                    .GroupBy(grouping)
-                    .OrderBy(g => g.Key)
-                    .FirstOrDefault();
+                var res = new List<IPalReference>();
+                var minEval = default(T);
 
-                if (token.IsCancellationRequested)
-                    return Empty;
+                foreach (var r in input)
+                {
+                    if (token.IsCancellationRequested)
+                        return Empty;
 
-                return resultGroup.ToList();
+                    if (res.Count == 0)
+                    {
+                        res.Add(r);
+                        minEval = grouping(r);
+                    }
+                    else
+                    {
+                        var eval = grouping(r);
+                        var comparison = comp.Compare(eval, minEval);
+                        if (comparison < 0)
+                        {
+                            res.Clear();
+                            res.Add(r);
+                            minEval = eval;
+                        }
+                        else if (comparison == 0)
+                        {
+                            res.Add(r);
+                        }
+                    }
+                }
+
+                return res;
             }
-            catch (Exception)
+            catch (Exception) when (token.IsCancellationRequested)
             {
-                if (token.IsCancellationRequested)
-                    return input;
-                else
-                    throw;
+                return input;
             }
         }
 
@@ -56,10 +80,10 @@ namespace PalCalc.Solver.ResultPruning
             {
             }
 
-            public sealed override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
-                ApplyNonDeterministic(results.OrderBy(r => r.GetHashCode()));
+            public sealed override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
+                ApplyNonDeterministic(results.OrderBy(r => r.GetHashCode()), cachedData);
 
-            protected abstract IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results);
+            protected abstract IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results, CachedResultData cachedData);
         }
     }
 }
