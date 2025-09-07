@@ -13,14 +13,6 @@ namespace PalCalc.Solver.ResultPruning
     public class OptimalIVsPruning(CancellationToken token, int maxIvDifference) : IResultPruning(token)
     {
 
-        static int ValueOf(IV_IValue value, int fallback, Func<IV_Range, int> map) =>
-            value switch
-            {
-                IV_Random => fallback,
-                IV_Range range => map(range),
-                _ => throw new NotImplementedException()
-            };
-
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results)
         {
             // note: all pals within a group being pruned should:
@@ -40,21 +32,21 @@ namespace PalCalc.Solver.ResultPruning
             // IVs doesn't affect whether we get a relevant result (see above), so we'll instead
             // try to maximize the highest possible value
 
-            int SelectValue(IV_IValue value) =>
-                ValueOf(value, 0, r => r.Max);
-
-            int TotalIVs(IV_Set ivs) =>
-                SelectValue(ivs.HP) + SelectValue(ivs.Attack) + SelectValue(ivs.Defense);
+            int TotalMaxIVs(IV_Set ivs) => ivs.HP.Max + ivs.Attack.Max + ivs.Defense.Max;
+            int TotalMinIVs(IV_Set ivs) => ivs.HP.Min + ivs.Attack.Min + ivs.Defense.Min;
 
             if (token.IsCancellationRequested) return results;
 
-            // could multiply maxIvDifference by the number of relevant IV types, but this
-            // just further prunes results, and I'd prefer to give later pruning steps an
-            // opportunity to apply their pruning
-            var bestValue = results.Max(r => TotalIVs(r.IVs));
-            var threshold = bestValue - maxIvDifference * 3;
+            var bestOption = results.OrderByDescending(r => TotalMaxIVs(r.IVs) * 1000 + TotalMinIVs(r.IVs)).FirstOrDefault();
+            if (bestOption == null) return [];
 
-            return results.Where(p => TotalIVs(p.IVs) >= threshold);
+            var bestMaxIVs = TotalMaxIVs(bestOption.IVs);
+            var bestMinIVs = TotalMinIVs(bestOption.IVs);
+
+            return results.Where(r =>
+                (bestMaxIVs - TotalMaxIVs(r.IVs) <= maxIvDifference * 3) &&
+                (bestMinIVs - TotalMinIVs(r.IVs) <= maxIvDifference * 3)
+            );
         }
     }
 }
