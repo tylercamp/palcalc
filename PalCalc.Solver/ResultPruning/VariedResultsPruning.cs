@@ -48,6 +48,9 @@ namespace PalCalc.Solver.ResultPruning
                 if (commonResults.Count == 1) break;
             }
 
+            if (commonResults.Count == 0)
+                return [];
+
             var prunedResults = new List<IPalReference>() { commonResults.First() };
             foreach (var currentResult in results)
             {
