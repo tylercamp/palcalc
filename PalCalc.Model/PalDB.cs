@@ -119,6 +119,22 @@ namespace PalCalc.Model
             }
         }
 
+        static PalDB instance;
+        static PalDB()
+        {
+            BeginLoadEmbedded();
+        }
+
+        public static PalDB SharedInstance
+        {
+            get
+            {
+                if (instance == null) instance = LoadEmbedded();
+                return instance;
+            }
+            set => instance = value;
+        }
+
         public static PalDB FromJson(string json) => JsonConvert.DeserializeObject<PalDB>(json);
 
         public string ToJson() => JsonConvert.SerializeObject(this);

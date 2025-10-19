@@ -27,7 +27,7 @@ namespace PalCalc.Model
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum PalGender
+    public enum PalGender : byte
     {
         // note: pal world is not P.C., so it only has two genders
         MALE = 0b0001,

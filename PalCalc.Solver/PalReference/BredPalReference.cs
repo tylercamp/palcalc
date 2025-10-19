@@ -178,46 +178,36 @@ namespace PalCalc.Solver.PalReference
         private BredPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)
         {
             if (gender == PalGender.WILDCARD)
-            {
-                return this;
-            }
-            else if (gender == PalGender.OPPOSITE_WILDCARD)
+                return this;           
+
+            int newBreedings;
+
+            if (gender == PalGender.OPPOSITE_WILDCARD)
             {
                 // should only happen if the other parent has the same gender probabilities as this parent
                 if (db.BreedingMostLikelyGender[Pal] != PalGender.WILDCARD)
                 {
                     // assume that the other parent has the more likely gender
-                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs)
-                    {
-                        AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
-                        Gender = gender,
-                        PassivesProbability = PassivesProbability,
-                        IVsProbability = IVsProbability,
-                    };
+                    newBreedings = (int)Math.Ceiling(AvgRequiredBreedings / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]);
                 }
                 else
                 {
                     // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
-                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs)
-                    {
-                        AvgRequiredBreedings = AvgRequiredBreedings * 2,
-                        Gender = gender,
-                        PassivesProbability = PassivesProbability,
-                        IVsProbability = IVsProbability,
-                    };
+                    newBreedings = AvgRequiredBreedings * 2;
                 }
             }
             else
             {
-                var genderProbability = db.BreedingGenderProbability[Pal][gender];
-                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs)
-                {
-                    AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / genderProbability),
-                    Gender = gender,
-                    PassivesProbability = PassivesProbability,
-                    IVsProbability = IVsProbability,
-                };
+                newBreedings = (int)Math.Ceiling(AvgRequiredBreedings / db.BreedingGenderProbability[Pal][gender]);
             }
+
+            return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs)
+            {
+                AvgRequiredBreedings = newBreedings,
+                Gender = gender,
+                PassivesProbability = PassivesProbability,
+                IVsProbability = IVsProbability,
+            };
         }
 
         private IPalReference cachedOppositeWildcardRef;
