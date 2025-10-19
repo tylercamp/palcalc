@@ -59,12 +59,21 @@ namespace PalCalc.GenDB
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
-            return rawPals
+            var allPals = rawPals
                 .Where(p => !p.InternalName.StartsWith("SUMMON_", StringComparison.InvariantCultureIgnoreCase))
                 .Where(p => !p.InternalName.EndsWith("_Oilrig", StringComparison.InvariantCultureIgnoreCase))
                 .Select(rawPal =>
                 {
-                    var localizedNames = palNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetOneOf(rawPal.InternalName, rawPal.AlternativeInternalName));
+                    var localizedNames = palNames.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp =>
+                        {
+                            var fromName = kvp.Value.GetValueOrDefault(rawPal.InternalName);
+                            var fromAlternative = kvp.Value.GetValueOrDefault(rawPal.AlternativeInternalName);
+                            return fromName ?? fromAlternative;
+                        }
+                    );
+
                     var englishName = localizedNames["en"];
 
                     var minWildLevel = wildPalLevels.ContainsKey(rawPal.InternalName) ? (int?)wildPalLevels[rawPal.InternalName].Item1 : null;
@@ -122,6 +131,18 @@ namespace PalCalc.GenDB
                         GuaranteedPassivesInternalIds = rawPal.GuaranteedPassives,
                     };
                 }).ToList();
+
+            var missingIds = allPals
+                .Where(p => p.Id.PalDexNo < 0)
+                .OrderBy(p => p.BreedingPower)
+                .ThenBy(p => p.InternalName);
+
+            foreach (var (pal, index) in missingIds.ZipWithIndex())
+            {
+                pal.Id = new PalId() { PalDexNo = 10000 + index, IsVariant = false };
+            }
+
+            return allPals;
         }
 
         // descriptions may be formatted e.g.:

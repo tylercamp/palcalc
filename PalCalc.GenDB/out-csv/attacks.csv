@@ -48,7 +48,6 @@ Pal Blast,HyperBeam,Neutral,150,55,True,True
 Absolute Frost,IceAge,Ice,140,50,True,True
 Icicle Cutter,IceBlade,Ice,55,10,True,True
 Ice Missile,IceMissile,Ice,30,3,True,True
-Freeze Wall,IceWall,Ice,100,30,True,True
 Icicle Line,IcicleLine,Ice,120,40,True,True
 Icicle Bullet,IciclePierce,Ice,110,35,True,True
 Blizzard Spike,IcicleThrow,Ice,130,45,True,True
@@ -62,15 +61,11 @@ Poison Fog,PoisonFog,Dark,0,30,True,False
 Poison Blast,PoisonShot,Dark,30,2,True,True
 Power Bomb,PowerBall,Neutral,70,15,True,True
 Power Shot,PowerShot,Neutral,35,4,True,True
-Predator Blast,PredatorBeam,Neutral,200,20,False,False
-Predator Mark,PredatorLockon,Neutral,180,20,False,False
-Predator Surge,PredatorWave,Neutral,100,20,False,False
 Raid Cutter,RaidCutter,Grass,110,35,True,False
 Thunder Rail,Railbolt,Electric,200,60,True,False
 All Range Thunder,RangeThunder,Electric,125,40,True,True
 Reflect Leaf,ReflectiveShuriken,Grass,130,42,True,True
 Aqua Surge,RipTide,Water,160,56,True,True
-Stone Beat,RockBeat,Ground,170,60,True,True
 Rock Lance,RockLance,Ground,150,55,True,True
 Spine Vine,RootAttack,Grass,95,25,True,True
 Circle Vine,RootLance,Grass,120,40,True,True
@@ -222,7 +217,6 @@ Slime Press (Neutral),Unique_YakushimaMonster001_SlimePress_Normal,Neutral,50,1,
 Slime Press (Rainbow),Unique_YakushimaMonster001_SlimePress_Rainbow,Neutral,100,1,False,False
 Slime Press (Water),Unique_YakushimaMonster001_SlimePress_Water,Water,50,1,False,False
 Sword Charge,Unique_YakushimaMonster002_SwordCharge,Neutral,80,2,False,False
-Winged Assault,Unique_YakushimaMonster003_BatCharge,Neutral,70,2,False,False
 Lawn Bowling,Unique_Yeti_Grass_GrassBall,Grass,100,20,False,False
 Snow Bowling,Unique_Yeti_SnowBall,Ice,100,20,False,False
 Curtain Splash,WallSplash,Water,120,40,True,True
