@@ -10,6 +10,7 @@ using CUE4Parse.UE4.Versions;
 using CUE4Parse_Conversion;
 using CUE4Parse_Conversion.Animations.PSA;
 using CUE4Parse_Conversion.Textures;
+using Newtonsoft.Json;
 using PalCalc.GenDB.GameDataReaders;
 using PalCalc.Model;
 using Serilog;
@@ -308,11 +309,26 @@ namespace PalCalc.GenDB
             return rawActiveSkills.Where(s => !s.DisabledData).Select(rawAttack =>
             {
                 var attackId = rawAttack.WazaType.Replace("EPalWazaID::", "");
+
+                if (ManualFixes.ActiveSkillInternalNameOverrides.ContainsKey(attackId))
+                {
+                    var fixedId = ManualFixes.ActiveSkillInternalNameOverrides[attackId];
+                    if (rawActiveSkills.Any(s => s.WazaType == "EPalWazaID::" +  fixedId))
+                    {
+                        logger.Warning("Attack ID {OldId} is manually reassigned to {NewId}, but that ID is already in use", attackId, fixedId);
+                    }
+                    else
+                    {
+                        logger.Information("Overriding attack ID {OldId} with {NewId}", attackId, fixedId);
+                        attackId = fixedId;
+                    }
+                }
+
                 var localizedNames = attackNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetValueOrDefault(attackId));
 
                 if (localizedNames.Any(kvp => kvp.Value == null))
                 {
-                    logger.Warning("Skill {InternalName} missing at least 1 translation, skipping", attackId);
+                    logger.Warning("Skill {InternalName} missing at least 1 translation, skipping: {Json}", attackId, JsonConvert.SerializeObject(rawAttack));
                     return null;
                 }
 
@@ -738,7 +754,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v20");
+            var db = PalDB.MakeEmptyUnsafe("v21");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.Humans = humans;

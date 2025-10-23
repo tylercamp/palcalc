@@ -48,6 +48,7 @@ Pal Blast,HyperBeam,Neutral,150,55,True,True
 Absolute Frost,IceAge,Ice,140,50,True,True
 Icicle Cutter,IceBlade,Ice,55,10,True,True
 Ice Missile,IceMissile,Ice,30,3,True,True
+Freeze Wall,IceWall,Ice,100,30,True,True
 Icicle Line,IcicleLine,Ice,120,40,True,True
 Icicle Bullet,IciclePierce,Ice,110,35,True,True
 Blizzard Spike,IcicleThrow,Ice,130,45,True,True
@@ -66,6 +67,7 @@ Thunder Rail,Railbolt,Electric,200,60,True,False
 All Range Thunder,RangeThunder,Electric,125,40,True,True
 Reflect Leaf,ReflectiveShuriken,Grass,130,42,True,True
 Aqua Surge,RipTide,Water,160,56,True,True
+Stone Beat,RockBeat,Ground,170,60,True,True
 Rock Lance,RockLance,Ground,150,55,True,True
 Spine Vine,RootAttack,Grass,95,25,True,True
 Circle Vine,RootLance,Grass,120,40,True,True
@@ -143,7 +145,7 @@ Ground Pound,Unique_Gorilla_GroundPunch,Neutral,85,14,False,False
 Earth Impact,Unique_Grassmammoth_Earthquake,Ground,100,30,False,False
 Blast Punch,Unique_GrassPanda_Electric_ElectricPunch,Electric,85,14,False,False
 Crushing Punch,Unique_GrassPanda_MusclePunch,Grass,85,18,False,False
-Spinning Roundhouse,Unique_GrassRabbitMan_GrassRoundKick,Grass,90,15,False,False
+Leaping Roundhouse,Unique_GrassRabbitMan_GrassRoundKick,Grass,90,15,False,False
 Grudge Barrage,Unique_GrimGirl_BrutalMachete,Dark,130,31,False,False
 Tornado Attack,Unique_HawkBird_Storm,Neutral,65,13,False,False
 Giga Horn,Unique_HerculesBeetle_BeetleTackle,Ground,75,11,False,False
@@ -217,6 +219,7 @@ Slime Press (Neutral),Unique_YakushimaMonster001_SlimePress_Normal,Neutral,50,1,
 Slime Press (Rainbow),Unique_YakushimaMonster001_SlimePress_Rainbow,Neutral,100,1,False,False
 Slime Press (Water),Unique_YakushimaMonster001_SlimePress_Water,Water,50,1,False,False
 Sword Charge,Unique_YakushimaMonster002_SwordCharge,Neutral,80,2,False,False
+Winged Assault,Unique_YakushimaMonster003_BatCharge,Neutral,70,2,False,False
 Lawn Bowling,Unique_Yeti_Grass_GrassBall,Grass,100,20,False,False
 Snow Bowling,Unique_Yeti_SnowBall,Ice,100,20,False,False
 Curtain Splash,WallSplash,Water,120,40,True,True
