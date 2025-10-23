@@ -29,7 +29,7 @@ namespace PalCalc.GenDB.GameDataReaders
 
         public static MapInfo ReadMapInfo(IFileProvider provider)
         {
-            var maps = provider.LoadObject<UDataTable>(AssetPaths.MAP_PROPERTIES_PATH);
+            var maps = provider.LoadPackageObject<UDataTable>(AssetPaths.MAP_PROPERTIES_PATH);
 
             MapInfo result = null;
 

@@ -140,7 +140,7 @@ namespace PalCalc.GenDB.GameDataReaders
         public static List<UPal> ReadPals(IFileProvider provider)
         {
             logger.Information("Reading pals");
-            var rawPals = provider.LoadObject<UDataTable>(AssetPaths.PALS_PATH);
+            var rawPals = provider.LoadPackageObject<UDataTable>(AssetPaths.PALS_PATH);
             List<UPal> result = [];
 
             // note: index order won't match other pal DBs exactly since we're not skipping Warsect Terra

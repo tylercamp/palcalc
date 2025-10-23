@@ -46,11 +46,12 @@ namespace PalCalc.GenDB.GameDataReaders
         public static List<UActiveSkill> ReadActiveSkills(IFileProvider provider)
         {
             logger.Information("Reading active skills");
-
-            var rawAttackLevels = provider.LoadObject<UDataTable>(AssetPaths.ACTIVE_SKILLS_PAL_LEVEL_PATH);
+            var rawAttackLevels = provider.LoadPackageObject<UCompositeDataTable>(AssetPaths.ACTIVE_SKILLS_PAL_LEVEL_PATH);
             var availableAttackIds = rawAttackLevels.RowMap.Select(r => r.Value.ToObject<UActiveSkillLevel>().WazaID).Distinct().ToList();
 
-            var rawAttacks = provider.LoadObject<UDataTable>(AssetPaths.ACTIVE_SKILLS_PATH);
+            var rawAttacks = provider.LoadPackageObject<UCompositeDataTable>(AssetPaths.ACTIVE_SKILLS_PATH);
+
+            
 
             var res = new List<UActiveSkill>();
             foreach (var row in rawAttacks.RowMap)

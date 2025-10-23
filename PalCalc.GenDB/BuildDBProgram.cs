@@ -1,4 +1,5 @@
-﻿using CUE4Parse.FileProvider;
+﻿using CUE4Parse.Compression;
+using CUE4Parse.FileProvider;
 using CUE4Parse.MappingsProvider;
 using CUE4Parse.UE4.Assets.Exports.Engine;
 using CUE4Parse.UE4.Assets.Exports.Texture;
@@ -672,13 +673,15 @@ namespace PalCalc.GenDB
         {
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
+            OodleHelper.DownloadOodleDll();
+            OodleHelper.Initialize(OodleHelper.OODLE_DLL_NAME);
+
             var provider = new DefaultFileProvider(PalworldDirPath, SearchOption.AllDirectories, true, new VersionContainer(EGame.GAME_UE5_1));
             provider.MappingsContainer = new FileUsmapTypeMappingsProvider(MappingsPath);
 
             provider.Initialize();
             provider.Mount();
             provider.LoadVirtualPaths();
-            provider.LoadLocalization();
 
             logger.Information("Reading localizations, pals, and passives...");
             var localizations = LocalizationsReader.FetchLocalizations(provider);

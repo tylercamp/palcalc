@@ -26,7 +26,7 @@ namespace PalCalc.GenDB.GameDataReaders
 
         public Dictionary<string, string> ReadPalNames(IFileProvider provider)
         {
-            var rawEntries = provider.LoadObject<UDataTable>(palNameTextPath);
+            var rawEntries = provider.LoadPackageObject<UDataTable>(palNameTextPath);
             Dictionary<string, string> result = new Dictionary<string, string>();
 
             foreach (var entry in rawEntries.RowMap)
@@ -42,7 +42,7 @@ namespace PalCalc.GenDB.GameDataReaders
 
         public Dictionary<string, string> ReadSkillNames(IFileProvider provider)
         {
-            var rawEntries = provider.LoadObject<UDataTable>(skillNameTextPath);
+            var rawEntries = provider.LoadPackageObject<UDataTable>(skillNameTextPath);
             Dictionary<string, string> result = new Dictionary<string, string>();
 
             foreach (var entry in rawEntries.RowMap)
@@ -59,7 +59,7 @@ namespace PalCalc.GenDB.GameDataReaders
         // note: returns description IDs
         public Dictionary<string, string> ReadSkillDescriptions(IFileProvider provider)
         {
-            var rawEntries = provider.LoadObject<UDataTable>(skillDescriptionTextPath);
+            var rawEntries = provider.LoadPackageObject<UDataTable>(skillDescriptionTextPath);
             Dictionary<string, string> result = new Dictionary<string, string>();
 
             foreach (var entry in rawEntries.RowMap)
@@ -75,7 +75,7 @@ namespace PalCalc.GenDB.GameDataReaders
 
         public Dictionary<string, string> ReadCommonText(IFileProvider provider)
         {
-            var rawEntries = provider.LoadObject<UDataTable>(commonTextPath);
+            var rawEntries = provider.LoadPackageObject<UDataTable>(commonTextPath);
             Dictionary<string, string> result = new Dictionary<string, string>();
 
             foreach (var entry in rawEntries.RowMap)
@@ -99,7 +99,7 @@ namespace PalCalc.GenDB.GameDataReaders
 
         public Dictionary<string, string> ReadAttackNames(IFileProvider provider)
         {
-            var rawEntries = provider.LoadObject<UDataTable>(skillNameTextPath);
+            var rawEntries = provider.LoadPackageObject<UDataTable>(skillNameTextPath);
             Dictionary<string, string> result = new Dictionary<string, string>();
 
             foreach (var entry in rawEntries.RowMap)
@@ -115,7 +115,7 @@ namespace PalCalc.GenDB.GameDataReaders
 
         public Dictionary<string, string> ReadHumanNames(IFileProvider provider)
         {
-            var rawEntries = provider.LoadObject<UDataTable>(humanNameTextPath);
+            var rawEntries = provider.LoadPackageObject<UDataTable>(humanNameTextPath);
             return rawEntries.RowMap.ToDictionary(
                 kvp => kvp.Key.Text,
                 kvp => kvp.Value.Get<FText>("TextData").Text.Trim()

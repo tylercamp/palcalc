@@ -19,7 +19,7 @@ namespace PalCalc.GenDB.GameDataReaders
         public static Dictionary<string, UTexture2D> ReadPalIconMappings(IFileProvider provider)
         {
             logger.Information("Reading pal icon mappings");
-            var rawMappings = provider.LoadObject<UDataTable>(AssetPaths.PAL_ICONS_MAPPING_PATH);
+            var rawMappings = provider.LoadPackageObject<UDataTable>(AssetPaths.PAL_ICONS_MAPPING_PATH);
             var res = new Dictionary<string, UTexture2D>();
 
             foreach (var entry in rawMappings.RowMap)
