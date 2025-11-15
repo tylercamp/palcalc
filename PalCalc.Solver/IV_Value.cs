@@ -14,6 +14,28 @@ namespace PalCalc.Solver
 
         int Min { get; }
         int Max { get; }
+
+        // (any equality between IV_IValues will always be reference
+        // comparisons, despite IV_Range being a record struct, due to boxing)
+        public static bool AreEqual(IV_IValue a, IV_IValue b)
+        {
+            var nullA = a is null;
+            var nullB = b is null;
+
+            if (nullA != nullB) return false;
+            if (nullA && nullB) return true;
+
+            var randA = ReferenceEquals(a, IV_Random.Instance);
+            var randB = ReferenceEquals(b, IV_Random.Instance);
+
+            if (randA != randB) return false;
+            if (randA && randB) return true;
+
+            var rangeA = (IV_Range)a;
+            var rangeB = (IV_Range)b;
+
+            return rangeA == rangeB;
+        }
     }
 
     public record class IV_Random : IV_IValue

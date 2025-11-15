@@ -22,6 +22,8 @@ namespace PalCalc.Solver
 
     public readonly record struct Gender(byte Store) : AttrId
     {
+        public Gender(PalGender value) : this((byte)value) { }
+
         public PalGender Value => (PalGender)Store;
     }
 
@@ -46,7 +48,7 @@ namespace PalCalc.Solver
 
         public IV(bool isRelevant, int minValue, int maxValue)
             : this((short)(
-                (isRelevant ? 0xF000 : 0)
+                (isRelevant ? 0x8000 : 0)
                   | ((minValue & 0x7F) << 7)
                   | (maxValue & 0x7F)
             ))
@@ -54,7 +56,7 @@ namespace PalCalc.Solver
         }
 
 
-        public bool IsRelevant => (Store & 0xF000) != 0;
+        public bool IsRelevant => (Store & 0x8000) != 0;
         public int Max => Store & 0x7F;
         public int Min => (Store >> 7) & 0x7F;
 
@@ -80,49 +82,62 @@ namespace PalCalc.Solver
     // actual passives are represented by array index in DB, +1
     public readonly record struct Passive(ushort Store)
     {
-        private const ushort RANDOM = unchecked(0x8000);
-        public static Passive Random = new(RANDOM);
+        private const ushort RANDOM = unchecked(0xFFFF);
+        public static readonly Passive Random = new(RANDOM);
+        public static readonly Passive Empty = new(0);
 
-        public Passive(PassiveSkill ps) : this((ushort)(
-            ps is RandomPassiveSkill ? RANDOM : (PalDB.SharedInstance.PassiveSkills.IndexOf(ps) + 1)
+        public Passive(PalDB db, PassiveSkill ps) : this((ushort)(
+            ps is RandomPassiveSkill ? RANDOM : (db.PassiveSkills.IndexOf(ps) + 1)
         ))
         {
+            if (ps is UnrecognizedPassiveSkill && !db.PassiveSkills.Contains(ps))
+                // shouldn't happen if used correctly
+                throw new Exception($"Unrecognized passive skill {ps.Name} does not exist in DB");
         }
 
         public bool IsRandom => Store == RANDOM;
         public bool IsEmpty => Store == 0;
 
         public PassiveSkill ModelObject => IsEmpty ? null : (IsRandom ? new RandomPassiveSkill() : PalDB.SharedInstance.PassiveSkills[Store - 1]);
+
+        public readonly bool Equals(Passive other) => !IsRandom && Store == other.Store;
+        override public int GetHashCode() => Store;
     }
 
-    // 64-bit long split into four ordered 16-bit items
-    public readonly record struct PassiveSet(long Store)
+    // 64-bit long split into four ordered 16-bit items, sorted smallest (LSB) to largest (MSB)
+    public readonly record struct PassiveSet(ulong Store)
     {
         /// <param name="modelObjects">MUST be deduplicated!</param>
-        /// <returns></returns>
-        private static long Serialize(List<PassiveSkill> modelObjects)
+        private static ulong Serialize(PalDB db, List<PassiveSkill> modelObjects)
         {
-            var p1 = new Passive(modelObjects.Skip(0).FirstOrDefault()).Store;
-            var p2 = new Passive(modelObjects.Skip(1).FirstOrDefault()).Store;
-            var p3 = new Passive(modelObjects.Skip(2).FirstOrDefault()).Store;
-            var p4 = new Passive(modelObjects.Skip(3).FirstOrDefault()).Store;
+            if (modelObjects.Count > 4)
+                throw new ArgumentException($"PassiveSet must not exceed 4 elements, but was provided {modelObjects.Count} elements");
+
+            if (modelObjects.Distinct().Count() != modelObjects.Count)
+                throw new ArgumentException($"PassiveSet requires deduplicated elements, but at least one was duplicated");
+
+            var p1 = new Passive(db, modelObjects.Skip(0).FirstOrDefault()).Store;
+            var p2 = new Passive(db, modelObjects.Skip(1).FirstOrDefault()).Store;
+            var p3 = new Passive(db, modelObjects.Skip(2).FirstOrDefault()).Store;
+            var p4 = new Passive(db, modelObjects.Skip(3).FirstOrDefault()).Store;
 
             // sort the ints
-            if (p1 > p2) (p1, p2) = (p2, p1);
-            if (p3 > p4) (p3, p4) = (p4, p3);
-            if (p1 > p3) { (p1, p3) = (p3, p1); (p2, p4) = (p4, p2); }
-            if (p2 > p3) (p2, p3) = (p3, p2);
+            if (p1 > p2) (p1, p2) = (p2, p1);   // (0,1)
+            if (p3 > p4) (p3, p4) = (p4, p3);   // (2,3)
+            if (p1 > p3) (p1, p3) = (p3, p1);   // (0,2)
+            if (p2 > p4) (p2, p4) = (p4, p2);   // (1,3)
+            if (p2 > p3) (p2, p3) = (p3, p2);   // (1,2)
 
             return (
-                (((long)p1) << 0) |
-                (((long)p2) << 16) |
-                (((long)p3) << 32) |
-                (((long)p4) << 48)
+                (((ulong)p1) << 0) |
+                (((ulong)p2) << 16) |
+                (((ulong)p3) << 32) |
+                (((ulong)p4) << 48)
             );
         }
 
-        public PassiveSet(List<PassiveSkill> passives)
-            : this(Serialize(passives))
+        public PassiveSet(PalDB db, List<PassiveSkill> passives)
+            : this(Serialize(db, passives))
         {
         }
 
@@ -138,7 +153,10 @@ namespace PalCalc.Solver
             get
             {
                 for (int i = 0; i < 4; i++)
-                    yield return this[i].ModelObject;
+                {
+                    var p = this[i];
+                    if (!p.IsEmpty) yield return p.ModelObject;
+                }
             }
         }
 
@@ -148,8 +166,6 @@ namespace PalCalc.Solver
             passive == this[2] ||
             passive == this[3];
 
-        /// <param name="others">Must NOT be empty!</param>
-        /// <returns></returns>
         public PassiveSet Except(PassiveSet others)
         {
             if (Store == 0 || others.Store == 0) return this;
@@ -157,20 +173,54 @@ namespace PalCalc.Solver
             var remainingSelf = Store;
             var remainingOther = others.Store;
 
-            long res = 0;
-            for (int i = 0; i < 4; i++)
+            ulong res = 0;
+            while (remainingSelf != 0)
             {
-                short sv = (short)(remainingSelf & 0xFFFF);
-                short ov = (short)(remainingOther & 0xFFFF);
+                // `sv` and `ov` contain the smallest of the remaining values
+                // in each set
+                ushort sv = (ushort)(remainingSelf & 0xFFFF);
+                ushort ov = (ushort)(remainingOther & 0xFFFF);
+                
+                if (sv == Passive.Random.Store)
+                {
+                    // this is a 'Random' passive, which can't be matched against
+                    // any other passives (even other Random passives), so this always
+                    // gets kept
 
-                if 
+                    res >>= 16;
+                    res |= (ulong)sv << 48;
+                    remainingSelf >>= 16;
+                }
+                else if (sv == ov)
+                {
+                    // value in `self` which is also in `other`, skip
+                    remainingSelf >>= 16;
+                    remainingOther >>= 16;
+                }
+                else if (sv > ov && remainingOther != 0)
+                {
+                    // all values in `remainingSelf` are greater than `ov`
+                    // shift `remainingOther` to skip the small value
+                    //
+                    // (but only do this if `remainingOther` is non-zero -- we're shifting
+                    // `remainingOther` to get the next potential passive, but if the whole thing
+                    // is empty, there's no point in shifting)
+                    remainingOther >>= 16;
+                }
+                else // sv < ov -- value in `self` which isn't in `other`
+                {
+                    // all values in `remainingOther` are greater than `sv`, i.e.
+                    // `sv` (self) does not exist in `ov` (excluded), and should be
+                    // kept
+                    res >>= 16;
+                    res |= (ulong)sv << 48;
 
-                res <<= 16;
-                remainingSelf >>= 16;
-                remainingOther >>= 16;
+                    // value copied, remove from `self`
+                    remainingSelf >>= 16;
+                }
             }
 
-            return res;
+            return new PassiveSet(res);
         }
 
         /// <param name="other">Must NOT be empty!</param>
@@ -178,16 +228,16 @@ namespace PalCalc.Solver
         public PassiveSet Except(Passive other)
         {
             if (Store == 0 || other.Store == 0) return this; // empty
+            if (other.IsRandom) return this; // 'Random' could be anything, "excluding" it is meaningless
 
-            long remaining = Store;
-            long result = 0;
+            ulong remaining = Store;
+            ulong result = 0;
             for (int i = 0; i < 4; i++)
             {
-                result <<= 16;
-
-                if ((remaining & other.Store) != other.Store)
+                if ((remaining & 0xFFFF) != other.Store)
                 {
-                    result |= remaining & 0xFFFF;
+                    result >>= 16;
+                    result |= (remaining & 0xFFFF) << 48;
                 }
 
                 remaining >>= 16;
@@ -210,7 +260,7 @@ namespace PalCalc.Solver
     {
         public List<IPalReference> SolveFor(PalSpecifier spec, SolverStateController controller)
         {
-            int x = Marshal.SizeOf()
+            throw new NotImplementedException();
         }
     }
 }
