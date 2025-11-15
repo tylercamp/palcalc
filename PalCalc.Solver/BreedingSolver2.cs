@@ -105,55 +105,108 @@ namespace PalCalc.Solver
     }
 
     // 64-bit long split into four ordered 16-bit items, sorted smallest (LSB) to largest (MSB)
-    public readonly record struct PassiveSet(ulong Store)
+    public readonly record struct PassiveSet(ulong StoreLo, ulong StoreHi)
     {
-        /// <param name="modelObjects">MUST be deduplicated!</param>
-        private static ulong Serialize(PalDB db, List<PassiveSkill> modelObjects)
+        public static readonly PassiveSet Empty = new(0, 0);
+
+        private const ulong LaneMask = 0xFFFFUL;
+
+        // 128-bit logical shift right by 16:
+        // [Hi:Lo] >>> 16
+        private static void ShiftRight16(ref ulong lo, ref ulong hi)
         {
-            if (modelObjects.Count > 4)
-                throw new ArgumentException($"PassiveSet must not exceed 4 elements, but was provided {modelObjects.Count} elements");
+            lo = (lo >> 16) | (hi << 48);
+            hi >>= 16;
+        }
+
+        private static void ShiftLeft16(ref ulong lo, ref ulong hi)
+        {
+            hi = (hi << 16) | (lo >> 48);
+            lo <<= 16;
+        }
+
+        // Compact "keep" operation:
+        // shift result right 16 bits and insert v in the top lane.
+        private static void PushHigh(ref ulong resLo, ref ulong resHi, ushort v)
+        {
+            ShiftRight16(ref resLo, ref resHi);
+            resHi |= (ulong)v << 48;
+        }
+
+        public static PassiveSet FromModel(PalDB db, List<PassiveSkill> modelObjects)
+        {
+            if (modelObjects.Count > 8)
+                throw new ArgumentException($"PassiveSet must not exceed 8 elements, but was provided {modelObjects.Count} elements");
 
             if (modelObjects.Distinct().Count() != modelObjects.Count)
                 throw new ArgumentException($"PassiveSet requires deduplicated elements, but at least one was duplicated");
 
-            var p1 = new Passive(db, modelObjects.Skip(0).FirstOrDefault()).Store;
-            var p2 = new Passive(db, modelObjects.Skip(1).FirstOrDefault()).Store;
-            var p3 = new Passive(db, modelObjects.Skip(2).FirstOrDefault()).Store;
-            var p4 = new Passive(db, modelObjects.Skip(3).FirstOrDefault()).Store;
+            // TODO - efficient sort
+            var sorted = modelObjects.Select(m => new Passive(db, m)).OrderBy(p => p.Store).ToList();
 
-            // sort the ints
-            if (p1 > p2) (p1, p2) = (p2, p1);   // (0,1)
-            if (p3 > p4) (p3, p4) = (p4, p3);   // (2,3)
-            if (p1 > p3) (p1, p3) = (p3, p1);   // (0,2)
-            if (p2 > p4) (p2, p4) = (p4, p2);   // (1,3)
-            if (p2 > p3) (p2, p3) = (p3, p2);   // (1,2)
+            ulong lo = 0, hi = 0;
+            for (int i = 0; i < sorted.Count; i++)
+                PushHigh(ref lo, ref hi, sorted[i].Store);
 
-            return (
-                (((ulong)p1) << 0) |
-                (((ulong)p2) << 16) |
-                (((ulong)p3) << 32) |
-                (((ulong)p4) << 48)
-            );
+            return new PassiveSet(lo, hi);
         }
 
-        public PassiveSet(PalDB db, List<PassiveSkill> passives)
-            : this(Serialize(db, passives))
+        public static PassiveSet Single(Passive item)
         {
+            ulong lo = 0, hi = 0;
+            PushHigh(ref lo, ref hi, item.Store);
+
+            return new PassiveSet(lo, hi);
         }
+
+        public int Count
+        {
+            get
+            {
+                int res = 0;
+                ulong tmpLo = StoreLo, tmpHi = StoreHi;
+
+                while (tmpHi != 0)
+                {
+                    ++res;
+                    ShiftLeft16(ref tmpLo, ref tmpHi);
+                }
+
+                return res;
+            }
+        }
+
+        // (a non-empty set will have at least one value in the `hi` part)
+        public bool IsEmpty => StoreHi == 0;
 
         public Passive this[int i]
         {
-            get => new((ushort)(
-                (Store >> (i * 16)) & 0xFFFF
-            ));
+            get
+            {
+                if (i < 0 || i >= 8) throw new IndexOutOfRangeException($"{i} is outside the range [0, 8)");
+
+                ulong s;
+                if (i < 4)
+                {
+                    s = StoreHi;
+                }
+                else
+                {
+                    s = StoreLo;
+                    i -= 4;
+                }
+
+                return new Passive((ushort)((s >> (i * 16)) & 0xFFFF));
+            }
         }
 
         public IEnumerable<PassiveSkill> ModelObjects
         {
             get
             {
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 8; i++)
                 {
+                    // important: defer to `this[i]` so it's covered by unit tests
                     var p = this[i];
                     if (!p.IsEmpty) yield return p.ModelObject;
                 }
@@ -161,89 +214,203 @@ namespace PalCalc.Solver
         }
 
         public bool Contains(Passive passive) =>
-            passive == this[0] ||
-            passive == this[1] ||
-            passive == this[2] ||
-            passive == this[3];
+            !passive.IsEmpty && !passive.IsRandom && !IsEmpty && (
+            this[0] == passive ||
+            this[1] == passive ||
+            this[2] == passive ||
+            this[3] == passive ||
+            this[4] == passive ||
+            this[5] == passive ||
+            this[6] == passive ||
+            this[7] == passive
+        );
 
         public PassiveSet Except(PassiveSet others)
         {
-            if (Store == 0 || others.Store == 0) return this;
+            if (IsEmpty || others.IsEmpty) return this;
 
-            var remainingSelf = Store;
-            var remainingOther = others.Store;
+            ulong selfLo = StoreLo;
+            ulong selfHi = StoreHi;
+            ulong otherLo = others.StoreLo;
+            ulong otherHi = others.StoreHi;
+            ulong resLo = 0;
+            ulong resHi = 0;
 
-            ulong res = 0;
-            while (remainingSelf != 0)
+            while ((selfLo | selfHi) != 0)
             {
-                // `sv` and `ov` contain the smallest of the remaining values
-                // in each set
-                ushort sv = (ushort)(remainingSelf & 0xFFFF);
-                ushort ov = (ushort)(remainingOther & 0xFFFF);
-                
+                // smallest remaining in self
+                ushort sv = (ushort)(selfLo & LaneMask);
+                ushort ov = (ushort)(otherLo & LaneMask);
+
                 if (sv == Passive.Random.Store)
                 {
-                    // this is a 'Random' passive, which can't be matched against
-                    // any other passives (even other Random passives), so this always
-                    // gets kept
-
-                    res >>= 16;
-                    res |= (ulong)sv << 48;
-                    remainingSelf >>= 16;
+                    // Random is never matched; always kept
+                    PushHigh(ref resLo, ref resHi, sv);
+                    ShiftRight16(ref selfLo, ref selfHi);
                 }
                 else if (sv == ov)
                 {
-                    // value in `self` which is also in `other`, skip
-                    remainingSelf >>= 16;
-                    remainingOther >>= 16;
+                    // value in self also appears in others: skip both
+                    ShiftRight16(ref selfLo, ref selfHi);
+                    ShiftRight16(ref otherLo, ref otherHi);
                 }
-                else if (sv > ov && remainingOther != 0)
+                else if (sv > ov && (otherLo | otherHi) != 0)
                 {
-                    // all values in `remainingSelf` are greater than `ov`
-                    // shift `remainingOther` to skip the small value
-                    //
-                    // (but only do this if `remainingOther` is non-zero -- we're shifting
-                    // `remainingOther` to get the next potential passive, but if the whole thing
-                    // is empty, there's no point in shifting)
-                    remainingOther >>= 16;
+                    // all values in self are >= sv > ov, so advance others
+                    ShiftRight16(ref otherLo, ref otherHi);
                 }
-                else // sv < ov -- value in `self` which isn't in `other`
+                else
                 {
-                    // all values in `remainingOther` are greater than `sv`, i.e.
-                    // `sv` (self) does not exist in `ov` (excluded), and should be
-                    // kept
-                    res >>= 16;
-                    res |= (ulong)sv << 48;
-
-                    // value copied, remove from `self`
-                    remainingSelf >>= 16;
+                    // sv < ov, or others is empty:
+                    // sv does not exist in others -> keep
+                    PushHigh(ref resLo, ref resHi, sv);
+                    ShiftRight16(ref selfLo, ref selfHi);
                 }
             }
 
-            return new PassiveSet(res);
+            return new PassiveSet(resLo, resHi);
         }
 
         /// <param name="other">Must NOT be empty!</param>
         /// <returns></returns>
         public PassiveSet Except(Passive other)
         {
-            if (Store == 0 || other.Store == 0) return this; // empty
+            if (IsEmpty || other.IsEmpty) return this; // empty
             if (other.IsRandom) return this; // 'Random' could be anything, "excluding" it is meaningless
 
-            ulong remaining = Store;
-            ulong result = 0;
-            for (int i = 0; i < 4; i++)
+            ulong selfLo = StoreLo, selfHi = StoreHi;
+            ulong resLo = 0, resHi = 0;
+
+            for (int i = 0; i < 8; i++)
             {
-                if ((remaining & 0xFFFF) != other.Store)
+                if ((selfLo & 0xFFFF) != other.Store)
                 {
-                    result >>= 16;
-                    result |= (remaining & 0xFFFF) << 48;
+                    PushHigh(ref resLo, ref resHi, (ushort)(selfLo & 0xFFFF));
                 }
 
-                remaining >>= 16;
+                ShiftRight16(ref selfLo, ref selfHi);
             }
 
-            return new PassiveSet(result);
+            return new PassiveSet(resLo, resHi);
+        }
+
+        public PassiveSet Intersect(PassiveSet others)
+        {
+            if (IsEmpty || others.IsEmpty)
+                return new PassiveSet(0, 0);
+
+            ulong selfLo = StoreLo;
+            ulong selfHi = StoreHi;
+            ulong otherLo = others.StoreLo;
+            ulong otherHi = others.StoreHi;
+            ulong resLo = 0;
+            ulong resHi = 0;
+
+            while ((selfLo | selfHi) != 0 && (otherLo | otherHi) != 0)
+            {
+                ushort sv = (ushort)(selfLo & LaneMask);
+                ushort ov = (ushort)(otherLo & LaneMask);
+
+                // Random never intersects with anything, even another Random
+                if (sv == Passive.Random.Store)
+                {
+                    ShiftRight16(ref selfLo, ref selfHi);
+                }
+                else if (ov == Passive.Random.Store)
+                {
+                    ShiftRight16(ref otherLo, ref otherHi);
+                }
+                else if (sv == ov)
+                {
+                    // common element -> keep it
+                    PushHigh(ref resLo, ref resHi, sv);
+                    ShiftRight16(ref selfLo, ref selfHi);
+                    ShiftRight16(ref otherLo, ref otherHi);
+                }
+                else if (sv > ov)
+                {
+                    // advance other to catch up
+                    ShiftRight16(ref otherLo, ref otherHi);
+                }
+                else // sv < ov
+                {
+                    // advance self to catch up
+                    ShiftRight16(ref selfLo, ref selfHi);
+                }
+            }
+
+            return new PassiveSet(resLo, resHi);
+        }
+
+        // (note: preserves `Set` semantics, i.e. auto-deduplicates (not including Random))
+        public PassiveSet Concat(PassiveSet other)
+        {
+            if (IsEmpty) return other;
+            if (other.IsEmpty) return this;
+
+            ulong selfLo = StoreLo;
+            ulong selfHi = StoreHi;
+            ulong otherLo = other.StoreLo;
+            ulong otherHi = other.StoreHi;
+            ulong resLo = 0;
+            ulong resHi = 0;
+
+            while ((selfLo | selfHi) != 0 && (otherLo | otherHi) != 0)
+            {
+                ushort sv = (ushort)(selfLo & LaneMask);
+                ushort ov = (ushort)(otherLo & LaneMask);
+
+                if (sv == ov)
+                {
+                    // Non-special duplicate: keep one
+                    if (sv != 0 && sv != Passive.Random.Store)
+                    {
+                        PushHigh(ref resLo, ref resHi, sv);
+                    }
+                    else
+                    {
+                        // Random or Empty: keep both
+                        PushHigh(ref resLo, ref resHi, sv);
+                        PushHigh(ref resLo, ref resHi, ov);
+                    }
+
+                    ShiftRight16(ref selfLo, ref selfHi);
+                    ShiftRight16(ref otherLo, ref otherHi);
+                }
+                else if (sv < ov)
+                {
+                    PushHigh(ref resLo, ref resHi, sv);
+                    ShiftRight16(ref selfLo, ref selfHi);
+                }
+                else // sv > ov
+                {
+                    PushHigh(ref resLo, ref resHi, ov);
+                    ShiftRight16(ref otherLo, ref otherHi);
+                }
+            }
+
+            // Append remaining from self
+            while ((selfLo | selfHi) != 0)
+            {
+                ushort sv = (ushort)(selfLo & LaneMask);
+                PushHigh(ref resLo, ref resHi, sv);
+                ShiftRight16(ref selfLo, ref selfHi);
+            }
+
+            // Append remaining from other
+            while ((otherLo | otherHi) != 0)
+            {
+                ushort ov = (ushort)(otherLo & LaneMask);
+                PushHigh(ref resLo, ref resHi, ov);
+                ShiftRight16(ref otherLo, ref otherHi);
+            }
+
+            return new PassiveSet(resLo, resHi);
+        }
+
+        public PassiveSet Concat(Passive other)
+        {
+            return Concat(Single(other));
         }
     }
 
