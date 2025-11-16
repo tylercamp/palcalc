@@ -47,10 +47,16 @@ namespace PalCalc.Model
         {
             var token = JToken.ReadFrom(reader);
             var passives = token["PassiveSkills"] ?? token["Traits"];
+
+            var palFromName = token["InternalName"]?.ToObject<string>()?.InternalToPal(db);
+            var palFromId = token["Id"]?.ToObject<PalId>()?.ToPal(db);
+
+            var pal = palFromName ?? palFromId;
+            if (pal == null) throw new Exception($"Unable to detect pal type with 'InternalName={token["InternalName"]}' and 'Id={token["Id"]}'");
+
             return new PalInstance()
             {
-                // TODO - apparently paldex num. can change, should switch to internal pal name
-                Pal = token["Id"].ToObject<PalId>().ToPal(db),
+                Pal = pal,
                 Location = token["Location"].ToObject<PalLocation>(),
                 Gender = token["Gender"].ToObject<PalGender>(),
                 PassiveSkills = passives.ToObject<List<string>>().Select(s => s.ToStandardPassive(db)).ToList(),
@@ -72,7 +78,8 @@ namespace PalCalc.Model
         {
             JToken.FromObject(new
             {
-                Id = value.Pal.Id,
+                // (paldex ID can change, prefer internal name as unique ID)
+                InternalName = value.Pal.InternalName,
                 Location = value.Location,
                 Gender = value.Gender,
                 PassiveSkills = value.PassiveSkills.Select(t => t.InternalName),

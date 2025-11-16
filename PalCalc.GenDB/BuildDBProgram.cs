@@ -1,4 +1,5 @@
-﻿using CUE4Parse.FileProvider;
+﻿using CUE4Parse.Compression;
+using CUE4Parse.FileProvider;
 using CUE4Parse.MappingsProvider;
 using CUE4Parse.UE4.Assets.Exports.Engine;
 using CUE4Parse.UE4.Assets.Exports.Texture;
@@ -9,6 +10,7 @@ using CUE4Parse.UE4.Versions;
 using CUE4Parse_Conversion;
 using CUE4Parse_Conversion.Animations.PSA;
 using CUE4Parse_Conversion.Textures;
+using Newtonsoft.Json;
 using PalCalc.GenDB.GameDataReaders;
 using PalCalc.Model;
 using Serilog;
@@ -59,12 +61,21 @@ namespace PalCalc.GenDB
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
-            return rawPals
+            var allPals = rawPals
                 .Where(p => !p.InternalName.StartsWith("SUMMON_", StringComparison.InvariantCultureIgnoreCase))
                 .Where(p => !p.InternalName.EndsWith("_Oilrig", StringComparison.InvariantCultureIgnoreCase))
                 .Select(rawPal =>
                 {
-                    var localizedNames = palNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetOneOf(rawPal.InternalName, rawPal.AlternativeInternalName));
+                    var localizedNames = palNames.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp =>
+                        {
+                            var fromName = kvp.Value.GetValueOrDefault(rawPal.InternalName);
+                            var fromAlternative = kvp.Value.GetValueOrDefault(rawPal.AlternativeInternalName);
+                            return fromName ?? fromAlternative;
+                        }
+                    );
+
                     var englishName = localizedNames["en"];
 
                     var minWildLevel = wildPalLevels.ContainsKey(rawPal.InternalName) ? (int?)wildPalLevels[rawPal.InternalName].Item1 : null;
@@ -122,6 +133,18 @@ namespace PalCalc.GenDB
                         GuaranteedPassivesInternalIds = rawPal.GuaranteedPassives,
                     };
                 }).ToList();
+
+            var missingIds = allPals
+                .Where(p => p.Id.PalDexNo < 0)
+                .OrderBy(p => p.BreedingPower)
+                .ThenBy(p => p.InternalName);
+
+            foreach (var (pal, index) in missingIds.ZipWithIndex())
+            {
+                pal.Id = new PalId() { PalDexNo = 10000 + index, IsVariant = false };
+            }
+
+            return allPals;
         }
 
         // descriptions may be formatted e.g.:
@@ -286,11 +309,26 @@ namespace PalCalc.GenDB
             return rawActiveSkills.Where(s => !s.DisabledData).Select(rawAttack =>
             {
                 var attackId = rawAttack.WazaType.Replace("EPalWazaID::", "");
+
+                if (ManualFixes.ActiveSkillInternalNameOverrides.ContainsKey(attackId))
+                {
+                    var fixedId = ManualFixes.ActiveSkillInternalNameOverrides[attackId];
+                    if (rawActiveSkills.Any(s => s.WazaType == "EPalWazaID::" +  fixedId))
+                    {
+                        logger.Warning("Attack ID {OldId} is manually reassigned to {NewId}, but that ID is already in use", attackId, fixedId);
+                    }
+                    else
+                    {
+                        logger.Information("Overriding attack ID {OldId} with {NewId}", attackId, fixedId);
+                        attackId = fixedId;
+                    }
+                }
+
                 var localizedNames = attackNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetValueOrDefault(attackId));
 
                 if (localizedNames.Any(kvp => kvp.Value == null))
                 {
-                    logger.Warning("Skill {InternalName} missing at least 1 translation, skipping", attackId);
+                    logger.Warning("Skill {InternalName} missing at least 1 translation, skipping: {Json}", attackId, JsonConvert.SerializeObject(rawAttack));
                     return null;
                 }
 
@@ -651,13 +689,15 @@ namespace PalCalc.GenDB
         {
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
+            OodleHelper.DownloadOodleDll();
+            OodleHelper.Initialize(OodleHelper.OODLE_DLL_NAME);
+
             var provider = new DefaultFileProvider(PalworldDirPath, SearchOption.AllDirectories, true, new VersionContainer(EGame.GAME_UE5_1));
             provider.MappingsContainer = new FileUsmapTypeMappingsProvider(MappingsPath);
 
             provider.Initialize();
             provider.Mount();
             provider.LoadVirtualPaths();
-            provider.LoadLocalization();
 
             logger.Information("Reading localizations, pals, and passives...");
             var localizations = LocalizationsReader.FetchLocalizations(provider);
@@ -714,7 +754,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v20");
+            var db = PalDB.MakeEmptyUnsafe("v21");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.Humans = humans;

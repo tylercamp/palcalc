@@ -196,21 +196,32 @@ Prunelia,BlueberryFairy,138,False,755,40,6020,2,30,58
 Nyafia,BadCatgirl,139,False,645,40,5180,1,30,58
 Gildane,GoldenHorse,140,False,505,50,8750,3,52,58
 Herbil,LeafMomonga,141,False,1445,50,1110,215,1,50
-Icelyn,IceWitch,142,False,605,50,2310,214,10,44
-Frostplume,SnowPeafowl,143,False,655,50,1460,222,10,20
+Icelyn,IceWitch,142,False,605,50,2310,214,,
+Frostplume,SnowPeafowl,143,False,655,50,1460,222,10,45
 Palumba,TropicalOstrich,144,False,455,50,5850,221,32,50
 Braloha,Plesiosaur,145,False,335,50,6500,220,40,50
-Munchill,IceCrocodile,146,False,1335,50,1580,216,10,20
-Polapup,IceSeal,147,False,745,50,2130,219,5,60
-Turtacle,TentacleTurtle,148,False,1105,50,1320,4,5,20
+Munchill,IceCrocodile,146,False,1335,50,1580,216,10,45
+Polapup,IceSeal,147,False,745,50,2130,219,39,60
+Turtacle,TentacleTurtle,148,False,1105,50,1320,4,5,29
 Turtacle Terra,TentacleTurtle_Ground,148,True,1065,50,19550,5,,
-Jellroy,JellyfishGhost,149,False,1395,50,1630,223,30,41
-Jelliette,JellyfishFairy,150,False,1385,50,1780,192,10,20
-Gloopie,OctopusGirl,151,False,1195,50,1930,189,10,20
-Finsider,StuffedShark,152,False,1295,50,1100,217,1,38
+Jellroy,JellyfishGhost,149,False,1395,50,1630,223,14,41
+Jelliette,JellyfishFairy,150,False,1385,50,1780,192,6,20
+Gloopie,OctopusGirl,151,False,1195,50,1930,189,10,38
+Finsider,StuffedShark,152,False,1295,50,1100,217,1,40
 Finsider Ignis,StuffedShark_Fire,152,True,1255,50,1290,218,,
-Ghangler,GhostAnglerfish,153,False,525,50,6850,212,15,40
+Ghangler,GhostAnglerfish,153,False,525,50,6850,212,30,49
 Ghangler Ignis,GhostAnglerfish_Fire,153,True,505,50,7240,213,,
 Whalaska,IceNarwhal,154,False,445,58,8510,190,42,60
 Whalaska Ignis,IceNarwhal_Fire,154,True,430,42,8630,191,58,58
 Neptilius,PoseidonOrca,155,False,90,50,8690,224,60,60
+Illuminant Bat,YakushimaMonster003_Purple,10000,False,1250,50,1940,233,42,44
+Rainbow Slime,YakushimaMonster001_Rainbow,10001,False,1320,50,3120,230,42,44
+Cave Bat,YakushimaMonster003,10002,False,1340,50,1730,232,36,41
+Eye of Cthulhu,YakushimaBoss001,10003,False,1380,50,8100,234,45,45
+Enchanted Sword,YakushimaMonster002,10004,False,1380,50,2330,231,42,44
+Demon Eye,YakushimaBoss001_Small,10005,False,1390,50,1620,235,33,35
+Purple Slime,YakushimaMonster001_Purple,10006,False,1390,50,1610,228,36,41
+Red Slime,YakushimaMonster001_Red,10007,False,1405,50,1540,227,36,41
+Green Slime,YakushimaMonster001,10008,False,1430,50,1510,225,33,35
+Blue Slime,YakushimaMonster001_Blue,10009,False,1490,50,1520,226,33,35
+Illuminant Slime,YakushimaMonster001_Pink,10010,False,1500,50,1810,229,42,44

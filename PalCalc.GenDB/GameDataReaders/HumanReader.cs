@@ -20,7 +20,7 @@ namespace PalCalc.GenDB.GameDataReaders
     {
         public static List<UHumanInfo> ReadHumans(IFileProvider provider)
         {
-            var rawHumans = provider.LoadObject<UDataTable>(AssetPaths.HUMANS_PATH);
+            var rawHumans = provider.LoadPackageObject<UDataTable>(AssetPaths.HUMANS_PATH);
             List<UHumanInfo> result = [];
 
             foreach (var row in rawHumans.RowMap)

@@ -62,9 +62,6 @@ Poison Fog,PoisonFog,Dark,0,30,True,False
 Poison Blast,PoisonShot,Dark,30,2,True,True
 Power Bomb,PowerBall,Neutral,70,15,True,True
 Power Shot,PowerShot,Neutral,35,4,True,True
-Predator Blast,PredatorBeam,Neutral,200,20,False,False
-Predator Mark,PredatorLockon,Neutral,180,20,False,False
-Predator Surge,PredatorWave,Neutral,100,20,False,False
 Raid Cutter,RaidCutter,Grass,110,35,True,False
 Thunder Rail,Railbolt,Electric,200,60,True,False
 All Range Thunder,RangeThunder,Electric,125,40,True,True
@@ -148,7 +145,7 @@ Ground Pound,Unique_Gorilla_GroundPunch,Neutral,85,14,False,False
 Earth Impact,Unique_Grassmammoth_Earthquake,Ground,100,30,False,False
 Blast Punch,Unique_GrassPanda_Electric_ElectricPunch,Electric,85,14,False,False
 Crushing Punch,Unique_GrassPanda_MusclePunch,Grass,85,18,False,False
-Spinning Roundhouse,Unique_GrassRabbitMan_GrassRoundKick,Grass,90,15,False,False
+Leaping Roundhouse,Unique_GrassRabbitMan_GrassRoundKick,Grass,90,15,False,False
 Grudge Barrage,Unique_GrimGirl_BrutalMachete,Dark,130,31,False,False
 Tornado Attack,Unique_HawkBird_Storm,Neutral,65,13,False,False
 Giga Horn,Unique_HerculesBeetle_BeetleTackle,Ground,75,11,False,False

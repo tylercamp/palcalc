@@ -33,7 +33,7 @@ namespace PalCalc.GenDB.GameDataReaders
         public static List<((string, PalGender?), (string, PalGender?), string)> ReadUniqueBreedCombos(IFileProvider provider)
         {
             logger.Information("Reading unique breeding combos");
-            var rawCombos = provider.LoadObject<UDataTable>(AssetPaths.PALS_UNIQUE_BREEDING_PATH);
+            var rawCombos = provider.LoadPackageObject<UDataTable>(AssetPaths.PALS_UNIQUE_BREEDING_PATH);
 
             string TribeToPal(string tribe) => tribe.Split("::").Last();
             PalGender? StringToGender(string gender) => gender switch

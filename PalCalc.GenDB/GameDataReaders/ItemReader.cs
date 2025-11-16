@@ -28,7 +28,7 @@ namespace PalCalc.GenDB.GameDataReaders
         {
             logger.Information("Reading items");
 
-            var rawItems = provider.LoadObject<UDataTable>(AssetPaths.ITEM_DATA_TABLE_PATH);
+            var rawItems = provider.LoadPackageObject<UDataTable>(AssetPaths.ITEM_DATA_TABLE_PATH);
 
             var res = new List<UItem>();
             foreach (var row in rawItems.RowMap)
