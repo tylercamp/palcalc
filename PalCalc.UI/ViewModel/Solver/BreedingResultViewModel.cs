@@ -88,7 +88,7 @@ namespace PalCalc.UI.ViewModel.Solver
                     displayedResult.IVs.HP,
                     displayedResult.IVs.Attack,
                     displayedResult.IVs.Defense
-                }.OfType<IV_Range>().ToArray();
+                }.Where(iv => !iv.IsRandom).ToArray();
 
                 if (validIVs.Length > 0)
                 {

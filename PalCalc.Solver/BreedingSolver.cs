@@ -1,9 +1,11 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 using Serilog;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
+using System.Linq;
 
 namespace PalCalc.Solver
 {
@@ -63,7 +65,7 @@ namespace PalCalc.Solver
             var allExceptGenderGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvRelevance);
 
             bool WithinBreedingSteps(Pal pal, int maxSteps) => breedingdb.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
-            static IV_Range MakeIV(int minValue, int value) =>
+            static FIV MakeIV(int minValue, int value) =>
                 new(
                     isRelevant: minValue != 0 && value >= minValue,
                     value: value
@@ -78,12 +80,11 @@ namespace PalCalc.Solver
                 .Select(p => new OwnedPalReference(
                     instance: p,
                     effectivePassives: p.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives),
-                    effectiveIVs: new IV_Set()
-                    {
-                        HP = MakeIV(spec.IV_HP, p.IV_HP),
-                        Attack = MakeIV(spec.IV_Attack, p.IV_Attack),
-                        Defense = MakeIV(spec.IV_Defense, p.IV_Defense)
-                    }
+                    effectiveIVs: new FImpl.AttrId.FIVSet(
+                        Attack: MakeIV(spec.IV_Attack, p.IV_Attack),
+                        Defense: MakeIV(spec.IV_Defense, p.IV_Defense),
+                        HP: MakeIV(spec.IV_HP, p.IV_HP)
+                    )
                 ))
                 // group pals by their "important" properties and select the "best" pal from each group
                 .GroupBy(p => allPropertiesGroupFn(p))

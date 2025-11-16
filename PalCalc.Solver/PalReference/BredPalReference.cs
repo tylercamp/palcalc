@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace PalCalc.Solver.PalReference
             IPalReference parent1,
             IPalReference parent2,
             List<PassiveSkill> passives,
-            IV_Set ivs
+            FIVSet ivs
         )
         {
             this.gameSettings = gameSettings;
@@ -67,7 +68,7 @@ namespace PalCalc.Solver.PalReference
             IPalReference parent2,
             List<PassiveSkill> passives,
             float passivesProbability,
-            IV_Set ivs,
+            FIVSet ivs,
             float ivsProbability
         ) : this(gameSettings, pal, parent1, parent2, passives, ivs)
         {
@@ -96,7 +97,7 @@ namespace PalCalc.Solver.PalReference
 
         public IPalRefLocation Location => BredRefLocation.Instance;
 
-        public IV_Set IVs { get; private set; }
+        public FIVSet IVs { get; private set; }
         public float IVsProbability { get; private set; }
 
         public float TimeFactor { get; }

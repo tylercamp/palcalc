@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Concurrent;
@@ -282,10 +283,7 @@ namespace PalCalc.Solver
 
                 var ivsProbability = Probabilities.IVs.ProbabilityInheritedTargetIVs(p.Item1.IVs, p.Item2.IVs);
 
-                var finalIVs = ivSetPool.Borrow();
-                finalIVs.HP = MergeIVs(p.Item1.IVs.HP, p.Item2.IVs.HP);
-                finalIVs.Attack = MergeIVs(p.Item1.IVs.Attack, p.Item2.IVs.Attack);
-                finalIVs.Defense = MergeIVs(p.Item1.IVs.Defense, p.Item2.IVs.Defense);
+                var finalIVs = FIVSet.Merge(p.Item1.IVs, p.Item2.IVs);
 
                 var parentPassives = passiveListPool.BorrowWith(p.Item1.ActualPassives);
                 foreach (var passive in p.Item2.ActualPassives)
@@ -462,9 +460,6 @@ namespace PalCalc.Solver
                 }
 
                 palPairListPool.Return(expandedGendersByChildren);
-
-                if (!createdResult)
-                    ivSetPool.Return(finalIVs);
 
                 passiveListPool.Return(parentPassives);
                 passiveListPool.Return(availableRequiredPassives);

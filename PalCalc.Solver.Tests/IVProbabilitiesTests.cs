@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +12,14 @@ namespace PalCalc.Solver.Tests
     [TestClass]
     public class IVProbabilitiesTests
     {
-        private static IV_IValue RealValue_Relevant = new IV_Range(true, 50);
-        private static IV_IValue RealValue_Irrelevant = new IV_Range(false, 50);
-        private static IV_IValue RandomValue = IV_Random.Instance;
+        private static FIV RealValue_Relevant = new FIV(true, 50);
+        private static FIV RealValue_Irrelevant = new FIV(false, 50);
+        private static FIV RandomValue = FIV.Random;
 
-        private static IV_IValue _ANY_ = RandomValue;
+        private static FIV _ANY_ = FIV.Random;
 
-        private static IV_Set MkIVs(IV_IValue? hp = null, IV_IValue? attack = null, IV_IValue? defense = null) =>
-            new IV_Set { HP = hp ?? _ANY_, Attack = attack ?? _ANY_, Defense = defense ?? _ANY_ };
+        private static FIVSet MkIVs(FIV? hp = null, FIV? attack = null, FIV? defense = null) =>
+            new FIVSet(HP: hp ?? _ANY_, Attack: attack ?? _ANY_, Defense: defense ?? _ANY_);
 
         [TestMethod]
         public void IVs_HP_0_Atk_0_Def_0()
@@ -26,16 +27,16 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 1,
                 Probabilities.IVs.ProbabilityInheritedTargetIVs(
-                    new IV_Set { HP = RealValue_Irrelevant, Attack = RealValue_Irrelevant, Defense = RealValue_Irrelevant },
-                    new IV_Set { HP = RealValue_Irrelevant, Attack = RealValue_Irrelevant, Defense = RealValue_Irrelevant }
+                    new FIVSet(HP: RealValue_Irrelevant, Attack: RealValue_Irrelevant, Defense: RealValue_Irrelevant),
+                    new FIVSet(HP: RealValue_Irrelevant, Attack: RealValue_Irrelevant, Defense: RealValue_Irrelevant)
                 )
             );
 
             Assert.AreEqual(
                 1,
                 Probabilities.IVs.ProbabilityInheritedTargetIVs(
-                    new IV_Set { HP = RandomValue, Attack = RandomValue, Defense = RandomValue },
-                    new IV_Set { HP = RandomValue, Attack = RandomValue, Defense = RandomValue }
+                    new FIVSet(HP: RandomValue, Attack: RandomValue, Defense: RandomValue),
+                    new FIVSet(HP: RandomValue, Attack: RandomValue, Defense: RandomValue)
                 )
             );
         }

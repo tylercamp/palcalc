@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -81,7 +82,7 @@ namespace PalCalc.Solver.Probabilities
         /// 
         /// A desired IV is determined by whether it's a "relevant" IV. (i.e. targetted during solving)
         /// </summary>
-        public static float ProbabilityInheritedTargetIVs(IV_Set a, IV_Set b)
+        public static float ProbabilityInheritedTargetIVs(FIVSet a, FIVSet b)
         {
             int numRelevantHP = 0;
             if (a.HP.IsRelevant) numRelevantHP++;

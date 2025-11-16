@@ -2,6 +2,7 @@
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
+using PalCalc.Solver.FImpl.AttrId;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 using PalCalc.Solver.Tree;
@@ -26,7 +27,7 @@ internal class Program
                 PassiveSkills = ["Brave".ToStandardPassive(db), "Workaholic".ToStandardPassive(db), "Runner".ToStandardPassive(db)]
             },
             ["Runner".ToStandardPassive(db), new RandomPassiveSkill(), new RandomPassiveSkill()],
-            new IV_Set()
+            FIVSet.AllRandom
         );
 
         var wixen = new OwnedPalReference(
@@ -37,7 +38,7 @@ internal class Program
                 PassiveSkills = ["Lucky".ToStandardPassive(db), "Brave".ToStandardPassive(db)]
             },
             ["Lucky".ToStandardPassive(db), "Brave".ToStandardPassive(db)],
-            new IV_Set()
+            FIVSet.AllRandom
         );
 
         var parentPassives = reptyro.ActualPassives.Concat(wixen.ActualPassives).Distinct().ToList();

@@ -231,9 +231,9 @@ namespace PalCalc.UI
                 Instance = value.UnderlyingInstance,
                 IVs = new
                 {
-                    HP = value.IVs.HP,
-                    Attack = value.IVs.Attack,
-                    Defense = value.IVs.Defense
+                    HP = value.IVs.HP.ModelObject,
+                    Attack = value.IVs.Attack.ModelObject,
+                    Defense = value.IVs.Defense.ModelObject
                 }
             }, serializer);
         }
@@ -268,12 +268,11 @@ namespace PalCalc.UI
                 inst,
                 // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
                 inst.PassiveSkills,
-                new IV_Set()
-                {
-                    HP = hp,
-                    Attack = attack,
-                    Defense = defense
-                }
+                new Solver.FImpl.AttrId.FIVSet(
+                    Attack: new Solver.FImpl.AttrId.FIV(attack),
+                    Defense: new Solver.FImpl.AttrId.FIV(defense),
+                    HP: new Solver.FImpl.AttrId.FIV(hp)
+                )
             );
         }
     }
@@ -412,7 +411,11 @@ namespace PalCalc.UI
             var IV_hp = token["IV_HP"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
             var IV_attack = token["IV_Attack"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
             var IV_defense = token["IV_Defense"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
-            var ivs = new IV_Set() { HP = IV_hp, Attack = IV_attack, Defense = IV_defense };
+            var ivs = new Solver.FImpl.AttrId.FIVSet(
+                Attack: new Solver.FImpl.AttrId.FIV(IV_attack),
+                Defense: new Solver.FImpl.AttrId.FIV(IV_defense),
+                HP: new Solver.FImpl.AttrId.FIV(IV_hp)
+            );
 
             return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability, ivs, ivsProbability).WithGuaranteedGender(db, gender) as BredPalReference;
         }
@@ -428,9 +431,9 @@ namespace PalCalc.UI
                 Parent2 = value.Parent2,
                 Gender = value.Gender,
                 PassivesProbability = value.PassivesProbability,
-                IV_HP = value.IVs.HP,
-                IV_Attack = value.IVs.Attack,
-                IV_Defense = value.IVs.Defense,
+                IV_HP = value.IVs.HP.ModelObject,
+                IV_Attack = value.IVs.Attack.ModelObject,
+                IV_Defense = value.IVs.Defense.ModelObject,
                 IVsProbability = value.IVsProbability
 
             }, serializer);

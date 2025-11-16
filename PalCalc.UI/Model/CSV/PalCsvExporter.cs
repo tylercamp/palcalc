@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.Solver.FImpl.AttrId;
 using PalCalc.Solver.PalReference;
 using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
@@ -49,7 +50,7 @@ namespace PalCalc.UI.Model.CSV
                 new(col, p => sel(p)?.ToString() ?? "");
 
             SimpleCSVPropertySerializer<PalInstanceViewModel> SimplePalRef(string col, Func<IPalReference, object> sel) =>
-                Simple(col, p => sel(new OwnedPalReference(p.ModelObject, [], new IV_Set())));
+                Simple(col, p => sel(new OwnedPalReference(p.ModelObject, [], FIVSet.AllRandom)));
 
             SimpleCSVPropertySerializer<PalInstanceViewModel> SimplePalLoc(string col, Func<SpecificPalRefLocationViewModel, object> sel) =>
                 SimplePalRef(col, p => sel(new SpecificPalRefLocationViewModel(csg, settings, p.Location)));

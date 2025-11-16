@@ -1,4 +1,5 @@
 ﻿using PalCalc.Solver;
+using PalCalc.Solver.FImpl.AttrId;
 using QuickGraph;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 {
     public record class IVSetViewModel(IVValueViewModel HP, IVValueViewModel Attack, IVValueViewModel Defense)
     {
-        public static IVSetViewModel FromIVs(IV_Set ivs) =>
+        public static IVSetViewModel FromIVs(FIVSet ivs) =>
             new IVSetViewModel(
                 HP: IVValueViewModel.FromIV(ivs.HP),
                 Attack: IVValueViewModel.FromIV(ivs.Attack),
@@ -26,18 +27,12 @@ namespace PalCalc.UI.ViewModel.Mapped
         bool IsRelevant { get; }
 
         /* Utils */
-        public static IVValueViewModel FromIV(IV_IValue value)
+        public static IVValueViewModel FromIV(FIV value)
         {
-            switch (value)
-            {
-                case IV_Random: return IVAnyValueViewModel.Instance;
-                case IV_Range range:
-                    if (range.Min == range.Max) return new IVDirectValueViewModel(range.IsRelevant, range.Min);
-                    else return new IVRangeValueViewModel(range.IsRelevant, range.Min, range.Max);
+            if (value.IsRandom) return IVAnyValueViewModel.Instance;
 
-                default:
-                    throw new NotImplementedException();
-            }
+            if (value.Min == value.Max) return new IVDirectValueViewModel(value.IsRandom, value.Min);
+            else return new IVRangeValueViewModel(value.IsRelevant, value.Min, value.Max);
         }
 
         int IComparable.CompareTo(object obj)

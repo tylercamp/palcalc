@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
 	<CETCompat>false</CETCompat>
 	<Platforms>x64</Platforms> <!-- https://github.com/tylercamp/palcalc/issues/85 -->
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -18,6 +19,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PalCalc.Model\PalCalc.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pathing\" />
   </ItemGroup>
 
 </Project>

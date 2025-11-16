@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +14,7 @@ namespace PalCalc.Solver.PalReference
         PalInstance instance;
 
         /// <param name="effectivePassives">The list of passives held by the `instance`, filtered/re-mapped based on desired passives. (.ToDedicatedPassives())</param>
-        public OwnedPalReference(PalInstance instance, List<PassiveSkill> effectivePassives, IV_Set effectiveIVs)
+        public OwnedPalReference(PalInstance instance, List<PassiveSkill> effectivePassives, FIVSet effectiveIVs)
         {
             this.instance = instance;
 
@@ -38,7 +39,7 @@ namespace PalCalc.Solver.PalReference
 
         public float TimeFactor { get; }
 
-        public IV_Set IVs { get; }
+        public FIVSet IVs { get; }
 
         public PalGender Gender => instance.Gender;
 

@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,15 +23,15 @@ namespace PalCalc.Solver.PalReference
     /// </summary>
     public class CompositeOwnedPalReference : IPalReference
     {
-        private static IV_IValue PropagateIVs(IV_IValue a, IV_IValue b)
+        private static FIV PropagateIVs(FIV a, FIV b)
         {
-            if (a is IV_Range ar && b is IV_Range br)
+            if (!a.IsRandom && !b.IsRandom)
             {
-                return IV_Range.Merge(ar, br);
+                return FIV.Merge(a, b);
             }
             else
             {
-                return IV_Random.Instance;
+                return FIV.Random;
             }
         }
 
@@ -50,12 +51,11 @@ namespace PalCalc.Solver.PalReference
 
             TimeFactor = ActualPassives.ToTimeFactor();
 
-            IVs = new IV_Set()
-            {
-                HP = PropagateIVs(male.IVs.HP, female.IVs.HP),
-                Attack = PropagateIVs(male.IVs.Attack, female.IVs.Attack),
-                Defense = PropagateIVs(male.IVs.Defense, female.IVs.Defense)
-            };
+            IVs = new FIVSet(
+                Attack: PropagateIVs(male.IVs.Attack, female.IVs.Attack),
+                Defense: PropagateIVs(male.IVs.Defense, female.IVs.Defense),
+                HP: PropagateIVs(male.IVs.HP, female.IVs.HP)
+            );
         }
 
         public OwnedPalReference Male { get; }
@@ -69,7 +69,7 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> ActualPassives { get; }
 
-        public IV_Set IVs { get; }
+        public FIVSet IVs { get; }
 
         public PalGender Gender { get; private set; } = PalGender.WILDCARD;
 

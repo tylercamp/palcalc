@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 using Serilog;
@@ -58,8 +59,8 @@ namespace PalCalc.Solver
 
         public bool IsOptimal(IPalReference p)
         {
-            int TotalMaxValue(IV_Set ivs) => ivs.Attack.Max + ivs.Defense.Max + ivs.HP.Max;
-            int TotalMinValue(IV_Set ivs) => ivs.Attack.Min + ivs.Defense.Min + ivs.HP.Min;
+            int TotalMaxValue(FIVSet ivs) => ivs.Attack.Max + ivs.Defense.Max + ivs.HP.Max;
+            int TotalMinValue(FIVSet ivs) => ivs.Attack.Min + ivs.Defense.Min + ivs.HP.Min;
 
             var match = content[p]?.FirstOrDefault();
             if (match == null) return true;

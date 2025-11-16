@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.Solver.FImpl.AttrId;
 using PalCalc.Solver.PalReference;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
@@ -107,12 +108,7 @@ namespace PalCalc.UI.ViewModel.Solver
                         }
                     },
                     new List<PassiveSkill>() { "Runner".ToStandardPassive(PalDB.LoadEmbedded()) },
-                    new IV_Set()
-                    {
-                        HP = new IV_Range(true, 80, 90),
-                        Attack = IV_Random.Instance,
-                        Defense = IV_Random.Instance
-                    }
+                    new FIVSet(HP: new FIV(true, 80, 90), Attack: FIV.Random, Defense: FIV.Random)
                 ))
             }
         };

@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace PalCalc.Solver.PalReference
         // since that would prevent random-passive pals from being grouped together during pruning.)
         int EffectivePassivesHash { get; } // optimizations
 
-        IV_Set IVs { get; }
+        FIVSet IVs { get; }
 
         List<PassiveSkill> ActualPassives { get; }
 

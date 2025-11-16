@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace PalCalc.Solver.PalReference
             if (EffectivePassives.Count > GameConstants.MaxTotalPassives) throw new InvalidOperationException();
 
             EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
-            IVs = new IV_Set() { HP = IV_Random.Instance, Attack =  IV_Random.Instance, Defense = IV_Random.Instance };
+            IVs = new FIVSet(FIV.Random, FIV.Random, FIV.Random);
         }
 
         private WildPalReference(Pal pal)
@@ -33,7 +34,7 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> EffectivePassives { get; private set; }
 
-        public IV_Set IVs { get; private set; }
+        public FIVSet IVs { get; private set; }
 
         public PalGender Gender { get; private set; }
 

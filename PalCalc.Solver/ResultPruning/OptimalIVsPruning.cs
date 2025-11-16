@@ -1,4 +1,5 @@
-﻿using PalCalc.Solver.PalReference;
+﻿using PalCalc.Solver.FImpl.AttrId;
+using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,8 +33,8 @@ namespace PalCalc.Solver.ResultPruning
             // IVs doesn't affect whether we get a relevant result (see above), so we'll instead
             // try to maximize the highest possible value
 
-            int TotalMaxIVs(IV_Set ivs) => ivs.HP.Max + ivs.Attack.Max + ivs.Defense.Max;
-            int TotalMinIVs(IV_Set ivs) => ivs.HP.Min + ivs.Attack.Min + ivs.Defense.Min;
+            int TotalMaxIVs(FIVSet ivs) => ivs.HP.Max + ivs.Attack.Max + ivs.Defense.Max;
+            int TotalMinIVs(FIVSet ivs) => ivs.HP.Min + ivs.Attack.Min + ivs.Defense.Min;
 
             if (token.IsCancellationRequested) return results;
 
