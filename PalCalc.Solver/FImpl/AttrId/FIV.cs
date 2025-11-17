@@ -11,8 +11,9 @@ namespace PalCalc.Solver.FImpl.AttrId
     // first 2 bits are Type, next 7 are Range-Min, last 7 are Range-Max/Exact Value
     public readonly record struct FIV(ushort Store)
     {
-        private const ushort IS_RELEVANT = 0x8000;
-        public static readonly FIV Random = new(0);
+        private const ushort IS_RELEVANT = 0b10_0000000_0000000;
+        private const ushort IS_RANDOM = 0b01_0000000_0000000;
+        public static readonly FIV Random = new(IS_RANDOM);
 
         public FIV(IV_IValue v) : this(v.IsRelevant, v.Min, v.Max)
         {
@@ -50,7 +51,7 @@ namespace PalCalc.Solver.FImpl.AttrId
             }
         }
 
-        public bool IsRandom => Store == 0;
+        public bool IsRandom => Store == IS_RANDOM;
         public bool IsRelevant => (Store & 0x8000) != 0;
         public int Max => Store & 0x7F;
         public int Min => (Store >> 7) & 0x7F;

@@ -44,12 +44,14 @@ namespace PalCalc.Solver.PalReference
 
             // effective passives based on which pal has the most irrelevant passives
             EffectivePassives = male.EffectivePassives.Count > female.EffectivePassives.Count ? male.EffectivePassives : female.EffectivePassives;
-            EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
 
-            ActualPassives = Male.ActualPassives.Intersect(Female.ActualPassives).ToList();
-            while (ActualPassives.Count < EffectivePassives.Count) ActualPassives.Add(new RandomPassiveSkill());
+            ActualPassives = Male.ActualPassives.Intersect(Female.ActualPassives);
+            if (ActualPassives.Count < EffectivePassives.Count)
+            {
+                ActualPassives = ActualPassives.Concat(FPassiveSet.RepeatRandom(EffectivePassives.Count - ActualPassives.Count));
+            }
 
-            TimeFactor = ActualPassives.ToTimeFactor();
+            TimeFactor = ActualPassives.ModelObjects.ToTimeFactor();
 
             IVs = new FIVSet(
                 Attack: PropagateIVs(male.IVs.Attack, female.IVs.Attack),
@@ -63,11 +65,8 @@ namespace PalCalc.Solver.PalReference
 
         public Pal Pal => Male.Pal;
 
-        public List<PassiveSkill> EffectivePassives { get; private set; }
-
-        public int EffectivePassivesHash { get; private set; }
-
-        public List<PassiveSkill> ActualPassives { get; }
+        public FPassiveSet EffectivePassives { get; private set; }
+        public FPassiveSet ActualPassives { get; }
 
         public FIVSet IVs { get; }
 
@@ -109,7 +108,7 @@ namespace PalCalc.Solver.PalReference
             HashCode.Combine(
                 nameof(CompositeOwnedPalReference),
                 Male, Female,
-                EffectivePassivesHash,
+                EffectivePassives,
                 Gender,
                 IVs
             );

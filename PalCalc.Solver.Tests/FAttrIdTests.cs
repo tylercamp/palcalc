@@ -264,6 +264,129 @@ namespace PalCalc.Solver.Tests
         }
 
         [TestMethod]
+        public void FPassiveSet_Count()
+        {
+            Assert.AreEqual(
+                expected: 0,
+                FPassiveSet.FromModel(db, []).Count
+            );
+
+            Assert.AreEqual(
+                expected: 1,
+                FPassiveSet.FromModel(db, [runner]).Count
+            );
+
+            Assert.AreEqual(
+                expected: 2,
+                FPassiveSet.FromModel(db, [runner, swift]).Count
+            );
+
+            Assert.AreEqual(
+                expected: 3,
+                FPassiveSet.FromModel(db, [runner, swift, nimble]).Count
+            );
+
+            Assert.AreEqual(
+                expected: 4,
+                FPassiveSet.FromModel(db, [runner, swift, nimble, legend]).Count
+            );
+
+            Assert.AreEqual(
+                expected: 5,
+                FPassiveSet.FromModel(db, [runner, swift, nimble, legend, lucky]).Count
+            );
+
+            Assert.AreEqual(
+                expected: 6,
+                FPassiveSet.FromModel(db, [runner, swift, nimble, legend, lucky, workaholic]).Count
+            );
+
+            Assert.AreEqual(
+                expected: 7,
+                FPassiveSet.FromModel(db, [runner, swift, nimble, legend, lucky, workaholic, random1]).Count
+            );
+
+            Assert.AreEqual(
+                expected: 8,
+                FPassiveSet.FromModel(db, [runner, swift, nimble, legend, lucky, workaholic, random1, random2]).Count
+            );
+        }
+
+        [TestMethod]
+        public void FPassiveSet_CountRandom()
+        {
+            Assert.AreEqual(
+                expected: 0,
+                FPassiveSet.FromModel(db, []).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 0,
+                FPassiveSet.FromModel(db, [runner]).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 0,
+                FPassiveSet.FromModel(db, [runner, swift]).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 0,
+                FPassiveSet.FromModel(db, [runner, swift, nimble]).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 0,
+                FPassiveSet.FromModel(db, [runner, swift, nimble, legend]).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 0,
+                FPassiveSet.FromModel(db, [runner, swift, nimble, legend, lucky]).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 0,
+                FPassiveSet.FromModel(db, [runner, swift, nimble, legend, lucky, workaholic]).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 0,
+                FPassiveSet.FromModel(db, []).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 1,
+                FPassiveSet.FromModel(db, [random1]).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 2,
+                FPassiveSet.FromModel(db, [random1, random2]).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 3,
+                FPassiveSet.FromModel(db, [random1, random2, random3]).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 3,
+                FPassiveSet.FromModel(db, [random1, random2, random3, legend]).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 4,
+                FPassiveSet.FromModel(db, [random1, random2, random3, random4]).CountRandom
+            );
+
+            Assert.AreEqual(
+                expected: 5,
+                FPassiveSet.FromModel(db, [random1, random2, random3, random4, random5, lucky, workaholic]).CountRandom
+            );
+        }
+
+        [TestMethod]
         public void FPassiveSet_OfZero_ExceptSingle()
         {
             Assert.AreEqual(
@@ -1326,6 +1449,88 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: FPassiveSet.FromModel(db, [runner, swift, nimble, lucky, random1, random2, legend, random3]),
                 actual: FPassiveSet.FromModel(db, [runner, swift, nimble, lucky, random1, random2]).Concat(FPassiveSet.FromModel(db, [legend, runner, swift, nimble, random1]))
+            );
+        }
+
+        private IEnumerable<FPassiveSet> FSetCombinations(FPassiveSet set, int comboSize)
+        {
+            var iter = set.GetCombinationIterator(comboSize);
+            while (iter.MoveNext())
+                yield return iter.Current;
+        }
+
+        private FPassiveSet MkSet(params PassiveSkill[] passives) =>
+            FPassiveSet.FromModel(db, passives.ToList());
+
+        [TestMethod]
+        public void FPassiveSet_OfTwo_Combinations()
+        {
+            var set = MkSet(runner, swift);
+
+            CollectionAssert.AreEquivalent(
+                expected: new List<FPassiveSet>()
+                {
+                    MkSet(runner),
+                    MkSet(swift)
+                },
+                actual: FSetCombinations(set, 1).ToList()
+            );
+
+            CollectionAssert.AreEquivalent(
+                expected: new List<FPassiveSet>()
+                {
+                    MkSet(runner, swift)
+                },
+                actual: FSetCombinations(set, 2).ToList()
+            );
+        }
+
+        [TestMethod]
+        public void FPassiveSet_OfFour_Combinations()
+        {
+            var set = MkSet(runner, swift, nimble, legend);
+
+            CollectionAssert.AreEquivalent(
+                expected: new List<FPassiveSet>()
+                {
+                    MkSet(runner),
+                    MkSet(swift),
+                    MkSet(nimble),
+                    MkSet(legend)
+                },
+                actual: FSetCombinations(set, 1).ToList()
+            );
+
+            CollectionAssert.AreEquivalent(
+                expected: new List<FPassiveSet>()
+                {
+                    MkSet(runner, swift),
+                    MkSet(runner, nimble),
+                    MkSet(runner, legend),
+                    MkSet(swift, nimble),
+                    MkSet(swift, legend),
+                    MkSet(nimble, legend)
+                },
+                actual: FSetCombinations(set, 2).ToList()
+            );
+
+            CollectionAssert.AreEquivalent(
+                expected: new List<FPassiveSet>()
+                {
+                    MkSet(runner, swift, nimble),
+                    MkSet(runner, swift, legend),
+                    MkSet(swift, nimble, legend),
+                    MkSet(runner, nimble, legend)
+                },
+                actual: FSetCombinations(set, 3).ToList()
+            );
+
+            CollectionAssert.AreEquivalent(
+                expected: new List<FPassiveSet>()
+                {
+                    MkSet(runner, swift, nimble, legend)
+                },
+                actual: FSetCombinations(set, 4).ToList()
             );
         }
     }

@@ -97,6 +97,7 @@ namespace PalCalc.UI.ViewModel.Solver
             Results = new List<BreedingResultViewModel>()
             {
                 new BreedingResultViewModel(null, GameSettings.Defaults, new OwnedPalReference(
+                    PalDB.SharedInstance,
                     new PalInstance()
                     {
                         Pal = "Beakon".ToPal(PalDB.LoadEmbedded()),

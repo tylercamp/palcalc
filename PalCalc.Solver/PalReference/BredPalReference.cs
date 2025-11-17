@@ -19,7 +19,7 @@ namespace PalCalc.Solver.PalReference
             Pal pal,
             IPalReference parent1,
             IPalReference parent2,
-            List<PassiveSkill> passives,
+            FPassiveSet passives,
             FIVSet ivs
         )
         {
@@ -50,7 +50,6 @@ namespace PalCalc.Solver.PalReference
             IVs = ivs;
 
             EffectivePassives = passives;
-            EffectivePassivesHash = passives.SetHash(p => p.InternalName);
 
             parentBreedingEffort = gameSettings.MultipleBreedingFarms && Parent1 is BredPalReference && Parent2 is BredPalReference
                 ? Parent1.BreedingEffort > Parent2.BreedingEffort
@@ -58,7 +57,7 @@ namespace PalCalc.Solver.PalReference
                     : Parent2.BreedingEffort
                 : Parent1.BreedingEffort + Parent2.BreedingEffort;
 
-            TimeFactor = EffectivePassives.ToTimeFactor();
+            TimeFactor = EffectivePassives.ModelObjects.ToTimeFactor();
         }
 
         public BredPalReference(
@@ -66,7 +65,7 @@ namespace PalCalc.Solver.PalReference
             Pal pal,
             IPalReference parent1,
             IPalReference parent2,
-            List<PassiveSkill> passives,
+            FPassiveSet passives,
             float passivesProbability,
             FIVSet ivs,
             float ivsProbability
@@ -170,11 +169,8 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalWildPals => Parent1.NumTotalWildPals + Parent2.NumTotalWildPals;
 
-        public List<PassiveSkill> EffectivePassives { get; }
-
-        public int EffectivePassivesHash { get; }
-
-        public List<PassiveSkill> ActualPassives => EffectivePassives;
+        public FPassiveSet EffectivePassives { get; }
+        public FPassiveSet ActualPassives => EffectivePassives;
 
         private BredPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)
         {
@@ -229,7 +225,7 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
-        public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectivePassives.PassiveSkillListToString()})";
+        public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectivePassives.ModelObjects.PassiveSkillListToString()})";
 
         public override bool Equals(object obj)
         {
@@ -243,7 +239,7 @@ namespace PalCalc.Solver.PalReference
             nameof(BredPalReference),
             Pal,
             Parent1.GetHashCode() ^ Parent2.GetHashCode(),
-            EffectivePassivesHash,
+            EffectivePassives,
             BreedingEffort,
             SelfBreedingEffort,
             Gender,

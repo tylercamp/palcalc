@@ -18,16 +18,11 @@ namespace PalCalc.Solver.PalReference
         /// The list of DESIRED passives held by this pal. Any irrelevant passives are to
         /// be represented as a Random passive.
         /// </summary>
-        List<PassiveSkill> EffectivePassives { get; }
+        FPassiveSet EffectivePassives { get; }
 
-        // (note: should be based on the effective passives names, not on the effective passives themselves. we
-        // want random passives to be distinct from each other for passive-list-dedup purposes, but not for set-hash,
-        // since that would prevent random-passive pals from being grouped together during pruning.)
-        int EffectivePassivesHash { get; } // optimizations
+        FPassiveSet ActualPassives { get; }
 
         FIVSet IVs { get; }
-
-        List<PassiveSkill> ActualPassives { get; }
 
         PalGender Gender { get; }
 
@@ -38,8 +33,6 @@ namespace PalCalc.Solver.PalReference
         /// </summary>
         float TimeFactor { get; }
 
-        string EffectivePassivesString => EffectivePassives.PassiveSkillListToString();
-
         IPalRefLocation Location { get; }
 
         TimeSpan BreedingEffort { get; }
@@ -48,7 +41,6 @@ namespace PalCalc.Solver.PalReference
         IPalReference WithGuaranteedGender(PalDB db, PalGender gender);
 
         bool IsCompatibleGender(PalGender otherGender) => Gender == PalGender.WILDCARD || Gender != otherGender;
-
 
 
         /* Small, pre-computed properties used for result pruning (try and minimize calls to `.AllReferences()` ext. method */

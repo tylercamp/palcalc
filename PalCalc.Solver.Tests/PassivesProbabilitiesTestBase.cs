@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,18 @@ namespace PalCalc.Solver.Tests
         protected PassiveSkill Lucky => "Lucky".ToStandardPassive(db);
 
         private int irrelevantId = 0;
-        protected PassiveSkill Irrelevant => new($"Irrelevant {irrelevantId}", $"Irrelevant {irrelevantId}", 1);
+        protected PassiveSkill Irrelevant
+        {
+            get
+            {
+                irrelevantId++;
+                var res = new PassiveSkill($"Irrelevant {irrelevantId}", $"Irrelevant {irrelevantId}", 1);
+                db.PassiveSkills.Add(res);
+                return res;
+            }
+        }
+
+        protected FPassiveSet MkSet(IEnumerable<PassiveSkill> passives) => FPassiveSet.FromModel(db, passives.ToList());
 
         protected float SubCombinationProbability(int numAvail, int numDesired, int numChosen) =>
             Probabilities.Passives.Choose(numAvail - numDesired, numChosen - numDesired) / (float)Probabilities.Passives.Choose(numAvail, numChosen);

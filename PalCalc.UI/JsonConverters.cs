@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.Solver.FImpl.AttrId;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.Probabilities;
 using PalCalc.UI.Localization;
@@ -265,13 +266,14 @@ namespace PalCalc.UI
             }
 
             return new OwnedPalReference(
+                db,
                 inst,
                 // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
                 inst.PassiveSkills,
-                new Solver.FImpl.AttrId.FIVSet(
-                    Attack: new Solver.FImpl.AttrId.FIV(attack),
-                    Defense: new Solver.FImpl.AttrId.FIV(defense),
-                    HP: new Solver.FImpl.AttrId.FIV(hp)
+                new FIVSet(
+                    Attack: new FIV(attack),
+                    Defense: new FIV(defense),
+                    HP: new FIV(hp)
                 )
             );
         }
@@ -325,8 +327,8 @@ namespace PalCalc.UI
             return JToken.FromObject(new
             {
                 PalId = value.Pal.Id,
-                GuaranteedPassives = value.EffectivePassives.Where(t => t is not RandomPassiveSkill).ToList(),
-                NumPassives = value.EffectivePassives.Count(t => t is RandomPassiveSkill),
+                GuaranteedPassives = value.EffectivePassives.ModelObjects.Where(p => p is not RandomPassiveSkill).ToList(),
+                NumPassives = value.EffectivePassives.CountRandom,
                 Gender = value.Gender,
             }, serializer);
         }
@@ -342,7 +344,7 @@ namespace PalCalc.UI
                 ?.ToList()
                 ?? Enumerable.Empty<PassiveSkill>();
 
-            return (WildPalReference)new WildPalReference(pal, guaranteedPassives, numPassives).WithGuaranteedGender(db, gender);
+            return (WildPalReference)new WildPalReference(pal, FPassiveSet.FromModel(db, guaranteedPassives.ToList()), numPassives).WithGuaranteedGender(db, gender);
         }
     }
 
@@ -411,13 +413,13 @@ namespace PalCalc.UI
             var IV_hp = token["IV_HP"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
             var IV_attack = token["IV_Attack"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
             var IV_defense = token["IV_Defense"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
-            var ivs = new Solver.FImpl.AttrId.FIVSet(
-                Attack: new Solver.FImpl.AttrId.FIV(IV_attack),
-                Defense: new Solver.FImpl.AttrId.FIV(IV_defense),
-                HP: new Solver.FImpl.AttrId.FIV(IV_hp)
+            var ivs = new FIVSet(
+                Attack: new FIV(IV_attack),
+                Defense: new FIV(IV_defense),
+                HP: new FIV(IV_hp)
             );
 
-            return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability, ivs, ivsProbability).WithGuaranteedGender(db, gender) as BredPalReference;
+            return new BredPalReference(gameSettings, pal, parent1, parent2, FPassiveSet.FromModel(db, passives), passivesProbability, ivs, ivsProbability).WithGuaranteedGender(db, gender) as BredPalReference;
         }
 
         internal override JToken MakeRefJson(BredPalReference value, JsonSerializer serializer)
@@ -426,7 +428,7 @@ namespace PalCalc.UI
             return JToken.FromObject(new
             {
                 PalId = value.Pal.Id,
-                Passives = value.EffectivePassives,
+                Passives = value.EffectivePassives.ModelObjects,
                 Parent1 = value.Parent1,
                 Parent2 = value.Parent2,
                 Gender = value.Gender,
@@ -512,18 +514,18 @@ namespace PalCalc.UI
             var modelSpecifier = new PalSpecifier()
             {
                 Pal = obj["TargetPal"].ToObject<PalViewModel>(serializer).ModelObject,
-                RequiredPassives = [
+                RequiredPassives = FPassiveSet.FromModel(db, [
                     (obj["Passive1"] ?? obj["Trait1"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
                     (obj["Passive2"] ?? obj["Trait2"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
                     (obj["Passive3"] ?? obj["Trait3"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
                     (obj["Passive4"] ?? obj["Trait4"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
-                ],
-                OptionalPassives = [
+                ]),
+                OptionalPassives = FPassiveSet.FromModel(db, [
                     (obj["OptionalPassive1"] ?? obj["OptionalTrait1"])?.ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
                     (obj["OptionalPassive2"] ?? obj["OptionalTrait2"]) ?.ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
                     (obj["OptionalPassive3"] ?? obj["OptionalTrait3"]) ?.ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
                     (obj["OptionalPassive4"] ?? obj["OptionalTrait4"])?.ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
-                ]
+                ])
             };
 
             List<IPalSourceTreeSelection> palSourceSelections;

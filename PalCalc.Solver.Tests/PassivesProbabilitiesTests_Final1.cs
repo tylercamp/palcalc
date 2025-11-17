@@ -17,8 +17,8 @@ namespace PalCalc.Solver.Tests
                 // nothing to inherit, just the chance of inheriting 1 random
                 expected: GameConstants.PassiveRandomAddedProbability[1],
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 1
                 ),
                 delta: 0.0001f
@@ -39,8 +39,8 @@ namespace PalCalc.Solver.Tests
                     (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 1, numRequired: 1))
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 1
                 ),
                 delta: 0.0001f
@@ -60,8 +60,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner],
-                    desiredParentPassives: [Runner],
+                    parentPassives: MkSet([Runner]),
+                    desiredParentPassives: MkSet([Runner]),
                     numFinalPassives: 1
                 ),
                 delta: 0.0001f
@@ -83,8 +83,8 @@ namespace PalCalc.Solver.Tests
                     (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 0))
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 1
                 ),
                 delta: 0.0001f
@@ -104,8 +104,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Irrelevant],
-                    desiredParentPassives: [Runner],
+                    parentPassives: MkSet([Runner, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner]),
                     numFinalPassives: 1
                 ),
                 delta: 0.0001f
@@ -127,8 +127,8 @@ namespace PalCalc.Solver.Tests
                     (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 0))
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 1
                 ),
                 delta: 0.0001f
@@ -148,8 +148,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Irrelevant, Irrelevant],
-                    desiredParentPassives: [Runner],
+                    parentPassives: MkSet([Runner, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner]),
                     numFinalPassives: 1
                 ),
                 delta: 0.0001f
@@ -171,8 +171,8 @@ namespace PalCalc.Solver.Tests
                     (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 0))
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 1
                 ),
                 delta: 0.0001f
@@ -192,8 +192,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [Runner],
+                    parentPassives: MkSet([Runner, Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner]),
                     numFinalPassives: 1
                 ),
                 delta: 0.0001f
@@ -215,8 +215,8 @@ namespace PalCalc.Solver.Tests
                     (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 0))
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant, Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 1
                 ),
                 delta: 0.0001f
@@ -236,8 +236,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Irrelevant, Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [Runner],
+                    parentPassives: MkSet([Runner, Irrelevant, Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner]),
                     numFinalPassives: 1
                 ),
                 delta: 0.0001f

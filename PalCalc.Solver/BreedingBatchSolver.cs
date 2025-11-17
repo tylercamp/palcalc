@@ -90,7 +90,7 @@ namespace PalCalc.Solver
         /// <param name="requiredPassives">The list of passives that will be contained in all permutations.</param>
         /// <param name="optionalPassives">The list of passives that will appear at least once across the permutations, if possible.</param>
         /// <returns></returns>
-        static IEnumerable<IEnumerable<PassiveSkill>> PassiveSkillPermutations(List<PassiveSkill> requiredPassives, List<PassiveSkill> optionalPassives)
+        static IEnumerable<FPassiveSet> PassiveSkillPermutations(FPassiveSet requiredPassives, FPassiveSet optionalPassives)
         {
 #if DEBUG && DEBUG_CHECKS
             if (
@@ -101,18 +101,20 @@ namespace PalCalc.Solver
             ) Debugger.Break();
 #endif
 
+            yield return requiredPassives;
+
             // can't add any optional passives, just return required passives
             if (optionalPassives.Count == 0 || requiredPassives.Count == GameConstants.MaxTotalPassives)
             {
-                yield return requiredPassives;
                 yield break;
             }
 
-            var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count();
-            foreach (var optional in optionalPassives.Combinations(maxOptionalPassives))
+            var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count;
+            for (int i = 1; i <= maxOptionalPassives; i++)
             {
-                var res = requiredPassives.Concat(optional);
-                yield return res;
+                var iterator = optionalPassives.GetCombinationIterator(i);
+                while (iterator.MoveNext())
+                    yield return requiredPassives.Concat(iterator.Current);
             }
         }
 
@@ -269,12 +271,7 @@ namespace PalCalc.Solver
                 {
                     bool HasValidPassives(IPalReference parent)
                     {
-                        foreach (var passive in parent.EffectivePassives)
-                        {
-                            if (state.Spec.RequiredPassives.Contains(passive)) return true;
-                        }
-
-                        return parent.EffectivePassives.Count == 0;
+                        return parent.EffectivePassives.IsEmpty || !parent.EffectivePassives.Intersect(state.Spec.RequiredPassives).IsEmpty;
                     }
 
                     if (!HasValidPassives(p.Item1) && !HasValidPassives(p.Item2))
@@ -285,22 +282,10 @@ namespace PalCalc.Solver
 
                 var finalIVs = FIVSet.Merge(p.Item1.IVs, p.Item2.IVs);
 
-                var parentPassives = passiveListPool.BorrowWith(p.Item1.ActualPassives);
-                foreach (var passive in p.Item2.ActualPassives)
-                    if (!parentPassives.Contains(passive))
-                        parentPassives.Add(passive);
+                var parentPassives = p.Item1.ActualPassives.Concat(p.Item2.ActualPassives);
 
-                var availableRequiredPassives = passiveListPool.Borrow();
-                var availableOptionalPassives = passiveListPool.Borrow();
-
-                foreach (var passive in parentPassives)
-                {
-                    if (state.Spec.RequiredPassives.Contains(passive))
-                        availableRequiredPassives.Add(passive);
-
-                    if (state.Spec.OptionalPassives.Contains(passive))
-                        availableOptionalPassives.Add(passive);
-                }
+                var availableRequiredPassives = parentPassives.Intersect(state.Spec.RequiredPassives);
+                var availableOptionalPassives = parentPassives.Intersect(state.Spec.OptionalPassives);
 
                 // if both parents are wildcards, go through the list of possible gender-specific breeding results
                 // and modify the parent genders to cover each possible child
@@ -382,10 +367,8 @@ namespace PalCalc.Solver
                     // so we'd end up overestimating the effort of parents which have the same (but irrelevant)
                     // passives.
 
-                    foreach (var rawTargetPassives in PassiveSkillPermutations(availableRequiredPassives, availableOptionalPassives))
+                    foreach (var targetPassives in PassiveSkillPermutations(availableRequiredPassives, availableOptionalPassives))
                     {
-                        var targetPassives = passiveListPool.BorrowWith(rawTargetPassives);
-
                         // go through each potential final number of passives, accumulate the probability of any of these exact options
                         // leading to the desired passives within MAX_IRRELEVANT_PASSIVES.
                         //
@@ -411,9 +394,7 @@ namespace PalCalc.Solver
                             // (not entirely correct, since some irrelevant passives may be specific and inherited by parents. if we know a child
                             //  may have some specific passive, it may be efficient to breed that child with another parent which also has that
                             //  irrelevant passive, which would increase the overall likelyhood of a desired passive being inherited)
-                            var newPassives = passiveListPool.BorrowWith(targetPassives);
-                            while (newPassives.Count < numFinalPassives)
-                                newPassives.Add(new RandomPassiveSkill());
+                            var newPassives = targetPassives.Concat(FPassiveSet.RepeatRandom(numFinalPassives - targetPassives.Count));
 
                             var res = new BredPalReference(
                                 settings.GameSettings,
@@ -450,20 +431,11 @@ namespace PalCalc.Solver
                                     added = true;
                                 }
                             }
-
-                            if (!added)
-                                passiveListPool.Return(newPassives);
                         }
-
-                        passiveListPool.Return(targetPassives);
                     }
                 }
 
                 palPairListPool.Return(expandedGendersByChildren);
-
-                passiveListPool.Return(parentPassives);
-                passiveListPool.Return(availableRequiredPassives);
-                passiveListPool.Return(availableOptionalPassives);
             }
         }
     }

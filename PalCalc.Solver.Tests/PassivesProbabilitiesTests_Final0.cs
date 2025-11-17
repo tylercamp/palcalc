@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 
 namespace PalCalc.Solver.Tests
 {
@@ -13,8 +14,8 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: GameConstants.PassiveRandomAddedProbability[0],
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 0
                 ),
                 delta: 0.0001f
@@ -27,8 +28,8 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: GameConstants.PassiveRandomAddedProbability[0] * GameConstants.PassiveProbabilityDirect[0],
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 0
                 ),
                 delta: 0.0001f
@@ -41,8 +42,8 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: GameConstants.PassiveRandomAddedProbability[0] * GameConstants.PassiveProbabilityDirect[0],
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 0
                 ),
                 delta: 0.0001f
@@ -55,8 +56,8 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: GameConstants.PassiveRandomAddedProbability[0] * GameConstants.PassiveProbabilityDirect[0],
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 0
                 ),
                 delta: 0.0001f
@@ -69,8 +70,8 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: GameConstants.PassiveRandomAddedProbability[0] * GameConstants.PassiveProbabilityDirect[0],
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 0
                 ),
                 delta: 0.0001f
@@ -83,8 +84,8 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: GameConstants.PassiveRandomAddedProbability[0] * GameConstants.PassiveProbabilityDirect[0],
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant, Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 0
                 ),
                 delta: 0.0001f

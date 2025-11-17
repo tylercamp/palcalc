@@ -260,7 +260,7 @@ namespace PalCalc.UI.ViewModel
 
                     if (sfd.ShowDialog() == true)
                     {
-                        File.WriteAllText(sfd.FileName, PalCSVExporter.Export(SelectedFullGame.CachedValue, GameSettingsViewModel.Load(SelectedFullGame.Value).ModelObject));
+                        File.WriteAllText(sfd.FileName, PalCSVExporter.Export(PalDB.SharedInstance, SelectedFullGame.CachedValue, GameSettingsViewModel.Load(SelectedFullGame.Value).ModelObject));
                     }
                 },
                 canExecute: () => SelectedFullGame?.Value != null

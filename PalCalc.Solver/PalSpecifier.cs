@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
@@ -11,22 +12,22 @@ namespace PalCalc.Solver
     public class PalSpecifier
     {
         public Pal Pal { get; set; }
-        public List<PassiveSkill> RequiredPassives { get; set; } = new List<PassiveSkill>();
+        public FPassiveSet RequiredPassives { get; set; } = FPassiveSet.Empty;
         public PalGender RequiredGender { get; set; } = PalGender.WILDCARD;
 
-        public List<PassiveSkill> OptionalPassives { get; set; } = new List<PassiveSkill>();
+        public FPassiveSet OptionalPassives { get; set; } = FPassiveSet.Empty;
 
-        public IEnumerable<PassiveSkill> DesiredPassives => RequiredPassives.Concat(OptionalPassives);
+        public FPassiveSet DesiredPassives => RequiredPassives.Concat(OptionalPassives);
 
         public int IV_HP { get; set; }
         public int IV_Attack { get; set; }
         public int IV_Defense { get; set; }
 
-        public override string ToString() => $"{Pal.Name} with {RequiredPassives.PassiveSkillListToString()}";
+        public override string ToString() => $"{Pal.Name} with {RequiredPassives.ModelObjects.PassiveSkillListToString()}";
 
         public bool IsSatisfiedBy(IPalReference palRef) =>
             Pal == palRef.Pal &&
-            !RequiredPassives.Except(palRef.EffectivePassives).Any() &&
+            RequiredPassives.Except(palRef.EffectivePassives).IsEmpty &&
             (RequiredGender == PalGender.WILDCARD || palRef.Gender == PalGender.WILDCARD || palRef.Gender == RequiredGender) &&
             (IV_HP == 0 || palRef.IVs.HP.Satisfies(IV_HP)) &&
             (IV_Attack == 0 || palRef.IVs.Attack.Satisfies(IV_Attack)) &&
@@ -34,8 +35,7 @@ namespace PalCalc.Solver
 
         public void Normalize()
         {
-            RequiredPassives = RequiredPassives.Distinct().ToList();
-            OptionalPassives = OptionalPassives.Except(RequiredPassives).Distinct().ToList();
+            OptionalPassives = OptionalPassives.Except(RequiredPassives);
         }
     }
 }

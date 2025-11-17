@@ -39,7 +39,7 @@ namespace PalCalc.Solver
                 .ToList();
         }
 
-        public static float ToTimeFactor(this List<PassiveSkill> passives)
+        public static float ToTimeFactor(this IEnumerable<PassiveSkill> passives)
         {
             var timeFactor = 1.0f;
 

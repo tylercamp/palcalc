@@ -138,9 +138,9 @@ namespace PalCalc.Solver
                     //  we'd like, then we'll keep this in the pool)
                     if (
                         // at max passives
-                        refNewInst.EffectivePassives.Count(t => t is not RandomPassiveSkill) == GameConstants.MaxTotalPassives ||
+                        refNewInst.EffectivePassives.CountNonRandom == GameConstants.MaxTotalPassives ||
                         // there's nothing else we'd be interested in
-                        !target.OptionalPassives.Except(refNewInst.EffectivePassives).Any()
+                        target.OptionalPassives.Except(refNewInst.EffectivePassives).IsEmpty
                     ) continue;
                 }
 

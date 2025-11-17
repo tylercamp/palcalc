@@ -2,6 +2,7 @@
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
+using PalCalc.Solver.FImpl.AttrId;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Localization;
@@ -47,11 +48,11 @@ namespace PalCalc.UI.ViewModel.Solver
             var targetInstance = new PalSpecifier
             {
                 Pal = "Galeclaw".ToPal(db),
-                RequiredPassives = new List<PassiveSkill> {
+                RequiredPassives = FPassiveSet.FromModel(db, [
                     "Swift".ToStandardPassive(db),
                     "Runner".ToStandardPassive(db),
                     "Nimble".ToStandardPassive(db)
-                },
+                ]),
             };
 
             DisplayedResult = solver.SolveFor(targetInstance, new SolverStateController() { CancellationToken = CancellationToken.None }).MaxBy(r => r.NumTotalBreedingSteps);
@@ -79,7 +80,7 @@ namespace PalCalc.UI.ViewModel.Solver
             {
                 DisplayedResult = displayedResult;
                 Graph = BreedingGraph.FromPalReference(source, settings, displayedResult);
-                EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
+                EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.ModelObjects.Select(PassiveSkillViewModel.Make));
 
                 IVs = IVSetViewModel.FromIVs(displayedResult.IVs);
 

@@ -10,18 +10,17 @@ namespace PalCalc.Solver.PalReference
 {
     public class WildPalReference : IPalReference
     {
-        public WildPalReference(Pal pal, IEnumerable<PassiveSkill> guaranteedPassives, int numPassives)
+        public WildPalReference(Pal pal, FPassiveSet guaranteedPassives, int numRandomPassives)
         {
             Pal = pal;
-            SelfBreedingEffort = GameConstants.TimeToCatch(pal) / GameConstants.PassivesWildAtMostN[numPassives];
-            EffectivePassives = guaranteedPassives.Concat(Enumerable.Range(0, numPassives).Select(i => new RandomPassiveSkill())).ToList();
+            SelfBreedingEffort = GameConstants.TimeToCatch(pal) / GameConstants.PassivesWildAtMostN[numRandomPassives];
+            EffectivePassives = guaranteedPassives.Concat(FPassiveSet.RepeatRandom(numRandomPassives));
             Gender = PalGender.WILDCARD;
             CapturesRequiredForGender = 1;
 
-            if (guaranteedPassives.Any(t => !pal.GuaranteedPassivesInternalIds.Contains(t.InternalName))) throw new InvalidOperationException();
+            if (guaranteedPassives.ModelObjects.Any(t => !pal.GuaranteedPassivesInternalIds.Contains(t.InternalName))) throw new InvalidOperationException();
             if (EffectivePassives.Count > GameConstants.MaxTotalPassives) throw new InvalidOperationException();
 
-            EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
             IVs = new FIVSet(FIV.Random, FIV.Random, FIV.Random);
         }
 
@@ -32,13 +31,13 @@ namespace PalCalc.Solver.PalReference
 
         public Pal Pal { get; private set; }
 
-        public List<PassiveSkill> EffectivePassives { get; private set; }
+        public FPassiveSet EffectivePassives { get; private set; }
 
         public FIVSet IVs { get; private set; }
 
         public PalGender Gender { get; private set; }
 
-        public List<PassiveSkill> ActualPassives => EffectivePassives;
+        public FPassiveSet ActualPassives => EffectivePassives;
 
         public float TimeFactor => 1.0f;
 
@@ -58,8 +57,6 @@ namespace PalCalc.Solver.PalReference
         public int NumTotalEggs => 0;
 
         public int NumTotalWildPals => 1;
-
-        public int EffectivePassivesHash { get; }
 
         private IPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)
         {
@@ -108,6 +105,6 @@ namespace PalCalc.Solver.PalReference
 
         public override string ToString() => $"Captured {Gender} {Pal} w/ up to {EffectivePassives.Count} random passive skills";
 
-        public override int GetHashCode() => HashCode.Combine(nameof(WildPalReference), Pal, Gender, EffectivePassivesHash);
+        public override int GetHashCode() => HashCode.Combine(nameof(WildPalReference), Pal, Gender, EffectivePassives);
     }
 }

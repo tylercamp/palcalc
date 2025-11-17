@@ -20,6 +20,7 @@ internal class Program
         Console.WriteLine("Loaded Pal DB");
 
         var reptyro = new OwnedPalReference(
+            db,
             new PalInstance()
             {
                 Gender = PalGender.MALE,
@@ -31,6 +32,7 @@ internal class Program
         );
 
         var wixen = new OwnedPalReference(
+            db,
             new PalInstance()
             {
                 Gender = PalGender.FEMALE,
@@ -41,8 +43,8 @@ internal class Program
             FIVSet.AllRandom
         );
 
-        var parentPassives = reptyro.ActualPassives.Concat(wixen.ActualPassives).Distinct().ToList();
-        var targetPassives = new List<PassiveSkill>() { "Lucky".ToStandardPassive(db), "Runner".ToStandardPassive(db) };
+        var parentPassives = reptyro.ActualPassives.Concat(wixen.ActualPassives);
+        var targetPassives = FPassiveSet.FromModel(db, ["Lucky".ToStandardPassive(db), "Runner".ToStandardPassive(db)]);
         var numFinalPassives = 3;
 
         var prob = PalCalc.Solver.Probabilities.Passives.ProbabilityInheritedTargetPassives(parentPassives, targetPassives, numFinalPassives);
@@ -77,7 +79,7 @@ internal class Program
         var targetInstance = new PalSpecifier
         {
             Pal = "Beakon".ToPal(db),
-            RequiredPassives = new List<PassiveSkill> { "Swift".ToStandardPassive(db), "Runner".ToStandardPassive(db), "Nimble".ToStandardPassive(db) },
+            RequiredPassives = FPassiveSet.FromModel(db, ["Swift".ToStandardPassive(db), "Runner".ToStandardPassive(db), "Nimble".ToStandardPassive(db)]),
             IV_Attack = 90,
             IV_Defense = 90,
             IV_HP = 90

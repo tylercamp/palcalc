@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.FImpl.AttrId;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,7 +39,7 @@ namespace PalCalc.Solver.Probabilities
         /// Should be used repeatedly to calculate probabilities for all possible counts of passive skills (max 4)
         /// </remarks>
         /// 
-        public static float ProbabilityInheritedTargetPassives(List<PassiveSkill> parentPassives, List<PassiveSkill> desiredParentPassives, int numFinalPassives)
+        public static float ProbabilityInheritedTargetPassives(FPassiveSet parentPassives, FPassiveSet desiredParentPassives, int numFinalPassives)
         {
             // we know we need at least `desiredParentPassives.Count` to be inherited from the parents, but the overall number
             // of passives must be `numFinalPassives`. consider N, N+1, ..., passives inherited from parents, and an inverse amount
@@ -56,16 +57,18 @@ namespace PalCalc.Solver.Probabilities
 
             float probabilityForNumPassives = 0.0f;
 
-            for (int numInheritedFromParent = desiredParentPassives.Count; numInheritedFromParent <= GameConstants.MaxTotalPassives; numInheritedFromParent++)
+            var parentCount = parentPassives.Count;
+            var desiredCount = desiredParentPassives.Count;
+            for (int numInheritedFromParent = desiredCount; numInheritedFromParent <= GameConstants.MaxTotalPassives; numInheritedFromParent++)
             {
                 // we may inherit more passives from the parents than the parents actually have (e.g. inherit 4 passives from parents with
                 // 2 total passives), in which case we'd still inherit just two
                 //
                 // this doesn't affect probabilities of getting `numInherited`, but it affects the number of random passives which must
                 // be added to each `numFinalPassives` and the number of combinations of parent passives that we check
-                var actualNumInheritedFromParent = Math.Min(numInheritedFromParent, parentPassives.Count);
+                var actualNumInheritedFromParent = Math.Min(numInheritedFromParent, parentCount);
 
-                var numIrrelevantFromParent = actualNumInheritedFromParent - desiredParentPassives.Count;
+                var numIrrelevantFromParent = actualNumInheritedFromParent - desiredCount;
                 var numIrrelevantFromRandom = Math.Max(0, numFinalPassives - actualNumInheritedFromParent);
 
                 if (actualNumInheritedFromParent + numIrrelevantFromRandom > numFinalPassives) continue;
@@ -78,7 +81,7 @@ namespace PalCalc.Solver.Probabilities
                 // easier to organize if we include it for each individual case below)
                 float probabilityGotRequiredFromParent;
 
-                if (desiredParentPassives.Count == 0)
+                if (desiredCount == 0)
                 {
                     // just the chance of getting this number of passives from parents
                     probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent];
@@ -86,7 +89,7 @@ namespace PalCalc.Solver.Probabilities
                 else if (numIrrelevantFromParent == 0)
                 {
                     // chance of getting exactly the required passives
-                    probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent] / Choose(parentPassives.Count, desiredParentPassives.Count);
+                    probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent] / Choose(parentCount, desiredCount);
                 }
                 else
                 {
@@ -100,12 +103,12 @@ namespace PalCalc.Solver.Probabilities
                     // (available passives except desired)
                     // choose
                     // (required num irrelevant)
-                    var numCombinationsWithIrrelevantPassive = (float)Choose(parentPassives.Count - desiredParentPassives.Count, numIrrelevantFromParent);
+                    var numCombinationsWithIrrelevantPassive = (float)Choose(parentCount - desiredCount, numIrrelevantFromParent);
 
                     // (all available passives)
                     // choose
                     // (actual num inherited from parent)
-                    var numCombinationsWithAnyPassives = (float)Choose(parentPassives.Count, actualNumInheritedFromParent);
+                    var numCombinationsWithAnyPassives = (float)Choose(parentCount, actualNumInheritedFromParent);
 
                     var probabilityCombinationWithDesiredPassives =
                         numCombinationsWithIrrelevantPassive / numCombinationsWithAnyPassives;

@@ -39,7 +39,7 @@ namespace PalCalc.Solver.Tree
                     case OwnedPalReference owned:
                         yield return $"Owned {owned.Pal.Name}";
                         yield return $"in {owned.Location}";
-                        yield return $"{owned.Gender} w/ {owned.EffectivePassives.PassiveSkillListToString()}";
+                        yield return $"{owned.Gender} w/ {owned.EffectivePassives.ModelObjects.PassiveSkillListToString()}";
                         break;
 
                     default: throw new NotImplementedException();

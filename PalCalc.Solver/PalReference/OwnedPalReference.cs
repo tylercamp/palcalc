@@ -14,15 +14,14 @@ namespace PalCalc.Solver.PalReference
         PalInstance instance;
 
         /// <param name="effectivePassives">The list of passives held by the `instance`, filtered/re-mapped based on desired passives. (.ToDedicatedPassives())</param>
-        public OwnedPalReference(PalInstance instance, List<PassiveSkill> effectivePassives, FIVSet effectiveIVs)
+        public OwnedPalReference(PalDB db, PalInstance instance, List<PassiveSkill> effectivePassives, FIVSet effectiveIVs)
         {
             this.instance = instance;
 
-            EffectivePassives = effectivePassives;
-            EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
             TimeFactor = effectivePassives.ToTimeFactor();
 
-            ActualPassives = instance.PassiveSkills;
+            EffectivePassives = FPassiveSet.FromModel(db, effectivePassives);
+            ActualPassives = FPassiveSet.FromModel(db, instance.PassiveSkills);
 
             IVs = effectiveIVs;
         }
@@ -31,11 +30,8 @@ namespace PalCalc.Solver.PalReference
 
         public Pal Pal => instance.Pal;
 
-        public List<PassiveSkill> EffectivePassives { get; private set; }
-
-        public int EffectivePassivesHash { get; }
-
-        public List<PassiveSkill> ActualPassives { get; }
+        public FPassiveSet EffectivePassives { get; private set; }
+        public FPassiveSet ActualPassives { get; }
 
         public float TimeFactor { get; }
 
@@ -60,7 +56,7 @@ namespace PalCalc.Solver.PalReference
             return this;
         }
 
-        public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({EffectivePassives.PassiveSkillListToString()}) in {Location}";
+        public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({EffectivePassives.ModelObjects.PassiveSkillListToString()}) in {Location}";
 
         public override int GetHashCode() => HashCode.Combine(nameof(OwnedPalReference), UnderlyingInstance.GetHashCode());
     }

@@ -44,13 +44,13 @@ namespace PalCalc.UI.Model.CSV
             public List<string> ValuesOf(PalInstanceViewModel item) => item.ActiveSkills.Select(s => s.Name.Value).ToList();
         }
 
-        public static string Export(CachedSaveGame csg, GameSettings settings)
+        public static string Export(PalDB db, CachedSaveGame csg, GameSettings settings)
         {
             SimpleCSVPropertySerializer<PalInstanceViewModel> Simple(string col, Func<PalInstanceViewModel, object> sel) =>
                 new(col, p => sel(p)?.ToString() ?? "");
 
             SimpleCSVPropertySerializer<PalInstanceViewModel> SimplePalRef(string col, Func<IPalReference, object> sel) =>
-                Simple(col, p => sel(new OwnedPalReference(p.ModelObject, [], FIVSet.AllRandom)));
+                Simple(col, p => sel(new OwnedPalReference(db, p.ModelObject, [], FIVSet.AllRandom)));
 
             SimpleCSVPropertySerializer<PalInstanceViewModel> SimplePalLoc(string col, Func<SpecificPalRefLocationViewModel, object> sel) =>
                 SimplePalRef(col, p => sel(new SpecificPalRefLocationViewModel(csg, settings, p.Location)));

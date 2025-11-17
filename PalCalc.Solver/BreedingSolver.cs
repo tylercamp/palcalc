@@ -75,11 +75,12 @@ namespace PalCalc.Solver
                 // skip pals if they can't be used to reach the desired pals (e.g. Jetragon can only be bred from other Jetragons)
                 .Where(p => WithinBreedingSteps(p.Pal, settings.MaxBreedingSteps))
                 // apply "Max Input Irrelevant Passives" setting
-                .Where(p => p.PassiveSkills.Except(spec.DesiredPassives).Count() <= settings.MaxInputIrrelevantPassives)
+                .Where(p => p.PassiveSkills.Except(spec.DesiredPassives.ModelObjects).Count() <= settings.MaxInputIrrelevantPassives)
                 // convert from Model to Solver repr
                 .Select(p => new OwnedPalReference(
+                    db: settings.DB,
                     instance: p,
-                    effectivePassives: p.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives),
+                    effectivePassives: p.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives.ModelObjects),
                     effectiveIVs: new FImpl.AttrId.FIVSet(
                         Attack: MakeIV(spec.IV_Attack, p.IV_Attack),
                         Defense: MakeIV(spec.IV_Defense, p.IV_Defense),
@@ -117,7 +118,7 @@ namespace PalCalc.Solver
 
                     // (note - these pals weren't combined in earlier groupings since PalProperty.RelevantPassives is intentionally used
                     //         instead of EffectivePassives or ActualPassives)
-                    if (malePal.EffectivePassivesHash == femalePal.EffectivePassivesHash)
+                    if (malePal.EffectivePassives == femalePal.EffectivePassives)
                     {
                         return [composite];
                     }
@@ -146,10 +147,10 @@ namespace PalCalc.Solver
                                     // number of "effectively random" passives should exclude guaranteed passives which are part of the desired list of passives
                                     Math.Max(
                                         0,
-                                        settings.MaxInputIrrelevantPassives - p.GuaranteedPassiveSkills(settings.DB).Except(spec.DesiredPassives).Count()
+                                        settings.MaxInputIrrelevantPassives - p.GuaranteedPassiveSkills(settings.DB).Except(spec.DesiredPassives.ModelObjects).Count()
                                     )
                                 )
-                                .Select(numRandomPassives => new WildPalReference(p, p.GuaranteedPassiveSkills(settings.DB), numRandomPassives))
+                                .Select(numRandomPassives => new WildPalReference(p, FPassiveSet.FromModel(settings.DB, p.GuaranteedPassiveSkills(settings.DB).ToList()), numRandomPassives))
                         )
                         .Where(pi => pi.BreedingEffort <= settings.MaxEffort)
                 );
@@ -294,7 +295,7 @@ namespace PalCalc.Solver
                 .Result
                 // the breeding logic will never emit pals which exceed this limit, but this isn't applied for owned pals
                 // which already satisfy the pal specifier
-                .Where(r => r.ActualPassives.Except(spec.DesiredPassives).Count() <= settings.MaxBredIrrelevantPassives)
+                .Where(r => r.ActualPassives.Except(spec.DesiredPassives).Count <= settings.MaxBredIrrelevantPassives)
                 .Select(r =>
                 {
                     if (spec.RequiredGender != PalGender.WILDCARD)

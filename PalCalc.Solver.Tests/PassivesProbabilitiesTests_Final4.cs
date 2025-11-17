@@ -33,8 +33,8 @@ namespace PalCalc.Solver.Tests
                 // nothing to inherit, just the chance of inheriting 4 random
                 expected: RandomProbabilityAddedAtLeast(4),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -55,8 +55,8 @@ namespace PalCalc.Solver.Tests
                     (RandomProbabilityAddedAtLeast(3) * PassiveProbabilityDirectUpTo(numAvailable: 1, numRequired: 1))
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -76,8 +76,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner],
-                    desiredParentPassives: [Runner],
+                    parentPassives: MkSet([Runner]),
+                    desiredParentPassives: MkSet([Runner]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -103,8 +103,8 @@ namespace PalCalc.Solver.Tests
                     (RandomProbabilityAddedAtLeast(2) * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 2))
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -130,8 +130,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Irrelevant],
-                    desiredParentPassives: [Runner],
+                    parentPassives: MkSet([Runner, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -151,8 +151,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Swift],
-                    desiredParentPassives: [Runner, Swift],
+                    parentPassives: MkSet([Runner, Swift]),
+                    desiredParentPassives: MkSet([Runner, Swift]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -181,8 +181,8 @@ namespace PalCalc.Solver.Tests
                     (RandomProbabilityAddedAtLeast(1) * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 3))
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -214,8 +214,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Irrelevant, Irrelevant],
-                    desiredParentPassives: [Runner],
+                    parentPassives: MkSet([Runner, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -241,8 +241,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Swift, Irrelevant],
-                    desiredParentPassives: [Runner, Swift],
+                    parentPassives: MkSet([Runner, Swift, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner, Swift]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -262,8 +262,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Swift, Nimble],
-                    desiredParentPassives: [Runner, Swift, Nimble],
+                    parentPassives: MkSet([Runner, Swift, Nimble]),
+                    desiredParentPassives: MkSet([Runner, Swift, Nimble]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -295,8 +295,8 @@ namespace PalCalc.Solver.Tests
                     (RandomProbabilityAddedAtLeast(0) * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 4))
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -334,8 +334,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [Runner],
+                    parentPassives: MkSet([Runner, Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -367,8 +367,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Swift, Irrelevant, Irrelevant],
-                    desiredParentPassives: [Runner, Swift],
+                    parentPassives: MkSet([Runner, Swift, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner, Swift]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -394,8 +394,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Swift, Nimble, Irrelevant],
-                    desiredParentPassives: [Runner, Swift, Nimble],
+                    parentPassives: MkSet([Runner, Swift, Nimble, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner, Swift, Nimble]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -415,8 +415,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Swift, Nimble, Lucky],
-                    desiredParentPassives: [Runner, Swift, Nimble, Lucky],
+                    parentPassives: MkSet([Runner, Swift, Nimble, Lucky]),
+                    desiredParentPassives: MkSet([Runner, Swift, Nimble, Lucky]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -448,8 +448,8 @@ namespace PalCalc.Solver.Tests
                     (RandomProbabilityAddedAtLeast(0) * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 4))
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [],
+                    parentPassives: MkSet([Irrelevant, Irrelevant, Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -487,8 +487,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Irrelevant, Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [Runner],
+                    parentPassives: MkSet([Runner, Irrelevant, Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -520,8 +520,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Swift, Irrelevant, Irrelevant, Irrelevant],
-                    desiredParentPassives: [Runner, Swift],
+                    parentPassives: MkSet([Runner, Swift, Irrelevant, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner, Swift]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -547,8 +547,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Swift, Nimble, Irrelevant, Irrelevant],
-                    desiredParentPassives: [Runner, Swift, Nimble],
+                    parentPassives: MkSet([Runner, Swift, Nimble, Irrelevant, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner, Swift, Nimble]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f
@@ -568,8 +568,8 @@ namespace PalCalc.Solver.Tests
                     )
                 ),
                 actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
-                    parentPassives: [Runner, Swift, Nimble, Lucky, Irrelevant],
-                    desiredParentPassives: [Runner, Swift, Nimble, Lucky],
+                    parentPassives: MkSet([Runner, Swift, Nimble, Lucky, Irrelevant]),
+                    desiredParentPassives: MkSet([Runner, Swift, Nimble, Lucky]),
                     numFinalPassives: 4
                 ),
                 delta: 0.0001f

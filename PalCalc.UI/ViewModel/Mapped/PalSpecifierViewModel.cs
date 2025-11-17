@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.Solver.FImpl.AttrId;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.PalDerived;
@@ -35,10 +36,10 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 TargetPal = PalViewModel.Make(underlyingSpec.Pal);
 
-                RequiredPassives = new(underlyingSpec.RequiredPassives);
-                OptionalPassives = new(underlyingSpec.OptionalPassives);
+                RequiredPassives = new(underlyingSpec.RequiredPassives.ModelObjects);
+                OptionalPassives = new(underlyingSpec.OptionalPassives.ModelObjects);
 
-                var optionalVms = underlyingSpec.OptionalPassives
+                var optionalVms = underlyingSpec.OptionalPassives.ModelObjects
                     .Select(PassiveSkillViewModel.Make)
                     .Concat(Enumerable.Repeat<PassiveSkillViewModel>(null, GameConstants.MaxTotalPassives - underlyingSpec.OptionalPassives.Count))
                     .ToArray();
@@ -74,8 +75,8 @@ namespace PalCalc.UI.ViewModel.Mapped
             ? new PalSpecifier()
             {
                 Pal = TargetPal.ModelObject,
-                RequiredPassives = RequiredPassives.AsModelEnumerable().ToList(),
-                OptionalPassives = RequiredPassives.AsModelEnumerable().ToList(),
+                RequiredPassives = FPassiveSet.FromModel(PalDB.SharedInstance, RequiredPassives.AsModelEnumerable().ToList()),
+                OptionalPassives = FPassiveSet.FromModel(PalDB.SharedInstance, OptionalPassives.AsModelEnumerable().ToList()),
                 RequiredGender = RequiredGender.Value,
                 IV_HP = MinIv_HP,
                 IV_Attack = MinIv_Attack,
@@ -194,8 +195,8 @@ namespace PalCalc.UI.ViewModel.Mapped
             new PalSpecifier()
             {
                 Pal = TargetPal.ModelObject,
-                RequiredPassives = RequiredPassives.AsModelEnumerable().ToList(),
-                OptionalPassives = OptionalPassives.AsModelEnumerable().ToList(),
+                RequiredPassives = FPassiveSet.FromModel(PalDB.SharedInstance, RequiredPassives.AsModelEnumerable().ToList()),
+                OptionalPassives = FPassiveSet.FromModel(PalDB.SharedInstance, OptionalPassives.AsModelEnumerable().ToList()),
                 RequiredGender = RequiredGender.Value,
                 IV_HP = MinIv_HP,
                 IV_Attack = MinIv_Attack,
@@ -225,8 +226,8 @@ namespace PalCalc.UI.ViewModel.Mapped
                     new PalSpecifier()
                     {
                         Pal = "Beakon".ToPal(db),
-                        RequiredPassives = ["Runner".ToStandardPassive(db), "Swift".ToStandardPassive(db)],
-                        OptionalPassives = ["Aggressive".ToStandardPassive(db)],
+                        RequiredPassives = FPassiveSet.FromModel(PalDB.SharedInstance, ["Runner".ToStandardPassive(db), "Swift".ToStandardPassive(db)]),
+                        OptionalPassives = FPassiveSet.FromModel(PalDB.SharedInstance, ["Aggressive".ToStandardPassive(db)]),
                         IV_Attack = 90,
                     }
                 );
