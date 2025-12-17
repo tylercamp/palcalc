@@ -754,7 +754,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v21");
+            var db = PalDB.MakeEmptyUnsafe("v22");
 
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.Humans = humans;
