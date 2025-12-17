@@ -215,23 +215,14 @@ Whalaska,IceNarwhal,154,False,445,58,8510,199,42,60
 Whalaska Ignis,IceNarwhal_Fire,154,True,430,42,8630,200,58,58
 Neptilius,PoseidonOrca,155,False,90,50,8690,234,60,60
 Hartalis,LegendDeer,156,False,20,50,10620,224,,
-,ScorpionMan_Electric,10000,False,355,50,3946,176,,
-,NightBlueHorse_Neutral,10001,False,365,50,6225,188,,
-,Kirin_Ice,10002,False,680,50,4285,26,,
-,GhostRabbit_Grass,10003,False,705,40,7185,186,,
-,ThunderDog_Ice,10004,False,740,50,3885,115,,
-,SweetsSheep_Ground,10005,False,1190,50,1455,48,,
-,OctopusGirl_Neutral,10006,False,1195,50,1935,198,,
-,BlackPuppy_Ice,10007,False,1245,50,7825,191,,
-,Monkey_Ice,10008,False,1250,50,1285,123,,
-Illuminant Bat,YakushimaMonster003_Purple,10009,False,1250,50,1940,243,42,44
-Rainbow Slime,YakushimaMonster001_Rainbow,10010,False,1320,50,3120,240,42,44
-Cave Bat,YakushimaMonster003,10011,False,1340,50,1730,242,36,41
-Eye of Cthulhu,YakushimaBoss001,10012,False,1380,50,8100,244,45,45
-Enchanted Sword,YakushimaMonster002,10013,False,1380,50,2330,241,42,44
-Demon Eye,YakushimaBoss001_Small,10014,False,1390,50,1620,245,33,35
-Purple Slime,YakushimaMonster001_Purple,10015,False,1390,50,1610,238,36,41
-Red Slime,YakushimaMonster001_Red,10016,False,1405,50,1540,237,36,41
-Green Slime,YakushimaMonster001,10017,False,1430,50,1510,235,33,35
-Blue Slime,YakushimaMonster001_Blue,10018,False,1490,50,1520,236,33,35
-Illuminant Slime,YakushimaMonster001_Pink,10019,False,1500,50,1810,239,42,44
+Illuminant Bat,YakushimaMonster003_Purple,10000,False,1250,50,1940,243,42,44
+Rainbow Slime,YakushimaMonster001_Rainbow,10001,False,1320,50,3120,240,42,44
+Cave Bat,YakushimaMonster003,10002,False,1340,50,1730,242,36,41
+Eye of Cthulhu,YakushimaBoss001,10003,False,1380,50,8100,244,45,45
+Enchanted Sword,YakushimaMonster002,10004,False,1380,50,2330,241,42,44
+Demon Eye,YakushimaBoss001_Small,10005,False,1390,50,1620,245,33,35
+Purple Slime,YakushimaMonster001_Purple,10006,False,1390,50,1610,238,36,41
+Red Slime,YakushimaMonster001_Red,10007,False,1405,50,1540,237,36,41
+Green Slime,YakushimaMonster001,10008,False,1430,50,1510,235,33,35
+Blue Slime,YakushimaMonster001_Blue,10009,False,1490,50,1520,236,33,35
+Illuminant Slime,YakushimaMonster001_Pink,10010,False,1500,50,1810,239,42,44

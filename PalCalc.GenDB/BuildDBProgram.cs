@@ -76,6 +76,12 @@ namespace PalCalc.GenDB
                         }
                     );
 
+                    if (localizedNames.Values.Any(v => v == null))
+                    {
+                        logger.Warning("Pal {InternalName} missing at least 1 translation, skipping: {Json}", rawPal.InternalName, JsonConvert.SerializeObject(rawPal));
+                        return null;
+                    }
+
                     var englishName = localizedNames["en"];
 
                     var minWildLevel = wildPalLevels.ContainsKey(rawPal.InternalName) ? (int?)wildPalLevels[rawPal.InternalName].Item1 : null;
@@ -132,7 +138,7 @@ namespace PalCalc.GenDB
 
                         GuaranteedPassivesInternalIds = rawPal.GuaranteedPassives,
                     };
-                }).ToList();
+                }).SkipNull().ToList();
 
             var missingIds = allPals
                 .Where(p => p.Id.PalDexNo < 0)
