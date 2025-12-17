@@ -30,16 +30,16 @@ namespace PalCalc.Model
     public enum PalGender : byte
     {
         // note: pal world is not P.C., so it only has two genders
-        MALE = 0b0001,
-        FEMALE = 0b0010,
+        MALE = 0b001,
+        FEMALE = 0b010,
         // (but this program is P.C., and has four genders)
-        WILDCARD = 0b0011,
-        OPPOSITE_WILDCARD = 0b0100, // contextual - pals of this gender should be paired with pals of WILDCARD gender
+        WILDCARD = 0b011,
+        OPPOSITE_WILDCARD = 0b111, // contextual - pals of this gender should be paired with pals of WILDCARD gender
 
         // for pals read which are missing the `Gender` attribute entirely, not sure
         // how but this apparently can happen
         // https://github.com/tylercamp/palcalc/issues/78
-        NONE = 0b1000
+        NONE = 0b100
     }
 
     public class PalInstance : IPalworldCharacterInstance

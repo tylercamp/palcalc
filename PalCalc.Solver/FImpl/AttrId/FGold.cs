@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.FImpl.AttrId
 {
-    public record struct FGold(ushort Store)
+    public readonly record struct FGold(ushort Store)
     {
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.FImpl.AttrId.Group
 {
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    public record struct FCostId(FTime Time, FGold Gold, FReversers Reversers)
+    public readonly record struct FCostId(FTime Time, FGold Gold, FReversers Reversers)
     {
     }
 }

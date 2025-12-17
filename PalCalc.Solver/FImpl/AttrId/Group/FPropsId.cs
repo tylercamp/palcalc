@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.FImpl.AttrId.Group
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public record struct FPropsId(byte NumSteps, byte NumWildPals)
+    public readonly record struct FPropsId(byte NumSteps, byte NumWildPals)
     {
     }
 }

@@ -7,8 +7,13 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.FImpl.AttrId.Group
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    public record struct FTypeId(FPal Pal, FGender Gender, FPassiveSet Passives, FIVSet IVs)
+    [StructLayout(LayoutKind.Auto, Pack = 0)]
+    public readonly record struct FTypeId(
+        FPal Pal,
+        FIVSet IVs,
+        FGender Gender,
+        FPassiveSpec Passives
+    )
     {
     }
 }

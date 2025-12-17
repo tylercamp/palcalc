@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.FImpl.AttrId
 {
-    public record struct FReversers(byte Value);
+    public readonly record struct FReversers(byte Value);
 }

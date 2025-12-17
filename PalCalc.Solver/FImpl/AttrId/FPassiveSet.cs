@@ -138,6 +138,24 @@ namespace PalCalc.Solver.FImpl.AttrId
         // (a non-empty set will have at least one value in the `hi` part)
         public bool IsEmpty => StoreHi == 0;
 
+        public int IndexOf(FPassive passive)
+        {
+            if (passive.IsRandom || passive.IsEmpty) return -1;
+
+            ulong tmpLo = StoreLo, tmpHi = StoreHi;
+
+            for (int i = 0; i < 8; i++)
+            {
+                ushort part = (ushort)(tmpHi >> 48);
+                if (part == passive.Store)
+                    return i;
+
+                ShiftLeft16(ref tmpLo, ref tmpHi);
+            }
+
+            return -1;
+        }
+
         public FPassive this[int i]
         {
             get
@@ -155,7 +173,7 @@ namespace PalCalc.Solver.FImpl.AttrId
                     i -= 4;
                 }
 
-                return new FPassive((ushort)((s >> (i * 16)) & 0xFFFF));
+                return new FPassive((ushort)((s >> ((3 - i) * 16)) & 0xFFFF));
             }
         }
 
@@ -172,17 +190,26 @@ namespace PalCalc.Solver.FImpl.AttrId
             }
         }
 
-        public bool Contains(FPassive passive) =>
-            !passive.IsEmpty && !passive.IsRandom && !IsEmpty && (
-            this[0] == passive ||
-            this[1] == passive ||
-            this[2] == passive ||
-            this[3] == passive ||
-            this[4] == passive ||
-            this[5] == passive ||
-            this[6] == passive ||
-            this[7] == passive
-        );
+        public bool Contains(FPassive passive)
+        {
+            if (passive.IsEmpty || passive.IsRandom || IsEmpty)
+                return false;
+
+            ulong curLo = StoreLo;
+            ulong curHi = StoreHi;
+
+            ulong passiveHi = (ulong)passive.Store << 48;
+
+            while ((curHi | curLo) != 0)
+            {
+                if ((curHi & 0xFFFF_0000_0000_0000) == passiveHi)
+                    return true;
+
+                ShiftLeft16(ref curLo, ref curHi);
+            }
+
+            return false;
+        }
 
         public FPassiveSet Except(FPassiveSet others)
         {
@@ -233,8 +260,6 @@ namespace PalCalc.Solver.FImpl.AttrId
             return new FPassiveSet(resLo, resHi);
         }
 
-        /// <param name="other">Must NOT be empty!</param>
-        /// <returns></returns>
         public FPassiveSet Except(FPassive other)
         {
             if (IsEmpty || other.IsEmpty) return this; // empty
@@ -305,7 +330,6 @@ namespace PalCalc.Solver.FImpl.AttrId
             return new FPassiveSet(resLo, resHi);
         }
 
-        // (note: preserves `Set` semantics, i.e. auto-deduplicates (not including Random))
         public FPassiveSet Concat(FPassiveSet other)
         {
             // ty chatgpt
@@ -407,6 +431,8 @@ namespace PalCalc.Solver.FImpl.AttrId
 
         public struct CombinationIterator
         {
+            // tyvm chatgpt
+
             private readonly FPassiveSet _universe;
             private readonly int _n;
             private readonly int _k;

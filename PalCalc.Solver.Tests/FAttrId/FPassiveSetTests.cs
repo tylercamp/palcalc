@@ -6,140 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.Solver.Tests
+namespace PalCalc.Solver.Tests.FAttrId
 {
     [TestClass]
-    public class FAttrIdTests
+    public class FPassiveSetTests : FAttrIdTests
     {
-        private PalDB db;
-
-        private PassiveSkill runner;
-        private PassiveSkill swift;
-        private PassiveSkill nimble;
-        private PassiveSkill lucky;
-        private PassiveSkill legend;
-        private PassiveSkill workaholic;
-
-        private PassiveSkill random1 = new RandomPassiveSkill();
-        private PassiveSkill random2 = new RandomPassiveSkill();
-        private PassiveSkill random3 = new RandomPassiveSkill();
-        private PassiveSkill random4 = new RandomPassiveSkill();
-        private PassiveSkill random5 = new RandomPassiveSkill();
-        private PassiveSkill random6 = new RandomPassiveSkill();
-
-        [TestInitialize]
-        public void InitDB()
-        {
-            db = PalDB.LoadEmbedded();
-
-            runner = "Runner".ToStandardPassive(db);
-            swift = "Swift".ToStandardPassive(db);
-            nimble = "Nimble".ToStandardPassive(db);
-            lucky = "Lucky".ToStandardPassive(db);
-            legend = "Legend".ToStandardPassive(db);
-            workaholic = "Workaholic".ToStandardPassive(db);
-        }
-
-        [TestMethod]
-        public void Gender_CtorIdentity()
-        {
-            Assert.AreEqual(Model.PalGender.MALE, new FGender(Model.PalGender.MALE).Value);
-            Assert.AreEqual(Model.PalGender.FEMALE, new FGender(Model.PalGender.FEMALE).Value);
-            Assert.AreEqual(Model.PalGender.WILDCARD, new FGender(Model.PalGender.WILDCARD).Value);
-            Assert.AreEqual(Model.PalGender.OPPOSITE_WILDCARD, new FGender(Model.PalGender.OPPOSITE_WILDCARD).Value);
-            Assert.AreEqual(Model.PalGender.NONE, new FGender(Model.PalGender.NONE).Value);
-        }
-
-        [TestMethod]
-        public void Time_CtorIdentity()
-        {
-            Assert.AreEqual(TimeSpan.Zero, new FTime(TimeSpan.Zero).Value);
-            Assert.AreEqual(TimeSpan.FromMinutes(100), new FTime(TimeSpan.FromMinutes(100)).Value);
-        }
-
-        [TestMethod]
-        public void IV_CtorIdentity()
-        {
-            Assert.AreEqual(
-                new IV_Range(isRelevant: true, value: 50),
-                new FIV(isRelevant: true, value: 50).ModelObject
-            );
-
-            Assert.AreEqual(
-                new IV_Range(isRelevant: false, value: 50),
-                new FIV(isRelevant: false, value: 50).ModelObject
-            );
-
-            Assert.AreEqual(
-                new IV_Range(IsRelevant: true, Min: 25, Max: 100),
-                new FIV(isRelevant: true, minValue: 25, maxValue: 100).ModelObject
-            );
-
-            Assert.AreEqual(
-                new IV_Range(IsRelevant: false, Min: 25, Max: 100),
-                new FIV(isRelevant: false, minValue: 25, maxValue: 100).ModelObject
-            );
-
-            Assert.AreEqual(
-                IV_Random.Instance,
-                FIV.Random.ModelObject
-            );
-        }
-
-        [TestMethod]
-        public void IVSet_CtorIdentity()
-        {
-            Assert.AreEqual(
-                new IV_Set() { Attack = IV_Random.Instance, Defense = IV_Random.Instance, HP = IV_Random.Instance },
-                new FIVSet(FIV.Random, FIV.Random, FIV.Random).ModelObject
-            );
-
-            Assert.AreEqual(
-                new IV_Set()
-                {
-                    Attack = new IV_Range(isRelevant: true, 10),
-                    Defense = new IV_Range(isRelevant: false, 50),
-                    HP = new IV_Range(isRelevant: true, 100)
-                },
-                new FIVSet(
-                    Attack: new FIV(isRelevant: true, value: 10),
-                    Defense: new FIV(isRelevant: false, value: 50),
-                    HP: new FIV(isRelevant: true, value: 100)
-                ).ModelObject
-            );
-        }
-
-        [TestMethod]
-        public void Passive_CtorIdentity()
-        {
-            Assert.IsInstanceOfType<RandomPassiveSkill>(FPassive.Random.ModelObject);
-            Assert.AreEqual(null, new FPassive(db, null).ModelObject);
-
-            var runner = "Runner".ToStandardPassive(db);
-            Assert.AreEqual(runner, new FPassive(db, runner).ModelObject);
-        }
-
-        [TestMethod]
-        public void Passive_Valid_Properties()
-        {
-            Assert.IsFalse(new FPassive(db, runner).IsEmpty);
-            Assert.IsFalse(new FPassive(db, runner).IsRandom);
-        }
-
-        [TestMethod]
-        public void Passive_Random_Properties()
-        {
-            Assert.IsFalse(FPassive.Random.IsEmpty);
-            Assert.IsTrue(FPassive.Random.IsRandom);
-        }
-
-        [TestMethod]
-        public void Passive_Empty_Properties()
-        {
-            Assert.IsTrue(new FPassive(db, null).IsEmpty);
-            Assert.IsFalse(new FPassive(db, null).IsRandom);
-        }
-
         [TestMethod]
         public void FPassiveSet_CtorIdentity()
         {
@@ -387,6 +258,36 @@ namespace PalCalc.Solver.Tests
         }
 
         [TestMethod]
+        public void FPassiveSet_Indexer()
+        {
+            var orderedPassives = new List<PassiveSkill>()
+            {
+                runner, swift, nimble
+            }.OrderByDescending(p => new FPassive(db, p).Store).ToList();
+
+            Assert.AreEqual(
+                expected: orderedPassives[0],
+                actual: FPassiveSet.FromModel(db, [runner, swift, nimble])[0].ModelObject
+            );
+
+            Assert.AreEqual(
+                expected: orderedPassives[1],
+                actual: FPassiveSet.FromModel(db, [runner, swift, nimble])[1].ModelObject
+            );
+
+            Assert.AreEqual(
+                expected: orderedPassives[2],
+                actual: FPassiveSet.FromModel(db, [runner, swift, nimble])[2].ModelObject
+            );
+
+            Assert.AreEqual(expected: FPassive.Empty, actual: FPassiveSet.FromModel(db, [runner, swift, nimble])[3]);
+            Assert.AreEqual(expected: FPassive.Empty, actual: FPassiveSet.FromModel(db, [runner, swift, nimble])[4]);
+            Assert.AreEqual(expected: FPassive.Empty, actual: FPassiveSet.FromModel(db, [runner, swift, nimble])[5]);
+            Assert.AreEqual(expected: FPassive.Empty, actual: FPassiveSet.FromModel(db, [runner, swift, nimble])[6]);
+            Assert.AreEqual(expected: FPassive.Empty, actual: FPassiveSet.FromModel(db, [runner, swift, nimble])[7]);
+        }
+
+        [TestMethod]
         public void FPassiveSet_OfZero_ExceptSingle()
         {
             Assert.AreEqual(
@@ -417,7 +318,7 @@ namespace PalCalc.Solver.Tests
                 expected: FPassiveSet.FromModel(db, [runner]),
                 actual: FPassiveSet.FromModel(db, [runner]).Except(new FPassive(db, swift))
             );
-                              
+
             Assert.AreEqual(
                 expected: FPassiveSet.FromModel(db, [random1]),
                 actual: FPassiveSet.FromModel(db, [random1]).Except(new FPassive(db, swift))
@@ -1532,6 +1433,45 @@ namespace PalCalc.Solver.Tests
                 },
                 actual: FSetCombinations(set, 4).ToList()
             );
+        }
+
+        [TestMethod]
+        public void FPassiveSet_IndexOf_Consistency()
+        {
+            var set = FPassiveSet.FromModel(db, [runner, swift, nimble]);
+            var runnerPassive = new FPassive(db, runner);
+            var swiftPassive = new FPassive(db, swift);
+            var nimblePassive = new FPassive(db, nimble);
+
+            Assert.AreEqual(runnerPassive, set[set.IndexOf(runnerPassive)]);
+            Assert.AreEqual(swiftPassive, set[set.IndexOf(swiftPassive)]);
+            Assert.AreEqual(nimblePassive, set[set.IndexOf(nimblePassive)]);
+
+            for (int i = 0; i < set.Count; i++)
+            {
+                var passiveAtIndex = set[i];
+                Assert.AreEqual(i, set.IndexOf(passiveAtIndex));
+            }
+        }
+
+        [TestMethod]
+        public void FPassiveSet_IndexOf_NotFound()
+        {
+            var set = FPassiveSet.FromModel(db, [runner, swift, nimble]);
+            var luckyPassive = new FPassive(db, lucky);
+            var legendPassive = new FPassive(db, legend);
+
+            Assert.AreEqual(-1, set.IndexOf(luckyPassive));
+            Assert.AreEqual(-1, set.IndexOf(legendPassive));
+        }
+
+        [TestMethod]
+        public void FPassiveSet_IndexOf_EmptySet()
+        {
+            var emptySet = FPassiveSet.FromModel(db, []);
+            var runnerPassive = new FPassive(db, runner);
+
+            Assert.AreEqual(-1, emptySet.IndexOf(runnerPassive));
         }
     }
 }
