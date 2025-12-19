@@ -406,8 +406,12 @@ namespace PalCalc.Solver
                             childPalType = br.Child;
 
                     if (childPalType == null)
-                        continue; // should only happen if there are gender-specific breeding paths and wildcard gender is used
-                        //throw new NotImplementedException(); // shouldn't happen
+                    {
+                        // should only happen if there are gender-specific breeding paths and wildcard gender is used.
+                        // there should be other specific-gender pairs in `genderedParentPairs` we will check, so this
+                        // is safe to skip
+                        continue;
+                    }
 
                     if (settings.BannedBredPals.Contains(childPalType))
                         continue;
