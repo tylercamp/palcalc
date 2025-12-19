@@ -31,9 +31,9 @@ namespace PalCalc.Solver.FImpl.AttrId
 
         /* Values for gender-change op */
 
-        // (reuse 
+        // (reuse MASK_ADD_IDX bits to store target gender)
         public static FSurgeryOp ChangeGender(FGender newGender) =>
-            new((byte)(TYPE_CHANGE_GENDER | newGender.Store << 3));
+            new((byte)(TYPE_CHANGE_GENDER | (newGender.Store << 3)));
 
         public bool IsGenderChange => (Store & MASK_TYPE) == TYPE_CHANGE_GENDER;
 
