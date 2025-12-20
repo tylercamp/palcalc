@@ -362,8 +362,7 @@ namespace PalCalc.Solver
                             }
                         }
 
-                        SurgeryTablePalReference.NewCached(r, ref ops, out var modified);
-                        return modified;
+                        return new SurgeryTablePalReference(r, ops);
                     })
                     // 2. Fill remaining non-desired slots with Optional passives
                     .SelectMany(r =>
@@ -371,12 +370,15 @@ namespace PalCalc.Solver
                         var missingOptionalPassives = surgeryCompatiblePassives.Where(spec.OptionalPassives.Contains).Except(r.EffectivePassives).ToList();
                         var numAddablePassives = GameConstants.MaxTotalPassives - r.EffectivePassives.Count(p => p is not RandomPassiveSkill);
 
-                        var res = new List<IPalReference>();
+                        // (we're still in the same pass, just the 2nd part. the pals from the previous pass haven't been stored yet, so make sure
+                        // to include them in the list of results for this pass)
+                        var res = new List<IPalReference>() { r };
 
                         foreach (
                             var passives in missingOptionalPassives
                                 .Combinations(numAddablePassives)
                                 .Where(p => r.TotalCost + p.Sum(i => i.SurgeryCost) <= settings.MaxSurgeryCost)
+                                .Where(p => p.Any())
                                 .Select(l => l.ToList())
                         )
                         {
@@ -405,8 +407,8 @@ namespace PalCalc.Solver
                                 }
                             }
 
-                            SurgeryTablePalReference.NewCached(r, ref ops, out var modified);
-                            res.Add(modified);
+                            // TODO - if `r` is a SurgeryTablePalReference, combine + simplify
+                            res.Add(new SurgeryTablePalReference(r, ops));
                         }
 
                         return res;
@@ -420,16 +422,9 @@ namespace PalCalc.Solver
                 if (spec.RequiredGender != PalGender.WILDCARD && input.Gender != spec.RequiredGender)
                 {
                     // pals with indeterminate gender can naturally be forced to a specific gender
-                    if (input.Gender == PalGender.WILDCARD)
-                        yield return input.WithGuaranteedGender(settings.DB, spec.RequiredGender);
-
-                    // pals can always have gender surgery applied regardless of current gender
-                    if (input.NumTotalGenderReversers < settings.MaxSurgeryReversers)
-                    {
-                        var ops = new List<ISurgeryOperation>() { ChangeGenderSurgeryOperation.NewCached(spec.RequiredGender) };
-                        SurgeryTablePalReference.NewCached(input, ref ops, out IPalReference result);
-                        yield return result;
-                    }
+                    // pals with a specific gender can also be forced with surgery if enabled
+                    if (input.Gender == PalGender.WILDCARD || settings.UseGenderReversers)
+                        yield return input.WithGuaranteedGender(settings.DB, spec.RequiredGender, settings.UseGenderReversers);
                 }
                 else
                 {

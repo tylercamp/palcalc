@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.PalReference
 {
-    public class WildPalReference : IPalReference, ISurgeryCachingPalReference
+    public class WildPalReference : IPalReference
     {
         public WildPalReference(Pal pal, IEnumerable<PassiveSkill> guaranteedPassives, int numPassives)
         {
@@ -59,15 +59,13 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalSurgerySteps => 0;
 
-        public int NumTotalGenderReversers => 0;
-
         public int NumTotalEggs => 0;
 
         public int NumTotalWildPals => 1;
 
         public int EffectivePassivesHash { get; }
 
-        private IPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)
+        private IPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
         {
             return new WildPalReference(Pal)
             {
@@ -75,7 +73,7 @@ namespace PalCalc.Solver.PalReference
                 Gender = gender,
                 EffectivePassives = EffectivePassives,
                 IVs = IVs,
-                CapturesRequiredForGender = gender switch
+                CapturesRequiredForGender = useReverser ? 1 : gender switch
                 {
                     PalGender.WILDCARD => 1,
                     PalGender.OPPOSITE_WILDCARD =>
@@ -93,7 +91,7 @@ namespace PalCalc.Solver.PalReference
         }
 
         private Dictionary<PalGender, IPalReference> cachedGuaranteedGenders = null;
-        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)
         {
             if (Gender != PalGender.WILDCARD) throw new Exception("Wild pal has already been given a guaranteed gender");
 
@@ -106,19 +104,16 @@ namespace PalCalc.Solver.PalReference
                     PalGender.MALE,
                     PalGender.FEMALE,
                     PalGender.OPPOSITE_WILDCARD
-                }.ToDictionary(g => g, g => WithGuaranteedGenderImpl(db, g));
+                }.ToDictionary(g => g, g => WithGuaranteedGenderImpl(db, g, useReverser));
             }
 
             return cachedGuaranteedGenders[gender];
         }
 
-        private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
-        public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();
-
         public override bool Equals(object obj)
         {
             var asWild = obj as WildPalReference;
-            if (ReferenceEquals(asWild, null)) return false;
+            if (asWild is null) return false;
 
             return GetHashCode() == obj.GetHashCode();
         }

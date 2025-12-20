@@ -45,7 +45,7 @@ namespace PalCalc.UI.ViewModel.Solver
                     allowedSurgeryPassives: [],
                     eagerPruning: true,
                     optimizeInitStep: true,
-                    maxSurgeryReversers: 0
+                    useGenderReversers: false
                 )
             );
 
@@ -181,7 +181,7 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public bool HasValue => Graph != null;
         public bool NeedsRefresh => Graph?.NeedsRefresh ?? false;
-        public int NumWildPals => DisplayedResult.NumWildPalParticipants();
+        public int NumWildPals => DisplayedResult.NumTotalWildPals;
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
         public int NumEggs => DisplayedResult.NumTotalEggs;
 

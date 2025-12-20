@@ -71,7 +71,7 @@ internal class Program
                 allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
                 eagerPruning: true,
                 optimizeInitStep: true,
-                maxSurgeryReversers: 2
+                useGenderReversers: true
             )
         );
 

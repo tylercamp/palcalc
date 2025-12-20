@@ -22,8 +22,7 @@ namespace PalCalc.Solver
             PalProperty.Pal,
             PalProperty.Gender,
             PalProperty.EffectivePassives,
-            PalProperty.IvRelevance,
-            PalProperty.GenderReversers
+            PalProperty.IvRelevance
             //PalProperty.GoldCost
         );
 
@@ -77,9 +76,6 @@ namespace PalCalc.Solver
 
             if (p.BreedingEffort > match.BreedingEffort) return false;
             if (p.BreedingEffort < match.BreedingEffort) return true;
-
-            if (p.NumTotalGenderReversers > match.NumTotalGenderReversers) return false;
-            if (p.NumTotalGenderReversers < match.NumTotalGenderReversers) return true;
 
             if (p.TotalCost > match.TotalCost) return false;
             if (p.TotalCost <  match.TotalCost) return true;

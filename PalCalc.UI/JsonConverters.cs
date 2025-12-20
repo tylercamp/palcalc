@@ -278,6 +278,7 @@ namespace PalCalc.UI
                 defense = new IV_Range(isRelevant: true, inst.IV_Defense);
             }
 
+            // TODO - Copy over any forced genders from reverser
             return new OwnedPalReference(
                 inst,
                 // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
@@ -321,7 +322,8 @@ namespace PalCalc.UI
             var female = token["Female"].ToObject<OwnedPalReference>(serializer);
             var gender = token["Gender"]?.ToObject<PalGender>(serializer) ?? PalGender.WILDCARD;
 
-            return (CompositeOwnedPalReference)new CompositeOwnedPalReference(male, female).WithGuaranteedGender(db, gender);
+            // use of "gender reverser" is ignored by a composite reference
+            return (CompositeOwnedPalReference)new CompositeOwnedPalReference(male, female).WithGuaranteedGender(db, gender, false);
         }
     }
 
@@ -357,7 +359,8 @@ namespace PalCalc.UI
                 ?.ToList()
                 ?? Enumerable.Empty<PassiveSkill>();
 
-            return (WildPalReference)new WildPalReference(pal, guaranteedPassives, numPassives).WithGuaranteedGender(db, gender);
+            // TODO - properly pass "UseReversers"
+            return (WildPalReference)new WildPalReference(pal, guaranteedPassives, numPassives).WithGuaranteedGender(db, gender, false);
         }
     }
 
@@ -386,9 +389,6 @@ namespace PalCalc.UI
                         addedPassive: token["AddedPassive"].ToObject<PassiveSkill>(serializer)
                     );
 
-                case "CHANGE_GENDER":
-                    return new ChangeGenderSurgeryOperation(token["NewGender"].ToObject<PalGender>(serializer));
-
                 default:
                     throw new Exception($"Unrecognized ISurgeryOperation type: {operationType}");
             }
@@ -416,17 +416,6 @@ namespace PalCalc.UI
                             Type = "REPLACE_PASSIVE",
                             RemovedPassive = rpso.RemovedPassive,
                             AddedPassive = rpso.AddedPassive,
-                        },
-                        serializer
-                    ).WriteTo(writer, dependencyConverters);
-                    break;
-
-                case ChangeGenderSurgeryOperation cgso:
-                    JToken.FromObject(
-                        new
-                        {
-                            Type = "CHANGE_GENDER",
-                            NewGender = cgso.NewGender,
                         },
                         serializer
                     ).WriteTo(writer, dependencyConverters);
@@ -464,7 +453,7 @@ namespace PalCalc.UI
             var ops = token["Operations"].ToObject<List<ISurgeryOperation>>(serializer);
             return new SurgeryTablePalReference(
                 input: token["Input"].ToObject<IPalReference>(serializer),
-                rawOperations: ref ops
+                rawOperations: ops
             );
         }
     }
@@ -522,7 +511,7 @@ namespace PalCalc.UI
 
         internal override BredPalReference ReadRefJson(JToken token, Type objectType, BredPalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            InjectDependencyConverters(serializer);
+            InjectDependencyConverters(serializer); 
             var pal = token["PalId"].ToObject<PalId>(serializer).ToPal(db);
             var passives = (token["Passives"] ?? token["Traits"]).ToObject<List<PassiveSkill>>(serializer);
             var parent1 = token["Parent1"].ToObject<IPalReference>(serializer);
@@ -536,7 +525,8 @@ namespace PalCalc.UI
             var IV_defense = token["IV_Defense"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
             var ivs = new IV_Set() { HP = IV_hp, Attack = IV_attack, Defense = IV_defense };
 
-            return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability, ivs, ivsProbability).WithGuaranteedGender(db, gender) as BredPalReference;
+            // TODO - Properly pass in UseReversers
+            return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability, ivs, ivsProbability).WithGuaranteedGender(db, gender, false) as BredPalReference;
         }
 
         internal override JToken MakeRefJson(BredPalReference value, JsonSerializer serializer)

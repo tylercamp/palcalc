@@ -162,11 +162,11 @@ namespace PalCalc.UI.ViewModel.Solver
             set => SetProperty(ref maxGoldCost, Math.Max(value, 0));
         }
 
-        private int maxGenderReversers;
-        public int MaxGenderReversers
+        private bool useGenderReversers;
+        public bool UseGenderReversers
         {
-            get => maxGenderReversers;
-            set => SetProperty(ref maxGenderReversers, Math.Max(value, 0));
+            get => useGenderReversers;
+            set => SetProperty(ref useGenderReversers, value);
         }
 
         [ObservableProperty]
@@ -286,7 +286,7 @@ namespace PalCalc.UI.ViewModel.Solver
 
                 maxSurgeryCost: MaxGoldCost,
                 allowedSurgeryPassives: PalDB.LoadEmbedded().SurgeryPassiveSkills.Except(BannedSurgeryPassives).ToList(),
-                maxSurgeryReversers: MaxGenderReversers,
+                useGenderReversers: UseGenderReversers,
 
                 eagerPruning: EagerPruning,
                 optimizeInitStep: OptimizeInitStep
@@ -305,7 +305,7 @@ namespace PalCalc.UI.ViewModel.Solver
             BannedWildPalInternalNames = BannedWildPals.Select(p => p.InternalName).ToList(),
             BannedSurgeryPassiveInternalNames = BannedSurgeryPassives.Select(p => p.InternalName).ToList(),
             MaxGoldCost = MaxGoldCost,
-            MaxGenderReversers = MaxGenderReversers,
+            UseGenderReversers = UseGenderReversers,
             EagerPruning = EagerPruning,
             OptimizeInitStep = OptimizeInitStep,
         };
@@ -319,7 +319,7 @@ namespace PalCalc.UI.ViewModel.Solver
             MaxBredIrrelevantPassives = model.MaxBredIrrelevantPassives;
             MaxThreads = model.MaxThreads;
             MaxGoldCost = model.MaxGoldCost;
-            MaxGenderReversers = model.MaxGenderReversers;
+            UseGenderReversers = model.UseGenderReversers;
             EagerPruning = model.EagerPruning;
             OptimizeInitStep = model.OptimizeInitStep;
 

@@ -11,19 +11,6 @@ namespace PalCalc.Solver
 {
     public static class SolverExtensions
     {
-        public static int NumWildPalParticipants(this IPalReference pref)
-        {
-            switch (pref)
-            {
-                case BredPalReference bpr: return NumWildPalParticipants(bpr.Parent1) + NumWildPalParticipants(bpr.Parent2);
-                case OwnedPalReference opr: return 0;
-                case WildPalReference wpr: return 1;
-                case CompositeOwnedPalReference c: return 0;
-                case SurgeryTablePalReference str: return NumWildPalParticipants(str.Input);
-                default: throw new Exception($"Unhandled pal reference type {pref.GetType()}");
-            }
-        }
-
         public static List<PassiveSkill> ToDedicatedPassives(this IEnumerable<PassiveSkill> actualPassives, IEnumerable<PassiveSkill> desiredPassives)
         {
             var irrelevantAsRandom = actualPassives

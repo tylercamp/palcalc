@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.PalReference
 {
-    public class OwnedPalReference : IPalReference, ISurgeryCachingPalReference
+    public class OwnedPalReference : IPalReference
     {
         PalInstance instance;
 
@@ -25,6 +25,8 @@ namespace PalCalc.Solver.PalReference
             ActualPassives = instance.PassiveSkills;
 
             IVs = effectiveIVs;
+
+            Gender = instance.Gender;
         }
 
         public PalInstance UnderlyingInstance => instance;
@@ -41,7 +43,7 @@ namespace PalCalc.Solver.PalReference
 
         public IV_Set IVs { get; }
 
-        public PalGender Gender => instance.Gender;
+        public PalGender Gender { get; private set; }
 
         public IPalRefLocation Location => new OwnedRefLocation() { OwnerId = instance.OwnerPlayerId, Location = instance.Location };
 
@@ -52,19 +54,34 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps => 0;
 
-        public int NumTotalGenderReversers => 0;
-
         public int NumTotalEggs => 0;
 
         public int NumTotalWildPals => 0;
 
+        private OwnedPalReference cachedFemaleRef, cachedMaleRef, cachedOppositeWildcardRef;
 
-        private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
-        public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();
-
-        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        private OwnedPalReference MakeGuaranteedGenderImpl(PalGender gender)
         {
-            if (gender != Gender) throw new Exception("Cannot force a gender change for owned pals");
+            var res = new OwnedPalReference(instance, EffectivePassives, IVs);
+            res.Gender = gender;
+            return res;
+        }
+
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)
+        {
+            if (gender != Gender)
+            {
+                if (!useReverser)
+                    throw new Exception("Cannot force a gender change for owned pals without a gender reverser");
+
+                switch (gender)
+                {
+                    case PalGender.FEMALE: return cachedFemaleRef ??= MakeGuaranteedGenderImpl(gender);
+                    case PalGender.MALE: return cachedMaleRef ??= MakeGuaranteedGenderImpl(gender);
+                    case PalGender.OPPOSITE_WILDCARD: return cachedOppositeWildcardRef ??= MakeGuaranteedGenderImpl(gender);
+                }
+            }
+
             return this;
         }
 

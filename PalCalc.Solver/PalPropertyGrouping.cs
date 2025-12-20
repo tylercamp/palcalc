@@ -15,7 +15,7 @@ namespace PalCalc.Solver
 
         public static GroupIdFn Pal = p => p.Pal.Id.GetHashCode();
         public static GroupIdFn Gender = p => (int)p.Gender;
-        public static GroupIdFn WildPalCount = p => p.NumWildPalParticipants();
+        public static GroupIdFn WildPalCount = p => p.NumTotalWildPals;
         public static GroupIdFn NumBreedingSteps = p => p.NumTotalBreedingSteps;
         public static GroupIdFn EffectivePassives = p => p.EffectivePassivesHash;
         public static GroupIdFn RelevantPassives = p => p.ActualPassives.Intersect(p.EffectivePassives).SetHash();
@@ -25,7 +25,6 @@ namespace PalCalc.Solver
         public static GroupIdFn IvRelevance = p => HashCode.Combine(p.IVs.HP.IsRelevant, p.IVs.Attack.IsRelevant, p.IVs.Defense.IsRelevant);
         public static GroupIdFn IvExact = p => HashCode.Combine(p.IVs.HP, p.IVs.Attack, p.IVs.Defense);
         public static GroupIdFn GoldCost = p => p.TotalCost;
-        public static GroupIdFn GenderReversers = p => p.NumTotalGenderReversers;
 
         /// <summary>
         /// Makes a grouping function based on the result of applying `mainFn` to all

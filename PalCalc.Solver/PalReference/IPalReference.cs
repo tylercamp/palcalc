@@ -45,7 +45,11 @@ namespace PalCalc.Solver.PalReference
         TimeSpan SelfBreedingEffort { get; }
         int TotalCost { get; }
 
-        IPalReference WithGuaranteedGender(PalDB db, PalGender gender);
+        /// <summary>
+        /// Returns a version of this pal with the given gender. The new pal may have its effort updated
+        /// to reflect gender probabilities, depending on `useReverser` (which makes gender-change free).
+        /// </summary>
+        IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser);
 
         bool IsCompatibleGender(PalGender otherGender) => Gender == PalGender.WILDCARD || Gender != otherGender;
 
@@ -57,7 +61,5 @@ namespace PalCalc.Solver.PalReference
         int NumTotalEggs { get; }
 
         int NumTotalWildPals { get; }
-
-        int NumTotalGenderReversers { get; }
     }
 }

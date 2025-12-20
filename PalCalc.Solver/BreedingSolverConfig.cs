@@ -43,8 +43,8 @@ namespace PalCalc.Solver
         int maxThreads,
 
         int maxSurgeryCost,
-        int maxSurgeryReversers,
         List<PassiveSkill> allowedSurgeryPassives,
+        bool useGenderReversers,
 
         bool eagerPruning,
         bool optimizeInitStep
@@ -74,7 +74,7 @@ namespace PalCalc.Solver
 
         // Surgery settings
         public int MaxSurgeryCost => maxSurgeryCost;
-        public int MaxSurgeryReversers => maxSurgeryReversers; // gender-swap required item
         public List<PassiveSkill> SurgeryPassives => allowedSurgeryPassives ?? [];
+        public bool UseGenderReversers => useGenderReversers;
     }
 }

@@ -32,8 +32,7 @@ namespace PalCalc.Solver
 
     internal record struct BreedingSolverEfficiencyMetric(
         TimeSpan Effort,
-        int GoldCost,
-        int NumGenderReversers
+        int GoldCost
     );
 
     /// <summary>
@@ -144,18 +143,18 @@ namespace PalCalc.Solver
                 if (parent2.Gender == PalGender.WILDCARD)
                 {
                     parentPairOptions.Add((
-                        parent1.WithGuaranteedGender(db, PalGender.MALE),
-                        parent2.WithGuaranteedGender(db, PalGender.FEMALE)
+                        parent1.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers),
+                        parent2.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers)
                     )); 
                     parentPairOptions.Add((
-                        parent1.WithGuaranteedGender(db, PalGender.FEMALE),
-                        parent2.WithGuaranteedGender(db, PalGender.MALE)
+                        parent1.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers),
+                        parent2.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers)
                     ));
                 }
                 else
                 {
                     parentPairOptions.Add((
-                        parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender()),
+                        parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender(), settings.UseGenderReversers),
                         parent2
                     ));
                 }
@@ -164,7 +163,7 @@ namespace PalCalc.Solver
             {
                 parentPairOptions.Add((
                     parent1,
-                    parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender())
+                    parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender(), settings.UseGenderReversers)
                 ));
             }
             else if (parent1.Gender != parent2.Gender)
@@ -200,7 +199,7 @@ namespace PalCalc.Solver
                     parent1.BreedingEffort < parent2.BreedingEffort // p1 takes less effort than p2
                 ))
                 {
-                    return (parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender()), parent2);
+                    return (parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender(), settings.UseGenderReversers), parent2);
                 }
 
                 // should we set a specific gender on p2?
@@ -209,7 +208,7 @@ namespace PalCalc.Solver
                     parent2.BreedingEffort <= parent1.BreedingEffort // p2 takes less effort than p1 (need <= to resolve cases where self-effort is same for both wildcards)
                 ))
                 {
-                    return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender()));
+                    return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender(), settings.UseGenderReversers));
                 }
 
 #if DEBUG && DEBUG_CHECKS
@@ -251,8 +250,8 @@ namespace PalCalc.Solver
 
                 progress.NumProcessed++;
 
-                if (settings.MaxSurgeryReversers == 0 && !p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
-                if (p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() > settings.MaxWildPals) continue;
+                if (settings.UseGenderReversers &&!p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
+                if (p.Item1.NumTotalWildPals + p.Item2.NumTotalWildPals > settings.MaxWildPals) continue;
                 if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= settings.MaxBreedingSteps) continue;
                 if (p.Item1.TotalCost + p.Item2.TotalCost > settings.MaxSurgeryCost) continue;
 
@@ -316,6 +315,8 @@ namespace PalCalc.Solver
                         availableOptionalPassives.Add(passive);
                 }
 
+                // TODO - update with new gender-surgery approach
+
                 // arbitrary reordering of (p1, p2) to prevent duplicate results from swapped pairs
                 // (though this shouldn't be necessary if the `IResultPruning` impls are working right?)
                 (IPalReference, IPalReference) ReorderPair((IPalReference, IPalReference) p) =>
@@ -342,54 +343,9 @@ namespace PalCalc.Solver
                         foreach (var br in breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal])
                         {
                             genderedParentPairs.Add(PreferredParentsGenders(ReorderPair((
-                                p.Item1.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item1.Pal)),
-                                p.Item2.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item2.Pal))
+                                p.Item1.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item1.Pal), settings.UseGenderReversers),
+                                p.Item2.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item2.Pal), settings.UseGenderReversers)
                             ))));
-                        }
-                    }
-                }
-
-                // TODO - Currently won't handle e.g. "breed pal with 1 desired, 2 undesired passives, replace undesired with desired"
-
-                if (settings.MaxSurgeryReversers > 0)
-                {
-                    var remainingReversers = settings.MaxSurgeryReversers - (p.Item1.NumTotalGenderReversers + p.Item2.NumTotalGenderReversers);
-
-                    if (remainingReversers > 0)
-                    {
-                        if (p.Item2.Gender != p.Item1.Gender.OppositeGender())
-                        {
-                            genderedParentPairs.AddIfMissing(ReorderPair((
-                                p.Item1,
-                                SurgeryTablePalReference.EnforceGender(db, p.Item2, p.Item1.Gender.OppositeGender(), poolFactory)
-                            )));
-                        }
-
-                        if (p.Item1.Gender != p.Item2.Gender.OppositeGender())
-                        {
-                            genderedParentPairs.AddIfMissing(ReorderPair((
-                                SurgeryTablePalReference.EnforceGender(db, p.Item1, p.Item2.Gender.OppositeGender(), poolFactory),
-                                p.Item2
-                            )));
-                        }
-                    }
-
-                    if (remainingReversers > 1)
-                    {
-                        if (p.Item1.Gender != PalGender.MALE || p.Item2.Gender != PalGender.FEMALE)
-                        {
-                            genderedParentPairs.AddIfMissing(ReorderPair((
-                                SurgeryTablePalReference.EnforceGender(db, p.Item1, PalGender.MALE, poolFactory),
-                                SurgeryTablePalReference.EnforceGender(db, p.Item2, PalGender.FEMALE, poolFactory)
-                            )));
-                        }
-
-                        if (p.Item1.Gender != PalGender.FEMALE || p.Item2.Gender != PalGender.MALE)
-                        {
-                            genderedParentPairs.AddIfMissing(ReorderPair((
-                                SurgeryTablePalReference.EnforceGender(db, p.Item1, PalGender.FEMALE, poolFactory),
-                                SurgeryTablePalReference.EnforceGender(db, p.Item2, PalGender.MALE, poolFactory)
-                            )));
                         }
                     }
                 }
@@ -498,8 +454,7 @@ namespace PalCalc.Solver
                                 var added = false;
                                 var effort = res.BreedingEffort;
                                 var cost = res.TotalCost;
-                                var reversers = res.NumTotalGenderReversers;
-                                var efficiency = new BreedingSolverEfficiencyMetric(effort, cost, reversers);
+                                var efficiency = new BreedingSolverEfficiencyMetric(effort, cost);
                                 if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
                                 {
                                     var resultId = WorkingSet.DefaultGroupFn(res);
@@ -510,7 +465,6 @@ namespace PalCalc.Solver
                                         var v = workingOptimalResults[resultId];
 
                                         if (v.Effort < effort) break;
-                                        if (v.NumGenderReversers < reversers) break;
                                         if (v.GoldCost < cost) break;
 
                                         updated = workingOptimalResults.TryUpdate(resultId, efficiency, v);

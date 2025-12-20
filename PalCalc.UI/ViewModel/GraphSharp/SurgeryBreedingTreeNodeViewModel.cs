@@ -18,7 +18,6 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             {
                 AddPassiveSurgeryOperation apso => new AddPassiveSurgeryOperationViewModel(apso),
                 ReplacePassiveSurgeryOperation rpso => new ReplacePassiveSurgeryOperationViewModel(rpso),
-                ChangeGenderSurgeryOperation cgso => new ChangeGenderSurgeryOperationViewModel(cgso),
                 _ => throw new NotImplementedException($"VM creation not handled for surgery type: {modelObject?.GetType()?.Name}")
             };
     }
@@ -36,13 +35,6 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
         public PassiveSkillViewModel AddedPassive { get; } = PassiveSkillViewModel.Make(op.AddedPassive);
         public PassiveSkillViewModel RemovedPassive { get; } = PassiveSkillViewModel.Make(op.RemovedPassive);
-    }
-
-    public class ChangeGenderSurgeryOperationViewModel(ChangeGenderSurgeryOperation op) : ISurgeryOperationViewModel
-    {
-        public ISurgeryOperation ModelObject => op;
-
-        public PalGenderViewModel NewGender { get; } = PalGenderViewModel.Make(op.NewGender);
     }
 
     // (note: this node just represents the breeding table itself, the result pal is a separate (parent) node)
