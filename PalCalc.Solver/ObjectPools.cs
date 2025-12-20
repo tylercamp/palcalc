@@ -8,7 +8,7 @@ namespace PalCalc.Solver
 {
     class LocalListPool<T>(int initialCapacity)
     {
-        private readonly Stack<List<T>> pool = new(initialCapacity);
+        private Stack<List<T>> pool = new(initialCapacity);
 
         public List<T> Borrow()
         {
@@ -32,7 +32,7 @@ namespace PalCalc.Solver
 
     class LocalObjectPool<T>(int initialCapacity) where T : new()
     {
-        private readonly Stack<T> pool = new(initialCapacity);
+        private Stack<T> pool = new(initialCapacity);
 
         public T Borrow()
         {

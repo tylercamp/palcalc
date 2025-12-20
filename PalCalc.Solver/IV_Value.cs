@@ -11,11 +11,17 @@ namespace PalCalc.Solver
         bool Satisfies(int minValue);
 
         bool IsRelevant { get; }
+
+        int Min { get; }
+        int Max { get; }
     }
 
     public record class IV_Random : IV_IValue
     {
         private IV_Random() { }
+
+        public int Min => 0;
+        public int Max => 0;
 
         public bool IsRelevant => false;
 

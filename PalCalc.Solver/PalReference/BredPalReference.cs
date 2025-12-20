@@ -167,11 +167,11 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
-        public int NumTotalSurgerySteps => Parent1.NumTotalSurgerySteps + Parent2.NumTotalSurgerySteps;
-
         public int NumTotalGenderReversers => Parent1.NumTotalGenderReversers + Parent2.NumTotalGenderReversers;
 
         public int NumTotalEggs => AvgRequiredBreedings + Parent1.NumTotalEggs + Parent2.NumTotalEggs;
+
+        public int NumTotalWildPals => Parent1.NumTotalWildPals + Parent2.NumTotalWildPals;
 
         public List<PassiveSkill> EffectivePassives { get; }
 

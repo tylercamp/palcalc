@@ -68,8 +68,8 @@ namespace PalCalc.GenDB.GameDataReaders
         public static Dictionary<string, (int, int)> ReadWildLevelRanges(IFileProvider provider)
         {
             logger.Information("Reading wild pal level ranges");
-            var rawWildSpawnEntries = provider.LoadObject<UDataTable>(AssetPaths.PAL_SPAWNERS_PATH);
-            var rawCagedSpawnEntries = provider.LoadObject<UDataTable>(AssetPaths.PAL_CAGED_SPAWNERS_PATH);
+            var rawWildSpawnEntries = provider.LoadPackageObject<UDataTable>(AssetPaths.PAL_SPAWNERS_PATH);
+            var rawCagedSpawnEntries = provider.LoadPackageObject<UDataTable>(AssetPaths.PAL_CAGED_SPAWNERS_PATH);
 
             var rawWildLevels = rawWildSpawnEntries.RowMap.SelectMany(entry => entry.Value.ToObject<UPalSpawner>().Entries());
             var rawCagedLevels = rawCagedSpawnEntries.RowMap.Select(entry => entry.Value.ToObject<UCagedPalSpawner>()).Select(e => (e.PalID, e.MinLevel, e.MaxLevel));

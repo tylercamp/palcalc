@@ -65,7 +65,7 @@ namespace PalCalc.GenDB.GameDataReaders
         public static List<UPassiveSkill> ReadPassiveSkills(IFileProvider provider, List<string> extraPassives)
         {
             logger.Information("Reading passive skills");
-            var rawPassives = provider.LoadObject<UDataTable>(AssetPaths.PASSIVE_SKILLS_PATH);
+            var rawPassives = provider.LoadPackageObject<UDataTable>(AssetPaths.PASSIVE_SKILLS_PATH);
 
             var res = new List<UPassiveSkill>();
             foreach (var row in rawPassives.RowMap)

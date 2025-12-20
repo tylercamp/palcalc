@@ -29,7 +29,7 @@ namespace PalCalc.GenDB.GameDataReaders
         {
             logger.Information("Reading surgery-table passives");
 
-            var rawItems = provider.LoadObject<UDataTable>(AssetPaths.OPERATING_TABLE_PASSIVES_PATH);
+            var rawItems = provider.LoadPackageObject<UDataTable>(AssetPaths.OPERATING_TABLE_PASSIVES_PATH);
 
             var res = new List<USurgeryPassive>();
             foreach (var row in rawItems.RowMap)

@@ -46,6 +46,8 @@ namespace PalCalc.Solver.ResultPruning
             // (for each observed pal in the results, ordered by which pal is used the most, find the results which have the most references to that pal)
             foreach (var pal in totalPalOccurrences.OrderByDescending(KvpValue).Select(KvpKey))
             {
+                if (token.IsCancellationRequested) return Empty;
+
                 var nextCommonResults = commonResults.GroupBy(r => palOccurrences[r].GetValueOrElse(pal, 0)).OrderByDescending(GroupKeyOf).SelectMany(Identity).ToList();
                 if (nextCommonResults.Count > 0)
                     commonResults = nextCommonResults;
@@ -53,11 +55,14 @@ namespace PalCalc.Solver.ResultPruning
                 if (commonResults.Count == 1) break;
             }
 
-            if (token.IsCancellationRequested) return Empty;
+            if (commonResults.Count == 0)
+                return [];
 
             var prunedResults = new List<IPalReference>() { commonResults.First() };
             foreach (var currentResult in results.TakeUntilCancelled(token))
             {
+                if (token.IsCancellationRequested) return Empty;
+
                 if (prunedResults.Contains(currentResult)) continue;
 
                 var resultOccurrences = palOccurrences[currentResult];

@@ -376,7 +376,6 @@ namespace PalCalc.Solver
                         foreach (
                             var passives in missingOptionalPassives
                                 .Combinations(numAddablePassives)
-                                .Where(c => c.Any())
                                 .Where(p => r.TotalCost + p.Sum(i => i.SurgeryCost) <= settings.MaxSurgeryCost)
                                 .Select(l => l.ToList())
                         )

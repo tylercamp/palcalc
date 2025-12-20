@@ -167,6 +167,8 @@ namespace PalCalc.Solver.PalReference
             Gender = input.Gender;
             TotalCost = input.TotalCost;
 
+            NumTotalWildPals = input.NumTotalWildPals;
+
             operationsHash = Operations.ListSetHash();
             inputHash = Input.GetHashCode();
 
@@ -232,7 +234,6 @@ namespace PalCalc.Solver.PalReference
 
             TimeFactor = EffectivePassives.ToTimeFactor();
 
-            NumTotalSurgerySteps = 1 + Input.NumTotalSurgerySteps;
             NumTotalGenderReversers = Operations.Sum(op => op.NumGenderReversers) + Input.NumTotalGenderReversers;
         }
 
@@ -245,7 +246,7 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps => Input.NumTotalBreedingSteps;
         public int NumTotalEggs => Input.NumTotalEggs;
-        public int NumTotalSurgerySteps { get; }
+        public int NumTotalWildPals { get; }
         public int NumTotalGenderReversers { get; }
 
         public IPalRefLocation Location => SurgeryRefLocation.Instance;

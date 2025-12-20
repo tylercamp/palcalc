@@ -51,7 +51,7 @@ namespace PalCalc.GenDB.GameDataReaders
                 f =>
                 {
                     var fullName = f.Key.SubstringBeforeLast('.') + '.' + f.Value.NameWithoutExtension;
-                    provider.TryLoadObject<UTexture2D>(fullName, out var tex);
+                    provider.TryLoadPackageObject<UTexture2D>(fullName, out var tex);
                     return tex;
                 },
                 StringComparer.InvariantCultureIgnoreCase
@@ -69,15 +69,15 @@ namespace PalCalc.GenDB.GameDataReaders
             result.WorkSuitabilityIcons = ReadIconsLike(provider, AssetPaths.WORK_SUITABILITY_ICONS_BASE);
             result.StatusIcons = ReadIconsLike(provider, AssetPaths.STATUS_ICONS_BASE);
 
-            result.FoodIconOn = provider.LoadObject<UTexture2D>(AssetPaths.FOOD_ICON_ON_PATH);
-            result.FoodIconOff = provider.LoadObject<UTexture2D>(AssetPaths.FOOD_ICON_OFF_PATH);
-            result.TimerIcon = provider.LoadObject<UTexture2D>(AssetPaths.TIMER_ICON_PATH);
-            result.DayIcon = provider.LoadObject<UTexture2D>(AssetPaths.DAY_ICON_PATH);
-            result.NightIcon = provider.LoadObject<UTexture2D>(AssetPaths.NIGHT_ICON_PATH);
+            result.FoodIconOn = provider.LoadPackageObject<UTexture2D>(AssetPaths.FOOD_ICON_ON_PATH);
+            result.FoodIconOff = provider.LoadPackageObject<UTexture2D>(AssetPaths.FOOD_ICON_OFF_PATH);
+            result.TimerIcon = provider.LoadPackageObject<UTexture2D>(AssetPaths.TIMER_ICON_PATH);
+            result.DayIcon = provider.LoadPackageObject<UTexture2D>(AssetPaths.DAY_ICON_PATH);
+            result.NightIcon = provider.LoadPackageObject<UTexture2D>(AssetPaths.NIGHT_ICON_PATH);
 
-            result.DungeonIconSmall = provider.LoadObject<UTexture2D>(AssetPaths.DUNGEON_ICON_SMALL_PATH);
+            result.DungeonIconSmall = provider.LoadPackageObject<UTexture2D>(AssetPaths.DUNGEON_ICON_SMALL_PATH);
 
-            result.SurgeryTableIcon = provider.LoadObject<UTexture2D>(AssetPaths.SURGERY_TABLE_ICON_PATH);
+            result.SurgeryTableIcon = provider.LoadPackageObject<UTexture2D>(AssetPaths.SURGERY_TABLE_ICON_PATH);
 
             return result;
         }

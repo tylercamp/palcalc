@@ -140,7 +140,7 @@ namespace PalCalc.GenDB.GameDataReaders
         public static List<UPal> ReadPals(IFileProvider provider)
         {
             logger.Information("Reading pals");
-            var rawPals = provider.LoadObject<UDataTable>(AssetPaths.PALS_PATH);
+            var rawPals = provider.LoadPackageObject<UDataTable>(AssetPaths.PALS_PATH);
             List<UPal> result = [];
 
             // note: index order won't match other pal DBs exactly since we're not skipping Warsect Terra
@@ -155,10 +155,17 @@ namespace PalCalc.GenDB.GameDataReaders
                 var palData = row.Value.ToObject<UPal>();
 
                 if (
+                    // only get normal Pals
                     palData.IsPal &&
-                    palData.PalDexNum >= 0 &&
                     !(palData.IsBoss || palData.IsRaidBoss || palData.IsTowerBoss) &&
-                    !key.Text.StartsWith("Quest_")
+                    !key.Text.StartsWith("Quest_") &&
+                    !key.Text.StartsWith("GYM_") &&
+
+                    // make sure the Pal is fully-configured - unreleased Pals typically set these to -1
+                    palData.Rarity > 0 &&
+                    palData.RunSpeed > 0 &&
+                    palData.WalkSpeed > 0 &&
+                    palData.BreedingPower > 0
                 )
                 {
                     palData.InternalName = key.Text;

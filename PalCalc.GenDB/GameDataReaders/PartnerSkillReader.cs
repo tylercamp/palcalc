@@ -55,7 +55,7 @@ namespace PalCalc.GenDB.GameDataReaders
                 // this is incomplete, but atm we really only care about partner skills
                 // which involve passive skills (namely Yakumo's partner skill)
 
-                var ps = pkg.GetExport("PalPartnerSkillParameter_GEN_VARIABLE", StringComparison.InvariantCultureIgnoreCase);
+                var ps = ipkg.GetExport("PalPartnerSkillParameter_GEN_VARIABLE", StringComparison.InvariantCultureIgnoreCase);
                 if (ps == null)
                 {
                     logger.Warning("Unable to find PalPartnerSkillParameter_GEN_VARIABLE for {path}, skipping", kvp.Key);

@@ -13,18 +13,7 @@ namespace PalCalc.Solver.ResultPruning
         {
         }
 
-        private static int CountWildPals(IPalReference r, CachedResultData cachedData)
-        {
-            int count = 0;
-            foreach (var p in cachedData.InnerReferences[r])
-            {
-                if (p is WildPalReference)
-                    count++;
-            }
-            return count;
-        }
-
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
-            MinGroupOf(results, r => CountWildPals(r, cachedData));
+            MinGroupOf(results, r => r.NumTotalWildPals);
     }
 }

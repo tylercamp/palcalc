@@ -46,7 +46,7 @@ namespace PalCalc.UI.Model.CSV
         public static string Export(CachedSaveGame csg, GameSettings settings)
         {
             SimpleCSVPropertySerializer<PalInstanceViewModel> Simple(string col, Func<PalInstanceViewModel, object> sel) =>
-                new(col, p => sel(p).ToString());
+                new(col, p => sel(p)?.ToString() ?? "");
 
             SimpleCSVPropertySerializer<PalInstanceViewModel> SimplePalRef(string col, Func<IPalReference, object> sel) =>
                 Simple(col, p => sel(new OwnedPalReference(p.ModelObject, [], new IV_Set())));
@@ -58,9 +58,9 @@ namespace PalCalc.UI.Model.CSV
                 Simple(LocalizationCodes.LC_COMMON_PAL.Bind().Value, p => p.Pal.Name.Value),
                 Simple(LocalizationCodes.LC_COMMON_GENDER.Bind().Value, p => p.Gender.Label.Value),
                 Simple(LocalizationCodes.LC_COMMON_LEVEL.Bind().Value, p => p.ModelObject.Level),
-                SimplePalLoc(LocalizationCodes.LC_COMMON_OWNER.Bind().Value, loc => loc.LocationOwnerDescription.Value),
-                SimplePalLoc(LocalizationCodes.LC_COMMON_LOCATION.Bind().Value, loc => loc.LocationCoordDescription.Value),
-                SimplePalLoc(LocalizationCodes.LC_COMMON_MAP_COORDS.Bind().Value, loc => loc.MapLocationPreview?.MapCoord?.DisplayCoordsText ?? string.Empty),
+                SimplePalLoc(LocalizationCodes.LC_COMMON_OWNER.Bind().Value, loc => loc.LocationOwnerDescription?.Value),
+                SimplePalLoc(LocalizationCodes.LC_COMMON_LOCATION.Bind().Value, loc => loc.LocationCoordDescription?.Value),
+                SimplePalLoc(LocalizationCodes.LC_COMMON_MAP_COORDS.Bind().Value, loc => loc.MapLocationPreview?.MapCoord?.DisplayCoordsText),
 
                 Simple(LocalizationCodes.LC_COMMON_IV_HP_SHORT.Bind().Value, p => p.ModelObject.IV_HP),
                 Simple(LocalizationCodes.LC_COMMON_IV_ATTACK_SHORT.Bind().Value, p => p.ModelObject.IV_Attack),

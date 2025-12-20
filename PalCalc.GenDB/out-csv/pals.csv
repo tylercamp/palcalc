@@ -1,216 +1,228 @@
 Name,CodeName,PalDexNo,IsVariant,BreedPower,MaleProbability,Price,IndexOrder,MinWildLevel,MaxWildLevel
-Lamball,SheepBall,1,False,1470,50,1000,34,1,20
-Cattiva,PinkCat,2,False,1460,50,1000,54,1,45
-Chikipi,ChickenPal,3,False,1500,50,1000,71,1,25
+Lamball,SheepBall,1,False,1470,50,1000,35,1,20
+Cattiva,PinkCat,2,False,1460,50,1000,56,1,45
+Chikipi,ChickenPal,3,False,1500,50,1000,73,1,25
 Lifmunk,Carbunclo,4,False,1430,50,1010,12,1,13
-Foxparks,Kitsunebi,5,False,1400,50,1040,26,1,18
-Foxparks Cryst,Kitsunebi_Ice,5,True,1305,50,1410,196,30,58
-Fuack,BluePlatypus,6,False,1330,50,1120,67,2,20
-Fuack Ignis,BluePlatypus_Fire,6,True,1290,50,1340,68,,
-Sparkit,ElecCat,7,False,1410,50,1030,74,1,17
-Tanzee,Monkey,8,False,1250,50,1280,119,2,20
-Rooby,FlameBambi,9,False,1155,50,2950,160,2,30
-Pengullet,Penguin,10,False,1350,50,1080,29,1,45
-Pengullet Lux,Penguin_Electric,10,True,1310,50,1290,30,,
-Penking,CaptainPenguin,11,False,520,50,5410,136,15,45
-Penking Lux,CaptainPenguin_Black,11,True,490,50,6490,137,,
+Foxparks,Kitsunebi,5,False,1400,50,1040,27,1,18
+Foxparks Cryst,Kitsunebi_Ice,5,True,1305,50,1410,205,30,58
+Fuack,BluePlatypus,6,False,1330,50,1120,69,2,20
+Fuack Ignis,BluePlatypus_Fire,6,True,1290,50,1340,70,,
+Sparkit,ElecCat,7,False,1410,50,1030,76,1,17
+Tanzee,Monkey,8,False,1250,50,1280,122,2,20
+Rooby,FlameBambi,9,False,1155,50,2950,164,2,30
+Pengullet,Penguin,10,False,1350,50,1080,30,1,45
+Pengullet Lux,Penguin_Electric,10,True,1310,50,1290,31,,
+Penking,CaptainPenguin,11,False,520,50,5410,140,15,45
+Penking Lux,CaptainPenguin_Black,11,True,490,50,6490,141,,
 Jolthog,Hedgehog,12,False,1370,50,1060,23,1,13
 Jolthog Cryst,Hedgehog_Ice,12,True,1360,50,1070,24,1,20
-Gumoss,PlantSlime,13,False,1240,50,1310,124,2,14
-Gumoss,PlantSlime_Flower,13,True,1240,50,1310,125,2,14
-Vixy,CuteFox,14,False,1450,50,1000,89,1,25
-Hoocrates,WizardOwl,15,False,1390,50,1050,93,3,14
+Gumoss,PlantSlime,13,False,1240,50,1310,128,2,14
+Gumoss,PlantSlime_Flower,13,True,1240,50,1310,129,2,14
+Vixy,CuteFox,14,False,1450,50,1000,91,1,25
+Hoocrates,WizardOwl,15,False,1390,50,1050,95,3,14
 Teafant,Ganesha,16,False,1490,50,1000,19,1,25
-Depresso,NegativeKoala,17,False,1380,50,1050,55,3,45
-Cremis,WoolFox,18,False,1455,50,1420,156,2,14
-Daedream,DreamDemon,19,False,1230,50,1330,118,3,15
+Depresso,NegativeKoala,17,False,1380,50,1050,57,3,45
+Cremis,WoolFox,18,False,1455,50,1420,160,2,14
+Daedream,DreamDemon,19,False,1230,50,1330,121,3,15
 Rushoar,Boar,20,False,1130,50,1680,11,2,25
-Nox,NightFox,21,False,1180,50,1480,135,1,25
-Fuddler,CuteMole,22,False,1220,50,1360,113,1,40
-Killamari,NegativeOctopus,23,False,1290,50,1200,96,5,13
-Killamari Primo,NegativeOctopus_Neutral,23,True,1250,50,1440,97,42,44
+Nox,NightFox,21,False,1180,50,1480,139,1,25
+Fuddler,CuteMole,22,False,1220,50,1360,116,1,40
+Killamari,NegativeOctopus,23,False,1290,50,1200,98,5,13
+Killamari Primo,NegativeOctopus_Neutral,23,True,1250,50,1440,99,42,44
 Mau,Bastet,24,False,1480,50,1000,9,5,25
 Mau Cryst,Bastet_Ice,24,True,1440,50,1010,10,1,45
-Celaray,FlyingManta,25,False,870,50,2860,147,2,13
-Celaray Lux,FlyingManta_Thunder,25,True,830,50,3430,148,,
+Celaray,FlyingManta,25,False,870,50,2860,151,2,13
+Celaray Lux,FlyingManta_Thunder,25,True,830,50,3430,152,,
 Direhowl,Garm,26,False,1060,50,1920,20,4,15
 Tocotoco,ColorfulBird,27,False,1340,50,1090,13,1,45
-Flopie,FlowerRabbit,28,False,1280,50,1220,103,1,45
-Mozzarina,CowPal,29,False,910,20,2620,98,10,19
-Bristla,LittleBriarRose,30,False,1320,50,1140,27,1,29
-Gobfin,SharkKid,31,False,1090,50,1840,32,20,29
-Gobfin Ignis,SharkKid_Fire,31,True,1100,50,1800,33,20,38
-Hangyu,WindChimes,32,False,1420,50,1020,38,14,40
-Hangyu Cryst,WindChimes_Ice,32,True,1422,50,1020,39,25,35
-Mossanda,GrassPanda,33,False,430,50,6200,109,25,29
-Mossanda Lux,GrassPanda_Electric,33,True,390,50,6610,110,15,40
-Woolipop,SweetsSheep,34,False,1190,50,1450,46,14,19
-Caprity,BerryGoat,35,False,930,50,2510,85,6,41
-Caprity Noct,BerryGoat_Dark,35,True,855,50,3080,197,30,58
-Melpaca,Alpaca,36,False,890,50,2740,48,5,17
+Flopie,FlowerRabbit,28,False,1280,50,1220,105,1,45
+Mozzarina,CowPal,29,False,910,20,2620,100,10,19
+Bristla,LittleBriarRose,30,False,1320,50,1140,28,1,29
+Gobfin,SharkKid,31,False,1090,50,1840,33,20,29
+Gobfin Ignis,SharkKid_Fire,31,True,1100,50,1800,34,20,38
+Hangyu,WindChimes,32,False,1420,50,1020,39,14,40
+Hangyu Cryst,WindChimes_Ice,32,True,1422,50,1020,40,25,35
+Mossanda,GrassPanda,33,False,430,50,6200,111,25,29
+Mossanda Lux,GrassPanda_Electric,33,True,390,50,6610,112,15,40
+Woolipop,SweetsSheep,34,False,1190,50,1450,47,14,19
+Caprity,BerryGoat,35,False,930,50,2510,87,6,41
+Caprity Noct,BerryGoat_Dark,35,True,855,50,3080,206,30,58
+Melpaca,Alpaca,36,False,890,50,2740,50,5,17
 Eikthyrdeer,Deer,37,False,920,50,2620,14,1,13
 Eikthyrdeer Terra,Deer_Ground,37,True,900,50,2680,15,18,22
-Nitewing,HawkBird,38,False,420,50,6300,102,9,40
-Ribbuny,PinkRabbit,39,False,1310,50,1160,130,1,45
-Ribbuny Botan,PinkRabbit_Grass,39,True,1205,50,1620,198,30,58
+Nitewing,HawkBird,38,False,420,50,6300,104,9,40
+Ribbuny,PinkRabbit,39,False,1310,50,1160,134,1,45
+Ribbuny Botan,PinkRabbit_Grass,39,True,1205,50,1620,207,30,58
 Incineram,Baphomet,40,False,590,50,4780,7,27,38
 Incineram Noct,Baphomet_Dark,40,True,580,50,4870,8,40,45
-Cinnamoth,CuteButterfly,41,False,490,50,5700,152,18,29
-Arsox,FlameBuffalo,42,False,790,50,3520,111,1,39
-Dumud,LazyCatfish,43,False,895,50,4690,157,1,38
-Dumud Gild,LazyCatfish_Gold,43,True,855,50,24900,158,33,35
-Cawgnito,DarkCrow,44,False,1080,50,1840,51,12,45
-Leezpunk,LizardMan,45,False,1120,50,1720,65,26,40
-Leezpunk Ignis,LizardMan_Fire,45,True,1140,50,1640,66,15,40
-Loupmoon,Werewolf,46,False,950,50,2400,37,12,29
-Loupmoon Cryst,Werewolf_Ice,46,True,805,50,2820,199,30,58
+Cinnamoth,CuteButterfly,41,False,490,50,5700,156,18,29
+Arsox,FlameBuffalo,42,False,790,50,3520,113,1,39
+Dumud,LazyCatfish,43,False,895,50,4690,161,1,38
+Dumud Gild,LazyCatfish_Gold,43,True,855,50,24900,162,33,35
+Cawgnito,DarkCrow,44,False,1080,50,1840,53,12,45
+Leezpunk,LizardMan,45,False,1120,50,1720,67,26,40
+Leezpunk Ignis,LizardMan_Fire,45,True,1140,50,1640,68,15,40
+Loupmoon,Werewolf,46,False,950,50,2400,38,12,29
+Loupmoon Cryst,Werewolf_Ice,46,True,805,50,2820,208,30,58
 Galeclaw,Eagle,47,False,1030,50,2010,17,9,29
-Robinquill,RobinHood,48,False,1020,50,2050,60,22,29
-Robinquill Terra,RobinHood_Ground,48,True,1000,50,2150,61,28,40
+Robinquill,RobinHood,48,False,1020,50,2050,62,22,29
+Robinquill Terra,RobinHood_Ground,48,True,1000,50,2150,63,28,40
 Gorirat,Gorilla,49,False,1040,50,2010,21,22,29
 Gorirat Terra,Gorilla_Ground,49,True,1030,50,4020,22,30,52
-Beegarde,SoldierBee,50,False,1070,10,1880,107,20,25
-Elizabee,QueenBee,51,False,330,10,6830,106,28,31
-Grintale,NaughtyCat,52,False,510,50,5510,151,17,50
-Swee,MopBaby,53,False,1300,50,1180,126,1,27
-Sweepa,MopKing,54,False,410,50,6400,127,11,32
-Chillet,WeaselDragon,55,False,800,50,3450,138,11,45
-Chillet Ignis,WeaselDragon_Fire,55,True,790,50,4450,139,30,52
+Beegarde,SoldierBee,50,False,1070,10,1880,109,20,25
+Elizabee,QueenBee,51,False,330,10,6830,108,28,31
+Grintale,NaughtyCat,52,False,510,50,5510,155,17,50
+Swee,MopBaby,53,False,1300,50,1180,130,1,27
+Sweepa,MopKing,54,False,410,50,6400,131,11,32
+Chillet,WeaselDragon,55,False,800,50,3450,142,11,45
+Chillet Ignis,WeaselDragon_Fire,55,True,790,50,4450,143,30,52
 Univolt,Kirin,56,False,680,50,4280,25,13,31
-Foxcicle,IceFox,57,False,760,50,3730,116,24,30
-Pyrin,FireKirin,58,False,360,50,6720,42,28,38
-Pyrin Noct,FireKirin_Dark,58,True,240,50,7270,43,30,38
-Reindrix,IceDeer,59,False,880,50,2800,86,25,45
-Rayhound,ThunderDog,60,False,740,50,3880,112,20,53
-Kitsun,AmaterasuWolf,61,False,830,50,3170,64,28,32
-Kitsun Noct,AmaterasuWolf_Dark,61,True,735,50,3170,200,56,58
-Dazzi,RaijinDaughter,62,False,1210,20,1390,31,1,40
-Dazzi Noct,RaijinDaughter_Water,62,True,1115,20,1810,201,20,58
-Lunaris,Mutant,63,False,1110,50,1760,28,25,45
-Dinossom,FlowerDinosaur,64,False,820,50,3240,72,10,50
-Dinossom Lux,FlowerDinosaur_Electric,64,True,810,50,3380,73,15,47
-Surfent,Serpent,65,False,560,50,5050,49,10,26
-Surfent Terra,Serpent_Ground,65,True,550,50,5140,50,20,54
-Maraith,GhostBeast,66,False,1150,50,1570,59,36,54
+Foxcicle,IceFox,57,False,760,50,3730,119,24,30
+Pyrin,FireKirin,58,False,360,50,6720,43,28,38
+Pyrin Noct,FireKirin_Dark,58,True,240,50,7270,44,30,38
+Reindrix,IceDeer,59,False,880,50,2800,88,25,45
+Rayhound,ThunderDog,60,False,740,50,3880,114,20,53
+Kitsun,AmaterasuWolf,61,False,830,50,3170,66,28,32
+Kitsun Noct,AmaterasuWolf_Dark,61,True,735,50,3170,209,56,58
+Dazzi,RaijinDaughter,62,False,1210,20,1390,32,1,40
+Dazzi Noct,RaijinDaughter_Water,62,True,1115,20,1810,210,20,58
+Lunaris,Mutant,63,False,1110,50,1760,29,25,45
+Dinossom,FlowerDinosaur,64,False,820,50,3240,74,10,50
+Dinossom Lux,FlowerDinosaur_Electric,64,True,810,50,3380,75,15,47
+Surfent,Serpent,65,False,560,50,5050,51,14,26
+Surfent Terra,Serpent_Ground,65,True,550,50,5140,52,28,54
+Maraith,GhostBeast,66,False,1150,50,1570,61,36,54
 Digtoise,DrillGame,67,False,850,50,2980,16,17,40
-Tombat,CatBat,68,False,750,50,3810,108,5,45
-Lovander,PinkLizard,69,False,940,30,2450,92,18,40
-Flambelle,LavaGirl,70,False,1405,50,2500,159,1,38
-Vanwyrm,BirdDragon,71,False,660,50,4360,69,10,54
-Vanwyrm Cryst,BirdDragon_Ice,71,True,620,50,4610,70,22,54
-Bushi,Ronin,72,False,640,50,4520,145,23,50
-Bushi Noct,Ronin_Dark,72,True,650,50,4520,146,46,53
-Beakon,ThunderBird,73,False,220,50,7490,131,20,50
-Ragnahawk,RedArmorBird,74,False,380,50,6720,144,34,54
-Katress,CatMage,75,False,700,50,4120,128,20,29
-Katress Ignis,CatMage_Fire,75,True,690,50,4120,129,30,52
-Wixen,FoxMage,76,False,1160,50,3080,90,16,38
-Wixen Noct,FoxMage_Dark,76,True,1150,50,4080,91,30,53
-Verdash,GrassRabbitMan,77,False,990,50,2200,115,35,53
-Vaelet,VioletFairy,78,False,1050,50,1960,101,18,38
-Sibelyx,WhiteMoth,79,False,450,50,5900,88,25,45
-Elphidran,FairyDragon,80,False,540,50,5230,44,18,45
-Elphidran Aqua,FairyDragon_Water,80,True,530,50,5320,45,,
-Kelpsea,Kelpie,81,False,1260,50,1260,94,9,19
-Kelpsea Ignis,Kelpie_Fire,81,True,1270,50,1240,95,9,38
-Azurobe,BlueDragon,82,False,500,50,5600,52,17,22
-Azurobe Cryst,BlueDragon_Ice,82,True,480,50,6720,53,,
-Cryolinx,WhiteTiger,83,False,130,50,8440,47,36,45
-Cryolinx Terra,WhiteTiger_Ground,83,True,160,50,9160,202,51,58
-Blazehowl,Manticore,84,False,710,50,4040,120,34,54
-Blazehowl Noct,Manticore_Dark,84,True,670,50,4360,121,33,59
-Relaxaurus,LazyDragon,85,False,280,50,10240,62,18,50
-Relaxaurus Lux,LazyDragon_Electric,85,True,270,50,10380,63,31,31
-Broncherry,SakuraSaurus,86,False,860,50,2920,80,17,23
-Broncherry Aqua,SakuraSaurus_Water,86,True,840,50,3110,81,30,30
-Petallia,FlowerDoll,87,False,780,50,3590,150,18,51
-Reptyro,VolcanicMonster,88,False,320,50,6940,57,34,38
-Reptyro Cryst,VolcanicMonster_Ice,88,True,230,50,7380,58,42,45
-Kingpaca,KingAlpaca,89,False,470,90,5800,122,23,45
-Kingpaca Cryst,KingAlpaca_Ice,89,True,440,90,6100,123,46,46
-Mammorest,GrassMammoth,90,False,300,50,9450,77,30,40
-Mammorest Cryst,GrassMammoth_Ice,90,True,290,50,9580,78,41,45
-Wumpo,Yeti,91,False,460,50,5900,99,41,45
-Wumpo Botan,Yeti_Grass,91,True,480,50,5700,100,38,45
-Warsect,HerculesBeetle,92,False,340,85,6830,132,30,45
-Warsect Terra,HerculesBeetle_Ground,92,True,275,85,8140,133,30,59
-Fenglope,FengyunDeeper,93,False,980,50,2250,56,15,45
-Fenglope Lux,FengyunDeeper_Electric,93,True,835,50,2720,203,57,57
-Felbat,CatVampire,94,False,1010,50,2100,79,20,31
-Quivern,SkyDragon,95,False,350,50,6830,140,23,52
-Quivern Botan,SkyDragon_Grass,95,True,340,50,7830,141,51,54
-Blazamut,KingBahamut,96,False,10,50,10520,83,40,49
-Blazamut Ryu,KingBahamut_Dragon,96,True,9,50,10520,84,,
-Helzephyr,HadesBird,97,False,190,50,7840,142,24,28
-Helzephyr Lux,HadesBird_Electric,97,True,180,50,8840,143,46,52
-Astegon,BlackMetalDragon,98,False,150,50,8200,114,40,48
-Menasting,DarkScorpion,99,False,260,50,7050,153,40,51
-Menasting Terra,DarkScorpion_Ground,99,True,250,50,8050,154,54,54
+Tombat,CatBat,68,False,750,50,3810,110,5,45
+Lovander,PinkLizard,69,False,940,30,2450,94,18,40
+Flambelle,LavaGirl,70,False,1405,50,2500,163,1,38
+Vanwyrm,BirdDragon,71,False,660,50,4360,71,10,54
+Vanwyrm Cryst,BirdDragon_Ice,71,True,620,50,4610,72,22,54
+Bushi,Ronin,72,False,640,50,4520,149,23,50
+Bushi Noct,Ronin_Dark,72,True,650,50,4520,150,46,53
+Beakon,ThunderBird,73,False,220,50,7490,135,29,50
+Ragnahawk,RedArmorBird,74,False,380,50,6720,148,34,54
+Katress,CatMage,75,False,700,50,4120,132,20,29
+Katress Ignis,CatMage_Fire,75,True,690,50,4120,133,30,52
+Wixen,FoxMage,76,False,1160,50,3080,92,16,38
+Wixen Noct,FoxMage_Dark,76,True,1150,50,4080,93,30,53
+Verdash,GrassRabbitMan,77,False,990,50,2200,118,35,53
+Vaelet,VioletFairy,78,False,1050,50,1960,103,18,38
+Sibelyx,WhiteMoth,79,False,450,50,5900,90,25,45
+Elphidran,FairyDragon,80,False,540,50,5230,45,18,45
+Elphidran Aqua,FairyDragon_Water,80,True,530,50,5320,46,,
+Kelpsea,Kelpie,81,False,1260,50,1260,96,9,19
+Kelpsea Ignis,Kelpie_Fire,81,True,1270,50,1240,97,9,38
+Azurobe,BlueDragon,82,False,500,50,5600,54,17,22
+Azurobe Cryst,BlueDragon_Ice,82,True,480,50,6720,55,,
+Cryolinx,WhiteTiger,83,False,130,50,8440,49,36,45
+Cryolinx Terra,WhiteTiger_Ground,83,True,160,50,9160,211,51,58
+Blazehowl,Manticore,84,False,710,50,4040,124,34,54
+Blazehowl Noct,Manticore_Dark,84,True,670,50,4360,125,33,59
+Relaxaurus,LazyDragon,85,False,280,50,10240,64,18,50
+Relaxaurus Lux,LazyDragon_Electric,85,True,270,50,10380,65,31,31
+Broncherry,SakuraSaurus,86,False,860,50,2920,82,17,23
+Broncherry Aqua,SakuraSaurus_Water,86,True,840,50,3110,83,30,30
+Petallia,FlowerDoll,87,False,780,50,3590,154,18,51
+Reptyro,VolcanicMonster,88,False,320,50,6940,59,34,38
+Reptyro Cryst,VolcanicMonster_Ice,88,True,230,50,7380,60,42,45
+Kingpaca,KingAlpaca,89,False,470,90,5800,126,23,45
+Kingpaca Cryst,KingAlpaca_Ice,89,True,440,90,6100,127,46,46
+Mammorest,GrassMammoth,90,False,300,50,9450,79,30,40
+Mammorest Cryst,GrassMammoth_Ice,90,True,290,50,9580,80,41,45
+Wumpo,Yeti,91,False,460,50,5900,101,41,45
+Wumpo Botan,Yeti_Grass,91,True,480,50,5700,102,38,45
+Warsect,HerculesBeetle,92,False,340,85,6830,136,30,45
+Warsect Terra,HerculesBeetle_Ground,92,True,275,85,8140,137,30,59
+Fenglope,FengyunDeeper,93,False,980,50,2250,58,15,45
+Fenglope Lux,FengyunDeeper_Electric,93,True,835,50,2720,212,57,57
+Felbat,CatVampire,94,False,1010,50,2100,81,20,31
+Quivern,SkyDragon,95,False,350,50,6830,144,23,52
+Quivern Botan,SkyDragon_Grass,95,True,340,50,7830,145,51,54
+Blazamut,KingBahamut,96,False,10,50,10520,85,40,49
+Blazamut Ryu,KingBahamut_Dragon,96,True,9,50,10520,86,,
+Helzephyr,HadesBird,97,False,190,50,7840,146,24,28
+Helzephyr Lux,HadesBird_Electric,97,True,180,50,8840,147,46,52
+Astegon,BlackMetalDragon,98,False,150,50,8200,117,40,48
+Menasting,DarkScorpion,99,False,260,50,7050,157,40,51
+Menasting Terra,DarkScorpion_Ground,99,True,250,50,8050,158,54,54
 Anubis,Anubis,100,False,570,50,4960,6,16,47
-Jormuntide,Umihebi,101,False,310,50,9320,35,45,45
-Jormuntide Ignis,Umihebi_Fire,101,True,315,50,9500,36,40,56
-Suzaku,Suzaku,102,False,50,50,9840,40,40,45
-Suzaku Aqua,Suzaku_Water,102,True,30,50,10110,41,42,45
+Jormuntide,Umihebi,101,False,310,50,9320,36,45,45
+Jormuntide Ignis,Umihebi_Fire,101,True,315,50,9500,37,40,56
+Suzaku,Suzaku,102,False,50,50,9840,41,40,45
+Suzaku Aqua,Suzaku_Water,102,True,30,50,10110,42,42,45
 Grizzbolt,ElecPanda,103,False,200,50,7720,18,15,22
-Lyleen,LilyQueen,104,False,250,30,7160,104,15,51
-Lyleen Noct,LilyQueen_Dark,104,True,210,30,7610,105,49,49
-Faleris,Horus,105,False,370,50,6720,82,40,45
-Faleris Aqua,Horus_Water,105,True,245,50,7260,204,52,58
-Orserk,ThunderDragonMan,106,False,140,50,8320,155,40,45
-Shadowbeak,BlackGriffon,107,False,60,50,9060,87,40,45
-Paladius,SaintCentaur,108,False,80,50,8810,134,60,60
-Necromus,BlackCentaur,109,False,70,50,8930,149,60,60
-Frostallion,IceHorse,110,False,120,50,8440,75,60,60
-Frostallion Noct,IceHorse_Dark,110,True,100,50,8560,76,60,60
-Jetragon,JetDragon,111,False,90,50,8680,117,60,60
-Bellanoir,NightLady,112,False,1,10,10030,161,,
-Bellanoir Libero,NightLady_Dark,112,True,1,10,10030,162,,
-Selyne,MoonQueen,113,False,345,20,9500,163,,
-Croajiro,KendoFrog,114,False,795,50,2070,164,3,49
-Croajiro Noct,KendoFrog_Dark,114,True,765,50,2130,165,,
-Lullu,LeafPrincess,115,False,905,30,3420,166,30,49
-Shroomer,MushroomDragon,116,False,720,55,3660,167,30,49
-Shroomer Noct,MushroomDragon_Dark,116,True,730,50,4240,168,39,54
-Kikit,SmallArmadillo,117,False,1125,50,2800,169,30,49
-Sootseer,CandleGhost,118,False,545,50,4890,170,46,52
-Prixter,ScorpionMan,119,False,355,50,3939,171,43,46
-Knocklem,WingGolem,120,False,265,70,10380,172,55,55
-Yakumo,GuardianDog,121,False,945,50,3360,173,30,49
-Dogen,SifuDog,122,False,665,50,4440,174,50,53
-Dazemu,FeatherOstrich,123,False,675,50,2610,175,18,49
-Mimog,MimicDog,124,False,1200,80,6150,176,5,55
-Xenovader,DarkAlien,125,False,465,50,6750,177,25,30
-Xenogard,WhiteAlienDragon,126,False,435,50,8810,178,,
-Xenolord,DarkMechaDragon,127,False,265,50,6120,179,,
-Nitemary,GhostRabbit,128,False,705,40,7180,180,50,58
-Starryon,NightBlueHorse,129,False,365,50,6220,181,42,58
-Silvegis,WhiteShieldDragon,130,False,215,50,7420,182,59,59
-Smokie,BlackPuppy,131,False,1245,50,7820,183,30,58
-Celesdir,WhiteDeer,132,False,815,50,3080,184,57,60
-Omascul,MysteryMask,133,False,630,50,5820,185,50,58
-Splatterina,GrimGirl,134,False,725,38,4420,186,52,58
-Tarantriss,PurpleSpider,135,False,825,50,4290,187,20,58
-Azurmane,BlueThunderHorse,136,False,400,50,6680,188,57,59
-Bastigor,SnowTigerBeastman,137,False,170,60,9020,205,,
+Lyleen,LilyQueen,104,False,250,30,7160,106,15,51
+Lyleen Noct,LilyQueen_Dark,104,True,210,30,7610,107,49,49
+Faleris,Horus,105,False,370,50,6720,84,40,45
+Faleris Aqua,Horus_Water,105,True,245,50,7260,213,52,58
+Orserk,ThunderDragonMan,106,False,140,50,8320,159,40,45
+Shadowbeak,BlackGriffon,107,False,60,50,9060,89,40,45
+Paladius,SaintCentaur,108,False,80,50,8810,138,60,60
+Necromus,BlackCentaur,109,False,70,50,8930,153,60,60
+Frostallion,IceHorse,110,False,120,50,8440,77,60,60
+Frostallion Noct,IceHorse_Dark,110,True,100,50,8560,78,60,60
+Jetragon,JetDragon,111,False,90,50,8680,120,60,60
+Bellanoir,NightLady,112,False,1,10,10030,165,,
+Bellanoir Libero,NightLady_Dark,112,True,1,10,10030,166,,
+Selyne,MoonQueen,113,False,345,20,9500,167,,
+Croajiro,KendoFrog,114,False,795,50,2070,168,3,49
+Croajiro Noct,KendoFrog_Dark,114,True,765,50,2130,169,,
+Lullu,LeafPrincess,115,False,905,30,3420,170,30,49
+Shroomer,MushroomDragon,116,False,720,55,3660,171,30,49
+Shroomer Noct,MushroomDragon_Dark,116,True,730,50,4240,172,39,54
+Kikit,SmallArmadillo,117,False,1125,50,2800,173,30,49
+Sootseer,CandleGhost,118,False,545,50,4890,174,46,52
+Prixter,ScorpionMan,119,False,355,50,3939,175,43,46
+Knocklem,WingGolem,120,False,265,70,10380,177,55,55
+Yakumo,GuardianDog,121,False,945,50,3360,178,30,49
+Dogen,SifuDog,122,False,665,50,4440,179,50,53
+Dazemu,FeatherOstrich,123,False,675,50,2610,180,18,49
+Mimog,MimicDog,124,False,1200,80,6150,181,5,55
+Xenovader,DarkAlien,125,False,465,50,6750,182,25,30
+Xenogard,WhiteAlienDragon,126,False,435,50,8810,183,,
+Xenolord,DarkMechaDragon,127,False,265,50,6120,184,,
+Nitemary,GhostRabbit,128,False,705,40,7180,185,50,58
+Starryon,NightBlueHorse,129,False,365,50,6220,187,42,58
+Silvegis,WhiteShieldDragon,130,False,215,50,7420,189,59,59
+Smokie,BlackPuppy,131,False,1245,50,7820,190,30,58
+Celesdir,WhiteDeer,132,False,815,50,3080,192,57,60
+Omascul,MysteryMask,133,False,630,50,5820,193,50,58
+Splatterina,GrimGirl,134,False,725,38,4420,194,52,58
+Tarantriss,PurpleSpider,135,False,825,50,4290,195,20,58
+Azurmane,BlueThunderHorse,136,False,400,50,6680,196,57,59
+Bastigor,SnowTigerBeastman,137,False,170,60,9020,214,,
 Prunelia,BlueberryFairy,138,False,755,40,6020,2,30,58
 Nyafia,BadCatgirl,139,False,645,40,5180,1,30,58
 Gildane,GoldenHorse,140,False,505,50,8750,3,52,58
-Herbil,LeafMomonga,141,False,1445,50,1110,215,1,50
-Icelyn,IceWitch,142,False,605,50,2310,214,10,44
-Frostplume,SnowPeafowl,143,False,655,50,1460,222,10,20
-Palumba,TropicalOstrich,144,False,455,50,5850,221,32,50
-Braloha,Plesiosaur,145,False,335,50,6500,220,40,50
-Munchill,IceCrocodile,146,False,1335,50,1580,216,10,20
-Polapup,IceSeal,147,False,745,50,2130,219,5,60
-Turtacle,TentacleTurtle,148,False,1105,50,1320,4,5,20
+Herbil,LeafMomonga,141,False,1445,50,1110,225,1,50
+Icelyn,IceWitch,142,False,605,50,2310,223,,
+Frostplume,SnowPeafowl,143,False,655,50,1460,232,10,45
+Palumba,TropicalOstrich,144,False,455,50,5850,231,32,50
+Braloha,Plesiosaur,145,False,335,50,6500,230,40,50
+Munchill,IceCrocodile,146,False,1335,50,1580,226,10,45
+Polapup,IceSeal,147,False,745,50,2130,229,39,60
+Turtacle,TentacleTurtle,148,False,1105,50,1320,4,5,29
 Turtacle Terra,TentacleTurtle_Ground,148,True,1065,50,19550,5,,
-Jellroy,JellyfishGhost,149,False,1395,50,1630,223,30,41
-Jelliette,JellyfishFairy,150,False,1385,50,1780,192,10,20
-Gloopie,OctopusGirl,151,False,1195,50,1930,189,10,20
-Finsider,StuffedShark,152,False,1295,50,1100,217,1,38
-Finsider Ignis,StuffedShark_Fire,152,True,1255,50,1290,218,,
-Ghangler,GhostAnglerfish,153,False,525,50,6850,212,15,40
-Ghangler Ignis,GhostAnglerfish_Fire,153,True,505,50,7240,213,,
-Whalaska,IceNarwhal,154,False,445,58,8510,190,42,60
-Whalaska Ignis,IceNarwhal_Fire,154,True,430,42,8630,191,58,58
-Neptilius,PoseidonOrca,155,False,90,50,8690,224,60,60
+Jellroy,JellyfishGhost,149,False,1395,50,1630,233,14,41
+Jelliette,JellyfishFairy,150,False,1385,50,1780,201,6,20
+Gloopie,OctopusGirl,151,False,1195,50,1930,197,10,38
+Finsider,StuffedShark,152,False,1295,50,1100,227,1,40
+Finsider Ignis,StuffedShark_Fire,152,True,1255,50,1290,228,,
+Ghangler,GhostAnglerfish,153,False,525,50,6850,221,30,49
+Ghangler Ignis,GhostAnglerfish_Fire,153,True,505,50,7240,222,,
+Whalaska,IceNarwhal,154,False,445,58,8510,199,42,60
+Whalaska Ignis,IceNarwhal_Fire,154,True,430,42,8630,200,58,58
+Neptilius,PoseidonOrca,155,False,90,50,8690,234,60,60
+Hartalis,LegendDeer,156,False,20,50,10620,224,,
+Illuminant Bat,YakushimaMonster003_Purple,10000,False,1250,50,1940,243,42,44
+Rainbow Slime,YakushimaMonster001_Rainbow,10001,False,1320,50,3120,240,42,44
+Cave Bat,YakushimaMonster003,10002,False,1340,50,1730,242,36,41
+Eye of Cthulhu,YakushimaBoss001,10003,False,1380,50,8100,244,45,45
+Enchanted Sword,YakushimaMonster002,10004,False,1380,50,2330,241,42,44
+Demon Eye,YakushimaBoss001_Small,10005,False,1390,50,1620,245,33,35
+Purple Slime,YakushimaMonster001_Purple,10006,False,1390,50,1610,238,36,41
+Red Slime,YakushimaMonster001_Red,10007,False,1405,50,1540,237,36,41
+Green Slime,YakushimaMonster001,10008,False,1430,50,1510,235,33,35
+Blue Slime,YakushimaMonster001_Blue,10009,False,1490,50,1520,236,33,35
+Illuminant Slime,YakushimaMonster001_Pink,10010,False,1500,50,1810,239,42,44

@@ -4,6 +4,7 @@ using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 using Serilog;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -67,9 +68,13 @@ namespace PalCalc.Solver
 
         public bool IsOptimal(IPalReference p)
         {
+            int TotalMaxValue(IV_Set ivs) => ivs.Attack.Max + ivs.Defense.Max + ivs.HP.Max;
+            int TotalMinValue(IV_Set ivs) => ivs.Attack.Min + ivs.Defense.Min + ivs.HP.Min;
+
             var match = content[p]?.FirstOrDefault();
 
             if (match == null) return true;
+
             if (p.BreedingEffort > match.BreedingEffort) return false;
             if (p.BreedingEffort < match.BreedingEffort) return true;
 
@@ -79,8 +84,17 @@ namespace PalCalc.Solver
             if (p.TotalCost > match.TotalCost) return false;
             if (p.TotalCost <  match.TotalCost) return true;
 
-            // all important measures are equal, this is as good as (but not more optimal than) what we've already stored
-            return false;
+            switch (Math.Sign(TotalMaxValue(p.IVs) - TotalMaxValue(match.IVs)))
+            {
+                // same max IVs between the two, `p` is optimal if its avg IVs are higher
+                case 0: return TotalMinValue(p.IVs) > TotalMinValue(match.IVs);
+                // `p` IVs are higher
+                case 1: return true;
+                // `p` IVs are lower
+                case -1: return false;
+
+                default: throw new NotImplementedException(); // shouldn't happen
+            }
         }
 
         /// <summary>

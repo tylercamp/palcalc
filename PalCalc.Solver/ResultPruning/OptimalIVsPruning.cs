@@ -12,7 +12,6 @@ namespace PalCalc.Solver.ResultPruning
     /// </param>
     public class OptimalIVsPruning(CancellationToken token, int maxIvDifference) : IResultPruning(token)
     {
-
         static int ValueOf(IV_IValue value, int fallback, Func<IV_Range, int> map) =>
             value switch
             {

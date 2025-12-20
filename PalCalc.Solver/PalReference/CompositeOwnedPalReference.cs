@@ -76,11 +76,11 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps { get; } = 0;
 
-        public int NumTotalSurgerySteps { get; } = 0;
-
         public int NumTotalGenderReversers { get; } = 0;
 
         public int NumTotalEggs { get; } = 0;
+
+        public int NumTotalWildPals { get; } = 0;
 
         public IPalRefLocation Location { get; }
 

@@ -65,6 +65,7 @@ Power Shot,PowerShot,Neutral,35,4,True,True
 Predator Blast,PredatorBeam,Neutral,200,20,False,False
 Predator Mark,PredatorLockon,Neutral,180,20,False,False
 Predator Surge,PredatorWave,Neutral,100,20,False,False
+Radiant Barrage,RadiantBarrage,Neutral,120,40,True,False
 Raid Cutter,RaidCutter,Grass,110,35,True,False
 Thunder Rail,Railbolt,Electric,200,60,True,False
 All Range Thunder,RangeThunder,Electric,125,40,True,True
@@ -114,7 +115,7 @@ Divine Disaster,Unique_BlackGriffon_TackleLaser,Dark,160,45,False,False
 Divine Disaster II,Unique_BlackGriffon_TackleLaser2,Dark,170,45,False,False
 Firefist Breathstorm,Unique_BlackMetalDragon_FirePunch,Dragon,130,30,False,False
 Bolt Blink,Unique_BlueThunderHorse_FlashDash,Electric,200,45,False,False
-Reckless Charge,Unique_Boar_Tackle,Neutral,55,2,False,False
+Reckless Charge,Unique_Boar_Tackle,Ground,55,2,False,False
 Thunderslide,Unique_CaptainPenguin_Black_BodySlide_Electric,Electric,145,35,False,False
 Emperor Slide,Unique_CaptainPenguin_BodySlide,Ice,70,10,False,False
 Chicken Rush,Unique_ChickenPal_ChickenPeck,Neutral,30,1,False,False
@@ -148,7 +149,7 @@ Ground Pound,Unique_Gorilla_GroundPunch,Neutral,85,14,False,False
 Earth Impact,Unique_Grassmammoth_Earthquake,Ground,100,30,False,False
 Blast Punch,Unique_GrassPanda_Electric_ElectricPunch,Electric,85,14,False,False
 Crushing Punch,Unique_GrassPanda_MusclePunch,Grass,85,18,False,False
-Spinning Roundhouse,Unique_GrassRabbitMan_GrassRoundKick,Grass,90,15,False,False
+Leaping Roundhouse,Unique_GrassRabbitMan_GrassRoundKick,Grass,90,15,False,False
 Grudge Barrage,Unique_GrimGirl_BrutalMachete,Dark,130,31,False,False
 Tornado Attack,Unique_HawkBird_Storm,Neutral,65,13,False,False
 Giga Horn,Unique_HerculesBeetle_BeetleTackle,Ground,75,11,False,False
@@ -165,6 +166,9 @@ Magna Crush,Unique_KingBahamut_AirCrash,Dragon,160,42,False,False
 Brawn Impact,Unique_KingBahamut_ArmSmash,Fire,150,38,False,False
 Lightning Gale,Unique_Kirin_LightningTackle,Electric,60,8,False,False
 Konoha Flip,Unique_LeafMomonga_SomerSault,Grass,105,20,False,False
+Purifying Light,Unique_LegendDeer_RadiantPurge_Otomo,Neutral,250,100,False,False
+Divine Wing,Unique_LegendDeer_RadiantWingRush,Neutral,140,35,False,False
+Sacred Rain,Unique_LegendDeer_WarpPillarBurst,Neutral,200,60,False,False
 Bountiful Protection,Unique_LilyQueen_LilyHealing,Grass,0,240,False,False
 Volcanic Fang,Unique_Manticore_InfernoStrike,Fire,125,30,False,False
 Seigetsu Flash,Unique_MoonQueen_IceMoonBlade,Neutral,110,24,False,False
@@ -186,7 +190,7 @@ Rush Beak,Unique_RedArmorBird_TriplePeck,Fire,85,14,False,False
 Focus Shot,Unique_RobinHood_BowSnipe,Grass,65,9,False,False
 Iaigiri,Unique_Ronin_Iai,Fire,65,9,False,False
 Spear Thrust,Unique_SaintCentaur_OneSpearRushes,Neutral,120,40,False,False
-Muscle Slam,Unique_SakuraSaurus_SideTackle,Neutral,80,12,False,False
+Muscle Slam,Unique_SakuraSaurus_SideTackle,Grass,80,12,False,False
 Upper Smash,Unique_ScorpionMan_Uppercut,Dark,110,24,False,False
 Roly Poly,Unique_SheepBall_Roll,Neutral,35,1,False,False
 Wholehearted Stance,Unique_SifuDog_Counter,Neutral,170,30,False,False

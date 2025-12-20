@@ -52,11 +52,12 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps => 0;
 
-        public int NumTotalSurgerySteps => 0;
-
         public int NumTotalGenderReversers => 0;
 
         public int NumTotalEggs => 0;
+
+        public int NumTotalWildPals => 0;
+
 
         private ConcurrentDictionary<int, IPalReference> surgeryResultCache = null;
         public ConcurrentDictionary<int, IPalReference> SurgeryResultCache => surgeryResultCache ??= new();

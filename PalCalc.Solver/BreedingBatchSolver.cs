@@ -397,6 +397,8 @@ namespace PalCalc.Solver
                 bool createdResult = false;
                 foreach (var expanded in genderedParentPairs)
                 {
+                    if (controller.CancellationToken.IsCancellationRequested) yield break;
+
                     var (parent1, parent2) = expanded;
 
                     Pal childPalType = null;
