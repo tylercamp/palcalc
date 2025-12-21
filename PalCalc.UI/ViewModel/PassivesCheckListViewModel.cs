@@ -22,10 +22,9 @@ namespace PalCalc.UI.ViewModel
 
             isEnabled = initialEnabled;
 
-            // TODO - itl
             ItemRequiredLabel = passive.ModelObject.SurgeryRequiredItem == null
-                ? new HardCodedText("No")
-                : new HardCodedText("Yes");
+                ? LocalizationCodes.LC_PASSIVES_CHECKLIST_SURGERY_ITEM_NO.Bind()
+                : LocalizationCodes.LC_PASSIVES_CHECKLIST_SURGERY_ITEM_YES.Bind();
         }
 
         public PassiveSkillViewModel Passive { get; }

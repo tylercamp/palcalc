@@ -91,7 +91,7 @@ namespace PalCalc.UI.ViewModel.Solver
                     initialState: PalDB.LoadEmbedded().SurgeryPassiveSkills.ToDictionary(p => p, p => !BannedSurgeryPassives.Contains(p))
                 )
                 {
-                    Title = new HardCodedText("TODO")
+                    Title = LocalizationCodes.LC_PASSIVES_CHECKLIST_SURGERY_TITLE.Bind()
                 };
                 window.Owner = App.Current.MainWindow;
                 window.ShowDialog();

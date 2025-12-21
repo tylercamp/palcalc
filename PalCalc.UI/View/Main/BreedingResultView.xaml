@@ -64,7 +64,7 @@
                 </Border>
 
                 <StackPanel>
-                    <Label>Surgery</Label>
+                    <Label Content="{itl:LocalizedText Code=LC_SURGERY_STEP_TITLE}" />
                     <ItemsControl ItemsSource="{Binding Operations}">
                         <ItemsControl.Resources>
                             <Style TargetType="vu:LocalizedEmbeddedText">

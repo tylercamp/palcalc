@@ -40,34 +40,6 @@
                 <RowDefinition />
                 <RowDefinition Height="{StaticResource SepHeight}" />
                 <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="{StaticResource SepWidth}" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <!-- TODO - ITL -->
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Eager Pruning"/>
-            <CheckBox Grid.Row="0" Grid.Column="2"
-                      IsChecked="{Binding EagerPruning}"
-                      ToolTipService.ToolTip="TODO"
-                      ToolTipService.ShowOnDisabled="True"
-                      />
-
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Optimize Init"/>
-            <CheckBox Grid.Row="2" Grid.Column="2"
-                      IsChecked="{Binding OptimizeInitStep}"
-                      ToolTipService.ToolTip="TODO"
-                      ToolTipService.ShowOnDisabled="True"
-                      />
-        </Grid>
-
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="{StaticResource SepHeight}" />
-                <RowDefinition />
                 <RowDefinition Height="{StaticResource SepHeight}" />
                 <RowDefinition />
             </Grid.RowDefinitions>
@@ -78,22 +50,22 @@
             </Grid.ColumnDefinitions>
 
             <!-- TODO - ITL -->
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="TODO Use Gender Reversers" />
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS}" />
             <CheckBox
                 Grid.Row="0" Grid.Column="2"
                 IsChecked="{Binding UseGenderReversers, Mode=TwoWay}"
                 IsEnabled="{Binding CanEditSettings}"
-                ToolTipService.ToolTip="TODO"
+                ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION}"
                 ToolTipService.ShowOnDisabled="True"
                 />
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="TODO Max Gold Cost"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_MAX_GOLD_COST}"/>
             <vu:IntegerTextBox
                 Grid.Row="2" Grid.Column="2"
                 Value="{Binding MaxGoldCost}"
                 IsEnabled="{Binding CanEditSettings}"
                 MinValue="0" MaxValue="1000000"
-                ToolTipService.ToolTip="TODO"
+                ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_MAX_GOLD_COST_DESCRIPTION}"
                 ToolTipService.ShowOnDisabled="True"
                 MinWidth="60"
             />
@@ -102,7 +74,7 @@
                     Grid.ColumnSpan="99"
                     Command="{Binding ChangeSurgeryPassives}"
                     IsEnabled="{Binding CanEditSettings}"
-                    Content="TODO Allowed Surgery Passives"
+                    Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_SURGERY_ALLOWED_PASSIVES}"
             />
         </Grid>
 

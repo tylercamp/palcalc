@@ -51,7 +51,7 @@
             <ListView.View>
                 <GridView>
                     <GridView.Columns>
-                        <GridViewColumn Header="Name"
+                        <GridViewColumn Header="{itl:LocalizedText Code=LC_PASSIVES_CHECKLIST_NAME}"
                                         util:GridViewSort.PropertyName="Passive.Name.Value"
                                         Width="150"
                                         >
@@ -77,17 +77,17 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Description"
+                        <GridViewColumn Header="{itl:LocalizedText Code=LC_PASSIVES_CHECKLIST_DESCRIPTION}"
                                         DisplayMemberBinding="{Binding Passive.Description.Value}"
                                         util:GridViewSort.PropertyName="Passive.Description.Value"
                                         Width="200"
                                         />
-                        <GridViewColumn Header="Surgery Cost"
+                        <GridViewColumn Header="{itl:LocalizedText Code=LC_PASSIVES_CHECKLIST_COST}"
                                         DisplayMemberBinding="{Binding Passive.ModelObject.SurgeryCost}"
                                         util:GridViewSort.PropertyName="Passive.ModelObject.SurgeryCost"
                                         Width="100"
                                         />
-                        <GridViewColumn Header="Item Required"
+                        <GridViewColumn Header="{itl:LocalizedText Code=LC_PASSIVES_CHECKLIST_SURGERY_ITEM}"
                                         DisplayMemberBinding="{Binding ItemRequiredLabel.Value}"
                                         util:GridViewSort.PropertyName="ItemRequiredLabel.Value"
                                         Width="100"
