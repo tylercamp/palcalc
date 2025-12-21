@@ -37,8 +37,6 @@ namespace PalCalc.UI.Model
         public int MaxThreads { get; set; } = 0;
         public int MaxGoldCost { get; set; } = 0;
         public bool UseGenderReversers { get; set; } = false;
-        public bool EagerPruning { get; set; } = true;
-        public bool OptimizeInitStep { get; set; } = true;
 
         public List<string> BannedBredPalInternalNames { get; set; } = [];
         public List<string> BannedWildPalInternalNames { get; set; } = [

@@ -43,8 +43,6 @@ namespace PalCalc.UI.ViewModel.Solver
                     maxThreads: 0,
                     maxSurgeryCost: 0,
                     allowedSurgeryPassives: [],
-                    eagerPruning: true,
-                    optimizeInitStep: true,
                     useGenderReversers: false
                 )
             );

@@ -447,45 +447,37 @@ namespace PalCalc.Solver
                                 ivsProbability
                             );
 
-                            if (settings.EagerPruning)
+                            var workingOptimalResults = state.WorkingOptimalTimesByPalId[res.Pal.Id];
+
+                            var added = false;
+                            var effort = res.BreedingEffort;
+                            var cost = res.TotalCost;
+                            var efficiency = new BreedingSolverEfficiencyMetric(effort, cost);
+                            if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
                             {
-                                var workingOptimalResults = state.WorkingOptimalTimesByPalId[res.Pal.Id];
+                                var resultId = WorkingSet.DefaultGroupFn(res);
 
-                                var added = false;
-                                var effort = res.BreedingEffort;
-                                var cost = res.TotalCost;
-                                var efficiency = new BreedingSolverEfficiencyMetric(effort, cost);
-                                if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
+                                bool updated = workingOptimalResults.TryAdd(resultId, efficiency);
+                                while (!updated)
                                 {
-                                    var resultId = WorkingSet.DefaultGroupFn(res);
+                                    var v = workingOptimalResults[resultId];
 
-                                    bool updated = workingOptimalResults.TryAdd(resultId, efficiency);
-                                    while (!updated)
-                                    {
-                                        var v = workingOptimalResults[resultId];
+                                    if (v.Effort < effort) break;
+                                    if (v.GoldCost < cost) break;
 
-                                        if (v.Effort < effort) break;
-                                        if (v.GoldCost < cost) break;
-
-                                        updated = workingOptimalResults.TryUpdate(resultId, efficiency, v);
-                                    }
-
-                                    if (updated && res.BreedingEffort <= settings.MaxEffort)
-                                    {
-                                        yield return res;
-                                        createdResult = true;
-                                        added = true;
-                                    }
+                                    updated = workingOptimalResults.TryUpdate(resultId, efficiency, v);
                                 }
 
-                                if (!added)
-                                    passiveListPool.Return(newPassives);
+                                if (updated && res.BreedingEffort <= settings.MaxEffort)
+                                {
+                                    yield return res;
+                                    createdResult = true;
+                                    added = true;
+                                }
                             }
-                            else if (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res))
-                            {
-                                createdResult = true;
-                                yield return res;
-                            }
+
+                            if (!added)
+                                passiveListPool.Return(newPassives);
                         }
 
                         passiveListPool.Return(targetPassives);

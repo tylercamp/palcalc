@@ -133,19 +133,6 @@ namespace PalCalc.Solver
                 })
                 .ToList();
 
-            if (!settings.OptimizeInitStep)
-            {
-                initialContent = initialContent.Concat(
-                    settings.OwnedPals.Select(
-                        p => new OwnedPalReference(
-                            p,
-                            p.PassiveSkills.ToDedicatedPassives(spec.DesiredPassives),
-                            new IV_Set() { HP = MakeIV(spec.IV_HP, p.IV_HP), Attack = MakeIV(spec.IV_Attack, p.IV_Attack), Defense = MakeIV(spec.IV_Defense, p.IV_Defense) }
-                        )
-                    )
-                ).Distinct().ToList();
-            }
-
             if (settings.MaxWildPals > 0)
             {
                 // add wild pals with varying number of random passives
@@ -407,7 +394,6 @@ namespace PalCalc.Solver
                                 }
                             }
 
-                            // TODO - if `r` is a SurgeryTablePalReference, combine + simplify
                             res.Add(new SurgeryTablePalReference(r, ops));
                         }
 
@@ -425,6 +411,9 @@ namespace PalCalc.Solver
                     // pals with a specific gender can also be forced with surgery if enabled
                     if (input.Gender == PalGender.WILDCARD || settings.UseGenderReversers)
                         yield return input.WithGuaranteedGender(settings.DB, spec.RequiredGender, settings.UseGenderReversers);
+
+                    // otherwise this pal doesn't have the required gender and can't be forced to that
+                    // gender, skip it
                 }
                 else
                 {

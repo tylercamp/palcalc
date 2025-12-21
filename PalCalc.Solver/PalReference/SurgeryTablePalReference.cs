@@ -66,8 +66,10 @@ namespace PalCalc.Solver.PalReference
                 Debugger.Break();
 #endif
 
+            // RandomPassiveSkill is reference-compared, not equality-compared, so we need to preserve exact references
+            // to any RandomPassiveSkill instances we get (and cannot cache)
             if (removedPassive is RandomPassiveSkill || addedPassive is RandomPassiveSkill)
-                return new ReplacePassiveSurgeryOperation(removedPassive, addedPassive); // TODO - is this necessary?
+                return new ReplacePassiveSurgeryOperation(removedPassive, addedPassive);
 
             int SkillHash(PassiveSkill skill) => skill switch
             {
@@ -105,11 +107,29 @@ namespace PalCalc.Solver.PalReference
 
         public SurgeryTablePalReference(IPalReference input, List<ISurgeryOperation> rawOperations)
         {
-            Input = input;
-            Operations = [.. rawOperations];
+            if (input is SurgeryTablePalReference stpr)
+            {
+                // flatten if the input is from another surgery
 
-            EffectivePassives = [.. input.EffectivePassives];
-            ActualPassives = [.. input.ActualPassives];
+                Input = stpr.Input;
+                Operations = [.. stpr.Operations, .. rawOperations];
+
+                EffectivePassives = [.. stpr.Input.EffectivePassives];
+                ActualPassives = [.. stpr.Input.ActualPassives];
+
+#if DEBUG && DEBUG_CHECKS
+                if (stpr.Operations.Intersect(rawOperations).Any())
+                    Debugger.Break();
+#endif
+            }
+            else
+            {
+                Input = input;
+                Operations = [.. rawOperations];
+
+                EffectivePassives = [.. input.EffectivePassives];
+                ActualPassives = [.. input.ActualPassives];
+            }
 
             Gender = input.Gender;
             TotalCost = input.TotalCost;
@@ -117,7 +137,7 @@ namespace PalCalc.Solver.PalReference
             operationsHash = Operations.ListSetHash();
             inputHash = Input.GetHashCode();
 
-#if DEBUG_CHECKS
+#if DEBUG && DEBUG_CHECKS
             if (
                 Operations.OfType<ReplacePassiveSurgeryOperation>().Count() > 0 &&
                 input.ActualPassives.Count + (
@@ -134,7 +154,7 @@ namespace PalCalc.Solver.PalReference
                 switch (op)
                 {
                     case AddPassiveSurgeryOperation apso:
-#if DEBUG_CHECKS
+#if DEBUG && DEBUG_CHECKS
                         if (input.ActualPassives.Contains(apso.AddedPassive)) Debugger.Break();
                         if (input.ActualPassives.Count == GameConstants.MaxTotalPassives) Debugger.Break();
 #endif
@@ -147,7 +167,7 @@ namespace PalCalc.Solver.PalReference
                         int removedEffectiveIdx = rpso.RemovedPassive is RandomPassiveSkill ? EffectivePassives.FindIndex(p => p is RandomPassiveSkill) : EffectivePassives.IndexOf(rpso.RemovedPassive);
                         int removedActualIdx = rpso.RemovedPassive is RandomPassiveSkill ? ActualPassives.FindIndex(p => p is RandomPassiveSkill || !EffectivePassives.Contains(p)) : EffectivePassives.IndexOf(rpso.RemovedPassive);
 
-#if DEBUG_CHECKS
+#if DEBUG && DEBUG_CHECKS
                         if (input.ActualPassives.Contains(rpso.AddedPassive)) Debugger.Break();
 
                         if (removedEffectiveIdx < 0) Debugger.Break();
@@ -163,7 +183,7 @@ namespace PalCalc.Solver.PalReference
                 }
             }
 
-#if DEBUG_CHECKS
+#if DEBUG && DEBUG_CHECKS
             if (EffectivePassives.Count > GameConstants.MaxTotalPassives || ActualPassives.Count > GameConstants.MaxTotalPassives)
                 Debugger.Break();
 #endif

@@ -69,8 +69,6 @@ internal class Program
                 maxThreads: 16,
                 maxSurgeryCost: 1_000_000,
                 allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
-                eagerPruning: true,
-                optimizeInitStep: true,
                 useGenderReversers: true
             )
         );

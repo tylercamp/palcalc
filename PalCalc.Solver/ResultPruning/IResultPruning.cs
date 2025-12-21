@@ -27,14 +27,13 @@ namespace PalCalc.Solver.ResultPruning
 
         public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData);
 
-        protected static readonly IEnumerable<IPalReference> Empty = Enumerable.Empty<IPalReference>();
         protected IEnumerable<IPalReference> MinGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)
         {
             var comp = Comparer<T>.Default;
             try
             {
                 if (token.IsCancellationRequested)
-                    return Empty;
+                    return [];
 
                 var res = new List<IPalReference>();
                 var minEval = default(T);
@@ -42,7 +41,7 @@ namespace PalCalc.Solver.ResultPruning
                 foreach (var r in input)
                 {
                     if (token.IsCancellationRequested)
-                        return Empty;
+                        return [];
 
                     if (res.Count == 0)
                     {

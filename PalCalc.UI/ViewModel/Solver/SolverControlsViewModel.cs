@@ -169,12 +169,6 @@ namespace PalCalc.UI.ViewModel.Solver
             set => SetProperty(ref useGenderReversers, value);
         }
 
-        [ObservableProperty]
-        private bool eagerPruning;
-
-        [ObservableProperty]
-        private bool optimizeInitStep;
-
         private void OnStatePropertiesChanged()
         {
             OnPropertyChanged(nameof(CanRunSolver));
@@ -286,10 +280,7 @@ namespace PalCalc.UI.ViewModel.Solver
 
                 maxSurgeryCost: MaxGoldCost,
                 allowedSurgeryPassives: PalDB.LoadEmbedded().SurgeryPassiveSkills.Except(BannedSurgeryPassives).ToList(),
-                useGenderReversers: UseGenderReversers,
-
-                eagerPruning: EagerPruning,
-                optimizeInitStep: OptimizeInitStep
+                useGenderReversers: UseGenderReversers
             )
         );
 
@@ -306,8 +297,6 @@ namespace PalCalc.UI.ViewModel.Solver
             BannedSurgeryPassiveInternalNames = BannedSurgeryPassives.Select(p => p.InternalName).ToList(),
             MaxGoldCost = MaxGoldCost,
             UseGenderReversers = UseGenderReversers,
-            EagerPruning = EagerPruning,
-            OptimizeInitStep = OptimizeInitStep,
         };
 
         public void CopyFrom(SerializableSolverSettings model)
@@ -320,8 +309,6 @@ namespace PalCalc.UI.ViewModel.Solver
             MaxThreads = model.MaxThreads;
             MaxGoldCost = model.MaxGoldCost;
             UseGenderReversers = model.UseGenderReversers;
-            EagerPruning = model.EagerPruning;
-            OptimizeInitStep = model.OptimizeInitStep;
 
             BannedBredPals = model.BannedBredPals(PalDB.LoadEmbedded());
             BannedWildPals = model.BannedWildPals(PalDB.LoadEmbedded());
