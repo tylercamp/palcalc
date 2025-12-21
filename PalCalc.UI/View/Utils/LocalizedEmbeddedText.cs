@@ -37,6 +37,8 @@ namespace PalCalc.UI.View.Utils
     [ContentProperty(nameof(Params))]
     public class LocalizedEmbeddedText : Control
     {
+        // ty chatgpt
+
         public static readonly DependencyProperty CodeProperty = DependencyProperty.Register(
             nameof(Code),
             typeof(LocalizationCodes),

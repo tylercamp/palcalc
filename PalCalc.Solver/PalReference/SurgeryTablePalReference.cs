@@ -114,8 +114,6 @@ namespace PalCalc.Solver.PalReference
             Gender = input.Gender;
             TotalCost = input.TotalCost;
 
-            NumTotalWildPals = input.NumTotalWildPals;
-
             operationsHash = Operations.ListSetHash();
             inputHash = Input.GetHashCode();
 
@@ -184,7 +182,7 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps => Input.NumTotalBreedingSteps;
         public int NumTotalEggs => Input.NumTotalEggs;
-        public int NumTotalWildPals { get; }
+        public int NumTotalWildPals => Input.NumTotalWildPals;
 
         public IPalRefLocation Location => SurgeryRefLocation.Instance;
 

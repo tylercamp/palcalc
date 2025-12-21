@@ -208,7 +208,7 @@ namespace PalCalc.Solver
                 );
                 List<WorkBatchProgress> progressEntries = [];
 
-                bool didBreed = workingSet.UpdateByPairs(work =>
+                bool didUpdate = workingSet.UpdateByPairs(work =>
                 {
                     logger.Debug("Performing breeding step {step} with {numWork} work items", s+1, work.Count);
 
@@ -295,7 +295,7 @@ namespace PalCalc.Solver
 
                 if (controller.CancellationToken.IsCancellationRequested) break;
 
-                if (!didBreed)
+                if (!didUpdate)
                 {
                     logger.Debug("Last pass found no new useful options, stopping iteration early");
                     break;
@@ -370,7 +370,7 @@ namespace PalCalc.Solver
                         var missingOptionalPassives = surgeryCompatiblePassives.Where(spec.OptionalPassives.Contains).Except(r.EffectivePassives).ToList();
                         var numAddablePassives = GameConstants.MaxTotalPassives - r.EffectivePassives.Count(p => p is not RandomPassiveSkill);
 
-                        // (we're still in the same pass, just the 2nd part. the pals from the previous pass haven't been stored yet, so make sure
+                        // (we're still in the same UpdateBySingle pass, just the 2nd part. the pals from the previous pass haven't been stored yet, so make sure
                         // to include them in the list of results for this pass)
                         var res = new List<IPalReference>() { r };
 

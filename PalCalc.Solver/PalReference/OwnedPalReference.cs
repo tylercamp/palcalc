@@ -43,6 +43,7 @@ namespace PalCalc.Solver.PalReference
 
         public IV_Set IVs { get; }
 
+        // (Make this private-settable for use by WithGuaranteedGender when gender-reversers are enabled)
         public PalGender Gender { get; private set; }
 
         public IPalRefLocation Location => new OwnedRefLocation() { OwnerId = instance.OwnerPlayerId, Location = instance.Location };

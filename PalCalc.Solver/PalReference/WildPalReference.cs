@@ -57,8 +57,6 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalBreedingSteps => 0;
 
-        public int NumTotalSurgerySteps => 0;
-
         public int NumTotalEggs => 0;
 
         public int NumTotalWildPals => 1;

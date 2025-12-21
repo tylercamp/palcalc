@@ -40,7 +40,7 @@ namespace PalCalc.Solver.Probabilities
         /// 
         public static float ProbabilityInheritedTargetPassives(List<PassiveSkill> parentPassives, List<PassiveSkill> desiredParentPassives, int numFinalPassives)
         {
-#if DEBUG_CHECKS
+#if DEBUG && DEBUG_CHECKS
             if (parentPassives.Count != parentPassives.Distinct().Count()) Debugger.Break();
             if (desiredParentPassives.Count != desiredParentPassives.Distinct().Count()) Debugger.Break();
 #endif
