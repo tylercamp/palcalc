@@ -39,7 +39,7 @@ namespace PalCalc.Model
 
         private Dictionary<string, PassiveSkill> standardPassiveSkillsByName;
         public Dictionary<string, PassiveSkill> StandardPassiveSkillsByName =>
-            standardPassiveSkillsByName ??= StandardPassiveSkills.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First());
+            standardPassiveSkillsByName ??= StandardPassiveSkills.GroupBy(t => t.Name).ToDictionary(t => t.Key, t => t.First(), StringComparer.OrdinalIgnoreCase);
 
         private Dictionary<Pal, PalGender> breedingMostLikelyGender;
         public Dictionary<Pal, PalGender> BreedingMostLikelyGender =>

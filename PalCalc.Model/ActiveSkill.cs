@@ -18,6 +18,8 @@ namespace PalCalc.Model
         }
 
         public string Name { get; private set; }
+
+        [JsonConverter(typeof(CaseInsensitiveStringDictionaryConverter<string>))]
         public Dictionary<string, string> LocalizedNames { get; set; }
 
         // (avoid serializing a whole copy of each element for a skill, the proper element objects will be resolved

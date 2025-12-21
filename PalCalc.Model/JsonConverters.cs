@@ -9,6 +9,23 @@ using static PalCalc.Model.BreedingResult;
 
 namespace PalCalc.Model
 {
+    public class CaseInsensitiveStringDictionaryConverter<T> : JsonConverter<Dictionary<string, T>>
+    {
+        public override Dictionary<string, T> ReadJson(JsonReader reader, Type objectType, Dictionary<string, T> existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var originalDict = JToken.ReadFrom(reader).ToObject<Dictionary<string, T>>();
+
+            if (originalDict == null) return null;
+
+            return new Dictionary<string, T>(originalDict, StringComparer.OrdinalIgnoreCase);
+        }
+
+        public override void WriteJson(JsonWriter writer, Dictionary<string, T> value, JsonSerializer serializer)
+        {
+            JToken.FromObject(value).WriteTo(writer);
+        }
+    }
+
     public class PalContainerJsonConverter : JsonConverter<IPalContainer>
     {
         public override IPalContainer ReadJson(JsonReader reader, Type objectType, IPalContainer existingValue, bool hasExistingValue, JsonSerializer serializer)

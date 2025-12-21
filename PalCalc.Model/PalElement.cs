@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,8 @@ namespace PalCalc.Model
     public class PalElement(string englishName, string internalName)
     {
         public string Name { get; } = englishName;
+
+        [JsonConverter(typeof(CaseInsensitiveStringDictionaryConverter<string>))]
         public Dictionary<string, string> LocalizedNames { get; set; }
 
         public string InternalName { get; protected set; } = internalName;
