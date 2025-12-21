@@ -49,7 +49,6 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!-- TODO - ITL -->
             <TextBlock Grid.Row="0" Grid.Column="0" Text="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS}" />
             <CheckBox
                 Grid.Row="0" Grid.Column="2"

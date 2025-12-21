@@ -250,7 +250,7 @@ namespace PalCalc.Solver
 
                 progress.NumProcessed++;
 
-                if (settings.UseGenderReversers &&!p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
+                if (!settings.UseGenderReversers && !p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
                 if (p.Item1.NumTotalWildPals + p.Item2.NumTotalWildPals > settings.MaxWildPals) continue;
                 if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= settings.MaxBreedingSteps) continue;
                 if (p.Item1.TotalCost + p.Item2.TotalCost > settings.MaxSurgeryCost) continue;
