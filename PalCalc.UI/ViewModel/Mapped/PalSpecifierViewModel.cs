@@ -75,7 +75,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             {
                 Pal = TargetPal.ModelObject,
                 RequiredPassives = RequiredPassives.AsModelEnumerable().ToList(),
-                OptionalPassives = RequiredPassives.AsModelEnumerable().ToList(),
+                OptionalPassives = OptionalPassives.AsModelEnumerable().ToList(),
                 RequiredGender = RequiredGender.Value,
                 IV_HP = MinIv_HP,
                 IV_Attack = MinIv_Attack,
