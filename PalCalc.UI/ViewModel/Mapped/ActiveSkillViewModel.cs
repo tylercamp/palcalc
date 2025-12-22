@@ -13,7 +13,7 @@ namespace PalCalc.UI.ViewModel.Mapped
     public class ActiveSkillViewModel
     {
         private static readonly DerivedLocalizableText<ActiveSkill> NameLocalizer = new DerivedLocalizableText<ActiveSkill>(
-            (locale, skill) => skill.LocalizedNames.GetValueOrElse(locale.ToFormalName().ToLower(), skill.Name)
+            (locale, skill) => skill.LocalizedNames.GetValueOrElse(locale.ToFormalName(), skill.Name)
         );
 
         private static Dictionary<ActiveSkill, ActiveSkillViewModel> instances;

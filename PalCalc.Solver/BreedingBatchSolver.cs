@@ -136,39 +136,45 @@ namespace PalCalc.Solver
         {
             var (parent1, parent2) = p;
 
-            var parentPairOptions = palPairListPool.Borrow();
+            scoped Span<(IPalReference, IPalReference)> parentPairOptions;
 
             if (parent1.Gender == PalGender.WILDCARD)
             {
                 if (parent2.Gender == PalGender.WILDCARD)
                 {
-                    parentPairOptions.Add((
-                        parent1.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers),
-                        parent2.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers)
-                    )); 
-                    parentPairOptions.Add((
-                        parent1.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers),
-                        parent2.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers)
-                    ));
+                    parentPairOptions = [
+                        (
+                            parent1.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers),
+                            parent2.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers)
+                        ),
+                        (
+                            parent1.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers),
+                            parent2.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers)
+                        )
+                    ];
                 }
                 else
                 {
-                    parentPairOptions.Add((
+                    parentPairOptions = [(
                         parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender(), settings.UseGenderReversers),
                         parent2
-                    ));
+                    )];
                 }
             }
             else if (parent2.Gender == PalGender.WILDCARD)
             {
-                parentPairOptions.Add((
+                parentPairOptions = [(
                     parent1,
                     parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender(), settings.UseGenderReversers)
-                ));
+                )];
             }
             else if (parent1.Gender != parent2.Gender)
             {
-                parentPairOptions.Add((parent1, parent2));
+                parentPairOptions = [(parent1, parent2)];
+            }
+            else
+            {
+                parentPairOptions = [];
             }
 
             TimeSpan optimalTime = TimeSpan.Zero;
@@ -187,8 +193,6 @@ namespace PalCalc.Solver
 
             if (hasNoPreference)
             {
-                palPairListPool.Return(parentPairOptions);
-
                 // either there is no preference or at least 1 parent already has a specific gender
                 var p1wildcard = parent1.Gender == PalGender.WILDCARD;
                 var p2wildcard = parent2.Gender == PalGender.WILDCARD;
@@ -224,7 +228,6 @@ namespace PalCalc.Solver
                 {
                     if (optimalTime == CombinedEffort(opt.Item1, opt.Item2))
                     {
-                        palPairListPool.Return(parentPairOptions);
                         return opt;
                     }
                 }

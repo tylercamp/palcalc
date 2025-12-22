@@ -60,8 +60,8 @@ namespace PalCalc.Solver
         public List<Pal> AllowedWildPals => allowedWildPals;
         public List<Pal> BannedBredPals => bannedBredPals;
 
-        public int MaxInputIrrelevantPassives { get; } = Math.Min(3, maxInputIrrelevantPassives);
-        public int MaxBredIrrelevantPassives { get; } = Math.Min(3, maxBredIrrelevantPassives);
+        public int MaxInputIrrelevantPassives { get; } = Math.Clamp(maxInputIrrelevantPassives, 0, GameConstants.MaxTotalPassives);
+        public int MaxBredIrrelevantPassives { get; } = Math.Clamp(maxBredIrrelevantPassives, 0, GameConstants.MaxTotalPassives);
 
         public TimeSpan MaxEffort => maxEffort;
         public int MaxThreads { get; } = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);

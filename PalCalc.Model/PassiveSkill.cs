@@ -17,6 +17,8 @@ namespace PalCalc.Model
         }
 
         public string Name { get; }
+
+        [JsonConverter(typeof(CaseInsensitiveStringDictionaryConverter<string>))]
         public Dictionary<string, string> LocalizedNames { get; set; }
 
         public string InternalName { get; }
@@ -32,6 +34,8 @@ namespace PalCalc.Model
         public bool SupportsSurgery => SurgeryCost > 0;
 
         public string Description { get; set; }
+
+        [JsonConverter(typeof(CaseInsensitiveStringDictionaryConverter<string>))]
         public Dictionary<string, string> LocalizedDescriptions { get; set; }
 
         // whether this is a passive you would find on a pal's list of passives,
