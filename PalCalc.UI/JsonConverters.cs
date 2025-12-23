@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using static PalCalc.Model.BreedingResult;
@@ -166,12 +167,12 @@ namespace PalCalc.UI
         CompositePalReferenceConverter cprc;
         SurgeryPalReferenceConverter sprc;
 
-        public PalReferenceConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        public PalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings) : base(db, gameSettings)
         {
-            this.oprc = new OwnedPalReferenceConverter(db, gameSettings);
-            this.wprc = new WildPalReferenceConverter(db, gameSettings);
-            this.bprc = new BredPalReferenceConverter(db, gameSettings, this);
-            this.cprc = new CompositePalReferenceConverter(db, gameSettings);
+            this.oprc = new OwnedPalReferenceConverter(db, gameSettings, solverSettings);
+            this.wprc = new WildPalReferenceConverter(db, gameSettings, solverSettings);
+            this.bprc = new BredPalReferenceConverter(db, gameSettings, solverSettings, this);
+            this.cprc = new CompositePalReferenceConverter(db, gameSettings, solverSettings);
             this.sprc = new SurgeryPalReferenceConverter(db, gameSettings, this);
 
             dependencyConverters = [
@@ -225,8 +226,11 @@ namespace PalCalc.UI
 
     internal class OwnedPalReferenceConverter : IPalReferenceConverterBase<OwnedPalReference>
     {
-        public OwnedPalReferenceConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings, "OWNED_PAL")
+        private SerializableSolverSettings solverSettings;
+        public OwnedPalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings) : base(db, gameSettings, "OWNED_PAL")
         {
+            this.solverSettings = solverSettings;
+
             dependencyConverters = new JsonConverter[]
             {
                 new IV_IValueConverter(),
@@ -243,6 +247,7 @@ namespace PalCalc.UI
             return JToken.FromObject(new
             {
                 Instance = value.UnderlyingInstance,
+                ActualGender = value.Gender,
                 IVs = new
                 {
                     HP = value.IVs.HP,
@@ -278,8 +283,9 @@ namespace PalCalc.UI
                 defense = new IV_Range(isRelevant: true, inst.IV_Defense);
             }
 
-            // TODO - Copy over any forced genders from reverser
-            return new OwnedPalReference(
+            var actualGender = token["ActualGender"]?.ToObject<PalGender>() ?? inst.Gender;
+
+            var res = new OwnedPalReference(
                 inst,
                 // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
                 inst.PassiveSkills,
@@ -290,16 +296,21 @@ namespace PalCalc.UI
                     Defense = defense
                 }
             );
+
+            if (solverSettings.UseGenderReversers && inst.Gender != actualGender)
+                res = (OwnedPalReference)res.WithGuaranteedGender(db, actualGender, solverSettings.UseGenderReversers);
+
+            return res;
         }
     }
 
     internal class CompositePalReferenceConverter : IPalReferenceConverterBase<CompositeOwnedPalReference>
     {
-        public CompositePalReferenceConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings, "COMPOSITE_PAL")
+        public CompositePalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings) : base(db, gameSettings, "COMPOSITE_PAL")
         {
             dependencyConverters = new JsonConverter[]
             {
-                new OwnedPalReferenceConverter(db, gameSettings),
+                new OwnedPalReferenceConverter(db, gameSettings, solverSettings),
                 new ILocalizedTextConverter(db, gameSettings),
             };
         }
@@ -329,8 +340,11 @@ namespace PalCalc.UI
 
     internal class WildPalReferenceConverter : IPalReferenceConverterBase<WildPalReference>
     {
-        public WildPalReferenceConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings, "WILD_PAL")
+        SerializableSolverSettings solverSettings;
+        public WildPalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings) : base(db, gameSettings, "WILD_PAL")
         {
+            this.solverSettings = solverSettings;
+
             dependencyConverters = [
                 new ILocalizedTextConverter(db, gameSettings),
                 new PassiveSkillConverter(db, gameSettings),
@@ -359,8 +373,7 @@ namespace PalCalc.UI
                 ?.ToList()
                 ?? Enumerable.Empty<PassiveSkill>();
 
-            // TODO - properly pass "UseReversers"
-            return (WildPalReference)new WildPalReference(pal, guaranteedPassives, numPassives).WithGuaranteedGender(db, gender, false);
+            return (WildPalReference)new WildPalReference(pal, guaranteedPassives, numPassives).WithGuaranteedGender(db, gender, solverSettings.UseGenderReversers);
         }
     }
 
@@ -498,8 +511,10 @@ namespace PalCalc.UI
 
     internal class BredPalReferenceConverter : IPalReferenceConverterBase<BredPalReference>
     {
-        public BredPalReferenceConverter(PalDB db, GameSettings gameSettings, PalReferenceConverter genericConverter) : base(db, gameSettings, "BRED_PAL")
+        SerializableSolverSettings solverSettings;
+        public BredPalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, PalReferenceConverter genericConverter) : base(db, gameSettings, "BRED_PAL")
         {
+            this.solverSettings = solverSettings;
             dependencyConverters = new JsonConverter[]
             {
                 genericConverter,
@@ -525,8 +540,7 @@ namespace PalCalc.UI
             var IV_defense = token["IV_Defense"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
             var ivs = new IV_Set() { HP = IV_hp, Attack = IV_attack, Defense = IV_defense };
 
-            // TODO - Properly pass in UseReversers
-            return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability, ivs, ivsProbability).WithGuaranteedGender(db, gender, false) as BredPalReference;
+            return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability, ivs, ivsProbability).WithGuaranteedGender(db, gender, solverSettings.UseGenderReversers) as BredPalReference;
         }
 
         internal override JToken MakeRefJson(BredPalReference value, JsonSerializer serializer)
@@ -702,14 +716,16 @@ namespace PalCalc.UI
     internal class BreedingResultViewModelConverter : PalConverterBase<BreedingResultViewModel>
     {
         private CachedSaveGame source;
-        public BreedingResultViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source) : base(db, gameSettings)
+        private SerializableSolverSettings solverSettings;
+        public BreedingResultViewModelConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, CachedSaveGame source) : base(db, gameSettings)
         {
             dependencyConverters = new JsonConverter[]
             {
-                new PalReferenceConverter(db, gameSettings),
+                new PalReferenceConverter(db, gameSettings, solverSettings),
                 new ILocalizedTextConverter(db, gameSettings),
             };
 
+            this.solverSettings = solverSettings;
             this.source = source;
         }
 
@@ -727,13 +743,31 @@ namespace PalCalc.UI
 
     internal class BreedingResultListViewModelConverter : PalConverterBase<BreedingResultListViewModel>
     {
+        bool didInjectConverters;
+        CachedSaveGame source;
         public BreedingResultListViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source) : base(db, gameSettings)
         {
+            this.didInjectConverters = false;
+            this.source = source;
+        }
+
+        private void InjectBreedingResultDependencyConverters(JsonSerializer serializer, BreedingResultListViewModelSettingsSnapshot fullSettings)
+        {
+            // will be non-null once they've been injected
+            if (didInjectConverters) return;
+
+            // The `Settings` required for `BreedingResultViewModelConverter` aren't available until we deserialize them, so
+            // we'll need to inject them while reading
             dependencyConverters = new JsonConverter[]
             {
-                new BreedingResultViewModelConverter(db, gameSettings, source),
+                new BreedingResultViewModelConverter(db, gameSettings, fullSettings.SolverSettings, source),
                 new ILocalizedTextConverter(db, gameSettings),
             };
+
+            foreach (var c in dependencyConverters)
+                serializer.Converters.Add(c);
+
+            didInjectConverters = true;
         }
 
         protected override BreedingResultListViewModel ReadTypeJson(JsonReader reader, Type objectType, BreedingResultListViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
@@ -741,13 +775,43 @@ namespace PalCalc.UI
             var fullToken = JToken.ReadFrom(reader);
             if (fullToken.Type == JTokenType.Null) return new BreedingResultListViewModel();
 
-            var resultsToken = fullToken["Results"];
-            return new BreedingResultListViewModel() { Results = resultsToken.ToObject<List<BreedingResultViewModel>>(serializer) };
+            var fullSettings = fullToken["Settings"]?.ToObject<BreedingResultListViewModelSettingsSnapshot>(serializer);
+            if (fullSettings == null)
+            {
+                // Pal Calc 1.17.0 starts storing solver settings directly with each breeding results, mainly for
+                // access to the UseGenderReversers setting (don't need to init others). This setting was also introduced
+                // in 1.17.0 (feature not previously supported, effectively "disabled").
+                fullSettings = new BreedingResultListViewModelSettingsSnapshot()
+                {
+                    GameSettings = gameSettings,
+                    SolverSettings = new SerializableSolverSettings() { UseGenderReversers = false }
+                };
+            }
+
+            InjectBreedingResultDependencyConverters(serializer, fullSettings);
+
+            var breedingResults = fullToken["Results"].ToObject<List<BreedingResultViewModel>>(serializer);
+
+            return new BreedingResultListViewModel()
+            {
+                Results = breedingResults,
+                SettingsSnapshot = fullSettings,
+            };
         }
 
         protected override void WriteTypeJson(JsonWriter writer, BreedingResultListViewModel value, JsonSerializer serializer)
         {
-            JToken.FromObject(new { Results = value.Results }, serializer).WriteTo(writer, dependencyConverters);
+#if DEBUG
+            // shouldn't happen, value is necessary for accurate deserialization later on
+            if (value.SettingsSnapshot == null) Debugger.Break();
+#endif
+
+            InjectBreedingResultDependencyConverters(serializer, value.SettingsSnapshot);
+
+            JToken.FromObject(new {
+                Settings = value.SettingsSnapshot,
+                Results = value.Results
+            }, serializer).WriteTo(writer, dependencyConverters);
         }
     }
 

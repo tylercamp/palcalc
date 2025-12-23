@@ -59,7 +59,7 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalWildPals => 0;
 
-        private OwnedPalReference cachedFemaleRef, cachedMaleRef, cachedOppositeWildcardRef;
+        private OwnedPalReference cachedFemaleRef, cachedMaleRef, cachedWildcardRef, cachedOppositeWildcardRef;
 
         private OwnedPalReference MakeGuaranteedGenderImpl(PalGender gender)
         {
@@ -80,6 +80,7 @@ namespace PalCalc.Solver.PalReference
                     case PalGender.FEMALE: return cachedFemaleRef ??= MakeGuaranteedGenderImpl(gender);
                     case PalGender.MALE: return cachedMaleRef ??= MakeGuaranteedGenderImpl(gender);
                     case PalGender.OPPOSITE_WILDCARD: return cachedOppositeWildcardRef ??= MakeGuaranteedGenderImpl(gender);
+                    case PalGender.WILDCARD: return cachedWildcardRef ??= MakeGuaranteedGenderImpl(gender);
                 }
             }
 

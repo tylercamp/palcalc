@@ -16,8 +16,22 @@ using System.Windows.Controls;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
+    // A snapshot of the full solver settings used when the breeding results were produced. Used
+    // during deserialization.
+    public class BreedingResultListViewModelSettingsSnapshot
+    {
+        public GameSettings GameSettings { get; set; }
+        public SerializableSolverSettings SolverSettings { get; set; }
+    }
+
     public partial class BreedingResultListViewModel : ObservableObject
     {
+        public BreedingResultListViewModel()
+        {
+        }
+
+        public BreedingResultListViewModelSettingsSnapshot SettingsSnapshot { get; set; }
+
         private List<BreedingResultViewModel> results;
         public List<BreedingResultViewModel> Results
         {
