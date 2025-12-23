@@ -77,13 +77,10 @@ namespace PalCalc.Solver
             }
         }
 
+        // Returns a list of passives acting as a representation of `actualPassives` being dedicated to some set of desired passives;
+        // i.e., everything in `desired` is preserved, everything else is just `Random`
         public static List<PassiveSkill> ToDedicatedPassives(this IEnumerable<PassiveSkill> actualPassives, IEnumerable<PassiveSkill> desiredPassives)
         {
-            var irrelevantAsRandom = actualPassives
-                .Except(desiredPassives)
-                .Where(p => !p.TrackedEffects.Any(e => e.InternalName == PassiveSkillEffect.BreedSpeed))
-                .Select(_ => new RandomPassiveSkill());
-
             return actualPassives
                 .Select(p =>
                     desiredPassives.Contains(p) || p.TrackedEffects.Any(e => e.InternalName == PassiveSkillEffect.BreedSpeed)

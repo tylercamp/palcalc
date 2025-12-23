@@ -113,7 +113,7 @@ namespace PalCalc.Solver
             existingContent.RemoveAll(changeset.Removed.Contains);
             
             remainingParentPairs = new ConcatenatedLazyCartesianProduct<IPalReference>([
-                (content.All.OrderBy(p => p.Pal.Id).ToList(), changeset.Added),
+                (existingContent.OrderBy(p => p.Pal.Id).ToList(), changeset.Added),
                 (changeset.Added, changeset.Added)
             ]);
 

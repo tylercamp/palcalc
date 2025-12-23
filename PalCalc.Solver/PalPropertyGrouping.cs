@@ -96,8 +96,6 @@ namespace PalCalc.Solver
             var group = content.GetValueOrDefault(key);
             if (group == null) return;
 
-            var toKeep = filterFn(group);
-            group.RemoveAll(r => !toKeep.Contains(r));
             content[key] = filterFn(group).ToList();
         }
 
