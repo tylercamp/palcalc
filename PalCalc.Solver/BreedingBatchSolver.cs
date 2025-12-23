@@ -69,7 +69,7 @@ namespace PalCalc.Solver
     {
         private PalDB db = settings.DB;
 
-        private LocalListPool<IEnumerable<PassiveSkill>> passiveMultiListPool = poolFactory.GetListPool<IEnumerable<PassiveSkill>>();
+        private LocalListPool<List<PassiveSkill>> passiveMultiListPool = poolFactory.GetListPool<List<PassiveSkill>>();
         private LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();
         private LocalListPool<(IPalReference, IPalReference)> palPairListPool = poolFactory.GetListPool<(IPalReference, IPalReference)>();
         private LocalObjectPool<IV_Set> ivSetPool = poolFactory.GetObjectPool<IV_Set>();
@@ -96,7 +96,7 @@ namespace PalCalc.Solver
         /// <param name="requiredPassives">The list of passives that will be contained in all permutations.</param>
         /// <param name="optionalPassives">The list of passives that will appear at least once across the permutations, if possible.</param>
         /// <returns></returns>
-        List<IEnumerable<PassiveSkill>> PassiveSkillPermutations(List<PassiveSkill> requiredPassives, List<PassiveSkill> optionalPassives)
+        List<List<PassiveSkill>> PassiveSkillPermutations(List<PassiveSkill> requiredPassives, List<PassiveSkill> optionalPassives)
         {
 #if DEBUG && DEBUG_CHECKS
             if (
@@ -112,14 +112,17 @@ namespace PalCalc.Solver
             // can't add any optional passives, just return required passives
             if (optionalPassives.Count == 0 || requiredPassives.Count == GameConstants.MaxTotalPassives)
             {
-                res.Add(requiredPassives);
+                res.Add(passiveListPool.BorrowWith(requiredPassives));
                 return res;
             }
 
             var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count;
-            foreach (var optional in optionalPassives.Combinations(maxOptionalPassives))
+            foreach (var optional in optionalPassives.Combinations2(maxOptionalPassives, passiveListPool))
             {
-                res.Add(requiredPassives.Concat(optional));
+                var record = passiveListPool.BorrowWith(requiredPassives);
+                record.AddRange(optional);
+                res.Add(record);
+                passiveListPool.Return(optional);
             }
 
             return res;
@@ -248,7 +251,7 @@ namespace PalCalc.Solver
 
             foreach (var p in workBatch)
             {
-                controller.PauseIfRequested();
+                if (controller.IsPaused) controller.PauseIfRequested();
                 if (controller.CancellationToken.IsCancellationRequested) yield break;
 
                 progress.NumProcessed++;
@@ -258,16 +261,20 @@ namespace PalCalc.Solver
                 if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= settings.MaxBreedingSteps) continue;
                 if (p.Item1.TotalCost + p.Item2.TotalCost > settings.MaxSurgeryCost) continue;
 
+                var breedingResults = breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal];
+
                 {
                     // don't bother checking the child pal if it's impossible for them to reach the target within the remaining
                     // number of iterations
-                    var breedingResults = breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal];
                     bool canReach = false;
 
                     foreach (var result in breedingResults)
                     {
                         if (breedingdb.MinBreedingSteps[result.Child][state.Spec.Pal] <= settings.MaxSolverIterations - state.StepIndex - 1)
+                        {
                             canReach = true;
+                            break;
+                        }
                     }
 
                     if (!canReach) continue;
@@ -337,13 +344,13 @@ namespace PalCalc.Solver
                     if (p.Item1.Gender == PalGender.OPPOSITE_WILDCARD || p.Item2.Gender == PalGender.OPPOSITE_WILDCARD)
                         Debugger.Break();
 #endif
-                    if (p.Item1.Gender != PalGender.WILDCARD || p.Item2.Gender != PalGender.WILDCARD)
+                    if (!settings.UseGenderReversers && (p.Item1.Gender != PalGender.WILDCARD || p.Item2.Gender != PalGender.WILDCARD))
                     {
                         genderedParentPairs.Add(PreferredParentsGenders(ReorderPair(p)));
                     }
                     else
                     {
-                        foreach (var br in breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal])
+                        foreach (var br in breedingResults)
                         {
                             genderedParentPairs.Add(PreferredParentsGenders(ReorderPair((
                                 p.Item1.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item1.Pal), settings.UseGenderReversers),
@@ -361,7 +368,7 @@ namespace PalCalc.Solver
                     var (parent1, parent2) = expanded;
 
                     Pal childPalType = null;
-                    foreach (var br in breedingdb.BreedingByParent[parent1.Pal][parent2.Pal])
+                    foreach (var br in breedingResults)
                         if (br.Matches(parent1.Pal, parent1.Gender, parent2.Pal, parent2.Gender))
                             childPalType = br.Child;
 
@@ -406,10 +413,8 @@ namespace PalCalc.Solver
                     // passives.
 
                     var passivePerms = PassiveSkillPermutations(availableRequiredPassives, availableOptionalPassives);
-                    foreach (var rawTargetPassives in passivePerms)
+                    foreach (var targetPassives in passivePerms)
                     {
-                        var targetPassives = passiveListPool.BorrowWith(rawTargetPassives);
-
                         // go through each potential final number of passives, accumulate the probability of any of these exact options
                         // leading to the desired passives within MAX_IRRELEVANT_PASSIVES.
                         //

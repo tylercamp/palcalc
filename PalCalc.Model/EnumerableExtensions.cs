@@ -9,37 +9,6 @@ namespace PalCalc.Model
 {
     public static class EnumerableExtensions
     {
-        // thanks chatgpt
-        // Returns the list of combinations of elements in the given list, where combinations are order-independent
-        public static IEnumerable<IEnumerable<T>> Combinations<T>(this List<T> elements, int maxSubListSize)
-        {
-            for (int i = 0; i <= maxSubListSize; i++)
-            {
-                foreach (var combo in GenerateCombinations(elements, i))
-                {
-                    yield return combo;
-                }
-            }
-        }
-
-        private static IEnumerable<IEnumerable<T>> GenerateCombinations<T>(List<T> list, int combinationSize)
-        {
-            if (combinationSize == 0)
-            {
-                yield return new T[0];
-            }
-            else
-            {
-                for (int i = 0; i < list.Count; i++)
-                {
-                    foreach (var next in GenerateCombinations(list.Skip(i + 1).ToList(), combinationSize - 1))
-                    {
-                        yield return new T[] { list[i] }.Concat(next);
-                    }
-                }
-            }
-        }
-
         public static int PreferredParallelBatchSize(this long collectionSize) =>
             (int)Math.Min(
                 100000,

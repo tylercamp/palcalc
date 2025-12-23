@@ -54,8 +54,11 @@ namespace PalCalc.Solver
         public void Add(IPalReference p)
         {
             var groupId = groupIdFn(p);
-            var group = content.GetValueOrElse(groupId, new List<IPalReference>());
-            content.TryAdd(groupId, group);
+            if (!content.TryGetValue(groupId, out var group))
+            {
+                group = [];
+                content.Add(groupId, group);
+            }
 
             if (!group.Contains(p)) group.Add(p);
         }

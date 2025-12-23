@@ -119,7 +119,7 @@ namespace PalCalc.Solver
 
             foreach (var ta in changeset.Added.TakeUntilCancelled(controller.CancellationToken))
             {
-                controller.PauseIfRequested();
+                if (controller.IsPaused) controller.PauseIfRequested();
                 content.Add(ta);
             }
 
@@ -151,7 +151,7 @@ namespace PalCalc.Solver
 
             foreach (var ta in changeset.Added.TakeUntilCancelled(controller.CancellationToken))
             {
-                controller.PauseIfRequested();
+                if (controller.IsPaused) controller.PauseIfRequested();
                 content.Add(ta);
             }
 
@@ -162,11 +162,17 @@ namespace PalCalc.Solver
         // reference for each instance spec (gender, passives, etc.)
         private IEnumerable<IPalReference> PruneCollection(IEnumerable<IPalReference> refs) =>
             refs
-                .TakeUntilCancelled(controller.CancellationToken)
-                .Tap(_ => controller.PauseIfRequested())
+                .TakeWhile(r =>
+                {
+                    if (controller.IsPaused) controller.PauseIfRequested();
+                    return !controller.CancellationToken.IsCancellationRequested;
+                })
                 .GroupBy(pref => DefaultGroupFn(pref))
-                .Select(g => g.Distinct())
-                .SelectMany(g => PruningFunc(g, new CachedResultData(g)));
+                .SelectMany(g =>
+                {
+                    var group = g.Distinct().ToList();
+                    return PruningFunc(group, new CachedResultData(group));
+                });
 
         private record class MergeChangeset(bool Changed, List<IPalReference> Added, HashSet<IPalReference> Removed);
 
@@ -186,8 +192,11 @@ namespace PalCalc.Solver
 
             discoveredResults.AddRange(
                 newResults
-                    .TakeUntilCancelled(controller.CancellationToken)
-                    .Tap(_ => controller.PauseIfRequested())
+                    .TakeWhile(_ =>
+                    {
+                        if (controller.IsPaused) controller.PauseIfRequested();
+                        return !controller.CancellationToken.IsCancellationRequested;
+                    })
                     .Where(target.IsSatisfiedBy)
             );
             if (controller.CancellationToken.IsCancellationRequested) return new MergeChangeset(false, [], []);
@@ -208,7 +217,7 @@ namespace PalCalc.Solver
             foreach (var newInstances in pruned.GroupBy(i => DefaultGroupFn(i)).Select(g => g.ToList()).ToList())
             {
                 if (controller.CancellationToken.IsCancellationRequested) return new MergeChangeset(changed, [], []);
-                controller.PauseIfRequested();
+                if (controller.IsPaused) controller.PauseIfRequested();
 
                 var refNewInst = newInstances.First();
 

@@ -11,6 +11,72 @@ namespace PalCalc.Solver
 {
     public static class SolverExtensions
     {
+        // thanks chatgpt
+        // Returns the list of combinations of elements in the given list, where combinations are order-independent
+        public static IEnumerable<IEnumerable<T>> Combinations<T>(this List<T> elements, int maxSubListSize)
+        {
+            for (int i = 0; i <= maxSubListSize; i++)
+            {
+                foreach (var combo in GenerateCombinations(elements, i))
+                {
+                    yield return combo;
+                }
+            }
+        }
+
+        private static IEnumerable<IEnumerable<T>> GenerateCombinations<T>(List<T> list, int combinationSize)
+        {
+            if (combinationSize == 0)
+            {
+                yield return new T[0];
+            }
+            else
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    foreach (var next in GenerateCombinations(list.Skip(i + 1).ToList(), combinationSize - 1))
+                    {
+                        yield return new T[] { list[i] }.Concat(next);
+                    }
+                }
+            }
+        }
+
+        internal static IEnumerable<List<T>> Combinations2<T>(this List<T> elements, int maxSubListSize, LocalListPool<T> pool)
+        {
+            // Use indices-based iteration with pooled output lists
+            var indices = new int[maxSubListSize];
+            for (int size = 0; size <= Math.Min(maxSubListSize, elements.Count); size++)
+            {
+                if (size == 0)
+                {
+                    var result = pool.Borrow();
+                    yield return result;
+                    continue;
+                }
+
+                // Initialize indices
+                for (int i = 0; i < size; i++) indices[i] = i;
+
+                while (true)
+                {
+                    var result = pool.Borrow();
+                    for (int i = 0; i < size; i++)
+                        result.Add(elements[indices[i]]);
+                    yield return result;
+
+                    // Advance to next combination
+                    int k = size - 1;
+                    while (k >= 0 && indices[k] == elements.Count - size + k)
+                        k--;
+                    if (k < 0) break;
+                    indices[k]++;
+                    for (int j = k + 1; j < size; j++)
+                        indices[j] = indices[j - 1] + 1;
+                }
+            }
+        }
+
         public static List<PassiveSkill> ToDedicatedPassives(this IEnumerable<PassiveSkill> actualPassives, IEnumerable<PassiveSkill> desiredPassives)
         {
             var irrelevantAsRandom = actualPassives

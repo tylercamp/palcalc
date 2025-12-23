@@ -9,7 +9,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Optimize>False</Optimize>
-    <DefineConstants>$(DefineConstants);XDEBUG_CHECKS;DEBUG_CHECKS</DefineConstants>
+    <DefineConstants>$(DefineConstants);XDEBUG_CHECKS</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
