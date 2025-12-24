@@ -1,6 +1,5 @@
 ﻿using PalCalc.Model;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;

@@ -526,7 +526,7 @@ namespace PalCalc.UI
 
         internal override BredPalReference ReadRefJson(JToken token, Type objectType, BredPalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            InjectDependencyConverters(serializer); 
+            InjectDependencyConverters(serializer);
             var pal = token["PalId"].ToObject<PalId>(serializer).ToPal(db);
             var passives = (token["Passives"] ?? token["Traits"]).ToObject<List<PassiveSkill>>(serializer);
             var parent1 = token["Parent1"].ToObject<IPalReference>(serializer);
@@ -753,16 +753,14 @@ namespace PalCalc.UI
 
         private void InjectBreedingResultDependencyConverters(JsonSerializer serializer, BreedingResultListViewModelSettingsSnapshot fullSettings)
         {
-            // will be non-null once they've been injected
             if (didInjectConverters) return;
 
             // The `Settings` required for `BreedingResultViewModelConverter` aren't available until we deserialize them, so
             // we'll need to inject them while reading
-            dependencyConverters = new JsonConverter[]
-            {
+            dependencyConverters = [
                 new BreedingResultViewModelConverter(db, gameSettings, fullSettings.SolverSettings, source),
                 new ILocalizedTextConverter(db, gameSettings),
-            };
+            ];
 
             foreach (var c in dependencyConverters)
                 serializer.Converters.Add(c);

@@ -409,7 +409,7 @@ namespace PalCalc.UI.ViewModel
 
         private void CachedSaveGame_SaveFileLoadEnd(ISaveGame obj, CachedSaveGame loaded)
         {
-            if (loaded != null && targetsBySaveFile != null && targetsBySaveFile.ContainsKey(obj))
+            if (loaded != null && targetsBySaveFile.ContainsKey(obj))
                 targetsBySaveFile[obj].UpdateCachedData(loaded, GameSettingsViewModel.Load(obj).ModelObject);
         }
 

@@ -117,7 +117,7 @@ namespace PalCalc.Solver
             }
 
             var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count;
-            foreach (var optional in optionalPassives.Combinations2(maxOptionalPassives, passiveListPool))
+            foreach (var optional in optionalPassives.Combinations(maxOptionalPassives, passiveListPool))
             {
                 var record = passiveListPool.BorrowWith(requiredPassives);
                 record.AddRange(optional);

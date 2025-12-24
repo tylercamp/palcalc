@@ -26,10 +26,6 @@ namespace PalCalc.UI.ViewModel.Solver
 
     public partial class BreedingResultListViewModel : ObservableObject
     {
-        public BreedingResultListViewModel()
-        {
-        }
-
         public BreedingResultListViewModelSettingsSnapshot SettingsSnapshot { get; set; }
 
         private List<BreedingResultViewModel> results;

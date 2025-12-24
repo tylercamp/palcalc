@@ -117,6 +117,8 @@ namespace PalCalc.Solver.PalReference
                 EffectivePassives = [.. stpr.Input.EffectivePassives];
                 ActualPassives = [.. stpr.Input.ActualPassives];
 
+                // when adding more operations onto a surgery pal, the new operations shouldn't have
+                // any overlap with the original surgery pal
 #if DEBUG && DEBUG_CHECKS
                 if (stpr.Operations.Intersect(rawOperations).Any())
                     Debugger.Break();
@@ -137,6 +139,7 @@ namespace PalCalc.Solver.PalReference
             operationsHash = Operations.ListSetHash();
             inputHash = Input.GetHashCode();
 
+            // replace-passive operations are only valid when the pal's passive slots are all occupied
 #if DEBUG && DEBUG_CHECKS
             if (
                 Operations.OfType<ReplacePassiveSurgeryOperation>().Count() > 0 &&
@@ -155,7 +158,9 @@ namespace PalCalc.Solver.PalReference
                 {
                     case AddPassiveSurgeryOperation apso:
 #if DEBUG && DEBUG_CHECKS
+                        // we shouldn't be adding passives which already exist on the pal
                         if (input.ActualPassives.Contains(apso.AddedPassive)) Debugger.Break();
+                        // we can't add more passives if the pal's already at the limit
                         if (input.ActualPassives.Count == GameConstants.MaxTotalPassives) Debugger.Break();
 #endif
 
@@ -168,6 +173,7 @@ namespace PalCalc.Solver.PalReference
                         int removedActualIdx = rpso.RemovedPassive is RandomPassiveSkill ? ActualPassives.FindIndex(p => p is RandomPassiveSkill || !EffectivePassives.Contains(p)) : EffectivePassives.IndexOf(rpso.RemovedPassive);
 
 #if DEBUG && DEBUG_CHECKS
+                        // we shouldn't be adding passives which already exist on the pal
                         if (input.ActualPassives.Contains(rpso.AddedPassive)) Debugger.Break();
 
                         if (removedEffectiveIdx < 0) Debugger.Break();

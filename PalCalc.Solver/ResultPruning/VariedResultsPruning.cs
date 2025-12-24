@@ -41,7 +41,7 @@ namespace PalCalc.Solver.ResultPruning
             {
                 if (token.IsCancellationRequested) return [];
 
-                var nextCommonResults = commonResults.GroupBy(r => palOccurrences[r].GetValueOrElse(pal, 0)).OrderByDescending(g => g.Key).SelectMany(l => l).ToList();
+                var nextCommonResults = commonResults.GroupBy(r => palOccurrences[r].GetValueOrElse(pal, 0)).OrderByDescending(g => g.Key).SelectMany(g => g).ToList();
                 if (nextCommonResults.Count > 0)
                     commonResults = nextCommonResults;
 
@@ -52,7 +52,7 @@ namespace PalCalc.Solver.ResultPruning
                 return [];
 
             var prunedResults = new List<IPalReference>() { commonResults.First() };
-            foreach (var currentResult in results.TakeUntilCancelled(token))
+            foreach (var currentResult in results)
             {
                 if (token.IsCancellationRequested) return [];
 
