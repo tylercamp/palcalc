@@ -299,11 +299,6 @@ namespace PalCalc.Solver
 
                 var ivsProbability = Probabilities.IVs.ProbabilityInheritedTargetIVs(p.Item1.IVs, p.Item2.IVs);
 
-                var finalIVs = ivSetPool.Borrow();
-                finalIVs.HP = MergeIVs(p.Item1.IVs.HP, p.Item2.IVs.HP);
-                finalIVs.Attack = MergeIVs(p.Item1.IVs.Attack, p.Item2.IVs.Attack);
-                finalIVs.Defense = MergeIVs(p.Item1.IVs.Defense, p.Item2.IVs.Defense);
-
                 var parentPassives = passiveListPool.BorrowWith(p.Item1.ActualPassives);
                 foreach (var passive in p.Item2.ActualPassives)
                     if (!parentPassives.Contains(passive))
@@ -354,7 +349,6 @@ namespace PalCalc.Solver
                     }
                 }
 
-                bool createdResult = false;
                 foreach (var expanded in genderedParentPairs)
                 {
                     if (controller.CancellationToken.IsCancellationRequested) yield break;
@@ -385,6 +379,16 @@ namespace PalCalc.Solver
                         (parent1.Gender != PalGender.OPPOSITE_WILDCARD && parent2.Gender != PalGender.OPPOSITE_WILDCARD)
                     ) Debugger.Break();
 #endif
+
+                    // Must happen while going through the gendered pals - a composite pal with a specific gender
+                    // will resolve to a specific pal with an exact set of IVs rather than a range like the original
+                    // composite. 
+                    var finalIVs = ivSetPool.Borrow();
+                    finalIVs.HP = MergeIVs(parent1.IVs.HP, parent2.IVs.HP);
+                    finalIVs.Attack = MergeIVs(parent1.IVs.Attack, parent2.IVs.Attack);
+                    finalIVs.Defense = MergeIVs(parent1.IVs.Defense, parent2.IVs.Defense);
+
+                    bool createdForGender = false;
 
                     // Note: We need to use `ActualPassives` for inheritance calc, NOT `EffectivePassives`. If we have:
                     //
@@ -473,24 +477,29 @@ namespace PalCalc.Solver
                                 if (updated && res.BreedingEffort <= settings.MaxEffort)
                                 {
                                     yield return res;
-                                    createdResult = true;
                                     added = true;
+                                    createdForGender = true;
                                 }
                             }
 
                             if (!added)
+                            {
                                 passiveListPool.Return(newPassives);
+                            }
                         }
 
                         passiveListPool.Return(targetPassives);
                     }
+
                     passiveMultiListPool.Return(passivePerms);
+
+                    if (!createdForGender)
+                    {
+                        ivSetPool.Return(finalIVs);
+                    }
                 }
 
                 palPairListPool.Return(genderedParentPairs);
-
-                if (!createdResult)
-                    ivSetPool.Return(finalIVs);
 
                 passiveListPool.Return(parentPassives);
                 passiveListPool.Return(availableRequiredPassives);
