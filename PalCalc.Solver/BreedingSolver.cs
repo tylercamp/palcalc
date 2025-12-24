@@ -179,7 +179,6 @@ namespace PalCalc.Solver
             SolverStateUpdated?.Invoke(statusMsg);
 
             var workingSet = new WorkingSet(spec, settings.PruningBuilder, BuildInitialContent(spec), settings.MaxThreads, controller);
-            var tlPoolFactory = new ThreadLocal<ObjectPoolFactory>(() => new ObjectPoolFactory());
 
             // Apply main set of breeding passes
 
@@ -235,6 +234,8 @@ namespace PalCalc.Solver
                         .Range(0, settings.MaxThreads)
                         .Select(_ => new Thread(() =>
                         {
+                            var batchSolver = new BreedingBatchSolver(controller, settings, new ObjectPoolFactory());
+
                             while (true)
                             {
                                 IEnumerable<(IPalReference, IPalReference)> batch = null;
@@ -250,7 +251,6 @@ namespace PalCalc.Solver
                                 lock (progressEntries)
                                     progressEntries.Add(progress);
 
-                                var batchSolver = new BreedingBatchSolver(controller, settings, tlPoolFactory.Value);
                                 results.Add(batchSolver.ProcessBatch(batch, progress, stepState).ToList());
                             }
                         }))
@@ -323,7 +323,7 @@ namespace PalCalc.Solver
                         var missingRequiredPassives = surgeryCompatiblePassives.Where(spec.RequiredPassives.Contains).Except(r.EffectivePassives).ToList();
                         // if adding the required passives causes us to exceed the max surgery cost, then there's no way
                         // to make this pal meet the full requirements, and it can be skipped
-                        if (missingRequiredPassives.Sum(p => p.SurgeryCost) + r.TotalCost > settings.MaxSurgeryCost)
+                        if (missingRequiredPassives.Count == 0 || missingRequiredPassives.Sum(p => p.SurgeryCost) + r.TotalCost > settings.MaxSurgeryCost)
                             return r;
 
                         var removeablePassives = new Queue<PassiveSkill>(r.EffectivePassives.OfType<RandomPassiveSkill>());

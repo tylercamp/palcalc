@@ -127,15 +127,14 @@ namespace PalCalc.Model
         {
             // Stack allocation: no heap allocations here
             Span<int> buffer = stackalloc int[SetHashMaxSize];
-            int count = 0;
+            int count = elements.Count;
+            if (count > SetHashMaxSize)
+                throw new InvalidOperationException("Too many elements in the set.");
 
             // Read hash codes into the buffer
-            foreach (var element in elements)
+            for (int i = 0; i < elements.Count; i++)
             {
-                if (count == SetHashMaxSize)
-                    throw new InvalidOperationException("Too many elements in the set.");
-
-                buffer[count++] = selector(element)?.GetHashCode() ?? 0;
+                buffer[i] = selector(elements[i])?.GetHashCode() ?? 0;
             }
 
             // In-place insertion sort on the small buffer
