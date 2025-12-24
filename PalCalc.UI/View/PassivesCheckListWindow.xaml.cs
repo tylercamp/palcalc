@@ -26,7 +26,8 @@ namespace PalCalc.UI.View
             InitializeComponent();
         }
 
-        // TODO - PalCheckListWindow copy/pasta - deduplicate
+        // Note - PalCheckListWindow copy/pasta
+
         private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var senderElem = sender as FrameworkElement;

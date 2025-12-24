@@ -171,13 +171,9 @@ namespace PalCalc.Solver
                     parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender(), settings.UseGenderReversers)
                 )];
             }
-            else if (parent1.Gender != parent2.Gender)
-            {
-                parentPairOptions = [(parent1, parent2)];
-            }
             else
             {
-                parentPairOptions = [];
+                parentPairOptions = [(parent1, parent2)];
             }
 
             TimeSpan optimalTime = TimeSpan.Zero;
@@ -324,8 +320,6 @@ namespace PalCalc.Solver
                     if (state.Spec.OptionalPassives.Contains(passive))
                         availableOptionalPassives.Add(passive);
                 }
-
-                // TODO - update with new gender-surgery approach
 
                 // arbitrary reordering of (p1, p2) to prevent duplicate results from swapped pairs
                 // (though this shouldn't be necessary if the `IResultPruning` impls are working right?)
