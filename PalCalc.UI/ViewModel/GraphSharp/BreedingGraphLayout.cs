@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.GraphSharp
 {
-    public class BreedingGraphLayout : GraphLayout<BreedingTreeNodeViewModel, BreedingEdge, BreedingGraph>
+    public class BreedingGraphLayout : GraphLayout<IBreedingTreeNodeViewModel, BreedingEdge, BreedingGraph>
     {
         public BreedingGraphLayout()
         {

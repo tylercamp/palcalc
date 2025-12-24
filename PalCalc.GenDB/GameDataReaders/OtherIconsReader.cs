@@ -31,6 +31,8 @@ namespace PalCalc.GenDB.GameDataReaders
         public UTexture2D NightIcon { get; set; }
 
         public UTexture2D DungeonIconSmall { get; set; }
+
+        public UTexture2D SurgeryTableIcon { get; set; }
     }
 
     internal class OtherIconsReader
@@ -74,6 +76,8 @@ namespace PalCalc.GenDB.GameDataReaders
             result.NightIcon = provider.LoadPackageObject<UTexture2D>(AssetPaths.NIGHT_ICON_PATH);
 
             result.DungeonIconSmall = provider.LoadPackageObject<UTexture2D>(AssetPaths.DUNGEON_ICON_SMALL_PATH);
+
+            result.SurgeryTableIcon = provider.LoadPackageObject<UTexture2D>(AssetPaths.SURGERY_TABLE_ICON_PATH);
 
             return result;
         }

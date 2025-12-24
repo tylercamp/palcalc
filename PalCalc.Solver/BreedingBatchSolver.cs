@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +30,11 @@ namespace PalCalc.Solver
         public long NumProcessed;
     }
 
+    internal record struct BreedingSolverEfficiencyMetric(
+        TimeSpan Effort,
+        int GoldCost
+    );
+
     /// <summary>
     /// Represents the shared state of a single solver iteration.
     /// </summary>
@@ -45,7 +51,7 @@ namespace PalCalc.Solver
         int StepIndex,
         PalSpecifier Spec,
         WorkingSet WorkingSet,
-        FrozenDictionary<PalId, ConcurrentDictionary<int, TimeSpan>> WorkingOptimalTimesByPalId
+        FrozenDictionary<PalId, ConcurrentDictionary<int, BreedingSolverEfficiencyMetric>> WorkingOptimalTimesByPalId
     );
 
     /// <summary>
@@ -63,6 +69,7 @@ namespace PalCalc.Solver
     {
         private PalDB db = settings.DB;
 
+        private LocalListPool<List<PassiveSkill>> passiveMultiListPool = poolFactory.GetListPool<List<PassiveSkill>>();
         private LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();
         private LocalListPool<(IPalReference, IPalReference)> palPairListPool = poolFactory.GetListPool<(IPalReference, IPalReference)>();
         private LocalObjectPool<IV_Set> ivSetPool = poolFactory.GetObjectPool<IV_Set>();
@@ -89,7 +96,7 @@ namespace PalCalc.Solver
         /// <param name="requiredPassives">The list of passives that will be contained in all permutations.</param>
         /// <param name="optionalPassives">The list of passives that will appear at least once across the permutations, if possible.</param>
         /// <returns></returns>
-        static IEnumerable<IEnumerable<PassiveSkill>> PassiveSkillPermutations(List<PassiveSkill> requiredPassives, List<PassiveSkill> optionalPassives)
+        List<List<PassiveSkill>> PassiveSkillPermutations(List<PassiveSkill> requiredPassives, List<PassiveSkill> optionalPassives)
         {
 #if DEBUG && DEBUG_CHECKS
             if (
@@ -100,19 +107,25 @@ namespace PalCalc.Solver
             ) Debugger.Break();
 #endif
 
+            var res = passiveMultiListPool.Borrow();
+
             // can't add any optional passives, just return required passives
             if (optionalPassives.Count == 0 || requiredPassives.Count == GameConstants.MaxTotalPassives)
             {
-                yield return requiredPassives;
-                yield break;
+                res.Add(passiveListPool.BorrowWith(requiredPassives));
+                return res;
             }
 
-            var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count();
-            foreach (var optional in optionalPassives.Combinations(maxOptionalPassives))
+            var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count;
+            foreach (var optional in optionalPassives.Combinations(maxOptionalPassives, passiveListPool))
             {
-                var res = requiredPassives.Concat(optional);
-                yield return res;
+                var record = passiveListPool.BorrowWith(requiredPassives);
+                record.AddRange(optional);
+                res.Add(record);
+                passiveListPool.Return(optional);
             }
+
+            return res;
         }
 
         TimeSpan CombinedEffort(IPalReference p1, IPalReference p2) =>
@@ -134,19 +147,19 @@ namespace PalCalc.Solver
                 {
                     parentPairOptions = [
                         (
-                            parent1.WithGuaranteedGender(db, PalGender.MALE),
-                            parent2.WithGuaranteedGender(db, PalGender.FEMALE)
+                            parent1.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers),
+                            parent2.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers)
                         ),
                         (
-                            parent1.WithGuaranteedGender(db, PalGender.FEMALE),
-                            parent2.WithGuaranteedGender(db, PalGender.MALE)
+                            parent1.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers),
+                            parent2.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers)
                         )
                     ];
                 }
                 else
                 {
                     parentPairOptions = [(
-                        parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender()),
+                        parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender(), settings.UseGenderReversers),
                         parent2
                     )];
                 }
@@ -155,16 +168,12 @@ namespace PalCalc.Solver
             {
                 parentPairOptions = [(
                     parent1,
-                    parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender())
+                    parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender(), settings.UseGenderReversers)
                 )];
-            }
-            else if (parent1.Gender != parent2.Gender)
-            {
-                parentPairOptions = [(parent1, parent2)];
             }
             else
             {
-                parentPairOptions = [];
+                parentPairOptions = [(parent1, parent2)];
             }
 
             TimeSpan optimalTime = TimeSpan.Zero;
@@ -193,7 +202,7 @@ namespace PalCalc.Solver
                     parent1.BreedingEffort < parent2.BreedingEffort // p1 takes less effort than p2
                 ))
                 {
-                    return (parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender()), parent2);
+                    return (parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender(), settings.UseGenderReversers), parent2);
                 }
 
                 // should we set a specific gender on p2?
@@ -202,7 +211,7 @@ namespace PalCalc.Solver
                     parent2.BreedingEffort <= parent1.BreedingEffort // p2 takes less effort than p1 (need <= to resolve cases where self-effort is same for both wildcards)
                 ))
                 {
-                    return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender()));
+                    return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender(), settings.UseGenderReversers));
                 }
 
 #if DEBUG && DEBUG_CHECKS
@@ -238,25 +247,30 @@ namespace PalCalc.Solver
 
             foreach (var p in workBatch)
             {
-                controller.PauseIfRequested();
+                if (controller.IsPaused) controller.PauseIfRequested();
                 if (controller.CancellationToken.IsCancellationRequested) yield break;
 
                 progress.NumProcessed++;
 
-                if (!p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
-                if (p.Item1.NumWildPalParticipants() + p.Item2.NumWildPalParticipants() > settings.MaxWildPals) continue;
+                if (!settings.UseGenderReversers && !p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
+                if (p.Item1.NumTotalWildPals + p.Item2.NumTotalWildPals > settings.MaxWildPals) continue;
                 if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= settings.MaxBreedingSteps) continue;
+                if (p.Item1.TotalCost + p.Item2.TotalCost > settings.MaxSurgeryCost) continue;
+
+                var breedingResults = breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal];
 
                 {
                     // don't bother checking the child pal if it's impossible for them to reach the target within the remaining
                     // number of iterations
-                    var breedingResults = breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal];
                     bool canReach = false;
 
                     foreach (var result in breedingResults)
                     {
                         if (breedingdb.MinBreedingSteps[result.Child][state.Spec.Pal] <= settings.MaxSolverIterations - state.StepIndex - 1)
+                        {
                             canReach = true;
+                            break;
+                        }
                     }
 
                     if (!canReach) continue;
@@ -307,53 +321,58 @@ namespace PalCalc.Solver
                         availableOptionalPassives.Add(passive);
                 }
 
+                // arbitrary reordering of (p1, p2) to prevent duplicate results from swapped pairs
+                // (though this shouldn't be necessary if the `IResultPruning` impls are working right?)
+                (IPalReference, IPalReference) ReorderPair((IPalReference, IPalReference) p) =>
+                    p.Item1.GetHashCode() > p.Item2.GetHashCode()
+                        ? (p.Item2, p.Item1)
+                        : p;
+
+                var genderedParentPairs = palPairListPool.Borrow();
+
                 // if both parents are wildcards, go through the list of possible gender-specific breeding results
                 // and modify the parent genders to cover each possible child
-                var expandedGendersByChildren = palPairListPool.Borrow();
                 {
 #if DEBUG && DEBUG_CHECKS
                     // (shouldn't happen)
-                    if (parent1.Gender == PalGender.OPPOSITE_WILDCARD || parent2.Gender == PalGender.OPPOSITE_WILDCARD)
+                    if (p.Item1.Gender == PalGender.OPPOSITE_WILDCARD || p.Item2.Gender == PalGender.OPPOSITE_WILDCARD)
                         Debugger.Break();
 #endif
-                    if (p.Item1.Gender != PalGender.WILDCARD || p.Item2.Gender != PalGender.WILDCARD)
+                    if (!settings.UseGenderReversers && (p.Item1.Gender != PalGender.WILDCARD || p.Item2.Gender != PalGender.WILDCARD))
                     {
-                        expandedGendersByChildren.Add(p);
+                        genderedParentPairs.Add(PreferredParentsGenders(ReorderPair(p)));
                     }
                     else
                     {
-                        foreach (var br in breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal])
+                        foreach (var br in breedingResults)
                         {
-                            expandedGendersByChildren.Add((
-                                p.Item1.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item1.Pal)),
-                                p.Item2.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item2.Pal))
-                            ));
+                            genderedParentPairs.Add(PreferredParentsGenders(ReorderPair((
+                                p.Item1.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item1.Pal), settings.UseGenderReversers),
+                                p.Item2.WithGuaranteedGender(db, br.RequiredGenderOf(p.Item2.Pal), settings.UseGenderReversers)
+                            ))));
                         }
                     }
                 }
 
                 bool createdResult = false;
-                foreach (var expanded in expandedGendersByChildren)
+                foreach (var expanded in genderedParentPairs)
                 {
                     if (controller.CancellationToken.IsCancellationRequested) yield break;
 
-                    // arbitrary reordering of (p1, p2) to prevent duplicate results from swapped pairs
-                    // (though this shouldn't be necessary if the `IResultPruning` impls are working right?)
-                    var reexpanded = expanded.Item1.GetHashCode() > expanded.Item2.GetHashCode()
-                        ? (expanded.Item2, expanded.Item1)
-                        : expanded;
-
-                    var pg = PreferredParentsGenders(reexpanded);
-
-                    var (parent1, parent2) = pg;
+                    var (parent1, parent2) = expanded;
 
                     Pal childPalType = null;
-                    foreach (var br in breedingdb.BreedingByParent[parent1.Pal][parent2.Pal])
+                    foreach (var br in breedingResults)
                         if (br.Matches(parent1.Pal, parent1.Gender, parent2.Pal, parent2.Gender))
                             childPalType = br.Child;
 
                     if (childPalType == null)
-                        throw new NotImplementedException(); // shouldn't happen
+                    {
+                        // should only happen if there are gender-specific breeding paths and wildcard gender is used.
+                        // there should be other specific-gender pairs in `genderedParentPairs` we will check, so this
+                        // is safe to skip
+                        continue;
+                    }
 
                     if (settings.BannedBredPals.Contains(childPalType))
                         continue;
@@ -387,10 +406,9 @@ namespace PalCalc.Solver
                     // so we'd end up overestimating the effort of parents which have the same (but irrelevant)
                     // passives.
 
-                    foreach (var rawTargetPassives in PassiveSkillPermutations(availableRequiredPassives, availableOptionalPassives))
+                    var passivePerms = PassiveSkillPermutations(availableRequiredPassives, availableOptionalPassives);
+                    foreach (var targetPassives in passivePerms)
                     {
-                        var targetPassives = passiveListPool.BorrowWith(rawTargetPassives);
-
                         // go through each potential final number of passives, accumulate the probability of any of these exact options
                         // leading to the desired passives within MAX_IRRELEVANT_PASSIVES.
                         //
@@ -431,21 +449,25 @@ namespace PalCalc.Solver
                                 ivsProbability
                             );
 
-                            var workingOptimalTimes = state.WorkingOptimalTimesByPalId[res.Pal.Id];
+                            var workingOptimalResults = state.WorkingOptimalTimesByPalId[res.Pal.Id];
 
                             var added = false;
                             var effort = res.BreedingEffort;
+                            var cost = res.TotalCost;
+                            var efficiency = new BreedingSolverEfficiencyMetric(effort, cost);
                             if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
                             {
                                 var resultId = WorkingSet.DefaultGroupFn(res);
 
-                                bool updated = workingOptimalTimes.TryAdd(resultId, effort);
+                                bool updated = workingOptimalResults.TryAdd(resultId, efficiency);
                                 while (!updated)
                                 {
-                                    var v = workingOptimalTimes[resultId];
-                                    if (v < effort) break;
+                                    var v = workingOptimalResults[resultId];
 
-                                    updated = workingOptimalTimes.TryUpdate(resultId, effort, v);
+                                    if (v.Effort < effort) break;
+                                    if (v.GoldCost < cost) break;
+
+                                    updated = workingOptimalResults.TryUpdate(resultId, efficiency, v);
                                 }
 
                                 if (updated && res.BreedingEffort <= settings.MaxEffort)
@@ -462,9 +484,10 @@ namespace PalCalc.Solver
 
                         passiveListPool.Return(targetPassives);
                     }
+                    passiveMultiListPool.Return(passivePerms);
                 }
 
-                palPairListPool.Return(expandedGendersByChildren);
+                palPairListPool.Return(genderedParentPairs);
 
                 if (!createdResult)
                     ivSetPool.Return(finalIVs);

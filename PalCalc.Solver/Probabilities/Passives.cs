@@ -40,6 +40,11 @@ namespace PalCalc.Solver.Probabilities
         /// 
         public static float ProbabilityInheritedTargetPassives(List<PassiveSkill> parentPassives, List<PassiveSkill> desiredParentPassives, int numFinalPassives)
         {
+#if DEBUG && DEBUG_CHECKS
+            if (parentPassives.Count != parentPassives.Distinct().Count()) Debugger.Break();
+            if (desiredParentPassives.Count != desiredParentPassives.Distinct().Count()) Debugger.Break();
+#endif
+
             // we know we need at least `desiredParentPassives.Count` to be inherited from the parents, but the overall number
             // of passives must be `numFinalPassives`. consider N, N+1, ..., passives inherited from parents, and an inverse amount
             // of randomly-added passives

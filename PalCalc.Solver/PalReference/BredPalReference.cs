@@ -150,6 +150,8 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
+        public int TotalCost => Parent1.TotalCost + Parent2.TotalCost;
+
         private TimeSpan parentBreedingEffort;
         public TimeSpan BreedingEffort { get; private set; }
 
@@ -175,7 +177,7 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> ActualPassives => EffectivePassives;
 
-        private BredPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)
+        private BredPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
         {
             if (gender == PalGender.WILDCARD)
             {
@@ -189,7 +191,7 @@ namespace PalCalc.Solver.PalReference
                     // assume that the other parent has the more likely gender
                     return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs)
                     {
-                        AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
+                        AvgRequiredBreedings = useReverser ? AvgRequiredBreedings : (int)Math.Ceiling(AvgRequiredBreedings / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
                         Gender = gender,
                         PassivesProbability = PassivesProbability,
                         IVsProbability = IVsProbability,
@@ -200,7 +202,7 @@ namespace PalCalc.Solver.PalReference
                     // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
                     return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs)
                     {
-                        AvgRequiredBreedings = AvgRequiredBreedings * 2,
+                        AvgRequiredBreedings = useReverser ? AvgRequiredBreedings : AvgRequiredBreedings * 2,
                         Gender = gender,
                         PassivesProbability = PassivesProbability,
                         IVsProbability = IVsProbability,
@@ -212,7 +214,7 @@ namespace PalCalc.Solver.PalReference
                 var genderProbability = db.BreedingGenderProbability[Pal][gender];
                 return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs)
                 {
-                    AvgRequiredBreedings = (int)Math.Ceiling(AvgRequiredBreedings / genderProbability),
+                    AvgRequiredBreedings = useReverser ? AvgRequiredBreedings : (int)Math.Ceiling(AvgRequiredBreedings / genderProbability),
                     Gender = gender,
                     PassivesProbability = PassivesProbability,
                     IVsProbability = IVsProbability,
@@ -224,16 +226,19 @@ namespace PalCalc.Solver.PalReference
         private IPalReference cachedMaleRef;
         private IPalReference cachedFemaleRef;
 
-        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)
         {
-            if (Gender != PalGender.WILDCARD) throw new Exception("Cannot change gender of bred pal with an already-guaranteed gender");
+            // this exception isn't really necessary, we'd be okay without it, but we should only expect this to be called on
+            // bred pals in the outer pool which don't have a requested gender. these specific-gender pals should only be used
+            // as specialized parents of new pals. if these make it back into the broader working set, there's likely a bug elsewhere
+            if (Gender != PalGender.WILDCARD) throw new Exception("A bred pal with already-guaranteed gender should not be asked to change its gender again");
 
             switch (gender)
             {
                 case PalGender.WILDCARD: return this;
-                case PalGender.OPPOSITE_WILDCARD: return cachedOppositeWildcardRef ??= WithGuaranteedGenderImpl(db, gender);
-                case PalGender.MALE: return cachedMaleRef ??= WithGuaranteedGenderImpl(db, gender);
-                case PalGender.FEMALE: return cachedFemaleRef ??= WithGuaranteedGenderImpl(db, gender);
+                case PalGender.OPPOSITE_WILDCARD: return cachedOppositeWildcardRef ??= WithGuaranteedGenderImpl(db, gender, useReverser);
+                case PalGender.MALE: return cachedMaleRef ??= WithGuaranteedGenderImpl(db, gender, useReverser);
+                case PalGender.FEMALE: return cachedFemaleRef ??= WithGuaranteedGenderImpl(db, gender, useReverser);
                 default: throw new NotImplementedException();
             }
         }

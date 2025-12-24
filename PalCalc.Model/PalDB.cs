@@ -32,6 +32,8 @@ namespace PalCalc.Model
         // from items, partner skills, etc.
         public IEnumerable<PassiveSkill> StandardPassiveSkills => PassiveSkills.Where(p => p.IsStandardPassiveSkill);
 
+        public IEnumerable<PassiveSkill> SurgeryPassiveSkills => PassiveSkills.Where(p => p.SupportsSurgery);
+
         public List<PalElement> Elements { get; set; }
         public List<ActiveSkill> ActiveSkills { get; set; }
 

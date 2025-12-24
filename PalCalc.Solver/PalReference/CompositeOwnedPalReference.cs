@@ -87,9 +87,13 @@ namespace PalCalc.Solver.PalReference
 
         public TimeSpan SelfBreedingEffort { get; } = TimeSpan.Zero;
 
+        public int TotalCost => 0;
+
         private CompositeOwnedPalReference oppositeWildcardReference;
-        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)
         {
+            // (we have direct reprs for both genders, no need to check useReverser)
+
             switch (gender)
             {
                 case PalGender.MALE: return Male;
@@ -102,6 +106,14 @@ namespace PalCalc.Solver.PalReference
 
                 default: throw new NotImplementedException();
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            var asComposite = obj as CompositeOwnedPalReference;
+            if (ReferenceEquals(asComposite, null)) return false;
+
+            return GetHashCode() == obj.GetHashCode();
         }
 
         // TODO - maybe just use Pal, PassivesHash, Gender, IVs? don't need hashes specific to the instances chosen?

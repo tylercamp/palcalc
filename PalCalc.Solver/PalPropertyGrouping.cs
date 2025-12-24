@@ -15,7 +15,7 @@ namespace PalCalc.Solver
 
         public static GroupIdFn Pal = p => p.Pal.Id.GetHashCode();
         public static GroupIdFn Gender = p => (int)p.Gender;
-        public static GroupIdFn WildPalCount = p => p.NumWildPalParticipants();
+        public static GroupIdFn WildPalCount = p => p.NumTotalWildPals;
         public static GroupIdFn NumBreedingSteps = p => p.NumTotalBreedingSteps;
         public static GroupIdFn EffectivePassives = p => p.EffectivePassivesHash;
         public static GroupIdFn RelevantPassives = p => p.ActualPassives.Intersect(p.EffectivePassives).SetHash();
@@ -24,6 +24,7 @@ namespace PalCalc.Solver
         public static GroupIdFn LocationType = p => p.Location.GetType().GetHashCode();
         public static GroupIdFn IvRelevance = p => HashCode.Combine(p.IVs.HP.IsRelevant, p.IVs.Attack.IsRelevant, p.IVs.Defense.IsRelevant);
         public static GroupIdFn IvExact = p => HashCode.Combine(p.IVs.HP, p.IVs.Attack, p.IVs.Defense);
+        public static GroupIdFn GoldCost = p => p.TotalCost;
 
         /// <summary>
         /// Makes a grouping function based on the result of applying `mainFn` to all
@@ -53,8 +54,11 @@ namespace PalCalc.Solver
         public void Add(IPalReference p)
         {
             var groupId = groupIdFn(p);
-            var group = content.GetValueOrElse(groupId, new List<IPalReference>());
-            content.TryAdd(groupId, group);
+            if (!content.TryGetValue(groupId, out var group))
+            {
+                group = [];
+                content.Add(groupId, group);
+            }
 
             if (!group.Contains(p)) group.Add(p);
         }
@@ -84,7 +88,7 @@ namespace PalCalc.Solver
         {
             var pruner = prb.BuildAggregate(token);
             foreach (var group in content.Keys.TakeWhile(_ => !token.IsCancellationRequested))
-                content[group] = pruner.Apply(content[group]).ToList();
+                content[group] = pruner.Apply(content[group], new CachedResultData(content[group])).ToList();
         }
 
         public void Filter(int key, FilterFunc filterFn)
@@ -92,8 +96,6 @@ namespace PalCalc.Solver
             var group = content.GetValueOrDefault(key);
             if (group == null) return;
 
-            var toKeep = filterFn(group);
-            group.RemoveAll(r => !toKeep.Contains(r));
             content[key] = filterFn(group).ToList();
         }
 

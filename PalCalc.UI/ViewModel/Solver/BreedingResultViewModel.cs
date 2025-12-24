@@ -40,7 +40,10 @@ namespace PalCalc.UI.ViewModel.Solver
                     maxInputIrrelevantPassives: 2,
                     maxBredIrrelevantPassives: 0,
                     maxEffort: TimeSpan.FromHours(8),
-                    maxThreads: 0
+                    maxThreads: 0,
+                    maxSurgeryCost: 0,
+                    allowedSurgeryPassives: [],
+                    useGenderReversers: false
                 )
             );
 
@@ -176,7 +179,7 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public bool HasValue => Graph != null;
         public bool NeedsRefresh => Graph?.NeedsRefresh ?? false;
-        public int NumWildPals => DisplayedResult.NumWildPalParticipants();
+        public int NumWildPals => DisplayedResult.NumTotalWildPals;
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
         public int NumEggs => DisplayedResult.NumTotalEggs;
 

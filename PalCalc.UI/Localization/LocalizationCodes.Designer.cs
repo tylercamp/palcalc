@@ -585,6 +585,34 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_PAL_WILD_COUNT,
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVES_CHECKLIST_COST,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVES_CHECKLIST_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVES_CHECKLIST_NAME,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVES_CHECKLIST_SURGERY_ITEM,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVES_CHECKLIST_SURGERY_ITEM_NO,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVES_CHECKLIST_SURGERY_ITEM_YES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVES_CHECKLIST_SURGERY_TITLE,
+        /// <summary>
         ///   Looks up a localized string similar to PlayerName.
         /// </summary>
         LC_PLAYER_LABEL,
@@ -883,6 +911,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SOLVER_SETTINGS_MAX_GOLD_COST,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_SETTINGS_MAX_GOLD_COST_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -904,6 +940,18 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_SETTINGS_SURGERY_ALLOWED_PASSIVES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION,
         /// <summary>
         ///   Looks up a localized string similar to StepNum | WorkSize.
         /// </summary>
@@ -940,6 +988,22 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_STARTUP_LOADING,
+        /// <summary>
+        ///   Looks up a localized string similar to AddedPassive.
+        /// </summary>
+        LC_SURGERY_ADD_PASSIVE,
+        /// <summary>
+        ///   Looks up a localized string similar to NewGender.
+        /// </summary>
+        LC_SURGERY_CHANGE_GENDER,
+        /// <summary>
+        ///   Looks up a localized string similar to AddedPassive | RemovedPassive.
+        /// </summary>
+        LC_SURGERY_REPLACE_PASSIVE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SURGERY_STEP_TITLE,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

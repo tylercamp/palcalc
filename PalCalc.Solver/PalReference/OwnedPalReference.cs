@@ -24,6 +24,8 @@ namespace PalCalc.Solver.PalReference
             ActualPassives = instance.PassiveSkills;
 
             IVs = effectiveIVs;
+
+            Gender = instance.Gender;
         }
 
         public PalInstance UnderlyingInstance => instance;
@@ -40,12 +42,15 @@ namespace PalCalc.Solver.PalReference
 
         public IV_Set IVs { get; }
 
-        public PalGender Gender => instance.Gender;
+        // (Make this private-settable for use by WithGuaranteedGender when gender-reversers are enabled)
+        public PalGender Gender { get; private set; }
 
         public IPalRefLocation Location => new OwnedRefLocation() { OwnerId = instance.OwnerPlayerId, Location = instance.Location };
 
         public TimeSpan BreedingEffort => TimeSpan.Zero;
         public TimeSpan SelfBreedingEffort => TimeSpan.Zero;
+
+        public int TotalCost => 0;
 
         public int NumTotalBreedingSteps => 0;
 
@@ -53,10 +58,40 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalWildPals => 0;
 
-        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        private OwnedPalReference cachedFemaleRef, cachedMaleRef, cachedWildcardRef, cachedOppositeWildcardRef;
+
+        private OwnedPalReference MakeGuaranteedGenderImpl(PalGender gender)
         {
-            if (gender != Gender) throw new Exception("Cannot force a gender change for owned pals");
+            var res = new OwnedPalReference(instance, EffectivePassives, IVs);
+            res.Gender = gender;
+            return res;
+        }
+
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)
+        {
+            if (gender != Gender)
+            {
+                if (!useReverser)
+                    throw new Exception("Cannot force a gender change for owned pals without a gender reverser");
+
+                switch (gender)
+                {
+                    case PalGender.FEMALE: return cachedFemaleRef ??= MakeGuaranteedGenderImpl(gender);
+                    case PalGender.MALE: return cachedMaleRef ??= MakeGuaranteedGenderImpl(gender);
+                    case PalGender.OPPOSITE_WILDCARD: return cachedOppositeWildcardRef ??= MakeGuaranteedGenderImpl(gender);
+                    case PalGender.WILDCARD: return cachedWildcardRef ??= MakeGuaranteedGenderImpl(gender);
+                }
+            }
+
             return this;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var asOwned = obj as OwnedPalReference;
+            if (ReferenceEquals(asOwned, null)) return false;
+
+            return GetHashCode() == obj.GetHashCode();
         }
 
         public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({EffectivePassives.PassiveSkillListToString()}) in {Location}";

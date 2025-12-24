@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -52,6 +53,8 @@ namespace PalCalc.Solver.PalReference
         // used as the effort required to catch one
         public TimeSpan SelfBreedingEffort { get; private set; }
 
+        public int TotalCost => 0;
+
         public int NumTotalBreedingSteps => 0;
 
         public int NumTotalEggs => 0;
@@ -60,7 +63,7 @@ namespace PalCalc.Solver.PalReference
 
         public int EffectivePassivesHash { get; }
 
-        private IPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender)
+        private IPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
         {
             return new WildPalReference(Pal)
             {
@@ -68,7 +71,7 @@ namespace PalCalc.Solver.PalReference
                 Gender = gender,
                 EffectivePassives = EffectivePassives,
                 IVs = IVs,
-                CapturesRequiredForGender = gender switch
+                CapturesRequiredForGender = useReverser ? 1 : gender switch
                 {
                     PalGender.WILDCARD => 1,
                     PalGender.OPPOSITE_WILDCARD =>
@@ -86,7 +89,7 @@ namespace PalCalc.Solver.PalReference
         }
 
         private Dictionary<PalGender, IPalReference> cachedGuaranteedGenders = null;
-        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)
         {
             if (Gender != PalGender.WILDCARD) throw new Exception("Wild pal has already been given a guaranteed gender");
 
@@ -99,10 +102,18 @@ namespace PalCalc.Solver.PalReference
                     PalGender.MALE,
                     PalGender.FEMALE,
                     PalGender.OPPOSITE_WILDCARD
-                }.ToDictionary(g => g, g => WithGuaranteedGenderImpl(db, g));
+                }.ToDictionary(g => g, g => WithGuaranteedGenderImpl(db, g, useReverser));
             }
 
             return cachedGuaranteedGenders[gender];
+        }
+
+        public override bool Equals(object obj)
+        {
+            var asWild = obj as WildPalReference;
+            if (asWild is null) return false;
+
+            return GetHashCode() == obj.GetHashCode();
         }
 
         public override string ToString() => $"Captured {Gender} {Pal} w/ up to {EffectivePassives.Count} random passive skills";

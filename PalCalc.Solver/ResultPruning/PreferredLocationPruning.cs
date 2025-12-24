@@ -33,7 +33,7 @@ namespace PalCalc.Solver.ResultPruning
             _ => throw new NotImplementedException()
         };
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
+        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
             MinGroupOf(results, r =>
             {
                 var countsByLocationType = new Dictionary<LocationType, int>
@@ -47,7 +47,7 @@ namespace PalCalc.Solver.ResultPruning
                     { LocationType.Custom, 0 },
                 };
 
-                foreach (var pref in r.AllReferences())
+                foreach (var pref in cachedData.InnerReferences[r])
                 {
                     switch (pref.Location)
                     {

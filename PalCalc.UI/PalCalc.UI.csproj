@@ -272,6 +272,7 @@
     <None Remove="Resources\SkillElements\Leaf.png" />
     <None Remove="Resources\SkillElements\Normal.png" />
     <None Remove="Resources\SkillElements\Water.png" />
+    <None Remove="Resources\SurgeryTable.png" />
     <None Remove="Resources\TraitRank\Passive_Negative_2_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Negative_3_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Positive_1_icon.png" />
@@ -559,6 +560,7 @@
     <Resource Include="Resources\SkillElements\Leaf.png" />
     <Resource Include="Resources\SkillElements\Normal.png" />
     <Resource Include="Resources\SkillElements\Water.png" />
+    <Resource Include="Resources\SurgeryTable.png" />
     <Resource Include="Resources\TraitRank\Passive_Negative_1_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Negative_2_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Negative_3_icon.png" />

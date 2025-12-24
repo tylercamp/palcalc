@@ -73,7 +73,7 @@ namespace PalCalc.UI.ViewModel
                 {
                     if (value.Trim().Length > 0)
                     {
-                        VisibleEntries = allEntries.Where(e => e.PalName.Value.Contains(value, StringComparison.CurrentCultureIgnoreCase) || Fuzz.PartialRatio(value.ToLower(), searchText.ToLower()) > 80).ToList();
+                        VisibleEntries = allEntries.Where(e => e.PalName.Value.Contains(value, StringComparison.CurrentCultureIgnoreCase) || Fuzz.PartialRatio(value.ToLower(), e.PalName.Value.ToLower()) > 80).ToList();
                     }
                     else
                     {
