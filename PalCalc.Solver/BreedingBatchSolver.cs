@@ -69,10 +69,10 @@ namespace PalCalc.Solver
     {
         private PalDB db = settings.DB;
 
-        private LocalListPool<List<PassiveSkill>> passiveMultiListPool = poolFactory.GetListPool<List<PassiveSkill>>();
         private LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();
         private LocalListPool<(IPalReference, IPalReference)> palPairListPool = poolFactory.GetListPool<(IPalReference, IPalReference)>();
         private LocalObjectPool<IV_Set> ivSetPool = poolFactory.GetObjectPool<IV_Set>();
+        private LocalObjectPool<RandomPassiveSkill> randomPassivePool = poolFactory.GetObjectPool<RandomPassiveSkill>();
 
         // TODO - should be able to use an object pool for IV_Range
         static IV_IValue MergeIVs(IV_IValue a, IV_IValue b) =>
@@ -107,22 +107,18 @@ namespace PalCalc.Solver
             ) Debugger.Break();
 #endif
 
-            var res = passiveMultiListPool.Borrow();
-
             // can't add any optional passives, just return required passives
             if (optionalPassives.Count == 0 || requiredPassives.Count == GameConstants.MaxTotalPassives)
             {
-                res.Add(passiveListPool.BorrowWith(requiredPassives));
-                return res;
+                return [passiveListPool.BorrowRawWith(requiredPassives)];
             }
 
+            var res = new List<List<PassiveSkill>>();
             var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count;
             foreach (var optional in optionalPassives.Combinations(maxOptionalPassives, passiveListPool))
             {
-                var record = passiveListPool.BorrowWith(requiredPassives);
-                record.AddRange(optional);
-                res.Add(record);
-                passiveListPool.Return(optional);
+                optional.AddRange(requiredPassives);
+                res.Add(optional);
             }
 
             return res;
@@ -299,13 +295,17 @@ namespace PalCalc.Solver
 
                 var ivsProbability = Probabilities.IVs.ProbabilityInheritedTargetIVs(p.Item1.IVs, p.Item2.IVs);
 
-                var parentPassives = passiveListPool.BorrowWith(p.Item1.ActualPassives);
+                using var parentPassivesRef = passiveListPool.BorrowWith(p.Item1.ActualPassives);
+                using var availableRequiredPassivesRef = passiveListPool.Borrow();
+                using var availableOptionalPassivesRef = passiveListPool.Borrow();
+
+                var parentPassives = parentPassivesRef.Value;
+                var availableRequiredPassives = availableRequiredPassivesRef.Value;
+                var availableOptionalPassives = availableOptionalPassivesRef.Value;
+
                 foreach (var passive in p.Item2.ActualPassives)
                     if (!parentPassives.Contains(passive))
                         parentPassives.Add(passive);
-
-                var availableRequiredPassives = passiveListPool.Borrow();
-                var availableOptionalPassives = passiveListPool.Borrow();
 
                 foreach (var passive in parentPassives)
                 {
@@ -323,15 +323,16 @@ namespace PalCalc.Solver
                         ? (p.Item2, p.Item1)
                         : p;
 
-                var genderedParentPairs = palPairListPool.Borrow();
+                using var genderedParentPairsRef = palPairListPool.Borrow();
+                var genderedParentPairs = genderedParentPairsRef.Value;
 
                 // if both parents are wildcards, go through the list of possible gender-specific breeding results
                 // and modify the parent genders to cover each possible child
                 {
 #if DEBUG && DEBUG_CHECKS
-                    // (shouldn't happen)
-                    if (p.Item1.Gender == PalGender.OPPOSITE_WILDCARD || p.Item2.Gender == PalGender.OPPOSITE_WILDCARD)
-                        Debugger.Break();
+                            // (shouldn't happen)
+                            if (p.Item1.Gender == PalGender.OPPOSITE_WILDCARD || p.Item2.Gender == PalGender.OPPOSITE_WILDCARD)
+                                Debugger.Break();
 #endif
                     if (!settings.UseGenderReversers && (p.Item1.Gender != PalGender.WILDCARD || p.Item2.Gender != PalGender.WILDCARD))
                     {
@@ -382,13 +383,13 @@ namespace PalCalc.Solver
 
                     // Must happen while going through the gendered pals - a composite pal with a specific gender
                     // will resolve to a specific pal with an exact set of IVs rather than a range like the original
-                    // composite. 
-                    var finalIVs = ivSetPool.Borrow();
+                    // composite.
+                    using var finalIVsRef = ivSetPool.Borrow();
+
+                    var finalIVs = finalIVsRef.Value;
                     finalIVs.HP = MergeIVs(parent1.IVs.HP, parent2.IVs.HP);
                     finalIVs.Attack = MergeIVs(parent1.IVs.Attack, parent2.IVs.Attack);
                     finalIVs.Defense = MergeIVs(parent1.IVs.Defense, parent2.IVs.Defense);
-
-                    bool createdForGender = false;
 
                     // Note: We need to use `ActualPassives` for inheritance calc, NOT `EffectivePassives`. If we have:
                     //
@@ -438,9 +439,14 @@ namespace PalCalc.Solver
                             // (not entirely correct, since some irrelevant passives may be specific and inherited by parents. if we know a child
                             //  may have some specific passive, it may be efficient to breed that child with another parent which also has that
                             //  irrelevant passive, which would increase the overall likelyhood of a desired passive being inherited)
-                            var newPassives = passiveListPool.BorrowWith(targetPassives);
-                            while (newPassives.Count < numFinalPassives)
-                                newPassives.Add(new RandomPassiveSkill());
+                            using var newPassivesRef = passiveListPool.BorrowWith(targetPassives);
+                            var newPassives = newPassivesRef.Value;
+
+                            var numRandomPassivesNeeded = numFinalPassives - newPassives.Count;
+                            var randomPassivesStart = newPassives.Count;
+
+                            for (int i = 0; i < numRandomPassivesNeeded; i++)
+                                newPassives.Add(randomPassivePool.BorrowRaw());
 
                             var res = new BredPalReference(
                                 settings.GameSettings,
@@ -476,34 +482,28 @@ namespace PalCalc.Solver
 
                                 if (updated && res.BreedingEffort <= settings.MaxEffort)
                                 {
+                                    finalIVsRef.Retain();
+                                    newPassivesRef.Retain();
+
                                     yield return res;
                                     added = true;
-                                    createdForGender = true;
                                 }
                             }
 
                             if (!added)
                             {
-                                passiveListPool.Return(newPassives);
+                                // Return borrowed RandomPassiveSkill instances to the pool
+                                for (int i = randomPassivesStart; i < newPassives.Count; i++)
+                                {
+                                    if (newPassives[i] is RandomPassiveSkill rps)
+                                        randomPassivePool.Return(rps);
+                                }
                             }
                         }
 
                         passiveListPool.Return(targetPassives);
                     }
-
-                    passiveMultiListPool.Return(passivePerms);
-
-                    if (!createdForGender)
-                    {
-                        ivSetPool.Return(finalIVs);
-                    }
                 }
-
-                palPairListPool.Return(genderedParentPairs);
-
-                passiveListPool.Return(parentPassives);
-                passiveListPool.Return(availableRequiredPassives);
-                passiveListPool.Return(availableOptionalPassives);
             }
         }
     }

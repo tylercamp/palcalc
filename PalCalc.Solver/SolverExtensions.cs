@@ -21,7 +21,7 @@ namespace PalCalc.Solver
             {
                 if (size == 0)
                 {
-                    var result = pool?.Borrow() ?? [];
+                    var result = pool?.BorrowRaw() ?? [];
                     yield return result;
                     continue;
                 }
@@ -31,7 +31,7 @@ namespace PalCalc.Solver
 
                 while (true)
                 {
-                    var result = pool?.Borrow() ?? [];
+                    var result = pool?.BorrowRaw() ?? [];
                     for (int i = 0; i < size; i++)
                         result.Add(elements[indices[i]]);
                     yield return result;
