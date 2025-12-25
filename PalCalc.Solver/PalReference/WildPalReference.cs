@@ -22,7 +22,7 @@ namespace PalCalc.Solver.PalReference
             if (EffectivePassives.Count > GameConstants.MaxTotalPassives) throw new InvalidOperationException();
 
             EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
-            IVs = new IV_Set() { HP = IV_Random.Instance, Attack =  IV_Random.Instance, Defense = IV_Random.Instance };
+            IVs = new IV_Set() { HP = IV_Value.Random, Attack =  IV_Value.Random, Defense = IV_Value.Random };
         }
 
         private WildPalReference(Pal pal)

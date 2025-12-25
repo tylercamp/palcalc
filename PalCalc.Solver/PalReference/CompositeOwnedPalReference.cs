@@ -22,15 +22,15 @@ namespace PalCalc.Solver.PalReference
     /// </summary>
     public class CompositeOwnedPalReference : IPalReference
     {
-        private static IV_IValue PropagateIVs(IV_IValue a, IV_IValue b)
+        private static IV_Value PropagateIVs(IV_Value a, IV_Value b)
         {
-            if (a is IV_Range ar && b is IV_Range br)
+            if (a != IV_Value.Random && b != IV_Value.Random)
             {
-                return IV_Range.Merge(ar, br);
+                return IV_Value.Merge(a, b);
             }
             else
             {
-                return IV_Random.Instance;
+                return IV_Value.Random;
             }
         }
 

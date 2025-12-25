@@ -6,25 +6,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver
 {
-    public class IV_Set
+    public readonly record struct IV_Set(IV_Value HP, IV_Value Attack, IV_Value Defense)
     {
-        public IV_Set() { }
-        public IV_Set(IV_Set other)
-        {
-            HP = other.HP;
-            Attack = other.Attack;
-            Defense = other.Defense;
-        }
-
-        public IV_IValue HP { get; set; }
-        public IV_IValue Attack { get; set; }
-        public IV_IValue Defense { get; set; }
-
-        public override int GetHashCode() =>
-            HashCode.Combine(
-                HP,
-                Attack,
-                Defense
-            );
     }
 }

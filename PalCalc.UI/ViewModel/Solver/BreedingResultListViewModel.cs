@@ -119,9 +119,9 @@ namespace PalCalc.UI.ViewModel.Solver
                     new List<PassiveSkill>() { "Runner".ToStandardPassive(PalDB.LoadEmbedded()) },
                     new IV_Set()
                     {
-                        HP = new IV_Range(true, 80, 90),
-                        Attack = IV_Random.Instance,
-                        Defense = IV_Random.Instance
+                        HP = new IV_Value(true, 80, 90),
+                        Attack = IV_Value.Random,
+                        Defense = IV_Value.Random
                     }
                 ))
             }

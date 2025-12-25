@@ -11,13 +11,13 @@ namespace PalCalc.Solver.Tests
     [TestClass]
     public class IVProbabilitiesTests
     {
-        private static IV_IValue RealValue_Relevant = new IV_Range(true, 50);
-        private static IV_IValue RealValue_Irrelevant = new IV_Range(false, 50);
-        private static IV_IValue RandomValue = IV_Random.Instance;
+        private static IV_Value RealValue_Relevant = new IV_Value(true, 50, 50);
+        private static IV_Value RealValue_Irrelevant = new IV_Value(false, 50, 50);
+        private static IV_Value RandomValue = IV_Value.Random;
 
-        private static IV_IValue _ANY_ = RandomValue;
+        private static IV_Value _ANY_ = RandomValue;
 
-        private static IV_Set MkIVs(IV_IValue? hp = null, IV_IValue? attack = null, IV_IValue? defense = null) =>
+        private static IV_Set MkIVs(IV_Value? hp = null, IV_Value? attack = null, IV_Value? defense = null) =>
             new IV_Set { HP = hp ?? _ANY_, Attack = attack ?? _ANY_, Defense = defense ?? _ANY_ };
 
         [TestMethod]

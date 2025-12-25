@@ -65,10 +65,11 @@ namespace PalCalc.Solver
             var allExceptGenderGroupFn = PalProperty.Combine(PalProperty.Pal, PalProperty.RelevantPassives, PalProperty.IvRelevance);
 
             bool WithinBreedingSteps(Pal pal, int maxSteps) => breedingdb.MinBreedingSteps[pal][spec.Pal] <= maxSteps;
-            static IV_Range MakeIV(int minValue, int value) =>
+            static IV_Value MakeIV(int minValue, int value) =>
                 new(
-                    isRelevant: minValue != 0 && value >= minValue,
-                    value: value
+                    IsRelevant: minValue != 0 && value >= minValue,
+                    Min: value,
+                    Max: value
                 );
 
             var initialContent = settings.OwnedPals

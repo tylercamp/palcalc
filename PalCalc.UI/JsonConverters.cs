@@ -262,25 +262,25 @@ namespace PalCalc.UI
             InjectDependencyConverters(serializer);
 
             PalInstance inst;
-            IV_IValue hp;
-            IV_IValue attack;
-            IV_IValue defense;
+            IV_Value hp;
+            IV_Value attack;
+            IV_Value defense;
 
             if (token["Instance"] != null)
             {
                 inst = token["Instance"].ToObject<PalInstance>(serializer);
-                hp = token["IVs"]["HP"].ToObject<IV_IValue>(serializer);
-                attack = token["IVs"]["Attack"].ToObject<IV_IValue>(serializer);
-                defense = token["IVs"]["Defense"].ToObject<IV_IValue>(serializer);
+                hp = token["IVs"]["HP"].ToObject<IV_Value>(serializer);
+                attack = token["IVs"]["Attack"].ToObject<IV_Value>(serializer);
+                defense = token["IVs"]["Defense"].ToObject<IV_Value>(serializer);
             }
             else
             {
                 // old format (changed 1.10.0)
                 inst = token.ToObject<PalInstance>(serializer);
 
-                hp = new IV_Range(isRelevant: true, inst.IV_HP);
-                attack = new IV_Range(isRelevant: true, inst.IV_Attack);
-                defense = new IV_Range(isRelevant: true, inst.IV_Defense);
+                hp = new IV_Value(IsRelevant: true, inst.IV_HP, inst.IV_HP);
+                attack = new IV_Value(IsRelevant: true, inst.IV_Attack, inst.IV_Attack);
+                defense = new IV_Value(IsRelevant: true, inst.IV_Defense, inst.IV_Defense);
             }
 
             var actualGender = token["ActualGender"]?.ToObject<PalGender>() ?? inst.Gender;
@@ -471,15 +471,15 @@ namespace PalCalc.UI
         }
     }
 
-    internal class IV_IValueConverter : JsonConverter<IV_IValue>
+    internal class IV_IValueConverter : JsonConverter<IV_Value>
     {
-        public override IV_IValue ReadJson(JsonReader reader, Type objectType, IV_IValue existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override IV_Value ReadJson(JsonReader reader, Type objectType, IV_Value existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var token = JToken.ReadFrom(reader);
-            if (token is not JObject) return IV_Random.Instance;
+            if (token is not JObject) return IV_Value.Random;
             else
             {
-                return new IV_Range(
+                return new IV_Value(
                     token["IsRelevant"]?.ToObject<bool>() ?? true,
                     token["Min"].ToObject<int>(),
                     token["Max"].ToObject<int>()
@@ -487,24 +487,20 @@ namespace PalCalc.UI
             }
         }
 
-        public override void WriteJson(JsonWriter writer, IV_IValue value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, IV_Value value, JsonSerializer serializer)
         {
-            switch (value)
+            if (value == IV_Value.Random)
             {
-                case IV_Random:
-                    JToken.FromObject("any").WriteTo(writer); break;
-
-                case IV_Range range:
-                    JToken.FromObject(new
-                    {
-                        IsRelevant = range.IsRelevant,
-                        Min = range.Min,
-                        Max = range.Max
-                    }).WriteTo(writer);
-                    break;
-
-                default:
-                    throw new NotImplementedException();
+                JToken.FromObject("any").WriteTo(writer);
+            }
+            else
+            {
+                JToken.FromObject(new
+                {
+                    IsRelevant = value.IsRelevant,
+                    Min = value.Min,
+                    Max = value.Max
+                }).WriteTo(writer);
             }
         }
     }
@@ -535,9 +531,9 @@ namespace PalCalc.UI
             var passivesProbability = (token["PassivesProbability"] ?? token["TraitsProbability"]).ToObject<float>(serializer);
             var ivsProbability = token["IVsProbability"]?.ToObject<float>(serializer) ?? 1.0f;
 
-            var IV_hp = token["IV_HP"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
-            var IV_attack = token["IV_Attack"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
-            var IV_defense = token["IV_Defense"]?.ToObject<IV_IValue>(serializer) ?? IV_Random.Instance;
+            var IV_hp = token["IV_HP"]?.ToObject<IV_Value>(serializer) ?? IV_Value.Random;
+            var IV_attack = token["IV_Attack"]?.ToObject<IV_Value>(serializer) ?? IV_Value.Random;
+            var IV_defense = token["IV_Defense"]?.ToObject<IV_Value>(serializer) ?? IV_Value.Random;
             var ivs = new IV_Set() { HP = IV_hp, Attack = IV_attack, Defense = IV_defense };
 
             return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability, ivs, ivsProbability).WithGuaranteedGender(db, gender, solverSettings.UseGenderReversers) as BredPalReference;

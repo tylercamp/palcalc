@@ -75,18 +75,18 @@ namespace PalCalc.Solver
         private LocalObjectPool<RandomPassiveSkill> randomPassivePool = poolFactory.GetObjectPool<RandomPassiveSkill>();
 
         // TODO - should be able to use an object pool for IV_Range
-        static IV_IValue MergeIVs(IV_IValue a, IV_IValue b) =>
-            (a, b) switch
-            {
-                (IV_IValue, IV_IValue) when a.IsRelevant && !b.IsRelevant => a,
-                (IV_IValue, IV_IValue) when !a.IsRelevant && b.IsRelevant => b,
+        static IV_Value MergeIVs2(IV_Value a, IV_Value b)
+        {
+            // when one IV is random, the other IV is the only one that matters
+            if (a == IV_Value.Random) return b;
+            else if (b == IV_Value.Random) return a;
 
-                (IV_IValue, IV_Random) => a,
-                (IV_Random, IV_IValue) => b,
-
-                (IV_Range va, IV_Range vb) => IV_Range.Merge(va, vb),
-                _ => throw new NotImplementedException()
-            };
+            // if both are relevant (or both irrelevant), merge them
+            if (a.IsRelevant == b.IsRelevant) return IV_Value.Merge(a, b);
+            // otherwise return the 1 relevant IV
+            else if (a.IsRelevant) return a;
+            else return b;
+        }
 
         /// <summary>
         /// Creates a list of desired combinations of passives. Meant to handle the case where there are over MAX_PASSIVES desired passives.
@@ -386,10 +386,11 @@ namespace PalCalc.Solver
                     // composite.
                     using var finalIVsRef = ivSetPool.Borrow();
 
-                    var finalIVs = finalIVsRef.Value;
-                    finalIVs.HP = MergeIVs(parent1.IVs.HP, parent2.IVs.HP);
-                    finalIVs.Attack = MergeIVs(parent1.IVs.Attack, parent2.IVs.Attack);
-                    finalIVs.Defense = MergeIVs(parent1.IVs.Defense, parent2.IVs.Defense);
+                    var finalIVs = new IV_Set(
+                        HP: MergeIVs2(parent1.IVs.HP, parent2.IVs.HP),
+                        Attack: MergeIVs2(parent1.IVs.Attack, parent2.IVs.Attack),
+                        Defense: MergeIVs2(parent1.IVs.Defense, parent2.IVs.Defense)
+                    );
 
                     // Note: We need to use `ActualPassives` for inheritance calc, NOT `EffectivePassives`. If we have:
                     //

@@ -12,15 +12,10 @@ namespace PalCalc.Solver.ResultPruning
     /// </param>
     public class OptimalIVsPruning(CancellationToken token, int maxIvDifference) : IResultPruning(token)
     {
-        static int ValueOf(IV_IValue value, int fallback, Func<IV_Range, int> map) =>
-            value switch
-            {
-                IV_Random => fallback,
-                IV_Range range => map(range),
-                _ => throw new NotImplementedException()
-            };
+        static int ValueOf(IV_Value value, int fallback, Func<IV_Value, int> map) =>
+            value == IV_Value.Random ? fallback : map(value);
 
-        static int SelectValue(IV_IValue value) =>
+        static int SelectValue(IV_Value value) =>
             ValueOf(value, 0, r => r.Max);
 
         static int TotalIVs(IV_Set ivs) =>

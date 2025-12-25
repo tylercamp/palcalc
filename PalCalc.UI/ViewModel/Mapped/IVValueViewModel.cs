@@ -26,18 +26,12 @@ namespace PalCalc.UI.ViewModel.Mapped
         bool IsRelevant { get; }
 
         /* Utils */
-        public static IVValueViewModel FromIV(IV_IValue value)
+        public static IVValueViewModel FromIV(IV_Value value)
         {
-            switch (value)
-            {
-                case IV_Random: return IVAnyValueViewModel.Instance;
-                case IV_Range range:
-                    if (range.Min == range.Max) return new IVDirectValueViewModel(range.IsRelevant, range.Min);
-                    else return new IVRangeValueViewModel(range.IsRelevant, range.Min, range.Max);
+            if (value == IV_Value.Random) return IVAnyValueViewModel.Instance;
 
-                default:
-                    throw new NotImplementedException();
-            }
+            if (value.Min == value.Max) return new IVDirectValueViewModel(value.IsRelevant, value.Min);
+            else return new IVRangeValueViewModel(value.IsRelevant, value.Min, value.Max);
         }
 
         int IComparable.CompareTo(object obj)
