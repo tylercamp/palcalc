@@ -71,25 +71,29 @@ namespace PalCalc.Solver
             int TotalMinValue(IV_Set ivs) => ivs.Attack.Min + ivs.Defense.Min + ivs.HP.Min;
 
             var match = content[p]?.FirstOrDefault();
-
             if (match == null) return true;
 
-            if (p.BreedingEffort > match.BreedingEffort) return false;
-            if (p.BreedingEffort < match.BreedingEffort) return true;
-
-            if (p.TotalCost > match.TotalCost) return false;
-            if (p.TotalCost <  match.TotalCost) return true;
-
-            switch (Math.Sign(TotalMaxValue(p.IVs) - TotalMaxValue(match.IVs)))
+            switch (p.BreedingEffort.CompareTo(match.BreedingEffort))
             {
-                // same max IVs between the two, `p` is optimal if its avg IVs are higher
-                case 0: return TotalMinValue(p.IVs) > TotalMinValue(match.IVs);
-                // `p` IVs are higher
-                case 1: return true;
-                // `p` IVs are lower
-                case -1: return false;
+                // pick the one with lower effort
+                case -1: return true;
+                case 1: return false;
+            }
 
-                default: throw new NotImplementedException(); // shouldn't happen
+            switch (p.TotalCost.CompareTo(match.TotalCost))
+            {
+                // pick the one with lower cost
+                case -1: return true;
+                case 1: return false;
+            }
+
+            switch (TotalMaxValue(p.IVs).CompareTo(TotalMaxValue(match.IVs)))
+            {
+                // pick the one with higher IVs
+                case 1: return true;
+                case -1: return false;
+                // same max IVs between the two, `p` is optimal if its avg IVs are higher
+                default: return TotalMinValue(p.IVs) > TotalMinValue(match.IVs);
             }
         }
 
