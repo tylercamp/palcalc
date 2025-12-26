@@ -10,11 +10,11 @@ namespace PalCalc.Solver.PalReference
 {
     public class WildPalReference : IPalReference
     {
-        public WildPalReference(Pal pal, IEnumerable<PassiveSkill> guaranteedPassives, int numPassives)
+        public WildPalReference(Pal pal, IEnumerable<PassiveSkill> guaranteedPassives, int numRandomPassives)
         {
             Pal = pal;
-            SelfBreedingEffort = GameConstants.TimeToCatch(pal) / GameConstants.PassivesWildAtMostN[numPassives];
-            EffectivePassives = guaranteedPassives.Concat(Enumerable.Range(0, numPassives).Select(i => new RandomPassiveSkill())).ToList();
+            SelfBreedingEffort = GameConstants.TimeToCatch(pal) / GameConstants.PassivesWildAtMostN[numRandomPassives];
+            EffectivePassives = guaranteedPassives.Concat(Enumerable.Range(0, numRandomPassives).Select(i => new RandomPassiveSkill())).ToList();
             Gender = PalGender.WILDCARD;
             CapturesRequiredForGender = 1;
 
@@ -63,7 +63,7 @@ namespace PalCalc.Solver.PalReference
 
         public int EffectivePassivesHash { get; }
 
-        private IPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
+        private WildPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
         {
             return new WildPalReference(Pal)
             {
@@ -88,24 +88,22 @@ namespace PalCalc.Solver.PalReference
             };
         }
 
-        private Dictionary<PalGender, IPalReference> cachedGuaranteedGenders = null;
+        private WildPalReference cachedMaleRef, cachedFemaleRef, cachedOppositeRef;
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)
         {
             if (Gender != PalGender.WILDCARD) throw new Exception("Wild pal has already been given a guaranteed gender");
 
             if (gender == PalGender.WILDCARD) return this;
 
-            if (cachedGuaranteedGenders == null)
+            switch (gender)
             {
-                cachedGuaranteedGenders = new List<PalGender>()
-                {
-                    PalGender.MALE,
-                    PalGender.FEMALE,
-                    PalGender.OPPOSITE_WILDCARD
-                }.ToDictionary(g => g, g => WithGuaranteedGenderImpl(db, g, useReverser));
-            }
+                case PalGender.WILDCARD: return this;
+                case PalGender.OPPOSITE_WILDCARD: return cachedOppositeRef ??= WithGuaranteedGenderImpl(db, gender, useReverser);
+                case PalGender.MALE: return cachedMaleRef ??= WithGuaranteedGenderImpl(db, gender, useReverser);
+                case PalGender.FEMALE: return cachedFemaleRef ??= WithGuaranteedGenderImpl(db, gender, useReverser);
 
-            return cachedGuaranteedGenders[gender];
+                default: throw new NotImplementedException();
+            }
         }
 
         public override bool Equals(object obj)

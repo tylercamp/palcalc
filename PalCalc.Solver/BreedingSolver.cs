@@ -142,17 +142,22 @@ namespace PalCalc.Solver
                         .Where(p => !settings.OwnedPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, settings.MaxBreedingSteps))
                         .SelectMany(p =>
-                            Enumerable
+                        {
+                            var guaranteedPassives = p.GuaranteedPassiveSkills(settings.DB);
+                            var numIrrelevantGuaranteed = guaranteedPassives.Except(spec.DesiredPassives).Count();
+
+                            return Enumerable
                                 .Range(
                                     0,
                                     // number of "effectively random" passives should exclude guaranteed passives which are part of the desired list of passives
-                                    Math.Max(
-                                        0,
-                                        settings.MaxInputIrrelevantPassives - p.GuaranteedPassiveSkills(settings.DB).Except(spec.DesiredPassives).Count()
+                                    Math.Clamp(
+                                        value: settings.MaxInputIrrelevantPassives - numIrrelevantGuaranteed,
+                                        min: numIrrelevantGuaranteed > settings.MaxInputIrrelevantPassives ? 0 : 1,
+                                        max: GameConstants.MaxTotalPassives - guaranteedPassives.Count()
                                     )
                                 )
-                                .Select(numRandomPassives => new WildPalReference(p, p.GuaranteedPassiveSkills(settings.DB), numRandomPassives))
-                        )
+                                .Select(numRandomPassives => new WildPalReference(p, guaranteedPassives, numRandomPassives));
+                        })
                         .Where(pi => pi.BreedingEffort <= settings.MaxEffort)
                 );
             }
