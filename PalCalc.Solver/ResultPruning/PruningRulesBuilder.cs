@@ -27,8 +27,8 @@ namespace PalCalc.Solver.ResultPruning
                 new List<IResultPruning>()
                 {
                     new MinimumEffortPruning(token),
-                    new OptimalIVsPruning(token, maxIvDifference: 10),
                     new MinimumBreedingStepsPruning(token),
+                    new OptimalIVsPruning(token, maxIvDifference: 10),
                     new MinimumCostPruning(token),
                     new PreferredLocationPruning(token),
                     new MinimumReusePruning(token),
