@@ -14,7 +14,7 @@ namespace PalCalc.UI.ViewModel.Mapped
     public partial class PalViewModel : ObservableObject
     {
         private static readonly DerivedLocalizableText<Pal> NameLocalizer = new DerivedLocalizableText<Pal>(
-            (locale, pal) => pal.LocalizedNames.GetValueOrElse(locale.ToFormalName().ToLower(), pal.Name)
+            (locale, pal) => pal.LocalizedNames.GetValueOrElse(locale.ToFormalName(), pal.Name)
         );
 
         private static Dictionary<Pal, PalViewModel> instances;

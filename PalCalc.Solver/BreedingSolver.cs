@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using PalCalc.Solver.FImpl.AttrId;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.Probabilities;
 using PalCalc.Solver.ResultPruning;
 using Serilog;
 using System.Collections.Concurrent;
@@ -68,7 +69,8 @@ namespace PalCalc.Solver
             static FIV MakeIV(int minValue, int value) =>
                 new(
                     isRelevant: minValue != 0 && value >= minValue,
-                    value: value
+                    minValue: value,
+                    maxValue: value
                 );
 
             var initialContent = settings.OwnedPals
@@ -141,17 +143,22 @@ namespace PalCalc.Solver
                         .Where(p => !settings.OwnedPals.Any(i => i.Pal == p))
                         .Where(p => WithinBreedingSteps(p, settings.MaxBreedingSteps))
                         .SelectMany(p =>
-                            Enumerable
+                        {
+                            var guaranteedPassives = FPassiveSet.FromModel(settings.DB, p.GuaranteedPassiveSkills(settings.DB).ToList());
+                            var numIrrelevantGuaranteed = guaranteedPassives.Except(spec.DesiredPassives).Count;
+
+                            return Enumerable
                                 .Range(
                                     0,
                                     // number of "effectively random" passives should exclude guaranteed passives which are part of the desired list of passives
-                                    Math.Max(
-                                        0,
-                                        settings.MaxInputIrrelevantPassives - p.GuaranteedPassiveSkills(settings.DB).Except(spec.DesiredPassives.ModelObjects).Count()
+                                    Math.Clamp(
+                                        value: settings.MaxInputIrrelevantPassives - numIrrelevantGuaranteed,
+                                        min: numIrrelevantGuaranteed > settings.MaxInputIrrelevantPassives ? 0 : 1,
+                                        max: GameConstants.MaxTotalPassives - guaranteedPassives.Count
                                     )
                                 )
-                                .Select(numRandomPassives => new WildPalReference(p, FPassiveSet.FromModel(settings.DB, p.GuaranteedPassiveSkills(settings.DB).ToList()), numRandomPassives))
-                        )
+                                .Select(numRandomPassives => new WildPalReference(p, FPassiveSet.FromModel(settings.DB, p.GuaranteedPassiveSkills(settings.DB).ToList()), numRandomPassives));
+                        })
                         .Where(pi => pi.BreedingEffort <= settings.MaxEffort)
                 );
             }
@@ -179,7 +186,8 @@ namespace PalCalc.Solver
             SolverStateUpdated?.Invoke(statusMsg);
 
             var workingSet = new WorkingSet(spec, settings.PruningBuilder, BuildInitialContent(spec), settings.MaxThreads, controller);
-            var tlPoolFactory = new ThreadLocal<ObjectPoolFactory>(() => new ObjectPoolFactory());
+
+            // Apply main set of breeding passes
 
             for (int s = 0; s < settings.MaxSolverIterations; s++)
             {
@@ -189,11 +197,11 @@ namespace PalCalc.Solver
                     StepIndex: s,
                     Spec: spec,
                     WorkingSet: workingSet,
-                    WorkingOptimalTimesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, TimeSpan>())
+                    WorkingOptimalTimesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, BreedingSolverEfficiencyMetric>())
                 );
                 List<WorkBatchProgress> progressEntries = [];
 
-                bool didUpdate = workingSet.UpdateContents(work =>
+                bool didUpdate = workingSet.UpdateByPairs(work =>
                 {
                     logger.Debug("Performing breeding step {step} with {numWork} work items", s+1, work.Count);
 
@@ -233,6 +241,8 @@ namespace PalCalc.Solver
                         .Range(0, settings.MaxThreads)
                         .Select(_ => new Thread(() =>
                         {
+                            var batchSolver = new BreedingBatchSolver(controller, settings, new ObjectPoolFactory());
+
                             while (true)
                             {
                                 IEnumerable<(IPalReference, IPalReference)> batch = null;
@@ -248,7 +258,6 @@ namespace PalCalc.Solver
                                 lock (progressEntries)
                                     progressEntries.Add(progress);
 
-                                var batchSolver = new BreedingBatchSolver(controller, settings, tlPoolFactory.Value);
                                 results.Add(batchSolver.ProcessBatch(batch, progress, stepState).ToList());
                             }
                         }))
@@ -287,23 +296,149 @@ namespace PalCalc.Solver
                 }
             }
 
+            // (Main breeding pass done)
+
             statusMsg.Canceled = controller.CancellationToken.IsCancellationRequested;
             statusMsg.CurrentPhase = SolverPhase.Finished;
             SolverStateUpdated?.Invoke(statusMsg);
 
+            // Do another pass which performs surgery to add desired passives to all final pals. We only do this *after* the
+            // main breeding pass - applying it with each breeding pass would _technically_ be more accurate, since it would
+            // allow replacement of irrelevant passives with relevant passives which can affect breeding time estimates.
+            //
+            // Theoretically, there's some case where this would give a faster result. However, in practice, optimal paths
+            // almost always have passive-surgery ops at the end, and including surgery after each breeding pass significantly
+            // affects compute time.
+            
+            var surgeryCompatiblePassives = spec.DesiredPassives.ModelObjects.Where(p => p.SupportsSurgery).Where(settings.SurgeryPassives.Contains).ToList();
+            if (surgeryCompatiblePassives.Any() && !controller.CancellationToken.IsCancellationRequested)
+            {
+                workingSet.UpdateBySingle(palRefs => palRefs
+                    .Where(r => r.Pal == spec.Pal)
+                    .Where(r =>
+                        // there's room for a new passive
+                        r.EffectivePassives.Count < GameConstants.MaxTotalPassives ||
+                        // there's a replaceable irrelevant passive
+                        r.EffectivePassives.CountRandom > 0 ||
+                        // there's a replaceable optional passive
+                        r.EffectivePassives.Intersect(spec.OptionalPassives).Count > 0
+                    )
+                    .TakeUntilCancelled(controller.CancellationToken)
+                    // 1. Try to add the remaining Required passives to the pal
+                    .Select(r =>
+                    {
+                        // TODO convert this logic to avoid ModelObjects
+
+                        var missingRequiredPassives = surgeryCompatiblePassives.Where(spec.RequiredPassives.ModelObjects.Contains).Except(r.EffectivePassives.ModelObjects).ToList();
+                        // if adding the required passives causes us to exceed the max surgery cost, then there's no way
+                        // to make this pal meet the full requirements, and it can be skipped
+                        if (missingRequiredPassives.Count == 0 || missingRequiredPassives.Sum(p => p.SurgeryCost) + r.TotalCost > settings.MaxSurgeryCost)
+                            return r;
+
+                        var removeablePassives = new Queue<PassiveSkill>(r.EffectivePassives.ModelObjects.OfType<RandomPassiveSkill>());
+
+                        foreach (var optional in r.EffectivePassives.ModelObjects.Where(spec.OptionalPassives.ModelObjects.Contains))
+                            removeablePassives.Enqueue(optional);
+
+                        var ops = new List<ISurgeryOperation>();
+                        var modifiedPassives = new List<PassiveSkill>(r.EffectivePassives.ModelObjects);
+
+                        foreach (var toAdd in missingRequiredPassives)
+                        {
+                            if (modifiedPassives.Count < GameConstants.MaxTotalPassives)
+                            {
+                                modifiedPassives.Add(toAdd);
+                                ops.Add(AddPassiveSurgeryOperation.NewCached(toAdd));
+                            }
+                            else if (removeablePassives.TryDequeue(out var toRemove))
+                            {
+                                modifiedPassives.Remove(toRemove);
+                                modifiedPassives.Add(toAdd);
+                                ops.Add(ReplacePassiveSurgeryOperation.NewCached(toRemove, toAdd));
+                            }
+                        }
+
+                        return new SurgeryTablePalReference(r, ops);
+                    })
+                    // 2. Fill remaining non-desired slots with Optional passives
+                    .SelectMany(r =>
+                    {
+                        var missingOptionalPassives = surgeryCompatiblePassives.Where(spec.OptionalPassives.ModelObjects.Contains).Except(r.EffectivePassives.ModelObjects).ToList();
+                        var numAddablePassives = GameConstants.MaxTotalPassives - r.EffectivePassives.ModelObjects.Count(p => p is not RandomPassiveSkill);
+
+                        // (we're still in the same UpdateBySingle pass, just the 2nd part. the pals from the previous pass haven't been stored yet, so make sure
+                        // to include them in the list of results for this pass)
+                        var res = new List<IPalReference>() { r };
+
+                        foreach (
+                            var passives in missingOptionalPassives
+                                .Combinations(numAddablePassives, null)
+                                .Where(p => r.TotalCost + p.Sum(i => i.SurgeryCost) <= settings.MaxSurgeryCost)
+                                .Where(p => p.Any())
+                                .Select(l => l.ToList())
+                        )
+                        {
+                            var removablePassives = new Queue<PassiveSkill>(r.EffectivePassives.ModelObjects.OfType<RandomPassiveSkill>());
+                            var modifiedPassives = new List<PassiveSkill>(r.EffectivePassives.ModelObjects);
+
+                            var ops = new List<ISurgeryOperation>();
+                            foreach (var toAdd in passives)
+                            {
+                                if (modifiedPassives.Count < GameConstants.MaxTotalPassives)
+                                {
+                                    modifiedPassives.Add(toAdd);
+                                    ops.Add(AddPassiveSurgeryOperation.NewCached(toAdd));
+                                }
+                                else if (removablePassives.TryDequeue(out var toRemove))
+                                {
+                                    modifiedPassives.Remove(toRemove);
+                                    modifiedPassives.Add(toAdd);
+                                    ops.Add(ReplacePassiveSurgeryOperation.NewCached(toRemove, toAdd));
+                                }
+                                else
+                                {
+#if DEBUG_CHECKS
+                                    Debugger.Break();
+#endif
+                                }
+                            }
+
+                            res.Add(new SurgeryTablePalReference(r, ops));
+                        }
+
+                        return res;
+                    })
+                );
+
+            }
+
+            IEnumerable<IPalReference> EnforceRequiredGender(IPalReference input)
+            {
+                if (spec.RequiredGender != PalGender.WILDCARD && input.Gender != spec.RequiredGender)
+                {
+                    // pals with indeterminate gender can naturally be forced to a specific gender
+                    // pals with a specific gender can also be forced with surgery if enabled
+                    if (input.Gender == PalGender.WILDCARD || settings.UseGenderReversers)
+                        yield return input.WithGuaranteedGender(settings.DB, spec.RequiredGender, settings.UseGenderReversers);
+
+                    // otherwise this pal doesn't have the required gender and can't be forced to that
+                    // gender, skip it
+                }
+                else
+                {
+                    // no need to enforce gender, or pal is already the required gender
+                    yield return input;
+                }
+
+            }
             return workingSet
                 .Result
                 // the breeding logic will never emit pals which exceed this limit, but this isn't applied for owned pals
                 // which already satisfy the pal specifier
                 .Where(r => r.ActualPassives.Except(spec.DesiredPassives).Count <= settings.MaxBredIrrelevantPassives)
-                .Select(r =>
-                {
-                    if (spec.RequiredGender != PalGender.WILDCARD)
-                        return r.WithGuaranteedGender(settings.DB, spec.RequiredGender);
-                    else
-                        return r;
-
-                }).ToList();
+                .SelectMany(EnforceRequiredGender)
+                .Distinct()
+                .ToList();
         }
     }
 }

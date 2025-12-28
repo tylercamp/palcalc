@@ -86,9 +86,13 @@ namespace PalCalc.Solver.PalReference
 
         public TimeSpan SelfBreedingEffort { get; } = TimeSpan.Zero;
 
+        public int TotalCost => 0;
+
         private CompositeOwnedPalReference oppositeWildcardReference;
-        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)
         {
+            // (we have direct reprs for both genders, no need to check useReverser)
+
             switch (gender)
             {
                 case PalGender.MALE: return Male;

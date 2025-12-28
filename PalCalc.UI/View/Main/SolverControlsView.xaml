@@ -40,6 +40,48 @@
                 <RowDefinition />
                 <RowDefinition Height="{StaticResource SepHeight}" />
                 <RowDefinition />
+                <RowDefinition Height="{StaticResource SepHeight}" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="{StaticResource SepWidth}" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS}" />
+            <CheckBox
+                Grid.Row="0" Grid.Column="2"
+                IsChecked="{Binding UseGenderReversers, Mode=TwoWay}"
+                IsEnabled="{Binding CanEditSettings}"
+                ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION}"
+                ToolTipService.ShowOnDisabled="True"
+                />
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_MAX_GOLD_COST}"/>
+            <vu:IntegerTextBox
+                Grid.Row="2" Grid.Column="2"
+                Value="{Binding MaxGoldCost}"
+                IsEnabled="{Binding CanEditSettings}"
+                MinValue="0" MaxValue="1000000"
+                ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_MAX_GOLD_COST_DESCRIPTION}"
+                ToolTipService.ShowOnDisabled="True"
+                MinWidth="60"
+            />
+
+            <Button Grid.Row="4"
+                    Grid.ColumnSpan="99"
+                    Command="{Binding ChangeSurgeryPassives}"
+                    IsEnabled="{Binding CanEditSettings}"
+                    Content="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_SURGERY_ALLOWED_PASSIVES}"
+            />
+        </Grid>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="{StaticResource SepHeight}" />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />

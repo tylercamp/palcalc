@@ -177,6 +177,8 @@ namespace PalCalc.Solver
                 // Surgery pass
 
             } while (didChange);
+
+            throw new NotImplementedException();
         }
     }
 }

@@ -24,6 +24,9 @@ namespace PalCalc.Solver.Tree
                 case CompositeOwnedPalReference copr:
                     return new CompositePalNode(copr);
 
+                case SurgeryTablePalReference stpr:
+                    return new SurgeryResultNode(stpr, BuildNode(stpr.Input));
+
                 default: throw new NotImplementedException();
             }
         }

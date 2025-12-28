@@ -11,25 +11,47 @@ namespace PalCalc.Solver
 {
     public static class SolverExtensions
     {
-        public static int NumWildPalParticipants(this IPalReference pref)
+        // thanks chatgpt
+        // Returns the list of combinations of elements in the given list, where combinations are order-independent
+        internal static IEnumerable<List<T>> Combinations<T>(this List<T> elements, int maxSubListSize, LocalListPool<T> pool)
         {
-            switch (pref)
+            // Use indices-based iteration with pooled output lists
+            var indices = new int[maxSubListSize];
+            for (int size = 0; size <= Math.Min(maxSubListSize, elements.Count); size++)
             {
-                case BredPalReference bpr: return NumWildPalParticipants(bpr.Parent1) + NumWildPalParticipants(bpr.Parent2);
-                case OwnedPalReference opr: return 0;
-                case WildPalReference wpr: return 1;
-                case CompositeOwnedPalReference c: return 0;
-                default: throw new Exception($"Unhandled pal reference type {pref.GetType()}");
+                if (size == 0)
+                {
+                    var result = pool?.BorrowRaw() ?? [];
+                    yield return result;
+                    continue;
+                }
+
+                // Initialize indices
+                for (int i = 0; i < size; i++) indices[i] = i;
+
+                while (true)
+                {
+                    var result = pool?.BorrowRaw() ?? [];
+                    for (int i = 0; i < size; i++)
+                        result.Add(elements[indices[i]]);
+                    yield return result;
+
+                    // Advance to next combination
+                    int k = size - 1;
+                    while (k >= 0 && indices[k] == elements.Count - size + k)
+                        k--;
+                    if (k < 0) break;
+                    indices[k]++;
+                    for (int j = k + 1; j < size; j++)
+                        indices[j] = indices[j - 1] + 1;
+                }
             }
         }
 
+        // Returns a list of passives acting as a representation of `actualPassives` being dedicated to some set of desired passives;
+        // i.e., everything in `desired` is preserved, everything else is just `Random`
         public static List<PassiveSkill> ToDedicatedPassives(this IEnumerable<PassiveSkill> actualPassives, IEnumerable<PassiveSkill> desiredPassives)
         {
-            var irrelevantAsRandom = actualPassives
-                .Except(desiredPassives)
-                .Where(p => !p.TrackedEffects.Any(e => e.InternalName == PassiveSkillEffect.BreedSpeed))
-                .Select(_ => new RandomPassiveSkill());
-
             return actualPassives
                 .Select(p =>
                     desiredPassives.Contains(p) || p.TrackedEffects.Any(e => e.InternalName == PassiveSkillEffect.BreedSpeed)
@@ -65,6 +87,10 @@ namespace PalCalc.Solver
                 case BredPalReference bpr:
                     foreach (var r in bpr.Parent1.AllReferences()) yield return r;
                     foreach (var r in bpr.Parent2.AllReferences()) yield return r;
+                    break;
+
+                case SurgeryTablePalReference stpr:
+                    foreach (var r in stpr.Input.AllReferences()) yield return r;
                     break;
             }
         }

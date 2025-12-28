@@ -61,15 +61,18 @@ internal class Program
                 db: db,
                 pruningBuilder: PruningRulesBuilder.Default,
                 ownedPals: savedInstances,
-                maxBreedingSteps: 20,
-                maxSolverIterations: 20,
-                maxWildPals: 1,
+                maxBreedingSteps: 99,
+                maxSolverIterations: 99,
+                maxWildPals: 99,
                 allowedWildPals: db.Pals.ToList(),
                 bannedBredPals: new List<Pal>(),
-                maxBredIrrelevantPassives: 0,
-                maxInputIrrelevantPassives: 2,
+                maxBredIrrelevantPassives: 2,
+                maxInputIrrelevantPassives: 4,
                 maxEffort: TimeSpan.FromDays(7),
-                maxThreads: 1
+                maxThreads: 0,
+                maxSurgeryCost: 1_000_000,
+                allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
+                useGenderReversers: true
             )
         );
 
@@ -81,8 +84,8 @@ internal class Program
             Pal = "Beakon".ToPal(db),
             RequiredPassives = FPassiveSet.FromModel(db, ["Swift".ToStandardPassive(db), "Runner".ToStandardPassive(db), "Nimble".ToStandardPassive(db)]),
             IV_Attack = 90,
-            IV_Defense = 90,
-            IV_HP = 90
+            //IV_Defense = 90,
+            //IV_HP = 90
         };
 
         var controller = new SolverStateController()
@@ -94,7 +97,7 @@ internal class Program
         Console.WriteLine("Took {0}", TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds));
 
         Console.WriteLine("\n\nRESULTS:");
-        foreach (var match in matches)
+        foreach (var match in matches.OrderBy(m => m.BreedingEffort))
         {
             var tree = new BreedingTree(match);
             tree.Print();

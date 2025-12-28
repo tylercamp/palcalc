@@ -13,7 +13,7 @@ namespace PalCalc.Solver.ResultPruning
         {
         }
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
+        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
             MinGroupOf(results, r => r.NumTotalWildPals);
     }
 }

@@ -17,11 +17,11 @@ namespace PalCalc.Solver.ResultPruning
             this.maxSimilarityPercent = maxSimilarityPercent;
         }
 
-        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results)
+        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results, CachedResultData cachedData)
         {
             var palOccurrences = results.ToDictionary(r => r, r =>
             {
-                return r.AllReferences().GroupBy(ir => ir.Pal).ToDictionary(g => g.Key, g => g.Count());
+                return cachedData.InnerReferences[r].GroupBy(ir => ir.Pal).ToDictionary(g => g.Key, g => g.Count());
             });
 
             var totalPalOccurrences = new Dictionary<Pal, int>();
@@ -39,7 +39,7 @@ namespace PalCalc.Solver.ResultPruning
             // (for each observed pal in the results, ordered by which pal is used the most, find the results which have the most references to that pal)
             foreach (var pal in totalPalOccurrences.OrderByDescending(kvp => kvp.Value).Select(kvp => kvp.Key))
             {
-                if (token.IsCancellationRequested) return Empty;
+                if (token.IsCancellationRequested) return [];
 
                 var nextCommonResults = commonResults.GroupBy(r => palOccurrences[r].GetValueOrElse(pal, 0)).OrderByDescending(g => g.Key).SelectMany(g => g).ToList();
                 if (nextCommonResults.Count > 0)
@@ -54,7 +54,7 @@ namespace PalCalc.Solver.ResultPruning
             var prunedResults = new List<IPalReference>() { commonResults.First() };
             foreach (var currentResult in results)
             {
-                if (token.IsCancellationRequested) return Empty;
+                if (token.IsCancellationRequested) return [];
 
                 if (prunedResults.Contains(currentResult)) continue;
 

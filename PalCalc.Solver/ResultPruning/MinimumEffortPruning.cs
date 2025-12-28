@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.ResultPruning
 {
     // main default pruning
-    public class MinimumEffortPruning : IResultPruning
+    public class MinimumEffortPruning : IResultPruning.ForceDeterministic
     {
         public MinimumEffortPruning(CancellationToken token) : base(token)
         {
         }
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results) =>
+        protected override IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
             MinGroupOf(results, r => r.BreedingEffort);
     }
 }

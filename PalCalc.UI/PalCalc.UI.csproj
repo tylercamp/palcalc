@@ -128,6 +128,7 @@
     <None Remove="Resources\Pals\Gumoss.png" />
     <None Remove="Resources\Pals\Hangyu Cryst.png" />
     <None Remove="Resources\Pals\Hangyu.png" />
+    <None Remove="Resources\Pals\Hartalis.png" />
     <None Remove="Resources\Pals\Helzephyr Lux.png" />
     <None Remove="Resources\Pals\Helzephyr.png" />
     <None Remove="Resources\Pals\Herbil.png" />
@@ -271,6 +272,7 @@
     <None Remove="Resources\SkillElements\Leaf.png" />
     <None Remove="Resources\SkillElements\Normal.png" />
     <None Remove="Resources\SkillElements\Water.png" />
+    <None Remove="Resources\SurgeryTable.png" />
     <None Remove="Resources\TraitRank\Passive_Negative_2_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Negative_3_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Positive_1_icon.png" />
@@ -414,6 +416,7 @@
     <Resource Include="Resources\Pals\Gumoss.png" />
     <Resource Include="Resources\Pals\Hangyu Cryst.png" />
     <Resource Include="Resources\Pals\Hangyu.png" />
+    <Resource Include="Resources\Pals\Hartalis.png" />
     <Resource Include="Resources\Pals\Helzephyr Lux.png" />
     <Resource Include="Resources\Pals\Helzephyr.png" />
     <Resource Include="Resources\Pals\Herbil.png" />
@@ -557,6 +560,7 @@
     <Resource Include="Resources\SkillElements\Leaf.png" />
     <Resource Include="Resources\SkillElements\Normal.png" />
     <Resource Include="Resources\SkillElements\Water.png" />
+    <Resource Include="Resources\SurgeryTable.png" />
     <Resource Include="Resources\TraitRank\Passive_Negative_1_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Negative_2_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Negative_3_icon.png" />

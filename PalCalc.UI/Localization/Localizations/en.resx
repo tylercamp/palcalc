@@ -818,6 +818,15 @@ Higher values linearly affect time required, depending on how many types of pals
   <data name="LC_STARTUP_LOADING" xml:space="preserve">
     <value>Loading...</value>
   </data>
+  <data name="LC_SURGERY_ADD_PASSIVE" xml:space="preserve">
+    <value>Add {AddedPassive}</value>
+  </data>
+  <data name="LC_SURGERY_CHANGE_GENDER" xml:space="preserve">
+    <value>Change gender to {NewGender}</value>
+  </data>
+  <data name="LC_SURGERY_REPLACE_PASSIVE" xml:space="preserve">
+    <value>Replace {RemovedPassive} with {AddedPassive}</value>
+  </data>
   <data name="LC_TARGET_PAL" xml:space="preserve">
     <value>Target Pal</value>
   </data>
@@ -898,5 +907,50 @@ Higher values linearly affect time required, depending on how many types of pals
   </data>
   <data name="LC_WINDOW_TITLE" xml:space="preserve">
     <value>Pal Calc</value>
+  </data>
+  <data name="LC_SURGERY_STEP_TITLE" xml:space="preserve">
+    <value>Surgery</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS" xml:space="preserve">
+    <value>Use Gender Reversers</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION" xml:space="preserve">
+    <value>Whether to assume the use of Gender Reversers for breeding effort calculations. This prevents Pal Calc from including gender probabilities, and allows Pal Calc to force-breed pals with incompatible genders.
+
+Gender Reversers are not shown in the breeding graph. If enabled, Owned Pals in the graph may be shown with a different gender.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_SURGERY_ALLOWED_PASSIVES" xml:space="preserve">
+    <value>Allowed Surgery Passives</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_GOLD_COST" xml:space="preserve">
+    <value>Max Gold Cost</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_GOLD_COST_DESCRIPTION" xml:space="preserve">
+    <value>The maximum total gold cost for breeding paths which use the Surgery Table to add or replace passives.
+
+Set this to 0 to prevent using the Surgery Table for passive skills.
+
+Higher values have minimal effect on time required.</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_COST" xml:space="preserve">
+    <value>Surgery Cost</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_DESCRIPTION" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_NAME" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_ITEM" xml:space="preserve">
+    <value>Item Required</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_TITLE" xml:space="preserve">
+    <value>Available Passives for Surgery</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_ITEM_NO" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_ITEM_YES" xml:space="preserve">
+    <value>Yes</value>
   </data>
 </root>

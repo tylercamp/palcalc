@@ -30,8 +30,6 @@ namespace PalCalc.UI.View
             Wpf.Util.GridViewSort.ApplySort(m_ListView.Items, nameof(PalCheckListEntryViewModel.PaldexNoValue));
         }
 
-        protected PalCheckListViewModel ViewModel => DataContext as PalCheckListViewModel;
-
         private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var senderElem = sender as FrameworkElement;

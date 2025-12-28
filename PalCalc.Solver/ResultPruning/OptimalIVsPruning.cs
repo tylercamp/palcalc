@@ -13,8 +13,7 @@ namespace PalCalc.Solver.ResultPruning
     /// </param>
     public class OptimalIVsPruning(CancellationToken token, int maxIvDifference) : IResultPruning(token)
     {
-
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results)
+        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData)
         {
             // note: all pals within a group being pruned should:
             //
@@ -33,21 +32,16 @@ namespace PalCalc.Solver.ResultPruning
             // IVs doesn't affect whether we get a relevant result (see above), so we'll instead
             // try to maximize the highest possible value
 
-            int TotalMaxIVs(FIVSet ivs) => ivs.HP.Max + ivs.Attack.Max + ivs.Defense.Max;
-            int TotalMinIVs(FIVSet ivs) => ivs.HP.Min + ivs.Attack.Min + ivs.Defense.Min;
-
+            static int TotalMaxIVs(FIVSet ivs) => ivs.HP.Max + ivs.Attack.Max + ivs.Defense.Max;
             if (token.IsCancellationRequested) return results;
 
-            var bestOption = results.OrderByDescending(r => TotalMaxIVs(r.IVs) * 1000 + TotalMinIVs(r.IVs)).FirstOrDefault();
-            if (bestOption == null) return [];
+            // could multiply maxIvDifference by the number of relevant IV types, but this
+            // just further prunes results, and I'd prefer to give later pruning steps an
+            // opportunity to apply their pruning
+            var bestValue = results.Max(r => TotalMaxIVs(r.IVs));
+            var threshold = bestValue - maxIvDifference * 3;
 
-            var bestMaxIVs = TotalMaxIVs(bestOption.IVs);
-            var bestMinIVs = TotalMinIVs(bestOption.IVs);
-
-            return results.Where(r =>
-                (bestMaxIVs - TotalMaxIVs(r.IVs) <= maxIvDifference * 3) &&
-                (bestMinIVs - TotalMinIVs(r.IVs) <= maxIvDifference * 3)
-            );
+            return results.Where(p => TotalMaxIVs(p.IVs) >= threshold);
         }
     }
 }

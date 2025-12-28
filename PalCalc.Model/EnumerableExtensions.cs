@@ -9,37 +9,6 @@ namespace PalCalc.Model
 {
     public static class EnumerableExtensions
     {
-        // thanks chatgpt
-        // Returns the list of combinations of elements in the given list, where combinations are order-independent
-        public static IEnumerable<IEnumerable<T>> Combinations<T>(this List<T> elements, int maxSubListSize)
-        {
-            for (int i = 0; i <= maxSubListSize; i++)
-            {
-                foreach (var combo in GenerateCombinations(elements, i))
-                {
-                    yield return combo;
-                }
-            }
-        }
-
-        private static IEnumerable<IEnumerable<T>> GenerateCombinations<T>(List<T> list, int combinationSize)
-        {
-            if (combinationSize == 0)
-            {
-                yield return new T[0];
-            }
-            else
-            {
-                for (int i = 0; i < list.Count; i++)
-                {
-                    foreach (var next in GenerateCombinations(list.Skip(i + 1).ToList(), combinationSize - 1))
-                    {
-                        yield return new T[] { list[i] }.Concat(next);
-                    }
-                }
-            }
-        }
-
         public static int PreferredParallelBatchSize(this long collectionSize) =>
             (int)Math.Min(
                 100000,
@@ -57,8 +26,8 @@ namespace PalCalc.Model
             }
         }
 
-        public static IEnumerable<IEnumerable<T>> BatchedForParallel<T>(this List<T> elements) =>
-            elements.Batched(elements.PreferredParallelBatchSize());
+        public static ParallelQuery<IEnumerable<T>> BatchedAsParallel<T>(this List<T> elements) =>
+            elements.Batched(elements.PreferredParallelBatchSize()).AsParallel();
 
         public static IEnumerable<T> SkipNull<T>(this IEnumerable<T> elements) => elements.Where(v => v != null);
 
@@ -154,7 +123,64 @@ namespace PalCalc.Model
         }
 
         // (copy of above impl. with slightly different signature to avoid need for iterator in a Solver hotpath)
-        public static int SetHash<T, V>(this List<T> elements, Func<T, V> selector)
+        public static int SetHash<T, V>(this IReadOnlyList<T> elements, Func<T, V> selector)
+        {
+            // Stack allocation: no heap allocations here
+            Span<int> buffer = stackalloc int[SetHashMaxSize];
+            int count = elements.Count;
+            if (count > SetHashMaxSize)
+                throw new InvalidOperationException("Too many elements in the set.");
+
+            // Read hash codes into the buffer
+            for (int i = 0; i < elements.Count; i++)
+            {
+                buffer[i] = selector(elements[i])?.GetHashCode() ?? 0;
+            }
+
+            // In-place insertion sort on the small buffer
+            for (int i = 1; i < count; i++)
+            {
+                int key = buffer[i];
+                int j = i - 1;
+
+                // Move elements greater than 'key' one position ahead 
+                while (j >= 0 && buffer[j] > key)
+                {
+                    buffer[j + 1] = buffer[j];
+                    j--;
+                }
+
+                buffer[j + 1] = key;
+            }
+
+            // Now the span is sorted; group duplicates and combine hashes
+            int baseHash = 0;
+            int total = 0;
+
+            int idx = 0;
+            while (idx < count)
+            {
+                int currentHash = buffer[idx];
+                int freq = 1;
+                idx++;
+
+                // Count how many duplicates of currentHash
+                while (idx < count && buffer[idx] == currentHash)
+                {
+                    freq++;
+                    idx++;
+                }
+
+                baseHash = HashCode.Combine(baseHash, currentHash, freq);
+                total += freq;
+            }
+
+            // Final combine with total to avoid collisions from same frequency patterns
+            return HashCode.Combine(baseHash, total);
+        }
+
+        // (copy of above impl. with slightly different signature to avoid need for iterator in a Solver hotpath)
+        public static int ListSetHash<T>(this IReadOnlyList<T> elements)
         {
             // Stack allocation: no heap allocations here
             Span<int> buffer = stackalloc int[SetHashMaxSize];
@@ -166,7 +192,7 @@ namespace PalCalc.Model
                 if (count == SetHashMaxSize)
                     throw new InvalidOperationException("Too many elements in the set.");
 
-                buffer[count++] = selector(element)?.GetHashCode() ?? 0;
+                buffer[count++] = element?.GetHashCode() ?? 0;
             }
 
             // In-place insertion sort on the small buffer

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,12 +17,25 @@ namespace PalCalc.Model
         }
 
         public string Name { get; }
+
+        [JsonConverter(typeof(CaseInsensitiveStringDictionaryConverter<string>))]
         public Dictionary<string, string> LocalizedNames { get; set; }
 
         public string InternalName { get; }
         public int Rank { get; }
 
+        /// <summary>
+        /// Monetary cost to apply this passive via Surgery (0 if not applicable).
+        /// </summary>
+        public int SurgeryCost { get; set; } = 0;
+        public string SurgeryRequiredItem { get; set; } = null;
+
+        [JsonIgnore]
+        public bool SupportsSurgery => SurgeryCost > 0;
+
         public string Description { get; set; }
+
+        [JsonConverter(typeof(CaseInsensitiveStringDictionaryConverter<string>))]
         public Dictionary<string, string> LocalizedDescriptions { get; set; }
 
         // whether this is a passive you would find on a pal's list of passives,

@@ -24,6 +24,8 @@ namespace PalCalc.Solver.PalReference
             ActualPassives = FPassiveSet.FromModel(db, instance.PassiveSkills);
 
             IVs = effectiveIVs;
+
+            Gender = instance.Gender;
         }
 
         public PalInstance UnderlyingInstance => instance;
@@ -37,12 +39,15 @@ namespace PalCalc.Solver.PalReference
 
         public FIVSet IVs { get; }
 
-        public PalGender Gender => instance.Gender;
+        // (Make this private-settable for use by WithGuaranteedGender when gender-reversers are enabled)
+        public PalGender Gender { get; private set; }
 
         public IPalRefLocation Location => new OwnedRefLocation() { OwnerId = instance.OwnerPlayerId, Location = instance.Location };
 
         public TimeSpan BreedingEffort => TimeSpan.Zero;
         public TimeSpan SelfBreedingEffort => TimeSpan.Zero;
+
+        public int TotalCost => 0;
 
         public int NumTotalBreedingSteps => 0;
 
@@ -50,9 +55,31 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalWildPals => 0;
 
-        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender)
+        private OwnedPalReference cachedFemaleRef, cachedMaleRef, cachedWildcardRef, cachedOppositeWildcardRef;
+
+        private OwnedPalReference MakeGuaranteedGenderImpl(PalDB db, PalGender gender)
         {
-            if (gender != Gender) throw new Exception("Cannot force a gender change for owned pals");
+            var res = new OwnedPalReference(db, instance, EffectivePassives.ModelObjects.ToList(), IVs);
+            res.Gender = gender;
+            return res;
+        }
+
+        public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)
+        {
+            if (gender != Gender)
+            {
+                if (!useReverser)
+                    throw new Exception("Cannot force a gender change for owned pals without a gender reverser");
+
+                switch (gender)
+                {
+                    case PalGender.FEMALE: return cachedFemaleRef ??= MakeGuaranteedGenderImpl(db, gender);
+                    case PalGender.MALE: return cachedMaleRef ??= MakeGuaranteedGenderImpl(db, gender);
+                    case PalGender.OPPOSITE_WILDCARD: return cachedOppositeWildcardRef ??= MakeGuaranteedGenderImpl(db, gender);
+                    case PalGender.WILDCARD: return cachedWildcardRef ??= MakeGuaranteedGenderImpl(db, gender);
+                }
+            }
+
             return this;
         }
 

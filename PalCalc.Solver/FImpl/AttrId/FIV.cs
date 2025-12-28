@@ -15,7 +15,7 @@ namespace PalCalc.Solver.FImpl.AttrId
         private const ushort IS_RANDOM = 0b01_0000000_0000000;
         public static readonly FIV Random = new(IS_RANDOM);
 
-        public FIV(IV_IValue v) : this(v.IsRelevant, v.Min, v.Max)
+        public FIV(IV_Value v) : this(v.IsRelevant, v.Min, v.Max)
         {
         }
 
@@ -59,13 +59,13 @@ namespace PalCalc.Solver.FImpl.AttrId
         public bool Satisfies(int minValue) =>
             !IsRandom && Min >= minValue;
 
-        public IV_IValue ModelObject
+        public IV_Value ModelObject
         {
             get
             {
-                if (this == Random) return IV_Random.Instance;
+                if (this == Random) return IV_Value.Random;
 
-                return new IV_Range(IsRelevant, Min, Max);
+                return new IV_Value(IsRelevant, Min, Max);
             }
         }
     }
