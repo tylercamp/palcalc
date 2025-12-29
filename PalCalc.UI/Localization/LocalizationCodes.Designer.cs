@@ -647,6 +647,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_RESULT_COLUMNS_RESET,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_RESULT_INPUT_LOCS,
         /// <summary>
         ///   Looks up a localized string similar to .

@@ -51,6 +51,14 @@ namespace PalCalc.UI.Model
         public List<PassiveSkill> BannedSurgeryPassives(PalDB db) => BannedSurgeryPassiveInternalNames.Select(n => n.InternalToStandardPassive(db)).ToList();
     }
 
+    public class BreedingResultListColumnSettings
+    {
+        // If key exists: true = force visible, false = force hidden
+        // If key doesn't exist: auto (follow ViewModel)
+        public Dictionary<string, bool> ColumnVisibility { get; set; } = new();
+        public List<string> ColumnOrder { get; set; } = new();
+    }
+
     public class AppSettings
     {
         public static AppSettings Current = null;
@@ -68,5 +76,7 @@ namespace PalCalc.UI.Model
         public string SelectedGameIdentifier { get; set; } = null;
 
         public TranslationLocale Locale { get; set; } = TranslationLocale.en;
+
+        public BreedingResultListColumnSettings BreedingResultListColumns { get; set; } = new();
     }
 }

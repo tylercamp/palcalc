@@ -953,4 +953,7 @@ Higher values have minimal effect on time required.</value>
   <data name="LC_PASSIVES_CHECKLIST_SURGERY_ITEM_YES" xml:space="preserve">
     <value>Yes</value>
   </data>
+  <data name="LC_RESULT_COLUMNS_RESET" xml:space="preserve">
+    <value>Reset All Columns</value>
+  </data>
 </root>
