@@ -71,15 +71,6 @@ namespace PalCalc.UI
 
             // (`Content` inherits the DataContext of the window, but we don't want `LoadingPage` to inherit that)
             (Content as LoadingPage).DataContext = null;
-
-#if DEBUG
-            if (App.TranslationErrors.Count > 0)
-            {
-                var debugWindow = new TranslationDebugWindow();
-                debugWindow.DataContext = new TranslationDebugViewModel(App.TranslationErrors);
-                debugWindow.Show();
-            }
-#endif
         }
     }
 }

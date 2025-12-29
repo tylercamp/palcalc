@@ -35,6 +35,9 @@
                         </Style>
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
+                <MenuItem Header="Debug" Padding="5" Name="DebugMenuItem">
+                    <MenuItem Header="Translation Debugger" Click="TranslationDebugger_Click" />
+                </MenuItem>
             </Menu>
             <Grid>
                 <Grid.ColumnDefinitions>

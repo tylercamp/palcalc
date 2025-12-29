@@ -31,7 +31,12 @@ All changes will be made in this "Localization" folder.
 
 This will create and run the Pal Calc program.
 
-Running with Visual Studio will also open a "Translation Debug" window. The Translation Debug window has a tab for each language with translation errors. It lists all errors, their `LC`, and sample English text.
+In Debug mode, a "Debug" menu appears in the toolbar. To open the Translation Debug window:
+
+1. Click the "Debug" menu
+2. Click "Translation Debugger"
+
+The Translation Debug window has a tab for each language with translation errors. It lists all errors, their `LC`, and sample English text.
 
 ### 4. Edit Translation Files
 

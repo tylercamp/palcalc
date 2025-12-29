@@ -33,12 +33,24 @@ namespace PalCalc.UI
 
             var sw = Stopwatch.StartNew();
             DataContext = new MainWindowViewModel(Dispatcher, null);
+
+#if DEBUG
+            DebugMenuItem.Visibility = Visibility.Visible;
+#else
+            DebugMenuItem.Visibility = Visibility.Collapsed;
+#endif
         }
 
         internal MainPage(MainWindowViewModel vm)
         {
             InitializeComponent();
             DataContext = vm;
+
+#if DEBUG
+            DebugMenuItem.Visibility = Visibility.Visible;
+#else
+            DebugMenuItem.Visibility = Visibility.Collapsed;
+#endif
         }
 
         private MainWindowViewModel ViewModel => DataContext as MainWindowViewModel;
@@ -58,6 +70,13 @@ namespace PalCalc.UI
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             Process.Start(new ProcessStartInfo { FileName = e.Uri.ToString(), UseShellExecute = true });
+        }
+
+        private void TranslationDebugger_Click(object sender, RoutedEventArgs e)
+        {
+            var debugWindow = new TranslationDebugWindow();
+            debugWindow.DataContext = new TranslationDebugViewModel(App.TranslationErrors);
+            debugWindow.Show();
         }
     }
 }
