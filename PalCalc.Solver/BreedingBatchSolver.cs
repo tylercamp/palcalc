@@ -71,11 +71,9 @@ namespace PalCalc.Solver
 
         private LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();
         private LocalListPool<(IPalReference, IPalReference)> palPairListPool = poolFactory.GetListPool<(IPalReference, IPalReference)>();
-        private LocalObjectPool<IV_Set> ivSetPool = poolFactory.GetObjectPool<IV_Set>();
         private LocalObjectPool<RandomPassiveSkill> randomPassivePool = poolFactory.GetObjectPool<RandomPassiveSkill>();
 
-        // TODO - should be able to use an object pool for IV_Range
-        static IV_Value MergeIVs2(IV_Value a, IV_Value b)
+        static IV_Value MergeIVs(IV_Value a, IV_Value b)
         {
             // when one IV is random, the other IV is the only one that matters
             if (a == IV_Value.Random) return b;
@@ -384,12 +382,10 @@ namespace PalCalc.Solver
                     // Must happen while going through the gendered pals - a composite pal with a specific gender
                     // will resolve to a specific pal with an exact set of IVs rather than a range like the original
                     // composite.
-                    using var finalIVsRef = ivSetPool.Borrow();
-
                     var finalIVs = new IV_Set(
-                        HP: MergeIVs2(parent1.IVs.HP, parent2.IVs.HP),
-                        Attack: MergeIVs2(parent1.IVs.Attack, parent2.IVs.Attack),
-                        Defense: MergeIVs2(parent1.IVs.Defense, parent2.IVs.Defense)
+                        HP: MergeIVs(parent1.IVs.HP, parent2.IVs.HP),
+                        Attack: MergeIVs(parent1.IVs.Attack, parent2.IVs.Attack),
+                        Defense: MergeIVs(parent1.IVs.Defense, parent2.IVs.Defense)
                     );
 
                     // Note: We need to use `ActualPassives` for inheritance calc, NOT `EffectivePassives`. If we have:
@@ -483,7 +479,6 @@ namespace PalCalc.Solver
 
                                 if (updated && res.BreedingEffort <= settings.MaxEffort)
                                 {
-                                    finalIVsRef.Retain();
                                     newPassivesRef.Retain();
 
                                     yield return res;
