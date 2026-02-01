@@ -958,4 +958,7 @@ Daha yüksek değerler, gereken süre üzerinde minimum etkiye sahiptir..</value
   <data name="LC_PASSIVES_CHECKLIST_SURGERY_ITEM_YES" xml:space="preserve">
     <value>Evet</value>
   </data>
+  <data name="LC_RESULT_COLUMNS_RESET" xml:space="preserve">
+    <value>Tüm Sütunları Sıfırla</value>
+  </data>
 </root>
