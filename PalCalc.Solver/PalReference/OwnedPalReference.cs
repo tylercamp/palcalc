@@ -19,7 +19,7 @@ namespace PalCalc.Solver.PalReference
 
             EffectivePassives = effectivePassives;
             EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
-            TimeFactor = effectivePassives.ToTimeFactor();
+            TimeFactor = instance.PassiveSkills.ToTimeFactor();
 
             ActualPassives = instance.PassiveSkills;
 
