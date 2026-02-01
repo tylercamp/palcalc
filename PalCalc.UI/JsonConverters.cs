@@ -167,12 +167,12 @@ namespace PalCalc.UI
         CompositePalReferenceConverter cprc;
         SurgeryPalReferenceConverter sprc;
 
-        public PalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings) : base(db, gameSettings)
+        public PalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, PalSpecifier target) : base(db, gameSettings)
         {
-            this.oprc = new OwnedPalReferenceConverter(db, gameSettings, solverSettings);
+            this.oprc = new OwnedPalReferenceConverter(db, gameSettings, solverSettings, target);
             this.wprc = new WildPalReferenceConverter(db, gameSettings, solverSettings);
             this.bprc = new BredPalReferenceConverter(db, gameSettings, solverSettings, this);
-            this.cprc = new CompositePalReferenceConverter(db, gameSettings, solverSettings);
+            this.cprc = new CompositePalReferenceConverter(db, gameSettings, solverSettings, target);
             this.sprc = new SurgeryPalReferenceConverter(db, gameSettings, this);
 
             dependencyConverters = [
@@ -227,9 +227,11 @@ namespace PalCalc.UI
     internal class OwnedPalReferenceConverter : IPalReferenceConverterBase<OwnedPalReference>
     {
         private SerializableSolverSettings solverSettings;
-        public OwnedPalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings) : base(db, gameSettings, "OWNED_PAL")
+        private PalSpecifier target;
+        public OwnedPalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, PalSpecifier target) : base(db, gameSettings, "OWNED_PAL")
         {
             this.solverSettings = solverSettings;
+            this.target = target;
 
             dependencyConverters = new JsonConverter[]
             {
@@ -288,7 +290,7 @@ namespace PalCalc.UI
             var res = new OwnedPalReference(
                 inst,
                 // supposed to be "effective passives", but that only matters when the solver is running, and this is a saved solver result
-                inst.PassiveSkills,
+                inst.PassiveSkills.Select(p => target.DesiredPassives.Contains(p) ? p : new RandomPassiveSkill()).ToList(),
                 new IV_Set()
                 {
                     HP = hp,
@@ -306,11 +308,11 @@ namespace PalCalc.UI
 
     internal class CompositePalReferenceConverter : IPalReferenceConverterBase<CompositeOwnedPalReference>
     {
-        public CompositePalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings) : base(db, gameSettings, "COMPOSITE_PAL")
+        public CompositePalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, PalSpecifier target) : base(db, gameSettings, "COMPOSITE_PAL")
         {
             dependencyConverters = new JsonConverter[]
             {
-                new OwnedPalReferenceConverter(db, gameSettings, solverSettings),
+                new OwnedPalReferenceConverter(db, gameSettings, solverSettings, target),
                 new ILocalizedTextConverter(db, gameSettings),
             };
         }
@@ -607,6 +609,9 @@ namespace PalCalc.UI
         }
     }
 
+    // NOTE - This converter injects other converters (namely BreedingResultListViewModelConverter) whose dependents
+    //        expect a specific pal target. Multiple PalSpecifierViewModels should _not_ be stored in the same JSON
+    //        data, and JsonSerializers should either be reset or newly created during each operation.
     internal class PalSpecifierViewModelConverter : PalConverterBase<PalSpecifierViewModel>
     {
         private CachedSaveGame source;
@@ -619,7 +624,6 @@ namespace PalCalc.UI
             {
                 new PalViewModelConverter(db, gameSettings),
                 new PassiveSkillViewModelConverter(db, gameSettings),
-                new BreedingResultListViewModelConverter(db, gameSettings, source),
                 new ILocalizedTextConverter(db, gameSettings),
             };
         }
@@ -662,6 +666,13 @@ namespace PalCalc.UI
                     ?.ToList();
             }
 
+            // (this converter is created during deserialization since it requires a `PalSpecifier`, which can only
+            // be obtained while parsing this object)
+            var resultsConverter = new BreedingResultListViewModelConverter(db, gameSettings, source, modelSpecifier);
+            serializer.Converters.Add(resultsConverter);
+            var currentResults = obj["CurrentResults"].ToObject<BreedingResultListViewModel>(serializer);
+            serializer.Converters.Remove(resultsConverter);
+
             // null-coalesce for backwards compatibility with older saves
             var id = obj["Id"]?.ToObject<string>() ?? Guid.NewGuid().ToString();
             return new PalSpecifierViewModel(id, modelSpecifier)
@@ -676,7 +687,7 @@ namespace PalCalc.UI
                 IncludeCagedPals = obj["IncludeCagedPals"]?.ToObject<bool>() ?? true,
                 IncludeGlobalStoragePals = obj["IncludeGlobalStoragePals"]?.ToObject<bool>() ?? true,
                 IncludeExpeditionPals = obj["IncludeExpeditionPals"]?.ToObject<bool>() ?? true,
-                CurrentResults = obj["CurrentResults"].ToObject<BreedingResultListViewModel>(serializer),
+                CurrentResults = currentResults,
             };
         }
 
@@ -713,11 +724,11 @@ namespace PalCalc.UI
     {
         private CachedSaveGame source;
         private SerializableSolverSettings solverSettings;
-        public BreedingResultViewModelConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, CachedSaveGame source) : base(db, gameSettings)
+        public BreedingResultViewModelConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, CachedSaveGame source, PalSpecifier target) : base(db, gameSettings)
         {
             dependencyConverters = new JsonConverter[]
             {
-                new PalReferenceConverter(db, gameSettings, solverSettings),
+                new PalReferenceConverter(db, gameSettings, solverSettings, target),
                 new ILocalizedTextConverter(db, gameSettings),
             };
 
@@ -741,10 +752,12 @@ namespace PalCalc.UI
     {
         bool didInjectConverters;
         CachedSaveGame source;
-        public BreedingResultListViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source) : base(db, gameSettings)
+        PalSpecifier target;
+        public BreedingResultListViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source, PalSpecifier target) : base(db, gameSettings)
         {
             this.didInjectConverters = false;
             this.source = source;
+            this.target = target;
         }
 
         private void InjectBreedingResultDependencyConverters(JsonSerializer serializer, BreedingResultListViewModelSettingsSnapshot fullSettings)
@@ -754,7 +767,7 @@ namespace PalCalc.UI
             // The `Settings` required for `BreedingResultViewModelConverter` aren't available until we deserialize them, so
             // we'll need to inject them while reading
             dependencyConverters = [
-                new BreedingResultViewModelConverter(db, gameSettings, fullSettings.SolverSettings, source),
+                new BreedingResultViewModelConverter(db, gameSettings, fullSettings.SolverSettings, source, target),
                 new ILocalizedTextConverter(db, gameSettings),
             ];
 
