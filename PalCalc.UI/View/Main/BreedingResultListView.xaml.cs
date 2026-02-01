@@ -182,7 +182,6 @@ namespace PalCalc.UI.View.Main
 
             contextMenu.Items.Add(new Separator());
 
-            // TODO - ITL
             var resetMenuItem = new MenuItem { Header = LocalizationCodes.LC_RESULT_COLUMNS_RESET.Bind().Value };
             resetMenuItem.Click += (s, args) => ResetAllColumns();
             contextMenu.Items.Add(resetMenuItem);
