@@ -693,7 +693,10 @@ namespace PalCalc.UI
 
         protected override void WriteTypeJson(JsonWriter writer, PalSpecifierViewModel value, JsonSerializer serializer)
         {
-            JToken.FromObject(new
+            var resultsConverter = new BreedingResultListViewModelConverter(db, gameSettings, source, value.ModelObject);
+            serializer.Converters.Add(resultsConverter);
+
+            serializer.Serialize(writer, new
             {
                 Id = value.Id,
                 TargetPal = value.TargetPal,
@@ -716,7 +719,9 @@ namespace PalCalc.UI
                 IncludeGlobalStoragePals = value.IncludeGlobalStoragePals,
                 IncludeExpeditionPals = value.IncludeExpeditionPals,
                 CurrentResults = value.CurrentResults
-            }, serializer).WriteTo(writer, dependencyConverters);
+            });
+
+            serializer.Converters.Remove(resultsConverter);
         }
     }
 
