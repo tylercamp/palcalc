@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -22,8 +22,10 @@
     <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
         <value>[base64 mime encoded serialized .NET Framework object]</value>
     </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" 
+  mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework 
+  object]</value>
         <comment>This is a comment</comment>
     </data>
                 
@@ -59,7 +61,8 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -112,15 +115,850 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0,
+      Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0,
+      Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="LC_ABOUT_APP" xml:space="preserve">
+    <value>Hakkında</value>
+  </data>
+  <data name="LC_ADD_FAKE_SAVE" xml:space="preserve">
+    <value>Sahte bir kaydetme ekle...</value>
+  </data>
+  <data name="LC_ADD_NEW_SAVE" xml:space="preserve">
+    <value>Yeni kaydet...</value>
+  </data>
+  <data name="LC_ANY_GUILD" xml:space="preserve">
+    <value>Herhangi bir Lonca</value>
+  </data>
+  <data name="LC_ANY_PLAYER" xml:space="preserve">
+    <value>Herhangi bir oyuncu</value>
+  </data>
+  <data name="LC_BASE_ASSIGNED_LABEL" xml:space="preserve">
+    <value>Üsse atandı</value>
+  </data>
+  <data name="LC_BASE_LABEL" xml:space="preserve">
+    <value>Üs ({BaseName})</value>
+  </data>
+  <data name="LC_BREEDING_TIME" xml:space="preserve">
+    <value>Üreme Dönemi Süresi (Seconds)</value>
+  </data>
+  <data name="LC_BREEDING_TIME_DESC" xml:space="preserve">
+    <value>Bir yumurta üretmek için gereken ortalama süre. Belirli özelliklere sahip bir pal üretmek için gereken süreyi tahmin etmek için kullanılır.
+Bu değer, geceleri palin hareketsizliğini hesaba katmak için dahili olarak iki katına çıkarılır.</value>
+  </data>
+  <data name="LC_COMMON_ALL_ATTACK_SKILLS" xml:space="preserve">
+    <value>Tüm Aktif Beceriler</value>
+  </data>
+  <data name="LC_COMMON_ATTACK_SKILLS" xml:space="preserve">
+    <value>Aktif Beceriler</value>
+  </data>
+  <data name="LC_COMMON_CANCEL" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="LC_COMMON_ENABLED" xml:space="preserve">
+    <value>Etkinleştirildi</value>
+  </data>
+  <data name="LC_COMMON_EQUIPPED_ATTACK_SKILLS" xml:space="preserve">
+    <value>Donanımlı Aktif Beceriler</value>
+  </data>
+  <data name="LC_COMMON_GENDER" xml:space="preserve">
+    <value>Cinsiyet</value>
+  </data>
+  <data name="LC_COMMON_GENDER_FEMALE" xml:space="preserve">
+    <value>Dişi</value>
+  </data>
+  <data name="LC_COMMON_GENDER_MALE" xml:space="preserve">
+    <value>Erkek</value>
+  </data>
+  <data name="LC_COMMON_GENDER_NONE" xml:space="preserve">
+    <value>Cinsiyetsiz</value>
+  </data>
+  <data name="LC_COMMON_GENDER_OPPOSITE_WILDCARD" xml:space="preserve">
+    <value>Karşı Cinsiyet</value>
+  </data>
+  <data name="LC_COMMON_GENDER_WILDCARD" xml:space="preserve">
+    <value>Herhangi bir Cinsiyet</value>
+  </data>
+  <data name="LC_COMMON_IVS" xml:space="preserve">
+    <value>IVs</value>
+  </data>
+  <data name="LC_COMMON_IV_ATTACK" xml:space="preserve">
+    <value>Saldırı</value>
+  </data>
+  <data name="LC_COMMON_IV_ATTACK_SHORT" xml:space="preserve">
+    <value>SLD</value>
+  </data>
+  <data name="LC_COMMON_IV_DEFENSE" xml:space="preserve">
+    <value>Savunma</value>
+  </data>
+  <data name="LC_COMMON_IV_DEFENSE_SHORT" xml:space="preserve">
+    <value>Sav</value>
+  </data>
+  <data name="LC_COMMON_IV_HP" xml:space="preserve">
+    <value>Can</value>
+  </data>
+  <data name="LC_COMMON_IV_HP_SHORT" xml:space="preserve">
+    <value>CAN</value>
+  </data>
+  <data name="LC_COMMON_LEVEL" xml:space="preserve">
+    <value>Level</value>
+  </data>
+  <data name="LC_COMMON_LOCATION" xml:space="preserve">
+    <value>Konum</value>
+  </data>
+  <data name="LC_COMMON_MAP_COORDS" xml:space="preserve">
+    <value>Harita Koordinatları</value>
+  </data>
+  <data name="LC_COMMON_OWNER" xml:space="preserve">
+    <value>Sahibi</value>
+  </data>
+  <data name="LC_COMMON_PAL" xml:space="preserve">
+    <value>Pal</value>
+  </data>
+  <data name="LC_COMMON_PALDEX_NUM_SHORT" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="LC_COMMON_SAVE" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="LC_COMMON_TRAITS" xml:space="preserve">
+    <value>Pasif Beceriler</value>
+  </data>
+  <data name="LC_COMMON_UNKNOWN" xml:space="preserve">
+    <value>Bilinmiyor</value>
+  </data>
+  <data name="LC_CRASHLOG_FAILED" xml:space="preserve">
+    <value>Çökme günlüğü dosyası oluşturulamadı.</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER" xml:space="preserve">
+    <value>{Label} (custom)</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINERS" xml:space="preserve">
+    <value>Özel Konteynerler</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve">
+    <value>Değişiklikler Pal Calc'ta otomatik olarak kaydedilecektir. Özel konteynerler Palworld kayıt dosyalarını etkilemez.</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve">
+    <value>Yeni Ekle...</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_FIELD" xml:space="preserve">
+    <value>İsim</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_TITLE" xml:space="preserve">
+    <value>Yeni Özel Konteyner</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_FIELD" xml:space="preserve">
+    <value>İsim</value>
+  </data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_TITLE" xml:space="preserve">
+    <value>Özel Konteyneri Yeniden Adlandır</value>
+  </data>
+  <data name="LC_CUSTOM_SAVE_GAME_NAME" xml:space="preserve">
+    <value>Yeni Kayıt Adı</value>
+  </data>
+  <data name="LC_CUSTOM_SAVE_GAME_NAME_LABEL" xml:space="preserve">
+    <value>İsim</value>
+  </data>
+  <data name="LC_DELETE_PAL_TARGET_MSG" xml:space="preserve">
+    <value>Bu {PalName} girişini sil ?</value>
+  </data>
+  <data name="LC_DELETE_PAL_TARGET_TITLE" xml:space="preserve">
+    <value>Pal Hedefi Sil</value>
+  </data>
+  <data name="LC_ERROR_HARD_CRASH" xml:space="preserve">
+    <value>İşlenmemiş bir hata oluştu.
+
+Destek sorularınızla birlikte göndereceğiniz oluşturulan ZIP dosyasını lütfen bulun.:
+
+{CrashlogPath}</value>
+  </data>
+  <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve">
+    <value>Kaydedilen dosyayı yüklerken bir hata oluştu.
+
+Palworld'ün yeni sürümlerinden dosyaları kaydetmek için Pal Calc'ın güncellenmesi gerekebilir.
+
+Eski sürümlerden gelen dosyalar desteklenmeyebilir ve Pal Calc'ın eski bir sürümü gerekebilir. 
+
+Destek sorularınızla birlikte göndereceğiniz oluşturulan ZIP dosyasını lütfen burada bulabilirsiniz:
+
+{CrashlogPath}</value>
+  </data>
+  <data name="LC_EXPORT_CRASH_LOG" xml:space="preserve">
+    <value>Çökme Günlüğünü Dışa Aktar</value>
+  </data>
+  <data name="LC_EXPORT_CRASH_LOG_DESCRIPTION" xml:space="preserve">
+    <value>Son zamanlarda başvurulan kayıtlı dosyaları, önbellek verilerini ve ayarları ZIP dosyası olarak dışa aktarır..</value>
+  </data>
+  <data name="LC_EXPORT_SAVE" xml:space="preserve">
+    <value>Dışa Aktar Kaydet</value>
+  </data>
+  <data name="LC_EXPORT_SAVE_CSV" xml:space="preserve">
+    <value>Dışa Aktar CSV Kaydet</value>
+  </data>
+  <data name="LC_EXPORT_SAVE_CSV_DESCRIPTION" xml:space="preserve">
+    <value>Kaydedilen dosyanızdaki tüm arkadaşları bir CSV tablosuna aktarır..</value>
+  </data>
+  <data name="LC_EXPORT_SAVE_DESCRIPTION" xml:space="preserve">
+    <value>Seçilen kaydetme için bilinen tüm Palworld dosyalarını ZIP olarak dışa aktarır.</value>
+  </data>
+  <data name="LC_GAME_SETTINGS" xml:space="preserve">
+    <value>Oyun Ayarları</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_CUSTOM" xml:space="preserve">
+    <value>Özel</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_FILL" xml:space="preserve">
+    <value>Doldur</value>
+  </data>
+  <data name="LC_GRAPH_ZOOM_PERCENT" xml:space="preserve">
+    <value>Yakınlaştır:</value>
+  </data>
+  <data name="LC_GUILD_LABEL" xml:space="preserve">
+    <value>Lonca '{GuildName}'</value>
+  </data>
+  <data name="LC_INCLUDE_CUSTOM_PALS" xml:space="preserve">
+    <value>Özel Konteynerdeki Arkadaşları Dahil Et</value>
+  </data>
+  <data name="LC_INCLUDE_PALS_AT_BASE" xml:space="preserve">
+    <value>Üsteki Palları Dahil Et</value>
+  </data>
+  <data name="LC_INCLUDE_PALS_GPS" xml:space="preserve">
+    <value>Global Palbox'daki Palları Dahil Et</value>
+  </data>
+  <data name="LC_INCLUDE_PALS_IN_CAGES" xml:space="preserve">
+    <value>Gözlem Kafesi'ndeki Palları Dahil Et</value>
+  </data>
+  <data name="LC_INCLUDE_PALS_ON_EXPEDITIONS" xml:space="preserve">
+    <value>Seferdeki Palları Dahil Et</value>
+  </data>
+  <data name="LC_INSPECT_SAVE" xml:space="preserve">
+    <value>Kontrol Et</value>
+  </data>
   <data name="LC_ITL_LABEL" xml:space="preserve">
     <value>Türkçe</value>
   </data>
   <data name="LC_LANGUAGE" xml:space="preserve">
     <value>Dil</value>
+  </data>
+  <data name="LC_JOB_QUEUE_CLOSING_MSG" xml:space="preserve">
+    <value>Pal Calc'ı kapatmak kalan tüm işleri iptal edecektir. Gerçekten çıkmak istiyor musunuz?</value>
+  </data>
+  <data name="LC_JOB_QUEUE_CLOSING_TITLE" xml:space="preserve">
+    <value>Bekleyen İşler</value>
+  </data>
+  <data name="LC_JOB_QUEUE_HEADER" xml:space="preserve">
+    <value>İşler ({Count})</value>
+  </data>
+  <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
+    <value>Yeni dilin tam olarak uygulanabilmesi için Pal Calc'ın yeniden başlatılması gerekir.</value>
+  </data>
+  <data name="LC_LIST_SEPARATOR" xml:space="preserve">
+    <value>, </value>
+  </data>
+  <data name="LC_LOC_COORD_BASE" xml:space="preserve">
+    <value>Üs, slot ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_COORD_DPS" xml:space="preserve">
+    <value>Dim. depolama, tab {Tab} at ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_COORD_GPS" xml:space="preserve">
+    <value>Küresel palbox, tab {Tab} at ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_COORD_PALBOX" xml:space="preserve">
+    <value>Palbox, tab {Tab} at ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_COORD_PARTY" xml:space="preserve">
+    <value>Parti, slot {SlotNum}</value>
+  </data>
+  <data name="LC_LOC_COORD_VIEWING_CAGE" xml:space="preserve">
+    <value>Gözlem kafesinde ({X},{Y})</value>
+  </data>
+  <data name="LC_LOC_OWNED_BY" xml:space="preserve">
+    <value>{Owner} tarafından sahiplenildi</value>
+  </data>
+  <data name="LC_LOC_PALBOX_TAB" xml:space="preserve">
+    <value>Tab {Tab}</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_ALREADY_REGISTERED" xml:space="preserve">
+    <value>Seçilen dosya zaten kaydedilmiş.</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_EXTENSION_LBL" xml:space="preserve">
+    <value>Seviye kaydetme dosyası</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_INCOMPLETE" xml:space="preserve">
+    <value>Seçilen dosya geçersiz veya tam bir oyun kaydetme klasöründe değil.</value>
+  </data>
+  <data name="LC_MANUAL_SAVE_SELECTOR_TITLE" xml:space="preserve">
+    <value>Kaydetme klasörünüzdeki 'Level.sav' dosyasını seçin.</value>
+  </data>
+  <data name="LC_MEMORY_WARNING_MSG" xml:space="preserve">
+    <value>Uyarı: Sistemdeki bellek yetersizliği nedeniyle çözücü geçici olarak durdurulmuştur. Bu mesaj kapandığında çalışma yeniden başlayacaktır.
+
+Bu çalıştırma için gelecekteki uyarıları yok saymak ister misiniz?</value>
+  </data>
+  <data name="LC_MEMORY_WARNING_TITLE" xml:space="preserve">
+    <value>Bellek Uyarısı!</value>
+  </data>
+  <data name="LC_MULTIPLE_BREEDING_FARMS" xml:space="preserve">
+    <value>Çoklu Yetiştirme Çiftlikleri</value>
+  </data>
+  <data name="LC_MULTIPLE_BREEDING_FARMS_DESC" xml:space="preserve">
+    <value>Birden fazla yetiştirme çiftliği kullanılıp kullanılmayacağı.
+Etkinleştirildiğinde, diğer iki yetiştirilmiş arkadaştan bir arkadaş yetiştirme süresi, ebeveynler arasındaki en uzun yetiştirme süresine göre belirlenir.
+Devre dışı bırakıldığında, bir pal yetiştirme süresi her zaman ebeveynler için gereken sürenin toplamına göre belirlenir.</value>
+  </data>
+  <data name="LC_NEW_TARGET_PAL" xml:space="preserve">
+    <value>Yeni</value>
+  </data>
+  <data name="LC_NO_RESULTS_FAQ_1" xml:space="preserve">
+    <value>Sonuç bulunamadı? Kontrol et</value>
+  </data>
+  <data name="LC_NO_RESULTS_FAQ_2" xml:space="preserve">
+    <value>SSS</value>
+  </data>
+  <data name="LC_NO_RESULTS_FAQ_3" xml:space="preserve">
+    <value>olası nedenler için.</value>
+  </data>
+  <data name="LC_NO_TRAITS" xml:space="preserve">
+    <value>Pasif yok</value>
+  </data>
+  <data name="LC_OPEN_IN_FILE_EXPLORER" xml:space="preserve">
+    <value>Explorer'da Aç</value>
+  </data>
+  <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve">
+    <value>İsteğe bağlı olarak {TraitsList}</value>
+  </data>
+  <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
+    <value>Arama</value>
+  </data>
+  <data name="LC_PAL_LABEL" xml:space="preserve">
+    <value>{PalName} (#{PaldexNum})</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS" xml:space="preserve">
+    <value>Ön ayarlar</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_ADD" xml:space="preserve">
+    <value>Pals'ı yeni ön ayar olarak kaydet...</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_ADD_TITLE" xml:space="preserve">
+    <value>Yeni Ön Ayar Adı</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_BUILTIN_NOT_OWNED" xml:space="preserve">
+    <value>Sahip Olunmayan Pallar</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_BUILTIN_OWNED" xml:space="preserve">
+    <value>Sahip Olunan Pallar</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_BTN_DESCRIPTION" xml:space="preserve">
+    <value>Ön Ayarı Sil</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_MSG" xml:space="preserve">
+    <value>'{PresetName}' ön ayarını silmek istiyor musunuz?</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_TITLE" xml:space="preserve">
+    <value>Ön Ayarı Sil</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_NAME" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_BTN_DESCRIPTION" xml:space="preserve">
+    <value>Ön Ayarı Üzerine Yaz</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_MSG" xml:space="preserve">
+    <value>'{PresetName}' ön ayarını mevcut Pallarla üzerine yazmak istiyor musunuz?</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_TITLE" xml:space="preserve">
+    <value>Ön Ayarı Üzerine Yaz</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_RENAME_BTN_DESCRIPTION" xml:space="preserve">
+    <value>Ön Ayarı Yeniden Adlandır</value>
+  </data>
+  <data name="LC_PAL_LIST_PRESETS_RENAME_TITLE" xml:space="preserve">
+    <value>'{PresetName}' Ön Ayarını Yeniden Adlandır</value>
+  </data>
+  <data name="LC_PAL_LOC_BASE" xml:space="preserve">
+    <value>Üs</value>
+  </data>
+  <data name="LC_PAL_LOC_CAPTURED" xml:space="preserve">
+    <value>Yakalandı</value>
+  </data>
+  <data name="LC_PAL_LOC_COUNT" xml:space="preserve">
+    <value>{LocType} içinde {Count} </value>
+  </data>
+  <data name="LC_PAL_LOC_CUSTOM" xml:space="preserve">
+    <value>(Custom)</value>
+  </data>
+  <data name="LC_PAL_LOC_DPS_FULL" xml:space="preserve">
+    <value>Boyutsal Pal Depolama</value>
+  </data>
+  <data name="LC_PAL_LOC_DPS_SHORT" xml:space="preserve">
+    <value>Dim. Depolama</value>
+  </data>
+  <data name="LC_PAL_LOC_GPS_FULL" xml:space="preserve">
+    <value>Global Palbox</value>
+  </data>
+  <data name="LC_PAL_LOC_GPS_SHORT" xml:space="preserve">
+    <value>Global Palbox</value>
+  </data>
+  <data name="LC_PAL_LOC_PALBOX" xml:space="preserve">
+    <value>Palbox</value>
+  </data>
+  <data name="LC_PAL_LOC_PARTY" xml:space="preserve">
+    <value>Parti</value>
+  </data>
+  <data name="LC_PAL_LOC_VIEWING_CAGE" xml:space="preserve">
+    <value>Gözlem Kafesi</value>
+  </data>
+  <data name="LC_PAL_SRC_ANY_GUILD_MEMBER" xml:space="preserve">
+    <value>Herhangi bir lonca üyesi</value>
+  </data>
+  <data name="LC_PAL_SRC_ANY_PLAYER_GUILD" xml:space="preserve">
+    <value>Herhangi bir guilddeki herhangi bir oyuncu</value>
+  </data>
+  <data name="LC_PAL_TARGET_OPTIONAL_TRAITS" xml:space="preserve">
+    <value>İsteğe bağlı</value>
+  </data>
+  <data name="LC_PAL_TARGET_REQUIRED_TRAITS" xml:space="preserve">
+    <value>Gerekli</value>
+  </data>
+  <data name="LC_PAL_WILD_COUNT" xml:space="preserve">
+    <value>{NumWild} Wild</value>
+  </data>
+  <data name="LC_PLAYER_LABEL" xml:space="preserve">
+    <value>Oyuncu '{PlayerName}'</value>
+  </data>
+  <data name="LC_POPUP_TITLE_LOADING_SAVE_FILE" xml:space="preserve">
+    <value>Dosya Kaydediliyor</value>
+  </data>
+  <data name="LC_RANDOM_TRAIT" xml:space="preserve">
+    <value>(Random)</value>
+  </data>
+  <data name="LC_REMOVE_CUSTOM_CONTAINER_DESCRIPTION" xml:space="preserve">
+    <value>Özel konteyner '{Label}' kaldırılacak.</value>
+  </data>
+  <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve">
+    <value>Bu kaydı Pal Calc'ten kaldırmak istediğinizden emin misiniz?
+
+{SaveLabel}
+
+Bu, bilgisayarınızdaki kayıtlı dosyaları silmez..</value>
+  </data>
+  <data name="LC_REMOVE_SAVE_TITLE" xml:space="preserve">
+    <value>Manuel Kaydetmeyi Kaldır?</value>
+  </data>
+  <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve">
+    <value>{TraitsList} ile </value>
+  </data>
+  <data name="LC_RESULT_BREEDING_ATTEMPTS" xml:space="preserve">
+    <value>{AvgAttempts} girişimler</value>
+  </data>
+  <data name="LC_RESULT_INPUT_LOCS" xml:space="preserve">
+    <value>Giriş Konumları</value>
+  </data>
+  <data name="LC_RESULT_IV_ATTACK" xml:space="preserve">
+    <value>IV ATK</value>
+  </data>
+  <data name="LC_RESULT_IV_AVERAGE" xml:space="preserve">
+    <value>IV AVG</value>
+  </data>
+  <data name="LC_RESULT_IV_DEFENSE" xml:space="preserve">
+    <value>IV DEF</value>
+  </data>
+  <data name="LC_RESULT_IV_HP" xml:space="preserve">
+    <value>IV HP</value>
+  </data>
+  <data name="LC_RESULT_LABEL" xml:space="preserve">
+    <value>{PalName} with {TraitsList}, takes ~{TimeEstimate}</value>
+  </data>
+  <data name="LC_RESULT_LIST_TITLE_COUNT" xml:space="preserve">
+    <value>{NumResults} Sonuç</value>
+  </data>
+  <data name="LC_RESULT_LIST_TITLE_EMPTY" xml:space="preserve">
+    <value>Sonuç Yok</value>
+  </data>
+  <data name="LC_RESULT_NUM_CAKES" xml:space="preserve">
+    <value># Pastalar</value>
+  </data>
+  <data name="LC_RESULT_NUM_STEPS" xml:space="preserve">
+    <value># Adımlar</value>
+  </data>
+  <data name="LC_RESULT_TIME_ESTIMATE" xml:space="preserve">
+    <value>Çaba</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_ID" xml:space="preserve">
+    <value>ID:</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_OWNER" xml:space="preserve">
+    <value>Sahip:</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_SLOTS_USED" xml:space="preserve">
+    <value>kullanılan slotlar</value>
+  </data>
+  <data name="LC_SAVEINSPECT_CONTAINER_TYPE" xml:space="preserve">
+    <value>Tip:</value>
+  </data>
+  <data name="LC_SAVEINSPECT_DETECTED_PROPERTIES" xml:space="preserve">
+    <value>Algılanan Özellikler</value>
+  </data>
+  <data name="LC_SAVEINSPECT_ON_EXPEDITION" xml:space="preserve">
+    <value>Keşif Seferinde</value>
+  </data>
+  <data name="LC_SAVEINSPECT_RAW_PROPERTIES" xml:space="preserve">
+    <value>Ham Özellikler</value>
+  </data>
+  <data name="LC_SAVEINSPECT_SLOT_EMPTY" xml:space="preserve">
+    <value>Boş</value>
+  </data>
+  <data name="LC_SAVESEARCH_CONTAINER_LABEL" xml:space="preserve">
+    <value>{Label} ({NumMatches} matches)</value>
+  </data>
+  <data name="LC_SAVESEARCH_GRP_PAL_CONTAINERS" xml:space="preserve">
+    <value>Pal Konteynerler</value>
+  </data>
+  <data name="LC_SAVESEARCH_GRP_SEARCH_SETTINGS" xml:space="preserve">
+    <value>Arama Ayarları</value>
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_MAX_IVS" xml:space="preserve">
+    <value>Max IVs</value>
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_MIN_IVS" xml:space="preserve">
+    <value>Min IVs</value>
+  </data>
+  <data name="LC_SAVESEARCH_SETTINGS_RESET" xml:space="preserve">
+    <value>Sıfırla</value>
+  </data>
+  <data name="LC_SAVEWINDOW_TAB_DETAILS" xml:space="preserve">
+    <value>Detaylar</value>
+  </data>
+  <data name="LC_SAVEWINDOW_TAB_SEARCH" xml:space="preserve">
+    <value>Ara</value>
+  </data>
+  <data name="LC_SAVEWINDOW_TITLE" xml:space="preserve">
+    <value>Müfettişi Kaydet - {SaveLabel}</value>
+  </data>
+  <data name="LC_SAVE_FILE" xml:space="preserve">
+    <value>Dosyayı Kaydet</value>
+  </data>
+  <data name="LC_SAVE_FILE_RELOADING" xml:space="preserve">
+    <value>Dosya henüz önbelleğe alınmadı veya önbellek güncel değil, içerik okunuyor...</value>
+  </data>
+  <data name="LC_SAVE_FILE_RELOAD_DESCRIPTION" xml:space="preserve">
+    <value>Bu kaydetme için bazı dosyalar değiştirilmiştir. En son verileri yeniden yüklemek için tıklayın.</value>
+  </data>
+  <data name="LC_SAVE_GAME" xml:space="preserve">
+    <value>Oyun</value>
+  </data>
+  <data name="LC_SAVE_GAME_ERROR" xml:space="preserve">
+    <value>Hiçbir kaydetme seçilmedi veya seçilen kaydetme yüklenemedi! Kaydetme dosyanız yoksa, "Konum: Manuel Olarak Eklendi" ve "Oyun: Sahte kaydetme ekle..." seçeneklerini seçmeyi düşünün. "İnceleme" düğmesini ve Özel Kapları kullanarak pals'ı manuel olarak ekleyin.</value>
+  </data>
+  <data name="LC_SAVE_GAME_INVALID" xml:space="preserve">
+    <value>Seçilen kayıt dosyası geçersiz!</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL" xml:space="preserve">
+    <value>{PlayerName} lv {PlayerLevel} in {WorldName} gün {DayNumber}</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL_NO_METADATA" xml:space="preserve">
+    <value>{GameId} (Meta verileri okuyamıyor)</value>
+  </data>
+  <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve">
+    <value>{WorldName} gün {DayNumber}</value>
+  </data>
+  <data name="LC_SAVE_GAME_REMOVE_BTN_LABEL" xml:space="preserve">
+    <value>Kaldır</value>
+  </data>
+  <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
+    <value>TXbox kayıt dosyası eksik, ancak özellikler yine de çalışacaktır. Palworld birkaç dakika kapatılıp Pal Calc yeniden başlatıldığında bu sorun otomatik olarak çözülür.</value>
+  </data>
+  <data name="LC_SAVE_INSPECTOR_LOADING" xml:space="preserve">
+    <value>Ham kayıt verilerini okunuyor...</value>
+  </data>
+  <data name="LC_SAVE_LOCATION" xml:space="preserve">
+    <value>Konum</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_LBL_STEAM" xml:space="preserve">
+    <value>Steam kullanıcısı {UserId} - {NumValidSaves} geçerli kayıtlar</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_LBL_XBOX" xml:space="preserve">
+    <value>Xbox kullanıcısı {UserId} - {NumValidSaves} geçerli kayıtlar</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_MANUAL" xml:space="preserve">
+    <value>Manuel olarak eklendi</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_STEAM_EMPTY" xml:space="preserve">
+    <value>Steam</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_EMPTY" xml:space="preserve">
+    <value>Xbox</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_1" xml:space="preserve">
+    <value>Xbox kaydı bulunamadı. Palworld, PC'ye</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_2" xml:space="preserve">
+    <value>Xbox app / Game Pass.</value>
+  </data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_3" xml:space="preserve">
+    <value>Oyunu çalıştırdığınızda kayıtlı dosyalar bilgisayarınıza senkronize edilir.</value>
+  </data>
+  <data name="LC_SAVE_WARNING" xml:space="preserve">
+    <value>(!)</value>
+  </data>
+  <data name="LC_SETTINGS_MASSIVE_EGG_INCUBATION" xml:space="preserve">
+    <value>Büyük Yumurta Kuluçka Süresi (Dakika)</value>
+  </data>
+  <data name="LC_SETTINGS_MASSIVE_EGG_INCUBATION_DESC" xml:space="preserve">
+    <value>Bonuslar (sıcaklık değiştiriciler) olmadan büyük bir yumurtayı kuluçkaya yatırmak ne kadar sürer?.</value>
+  </data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE" xml:space="preserve">
+    <value>Palbox Sekme Boyutu</value>
+  </data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE_DESC" xml:space="preserve">
+    <value>Palbox'ınızdaki sekmenin boyutu. Bu, Palbox'ınızdaki Pals'ların konumlarını görüntülerken kullanılır.
+
+Varsayılan ayar 6x5'tir. Palbox sekmesinin boyutunu değiştiren bir mod kullanmıyorsanız, bu ayar değiştirilmemelidir.
+
+Bu ayarın tam olarak uygulanması için yeniden başlatma gerekir..</value>
+  </data>
+  <data name="LC_SETTINGS_RESTART_REQUIRED_MSG" xml:space="preserve">
+    <value>Bazı değişikliklerin tam olarak yürürlüğe girmesi için yeniden başlatma gerekir..</value>
+  </data>
+  <data name="LC_SOLVER_PAUSE" xml:space="preserve">
+    <value>Duraklat</value>
+  </data>
+  <data name="LC_SOLVER_RESUME" xml:space="preserve">
+    <value>Devam Et</value>
+  </data>
+  <data name="LC_SOLVER_RUN" xml:space="preserve">
+    <value>Çalıştır</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS" xml:space="preserve">
+    <value>İzin Verilen Yetiştirme Palları</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS" xml:space="preserve">
+    <value>İzin Verilen Vahşi Pallar</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS" xml:space="preserve">
+    <value>Max Bred Alakasız Pasifler</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
+    <value>Son üreme sonucu dahil olmak üzere, herhangi bir yetiştirilmiş arkadaş için izin verilen maksimum alakasız pasif beceri sayısı.
+
+'1'den yüksek değerler, son palda kullanılmayan pasif beceri yuvaları varsa genellikle daha kısa üreme yolları ekler.
+
+Daha yüksek değerler, gereken süreyi *katlanarak* etkiler.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS" xml:space="preserve">
+    <value>Maksimum Üreme Adımları</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION" xml:space="preserve">
+    <value>Hedeflenen pal'a ulaşmak için gereken maksimum üreme adımı sayısı.
+
+(Bu değer genellikle "Maksimum Çözücü Adımları"ndan daha küçük olmalıdır.".)
+
+Daha yüksek değerler, Pal Calc'ın daha fazla seçeneği değerlendirmesine neden olur ve hesaplama süresini doğrusal olarak etkiler..</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve">
+    <value>Maksimum CPU sayısı</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION" xml:space="preserve">
+    <value>Çözücünün kullanmasına izin verilen CPU sayısı. Sıfır ise, tüm CPU'lar kullanılır..</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS" xml:space="preserve">
+    <value>Maksimum Giriş Önemsiz Pasifler</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
+    <value>Ebeveyn olarak kullanılan herhangi bir sahip olunan pal için izin verilen maksimum alakasız pasif beceri sayısı.
+
+Daha düşük değerler, bazı yararlı yolların kaçırılma riskini biraz azaltabilir.
+
+Daha yüksek değerler hesaplama süresini doğrusal olarak etkiler..</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS" xml:space="preserve">
+    <value>Maksimum Çözücü Adımları</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION" xml:space="preserve">
+    <value>Üreme çözücünün çalışacağı maksimum sayı. Daha büyük değerler, Pal Calc'ın optimal üreme yolunu ararken daha fazla seçenek bulmasını sağlayabilir.
+
+(Pal Calc, ek üreme girişimlerinin gerekli olup olmadığını algılar ve bu sınıra ulaşmadan önce durdurulabilir.)
+
+(Bu değer genellikle "Maksimum Üreme Adımı" ile aynı veya daha büyük olmalıdır.)
+
+Daha yüksek değerler hesaplama süresini doğrusal olarak etkiler.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS" xml:space="preserve">
+    <value>Max Vahşi Pallar</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION" xml:space="preserve">
+    <value>Üreme yolunda izin verilen maksimum vahşi arkadaş sayısı.
+Daha yüksek değerler, sahip olunan pal türlerinin sayısına bağlı olarak gereken süreyi doğrusal olarak etkiler.</value>
+  </data>
+  <data name="LC_SOLVER_STATUS_BREEDING" xml:space="preserve">
+    <value>Üreme aşaması {StepNum}, {WorkSize} çiftlerinin çocuk arkadaşlarını ve olasılıklarını hesaplama</value>
+  </data>
+  <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve">
+    <value>Tamamlandı, ({Duration} zaman aldı)</value>
+  </data>
+  <data name="LC_SOLVER_STATUS_INITIALIZING" xml:space="preserve">
+    <value>Başlatılıyor</value>
+  </data>
+  <data name="LC_SOLVER_STEP_STATUS_BREEDING" xml:space="preserve">
+    <value>İşlenen {NumProcessed} / {WorkSize} üreme çifti</value>
+  </data>
+  <data name="LC_SOLVER_STEP_STATUS_DONE" xml:space="preserve">
+    <value>Toplamda {TotalSize} üreme çifti işlendi</value>
+  </data>
+  <data name="LC_SOURCE_PALS" xml:space="preserve">
+    <value>Kaynak Pallar</value>
+  </data>
+  <data name="LC_SOURCE_PALS_FILTERS" xml:space="preserve">
+    <value>Filtreler</value>
+  </data>
+  <data name="LC_SOURCE_PALS_PLAYERS_AND_GUILDS" xml:space="preserve">
+    <value>Lonca ve Oyuncular</value>
+  </data>
+  <data name="LC_STARTUP_LOADING" xml:space="preserve">
+    <value>Yükleniyor...</value>
+  </data>
+  <data name="LC_SURGERY_ADD_PASSIVE" xml:space="preserve">
+    <value>Ekle {AddedPassive}</value>
+  </data>
+  <data name="LC_SURGERY_CHANGE_GENDER" xml:space="preserve">
+    <value>Cinsiyeti {NewGender} olarak değiştir</value>
+  </data>
+  <data name="LC_SURGERY_REPLACE_PASSIVE" xml:space="preserve">
+    <value>{RemovedPassive} yerine {AddedPassive} kullanın.</value>
+  </data>
+  <data name="LC_TARGET_PAL" xml:space="preserve">
+    <value>Hedef Pal</value>
+  </data>
+  <data name="LC_TARGET_PALS" xml:space="preserve">
+    <value>Hedef Pallar</value>
+  </data>
+  <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">
+    <value>pasif değil</value>
+  </data>
+  <data name="LC_TRAITS_COUNT_RANDOM" xml:space="preserve">
+    <value>{NumRandom} rastgele</value>
+  </data>
+  <data name="LC_TRAITS_COUNT_UNRECOGNIZED" xml:space="preserve">
+    <value>{NumUnrecognized} tanınmayan</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS" xml:space="preserve">
+    <value>Ön ayarlar</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_ADD" xml:space="preserve">
+    <value>Pasifleri yeni ön ayar olarak kaydedin...</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_ADD_TITLE" xml:space="preserve">
+    <value>Yeni Ön Ayar Adı</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_BTN_DESCRIPTION" xml:space="preserve">
+    <value>Ön Ayarı Sil</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_MSG" xml:space="preserve">
+    <value>'{PresetName}' ön ayarını silmek istiyor musunuz?</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_DELETE_TITLE" xml:space="preserve">
+    <value>Ön Ayarı Sil</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_NAME" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_BTN_DESCRIPTION" xml:space="preserve">
+    <value>Ön Ayarı Üzerine Yaz</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_MSG" xml:space="preserve">
+    <value>'{PresetName}' ön ayarını mevcut gerekli ve isteğe bağlı pasif becerileriyle üzerine yazmak istiyor musunuz?</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_TITLE" xml:space="preserve">
+    <value>Ön Ayarı Üzerine Yaz</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_RENAME_BTN_DESCRIPTION" xml:space="preserve">
+    <value>Ön Ayarı Yeniden Adlandır</value>
+  </data>
+  <data name="LC_TRAITS_PRESETS_RENAME_TITLE" xml:space="preserve">
+    <value>'{PresetName}' Ön Ayarını Yeniden Adlandır</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_DESCRIPTION" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_NAME" xml:space="preserve">
+    <value>İsim</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_SEARCH" xml:space="preserve">
+    <value>Ara</value>
+  </data>
+  <data name="LC_TRAITS_SEARCH_TITLE" xml:space="preserve">
+    <value>Pasif Becerileri Ara</value>
+  </data>
+  <data name="LC_TRAIT_LABEL_UNRECOGNIZED" xml:space="preserve">
+    <value>{InternalName} (Tanınmayan)</value>
+  </data>
+  <data name="LC_UNKNOWN_GUILD" xml:space="preserve">
+    <value>Bilinmeyen Kılıç</value>
+  </data>
+  <data name="LC_UNKNOWN_PLAYER" xml:space="preserve">
+    <value>Bilinmeyen Oyuncu</value>
+  </data>
+  <data name="LC_UPDATE_AVAILABLE" xml:space="preserve">
+    <value>Bir güncelleme mevcuttur!</value>
+  </data>
+  <data name="LC_VIEWING_CAGE_LABEL" xml:space="preserve">
+    <value>Gözetleme Kafesi ({CageId})</value>
+  </data>
+  <data name="LC_WINDOW_TITLE" xml:space="preserve">
+    <value>Pal Calc</value>
+  </data>
+  <data name="LC_SURGERY_STEP_TITLE" xml:space="preserve">
+    <value>Cerrahi</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS" xml:space="preserve">
+    <value>Cinsiyet Dönüştürücüleri Kullan</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION" xml:space="preserve">
+    <value>Üreme çabası hesaplamaları için Cinsiyet Değiştiricilerin kullanımını varsaymak. Bu, Pal Calc'ın cinsiyet olasılıklarını dahil etmesini engeller ve Pal Calc'ın uyumsuz cinsiyetlere sahip arkadaşları zorla üremesini sağlar.
+
+Cinsiyet Değiştiriciler üreme grafiğinde gösterilmez. Etkinleştirilirse, grafikteki Sahip Olunan Arkadaşlar farklı bir cinsiyetle gösterilebilir..</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_SURGERY_ALLOWED_PASSIVES" xml:space="preserve">
+    <value>İzin Verilen Cerrahi Pasif Becerileri</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_GOLD_COST" xml:space="preserve">
+    <value>Maksimum Altın Maliyeti</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_GOLD_COST_DESCRIPTION" xml:space="preserve">
+    <value>Pasif yetenekleri eklemek veya değiştirmek için Cerrahi Masası'nı kullanan yetiştirme yollarının maksimum toplam altın maliyeti.
+
+Pasif beceriler için Cerrahi Masasını kullanmayı engellemek için bunu 0 olarak ayarlayın.
+
+Daha yüksek değerler, gereken süre üzerinde minimum etkiye sahiptir..</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_COST" xml:space="preserve">
+    <value>Ameliyat Maliyeti</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_DESCRIPTION" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_NAME" xml:space="preserve">
+    <value>İsim</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_ITEM" xml:space="preserve">
+    <value>Gerekli öğe</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_TITLE" xml:space="preserve">
+    <value>Cerrahi İçin Uygun Pasif Beceriler</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_ITEM_NO" xml:space="preserve">
+    <value>Hayır</value>
+  </data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_ITEM_YES" xml:space="preserve">
+    <value>Evet</value>
+  </data>
+  <data name="LC_RESULT_COLUMNS_RESET" xml:space="preserve">
+    <value>Tüm Sütunları Sıfırla</value>
   </data>
 </root>
