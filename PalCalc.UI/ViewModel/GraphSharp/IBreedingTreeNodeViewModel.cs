@@ -1,4 +1,5 @@
-﻿using PalCalc.Model;
+﻿using CommunityToolkit.Mvvm.Input;
+using PalCalc.Model;
 using PalCalc.Solver.Tree;
 using PalCalc.UI.Model;
 using System;
@@ -12,6 +13,10 @@ namespace PalCalc.UI.ViewModel.GraphSharp
     public interface IBreedingTreeNodeViewModel
     {
         IBreedingTreeNode Value { get; }
+
+        bool IsChecked { get; set; }
+        event Action IsCheckedChanged;
+        IRelayCommand ToggleCheckedCommand { get; }
 
         public static IBreedingTreeNodeViewModel FromModel(CachedSaveGame source, GameSettings settings, IBreedingTreeNode node) =>
             node switch

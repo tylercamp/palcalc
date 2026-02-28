@@ -743,13 +743,56 @@ namespace PalCalc.UI
 
         protected override BreedingResultViewModel ReadTypeJson(JsonReader reader, Type objectType, BreedingResultViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            var palRef = JToken.ReadFrom(reader).ToObject<IPalReference>(serializer);
-            return new BreedingResultViewModel(source, gameSettings, palRef);
+            var token = JToken.ReadFrom(reader);
+
+            IPalReference palRef;
+            int[] checkedNodes = null;
+
+            if (token is JObject obj && obj.ContainsKey("PalReference"))
+            {
+                palRef = obj["PalReference"].ToObject<IPalReference>(serializer);
+                checkedNodes = obj["CheckedNodes"]?.ToObject<int[]>();
+            }
+            else
+            {
+                palRef = token.ToObject<IPalReference>(serializer);
+            }
+
+            var vm = new BreedingResultViewModel(source, gameSettings, palRef);
+
+            if (checkedNodes != null && vm.Graph != null)
+            {
+                var nodes = vm.Graph.Nodes;
+                foreach (var idx in checkedNodes)
+                {
+                    if (idx >= 0 && idx < nodes.Count)
+                        nodes[idx].IsChecked = true;
+                }
+            }
+
+            return vm;
         }
 
         protected override void WriteTypeJson(JsonWriter writer, BreedingResultViewModel value, JsonSerializer serializer)
         {
-            JToken.FromObject(value.DisplayedResult, serializer).WriteTo(writer, dependencyConverters);
+            var checkedIndices = new List<int>();
+            if (value.Graph != null)
+            {
+                var nodes = value.Graph.Nodes;
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    if (nodes[i].IsChecked)
+                        checkedIndices.Add(i);
+                }
+            }
+
+            var wrapper = new JObject();
+            wrapper["PalReference"] = JToken.FromObject(value.DisplayedResult, serializer);
+
+            if (checkedIndices.Count > 0)
+                wrapper["CheckedNodes"] = new JArray(checkedIndices.ToArray());
+
+            wrapper.WriteTo(writer, dependencyConverters);
         }
     }
 

@@ -26,6 +26,7 @@
     <UserControl.Resources>
         <c:ValueBoolConverter x:Key="VBC" />
         <c:ValueVisibilityConverter x:Key="VVC" />
+        <c:ValueVisibilityConverter x:Key="VVC_Negate" Negate="True" />
 
         <Style TargetType="Label">
             <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
@@ -52,33 +53,46 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type gsvm:SurgeryBreedingTreeNodeViewModel}">
-            <StackPanel Margin="5" Orientation="Horizontal">
-                <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0">
-                    <Border.Background>
-                        <ImageBrush>
-                            <ImageBrush.ImageSource>
-                                <BitmapImage UriSource="pack://application:,,,/PalCalc.UI;component/Resources/SurgeryTable.png" />
-                            </ImageBrush.ImageSource>
-                        </ImageBrush>
-                    </Border.Background>
-                </Border>
+            <Grid Margin="5">
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0">
+                        <Border.Background>
+                            <ImageBrush>
+                                <ImageBrush.ImageSource>
+                                    <BitmapImage UriSource="pack://application:,,,/PalCalc.UI;component/Resources/SurgeryTable.png" />
+                                </ImageBrush.ImageSource>
+                            </ImageBrush>
+                        </Border.Background>
+                    </Border>
 
-                <StackPanel>
-                    <Label Content="{itl:LocalizedText Code=LC_SURGERY_STEP_TITLE}" />
-                    <ItemsControl ItemsSource="{Binding Operations}">
-                        <ItemsControl.Resources>
-                            <Style TargetType="vu:LocalizedEmbeddedText">
-                                <Setter Property="Margin" Value="0,5,0,0" />
-                                <Setter Property="FontSize" Value="10" />
-                            </Style>
-                        </ItemsControl.Resources>
-                    </ItemsControl>
+                    <StackPanel>
+                        <Label Content="{itl:LocalizedText Code=LC_SURGERY_STEP_TITLE}" />
+                        <ItemsControl ItemsSource="{Binding Operations}">
+                            <ItemsControl.Resources>
+                                <Style TargetType="vu:LocalizedEmbeddedText">
+                                    <Setter Property="Margin" Value="0,5,0,0" />
+                                    <Setter Property="FontSize" Value="10" />
+                                </Style>
+                            </ItemsControl.Resources>
+                        </ItemsControl>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
+                <Button Command="{Binding ToggleCheckedCommand}" HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Background="Transparent" BorderThickness="0" Padding="0" Margin="0,-2,-2,0" Cursor="Hand"
+                        Opacity="0.6">
+                    <Grid>
+                        <materialIcons:MaterialIcon Kind="CheckCircleOutline" Width="18" Height="18" Foreground="#4CAF50"
+                                                    Visibility="{Binding IsChecked, Converter={StaticResource VVC_Negate}}" />
+                        <materialIcons:MaterialIcon Kind="CheckCircle" Width="18" Height="18" Foreground="#4CAF50"
+                                                    Visibility="{Binding IsChecked, Converter={StaticResource VVC}}" />
+                    </Grid>
+                </Button>
+            </Grid>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type gsvm:StandardBreedingTreeNodeViewModel}">
-            <StackPanel Orientation="Vertical" Margin="5" MinWidth="180" UseLayoutRounding="True">
+            <Grid Margin="5" MinWidth="180">
+                <StackPanel Orientation="Vertical" UseLayoutRounding="True">
                 <DockPanel HorizontalAlignment="Stretch">
                     <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
                     <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Stretch">
@@ -204,7 +218,18 @@
                 <Grid Visibility="{Binding PassiveSkillsVisibility}">
                     <vp:PassiveSkillCollectionView Margin="0,5,0,0" DataContext="{Binding PassiveSkillsCollection}" Width="Auto" />
                 </Grid>
-            </StackPanel>
+                </StackPanel>
+                <Button Command="{Binding ToggleCheckedCommand}" HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Background="Transparent" BorderThickness="0" Padding="0" Margin="0,-2,-2,0" Cursor="Hand"
+                        Opacity="0.6">
+                    <Grid>
+                        <materialIcons:MaterialIcon Kind="CheckCircleOutline" Width="18" Height="18" Foreground="#4CAF50"
+                                                    Visibility="{Binding IsChecked, Converter={StaticResource VVC_Negate}}" />
+                        <materialIcons:MaterialIcon Kind="CheckCircle" Width="18" Height="18" Foreground="#4CAF50"
+                                                    Visibility="{Binding IsChecked, Converter={StaticResource VVC}}" />
+                    </Grid>
+                </Button>
+            </Grid>
         </DataTemplate>
 
         <Style TargetType="{x:Type graphSharp:VertexControl}">
@@ -212,13 +237,29 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type graphSharp:VertexControl}">
-                        <Border BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}" 
+                        <Border x:Name="NodeBorder"
+                                BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
                                 Background="#111217"
                                 BorderThickness="2"
                                 CornerRadius="10,10,10,10"
                                 Padding="{TemplateBinding Padding}">
-                            <ContentPresenter Content="{TemplateBinding Vertex}" />
+                            <Grid>
+                                <ContentPresenter x:Name="NodeContent" Content="{TemplateBinding Vertex}" />
+                                <materialIcons:MaterialIcon x:Name="CheckIcon"
+                                    Kind="CheckCircle"
+                                    Visibility="Collapsed"
+                                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                                    Width="22" Height="22" Foreground="#4CAF50"
+                                    Margin="0,-5,-5,0" />
+                            </Grid>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Vertex.IsChecked, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                                <Setter TargetName="NodeContent" Property="Opacity" Value="0.4" />
+                                <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="NodeBorder" Property="BorderBrush" Value="#4CAF50" />
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
@@ -46,7 +47,17 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             AvgRequiredAttemptsDescription = LocalizationCodes.LC_RESULT_BREEDING_ATTEMPTS.Bind(AvgRequiredAttempts);
 
             IVs = IVSetViewModel.FromIVs(node.PalRef.IVs);
+
+            ToggleCheckedCommand = new RelayCommand(() => IsChecked = !IsChecked);
         }
+
+        [ObservableProperty]
+        private bool isChecked;
+
+        partial void OnIsCheckedChanged(bool value) => IsCheckedChanged?.Invoke();
+
+        public event Action IsCheckedChanged;
+        public IRelayCommand ToggleCheckedCommand { get; }
 
         public PalViewModel Pal { get; }
 
