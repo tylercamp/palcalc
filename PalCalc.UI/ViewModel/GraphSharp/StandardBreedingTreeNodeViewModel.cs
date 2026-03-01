@@ -48,6 +48,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
             IVs = IVSetViewModel.FromIVs(node.PalRef.IVs);
 
+            IsCheckable = node.PalRef is BredPalReference or WildPalReference or SurgeryTablePalReference;
             ToggleCheckedCommand = new RelayCommand(() => IsChecked = !IsChecked);
         }
 
@@ -58,6 +59,8 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
         public event Action IsCheckedChanged;
         public IRelayCommand ToggleCheckedCommand { get; }
+
+        public bool IsCheckable { get; }
 
         public PalViewModel Pal { get; }
 

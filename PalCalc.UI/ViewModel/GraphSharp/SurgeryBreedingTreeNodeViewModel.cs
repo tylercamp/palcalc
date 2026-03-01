@@ -61,6 +61,8 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         public event Action IsCheckedChanged;
         public IRelayCommand ToggleCheckedCommand { get; }
 
+        public bool IsCheckable => false;
+
         private SurgeryTablePalReference pref;
 
         public IBreedingTreeNode Value { get; }

@@ -14,6 +14,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
     {
         IBreedingTreeNode Value { get; }
 
+        bool IsCheckable { get; }
         bool IsChecked { get; set; }
         event Action IsCheckedChanged;
         IRelayCommand ToggleCheckedCommand { get; }

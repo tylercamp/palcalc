@@ -223,6 +223,7 @@
                                 <ContentPresenter x:Name="NodeContent" Content="{TemplateBinding Vertex}" />
                                 <Button x:Name="ToggleButton"
                                     Command="{Binding ToggleCheckedCommand}"
+                                    Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}"
                                     HorizontalAlignment="Right" VerticalAlignment="Top"
                                     Background="Transparent" BorderThickness="0" Padding="0"
                                     Margin="0,4,4,0" Cursor="Hand" Opacity="0.6">
