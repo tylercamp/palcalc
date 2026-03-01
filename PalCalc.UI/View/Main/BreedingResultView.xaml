@@ -226,6 +226,20 @@
                                     HorizontalAlignment="Right" VerticalAlignment="Top"
                                     Background="Transparent" BorderThickness="0" Padding="0"
                                     Margin="0,2,2,0" Cursor="Hand" Opacity="0.6">
+
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                                                    <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText Code=LC_GRAPH_UNCHECK_STEP_DESCRIPTION}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsChecked}" Value="False">
+                                                    <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText Code=LC_GRAPH_CHECK_STEP_DESCRIPTION}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+
                                     <Grid>
                                         <materialIcons:MaterialIcon x:Name="UncheckedIcon"
                                             Kind="CheckCircleOutline"

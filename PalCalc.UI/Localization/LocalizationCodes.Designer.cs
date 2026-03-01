@@ -296,6 +296,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_GRAPH_CHECK_STEP_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_GRAPH_UNCHECK_STEP_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_GRAPH_ZOOM_CUSTOM,
         /// <summary>
         ///   Looks up a localized string similar to .
