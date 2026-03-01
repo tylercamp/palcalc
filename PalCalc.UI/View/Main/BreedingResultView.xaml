@@ -225,7 +225,7 @@
                                     Command="{Binding ToggleCheckedCommand}"
                                     HorizontalAlignment="Right" VerticalAlignment="Top"
                                     Background="Transparent" BorderThickness="0" Padding="0"
-                                    Margin="0,2,2,0" Cursor="Hand" Opacity="0.6">
+                                    Margin="0,4,4,0" Cursor="Hand" Opacity="0.6">
 
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -242,11 +242,11 @@
 
                                     <Grid>
                                         <materialIcons:MaterialIcon x:Name="UncheckedIcon"
-                                            Kind="CheckCircleOutline"
-                                            Width="22" Height="22" Foreground="#4CAF50" />
+                                            Kind="CircleOutline"
+                                            Width="16" Height="16" Foreground="#999" />
                                         <materialIcons:MaterialIcon x:Name="CheckedIcon"
                                             Kind="CheckCircle"
-                                            Width="22" Height="22" Foreground="#4CAF50"
+                                            Width="16" Height="16" Foreground="#4CAF50"
                                             Visibility="Collapsed" />
                                     </Grid>
                                 </Button>
