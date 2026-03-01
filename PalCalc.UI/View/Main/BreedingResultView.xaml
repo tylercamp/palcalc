@@ -254,9 +254,11 @@
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                            <DataTrigger Binding="{Binding IsComplete}" Value="True">
                                 <Setter TargetName="NodeContent" Property="Opacity" Value="0.4" />
                                 <Setter TargetName="NodeBorder" Property="BorderBrush" Value="#4CAF50" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsChecked}" Value="True">
                                 <Setter TargetName="ToggleButton" Property="Opacity" Value="1.0" />
                                 <Setter TargetName="UncheckedIcon" Property="Visibility" Value="Collapsed" />
                                 <Setter TargetName="CheckedIcon" Property="Visibility" Value="Visible" />

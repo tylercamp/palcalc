@@ -55,12 +55,33 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         [ObservableProperty]
         private bool isChecked;
 
-        partial void OnIsCheckedChanged(bool value) => IsCheckedChanged?.Invoke();
+        partial void OnIsCheckedChanged(bool value)
+        {
+            IsCheckedChanged?.Invoke();
+            OnPropertyChanged(nameof(IsComplete));
+        }
 
         public event Action IsCheckedChanged;
         public IRelayCommand ToggleCheckedCommand { get; }
 
         public bool IsCheckable { get; }
+
+        private IBreedingTreeNodeViewModel consumer;
+
+        public bool IsComplete => IsChecked || (consumer?.IsComplete ?? false);
+
+        public void SetConsumer(IBreedingTreeNodeViewModel node)
+        {
+            consumer = node;
+            if (consumer is ObservableObject obs)
+            {
+                obs.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(IsComplete))
+                        OnPropertyChanged(nameof(IsComplete));
+                };
+            }
+        }
 
         public PalViewModel Pal { get; }
 
