@@ -238,6 +238,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type graphSharp:VertexControl}">
                         <Border x:Name="NodeBorder"
+                                DataContext="{Binding Vertex, RelativeSource={RelativeSource TemplatedParent}}"
                                 BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
                                 Background="#111217"
                                 BorderThickness="2"
@@ -254,7 +255,7 @@
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <DataTrigger Binding="{Binding Vertex.IsChecked, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                            <DataTrigger Binding="{Binding IsChecked}" Value="True">
                                 <Setter TargetName="NodeContent" Property="Opacity" Value="0.4" />
                                 <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
                                 <Setter TargetName="NodeBorder" Property="BorderBrush" Value="#4CAF50" />
