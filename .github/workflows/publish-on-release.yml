@@ -2,6 +2,7 @@
 name: Build / Publish Artifacts
 
 on:
+  workflow_dispatch: {}
   release:
     types: [published]
   workflow_dispatch:
