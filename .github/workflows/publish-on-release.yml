@@ -1,13 +1,16 @@
-# This workflow builds and publishes artifacts when a release (or pre-release) is published
-name: Publish on Release
+# This workflow builds artifacts when run manually and publishes them when a release is published
+name: Build / Publish Artifacts
 
 on:
+  workflow_dispatch: {}
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,7 +39,8 @@ jobs:
           name: PalCalc-NoBundle.zip
           path: publish/PalCalc-NoBundle.zip
 
-      - name: Upload release asset for Non-Bundled EXE
+      - name: Upload release asset for Non-Bundled ZIP
+        if: github.event_name == 'release'
         uses: shogo82148/actions-upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
@@ -45,15 +49,15 @@ jobs:
       - name: Publish Bundled profile (single EXE)
         run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release /p:PublishProfile=Properties/PublishProfiles/Bundled.pubxml --output publish/Bundled
 
-      - name: Upload release asset for Bundled EXE
-        uses: shogo82148/actions-upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: publish/Bundled/PalCalc.UI.exe
-
       - name: Upload Bundled EXE
         uses: actions/upload-artifact@v4
         with:
           name: PalCalc.UI_Bundled_EXE
-          path: |
-            publish/Bundled/*.exe
+          path: publish/Bundled/*.exe
+
+      - name: Upload release asset for Bundled EXE
+        if: github.event_name == 'release'
+        uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: publish/Bundled/PalCalc.UI.exe
