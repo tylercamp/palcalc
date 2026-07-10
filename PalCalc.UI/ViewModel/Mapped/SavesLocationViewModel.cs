@@ -1,12 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.SaveReader;
 using PalCalc.UI.Localization;
+using SharpVectors.Converters;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
@@ -50,6 +52,8 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
             
             LastModified = SaveGames.OfType<SaveGameViewModel>().OrderByDescending(g => g.LastModified).FirstOrDefault()?.LastModified;
+
+            SvgPath = isXbox ? "/Resources/Xbox_app_logo.svg" : "/Resources/Steam_icon_logo.svg";
         }
 
         public ISavesLocation Value { get; }
@@ -59,6 +63,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         public ILocalizedText Label { get; }
 
         public DateTime? LastModified { get; }
+
+        public string SvgPath { get; }
     }
 
     public partial class ManualSavesLocationViewModel : ObservableObject, ISavesLocationViewModel
