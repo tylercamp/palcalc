@@ -129,16 +129,14 @@ namespace PalCalc.Model
             var token = JToken.ReadFrom(reader);
             return new BreedingResult()
             {
-                Parent1 = new GenderedPal()
-                {
-                    Pal = token["Parent1ID"].ToObject<PalId>().ToPal(pals),
-                    Gender = token["Parent1Gender"].ToObject<PalGender>(),
-                },
-                Parent2 = new GenderedPal()
-                {
-                    Pal = token["Parent2ID"].ToObject<PalId>().ToPal(pals),
-                    Gender = token["Parent2Gender"].ToObject<PalGender>(),
-                },
+                Parent1 = new GenderedPal(
+                    Pal: token["Parent1ID"].ToObject<PalId>().ToPal(pals),
+                    Gender: token["Parent1Gender"].ToObject<PalGender>()
+                ),
+                Parent2 = new GenderedPal(
+                    Pal: token["Parent2ID"].ToObject<PalId>().ToPal(pals),
+                    Gender: token["Parent2Gender"].ToObject<PalGender>()
+                ),
                 Child = token["ChildID"].ToObject<PalId>().ToPal(pals)
             };
         }
