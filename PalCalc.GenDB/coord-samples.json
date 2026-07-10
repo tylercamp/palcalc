@@ -2,31 +2,53 @@
     { // Mammorest
         "WorldCoords": { "X": -343155, "Y": 244585 },
         "MapCoords": { "X": 189, "Y": -477 },
-        "ImageCoords": { "X": 1391, "Y": 1118 },
+        "ImageCoords": { "X": 2741, "Y": 1959 },
     },
     { // Kingpaca
         "WorldCoords": { "X": -335225, "Y": 180735 },
         "MapCoords": { "X": 50, "Y": -460 },
-        "ImageCoords": { "X": 1301, "Y": 1108 },
+        "ImageCoords": { "X": 2558, "Y": 1934 },
     },
     { // Anubis
         "WorldCoords": { "X": -167230, "Y": 96430 },
         "MapCoords": { "X": -134, "Y": -94 },
-        "ImageCoords": { "X": 1178, "Y": 870 },
+        "ImageCoords": { "X": 2321, "Y": 1461 },
     },
     { // Suzaku
-        "WorldCoords": { "X": -6430, "Y": 343440 },
-        "MapCoords": { "X": 404, "Y": 256 },
-        "ImageCoords": { "X": 1534, "Y": 644 },
-    },
-    { // Astegon
-        "WorldCoords": { "X": -320870, "Y": -124090 },
-        "MapCoords": { "X": -615, "Y": -428 },
-        "ImageCoords": { "X": 870, "Y": 1087 },
+        "WorldCoords": { "X": 97716, "Y": 307499 },
+        "MapCoords": { "X": 326, "Y": 483 },
+        "ImageCoords": { "X": 2919, "Y": 710 },
     },
     { // Frostallion
         "WorldCoords": { "X": 109790, "Y": -5880 },
         "MapCoords": { "X": -357, "Y": 509 },
-        "ImageCoords": { "X": 1037, "Y": 479 },
+        "ImageCoords": { "X": 2032, "Y": 678 },
+    },
+  { // Faleris Aqua
+    "WorldCoords": {
+      "X": -867560,
+      "Y": -441338
+    },
+    "MapCoords": {
+      "X": -1306,
+      "Y": -1620
+    },
+    "ImageCoords": {
+      "X": 779,
+      "Y": 3441
     }
+  },
+  { // Azurmane
+    "WorldCoords": {
+      "X": -889441,
+      "Y": -361294
+    },
+    "MapCoords": {
+      "X": -1131,
+      "Y": -1668
+    },
+    "ImageCoords": {
+      "X": 1027, "Y": 3502
+    }
+  }
 ]

@@ -11,6 +11,7 @@ using PalCalc.Model;
 using Serilog;
 using SkiaSharp;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 /*
@@ -157,6 +158,7 @@ namespace PalCalc.GenDB
                 { "EffectValue1", rawPassive.EffectValue1.ToString() },
                 { "EffectValue2", rawPassive.EffectValue2.ToString() },
                 { "EffectValue3", rawPassive.EffectValue3.ToString() },
+                { "EffectValue4", rawPassive.EffectValue4.ToString() }
             };
 
             foreach (var kvp in formatArgs)
@@ -167,7 +169,7 @@ namespace PalCalc.GenDB
                 logger.Warning("Description contains leftover format params: {description}", description);
             }
 
-            description = Regex.Replace(description, @"<(.+?)\s+id=\|(.+?)\|/>", match =>
+            description = Regex.Replace(description, @"<(\w+?)\s+id=\|([^\|]+?)\|/>", match =>
             {
                 var kind = match.Groups[1].Value;
                 var id = match.Groups[2].Value;
@@ -189,6 +191,9 @@ namespace PalCalc.GenDB
 
 
             description = Regex.Replace(description, "<.+?>", "");
+
+            if (description.Contains("<") || description.Contains(">"))
+                Debugger.Break();
 
             return description.Replace("\r\n", "\n");
         }
@@ -232,6 +237,7 @@ namespace PalCalc.GenDB
                 FormatEffect(rawPassive.EffectType1, rawPassive.EffectValue1),
                 FormatEffect(rawPassive.EffectType2, rawPassive.EffectValue2),
                 FormatEffect(rawPassive.EffectType3, rawPassive.EffectValue3),
+                FormatEffect(rawPassive.EffectType4, rawPassive.EffectValue4)
             }.SkipNull().ToList();
 
             if (parts.Count > 0) return string.Join('\n', parts);
@@ -274,7 +280,8 @@ namespace PalCalc.GenDB
                 {
                     (Strip(rawPassive.EffectType1), Strip(rawPassive.TargetType1), rawPassive.EffectValue1),
                     (Strip(rawPassive.EffectType2), Strip(rawPassive.TargetType2), rawPassive.EffectValue2),
-                    (Strip(rawPassive.EffectType3), Strip(rawPassive.TargetType3), rawPassive.EffectValue3)
+                    (Strip(rawPassive.EffectType3), Strip(rawPassive.TargetType3), rawPassive.EffectValue3),
+                    (Strip(rawPassive.EffectType4), Strip(rawPassive.TargetType4), rawPassive.EffectValue4)
                 }).Where(t => t.Item1 != "EPalPassiveSkillEffectType::no");
 
                 var trackedEffects = effects
@@ -796,9 +803,9 @@ namespace PalCalc.GenDB
             if (mapInfo != null)
             {
                 var rawData = mapInfo.MapTexture.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
-                var resized = rawData.Resize(new SKSizeI() { Width = 4096, Height = 4096 }, SKFilterQuality.High);
+                var resized = rawData.Resize(new SKSizeI() { Width = 8192, Height = 8192 }, SKFilterQuality.High);
 
-                var encoded = resized.Encode(SKEncodedImageFormat.Jpeg, 90);
+                var encoded = resized.Encode(SKEncodedImageFormat.Jpeg, 70);
 
                 using (var o = new FileStream("../PalCalc.UI/Resources/Map.jpeg", FileMode.Create))
                         encoded.SaveTo(o);
@@ -820,9 +827,9 @@ namespace PalCalc.GenDB
             //
             // `sampleMapTexSize` is the image size used when the "map pixel coordinates" were gathered
             //
-            // I was using a 2048x2048 image at the time, this should only change if the `ImageCoords` in `coord-samples.json` are updated
+            // I was using a 4096x4096 image at the time, this should only change if the `ImageCoords` in `coord-samples.json` are updated
             // from a new image resolution
-            MapTransformSolver.Run("coord-samples.json", sampleMapTexSize: 2048);
+            MapTransformSolver.Run("coord-samples.json", sampleMapTexSize: 4096);
 
             CSVExport.Write(
                 outDir: "out-csv",
