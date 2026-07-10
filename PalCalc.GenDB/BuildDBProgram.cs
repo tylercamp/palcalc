@@ -1,6 +1,7 @@
 ﻿using CUE4Parse.Compression;
 using CUE4Parse.FileProvider;
 using CUE4Parse.MappingsProvider;
+using CUE4Parse.MappingsProvider.Usmap;
 using CUE4Parse.UE4.Assets.Exports.Texture;
 using CUE4Parse.UE4.Versions;
 using CUE4Parse_Conversion.Textures;
@@ -74,7 +75,9 @@ namespace PalCalc.GenDB
                         Id = new PalId()
                         {
                             PalDexNo = rawPal.PalDexNum,
-                            IsVariant = rawPal.PalDexNumSuffix != null && rawPal.PalDexNumSuffix.Length > 0,
+                            IsVariant =
+                            (rawPal.PalDexNumSuffix != null && rawPal.PalDexNumSuffix.Length > 0) ||
+                            (rawPal.InternalName == "PlantSlime_Flower"), // (this used to have a Suffix, but that was removed for some reason)
                         },
                         BreedingPower = rawPal.BreedingPower,
                         Price = (int)rawPal.Price,
@@ -426,12 +429,12 @@ namespace PalCalc.GenDB
                     batch
                         .SelectMany(pair => new[] {
                             (
-                                new GenderedPal() { Pal = pair.Item1, Gender = PalGender.FEMALE },
-                                new GenderedPal() { Pal = pair.Item2, Gender = PalGender.MALE }
+                                new GenderedPal(Pal: pair.Item1, Gender: PalGender.FEMALE),
+                                new GenderedPal(Pal: pair.Item2, Gender: PalGender.MALE)
                             ),
                             (
-                                new GenderedPal() { Pal = pair.Item1, Gender = PalGender.MALE },
-                                new GenderedPal() { Pal = pair.Item2, Gender = PalGender.FEMALE }
+                                new GenderedPal(Pal: pair.Item1, Gender: PalGender.MALE),
+                                new GenderedPal(Pal: pair.Item2, Gender: PalGender.FEMALE)
                             )
                         })
                         // get the results of breeding with swapped genders (for results where the child is determined by parent genders)
@@ -459,16 +462,8 @@ namespace PalCalc.GenDB
                             [
                                 new BreedingResult()
                                 {
-                                    Parent1 = new GenderedPal()
-                                    {
-                                        Pal = results.First().Parent1.Pal,
-                                        Gender = PalGender.WILDCARD
-                                    },
-                                    Parent2 = new GenderedPal()
-                                    {
-                                        Pal = results.First().Parent2.Pal,
-                                        Gender = PalGender.WILDCARD
-                                    },
+                                    Parent1 = new GenderedPal(Pal: results.First().Parent1.Pal, Gender: PalGender.WILDCARD),
+                                    Parent2 = new GenderedPal(Pal: results.First().Parent2.Pal, Gender: PalGender.WILDCARD),
                                     Child = results.First().Child
                                 }
                             ];
@@ -481,7 +476,7 @@ namespace PalCalc.GenDB
 
         private static void ExportImage(UTexture2D tex, string path, int width, int height, SKEncodedImageFormat format, int quality = 100)
         {
-            var rawData = tex.Decode(ETexturePlatform.DesktopMobile);
+            var rawData = tex.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
             var resized = rawData.Resize(new SKSizeI() { Width = width, Height = height }, SKFilterQuality.High);
             var encoded = resized.Encode(format, quality);
 
@@ -491,7 +486,7 @@ namespace PalCalc.GenDB
 
         private static void ExportImage(UTexture2D tex, string path, SKEncodedImageFormat format, int quality = 100)
         {
-            var rawData = tex.Decode(ETexturePlatform.DesktopMobile);
+            var rawData = tex.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
             var encoded = rawData.Encode(format, 100);
             using (var o = new FileStream(path, FileMode.Create))
                 encoded.SaveTo(o);
@@ -550,7 +545,7 @@ namespace PalCalc.GenDB
 
             void ExportRankIcon(UTexture2D tex, string iconName, Func<SKBitmap, SKBitmap> transform)
             {
-                var rawData = tex.Decode(ETexturePlatform.DesktopMobile);
+                var rawData = tex.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
                 var modified = transform(rawData);
                 var encoded = modified.Encode(SKEncodedImageFormat.Png, 100);
                 using (var o = new FileStream($"../PalCalc.UI/Resources/TraitRank/{iconName}", FileMode.Create))
@@ -685,7 +680,7 @@ namespace PalCalc.GenDB
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
             OodleHelper.DownloadOodleDll();
-            OodleHelper.Initialize(OodleHelper.OODLE_DLL_NAME);
+            OodleHelper.Initialize(OodleHelper.OODLE_NAME_CURRENT);
 
             var provider = new DefaultFileProvider(PalworldDirPath, SearchOption.AllDirectories, true, new VersionContainer(EGame.GAME_UE5_1));
             provider.MappingsContainer = new FileUsmapTypeMappingsProvider(MappingsPath);
@@ -752,8 +747,9 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v22");
+            var db = PalDB.MakeEmptyUnsafe("v23");
 
+            var dups = pals.GroupBy(p => p.Id).Where(g => g.Count() > 1).ToList();
             db.PalsById = pals.ToDictionary(p => p.Id);
             db.Humans = humans;
             db.PassiveSkills = passives;
@@ -799,7 +795,7 @@ namespace PalCalc.GenDB
 
             if (mapInfo != null)
             {
-                var rawData = mapInfo.MapTexture.Decode(ETexturePlatform.DesktopMobile);
+                var rawData = mapInfo.MapTexture.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
                 var resized = rawData.Resize(new SKSizeI() { Width = 4096, Height = 4096 }, SKFilterQuality.High);
 
                 var encoded = resized.Encode(SKEncodedImageFormat.Jpeg, 90);

@@ -6,15 +6,9 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Model
 {
-    public class GenderedPal
+    public record class GenderedPal(Pal Pal, PalGender Gender)
     {
-        public Pal Pal { get; set; }
-        public PalGender Gender { get; set; }
-
         public bool Matches(PalInstance inst) => inst.Pal == Pal && inst.Gender == Gender;
-
-        public override bool Equals(object obj) => obj is GenderedPal && obj.GetHashCode() == GetHashCode();
-        public override int GetHashCode() => HashCode.Combine(Pal, Gender);
 
         public override string ToString() => $"{Gender} {Pal}";
     }
