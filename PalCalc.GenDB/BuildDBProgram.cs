@@ -29,6 +29,10 @@ using System.Text.RegularExpressions;
  * 5. Copy "Mappings.usmap" file created next to "Palworld-Win64-Shipping.exe"
  * 
  * (Delete / rename "dwmapi.dll" to effectively disable)
+ *
+ * The Steam Workshop "UE4SS Experimental (Palworld)" mod can also generate the usmap
+ * without copying UE4SS into the Win64 folder. In that case, look under the workshop
+ * UE4SS folder in Mods/NativeMods.
  */
 
 namespace PalCalc.GenDB
@@ -40,8 +44,10 @@ namespace PalCalc.GenDB
         // This is all HEAVILY dependent on having the right Mappings.usmap file for the Palworld version!
         //
         // (should be a folder containing "Pal-Windows.pak")
-        static string PalworldDirPath = @"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Content\Paks";
-        static string MappingsPath = @"C:\Users\algor\Desktop\Mappings.usmap";
+        static string PalworldDirPath = Environment.GetEnvironmentVariable("PALCALC_PALWORLD_PAKS")
+            ?? @"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Content\Paks";
+        static string MappingsPath = Environment.GetEnvironmentVariable("PALCALC_MAPPINGS_USMAP")
+            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Mappings.usmap");
 
         private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
         {
@@ -71,14 +77,21 @@ namespace PalCalc.GenDB
                     var minWildLevel = wildPalLevels.ContainsKey(rawPal.InternalName) ? (int?)wildPalLevels[rawPal.InternalName].Item1 : null;
                     var maxWildLevel = wildPalLevels.ContainsKey(rawPal.InternalName) ? (int?)wildPalLevels[rawPal.InternalName].Item2 : null;
 
+                    var isVariant =
+                        rawPal.PalDexNumSuffix != null &&
+                        rawPal.PalDexNumSuffix.Length > 0 &&
+                        rawPal.PalDexNumSuffix != "None";
+
+                    // (this used to have a Suffix, but that was removed for some reason)
+                    if (rawPal.InternalName == "PlantSlime_Flower")
+                        isVariant = true;
+
                     return new Pal()
                     {
                         Id = new PalId()
                         {
                             PalDexNo = rawPal.PalDexNum,
-                            IsVariant =
-                            (rawPal.PalDexNumSuffix != null && rawPal.PalDexNumSuffix.Length > 0) ||
-                            (rawPal.InternalName == "PlantSlime_Flower"), // (this used to have a Suffix, but that was removed for some reason)
+                            IsVariant = isVariant,
                         },
                         BreedingPower = rawPal.BreedingPower,
                         Price = (int)rawPal.Price,
@@ -483,7 +496,7 @@ namespace PalCalc.GenDB
 
         private static void ExportImage(UTexture2D tex, string path, int width, int height, SKEncodedImageFormat format, int quality = 100)
         {
-            var rawData = tex.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
+            using var rawData = tex.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
             var resized = rawData.Resize(new SKSizeI() { Width = width, Height = height }, SKFilterQuality.High);
             var encoded = resized.Encode(format, quality);
 
@@ -493,7 +506,7 @@ namespace PalCalc.GenDB
 
         private static void ExportImage(UTexture2D tex, string path, SKEncodedImageFormat format, int quality = 100)
         {
-            var rawData = tex.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
+            using var rawData = tex.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
             var encoded = rawData.Encode(format, 100);
             using (var o = new FileStream(path, FileMode.Create))
                 encoded.SaveTo(o);
@@ -552,7 +565,7 @@ namespace PalCalc.GenDB
 
             void ExportRankIcon(UTexture2D tex, string iconName, Func<SKBitmap, SKBitmap> transform)
             {
-                var rawData = tex.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
+                using var rawData = tex.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
                 var modified = transform(rawData);
                 var encoded = modified.Encode(SKEncodedImageFormat.Png, 100);
                 using (var o = new FileStream($"../PalCalc.UI/Resources/TraitRank/{iconName}", FileMode.Create))
@@ -687,7 +700,7 @@ namespace PalCalc.GenDB
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
             OodleHelper.DownloadOodleDll();
-            OodleHelper.Initialize(OodleHelper.OODLE_NAME_CURRENT);
+            OodleHelper.Initialize();
 
             var provider = new DefaultFileProvider(PalworldDirPath, SearchOption.AllDirectories, true, new VersionContainer(EGame.GAME_UE5_1));
             provider.MappingsContainer = new FileUsmapTypeMappingsProvider(MappingsPath);
@@ -802,7 +815,7 @@ namespace PalCalc.GenDB
 
             if (mapInfo != null)
             {
-                var rawData = mapInfo.MapTexture.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
+                using var rawData = mapInfo.MapTexture.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
                 var resized = rawData.Resize(new SKSizeI() { Width = 8192, Height = 8192 }, SKFilterQuality.High);
 
                 var encoded = resized.Encode(SKEncodedImageFormat.Jpeg, 70);
