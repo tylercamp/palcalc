@@ -228,10 +228,13 @@ namespace PalCalc.GenDB
             int cols = mat.GetLength(1);
             for (int r = 0; r < rows; r++)
             {
+                // (Use C# collection syntax for easy copypasta)
+                Console.Write("{ ");
                 for (int c = 0; c < cols; c++)
                 {
-                    Console.Write(mat[r, c].ToString() + (c == cols - 1 ? "" : " "));
+                    Console.Write(mat[r, c].ToString() + (c == cols - 1 ? "" : ", "));
                 }
+                Console.Write(" }" + (r == rows - 1 ? "," : ""));
                 Console.WriteLine();
             }
         }
