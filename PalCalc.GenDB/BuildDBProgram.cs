@@ -768,7 +768,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v23");
+            var db = PalDB.MakeEmptyUnsafe("v24");
 
             var dups = pals.GroupBy(p => p.Id).Where(g => g.Count() > 1).ToList();
             db.PalsById = pals.ToDictionary(p => p.Id);
