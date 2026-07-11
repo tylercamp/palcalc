@@ -94,6 +94,7 @@ namespace PalCalc.GenDB
                             IsVariant = isVariant,
                         },
                         BreedingPower = rawPal.BreedingPower,
+                        BreedingPowerPriority = rawPal.BreedingPowerPriority,
                         Price = (int)rawPal.Price,
                         Rarity = rawPal.Rarity,
                         InternalIndex = rawPal.InternalIndex,

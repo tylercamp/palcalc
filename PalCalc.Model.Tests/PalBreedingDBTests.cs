@@ -12,7 +12,7 @@
 
             var result = breedingdb.BreedingByParent[kitsunNoct][fellbat];
 
-            Assert.IsTrue(result.Any(br => br.Child == bulldosu), $"Expected Kitsun Noct + Fellbat = Bulldosu, got {string.Join(",", result.Select(br => br.Child.Name))}");
+            Assert.IsTrue(result.Any(br => br.Child == bulldosu), $"Expected Kitsun Noct + Fellbat = Bulldosu({bulldosu.InternalName}), got {string.Join(",", result.Select(br => $"{br.Child.Name}({br.Child.InternalName})"))}");
         }
     }
 }

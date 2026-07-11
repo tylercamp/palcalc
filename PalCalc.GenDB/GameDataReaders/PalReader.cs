@@ -30,6 +30,9 @@ namespace PalCalc.GenDB.GameDataReaders
         [FStructProperty("CombiRank")]
         public int BreedingPower { get; set; }
 
+        [FStructProperty("CombiDuplicatePriority")]
+        public int BreedingPowerPriority { get; set; }
+
         [FStructProperty]
         public int MaleProbability { get; set; }
 

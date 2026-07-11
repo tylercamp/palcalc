@@ -50,7 +50,7 @@ namespace PalCalc.GenDB
             return pals
                 .Where(p => !uniqueCombos.Any(c => p == c.Child)) // pals produced by a special combo can _only_ be produced by that combo
                 .OrderBy(p => Math.Abs(p.BreedingPower - childPower))
-                .ThenBy(p => p.InternalIndex)
+                .ThenByDescending(p => p.BreedingPowerPriority)
                 // if there are two pals with the same internal index, prefer the non-variant pal
                 .ThenBy(p => p.Id.IsVariant ? 1 : 0)
                 .First();
