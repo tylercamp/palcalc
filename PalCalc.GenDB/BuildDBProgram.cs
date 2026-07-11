@@ -604,6 +604,7 @@ namespace PalCalc.GenDB
             ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_03.uasset"], "Passive_Negative_3_icon.png", Flip);
 
             ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_04.uasset"], "Passive_Positive_4_icon.png", NoOp);
+            ExportRankIcon(ciSkillRankIcons["T_icon_skillstatus_rank_arrow_05.uasset"], "Passive_Positive_5_icon.png", NoOp);
         }
 
         public static void ExportWorkSuitabilityIcons(Dictionary<string, UTexture2D> workIcons)
