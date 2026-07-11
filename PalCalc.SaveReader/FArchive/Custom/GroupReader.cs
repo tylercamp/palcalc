@@ -121,6 +121,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
                 };
 
                 List<Func<GroupType, FArchiveReader, GroupDataProperty>> parsers = [
+                    ParseStream_V4_PalworldV1_0_0,
                     ParseStream_V3_TidesOfTerraria,
                     ParseStream_V2_Feybreak,
                     ParseStream_V1,
@@ -285,6 +286,127 @@ namespace PalCalc.SaveReader.FArchive.Custom
             }
 
             return result;
+        }
+
+        private static GroupDataProperty ParseStream_V4_PalworldV1_0_0(GroupType groupType, FArchiveReader subReader)
+        {
+            // Ref: https://github.com/deafdudecomputers/PalworldSaveTools/blob/1a20d52d821abbdcd3ed6e81a8e7bb8e57e2acdd/src/palsav/palsav/rawdata/group.py
+
+            var result = new GroupDataProperty() { TypedMeta = new GroupDataPropertyMeta() };
+
+            result.TypedMeta.Id = subReader.ReadGuid();
+            result.GroupType = groupType;
+            result.GroupName = subReader.ReadString();
+            result.CharacterHandleIds = subReader.ReadArray(r => new EntityInstanceId() { Guid = r.ReadGuid(), InstanceId = r.ReadGuid() });
+
+            // Note: This parser is a bit "looser" than the earlier parsers which were very strict with
+            //       byte ordering. We include extra validation and throw exceptions so we're more likely
+            //       to retry with parsers for the older save formats
+
+            if (GroupType.Mask_HasBaseIds.HasFlag(groupType))
+            {
+                result.OrgType = subReader.ReadByte();
+            }
+
+            if (groupType == GroupType.IndependentGuild)
+            {
+                result.BaseCampLevel = subReader.ReadInt32();
+                result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
+                result.GuildName = subReader.ReadString();
+                result.PlayerUid = subReader.ReadGuid();
+                result.GuildName2 = subReader.ReadString();
+                result.PlayerLastOnlineRealTime = subReader.ReadInt64();
+                result.PlayerName = subReader.ReadString();
+
+                if (result.PlayerLastOnlineRealTime < 0)
+                    throw new ArgumentOutOfRangeException($"Parsed PlayerLastOnlineRealTime {result.PlayerLastOnlineRealTime} is less than zero");
+            }
+
+            if (groupType == GroupType.Guild)
+            {
+                // New layout: explicit fields through unknown_2
+                subReader.ReadBytes(4); // leading_bytes
+                result.BaseIds = subReader.ReadArray(r => r.ReadGuid());
+                subReader.ReadInt32();  // unknown_1
+                result.BaseCampLevel = subReader.ReadInt32();
+                result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
+                result.GuildName = subReader.ReadString();
+                subReader.ReadGuid();   // last_guild_name_modifier_player_uid
+                subReader.ReadBytes(4); // unknown_2
+
+                if (result.BaseIds.Length != result.MapObjectBasePointInstanceIds.Length)
+                    throw new ArgumentException($"Guild BaseIds length of {result.BaseIds.Length} != MapObjectBasePointInstanceIds length {result.MapObjectBasePointInstanceIds.Length}");
+
+                // Tail region: port Python's probe-and-fallback
+                byte[] tail = subReader.ReadBytes((int)(subReader.StreamSize - subReader.StreamPosition));
+                bool hasV1Marker = false;
+
+                byte[] v1Marker = { 0x02, 0x00, 0x00, 0x00, 0x02, 0x03, 0x00, 0x00, 0x00, 0x00 };
+                int markerIndex = FindBytes(tail, v1Marker);
+                if (markerIndex >= 0)
+                {
+                    hasV1Marker = true;
+                    tail = tail.Skip(markerIndex + 10).ToArray();
+                }
+
+                using (var tailStream = new MemoryStream(tail))
+                using (var tailReader = subReader.Derived(tailStream))
+                {
+                    result.AdminPlayerUid = tailReader.ReadGuid();
+                    int playerCount = tailReader.ReadInt32();
+                    if (playerCount < 0 || playerCount > 1000)
+                        throw new ArgumentOutOfRangeException($"Parsed player count {playerCount} is outside the expected range [0 1000]");
+                    var members = new List<PlayerReference>();
+
+                    for (int i = 0; i < playerCount; i++)
+                    {
+                        var member = new PlayerReference()
+                        {
+                            PlayerUid = tailReader.ReadGuid(),
+                            LastOnlineRealTime = tailReader.ReadInt64(),
+                            PlayerName = tailReader.ReadString(),
+                        };
+
+                        if (member.LastOnlineRealTime < 0)
+                            throw new ArgumentOutOfRangeException($"Parsed player LastOnlineRealTime {member.LastOnlineRealTime} is less than zero");
+
+                        // Python checks eof before reading flag
+                        if (hasV1Marker && tailReader.StreamPosition < tailReader.StreamSize)
+                        {
+                            // _u8_flag present — skip it for now (no C# field for it)
+                            tailReader.ReadByte();
+                        }
+
+                        members.Add(member);
+                    }
+
+                    result.Members = members.ToArray();
+                }
+            }
+
+            // (use 100 as the max base level in case some mod / update pushes the limit over 30)
+            if (result.BaseCampLevel < 0 || result.BaseCampLevel > 100)
+                throw new ArgumentOutOfRangeException($"Parsed BaseCampLevel {result.BaseCampLevel} is outside the expected range [0 100]");
+
+            return result;
+        }
+
+        private static int FindBytes(byte[] haystack, byte[] needle)
+        {
+            for (int i = 0; i <= haystack.Length - needle.Length; i++)
+            {
+                bool match = true;
+                for (int j = 0; j < needle.Length; j++)
+                {
+                    if (haystack[i + j] != needle[j])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match) return i;
+            }
+            return -1;
         }
     }
 }

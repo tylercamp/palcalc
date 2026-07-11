@@ -44,6 +44,9 @@ namespace PalCalc.SaveReader.FArchive
             return res;
         }
 
+        public long StreamPosition => reader.BaseStream.Position;
+        public long StreamSize => reader.BaseStream.Length;
+
         public bool ReadBool() => reader.ReadBoolean();
         public Int16 ReadInt16() => reader.ReadInt16();
         public UInt16 ReadUInt16() => reader.ReadUInt16();
