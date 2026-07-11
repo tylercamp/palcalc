@@ -1,5 +1,6 @@
 ﻿using CUE4Parse.FileProvider;
 using CUE4Parse.UE4.Assets.Exports.Engine;
+using CUE4Parse.UE4.Objects.UObject;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,11 @@ namespace PalCalc.GenDB.GameDataReaders
 
         [FStructProperty("CombiDuplicatePriority")]
         public int BreedingPowerPriority { get; set; }
+
+        [FStructProperty]
+        public string Tribe { get; set; }
+
+        public string TribeName => Tribe.Replace("EPalTribeID::", "");
 
         [FStructProperty]
         public int MaleProbability { get; set; }
@@ -145,15 +151,24 @@ namespace PalCalc.GenDB.GameDataReaders
 
         public static List<UPal> ReadPals(IFileProvider provider)
         {
+            // note: many pals listed in `PALS_PATH` aren't actually available in-game, we use several heuristics for
+            //       these edge-cases
+
             logger.Information("Reading pals");
             var rawPals = provider.LoadPackageObject<UDataTable>(AssetPaths.PALS_PATH);
             List<UPal> result = [];
 
-            // note: index order won't match other pal DBs exactly since we're not skipping Warsect Terra
-            //       and we're giving "Gumoss (Special)" its own unique index value (rather than having it share
-            //       with normal gumoss)
-            //
-            //       ordering will be the same, but values may be slightly offset
+            // fetch the list of pals with icons, use as a filter
+            var rawIconMappings = provider.LoadPackageObject<UDataTable>(AssetPaths.PAL_ICONS_MAPPING_PATH);
+            var internalPalNames = rawIconMappings.RowMap
+                .Where(r =>
+                {
+                    var objectPath = r.Value.Get<FSoftObjectPath>("Icon");
+                    return !objectPath.AssetPathName.Text.Contains("T_dummy_icon");
+                })
+                .Select(kvp => kvp.Key.Text).ToList();
+
+            // (note: legacy prop used as a tie-breaker for ambiguous child-pal during breeding calc)
             int indexOrder = 1;
             foreach (var row in rawPals.RowMap)
             {
@@ -169,6 +184,8 @@ namespace PalCalc.GenDB.GameDataReaders
                     !key.Text.Contains("PREDATOR") &&
                     !key.Text.Contains("POLICE") &&
                     !key.Text.StartsWith("GYM_") &&
+
+                    (internalPalNames.Contains(key.Text, StringComparer.OrdinalIgnoreCase) || internalPalNames.Contains(palData.TribeName, StringComparer.OrdinalIgnoreCase)) &&
 
                     // make sure the Pal is fully-configured - unreleased Pals typically set these to -1
                     palData.Rarity > 0 &&
