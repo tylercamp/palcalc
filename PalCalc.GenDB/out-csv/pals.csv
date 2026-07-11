@@ -287,21 +287,16 @@ Frostallion Noct,IceHorse_Dark,200,True,110,50,5000,80,65,65
 Neptilius,PoseidonOrca,201,False,160,50,4277,272,60,60
 Jetragon,JetDragon,202,False,70,50,4452,123,60,70
 Panthalus,KingWhale,203,False,20,50,4913,204,,
-Kitsun Noct,AmaterasuWolf_Dark_Quest_Enemy,10000,False,800,50,2014,317,,
-Kitsun Noct,AmaterasuWolf_Dark_Quest_Friend,10001,False,800,50,2014,316,,
-Eye of Cthulhu,YakushimaBoss001,10002,False,3100,50,3000,284,45,45
-Demon Eye,YakushimaBoss001_Small,10003,False,3100,50,750,285,33,35
-Green Slime,YakushimaMonster001,10004,False,3100,50,500,275,33,35
-Blue Slime,YakushimaMonster001_Blue,10005,False,3100,50,600,276,33,35
-Illuminant Slime,YakushimaMonster001_Pink,10006,False,3100,50,900,279,42,44
-Purple Slime,YakushimaMonster001_Purple,10007,False,3100,50,800,278,36,41
-Rainbow Slime,YakushimaMonster001_Rainbow,10008,False,3100,50,1500,280,42,44
-Red Slime,YakushimaMonster001_Red,10009,False,3100,50,700,277,36,41
-Enchanted Sword,YakushimaMonster002,10010,False,3100,50,1250,281,42,44
-Cave Bat,YakushimaMonster003,10011,False,3100,50,1000,282,36,41
-Illuminant Bat,YakushimaMonster003_Purple,10012,False,3100,50,1250,283,42,44
-Dragostrophe,BlackFurDragon,10013,False,9999,50,8440,72,,
-en_text,DarkMutant,10014,False,9999,50,3960,134,,
-PIDF Rider,POLICE_HawkBird,10015,False,9999,-1,1012,315,,
-PIDF Rider,POLICE_ThunderDog,10016,False,9999,-1,1205,314,,
-Flopie,PREDATOR_FlowerRabbit_Quest,10017,False,9999,50,512,313,,
+Eye of Cthulhu,YakushimaBoss001,10000,False,3100,50,3000,284,45,45
+Demon Eye,YakushimaBoss001_Small,10001,False,3100,50,750,285,33,35
+Green Slime,YakushimaMonster001,10002,False,3100,50,500,275,33,35
+Blue Slime,YakushimaMonster001_Blue,10003,False,3100,50,600,276,33,35
+Illuminant Slime,YakushimaMonster001_Pink,10004,False,3100,50,900,279,42,44
+Purple Slime,YakushimaMonster001_Purple,10005,False,3100,50,800,278,36,41
+Rainbow Slime,YakushimaMonster001_Rainbow,10006,False,3100,50,1500,280,42,44
+Red Slime,YakushimaMonster001_Red,10007,False,3100,50,700,277,36,41
+Enchanted Sword,YakushimaMonster002,10008,False,3100,50,1250,281,42,44
+Cave Bat,YakushimaMonster003,10009,False,3100,50,1000,282,36,41
+Illuminant Bat,YakushimaMonster003_Purple,10010,False,3100,50,1250,283,42,44
+Dragostrophe,BlackFurDragon,10011,False,9999,50,8440,72,,
+en_text,DarkMutant,10012,False,9999,50,3960,134,,

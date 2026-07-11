@@ -63,6 +63,9 @@ namespace PalCalc.GenDB.GameDataReaders
         public bool IsRaidBoss { get; set; }
 
         [FStructProperty]
+        public bool Predator { get; set; }
+
+        [FStructProperty]
         public string Size { get; set; }
 
         [FStructProperty]
@@ -158,7 +161,10 @@ namespace PalCalc.GenDB.GameDataReaders
                     // only get normal Pals
                     palData.IsPal &&
                     !(palData.IsBoss || palData.IsRaidBoss || palData.IsTowerBoss) &&
-                    !key.Text.StartsWith("Quest_") &&
+                    !key.Text.Contains("Quest") &&
+                    // (Rampaging pals have "PREDATOR" in the name. Note there's also a separate `Predator` field which is apparently completely different)
+                    !key.Text.Contains("PREDATOR") &&
+                    !key.Text.Contains("POLICE") &&
                     !key.Text.StartsWith("GYM_") &&
 
                     // make sure the Pal is fully-configured - unreleased Pals typically set these to -1
