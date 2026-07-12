@@ -26,7 +26,7 @@ jobs:
       #       https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish#pubxml-files
 
       - name: Build solution
-        run: dotnet build --configuration Release -r win-x64 /p:Platform=x64 --no-restore
+        run: dotnet build --configuration Release /p:Platform=x64 --no-restore
 
       - name: Publish NonBundled profile (multiple files)
         run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release_NoBundle -r win-x64 /p:Platform=x64 /p:PublishProfile=Properties/PublishProfiles/NonBundled.pubxml --output publish/NonBundled
