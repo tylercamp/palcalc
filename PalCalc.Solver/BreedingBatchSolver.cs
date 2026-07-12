@@ -136,6 +136,11 @@ namespace PalCalc.Solver
             // (I REALLY don't like this, but now we NEED to. At some point we could declare `scoped` and assign
             // values in if/else blocks, but some C# compiler update happened and now we get CS9203. I
             // REALLY don't want to use this, but I REALLY don't want to do heap allocations even more.)
+            //
+            // https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/breaking-changes/compiler%20breaking%20changes%20-%20dotnet%2011
+            //
+            // (TODO - Now using ternary so we can keep using `scoped Span`, but I'm no longer confident this
+            //         actually avoids heap allocations.)
             scoped Span<(IPalReference, IPalReference)> parentPairOptions =
                 parent1.Gender == PalGender.WILDCARD
                     ? (

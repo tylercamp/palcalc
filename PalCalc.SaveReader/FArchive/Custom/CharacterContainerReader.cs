@@ -33,6 +33,9 @@ namespace PalCalc.SaveReader.FArchive.Custom
         {
             logger.Verbose("decoding");
 
+            if (subReader.StreamSize == 0)
+                return null;
+
             var pathVisitors = visitors.Where(v => v.Matches(path));
 
             var meta = new CharacterContainerDataPropertyMeta

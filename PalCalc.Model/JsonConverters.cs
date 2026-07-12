@@ -127,19 +127,30 @@ namespace PalCalc.Model
         public override BreedingResult ReadJson(JsonReader reader, Type objectType, BreedingResult existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var token = JToken.ReadFrom(reader);
+
+            var parent1Pal = token["Parent1ID"] != null
+                ? token["Parent1ID"].ToObject<PalId>().ToPal(pals)
+                : token["Parent1InternalName"].ToObject<string>().InternalToPal(pals);
+
+            var parent2Pal = token["Parent2ID"] != null
+                ? token["Parent2ID"].ToObject<PalId>().ToPal(pals)
+                : token["Parent2InternalName"].ToObject<string>().InternalToPal(pals);
+
+            var childPal = token["ChildID"] != null
+                ? token["ChildID"].ToObject<PalId>().ToPal(pals)
+                : token["ChildInternalName"].ToObject<string>().InternalToPal(pals);
+
             return new BreedingResult()
             {
-                Parent1 = new GenderedPal()
-                {
-                    Pal = token["Parent1ID"].ToObject<PalId>().ToPal(pals),
-                    Gender = token["Parent1Gender"].ToObject<PalGender>(),
-                },
-                Parent2 = new GenderedPal()
-                {
-                    Pal = token["Parent2ID"].ToObject<PalId>().ToPal(pals),
-                    Gender = token["Parent2Gender"].ToObject<PalGender>(),
-                },
-                Child = token["ChildID"].ToObject<PalId>().ToPal(pals)
+                Parent1 = new GenderedPal(
+                    Pal: parent1Pal,
+                    Gender: token["Parent1Gender"].ToObject<PalGender>()
+                ),
+                Parent2 = new GenderedPal(
+                    Pal: parent2Pal,
+                    Gender: token["Parent2Gender"].ToObject<PalGender>()
+                ),
+                Child = childPal
             };
         }
 
@@ -147,11 +158,11 @@ namespace PalCalc.Model
         {
             JToken.FromObject(new
             {
-                Parent1ID = value.Parent1.Pal.Id,
+                Parent1InternalName = value.Parent1.Pal.InternalName,
                 Parent1Gender = value.Parent1.Gender,
-                Parent2ID = value.Parent2.Pal.Id,
+                Parent2InternalName = value.Parent2.Pal.InternalName,
                 Parent2Gender = value.Parent2.Gender,
-                ChildID = value.Child.Id,
+                ChildInternalName = value.Child.InternalName,
             }).WriteTo(writer);
         }
     }

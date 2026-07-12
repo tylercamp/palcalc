@@ -62,6 +62,8 @@ namespace PalCalc.Model
 
         public int BreedingPower { get; set; }
 
+        public int BreedingPowerPriority { get; set; }
+
         //// fields introduced after first release will need a default value
 
         public int Price { get; set; } = 0;

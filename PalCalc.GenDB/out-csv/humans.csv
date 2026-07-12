@@ -10,7 +10,7 @@ Syndicate Thug,Hunter_Bat
 Syndicate Grenadier,Hunter_Grenade
 Syndicate Cleaner,Hunter_FlameThrower
 Syndicate Crusher,Hunter_Fat_GatlingGun
-PIDF Infantry,Police_Rifle
+PIDF Rifleman,Police_Rifle
 PIDF Guard,Police_Handgun
 PIDF Elite,Police_Shotgun
 Islander,MobuCitizen
@@ -33,8 +33,8 @@ Wandering Merchant,Visitor_Present
 Attack Chopper,SecurityDrone
 Brothers of the Eternal Pyre Martyr,FireCult_Rifle
 Brothers of the Eternal Pyre Martyr,FireCult_FlameThrower
-Free Pal Alliance Devout,Believer_Bat
-Free Pal Alliance Devout,Believer_CrossBow
+Free Pal Alliance Believer,Believer_Bat
+Free Pal Alliance Believer,Believer_CrossBow
 Villager,Male_People02
 Villager,Male_People03
 Villager,Female_People02
@@ -43,6 +43,9 @@ Villager,Male_Trader01
 Villager,Male_Trader02
 Villager,Male_Trader03
 Black Marketeer,Male_DarkTrader01
+Black Marketeer,Male_DarkTrader01_02
+Black Marketeer,Male_DarkTrader01_03
+Black Marketeer,Male_DarkTrader01_04
 Villager,Male_DesertPeople01
 Villager,Female_DesertPeople02
 Islander,MobuCitizen_Male
@@ -67,8 +70,8 @@ Syndicate Thug,Hunter_Bat_Invader
 Syndicate Grenadier,Hunter_Grenade_Invader
 Syndicate Cleaner,Hunter_FlameThrower_Invader
 Syndicate Crusher,Hunter_Fat_GatlingGun_Invader
-Free Pal Alliance Devout,Believer_Bat_Invader
-Free Pal Alliance Devout,Believer_CrossBow_Invader
+Free Pal Alliance Believer,Believer_Bat_Invader
+Free Pal Alliance Believer,Believer_CrossBow_Invader
 Brothers of the Eternal Pyre Martyr,FireCult_Rifle_Invader
 Brothers of the Eternal Pyre Martyr,FireCult_FlameThrower_Invader
 PAL Genetic Research Unit Executioner,Male_Scientist01_LaserRifle_Invader
@@ -92,10 +95,12 @@ Medal Merchant,Male_DarkTrader02
 Moonflower Genin,Male_Ninja01
 Moonflower Jonin,Male_NinjaElite01
 Syndicate Crusher,Hunter_Fat_GatlingGun_Tower
-Free Pal Alliance Devout,Believer_CrossBow_Tower
+Syndicate Gunner,Hunter_Rifle_Tower
+Free Pal Alliance Judicator,Believer_Fat_Cane_Tower
+Free Pal Alliance Believer,Believer_CrossBow_Tower
 Moonflower Genin,Ninja01_Tower
 Moonflower Jonin,NinjaElite01_Tower
-PIDF Infantry,Police_Rifle_Tower
+PIDF Rifleman,Police_Rifle_Tower
 PIDF Elite,Police_Shotgun_Tower
 Hawk,BOSS_Hunter_Rifle
 Grill,BOSS_Hunter_Fat_GatlingGun
@@ -181,8 +186,8 @@ Guard,BountyTrader
 Desert Town Ambassador,Ambassador01
 Blacksmith in Training,Blacksmith01
 Gourmet Hunter,Epicure01
-Bodyguard Mercenary,Escort_Warrior01
-Bodyguard Pal Tamer,Escort_PalTamer01
+Mercenary Bodyguard,Escort_Warrior01
+Pal Tamer Bodyguard,Escort_PalTamer01
 Feybreak Warrior,Viking_Tower
 Feybreak Berserker,VikingElite_Tower
 Moonflower Jonin,Male_NinjaElite01_Invader
@@ -194,7 +199,7 @@ Islander,Yamishima_guide1
 Islander,Yamishima_guide2
 Islander,Yamishima_guide3
 Islander,Yamishima_guide4
-Bodyguard Mercenary,Yamishima_guide5
+Mercenary Bodyguard,Yamishima_guide5
 Islander,Reward_Emote_A_01
 Islander,Reward_Emote_B_01
 Islander,Reward_Emote_C_01
@@ -228,11 +233,11 @@ Islander,Help03
 Islander,Help04
 Veteran Pal Tamer,DeathPenalty_guide
 Friendly Pal Tamer,Respawn_guide
-PIDF Infantry,Police_TreasureGuard_NarrowSite
-PIDF Infantry,Police_Vigilance
-PIDF Infantry,Police_BowGun
+PIDF Rifleman,Police_TreasureGuard_NarrowSite
+PIDF Rifleman,Police_Vigilance
+PIDF Rifleman,Police_BowGun
 Syndicate Thug,Hunter_Prisoner
-Free Pal Alliance Devout,Believer_Prisoner
+Free Pal Alliance Believer,Believer_Prisoner
 Brothers of the Eternal Pyre Martyr,FireCult_Prisoner
 Jailed Ex-Chief,Police_old_Prisoner
 PAL Genetic Research Unit Executioner,Scientist_Prisoner
@@ -308,7 +313,122 @@ Syndicate Swordsman,Quest_Hunter_Katana01
 Syndicate Elite,Quest_Hunter_RocketLauncher01
 Syndicate Crusher,Quest_Hunter_Fat_GatlingGun01
 Syndicate Cleaner,Quest_Hunter_FlameThrower
-Free Pal Alliance Devout,Believer_Bat_Camp02
-Free Pal Alliance Devout,Believer_CrossBow_Camp02
-PIDF Infantry,Police_Shield_Tower
+Free Pal Alliance Believer,Believer_Bat_Camp02
+Free Pal Alliance Believer,Believer_CrossBow_Camp02
+PIDF Rifleman,Police_Shield_Tower
 Islander,Male_Kigurumi01_v01
+,Negotiator
+Patrol Drone,WildlifeSanctuaryDrone
+,WorldTree_Hunter_MissileLauncher_test
+Fia,Female_SurveyGirl01
+Fia,Female_SurveyGirl02
+Fia,Female_SurveyGirl03
+Carla,Female_SurveyWoman01
+Carla,Female_SurveyWoman02
+Gadel,Male_SurveyMan01
+Gadel,Male_SurveyMan02
+Gadel,Male_SurveyMan03
+Harold,Male_StrongOldMan01
+Harold,Male_StrongOldMan02
+Syndicate Thug,Hunter_Handgun_Quest_StrongOldMan
+Syndicate Hunter,Hunter_Shotgun_Quest_StrongOldMan
+Syndicate Elite,Hunter_RocketLauncher_Quest_StrongOldMan
+Guard,Reward_Paldex_v02
+Guard,Reward_PalCaptureCount_v02
+Islander,Female_Farmer01_v05
+Islander,Male_Scholar01_v05
+Islander,Male_Breeder01_v05
+Islander,Female_Ranger01_v05
+Islander,Female_Nomad01_v05
+Elder,BOSS_Hunter_Fat_GatlingGun_Quest_StrongOldMan
+Brothers of the Eternal Pyre Martyr,FireCult_GrenadeLauncher
+Brothers of the Eternal Pyre Martyr,FireCult_RocketLauncher
+Brothers of the Eternal Pyre Martyr,FireCult_MissileLauncher
+PAL Genetic Research Unit Executioner,Scientist_GrenadeLauncher
+PAL Genetic Research Unit Executioner,Scientist_MissileLauncher
+Moonflower Genin,Ninja_Grenade
+Moonflower Jonin,NinjaElite_Grenade
+Feybreak Warrior,Viking_Melee
+Feybreak Warrior,Viking_GrenadeLauncher
+Feybreak Berserker,Viking_RocketLauncher
+Islander,Male_DTairikuPeople01_v01
+Islander,Female_DTairikuPeople01_v01
+Islander,Male_TenrakuPeople01
+Islander,Female_TenrakuPeople01
+Islander,Male_SnowPeople01
+Islander,Female_SnowPeople01
+Islander,Male_SakurajimaPeople01
+Islander,Female_SakurajimaPeople01
+Islander,Male_SorajimaPeople01
+Islander,Female_SorajimaPeople01
+PIDF Rifleman,Police_Invader_Rifle
+PIDF Guard,Police_Invader_Handgun
+PIDF Elite,Police_Invader_Shotgun
+PIDF Blader,Police_Invader_Katana
+PIDF Rioter,Police_Invader_CrossBow
+PIDF Technophile,Police_Invader_LaserRifle
+PIDF Veteran,Police_Invader_GrenadeLauncher
+PIDF Cleaner,Police_Invader_FlameThrower
+PIDF Rocketeer,Police_Invader_RocketLauncher
+PIDF Interceptor,Police_Invader_MissileLauncher
+Attack Chopper,SecurityDrone_Field
+Islander,Male_WorldTreePeople01
+Islander,Female_WorldTreePeople01
+,Arena_Legend_1
+,Arena_Legend_2
+,Arena_Legend_3
+,Arena_Legend_4
+,Arena_Legend_5
+,Arena_Legend_6
+,Arena_Legend_7
+,Arena_Legend_8
+,Arena_Legend_9
+,Arena_Legend_10
+,Arena_Legend_11
+,Arena_Legend_12
+,Arena_Legend_13
+,Arena_Legend_14
+,Arena_Legend_15
+,Arena_Legend_16
+,Arena_Legend_17
+,Arena_Legend_18
+,Arena_Legend_19
+,Arena_Legend_20
+Azure Covenant Enforcer,Female_Kunoichi01
+Islander,Male_Scholar02
+Caravan Leader,CaravanLeader04
+Butcher in Training,Male_Trader01_v04
+Village Grocer,Male_Trader01_v05
+Smugglers' Lackey,Male_Trader01_v06
+Foraging Merchant,Male_Trader01_v07
+Bakery Stand Baker,Male_Trader01_v08
+Shady Pharmacist,Male_Trader01_v09
+Surf & Turf Master,Male_Trader01_v10
+Expert Hunter,Male_Trader01_v11
+Legendary Game Hunter,Male_Trader01_v12
+Mercenary Supplier,Male_Trader01_v13
+Heavy Arms Merchant,Male_Trader01_v14
+Legendary Ammo Merchant,Male_Trader01_v15
+Farm Peddler,Male_Trader01_v16
+Legendary Grocer,Male_Trader01_v17
+Authorized Pharmacist,Male_Trader01_v18
+Legendary Pharmacist,Male_Trader01_v19
+Local Restaurateur,Male_Trader01_v20
+Novice Gourmet,Male_Trader01_v21
+Legendary Gourmet,Male_Trader01_v22
+Authorized Materials Merchant,Male_Trader01_v23
+Element Merchant,Male_Trader01_v24
+Legendary Materials Merchant,Male_Trader01_v25
+PAL Genetic Research Unit Executioner,Quest_Male_Scientist01_LaserRifle
+PAL Genetic Research Unit Executioner,Quest_Scientist_FlameThrower
+Moonflower Genin,Quest_Male_Ninja01
+Moonflower Jonin,Quest_Male_NinjaElite01
+Fia,Female_SurveyGirl04
+Moonflower Genin,Male_Ninja01_Seabase
+Moonflower Jonin,Male_NinjaElite01_Seabase
+Moonflower Genin,Ninja_Bowgun_Seabase
+PIDF Rifleman,Police_Rifle_Crime_Lv4
+PIDF Rifleman,Police_Rifle_Crime_Lv5
+Islander,SorajimaTowerGuide
+Newbie Pal Tamer,WildlifeSanctuary_guide
+Wandering Merchant,NPC_Dungeon_Shop

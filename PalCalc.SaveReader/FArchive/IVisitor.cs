@@ -62,6 +62,7 @@ namespace PalCalc.SaveReader.FArchive
         public virtual void VisitVector(string path, VectorLiteral value) { }
         public virtual void VisitQuaternion(string path, QuaternionLiteral value) { }
         public virtual void VisitLinearColor(string path, LinearColorLiteral value) { }
+        public virtual void VisitColor(string path, ColorLiteral value) { }
 
         // (byte arrays are typically large enough that per-element events are very slow)
         public virtual void VisitByteArray(string path, byte[] value) { }
@@ -203,6 +204,7 @@ namespace PalCalc.SaveReader.FArchive
         public override void VisitVector(string path, VectorLiteral value) => VisitValue(path, value);
         public override void VisitQuaternion(string path, QuaternionLiteral value) => VisitValue(path, value);
         public override void VisitLinearColor(string path, LinearColorLiteral value) => VisitValue(path, value);
+        public override void VisitColor(string path, ColorLiteral value) => VisitValue(path, value);
 
         public override void VisitUInt16(string path, ushort value) => VisitValue(path, value);
         public override void VisitUInt32(string path, uint value) => VisitValue(path, value);

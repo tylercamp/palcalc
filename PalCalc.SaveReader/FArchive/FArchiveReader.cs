@@ -44,6 +44,9 @@ namespace PalCalc.SaveReader.FArchive
             return res;
         }
 
+        public long StreamPosition => reader.BaseStream.Position;
+        public long StreamSize => reader.BaseStream.Length;
+
         public bool ReadBool() => reader.ReadBoolean();
         public Int16 ReadInt16() => reader.ReadInt16();
         public UInt16 ReadUInt16() => reader.ReadUInt16();
@@ -205,6 +208,13 @@ namespace PalCalc.SaveReader.FArchive
                     {
                         var r = ReadLinearColor();
                         foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitLinearColor(path, r);
+                        return r;
+                    }
+
+                case "Color":
+                    {
+                        var r = new ColorLiteral() { b = ReadByte(), g = ReadByte(), r = ReadByte(), a = ReadByte() };
+                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitColor(path, r);
                         return r;
                     }
 
@@ -439,19 +449,28 @@ namespace PalCalc.SaveReader.FArchive
 
                 case "ByteProperty":
                     {
-                        // always seems to be `"None"`
-                        ReadString();
-
-                        ReadByte(); // padding?
-                        var res = LiteralProperty.Create(path, ReadByte(), null);
-
-                        foreach (var v in pathVisitors)
+                        var enumType = ReadString();
+                        var id = ReadOptionalGuid();
+                        if (enumType == "None")
                         {
-                            v.VisitLiteralProperty(path, res);
-                            v.VisitByte(path, (byte)res.Value);
+                            var res = LiteralProperty.Create(path, id, ReadByte());
+                            foreach (var v in pathVisitors)
+                            {
+                                v.VisitLiteralProperty(path, res);
+                                v.VisitByte(path, (byte)res.Value);
+                            }
+                            return res;
                         }
-
-                        return res;
+                        else
+                        {
+                            var res = LiteralProperty.Create(path, id, ReadString());
+                            foreach (var v in pathVisitors)
+                            {
+                                v.VisitLiteralProperty(path, res);
+                                v.VisitString(path, (string)res.Value);
+                            }
+                            return res;
+                        }
                     }
 
                 case "StructProperty":
@@ -655,19 +674,21 @@ namespace PalCalc.SaveReader.FArchive
                 case "SetProperty":
                     {
                         // note: found independently, not in palworld-save-tools
-                        var subType = ReadString();
+                        var setType = ReadString();
                         var id = ReadOptionalGuid();
 
                         ReadUInt32(); // ?
                         var count = ReadUInt32();
 
-                        if (subType == "StructProperty")
+                        if (setType == "StructProperty")
                         {
+                            var structType = GetTypeOr($"{path}.StructProperty", "StructProperty");
                             var meta = new SetPropertyMeta
                             {
                                 Path = path,
                                 Id = id,
-                                ItemType = subType,
+                                SetType = setType,
+                                StructType = structType,
                             };
 
                             var extraVisitors = pathVisitors.SelectMany(v => v.VisitSetPropertyBegin(path, meta)).ToArray();
@@ -680,7 +701,7 @@ namespace PalCalc.SaveReader.FArchive
 
                                 // note: typically `StructProperty` wouldn't be passed as the `structType`, but it's all we've got
                                 // note: no sub-path to append here
-                                var r = ReadStructValue(subType, path, newEntryVisitors);
+                                var r = ReadStructValue(structType, $"{path}.StructProperty", newEntryVisitors);
 
                                 foreach (var v in extraEntryVisitors) v.Exit();
                                 foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitSetEntryEnd(path, i, meta);
@@ -706,7 +727,44 @@ namespace PalCalc.SaveReader.FArchive
                         }
                         else
                         {
-                            throw new NotImplementedException($"Unexpected SetProperty sub-type '{subType}'");
+                            var meta = new SetPropertyMeta
+                            {
+                                Path = path,
+                                Id = id,
+                                SetType = setType,
+                            };
+
+                            var extraVisitors = pathVisitors.SelectMany(v => v.VisitSetPropertyBegin(path, meta)).ToArray();
+                            var newVisitors = visitors.Concat(extraVisitors);
+
+                            var values = Enumerable.Range(0, (int)count).Select(i =>
+                            {
+                                var extraEntryVisitors = newVisitors.Where(v => v.Matches(path)).SelectMany(v => v.VisitSetEntryBegin(path, i, meta)).ToList();
+                                var newEntryVisitors = newVisitors.Concat(extraEntryVisitors);
+
+                                var r = ReadPropertiesUntilEnd(path, newEntryVisitors);
+
+                                foreach (var v in extraEntryVisitors) v.Exit();
+                                foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitSetEntryEnd(path, i, meta);
+
+                                return r;
+                            }).ToArray();
+
+                            foreach (var v in extraVisitors) v.Exit();
+                            foreach (var v in pathVisitors) v.VisitSetPropertyEnd(path, meta);
+
+                            if (archivePreserve)
+                            {
+                                return new SetProperty
+                                {
+                                    TypedMeta = meta,
+                                    Value = values
+                                };
+                            }
+                            else
+                            {
+                                return null;
+                            }
                         }
                     }
 
@@ -722,7 +780,7 @@ namespace PalCalc.SaveReader.FArchive
             // haven't seen a string larger than 100 chars yet, if we see it there's likely a bug
             if (Math.Abs(size) > 1000)
             {
-                logger.Warning("String size of {size} is abnormal, likely a parsing error which will cause a crash");
+                logger.Warning("String size of {size} is abnormal, likely a parsing error which will cause a crash", size);
 #if DEBUG
                 Debugger.Break();
 #endif

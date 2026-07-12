@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.0.11205.157 d18.0
+VisualStudioVersion = 18.0.11205.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalCalc.Model", "PalCalc.Model\PalCalc.Model.csproj", "{378F5690-2B20-46AC-8557-F8CFF6B16F0F}"
 EndProject
@@ -40,6 +40,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdonisUI", "adonis-ui\src\AdonisUI\AdonisUI.csproj", "{FC5805CF-6E39-4C36-8ED4-66698E7F918C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdonisUI.ClassicTheme", "adonis-ui\src\AdonisUI.ClassicTheme\AdonisUI.ClassicTheme.csproj", "{D76C3C76-1021-40F9-8079-F122819F69E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalCalc.Model.Tests", "PalCalc.Model.Tests\PalCalc.Model.Tests.csproj", "{712B99CA-8B44-4E7B-A2F6-4FD198532268}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +128,12 @@ Global
 		{D76C3C76-1021-40F9-8079-F122819F69E9}.Release_NoBundle|x64.Build.0 = Release|x64
 		{D76C3C76-1021-40F9-8079-F122819F69E9}.Release|x64.ActiveCfg = Release|x64
 		{D76C3C76-1021-40F9-8079-F122819F69E9}.Release|x64.Build.0 = Release|x64
+		{712B99CA-8B44-4E7B-A2F6-4FD198532268}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{712B99CA-8B44-4E7B-A2F6-4FD198532268}.Debug|x64.Build.0 = Debug|Any CPU
+		{712B99CA-8B44-4E7B-A2F6-4FD198532268}.Release_NoBundle|x64.ActiveCfg = Release|Any CPU
+		{712B99CA-8B44-4E7B-A2F6-4FD198532268}.Release_NoBundle|x64.Build.0 = Release|Any CPU
+		{712B99CA-8B44-4E7B-A2F6-4FD198532268}.Release|x64.ActiveCfg = Release|Any CPU
+		{712B99CA-8B44-4E7B-A2F6-4FD198532268}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

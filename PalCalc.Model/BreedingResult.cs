@@ -71,11 +71,11 @@ namespace PalCalc.Model
 
         public class Serialized
         {
-            public PalId Parent1ID { get; set; }
+            public string Parent1InternalName { get; set; }
             public PalGender Parent1Gender { get; set; }
-            public PalId Parent2ID { get; set; }
+            public string Parent2InternalName { get; set; }
             public PalGender Parent2Gender { get; set; }
-            public PalId Child1ID { get; set; }
+            public string ChildInternalName { get; set; }
         }
     }
 }
