@@ -658,19 +658,21 @@ namespace PalCalc.SaveReader.FArchive
                 case "SetProperty":
                     {
                         // note: found independently, not in palworld-save-tools
-                        var subType = ReadString();
+                        var setType = ReadString();
                         var id = ReadOptionalGuid();
 
                         ReadUInt32(); // ?
                         var count = ReadUInt32();
 
-                        if (subType == "StructProperty")
+                        if (setType == "StructProperty")
                         {
+                            var structType = GetTypeOr($"{path}.StructProperty", "StructProperty");
                             var meta = new SetPropertyMeta
                             {
                                 Path = path,
                                 Id = id,
-                                ItemType = subType,
+                                SetType = setType,
+                                StructType = structType,
                             };
 
                             var extraVisitors = pathVisitors.SelectMany(v => v.VisitSetPropertyBegin(path, meta)).ToArray();
@@ -683,7 +685,7 @@ namespace PalCalc.SaveReader.FArchive
 
                                 // note: typically `StructProperty` wouldn't be passed as the `structType`, but it's all we've got
                                 // note: no sub-path to append here
-                                var r = ReadStructValue(subType, path, newEntryVisitors);
+                                var r = ReadStructValue(structType, $"{path}.StructProperty", newEntryVisitors);
 
                                 foreach (var v in extraEntryVisitors) v.Exit();
                                 foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitSetEntryEnd(path, i, meta);
@@ -709,7 +711,7 @@ namespace PalCalc.SaveReader.FArchive
                         }
                         else
                         {
-                            throw new NotImplementedException($"Unexpected SetProperty sub-type '{subType}'");
+                            throw new NotImplementedException($"Unexpected SetProperty sub-type '{setType}'");
                         }
                     }
 
@@ -725,7 +727,7 @@ namespace PalCalc.SaveReader.FArchive
             // haven't seen a string larger than 100 chars yet, if we see it there's likely a bug
             if (Math.Abs(size) > 1000)
             {
-                logger.Warning("String size of {size} is abnormal, likely a parsing error which will cause a crash");
+                logger.Warning("String size of {size} is abnormal, likely a parsing error which will cause a crash", size);
 #if DEBUG
                 Debugger.Break();
 #endif

@@ -37,9 +37,19 @@ namespace PalCalc.SaveReader.GVAS
             { ".worldSaveData.EnemyCampSaveData.EnemyCampStatusMap.Value", "StructProperty" },
             { ".worldSaveData.DungeonSaveData.DungeonSaveData.MapObjectSaveData.MapObjectSaveData.Model.EffectMap.Value", "StructProperty" },
             { ".worldSaveData.DungeonSaveData.DungeonSaveData.MapObjectSaveData.MapObjectSaveData.ConcreteModel.ModuleMap.Value", "StructProperty" },
+            { ".worldSaveData.InvaderSaveData.Key", "Guid" },
+            { ".worldSaveData.InvaderSaveData.Value", "StructProperty" },
             { ".worldSaveData.OilrigSaveData.OilrigMap.Value", "StructProperty" },
+            { ".worldSaveData.InvaderDeclarationSaveData.ValidatedStartPointIds.StructProperty", "Guid" },
             { ".worldSaveData.SupplySaveData.SupplyInfos.Key", "Guid" },
             { ".worldSaveData.SupplySaveData.SupplyInfos.Value", "StructProperty" },
+            { ".worldSaveData.GuildExtraSaveDataMap.Key", "Guid" },
+            { ".worldSaveData.GuildExtraSaveDataMap.Value", "StructProperty" },
+            { ".worldSaveData.EnemyCampSaveData.EnemyCampStatusMap.Value.TreasureBoxInfoMapBySpawnerName.Value", "StructProperty" },
+            { ".worldSaveData.DungeonSaveData.DungeonSaveData.RewardSaveDataMap.Key", "Guid" },
+            { ".worldSaveData.DungeonSaveData.DungeonSaveData.RewardSaveDataMap.Value", "StructProperty" },
+            { ".SaveData.Local_MaxFriendshipPalIds.Key", "Guid" },
+            { ".SaveData.Local_MaxFriendshipPalIds.Value", "StructProperty" },
         };
     }
 }

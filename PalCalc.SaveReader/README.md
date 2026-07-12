@@ -1,6 +1,9 @@
 ﻿A partial port of cheahjs/palworld-save-tools to C#:
 https://github.com/cheahjs/palworld-save-tools
 
+... though the above is now unmaintained, and the following is used as latest:
+https://github.com/oMaN-Rod/palworld-save-tools
+
 Only supports reading .sav files, no writing. Most of the "custom" parsers (`rawdata` folder) were left unimplemented.
 
 This is mostly a one-to-one port, with some extra stuff enabling the visitor pattern to minimize memory usage while extracting data and remove the need for excessive casting/unperformant dynamic-type wrappers. Rather than refactor to selectively return specific parts of the data, the general structure was left as-is to accommodate any future updates to palworld-save-tools which may need to be reflected here.

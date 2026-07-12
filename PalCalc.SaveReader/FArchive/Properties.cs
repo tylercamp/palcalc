@@ -223,7 +223,8 @@ namespace PalCalc.SaveReader.FArchive
 
     public class SetPropertyMeta : BasicPropertyMeta
     {
-        public string ItemType { get; set; }
+        public string SetType { get; set; }
+        public string StructType { get; set; }
     }
 
     public class SetProperty : IProperty
@@ -237,11 +238,11 @@ namespace PalCalc.SaveReader.FArchive
 
         public void Traverse(Action<IProperty> action)
         {
-            if (TypedMeta.ItemType == "StructProperty")
+            if (TypedMeta.SetType == "StructProperty")
             {
                 foreach (var val in Values<object>())
                 {
-                    StructProperty.TryTraverse(val, TypedMeta.ItemType, action);
+                    StructProperty.TryTraverse(val, TypedMeta.SetType, action);
                 }
             }
         }
