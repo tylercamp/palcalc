@@ -211,6 +211,13 @@ namespace PalCalc.SaveReader.FArchive
                         return r;
                     }
 
+                case "Color":
+                    {
+                        var r = new ColorLiteral() { b = ReadByte(), g = ReadByte(), r = ReadByte(), a = ReadByte() };
+                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitColor(path, r);
+                        return r;
+                    }
+
                 case "Guid":
                     {
                         var r = ReadGuid();
@@ -442,19 +449,28 @@ namespace PalCalc.SaveReader.FArchive
 
                 case "ByteProperty":
                     {
-                        // always seems to be `"None"`
-                        ReadString();
-
-                        ReadByte(); // padding?
-                        var res = LiteralProperty.Create(path, ReadByte(), null);
-
-                        foreach (var v in pathVisitors)
+                        var enumType = ReadString();
+                        var id = ReadOptionalGuid();
+                        if (enumType == "None")
                         {
-                            v.VisitLiteralProperty(path, res);
-                            v.VisitByte(path, (byte)res.Value);
+                            var res = LiteralProperty.Create(path, id, ReadByte());
+                            foreach (var v in pathVisitors)
+                            {
+                                v.VisitLiteralProperty(path, res);
+                                v.VisitByte(path, (byte)res.Value);
+                            }
+                            return res;
                         }
-
-                        return res;
+                        else
+                        {
+                            var res = LiteralProperty.Create(path, id, ReadString());
+                            foreach (var v in pathVisitors)
+                            {
+                                v.VisitLiteralProperty(path, res);
+                                v.VisitString(path, (string)res.Value);
+                            }
+                            return res;
+                        }
                     }
 
                 case "StructProperty":
@@ -711,7 +727,44 @@ namespace PalCalc.SaveReader.FArchive
                         }
                         else
                         {
-                            throw new NotImplementedException($"Unexpected SetProperty sub-type '{setType}'");
+                            var meta = new SetPropertyMeta
+                            {
+                                Path = path,
+                                Id = id,
+                                SetType = setType,
+                            };
+
+                            var extraVisitors = pathVisitors.SelectMany(v => v.VisitSetPropertyBegin(path, meta)).ToArray();
+                            var newVisitors = visitors.Concat(extraVisitors);
+
+                            var values = Enumerable.Range(0, (int)count).Select(i =>
+                            {
+                                var extraEntryVisitors = newVisitors.Where(v => v.Matches(path)).SelectMany(v => v.VisitSetEntryBegin(path, i, meta)).ToList();
+                                var newEntryVisitors = newVisitors.Concat(extraEntryVisitors);
+
+                                var r = ReadPropertiesUntilEnd(path, newEntryVisitors);
+
+                                foreach (var v in extraEntryVisitors) v.Exit();
+                                foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitSetEntryEnd(path, i, meta);
+
+                                return r;
+                            }).ToArray();
+
+                            foreach (var v in extraVisitors) v.Exit();
+                            foreach (var v in pathVisitors) v.VisitSetPropertyEnd(path, meta);
+
+                            if (archivePreserve)
+                            {
+                                return new SetProperty
+                                {
+                                    TypedMeta = meta,
+                                    Value = values
+                                };
+                            }
+                            else
+                            {
+                                return null;
+                            }
                         }
                     }
 
