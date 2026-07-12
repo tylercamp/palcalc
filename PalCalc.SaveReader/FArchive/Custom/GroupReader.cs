@@ -41,11 +41,6 @@ namespace PalCalc.SaveReader.FArchive.Custom
         public Guid? AdminPlayerUid { get; set; }
         public PlayerReference[] Members { get; set; }
 
-        // V4 Guild fields
-        public GuildMarkerData[] GuildMarkers { get; set; }
-        public byte[] GuildChestAllowedRoles { get; set; }
-        public RolePermission[] RolePermissions { get; set; }
-
         public override string ToString()
         {
             switch (GroupType)
@@ -97,67 +92,6 @@ namespace PalCalc.SaveReader.FArchive.Custom
         }
     }
 
-    public struct GuildPlayerReference
-    {
-        public Guid PlayerUid;
-        public Int64 LastOnlineRealTime;
-        public string PlayerName;
-        public byte Role; // EPalGuildRole
-
-        public static GuildPlayerReference ReadFrom(FArchiveReader reader)
-        {
-            return new GuildPlayerReference()
-            {
-                PlayerUid = reader.ReadGuid(),
-                LastOnlineRealTime = reader.ReadInt64(),
-                PlayerName = reader.ReadString(),
-                Role = reader.ReadByte(),
-            };
-        }
-    }
-
-    public struct GuildMarkerData
-    {
-        public Guid MarkerId;
-        public Dictionary<string, VectorLiteral> IconLocation;
-        public int IconType;
-        public Guid OwnerPlayerUid;
-
-        public static GuildMarkerData ReadFrom(FArchiveReader reader)
-        {
-            var iconLocation = new Dictionary<string, VectorLiteral>();
-            var dictCount = reader.ReadUInt32();
-            for (int i = 0; i < dictCount; i++)
-            {
-                var key = reader.ReadString();
-                var value = reader.ReadVector();
-                iconLocation[key] = value;
-            }
-            return new GuildMarkerData()
-            {
-                MarkerId = reader.ReadGuid(),
-                IconLocation = iconLocation,
-                IconType = reader.ReadInt32(),
-                OwnerPlayerUid = reader.ReadGuid(),
-            };
-        }
-    }
-
-    public struct RolePermission
-    {
-        public byte Role; // EPalGuildRole
-        public byte[] Permissions; // EPalGuildPermission
-
-        public static RolePermission ReadFrom(FArchiveReader reader)
-        {
-            return new RolePermission()
-            {
-                Role = reader.ReadByte(),
-                Permissions = reader.ReadArray(r => r.ReadByte()),
-            };
-        }
-    }
-
     public class GroupReader : ICustomReader
     {
         private static ILogger logger = Log.ForContext<GroupReader>();
@@ -205,7 +139,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
                             result.TypedMeta.Path = path;
                         }
                     }
-                    catch {}
+                    catch { }
 
                     if (result != null)
                     {
@@ -356,7 +290,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
 
         private static GroupDataProperty ParseStream_V4_PalworldV1_0_0(GroupType groupType, FArchiveReader subReader)
         {
-            // Ref: https://github.com/oMaN-Rod/palworld-save-tools/blob/b34cf3c514c76b4cfa5653a6b44a7d7cf041692b/palworld_save_tools/rawdata/group.py
+            // Ref: https://github.com/deafdudecomputers/PalworldSaveTools/blob/1a20d52d821abbdcd3ed6e81a8e7bb8e57e2acdd/src/palsav/palsav/rawdata/group.py
 
             var result = new GroupDataProperty() { TypedMeta = new GroupDataPropertyMeta() };
 
@@ -365,14 +299,13 @@ namespace PalCalc.SaveReader.FArchive.Custom
             result.GroupName = subReader.ReadString();
             result.CharacterHandleIds = subReader.ReadArray(r => new EntityInstanceId() { Guid = r.ReadGuid(), InstanceId = r.ReadGuid() });
 
+            // Note: This parser is a bit "looser" than the earlier parsers which were very strict with
+            //       byte ordering. We include extra validation and throw exceptions so we're more likely
+            //       to retry with parsers for the older save formats
+
             if (GroupType.Mask_HasBaseIds.HasFlag(groupType))
             {
                 result.OrgType = subReader.ReadByte();
-            }
-
-            if (groupType == GroupType.Organization)
-            {
-                subReader.Skip(12); // trailing_bytes
             }
 
             if (groupType == GroupType.IndependentGuild)
@@ -391,6 +324,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
 
             if (groupType == GroupType.Guild)
             {
+                // New layout: explicit fields through unknown_2
                 subReader.ReadBytes(4); // leading_bytes
                 result.BaseIds = subReader.ReadArray(r => r.ReadGuid());
                 subReader.ReadInt32();  // unknown_1
@@ -398,61 +332,81 @@ namespace PalCalc.SaveReader.FArchive.Custom
                 result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
                 result.GuildName = subReader.ReadString();
                 subReader.ReadGuid();   // last_guild_name_modifier_player_uid
-                result.GuildMarkers = subReader.ReadArray(GuildMarkerData.ReadFrom);
+                subReader.ReadBytes(4); // unknown_2
 
                 if (result.BaseIds.Length != result.MapObjectBasePointInstanceIds.Length)
                     throw new ArgumentException($"Guild BaseIds length of {result.BaseIds.Length} != MapObjectBasePointInstanceIds length {result.MapObjectBasePointInstanceIds.Length}");
 
-                ReadGuildTail(groupType, subReader, result);
+                // Tail region: port Python's probe-and-fallback
+                byte[] tail = subReader.ReadBytes((int)(subReader.StreamSize - subReader.StreamPosition));
+                bool hasV1Marker = false;
+
+                byte[] v1Marker = { 0x02, 0x00, 0x00, 0x00, 0x02, 0x03, 0x00, 0x00, 0x00, 0x00 };
+                int markerIndex = FindBytes(tail, v1Marker);
+                if (markerIndex >= 0)
+                {
+                    hasV1Marker = true;
+                    tail = tail.Skip(markerIndex + 10).ToArray();
+                }
+
+                using (var tailStream = new MemoryStream(tail))
+                using (var tailReader = subReader.Derived(tailStream))
+                {
+                    result.AdminPlayerUid = tailReader.ReadGuid();
+                    int playerCount = tailReader.ReadInt32();
+                    if (playerCount < 0 || playerCount > 1000)
+                        throw new ArgumentOutOfRangeException($"Parsed player count {playerCount} is outside the expected range [0 1000]");
+                    var members = new List<PlayerReference>();
+
+                    for (int i = 0; i < playerCount; i++)
+                    {
+                        var member = new PlayerReference()
+                        {
+                            PlayerUid = tailReader.ReadGuid(),
+                            LastOnlineRealTime = tailReader.ReadInt64(),
+                            PlayerName = tailReader.ReadString(),
+                        };
+
+                        if (member.LastOnlineRealTime < 0)
+                            throw new ArgumentOutOfRangeException($"Parsed player LastOnlineRealTime {member.LastOnlineRealTime} is less than zero");
+
+                        // Python checks eof before reading flag
+                        if (hasV1Marker && tailReader.StreamPosition < tailReader.StreamSize)
+                        {
+                            // _u8_flag present — skip it for now (no C# field for it)
+                            tailReader.ReadByte();
+                        }
+
+                        members.Add(member);
+                    }
+
+                    result.Members = members.ToArray();
+                }
             }
 
+            // (use 100 as the max base level in case some mod / update pushes the limit over 30)
             if (result.BaseCampLevel < 0 || result.BaseCampLevel > 100)
                 throw new ArgumentOutOfRangeException($"Parsed BaseCampLevel {result.BaseCampLevel} is outside the expected range [0 100]");
 
             return result;
         }
 
-        private static void ReadGuildTail(GroupType groupType, FArchiveReader reader, GroupDataProperty result)
+        private static int FindBytes(byte[] haystack, byte[] needle)
         {
-            byte[] tail = reader.ReadBytes((int)(reader.StreamSize - reader.StreamPosition));
-
-            using (var tailStream = new MemoryStream(tail))
-            using (var tailReader = reader.Derived(tailStream))
+            for (int i = 0; i <= haystack.Length - needle.Length; i++)
             {
-                // Try v2 tail (2026-07 update: chest roles, per-player role, permissions)
-                result.GuildChestAllowedRoles = tailReader.ReadArray(r => r.ReadByte());
-                tailReader.ReadInt32(); // unknown_i32
-
-                result.AdminPlayerUid = tailReader.ReadGuid();
-                var v2Players = tailReader.ReadArray(GuildPlayerReference.ReadFrom);
-                result.RolePermissions = tailReader.ReadArray(RolePermission.ReadFrom);
-                tailReader.ReadBytes(4); // trailing_bytes
-
-                if (tailReader.StreamPosition == tailReader.StreamSize)
+                bool match = true;
+                for (int j = 0; j < needle.Length; j++)
                 {
-                    result.Members = Array.ConvertAll(v2Players, p => new PlayerReference
+                    if (haystack[i + j] != needle[j])
                     {
-                        PlayerUid = p.PlayerUid,
-                        LastOnlineRealTime = p.LastOnlineRealTime,
-                        PlayerName = p.PlayerName,
-                    });
-                    return;
+                        match = false;
+                        break;
+                    }
                 }
-
-                // v2 didn't consume all bytes — fall back to v1
-                tailStream.Seek(0, SeekOrigin.Begin);
+                if (match) return i;
             }
-
-            using (var tailStream = new MemoryStream(tail))
-            using (var tailReader = reader.Derived(tailStream))
-            {
-                result.AdminPlayerUid = tailReader.ReadGuid();
-                result.Members = tailReader.ReadArray(PlayerReference.ReadFrom);
-                tailReader.ReadBytes(4); // trailing_bytes
-
-                if (tailReader.StreamPosition != tailReader.StreamSize)
-                    throw new Exception("Guild tail: neither v1 nor v2 format consumed all bytes");
-            }
+            return -1;
         }
     }
 }
