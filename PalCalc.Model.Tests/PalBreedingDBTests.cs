@@ -4,39 +4,76 @@
     public sealed class PalBreedingDBTests : PalTestBase
     {
         [TestMethod]
-        public void BreedingResults_KitsunNoctAndFellbat_gives_Bulldosu()
+        public void BreedingByParent_ResultsAreCommutative()
         {
-            var kitsunNoct = "Kitsun Noct".ToPal(paldb);
-            var fellbat = "Felbat".ToPal(paldb);
-            var bulldosu = "Bulldosu".ToPal(paldb);
+            var pals = paldb.Pals.ToList();
 
-            var result = breedingdb.BreedingByParent[kitsunNoct][fellbat];
+            for (int ip1 = 0; ip1 < pals.Count; ip1++)
+            {
+                for (int ip2 = ip1; ip2 < pals.Count; ip2++)
+                {
+                    var p1 = pals[ip1];
+                    var p2 = pals[ip2];
 
-            Assert.IsTrue(result.Any(br => br.Child == bulldosu), $"Expected Kitsun Noct + Fellbat = Bulldosu({bulldosu.InternalName}), got {string.Join(",", result.Select(br => $"{br.Child.Name}({br.Child.InternalName})"))}");
+                    var childOrder1 = breedingdb.BreedingByParent[p1][p2];
+                    var childOrder2 = breedingdb.BreedingByParent[p2][p1];
+
+                    CollectionAssert.AreEquivalent(childOrder1, childOrder2);
+                }
+            }
+        }
+
+        private void TestSpecificBreedingResult(string parent1Name, string parent2Name, string childName)
+        {
+            var parent1 = parent1Name.ToPal(paldb);
+            var parent2 = parent2Name.ToPal(paldb);
+            var child = childName.ToPal(paldb);
+
+            var result = breedingdb.BreedingByParent[parent1][parent2];
+
+            Assert.IsTrue(result.Any(br => br.Child == child), $"Expected {parent1Name} + {parent2Name} = {childName}({child.InternalName}), got {string.Join(",", result.Select(br => $"{br.Child.Name}({br.Child.InternalName})"))}");
         }
 
         [TestMethod]
-        public void BreedingResults_FuddlerAndSuzaku_gives_Souffline()
+        public void BreedingByParent_Specific_KitsunNoctAndFellbat_gives_Bulldosu()
         {
-            var fuddler = "Fuddler".ToPal(paldb);
-            var suzaku = "Suzaku".ToPal(paldb);
-            var souffline = "Souffline".ToPal(paldb);
-
-            var result = breedingdb.BreedingByParent[fuddler][suzaku];
-
-            Assert.IsTrue(result.Any(br => br.Child == souffline), $"Expected Fuddler + Suzaku = Souffline({souffline.InternalName}), got {string.Join(",", result.Select(br => $"{br.Child.Name}({br.Child.InternalName})"))}");
+            TestSpecificBreedingResult(
+                parent1Name: "Kitsun Noct",
+                parent2Name: "Felbat",
+                childName: "Bulldosu"
+            );
         }
 
         [TestMethod]
-        public void BreedingResults_JormuntideIgnisAndBraloha_gives_WumpoBotan()
+        public void BreedingByParent_Specific_FuddlerAndSuzaku_gives_Souffline()
         {
-            var jormuntideIgnis = "Jormuntide Ignis".ToPal(paldb);
-            var braloha = "Braloha".ToPal(paldb);
-            var wumpoBotan = "Wumpo Botan".ToPal(paldb);
-
-            var result = breedingdb.BreedingByParent[jormuntideIgnis][braloha];
-
-            Assert.IsTrue(result.Any(br => br.Child == wumpoBotan), $"Expected Jormuntide Ignis + Braloha = Wumpo Botan({wumpoBotan.InternalName}), got {string.Join(",", result.Select(br => $"{br.Child.Name}({br.Child.InternalName})"))}");
+            TestSpecificBreedingResult(
+                parent1Name: "Fuddler",
+                parent2Name: "Suzaku",
+                childName: "Souffline"
+            );
         }
+
+        [TestMethod]
+        public void BreedingByParent_Specific_JormuntideIgnisAndBraloha_gives_WumpoBotan()
+        {
+            TestSpecificBreedingResult(
+                parent1Name: "Jormuntide Ignis",
+                parent2Name: "Braloha",
+                childName: "Wumpo Botan"
+            );
+        }
+
+        [TestMethod]
+        public void BreedingByParent_Specific_ElgroveCrystAndMycora_gives_WumpoBotan()
+        {
+            TestSpecificBreedingResult(
+                parent1Name: "Elgrove Cryst",
+                parent2Name: "Mycora",
+                childName: "Wumpo Botan"
+            );
+        }
+
+
     }
 }
