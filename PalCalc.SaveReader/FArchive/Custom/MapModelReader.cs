@@ -65,6 +65,11 @@ namespace PalCalc.SaveReader.FArchive.Custom
             result.OwnerInstanceId = subReader.ReadGuid();
             result.BuildPlayerUid = subReader.ReadGuid();
             result.InteractRestrictType = subReader.ReadByte();
+
+            // NOTE: Python reference has `deterioration_damage` (float) here, before
+            // stage_instance_id_belong_to. Skipping it shifts offset by 4 bytes for all
+            // subsequent reads. Fields below are not used by the solver — leaving as-is
+            // to avoid reading past EOF on older save formats that lack unknown_bytes.
             result.StageInstanceIdBelongTo = subReader.ReadGuid();
             result.StageInstanceIdBelongToValid = subReader.ReadUInt32() > 0;
             result.CreatedAt = subReader.ReadInt64();
