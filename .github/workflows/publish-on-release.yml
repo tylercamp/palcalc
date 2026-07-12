@@ -22,11 +22,14 @@ jobs:
       - name: Restore dependencies (with win-x64 and ReadyToRun)
         run: dotnet restore --runtime win-x64 /p:PublishReadyToRun=true
 
+      # Note: Configuration, Platform, Runtime Identifier are ignored from PublishProfiles, these must be set explicitly
+      #       https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish#pubxml-files
+
       - name: Build solution
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release -r win-x64 /p:Platform=x64 --no-restore
 
       - name: Publish NonBundled profile (multiple files)
-        run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release_NoBundle /p:PublishProfile=Properties/PublishProfiles/NonBundled.pubxml --output publish/NonBundled
+        run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release_NoBundle -r win-x64 /p:Platform=x64 /p:PublishProfile=Properties/PublishProfiles/NonBundled.pubxml --output publish/NonBundled
 
       - name: Zip NonBundled output
         run: Compress-Archive -Path publish/NonBundled/* -DestinationPath publish/PalCalc-NoBundle.zip
@@ -46,7 +49,7 @@ jobs:
           asset_path: publish/PalCalc-NoBundle.zip
 
       - name: Publish Bundled profile (single EXE)
-        run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release /p:PublishProfile=Properties/PublishProfiles/Bundled.pubxml --output publish/Bundled
+        run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release -r win-x64 /p:Platform=x64 /p:PublishProfile=Properties/PublishProfiles/Bundled.pubxml --output publish/Bundled
 
       - name: Upload Bundled EXE
         uses: actions/upload-artifact@v4
