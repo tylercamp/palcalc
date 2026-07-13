@@ -195,13 +195,14 @@ namespace PalCalc.SaveReader.SaveFile
             }
 
             var parsed = ReadRawCharacterData();
+            // the first listed player should be the owner of the save file
+            var defaultPlayerId = players.FirstOrDefault()?.PlayerId ?? parsed.Characters.FirstOrDefault(c => c.IsPlayer)?.PlayerId?.ToString() ?? "<NO-ID>";
 
             var gpsData = gpsFile?.ReadPals("GLOBAL_PAL_STORAGE");
             var gpsContainer = gpsData == null ? null : new GlobalPalStorageContainer()
             {
                 Id = gpsData.ContainerId,
-                // the first listed player should be the owner of the save file, and the save's owner has the global pal storage
-                PlayerId = players.FirstOrDefault()?.PlayerId ?? parsed.Characters.FirstOrDefault(c => c.IsPlayer)?.PlayerId?.ToString() ?? "<NO-ID>",
+                PlayerId = defaultPlayerId, // the save's owner has the global pal storage
             };
 
             var detectedContainers = CollectContainers(settings, parsed, players, dpsContainerByPlayerId.Values, gpsContainer);
@@ -274,7 +275,15 @@ namespace PalCalc.SaveReader.SaveFile
 
                     var pal = gvasInstance.ToPalInstance(db, containerTypeById[gvasInstance.ContainerId.ToString()]);
                     if (pal != null)
+                    {
+                        if (pal.OwnerPlayerId == null)
+                        {
+                            // #198 - `OwnerPlayerId` may be null and `OldOwnerPlayerIds` may be empty
+                            // Associate with the "default player" for this save
+                            pal.OwnerPlayerId = defaultPlayerId;
+                        }
                         result.Pals.Add(pal);
+                    }
                 }
             }
 
