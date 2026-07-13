@@ -3,8 +3,11 @@ using CommunityToolkit.Mvvm.Input;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.SaveSelection;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 
@@ -29,116 +32,50 @@ namespace PalCalc.UI.ViewModel
 
         public static SaveSelectionOnboardingViewModel DesignerInstance { get; }
 
-        public delegate void CustomSaveHandler(ManualSavesLocationViewModel location, ISaveGame save);
-        public event CustomSaveHandler NewCustomSaveSelected;
-        public event CustomSaveHandler CustomSaveDelete;
-
-        public IReadOnlyList<ISavesLocationViewModel> Locations { get; }
-
-        ManualSavesLocationViewModel ManualLocation;
+        public IReadOnlyCollection<ISavesCollectionViewModel> AvailableSaveGameCollections { get; }
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(CurrentSaveGames))]
-        [NotifyPropertyChangedFor(nameof(SelectedGameIsManual))]
-        [NotifyPropertyChangedFor(nameof(CanOpenLocationFolder))]
-        ISavesLocationViewModel? _selectedLocation;
+        private ISavesCollectionViewModel selectedCollection;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(SelectedSaveGame))]
-        [NotifyPropertyChangedFor(nameof(CanOpenSaveFolder))]
-        [NotifyPropertyChangedFor(nameof(SelectedSaveGamePlayerName))]
-        [NotifyPropertyChangedFor(nameof(SelectedSaveGamePlayerLevel))]
-        [NotifyPropertyChangedFor(nameof(SelectedSaveGameWorldName))]
-        [NotifyPropertyChangedFor(nameof(SelectedSaveGameDay))]
-        [NotifyPropertyChangedFor(nameof(SelectedSaveGameLastModified))]
-        [NotifyPropertyChangedFor(nameof(SelectedSaveGameGameId))]
-        [NotifyPropertyChangedFor(nameof(HasSelectedSave))]
-        ISaveGameViewModel? _selectedGame;
-
-        public IReadOnlyList<ISaveGameViewModel> CurrentSaveGames =>
-            SelectedLocation?.SaveGames.ToList() ?? Enumerable.Empty<ISaveGameViewModel>().ToList();
-
-        public SaveGameViewModel? SelectedSaveGame => SelectedGame as SaveGameViewModel;
-
-        public bool SelectedGameIsManual => SelectedLocation is ManualSavesLocationViewModel;
-
-        public bool CanOpenLocationFolder =>
-            (SelectedLocation as StandardSavesLocationViewModel)?.Value?.FolderPath != null;
-
-        public bool CanOpenSaveFolder =>
-            SelectedSaveGame?.Value?.BasePath != null;
-
-        public bool ShowXboxInstallHint =>
-            SelectedLocation is StandardSavesLocationViewModel { Value: XboxSavesLocation } &&
-            (SelectedLocation.SaveGames?.Count ?? 0) == 0;
-
-        public Visibility XboxIncompleteVisibility =>
-            SelectedSaveGame != null && SelectedSaveGame.Value is XboxSaveGame xboxSave &&
-            xboxSave.LevelMeta?.IsValid != true
-                ? Visibility.Visible
-                : Visibility.Collapsed;
-
-        public bool HasSelectedSave => SelectedSaveGame != null;
-
-        public string SelectedSaveGamePlayerName => SelectedSaveGame?.Value?.LevelMeta?.ReadGameOptions()?.PlayerName;
-        public int SelectedSaveGamePlayerLevel => SelectedSaveGame?.Value?.LevelMeta?.ReadGameOptions()?.PlayerLevel ?? 0;
-        public string SelectedSaveGameWorldName => SelectedSaveGame?.Value?.LevelMeta?.ReadGameOptions()?.WorldName;
-        public int SelectedSaveGameDay => SelectedSaveGame?.Value?.LevelMeta?.ReadGameOptions()?.InGameDay ?? 0;
-        public DateTime SelectedSaveGameLastModified => SelectedSaveGame?.Value?.LastModified ?? default;
-        public string SelectedSaveGameGameId => SelectedSaveGame?.Value?.GameId;
+        private ISaveGameViewModel selectedSave;
 
         public SaveSelectionOnboardingViewModel(
             IEnumerable<ISavesLocation> savesLocations,
             IEnumerable<ISaveGame> manualSaves)
         {
-            ManualLocation = new ManualSavesLocationViewModel(manualSaves);
+            var steamCollections = savesLocations
+                .OfType<DirectSavesLocation>()
+                .Select(dsl => new SteamSavesCollectionViewModel(dsl))
+                .Cast<ISavesCollectionViewModel>();
 
-            var locationVms = savesLocations
-                .Select(l => new StandardSavesLocationViewModel(l) as ISavesLocationViewModel)
-                .OrderByDescending(vm => vm.LastModified)
-                .ToList();
-            locationVms.Add(ManualLocation);
-            Locations = locationVms;
+            var xboxCollections = savesLocations
+                .OfType<XboxSavesLocation>()
+                .Select(xsl => new XboxSavesCollectionViewModel(xsl))
+                .Cast<ISavesCollectionViewModel>();
 
-            SelectedLocation = Locations.OrderByDescending(l => l.LastModified).FirstOrDefault();
+            var manualCollection = new ManualSavesCollectionViewModel(
+                // TODO - simplify
+                new ManualSavesLocationViewModel(manualSaves.OfType<StandardSaveGame>())
+            );
 
-            OpenLocationFolderCommand = new RelayCommand(
-                () =>
-                {
-                    var std = (SelectedLocation as StandardSavesLocationViewModel)!;
-                    System.Diagnostics.Process.Start("explorer.exe",
-                        System.IO.Path.GetFullPath(std.Value!.FolderPath!));
-                },
-                () => CanOpenLocationFolder);
+            var fakeSavesCollection = new FakeSavesCollectionViewModel(
+                manualSaves.OfType<VirtualSaveGame>()
+            );
 
-            OpenSaveFolderCommand = new RelayCommand(
-                () => System.Diagnostics.Process.Start("explorer.exe",
-                    System.IO.Path.GetFullPath(SelectedSaveGame!.Value!.BasePath!)),
-                () => CanOpenSaveFolder);
-
-            DeleteSaveCommand = new RelayCommand(
-                () => CustomSaveDelete?.Invoke(ManualLocation, SelectedSaveGame!.Value!),
-                () => SelectedGameIsManual && SelectedSaveGame != null);
+            AvailableSaveGameCollections = new ReadOnlyCollection<ISavesCollectionViewModel>(
+                [ ..steamCollections, ..xboxCollections, manualCollection, fakeSavesCollection ]
+            );
         }
 
-        public IRelayCommand OpenLocationFolderCommand { get; }
-        public IRelayCommand OpenSaveFolderCommand { get; }
-        public IRelayCommand DeleteSaveCommand { get; }
-
-        public void TrySelectSaveGame(string saveIdentifier)
+        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
         {
-            foreach (var loc in Locations)
+            if (e.PropertyName == nameof(SelectedCollection))
             {
-                foreach (var game in loc.SaveGames.OfType<SaveGameViewModel>().Where(g => g.Value != null))
-                {
-                    if (CachedSaveGame.IdentifierFor(game.Value) == saveIdentifier)
-                    {
-                        SelectedLocation = loc;
-                        SelectedGame = game;
-                        return;
-                    }
-                }
+                SelectedSave = null;
             }
+
+            base.OnPropertyChanged(e);
         }
     }
 }

@@ -6,6 +6,8 @@
       xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
       xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
       xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+      xmlns:ssvm="clr-namespace:PalCalc.UI.ViewModel.SaveSelection"
+      xmlns:vmc="clr-namespace:PalCalc.UI.ViewModel.Converters"
       xmlns:itl="clr-namespace:PalCalc.UI.Localization"
       xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
       xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
@@ -16,6 +18,31 @@
       Title="SaveSelectionOnboardingPage">
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BVC" />
+        <vmc:ValueVisibilityConverter x:Key="VVC" />
+
+        <DataTemplate x:Key="SteamIconTemplate">
+            <svgc:SvgBitmap UriSource="/Resources/Steam_icon_logo.svg" AppName="PalCalc.UI" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="XboxIconTemplate">
+            <svgc:SvgBitmap UriSource="/Resources/Xbox_app_logo.svg" AppName="PalCalc.UI" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="ManualSavesIconTemplate">
+            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="FakeSavesIconTemplate">
+            <materialIcons:MaterialIcon Kind="FileEdit" Foreground="LightSteelBlue" />
+        </DataTemplate>
+
+        <ssvm:CollectionIconTemplateSelector x:Key="IconTemplateSelector"
+                                             SteamTemplate="{StaticResource SteamIconTemplate}"
+                                             XboxTemplate="{StaticResource XboxIconTemplate}"
+                                             ManualTemplate="{StaticResource ManualSavesIconTemplate}"
+                                             FakeSavesTemplate="{StaticResource FakeSavesIconTemplate}"
+                                             />
+        
     </Page.Resources>
 
     <Grid Margin="16">
@@ -29,23 +56,24 @@
 
         <!-- Left pane: Save locations -->
         <ListBox Grid.Column="0"
-                 ItemsSource="{Binding Locations}"
-                 SelectedItem="{Binding SelectedLocation}"
+                 ItemsSource="{Binding AvailableSaveGameCollections}"
+                 SelectedItem="{Binding SelectedCollection}"
                  Style="{StaticResource {x:Type ListBox}}">
             <ListBox.ItemTemplate>
-                <DataTemplate DataType="mvm:ISavesLocationViewModel">
+                <DataTemplate DataType="ssvm:ISavesCollectionViewModel">
                     <StackPanel Margin="4,6" Orientation="Horizontal" vu:StackPanelExtensions.Spacing="12">
-                        <StackPanel.Resources>
-                            <DataTemplate DataType="mvm:StandardSavesLocationViewModel">
-                                <Image Source="{Binding Path=SvgPath, Converter={svgc:SvgImageConverter AppName=PalCalc.UI}}" Height="64" Width="64"/>
-                            </DataTemplate>
-                            <DataTemplate DataType="mvm:ManualSavesLocationViewModel">
-                                <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="64" />
-                            </DataTemplate>
-                        </StackPanel.Resources>
-                        <ContentPresenter Content="{Binding}" />
-                        <TextBlock Text="{Binding Label.Value}" FontWeight="SemiBold" FontSize="20" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding SaveGames.Count}" FontStyle="Italic" Foreground="Gray" FontSize="11" Margin="0,2,0,0" />
+                        <ContentPresenter Content="{Binding}"
+                                          ContentTemplateSelector="{StaticResource IconTemplateSelector}"
+                                          Width="48"
+                                          />
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="8">
+                                <TextBlock Text="{Binding TypeLabel.Value}" FontWeight="SemiBold" FontSize="20" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding AvailableSaves.Count, StringFormat='({0})'}" VerticalAlignment="Center"  Foreground="Gray" FontSize="20" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}}" />
+                        </StackPanel>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
