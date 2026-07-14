@@ -12,6 +12,8 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 {
     internal class SaveGameViewModel2
     {
+        public SaveType Type { get; set; }
+
         public ISaveGame ModelObject { get; set; }
         public bool IsValid { get; set; }
 

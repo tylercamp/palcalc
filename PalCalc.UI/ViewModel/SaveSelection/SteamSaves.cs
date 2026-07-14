@@ -13,6 +13,19 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 {
     internal static class SteamSaves
     {
+        public static SavesCollectionViewModel MakeEmptyCollection()
+        {
+            return new SavesCollectionViewModel(
+                SaveType: SaveType.Steam,
+                AvailableSaves: new([]),
+                TypeLabel: new HardCodedText("Steam"), // TODO ITL
+                Title: null,
+                OpenFolderCommand: null,
+                AddSaveCommand: null,
+                RemoveSaveCommand: null
+            );
+        }
+
         public static List<SavesCollectionViewModel> CollectAll(
             IEnumerable<ISavesLocation> savesLocations,
             ISavesService savesService
@@ -36,16 +49,21 @@ namespace PalCalc.UI.ViewModel.SaveSelection
                 ),
                 TypeLabel: new HardCodedText("Steam"), // TODO ITL
                 Title: new HardCodedText(location.FolderName),
-                OpenFolderCommand: null, // TODO
+                OpenFolderCommand: new RelayCommand(() => WindowsUtils.OpenPathInExplorer(location.FolderPath)),
                 AddSaveCommand: null,
                 RemoveSaveCommand: null
             );
         }
 
-        public static SaveGameViewModel2 FromSave(StandardSaveGame save, ISavesService savesService) =>
-            SavesCommon.BuildNormalSave(
+        public static SaveGameViewModel2 FromSave(StandardSaveGame save, ISavesService savesService)
+        {
+            var res = SavesCommon.BuildNormalSave(
                 save: save,
-                openFolderCommand: null // TODO
+                openFolderCommand: new RelayCommand(() => WindowsUtils.OpenPathInExplorer(save.BasePath))
             );
+            res.Type = SaveType.Steam;
+
+            return res;
+        }
     }
 }

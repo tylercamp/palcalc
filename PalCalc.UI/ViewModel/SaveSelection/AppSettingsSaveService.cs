@@ -1,39 +1,69 @@
-﻿using System;
+﻿using PalCalc.Model;
+using PalCalc.SaveReader;
+using PalCalc.UI.Model;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Intrinsics.Arm;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
 namespace PalCalc.UI.ViewModel.SaveSelection
 {
-    internal class AppSettingsSaveService : ISavesService
+    internal class AppSettingsSaveService(AppSettings settings) : ISavesService
     {
-        private void OpenInExplorer(string path)
+        public void AddManualSave(StandardSaveGame manualSave)
         {
-            var fullPath = System.IO.Path.GetFullPath(path);
-            Process.Start("explorer.exe", fullPath);
+            // When a save is selected and we try to go to the solver page,
+            // should stay on the "Save Selector" until the save + solver data is
+            // loaded
+
+            //if (Storage.LoadSave(null, save, db, GameSettings.Defaults) == null)
+            //{
+            //    SaveSelection.SelectedGame = null;
+            //    return;
+            //}
+
+            //targetsBySaveFile.Add(save, new PalTargetListViewModel());
+
+            //var saveVm = manualSaves.Add(save);
+            //SaveSelection.SelectedGame = saveVm;
+
+
+            settings.ExtraSaveLocations.Add(manualSave.BasePath);
+            Storage.SaveAppSettings(settings);
         }
 
-        public SaveGameViewModel2 TryAddSave(SaveType type)
+        public void AddVirtualSave(VirtualSaveGame virtualSave)
         {
-            throw new NotImplementedException();
+            settings.FakeSaveNames.Add(FakeSaveGame.GetLabel(virtualSave));
+            Storage.SaveAppSettings(settings);
         }
 
-        public bool TryRemoveSave(SaveGameViewModel2 save)
+        public void RemoveManualSave(StandardSaveGame manualSave)
         {
-            throw new NotImplementedException();
+            settings.ExtraSaveLocations.Remove(manualSave.BasePath);
+            Storage.SaveAppSettings(settings);
+
+            // TODO - do customizations need to be disposed here?
+
+            Storage.RemoveSave(manualSave);
+            manualSave.Dispose();
         }
 
-        public void OpenSavesLocationFolder(SavesCollectionViewModel location)
+        public void RemoveVirtualSave(VirtualSaveGame virtualSave)
         {
-            throw new NotImplementedException();
-        }
+            // TODO - dispose customizations
+            // (note yet in SaveGameViewModel2)
 
-        public void OpenSaveGameFolder(SaveGameViewModel2 save)
-        {
-            throw new NotImplementedException();
+            settings.FakeSaveNames.Remove(FakeSaveGame.GetLabel(virtualSave));
+
+            Storage.RemoveSave(virtualSave);
+            virtualSave.Dispose();
+
+            Storage.SaveAppSettings(settings);
         }
     }
 }

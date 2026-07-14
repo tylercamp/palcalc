@@ -42,19 +42,20 @@
             <materialIcons:MaterialIcon Kind="FileEdit" Foreground="LightSteelBlue" />
         </DataTemplate>
 
-        <ssvm:SavesCollectionTemplateSelector x:Key="IconTemplateSelector"
-                                              SteamTemplate="{StaticResource SteamIconTemplate}"
-                                              XboxTemplate="{StaticResource XboxIconTemplate}"
-                                              ManualTemplate="{StaticResource ManualSavesIconTemplate}"
-                                              FakeSavesTemplate="{StaticResource FakeSavesIconTemplate}"
-                                              />
+        <ssvm:SaveTypeTemplateSelector x:Key="IconTemplateSelector"
+                                       SteamTemplate="{StaticResource SteamIconTemplate}"
+                                       XboxTemplate="{StaticResource XboxIconTemplate}"
+                                       ManualSaveTemplate="{StaticResource ManualSavesIconTemplate}"
+                                       VirtualSaveTemplate="{StaticResource FakeSavesIconTemplate}"
+                                       />
         
         <!-- LOCATION NOTICE TEMPLATES -->
-        <DataTemplate x:Key="XboxNoticeTemplate" DataType="ssvm:XboxSavesCollectionViewModel">
+        <DataTemplate x:Key="XboxNoticeTemplate" DataType="ssvm:SavesCollectionViewModel">
             <TextBlock Grid.Row="1"
                        TextWrapping="Wrap"
                        Margin="0,0,0,6"
                        Visibility="{Binding AvailableSaves, Converter={StaticResource CVC_Negate}}"
+                       Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
                        FontStyle="Italic">
                 <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_1}" />
                 <Hyperlink NavigateUri="https://apps.microsoft.com/detail/9mv0b5hzvk9z"
@@ -65,29 +66,9 @@
             </TextBlock>
         </DataTemplate>
 
-        <ssvm:SavesCollectionTemplateSelector x:Key="NoticeTemplateSelector"
-                                              DefaultTemplate="{StaticResource EmptyTemplate}"
-                                              XboxTemplate="{StaticResource XboxNoticeTemplate}"
-                                              />
-        
-        <!-- SAVE LOCATION CONTROLS TEMPLATES -->
-        <DataTemplate DataType="ssvm:SteamSaveGameViewModel">
-            <StackPanel>
-                <Button Grid.Column="1"
-                        Command="{Binding OpenLocationFolderCommand}"
-                        IsEnabled="{Binding CanOpenLocationFolder}"
-                        ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}"
-                        VerticalAlignment="Center">
-                    <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
-                </Button>
-            </StackPanel>
-        </DataTemplate>
-        <ssvm:SavesCollectionTemplateSelector x:Key="LocationControlsTemplateSelector"
-                                              DefaultTemplate="{StaticResource EmptyTemplate}"
-                                              />
-        
-        <!-- SAVE GAME CONTROLS TEMPLATES -->
-        <ssvm:SaveGameTemplateSelector x:Key="SaveGameControlsTemplateSelector"
+        <ssvm:SaveTypeTemplateSelector x:Key="NoticeTemplateSelector"
+                                       DefaultTemplate="{StaticResource EmptyTemplate}"
+                                       XboxTemplate="{StaticResource XboxNoticeTemplate}"
                                        />
     </Page.Resources>
 
@@ -104,11 +85,11 @@
         <ListBox Grid.Column="0"
                  ItemsSource="{Binding AvailableSaveGameCollections}"
                  SelectedItem="{Binding SelectedCollection}"
-                 SelectedIndex="0">
+                 SelectedIndex="1">
             <ListBox.ItemTemplate>
-                <DataTemplate DataType="ssvm:ISavesCollectionViewModel">
+                <DataTemplate DataType="ssvm:SavesCollectionViewModel">
                     <StackPanel Margin="4,6" Orientation="Horizontal" vu:StackPanelExtensions.Spacing="12">
-                        <ContentPresenter Content="{Binding}"
+                        <ContentPresenter Content="{Binding SaveType}"
                                           ContentTemplateSelector="{StaticResource IconTemplateSelector}"
                                           Width="48"
                                           />
@@ -145,10 +126,11 @@
                        FontWeight="Bold"
                        VerticalAlignment="Center" />
 
-                <ContentPresenter Grid.Column="1"
-                                  Content="{Binding}"
-                                  ContentTemplateSelector="{StaticResource LocationControlsTemplateSelector}"
-                                  />
+                <StackPanel Grid.Column="1">
+                    <Button Command="{Binding SelectedCollection.OpenFolderCommand}" Visibility="{Binding SelectedCollection.OpenFolderCommand, Converter={StaticResource VVC}}">
+                        <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
+                    </Button>
+                </StackPanel>
             </Grid>
 
             <!-- Notices for the save location, e.g. instructions for syncing Xbox saves if no save-games are found -->
@@ -162,7 +144,7 @@
                      SelectedItem="{Binding SelectedSave}"
                      SelectedIndex="0">
                 <ListBox.ItemTemplate>
-                    <DataTemplate DataType="ssvm:ISaveGameViewModel2">
+                    <DataTemplate DataType="ssvm:SaveGameViewModel2">
                         <StackPanel Orientation="Horizontal" Margin="4,6">
                             <TextBlock Text="{itl:LocalizedText LC_SAVE_WARNING}"
                                        Visibility="{Binding IsValid, Converter={StaticResource VVC_Negate}}"
@@ -184,14 +166,16 @@
             </Grid.RowDefinitions>
 
             <!-- Action buttons -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12" HorizontalAlignment="Right">
-                <Button Command="{Binding OpenSaveFolderCommand}"
-                        IsEnabled="{Binding CanOpenSaveFolder}"
-                        ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}"
-                        Margin="0,0,6,0">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12" HorizontalAlignment="Right" vu:StackPanelExtensions.Spacing="6">
+                <Button Command="{Binding SelectedSave.OpenFolderCommand}"
+                        Visibility="{Binding SelectedSave.OpenFolderCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                        ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
                     <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
                 </Button>
-                <Button Command="{Binding DeleteSaveCommand}"
+                
+                <Button Command="{Binding SelectedCollection.RemoveSaveCommand}"
+                        CommandParameter="{Binding SelectedSave}"
+                        Visibility="{Binding SelectedCollection.RemoveSaveCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
                         Content="{itl:LocalizedText LC_SAVE_GAME_REMOVE_BTN_LABEL}" />
             </StackPanel>
 

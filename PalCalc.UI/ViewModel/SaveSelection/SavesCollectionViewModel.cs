@@ -14,6 +14,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
         ReadOnlyObservableCollection<SaveGameViewModel2> AvailableSaves,
         ILocalizedText TypeLabel,
         ILocalizedText Title,
+        IRelayCommand OpenFolderCommand,
         IRelayCommand AddSaveCommand,
         IRelayCommand<SaveGameViewModel2> RemoveSaveCommand
     );

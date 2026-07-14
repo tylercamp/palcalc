@@ -27,46 +27,37 @@ namespace PalCalc.UI.ViewModel
             else
                 locations.Add(new XboxSavesLocation());
 
-            DesignerInstance = new SaveSelectionOnboardingViewModel(locations, Enumerable.Empty<ISaveGame>());
+            DesignerInstance = new SaveSelectionOnboardingViewModel(locations, Enumerable.Empty<ISaveGame>(), null);
         }
 
         public static SaveSelectionOnboardingViewModel DesignerInstance { get; }
 
-        public IReadOnlyCollection<ISavesCollectionViewModel> AvailableSaveGameCollections { get; }
+        public IReadOnlyCollection<SavesCollectionViewModel> AvailableSaveGameCollections { get; }
 
         [ObservableProperty]
-        private ISavesCollectionViewModel selectedCollection;
+        private SavesCollectionViewModel selectedCollection;
 
         [ObservableProperty]
-        private ISaveGameViewModel2 selectedSave;
+        private SaveGameViewModel2 selectedSave;
 
         public SaveSelectionOnboardingViewModel(
             IEnumerable<ISavesLocation> savesLocations,
-            IEnumerable<ISaveGame> manualSaves)
+            IEnumerable<ISaveGame> manualSaves,
+            ISavesService savesService
+        )
         {
-            var steamCollections = savesLocations
-                .OfType<DirectSavesLocation>()
-                .Select(dsl => new SteamSavesCollectionViewModel(dsl))
-                .Cast<ISavesCollectionViewModel>();
+            var steamCollections = SteamSaves.CollectAll(savesLocations, savesService);
 
             if (!steamCollections.Any())
-                steamCollections = [new SteamSavesCollectionViewModel(null)];
+                steamCollections = [SteamSaves.MakeEmptyCollection()];
 
-            var xboxCollections = savesLocations
-                .OfType<XboxSavesLocation>()
-                .Select(xsl => new XboxSavesCollectionViewModel(xsl))
-                .Cast<ISavesCollectionViewModel>();
+            var xboxCollections = XboxSaves.CollectAll(savesLocations);
 
-            var manualCollection = new ManualSavesCollectionViewModel(
-                // TODO - simplify
-                new ManualSavesLocationViewModel(manualSaves.OfType<StandardSaveGame>())
-            );
+            var manualCollection = ManualSaves.FromList(manualSaves.OfType<StandardSaveGame>(), savesService);
 
-            var fakeSavesCollection = new FakeSavesCollectionViewModel(
-                manualSaves.OfType<VirtualSaveGame>()
-            );
+            var fakeSavesCollection = VirtualSaves.FromList(manualSaves.OfType<VirtualSaveGame>(), savesService); ;
 
-            AvailableSaveGameCollections = new ReadOnlyCollection<ISavesCollectionViewModel>(
+            AvailableSaveGameCollections = new ReadOnlyCollection<SavesCollectionViewModel>(
                 [ ..steamCollections, ..xboxCollections, manualCollection, fakeSavesCollection ]
             );
         }

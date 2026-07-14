@@ -9,11 +9,12 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 {
     internal interface ISavesService
     {
-        SaveGameViewModel2? TryAddSave(SaveType type);
+        void AddVirtualSave(VirtualSaveGame virtualSave);
 
-        bool TryRemoveSave(SaveGameViewModel2 save);
+        void AddManualSave(StandardSaveGame manualSave);
 
-        void OpenSavesLocationFolder(SavesCollectionViewModel location);
-        void OpenSaveGameFolder(SaveGameViewModel2 save);
+        void RemoveVirtualSave(VirtualSaveGame virtualSave);
+
+        void RemoveManualSave(StandardSaveGame manualSave);
     }
 }
