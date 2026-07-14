@@ -1,20 +1,23 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using PalCalc.SaveReader;
 using PalCalc.UI.Localization;
-using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.SaveSelection
 {
-    internal class XboxSavesCollectionViewModel : ISavesCollectionViewModel
+    internal static class XboxSaves
     {
-        public XboxSavesCollectionViewModel(XboxSavesLocation savesLocation)
+        public static List<SavesCollectionViewModel> CollectAll()
+        {
+
+        }
+
+        public static SavesCollectionViewModel FromLocation(XboxSavesLocation location)
         {
             AvailableSaves = new ReadOnlyCollection<ISaveGameViewModel2>([.. savesLocation.AllSaveGames.OfType<XboxSaveGame>().Select(sg => new XboxSaveGameViewModel(sg))]);
 
@@ -32,13 +35,16 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             );
         }
 
-        public IReadOnlyCollection<ISaveGameViewModel2> AvailableSaves { get; }
+        public static SaveGameViewModel2 FromSave(XboxSaveGame save)
+        {
+            var result = SavesCommon.BuildNormalSave(save);
 
-        
-        public ILocalizedText TypeLabel { get; }
-
-        public ILocalizedText Title { get; }
-
-        public IRelayCommand OpenFolderCommand { get; }
+            if (xboxSave.LevelMeta?.IsValid != true)
+            {
+                Warnings = [
+                    LocalizationCodes.LC_SAVE_GAME_XBOX_INCOMPLETE.Bind(),
+                ];
+            }
+        }
     }
 }
