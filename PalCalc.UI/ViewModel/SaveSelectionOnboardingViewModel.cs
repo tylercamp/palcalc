@@ -38,7 +38,7 @@ namespace PalCalc.UI.ViewModel
         private ISavesCollectionViewModel selectedCollection;
 
         [ObservableProperty]
-        private ISaveGameViewModel selectedSave;
+        private ISaveGameViewModel2 selectedSave;
 
         public SaveSelectionOnboardingViewModel(
             IEnumerable<ISavesLocation> savesLocations,
@@ -48,6 +48,9 @@ namespace PalCalc.UI.ViewModel
                 .OfType<DirectSavesLocation>()
                 .Select(dsl => new SteamSavesCollectionViewModel(dsl))
                 .Cast<ISavesCollectionViewModel>();
+
+            if (!steamCollections.Any())
+                steamCollections = [new SteamSavesCollectionViewModel(null)];
 
             var xboxCollections = savesLocations
                 .OfType<XboxSavesLocation>()

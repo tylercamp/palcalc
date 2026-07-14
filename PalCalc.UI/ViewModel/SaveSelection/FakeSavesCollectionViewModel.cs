@@ -7,17 +7,30 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace PalCalc.UI.ViewModel.SaveSelection
 {
-    internal class FakeSavesCollectionViewModel(IEnumerable<ISaveGame> fakeSaves) : ISavesCollectionViewModel
+    internal class FakeSavesCollectionViewModel : ISavesCollectionViewModel
     {
-        public IReadOnlyCollection<SaveGameViewModel> AvailableSaves { get; } =
-            new ReadOnlyCollection<SaveGameViewModel>([.. fakeSaves.Select(fs => new SaveGameViewModel(null, fs))]);
+        private ObservableCollection<ISaveGameViewModel2> _availableSaves;
 
-        // TODO ITL
-        public ILocalizedText TypeLabel { get; } = new HardCodedText("Fake Saves");
+        public FakeSavesCollectionViewModel(IEnumerable<VirtualSaveGame> fakeSaves)
+        {
+            _availableSaves = new([.. fakeSaves.Select(fs => new FakeSaveGameViewModel(fs))]);
+            AvailableSaves = new(_availableSaves);
 
-        public ILocalizedText Title { get; } = null;
+            // TODO ITL
+            TypeLabel = new HardCodedText("Fake Saves");
+            Title = null;
+        }
+
+        public ReadOnlyObservableCollection<ISaveGameViewModel2> AvailableSaves { get; }
+
+        public ILocalizedText TypeLabel { get; }
+
+        public ILocalizedText Title { get; }
+
+        public ICommand AddSaveCommand { get; }
     }
 }
