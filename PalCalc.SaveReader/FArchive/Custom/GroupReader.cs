@@ -40,11 +40,10 @@ namespace PalCalc.SaveReader.FArchive.Custom
         // For `Guild`
         public Guid? AdminPlayerUid { get; set; }
         public PlayerReference[] Members { get; set; }
+        public GuildMarker[] GuildMarkers { get; set; }
+        public byte[] GuildChestRoles { get; set; }
+        public GuildRolePermission[] RolePermissions { get; set; }
 
-        // V4 Guild fields
-        public GuildMarkerData[] GuildMarkers { get; set; }
-        public byte[] GuildChestAllowedRoles { get; set; }
-        public RolePermission[] RolePermissions { get; set; }
 
         public override string ToString()
         {
@@ -85,6 +84,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
         public Guid PlayerUid; // corresponds to EntityInstanceId.Guid (but what does it imply exactly??)
         public Int64 LastOnlineRealTime;
         public string PlayerName;
+        public byte? UnknownByte; // present in v1.0 saves
 
         public static PlayerReference ReadFrom(FArchiveReader reader)
         {
@@ -97,65 +97,15 @@ namespace PalCalc.SaveReader.FArchive.Custom
         }
     }
 
-    public struct GuildPlayerReference
+    public struct GuildMarker
     {
-        public Guid PlayerUid;
-        public Int64 LastOnlineRealTime;
-        public string PlayerName;
-        public byte Role; // EPalGuildRole
-
-        public static GuildPlayerReference ReadFrom(FArchiveReader reader)
-        {
-            return new GuildPlayerReference()
-            {
-                PlayerUid = reader.ReadGuid(),
-                LastOnlineRealTime = reader.ReadInt64(),
-                PlayerName = reader.ReadString(),
-                Role = reader.ReadByte(),
-            };
-        }
+        public byte[] RawBytes;
     }
 
-    public struct GuildMarkerData
+    public struct GuildRolePermission
     {
-        public Guid MarkerId;
-        public Dictionary<string, VectorLiteral> IconLocation;
-        public int IconType;
-        public Guid OwnerPlayerUid;
-
-        public static GuildMarkerData ReadFrom(FArchiveReader reader)
-        {
-            var iconLocation = new Dictionary<string, VectorLiteral>();
-            var dictCount = reader.ReadUInt32();
-            for (int i = 0; i < dictCount; i++)
-            {
-                var key = reader.ReadString();
-                var value = reader.ReadVector();
-                iconLocation[key] = value;
-            }
-            return new GuildMarkerData()
-            {
-                MarkerId = reader.ReadGuid(),
-                IconLocation = iconLocation,
-                IconType = reader.ReadInt32(),
-                OwnerPlayerUid = reader.ReadGuid(),
-            };
-        }
-    }
-
-    public struct RolePermission
-    {
-        public byte Role; // EPalGuildRole
-        public byte[] Permissions; // EPalGuildPermission
-
-        public static RolePermission ReadFrom(FArchiveReader reader)
-        {
-            return new RolePermission()
-            {
-                Role = reader.ReadByte(),
-                Permissions = reader.ReadArray(r => r.ReadByte()),
-            };
-        }
+        public byte Role;
+        public byte[] Permissions;
     }
 
     public class GroupReader : ICustomReader
@@ -205,7 +155,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
                             result.TypedMeta.Path = path;
                         }
                     }
-                    catch {}
+                    catch { }
 
                     if (result != null)
                     {
@@ -356,7 +306,9 @@ namespace PalCalc.SaveReader.FArchive.Custom
 
         private static GroupDataProperty ParseStream_V4_PalworldV1_0_0(GroupType groupType, FArchiveReader subReader)
         {
-            // Ref: https://github.com/oMaN-Rod/palworld-save-tools/blob/b34cf3c514c76b4cfa5653a6b44a7d7cf041692b/palworld_save_tools/rawdata/group.py
+            // Ref: https://github.com/deafdudecomputers/PalworldSaveTools/blob/1a20d52d821abbdcd3ed6e81a8e7bb8e57e2acdd/src/palsav/palsav/rawdata/group.py
+            //      https://github.com/oMaN-Rod/palworld-save-tools/blob/b34cf3c514c76b4cfa5653a6b44a7d7cf041692b/palworld_save_tools/rawdata/group.py
+            // (slightly tweaked with help from ImHex)
 
             var result = new GroupDataProperty() { TypedMeta = new GroupDataPropertyMeta() };
 
@@ -365,14 +317,13 @@ namespace PalCalc.SaveReader.FArchive.Custom
             result.GroupName = subReader.ReadString();
             result.CharacterHandleIds = subReader.ReadArray(r => new EntityInstanceId() { Guid = r.ReadGuid(), InstanceId = r.ReadGuid() });
 
+            // Note: This parser is a bit "looser" than the earlier parsers which were very strict with
+            //       byte ordering. We include extra validation and throw exceptions so we're more likely
+            //       to retry with parsers for the older save formats
+
             if (GroupType.Mask_HasBaseIds.HasFlag(groupType))
             {
                 result.OrgType = subReader.ReadByte();
-            }
-
-            if (groupType == GroupType.Organization)
-            {
-                subReader.Skip(12); // trailing_bytes
             }
 
             if (groupType == GroupType.IndependentGuild)
@@ -391,6 +342,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
 
             if (groupType == GroupType.Guild)
             {
+                // New layout: explicit fields through unknown_2
                 subReader.ReadBytes(4); // leading_bytes
                 result.BaseIds = subReader.ReadArray(r => r.ReadGuid());
                 subReader.ReadInt32();  // unknown_1
@@ -398,61 +350,41 @@ namespace PalCalc.SaveReader.FArchive.Custom
                 result.MapObjectBasePointInstanceIds = subReader.ReadArray(r => r.ReadGuid());
                 result.GuildName = subReader.ReadString();
                 subReader.ReadGuid();   // last_guild_name_modifier_player_uid
-                result.GuildMarkers = subReader.ReadArray(GuildMarkerData.ReadFrom);
 
                 if (result.BaseIds.Length != result.MapObjectBasePointInstanceIds.Length)
                     throw new ArgumentException($"Guild BaseIds length of {result.BaseIds.Length} != MapObjectBasePointInstanceIds length {result.MapObjectBasePointInstanceIds.Length}");
 
-                ReadGuildTail(groupType, subReader, result);
+                result.GuildMarkers = subReader.ReadArray(r => new GuildMarker() { RawBytes = r.ReadBytes(60) });
+                result.GuildChestRoles = subReader.ReadArray(r => r.ReadByte());
+
+                subReader.ReadUInt32(); // unknown int
+
+                result.AdminPlayerUid = subReader.ReadGuid();
+                result.Members = subReader.ReadArray(r =>
+                {
+                    var member = new PlayerReference()
+                    {
+                        PlayerUid = r.ReadGuid(),
+                        LastOnlineRealTime = r.ReadInt64(),
+                        PlayerName = r.ReadString(),
+                    };
+                    r.ReadByte(); // unknown
+                    return member;
+                });
+
+                result.RolePermissions = subReader.ReadArray(r =>
+                    new GuildRolePermission() {
+                        Role = r.ReadByte(),
+                        Permissions = r.ReadArray(sr => sr.ReadByte())
+                    }
+                );
             }
 
+            // (use 100 as the max base level in case some mod / update pushes the limit over 30)
             if (result.BaseCampLevel < 0 || result.BaseCampLevel > 100)
                 throw new ArgumentOutOfRangeException($"Parsed BaseCampLevel {result.BaseCampLevel} is outside the expected range [0 100]");
 
             return result;
-        }
-
-        private static void ReadGuildTail(GroupType groupType, FArchiveReader reader, GroupDataProperty result)
-        {
-            byte[] tail = reader.ReadBytes((int)(reader.StreamSize - reader.StreamPosition));
-
-            using (var tailStream = new MemoryStream(tail))
-            using (var tailReader = reader.Derived(tailStream))
-            {
-                // Try v2 tail (2026-07 update: chest roles, per-player role, permissions)
-                result.GuildChestAllowedRoles = tailReader.ReadArray(r => r.ReadByte());
-                tailReader.ReadInt32(); // unknown_i32
-
-                result.AdminPlayerUid = tailReader.ReadGuid();
-                var v2Players = tailReader.ReadArray(GuildPlayerReference.ReadFrom);
-                result.RolePermissions = tailReader.ReadArray(RolePermission.ReadFrom);
-                tailReader.ReadBytes(4); // trailing_bytes
-
-                if (tailReader.StreamPosition == tailReader.StreamSize)
-                {
-                    result.Members = Array.ConvertAll(v2Players, p => new PlayerReference
-                    {
-                        PlayerUid = p.PlayerUid,
-                        LastOnlineRealTime = p.LastOnlineRealTime,
-                        PlayerName = p.PlayerName,
-                    });
-                    return;
-                }
-
-                // v2 didn't consume all bytes — fall back to v1
-                tailStream.Seek(0, SeekOrigin.Begin);
-            }
-
-            using (var tailStream = new MemoryStream(tail))
-            using (var tailReader = reader.Derived(tailStream))
-            {
-                result.AdminPlayerUid = tailReader.ReadGuid();
-                result.Members = tailReader.ReadArray(PlayerReference.ReadFrom);
-                tailReader.ReadBytes(4); // trailing_bytes
-
-                if (tailReader.StreamPosition != tailReader.StreamSize)
-                    throw new Exception("Guild tail: neither v1 nor v2 format consumed all bytes");
-            }
         }
     }
 }

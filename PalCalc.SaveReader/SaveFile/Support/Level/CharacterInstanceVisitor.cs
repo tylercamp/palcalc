@@ -100,7 +100,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             {
                 Pal = pal,
                 InstanceId = InstanceId.ToString(),
-                OwnerPlayerId = OwnerPlayerId?.ToString() ?? OldOwnerPlayerIds.First().ToString(),
+                OwnerPlayerId = OwnerPlayerId?.ToString() ?? (OldOwnerPlayerIds.Count > 0 ? OldOwnerPlayerIds.First().ToString() : null),
 
                 IV_HP = TalentHp ?? 0,
                 IV_Melee = TalentMelee ?? 0,

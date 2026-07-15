@@ -810,11 +810,13 @@ namespace PalCalc.SaveReader.FArchive
 
         public T[] ReadArray<T>(Func<FArchiveReader, T> reader)
         {
+            // note: we do NOT pre-allocate the full array size. if there's a bad size-read somewhere,
+            //       we might allocate many GBs of memory
             var count = ReadUInt32();
-            var result = new T[count];
+            var result = new List<T>();
             for (int i = 0; i < count; i++)
-                result[i] = reader(this);
-            return result;
+                result.Add(reader(this));
+            return result.ToArray();
         }
 
         public VectorLiteral ReadVector() => new VectorLiteral { x = ReadDouble(), y = ReadDouble(), z = ReadDouble() };
