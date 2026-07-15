@@ -307,6 +307,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
         private static GroupDataProperty ParseStream_V4_PalworldV1_0_0(GroupType groupType, FArchiveReader subReader)
         {
             // Ref: https://github.com/deafdudecomputers/PalworldSaveTools/blob/1a20d52d821abbdcd3ed6e81a8e7bb8e57e2acdd/src/palsav/palsav/rawdata/group.py
+            //      https://github.com/oMaN-Rod/palworld-save-tools/blob/b34cf3c514c76b4cfa5653a6b44a7d7cf041692b/palworld_save_tools/rawdata/group.py
             // (slightly tweaked with help from ImHex)
 
             var result = new GroupDataProperty() { TypedMeta = new GroupDataPropertyMeta() };
