@@ -5,6 +5,7 @@ using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Presets;
+using PalCalc.UI.ViewModel.SaveSelection;
 using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
@@ -25,11 +26,11 @@ namespace PalCalc.UI.ViewModel
     /// </summary>
     public partial class PalTargetViewModel : ObservableObject
     {
-        private SaveGameViewModel sourceSave;
+        private SaveGameViewModel2 sourceSave;
 
         public PalTargetViewModel() : this(null, PalSpecifierViewModel.New, PassiveSkillsPresetCollectionViewModel.DesignerInstance) { }
 
-        public PalTargetViewModel(SaveGameViewModel sourceSave, PalSpecifierViewModel initial, PassiveSkillsPresetCollectionViewModel presets)
+        public PalTargetViewModel(SaveGameViewModel2 sourceSave, PalSpecifierViewModel initial, PassiveSkillsPresetCollectionViewModel presets)
         {
             this.sourceSave = sourceSave;
 

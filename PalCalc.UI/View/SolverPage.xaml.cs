@@ -25,14 +25,14 @@ namespace PalCalc.UI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainPage : Page
+    public partial class SolverPage : Page
     {
-        internal MainPage()
+        internal SolverPage()
         {
             InitializeComponent();
 
             var sw = Stopwatch.StartNew();
-            DataContext = new MainWindowViewModel(Dispatcher, null);
+            DataContext = new SolverPageViewModel(Dispatcher, null, null);
 
 #if DEBUG
             DebugMenuItem.Visibility = Visibility.Visible;
@@ -41,7 +41,7 @@ namespace PalCalc.UI
 #endif
         }
 
-        internal MainPage(MainWindowViewModel vm)
+        internal SolverPage(SolverPageViewModel vm)
         {
             InitializeComponent();
             DataContext = vm;
@@ -53,7 +53,7 @@ namespace PalCalc.UI
 #endif
         }
 
-        private MainWindowViewModel ViewModel => DataContext as MainWindowViewModel;
+        private SolverPageViewModel ViewModel => DataContext as SolverPageViewModel;
 
         private void AboutButton_Click(object sender, RoutedEventArgs e)
         {

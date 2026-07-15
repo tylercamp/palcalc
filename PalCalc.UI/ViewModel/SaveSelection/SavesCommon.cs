@@ -18,13 +18,10 @@ namespace PalCalc.UI.ViewModel.SaveSelection
     {
         private static ILogger logger = Log.ForContext(typeof(SavesCommon));
 
-        public static SaveGameViewModel2 BuildNormalSave(ISaveGame save, IRelayCommand openFolderCommand)
+        public static SaveGameViewModel2 BuildNormalSave(SavesCollectionViewModel parent, ISaveGame save, IRelayCommand openFolderCommand)
         {
-            var res = new SaveGameViewModel2()
+            var res = new SaveGameViewModel2(parent, save)
             {
-                ModelObject = save,
-                IsValid = save.IsValid,
-
                 OpenFolderCommand = openFolderCommand
             };
 

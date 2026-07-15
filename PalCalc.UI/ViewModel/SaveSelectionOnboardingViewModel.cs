@@ -18,21 +18,12 @@ namespace PalCalc.UI.ViewModel
         // TODO - Right now Steam is completely hidden if not detected, should instead display with
         //        warning "Steam saves location not found"
 
-        static SaveSelectionOnboardingViewModel()
-        {
-            List<ISavesLocation> locations = DirectSavesLocation.AllLocal.Cast<ISavesLocation>().ToList();
-            var xboxLocations = XboxSavesLocation.FindAll();
-            if (xboxLocations.Count > 0)
-                locations.AddRange(xboxLocations);
-            else
-                locations.Add(new XboxSavesLocation());
-
-            DesignerInstance = new SaveSelectionOnboardingViewModel(locations, Enumerable.Empty<ISaveGame>(), null);
-        }
-
-        public static SaveSelectionOnboardingViewModel DesignerInstance { get; }
+        private static SaveSelectionOnboardingViewModel _designerInstance;
+        public static SaveSelectionOnboardingViewModel DesignerInstance => _designerInstance ??= new SaveSelectionOnboardingViewModel(SavesDetection.FindAll(new AppSettings(), null), null);
 
         public IReadOnlyCollection<SavesCollectionViewModel> AvailableSaveGameCollections { get; }
+
+        public IRelayCommand<SaveGameViewModel2> LoadSaveCommand { get; }
 
         [ObservableProperty]
         private SavesCollectionViewModel selectedCollection;
@@ -41,25 +32,12 @@ namespace PalCalc.UI.ViewModel
         private SaveGameViewModel2 selectedSave;
 
         public SaveSelectionOnboardingViewModel(
-            IEnumerable<ISavesLocation> savesLocations,
-            IEnumerable<ISaveGame> manualSaves,
-            ISavesService savesService
+            IEnumerable<SavesCollectionViewModel> savesCollections,
+            IRelayCommand<SaveGameViewModel2> loadSaveCommand
         )
         {
-            var steamCollections = SteamSaves.CollectAll(savesLocations, savesService);
-
-            if (!steamCollections.Any())
-                steamCollections = [SteamSaves.MakeEmptyCollection()];
-
-            var xboxCollections = XboxSaves.CollectAll(savesLocations);
-
-            var manualCollection = ManualSaves.FromList(manualSaves.OfType<StandardSaveGame>(), savesService);
-
-            var fakeSavesCollection = VirtualSaves.FromList(manualSaves.OfType<VirtualSaveGame>(), savesService); ;
-
-            AvailableSaveGameCollections = new ReadOnlyCollection<SavesCollectionViewModel>(
-                [ ..steamCollections, ..xboxCollections, manualCollection, fakeSavesCollection ]
-            );
+            AvailableSaveGameCollections = [.. savesCollections];
+            LoadSaveCommand = loadSaveCommand;
         }
 
         protected override void OnPropertyChanged(PropertyChangedEventArgs e)

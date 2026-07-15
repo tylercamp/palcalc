@@ -26,9 +26,18 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 {
     internal static class ManualSaves
     {
-        public static SaveGameViewModel2 FromSave(StandardSaveGame save)
+        public static SavesCollectionViewModel CollectAll(AppSettings sourceSettings, ISavesService savesService)
+        {
+            return FromList(
+                sourceSettings.ExtraSaveLocations.Select(saveFolder => new StandardSaveGame(saveFolder)),
+                savesService
+            );
+        }
+
+        public static SaveGameViewModel2 FromSave(SavesCollectionViewModel parent, StandardSaveGame save)
         {
             var res = SavesCommon.BuildNormalSave(
+                parent: parent,
                 save: save,
                 openFolderCommand: new RelayCommand(() => WindowsUtils.OpenPathInExplorer(save.BasePath))
             );
@@ -40,71 +49,74 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 
         public static SavesCollectionViewModel FromList(IEnumerable<StandardSaveGame> existingSaves, ISavesService savesService)
         {
+            var res = new SavesCollectionViewModel()
+            {
+                SaveType = SaveType.LocalFile,
+                TypeLabel = new HardCodedText("Local Files"), // TODO ITL
+                Title = null,
+                OpenFolderCommand = null,
+            };
+
             var availableSaves = new ObservableCollection<SaveGameViewModel2>([
-                .. existingSaves.Select(FromSave).OrderBy(sg => sg.CombinedLabel.Value)
+                .. existingSaves.Select(sg => FromSave(res, sg)).OrderBy(sg => sg.CombinedLabel.Value)
             ]);
+            res.AvailableSaves = new(availableSaves);
 
-            return new SavesCollectionViewModel(
-                SaveType: SaveType.LocalFile,
-                AvailableSaves: new(availableSaves),
-                TypeLabel: new HardCodedText("Local Files"), // TODO ITL
-                Title: null,
-                OpenFolderCommand: null,
+            res.AddSaveCommand = new RelayCommand(() =>
+            {
+                var ofd = new OpenFileDialog();
+                ofd.Filter = LocalizationCodes.LC_MANUAL_SAVE_EXTENSION_LBL.Bind().Value + "|Level*.sav";
+                ofd.Title = LocalizationCodes.LC_MANUAL_SAVE_SELECTOR_TITLE.Bind().Value;
 
-                AddSaveCommand: new RelayCommand(() =>
+                if (true == ofd.ShowDialog(App.Current.MainWindow))
                 {
-                    var ofd = new OpenFileDialog();
-                    ofd.Filter = LocalizationCodes.LC_MANUAL_SAVE_EXTENSION_LBL.Bind().Value + "|Level*.sav";
-                    ofd.Title = LocalizationCodes.LC_MANUAL_SAVE_SELECTOR_TITLE.Bind().Value;
-
-                    if (true == ofd.ShowDialog(App.Current.MainWindow))
+                    var asSaveGame = new StandardSaveGame(Path.GetDirectoryName(ofd.FileName));
+                    if (!asSaveGame.IsValid)
                     {
-                        var asSaveGame = new StandardSaveGame(Path.GetDirectoryName(ofd.FileName));
-                        if (!asSaveGame.IsValid)
-                        {
-                            AdonisMessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_INCOMPLETE.Bind().Value, caption: "");
-                            return;
-                        }
-
-
-                        if (availableSaves.Any(existing => existing.ModelObject.BasePath == asSaveGame.BasePath))
-                        {
-                            AdonisMessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_ALREADY_REGISTERED.Bind().Value, caption: "");
-                            return;
-                        }
-
-                        savesService.AddManualSave(asSaveGame);
-                        var vm = FromSave(asSaveGame);
-                        // insert while preserving alphanumeric ordering
-                        var orderedIndex = availableSaves
-                            .AsEnumerable()
-                            .Append(vm)
-                            .OrderBy(vm => vm.CombinedLabel.Value)
-                            .ToList()
-                            .IndexOf(vm);
-
-                        availableSaves.Insert(orderedIndex, vm);
+                        AdonisMessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_INCOMPLETE.Bind().Value, caption: "");
+                        return;
                     }
-                }),
 
-                RemoveSaveCommand: new RelayCommand<SaveGameViewModel2>((save) =>
+
+                    if (availableSaves.Any(existing => existing.Value.BasePath == asSaveGame.BasePath))
+                    {
+                        AdonisMessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_MANUAL_SAVE_ALREADY_REGISTERED.Bind().Value, caption: "");
+                        return;
+                    }
+
+                    savesService.AddManualSave(asSaveGame);
+                    var vm = FromSave(res, asSaveGame);
+                    // insert while preserving alphanumeric ordering
+                    var orderedIndex = availableSaves
+                        .AsEnumerable()
+                        .Append(vm)
+                        .OrderBy(vm => vm.CombinedLabel.Value)
+                        .ToList()
+                        .IndexOf(vm);
+
+                    availableSaves.Insert(orderedIndex, vm);
+                }
+            });
+
+            res.RemoveSaveCommand = new RelayCommand<SaveGameViewModel2>((save) =>
+            {
+                var confirmation = AdonisMessageBox.Show(
+                    App.ActiveWindow,
+                    LocalizationCodes.LC_REMOVE_SAVE_DESCRIPTION.Bind(save.CombinedLabel).Value,
+                    LocalizationCodes.LC_REMOVE_SAVE_TITLE.Bind().Value,
+                    AdonisMessageBoxButton.YesNo
+                );
+
+                // TODO - when going from solver page back to save selector page, need to
+                //        close all open Inspector (and Passives List) windows
+                if (confirmation == AdonisMessageBoxResult.Yes)
                 {
-                    var confirmation = AdonisMessageBox.Show(
-                        App.ActiveWindow,
-                        LocalizationCodes.LC_REMOVE_SAVE_DESCRIPTION.Bind(save.CombinedLabel).Value,
-                        LocalizationCodes.LC_REMOVE_SAVE_TITLE.Bind().Value,
-                        AdonisMessageBoxButton.YesNo
-                    );
+                    availableSaves.Remove(save);
+                    savesService.RemoveManualSave(save.Value as StandardSaveGame);
+                }
+            });
 
-                    // TODO - when going from solver page back to save selector page, need to
-                    //        close all open Inspector (and Passives List) windows
-                    if (confirmation == AdonisMessageBoxResult.Yes)
-                    {
-                        availableSaves.Remove(save);
-                        savesService.RemoveManualSave(save.ModelObject as StandardSaveGame);
-                    }
-                })
-            );
+            return res;
         }
     }
 }

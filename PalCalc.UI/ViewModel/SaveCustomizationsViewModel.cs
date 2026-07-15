@@ -3,6 +3,7 @@ using PalCalc.Model;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.PalDerived;
+using PalCalc.UI.ViewModel.SaveSelection;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -56,7 +57,7 @@ namespace PalCalc.UI.ViewModel
     {
         private Debouncer saveAction;
 
-        public SaveCustomizationsViewModel(SaveGameViewModel save)
+        public SaveCustomizationsViewModel(SaveGameViewModel2 save)
         {
             var data = Storage.LoadSaveCustomizations(save.Value, PalDB.LoadEmbedded());
 

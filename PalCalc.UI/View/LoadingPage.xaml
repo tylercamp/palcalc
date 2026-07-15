@@ -35,14 +35,5 @@
                             VerticalAlignment="Center"
                             />
         </Viewbox>
-
-        <ProgressBar Visibility="{Binding Converter={StaticResource VVC}, FallbackValue=Collapsed}"
-                     VerticalAlignment="Bottom"
-                     Grid.RowSpan="99"
-                     Grid.ColumnSpan="99"
-                     Minimum="0" Maximum="100"
-                     Value="{Binding ProgressPercent, FallbackValue=0}"
-                     Height="15"
-                     />
     </Grid>
 </Page>

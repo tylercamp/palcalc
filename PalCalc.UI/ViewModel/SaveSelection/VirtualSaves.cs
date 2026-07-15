@@ -23,13 +23,21 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 {
     internal static class VirtualSaves
     {
-        public static SaveGameViewModel2 FromSave(VirtualSaveGame save)
+        public static SavesCollectionViewModel CollectAll(AppSettings sourceSettings, ISavesService savesService)
+        {
+            return FromList(
+                sourceSettings.FakeSaveNames.Select(FakeSaveGame.Create),
+                savesService
+            );
+        }
+
+        public static SaveGameViewModel2 FromSave(SavesCollectionViewModel parent, VirtualSaveGame save)
         {
             var meta = save.LevelMeta.ReadGameOptions();
 
-            return new SaveGameViewModel2()
+            return new SaveGameViewModel2(parent, save)
             {
-                ModelObject = save,
+                Value = save,
                 IsValid = true,
                 CombinedLabel = LocalizationCodes.LC_SAVE_GAME_LBL_SERVER.Bind(
                     // (InGameDay is always default 0, but the format param is required for this translation code)
@@ -46,71 +54,74 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 
         public static SavesCollectionViewModel FromList(IEnumerable<VirtualSaveGame> saves, ISavesService savesService)
         {
+            var res = new SavesCollectionViewModel();
+            res.SourceLocation = null;
+            res.SaveType = SaveType.Virtual;
+            res.TypeLabel = new HardCodedText("Fake Saves"); // TODO ITL
+            res.Title = null;
+            res.OpenFolderCommand = null;
+
             var availableSaves = new ObservableCollection<SaveGameViewModel2>(
-                [.. saves.Select(FromSave).OrderBy(s => s.CombinedLabel.Value)]
+                [.. saves.Select(sg => FromSave(res, sg)).OrderBy(s => s.CombinedLabel.Value)]
             );
+            res.AvailableSaves = new(availableSaves);
 
-            return new SavesCollectionViewModel(
-                SaveType: SaveType.Virtual,
-                AvailableSaves: new(availableSaves),
-                TypeLabel: new HardCodedText("Fake Saves"), // TODO ITL
-                Title: null,
-                OpenFolderCommand: null,
-                AddSaveCommand: new RelayCommand(() =>
+            res.AddSaveCommand = new RelayCommand(() =>
+            {
+                var existingSaveNames =
+                    availableSaves
+                        .Select(s => s.Value)
+                        .OfType<VirtualSaveGame>()
+                        .Select(FakeSaveGame.GetLabel)
+                        .ToList();
+
+                var window = new SimpleTextInputWindow()
                 {
-                    var existingSaveNames =
-                        availableSaves
-                            .Select(s => s.ModelObject)
-                            .OfType<VirtualSaveGame>()
-                            .Select(FakeSaveGame.GetLabel)
-                            .ToList();
+                    Title = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME.Bind().Value,
+                    InputLabel = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME_LABEL.Bind().Value,
+                    Validator = name => name.Length > 0 && !existingSaveNames.Contains(name),
+                    Owner = App.ActiveWindow,
+                };
 
-                    var window = new SimpleTextInputWindow()
-                    {
-                        Title = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME.Bind().Value,
-                        InputLabel = LocalizationCodes.LC_CUSTOM_SAVE_GAME_NAME_LABEL.Bind().Value,
-                        Validator = name => name.Length > 0 && !existingSaveNames.Contains(name),
-                        Owner = App.ActiveWindow,
-                    };
-
-                    if (window.ShowDialog() != true)
-                    {
-                        return;
-                    }
-
-                    var saveGame = FakeSaveGame.Create(window.Result) as VirtualSaveGame;
-                    savesService.AddVirtualSave(saveGame);
-
-                    var vm = FromSave(saveGame);
-                    // insert while preserving alphanumeric ordering
-                    var orderedIndex = availableSaves
-                        .AsEnumerable()
-                        .Append(vm)
-                        .OrderBy(vm => vm.CombinedLabel.Value)
-                        .ToList()
-                        .IndexOf(vm);
-
-                    availableSaves.Insert(orderedIndex, vm);
-                }),
-
-                RemoveSaveCommand: new RelayCommand<SaveGameViewModel2>((save) =>
+                if (window.ShowDialog() != true)
                 {
-                    var confirmation = AdonisMessageBox.Show(
-                        App.ActiveWindow,
-                        LocalizationCodes.LC_REMOVE_SAVE_DESCRIPTION.Bind(save.CombinedLabel).Value,
-                        LocalizationCodes.LC_REMOVE_SAVE_TITLE.Bind().Value,
-                        AdonisMessageBoxButton.YesNo
-                    );
+                    return;
+                }
 
-                    // TODO - when going from solver page back to save selector page, need to
-                    //        close all open Inspector (and Passives List) windows
-                    if (confirmation == AdonisMessageBoxResult.Yes)
-                    {
-                        availableSaves.Remove(save);
-                        savesService.RemoveManualSave(save.ModelObject as StandardSaveGame);
-                    }
-                })
-            );
+                var saveGame = FakeSaveGame.Create(window.Result) as VirtualSaveGame;
+                savesService.AddVirtualSave(saveGame);
+
+                var vm = FromSave(res, saveGame);
+                // insert while preserving alphanumeric ordering
+                var orderedIndex = availableSaves
+                    .AsEnumerable()
+                    .Append(vm)
+                    .OrderBy(vm => vm.CombinedLabel.Value)
+                    .ToList()
+                    .IndexOf(vm);
+
+                availableSaves.Insert(orderedIndex, vm);
+            });
+
+            res.RemoveSaveCommand = new RelayCommand<SaveGameViewModel2>((save) =>
+            {
+                var confirmation = AdonisMessageBox.Show(
+                    App.ActiveWindow,
+                    LocalizationCodes.LC_REMOVE_SAVE_DESCRIPTION.Bind(save.CombinedLabel).Value,
+                    LocalizationCodes.LC_REMOVE_SAVE_TITLE.Bind().Value,
+                    AdonisMessageBoxButton.YesNo
+                );
+
+                // TODO - when going from solver page back to save selector page, need to
+                //        close all open Inspector (and Passives List) windows
+                if (confirmation == AdonisMessageBoxResult.Yes)
+                {
+                    availableSaves.Remove(save);
+                    savesService.RemoveVirtualSave(save.Value as VirtualSaveGame);
+                }
+            });
+
+            return res;
         }
     }
 }

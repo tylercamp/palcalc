@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.SaveSelection
 {
-    internal enum SaveType
+    public enum SaveType
     {
         Steam,
         Xbox,

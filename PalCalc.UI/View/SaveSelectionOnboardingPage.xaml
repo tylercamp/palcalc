@@ -12,6 +12,7 @@
       xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
       xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
       xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+      xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
       mc:Ignorable="d"
       d:DataContext="{x:Static vm:SaveSelectionOnboardingViewModel.DesignerInstance}"
       d:DesignHeight="450" d:DesignWidth="900"
@@ -72,191 +73,222 @@
                                        />
     </Page.Resources>
 
-    <Grid Margin="16">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="320" />
-            <ColumnDefinition Width="12" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="12" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+    <GroupBox MaxWidth="1500"
+            MaxHeight="700"
+              Header="Save Selection"
+            >
+        <Grid Background="Transparent">
+        
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" />
+                <ColumnDefinition Width="{adonisUi:Space 3}" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <!-- Left pane: Save locations -->
-        <ListBox Grid.Column="0"
-                 ItemsSource="{Binding AvailableSaveGameCollections}"
-                 SelectedItem="{Binding SelectedCollection}"
-                 SelectedIndex="1">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="ssvm:SavesCollectionViewModel">
-                    <StackPanel Margin="4,6" Orientation="Horizontal" vu:StackPanelExtensions.Spacing="12">
-                        <ContentPresenter Content="{Binding SaveType}"
-                                          ContentTemplateSelector="{StaticResource IconTemplateSelector}"
-                                          Width="48"
-                                          />
-
-                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="8">
-                                <TextBlock Text="{Binding TypeLabel.Value}" FontWeight="SemiBold" FontSize="20" VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding AvailableSaves.Count, StringFormat='({0})'}" VerticalAlignment="Center"  Foreground="Gray" FontSize="20" />
-                            </StackPanel>
-                            <TextBlock Text="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}}" />
-                        </StackPanel>
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-
-        <!-- Middle pane: Save games -->
-        <Grid Grid.Column="2" Visibility="{Binding SelectedCollection, Converter={StaticResource VVC}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-
-            <!-- Location header with folder button -->
-            <Grid Grid.Row="0" Margin="0,0,0,6">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0"
-                       Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
-                       Content="{Binding SelectedCollection.TypeLabel.Value}"
-                       FontWeight="Bold"
-                       VerticalAlignment="Center" />
-
-                <StackPanel Grid.Column="1">
-                    <Button Command="{Binding SelectedCollection.OpenFolderCommand}" Visibility="{Binding SelectedCollection.OpenFolderCommand, Converter={StaticResource VVC}}">
-                        <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
-                    </Button>
-                </StackPanel>
-            </Grid>
-
-            <!-- Notices for the save location, e.g. instructions for syncing Xbox saves if no save-games are found -->
-            <ContentPresenter Grid.Row="1"
-                              Content="{Binding SelectedCollection}"
-                              ContentTemplateSelector="{StaticResource NoticeTemplateSelector}" />
-
-            <!-- Save games list -->
-            <ListBox Grid.Row="2"
-                     ItemsSource="{Binding SelectedCollection.AvailableSaves}"
-                     SelectedItem="{Binding SelectedSave}"
-                     SelectedIndex="0">
+            <!-- Left pane: Save locations -->
+            <ListBox Grid.Column="0"
+                     ItemsSource="{Binding AvailableSaveGameCollections}"
+                     SelectedItem="{Binding SelectedCollection}"
+                     SelectedIndex="1">
                 <ListBox.ItemTemplate>
-                    <DataTemplate DataType="ssvm:SaveGameViewModel2">
-                        <StackPanel Orientation="Horizontal" Margin="4,6">
-                            <TextBlock Text="{itl:LocalizedText LC_SAVE_WARNING}"
-                                       Visibility="{Binding IsValid, Converter={StaticResource VVC_Negate}}"
-                                       Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}"
-                                       Margin="0,0,5,0" />
-                            <TextBlock Text="{Binding CombinedLabel.Value}" />
+                    <DataTemplate DataType="ssvm:SavesCollectionViewModel">
+                        <StackPanel Margin="4,6" Orientation="Horizontal" vu:StackPanelExtensions.Spacing="12">
+                            <ContentPresenter Content="{Binding SaveType}"
+                                              ContentTemplateSelector="{StaticResource IconTemplateSelector}"
+                                              Width="48"
+                                              />
+
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="8">
+                                    <TextBlock Text="{Binding TypeLabel.Value}" FontWeight="SemiBold" FontSize="20" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding AvailableSaves.Count, StringFormat='({0})'}" VerticalAlignment="Center"  Foreground="Gray" FontSize="20" />
+                                </StackPanel>
+                                <Grid MaxWidth="200">
+                                    <TextBlock Text="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}}" TextWrapping="Wrap" />
+                                </Grid>
+                            </StackPanel>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-        </Grid>
 
-        <!-- Right pane: Save game properties -->
-        <Grid Grid.Column="4" Visibility="{Binding SelectedSave, Converter={StaticResource VVC}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+            <Border Grid.Column="1"
+                    Width="{adonisUi:Space 0.5}"
+                    Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
+                    Margin="-10"
+                    />
 
-            <!-- Action buttons -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12" HorizontalAlignment="Right" vu:StackPanelExtensions.Spacing="6">
-                <Button Command="{Binding SelectedSave.OpenFolderCommand}"
-                        Visibility="{Binding SelectedSave.OpenFolderCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
-                        ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
-                    <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
-                </Button>
+            <!-- Middle pane: Save games -->
+            <Grid Grid.Column="2" Visibility="{Binding SelectedCollection, Converter={StaticResource VVC}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Location header with folder button -->
+                <Grid Grid.Row="0" Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0"
+                           Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                           Content="{Binding SelectedCollection.TypeLabel.Value}"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center" />
+
+                    <StackPanel Grid.Column="1">
+                        <Button Command="{Binding SelectedCollection.AddSaveCommand}" Visibility="{Binding SelectedCollection.AddSaveCommand, Converter={StaticResource VVC}}">
+                            <materialIcons:MaterialIcon Kind="Add" Foreground="Red" Width="18" />
+                        </Button>
+                    
+                        <Button Command="{Binding SelectedCollection.OpenFolderCommand}" Visibility="{Binding SelectedCollection.OpenFolderCommand, Converter={StaticResource VVC}}">
+                            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Notices for the save location, e.g. instructions for syncing Xbox saves if no save-games are found -->
+                <ContentPresenter Grid.Row="1"
+                                  Content="{Binding SelectedCollection}"
+                                  ContentTemplateSelector="{StaticResource NoticeTemplateSelector}" />
+
+                <!-- Save games list -->
+                <ListBox Grid.Row="2"
+                         ItemsSource="{Binding SelectedCollection.AvailableSaves}"
+                         SelectedItem="{Binding SelectedSave}"
+                         SelectedIndex="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="ssvm:SaveGameViewModel2">
+                            <StackPanel Orientation="Horizontal" Margin="4,6">
+                                <TextBlock Text="{itl:LocalizedText LC_SAVE_WARNING}"
+                                           Visibility="{Binding IsValid, Converter={StaticResource VVC_Negate}}"
+                                           Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}"
+                                           Margin="0,0,5,0" />
+                                <TextBlock Text="{Binding CombinedLabel.Value}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
+            <Border Grid.Column="3"
+                    Width="{adonisUi:Space 0.5}"
+                    Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
+                    Margin="-10"
+                    />
+
+            <!-- Right pane: Save game properties -->
+            <Grid Grid.Column="4" Visibility="{Binding SelectedSave, Converter={StaticResource VVC}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Action buttons -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12" HorizontalAlignment="Right" vu:StackPanelExtensions.Spacing="6">
+                    <Button Command="{Binding LoadSaveCommand}"
+                            CommandParameter="{Binding SelectedSave}"
+                            >
+                        <!-- TODO ITL -->
+                        Open in Solver
+                    </Button>
                 
-                <Button Command="{Binding SelectedCollection.RemoveSaveCommand}"
-                        CommandParameter="{Binding SelectedSave}"
-                        Visibility="{Binding SelectedCollection.RemoveSaveCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
-                        Content="{itl:LocalizedText LC_SAVE_GAME_REMOVE_BTN_LABEL}" />
-            </StackPanel>
+                    <Button Command="{Binding SelectedSave.OpenFolderCommand}"
+                            Visibility="{Binding SelectedSave.OpenFolderCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                            ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
+                        <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
+                    </Button>
+                
+                    <Button Command="{Binding SelectedCollection.RemoveSaveCommand}"
+                            CommandParameter="{Binding SelectedSave}"
+                            Visibility="{Binding SelectedCollection.RemoveSaveCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                            Content="{itl:LocalizedText LC_SAVE_GAME_REMOVE_BTN_LABEL}" />
+                </StackPanel>
 
-            <!-- Warnings -->
-            <ItemsControl ItemsSource="{Binding SelectedSave.Warnings}" Grid.Row="1" Margin="0,0,0,12" Visibility="{Binding SelectedSave.Warnings, Converter={StaticResource CVC}}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock TextWrapping="Wrap"
-                                   Foreground="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
-                                   Text="{Binding Value}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                <!-- Warnings -->
+                <ItemsControl ItemsSource="{Binding SelectedSave.Warnings}" Grid.Row="1" Margin="0,0,0,12" Visibility="{Binding SelectedSave.Warnings, Converter={StaticResource CVC}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock TextWrapping="Wrap"
+                                       Foreground="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
+                                       Text="{Binding Value}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-            <!-- Properties -->
-            <StackPanel Grid.Row="2">
-                <Grid Margin="0,0,0,4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="6" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Player" Foreground="Gray" />
-                    <TextBlock Grid.Column="2" Text="{Binding SelectedSave.MainPlayerName}" />
-                </Grid>
+                <!-- Properties -->
+                <StackPanel Grid.Row="2">
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Player" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.MainPlayerName}" />
+                    </Grid>
 
-                <Grid Margin="0,0,0,4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="6" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Level" Foreground="Gray" />
-                    <TextBlock Grid.Column="2" Text="{Binding SelectedSave.MainPlayerLevel}" />
-                </Grid>
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Level" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.MainPlayerLevel}" />
+                    </Grid>
 
-                <Grid Margin="0,0,0,4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="6" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="World" Foreground="Gray" />
-                    <TextBlock Grid.Column="2" Text="{Binding SelectedSave.WorldName}" />
-                </Grid>
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="World" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.WorldName}" />
+                    </Grid>
 
-                <Grid Margin="0,0,0,4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="6" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Day" Foreground="Gray" />
-                    <TextBlock Grid.Column="2" Text="{Binding SelectedSave.DayNumber}" />
-                </Grid>
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Day" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.DayNumber}" />
+                    </Grid>
 
-                <Grid Margin="0,0,0,4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="6" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Modified" Foreground="Gray" />
-                    <TextBlock Grid.Column="2" Text="{Binding SelectedSaveGameLastModified, StringFormat={}{0:G}}" />
-                </Grid>
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Modified" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSaveGameLastModified, StringFormat={}{0:G}}" />
+                    </Grid>
 
-                <Grid Margin="0,0,0,12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="6" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Game ID" Foreground="Gray" />
-                    <TextBlock Grid.Column="2" Text="{Binding SelectedSaveGameGameId}" />
-                </Grid>
-            </StackPanel>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Game ID" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSaveGameGameId}" />
+                    </Grid>
+                </StackPanel>
+            </Grid>
         </Grid>
-    </Grid>
+    </GroupBox>
 </Page>

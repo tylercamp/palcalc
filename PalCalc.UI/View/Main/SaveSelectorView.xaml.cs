@@ -35,32 +35,5 @@ namespace PalCalc.UI.View.Main
         {
             InitializeComponent();
         }
-
-        private SaveSelectorViewModel ViewModel => DataContext as SaveSelectorViewModel;
-
-        private void SavesLocationsFolder_Click(object sender, RoutedEventArgs e)
-        {
-            if (ViewModel?.SelectedLocation == null) return;
-
-            var location = ViewModel?.SelectedLocation as StandardSavesLocationViewModel;
-            if (location == null) return;
-
-            var fullPath = System.IO.Path.GetFullPath(location.Value.FolderPath);
-            Process.Start("explorer.exe", fullPath);
-        }
-
-        private void SaveGameFolder_Click(object sender, RoutedEventArgs e)
-        {
-            var saveGame = ViewModel?.SelectedFullGame?.Value;
-            if (saveGame == null) return;
-
-            var fullPath = System.IO.Path.GetFullPath(saveGame.BasePath);
-            Process.Start("explorer.exe", fullPath);
-        }
-
-        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
-        {
-            Process.Start(new ProcessStartInfo { FileName = e.Uri.AbsoluteUri, UseShellExecute = true });
-        }
     }
 }
