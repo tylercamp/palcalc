@@ -17,7 +17,7 @@
                              WindowStyle="ToolWindow"
                              WindowStartupLocation="CenterOwner"
                              Title="{Binding Title.Value}"
-                             Height="450" Width="400"
+                             Height="450" Width="500"
                              >
     <Grid>
         <Grid.Resources>
@@ -115,6 +115,10 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
+                        <GridViewColumn Header="{itl:LocalizedText LC_COMMON_WILD_LEVEL}"
+                                        DisplayMemberBinding="{Binding WildLevelDisplay}"
+                                        util:GridViewSort.PropertyName="SortableWildLevelValue"
+                                        Width="70" />
                         <GridViewColumn util:GridViewSort.PropertyName="IsEnabled">
                             <GridViewColumn.Header>
                                 <StackPanel Orientation="Horizontal">

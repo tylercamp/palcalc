@@ -208,6 +208,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMMON_WILD_LEVEL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_CRASHLOG_FAILED,
         /// <summary>
         ///   Looks up a localized string similar to Label.
