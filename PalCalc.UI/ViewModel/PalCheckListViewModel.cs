@@ -181,6 +181,15 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private ILocalizedText title = new HardCodedText("Pal Checklist");
 
+        [ObservableProperty]
+        private bool showPaldexNo = true;
+
+        [ObservableProperty]
+        private bool showPalName = true;
+
+        [ObservableProperty]
+        private bool showWildLevel = true;
+
         [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         [ObservableProperty]
         private bool hasChanges = false;

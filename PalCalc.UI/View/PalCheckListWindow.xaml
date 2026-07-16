@@ -11,16 +11,18 @@
                              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                              xmlns:util="clr-namespace:Wpf.Util"
                              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
+                             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
                              mc:Ignorable="d"
                              d:DataContext="{x:Static vm:PalCheckListViewModel.DesignerInstance}"
                              IconVisibility="Collapsed"
                              WindowStyle="ToolWindow"
                              WindowStartupLocation="CenterOwner"
                              Title="{Binding Title.Value}"
-                             Height="450" Width="500"
+                             Height="450" Width="450"
                              >
     <Grid>
         <Grid.Resources>
+            <c:BooleanToColumnWidthConverter x:Key="BTCW" />
             <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
                 <Setter Property="adonisExtensions:ScrollBarExtension.ExpansionMode" Value="AlwaysExpand" />
             </Style>
@@ -98,14 +100,23 @@
             </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=ActualWidth, RelativeSource={RelativeSource Self}}" Value="0">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
                     <GridView.Columns>
                         <GridViewColumn Header="{itl:LocalizedText LC_COMMON_PALDEX_NUM_SHORT}"
                                         DisplayMemberBinding="{Binding PaldexNoDisplay}"
                                         util:GridViewSort.PropertyName="PaldexNoValue"
-                                        Width="40" />
+                                        Width="{Binding ShowPaldexNo, Converter={StaticResource BTCW}, ConverterParameter=40}" />
                         <GridViewColumn Header="{itl:LocalizedText LC_COMMON_PAL}"
                                         util:GridViewSort.PropertyName="PalName.Value"
-                                        Width="200">
+                                        Width="{Binding ShowPalName, Converter={StaticResource BTCW}, ConverterParameter=200}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -118,7 +129,7 @@
                         <GridViewColumn Header="{itl:LocalizedText LC_COMMON_WILD_LEVEL}"
                                         DisplayMemberBinding="{Binding WildLevelDisplay}"
                                         util:GridViewSort.PropertyName="SortableWildLevelValue"
-                                        Width="70" />
+                                        Width="{Binding ShowWildLevel, Converter={StaticResource BTCW}, ConverterParameter=70}" />
                         <GridViewColumn util:GridViewSort.PropertyName="IsEnabled">
                             <GridViewColumn.Header>
                                 <StackPanel Orientation="Horizontal">
