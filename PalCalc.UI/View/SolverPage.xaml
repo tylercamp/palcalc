@@ -1,4 +1,4 @@
-﻿<Page x:Class="PalCalc.UI.SolverPage"
+﻿<UserControl x:Class="PalCalc.UI.SolverPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -18,27 +18,12 @@
       VerticalAlignment="Stretch"
       HorizontalAlignment="Stretch"
       d:DataContext="{d:DesignInstance vm:SolverPageViewModel, IsDesignTimeCreatable=True}" d:DesignHeight="1351" d:DesignWidth="1659">
-    <Page.Resources>
+    <UserControl.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
         <c:ValueBoolConverter x:Key="NegatedVBC" Negate="True" />
-    </Page.Resources>
+    </UserControl.Resources>
     <Border Padding="5">
         <DockPanel>
-            <Menu DockPanel.Dock="Top" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
-                <MenuItem Header="{itl:LocalizedText LC_LANGUAGE}" ItemsSource="{Binding Locales}" Padding="5">
-                    <MenuItem.ItemContainerStyle>
-                        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
-                            <Setter Property="Header" Value="{Binding Label}" />
-                            <Setter Property="IsCheckable" Value="True" />
-                            <Setter Property="IsChecked" Value="{Binding IsSelected}" />
-                            <Setter Property="Command" Value="{Binding SelectCommand}" />
-                        </Style>
-                    </MenuItem.ItemContainerStyle>
-                </MenuItem>
-                <MenuItem Header="Debug" Padding="5" Name="DebugMenuItem">
-                    <MenuItem Header="Translation Debugger" Click="TranslationDebugger_Click" />
-                </MenuItem>
-            </Menu>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition MinWidth="220" Width="300"/>
@@ -259,4 +244,4 @@
             </Grid>
         </DockPanel>
     </Border>
-</Page>
+</UserControl>

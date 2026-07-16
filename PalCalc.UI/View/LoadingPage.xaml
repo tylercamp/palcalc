@@ -1,4 +1,4 @@
-﻿<Page x:Class="PalCalc.UI.LoadingPage"
+﻿<UserControl x:Class="PalCalc.UI.LoadingPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,11 +8,10 @@
       xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
       xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
       mc:Ignorable="d" 
-      d:Width="400" d:Height="200"
-      Title="LoadingPage">
-    <Page.Resources>
+      d:Width="400" d:Height="200">
+    <UserControl.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
-    </Page.Resources>
+    </UserControl.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -36,4 +35,4 @@
                             />
         </Viewbox>
     </Grid>
-</Page>
+</UserControl>

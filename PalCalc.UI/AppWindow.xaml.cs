@@ -16,6 +16,7 @@ using Serilog;
 using Serilog.Core;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -43,6 +44,12 @@ namespace PalCalc.UI
 
         // TODO - updates notification? translations dropdown?
 
+        [ObservableProperty]
+        private bool showToolbar = false;
+
+        private ToolbarViewModel toolbarVM;
+        public ToolbarViewModel ToolbarVM => toolbarVM;
+
         public AppWindowViewModel(Dispatcher dispatcher)
         {
             AppSettings.Current = settings = Storage.LoadAppSettings();
@@ -60,10 +67,10 @@ namespace PalCalc.UI
                 }
             };
 
+            toolbarVM = new ToolbarViewModel(BeginNavigateSaveSelectionPageCommand);
+
             //CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
             //CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
-
-
 
             //if (settings.SelectedGameIdentifier != null) SaveSelection.TrySelectSaveGame(settings.SelectedGameIdentifier);
 
@@ -79,10 +86,14 @@ namespace PalCalc.UI
             }, DispatcherPriority.ContextIdle);
         }
 
+        private bool CanBeginNavigateSaveSelectionPage() => Content is SolverPage;
+
+        [RelayCommand(CanExecute = nameof(CanBeginNavigateSaveSelectionPage))]
         private void BeginNavigateSaveSelectionPage()
         {
             var loadingPage = new LoadingPage();
             Content = loadingPage;
+            ShowToolbar = false;
 
             dispatcher.BeginInvoke(() =>
             {
@@ -94,6 +105,7 @@ namespace PalCalc.UI
                         App.Current.Dispatcher.BeginInvoke(() =>
                         {
                             NavigateSaveSelectionPage(saves);
+                            ShowToolbar = true;
                         }, DispatcherPriority.ContextIdle);
                     }
                     catch (Exception e)
@@ -108,6 +120,32 @@ namespace PalCalc.UI
             }, DispatcherPriority.ContextIdle);
         }
 
+        protected override void OnPropertyChanging(PropertyChangingEventArgs e)
+        {
+            base.OnPropertyChanging(e);
+
+            if (e.PropertyName == nameof(Content))
+            {
+                if (Content?.DataContext is SaveSelectionOnboardingViewModel ssovm)
+                {
+                    ssovm.PropertyChanged -= SaveSelectionOnboardingVm_PropertyChanged;
+                }
+            }
+        }
+
+        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(e);
+
+            if (e.PropertyName == nameof(Content))
+            {
+                if (Content?.DataContext is SaveSelectionOnboardingViewModel ssovm)
+                {
+                    ssovm.PropertyChanged += SaveSelectionOnboardingVm_PropertyChanged;
+                }
+            }
+        }
+
         private void NavigateSaveSelectionPage(IEnumerable<SavesCollectionViewModel> collections)
         {
             var vm = new SaveSelectionOnboardingViewModel(
@@ -119,6 +157,16 @@ namespace PalCalc.UI
             page.DataContext = vm;
 
             Content = page;
+        }
+
+        private void SaveSelectionOnboardingVm_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var vm = sender as SaveSelectionOnboardingViewModel;
+            switch (e.PropertyName)
+            {
+                case nameof(vm.SelectedCollection): toolbarVM.SelectedLocation = vm.SelectedCollection; break;
+                case nameof(vm.SelectedSave): ToolbarVM.SelectedSave = vm.SelectedSave; break;
+            }
         }
 
         private void NavigateSolverPage(SaveGameViewModel2 selectedSave)
@@ -228,147 +276,9 @@ namespace PalCalc.UI
         //    AdonisMessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind(crashsupport).Value, caption: "");
         //}
 
-        /*
-         * ExportSaveCommand = new RelayCommand(
-                execute: () =>
-                {
-                    var sfd = new SaveFileDialog()
-                    {
-                        FileName = $"Palworld-{CachedSaveGame.IdentifierFor(SelectedFullGame.Value)}.zip",
-                        Filter = "ZIP | *.zip",
-                        AddExtension = true,
-                        DefaultExt = "zip"
-                    };
-
-                    if (sfd.ShowDialog() == true)
-                    {
-                        using (var outStream = new FileStream(sfd.FileName, FileMode.Create))
-                        using (var archive = new ZipArchive(outStream, ZipArchiveMode.Create))
-                        {
-                            var save = SelectedFullGame.Value;
-
-                            void Export(ISaveFile file, string basePath)
-                            {
-                                var filePaths = file.FilePaths.ToArray();
-                                if (filePaths.Length == 1)
-                                {
-                                    archive.CreateEntryFromFile(filePaths[0], $"{basePath}.sav");
-                                }
-                                else
-                                {
-                                    for (int i = 0; i < filePaths.Length; i++)
-                                    {
-                                        archive.CreateEntryFromFile(filePaths[i], $"{basePath}-{i}.sav");
-                                    }
-                                }
-                            }
-
-                            void ExportRaw(SaveFileLocation rawFile)
-                            {
-                                archive.CreateEntryFromFile(rawFile.ActualPath, $"_raw_/{rawFile.NormalizedPath}");
-                            }
-
-                            if (save.Level != null && save.Level.Exists)
-                                Export(save.Level, "Level");
-
-                            if (save.LevelMeta != null && save.LevelMeta.Exists)
-                                Export(save.LevelMeta, "LevelMeta");
-
-                            if (save.WorldOption != null && save.WorldOption.Exists)
-                                Export(save.WorldOption, "WorldOption");
-
-                            if (save.LocalData != null && save.LocalData.Exists)
-                                Export(save.LocalData, "LocalData");
-
-                            foreach (var player in save.Players.Where(p => p.Exists))
-                            {
-                                string playerId;
-                                try
-                                {
-                                    playerId = player.ReadPlayerContent().PlayerId;
-                                }
-                                catch
-                                {
-                                    playerId = Path.GetFileNameWithoutExtension(player.FilePaths.First());
-                                }
-                                Export(player, $"Players/{playerId}");
-                            }
-
-                            foreach (var rawFile in save.RawFiles)
-                                ExportRaw(rawFile);
-                        }
-                    }
-                },
-                canExecute: () => SelectedFullGame?.Value != null
-            );
-
-            ExportSaveCsvCommand = new RelayCommand(
-                execute: () =>
-                {
-                    var sfd = new SaveFileDialog()
-                    {
-                        FileName = $"Pals.csv",
-                        Filter = "CSV | *.csv",
-                        AddExtension = true,
-                        DefaultExt = "csv"
-                    };
-
-                    if (sfd.ShowDialog() == true)
-                    {
-                        File.WriteAllText(sfd.FileName, PalCSVExporter.Export(SelectedFullGame.CachedValue, GameSettingsViewModel.Load(SelectedFullGame.Value).ModelObject));
-                    }
-                },
-                canExecute: () => SelectedFullGame?.Value != null
-            );
-
-            ExportCrashLogCommand = new RelayCommand(
-                execute: () =>
-                {
-                    var sfd = new SaveFileDialog();
-                    sfd.FileName = "CRASHLOG.zip";
-                    sfd.Filter = "ZIP | *.zip";
-                    sfd.AddExtension = true;
-                    sfd.DefaultExt = "zip";
-
-                    if (sfd.ShowDialog() == true)
-                    {
-                        try
-                        {
-                            CrashSupport.PrepareSupportFile(sfd.FileName);
-                        }
-                        catch (Exception e)
-                        {
-                            logger.Warning(e, "unexpected error when attempting to create crashlog file");
-                            AdonisMessageBox.Show(LocalizationCodes.LC_CRASHLOG_FAILED.Bind().Value, caption: "");
-                        }
-                    }
-                }
-            );
-
-            InspectSaveCommand = new RelayCommand(
-                execute: () =>
-                {
-                    var loadingModal = new LoadingSaveFileModal();
-                    loadingModal.Owner = App.Current.MainWindow;
-                    loadingModal.DataContext = LocalizationCodes.LC_SAVE_INSPECTOR_LOADING.Bind();
-
-                    var vm = loadingModal.ShowDialogDuring(
-                        () => new SaveInspectorWindowViewModel(SelectedLocation, SelectedFullGame, GameSettingsViewModel.Load(SelectedFullGame.Value).ModelObject)
-                    );
-
-                    var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
-                    inspector.Show();
-                },
-                canExecute: () => SelectedFullGame?.CachedValue != null
-            );
-
-            DeleteSaveCommand = new RelayCommand(
-                () => CustomSaveDelete?.Invoke(manualLocation, SelectedFullGame.Value)
-            );
-        */
-
+        [NotifyCanExecuteChangedFor(nameof(BeginNavigateSaveSelectionPageCommand))]
         [ObservableProperty]
-        private Page content;
+        private FrameworkElement content;
     }
 
     /// <summary>

@@ -25,32 +25,19 @@ namespace PalCalc.UI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class SolverPage : Page
+    public partial class SolverPage : UserControl
     {
         internal SolverPage()
         {
             InitializeComponent();
 
-            var sw = Stopwatch.StartNew();
             DataContext = new SolverPageViewModel(Dispatcher, null, null);
-
-#if DEBUG
-            DebugMenuItem.Visibility = Visibility.Visible;
-#else
-            DebugMenuItem.Visibility = Visibility.Collapsed;
-#endif
         }
 
         internal SolverPage(SolverPageViewModel vm)
         {
             InitializeComponent();
             DataContext = vm;
-
-#if DEBUG
-            DebugMenuItem.Visibility = Visibility.Visible;
-#else
-            DebugMenuItem.Visibility = Visibility.Collapsed;
-#endif
         }
 
         private SolverPageViewModel ViewModel => DataContext as SolverPageViewModel;
@@ -70,13 +57,6 @@ namespace PalCalc.UI
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             Process.Start(new ProcessStartInfo { FileName = e.Uri.ToString(), UseShellExecute = true });
-        }
-
-        private void TranslationDebugger_Click(object sender, RoutedEventArgs e)
-        {
-            var debugWindow = new TranslationDebugWindow();
-            debugWindow.DataContext = new TranslationDebugViewModel(App.TranslationErrors);
-            debugWindow.Show();
         }
     }
 }

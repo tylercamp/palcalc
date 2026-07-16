@@ -87,12 +87,6 @@ namespace PalCalc.UI.ViewModel
 
         public SolverQueueViewModel SolverQueue { get; } = new SolverQueueViewModel();
 
-        public List<TranslationLocaleViewModel> Locales { get; } =
-            Enum
-                .GetValues<TranslationLocale>()
-                .Select(l => new TranslationLocaleViewModel(l))
-                .ToList();
-
         public SolverPageViewModel() : this(null, null, null) { }
 
         // main app model
