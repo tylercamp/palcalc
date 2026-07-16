@@ -47,27 +47,32 @@
                         </Style>
                     </GridView.ColumnHeaderContainerStyle>
                     <GridView.Columns>
+                        <GridViewColumn Header="{itl:LocalizedText LC_COMMON_RANK}"
+                                        util:GridViewSort.PropertyName="Rank"
+                                        >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate DataType="{x:Type mvm:PassiveSkillViewModel}">
+                                    <Border CornerRadius="99"
+                                            Padding="2"
+                                            BorderThickness="0"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            >
+                                        <Rectangle Width="15"
+                                                   Height="15"
+                                                   Fill="{Binding Rank, Converter={StaticResource RCC}}">
+                                            <Rectangle.OpacityMask>
+                                                <ImageBrush ImageSource="{Binding RankIcon}" />
+                                            </Rectangle.OpacityMask>
+                                        </Rectangle>
+                                    </Border>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                         <GridViewColumn Header="{itl:LocalizedText Code=LC_TRAITS_SEARCH_NAME}" util:GridViewSort.PropertyName="Name" Width="Auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate DataType="{x:Type mvm:PassiveSkillViewModel}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Border CornerRadius="99"
-                                                Padding="2"
-                                                BorderThickness="0"
-                                                Margin="0,0,4,0"
-                                                VerticalAlignment="Center"
-                                                >
-                                            <Rectangle Width="15"
-                                                       Height="15"
-                                                       Fill="{Binding Rank, Converter={StaticResource RCC}}">
-                                                <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="{Binding RankIcon}" />
-                                                </Rectangle.OpacityMask>
-                                            </Rectangle>
-                                        </Border>
-
-                                        <TextBlock Text="{Binding Name.Value}" VerticalAlignment="Center" />
-                                    </StackPanel>
+                                    <TextBlock Text="{Binding Name.Value}" VerticalAlignment="Center" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

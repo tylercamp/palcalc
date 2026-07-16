@@ -202,6 +202,9 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_COMMON_LEVEL" xml:space="preserve">
     <value>Level</value>
   </data>
+  <data name="LC_COMMON_RANK" xml:space="preserve">
+    <value>Rank</value>
+  </data>
   <data name="LC_COMMON_WILD_LEVEL" xml:space="preserve">
     <value>Wild Level</value>
   </data>

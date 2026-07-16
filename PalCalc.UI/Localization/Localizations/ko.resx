@@ -208,6 +208,9 @@
   <data name="LC_COMMON_LEVEL" xml:space="preserve">
     <value>레벨</value>
   </data>
+  <data name="LC_COMMON_RANK" xml:space="preserve">
+    <value>등급</value>
+  </data>
   <data name="LC_COMMON_WILD_LEVEL" xml:space="preserve">
     <value>야생 레벨</value>
   </data>

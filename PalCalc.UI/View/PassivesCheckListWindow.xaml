@@ -51,29 +51,35 @@
             <ListView.View>
                 <GridView>
                     <GridView.Columns>
+                        <GridViewColumn Header="{itl:LocalizedText LC_COMMON_RANK}"
+                                        util:GridViewSort.PropertyName="Passive.Rank"
+                                        >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="99"
+                                            Padding="2"
+                                            BorderThickness="0"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            >
+                                        <Rectangle Width="15"
+                                                   Height="15"
+                                                   Fill="{Binding Passive.Rank, Converter={StaticResource RCC}}">
+                                            <Rectangle.OpacityMask>
+                                                <ImageBrush ImageSource="{Binding Passive.RankIcon}" />
+                                            </Rectangle.OpacityMask>
+                                        </Rectangle>
+                                    </Border>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                         <GridViewColumn Header="{itl:LocalizedText Code=LC_PASSIVES_CHECKLIST_NAME}"
                                         util:GridViewSort.PropertyName="Passive.Name.Value"
                                         Width="150"
                                         >
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Border CornerRadius="99"
-                                                Padding="2"
-                                                BorderThickness="0"
-                                                Margin="0,0,4,0"
-                                                VerticalAlignment="Center"
-                                                >
-                                            <Rectangle Width="15"
-                                                       Height="15"
-                                                       Fill="{Binding Passive.Rank, Converter={StaticResource RCC}}">
-                                                <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="{Binding Passive.RankIcon}" />
-                                                </Rectangle.OpacityMask>
-                                            </Rectangle>
-                                        </Border>
-                                        <TextBlock Text="{Binding Passive.Name.Value}" VerticalAlignment="Center"/>
-                                    </StackPanel>
+                                    <TextBlock Text="{Binding Passive.Name.Value}" VerticalAlignment="Center"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
