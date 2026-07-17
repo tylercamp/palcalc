@@ -75,15 +75,22 @@
     <GroupBox MaxWidth="1500"
             MaxHeight="700"
               Header="Save Selection"
-               BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" BorderThickness="{adonisUi:Space 0.5}"
+               BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
+              BorderThickness="{adonisUi:Space 0.5}"
             >
-        <Grid Background="Transparent" Margin="5,0,5,0">
+        <!--
+        Offset margin so the GroupBox content can take up the entire space.
+        Default padding is {adonisUi:Space 1, 1}.
+        Offset the that by 0.5 to account for the `BorderThickness` we set above.
+        Offset the top by another 0.5 (for some reason?)
+        -->
+        <Grid Margin="{adonisUi:Space -0.5, -1, -0.5, -0.5}">
         
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="320" />
-                <ColumnDefinition Width="{adonisUi:Space 3}" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="{adonisUi:Space 3}" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
@@ -91,7 +98,8 @@
             <ListBox Grid.Column="0"
                      ItemsSource="{Binding AvailableSaveGameCollections}"
                      SelectedItem="{Binding SelectedCollection}"
-                     SelectedIndex="1">
+                     SelectedIndex="1"
+                     Margin="{adonisUi:Space 1, 1}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="ssvm:SavesCollectionViewModel">
                         <StackPanel Margin="4,6" Orientation="Horizontal" vu:StackPanelExtensions.Spacing="12">
@@ -118,7 +126,6 @@
                     Width="{adonisUi:Space 0.5}"
                     Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
                     HorizontalAlignment="Center"
-                    Margin="-10"
                     />
 
             <!-- Middle pane: Save games -->
@@ -130,7 +137,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Location header with folder button -->
-                <Grid Grid.Row="0" Margin="0,0,0,6">
+                <Grid Grid.Row="0" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
@@ -139,9 +146,10 @@
                            Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
                            Content="{Binding SelectedCollection.TypeLabel.Value}"
                            FontWeight="Bold"
-                           VerticalAlignment="Center" />
+                           VerticalAlignment="Center"
+                           Padding="{adonisUi:Space 1}"/>
 
-                    <StackPanel Grid.Column="1">
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="{adonisUi:Space 0.5}" adonisExtensions:LayerExtension.IncreaseLayer="True">
                         <Button Command="{Binding SelectedCollection.AddSaveCommand}" Visibility="{Binding SelectedCollection.AddSaveCommand, Converter={StaticResource VVC}}">
                             <materialIcons:MaterialIcon Kind="Add" Foreground="Red" Width="18" />
                         </Button>
@@ -159,6 +167,7 @@
 
                 <!-- Save games list -->
                 <ListBox Grid.Row="2"
+                         Margin="{adonisUi:Space 1}"
                          ItemsSource="{Binding SelectedCollection.AvailableSaves}"
                          SelectedItem="{Binding SelectedSave}"
                          SelectedIndex="0">
@@ -180,7 +189,6 @@
                     Width="{adonisUi:Space 0.5}"
                     HorizontalAlignment="Center"
                     Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
-                    Margin="-10"
                     />
 
             <!-- Right pane: Save game properties -->
@@ -192,25 +200,41 @@
                 </Grid.RowDefinitions>
 
                 <!-- Action buttons -->
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12" HorizontalAlignment="Right" vu:StackPanelExtensions.Spacing="6">
-                    <Button Command="{Binding LoadSaveCommand}"
-                            CommandParameter="{Binding SelectedSave}"
-                            >
-                        <!-- TODO ITL -->
-                        Open in Solver
-                    </Button>
+                <Grid Grid.Row="0"
+                      Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}"
+                      adonisExtensions:LayerExtension.IncreaseLayer="True"
+                      >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- TODO ITL -->
+                    <Label Grid.Column="0"
+                           Padding="{adonisUi:Space 1}"
+                           Content="Selected Save"
+                           />
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="6" Margin="{adonisUi:Space 0.5}">
+                        <Button Command="{Binding LoadSaveCommand}"
+                                CommandParameter="{Binding SelectedSave}"
+                                >
+                            <!-- TODO ITL -->
+                            Open in Solver
+                        </Button>
                 
-                    <Button Command="{Binding SelectedSave.OpenFolderCommand}"
-                            Visibility="{Binding SelectedSave.OpenFolderCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
-                            ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
-                        <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
-                    </Button>
+                        <Button Command="{Binding SelectedSave.OpenFolderCommand}"
+                                Visibility="{Binding SelectedSave.OpenFolderCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                                ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
+                            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
+                        </Button>
                 
-                    <Button Command="{Binding SelectedCollection.RemoveSaveCommand}"
-                            CommandParameter="{Binding SelectedSave}"
-                            Visibility="{Binding SelectedCollection.RemoveSaveCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
-                            Content="{itl:LocalizedText LC_SAVE_GAME_REMOVE_BTN_LABEL}" />
-                </StackPanel>
+                        <Button Command="{Binding SelectedCollection.RemoveSaveCommand}"
+                                CommandParameter="{Binding SelectedSave}"
+                                Visibility="{Binding SelectedCollection.RemoveSaveCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                                Content="{itl:LocalizedText LC_SAVE_GAME_REMOVE_BTN_LABEL}" />
+                    </StackPanel>
+                </Grid>
 
                 <!-- Warnings -->
                 <ItemsControl ItemsSource="{Binding SelectedSave.Warnings}" Grid.Row="1" Margin="0,0,0,12" Visibility="{Binding SelectedSave.Warnings, Converter={StaticResource CVC}}">
@@ -229,7 +253,7 @@
                 </ItemsControl>
 
                 <!-- Properties -->
-                <StackPanel Grid.Row="2">
+                <StackPanel Grid.Row="2" Margin="{adonisUi:Space 1}">
                     <Grid Margin="0,0,0,4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
