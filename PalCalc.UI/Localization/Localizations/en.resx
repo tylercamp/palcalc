@@ -633,6 +633,9 @@ This will not delete the save files from your computer.</value>
   <data name="LC_SAVESEARCH_SETTINGS_RESET" xml:space="preserve">
     <value>Reset</value>
   </data>
+  <data name="LC_SAVESEARCH_NO_MATCHES" xml:space="preserve">
+    <value>No matches found</value>
+  </data>
   <data name="LC_SAVEWINDOW_TAB_DETAILS" xml:space="preserve">
     <value>Details</value>
   </data>
