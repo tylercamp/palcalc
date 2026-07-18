@@ -168,6 +168,8 @@ namespace PalCalc.GenDB.GameDataReaders
                 })
                 .Select(kvp => kvp.Key.Text).ToList();
 
+            // TODO - Could use DT_PaldexDistributionData for world map location previews?
+
             // (note: legacy prop used as a tie-breaker for ambiguous child-pal during breeding calc)
             int indexOrder = 1;
             foreach (var row in rawPals.RowMap)

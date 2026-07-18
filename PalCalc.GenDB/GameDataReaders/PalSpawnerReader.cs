@@ -70,6 +70,7 @@ namespace PalCalc.GenDB.GameDataReaders
             logger.Information("Reading wild pal level ranges");
             var rawWildSpawnEntries = provider.LoadPackageObject<UDataTable>(AssetPaths.PAL_SPAWNERS_PATH);
             var rawCagedSpawnEntries = provider.LoadPackageObject<UDataTable>(AssetPaths.PAL_CAGED_SPAWNERS_PATH);
+            // TODO - dungeon spawn data DT+DungeonEnemySpawnDataTable (SpawnerName / ...SoftClass.AssetPathName)
 
             var rawWildLevels = rawWildSpawnEntries.RowMap.SelectMany(entry => entry.Value.ToObject<UPalSpawner>().Entries());
             var rawCagedLevels = rawCagedSpawnEntries.RowMap.Select(entry => entry.Value.ToObject<UCagedPalSpawner>()).Select(e => (e.PalID, e.MinLevel, e.MaxLevel));
