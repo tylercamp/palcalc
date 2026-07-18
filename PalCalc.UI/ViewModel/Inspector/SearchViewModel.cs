@@ -34,7 +34,7 @@ namespace PalCalc.UI.ViewModel.Inspector
         [ObservableProperty]
         private OwnerTreeViewModel ownerTree;
 
-        public int TotalMatches => OwnerTree.AllContainerSources.Sum(s => s.Container.Grids.Sum(g => g.Slots.Count(slot => slot.Matches)));
+        public int TotalMatches => OwnerTree.AllContainerSources.SelectMany(c => c.Container.Grids).SelectMany(g => g.Slots).Count(slot => slot.Matches);
 
         public SearchSettingsViewModel SearchSettings { get; }
 
