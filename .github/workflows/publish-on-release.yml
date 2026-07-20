@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup .NET 9
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '9.0.x'
 
@@ -36,14 +36,14 @@ jobs:
         shell: pwsh
 
       - name: Upload NonBundled ZIP
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: PalCalc-NoBundle.zip
           path: publish/PalCalc-NoBundle.zip
+          archive: false
 
       - name: Upload release asset for Non-Bundled ZIP
         if: github.event_name == 'release'
-        uses: shogo82148/actions-upload-release-asset@v1
+        uses: shogo82148/actions-upload-release-asset@v1.10.2
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: publish/PalCalc-NoBundle.zip
@@ -52,14 +52,14 @@ jobs:
         run: dotnet publish PalCalc.UI/PalCalc.UI.csproj --configuration Release -r win-x64 /p:Platform=x64 /p:PublishProfile=Properties/PublishProfiles/Bundled.pubxml --output publish/Bundled
 
       - name: Upload Bundled EXE
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: PalCalc.UI_Bundled_EXE
           path: publish/Bundled/*.exe
+          archive: false
 
       - name: Upload release asset for Bundled EXE
         if: github.event_name == 'release'
-        uses: shogo82148/actions-upload-release-asset@v1
+        uses: shogo82148/actions-upload-release-asset@v1.10.2
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: publish/Bundled/PalCalc.UI.exe
