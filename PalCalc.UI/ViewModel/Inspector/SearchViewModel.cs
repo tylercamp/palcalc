@@ -35,6 +35,8 @@ namespace PalCalc.UI.ViewModel.Inspector
         [ObservableProperty]
         private OwnerTreeViewModel ownerTree;
 
+        public int TotalMatches => OwnerTree.AllContainerSources.SelectMany(c => c.Container.Grids).SelectMany(g => g.Slots).Count(slot => slot.Matches);
+
         public SearchSettingsViewModel SearchSettings { get; }
 
         private ICommand newCustomContainerCommand;
@@ -164,6 +166,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             if (e.PropertyName == nameof(SearchSettings.AsCriteria))
             {
                 ApplySearchSettings();
+                OnPropertyChanged(nameof(TotalMatches));
             }
         }
 

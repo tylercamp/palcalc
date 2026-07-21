@@ -8,6 +8,10 @@ namespace PalCalc.Model
 {
     public static class GameConstants
     {
+        // TODO - Could parse cake effects from DA_BreedingItemEffectData
+        // [{ TalentBonusMin, TalenBonusMax, MutationRateBonusPercent, CombiRankBonus, BreedCount, bInheritAllActiveSkills, PassiveInheritCountOverride }]
+
+        // TODO - Could scrape from PalEggRankInfoArray? [{ PalRarity, EggScale, HatchingSpeedDivisionRate }]
         public static readonly Dictionary<EggSize, int> EggSizeMinRarity = new()
         {
             // couldn't find this info when scraping through game data, found by checking against https://paldb.cc/en/Eggs
@@ -69,12 +73,33 @@ namespace PalCalc.Model
             var minTime = TimeSpan.FromMinutes(3);
 
             // TODO - tweak
-            var rarityModifier = (pal.Price - 1000) / 100.0f + (pal.Id.IsVariant ? 5 : 0);
+            var rarityModifier = Math.Max(0, (pal.Price - 1000)) / 100.0f + (pal.Id.IsVariant ? 5 : 0);
             return minTime + TimeSpan.FromMinutes(rarityModifier);
         }
 
         // https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/
         // supposedly the child will always inherit at least 1 passive directly from a parent?
+
+        /*
+         * TODO - Could scrape some of this from game files - `BP_PalGameSetting`
+              "Combi_TalentInheritNum": [
+                3.0,
+                2.0,
+                1.0
+              ],
+              "Combi_PassiveInheritNum": [
+                4.0,
+                3.0,
+                2.0,
+                1.0
+              ],
+              "Combi_PassiveRandomAddNum": [
+                4.0,
+                3.0,
+                2.0,
+                1.0
+              ],
+        */
 
         // probability of getting N passives from parent pool
         public static readonly IReadOnlyDictionary<int, float> PassiveProbabilityDirect = new Dictionary<int, float>()

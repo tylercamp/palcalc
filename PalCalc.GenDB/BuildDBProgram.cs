@@ -490,6 +490,12 @@ namespace PalCalc.GenDB
                             ];
                         })
                 )
+                // sort to ensure consistent order across runs, makes it easier to see if there are real changes
+                .OrderBy(br => br.Child.InternalName)
+                .ThenBy(br => br.Parent1.Pal.InternalName)
+                .ThenBy(br => br.Parent2.Pal.InternalName)
+                .ThenBy(br => br.Parent1.Gender)
+                .ThenBy(br => br.Parent2.Gender)
                 .ToList();
 
             return res;

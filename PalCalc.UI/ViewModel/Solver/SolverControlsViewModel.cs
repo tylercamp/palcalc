@@ -60,7 +60,8 @@ namespace PalCalc.UI.ViewModel.Solver
                     initialState: PalDB.LoadEmbedded().Pals.ToDictionary(p => p, p => !BannedBredPals.Contains(p))
                 )
                 {
-                    Title = LocalizationCodes.LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS.Bind()
+                    Title = LocalizationCodes.LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS.Bind(),
+                    ShowWildLevel = false,
                 };
                 window.Owner = App.Current.MainWindow;
                 window.ShowDialog();

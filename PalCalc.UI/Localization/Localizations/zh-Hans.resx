@@ -202,6 +202,12 @@
   <data name="LC_COMMON_LEVEL" xml:space="preserve">
     <value>等级</value>
   </data>
+  <data name="LC_COMMON_RANK" xml:space="preserve">
+    <value>品阶</value>
+  </data>
+  <data name="LC_COMMON_WILD_LEVEL" xml:space="preserve">
+    <value>野外等级</value>
+  </data>
   <data name="LC_COMMON_PAL" xml:space="preserve">
     <value>帕鲁</value>
   </data>
