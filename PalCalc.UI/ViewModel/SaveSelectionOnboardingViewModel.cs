@@ -57,5 +57,22 @@ namespace PalCalc.UI.ViewModel
 
             base.OnPropertyChanged(e);
         }
+
+        public void TrySelectSaveByIdentifier(string id)
+        {
+            foreach (var loc in AvailableSaveGameCollections)
+            {
+                foreach (var save in loc.AvailableSaves)
+                {
+                    if (CachedSaveGame.IdentifierFor(save.Value) == id)
+                    {
+                        SelectedCollection = loc;
+                        SelectedSave = save;
+                        break;
+                    }
+                }
+            }
+
+        }
     }
 }

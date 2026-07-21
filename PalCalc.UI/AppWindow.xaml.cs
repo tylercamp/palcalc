@@ -77,8 +77,6 @@ namespace PalCalc.UI
             //CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
             //CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
-            //if (settings.SelectedGameIdentifier != null) SaveSelection.TrySelectSaveGame(settings.SelectedGameIdentifier);
-
             BeginNavigateSaveSelectionPage();
 
             dispatcher.BeginInvoke(() =>
@@ -157,6 +155,11 @@ namespace PalCalc.UI
             );
 
             var page = new SaveSelectionOnboardingPage();
+            if (settings.SelectedGameIdentifier != null)
+            {
+                vm.TrySelectSaveByIdentifier(settings.SelectedGameIdentifier);
+            }
+
             page.DataContext = vm;
 
             Content = page;
