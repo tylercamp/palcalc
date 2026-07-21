@@ -31,6 +31,9 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private SaveGameViewModel2 selectedSave;
 
+        [ObservableProperty]
+        private CommonSaveOperationsViewModel commonSelectedSaveOperations;
+
         public SaveSelectionOnboardingViewModel(
             IEnumerable<SavesCollectionViewModel> savesCollections,
             IRelayCommand<SaveGameViewModel2> loadSaveCommand
@@ -45,6 +48,11 @@ namespace PalCalc.UI.ViewModel
             if (e.PropertyName == nameof(SelectedCollection))
             {
                 SelectedSave = null;
+            }
+
+            if (e.PropertyName == nameof(SelectedSave))
+            {
+                CommonSelectedSaveOperations = new CommonSaveOperationsViewModel(null, SelectedCollection, SelectedSave);
             }
 
             base.OnPropertyChanged(e);

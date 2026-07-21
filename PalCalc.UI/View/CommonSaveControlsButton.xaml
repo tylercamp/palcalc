@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="PalCalc.UI.View.CommonSaveControlsButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:vmc="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:local="clr-namespace:PalCalc.UI.View"
+             d:DataContext="{x:Static vm:CommonSaveOperationsViewModel.DesignerInstance}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <vmc:ValueVisibilityConverter x:Key="VVC" />
+    </UserControl.Resources>
+    <Grid>
+        <Button Padding="0" Width="24" Command="{Binding OpenMenuCommand}" Name="ControlsButton">
+            <materialIcons:MaterialIcon Kind="MenuDown" />
+        </Button>
+        <Popup PlacementTarget="{Binding ElementName=ControlsButton}" IsOpen="{Binding MenuIsOpen}" StaysOpen="False" AllowsTransparency="True" >
+            <!-- TODO ITL -->
+            <Border Padding="0 0 5 5">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" 
+                          Direction="315" 
+                          ShadowDepth="5"
+                          BlurRadius="5"
+                          Opacity="0.2"/>
+                </Border.Effect>
+                <StackPanel Orientation="Vertical" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}">
+                    <MenuItem Header="Back to Save Selector" Command="{Binding NavigateSaveSelectionPageCommand}" Visibility="{Binding NavigateSaveSelectionPageCommand, Converter={StaticResource VVC}}" />
+                    <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE}" Command="{Binding ExportSaveCommand}" />
+                    <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE_CSV}" Command="{Binding ExportSaveCsvCommand}" />
+                    <MenuItem Header="{itl:LocalizedText LC_INSPECT_SAVE}" Command="{Binding InspectSaveCommand}" />
+                </StackPanel>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>

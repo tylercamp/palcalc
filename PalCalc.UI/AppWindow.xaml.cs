@@ -47,8 +47,8 @@ namespace PalCalc.UI
         [ObservableProperty]
         private bool showToolbar = false;
 
-        private ToolbarViewModel toolbarVM;
-        public ToolbarViewModel ToolbarVM => toolbarVM;
+        private AppToolbarViewModel toolbarVM;
+        public AppToolbarViewModel ToolbarVM => toolbarVM;
 
         private bool checkedUpdates;
         private AppUpdatesViewModel appUpdates;
@@ -72,7 +72,7 @@ namespace PalCalc.UI
                 }
             };
 
-            toolbarVM = new ToolbarViewModel(dispatcher, appUpdates, BeginNavigateSaveSelectionPageCommand);
+            toolbarVM = new AppToolbarViewModel(dispatcher, appUpdates);
 
             //CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
             //CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
@@ -149,32 +149,6 @@ namespace PalCalc.UI
             });
         }
 
-        protected override void OnPropertyChanging(PropertyChangingEventArgs e)
-        {
-            base.OnPropertyChanging(e);
-
-            if (e.PropertyName == nameof(Content))
-            {
-                if (Content?.DataContext is SaveSelectionOnboardingViewModel ssovm)
-                {
-                    ssovm.PropertyChanged -= SaveSelectionOnboardingVm_PropertyChanged;
-                }
-            }
-        }
-
-        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            base.OnPropertyChanged(e);
-
-            if (e.PropertyName == nameof(Content))
-            {
-                if (Content?.DataContext is SaveSelectionOnboardingViewModel ssovm)
-                {
-                    ssovm.PropertyChanged += SaveSelectionOnboardingVm_PropertyChanged;
-                }
-            }
-        }
-
         private void NavigateSaveSelectionPage(IEnumerable<SavesCollectionViewModel> collections)
         {
             var vm = new SaveSelectionOnboardingViewModel(
@@ -188,16 +162,6 @@ namespace PalCalc.UI
             Content = page;
         }
 
-        private void SaveSelectionOnboardingVm_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            var vm = sender as SaveSelectionOnboardingViewModel;
-            switch (e.PropertyName)
-            {
-                case nameof(vm.SelectedCollection): toolbarVM.SelectedLocation = vm.SelectedCollection; break;
-                case nameof(vm.SelectedSave): ToolbarVM.SelectedSave = vm.SelectedSave; break;
-            }
-        }
-
         private void NavigateSolverPage(SaveGameViewModel2 selectedSave)
         {
             settings.SelectedGameIdentifier = CachedSaveGame.IdentifierFor(selectedSave.Value);
@@ -208,7 +172,8 @@ namespace PalCalc.UI
             if (parsedSave == null)
                 return;
 
-            var vm = new SolverPageViewModel(Dispatcher.CurrentDispatcher, selectedSave, LoadPalTargets(selectedSave));
+            var saveOperations = new CommonSaveOperationsViewModel(BeginNavigateSaveSelectionPageCommand, selectedSave.Parent, selectedSave);
+            var vm = new SolverPageViewModel(Dispatcher.CurrentDispatcher, saveOperations, selectedSave, LoadPalTargets(selectedSave));
             Content = new SolverPage(vm);
         }
 

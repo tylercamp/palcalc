@@ -31,7 +31,7 @@ namespace PalCalc.UI
         {
             InitializeComponent();
 
-            DataContext = new SolverPageViewModel(Dispatcher, null, null);
+            DataContext = new SolverPageViewModel(Dispatcher, null, null, null);
         }
 
         internal SolverPage(SolverPageViewModel vm)

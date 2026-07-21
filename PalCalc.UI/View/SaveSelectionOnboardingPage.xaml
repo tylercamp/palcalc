@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:v="clr-namespace:PalCalc.UI.View"
       xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
       xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
       xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
@@ -98,7 +99,7 @@
             <ListBox Grid.Column="0"
                      ItemsSource="{Binding AvailableSaveGameCollections}"
                      SelectedItem="{Binding SelectedCollection}"
-                     SelectedIndex="1"
+                     d:SelectedIndex="1"
                      Margin="{adonisUi:Space 1, 1}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="ssvm:SavesCollectionViewModel">
@@ -170,7 +171,7 @@
                          Margin="{adonisUi:Space 1}"
                          ItemsSource="{Binding SelectedCollection.AvailableSaves}"
                          SelectedItem="{Binding SelectedSave}"
-                         SelectedIndex="0">
+                         d:SelectedIndex="0">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="ssvm:SaveGameViewModel2">
                             <StackPanel Orientation="Horizontal" Margin="4,6">
@@ -209,17 +210,24 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- TODO ITL -->
-                    <Label Grid.Column="0"
-                           Padding="{adonisUi:Space 1}"
-                           Content="Selected Save"
-                           />
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <Label Padding="{adonisUi:Space 1}"
+                               Content="Selected Save"
+                               />
+
+                        <v:CommonSaveControlsButton DataContext="{Binding CommonSelectedSaveOperations}" Margin="{adonisUi:Space 0, 0.5}"
+
+adonisExtensions:LayerExtension.Layer="0" />
+                    </StackPanel>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="6" Margin="{adonisUi:Space 0.5}" adonisExtensions:LayerExtension.Layer="0">
                         <Button Command="{Binding LoadSaveCommand}"
                                 CommandParameter="{Binding SelectedSave}"
                                 >
                             <!-- TODO ITL -->
-                            Open in Solver
+                            <TextBlock FontWeight="Bold">
+                                Open in Solver
+                            </TextBlock>
                         </Button>
 
                         <Button Command="{Binding SelectedCollection.RemoveSaveCommand}"

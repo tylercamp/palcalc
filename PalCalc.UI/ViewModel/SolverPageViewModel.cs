@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-
+using System.Xml.Linq;
 using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 using AdonisMessageBoxButton = AdonisUI.Controls.MessageBoxButton;
 using AdonisMessageBoxResult = AdonisUI.Controls.MessageBoxResult;
@@ -52,7 +52,12 @@ namespace PalCalc.UI.ViewModel
                 if (designerInstance == null)
                 {
                     AppSettings.Current = new AppSettings();
-                    designerInstance = new SolverPageViewModel(Dispatcher.CurrentDispatcher, SaveGameViewModel2.DesignerInstance, new PalTargetListViewModel());
+                    designerInstance = new SolverPageViewModel(
+                        Dispatcher.CurrentDispatcher,
+                        CommonSaveOperationsViewModel.DesignerInstance,
+                        SaveGameViewModel2.DesignerInstance,
+                        new PalTargetListViewModel()
+                    );
                 }
 
                 return designerInstance;
@@ -102,11 +107,14 @@ namespace PalCalc.UI.ViewModel
 
         public SolverQueueViewModel SolverQueue { get; } = new SolverQueueViewModel();
 
+        public CommonSaveOperationsViewModel SaveOperations { get; }
+
         // main app model
-        public SolverPageViewModel(Dispatcher dispatcher, SaveGameViewModel2 selectedSave, PalTargetListViewModel targets)
+        public SolverPageViewModel(Dispatcher dispatcher, CommonSaveOperationsViewModel saveOperations, SaveGameViewModel2 selectedSave, PalTargetListViewModel targets)
         {
             this.dispatcher = dispatcher ?? Dispatcher.CurrentDispatcher;
             OpenedSave = selectedSave;
+            SaveOperations = saveOperations;
 
             settings = AppSettings.Current;
             settings.SolverSettings ??= new SerializableSolverSettings();

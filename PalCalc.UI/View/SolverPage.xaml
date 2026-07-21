@@ -5,6 +5,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:local="clr-namespace:PalCalc.UI"
       xmlns:v="clr-namespace:PalCalc.UI.View.Main"
+             xmlns:uiv="clr-namespace:PalCalc.UI.View"
       xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
       xmlns:itl="clr-namespace:PalCalc.UI.Localization"
       xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
@@ -27,7 +28,7 @@
         <DockPanel>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition MinWidth="220" Width="300"/>
+                    <ColumnDefinition MinWidth="220" Width="260"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="232*" MinWidth="250" />
                     <ColumnDefinition Width="Auto"/>
@@ -42,14 +43,18 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Padding="{adonisUi:Space 1}"
-                                           Grid.Column="0"
-                                           HorizontalAlignment="Stretch"
-                                           Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
-                                           Text="{Binding OpenedSave.CombinedLabel.Value}"
-                                           TextTrimming="CharacterEllipsis"/>
-                                <Button Grid.Column="1"
+                                           Grid.Column="0"  
+                                               HorizontalAlignment="Stretch"
+                                               Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                                               Text="{Binding OpenedSave.CombinedLabel.Value}"
+                                               TextTrimming="CharacterEllipsis"/>
+
+                                <uiv:CommonSaveControlsButton Grid.Column="1" DataContext="{Binding SaveOperations}" />
+
+                                <Button Grid.Column="2"
                                         HorizontalAlignment="Right"
                                         Visibility="{Binding OpenedSave.HasChanges, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
                                         Command="{Binding OpenedSave.ReloadSaveCommand}"

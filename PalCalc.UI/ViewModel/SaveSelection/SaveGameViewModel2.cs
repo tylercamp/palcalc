@@ -20,15 +20,13 @@ namespace PalCalc.UI.ViewModel.SaveSelection
     {
         private static ILogger logger = Log.ForContext<SaveGameViewModel2>();
 
-        private SavesCollectionViewModel parentLocation;
-
         private static SaveGameViewModel2 designerInstance;
         public static SaveGameViewModel2 DesignerInstance =>
             designerInstance ??= new SaveGameViewModel2(ManualSaves.FromList([], null), CachedSaveGame.SampleForDesignerView.UnderlyingSave);
 
         public SaveGameViewModel2(SavesCollectionViewModel parent, ISaveGame save)
         {
-            parentLocation = parent;
+            Parent = parent;
 
             Type = parent.SaveType;
             Value = save;
@@ -101,6 +99,9 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             IsValid = Value.IsValid;
         }
 
+        // TODO - Remove the need for this
+        public SavesCollectionViewModel Parent { get; }
+
         public SaveType Type { get; set; }
 
         public ISaveGame Value { get; set; }
@@ -119,7 +120,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 
         public SaveCustomizationsViewModel Customizations { get; }
 
-        public CachedSaveGame CachedValue => Storage.LoadSave(parentLocation.SourceLocation, Value, PalDB.LoadEmbedded(), GameSettingsViewModel.Load(Value).ModelObject);
+        public CachedSaveGame CachedValue => Storage.LoadSave(Parent.SourceLocation, Value, PalDB.LoadEmbedded(), GameSettingsViewModel.Load(Value).ModelObject);
 
         public IRelayCommand OpenFolderCommand { get; set; }
 

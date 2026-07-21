@@ -15,47 +15,43 @@ using Serilog;
 using Serilog.Core;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Threading;
+
 using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 
 namespace PalCalc.UI.ViewModel
 {
-    internal partial class ToolbarViewModel(Dispatcher dispatcher, AppUpdatesViewModel appUpdates, IRelayCommand navigateSaveSelectionPageCommand) : ObservableObject
+    internal partial class CommonSaveOperationsViewModel(
+        IRelayCommand navigateSaveSelectionPageCommand,
+        SavesCollectionViewModel selectedLocation,
+        SaveGameViewModel2 selectedSave
+    ) : ObservableObject
     {
-        private static ToolbarViewModel designerInstance;
-        public static ToolbarViewModel DesignerInstance => designerInstance ??= new(Dispatcher.CurrentDispatcher, null, new RelayCommand(() => { }));
+        private static ILogger logger = Log.ForContext<CommonSaveOperationsViewModel>();
 
-        private static ILogger logger = Log.ForContext<ToolbarViewModel>();
+        public static CommonSaveOperationsViewModel DesignerInstance { get; } = new CommonSaveOperationsViewModel(null, null, null);
+
+        [ObservableProperty]
+        private bool menuIsOpen = false;
 
         public IRelayCommand NavigateSaveSelectionPageCommand => navigateSaveSelectionPageCommand;
 
-        public List<TranslationLocaleViewModel> Locales { get; } =
-            Enum
-                .GetValues<TranslationLocale>()
-                .Select(l => new TranslationLocaleViewModel(l))
-                .ToList();
-
-        [NotifyCanExecuteChangedFor(nameof(ExportSaveCommand))]
-        [NotifyCanExecuteChangedFor(nameof(ExportSaveCsvCommand))]
-        [NotifyCanExecuteChangedFor(nameof(InspectSaveCommand))]
-        [ObservableProperty]
-        private SaveGameViewModel2 selectedSave;
-
-        [ObservableProperty]
-        private SavesCollectionViewModel selectedLocation;
+        [RelayCommand]
+        private void OpenMenu()
+        {
+            MenuIsOpen = true;
+        }
 
         [RelayCommand(CanExecute = nameof(CanExportSave))]
         private void ExportSave()
         {
             var sfd = new SaveFileDialog()
             {
-                FileName = $"Palworld-{CachedSaveGame.IdentifierFor(SelectedSave.Value)}.zip",
+                FileName = $"Palworld-{CachedSaveGame.IdentifierFor(selectedSave.Value)}.zip",
                 Filter = "ZIP | *.zip",
                 AddExtension = true,
                 DefaultExt = "zip"
@@ -66,7 +62,7 @@ namespace PalCalc.UI.ViewModel
                 using (var outStream = new FileStream(sfd.FileName, FileMode.Create))
                 using (var archive = new ZipArchive(outStream, ZipArchiveMode.Create))
                 {
-                    var save = SelectedSave.Value;
+                    var save = selectedSave.Value;
 
                     void Export(ISaveFile file, string basePath)
                     {
@@ -120,7 +116,7 @@ namespace PalCalc.UI.ViewModel
                 }
             }
         }
-        private bool CanExportSave() => SelectedSave != null;
+        private bool CanExportSave() => selectedSave != null;
 
         [RelayCommand(CanExecute = nameof(CanExportSaveCsv))]
         private void ExportSaveCsv()
@@ -136,10 +132,10 @@ namespace PalCalc.UI.ViewModel
             if (sfd.ShowDialog() == true)
             {
                 // TODO - ensure CachedValue is valid
-                File.WriteAllText(sfd.FileName, PalCSVExporter.Export(SelectedSave.CachedValue, GameSettingsViewModel.Load(SelectedSave.Value).ModelObject));
+                File.WriteAllText(sfd.FileName, PalCSVExporter.Export(selectedSave.CachedValue, GameSettingsViewModel.Load(selectedSave.Value).ModelObject));
             }
         }
-        private bool CanExportSaveCsv() => SelectedSave != null;
+        private bool CanExportSaveCsv() => selectedSave != null;
 
         [RelayCommand(CanExecute = nameof(CanInspectSave))]
         private void InspectSave()
@@ -151,70 +147,12 @@ namespace PalCalc.UI.ViewModel
             // TODO - ensure CachedValue is valid
 
             var vm = loadingModal.ShowDialogDuring(
-                () => new SaveInspectorWindowViewModel(SelectedLocation, SelectedSave, GameSettingsViewModel.Load(SelectedSave.Value).ModelObject)
+                () => new SaveInspectorWindowViewModel(selectedLocation, selectedSave, GameSettingsViewModel.Load(selectedSave.Value).ModelObject)
             );
 
             var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
             inspector.Show();
         }
-        private bool CanInspectSave() => SelectedSave != null;
-
-        [RelayCommand]
-        private void ExportCrashLog()
-        {
-            var sfd = new SaveFileDialog();
-            sfd.FileName = "CRASHLOG.zip";
-            sfd.Filter = "ZIP | *.zip";
-            sfd.AddExtension = true;
-            sfd.DefaultExt = "zip";
-
-            if (sfd.ShowDialog() == true)
-            {
-                try
-                {
-                    CrashSupport.PrepareSupportFile(sfd.FileName);
-                }
-                catch (Exception e)
-                {
-                    logger.Warning(e, "unexpected error when attempting to create crashlog file");
-                    AdonisMessageBox.Show(LocalizationCodes.LC_CRASHLOG_FAILED.Bind().Value, caption: "");
-                }
-            }
-        }
-
-        [RelayCommand]
-        private void OpenAboutWindow()
-        {
-            var window = new AboutWindow();
-            window.Owner = App.Current.MainWindow;
-            window.ShowDialog();
-        }
-
-        [RelayCommand]
-        private void ForceCheckForUpdates()
-        {
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var newVersion = await appUpdates.FetchNewUpdateUrl();
-
-                    dispatcher.BeginInvoke(() =>
-                    {
-                        if (newVersion == null)
-                        {
-                            AdonisMessageBox.Show("Pal Calc is up to date!");
-                            return;
-                        }
-
-                        appUpdates.PromptUpdateDownload(newVersion);
-                    }, DispatcherPriority.ContextIdle);
-                }
-                catch (Exception e)
-                {
-                    // TODO
-                }
-            });
-        }
+        private bool CanInspectSave() => selectedSave != null;
     }
 }
