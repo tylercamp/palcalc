@@ -42,18 +42,6 @@ namespace PalCalc.UI
 
         private SolverPageViewModel ViewModel => DataContext as SolverPageViewModel;
 
-        private void AboutButton_Click(object sender, RoutedEventArgs e)
-        {
-            var window = new AboutWindow();
-            window.Owner = App.Current.MainWindow;
-            window.ShowDialog();
-        }
-
-        private void DownloadUpdateLink_RequestNavigate(object sender, RequestNavigateEventArgs e)
-        {
-            ViewModel.TryDownloadLatestVersion();
-        }
-
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             Process.Start(new ProcessStartInfo { FileName = e.Uri.ToString(), UseShellExecute = true });

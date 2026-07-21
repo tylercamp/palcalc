@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel;
 using Serilog;
 using System;
 using System.Collections.Generic;

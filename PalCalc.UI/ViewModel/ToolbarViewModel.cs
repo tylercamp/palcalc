@@ -15,20 +15,21 @@ using Serilog;
 using Serilog.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows.Threading;
 using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 
 namespace PalCalc.UI.ViewModel
 {
-    internal partial class ToolbarViewModel(IRelayCommand navigateSaveSelectionPageCommand) : ObservableObject
+    internal partial class ToolbarViewModel(Dispatcher dispatcher, AppUpdatesViewModel appUpdates, IRelayCommand navigateSaveSelectionPageCommand) : ObservableObject
     {
         private static ToolbarViewModel designerInstance;
-        public static ToolbarViewModel DesignerInstance => designerInstance ??= new(new RelayCommand(() => { }));
+        public static ToolbarViewModel DesignerInstance => designerInstance ??= new(Dispatcher.CurrentDispatcher, null, new RelayCommand(() => { }));
 
         private static ILogger logger = Log.ForContext<ToolbarViewModel>();
 
@@ -179,6 +180,41 @@ namespace PalCalc.UI.ViewModel
                     AdonisMessageBox.Show(LocalizationCodes.LC_CRASHLOG_FAILED.Bind().Value, caption: "");
                 }
             }
+        }
+
+        [RelayCommand]
+        private void OpenAboutWindow()
+        {
+            var window = new AboutWindow();
+            window.Owner = App.Current.MainWindow;
+            window.ShowDialog();
+        }
+
+        [RelayCommand]
+        private void ForceCheckForUpdates()
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var newVersion = await appUpdates.FetchNewUpdateUrl();
+
+                    dispatcher.BeginInvoke(() =>
+                    {
+                        if (newVersion == null)
+                        {
+                            AdonisMessageBox.Show("Pal Calc is up to date!");
+                            return;
+                        }
+
+                        appUpdates.PromptUpdateDownload(newVersion);
+                    }, DispatcherPriority.ContextIdle);
+                }
+                catch (Exception e)
+                {
+                    // TODO
+                }
+            });
         }
     }
 }

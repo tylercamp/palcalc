@@ -74,7 +74,7 @@
 
     <GroupBox MaxWidth="1500"
             MaxHeight="700"
-              Header="Save Selection"
+              Header="Palworld Save Files"
                BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
               BorderThickness="{adonisUi:Space 0.5}"
             >
@@ -149,9 +149,9 @@
                            VerticalAlignment="Center"
                            Padding="{adonisUi:Space 1}"/>
 
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="{adonisUi:Space 0.5}" adonisExtensions:LayerExtension.IncreaseLayer="True">
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="{adonisUi:Space 0.5}" adonisExtensions:LayerExtension.IncreaseLayer="False" adonisExtensions:LayerExtension.Layer="0">
                         <Button Command="{Binding SelectedCollection.AddSaveCommand}" Visibility="{Binding SelectedCollection.AddSaveCommand, Converter={StaticResource VVC}}">
-                            <materialIcons:MaterialIcon Kind="Add" Foreground="Red" Width="18" />
+                            <materialIcons:MaterialIcon Kind="Add" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Width="18" />
                         </Button>
                     
                         <Button Command="{Binding SelectedCollection.OpenFolderCommand}" Visibility="{Binding SelectedCollection.OpenFolderCommand, Converter={StaticResource VVC}}">
@@ -202,7 +202,6 @@
                 <!-- Action buttons -->
                 <Grid Grid.Row="0"
                       Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}"
-                      adonisExtensions:LayerExtension.IncreaseLayer="True"
                       >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -215,24 +214,24 @@
                            Content="Selected Save"
                            />
 
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="6" Margin="{adonisUi:Space 0.5}">
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="6" Margin="{adonisUi:Space 0.5}" adonisExtensions:LayerExtension.Layer="0">
                         <Button Command="{Binding LoadSaveCommand}"
                                 CommandParameter="{Binding SelectedSave}"
                                 >
                             <!-- TODO ITL -->
                             Open in Solver
                         </Button>
-                
+
+                        <Button Command="{Binding SelectedCollection.RemoveSaveCommand}"
+                                CommandParameter="{Binding SelectedSave}"
+                                Visibility="{Binding SelectedCollection.RemoveSaveCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                                Content="{itl:LocalizedText LC_SAVE_GAME_REMOVE_BTN_LABEL}" />
+
                         <Button Command="{Binding SelectedSave.OpenFolderCommand}"
                                 Visibility="{Binding SelectedSave.OpenFolderCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
                                 ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
                             <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
                         </Button>
-                
-                        <Button Command="{Binding SelectedCollection.RemoveSaveCommand}"
-                                CommandParameter="{Binding SelectedSave}"
-                                Visibility="{Binding SelectedCollection.RemoveSaveCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
-                                Content="{itl:LocalizedText LC_SAVE_GAME_REMOVE_BTN_LABEL}" />
                     </StackPanel>
                 </Grid>
 

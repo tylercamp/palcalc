@@ -44,6 +44,21 @@ namespace PalCalc.UI.ViewModel
 
     internal partial class SolverPageViewModel : ObservableObject
     {
+        private static SolverPageViewModel designerInstance;
+        public static SolverPageViewModel DesignerInstance
+        {
+            get
+            {
+                if (designerInstance == null)
+                {
+                    AppSettings.Current = new AppSettings();
+                    designerInstance = new SolverPageViewModel(Dispatcher.CurrentDispatcher, SaveGameViewModel2.DesignerInstance, new PalTargetListViewModel());
+                }
+
+                return designerInstance;
+            }
+        }
+
         private static ILogger logger = Log.ForContext<SolverPageViewModel>();
         private static PalDB db = PalDB.LoadEmbedded();
         private Dispatcher dispatcher;
@@ -86,8 +101,6 @@ namespace PalCalc.UI.ViewModel
         }
 
         public SolverQueueViewModel SolverQueue { get; } = new SolverQueueViewModel();
-
-        public SolverPageViewModel() : this(null, null, null) { }
 
         // main app model
         public SolverPageViewModel(Dispatcher dispatcher, SaveGameViewModel2 selectedSave, PalTargetListViewModel targets)
@@ -183,8 +196,6 @@ namespace PalCalc.UI.ViewModel
             };
 
             SolverQueue.SelectItemCommand = new RelayCommand<PalSpecifierViewModel>(vm => PalTargetList.SelectedTarget = PalTargetList.Targets.FirstOrDefault(t => t.LatestJob == vm.LatestJob));
-
-            CheckForUpdates();
         }
 
         private void Storage_SaveReloaded(ISaveGame save)
@@ -388,57 +399,6 @@ namespace PalCalc.UI.ViewModel
         private void UpdateSolverControls()
         {
             SolverControls.CurrentTarget = PalTarget;
-        }
-
-        [ObservableProperty]
-        private Visibility updatesMessageVisibility = Visibility.Collapsed;
-
-        private string VersionFromUrl(string url) => url.Split('/').Last();
-        private string latestVersionUrl;
-
-        private void CheckForUpdates()
-        {
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var latestReleaseUrl = $"{App.RepositoryUrl}/releases/latest";
-                    using (var client = new HttpClient(new HttpClientHandler() { AllowAutoRedirect = false }))
-                    using (var response = await client.GetAsync(latestReleaseUrl))
-                    {
-                        if (response.StatusCode == HttpStatusCode.Found)
-                        {
-                            var location = response.Headers?.Location;
-                            if (location != null)
-                            {
-                                latestVersionUrl = location.AbsoluteUri;
-                                var latestVersion = VersionFromUrl(latestVersionUrl);
-                                if (latestVersion != App.Version)
-                                {
-                                    dispatcher?.BeginInvoke(() => UpdatesMessageVisibility = Visibility.Visible);
-                                }
-                            }
-                            else
-                            {
-                                logger.Warning("releases response did not include redirect URL, unable to determine latest version");
-                            }
-                        }
-                        else
-                        {
-                            logger.Warning("did not receive FOUND status code, unable to determine latest version");
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.Warning(e, "error fetching latest version");
-                }
-            });
-        }
-
-        public void TryDownloadLatestVersion()
-        {
-            Process.Start(new ProcessStartInfo { FileName = latestVersionUrl, UseShellExecute = true });
         }
     }
 }

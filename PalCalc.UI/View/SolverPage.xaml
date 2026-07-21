@@ -12,12 +12,13 @@
       xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
       xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
       xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
       xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
       mc:Ignorable="d"
       d:Width="1280" d:Height="720"
       VerticalAlignment="Stretch"
       HorizontalAlignment="Stretch"
-      d:DataContext="{d:DesignInstance vm:SolverPageViewModel, IsDesignTimeCreatable=True}" d:DesignHeight="1351" d:DesignWidth="1659">
+      d:DataContext="{x:Static vm:SolverPageViewModel.DesignerInstance}" d:DesignHeight="1351" d:DesignWidth="1659">
     <UserControl.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
         <c:ValueBoolConverter x:Key="NegatedVBC" Negate="True" />
@@ -36,9 +37,34 @@
                 <DockPanel Grid.Column="0">
                     <StackPanel DockPanel.Dock="Top" vu:StackPanelExtensions.Spacing="5">
                         <!-- "Save File" section -->
-                        <Expander Header="{itl:LocalizedText LC_SAVE_FILE}" IsExpanded="True" adonisExtensions:LayerExtension.IncreaseLayer="True">
-                            <!--<v:SaveSelectorView DataContext="{Binding SaveSelection}" AllowNavigation="{Binding RelativeSource={RelativeSource AncestorType=local:SolverPage}, Path=DataContext.SolverQueue.QueuedItems.Count, Converter={StaticResource NegatedVBC}}" />-->
-                        </Expander>
+                        <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Padding="{adonisUi:Space 1}"
+                                           Grid.Column="0"
+                                           HorizontalAlignment="Stretch"
+                                           Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                                           Text="{Binding OpenedSave.CombinedLabel.Value}"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <Button Grid.Column="1"
+                                        HorizontalAlignment="Right"
+                                        Visibility="{Binding OpenedSave.HasChanges, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                                        Command="{Binding OpenedSave.ReloadSaveCommand}"
+                                        ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SAVE_FILE_RELOAD_DESCRIPTION}"
+                                        >
+                                    <materialIcons:MaterialIcon Kind="Reload" Width="18" Height="18"
+                                                                Foreground="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
+                                                                />
+                                </Button>
+                            </Grid>
+                        </Border>
+                        <!--<Expander Header="{itl:LocalizedText LC_SAVE_FILE}" IsExpanded="True" adonisExtensions:LayerExtension.IncreaseLayer="True">
+                            
+                            --><!--<v:SaveSelectorView DataContext="{Binding SaveSelection}" AllowNavigation="{Binding RelativeSource={RelativeSource AncestorType=local:SolverPage}, Path=DataContext.SolverQueue.QueuedItems.Count, Converter={StaticResource NegatedVBC}}" />--><!--
+                        </Expander>-->
 
                         <!-- "Game Settings" section -->
                         <Expander Header="{itl:LocalizedText LC_GAME_SETTINGS}" IsExpanded="True" adonisExtensions:LayerExtension.IncreaseLayer="True">
@@ -118,7 +144,6 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <!-- "Target Pal" section -->
@@ -158,7 +183,7 @@
                                             <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeGlobalStoragePals}">
                                                 <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_GPS}" TextWrapping="Wrap" />
                                             </CheckBox>
-                                    
+
                                             <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeBasePals}">
                                                 <TextBlock Text="{itl:LocalizedText LC_INCLUDE_PALS_AT_BASE}" TextWrapping="Wrap" />
                                             </CheckBox>
@@ -229,17 +254,6 @@
                             </GroupBox>
                         </Grid>
                     </Grid>
-
-                    <!-- About button / Update Notice -->
-                    <StackPanel Grid.Row="2">
-                        <Button Width="50" Click="AboutButton_Click" Margin="0,5,0,5" Content="{itl:LocalizedText LC_ABOUT_APP}" />
-                        <TextBlock Visibility="{Binding UpdatesMessageVisibility}" TextWrapping="Wrap" TextAlignment="Center" FontSize="20">
-                            <!-- NavigateUri unused, value must be set for event to trigger -->
-                            <Hyperlink NavigateUri="http://github.com" RequestNavigate="DownloadUpdateLink_RequestNavigate">
-                                <TextBlock Text="{itl:LocalizedText LC_UPDATE_AVAILABLE}" />
-                            </Hyperlink>
-                        </TextBlock>
-                    </StackPanel>
                 </Grid>
             </Grid>
         </DockPanel>

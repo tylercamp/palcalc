@@ -50,10 +50,15 @@ namespace PalCalc.UI
         private ToolbarViewModel toolbarVM;
         public ToolbarViewModel ToolbarVM => toolbarVM;
 
+        private bool checkedUpdates;
+        private AppUpdatesViewModel appUpdates;
+
         public AppWindowViewModel(Dispatcher dispatcher)
         {
             AppSettings.Current = settings = Storage.LoadAppSettings();
             savesService = new AppSettingsSaveService(settings);
+            appUpdates = new AppUpdatesViewModel();
+            checkedUpdates = false;
             this.dispatcher = dispatcher;
 
             Translator.CurrentLocale = settings.Locale;
@@ -67,7 +72,7 @@ namespace PalCalc.UI
                 }
             };
 
-            toolbarVM = new ToolbarViewModel(BeginNavigateSaveSelectionPageCommand);
+            toolbarVM = new ToolbarViewModel(dispatcher, appUpdates, BeginNavigateSaveSelectionPageCommand);
 
             //CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
             //CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
@@ -106,6 +111,12 @@ namespace PalCalc.UI
                         {
                             NavigateSaveSelectionPage(saves);
                             ShowToolbar = true;
+
+                            if (!checkedUpdates)
+                            {
+                                RunStartupUpdatesCheck();
+                                checkedUpdates = true;
+                            }
                         }, DispatcherPriority.ContextIdle);
                     }
                     catch (Exception e)
@@ -118,6 +129,24 @@ namespace PalCalc.UI
                     }
                 });
             }, DispatcherPriority.ContextIdle);
+        }
+
+        private void RunStartupUpdatesCheck()
+        {
+            Task.Run(async () =>
+            {
+                var newVersion = await appUpdates.FetchNewUpdateUrl();
+                if (newVersion == null)
+                    return;
+
+                if (settings.SkippedAppVersion == newVersion.Version)
+                    return;
+
+                dispatcher.BeginInvoke(
+                    () => appUpdates.PromptUpdateDownload(newVersion),
+                    DispatcherPriority.ContextIdle
+                );
+            });
         }
 
         protected override void OnPropertyChanging(PropertyChangingEventArgs e)
