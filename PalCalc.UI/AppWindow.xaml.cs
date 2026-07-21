@@ -29,7 +29,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using Windows.ApplicationModel.VoiceCommands;
+
+using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 
 namespace PalCalc.UI
 {
@@ -74,8 +75,7 @@ namespace PalCalc.UI
 
             toolbarVM = new AppToolbarViewModel(dispatcher, appUpdates);
 
-            //CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
-            //CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
+            CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
             BeginNavigateSaveSelectionPage();
 
@@ -259,19 +259,28 @@ namespace PalCalc.UI
             return result;
         }
 
-        //private void CachedSaveGame_SaveFileLoadEnd(ISaveGame obj, CachedSaveGame loaded)
-        //{
-        //    if (loaded != null && targetsBySaveFile.ContainsKey(obj))
-        //        targetsBySaveFile[obj].UpdateCachedData(loaded, GameSettingsViewModel.Load(obj).ModelObject);
-        //}
+        private void CachedSaveGame_SaveFileLoadError(ISaveGame obj, Exception ex)
+        {
+            logger.Error(ex, "error when parsing save file for {saveId}", CachedSaveGame.IdentifierFor(obj));
 
-        //private void CachedSaveGame_SaveFileLoadError(ISaveGame obj, Exception ex)
-        //{
-        //    logger.Error(ex, "error when parsing save file for {saveId}", CachedSaveGame.IdentifierFor(obj));
+            var crashsupport = CrashSupport.PrepareSupportFile(specificSave: obj);
+            AdonisMessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind(crashsupport).Value, caption: "");
+        }
 
-        //    var crashsupport = CrashSupport.PrepareSupportFile(specificSave: obj);
-        //    AdonisMessageBox.Show(LocalizationCodes.LC_ERROR_SAVE_LOAD_FAILED.Bind(crashsupport).Value, caption: "");
-        //}
+        protected override void OnPropertyChanging(PropertyChangingEventArgs e)
+        {
+            base.OnPropertyChanging(e);
+
+            if (e.PropertyName == nameof(Content))
+            {
+                // TODO - hacky workaround
+                if (Content is SolverPage sp)
+                {
+                    var vm = sp.DataContext as SolverPageViewModel;
+                    vm.Dispose();
+                }
+            }
+        }
 
         [NotifyCanExecuteChangedFor(nameof(BeginNavigateSaveSelectionPageCommand))]
         [ObservableProperty]

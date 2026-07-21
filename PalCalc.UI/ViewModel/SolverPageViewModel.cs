@@ -42,7 +42,7 @@ namespace PalCalc.UI.ViewModel
 
     
 
-    internal partial class SolverPageViewModel : ObservableObject
+    internal partial class SolverPageViewModel : ObservableObject, IDisposable
     {
         private static SolverPageViewModel designerInstance;
         public static SolverPageViewModel DesignerInstance
@@ -120,8 +120,6 @@ namespace PalCalc.UI.ViewModel
             settings.SolverSettings ??= new SerializableSolverSettings();
             passivePresets = new PassiveSkillsPresetCollectionViewModel(settings.PassiveSkillsPresets);
 
-            
-
             // remove manually-added locations which no longer exist
             var manualLocs = settings.ExtraSaveLocations
                 .Where(loc =>
@@ -194,6 +192,7 @@ namespace PalCalc.UI.ViewModel
             targets.OrderChanged += SaveTargetList;
 
             Storage.SaveReloaded += Storage_SaveReloaded;
+            CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
 
             dispatcher.Invoke(UpdateFromSaveProperties);
 
@@ -206,10 +205,24 @@ namespace PalCalc.UI.ViewModel
             SolverQueue.SelectItemCommand = new RelayCommand<PalSpecifierViewModel>(vm => PalTargetList.SelectedTarget = PalTargetList.Targets.FirstOrDefault(t => t.LatestJob == vm.LatestJob));
         }
 
+        public void Dispose()
+        {
+            Storage.SaveReloaded -= Storage_SaveReloaded;
+            CachedSaveGame.SaveFileLoadEnd -= CachedSaveGame_SaveFileLoadEnd;
+        }
+
+        private void CachedSaveGame_SaveFileLoadEnd(ISaveGame save, CachedSaveGame cachedSave)
+        {
+
+            PalTargetList.UpdateCachedData(cachedSave, GameSettingsViewModel.Load(save).ModelObject);
+        }
+
         private void Storage_SaveReloaded(ISaveGame save)
         {
             if (OpenedSave?.Value == save)
+            {
                 UpdateFromSaveProperties();
+            }
         }
 
         private void OnDeletePalSpecifier(PalSpecifierViewModel spec)
