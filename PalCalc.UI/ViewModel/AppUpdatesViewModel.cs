@@ -87,12 +87,11 @@ namespace PalCalc.UI.ViewModel
             var res = AdonisMessageBox.Show(App.Current.MainWindow, new AdonisMessageBoxModel()
             {
                 Caption = LocalizationCodes.LC_UPDATE_AVAILABLE.Bind().Value,
-                Text = $"PalCalc {version.Version} is available! Would you like to open the download page now?",
+                Text = LocalizationCodes.LC_UPDATES_CHECK_BODY.Bind(version.Version).Value,
                 Buttons = [
                     AdonisMessageBoxButtons.Yes(),
                     AdonisMessageBoxButtons.Cancel(AdonisMessageBoxButtonLabels.No),
-                    // TODO ITL
-                    AdonisMessageBoxButtons.No("Skip this version")
+                    AdonisMessageBoxButtons.No(LocalizationCodes.LC_UPDATES_CHECK_OPTION_SKIP.Bind().Value)
                 ]
             });
 

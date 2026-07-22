@@ -18,7 +18,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             {
                 SaveType = SaveType.Xbox,
                 AvailableSaves = new([]),
-                TypeLabel = new HardCodedText("Xbox"), // TODO ITL
+                TypeLabel = LocalizationCodes.LC_SAVE_KIND_TITLE_XBOX.Bind(),
                 Title = null,
                 OpenFolderCommand = null,
                 AddSaveCommand = null,
@@ -40,7 +40,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             {
                 SourceLocation = location,
                 SaveType = SaveType.Xbox,
-                TypeLabel = new HardCodedText("Xbox"), // TODO ITL
+                TypeLabel = LocalizationCodes.LC_SAVE_KIND_TITLE_XBOX.Bind(),
                 Title = location.FolderPath != null ? new HardCodedText(((ISavesLocation)location).FolderName) : null,
                 OpenFolderCommand = location.FolderPath != null
                     ? new RelayCommand(() => WindowsUtils.OpenPathInExplorer(location.FolderPath))

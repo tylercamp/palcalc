@@ -52,7 +52,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             var res = new SavesCollectionViewModel()
             {
                 SaveType = SaveType.LocalFile,
-                TypeLabel = new HardCodedText("Local Files"), // TODO ITL
+                TypeLabel = LocalizationCodes.LC_SAVE_KIND_TITLE_LOCAL_FILES.Bind(),
                 Title = null,
                 OpenFolderCommand = null,
             };

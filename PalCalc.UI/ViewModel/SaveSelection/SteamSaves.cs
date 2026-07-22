@@ -19,7 +19,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             {
                 SaveType = SaveType.Steam,
                 AvailableSaves = new([]),
-                TypeLabel = new HardCodedText("Steam"), // TODO ITL
+                TypeLabel = LocalizationCodes.LC_SAVE_KIND_TITLE_STEAM.Bind(),
                 Title = null,
                 OpenFolderCommand = null,
                 AddSaveCommand = null,
@@ -45,7 +45,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             {
                 SourceLocation = location,
                 SaveType = SaveType.Steam,
-                TypeLabel = new HardCodedText("Steam"), // TODO ITL
+                TypeLabel = LocalizationCodes.LC_SAVE_KIND_TITLE_STEAM.Bind(),
                 Title = new HardCodedText(location.FolderName),
                 OpenFolderCommand = new RelayCommand(() => WindowsUtils.OpenPathInExplorer(location.FolderPath)),
                 AddSaveCommand = null,

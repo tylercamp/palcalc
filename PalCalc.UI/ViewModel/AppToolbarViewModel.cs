@@ -79,24 +79,25 @@ namespace PalCalc.UI.ViewModel
                 {
                     var result = await appUpdates.FetchNewUpdateUrl();
 
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                    // don't need to run this synchronously
                     dispatcher.BeginInvoke(() =>
                     {
                         if (result.Status == AppUpdateCheckStatus.Failed)
                         {
-                            // TODO - ITL
-                            AdonisMessageBox.Show("Unable to check for updates right now.");
+                            AdonisMessageBox.Show(LocalizationCodes.LC_UPDATES_CHECK_RESULT_FAILED.Bind().Value);
                             return;
                         }
 
                         if (result.Status == AppUpdateCheckStatus.UpToDate)
                         {
-                            // TODO - ITL
-                            AdonisMessageBox.Show("Pal Calc is up to date!");
+                            AdonisMessageBox.Show(LocalizationCodes.LC_UPDATES_CHECK_RESULT_ON_LATEST.Bind().Value);
                             return;
                         }
 
                         appUpdates.PromptUpdateDownload(result.Version);
                     }, DispatcherPriority.ContextIdle);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 }
                 catch (Exception e)
                 {

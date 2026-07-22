@@ -56,7 +56,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             var res = new SavesCollectionViewModel();
             res.SourceLocation = null;
             res.SaveType = SaveType.Virtual;
-            res.TypeLabel = new HardCodedText("Virtual Saves"); // TODO ITL
+            res.TypeLabel = LocalizationCodes.LC_SAVE_KIND_TITLE_VIRTUAL.Bind();
             res.Title = null;
             res.OpenFolderCommand = null;
 
