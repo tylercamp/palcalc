@@ -19,7 +19,6 @@
             <materialIcons:MaterialIcon Kind="MenuDown" />
         </Button>
         <Popup PlacementTarget="{Binding ElementName=ControlsButton}" IsOpen="{Binding MenuIsOpen}" StaysOpen="False" AllowsTransparency="True" >
-            <!-- TODO ITL -->
             <Border Padding="0 0 5 5">
                 <Border.Effect>
                     <DropShadowEffect Color="Black" 
@@ -29,7 +28,7 @@
                           Opacity="0.2"/>
                 </Border.Effect>
                 <StackPanel Orientation="Vertical" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}">
-                    <MenuItem Header="Back to Save Selector" Command="{Binding NavigateSaveSelectionPageCommand}" Visibility="{Binding NavigateSaveSelectionPageCommand, Converter={StaticResource VVC}}" />
+                    <MenuItem Header="{itl:LocalizedText LC_NAV_BACK_TO_SAVE_SELECTOR}" Command="{Binding NavigateSaveSelectionPageCommand}" Visibility="{Binding NavigateSaveSelectionPageCommand, Converter={StaticResource VVC}}" />
                     <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE}" Command="{Binding ExportSaveCommand}" />
                     <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE_CSV}" Command="{Binding ExportSaveCsvCommand}" />
                     <MenuItem Header="{itl:LocalizedText LC_INSPECT_SAVE}" Command="{Binding InspectSaveCommand}" />

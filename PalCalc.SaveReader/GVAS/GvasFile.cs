@@ -1,4 +1,5 @@
 ﻿using PalCalc.SaveReader.FArchive;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -59,6 +60,8 @@ namespace PalCalc.SaveReader.GVAS
 
     public class GvasFile
     {
+        private static ILogger logger = Log.ForContext<GvasFile>();
+
         public GvasHeader Header { get; set; }
         public Dictionary<string, object> Properties { get; set; }
 
@@ -135,9 +138,9 @@ namespace PalCalc.SaveReader.GVAS
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // TODO log
+                logger.Debug(e, "Exception thrown while checking IsValidGvas, returning false");
                 return false;
             }
         }

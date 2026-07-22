@@ -224,10 +224,7 @@ adonisExtensions:LayerExtension.Layer="0" />
                         <Button Command="{Binding LoadSaveCommand}"
                                 CommandParameter="{Binding SelectedSave}"
                                 >
-                            <!-- TODO ITL -->
-                            <TextBlock FontWeight="Bold">
-                                Open in Solver
-                            </TextBlock>
+                            <TextBlock FontWeight="Bold" Text="{itl:LocalizedText LC_NAV_OPEN_IN_SOLVER}" />
                         </Button>
 
                         <Button Command="{Binding SelectedCollection.RemoveSaveCommand}"

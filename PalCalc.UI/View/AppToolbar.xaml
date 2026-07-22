@@ -28,10 +28,9 @@
         <MenuItem Header="Debug" Padding="5" Name="DebugMenuItem">
             <MenuItem Header="Translation Debugger" Click="TranslationDebugger_Click" />
         </MenuItem>
-        <MenuItem Header="Help" Padding="5">
-            <MenuItem Header="{itl:LocalizedText LC_EXPORT_CRASH_LOG}" Command="{Binding ExportCrashLogCommand}" />
-            <!-- TODO ITL -->
-            <MenuItem Command="{Binding ForceCheckForUpdatesCommand}" Header="Check for updates" />
+        <MenuItem Header="{itl:LocalizedText LC_HELP}" Padding="5">
+            <MenuItem Command="{Binding ExportCrashLogCommand}" Header="{itl:LocalizedText LC_EXPORT_CRASH_LOG}" />
+            <MenuItem Command="{Binding ForceCheckForUpdatesCommand}" Header="{itl:LocalizedText LC_NAV_FORCE_CHECK_UPDATES}" />
             <MenuItem Command="{Binding OpenAboutWindowCommand}" Header="{itl:LocalizedText LC_ABOUT_APP}" />
         </MenuItem>
     </Menu>
