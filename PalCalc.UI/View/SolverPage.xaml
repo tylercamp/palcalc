@@ -66,10 +66,6 @@
                                 </Button>
                             </Grid>
                         </Border>
-                        <!--<Expander Header="{itl:LocalizedText LC_SAVE_FILE}" IsExpanded="True" adonisExtensions:LayerExtension.IncreaseLayer="True">
-                            
-                            --><!--<v:SaveSelectorView DataContext="{Binding SaveSelection}" AllowNavigation="{Binding RelativeSource={RelativeSource AncestorType=local:SolverPage}, Path=DataContext.SolverQueue.QueuedItems.Count, Converter={StaticResource NegatedVBC}}" />--><!--
-                        </Expander>-->
 
                         <!-- "Game Settings" section -->
                         <Expander Header="{itl:LocalizedText LC_GAME_SETTINGS}" IsExpanded="True" adonisExtensions:LayerExtension.IncreaseLayer="True">
