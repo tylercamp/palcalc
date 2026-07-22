@@ -29,6 +29,12 @@ namespace PalCalc.UI.ViewModel.PalDerived
         [ObservableProperty]
         private string label;
 
+        partial void OnLabelChanged(string value)
+        {
+            foreach (var pal in Contents)
+                pal.Location.ContainerId = value;
+        }
+
         // (hide the detail that ID-based references should be to a custom container's label)
         public string ContainerId => Label;
 

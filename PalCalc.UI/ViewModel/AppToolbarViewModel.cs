@@ -77,22 +77,30 @@ namespace PalCalc.UI.ViewModel
             {
                 try
                 {
-                    var newVersion = await appUpdates.FetchNewUpdateUrl();
+                    var result = await appUpdates.FetchNewUpdateUrl();
 
                     dispatcher.BeginInvoke(() =>
                     {
-                        if (newVersion == null)
+                        if (result.Status == AppUpdateCheckStatus.Failed)
                         {
+                            // TODO - ITL
+                            AdonisMessageBox.Show("Unable to check for updates right now.");
+                            return;
+                        }
+
+                        if (result.Status == AppUpdateCheckStatus.UpToDate)
+                        {
+                            // TODO - ITL
                             AdonisMessageBox.Show("Pal Calc is up to date!");
                             return;
                         }
 
-                        appUpdates.PromptUpdateDownload(newVersion);
+                        appUpdates.PromptUpdateDownload(result.Version);
                     }, DispatcherPriority.ContextIdle);
                 }
                 catch (Exception e)
                 {
-                    // TODO
+                    logger.Warning(e, "error checking for updates");
                 }
             });
         }

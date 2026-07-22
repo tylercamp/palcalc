@@ -43,6 +43,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
         {
             var res = new SavesCollectionViewModel()
             {
+                SourceLocation = location,
                 SaveType = SaveType.Steam,
                 TypeLabel = new HardCodedText("Steam"), // TODO ITL
                 Title = new HardCodedText(location.FolderName),

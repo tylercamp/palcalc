@@ -1,6 +1,8 @@
 ﻿using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
+using PalCalc.UI.View.Inspector;
+using PalCalc.UI.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -44,10 +46,10 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 
         public void RemoveManualSave(StandardSaveGame manualSave)
         {
+            SaveInspectorWindowManager.CloseAll(manualSave);
+            SaveCustomizationsViewModel.RemoveFor(manualSave);
             settings.ExtraSaveLocations.Remove(manualSave.BasePath);
             Storage.SaveAppSettings(settings);
-
-            // TODO - do customizations need to be disposed here?
 
             Storage.RemoveSave(manualSave);
             manualSave.Dispose();
@@ -55,8 +57,8 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 
         public void RemoveVirtualSave(VirtualSaveGame virtualSave)
         {
-            // TODO - dispose customizations
-            // (note yet in SaveGameViewModel2)
+            SaveInspectorWindowManager.CloseAll(virtualSave);
+            SaveCustomizationsViewModel.RemoveFor(virtualSave);
 
             settings.FakeSaveNames.Remove(FakeSaveGame.GetLabel(virtualSave));
 

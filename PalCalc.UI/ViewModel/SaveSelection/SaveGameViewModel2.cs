@@ -1,24 +1,20 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using Newtonsoft.Json.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using Serilog;
-using Serilog.Core;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 
 namespace PalCalc.UI.ViewModel.SaveSelection
 {
-    public class SaveGameViewModel2
+    public partial class SaveGameViewModel2 : ObservableObject
     {
-        private static ILogger logger = Log.ForContext<SaveGameViewModel2>();
+        private static readonly ILogger logger = Log.ForContext<SaveGameViewModel2>();
 
         private static SaveGameViewModel2 designerInstance;
         public static SaveGameViewModel2 DesignerInstance =>
@@ -27,43 +23,85 @@ namespace PalCalc.UI.ViewModel.SaveSelection
         public SaveGameViewModel2(SavesCollectionViewModel parent, ISaveGame save)
         {
             Parent = parent;
-
             Type = parent.SaveType;
             Value = save;
-            IsValid = save.IsValid;
 
             ReadSaveProperties();
-
-            save.Updated += (_) =>
-            {
-                if (!HasChanges)
-                    App.Current.Dispatcher.BeginInvoke(() => HasChanges = true);
-            };
 
             ReloadSaveCommand = new RelayCommand(() =>
             {
                 Storage.ReloadSave(parent.SourceLocation, save, PalDB.LoadEmbedded(), GameSettingsViewModel.Load(save).ModelObject);
             });
 
-            Customizations = new SaveCustomizationsViewModel(this);
+            SubscribeToChanges(save);
+        }
 
-            Storage.SaveReloaded += RespondToChanges;
-            CachedSaveGame.SaveFileLoadEnd += (save, cached) => RespondToChanges(save);
+        private void SubscribeToChanges(ISaveGame save)
+        {
+            // TODO - Replace these self-cleaning weak callbacks with explicit save-session ownership.
+            var weakSelf = new WeakReference<SaveGameViewModel2>(this);
+
+            Action<ISaveGame> saveUpdated = null;
+            saveUpdated = _ =>
+            {
+                if (weakSelf.TryGetTarget(out var vm))
+                    vm.QueueHasChanges();
+                else
+                    save.Updated -= saveUpdated;
+            };
+            save.Updated += saveUpdated;
+
+            Action<ISaveGame> saveReloaded = null;
+            saveReloaded = changedSave =>
+            {
+                if (weakSelf.TryGetTarget(out var vm))
+                    vm.RespondToChanges(changedSave);
+                else
+                    Storage.SaveReloaded -= saveReloaded;
+            };
+            Storage.SaveReloaded += saveReloaded;
+
+            Action<ISaveGame, CachedSaveGame> saveLoadEnded = null;
+            saveLoadEnded = (changedSave, _) =>
+            {
+                if (weakSelf.TryGetTarget(out var vm))
+                    vm.RespondToChanges(changedSave);
+                else
+                    CachedSaveGame.SaveFileLoadEnd -= saveLoadEnded;
+            };
+            CachedSaveGame.SaveFileLoadEnd += saveLoadEnded;
+        }
+
+        private void QueueHasChanges()
+        {
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher == null || dispatcher.CheckAccess())
+            {
+                HasChanges = true;
+                return;
+            }
+
+            dispatcher.BeginInvoke(() => HasChanges = true);
         }
 
         private void RespondToChanges(ISaveGame changedSave)
         {
-            if (changedSave == Value)
+            if (changedSave != Value) return;
+
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher == null || dispatcher.CheckAccess())
             {
-                App.Current.Dispatcher.BeginInvoke(() =>
-                {
-                    ReadSaveProperties();
-                    if (changedSave.IsLocal)
-                        HasChanges = false;
-                    else
-                        HasChanges = true;
-                });
+                UpdateAfterChange(changedSave);
+                return;
             }
+
+            dispatcher.BeginInvoke(() => UpdateAfterChange(changedSave));
+        }
+
+        private void UpdateAfterChange(ISaveGame changedSave)
+        {
+            ReadSaveProperties();
+            HasChanges = !changedSave.IsLocal;
         }
 
         private void ReadSaveProperties()
@@ -71,8 +109,13 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             try
             {
                 var meta = Value.LevelMeta.ReadGameOptions();
+                WorldName = meta.WorldName;
+                DayNumber = meta.InGameDay;
+
                 if (meta.IsServerSave)
                 {
+                    MainPlayerName = null;
+                    MainPlayerLevel = null;
                     CombinedLabel = LocalizationCodes.LC_SAVE_GAME_LBL_SERVER.Bind(new
                     {
                         DayNumber = meta.InGameDay,
@@ -81,6 +124,8 @@ namespace PalCalc.UI.ViewModel.SaveSelection
                 }
                 else
                 {
+                    MainPlayerName = meta.PlayerName;
+                    MainPlayerLevel = meta.PlayerLevel;
                     CombinedLabel = LocalizationCodes.LC_SAVE_GAME_LBL.Bind(new
                     {
                         PlayerName = meta.PlayerName,
@@ -93,10 +138,15 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             catch (Exception ex)
             {
                 logger.Warning(ex, "error when loading LevelMeta for {saveId}", CachedSaveGame.IdentifierFor(Value));
+                WorldName = null;
+                DayNumber = null;
+                MainPlayerName = null;
+                MainPlayerLevel = null;
                 CombinedLabel = LocalizationCodes.LC_SAVE_GAME_LBL_NO_METADATA.Bind(Value.GameId);
             }
 
             IsValid = Value.IsValid;
+            OnPropertyChanged(nameof(LastModified));
         }
 
         // TODO - Remove the need for this
@@ -104,21 +154,33 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 
         public SaveType Type { get; set; }
 
-        public ISaveGame Value { get; set; }
-        public bool IsValid { get; set; }
+        public ISaveGame Value { get; }
+        public DateTime LastModified => Value.LastModified;
 
-        public ILocalizedText CombinedLabel { get; set; }
+        [ObservableProperty]
+        private bool isValid;
+
+        [ObservableProperty]
+        private ILocalizedText combinedLabel;
 
         public ObservableCollection<ILocalizedText> Warnings { get; set; }
 
-        public string WorldName { get; set; }
-        public string MainPlayerName { get; set; }
-        public int? MainPlayerLevel { get; set; }
-        public int? DayNumber { get; set; }
+        [ObservableProperty]
+        private string worldName;
 
-        public bool HasChanges { get; private set; }
+        [ObservableProperty]
+        private string mainPlayerName;
 
-        public SaveCustomizationsViewModel Customizations { get; }
+        [ObservableProperty]
+        private int? mainPlayerLevel;
+
+        [ObservableProperty]
+        private int? dayNumber;
+
+        [ObservableProperty]
+        private bool hasChanges;
+
+        public SaveCustomizationsViewModel Customizations => SaveCustomizationsViewModel.GetOrCreate(Value);
 
         public CachedSaveGame CachedValue => Storage.LoadSave(Parent.SourceLocation, Value, PalDB.LoadEmbedded(), GameSettingsViewModel.Load(Value).ModelObject);
 

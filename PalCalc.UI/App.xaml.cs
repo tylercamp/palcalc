@@ -68,6 +68,12 @@ namespace PalCalc.UI
             base.OnStartup(e);
         }
 
+        protected override void OnExit(ExitEventArgs e)
+        {
+            SaveCustomizationsViewModel.FlushAll();
+            base.OnExit(e);
+        }
+
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             logger.Fatal(e.ExceptionObject as Exception, "An unhandled error occurred");

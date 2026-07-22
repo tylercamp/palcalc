@@ -38,6 +38,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
         {
             var res = new SavesCollectionViewModel()
             {
+                SourceLocation = location,
                 SaveType = SaveType.Xbox,
                 TypeLabel = new HardCodedText("Xbox"), // TODO ITL
                 Title = location.FolderPath != null ? new HardCodedText(((ISavesLocation)location).FolderName) : null,

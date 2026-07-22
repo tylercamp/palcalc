@@ -24,13 +24,22 @@ namespace PalCalc.UI.ViewModel
 
     record class NewAppVersion(string Version, string Url);
 
+    internal enum AppUpdateCheckStatus
+    {
+        UpToDate,
+        UpdateAvailable,
+        Failed,
+    }
+
+    internal record class AppUpdateCheckResult(AppUpdateCheckStatus Status, NewAppVersion Version = null);
+
     class AppUpdatesViewModel
     {
         private static ILogger logger = Log.ForContext<AppUpdatesViewModel>();
 
         private string VersionFromUrl(string url) => url.Split('/').Last();
 
-        public async Task<NewAppVersion> FetchNewUpdateUrl()
+        public async Task<AppUpdateCheckResult> FetchNewUpdateUrl()
         {
             try
             {
@@ -46,8 +55,10 @@ namespace PalCalc.UI.ViewModel
                             var latestVersion = VersionFromUrl(location.AbsoluteUri);
                             if (latestVersion != App.Version)
                             {
-                                return new NewAppVersion(latestVersion, location.AbsoluteUri);
+                                return new AppUpdateCheckResult(AppUpdateCheckStatus.UpdateAvailable, new NewAppVersion(latestVersion, location.AbsoluteUri));
                             }
+
+                            return new AppUpdateCheckResult(AppUpdateCheckStatus.UpToDate);
                         }
                         else
                         {
@@ -65,7 +76,7 @@ namespace PalCalc.UI.ViewModel
                 logger.Warning(e, "error fetching latest version");
             }
 
-            return null;
+            return new AppUpdateCheckResult(AppUpdateCheckStatus.Failed);
         }
 
         public void OpenUpdateUrl(string url) =>

@@ -308,7 +308,7 @@ adonisExtensions:LayerExtension.Layer="0" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Modified" Foreground="Gray" />
-                        <TextBlock Grid.Column="2" Text="{Binding SelectedSaveGameLastModified, StringFormat={}{0:G}}" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.LastModified, StringFormat={}{0:G}}" />
                     </Grid>
 
                     <Grid Margin="0,0,0,12">
@@ -318,7 +318,7 @@ adonisExtensions:LayerExtension.Layer="0" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Game ID" Foreground="Gray" />
-                        <TextBlock Grid.Column="2" Text="{Binding SelectedSaveGameGameId}" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.Value.GameId}" />
                     </Grid>
                 </StackPanel>
             </Grid>

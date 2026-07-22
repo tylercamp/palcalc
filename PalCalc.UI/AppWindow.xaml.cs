@@ -77,16 +77,26 @@ namespace PalCalc.UI
 
             CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
+            RemoveMissingManualSaveLocations();
             BeginNavigateSaveSelectionPage();
+        }
 
-            dispatcher.BeginInvoke(() =>
-            {
-                Task.Run(() =>
+        private void RemoveMissingManualSaveLocations()
+        {
+            var remainingLocations = settings.ExtraSaveLocations
+                .Where(location =>
                 {
-                    db = PalDB.LoadEmbedded();
-                    PalBreedingDB.BeginLoadEmbedded(db);
-                });
-            }, DispatcherPriority.ContextIdle);
+                    if (Directory.Exists(location)) return true;
+
+                    Storage.ClearForSave(new StandardSaveGame(location));
+                    return false;
+                })
+                .ToList();
+
+            if (remainingLocations.Count == settings.ExtraSaveLocations.Count) return;
+
+            settings.ExtraSaveLocations = remainingLocations;
+            Storage.SaveAppSettings(settings);
         }
 
         private bool CanBeginNavigateSaveSelectionPage() => Content is SolverPage;
@@ -104,7 +114,18 @@ namespace PalCalc.UI
                 {
                     try
                     {
-                        var saves = SavesDetection.FindAll(settings, savesService);
+                        // TODO - Move startup loading/detection orchestration into dedicated services.
+                        var databaseTask = Task.Run(() =>
+                        {
+                            var loadedDb = PalDB.LoadEmbedded();
+                            PalBreedingDB.BeginLoadEmbedded(loadedDb);
+                            return loadedDb;
+                        });
+                        var savesTask = Task.Run(() => SavesDetection.FindAll(settings, savesService));
+
+                        Task.WaitAll(databaseTask, savesTask);
+                        db = databaseTask.Result;
+                        var saves = savesTask.Result;
                         App.Current.Dispatcher.BeginInvoke(() =>
                         {
                             NavigateSaveSelectionPage(saves);
@@ -133,9 +154,11 @@ namespace PalCalc.UI
         {
             Task.Run(async () =>
             {
-                var newVersion = await appUpdates.FetchNewUpdateUrl();
-                if (newVersion == null)
+                var result = await appUpdates.FetchNewUpdateUrl();
+                if (result.Status != AppUpdateCheckStatus.UpdateAvailable)
                     return;
+
+                var newVersion = result.Version;
 
                 if (settings.SkippedAppVersion == newVersion.Version)
                     return;
@@ -171,7 +194,7 @@ namespace PalCalc.UI
             Storage.SaveAppSettings(settings);
             CrashSupport.ReferencedSave(selectedSave.Value);
 
-            var parsedSave = CachedSaveGame.FromSaveGame(null /* TODO */, selectedSave.Value, db, GameSettingsViewModel.Load(selectedSave.Value).ModelObject);
+            var parsedSave = Storage.LoadSave(selectedSave.Parent.SourceLocation, selectedSave.Value, db, GameSettingsViewModel.Load(selectedSave.Value).ModelObject);
             if (parsedSave == null)
                 return;
 

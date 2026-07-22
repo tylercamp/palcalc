@@ -15,23 +15,45 @@ using Serilog;
 using Serilog.Core;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 
 namespace PalCalc.UI.ViewModel
 {
-    internal partial class CommonSaveOperationsViewModel(
-        IRelayCommand navigateSaveSelectionPageCommand,
-        SavesCollectionViewModel selectedLocation,
-        SaveGameViewModel2 selectedSave
-    ) : ObservableObject
+    internal partial class CommonSaveOperationsViewModel : ObservableObject
     {
         private static ILogger logger = Log.ForContext<CommonSaveOperationsViewModel>();
+
+        private readonly IRelayCommand navigateSaveSelectionPageCommand;
+        private readonly SavesCollectionViewModel selectedLocation;
+        private readonly SaveGameViewModel2 selectedSave;
+
+        public CommonSaveOperationsViewModel(
+            IRelayCommand navigateSaveSelectionPageCommand,
+            SavesCollectionViewModel selectedLocation,
+            SaveGameViewModel2 selectedSave
+        )
+        {
+            this.navigateSaveSelectionPageCommand = navigateSaveSelectionPageCommand;
+            this.selectedLocation = selectedLocation;
+            this.selectedSave = selectedSave;
+
+            if (selectedSave != null)
+            {
+                PropertyChangedEventManager.AddHandler(
+                    selectedSave,
+                    SelectedSave_PropertyChanged,
+                    nameof(SaveGameViewModel2.IsValid)
+                );
+            }
+        }
 
         public static CommonSaveOperationsViewModel DesignerInstance { get; } = new CommonSaveOperationsViewModel(null, null, null);
 
@@ -39,6 +61,11 @@ namespace PalCalc.UI.ViewModel
         private bool menuIsOpen = false;
 
         public IRelayCommand NavigateSaveSelectionPageCommand => navigateSaveSelectionPageCommand;
+
+        private void SelectedSave_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            ExportSaveCsvCommand.NotifyCanExecuteChanged();
+        }
 
         [RelayCommand]
         private void OpenMenu()
@@ -131,11 +158,18 @@ namespace PalCalc.UI.ViewModel
 
             if (sfd.ShowDialog() == true)
             {
-                // TODO - ensure CachedValue is valid
-                File.WriteAllText(sfd.FileName, PalCSVExporter.Export(selectedSave.CachedValue, GameSettingsViewModel.Load(selectedSave.Value).ModelObject));
+                var cachedSave = selectedSave.CachedValue;
+                if (cachedSave == null)
+                {
+                    // TODO - ITL
+                    AdonisMessageBox.Show("The save could not be loaded.", caption: "");
+                    return;
+                }
+
+                File.WriteAllText(sfd.FileName, PalCSVExporter.Export(cachedSave, GameSettingsViewModel.Load(selectedSave.Value).ModelObject));
             }
         }
-        private bool CanExportSaveCsv() => selectedSave != null;
+        private bool CanExportSaveCsv() => selectedSave?.Value?.IsValid == true;
 
         [RelayCommand(CanExecute = nameof(CanInspectSave))]
         private void InspectSave()
@@ -144,14 +178,22 @@ namespace PalCalc.UI.ViewModel
             loadingModal.Owner = App.Current.MainWindow;
             loadingModal.DataContext = LocalizationCodes.LC_SAVE_INSPECTOR_LOADING.Bind();
 
-            // TODO - ensure CachedValue is valid
+            try
+            {
+                var vm = loadingModal.ShowDialogDuring(
+                    () => new SaveInspectorWindowViewModel(selectedLocation, selectedSave, GameSettingsViewModel.Load(selectedSave.Value).ModelObject)
+                );
 
-            var vm = loadingModal.ShowDialogDuring(
-                () => new SaveInspectorWindowViewModel(selectedLocation, selectedSave, GameSettingsViewModel.Load(selectedSave.Value).ModelObject)
-            );
-
-            var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
-            inspector.Show();
+                var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
+                SaveInspectorWindowManager.Register(selectedSave.Value, inspector);
+                inspector.Show();
+            }
+            catch (Exception e)
+            {
+                logger.Error(e, "Error loading save inspector data");
+                // TODO - ITL
+                AdonisMessageBox.Show("The save inspector could not be opened.", caption: "");
+            }
         }
         private bool CanInspectSave() => selectedSave != null;
     }

@@ -37,7 +37,6 @@ namespace PalCalc.UI.ViewModel.SaveSelection
 
             return new SaveGameViewModel2(parent, save)
             {
-                Value = save,
                 IsValid = true,
                 CombinedLabel = LocalizationCodes.LC_SAVE_GAME_LBL_SERVER.Bind(
                     // (InGameDay is always default 0, but the format param is required for this translation code)

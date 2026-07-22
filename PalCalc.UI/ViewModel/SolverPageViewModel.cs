@@ -70,6 +70,10 @@ namespace PalCalc.UI.ViewModel
         private AppSettings settings;
         private PassiveSkillsPresetCollectionViewModel passivePresets;
         private IRelayCommand<PalSpecifierViewModel> deletePalTargetCommand;
+        private ExitEventHandler appExitHandler;
+        private CancelEventHandler mainWindowClosingHandler;
+        private PropertyChangedEventHandler solverControlsPropertyChangedHandler;
+        private Action<PassiveSkillsPresetViewModel> presetSelectedHandler;
 
         public ICommand RunSolverCommand { get; }
         public ICommand PauseSolverCommand { get; }
@@ -120,40 +124,25 @@ namespace PalCalc.UI.ViewModel
             settings.SolverSettings ??= new SerializableSolverSettings();
             passivePresets = new PassiveSkillsPresetCollectionViewModel(settings.PassiveSkillsPresets);
 
-            // remove manually-added locations which no longer exist
-            var manualLocs = settings.ExtraSaveLocations
-                .Where(loc =>
-                {
-                    var exists = Directory.Exists(loc);
-                    if (!exists)
-                    {
-                        var asSave = new StandardSaveGame(loc);
-                        Storage.ClearForSave(asSave);
-                    }
-                    return exists;
-                })
-                .ToList();
-
-            Storage.SaveAppSettings(settings);
-
             PauseSolverCommand = new RelayCommand(PauseSolver);
             ResumeSolverCommand = new RelayCommand(ResumeSolver);
             CancelSolverCommand = new RelayCommand(CancelSolver);
 
             RunSolverCommand = new RelayCommand(RunSolver);
 
-            dispatcher.Invoke(() =>
+            this.dispatcher.Invoke(() =>
             {
                 // (needed for XAML designer view)
                 if (App.Current.MainWindow != null)
                 {
-                    App.Current.Exit += (o, e) =>
+                    appExitHandler = (o, e) =>
                     {
                         foreach (var target in SolverQueue.QueuedItems)
                             target.LatestJob.Cancel();
                     };
+                    App.Current.Exit += appExitHandler;
 
-                    App.Current.MainWindow.Closing += (o, e) =>
+                    mainWindowClosingHandler = (o, e) =>
                     {
                         if (SolverQueue.QueuedItems.Count == 0)
                             return;
@@ -165,6 +154,7 @@ namespace PalCalc.UI.ViewModel
                             e.Cancel = true;
                         }
                     };
+                    App.Current.MainWindow.Closing += mainWindowClosingHandler;
                 }
             });
 
@@ -175,11 +165,8 @@ namespace PalCalc.UI.ViewModel
                 resumeSolverCommand: ResumeSolverCommand
             );
             SolverControls.CopyFrom(settings.SolverSettings);
-            SolverControls.PropertyChanged += (s, e) =>
-            {
-                settings.SolverSettings = SolverControls.AsModel;
-                Storage.SaveAppSettings(settings);
-            };
+            solverControlsPropertyChangedHandler = SolverControls_PropertyChanged;
+            SolverControls.PropertyChanged += solverControlsPropertyChangedHandler;
 
             PalTargetList = targets;
             
@@ -189,18 +176,13 @@ namespace PalCalc.UI.ViewModel
             foreach (var target in targets.Targets.Where(t => !t.IsReadOnly))
                 target.DeleteCommand = deletePalTargetCommand;
 
-            targets.OrderChanged += SaveTargetList;
-
             Storage.SaveReloaded += Storage_SaveReloaded;
             CachedSaveGame.SaveFileLoadEnd += CachedSaveGame_SaveFileLoadEnd;
 
-            dispatcher.Invoke(UpdateFromSaveProperties);
+            this.dispatcher.Invoke(UpdateFromSaveProperties);
 
-            passivePresets.PresetSelected += selectedPreset =>
-            {
-                var spec = PalTarget?.CurrentPalSpecifier;
-                if (spec != null) selectedPreset.ApplyTo(spec);
-            };
+            presetSelectedHandler = PassivePresets_PresetSelected;
+            passivePresets.PresetSelected += presetSelectedHandler;
 
             SolverQueue.SelectItemCommand = new RelayCommand<PalSpecifierViewModel>(vm => PalTargetList.SelectedTarget = PalTargetList.Targets.FirstOrDefault(t => t.LatestJob == vm.LatestJob));
         }
@@ -209,12 +191,45 @@ namespace PalCalc.UI.ViewModel
         {
             Storage.SaveReloaded -= Storage_SaveReloaded;
             CachedSaveGame.SaveFileLoadEnd -= CachedSaveGame_SaveFileLoadEnd;
+
+            if (PalTargetList != null)
+            {
+                PalTargetList.PropertyChanged -= PalTargetList_PropertyChanged;
+                PalTargetList.OrderChanged -= SaveTargetList;
+            }
+
+            if (SelectedGameSettings != null)
+                SelectedGameSettings.PropertyChanged -= GameSettings_PropertyChanged;
+
+            if (SolverControls != null && solverControlsPropertyChangedHandler != null)
+                SolverControls.PropertyChanged -= solverControlsPropertyChangedHandler;
+
+            if (passivePresets != null && presetSelectedHandler != null)
+                passivePresets.PresetSelected -= presetSelectedHandler;
+
+            if (appExitHandler != null)
+                App.Current.Exit -= appExitHandler;
+
+            if (mainWindowClosingHandler != null && App.Current.MainWindow != null)
+                App.Current.MainWindow.Closing -= mainWindowClosingHandler;
         }
 
         private void CachedSaveGame_SaveFileLoadEnd(ISaveGame save, CachedSaveGame cachedSave)
         {
-
+            if (save != OpenedSave?.Value || cachedSave == null) return;
             PalTargetList.UpdateCachedData(cachedSave, GameSettingsViewModel.Load(save).ModelObject);
+        }
+
+        private void SolverControls_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            settings.SolverSettings = SolverControls.AsModel;
+            Storage.SaveAppSettings(settings);
+        }
+
+        private void PassivePresets_PresetSelected(PassiveSkillsPresetViewModel selectedPreset)
+        {
+            var spec = PalTarget?.CurrentPalSpecifier;
+            if (spec != null) selectedPreset.ApplyTo(spec);
         }
 
         private void Storage_SaveReloaded(ISaveGame save)
@@ -251,6 +266,15 @@ namespace PalCalc.UI.ViewModel
 
         private void UpdateFromSaveProperties()
         {
+            if (PalTargetList != null)
+            {
+                PalTargetList.PropertyChanged -= PalTargetList_PropertyChanged;
+                PalTargetList.OrderChanged -= SaveTargetList;
+            }
+
+            if (SelectedGameSettings != null)
+                SelectedGameSettings.PropertyChanged -= GameSettings_PropertyChanged;
+
             PalTargetList.PropertyChanged += PalTargetList_PropertyChanged;
             PalTargetList.OrderChanged += SaveTargetList; // TODO - debounce
 
