@@ -213,6 +213,7 @@
                     <StackPanel Grid.Column="0" Orientation="Horizontal">
                         <Label Padding="{adonisUi:Space 1}"
                                Content="Selected Save"
+                               VerticalAlignment="Center"
                                />
 
                         <v:CommonSaveControlsButton DataContext="{Binding CommonSelectedSaveOperations}" Margin="{adonisUi:Space 0, 0.5}"

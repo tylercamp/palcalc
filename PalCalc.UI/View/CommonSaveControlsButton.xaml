@@ -18,20 +18,22 @@
         <Button Padding="0" Width="24" Command="{Binding OpenMenuCommand}" Name="ControlsButton">
             <materialIcons:MaterialIcon Kind="MenuDown" />
         </Button>
-        <Popup PlacementTarget="{Binding ElementName=ControlsButton}" IsOpen="{Binding MenuIsOpen}" StaysOpen="False" AllowsTransparency="True" >
-            <Border Padding="0 0 5 5">
+        <Popup PlacementTarget="{Binding ElementName=ControlsButton}" IsOpen="{Binding MenuIsOpen}" StaysOpen="False" AllowsTransparency="True">
+            <Border Margin="0 0 8 8" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" BorderThickness="1">
                 <Border.Effect>
-                    <DropShadowEffect Color="Black" 
-                          Direction="315" 
-                          ShadowDepth="5"
-                          BlurRadius="5"
-                          Opacity="0.2"/>
+                    <DropShadowEffect ShadowDepth="2"
+                                      BlurRadius="8"
+                                      Opacity="0.3"
+                                      Direction="315"/>
                 </Border.Effect>
-                <StackPanel Orientation="Vertical" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}">
-                    <MenuItem Header="{itl:LocalizedText LC_NAV_BACK_TO_SAVE_SELECTOR}" Command="{Binding NavigateSaveSelectionPageCommand}" Visibility="{Binding NavigateSaveSelectionPageCommand, Converter={StaticResource VVC}}" />
+                <StackPanel Orientation="Vertical" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
                     <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE}" Command="{Binding ExportSaveCommand}" />
                     <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE_CSV}" Command="{Binding ExportSaveCsvCommand}" />
                     <MenuItem Header="{itl:LocalizedText LC_INSPECT_SAVE}" Command="{Binding InspectSaveCommand}" />
+                    <StackPanel Orientation="Vertical" Visibility="{Binding NavigateSaveSelectionPageCommand, Converter={StaticResource VVC}}">
+                        <Rectangle Fill="{DynamicResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}" Height="1" Margin="{adonisUi:Space 1, 0.25}" />
+                        <MenuItem Header="{itl:LocalizedText LC_NAV_BACK_TO_SAVE_SELECTOR}" Command="{Binding NavigateSaveSelectionPageCommand}" />
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </Popup>
