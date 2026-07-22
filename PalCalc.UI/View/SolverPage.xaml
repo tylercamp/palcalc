@@ -28,7 +28,7 @@
         <DockPanel>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition MinWidth="220" Width="260"/>
+                    <ColumnDefinition MinWidth="220" Width="300"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="232*" MinWidth="250" />
                     <ColumnDefinition Width="Auto"/>
