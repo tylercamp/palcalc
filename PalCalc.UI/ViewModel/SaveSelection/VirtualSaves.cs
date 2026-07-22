@@ -111,8 +111,6 @@ namespace PalCalc.UI.ViewModel.SaveSelection
                     AdonisMessageBoxButton.YesNo
                 );
 
-                // TODO - when going from solver page back to save selector page, need to
-                //        close all open Inspector (and Passives List) windows
                 if (confirmation == AdonisMessageBoxResult.Yes)
                 {
                     availableSaves.Remove(save);

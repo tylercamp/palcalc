@@ -15,12 +15,14 @@ using PalCalc.UI.ViewModel.Solver;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -118,7 +120,8 @@ namespace PalCalc.UI.ViewModel
         {
             this.dispatcher = dispatcher ?? Dispatcher.CurrentDispatcher;
             OpenedSave = selectedSave;
-            SaveOperations = saveOperations;
+
+            SaveOperations = saveOperations.WithNavigateCondition(() => SolverQueue.QueuedItems.Count == 0);
 
             settings = AppSettings.Current;
             settings.SolverSettings ??= new SerializableSolverSettings();
@@ -185,6 +188,10 @@ namespace PalCalc.UI.ViewModel
             passivePresets.PresetSelected += presetSelectedHandler;
 
             SolverQueue.SelectItemCommand = new RelayCommand<PalSpecifierViewModel>(vm => PalTargetList.SelectedTarget = PalTargetList.Targets.FirstOrDefault(t => t.LatestJob == vm.LatestJob));
+            ((INotifyCollectionChanged)SolverQueue.QueuedItems).CollectionChanged += (a, b) =>
+            {
+                SaveOperations.NavigateSaveSelectionPageCommand.NotifyCanExecuteChanged();
+            };
         }
 
         public void Dispose()

@@ -16,7 +16,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using Windows.Media.Streaming.Adaptive;
 
 using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 using AdonisMessageBoxButton = AdonisUI.Controls.MessageBoxButton;
@@ -107,8 +106,6 @@ namespace PalCalc.UI.ViewModel.SaveSelection
                     AdonisMessageBoxButton.YesNo
                 );
 
-                // TODO - when going from solver page back to save selector page, need to
-                //        close all open Inspector (and Passives List) windows
                 if (confirmation == AdonisMessageBoxResult.Yes)
                 {
                     availableSaves.Remove(save);

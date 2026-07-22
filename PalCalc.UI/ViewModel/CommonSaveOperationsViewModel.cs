@@ -57,6 +57,19 @@ namespace PalCalc.UI.ViewModel
 
         public static CommonSaveOperationsViewModel DesignerInstance { get; } = new CommonSaveOperationsViewModel(null, null, null);
 
+        public CommonSaveOperationsViewModel WithNavigateCondition(Func<bool> condition)
+        {
+            if (navigateSaveSelectionPageCommand == null)
+                return this; // no command to augment
+
+            var newCommand = new RelayCommand(
+                () => navigateSaveSelectionPageCommand.Execute(null),
+                () => navigateSaveSelectionPageCommand.CanExecute(null) && condition()
+            );
+
+            return new CommonSaveOperationsViewModel(newCommand, selectedLocation, selectedSave);
+        }
+
         [ObservableProperty]
         private bool menuIsOpen = false;
 

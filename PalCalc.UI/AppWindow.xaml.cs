@@ -43,8 +43,6 @@ namespace PalCalc.UI
         private PalDB db;
         private Dispatcher dispatcher;
 
-        // TODO - updates notification? translations dropdown?
-
         [ObservableProperty]
         private bool showToolbar = false;
 

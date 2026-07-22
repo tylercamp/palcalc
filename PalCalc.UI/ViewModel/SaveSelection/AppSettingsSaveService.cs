@@ -18,22 +18,6 @@ namespace PalCalc.UI.ViewModel.SaveSelection
     {
         public void AddManualSave(StandardSaveGame manualSave)
         {
-            // When a save is selected and we try to go to the solver page,
-            // should stay on the "Save Selector" until the save + solver data is
-            // loaded
-
-            //if (Storage.LoadSave(null, save, db, GameSettings.Defaults) == null)
-            //{
-            //    SaveSelection.SelectedGame = null;
-            //    return;
-            //}
-
-            //targetsBySaveFile.Add(save, new PalTargetListViewModel());
-
-            //var saveVm = manualSaves.Add(save);
-            //SaveSelection.SelectedGame = saveVm;
-
-
             settings.ExtraSaveLocations.Add(manualSave.BasePath);
             Storage.SaveAppSettings(settings);
         }
