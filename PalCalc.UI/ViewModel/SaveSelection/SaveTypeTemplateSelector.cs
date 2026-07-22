@@ -23,7 +23,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             if (item == null) return DefaultTemplate;
 
             if (item is SavesCollectionViewModel scvm) return SelectTemplate(scvm.SaveType, container);
-            if (item is SaveGameViewModel2 sgvm) return SelectTemplate(sgvm.Type, container);
+            if (item is SaveGameViewModel sgvm) return SelectTemplate(sgvm.Type, container);
 
             return (SaveType)item switch
             {

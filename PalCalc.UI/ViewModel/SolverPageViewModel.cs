@@ -55,7 +55,7 @@ namespace PalCalc.UI.ViewModel
                     designerInstance = new SolverPageViewModel(
                         Dispatcher.CurrentDispatcher,
                         CommonSaveOperationsViewModel.DesignerInstance,
-                        SaveGameViewModel2.DesignerInstance,
+                        SaveGameViewModel.DesignerInstance,
                         new PalTargetListViewModel()
                     );
                 }
@@ -80,7 +80,7 @@ namespace PalCalc.UI.ViewModel
         public ICommand ResumeSolverCommand { get; }
         public ICommand CancelSolverCommand { get; }
 
-        public SaveGameViewModel2 OpenedSave { get; }
+        public SaveGameViewModel OpenedSave { get; }
 
         [ObservableProperty]
         private GameSettingsViewModel selectedGameSettings;
@@ -114,7 +114,7 @@ namespace PalCalc.UI.ViewModel
         public CommonSaveOperationsViewModel SaveOperations { get; }
 
         // main app model
-        public SolverPageViewModel(Dispatcher dispatcher, CommonSaveOperationsViewModel saveOperations, SaveGameViewModel2 selectedSave, PalTargetListViewModel targets)
+        public SolverPageViewModel(Dispatcher dispatcher, CommonSaveOperationsViewModel saveOperations, SaveGameViewModel selectedSave, PalTargetListViewModel targets)
         {
             this.dispatcher = dispatcher ?? Dispatcher.CurrentDispatcher;
             OpenedSave = selectedSave;

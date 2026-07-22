@@ -23,20 +23,20 @@ namespace PalCalc.UI.ViewModel
 
         public IReadOnlyCollection<SavesCollectionViewModel> AvailableSaveGameCollections { get; }
 
-        public IRelayCommand<SaveGameViewModel2> LoadSaveCommand { get; }
+        public IRelayCommand<SaveGameViewModel> LoadSaveCommand { get; }
 
         [ObservableProperty]
         private SavesCollectionViewModel selectedCollection;
 
         [ObservableProperty]
-        private SaveGameViewModel2 selectedSave;
+        private SaveGameViewModel selectedSave;
 
         [ObservableProperty]
         private CommonSaveOperationsViewModel commonSelectedSaveOperations;
 
         public SaveSelectionOnboardingViewModel(
             IEnumerable<SavesCollectionViewModel> savesCollections,
-            IRelayCommand<SaveGameViewModel2> loadSaveCommand
+            IRelayCommand<SaveGameViewModel> loadSaveCommand
         )
         {
             AvailableSaveGameCollections = [.. savesCollections];

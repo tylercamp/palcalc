@@ -33,12 +33,12 @@ namespace PalCalc.UI.ViewModel
 
         private readonly IRelayCommand navigateSaveSelectionPageCommand;
         private readonly SavesCollectionViewModel selectedLocation;
-        private readonly SaveGameViewModel2 selectedSave;
+        private readonly SaveGameViewModel selectedSave;
 
         public CommonSaveOperationsViewModel(
             IRelayCommand navigateSaveSelectionPageCommand,
             SavesCollectionViewModel selectedLocation,
-            SaveGameViewModel2 selectedSave
+            SaveGameViewModel selectedSave
         )
         {
             this.navigateSaveSelectionPageCommand = navigateSaveSelectionPageCommand;
@@ -50,7 +50,7 @@ namespace PalCalc.UI.ViewModel
                 PropertyChangedEventManager.AddHandler(
                     selectedSave,
                     SelectedSave_PropertyChanged,
-                    nameof(SaveGameViewModel2.IsValid)
+                    nameof(SaveGameViewModel.IsValid)
                 );
             }
         }

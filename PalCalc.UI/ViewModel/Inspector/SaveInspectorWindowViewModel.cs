@@ -15,16 +15,16 @@ namespace PalCalc.UI.ViewModel.Inspector
     public class SaveInspectorWindowViewModel
     {
         private static SaveInspectorWindowViewModel designerInstance = null;
-        public static SaveInspectorWindowViewModel DesignerInstance => designerInstance ??= new SaveInspectorWindowViewModel(null, SaveGameViewModel2.DesignerInstance, GameSettings.Defaults);
+        public static SaveInspectorWindowViewModel DesignerInstance => designerInstance ??= new SaveInspectorWindowViewModel(null, SaveGameViewModel.DesignerInstance, GameSettings.Defaults);
 
-        public SaveGameViewModel2 DisplayedSave { get; }
+        public SaveGameViewModel DisplayedSave { get; }
 
         public SearchViewModel Search { get; }
         public SaveDetailsViewModel Details { get; }
 
         public ILocalizedText WindowTitle { get; }
 
-        public SaveInspectorWindowViewModel(SavesCollectionViewModel slvm, SaveGameViewModel2 sgvm, GameSettings settings)
+        public SaveInspectorWindowViewModel(SavesCollectionViewModel slvm, SaveGameViewModel sgvm, GameSettings settings)
         {
             DisplayedSave = sgvm;
 

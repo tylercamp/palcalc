@@ -12,15 +12,15 @@ using System.Windows;
 
 namespace PalCalc.UI.ViewModel.SaveSelection
 {
-    public partial class SaveGameViewModel2 : ObservableObject
+    public partial class SaveGameViewModel : ObservableObject
     {
-        private static readonly ILogger logger = Log.ForContext<SaveGameViewModel2>();
+        private static readonly ILogger logger = Log.ForContext<SaveGameViewModel>();
 
-        private static SaveGameViewModel2 designerInstance;
-        public static SaveGameViewModel2 DesignerInstance =>
-            designerInstance ??= new SaveGameViewModel2(ManualSaves.FromList([], null), CachedSaveGame.SampleForDesignerView.UnderlyingSave);
+        private static SaveGameViewModel designerInstance;
+        public static SaveGameViewModel DesignerInstance =>
+            designerInstance ??= new SaveGameViewModel(ManualSaves.FromList([], null), CachedSaveGame.SampleForDesignerView.UnderlyingSave);
 
-        public SaveGameViewModel2(SavesCollectionViewModel parent, ISaveGame save)
+        public SaveGameViewModel(SavesCollectionViewModel parent, ISaveGame save)
         {
             Parent = parent;
             Type = parent.SaveType;
@@ -39,7 +39,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
         private void SubscribeToChanges(ISaveGame save)
         {
             // TODO - Replace these self-cleaning weak callbacks with explicit save-session ownership.
-            var weakSelf = new WeakReference<SaveGameViewModel2>(this);
+            var weakSelf = new WeakReference<SaveGameViewModel>(this);
 
             Action<ISaveGame> saveUpdated = null;
             saveUpdated = _ =>

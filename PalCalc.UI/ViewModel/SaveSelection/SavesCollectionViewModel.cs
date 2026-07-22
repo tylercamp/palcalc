@@ -14,11 +14,11 @@ namespace PalCalc.UI.ViewModel.SaveSelection
     {
         public ISavesLocation SourceLocation { get; set; }
         public SaveType SaveType { get; set; }
-        public ReadOnlyObservableCollection<SaveGameViewModel2> AvailableSaves { get; set; }
+        public ReadOnlyObservableCollection<SaveGameViewModel> AvailableSaves { get; set; }
         public ILocalizedText TypeLabel { get; set; }
         public ILocalizedText Title { get; set; }
         public IRelayCommand OpenFolderCommand { get; set; }
         public IRelayCommand AddSaveCommand { get; set; }
-        public IRelayCommand<SaveGameViewModel2> RemoveSaveCommand { get; set; }
+        public IRelayCommand<SaveGameViewModel> RemoveSaveCommand { get; set; }
     }
 }

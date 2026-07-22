@@ -34,7 +34,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             );
         }
 
-        public static SaveGameViewModel2 FromSave(SavesCollectionViewModel parent, StandardSaveGame save)
+        public static SaveGameViewModel FromSave(SavesCollectionViewModel parent, StandardSaveGame save)
         {
             var res = SavesCommon.BuildNormalSave(
                 parent: parent,
@@ -57,7 +57,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
                 OpenFolderCommand = null,
             };
 
-            var availableSaves = new ObservableCollection<SaveGameViewModel2>([
+            var availableSaves = new ObservableCollection<SaveGameViewModel>([
                 .. existingSaves.Select(sg => FromSave(res, sg)).OrderBy(sg => sg.CombinedLabel.Value)
             ]);
             res.AvailableSaves = new(availableSaves);
@@ -98,7 +98,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
                 }
             });
 
-            res.RemoveSaveCommand = new RelayCommand<SaveGameViewModel2>((save) =>
+            res.RemoveSaveCommand = new RelayCommand<SaveGameViewModel>((save) =>
             {
                 var confirmation = AdonisMessageBox.Show(
                     App.ActiveWindow,

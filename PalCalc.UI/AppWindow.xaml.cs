@@ -174,7 +174,7 @@ namespace PalCalc.UI
         {
             var vm = new SaveSelectionOnboardingViewModel(
                 savesCollections: collections,
-                loadSaveCommand: new RelayCommand<SaveGameViewModel2>(NavigateSolverPage)
+                loadSaveCommand: new RelayCommand<SaveGameViewModel>(NavigateSolverPage)
             );
 
             var page = new SaveSelectionOnboardingPage();
@@ -188,7 +188,7 @@ namespace PalCalc.UI
             Content = page;
         }
 
-        private void NavigateSolverPage(SaveGameViewModel2 selectedSave)
+        private void NavigateSolverPage(SaveGameViewModel selectedSave)
         {
             settings.SelectedGameIdentifier = CachedSaveGame.IdentifierFor(selectedSave.Value);
             Storage.SaveAppSettings(settings);
@@ -203,7 +203,7 @@ namespace PalCalc.UI
             Content = new SolverPage(vm);
         }
 
-        private PalTargetListViewModel LoadPalTargets(SaveGameViewModel2 sg)
+        private PalTargetListViewModel LoadPalTargets(SaveGameViewModel sg)
         {
             var gameSettings = GameSettingsViewModel.Load(sg.Value).ModelObject;
             var originalCachedSave = Storage.LoadSaveFromCache(sg.Value, db);

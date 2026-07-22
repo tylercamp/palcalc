@@ -54,7 +54,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             return res;
         }
 
-        public static SaveGameViewModel2 FromSave(SavesCollectionViewModel parent, XboxSaveGame save)
+        public static SaveGameViewModel FromSave(SavesCollectionViewModel parent, XboxSaveGame save)
         {
             var result = SavesCommon.BuildNormalSave(
                 parent: parent,

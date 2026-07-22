@@ -28,7 +28,7 @@ namespace PalCalc.UI.ViewModel.Inspector
     public partial class SearchViewModel : ObservableObject
     {
         private static SearchViewModel designerInstance = null;
-        //public static SearchViewModel DesignerInstance => designerInstance ??= new SearchViewModel(SaveGameViewModel2.DesignerInstance, GameSettings.Defaults);
+        public static SearchViewModel DesignerInstance => designerInstance ??= new SearchViewModel(SaveGameViewModel.DesignerInstance, GameSettings.Defaults);
 
         private GameSettings settings;
 
@@ -46,10 +46,10 @@ namespace PalCalc.UI.ViewModel.Inspector
 
         public IRelayCommand<IContainerGridSlotViewModel> DeleteSlotCommand { get; }
 
-        private static bool IsValidCustomLabel(SaveGameViewModel2 context, string label) =>
+        private static bool IsValidCustomLabel(SaveGameViewModel context, string label) =>
             label.Length > 0 && !context.Customizations.CustomContainers.Any(c => c.Label == label);
 
-        public SearchViewModel(SaveGameViewModel2 sgvm, GameSettings settings)
+        public SearchViewModel(SaveGameViewModel sgvm, GameSettings settings)
         {
             this.settings = settings;
 
@@ -130,7 +130,7 @@ namespace PalCalc.UI.ViewModel.Inspector
             SearchSettings.PropertyChanged += SearchSettings_PropertyChanged;
         }
 
-        private void BuildContainerTree(SaveGameViewModel2 sgvm)
+        private void BuildContainerTree(SaveGameViewModel sgvm)
         {
             var csg = sgvm.CachedValue;
             var palsByContainerId = csg.OwnedPals.GroupBy(p => p.Location.ContainerId).ToDictionary(g => g.Key, g => g.ToList());

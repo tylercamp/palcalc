@@ -31,11 +31,11 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             );
         }
 
-        public static SaveGameViewModel2 FromSave(SavesCollectionViewModel parent, VirtualSaveGame save)
+        public static SaveGameViewModel FromSave(SavesCollectionViewModel parent, VirtualSaveGame save)
         {
             var meta = save.LevelMeta.ReadGameOptions();
 
-            return new SaveGameViewModel2(parent, save)
+            return new SaveGameViewModel(parent, save)
             {
                 IsValid = true,
                 CombinedLabel = LocalizationCodes.LC_SAVE_GAME_LBL_SERVER.Bind(
@@ -60,7 +60,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
             res.Title = null;
             res.OpenFolderCommand = null;
 
-            var availableSaves = new ObservableCollection<SaveGameViewModel2>(
+            var availableSaves = new ObservableCollection<SaveGameViewModel>(
                 [.. saves.Select(sg => FromSave(res, sg)).OrderBy(s => s.CombinedLabel.Value)]
             );
             res.AvailableSaves = new(availableSaves);
@@ -102,7 +102,7 @@ namespace PalCalc.UI.ViewModel.SaveSelection
                 availableSaves.Insert(orderedIndex, vm);
             });
 
-            res.RemoveSaveCommand = new RelayCommand<SaveGameViewModel2>((save) =>
+            res.RemoveSaveCommand = new RelayCommand<SaveGameViewModel>((save) =>
             {
                 var confirmation = AdonisMessageBox.Show(
                     App.ActiveWindow,

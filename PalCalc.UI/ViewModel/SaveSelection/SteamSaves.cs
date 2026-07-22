@@ -52,14 +52,14 @@ namespace PalCalc.UI.ViewModel.SaveSelection
                 RemoveSaveCommand = null
             };
 
-            res.AvailableSaves = new ReadOnlyObservableCollection<SaveGameViewModel2>(
+            res.AvailableSaves = new ReadOnlyObservableCollection<SaveGameViewModel>(
                 [.. location.ValidSaveGames.OfType<StandardSaveGame>().Select(dsl => FromSave(res, dsl))]
             );
 
             return res;
         }
 
-        public static SaveGameViewModel2 FromSave(SavesCollectionViewModel parent, StandardSaveGame save)
+        public static SaveGameViewModel FromSave(SavesCollectionViewModel parent, StandardSaveGame save)
         {
             var res = SavesCommon.BuildNormalSave(
                 parent: parent,

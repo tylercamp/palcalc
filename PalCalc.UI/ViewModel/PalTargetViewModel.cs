@@ -26,11 +26,11 @@ namespace PalCalc.UI.ViewModel
     /// </summary>
     public partial class PalTargetViewModel : ObservableObject
     {
-        private SaveGameViewModel2 sourceSave;
+        private SaveGameViewModel sourceSave;
 
         public PalTargetViewModel() : this(null, PalSpecifierViewModel.New, PassiveSkillsPresetCollectionViewModel.DesignerInstance) { }
 
-        public PalTargetViewModel(SaveGameViewModel2 sourceSave, PalSpecifierViewModel initial, PassiveSkillsPresetCollectionViewModel presets)
+        public PalTargetViewModel(SaveGameViewModel sourceSave, PalSpecifierViewModel initial, PassiveSkillsPresetCollectionViewModel presets)
         {
             this.sourceSave = sourceSave;
 

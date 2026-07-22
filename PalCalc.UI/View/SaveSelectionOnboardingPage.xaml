@@ -173,7 +173,7 @@
                          SelectedItem="{Binding SelectedSave}"
                          d:SelectedIndex="0">
                     <ListBox.ItemTemplate>
-                        <DataTemplate DataType="ssvm:SaveGameViewModel2">
+                        <DataTemplate DataType="ssvm:SaveGameViewModel">
                             <StackPanel Orientation="Horizontal" Margin="4,6">
                                 <TextBlock Text="{itl:LocalizedText LC_SAVE_WARNING}"
                                            Visibility="{Binding IsValid, Converter={StaticResource VVC_Negate}}"
