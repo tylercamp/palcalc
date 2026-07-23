@@ -276,9 +276,10 @@
                                VerticalAlignment="Center"
                                />
 
-                        <v:CommonSaveControlsButton DataContext="{Binding CommonSelectedSaveOperations}" Margin="{adonisUi:Space 0, 0.5}"
-
-adonisExtensions:LayerExtension.Layer="0" />
+                        <v:CommonSaveControlsButton DataContext="{Binding CommonSelectedSaveOperations}"
+                                                    Margin="{adonisUi:Space 0, 0.5}"
+                                                    adonisExtensions:LayerExtension.Layer="0"
+                                                    />
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="6" Margin="{adonisUi:Space 0.5}" adonisExtensions:LayerExtension.Layer="0">
@@ -319,6 +320,7 @@ adonisExtensions:LayerExtension.Layer="0" />
 
                 <!-- Properties -->
                 <StackPanel Grid.Row="2" Margin="{adonisUi:Space 1}">
+                    <!-- TODO - Better general styling + XAML structure -->
                     <Grid Margin="0,0,0,4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />

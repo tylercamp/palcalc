@@ -20,10 +20,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Security.Authentication;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -34,16 +30,6 @@ using AdonisMessageBoxResult = AdonisUI.Controls.MessageBoxResult;
 
 namespace PalCalc.UI.ViewModel
 {
-    internal class MainWindowViewModelLoadingProgress
-    {
-        public int LoadedSaves { get; set; }
-        public int TotalSaves { get; set; }
-
-        public double ProgressPercent => 100 * (TotalSaves > 0 ? (double)LoadedSaves / TotalSaves : 1);
-    }
-
-    
-
     internal partial class SolverPageViewModel : ObservableObject, IDisposable
     {
         private static SolverPageViewModel designerInstance;

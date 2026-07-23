@@ -16,8 +16,8 @@ namespace PalCalc.UI.ViewModel.PalDerived
     {
         public CustomContainerViewModel(CustomContainer value)
         {
-            Label = value.Label;
             Contents = new ObservableCollection<CustomPalInstanceViewModel>(value.Contents.Select(i => new CustomPalInstanceViewModel(i)));
+            Label = value.Label;
         }
 
         public CustomContainer ModelObject => new CustomContainer()

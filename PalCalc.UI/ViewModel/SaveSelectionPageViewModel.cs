@@ -16,9 +16,6 @@ namespace PalCalc.UI.ViewModel
 {
     internal partial class SaveSelectionPageViewModel : ObservableObject
     {
-        // TODO - Right now Steam is completely hidden if not detected, should instead display with
-        //        warning "Steam saves location not found"
-
         private static SaveSelectionPageViewModel _designerInstance;
         public static SaveSelectionPageViewModel DesignerInstance =>
             _designerInstance ??= new SaveSelectionPageViewModel(SavesCollectionViewModel.DetectAll(new AppSettings(), null), null);

@@ -30,8 +30,11 @@ namespace PalCalc.SaveReader.SaveFile
     // Files in the `Players/` folder may also have a `_dps.sav` file, which stores the player's pals in Dimensional Pal Storage
     public class PlayersDpsSaveFile(IFileSource files) : ISaveFile(files)
     {
+        private static ILogger logger = Log.ForContext<PlayersDpsSaveFile>();
+
         public virtual List<GvasCharacterInstance> ReadRawCharacters()
         {
+            logger.Debug("Reading Player_dps.sav file");
             var v = new DimensionalPalStorage_CharacterInstanceVisitor();
             ParseGvas(v);
             return v.Result;
@@ -78,6 +81,8 @@ namespace PalCalc.SaveReader.SaveFile
 
         public virtual PlayerMeta ReadPlayerContent()
         {
+            logger.Debug("Reading Player.sav file");
+
             var dataVisitor = new ValueCollectingVisitor(".SaveData", isCaseSensitive: false, K_PLAYER_UID, K_INSTANCE_ID, K_PARTY_CONTAINER_ID, K_PALBOX_CONTAINER_ID);
             ParseGvas(dataVisitor);
 
