@@ -212,13 +212,58 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type graphSharp:VertexControl}">
-                        <Border BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}" 
+                        <Border x:Name="NodeBorder"
+                                DataContext="{Binding Vertex, RelativeSource={RelativeSource TemplatedParent}}"
+                                BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
                                 Background="#111217"
                                 BorderThickness="2"
                                 CornerRadius="10,10,10,10"
                                 Padding="{TemplateBinding Padding}">
-                            <ContentPresenter Content="{TemplateBinding Vertex}" />
+                            <Grid>
+                                <ContentPresenter x:Name="NodeContent" Content="{TemplateBinding Vertex}" />
+                                <Button x:Name="ToggleButton"
+                                    Command="{Binding ToggleCheckedCommand}"
+                                    Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}"
+                                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                                    Background="Transparent" BorderThickness="0" Padding="0"
+                                    Margin="0,4,4,0" Cursor="Hand" Opacity="0.6">
+
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                                                    <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText Code=LC_GRAPH_UNCHECK_STEP_DESCRIPTION}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsChecked}" Value="False">
+                                                    <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText Code=LC_GRAPH_CHECK_STEP_DESCRIPTION}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+
+                                    <Grid>
+                                        <materialIcons:MaterialIcon x:Name="UncheckedIcon"
+                                            Kind="CircleOutline"
+                                            Width="16" Height="16" Foreground="#999" />
+                                        <materialIcons:MaterialIcon x:Name="CheckedIcon"
+                                            Kind="CheckCircle"
+                                            Width="16" Height="16" Foreground="#4CAF50"
+                                            Visibility="Collapsed" />
+                                    </Grid>
+                                </Button>
+                            </Grid>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsComplete}" Value="True">
+                                <Setter TargetName="NodeContent" Property="Opacity" Value="0.4" />
+                                <Setter TargetName="NodeBorder" Property="BorderBrush" Value="#4CAF50" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                                <Setter TargetName="ToggleButton" Property="Opacity" Value="1.0" />
+                                <Setter TargetName="UncheckedIcon" Property="Visibility" Value="Collapsed" />
+                                <Setter TargetName="CheckedIcon" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

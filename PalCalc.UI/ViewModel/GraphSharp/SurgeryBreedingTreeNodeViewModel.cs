@@ -1,4 +1,6 @@
-﻿using PalCalc.Solver.PalReference;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using PalCalc.Solver.PalReference;
 using PalCalc.Solver.Tree;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
@@ -38,7 +40,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
     }
 
     // (note: this node just represents the breeding table itself, the result pal is a separate (parent) node)
-    public partial class SurgeryBreedingTreeNodeViewModel : IBreedingTreeNodeViewModel
+    public partial class SurgeryBreedingTreeNodeViewModel : ObservableObject, IBreedingTreeNodeViewModel
     {
         public SurgeryBreedingTreeNodeViewModel(SurgeryOperationNode node)
         {
@@ -47,6 +49,39 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             Value = node;
             Operations = pref.Operations.Select(ISurgeryOperationViewModel.FromModelObject).ToList();
             GoldCost = pref.Operations.Sum(op => op.GoldCost);
+
+            ToggleCheckedCommand = new RelayCommand(() => IsChecked = !IsChecked);
+        }
+
+        [ObservableProperty]
+        private bool isChecked;
+
+        partial void OnIsCheckedChanged(bool value)
+        {
+            IsCheckedChanged?.Invoke();
+            OnPropertyChanged(nameof(IsComplete));
+        }
+
+        public event Action IsCheckedChanged;
+        public IRelayCommand ToggleCheckedCommand { get; }
+
+        public bool IsCheckable => false;
+
+        private IBreedingTreeNodeViewModel consumer;
+
+        public bool IsComplete => IsChecked || (consumer?.IsComplete ?? false);
+
+        public void SetConsumer(IBreedingTreeNodeViewModel node)
+        {
+            consumer = node;
+            if (consumer is ObservableObject obs)
+            {
+                obs.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(IsComplete))
+                        OnPropertyChanged(nameof(IsComplete));
+                };
+            }
         }
 
         private SurgeryTablePalReference pref;

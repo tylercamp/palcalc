@@ -285,6 +285,19 @@ namespace PalCalc.UI.ViewModel
             foreach (var list in targetsBySaveFile.Values)
                 list.OrderChanged += SaveTargetList;
 
+            // wire checked-state auto-save for all loaded targets
+            foreach (var (save, targetList) in targetsBySaveFile)
+            {
+                foreach (var target in targetList.Targets)
+                {
+                    if (target.CurrentResults != null)
+                    {
+                        var capturedTarget = target;
+                        target.CurrentResults.CheckedStateChanged += () => SaveTarget(capturedTarget);
+                    }
+                }
+            }
+
             Storage.SaveReloaded += Storage_SaveReloaded;
 
             dispatcher.Invoke(UpdateFromSaveProperties);
@@ -594,6 +607,8 @@ namespace PalCalc.UI.ViewModel
 
                     UpdatePalTarget();
                 }
+
+                currentSpec.CurrentResults.CheckedStateChanged += () => SaveTarget(currentSpec);
 
                 SaveTarget(currentSpec);
                 SaveTargetList(PalTargetList);

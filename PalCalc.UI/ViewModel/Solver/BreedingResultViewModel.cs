@@ -162,8 +162,13 @@ namespace PalCalc.UI.ViewModel.Solver
                     descriptionParts.Add(LocalizationCodes.LC_PAL_WILD_COUNT.Bind(numWildPals));
 
                 InputLocations = Translator.Join.Bind(descriptionParts);
+
+                foreach (var node in Graph.Nodes)
+                    node.IsCheckedChanged += () => CheckedStateChanged?.Invoke();
             }
         }
+
+        public event Action CheckedStateChanged;
 
         public ILocalizedText Label { get; }
         public ILocalizedText InputLocations { get; }
