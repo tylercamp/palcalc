@@ -22,6 +22,7 @@ namespace AdonisUI.Controls
             var messageBoxModel = new MessageBoxModel
             {
                 Text = text,
+                Buttons = [MessageBoxButtons.Ok()]
             };
 
             return Show(messageBoxModel);
