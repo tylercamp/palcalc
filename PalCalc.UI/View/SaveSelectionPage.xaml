@@ -270,10 +270,9 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- TODO ITL -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal">
                         <Label Padding="{adonisUi:Space 1}"
-                               Content="Selected Save"
+                               Content="{itl:LocalizedText LC_SELECTED_SAVE}"
                                VerticalAlignment="Center"
                                />
 

@@ -915,6 +915,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SELECTED_SAVE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SETTINGS_MASSIVE_EGG_INCUBATION,
         /// <summary>
         ///   Looks up a localized string similar to .

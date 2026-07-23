@@ -967,4 +967,7 @@
   <data name="LC_LOCATION_STEAM_INSTRUCTIONS" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SELECTED_SAVE" xml:space="preserve">
+    <value />
+  </data>
 </root>

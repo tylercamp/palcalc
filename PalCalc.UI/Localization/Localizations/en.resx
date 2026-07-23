@@ -1032,4 +1032,7 @@ When connecting to another person's multiplayer world, Palworld does not downloa
 
 When connecting to another person's multiplayer world, Palworld does not download the full save file. The data must be manually collected and added to "Local Files". See that section for more details.</value>
   </data>
+  <data name="LC_SELECTED_SAVE" xml:space="preserve">
+    <value>Selected Save</value>
+  </data>
 </root>
