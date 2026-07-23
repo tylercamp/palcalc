@@ -26,7 +26,13 @@
                                       Opacity="0.3"
                                       Direction="315"/>
                 </Border.Effect>
-                <StackPanel Orientation="Vertical" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
+                <!-- (Would normally just use a `StackPanel`, but `MenuItem` has some binding to a parent ItemsControl. We satisfy that to avoid noisy binding errors) -->
+                <ItemsControl Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
                     <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE}" Command="{Binding ExportSaveCommand}" />
                     <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE_CSV}" Command="{Binding ExportSaveCsvCommand}" />
                     <MenuItem Header="{itl:LocalizedText LC_INSPECT_SAVE}" Command="{Binding InspectSaveCommand}" />
@@ -34,7 +40,7 @@
                         <Rectangle Fill="{DynamicResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}" Height="1" Margin="{adonisUi:Space 1, 0.25}" />
                         <MenuItem Header="{itl:LocalizedText LC_NAV_BACK_TO_SAVE_SELECTOR}" Command="{Binding NavigateSaveSelectionPageCommand}" />
                     </StackPanel>
-                </StackPanel>
+                </ItemsControl>
             </Border>
         </Popup>
     </Grid>
