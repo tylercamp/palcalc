@@ -419,6 +419,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_LOCATION_STEAM_INSTRUCTIONS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_LOCATION_XBOX_INSTRUCTIONS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_MANUAL_SAVE_ALREADY_REGISTERED,
         /// <summary>
         ///   Looks up a localized string similar to .

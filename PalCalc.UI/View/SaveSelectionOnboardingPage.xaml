@@ -83,6 +83,14 @@
         
         <!-- LOCATION INSTRUCTION TEMPLATES -->
 
+        <DataTemplate x:Key="SteamSaveInstructionsTemplate">
+            <TextBlock Padding="{adonisUi:Space 2}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_LOCATION_STEAM_INSTRUCTIONS}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="XboxSaveInstructionsTemplate">
+            <TextBlock Padding="{adonisUi:Space 2}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_LOCATION_XBOX_INSTRUCTIONS}" />
+        </DataTemplate>
+
         <DataTemplate x:Key="ManualSaveInstructionsTemplate">
             <TextBlock Padding="{adonisUi:Space 2}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_LOCATION_MANUAL_SAVES_INSTRUCTIONS}" />
         </DataTemplate>
@@ -93,6 +101,8 @@
 
         <msvm:SaveTypeTemplateSelector x:Key="SaveTypeInstructionsTemplateSelector"
                                        DefaultTemplate="{StaticResource EmptyTemplate}"
+                                       SteamTemplate="{StaticResource SteamSaveInstructionsTemplate}"
+                                       XboxTemplate="{StaticResource XboxSaveInstructionsTemplate}"
                                        ManualSaveTemplate="{StaticResource ManualSaveInstructionsTemplate}"
                                        VirtualSaveTemplate="{StaticResource VirtualSaveInstructionsTemplate}"
                                        />

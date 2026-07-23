@@ -961,4 +961,10 @@
   <data name="LC_LOCATION_FAKE_SAVES_INSTRUCTIONS" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_LOCATION_XBOX_INSTRUCTIONS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LOCATION_STEAM_INSTRUCTIONS" xml:space="preserve">
+    <value />
+  </data>
 </root>

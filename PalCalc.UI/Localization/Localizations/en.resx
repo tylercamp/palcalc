@@ -1005,7 +1005,7 @@ Higher values have minimal effect on time required.</value>
     <value>No Steam save files were found. Steam will automatically download save files when Palworld is installed and ran at least once.</value>
   </data>
   <data name="LC_LOCATION_MANUAL_SAVES_INSTRUCTIONS" xml:space="preserve">
-    <value>"Local File" saves can be used to manually register Palworld save files with Pal Calc. A folder with Palworld save data will contain:
+    <value>Save files shared manually can be added here. A Palworld save is a folder containing:
 
 1. A Level.sav file - This is the main save data.
 2. A LevelMeta.sav file - This contains info like the host's player name and in-game day.
@@ -1013,13 +1013,23 @@ Higher values have minimal effect on time required.</value>
 
 Level.sav is required. Pal Calc benefits from the other files but can operate without them.
 
-When playing a P2P multiplayer session, the host player can use Pal Calc to export the save files to a ZIP and share with others.
+When playing a P2P multiplayer session ("Multiplayer" set to "On"), the host can use Pal Calc to export the save files to a ZIP and share with others.
 
 When playing on a dedicated server, these files must be gathered manually. You may need to ask the server host for a copy. Save files are typically included in any "backups" of server data.</value>
   </data>
   <data name="LC_LOCATION_FAKE_SAVES_INSTRUCTIONS" xml:space="preserve">
-    <value>A "Virtual Save" is a placeholder save file for players who are otherwise unable to load their save file into Pal Calc. (e.g. PlayStation saves, or Server saves where the server host does not provide a copy of the save files.)
+    <value>A "Virtual Save" is a placeholder for players who are otherwise unable to load their save file into Pal Calc. (e.g. PlayStation saves, or Server saves where the server host does not provide a copy of the save files.)
 
 Like all other save types, you can use the Save Inspector window ("Selected Save" menu → "Inspect") to manually add pals for the solver to use. The "Pal Containers" section on the left has a "Custom Containers" option where you can add and edit pals.</value>
+  </data>
+  <data name="LC_LOCATION_STEAM_INSTRUCTIONS" xml:space="preserve">
+    <value>Pal Calc automatically detects standard save files managed by Steam. A Steam location appears in Pal Calc for each user with Palworld save data.
+
+When connecting to another person's multiplayer world, Palworld does not download the full save file. The data must be manually collected and added to "Local Files". See that section for more details.</value>
+  </data>
+  <data name="LC_LOCATION_XBOX_INSTRUCTIONS" xml:space="preserve">
+    <value>Pal Calc automatically detects standard save files managed by Xbox Game Pass. An Xbox location appears in Pal Calc for each user with Palworld save data.
+
+When connecting to another person's multiplayer world, Palworld does not download the full save file. The data must be manually collected and added to "Local Files". See that section for more details.</value>
   </data>
 </root>
