@@ -79,6 +79,7 @@ namespace PalCalc.UI.ViewModel
         private void SelectedSave_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             ExportSaveCsvCommand.NotifyCanExecuteChanged();
+            InspectSaveCommand.NotifyCanExecuteChanged();
         }
 
         [RelayCommand]
@@ -173,12 +174,9 @@ namespace PalCalc.UI.ViewModel
             if (sfd.ShowDialog() == true)
             {
                 var cachedSave = selectedSave.CachedValue;
-                if (cachedSave == null)
-                {
-                    // TODO - ITL
-                    AdonisMessageBox.Show("The save could not be loaded.", caption: "");
-                    return;
-                }
+                // CachedSaveGame reports the initial load failure. A cached null prevents
+                // subsequent consumers from retrying the same failed load and showing it again.
+                if (cachedSave == null) return;
 
                 File.WriteAllText(sfd.FileName, PalCSVExporter.Export(cachedSave, GameSettingsViewModel.Load(selectedSave.Value).ModelObject));
             }
@@ -188,27 +186,28 @@ namespace PalCalc.UI.ViewModel
         [RelayCommand(CanExecute = nameof(CanInspectSave))]
         private void InspectSave()
         {
+            // Resolve the shared cached data before building the inspector. Load failures are
+            // reported by CachedSaveGame and represented by a negatively cached null.
+            var cachedSave = selectedSave.CachedValue;
+            if (cachedSave == null) return;
+
             var loadingModal = new LoadingSaveFileModal();
             loadingModal.Owner = App.Current.MainWindow;
             loadingModal.DataContext = LocalizationCodes.LC_SAVE_INSPECTOR_LOADING.Bind();
 
-            try
-            {
-                var vm = loadingModal.ShowDialogDuring(
-                    () => new SaveInspectorWindowViewModel(selectedLocation, selectedSave, GameSettingsViewModel.Load(selectedSave.Value).ModelObject)
-                );
+            var vm = loadingModal.ShowDialogDuring(
+                () => new SaveInspectorWindowViewModel(
+                    selectedLocation,
+                    selectedSave,
+                    cachedSave,
+                    GameSettingsViewModel.Load(selectedSave.Value).ModelObject
+                )
+            );
 
-                var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
-                SaveInspectorWindowManager.Register(selectedSave.Value, inspector);
-                inspector.Show();
-            }
-            catch (Exception e)
-            {
-                logger.Error(e, "Error loading save inspector data");
-                // TODO - ITL
-                AdonisMessageBox.Show("The save inspector could not be opened.", caption: "");
-            }
+            var inspector = new SaveInspectorWindow() { DataContext = vm, Owner = App.Current.MainWindow };
+            SaveInspectorWindowManager.Register(selectedSave.Value, inspector);
+            inspector.Show();
         }
-        private bool CanInspectSave() => selectedSave != null;
+        private bool CanInspectSave() => selectedSave?.Value?.IsValid == true;
     }
 }

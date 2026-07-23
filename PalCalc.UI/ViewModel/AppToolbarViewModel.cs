@@ -75,8 +75,6 @@ namespace PalCalc.UI.ViewModel
         {
             Task.Run(async () =>
             {
-                try
-                {
                     var result = await AppUpdates.CheckForUpdates();
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -98,11 +96,6 @@ namespace PalCalc.UI.ViewModel
                         AppUpdates.PromptUpdateDownload(result.Version);
                     }, DispatcherPriority.ContextIdle);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                }
-                catch (Exception e)
-                {
-                    logger.Warning(e, "error checking for updates");
-                }
             });
         }
     }
