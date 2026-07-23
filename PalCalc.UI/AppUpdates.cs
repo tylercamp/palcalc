@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using PalCalc.UI.Localization;
+using PalCalc.UI.Model;
+using Serilog;
 using Serilog.Core;
 using System;
 using System.Collections.Generic;
@@ -6,22 +8,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using PalCalc.UI.Localization;
 
 using AdonisMessageBox = AdonisUI.Controls.MessageBox;
-using AdonisMessageBoxModel = AdonisUI.Controls.MessageBoxModel;
-using AdonisMessageBoxButtons = AdonisUI.Controls.MessageBoxButtons;
-using AdonisMessageBoxResult = AdonisUI.Controls.MessageBoxResult;
 using AdonisMessageBoxButtonLabels = AdonisUI.Controls.MessageBoxButtonLabels;
-using PalCalc.UI.Model;
+using AdonisMessageBoxButtons = AdonisUI.Controls.MessageBoxButtons;
+using AdonisMessageBoxModel = AdonisUI.Controls.MessageBoxModel;
+using AdonisMessageBoxResult = AdonisUI.Controls.MessageBoxResult;
 
-namespace PalCalc.UI.ViewModel
+namespace PalCalc.UI
 {
-    // TODO - Re-review and refactor
-
     record class NewAppVersion(string Version, string Url);
 
     internal enum AppUpdateCheckStatus
@@ -33,13 +32,13 @@ namespace PalCalc.UI.ViewModel
 
     internal record class AppUpdateCheckResult(AppUpdateCheckStatus Status, NewAppVersion Version = null);
 
-    class AppUpdatesViewModel
+    static class AppUpdates
     {
-        private static ILogger logger = Log.ForContext<AppUpdatesViewModel>();
+        private static ILogger logger = Log.ForContext(typeof(AppUpdates));
 
-        private string VersionFromUrl(string url) => url.Split('/').Last();
+        private static string VersionFromUrl(string url) => url.Split('/').Last();
 
-        public async Task<AppUpdateCheckResult> FetchNewUpdateUrl()
+        public static async Task<AppUpdateCheckResult> CheckForUpdates()
         {
             try
             {
@@ -67,7 +66,7 @@ namespace PalCalc.UI.ViewModel
                     }
                     else
                     {
-                        logger.Warning("did not receive FOUND status code, unable to determine latest version");
+                        logger.Warning("expected FOUND status but got {code}, unable to determine latest version", response.StatusCode);
                     }
                 }
             }
@@ -79,10 +78,7 @@ namespace PalCalc.UI.ViewModel
             return new AppUpdateCheckResult(AppUpdateCheckStatus.Failed);
         }
 
-        public void OpenUpdateUrl(string url) =>
-            Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
-
-        public void PromptUpdateDownload(NewAppVersion version)
+        public static void PromptUpdateDownload(NewAppVersion version)
         {
             var res = AdonisMessageBox.Show(App.Current.MainWindow, new AdonisMessageBoxModel()
             {
@@ -97,7 +93,7 @@ namespace PalCalc.UI.ViewModel
 
             if (res == AdonisMessageBoxResult.Yes)
             {
-                OpenUpdateUrl(version.Url);
+                Process.Start(new ProcessStartInfo { FileName = version.Url, UseShellExecute = true });
             }
             else if (res == AdonisMessageBoxResult.No)
             {

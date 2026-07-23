@@ -26,12 +26,12 @@ using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 
 namespace PalCalc.UI.ViewModel
 {
-    internal partial class AppToolbarViewModel(Dispatcher dispatcher, AppUpdatesViewModel appUpdates) : ObservableObject
+    internal partial class AppToolbarViewModel(Dispatcher dispatcher) : ObservableObject
     {
         private static ILogger logger = Log.ForContext<AppToolbarViewModel>();
 
         private static AppToolbarViewModel designerInstance;
-        public static AppToolbarViewModel DesignerInstance => designerInstance ??= new(Dispatcher.CurrentDispatcher, null);
+        public static AppToolbarViewModel DesignerInstance => designerInstance ??= new(Dispatcher.CurrentDispatcher);
 
         public List<TranslationLocaleViewModel> Locales { get; } =
             Enum
@@ -77,7 +77,7 @@ namespace PalCalc.UI.ViewModel
             {
                 try
                 {
-                    var result = await appUpdates.FetchNewUpdateUrl();
+                    var result = await AppUpdates.CheckForUpdates();
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     // don't need to run this synchronously
@@ -95,7 +95,7 @@ namespace PalCalc.UI.ViewModel
                             return;
                         }
 
-                        appUpdates.PromptUpdateDownload(result.Version);
+                        AppUpdates.PromptUpdateDownload(result.Version);
                     }, DispatcherPriority.ContextIdle);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 }

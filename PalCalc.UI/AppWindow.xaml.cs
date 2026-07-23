@@ -50,13 +50,11 @@ namespace PalCalc.UI
         public AppToolbarViewModel ToolbarVM => toolbarVM;
 
         private bool checkedUpdates;
-        private AppUpdatesViewModel appUpdates;
 
         public AppWindowViewModel(Dispatcher dispatcher)
         {
             AppSettings.Current = settings = Storage.LoadAppSettings();
             savesService = new AppSettingsSaveService(settings);
-            appUpdates = new AppUpdatesViewModel();
             checkedUpdates = false;
             this.dispatcher = dispatcher;
 
@@ -71,7 +69,7 @@ namespace PalCalc.UI
                 }
             };
 
-            toolbarVM = new AppToolbarViewModel(dispatcher, appUpdates);
+            toolbarVM = new AppToolbarViewModel(dispatcher);
 
             CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 
@@ -152,7 +150,7 @@ namespace PalCalc.UI
         {
             Task.Run(async () =>
             {
-                var result = await appUpdates.FetchNewUpdateUrl();
+                var result = await AppUpdates.CheckForUpdates();
                 if (result.Status != AppUpdateCheckStatus.UpdateAvailable)
                     return;
 
@@ -161,10 +159,12 @@ namespace PalCalc.UI
                 if (settings.SkippedAppVersion == newVersion.Version)
                     return;
 
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 dispatcher.BeginInvoke(
-                    () => appUpdates.PromptUpdateDownload(newVersion),
+                    () => AppUpdates.PromptUpdateDownload(newVersion),
                     DispatcherPriority.ContextIdle
                 );
+#pragma warning restore CS4014
             });
         }
 
