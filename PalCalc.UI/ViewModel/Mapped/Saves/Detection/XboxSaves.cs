@@ -68,6 +68,7 @@ namespace PalCalc.UI.ViewModel.Mapped.Saves.Detection
 
             if (save.LevelMeta?.IsValid != true)
             {
+                // note: maybe this is no longer necessary? haven't seen this behavior in a while
                 result.Warnings = [
                     LocalizationCodes.LC_SAVE_GAME_XBOX_INCOMPLETE.Bind(),
                 ];
