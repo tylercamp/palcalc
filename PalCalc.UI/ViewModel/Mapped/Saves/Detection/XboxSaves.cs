@@ -29,7 +29,7 @@ namespace PalCalc.UI.ViewModel.Mapped.Saves.Detection
 
         public static List<SavesCollectionViewModel> CollectAll(IEnumerable<ISavesLocation> saves)
         {
-            return []; // for "no saves available" testing
+            //return []; // for "no saves available" testing
             return saves
                 .OfType<XboxSavesLocation>()
                 .Select(FromLocation)

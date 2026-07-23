@@ -14,14 +14,14 @@ using System.Windows;
 
 namespace PalCalc.UI.ViewModel
 {
-    internal partial class SaveSelectionOnboardingViewModel : ObservableObject
+    internal partial class SaveSelectionPageViewModel : ObservableObject
     {
         // TODO - Right now Steam is completely hidden if not detected, should instead display with
         //        warning "Steam saves location not found"
 
-        private static SaveSelectionOnboardingViewModel _designerInstance;
-        public static SaveSelectionOnboardingViewModel DesignerInstance =>
-            _designerInstance ??= new SaveSelectionOnboardingViewModel(SavesCollectionViewModel.DetectAll(new AppSettings(), null), null);
+        private static SaveSelectionPageViewModel _designerInstance;
+        public static SaveSelectionPageViewModel DesignerInstance =>
+            _designerInstance ??= new SaveSelectionPageViewModel(SavesCollectionViewModel.DetectAll(new AppSettings(), null), null);
 
         public IReadOnlyCollection<SavesCollectionViewModel> AvailableSaveGameCollections { get; }
 
@@ -39,7 +39,7 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private bool isLocationHelpMenuOpen;
 
-        public SaveSelectionOnboardingViewModel(
+        public SaveSelectionPageViewModel(
             IEnumerable<SavesCollectionViewModel> savesCollections,
             IRelayCommand<SaveGameViewModel> loadSaveCommand
         )

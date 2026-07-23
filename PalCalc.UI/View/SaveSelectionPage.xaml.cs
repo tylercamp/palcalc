@@ -6,9 +6,9 @@ using System.Windows.Navigation;
 
 namespace PalCalc.UI.View
 {
-    public partial class SaveSelectionOnboardingPage : UserControl
+    public partial class SaveSelectionPage : UserControl
     {
-        public SaveSelectionOnboardingPage()
+        public SaveSelectionPage()
         {
             InitializeComponent();
         }

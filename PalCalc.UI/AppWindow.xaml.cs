@@ -172,12 +172,12 @@ namespace PalCalc.UI
 
         private void NavigateSaveSelectionPage(IEnumerable<SavesCollectionViewModel> collections)
         {
-            var vm = new SaveSelectionOnboardingViewModel(
+            var vm = new SaveSelectionPageViewModel(
                 savesCollections: collections,
                 loadSaveCommand: new RelayCommand<SaveGameViewModel>(NavigateSolverPage)
             );
 
-            var page = new SaveSelectionOnboardingPage();
+            var page = new SaveSelectionPage();
             if (settings.SelectedGameIdentifier != null)
             {
                 vm.TrySelectSaveByIdentifier(settings.SelectedGameIdentifier);
