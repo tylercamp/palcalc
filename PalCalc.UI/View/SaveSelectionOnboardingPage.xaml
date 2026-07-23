@@ -50,14 +50,22 @@
                                        VirtualSaveTemplate="{StaticResource FakeSavesIconTemplate}"
                                        />
         
-        <!-- LOCATION NOTICE TEMPLATES -->
-        <DataTemplate x:Key="XboxNoticeTemplate" DataType="ssvm:SavesCollectionViewModel">
-            <TextBlock Grid.Row="1"
+        <!-- LOCATION NOTICE TEMPLATES - NO SAVES -->
+        <DataTemplate x:Key="SteamNoSavesTemplate" DataType="ssvm:SavesCollectionViewModel">
+            <TextBlock Text="{itl:LocalizedText LC_SAVE_LOCATION_STEAM_INSTALL}"
                        TextWrapping="Wrap"
-                       Margin="0,0,0,6"
+                       Padding="{adonisUi:Space 2}"
                        Visibility="{Binding AvailableSaves, Converter={StaticResource CVC_Negate}}"
                        Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
-                       FontStyle="Italic">
+                       />
+        </DataTemplate>
+        
+        <DataTemplate x:Key="XboxNoSavesTemplate" DataType="ssvm:SavesCollectionViewModel">
+            <TextBlock TextWrapping="Wrap"
+                       Padding="{adonisUi:Space 2}"
+                       Visibility="{Binding AvailableSaves, Converter={StaticResource CVC_Negate}}"
+                       Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                       >
                 <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_1}" />
                 <Hyperlink NavigateUri="https://apps.microsoft.com/detail/9mv0b5hzvk9z"
                            RequestNavigate="Hyperlink_RequestNavigate">
@@ -67,16 +75,34 @@
             </TextBlock>
         </DataTemplate>
 
-        <msvm:SaveTypeTemplateSelector x:Key="NoticeTemplateSelector"
+        <msvm:SaveTypeTemplateSelector x:Key="NoSavesNoticeTemplateSelector"
                                        DefaultTemplate="{StaticResource EmptyTemplate}"
-                                       XboxTemplate="{StaticResource XboxNoticeTemplate}"
+                                       SteamTemplate="{StaticResource SteamNoSavesTemplate}"
+                                       XboxTemplate="{StaticResource XboxNoSavesTemplate}"
                                        />
+        
+        <!-- LOCATION INSTRUCTION TEMPLATES -->
+
+        <DataTemplate x:Key="ManualSaveInstructionsTemplate">
+            <TextBlock Padding="{adonisUi:Space 2}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_LOCATION_MANUAL_SAVES_INSTRUCTIONS}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="VirtualSaveInstructionsTemplate">
+            <TextBlock Padding="{adonisUi:Space 2}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_LOCATION_FAKE_SAVES_INSTRUCTIONS}" />
+        </DataTemplate>
+
+        <msvm:SaveTypeTemplateSelector x:Key="SaveTypeInstructionsTemplateSelector"
+                                       DefaultTemplate="{StaticResource EmptyTemplate}"
+                                       ManualSaveTemplate="{StaticResource ManualSaveInstructionsTemplate}"
+                                       VirtualSaveTemplate="{StaticResource VirtualSaveInstructionsTemplate}"
+                                       />
+
     </UserControl.Resources>
 
     <GroupBox MaxWidth="1500"
-            MaxHeight="700"
+              MaxHeight="700"
               Header="Palworld Save Files"
-               BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
+              BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
               BorderThickness="{adonisUi:Space 0.5}"
             >
         <!--
@@ -134,6 +160,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
@@ -164,10 +191,14 @@
                 <!-- Notices for the save location, e.g. instructions for syncing Xbox saves if no save-games are found -->
                 <ContentPresenter Grid.Row="1"
                                   Content="{Binding SelectedCollection}"
-                                  ContentTemplateSelector="{StaticResource NoticeTemplateSelector}" />
+                                  ContentTemplateSelector="{StaticResource NoSavesNoticeTemplateSelector}" />
+
+                <ContentPresenter Grid.Row="2"
+                                  Content="{Binding SelectedCollection}"
+                                  ContentTemplateSelector="{StaticResource SaveTypeInstructionsTemplateSelector}" />
 
                 <!-- Save games list -->
-                <ListBox Grid.Row="2"
+                <ListBox Grid.Row="3"
                          Margin="{adonisUi:Space 1}"
                          ItemsSource="{Binding SelectedCollection.AvailableSaves}"
                          SelectedItem="{Binding SelectedSave}"

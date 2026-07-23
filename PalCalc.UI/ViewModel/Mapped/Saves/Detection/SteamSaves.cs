@@ -32,6 +32,7 @@ namespace PalCalc.UI.ViewModel.Mapped.Saves.Detection
             IEnumerable<ISavesLocation> savesLocations
         )
         {
+            return []; // for "no saves available" testing
             return savesLocations
                 .OfType<DirectSavesLocation>()
                 .Select(FromLocation)

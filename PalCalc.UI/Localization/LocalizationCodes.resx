@@ -952,4 +952,13 @@
   <data name="LC_HELP" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SAVE_LOCATION_STEAM_INSTALL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LOCATION_MANUAL_SAVES_INSTRUCTIONS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LOCATION_FAKE_SAVES_INSTRUCTIONS" xml:space="preserve">
+    <value />
+  </data>
 </root>

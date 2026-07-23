@@ -411,6 +411,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_LOCATION_FAKE_SAVES_INSTRUCTIONS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_LOCATION_MANUAL_SAVES_INSTRUCTIONS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_MANUAL_SAVE_ALREADY_REGISTERED,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -800,6 +808,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_LOCATION_STEAM_EMPTY,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_LOCATION_STEAM_INSTALL,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
