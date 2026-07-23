@@ -5,6 +5,7 @@ using PalCalc.SaveReader;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.Mapped.Saves;
 using Serilog;
 using System;
 using System.Collections.ObjectModel;

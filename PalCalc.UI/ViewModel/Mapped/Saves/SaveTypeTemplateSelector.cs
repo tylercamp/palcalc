@@ -1,4 +1,5 @@
 ﻿using ABI.Windows.AI.MachineLearning;
+using PalCalc.UI.ViewModel.SaveSelection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace PalCalc.UI.ViewModel.SaveSelection
+namespace PalCalc.UI.ViewModel.Mapped.Saves
 {
     internal class SaveTypeTemplateSelector : DataTemplateSelector
     {

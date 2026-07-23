@@ -7,7 +7,7 @@
       xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
       xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
       xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
-      xmlns:ssvm="clr-namespace:PalCalc.UI.ViewModel.SaveSelection"
+      xmlns:msvm="clr-namespace:PalCalc.UI.ViewModel.Mapped.Saves"
       xmlns:vmc="clr-namespace:PalCalc.UI.ViewModel.Converters"
       xmlns:itl="clr-namespace:PalCalc.UI.Localization"
       xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
@@ -43,7 +43,7 @@
             <materialIcons:MaterialIcon Kind="FileEdit" Foreground="LightSteelBlue" />
         </DataTemplate>
 
-        <ssvm:SaveTypeTemplateSelector x:Key="IconTemplateSelector"
+        <msvm:SaveTypeTemplateSelector x:Key="IconTemplateSelector"
                                        SteamTemplate="{StaticResource SteamIconTemplate}"
                                        XboxTemplate="{StaticResource XboxIconTemplate}"
                                        ManualSaveTemplate="{StaticResource ManualSavesIconTemplate}"
@@ -67,7 +67,7 @@
             </TextBlock>
         </DataTemplate>
 
-        <ssvm:SaveTypeTemplateSelector x:Key="NoticeTemplateSelector"
+        <msvm:SaveTypeTemplateSelector x:Key="NoticeTemplateSelector"
                                        DefaultTemplate="{StaticResource EmptyTemplate}"
                                        XboxTemplate="{StaticResource XboxNoticeTemplate}"
                                        />

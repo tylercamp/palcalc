@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.ViewModel.SaveSelection
+namespace PalCalc.UI.ViewModel.Mapped.Saves
 {
     public enum SaveType
     {

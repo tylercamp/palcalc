@@ -10,6 +10,7 @@ using PalCalc.UI.View;
 using PalCalc.UI.View.Inspector;
 using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.Mapped.Saves;
 using PalCalc.UI.ViewModel.SaveSelection;
 using Serilog;
 using Serilog.Core;

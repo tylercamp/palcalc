@@ -2,6 +2,7 @@
 using PalCalc.SaveReader;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.SaveSelection;
 using Serilog;
 using Serilog.Core;
 using System;
@@ -12,7 +13,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.ViewModel.SaveSelection
+namespace PalCalc.UI.ViewModel.Mapped.Saves
 {
     internal static class SavesCommon
     {

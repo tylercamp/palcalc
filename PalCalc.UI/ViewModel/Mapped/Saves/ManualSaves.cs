@@ -4,9 +4,11 @@ using Microsoft.Xaml.Behaviors.Core;
 using PalCalc.SaveReader;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.Model.Service;
 using PalCalc.UI.View.Inspector;
 using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.SaveSelection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,7 +23,7 @@ using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 using AdonisMessageBoxButton = AdonisUI.Controls.MessageBoxButton;
 using AdonisMessageBoxResult = AdonisUI.Controls.MessageBoxResult;
 
-namespace PalCalc.UI.ViewModel.SaveSelection
+namespace PalCalc.UI.ViewModel.Mapped.Saves
 {
     internal static class ManualSaves
     {

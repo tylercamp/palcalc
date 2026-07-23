@@ -1,12 +1,13 @@
 ﻿using PalCalc.SaveReader;
 using PalCalc.UI.Model;
+using PalCalc.UI.Model.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.ViewModel.SaveSelection
+namespace PalCalc.UI.ViewModel.Mapped.Saves
 {
     internal static class SavesDetection
     {

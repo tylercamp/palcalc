@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.Mapped.Saves;
 using PalCalc.UI.ViewModel.SaveSelection;
 using System;
 using System.Collections.Generic;
