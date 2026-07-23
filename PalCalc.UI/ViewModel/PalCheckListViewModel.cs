@@ -31,6 +31,28 @@ namespace PalCalc.UI.ViewModel
         public double PaldexNoValue => Pal.ModelObject.Id.PalDexNo + (Pal.ModelObject.Id.IsVariant ? 0.1 : 0);
         public ILocalizedText PalName => Pal.Name;
 
+        public double SortableWildLevelValue
+        {
+            get
+            {
+                var min = Pal.ModelObject.MinWildLevel;
+                var max = Pal.ModelObject.MaxWildLevel;
+                if (min == null) return 1000000;
+                return min.Value * 100 + (max ?? min.Value);
+            }
+        }
+        public string WildLevelDisplay
+        {
+            get
+            {
+                var min = Pal.ModelObject.MinWildLevel;
+                var max = Pal.ModelObject.MaxWildLevel;
+                if (min == null) return string.Empty;
+                if (max == null || min == max) return min.Value.ToString();
+                return $"{min.Value}-{max.Value}";
+            }
+        }
+
         public PalViewModel Pal { get; }
 
         [NotifyPropertyChangedFor(nameof(HasChanges))]
@@ -158,6 +180,15 @@ namespace PalCalc.UI.ViewModel
         // for XAML designer preview
         [ObservableProperty]
         private ILocalizedText title = new HardCodedText("Pal Checklist");
+
+        [ObservableProperty]
+        private bool showPaldexNo = true;
+
+        [ObservableProperty]
+        private bool showPalName = true;
+
+        [ObservableProperty]
+        private bool showWildLevel = true;
 
         [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         [ObservableProperty]

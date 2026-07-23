@@ -133,42 +133,42 @@ namespace PalCalc.Solver
         {
             var (parent1, parent2) = p;
 
-            scoped Span<(IPalReference, IPalReference)> parentPairOptions;
-
-            if (parent1.Gender == PalGender.WILDCARD)
-            {
-                if (parent2.Gender == PalGender.WILDCARD)
-                {
-                    parentPairOptions = [
-                        (
-                            parent1.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers),
-                            parent2.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers)
-                        ),
-                        (
-                            parent1.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers),
-                            parent2.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers)
-                        )
-                    ];
-                }
-                else
-                {
-                    parentPairOptions = [(
-                        parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender(), settings.UseGenderReversers),
-                        parent2
-                    )];
-                }
-            }
-            else if (parent2.Gender == PalGender.WILDCARD)
-            {
-                parentPairOptions = [(
-                    parent1,
-                    parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender(), settings.UseGenderReversers)
-                )];
-            }
-            else
-            {
-                parentPairOptions = [(parent1, parent2)];
-            }
+            // (I REALLY don't like this, but now we NEED to. At some point we could declare `scoped` and assign
+            // values in if/else blocks, but some C# compiler update happened and now we get CS9203. I
+            // REALLY don't want to use this, but I REALLY don't want to do heap allocations even more.)
+            //
+            // https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/breaking-changes/compiler%20breaking%20changes%20-%20dotnet%2011
+            //
+            // (TODO - Now using ternary so we can keep using `scoped Span`, but I'm no longer confident this
+            //         actually avoids heap allocations.)
+            scoped Span<(IPalReference, IPalReference)> parentPairOptions =
+                parent1.Gender == PalGender.WILDCARD
+                    ? (
+                        parent2.Gender == PalGender.WILDCARD
+                            ? [ // parent1 && parent2 are wildcard, try setting each to M/F and F/M
+                                (
+                                    parent1.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers),
+                                    parent2.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers)
+                                ),
+                                (
+                                    parent1.WithGuaranteedGender(db, PalGender.FEMALE, settings.UseGenderReversers),
+                                    parent2.WithGuaranteedGender(db, PalGender.MALE, settings.UseGenderReversers)
+                                )
+                            ]
+                            : [( // only parent1 is wildcard, set it to opposite of parent2
+                                parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender(), settings.UseGenderReversers),
+                                parent2
+                            )]
+                    )
+                    : (
+                        parent2.Gender == PalGender.WILDCARD
+                            ? [( // only parent2 is wildcard, set it to opposite of parent1
+                                parent1,
+                                parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender(), settings.UseGenderReversers)
+                            )]
+                            // neither parents are wildcards - keep as-is
+                            : [(parent1, parent2)]
+                    );
 
             TimeSpan optimalTime = TimeSpan.Zero;
             bool hasNoPreference = true;
@@ -247,6 +247,7 @@ namespace PalCalc.Solver
                 progress.NumProcessed++;
 
                 if (!settings.UseGenderReversers && !p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
+                if (p.Item1 == p.Item2) continue; // possible to reach this if UseGenderReversers is enabled
                 if (p.Item1.NumTotalWildPals + p.Item2.NumTotalWildPals > settings.MaxWildPals) continue;
                 if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= settings.MaxBreedingSteps) continue;
                 if (p.Item1.TotalCost + p.Item2.TotalCost > settings.MaxSurgeryCost) continue;

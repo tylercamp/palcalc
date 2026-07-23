@@ -11,6 +11,11 @@ namespace PalCalc.SaveReader.FArchive
         public float r, g, b, a;
     }
 
+    public struct ColorLiteral
+    {
+        public byte b, g, r, a;
+    }
+
     public struct QuaternionLiteral
     {
         public double x, y, z, w;

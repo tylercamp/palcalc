@@ -51,6 +51,13 @@ namespace PalCalc.GenDB.GameDataReaders
         public string EffectType3 { get; set; }
         [FStructProperty]
         public float EffectValue3 { get; set; }
+
+        [FStructProperty]
+        public string TargetType4 { get; set; }
+        [FStructProperty]
+        public string EffectType4 { get; set; }
+        [FStructProperty]
+        public float EffectValue4 { get; set; }
         #endregion
 
         // (assigned manually)

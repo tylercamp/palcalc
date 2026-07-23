@@ -202,6 +202,12 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_COMMON_LEVEL" xml:space="preserve">
     <value>Level</value>
   </data>
+  <data name="LC_COMMON_RANK" xml:space="preserve">
+    <value>Tier</value>
+  </data>
+  <data name="LC_COMMON_WILD_LEVEL" xml:space="preserve">
+    <value>Wild Level</value>
+  </data>
   <data name="LC_COMMON_LOCATION" xml:space="preserve">
     <value>Location</value>
   </data>
@@ -626,6 +632,9 @@ This will not delete the save files from your computer.</value>
   </data>
   <data name="LC_SAVESEARCH_SETTINGS_RESET" xml:space="preserve">
     <value>Reset</value>
+  </data>
+  <data name="LC_SAVESEARCH_NO_MATCHES" xml:space="preserve">
+    <value>No matches found</value>
   </data>
   <data name="LC_SAVEWINDOW_TAB_DETAILS" xml:space="preserve">
     <value>Details</value>

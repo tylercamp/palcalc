@@ -8,6 +8,10 @@ namespace PalCalc.Model
 {
     public static class GameConstants
     {
+        // TODO - Could parse cake effects from DA_BreedingItemEffectData
+        // [{ TalentBonusMin, TalenBonusMax, MutationRateBonusPercent, CombiRankBonus, BreedCount, bInheritAllActiveSkills, PassiveInheritCountOverride }]
+
+        // TODO - Could scrape from PalEggRankInfoArray? [{ PalRarity, EggScale, HatchingSpeedDivisionRate }]
         public static readonly Dictionary<EggSize, int> EggSizeMinRarity = new()
         {
             // couldn't find this info when scraping through game data, found by checking against https://paldb.cc/en/Eggs
@@ -25,9 +29,9 @@ namespace PalCalc.Model
         // left of in-game Map)
         public static readonly double[,] WorldToMapMatrix = new double[3, 3]
         {
-            { -3.79519292446884E-07, 0.0021798096874746462, -344.34052549588256 },
-            { 0.0021767405112596513, -9.438090431935445E-07, 270.1383799358495 },
-            { 0, 0, 1 },
+            { -4.830223727277094E-07, 0.0021796738568829717, -344.193826581459 },
+            { 0.0021779338609583232, 1.3843765562632747E-06, 269.9073674619908 },
+            { 0, 0, 1 }
         };
 
         // transformation matrix converting world coords to normalized image coords within
@@ -35,9 +39,9 @@ namespace PalCalc.Model
         // X/Y for placing things on the map image
         public static readonly double[,] WorldToImageMatrix = new double[3, 3]
         {
-            { 1.159760335217757E-09, 6.928117576533099E-07, 0.5102813537826183 },
-            { -6.890618703631407E-07, 6.348508350224871E-10, 0.30963301697476875 },
-            { 0, 0, 1 },
+            { 5.853358785966763E-10, 6.942623697264833E-07, 0.49957354110764096 },
+            { -6.900889463287533E-07, -3.9501572187562305E-10, 0.24117673696704256 },
+            { 0, 0, 1 }
         };
 
         /*
@@ -69,12 +73,33 @@ namespace PalCalc.Model
             var minTime = TimeSpan.FromMinutes(3);
 
             // TODO - tweak
-            var rarityModifier = (pal.Price - 1000) / 100.0f + (pal.Id.IsVariant ? 5 : 0);
+            var rarityModifier = Math.Max(0, (pal.Price - 1000)) / 100.0f + (pal.Id.IsVariant ? 5 : 0);
             return minTime + TimeSpan.FromMinutes(rarityModifier);
         }
 
         // https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/
         // supposedly the child will always inherit at least 1 passive directly from a parent?
+
+        /*
+         * TODO - Could scrape some of this from game files - `BP_PalGameSetting`
+              "Combi_TalentInheritNum": [
+                3.0,
+                2.0,
+                1.0
+              ],
+              "Combi_PassiveInheritNum": [
+                4.0,
+                3.0,
+                2.0,
+                1.0
+              ],
+              "Combi_PassiveRandomAddNum": [
+                4.0,
+                3.0,
+                2.0,
+                1.0
+              ],
+        */
 
         // probability of getting N passives from parent pool
         public static readonly IReadOnlyDictionary<int, float> PassiveProbabilityDirect = new Dictionary<int, float>()

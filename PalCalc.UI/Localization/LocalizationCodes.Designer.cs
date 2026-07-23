@@ -196,6 +196,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMMON_RANK,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMMON_SAVE,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -205,6 +209,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_UNKNOWN,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMMON_WILD_LEVEL,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -832,6 +840,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVESEARCH_GRP_SEARCH_SETTINGS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVESEARCH_NO_MATCHES,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

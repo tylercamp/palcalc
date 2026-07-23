@@ -24,6 +24,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
+        <c:ValueVisibilityConverter x:Key="VVC_Negate" Negate="True" />
         <c:ValueBoolConverter x:Key="VBC" />
     </UserControl.Resources>
     <Grid>
@@ -250,7 +251,10 @@
                         </StackPanel>
                     </vu:SpacedWrapPanel>
 
-                    <Button Width="80" Margin="5" HorizontalAlignment="Left" Command="{Binding SearchSettings.ResetCommand}" Content="{itl:LocalizedText LC_SAVESEARCH_SETTINGS_RESET}" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button Width="80" Margin="5" HorizontalAlignment="Left" Command="{Binding SearchSettings.ResetCommand}" Content="{itl:LocalizedText LC_SAVESEARCH_SETTINGS_RESET}" />
+                        <TextBlock Text="{itl:LocalizedText LC_SAVESEARCH_NO_MATCHES}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}" Margin="5" VerticalAlignment="Center" Visibility="{Binding TotalMatches, Converter={StaticResource VVC_Negate}, FallbackValue=Collapsed}" />
+                    </StackPanel>
                 </StackPanel>
             </Expander>
 

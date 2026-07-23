@@ -2,6 +2,7 @@
 using PalCalc.SaveReader.SaveFile;
 using PalCalc.SaveReader.SaveFile.Virtual;
 using PalCalc.SaveReader.SaveFile.Xbox;
+using Serilog;
 using System.Net;
 
 
@@ -46,6 +47,8 @@ namespace PalCalc.SaveReader
 
     public class StandardSaveGame : ISaveGame
     {
+        private static ILogger logger = Log.ForContext<StandardSaveGame>();
+
         private FileSystemWatcher folderWatcher;
         public event Action<ISaveGame> Updated;
 
@@ -88,6 +91,16 @@ namespace PalCalc.SaveReader
                         var dpsPath = $"{playersPath}/{baseName}_dps.sav";
                         var dpsFile = File.Exists(dpsPath) ? new PlayersDpsSaveFile(new SingleFileSource(dpsPath)) : null;
                         return new PlayersSaveFile(new SingleFileSource(f), dpsFile);
+                    })
+                    .Where(psf =>
+                    {
+                        if (!psf.IsValid)
+                        {
+                            // some software, namely the "SaveSync" app on Steam, will store extra data in the Players
+                            // folder which is not valid GVAS. skip these
+                            logger.Warning("Player save file is invalid, skipping: {savePath}", string.Join("; ", psf.FilePaths));
+                        }
+                        return psf.IsValid;
                     })
                     .ToList();
             }

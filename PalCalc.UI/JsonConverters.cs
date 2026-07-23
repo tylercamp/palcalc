@@ -357,7 +357,7 @@ namespace PalCalc.UI
         {
             return JToken.FromObject(new
             {
-                PalId = value.Pal.Id,
+                PalInternalName = value.Pal.InternalName,
                 GuaranteedPassives = value.EffectivePassives.Where(t => t is not RandomPassiveSkill).ToList(),
                 NumPassives = value.EffectivePassives.Count(t => t is RandomPassiveSkill),
                 Gender = value.Gender,
@@ -366,7 +366,10 @@ namespace PalCalc.UI
 
         internal override WildPalReference ReadRefJson(JToken token, Type objectType, WildPalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            var pal = token["PalId"].ToObject<PalId>(serializer).ToPal(db);
+            var pal = token["PalId"] != null
+                ? token["PalId"].ToObject<PalId>(serializer).ToPal(db) // old format
+                : token["PalInternalName"].ToObject<string>(serializer).InternalToPal(db); // new format
+
             var numPassives = (token["NumPassives"] ?? token["NumTraits"]).ToObject<int>();
             var gender = token["Gender"]?.ToObject<PalGender>(serializer) ?? PalGender.WILDCARD;
 
@@ -525,7 +528,12 @@ namespace PalCalc.UI
         internal override BredPalReference ReadRefJson(JToken token, Type objectType, BredPalReference existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             InjectDependencyConverters(serializer);
-            var pal = token["PalId"].ToObject<PalId>(serializer).ToPal(db);
+            
+            var pal = token["PalId"] != null
+                ? token["PalId"].ToObject<PalId>(serializer).ToPal(db) // old format
+                : token["PalInternalName"].ToObject<string>(serializer).InternalToPal(db); // new format
+
+
             var passives = (token["Passives"] ?? token["Traits"]).ToObject<List<PassiveSkill>>(serializer);
             var parent1 = token["Parent1"].ToObject<IPalReference>(serializer);
             var parent2 = token["Parent2"].ToObject<IPalReference>(serializer);
@@ -546,7 +554,7 @@ namespace PalCalc.UI
             InjectDependencyConverters(serializer);
             return JToken.FromObject(new
             {
-                PalId = value.Pal.Id,
+                PalInternalName = value.Pal.InternalName,
                 Passives = value.EffectivePassives,
                 Parent1 = value.Parent1,
                 Parent2 = value.Parent2,
@@ -574,13 +582,23 @@ namespace PalCalc.UI
 
         protected override PalViewModel ReadTypeJson(JsonReader reader, Type objectType, PalViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            var palId = JToken.ReadFrom(reader).ToObject<PalId>(serializer);
-            return PalViewModel.Make(palId.ToPal(db));
+            var token = JToken.ReadFrom(reader);
+            if (token.Type == JTokenType.Object)
+            {
+                // Old format
+                var palId = token.ToObject<PalId>(serializer);
+                return PalViewModel.Make(palId.ToPal(db));
+            }
+            else
+            {
+                var palInternalName = token.ToObject<string>(serializer);
+                return PalViewModel.Make(palInternalName.InternalToPal(db));
+            }
         }
 
         protected override void WriteTypeJson(JsonWriter writer, PalViewModel value, JsonSerializer serializer)
         {
-            JToken.FromObject(value.ModelObject.Id, serializer).WriteTo(writer, dependencyConverters);
+            JToken.FromObject(value.ModelObject.InternalName, serializer).WriteTo(writer, dependencyConverters);
         }
     }
 
