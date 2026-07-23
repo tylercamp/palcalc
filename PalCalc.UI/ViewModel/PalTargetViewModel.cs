@@ -5,6 +5,7 @@ using PalCalc.UI.Model;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Presets;
+using PalCalc.UI.ViewModel.SaveSelection;
 using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;

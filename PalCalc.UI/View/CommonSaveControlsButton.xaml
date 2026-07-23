@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="PalCalc.UI.View.CommonSaveControlsButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:vmc="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:local="clr-namespace:PalCalc.UI.View"
+             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
+             d:DataContext="{x:Static vm:CommonSaveOperationsViewModel.DesignerInstance}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <vmc:ValueVisibilityConverter x:Key="VVC" />
+    </UserControl.Resources>
+    <Grid>
+        <Button Padding="0" Width="24" Command="{Binding OpenMenuCommand}" Name="ControlsButton">
+            <materialIcons:MaterialIcon Kind="MenuDown" />
+        </Button>
+        <Popup PlacementTarget="{Binding ElementName=ControlsButton}" IsOpen="{Binding MenuIsOpen}" StaysOpen="False" AllowsTransparency="True">
+            <vu:AdonisPopupContent>
+                <!-- (Would normally just use a `StackPanel`, but `MenuItem` has some binding to a parent ItemsControl. We satisfy that to avoid noisy binding errors) -->
+                <ItemsControl>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE}" Command="{Binding ExportSaveCommand}" />
+                    <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE_CSV}" Command="{Binding ExportSaveCsvCommand}" />
+                    <MenuItem Header="{itl:LocalizedText LC_INSPECT_SAVE}" Command="{Binding InspectSaveCommand}" />
+                    <StackPanel Orientation="Vertical" Visibility="{Binding NavigateSaveSelectionPageCommand, Converter={StaticResource VVC}}">
+                        <Rectangle Fill="{DynamicResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}" Height="1" Margin="{adonisUi:Space 1, 0.25}" />
+                        <MenuItem Header="{itl:LocalizedText LC_NAV_BACK_TO_SAVE_SELECTOR}" Command="{Binding NavigateSaveSelectionPageCommand}" />
+                    </StackPanel>
+                </ItemsControl>
+            </vu:AdonisPopupContent>
+        </Popup>
+    </Grid>
+</UserControl>

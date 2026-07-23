@@ -104,7 +104,9 @@ namespace PalCalc.UI.Model
         // NOTE: Any new fields should be added here
         public void CopyFrom(CachedSaveGame src)
         {
-            if (UnderlyingSave != src.UnderlyingSave) throw new InvalidOperationException();
+            // (object references might not be the same, but they need to refer to the same general save ID)
+            if (IdentifierFor(UnderlyingSave) != IdentifierFor(src.UnderlyingSave))
+                throw new InvalidOperationException();
 
             LastModified = src.LastModified;
             IsServerSave = src.IsServerSave;

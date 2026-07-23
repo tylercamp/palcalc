@@ -45,6 +45,21 @@
         <Setter Property="Padding" Value="3" />
     </Style>
 
+    <Style TargetType="{x:Type local:AdonisPopupContent}">
+        <Setter Property="Margin" Value="0,0,8,8" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect ShadowDepth="2"
+                                  BlurRadius="8"
+                                  Opacity="0.3"
+                                  Direction="315" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="{x:Type local:LocalizedEmbeddedText}">
         <Setter Property="Template">
             <Setter.Value>

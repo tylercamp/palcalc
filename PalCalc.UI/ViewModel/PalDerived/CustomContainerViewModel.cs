@@ -16,8 +16,8 @@ namespace PalCalc.UI.ViewModel.PalDerived
     {
         public CustomContainerViewModel(CustomContainer value)
         {
-            Label = value.Label;
             Contents = new ObservableCollection<CustomPalInstanceViewModel>(value.Contents.Select(i => new CustomPalInstanceViewModel(i)));
+            Label = value.Label;
         }
 
         public CustomContainer ModelObject => new CustomContainer()
@@ -28,6 +28,12 @@ namespace PalCalc.UI.ViewModel.PalDerived
 
         [ObservableProperty]
         private string label;
+
+        partial void OnLabelChanged(string value)
+        {
+            foreach (var pal in Contents)
+                pal.Location.ContainerId = value;
+        }
 
         // (hide the detail that ID-based references should be to a custom container's label)
         public string ContainerId => Label;

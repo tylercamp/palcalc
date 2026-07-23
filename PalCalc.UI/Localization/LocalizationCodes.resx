@@ -916,4 +916,79 @@
   <data name="LC_RESULT_COLUMNS_RESET" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_NAV_BACK_TO_SAVE_SELECTOR" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_NAV_FORCE_CHECK_UPDATES" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_NAV_OPEN_IN_SOLVER" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_KIND_TITLE_LOCAL_FILES" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_KIND_TITLE_STEAM" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_KIND_TITLE_XBOX" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_KIND_TITLE_VIRTUAL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_UPDATES_CHECK_RESULT_FAILED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_UPDATES_CHECK_RESULT_ON_LATEST" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_UPDATES_CHECK_OPTION_SKIP" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_UPDATES_CHECK_BODY" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="LC_HELP" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_LOCATION_STEAM_INSTALL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LOCATION_MANUAL_SAVES_INSTRUCTIONS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LOCATION_FAKE_SAVES_INSTRUCTIONS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LOCATION_XBOX_INSTRUCTIONS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LOCATION_STEAM_INSTRUCTIONS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SELECTED_SAVE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_PROPERTY_PLAYER_NAME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_PROPERTY_PLAYER_LEVEL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_PROPERTY_WORLD_NAME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_PROPERTY_WORLD_DAY" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_PROPERTY_LAST_MODIFIED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_PROPERTY_SAVE_ID" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PALWORLD_SAVE_FILES" xml:space="preserve">
+    <value />
+  </data>
 </root>

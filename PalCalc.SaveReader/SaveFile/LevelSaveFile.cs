@@ -37,6 +37,8 @@ namespace PalCalc.SaveReader.SaveFile
 
         public virtual RawLevelSaveData ReadRawCharacterData()
         {
+            logger.Debug("Reading raw Level.sav data");
+
             var containerVisitor = new PalContainerVisitor();
             var instanceVisitor = new WorldSaveData_CharacterInstanceVisitor();
             var groupVisitor = new GroupVisitor();

@@ -101,6 +101,12 @@ namespace PalCalc.Model
             {
                 lock (loadEmbeddedLock)
                 {
+                    if (embedded != null)
+                    {
+                        logger.Verbose("Pal DB already loaded");
+                        return;
+                    }
+
                     embedded = _LoadEmbedded();
                 }
             });

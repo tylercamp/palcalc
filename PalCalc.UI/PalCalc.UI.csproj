@@ -345,6 +345,7 @@
     <None Remove="Resources\SkillElements\Leaf.png" />
     <None Remove="Resources\SkillElements\Normal.png" />
     <None Remove="Resources\SkillElements\Water.png" />
+    <None Remove="Resources\Steam_icon_logo.svg" />
     <None Remove="Resources\SurgeryTable.png" />
     <None Remove="Resources\TraitRank\Passive_Negative_2_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Negative_3_icon.png" />
@@ -354,6 +355,7 @@
     <None Remove="Resources\TraitRank\Passive_Positive_4_icon.png" />
     <None Remove="Resources\TraitRank\Passive_Positive_5_icon.png" />
     <None Remove="Resources\T_icon_compass_camp.png" />
+    <None Remove="Resources\Xbox_app_logo.svg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -382,6 +384,7 @@
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="FuzzySharp" Version="2.0.2" />
+    <PackageReference Include="SharpVectors.Wpf" Version="1.8.5" />
     <PackageReference Include="VirtualizingWrapPanel" Version="2.1.1" />
   </ItemGroup>
 
@@ -706,6 +709,7 @@
     <Resource Include="Resources\SkillElements\Leaf.png" />
     <Resource Include="Resources\SkillElements\Normal.png" />
     <Resource Include="Resources\SkillElements\Water.png" />
+    <Resource Include="Resources\Steam_icon_logo.svg" />
     <Resource Include="Resources\SurgeryTable.png" />
     <Resource Include="Resources\TraitRank\Passive_Negative_1_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Negative_2_icon.png" />
@@ -716,6 +720,7 @@
     <Resource Include="Resources\TraitRank\Passive_Positive_4_icon.png" />
     <Resource Include="Resources\TraitRank\Passive_Positive_5_icon.png" />
     <Resource Include="Resources\T_icon_compass_camp.png" />
+    <Resource Include="Resources\Xbox_app_logo.svg" />
   </ItemGroup>
 
   <ItemGroup>

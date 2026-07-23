@@ -11,6 +11,7 @@ using PalCalc.UI.ViewModel.Inspector.Search.Container;
 using PalCalc.UI.ViewModel.Inspector.Search.Grid;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.PalDerived;
+using PalCalc.UI.ViewModel.SaveSelection;
 using QuickGraph.Graphviz;
 using QuickGraph.Serialization;
 using System;
@@ -27,9 +28,14 @@ namespace PalCalc.UI.ViewModel.Inspector
     public partial class SearchViewModel : ObservableObject
     {
         private static SearchViewModel designerInstance = null;
-        public static SearchViewModel DesignerInstance => designerInstance ??= new SearchViewModel(SaveGameViewModel.DesignerInstance, GameSettings.Defaults);
+        public static SearchViewModel DesignerInstance => designerInstance ??= new SearchViewModel(
+            SaveGameViewModel.DesignerInstance,
+            CachedSaveGame.SampleForDesignerView,
+            GameSettings.Defaults
+        );
 
         private GameSettings settings;
+        private CachedSaveGame cachedSave;
 
         [ObservableProperty]
         private OwnerTreeViewModel ownerTree;
@@ -48,9 +54,10 @@ namespace PalCalc.UI.ViewModel.Inspector
         private static bool IsValidCustomLabel(SaveGameViewModel context, string label) =>
             label.Length > 0 && !context.Customizations.CustomContainers.Any(c => c.Label == label);
 
-        public SearchViewModel(SaveGameViewModel sgvm, GameSettings settings)
+        public SearchViewModel(SaveGameViewModel sgvm, CachedSaveGame cachedSave, GameSettings settings)
         {
             this.settings = settings;
+            this.cachedSave = cachedSave;
 
             newCustomContainerCommand = new RelayCommand(() =>
             {
@@ -131,7 +138,7 @@ namespace PalCalc.UI.ViewModel.Inspector
 
         private void BuildContainerTree(SaveGameViewModel sgvm)
         {
-            var csg = sgvm.CachedValue;
+            var csg = cachedSave;
             var palsByContainerId = csg.OwnedPals.GroupBy(p => p.Location.ContainerId).ToDictionary(g => g.Key, g => g.ToList());
 
             var containers = csg.PalContainers

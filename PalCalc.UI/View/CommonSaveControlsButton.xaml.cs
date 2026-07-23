@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,20 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PalCalc.UI
+namespace PalCalc.UI.View
 {
-    public partial class LoadingPageViewModel : ObservableObject
-    {
-        [ObservableProperty]
-        private double progressPercent = 0;
-    }
-
     /// <summary>
-    /// Interaction logic for LoadingPage.xaml
+    /// Interaction logic for CommonSaveControlsMenu.xaml
     /// </summary>
-    public partial class LoadingPage : UserControl
+    public partial class CommonSaveControlsButton : UserControl
     {
-        public LoadingPage()
+        public CommonSaveControlsButton()
         {
             InitializeComponent();
         }

@@ -1,4 +1,5 @@
 ﻿using PalCalc.SaveReader.FArchive;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -59,6 +60,8 @@ namespace PalCalc.SaveReader.GVAS
 
     public class GvasFile
     {
+        private static ILogger logger = Log.ForContext<GvasFile>();
+
         public GvasHeader Header { get; set; }
         public Dictionary<string, object> Properties { get; set; }
 
@@ -111,26 +114,34 @@ namespace PalCalc.SaveReader.GVAS
 
         public static bool IsValidGvas(IFileSource fileSource)
         {
-            using (var stream = FileUtil.ReadFileNonLocking(fileSource.Content.First()))
+            try
             {
-                var isCompressed = CompressedSAV.HasSaveCompression(stream);
-                stream.Seek(0, SeekOrigin.Begin);
+                using (var stream = FileUtil.ReadFileNonLocking(fileSource.Content.First()))
+                {
+                    var isCompressed = CompressedSAV.HasSaveCompression(stream);
+                    stream.Seek(0, SeekOrigin.Begin);
 
-                if (isCompressed)
-                {
-                    var isValid = false;
-                    CompressedSAV.WithDecompressedSave(stream, decompressed =>
+                    if (isCompressed)
                     {
-                        using (var reader = new FArchiveReader(decompressed, PalWorldTypeHints.Hints))
-                            isValid = IsValidGvas(reader);
-                    });
-                    return isValid;
+                        var isValid = false;
+                        CompressedSAV.WithDecompressedSave(stream, decompressed =>
+                        {
+                            using (var reader = new FArchiveReader(decompressed, PalWorldTypeHints.Hints))
+                                isValid = IsValidGvas(reader);
+                        });
+                        return isValid;
+                    }
+                    else
+                    {
+                        using (var reader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
+                            return IsValidGvas(reader);
+                    }
                 }
-                else
-                {
-                    using (var reader = new FArchiveReader(stream, PalWorldTypeHints.Hints))
-                        return IsValidGvas(reader);
-                }
+            }
+            catch (Exception e)
+            {
+                logger.Debug(e, "Exception thrown while checking IsValidGvas, returning false");
+                return false;
             }
         }
 

@@ -5,12 +5,27 @@
                              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
                              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+                             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+                             xmlns:vmc="clr-namespace:PalCalc.UI.ViewModel.Converters"
+                             xmlns:v="clr-namespace:PalCalc.UI.View"
+                             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+                             d:DataContext="{d:DesignInstance Type=vm:AppWindowViewModel}"
                              mc:Ignorable="d"
                              Title="{itl:LocalizedText LC_WINDOW_TITLE}"
                              Width="1280" Height="720"
-                             IconVisibility="Collapsed"
-                             Content="{Binding Content}">
+                             IconVisibility="Collapsed">
+    <Window.Resources>
+        <vmc:ValueVisibilityConverter x:Key="VVC" />
+    </Window.Resources>
     <Window.Style>
         <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}" />
     </Window.Style>
+    <DockPanel>
+        <Grid DockPanel.Dock="Top"
+              Visibility="{Binding ShowToolbar, Converter={StaticResource VVC}}">
+            <v:AppToolbar DataContext="{Binding ToolbarVM}" />
+        </Grid>
+
+        <ContentControl Content="{Binding Content}" />
+    </DockPanel>
 </adonisControls:AdonisWindow>

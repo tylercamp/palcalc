@@ -12,9 +12,11 @@ namespace PalCalc.UI.ViewModel.Converters
 {
     internal class CollectionVisibilityConverter : IValueConverter
     {
+        public bool Negate { get; set; } = false;
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (value as IEnumerable)?.GetEnumerator()?.MoveNext() == true
+            return (value as IEnumerable)?.GetEnumerator()?.MoveNext() == !Negate
                 ? Visibility.Visible
                 : Visibility.Collapsed;
         }

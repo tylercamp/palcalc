@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
+using PalCalc.SaveReader;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.PalDerived;
+using PalCalc.UI.ViewModel.SaveSelection;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel
@@ -19,9 +22,11 @@ namespace PalCalc.UI.ViewModel
     class Debouncer : IDisposable
     {
         private DispatcherTimer timer;
+        private readonly Action action;
 
-        public Debouncer(TimeSpan delay, Action action)
+        public Debouncer(TimeSpan delay, Action action, Dispatcher dispatcher)
         {
+            this.action = action;
             timer = new(
                 delay,
                 DispatcherPriority.Normal,
@@ -30,7 +35,7 @@ namespace PalCalc.UI.ViewModel
                     action();
                     timer.Stop();
                 },
-                Dispatcher.CurrentDispatcher
+                dispatcher
             );
         }
 
@@ -46,19 +51,75 @@ namespace PalCalc.UI.ViewModel
 
         public void Dispose()
         {
-            timer.Stop();
+            Cancel();
             timer = null;
         }
+
+        public void Flush()
+        {
+            if (timer == null || !timer.IsEnabled) return;
+
+            timer.Stop();
+            action();
+        }
+
+        public void Cancel() => timer?.Stop();
     }
 
     // (Auto-saves any changes with debounce. There should only ever be one instance for each save file)
     public partial class SaveCustomizationsViewModel : ObservableObject, IDisposable
     {
+        // TODO - Move this application-lifetime cache into a save/session service during the broader refactor.
+        private static readonly object instancesLock = new();
+        private static readonly Dictionary<SaveIdentity, SaveCustomizationsViewModel> instances = new();
+
+        public static SaveCustomizationsViewModel GetOrCreate(ISaveGame save)
+        {
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher != null && !dispatcher.CheckAccess())
+                return dispatcher.Invoke(() => GetOrCreate(save));
+
+            var identity = SaveIdentity.From(save);
+            lock (instancesLock)
+            {
+                if (!instances.TryGetValue(identity, out var result))
+                {
+                    result = new SaveCustomizationsViewModel(save, dispatcher ?? Dispatcher.CurrentDispatcher);
+                    instances.Add(identity, result);
+                }
+
+                return result;
+            }
+        }
+
+        public static void RemoveFor(ISaveGame save)
+        {
+            SaveCustomizationsViewModel result = null;
+            lock (instancesLock)
+            {
+                var identity = SaveIdentity.From(save);
+                if (instances.TryGetValue(identity, out result))
+                    instances.Remove(identity);
+            }
+
+            result?.Dispose();
+        }
+
+        public static void FlushAll()
+        {
+            List<SaveCustomizationsViewModel> current;
+            lock (instancesLock)
+                current = [.. instances.Values];
+
+            foreach (var customizations in current)
+                customizations.Flush();
+        }
+
         private Debouncer saveAction;
 
-        public SaveCustomizationsViewModel(SaveGameViewModel save)
+        private SaveCustomizationsViewModel(ISaveGame save, Dispatcher dispatcher)
         {
-            var data = Storage.LoadSaveCustomizations(save.Value, PalDB.LoadEmbedded());
+            var data = Storage.LoadSaveCustomizations(save, PalDB.LoadEmbedded());
 
             CustomContainers = new ObservableCollection<CustomContainerViewModel>(data.CustomContainers.Select(c => new CustomContainerViewModel(c)));
 
@@ -69,14 +130,16 @@ namespace PalCalc.UI.ViewModel
 
             saveAction = new Debouncer(TimeSpan.FromSeconds(3), () =>
             {
-                Storage.SaveCustomizations(save.Value, ModelObject, PalDB.LoadEmbedded());
-            });
+                Storage.SaveCustomizations(save, ModelObject, PalDB.LoadEmbedded());
+            }, dispatcher);
         }
 
         public void Dispose()
         {
             saveAction.Dispose();
         }
+
+        public void Flush() => saveAction.Flush();
 
         public SaveCustomizations ModelObject => new SaveCustomizations()
         {
@@ -105,11 +168,8 @@ namespace PalCalc.UI.ViewModel
 
         private void PalInst_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if ((sender as CustomPalInstanceViewModel).IsValid)
-            {
-                saveAction.Run();
-                OnPropertyChanged(nameof(CustomContainers));
-            }
+            saveAction.Run();
+            OnPropertyChanged(nameof(CustomContainers));
         }
 
         private void Container_PropertyChanged(object sender, PropertyChangedEventArgs e)
