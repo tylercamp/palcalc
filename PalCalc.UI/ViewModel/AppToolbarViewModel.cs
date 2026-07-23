@@ -85,13 +85,13 @@ namespace PalCalc.UI.ViewModel
                     {
                         if (result.Status == AppUpdateCheckStatus.Failed)
                         {
-                            AdonisMessageBox.Show(LocalizationCodes.LC_UPDATES_CHECK_RESULT_FAILED.Bind().Value);
+                            AdonisMessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_UPDATES_CHECK_RESULT_FAILED.Bind().Value);
                             return;
                         }
 
                         if (result.Status == AppUpdateCheckStatus.UpToDate)
                         {
-                            AdonisMessageBox.Show(LocalizationCodes.LC_UPDATES_CHECK_RESULT_ON_LATEST.Bind().Value);
+                            AdonisMessageBox.Show(App.Current.MainWindow, LocalizationCodes.LC_UPDATES_CHECK_RESULT_ON_LATEST.Bind().Value);
                             return;
                         }
 
