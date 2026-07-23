@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.UI.Model.Service
 {
-    internal interface ISavesService
+    public interface ISavesService
     {
         void AddVirtualSave(VirtualSaveGame virtualSave);
 

@@ -119,7 +119,7 @@ namespace PalCalc.UI
                             PalBreedingDB.BeginLoadEmbedded(loadedDb);
                             return loadedDb;
                         });
-                        var savesTask = Task.Run(() => SavesDetection.FindAll(settings, savesService));
+                        var savesTask = Task.Run(() => SavesCollectionViewModel.DetectAll(settings, savesService));
 
                         Task.WaitAll(databaseTask, savesTask);
                         db = databaseTask.Result;

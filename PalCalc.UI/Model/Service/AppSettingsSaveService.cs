@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 
 namespace PalCalc.UI.Model.Service
 {
-    internal class AppSettingsSaveService(AppSettings settings) : ISavesService
+    public class AppSettingsSaveService(AppSettings settings) : ISavesService
     {
         public void AddManualSave(StandardSaveGame manualSave)
         {

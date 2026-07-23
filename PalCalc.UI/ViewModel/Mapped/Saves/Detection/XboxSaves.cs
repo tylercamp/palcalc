@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PalCalc.UI.ViewModel.Mapped.Saves
+namespace PalCalc.UI.ViewModel.Mapped.Saves.Detection
 {
     internal static class XboxSaves
     {

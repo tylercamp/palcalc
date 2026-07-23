@@ -20,7 +20,8 @@ namespace PalCalc.UI.ViewModel
         //        warning "Steam saves location not found"
 
         private static SaveSelectionOnboardingViewModel _designerInstance;
-        public static SaveSelectionOnboardingViewModel DesignerInstance => _designerInstance ??= new SaveSelectionOnboardingViewModel(SavesDetection.FindAll(new AppSettings(), null), null);
+        public static SaveSelectionOnboardingViewModel DesignerInstance =>
+            _designerInstance ??= new SaveSelectionOnboardingViewModel(SavesCollectionViewModel.DetectAll(new AppSettings(), null), null);
 
         public IReadOnlyCollection<SavesCollectionViewModel> AvailableSaveGameCollections { get; }
 
