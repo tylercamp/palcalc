@@ -165,7 +165,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Location header with folder button -->
-                <Grid Grid.Row="0" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
+                <Grid Grid.Row="0" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}" Name="SaveGameSelectorHeader">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
@@ -177,7 +177,16 @@
                            VerticalAlignment="Center"
                            Padding="{adonisUi:Space 1}"/>
 
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="{adonisUi:Space 0.5}" adonisExtensions:LayerExtension.IncreaseLayer="False" adonisExtensions:LayerExtension.Layer="0">
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="{adonisUi:Space 0.5}"
+                                adonisExtensions:LayerExtension.Layer="0"
+                                vu:StackPanelExtensions.Spacing="5">
+                        <Button Command="{Binding OpenLocationHelpMenuCommand}">
+                            <materialIcons:MaterialIcon Kind="TooltipHelp" Width="18" />
+                        </Button>
+                        
                         <Button Command="{Binding SelectedCollection.AddSaveCommand}" Visibility="{Binding SelectedCollection.AddSaveCommand, Converter={StaticResource VVC}}">
                             <materialIcons:MaterialIcon Kind="Add" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Width="18" />
                         </Button>
@@ -188,14 +197,25 @@
                     </StackPanel>
                 </Grid>
 
+                <Popup PlacementTarget="{Binding ElementName=SaveGameSelectorHeader}"
+                       HorizontalOffset="{adonisUi:Space -1}"
+                       IsOpen="{Binding IsLocationHelpMenuOpen}"
+                       StaysOpen="False"
+                       HorizontalAlignment="Stretch"
+                       MaxWidth="600"
+                       AllowsTransparency="True"
+                       >
+                    <vu:AdonisPopupContent>
+                        <ContentPresenter Grid.Row="2"
+                                          Content="{Binding SelectedCollection}"
+                                          ContentTemplateSelector="{StaticResource SaveTypeInstructionsTemplateSelector}" />
+                    </vu:AdonisPopupContent>
+                </Popup>
+
                 <!-- Notices for the save location, e.g. instructions for syncing Xbox saves if no save-games are found -->
                 <ContentPresenter Grid.Row="1"
                                   Content="{Binding SelectedCollection}"
                                   ContentTemplateSelector="{StaticResource NoSavesNoticeTemplateSelector}" />
-
-                <ContentPresenter Grid.Row="2"
-                                  Content="{Binding SelectedCollection}"
-                                  ContentTemplateSelector="{StaticResource SaveTypeInstructionsTemplateSelector}" />
 
                 <!-- Save games list -->
                 <ListBox Grid.Row="3"

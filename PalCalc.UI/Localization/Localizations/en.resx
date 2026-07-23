@@ -1007,9 +1007,9 @@ Higher values have minimal effect on time required.</value>
   <data name="LC_LOCATION_MANUAL_SAVES_INSTRUCTIONS" xml:space="preserve">
     <value>"Local File" saves can be used to manually register Palworld save files with Pal Calc. A folder with Palworld save data will contain:
 
-1. A Level.sav file - this is the main save data
-2. A LevelMeta.sav file - this contains info like the host's player name and in-game day
-3. A Player folder containing one or more .sav files - this identifies each player and the Pal Containers they own
+1. A Level.sav file - This is the main save data.
+2. A LevelMeta.sav file - This contains info like the host's player name and in-game day.
+3. A Player folder containing one or more .sav files - This identifies each player and the Pal Containers they own.
 
 Level.sav is required. Pal Calc benefits from the other files but can operate without them.
 

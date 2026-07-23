@@ -36,6 +36,9 @@ namespace PalCalc.UI.ViewModel
         [ObservableProperty]
         private CommonSaveOperationsViewModel commonSelectedSaveOperations;
 
+        [ObservableProperty]
+        private bool isLocationHelpMenuOpen;
+
         public SaveSelectionOnboardingViewModel(
             IEnumerable<SavesCollectionViewModel> savesCollections,
             IRelayCommand<SaveGameViewModel> loadSaveCommand
@@ -74,7 +77,12 @@ namespace PalCalc.UI.ViewModel
                     }
                 }
             }
+        }
 
+        [RelayCommand]
+        private void OpenLocationHelpMenu()
+        {
+            IsLocationHelpMenuOpen = true;
         }
     }
 }

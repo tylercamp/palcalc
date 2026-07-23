@@ -9,6 +9,7 @@
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
              xmlns:vmc="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:local="clr-namespace:PalCalc.UI.View"
+             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              d:DataContext="{x:Static vm:CommonSaveOperationsViewModel.DesignerInstance}"
              mc:Ignorable="d">
     <UserControl.Resources>
@@ -19,15 +20,9 @@
             <materialIcons:MaterialIcon Kind="MenuDown" />
         </Button>
         <Popup PlacementTarget="{Binding ElementName=ControlsButton}" IsOpen="{Binding MenuIsOpen}" StaysOpen="False" AllowsTransparency="True">
-            <Border Margin="0 0 8 8" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" BorderThickness="1">
-                <Border.Effect>
-                    <DropShadowEffect ShadowDepth="2"
-                                      BlurRadius="8"
-                                      Opacity="0.3"
-                                      Direction="315"/>
-                </Border.Effect>
+            <vu:AdonisPopupContent>
                 <!-- (Would normally just use a `StackPanel`, but `MenuItem` has some binding to a parent ItemsControl. We satisfy that to avoid noisy binding errors) -->
-                <ItemsControl Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
+                <ItemsControl>
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Vertical" />
@@ -41,7 +36,7 @@
                         <MenuItem Header="{itl:LocalizedText LC_NAV_BACK_TO_SAVE_SELECTOR}" Command="{Binding NavigateSaveSelectionPageCommand}" />
                     </StackPanel>
                 </ItemsControl>
-            </Border>
+            </vu:AdonisPopupContent>
         </Popup>
     </Grid>
 </UserControl>
