@@ -970,4 +970,25 @@
   <data name="LC_SELECTED_SAVE" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SAVE_PROPERTY_PLAYER_NAME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_PROPERTY_PLAYER_LEVEL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_PROPERTY_WORLD_NAME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_PROPERTY_WORLD_DAY" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_PROPERTY_LAST_MODIFIED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SAVE_PROPERTY_SAVE_ID" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PALWORLD_SAVE_FILES" xml:space="preserve">
+    <value />
+  </data>
 </root>

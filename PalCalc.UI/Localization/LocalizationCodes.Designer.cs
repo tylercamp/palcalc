@@ -627,6 +627,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_PALWORLD_SAVE_FILES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_PASSIVES_CHECKLIST_COST,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -836,6 +840,30 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_LOCATION_XBOX_INSTALL_3,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_LAST_MODIFIED,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_PLAYER_LEVEL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_PLAYER_NAME,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_SAVE_ID,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_WORLD_DAY,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_WORLD_NAME,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

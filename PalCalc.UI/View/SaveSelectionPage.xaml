@@ -111,7 +111,7 @@
 
     <GroupBox MaxWidth="1500"
               MaxHeight="700"
-              Header="Palworld Save Files"
+              Header="{itl:LocalizedText LC_PALWORLD_SAVE_FILES}"
               BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
               BorderThickness="{adonisUi:Space 0.5}"
             >
@@ -327,7 +327,7 @@
                             <ColumnDefinition Width="6" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Player" Foreground="Gray" />
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_PLAYER_NAME}" Foreground="Gray" />
                         <TextBlock Grid.Column="2" Text="{Binding SelectedSave.MainPlayerName}" />
                     </Grid>
 
@@ -337,7 +337,7 @@
                             <ColumnDefinition Width="6" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Level" Foreground="Gray" />
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_PLAYER_LEVEL}" Foreground="Gray" />
                         <TextBlock Grid.Column="2" Text="{Binding SelectedSave.MainPlayerLevel}" />
                     </Grid>
 
@@ -347,7 +347,7 @@
                             <ColumnDefinition Width="6" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="World" Foreground="Gray" />
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_WORLD_NAME}" Foreground="Gray" />
                         <TextBlock Grid.Column="2" Text="{Binding SelectedSave.WorldName}" />
                     </Grid>
 
@@ -357,7 +357,7 @@
                             <ColumnDefinition Width="6" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Day" Foreground="Gray" />
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_WORLD_DAY}" Foreground="Gray" />
                         <TextBlock Grid.Column="2" Text="{Binding SelectedSave.DayNumber}" />
                     </Grid>
 
@@ -367,7 +367,7 @@
                             <ColumnDefinition Width="6" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Modified" Foreground="Gray" />
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_LAST_MODIFIED}" Foreground="Gray" />
                         <TextBlock Grid.Column="2" Text="{Binding SelectedSave.LastModified, StringFormat={}{0:G}}" />
                     </Grid>
 
@@ -377,7 +377,7 @@
                             <ColumnDefinition Width="6" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Game ID" Foreground="Gray" />
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_SAVE_ID}" Foreground="Gray" />
                         <TextBlock Grid.Column="2" Text="{Binding SelectedSave.Value.GameId}" />
                     </Grid>
                 </StackPanel>

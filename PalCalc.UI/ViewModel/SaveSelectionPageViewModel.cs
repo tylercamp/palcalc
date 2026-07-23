@@ -54,6 +54,7 @@ namespace PalCalc.UI.ViewModel
 
             if (e.PropertyName == nameof(SelectedSave))
             {
+                // (`null` for `navigateSaveSelectionPageCommand` since we're already on that page)
                 CommonSelectedSaveOperations = new CommonSaveOperationsViewModel(null, SelectedCollection, SelectedSave);
             }
 
