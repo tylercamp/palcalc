@@ -19,7 +19,7 @@ namespace PalCalc.UI.ViewModel
 
     public partial class PalTargetListViewModel : ObservableObject, IDropTarget
     {
-        public PalTargetListViewModel()
+        public PalTargetListViewModel(PalSourceViewModel sourcePals)
         {
             targets = new ObservableCollection<PalSpecifierViewModel>
             {
@@ -28,6 +28,8 @@ namespace PalCalc.UI.ViewModel
 
             Targets = new ReadOnlyObservableCollection<PalSpecifierViewModel>(targets);
             SelectedTarget = PalSpecifierViewModel.New;
+
+            SourcePals = sourcePals;
         }
 
         public PalTargetListViewModel(PalSourceViewModel sourcePals, IEnumerable<PalSpecifierViewModel> existingSpecs)

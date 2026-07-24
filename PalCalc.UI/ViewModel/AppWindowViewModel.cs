@@ -231,7 +231,7 @@ namespace PalCalc.UI.ViewModel
                     handleErr: (ex) =>
                     {
                         logger.Warning(ex, "an error occurred loading the old targets list for {saveId}, skipping", CachedSaveGame.IdentifierFor(sg.Value));
-                        return new PalTargetListViewModel();
+                        return new PalTargetListViewModel(new PalSourceViewModel(sg, null));
                     }
                 );
             }
@@ -261,13 +261,13 @@ namespace PalCalc.UI.ViewModel
                     handleErr: (ex) =>
                     {
                         logger.Warning(ex, "an error occurred loading targets list for {saveId}, skipping", CachedSaveGame.IdentifierFor(sg.Value));
-                        return new PalTargetListViewModel();
+                        return new PalTargetListViewModel(new PalSourceViewModel(sg, null));
                     }
                 );
             }
             else
             {
-                result = new PalTargetListViewModel();
+                result = new PalTargetListViewModel(new PalSourceViewModel(sg, null));
             }
 
             return result;

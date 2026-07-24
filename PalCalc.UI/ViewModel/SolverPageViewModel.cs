@@ -44,7 +44,7 @@ namespace PalCalc.UI.ViewModel
                         Dispatcher.CurrentDispatcher,
                         CommonSaveOperationsViewModel.DesignerInstance,
                         SaveGameViewModel.DesignerInstance,
-                        new PalTargetListViewModel()
+                        new PalTargetListViewModel(new PalSourceViewModel(SaveGameViewModel.DesignerInstance, null))
                     );
                 }
 
