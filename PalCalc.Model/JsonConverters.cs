@@ -197,6 +197,10 @@ namespace PalCalc.Model
                     kvp => kvp.Key.InternalToPal(pals),
                     kvp => kvp.Value
                 ),
+
+                CombiTalentInheritNum = asToken["CombiTalentInheritNum"]?.ToObject<List<int>>(),
+                CombiPassiveInheritNum = asToken["CombiPassiveInheritNum"]?.ToObject<List<int>>(),
+                CombiPassiveRandomAddNum = asToken["CombiPassiveRandomAddNum"]?.ToObject<List<int>>(),
             };
         }
 
@@ -211,6 +215,9 @@ namespace PalCalc.Model
                 ActiveSkills = value.ActiveSkills,
                 Elements = value.Elements,
                 BreedingGenderProbability = value.BreedingGenderProbability.ToDictionary(kvp => kvp.Key.InternalName, kvp => kvp.Value),
+                CombiTalentInheritNum = value.CombiTalentInheritNum,
+                CombiPassiveInheritNum = value.CombiPassiveInheritNum,
+                CombiPassiveRandomAddNum = value.CombiPassiveRandomAddNum,
             }).WriteTo(writer);
         }
     }
