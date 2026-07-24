@@ -56,16 +56,98 @@ namespace PalCalc.Model
 
         // (note: changing these from dictionaries to arrays has negligible impact on performance. dictionaries are more legible in this case)
 
-        // probability of inheriting exactly N IVs from parents
-        public static readonly Dictionary<int, float> IVProbabilityDirect = new()
+        // === Inheritance probability tables ===
+        //
+        // Derived from the game's raw weight arrays in `PalGameSetting` (scraped by PalCalc.GenDB):
+        //   Combi_TalentInheritNum    -> how many IVs are copied from parents
+        //   Combi_PassiveInheritNum   -> how many passives are copied from parents
+        //   Combi_PassiveRandomAddNum -> how many random passives are added
+        //
+        // A weight array [w0, w1, ...] over outcomes {c, c+1, ...} gives P(k) = w / sum(w).
+        // e.g. Combi_TalentInheritNum = [3,2,1] -> inherit 1/2/3 IVs at 50% / 33.3% / 16.7%.
+        //
+        // The raw arrays are scraped into db.json and applied at load via ApplyScrapedInheritance().
+        // The defaults below are the datamined values, used as a fallback if a db.json predates scraping.
+        // (datamined from BP_PalGameSetting, Steam build 24181527, 2026-07)
+        private static IReadOnlyList<int> talentInheritWeights = new[] { 3, 2, 1 };
+        private static IReadOnlyList<int> passiveInheritWeights = new[] { 4, 3, 2, 1 };
+        private static IReadOnlyList<int> passiveRandomAddWeights = new[] { 4, 3, 2, 1 };
+
+        // probability of inheriting exactly N IVs from parents (always inherits at least 1)
+        public static IReadOnlyDictionary<int, float> IVProbabilityDirect { get; private set; }
+        // probability of ending up with N desired IVs, indexed [numDesired - 1]
+        public static IReadOnlyList<float> IVDesiredProbabilities { get; private set; }
+
+        // probability of inheriting exactly / at least N passives from the parent pool
+        public static IReadOnlyDictionary<int, float> PassiveProbabilityDirect { get; private set; }
+        public static IReadOnlyDictionary<int, float> PassiveProbabilityAtLeastN { get; private set; }
+        // probability of adding exactly / at least N random passives
+        public static IReadOnlyDictionary<int, float> PassiveRandomAddedProbability { get; private set; }
+        public static IReadOnlyDictionary<int, float> PassiveRandomAddedAtLeastN { get; private set; }
+
+        static GameConstants() => RecomputeInheritanceTables();
+
+        /// <summary>
+        /// Overrides the raw inheritance weight arrays with values scraped from game files
+        /// (see PalCalc.GenDB.GameSettingReader). Null/empty arguments keep the datamined defaults.
+        /// </summary>
+        public static void ApplyScrapedInheritance(
+            IReadOnlyList<int> talentInherit,
+            IReadOnlyList<int> passiveInherit,
+            IReadOnlyList<int> passiveRandomAdd)
         {
-            // will always inherit at least 1
-            { 0, 0.0f },
-            // (determined manually by gathering samples, unlike passive probabilities which were reverse engineered)
-            { 1, 0.5f },
-            { 2, 0.25f },
-            { 3, 0.25f },
-        };
+            if (talentInherit is { Count: > 0 }) talentInheritWeights = talentInherit;
+            if (passiveInherit is { Count: > 0 }) passiveInheritWeights = passiveInherit;
+            if (passiveRandomAdd is { Count: > 0 }) passiveRandomAddWeights = passiveRandomAdd;
+            RecomputeInheritanceTables();
+        }
+
+        private static void RecomputeInheritanceTables()
+        {
+            // exact-count distributions
+            IVProbabilityDirect = WithKey(DistFromWeights(talentInheritWeights, startCount: 1), 0);
+            PassiveProbabilityDirect = WithKey(DistFromWeights(passiveInheritWeights, startCount: 1), 0);
+            PassiveRandomAddedProbability = WithKey(DistFromWeights(passiveRandomAddWeights, startCount: 0), MaxTotalPassives);
+
+            // cumulative "at least N"
+            PassiveProbabilityAtLeastN = AtLeast(DistFromWeights(passiveInheritWeights, startCount: 1));
+            PassiveRandomAddedAtLeastN = AtLeast(PassiveRandomAddedProbability);
+
+            // IV desired-count probabilities: chance of getting `numDesired` specific IVs given the
+            // inherited-count distribution. combinations table is fixed (there are 3 IV stats).
+            var comb = new Dictionary<int, Dictionary<int, float>>()
+            {
+                { 1, new() { { 1, 1f / 3f }, { 2, 0f },      { 3, 0f } } },
+                { 2, new() { { 1, 2f / 3f }, { 2, 1f / 3f }, { 3, 0f } } },
+                { 3, new() { { 1, 1f },      { 2, 1f },      { 3, 1f } } },
+            };
+            var ivDesired = new float[3];
+            for (int numInherited = 1; numInherited <= 3; numInherited++)
+                for (int numDesired = 1; numDesired <= 3; numDesired++)
+                    ivDesired[numDesired - 1] += IVProbabilityDirect[numInherited] * comb[numInherited][numDesired];
+            IVDesiredProbabilities = ivDesired;
+        }
+
+        // weights[i] is the weight for outcome (startCount + i); P(outcome) = weight / sum
+        private static Dictionary<int, float> DistFromWeights(IReadOnlyList<int> weights, int startCount)
+        {
+            float sum = weights.Sum();
+            var d = new Dictionary<int, float>();
+            for (int i = 0; i < weights.Count; i++)
+                d[startCount + i] = weights[i] / sum;
+            return d;
+        }
+
+        // ensure `key` exists (probability 0) so consumers can index it safely
+        private static Dictionary<int, float> WithKey(Dictionary<int, float> dist, int key)
+        {
+            if (!dist.ContainsKey(key)) dist[key] = 0.0f;
+            return dist;
+        }
+
+        // P(X >= k) for each k present in the exact-count distribution
+        private static Dictionary<int, float> AtLeast(IReadOnlyDictionary<int, float> exact) =>
+            exact.Keys.ToDictionary(k => k, k => exact.Where(kv => kv.Key >= k).Sum(kv => kv.Value));
 
         // roughly estimate time to catch a given pal
         public static TimeSpan TimeToCatch(Pal pal)
@@ -101,59 +183,8 @@ namespace PalCalc.Model
               ],
         */
 
-        // probability of getting N passives from parent pool
-        public static readonly IReadOnlyDictionary<int, float> PassiveProbabilityDirect = new Dictionary<int, float>()
-        {
-            { 4, 0.10f },
-            { 3, 0.20f },
-            { 2, 0.30f },
-            { 1, 0.40f },
-            { 0, 0.0f },
-        };
-
-        // probability of getting N passives from parent pool without any random passives
-        public static readonly IReadOnlyDictionary<int, float> PassiveProbabilityNoRandom = new Dictionary<int, float>()
-        {
-            { 4, 0.10f },
-            { 3, 0.08f },
-            { 2, 0.12f },
-            { 1, 0.16f },
-        };
-
-        public static readonly IReadOnlyDictionary<int, float> PassiveProbabilityAtLeastN = new Dictionary<int, float>()
-        {
-            { 4, 0.10f },
-            { 3, 0.30f },
-            { 2, 0.60f },
-            { 1, 1.00f },
-        };
-
-        public static readonly IReadOnlyDictionary<int, float> PassiveProbabilityNoRandomAtLeastN = new Dictionary<int, float>()
-        {
-            { 4, 0.10f },
-            { 3, 0.12f },
-            { 2, 0.24f },
-            { 1, 0.40f },
-        };
-
-        // probability of getting N additional random passives added
-        public static readonly IReadOnlyDictionary<int, float> PassiveRandomAddedProbability = new Dictionary<int, float>()
-        {
-            { 4, 0.0f },
-            { 3, 0.10f },
-            { 2, 0.20f },
-            { 1, 0.30f },
-            { 0, 0.40f },
-        };
-
-        public static readonly IReadOnlyDictionary<int, float> PassiveRandomAddedAtLeastN = new Dictionary<int, float>()
-        {
-            { 4, 0.0f },
-            { 3, 0.10f },
-            { 2, 0.3f },
-            { 1, 0.6f },
-            { 0, 1.0f }
-        };
+        // (PassiveProbabilityDirect / AtLeastN and PassiveRandomAdded* are now computed from the
+        //  scraped weight arrays — see the inheritance tables section above)
 
         // probability of a wild pal having, at most, N random passives
         // (assume equal probability of gaining anywhere from 0 through 4 random passives)
