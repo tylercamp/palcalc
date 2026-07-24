@@ -26,20 +26,18 @@ namespace PalCalc.UI.ViewModel
     /// </summary>
     public partial class PalTargetViewModel : ObservableObject
     {
-        private SaveGameViewModel sourceSave;
+        private PalSourceViewModel sourcePals;
 
-        public PalTargetViewModel() : this(null, PalSpecifierViewModel.New, PassiveSkillsPresetCollectionViewModel.DesignerInstance) { }
+        public PalTargetViewModel() : this(null, null, PalSpecifierViewModel.New, PassiveSkillsPresetCollectionViewModel.DesignerInstance) { }
 
-        public PalTargetViewModel(SaveGameViewModel sourceSave, PalSpecifierViewModel initial, PassiveSkillsPresetCollectionViewModel presets)
+        public PalTargetViewModel(SaveGameViewModel sourceSave, PalSourceViewModel sourcePals, PalSpecifierViewModel initial, PassiveSkillsPresetCollectionViewModel presets)
         {
-            this.sourceSave = sourceSave;
+            this.sourcePals = sourcePals;
 
             if (initial.IsReadOnly)
             {
                 InitialPalSpecifier = null;
                 CurrentPalSpecifier = new PalSpecifierViewModel(Guid.NewGuid().ToString(), null);
-
-                PalSource = new PalSourceTreeViewModel(sourceSave.CachedValue);
             }
             else
             {
@@ -52,31 +50,17 @@ namespace PalCalc.UI.ViewModel
                 {
                     CurrentPalSpecifier = initial.Copy();
                 }
-
-                PalSource = new PalSourceTreeViewModel(sourceSave.CachedValue);
             }
 
-            if (CurrentPalSpecifier.PalSourceSelections?.Any() == true)
-            {
-                PalSource.Selections = CurrentPalSpecifier.PalSourceSelections;
-            }
-
-            if (PalSource.Selections != null)
-                CurrentPalSpecifier.RefreshWith(AvailablePals);
+            CurrentPalSpecifier.RefreshWith(sourcePals.AvailablePals);
 
             void RefreshOnChange(object sender, PropertyChangedEventArgs ev)
             {
-                CurrentPalSpecifier?.RefreshWith(AvailablePals);
+                CurrentPalSpecifier?.RefreshWith(sourcePals.AvailablePals);
             }
 
             PropertyChangedEventManager.AddHandler(sourceSave.Customizations, RefreshOnChange, nameof(sourceSave.Customizations.CustomContainers));
-
-            PropertyChangedEventManager.AddHandler(CurrentPalSpecifier, RefreshOnChange, nameof(CurrentPalSpecifier.IncludeCagedPals));
-            PropertyChangedEventManager.AddHandler(CurrentPalSpecifier, RefreshOnChange, nameof(CurrentPalSpecifier.IncludeBasePals));
-            PropertyChangedEventManager.AddHandler(CurrentPalSpecifier, RefreshOnChange, nameof(CurrentPalSpecifier.IncludeCustomPals));
-            PropertyChangedEventManager.AddHandler(CurrentPalSpecifier, RefreshOnChange, nameof(CurrentPalSpecifier.IncludeGlobalStoragePals));
-
-            PalSource.PropertyChanged += PalSource_PropertyChanged;
+            PropertyChangedEventManager.AddHandler(sourcePals, RefreshOnChange, nameof(sourcePals.AvailablePals));
             
             Presets = presets;
             OpenPresetsMenuCommand = new RelayCommand(() => PresetsMenuIsOpen = true);
@@ -84,18 +68,6 @@ namespace PalCalc.UI.ViewModel
             presets.PresetSelected += (_) => PresetsMenuIsOpen = false;
 
             OpenPassivesSearchCommand = new RelayCommand(() => new PassivesSearchWindow() { Owner = App.Current.MainWindow }.Show());
-        }
-
-        private void PalSource_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(PalSource.HasValidSource))
-                OnPropertyChanged(nameof(IsValid));
-
-            if (e.PropertyName == nameof(PalSource.Selections) && PalSource.Selections?.Any() == true)
-            {
-                CurrentPalSpecifier.PalSourceSelections = PalSource.Selections;
-                CurrentPalSpecifier?.RefreshWith(AvailablePals);
-            }
         }
 
         private SolverJobViewModel currentLatestJob;
@@ -151,7 +123,7 @@ namespace PalCalc.UI.ViewModel
 
                     if (value != null)
                     {
-                        value?.RefreshWith(AvailablePals);
+                        value?.RefreshWith(sourcePals.AvailablePals);
                     }
                 }
             }
@@ -168,66 +140,12 @@ namespace PalCalc.UI.ViewModel
                 case nameof(CurrentPalSpecifier.LatestJob):
                     CurrentLatestJob = CurrentPalSpecifier.LatestJob;
                     break;
-
-                case nameof(CurrentPalSpecifier.IncludeBasePals):
-                case nameof(CurrentPalSpecifier.IncludeCagedPals):
-                case nameof(CurrentPalSpecifier.IncludeCustomPals):
-                    CurrentPalSpecifier.RefreshWith(AvailablePals);
-                    break;
             }
         }
 
-        public bool IsValid => PalSource.HasValidSource && CurrentPalSpecifier.IsValid;
-
-        public PalSourceTreeViewModel PalSource { get; set; }
+        public bool IsValid => CurrentPalSpecifier.IsValid;
 
         public PassiveSkillsPresetCollectionViewModel Presets { get; }
-
-        public IEnumerable<PalInstance> AvailablePals
-        {
-            get
-            {
-                if (PalSource?.Selections != null)
-                {
-                    var cachedSave = sourceSave.CachedValue;
-                    var selections = PalSource.Selections;
-                    foreach (var pal in cachedSave.OwnedPals)
-                    {
-                        if (!selections.Any(s => s.Matches(cachedSave, pal)))
-                            continue;
-
-                        if (pal.Location.Type == LocationType.GlobalPalStorage)
-                            continue;
-
-                        if (!CurrentPalSpecifier.IncludeBasePals && pal.Location.Type == LocationType.Base)
-                            continue;
-
-                        if (!CurrentPalSpecifier.IncludeCagedPals && pal.Location.Type == LocationType.ViewingCage)
-                            continue;
-
-                        if (!CurrentPalSpecifier.IncludeExpeditionPals && pal.IsOnExpedition)
-                            continue;
-
-                        yield return pal;
-                    }
-                }
-
-                if (CurrentPalSpecifier.IncludeGlobalStoragePals)
-                {
-                    foreach (var pal in sourceSave.CachedValue.OwnedPals.Where(p => p.Location.Type == LocationType.GlobalPalStorage))
-                    {
-                        yield return pal;
-                    }
-                }
-
-                if (CurrentPalSpecifier.IncludeCustomPals)
-                {
-                    foreach (var pal in sourceSave.Customizations.CustomContainers.SelectMany(c => c.Contents))
-                        if (pal.IsValid)
-                            yield return pal.ModelObject;
-                }
-            }
-        }
 
         [ObservableProperty]
         private bool presetsMenuIsOpen = false;

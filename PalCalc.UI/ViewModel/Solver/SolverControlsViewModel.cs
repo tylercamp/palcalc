@@ -29,21 +29,23 @@ namespace PalCalc.UI.ViewModel.Solver
 
     public partial class SolverControlsViewModel : ObservableObject
     {
-        public static SolverControlsViewModel DesignerInstance { get; } = new SolverControlsViewModel(null, null, null, null);
+        public static SolverControlsViewModel DesignerInstance { get; } = new SolverControlsViewModel(null, null, null, null, null);
 
         private PalListPresetCollectionViewModel PalListPresets => new(
-            CurrentTarget?.PalSource?.Save,
-            CurrentTarget?.PalSource?.Selections,
+            SourcePals,
             AppSettings.Current?.PalListPresets
         );
 
         public SolverControlsViewModel(
+            PalSourceViewModel sourcePals,
             ICommand runSolverCommand,
             ICommand cancelSolverCommand,
             ICommand pauseSolverCommand,
             ICommand resumeSolverCommand
         )
         {
+            SourcePals = sourcePals;
+
             MaxBreedingSteps = 6;
             MaxWildPals = 1;
             MaxInputIrrelevantPassives = 2;
@@ -176,6 +178,8 @@ namespace PalCalc.UI.ViewModel.Solver
             OnPropertyChanged(nameof(CanCancelSolver));
             OnPropertyChanged(nameof(CanEditSettings));
         }
+
+        public PalSourceViewModel SourcePals { get; }
 
         private SolverJobViewModel currentJob;
         public SolverJobViewModel CurrentJob

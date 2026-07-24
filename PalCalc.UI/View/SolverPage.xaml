@@ -182,23 +182,23 @@
                                     <StackPanel Grid.Row="0" vu:StackPanelExtensions.Spacing="8">
                                         <Label Content="{itl:LocalizedText Code=LC_SOURCE_PALS_FILTERS}" />
                                         <StackPanel vu:StackPanelExtensions.Spacing="5">
-                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeGlobalStoragePals}">
+                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTargetList.SourcePals.IncludeGlobalStoragePals}">
                                                 <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_GPS}" TextWrapping="Wrap" />
                                             </CheckBox>
 
-                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeBasePals}">
+                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTargetList.SourcePals.IncludeBasePals}">
                                                 <TextBlock Text="{itl:LocalizedText LC_INCLUDE_PALS_AT_BASE}" TextWrapping="Wrap" />
                                             </CheckBox>
 
-                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCagedPals}">
+                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTargetList.SourcePals.IncludeCagedPals}">
                                                 <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_IN_CAGES}" TextWrapping="Wrap" />
                                             </CheckBox>
 
-                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeCustomPals}">
+                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTargetList.SourcePals.IncludeCustomPals}">
                                                 <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_CUSTOM_PALS}" TextWrapping="Wrap" />
                                             </CheckBox>
 
-                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTarget.CurrentPalSpecifier.IncludeExpeditionPals}">
+                                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding PalTargetList.SourcePals.IncludeExpeditionPals}">
                                                 <TextBlock Text="{itl:LocalizedText Code=LC_INCLUDE_PALS_ON_EXPEDITIONS}" TextWrapping="Wrap" />
                                             </CheckBox>
                                         </StackPanel>
@@ -208,7 +208,7 @@
 
                                     <StackPanel Grid.Row="2" vu:StackPanelExtensions.Spacing="5">
                                         <Label Content="{itl:LocalizedText Code=LC_SOURCE_PALS_PLAYERS_AND_GUILDS}" />
-                                        <v:PalSourceTreeView DataContext="{Binding PalTarget.PalSource}">
+                                        <v:PalSourceTreeView DataContext="{Binding PalTargetList.SourcePals.PlayerSources}">
                                             <v:PalSourceTreeView.Resources>
                                                 <Style TargetType="TreeView" BasedOn="{StaticResource {x:Type TreeView}}">
                                                     <Setter Property="Template">

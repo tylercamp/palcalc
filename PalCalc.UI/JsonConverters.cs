@@ -8,6 +8,7 @@ using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.SaveSelection;
 using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
@@ -698,13 +699,8 @@ namespace PalCalc.UI
                 MinIv_HP = obj["MinIV_HP"]?.ToObject<int>() ?? 0,
                 MinIv_Attack = obj["MinIV_Attack"]?.ToObject<int>() ?? 0,
                 MinIv_Defense = obj["MinIV_Defense"]?.ToObject<int>() ?? 0,
-                PalSourceSelections = palSourceSelections ?? [new SourceTreeAllSelection()],
                 RequiredGender = PalGenderViewModel.Make(obj["RequiredGender"]?.ToObject<PalGender>() ?? PalGender.WILDCARD),
-                IncludeBasePals = obj["IncludeBasePals"]?.ToObject<bool>() ?? true,
-                IncludeCustomPals = obj["IncludeCustomPals"]?.ToObject<bool>() ?? true,
-                IncludeCagedPals = obj["IncludeCagedPals"]?.ToObject<bool>() ?? true,
-                IncludeGlobalStoragePals = obj["IncludeGlobalStoragePals"]?.ToObject<bool>() ?? true,
-                IncludeExpeditionPals = obj["IncludeExpeditionPals"]?.ToObject<bool>() ?? true,
+                
                 CurrentResults = currentResults,
             };
         }
@@ -729,13 +725,7 @@ namespace PalCalc.UI
                 MinIV_HP = value.MinIv_HP,
                 MinIV_Attack = value.MinIv_Attack,
                 MinIV_Defense = value.MinIv_Defense,
-                PalSourceSelections = value.PalSourceSelections?.Select(s => s.SerializedId),
                 RequiredGender = value.RequiredGender?.Value ?? PalGender.WILDCARD,
-                IncludeBasePals = value.IncludeBasePals,
-                IncludeCustomPals = value.IncludeCustomPals,
-                IncludeCagedPals = value.IncludeCagedPals,
-                IncludeGlobalStoragePals = value.IncludeGlobalStoragePals,
-                IncludeExpeditionPals = value.IncludeExpeditionPals,
                 CurrentResults = value.CurrentResults
             });
 
@@ -845,30 +835,94 @@ namespace PalCalc.UI
         }
     }
 
+    internal class PalSourceViewModelConverter : PalConverterBase<PalSourceViewModel>
+    {
+        SaveGameViewModel sourceSave;
+        CachedSaveGame cachedSourceSave;
+
+        public PalSourceViewModelConverter(PalDB db, GameSettings gameSettings, SaveGameViewModel sourceSave, CachedSaveGame cachedSourceSave) : base(db, gameSettings)
+        {
+            this.sourceSave = sourceSave;
+            this.cachedSourceSave = cachedSourceSave;
+        }
+
+        protected override PalSourceViewModel ReadTypeJson(JsonReader reader, Type objectType, PalSourceViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var obj = JToken.ReadFrom(reader);
+
+            var palSourceSelections = obj["PalSourceSelections"]
+                    ?.ToObject<List<string>>()
+                    ?.Select(id => IPalSourceTreeSelection.SingleFromId(cachedSourceSave, id))
+                    ?.SkipNull()
+                    ?.ToList();
+
+            return new PalSourceViewModel(sourceSave, palSourceSelections ?? [new SourceTreeAllSelection()])
+            {
+                IncludeBasePals = obj["IncludeBasePals"]?.ToObject<bool>() ?? true,
+                IncludeCustomPals = obj["IncludeCustomPals"]?.ToObject<bool>() ?? true,
+                IncludeCagedPals = obj["IncludeCagedPals"]?.ToObject<bool>() ?? true,
+                IncludeGlobalStoragePals = obj["IncludeGlobalStoragePals"]?.ToObject<bool>() ?? true,
+                IncludeExpeditionPals = obj["IncludeExpeditionPals"]?.ToObject<bool>() ?? true,
+            };
+        }
+
+        protected override void WriteTypeJson(JsonWriter writer, PalSourceViewModel value, JsonSerializer serializer)
+        {
+            serializer.Serialize(writer, new
+            {
+                PalSourceSelections = value.PlayerSources.Selections?.Select(s => s.SerializedId),
+                IncludeBasePals = value.IncludeBasePals,
+                IncludeCustomPals = value.IncludeCustomPals,
+                IncludeCagedPals = value.IncludeCagedPals,
+                IncludeGlobalStoragePals = value.IncludeGlobalStoragePals,
+                IncludeExpeditionPals = value.IncludeExpeditionPals,
+            });
+        }
+    }
+
     internal class PalTargetListViewModelConverter : PalConverterBase<PalTargetListViewModel>
     {
         private Dictionary<string, PalSpecifierViewModel> expectedSpecifiers;
+        private SaveGameViewModel sourceSave;
 
-        public PalTargetListViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source, Dictionary<string, PalSpecifierViewModel> specifiersById) : base(db, gameSettings)
+        // Separate `SaveGameViewModel` and `CachedSaveGame` params seem redundant, but accessing `source.CachedSave`
+        // might trigger a full re-parse of the save file. We don't want to trigger that here, so we accept a direct
+        // `CachedSaveGame` which should have been loaded directly from disk without an "is-up-to-date" check.
+        //
+        // TODO - Maybe rename `CachedValue` to `LatestCachedValue`, and add another `CachedValue` which is just a strict
+        //        load from disk?
+        public PalTargetListViewModelConverter(PalDB db, GameSettings gameSettings, SaveGameViewModel source, CachedSaveGame cachedSource, Dictionary<string, PalSpecifierViewModel> specifiersById) : base(db, gameSettings)
         {
+            sourceSave = source;
             expectedSpecifiers = specifiersById;
             dependencyConverters = new JsonConverter[]
             {
-                new PalSpecifierViewModelConverter(db, gameSettings, source),
+                new PalSpecifierViewModelConverter(db, gameSettings, cachedSource),
+                new PalSourceViewModelConverter(db, gameSettings, source, cachedSource),
                 new ILocalizedTextConverter(db, gameSettings),
             };
         }
 
         protected override PalTargetListViewModel ReadTypeJson(JsonReader reader, Type objectType, PalTargetListViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            var orderedIds = JToken.ReadFrom(reader)["OrderedTargetIds"].ToObject<List<string>>();
-            return new PalTargetListViewModel(expectedSpecifiers.Values.OrderBy(s => orderedIds.Contains(s.Id) ? orderedIds.IndexOf(s.Id) : int.MaxValue));
+            var token = JToken.ReadFrom(reader);
+            var orderedIds = token["OrderedTargetIds"].ToObject<List<string>>();
+            var sourcePals = token["SourcePals"]?.ToObject<PalSourceViewModel>(serializer);
+
+            return new PalTargetListViewModel(
+                sourcePals: sourcePals ?? new PalSourceViewModel(sourceSave, [new SourceTreeAllSelection()]),
+                existingSpecs: expectedSpecifiers.Values.OrderBy(s => orderedIds.Contains(s.Id) ? orderedIds.IndexOf(s.Id) : int.MaxValue)
+            );
         }
 
         protected override void WriteTypeJson(JsonWriter writer, PalTargetListViewModel value, JsonSerializer serializer)
         {
             JToken
-                .FromObject(new { OrderedTargetIds = value.Targets.Where(t => !t.IsReadOnly).Select(t => t.Id).ToList() }, serializer)
+                .FromObject(new
+                {
+                    OrderedTargetIds = value.Targets.Where(t => !t.IsReadOnly).Select(t => t.Id).ToList(),
+                    SourcePals = value.SourcePals,
+                }, serializer)
                 .WriteTo(writer, dependencyConverters);
         }
     }

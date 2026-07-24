@@ -132,24 +132,6 @@ namespace PalCalc.UI.ViewModel.Mapped
         [ObservableProperty]
         private PalGenderViewModel requiredGender;
 
-        [ObservableProperty]
-        private List<IPalSourceTreeSelection> palSourceSelections;
-
-        [ObservableProperty]
-        private bool includeBasePals = true;
-
-        [ObservableProperty]
-        private bool includeCustomPals = true;
-
-        [ObservableProperty]
-        private bool includeCagedPals = true;
-
-        [ObservableProperty]
-        private bool includeGlobalStoragePals = true;
-
-        [ObservableProperty]
-        private bool includeExpeditionPals = true;
-
         public bool HasIVs => MinIv_HP > 0 || MinIv_Attack > 0 || MinIv_Defense > 0;
 
         public bool IsValid => TargetPal != null;
@@ -203,12 +185,6 @@ namespace PalCalc.UI.ViewModel.Mapped
             }
         ) {
             CurrentResults = CurrentResults,
-            PalSourceSelections = PalSourceSelections,
-            IncludeBasePals = IncludeBasePals,
-            IncludeCustomPals = IncludeCustomPals,
-            IncludeCagedPals = IncludeCagedPals,
-            IncludeGlobalStoragePals = IncludeGlobalStoragePals,
-            IncludeExpeditionPals = IncludeExpeditionPals,
             DeleteCommand = DeleteCommand,
             LatestJob = LatestJob,
         };

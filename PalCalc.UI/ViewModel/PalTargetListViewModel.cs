@@ -4,6 +4,7 @@ using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.Solver;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace PalCalc.UI.ViewModel
             SelectedTarget = PalSpecifierViewModel.New;
         }
 
-        public PalTargetListViewModel(IEnumerable<PalSpecifierViewModel> existingSpecs)
+        public PalTargetListViewModel(PalSourceViewModel sourcePals, IEnumerable<PalSpecifierViewModel> existingSpecs)
         {
             targets = new ObservableCollection<PalSpecifierViewModel>()
             {
@@ -41,6 +42,8 @@ namespace PalCalc.UI.ViewModel
 
             Targets = new ReadOnlyObservableCollection<PalSpecifierViewModel>(targets);
             SelectedTarget = PalSpecifierViewModel.New;
+
+            SourcePals = sourcePals;
         }
 
         private ObservableCollection<PalSpecifierViewModel> targets;
@@ -48,6 +51,10 @@ namespace PalCalc.UI.ViewModel
 
         [ObservableProperty]
         private PalSpecifierViewModel selectedTarget;
+
+        // TODO - there should be a better place to put this
+        [ObservableProperty]
+        private PalSourceViewModel sourcePals;
 
         public event Action<PalTargetListViewModel> OrderChanged;
 
