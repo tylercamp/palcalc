@@ -20,4 +20,8 @@
     <ProjectReference Include="..\PalCalc.Model\PalCalc.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="PalCalc.Solver.Tests" />
+  </ItemGroup>
+
 </Project>
