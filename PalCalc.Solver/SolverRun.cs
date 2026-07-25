@@ -9,29 +9,6 @@ using System.Diagnostics;
 
 namespace PalCalc.Solver
 {
-    public enum SolverPhase
-    {
-        Initializing,
-        Breeding,
-        Finished,
-    }
-
-    public class SolverStatus
-    {
-        public SolverPhase CurrentPhase { get; set; }
-        public int CurrentStepIndex { get; set; }
-        public int TargetSteps { get; set; }
-        public bool Canceled { get; set; }
-        public bool Paused { get; set; }
-
-        public long CurrentWorkSize { get; set; }
-
-        public long WorkProcessedCount { get; set; }
-        public long TotalWorkProcessedCount { get; set; }
-
-        public override int GetHashCode() => HashCode.Combine(CurrentPhase, CurrentStepIndex, Canceled, Paused, CurrentWorkSize, WorkProcessedCount);
-    }
-
     internal sealed class SolverRun(
         SolverRunContext context,
         Action<SolverStatus> stateUpdated,
@@ -189,6 +166,7 @@ namespace PalCalc.Solver
             stateUpdated?.Invoke(statusMsg);
 
             var workingSet = new WorkingSet(spec, settings.PruningBuilder, BuildInitialContent(spec), settings.MaxThreads, controller);
+            var batchExecutor = new ParallelBatchExecutor(context, stateUpdateInterval);
 
             // Apply main set of breeding passes
 
@@ -202,92 +180,49 @@ namespace PalCalc.Solver
                     WorkingSet: workingSet,
                     WorkingOptimalTimesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, BreedingSolverEfficiencyMetric>())
                 );
-                List<WorkBatchProgress> progressEntries = [];
 
                 bool didUpdate = workingSet.UpdateByPairs(work =>
                 {
                     logger.Debug("Performing breeding step {step} with {numWork} work items", s+1, work.Count);
 
-                    statusMsg.CurrentPhase = SolverPhase.Breeding;
-                    statusMsg.CurrentStepIndex = s;
-                    statusMsg.Canceled = controller.CancellationToken.IsCancellationRequested;
-                    statusMsg.CurrentWorkSize = work.Count;
-                    statusMsg.WorkProcessedCount = 0;
+                    statusMsg = statusMsg with
+                    {
+                        CurrentPhase = SolverPhase.Breeding,
+                        CurrentStepIndex = s,
+                        Canceled = controller.CancellationToken.IsCancellationRequested,
+                        Paused = controller.IsPaused,
+                        CurrentWorkSize = work.Count,
+                        WorkProcessedCount = 0,
+                    };
                     stateUpdated?.Invoke(statusMsg);
 
-                    int lastMsgHash = 0;
-                    void EmitProgressMsg(object _)
-                    {
-                        lock (progressEntries)
+                    var execution = batchExecutor.Execute(
+                        work,
+                        stepState,
+                        progress =>
                         {
-                            var progress = progressEntries.Sum(e => e.NumProcessed);
-                            statusMsg.WorkProcessedCount = progress;
-                        }
-                        statusMsg.Paused = controller.IsPaused;
-                        statusMsg.Canceled = controller.CancellationToken.IsCancellationRequested;
-
-                        if (lastMsgHash == 0 || lastMsgHash != statusMsg.GetHashCode())
-                        {
-                            lastMsgHash = statusMsg.GetHashCode();
+                            statusMsg = statusMsg with
+                            {
+                                WorkProcessedCount = progress.WorkProcessedCount,
+                                Paused = progress.Paused,
+                                Canceled = progress.Canceled,
+                            };
                             stateUpdated?.Invoke(statusMsg);
                         }
-                    }
+                    );
 
-                    var progressTimer = new Timer(EmitProgressMsg, null, (int)stateUpdateInterval.TotalMilliseconds, (int)stateUpdateInterval.TotalMilliseconds);
-
-                    var chunksEnumerator = work.Chunks(work.Count.PreferredParallelBatchSize()).TakeUntilCancelled(controller.CancellationToken).GetEnumerator();
-                    var results = new ConcurrentBag<List<IPalReference>>();
-
-                    // specifically avoiding AsParallel so we don't congest the default threadpool and so we can
-                    // set a lower priority for these threads
-                    var workThreads = Enumerable
-                        .Range(0, settings.MaxThreads)
-                        .Select(_ => new Thread(() =>
-                        {
-                            var batchSolver = new BreedingBatchSolver(controller, settings, new ObjectPoolFactory());
-
-                            while (true)
-                            {
-                                IEnumerable<(IPalReference, IPalReference)> batch = null;
-                                lock(chunksEnumerator)
-                                {
-                                    if (!chunksEnumerator.MoveNext())
-                                        break;
-
-                                    batch = chunksEnumerator.Current;
-                                }
-
-                                var progress = new WorkBatchProgress();
-                                lock (progressEntries)
-                                    progressEntries.Add(progress);
-
-                                results.Add(batchSolver.ProcessBatch(batch, progress, stepState).ToList());
-                            }
-                        }))
-                        .ToList();
-
-                    foreach (var thread in workThreads)
+                    statusMsg = statusMsg with
                     {
-                        thread.Priority = ThreadPriority.BelowNormal;
-                        thread.Start();
-                    }
-
-                    foreach (var thread in workThreads)
-                    {
-                        thread.Join();
-                    }
-
-                    var res = results.SelectMany(l => l).ToList();
-                    progressTimer.Dispose();
-
-                    lock (progressEntries)
-                        statusMsg.WorkProcessedCount = progressEntries.Sum(e => e.NumProcessed);
-
-                    statusMsg.TotalWorkProcessedCount += statusMsg.WorkProcessedCount;
-                    statusMsg.Canceled = controller.CancellationToken.IsCancellationRequested;
+                        WorkProcessedCount = execution.WorkProcessedCount,
+                        TotalWorkProcessedCount =
+                            statusMsg.TotalWorkProcessedCount +
+                            execution.WorkProcessedCount,
+                        Canceled = controller.CancellationToken.IsCancellationRequested,
+                        Paused = controller.IsPaused,
+                    };
                     stateUpdated?.Invoke(statusMsg);
 
-                    return res;
+                    return execution.Candidates;
                 });
 
                 if (controller.CancellationToken.IsCancellationRequested) break;
@@ -301,8 +236,12 @@ namespace PalCalc.Solver
 
             // (Main breeding pass done)
 
-            statusMsg.Canceled = controller.CancellationToken.IsCancellationRequested;
-            statusMsg.CurrentPhase = SolverPhase.Finished;
+            statusMsg = statusMsg with
+            {
+                Canceled = controller.CancellationToken.IsCancellationRequested,
+                Paused = controller.IsPaused,
+                CurrentPhase = SolverPhase.Finished,
+            };
             stateUpdated?.Invoke(statusMsg);
 
             // Do another pass which performs surgery to add desired passives to all final pals. We only do this *after* the
