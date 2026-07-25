@@ -26,8 +26,7 @@ namespace PalCalc.UI.ViewModel.Solver
             var db = PalDB.LoadEmbedded();
             var saveGame = CachedSaveGame.SampleForDesignerView;
 
-            var solver = new BreedingSolver(
-                new BreedingSolverSettings(
+            var settings = new BreedingSolverSettings(
                     gameSettings: new GameSettings(),
                     db: db,
                     pruningBuilder: PruningRulesBuilder.Default,
@@ -44,8 +43,8 @@ namespace PalCalc.UI.ViewModel.Solver
                     maxSurgeryCost: 0,
                     allowedSurgeryPassives: [],
                     useGenderReversers: false
-                )
             );
+            var solver = new BreedingSolver();
 
             var targetInstance = new PalSpecifier
             {
@@ -57,7 +56,12 @@ namespace PalCalc.UI.ViewModel.Solver
                 },
             };
 
-            DisplayedResult = solver.SolveFor(targetInstance, new SolverStateController() { CancellationToken = CancellationToken.None }).MaxBy(r => r.NumTotalBreedingSteps);
+            DisplayedResult = solver
+                .Solve(
+                    new BreedingSolverRequest(targetInstance, settings),
+                    new SolverStateController { CancellationToken = CancellationToken.None }
+                )
+                .MaxBy(r => r.NumTotalBreedingSteps);
 
             IVs = new IVSetViewModel(
                 HP: new IVDirectValueViewModel(true, 80),

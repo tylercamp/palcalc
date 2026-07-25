@@ -42,7 +42,7 @@ internal static class SolverTestScenario
         };
     }
 
-    public static BreedingSolver Solver(
+    public static ConfiguredSolver Solver(
         IEnumerable<PalInstance> ownedPals,
         int maxBreedingSteps = 4,
         int maxSolverIterations = 4,
@@ -57,7 +57,8 @@ internal static class SolverTestScenario
         IEnumerable<Pal>? bannedBredPals = null
     ) =>
         new(
-            new BreedingSolverSettings(
+            solver: new BreedingSolver(),
+            settings: new BreedingSolverSettings(
                 db: DB,
                 gameSettings: gameSettings ?? new GameSettings(),
                 ownedPals: ownedPals.ToList(),
@@ -78,7 +79,7 @@ internal static class SolverTestScenario
         );
 
     public static List<IPalReference> Solve(
-        BreedingSolver solver,
+        ConfiguredSolver solver,
         string targetPal,
         IEnumerable<PassiveSkill>? requiredPassives = null,
         IEnumerable<PassiveSkill>? optionalPassives = null,
@@ -87,22 +88,40 @@ internal static class SolverTestScenario
         int ivAttack = 0,
         int ivDefense = 0
     ) =>
-        solver.SolveFor(
-            new PalSpecifier
-            {
-                Pal = targetPal.ToPal(DB),
-                RequiredPassives = requiredPassives?.ToList() ?? [],
-                OptionalPassives = optionalPassives?.ToList() ?? [],
-                RequiredGender = requiredGender,
-                IV_HP = ivHp,
-                IV_Attack = ivAttack,
-                IV_Defense = ivDefense,
-            },
+        solver.Solver.Solve(
+            new BreedingSolverRequest(
+                new PalSpecifier
+                {
+                    Pal = targetPal.ToPal(DB),
+                    RequiredPassives = requiredPassives?.ToList() ?? [],
+                    OptionalPassives = optionalPassives?.ToList() ?? [],
+                    RequiredGender = requiredGender,
+                    IV_HP = ivHp,
+                    IV_Attack = ivAttack,
+                    IV_Defense = ivDefense,
+                },
+                solver.Settings
+            ),
             new SolverStateController
             {
                 CancellationToken = CancellationToken.None,
             }
         );
+
+    internal sealed class ConfiguredSolver(
+        BreedingSolver solver,
+        BreedingSolverSettings settings
+    )
+    {
+        public BreedingSolver Solver { get; } = solver;
+        public BreedingSolverSettings Settings { get; } = settings;
+
+        public event Action<SolverStatus> SolverStateUpdated
+        {
+            add => Solver.SolverStateUpdated += value;
+            remove => Solver.SolverStateUpdated -= value;
+        }
+    }
 
     public static IReadOnlyList<ResultSignature> Signatures(IEnumerable<IPalReference> results) =>
         results

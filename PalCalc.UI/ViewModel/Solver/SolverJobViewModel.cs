@@ -28,7 +28,8 @@ namespace PalCalc.UI.ViewModel.Solver
         // (dispatcher.HasShutdownStarted checks added in case a job fails, causes UI shutdown, and remaining
         // jobs continue due to Dispose but throw more errors due to UI env. shutdown)
         private Dispatcher dispatcher;
-        private BreedingSolver solver;
+        private BreedingSolver solver = new();
+        private BreedingSolverRequest solverRequest;
         private CancellationTokenSource tokenSource;
         private SolverStateController solverController;
 
@@ -113,13 +114,13 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public SolverJobViewModel(
             Dispatcher dispatcher,
-            BreedingSolver solver,
+            BreedingSolverRequest solverRequest,
             PalSpecifierViewModel spec,
             int saveStateId
         )
         {
             this.dispatcher = dispatcher;
-            this.solver = solver;
+            this.solverRequest = solverRequest;
 
             Specifier = spec;
 
@@ -139,7 +140,7 @@ namespace PalCalc.UI.ViewModel.Solver
         {
             if (thread == null)
             {
-                thread = new Thread(() => RunSolver(Specifier.ModelObject));
+                thread = new Thread(RunSolver);
 
                 thread.Priority = ThreadPriority.BelowNormal;
                 thread.Start();
@@ -182,14 +183,14 @@ namespace PalCalc.UI.ViewModel.Solver
             tokenSource.Dispose();
         }
 
-        private void RunSolver(PalSpecifier spec)
+        private void RunSolver()
         {
             try
             {
                 List<IPalReference> results;
                 try
                 {
-                    results = solver.SolveFor(spec, solverController);
+                    results = solver.Solve(solverRequest, solverController);
                 }
                 catch (OperationCanceledException)
                 {

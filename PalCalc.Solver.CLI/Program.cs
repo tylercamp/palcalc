@@ -52,8 +52,7 @@ internal class Program
         var savedInstances = saveGame.Level.ReadCharacterData(db, GameSettings.Defaults, [], null).Pals;
         Console.WriteLine("Loaded save game");
 
-        var solver = new BreedingSolver(
-            new BreedingSolverSettings(
+        var solverSettings = new BreedingSolverSettings(
                 gameSettings: new GameSettings(),
                 db: db,
                 pruningBuilder: PruningRulesBuilder.Default,
@@ -70,8 +69,8 @@ internal class Program
                 maxSurgeryCost: 1_000_000,
                 allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
                 useGenderReversers: true
-            )
         );
+        var solver = new BreedingSolver();
 
         solver.SolverStateUpdateInterval = TimeSpan.FromSeconds(1);
         solver.SolverStateUpdated += ev => Console.WriteLine($"{ev.CurrentPhase} ({ev.CurrentStepIndex}) - {ev.WorkProcessedCount} / {ev.CurrentWorkSize}");
@@ -89,7 +88,10 @@ internal class Program
         {
             CancellationToken = CancellationToken.None,
         };
-        var matches = solver.SolveFor(targetInstance, controller);
+        var matches = solver.Solve(
+            new BreedingSolverRequest(targetInstance, solverSettings),
+            controller
+        );
 
         Console.WriteLine("Took {0}", TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds));
 
