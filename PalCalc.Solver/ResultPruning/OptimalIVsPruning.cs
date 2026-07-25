@@ -30,7 +30,7 @@ namespace PalCalc.Solver.ResultPruning
             // - all have the same `IsRelevant` for each type of IV
             //   e.g. all HP will be relevant or all HP will be irrelevant
             //
-            //   (would be enforced by grouping with `WorkingSet.DefaultGroupFn`)
+            //   (enforced by `BreedingStateKey`)
             //
             // - if an IV range is relevant, all its min/max values will also be relevant
             //

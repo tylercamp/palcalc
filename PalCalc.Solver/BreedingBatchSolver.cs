@@ -51,7 +51,8 @@ namespace PalCalc.Solver
         int StepIndex,
         PalSpecifier Spec,
         WorkingSet WorkingSet,
-        FrozenDictionary<PalId, ConcurrentDictionary<int, BreedingSolverEfficiencyMetric>> WorkingOptimalTimesByPalId
+        IBreedingStateKeyProvider StateKeyProvider,
+        FrozenDictionary<PalId, ConcurrentDictionary<BreedingStateKey, BreedingSolverEfficiencyMetric>> WorkingOptimalTimesByPalId
     );
 
     /// <summary>
@@ -464,11 +465,10 @@ namespace PalCalc.Solver
                             var effort = res.BreedingEffort;
                             var cost = res.TotalCost;
                             var efficiency = new BreedingSolverEfficiencyMetric(effort, cost);
-                            bool isOptimal = state.WorkingSet.IsOptimal(res);
+                            var resultId = state.StateKeyProvider.KeyOf(res);
+                            bool isOptimal = state.WorkingSet.IsOptimal(res, resultId);
                             if (effort <= settings.MaxEffort && (isOptimal || state.Spec.IsSatisfiedBy(res)))
                             {
-                                var resultId = WorkingSet.DefaultGroupFn(res);
-
                                 bool updated = workingOptimalResults.TryAdd(resultId, efficiency);
                                 while (!updated)
                                 {
@@ -489,7 +489,7 @@ namespace PalCalc.Solver
 
                                     if (isOptimal)
                                     {
-                                        var oldContent = state.WorkingSet.CurrentGroupedContent[resultId];
+                                        var oldContent = state.WorkingSet.CurrentStateIndex[resultId];
                                         if (oldContent != null)
                                         {
                                             foreach (var pref in oldContent)

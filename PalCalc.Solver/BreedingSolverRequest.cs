@@ -29,11 +29,13 @@ internal sealed class SolverRunContext
         Target = target;
         Settings = settings;
         Controller = controller;
+        StateKeyProvider = DefaultBreedingStateKeyProvider.Instance;
     }
 
     public PalSpecifier Target { get; }
     public BreedingSolverSettings Settings { get; }
     public SolverStateController Controller { get; }
+    public IBreedingStateKeyProvider StateKeyProvider { get; }
 
     public static SolverRunContext Create(
         BreedingSolverRequest request,

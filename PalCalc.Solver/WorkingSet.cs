@@ -18,16 +18,9 @@ namespace PalCalc.Solver
     {
         private static ILogger logger = Log.ForContext<WorkingSet>();
 
-        public static PalProperty.GroupIdFn DefaultGroupFn = PalProperty.Combine(
-            PalProperty.Pal,
-            PalProperty.Gender,
-            PalProperty.EffectivePassives,
-            PalProperty.IvRelevance
-            //PalProperty.GoldCost
-        );
-
         private SolverStateController controller;
-        private PalPropertyGrouping content;
+        private IBreedingStateKeyProvider stateKeyProvider;
+        private BreedingStateIndex content;
         private ILazyCartesianProduct<IPalReference> remainingParentPairs;
 
         int maxThreads;
@@ -43,18 +36,28 @@ namespace PalCalc.Solver
         
         public IEnumerable<IPalReference> CurrentContent => content.All;
 
-        public PalPropertyGrouping CurrentGroupedContent => content;
+        public BreedingStateIndex CurrentStateIndex => content;
 
         Func<IEnumerable<IPalReference>, CachedResultData, IEnumerable<IPalReference>> PruningFunc;
 
-        public WorkingSet(PalSpecifier target, PruningRulesBuilder pruningRulesBuilder, IEnumerable<IPalReference> initialContent, int maxThreads, SolverStateController controller)
+        public WorkingSet(
+            PalSpecifier target,
+            PruningRulesBuilder pruningRulesBuilder,
+            IEnumerable<IPalReference> initialContent,
+            int maxThreads,
+            SolverStateController controller,
+            IBreedingStateKeyProvider stateKeyProvider = null
+        )
         {
             this.target = target;
             this.controller = controller;
+            this.stateKeyProvider =
+                stateKeyProvider ??
+                DefaultBreedingStateKeyProvider.Instance;
 
             PruningFunc = pruningRulesBuilder.BuildAggregate(controller.CancellationToken).Apply;
 
-            content = new PalPropertyGrouping(DefaultGroupFn);
+            content = new BreedingStateIndex(this.stateKeyProvider);
             content.AddRange(initialContent);
 
             discoveredResults.AddRange(content.All.Where(target.IsSatisfiedBy));
@@ -67,35 +70,41 @@ namespace PalCalc.Solver
             this.maxThreads = maxThreads;
         }
 
-        public bool IsOptimal(IPalReference p)
+        public bool IsOptimal(IPalReference reference) =>
+            IsOptimal(reference, stateKeyProvider.KeyOf(reference));
+
+        public bool IsOptimal(
+            IPalReference reference,
+            BreedingStateKey stateKey
+        )
         {
             int TotalMaxValue(IV_Set ivs) => ivs.Attack.Max + ivs.Defense.Max + ivs.HP.Max;
             int TotalMinValue(IV_Set ivs) => ivs.Attack.Min + ivs.Defense.Min + ivs.HP.Min;
 
-            var match = content[p]?.FirstOrDefault();
+            var match = content[stateKey]?.FirstOrDefault();
             if (match == null) return true;
 
-            switch (p.BreedingEffort.CompareTo(match.BreedingEffort))
+            switch (reference.BreedingEffort.CompareTo(match.BreedingEffort))
             {
                 // pick the one with lower effort
                 case -1: return true;
                 case 1: return false;
             }
 
-            switch (p.TotalCost.CompareTo(match.TotalCost))
+            switch (reference.TotalCost.CompareTo(match.TotalCost))
             {
                 // pick the one with lower cost
                 case -1: return true;
                 case 1: return false;
             }
 
-            switch (TotalMaxValue(p.IVs).CompareTo(TotalMaxValue(match.IVs)))
+            switch (TotalMaxValue(reference.IVs).CompareTo(TotalMaxValue(match.IVs)))
             {
                 // pick the one with higher IVs
                 case 1: return true;
                 case -1: return false;
                 // same max IVs between the two, `p` is optimal if its avg IVs are higher
-                default: return TotalMinValue(p.IVs) > TotalMinValue(match.IVs);
+                default: return TotalMinValue(reference.IVs) > TotalMinValue(match.IVs);
             }
         }
 
@@ -173,7 +182,7 @@ namespace PalCalc.Solver
                     if (controller.IsPaused) controller.PauseIfRequested();
                     return !controller.CancellationToken.IsCancellationRequested;
                 })
-                .GroupBy(pref => DefaultGroupFn(pref))
+                .GroupBy(stateKeyProvider.KeyOf)
                 .SelectMany(g =>
                 {
                     var group = g.Distinct().ToList();
@@ -220,11 +229,16 @@ namespace PalCalc.Solver
 
             logger.Debug("merging");
 
-            foreach (var newInstances in pruned.GroupBy(i => DefaultGroupFn(i)).Select(g => g.ToList()).ToList())
+            foreach (
+                var newGroup in pruned
+                    .GroupBy(stateKeyProvider.KeyOf)
+                    .ToList()
+            )
             {
                 if (controller.CancellationToken.IsCancellationRequested) return new MergeChangeset(changed, [], []);
                 if (controller.IsPaused) controller.PauseIfRequested();
 
+                var newInstances = newGroup.ToList();
                 var refNewInst = newInstances.First();
 
                 // these are results to be used as output, don't bother adding them to working set / continue breeding those
@@ -240,7 +254,7 @@ namespace PalCalc.Solver
                     ) continue;
                 }
 
-                var existingInstances = content[refNewInst];
+                var existingInstances = content[newGroup.Key];
                 var refInst = existingInstances?.FirstOrDefault();
 
                 if (refInst != null)

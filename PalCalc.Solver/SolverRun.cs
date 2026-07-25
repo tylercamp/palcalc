@@ -165,7 +165,14 @@ namespace PalCalc.Solver
             };
             stateUpdated?.Invoke(statusMsg);
 
-            var workingSet = new WorkingSet(spec, settings.PruningBuilder, BuildInitialContent(spec), settings.MaxThreads, controller);
+            var workingSet = new WorkingSet(
+                spec,
+                settings.PruningBuilder,
+                BuildInitialContent(spec),
+                settings.MaxThreads,
+                controller,
+                context.StateKeyProvider
+            );
             var batchExecutor = new ParallelBatchExecutor(context, stateUpdateInterval);
 
             // Apply main set of breeding passes
@@ -178,7 +185,14 @@ namespace PalCalc.Solver
                     StepIndex: s,
                     Spec: spec,
                     WorkingSet: workingSet,
-                    WorkingOptimalTimesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(id => id, _ => new ConcurrentDictionary<int, BreedingSolverEfficiencyMetric>())
+                    StateKeyProvider: context.StateKeyProvider,
+                    WorkingOptimalTimesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(
+                        id => id,
+                        _ => new ConcurrentDictionary<
+                            BreedingStateKey,
+                            BreedingSolverEfficiencyMetric
+                        >()
+                    )
                 );
 
                 bool didUpdate = workingSet.UpdateByPairs(work =>

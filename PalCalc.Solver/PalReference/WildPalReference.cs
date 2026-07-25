@@ -61,7 +61,7 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalWildPals => 1;
 
-        public int EffectivePassivesHash { get; }
+        public int EffectivePassivesHash { get; private set; }
 
         public bool IsOutdated { get; set; }
 
@@ -72,6 +72,7 @@ namespace PalCalc.Solver.PalReference
                 SelfBreedingEffort = SelfBreedingEffort,
                 Gender = gender,
                 EffectivePassives = EffectivePassives,
+                EffectivePassivesHash = this.EffectivePassivesHash,
                 IVs = IVs,
                 CapturesRequiredForGender = useReverser ? 1 : gender switch
                 {

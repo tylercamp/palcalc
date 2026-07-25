@@ -121,6 +121,7 @@ public class ParallelBatchExecutorTests
             StepIndex: 0,
             Spec: target,
             WorkingSet: workingSet,
+            StateKeyProvider: context.StateKeyProvider,
             WorkingOptimalTimesByPalId: configuredSolver
                 .Settings
                 .DB
@@ -128,7 +129,10 @@ public class ParallelBatchExecutorTests
                 .Keys
                 .ToFrozenDictionary(
                     id => id,
-                    _ => new ConcurrentDictionary<int, BreedingSolverEfficiencyMetric>()
+                    _ => new ConcurrentDictionary<
+                        BreedingStateKey,
+                        BreedingSolverEfficiencyMetric
+                    >()
                 )
         );
         var failingReference = new FailingPalReference(
