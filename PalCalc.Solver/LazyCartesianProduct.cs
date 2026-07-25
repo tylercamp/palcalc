@@ -77,7 +77,7 @@ namespace PalCalc.Solver
 
         public ConcatenatedLazyCartesianProduct(IEnumerable<(List<T>, List<T>)> setPairs)
         {
-            innerProducts = setPairs.Select(p => (ILazyCartesianProduct<T>)new LazyCartesianProduct<T>(p.Item1, p.Item2)).ToList();
+            innerProducts = setPairs.Select(p => (ILazyCartesianProduct<T>)new AntiDiagonalLazyCartesianProduct<T>(p.Item1, p.Item2)).ToList();
         }
 
         public ConcatenatedLazyCartesianProduct(IEnumerable<ILazyCartesianProduct<T>> products)

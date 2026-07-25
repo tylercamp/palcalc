@@ -43,6 +43,8 @@ namespace PalCalc.Solver
         
         public IEnumerable<IPalReference> CurrentContent => content.All;
 
+        public PalPropertyGrouping CurrentGroupedContent => content;
+
         Func<IEnumerable<IPalReference>, CachedResultData, IEnumerable<IPalReference>> PruningFunc;
 
         public WorkingSet(PalSpecifier target, PruningRulesBuilder pruningRulesBuilder, IEnumerable<IPalReference> initialContent, int maxThreads, SolverStateController controller)
@@ -117,7 +119,7 @@ namespace PalCalc.Solver
             existingContent.RemoveAll(changeset.Removed.Contains);
             
             remainingParentPairs = new ConcatenatedLazyCartesianProduct<IPalReference>([
-                (existingContent.OrderBy(p => p.Pal.Id).ToList(), changeset.Added),
+                (existingContent.OrderBy(p => p.BreedingEffort).ToList(), changeset.Added),
                 (changeset.Added, changeset.Added)
             ]);
 
@@ -143,14 +145,14 @@ namespace PalCalc.Solver
             var newItems = doWork(content.All).ToList();
             if (!newItems.Any()) return false;
 
-            var existingContent = content.All.OrderBy(p => p.Pal.Id).ToList();
+            var existingContent = content.All.OrderBy(p => p.BreedingEffort).ToList();
             var changeset = MergeWithResults(newItems);
             existingContent.RemoveAll(changeset.Removed.Contains);
 
             remainingParentPairs = new ConcatenatedLazyCartesianProduct<IPalReference>([
                 remainingParentPairs.Where(parent => !changeset.Removed.Contains(parent), controller.CancellationToken),
-                new LazyCartesianProduct<IPalReference>(changeset.Added, existingContent),
-                new LazyCartesianProduct<IPalReference>(changeset.Added, changeset.Added)
+                new AntiDiagonalLazyCartesianProduct<IPalReference>(changeset.Added, existingContent),
+                new AntiDiagonalLazyCartesianProduct<IPalReference>(changeset.Added, changeset.Added)
             ]);
 
             foreach (var ta in changeset.Added.TakeUntilCancelled(controller.CancellationToken))
@@ -272,9 +274,11 @@ namespace PalCalc.Solver
                 }
             }
 
-            // (minor memory bandwidth improvement by minimizing how often we switch types of pals, hopefully
-            // keeps some pal-specific data like child pal + gender probabilities in CPU cache.)
-            allAdded = allAdded.OrderBy(p => p.Pal.Id).ToList();
+            
+            // sort by breeding effort so the most efficient parents are bred to produce new efficient children
+            // early on. newly-discovered efficient children will quickly invalidate less efficient parents in the
+            // set and allow them to be skipped as the breeding continues
+            allAdded = allAdded.OrderBy(p => p.BreedingEffort).ToList();
 
             return new MergeChangeset(changed, allAdded, new HashSet<IPalReference>(allRemoved));
         }

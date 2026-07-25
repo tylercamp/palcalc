@@ -216,6 +216,8 @@ namespace PalCalc.Solver.PalReference
         public TimeSpan BreedingEffort => Input.BreedingEffort;
         public TimeSpan SelfBreedingEffort => Input.SelfBreedingEffort;
 
+        public bool IsOutdated { get; set; }
+
         ConcurrentDictionary<PalGender, IPalReference> cachedGenders = null;
 
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)

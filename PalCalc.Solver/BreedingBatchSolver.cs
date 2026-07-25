@@ -246,6 +246,7 @@ namespace PalCalc.Solver
 
                 progress.NumProcessed++;
 
+                if (p.Item1.IsOutdated || p.Item2.IsOutdated) continue;
                 if (!settings.UseGenderReversers && !p.Item1.IsCompatibleGender(p.Item2.Gender)) continue;
                 if (p.Item1 == p.Item2) continue; // possible to reach this if UseGenderReversers is enabled
                 if (p.Item1.NumTotalWildPals + p.Item2.NumTotalWildPals > settings.MaxWildPals) continue;
@@ -463,7 +464,8 @@ namespace PalCalc.Solver
                             var effort = res.BreedingEffort;
                             var cost = res.TotalCost;
                             var efficiency = new BreedingSolverEfficiencyMetric(effort, cost);
-                            if (effort <= settings.MaxEffort && (state.Spec.IsSatisfiedBy(res) || state.WorkingSet.IsOptimal(res)))
+                            bool isOptimal = state.WorkingSet.IsOptimal(res);
+                            if (effort <= settings.MaxEffort && (isOptimal || state.Spec.IsSatisfiedBy(res)))
                             {
                                 var resultId = WorkingSet.DefaultGroupFn(res);
 
@@ -473,7 +475,7 @@ namespace PalCalc.Solver
                                     var v = workingOptimalResults[resultId];
 
                                     if (v.Effort < effort) break;
-                                    if (v.GoldCost < cost) break;
+                                    if (v.Effort == effort && v.GoldCost < cost) break;
 
                                     updated = workingOptimalResults.TryUpdate(resultId, efficiency, v);
                                 }
@@ -484,6 +486,16 @@ namespace PalCalc.Solver
 
                                     yield return res;
                                     added = true;
+
+                                    if (isOptimal)
+                                    {
+                                        var oldContent = state.WorkingSet.CurrentGroupedContent[resultId];
+                                        if (oldContent != null)
+                                        {
+                                            foreach (var pref in oldContent)
+                                                pref.IsOutdated = true;
+                                        }
+                                    }
                                 }
                             }
 

@@ -177,6 +177,8 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> ActualPassives => EffectivePassives;
 
+        public bool IsOutdated { get; set; }
+
         private BredPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
         {
             if (gender == PalGender.WILDCARD)

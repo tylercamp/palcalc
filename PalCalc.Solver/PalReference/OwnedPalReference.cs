@@ -58,6 +58,8 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalWildPals => 0;
 
+        public bool IsOutdated { get; set; }
+
         private OwnedPalReference cachedFemaleRef, cachedMaleRef, cachedWildcardRef, cachedOppositeWildcardRef;
 
         private OwnedPalReference MakeGuaranteedGenderImpl(PalGender gender)

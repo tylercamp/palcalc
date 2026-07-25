@@ -89,6 +89,8 @@ namespace PalCalc.Solver.PalReference
 
         public int TotalCost => 0;
 
+        public bool IsOutdated { get; set; }
+
         private CompositeOwnedPalReference oppositeWildcardReference;
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)
         {

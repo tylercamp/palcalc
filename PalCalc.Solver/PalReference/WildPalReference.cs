@@ -63,6 +63,8 @@ namespace PalCalc.Solver.PalReference
 
         public int EffectivePassivesHash { get; }
 
+        public bool IsOutdated { get; set; }
+
         private WildPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
         {
             return new WildPalReference(Pal)
