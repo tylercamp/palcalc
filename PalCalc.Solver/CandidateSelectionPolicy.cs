@@ -33,6 +33,24 @@ internal interface ICandidateSelectionPolicy : IBreedingStateKeyProvider
     IComparer<IPalReference> ExpansionPriorityComparer { get; }
 }
 
+internal static class CandidateSelectionPolicyExtensions
+{
+    /// <summary>
+    /// Orders candidates for expansion while preserving discovery order among
+    /// candidates with equal priority.
+    /// </summary>
+    public static List<IPalReference> OrderForExpansion(
+        this ICandidateSelectionPolicy policy,
+        IEnumerable<IPalReference> candidates
+    ) =>
+        candidates
+            .OrderBy(
+                candidate => candidate,
+                policy.ExpansionPriorityComparer
+            )
+            .ToList();
+}
+
 internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolicy
 {
     private readonly IResultPruning retainedAlternativeSelection;

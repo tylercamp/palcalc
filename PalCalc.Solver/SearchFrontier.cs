@@ -97,9 +97,8 @@ internal sealed class SearchFrontier
         retainedExisting.RemoveAll(delta.Removed.Contains);
 
         pairSchedule = ParentPairSchedule.AfterPairMerge(
-            retainedExisting,
-            delta,
-            selectionPolicy.ExpansionPriorityComparer
+            selectionPolicy.OrderForExpansion(retainedExisting),
+            delta
         );
         AddToIndex(delta.Added);
 
@@ -122,13 +121,7 @@ internal sealed class SearchFrontier
         var newCandidates = expand(index.All).ToList();
         if (newCandidates.Count == 0) return FrontierDelta.None;
 
-        var retainedExisting = index
-            .All
-            .OrderBy(
-                reference => reference,
-                selectionPolicy.ExpansionPriorityComparer
-            )
-            .ToList();
+        var retainedExisting = selectionPolicy.OrderForExpansion(index.All);
         var delta = MergeCandidates(newCandidates);
         retainedExisting.RemoveAll(delta.Removed.Contains);
 
@@ -261,7 +254,7 @@ internal sealed class SearchFrontier
 
         // Efficient additions are expanded first so they can invalidate less
         // efficient parents while the following batch is still running.
-        allAdded.Sort(selectionPolicy.ExpansionPriorityComparer);
+        allAdded = selectionPolicy.OrderForExpansion(allAdded);
 
         return new FrontierDelta(
             changed,

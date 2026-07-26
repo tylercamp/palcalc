@@ -23,20 +23,16 @@ internal sealed class ParentPairSchedule
         new(new LazyCartesianProduct<IPalReference>(initialContent, initialContent));
 
     public static ParentPairSchedule AfterPairMerge(
-        List<IPalReference> retainedExisting,
-        FrontierDelta delta,
-        IComparer<IPalReference> expansionPriorityComparer
+        List<IPalReference> orderedRetainedExisting,
+        FrontierDelta delta
     )
-    {
-        retainedExisting.Sort(expansionPriorityComparer);
-
-        return new(
+    =>
+        new(
             new ConcatenatedLazyCartesianProduct<IPalReference>([
-                (retainedExisting, delta.AddedForScheduling),
+                (orderedRetainedExisting, delta.AddedForScheduling),
                 (delta.AddedForScheduling, delta.AddedForScheduling),
             ])
         );
-    }
 
     public ParentPairSchedule AfterSingleMerge(
         List<IPalReference> retainedExisting,

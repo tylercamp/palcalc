@@ -111,6 +111,29 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
+    public void ExpansionOrdering_PreservesDiscoveryOrderForEqualPriorities()
+    {
+        var policy = new DefaultCandidateSelectionPolicy(
+            PruningRulesBuilder.Default,
+            CancellationToken.None
+        );
+        var candidates = Enumerable
+            .Range(0, 32)
+            .Select(index =>
+                Reference(
+                    $"candidate-{index}",
+                    "Katress",
+                    TimeSpan.FromMinutes(1)
+                )
+            )
+            .ToList();
+
+        var ordered = policy.OrderForExpansion(candidates);
+
+        CollectionAssert.AreEqual(candidates, ordered);
+    }
+
+    [TestMethod]
     public void ReverseExpansionPolicy_ChangesPairOrderWithoutChangingSolverResults()
     {
         var defaultOrder = DeltaPairOrder(
