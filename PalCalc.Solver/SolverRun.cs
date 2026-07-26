@@ -36,7 +36,10 @@ namespace PalCalc.Solver
 
             var frontier = new SearchFrontier(
                 spec,
-                new InitialPalBuilder(settings).Build(spec),
+                new InitialPalBuilder(
+                    settings,
+                    context.Mechanics
+                ).Build(spec),
                 settings.MaxThreads,
                 controller,
                 context.SelectionPolicy

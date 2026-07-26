@@ -379,7 +379,16 @@ namespace PalCalc.UI
                 ?.ToList()
                 ?? Enumerable.Empty<PassiveSkill>();
 
-            return (WildPalReference)new WildPalReference(pal, guaranteedPassives, numPassives).WithGuaranteedGender(db, gender, solverSettings.UseGenderReversers);
+            return (WildPalReference)new WildPalReference(
+                pal,
+                guaranteedPassives,
+                numPassives,
+                db.BreedingMechanics
+            ).WithGuaranteedGender(
+                db,
+                gender,
+                solverSettings.UseGenderReversers
+            );
         }
     }
 

@@ -26,6 +26,15 @@ namespace PalCalc.Model
 
         public Dictionary<Pal, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
 
+        private BreedingMechanics breedingMechanics =
+            BreedingMechanics.CreateDefault();
+        public BreedingMechanics BreedingMechanics
+        {
+            get => breedingMechanics;
+            set => breedingMechanics =
+                value ?? throw new ArgumentNullException(nameof(value));
+        }
+
         public List<PassiveSkill> PassiveSkills { get; set; }
 
         // passive skills which most users would expect, does *not* include passive effects

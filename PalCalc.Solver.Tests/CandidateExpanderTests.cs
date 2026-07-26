@@ -113,7 +113,8 @@ public class CandidateExpanderTests
         var expander = new CandidateExpander(
             controller,
             settings,
-            new ObjectPoolFactory()
+            new ObjectPoolFactory(),
+            settings.DB.BreedingMechanics
         );
 
         var candidates = expander

@@ -80,7 +80,8 @@ internal sealed class ParallelBatchExecutor(
                 var expander = new CandidateExpander(
                     controller,
                     settings,
-                    new ObjectPoolFactory()
+                    new ObjectPoolFactory(),
+                    context.Mechanics
                 );
 
                 while (Volatile.Read(ref workerFailure) == null)

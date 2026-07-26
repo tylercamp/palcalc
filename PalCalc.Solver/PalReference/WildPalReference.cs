@@ -10,10 +10,32 @@ namespace PalCalc.Solver.PalReference
 {
     public class WildPalReference : IPalReference
     {
-        public WildPalReference(Pal pal, IEnumerable<PassiveSkill> guaranteedPassives, int numRandomPassives)
+        public WildPalReference(
+            Pal pal,
+            IEnumerable<PassiveSkill> guaranteedPassives,
+            int numRandomPassives
+        ) : this(
+            pal,
+            guaranteedPassives,
+            numRandomPassives,
+            BreedingMechanics.Default
+        )
         {
+        }
+
+        public WildPalReference(
+            Pal pal,
+            IEnumerable<PassiveSkill> guaranteedPassives,
+            int numRandomPassives,
+            BreedingMechanics mechanics
+        )
+        {
+            ArgumentNullException.ThrowIfNull(mechanics);
+
             Pal = pal;
-            SelfBreedingEffort = GameConstants.TimeToCatch(pal) / GameConstants.PassivesWildAtMostN[numRandomPassives];
+            SelfBreedingEffort =
+                mechanics.TimeToCatch(pal) /
+                mechanics.PassivesWildAtMostN[numRandomPassives];
             EffectivePassives = guaranteedPassives.Concat(Enumerable.Range(0, numRandomPassives).Select(i => new RandomPassiveSkill())).ToList();
             Gender = PalGender.WILDCARD;
             CapturesRequiredForGender = 1;

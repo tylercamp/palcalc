@@ -35,7 +35,8 @@ namespace PalCalc.Solver
     internal sealed class CandidateExpander(
         SolverStateController controller,
         BreedingSolverSettings settings,
-        ObjectPoolFactory poolFactory
+        ObjectPoolFactory poolFactory,
+        BreedingMechanics mechanics
     )
     {
         private readonly PalDB db = settings.DB;
@@ -264,7 +265,12 @@ namespace PalCalc.Solver
                         continue;
                 }
 
-                var ivsProbability = Probabilities.IVs.ProbabilityInheritedTargetIVs(p.Item1.IVs, p.Item2.IVs);
+                var ivsProbability =
+                    Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                        p.Item1.IVs,
+                        p.Item2.IVs,
+                        mechanics
+                    );
 
                 using var parentPassivesRef = passiveListPool.BorrowWith(p.Item1.ActualPassives);
                 using var availableRequiredPassivesRef = passiveListPool.Borrow();
@@ -397,7 +403,14 @@ namespace PalCalc.Solver
                             float initialProbability = probabilityForUpToNumPassives;
 #endif
 
-                            probabilityForUpToNumPassives += Probabilities.Passives.ProbabilityInheritedTargetPassives(parentPassives, targetPassives, numFinalPassives);
+                            probabilityForUpToNumPassives +=
+                                Probabilities.Passives
+                                    .ProbabilityInheritedTargetPassives(
+                                        parentPassives,
+                                        targetPassives,
+                                        numFinalPassives,
+                                        mechanics
+                                    );
 
                             if (probabilityForUpToNumPassives <= 0)
                                 continue;

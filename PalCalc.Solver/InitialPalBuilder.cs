@@ -7,7 +7,10 @@ namespace PalCalc.Solver;
 /// <summary>
 /// Builds and reduces the owned and wild candidates which seed a solver run.
 /// </summary>
-internal sealed class InitialPalBuilder(BreedingSolverSettings settings)
+internal sealed class InitialPalBuilder(
+    BreedingSolverSettings settings,
+    BreedingMechanics mechanics
+)
 {
     private readonly PalBreedingDB breedingDB =
         PalBreedingDB.LoadEmbedded(settings.DB);
@@ -168,7 +171,8 @@ internal sealed class InitialPalBuilder(BreedingSolverSettings settings)
                             new WildPalReference(
                                 p,
                                 guaranteedPassives,
-                                numRandomPassives
+                                numRandomPassives,
+                                mechanics
                             )
                         );
                 })
