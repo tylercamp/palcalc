@@ -110,7 +110,7 @@ public class ParallelBatchExecutorTests
             effectivePassives: [],
             effectiveIVs: new IV_Set()
         );
-        var workingSet = new WorkingSet(
+        var frontier = new SearchFrontier(
             target,
             [healthyReference],
             configuredSolver.Settings.MaxThreads,
@@ -120,7 +120,7 @@ public class ParallelBatchExecutorTests
         var stepState = new BreedingSolverStepState(
             StepIndex: 0,
             Spec: target,
-            WorkingSet: workingSet,
+            Frontier: frontier,
             SelectionPolicy: context.SelectionPolicy,
             WorkingEarlyCandidatesByPalId: configuredSolver
                 .Settings

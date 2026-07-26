@@ -165,7 +165,7 @@ namespace PalCalc.Solver
             };
             stateUpdated?.Invoke(statusMsg);
 
-            var workingSet = new WorkingSet(
+            var frontier = new SearchFrontier(
                 spec,
                 BuildInitialContent(spec),
                 settings.MaxThreads,
@@ -183,7 +183,7 @@ namespace PalCalc.Solver
                 var stepState = new BreedingSolverStepState(
                     StepIndex: s,
                     Spec: spec,
-                    WorkingSet: workingSet,
+                    Frontier: frontier,
                     SelectionPolicy: context.SelectionPolicy,
                     WorkingEarlyCandidatesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(
                         id => id,
@@ -194,7 +194,7 @@ namespace PalCalc.Solver
                     )
                 );
 
-                bool didUpdate = workingSet.UpdateByPairs(work =>
+                var delta = frontier.ExpandPairs(work =>
                 {
                     logger.Debug("Performing breeding step {step} with {numWork} work items", s+1, work.Count);
 
@@ -240,7 +240,7 @@ namespace PalCalc.Solver
 
                 if (controller.CancellationToken.IsCancellationRequested) break;
 
-                if (!didUpdate)
+                if (!delta.Changed)
                 {
                     logger.Debug("Last pass found no new useful options, stopping iteration early");
                     break;
@@ -268,7 +268,7 @@ namespace PalCalc.Solver
             var surgeryCompatiblePassives = spec.DesiredPassives.Where(p => p.SupportsSurgery).Where(settings.SurgeryPassives.Contains).ToList();
             if (surgeryCompatiblePassives.Any() && !controller.CancellationToken.IsCancellationRequested)
             {
-                workingSet.UpdateBySingle(palRefs => palRefs
+                frontier.ExpandSingles(palRefs => palRefs
                     .Where(r => r.Pal == spec.Pal)
                     .Where(r =>
                         // there's room for a new passive
@@ -319,7 +319,7 @@ namespace PalCalc.Solver
                         var missingOptionalPassives = surgeryCompatiblePassives.Where(spec.OptionalPassives.Contains).Except(r.EffectivePassives).ToList();
                         var numAddablePassives = GameConstants.MaxTotalPassives - r.EffectivePassives.Count(p => p is not RandomPassiveSkill);
 
-                        // (we're still in the same UpdateBySingle pass, just the 2nd part. the pals from the previous pass haven't been stored yet, so make sure
+                        // (we're still in the same ExpandSingles pass, just the 2nd part. the pals from the previous pass haven't been stored yet, so make sure
                         // to include them in the list of results for this pass)
                         var res = new List<IPalReference>() { r };
 
@@ -384,8 +384,8 @@ namespace PalCalc.Solver
                 }
 
             }
-            return workingSet
-                .Result
+            return frontier
+                .Results
                 // the breeding logic will never emit pals which exceed this limit, but this isn't applied for owned pals
                 // which already satisfy the pal specifier
                 .Where(r => r.ActualPassives.Except(spec.DesiredPassives).Count() <= settings.MaxBredIrrelevantPassives)

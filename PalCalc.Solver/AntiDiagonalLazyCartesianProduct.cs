@@ -7,7 +7,7 @@ namespace PalCalc.Solver
     // high-efficiency children, which should let us quickly rule out the low-efficiency remaining
     // in the set.
     //
-    // `WorkingSet` orders the lists of parents by effort, and this `AntiDiagonal` approach ensures
+    // `SearchFrontier` orders the lists of parents by effort, and this `AntiDiagonal` approach ensures
     // we visit the early inner products first.
 
     /// <summary>

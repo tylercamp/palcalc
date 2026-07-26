@@ -35,19 +35,19 @@ namespace PalCalc.Solver
     /// </summary>
     /// <param name="StepIndex">The current step num. being processed</param>
     /// <param name="Spec">The target pal being solved for</param>
-    /// <param name="WorkingSet">The current set of finalized optimal pals</param>
+    /// <param name="Frontier">The current set of finalized optimal pals</param>
     /// <param name="WorkingEarlyCandidatesByPalId">
     /// A rough map of breeding states to the candidate retained by cheap early
     /// selection during this step.
     /// 
-    /// While the `WorkingSet` and selection policy have the final say in which
+    /// While the search frontier and selection policy have the final say in which
     /// alternatives are kept, this reduces the number returned for authoritative
     /// processing.
     /// </param>
     internal record class BreedingSolverStepState(
         int StepIndex,
         PalSpecifier Spec,
-        WorkingSet WorkingSet,
+        SearchFrontier Frontier,
         ICandidateSelectionPolicy SelectionPolicy,
         FrozenDictionary<PalId, ConcurrentDictionary<BreedingStateKey, IPalReference>> WorkingEarlyCandidatesByPalId
     );
@@ -463,7 +463,7 @@ namespace PalCalc.Solver
                             var effort = res.BreedingEffort;
                             var resultId = state.SelectionPolicy.KeyOf(res);
                             bool improvesFrontier =
-                                state.WorkingSet.IsFrontierImprovement(
+                                state.Frontier.IsImprovement(
                                     res,
                                     resultId
                                 );
@@ -518,14 +518,7 @@ namespace PalCalc.Solver
                                     added = true;
 
                                     if (improvesFrontier)
-                                    {
-                                        var oldContent = state.WorkingSet.CurrentStateIndex[resultId];
-                                        if (oldContent != null)
-                                        {
-                                            foreach (var pref in oldContent)
-                                                pref.IsOutdated = true;
-                                        }
-                                    }
+                                        state.Frontier.MarkStateObsolete(resultId);
                                 }
                             }
 

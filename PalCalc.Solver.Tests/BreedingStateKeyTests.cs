@@ -62,7 +62,7 @@ public class BreedingStateKeyTests
     }
 
     [TestMethod]
-    public void BreedingStateIndex_DoesNotMergeCollidingLegacyGroupIds()
+    public void FrontierIndex_DoesNotMergeCollidingLegacyGroupIds()
     {
         var pal = "Katress".ToPal(SolverTestScenario.DB);
         var first = new TestPalReference(
@@ -80,7 +80,7 @@ public class BreedingStateKeyTests
             effectivePassivesHash: 12345
         );
         var provider = DefaultBreedingStateKeyProvider.Instance;
-        var index = new BreedingStateIndex(provider);
+        var index = new FrontierIndex(provider);
 
         Assert.AreEqual(LegacyGroupId(first), LegacyGroupId(second));
         Assert.AreNotEqual(provider.KeyOf(first), provider.KeyOf(second));

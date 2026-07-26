@@ -290,7 +290,7 @@ public class CandidateSelectionPolicyTests
             "Wixen Noct",
             TimeSpan.FromMinutes(3)
         );
-        var workingSet = new WorkingSet(
+        var frontier = new SearchFrontier(
             target: new PalSpecifier
             {
                 Pal = "Anubis".ToPal(SolverTestScenario.DB),
@@ -301,10 +301,10 @@ public class CandidateSelectionPolicyTests
             selectionPolicy: policy
         );
 
-        workingSet.UpdateByPairs(_ => [added]);
+        frontier.ExpandPairs(_ => [added]);
 
         var orderedPairs = new List<(IPalReference, IPalReference)>();
-        workingSet.UpdateByPairs(work =>
+        frontier.ExpandPairs(work =>
         {
             orderedPairs.AddRange(
                 work.Chunks(100).SelectMany(chunk => chunk)

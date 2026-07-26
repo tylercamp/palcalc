@@ -2,7 +2,10 @@ using PalCalc.Solver.PalReference;
 
 namespace PalCalc.Solver;
 
-internal sealed class BreedingStateIndex(IBreedingStateKeyProvider keyProvider)
+/// <summary>
+/// Indexes the alternatives currently retained by the search frontier.
+/// </summary>
+internal sealed class FrontierIndex(IBreedingStateKeyProvider keyProvider)
 {
     private readonly Dictionary<BreedingStateKey, List<IPalReference>> content = [];
 

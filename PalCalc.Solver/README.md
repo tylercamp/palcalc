@@ -48,7 +48,7 @@ When Pal Calc produces children in the breeding process it will _always_ skip ch
 
 (See [PruningRulesBuilder.cs](./ResultPruning/PruningRulesBuilder.cs).)
 
-This pruning is applied at the end of each breeding step before building the next list of parent pairs for breeding. (See [WorkingSet.cs](./WorkingSet.cs).)
+This pruning is applied at the end of each breeding step before building the next list of parent pairs for breeding. (See [SearchFrontier.cs](./SearchFrontier.cs).)
 
 (Unfortunately there is still some randomness even after applying this pruning, since e.g. there may be multiple paths with the same effort estimate, same total breeding steps, same pal locations, etc.)
 
