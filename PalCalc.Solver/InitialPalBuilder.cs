@@ -15,9 +15,9 @@ internal sealed class InitialPalBuilder(
 {
     public List<IPalReference> Build(PalSpecifier target)
     {
-        // This reduction remains before the frontier because it selects concrete
-        // owned instances and constructs composite-gender references. Those
-        // choices cannot be recovered from frontier state keys alone.
+        // This step selects concrete owned instances and creates composite
+        // gender candidates before the frontier simplifies breeding paths.
+        // Those choices cannot be recovered from effective properties alone.
         static (
             Pal Pal,
             PassiveSetKey Passives,
@@ -34,8 +34,7 @@ internal sealed class InitialPalBuilder(
             );
 
         bool WithinBreedingSteps(Pal pal) =>
-            breedingDB.MinBreedingSteps[pal][target.Pal] <=
-            settings.MaxBreedingSteps;
+            breedingDB.MinBreedingSteps[pal][target.Pal] <= settings.MaxBreedingSteps;
 
         static IV_Value MakeIV(int minValue, int value) =>
             new(
@@ -47,18 +46,12 @@ internal sealed class InitialPalBuilder(
         var initialContent = settings.OwnedPals
             .Where(p => WithinBreedingSteps(p.Pal))
             .Where(p =>
-                p.PassiveSkills
-                    .Except(target.DesiredPassives)
-                    .Count() <=
-                settings.MaxInputIrrelevantPassives
+                p.PassiveSkills.Except(target.DesiredPassives).Count() <= settings.MaxInputIrrelevantPassives
             )
             .Select(p =>
                 new OwnedPalReference(
                     instance: p,
-                    effectivePassives:
-                        p.PassiveSkills.ToDedicatedPassives(
-                            target.DesiredPassives
-                        ),
+                    effectivePassives: p.PassiveSkills.ToDedicatedPassives(target.DesiredPassives),
                     effectiveIVs: new IV_Set
                     {
                         HP = MakeIV(target.IV_HP, p.IV_HP),
@@ -81,9 +74,7 @@ internal sealed class InitialPalBuilder(
                 group
                     .OrderBy(p => p.ActualPassives.Count)
                     .ThenBy(p =>
-                        PreferredLocationPruning.LocationOrderingOf(
-                            p.UnderlyingInstance.Location.Type
-                        )
+                        PreferredLocationPruning.LocationOrderingOf(p.UnderlyingInstance.Location.Type)
                     )
                     .ThenByDescending(p =>
                         p.UnderlyingInstance.IV_HP +
@@ -94,10 +85,7 @@ internal sealed class InitialPalBuilder(
             )
             .GroupBy(StateWithoutGender)
             .Select(group => group.ToList())
-            .SelectMany<
-                List<OwnedPalReference>,
-                IPalReference
-            >(CombineGenders)
+            .SelectMany(CombineGenders)
             .ToList();
 
         if (settings.MaxWildPals > 0)
@@ -115,16 +103,11 @@ internal sealed class InitialPalBuilder(
         if (group.Count != 2)
             throw new NotImplementedException();
 
-        var male = group.SingleOrDefault(
-            pal => pal.Gender == PalGender.MALE
-        );
-        var female = group.SingleOrDefault(
-            pal => pal.Gender == PalGender.FEMALE
-        );
+        var male = group.SingleOrDefault(pal => pal.Gender == PalGender.MALE);
+        var female = group.SingleOrDefault(pal => pal.Gender == PalGender.FEMALE);
         var composite = new CompositeOwnedPalReference(male, female);
 
-        return male.EffectivePassivesHash ==
-            female.EffectivePassivesHash
+        return male.EffectivePassivesHash == female.EffectivePassivesHash
             ? [composite]
             : [male, female, composite];
     }
@@ -137,40 +120,20 @@ internal sealed class InitialPalBuilder(
     {
         initialContent.AddRange(
             settings.AllowedWildPals
-                .Where(p =>
-                    !settings.OwnedPals.Any(
-                        instance => instance.Pal == p
-                    )
-                )
+                .Where(p => !settings.OwnedPals.Any(instance => instance.Pal == p))
                 .Where(withinBreedingSteps)
                 .SelectMany(p =>
                 {
-                    var guaranteedPassives =
-                        p.GuaranteedPassiveSkills(settings.DB);
-                    var numIrrelevantGuaranteed =
-                        guaranteedPassives
-                            .Except(target.DesiredPassives)
-                            .Count();
+                    var guaranteedPassives = p.GuaranteedPassiveSkills(settings.DB);
+                    var numIrrelevantGuaranteed = guaranteedPassives.Except(target.DesiredPassives).Count();
+                    var numAllowedRandomPassives = Math.Clamp(
+                        value: settings.MaxInputIrrelevantPassives - numIrrelevantGuaranteed,
+                        min: numIrrelevantGuaranteed > settings.MaxInputIrrelevantPassives ? 0 : 1,
+                        max: GameConstants.MaxTotalPassives - guaranteedPassives.Count()
+                    );
 
                     return Enumerable
-                        .Range(
-                            0,
-                            Math.Clamp(
-                                value:
-                                    settings
-                                        .MaxInputIrrelevantPassives -
-                                    numIrrelevantGuaranteed,
-                                min:
-                                    numIrrelevantGuaranteed >
-                                    settings
-                                        .MaxInputIrrelevantPassives
-                                        ? 0
-                                        : 1,
-                                max:
-                                    GameConstants.MaxTotalPassives -
-                                    guaranteedPassives.Count()
-                            )
-                        )
+                        .Range(0, numAllowedRandomPassives)
                         .Select(numRandomPassives =>
                             new WildPalReference(
                                 p,
@@ -180,9 +143,7 @@ internal sealed class InitialPalBuilder(
                             )
                         );
                 })
-                .Where(candidate =>
-                    candidate.BreedingEffort <= settings.MaxEffort
-                )
+                .Where(candidate => candidate.BreedingEffort <= settings.MaxEffort)
         );
     }
 }

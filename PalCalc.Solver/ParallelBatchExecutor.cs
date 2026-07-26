@@ -16,6 +16,10 @@ internal readonly record struct ParallelBatchExecutionResult(
     long WorkProcessedCount
 );
 
+/// <summary>
+/// Divides pending parent pairs among worker threads, combines their candidate
+/// lists, and reports aggregate progress or worker failures to the solver run.
+/// </summary>
 internal sealed class ParallelBatchExecutor(
     SolverRunContext context,
     TimeSpan progressUpdateInterval

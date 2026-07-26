@@ -184,7 +184,7 @@ public class SearchFrontierCharacterizationTests
     }
 
     [TestMethod]
-    public void MarkStateObsolete_OnlyUpdatesAlternativesInRequestedState()
+    public void MarkCandidatesOutdated_OnlyUpdatesMatchingEffectiveProperties()
     {
         var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
         var statePal = "Katress".ToPal(SolverTestScenario.DB);
@@ -202,8 +202,8 @@ public class SearchFrontierCharacterizationTests
         );
         var frontier = FrontierFor(targetPal, [matching, otherGender]);
 
-        frontier.MarkStateObsolete(
-            DefaultBreedingStateKeyProvider.Instance.KeyOf(matching)
+        frontier.MarkCandidatesOutdated(
+            DefaultEffectivePropertiesKeyProvider.Instance.KeyOf(matching)
         );
 
         Assert.IsTrue(matching.IsOutdated);

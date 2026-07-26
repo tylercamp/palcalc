@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver
 {
+    /// <summary>
+    /// Lazily pairs every item from one input list with every item from another
+    /// and divides those pairs into batches without constructing the full
+    /// Cartesian product in memory.
+    /// </summary>
     public interface ILazyCartesianProduct<T>
     {
         long Count { get; }
@@ -18,6 +23,11 @@ namespace PalCalc.Solver
         ILazyCartesianProduct<T> Where(Func<T, bool> predicate, CancellationToken token);
     }
 
+    /// <summary>
+    /// Enumerates pairs in ordinary row-major order: each item from the second
+    /// list is paired with the first item before advancing through the first
+    /// list.
+    /// </summary>
     public class LazyCartesianProduct<T>(List<T> listA, List<T> listB) : ILazyCartesianProduct<T>
     {
         public long Count { get; } = ((long)listA.Count) * ((long)listB.Count);

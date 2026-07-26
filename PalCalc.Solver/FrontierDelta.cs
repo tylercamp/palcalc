@@ -3,8 +3,8 @@ using PalCalc.Solver.PalReference;
 namespace PalCalc.Solver;
 
 /// <summary>
-/// Describes the authoritative change made to the search frontier by one
-/// expansion pass.
+/// Records which candidates one simplification pass added to and removed from
+/// the frontier. The parent-pair schedule uses this change to find new work.
 /// </summary>
 internal sealed class FrontierDelta
 {

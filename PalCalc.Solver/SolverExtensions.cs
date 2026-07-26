@@ -11,8 +11,7 @@ namespace PalCalc.Solver
 {
     public static class SolverExtensions
     {
-        // thanks chatgpt
-        // Returns the list of combinations of elements in the given list, where combinations are order-independent
+        // Returns each order-independent subset up to the requested size.
         internal static IEnumerable<List<T>> Combinations<T>(this List<T> elements, int maxSubListSize, LocalListPool<T> pool)
         {
             // Use indices-based iteration with pooled output lists
@@ -65,7 +64,9 @@ namespace PalCalc.Solver
         {
             var timeFactor = 1.0f;
 
-            // TODO - atm only Philanthropist affects breeding time. if another is added, how do they interact if both are on a given pal?
+            // Only Philanthropist currently affects breeding time. If another
+            // effect is added, its interaction with Philanthropist must be
+            // defined here.
             foreach (var p in passives)
             {
                 foreach (var e in p.TrackedEffects)

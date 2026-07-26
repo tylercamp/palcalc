@@ -5,9 +5,9 @@ namespace PalCalc.Solver;
 /// <summary>
 /// Indexes the alternatives currently retained by the search frontier.
 /// </summary>
-internal sealed class FrontierIndex(IBreedingStateKeyProvider keyProvider)
+internal sealed class FrontierIndex(IEffectivePropertiesKeyProvider keyProvider)
 {
-    private readonly Dictionary<BreedingStateKey, List<IPalReference>> content = [];
+    private readonly Dictionary<EffectivePropertiesKey, List<IPalReference>> content = [];
 
     public IEnumerable<IPalReference> All =>
         content.Values.SelectMany(group => group);
@@ -40,6 +40,6 @@ internal sealed class FrontierIndex(IBreedingStateKeyProvider keyProvider)
     public IReadOnlyList<IPalReference> this[IPalReference reference] =>
         this[keyProvider.KeyOf(reference)];
 
-    public IReadOnlyList<IPalReference> this[BreedingStateKey key] =>
+    public IReadOnlyList<IPalReference> this[EffectivePropertiesKey key] =>
         content.GetValueOrDefault(key);
 }

@@ -3,7 +3,7 @@ namespace PalCalc.Solver.ResultPruning
 {
     /// <summary>
     /// Creates the ordered, relatively expensive rule pipeline used to retain
-    /// a small set of alternatives after cheap primary-objective comparisons.
+    /// a small set of alternatives after quick breeding-effort comparisons.
     /// </summary>
     public sealed class ResultPruningPolicy
     {

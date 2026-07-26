@@ -3,7 +3,8 @@ using PalCalc.Model;
 namespace PalCalc.Solver;
 
 /// <summary>
-/// The fixed definition of one solver invocation.
+/// Captures the target and settings for one solver invocation. The target is
+/// normalized and copied so later caller changes cannot alter the run.
 /// </summary>
 public sealed class BreedingSolverRequest
 {

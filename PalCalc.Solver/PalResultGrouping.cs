@@ -10,8 +10,9 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver
 {
     /// <summary>
-    /// Hash-based property selectors intended for presentation-level result
-    /// grouping. Solver state identity uses structural keys instead.
+    /// Groups results for presentation screens. The solver uses
+    /// <see cref="EffectivePropertiesKey"/> instead when deciding which
+    /// candidates are interchangeable for future breeding.
     /// </summary>
     public static class PalResultProperty
     {

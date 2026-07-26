@@ -116,11 +116,16 @@ internal readonly struct RelevantIVKey : IEquatable<RelevantIVKey>
         !left.Equals(right);
 }
 
-internal readonly struct BreedingStateKey : IEquatable<BreedingStateKey>
+/// <summary>
+/// Groups candidates that are interchangeable in future breeding steps.
+/// Effort, cost, and breeding history are intentionally excluded because the
+/// selection policy compares those details within each group.
+/// </summary>
+internal readonly struct EffectivePropertiesKey : IEquatable<EffectivePropertiesKey>
 {
     private readonly int hashCode;
 
-    public BreedingStateKey(
+    public EffectivePropertiesKey(
         PalId palId,
         PalGender gender,
         PassiveSetKey passives,
@@ -149,7 +154,7 @@ internal readonly struct BreedingStateKey : IEquatable<BreedingStateKey>
     public PassiveSetKey Passives { get; }
     public RelevantIVKey IVs { get; }
 
-    public bool Equals(BreedingStateKey other) =>
+    public bool Equals(EffectivePropertiesKey other) =>
         PalDexNo == other.PalDexNo &&
         IsPalVariant == other.IsPalVariant &&
         Gender == other.Gender &&
@@ -157,29 +162,29 @@ internal readonly struct BreedingStateKey : IEquatable<BreedingStateKey>
         IVs == other.IVs;
 
     public override bool Equals(object obj) =>
-        obj is BreedingStateKey other && Equals(other);
+        obj is EffectivePropertiesKey other && Equals(other);
 
     public override int GetHashCode() => hashCode;
 
-    public static bool operator ==(BreedingStateKey left, BreedingStateKey right) =>
+    public static bool operator ==(EffectivePropertiesKey left, EffectivePropertiesKey right) =>
         left.Equals(right);
 
-    public static bool operator !=(BreedingStateKey left, BreedingStateKey right) =>
+    public static bool operator !=(EffectivePropertiesKey left, EffectivePropertiesKey right) =>
         !left.Equals(right);
 }
 
-internal interface IBreedingStateKeyProvider
+internal interface IEffectivePropertiesKeyProvider
 {
-    BreedingStateKey KeyOf(IPalReference reference);
+    EffectivePropertiesKey KeyOf(IPalReference reference);
 }
 
-internal sealed class DefaultBreedingStateKeyProvider : IBreedingStateKeyProvider
+internal sealed class DefaultEffectivePropertiesKeyProvider : IEffectivePropertiesKeyProvider
 {
-    public static DefaultBreedingStateKeyProvider Instance { get; } = new();
+    public static DefaultEffectivePropertiesKeyProvider Instance { get; } = new();
 
-    private DefaultBreedingStateKeyProvider() { }
+    private DefaultEffectivePropertiesKeyProvider() { }
 
-    public BreedingStateKey KeyOf(IPalReference reference) =>
+    public EffectivePropertiesKey KeyOf(IPalReference reference) =>
         new(
             palId: reference.Pal.Id,
             gender: reference.Gender,

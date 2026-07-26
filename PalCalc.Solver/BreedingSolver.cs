@@ -1,5 +1,9 @@
 namespace PalCalc.Solver;
 
+/// <summary>
+/// Runs one breeding-path search and reports progress through immutable status
+/// snapshots. The request supplies all run-specific data and constraints.
+/// </summary>
 public sealed class BreedingSolver
 {
     public event Action<SolverStatus> StatusUpdated;

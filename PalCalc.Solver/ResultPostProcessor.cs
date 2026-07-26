@@ -27,9 +27,9 @@ internal sealed class ResultPostProcessor(
         )
             return;
 
-        // Surgery remains a single pass after breeding search. Applying it
-        // during every iteration would be more exact but materially expands the
-        // frontier and has historically been too expensive.
+        // Surgery runs once after breeding. Applying it during every iteration
+        // would model more combinations, but would materially expand the
+        // frontier and increase search cost.
         frontier.ExpandSingles(palReferences =>
             palReferences
                 .Where(reference => reference.Pal == target.Pal)

@@ -1,22 +1,16 @@
 namespace PalCalc.Solver
 {
-    // ty chatgpt
-
-    // `CandidateExpander` includes an early "IsOutdated" check which gets updated as new optimal
-    // pals are discovered. We want to process the high-efficiency parent pairs first to produce
-    // high-efficiency children, which should let us quickly rule out the low-efficiency remaining
-    // in the set.
-    //
-    // `SearchFrontier` orders the lists of parents by effort, and this `AntiDiagonal` approach ensures
-    // we visit the early inner products first.
-
     /// <summary>
-    /// Lazily enumerates a Cartesian product in approximately increasing order of
-    /// the combined indices of each pair.
+    /// Prioritizes pairs near the beginning of both input lists instead of
+    /// exhausting the second list for each item in the first.
     ///
-    /// The product is divided into roughly square tiles. Tiles are emitted along
-    /// anti-diagonals so that pairs near the beginning of both input lists are
-    /// scheduled before pairs with a large index in either list.
+    /// `SearchFrontier` orders parents by breeding effort. Visiting efficient
+    /// parents from both lists early tends to discover efficient children
+    /// sooner, allowing `CandidateExpander` to skip pending pairs whose parents
+    /// have since been marked as outdated.
+    ///
+    /// The product is divided into roughly square tiles and the tiles are
+    /// emitted along anti-diagonals to maintain that priority.
     /// </summary>
     public class AntiDiagonalLazyCartesianProduct<T>(List<T> listA, List<T> listB) : ILazyCartesianProduct<T>
     {

@@ -100,7 +100,7 @@ public class CandidateExpanderTests
         var context = new CandidateExpansionContext(
             StepIndex: 0,
             Target: target,
-            Admissions: new CandidateAdmissionState(
+            PreFilter: new CandidatePreFilter(
                 target,
                 settings.MaxEffort,
                 selectionPolicy,

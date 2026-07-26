@@ -4,6 +4,10 @@ using Serilog;
 
 namespace PalCalc.Solver
 {
+    /// <summary>
+    /// Coordinates one complete search from starting candidates through final
+    /// surgery and output constraints.
+    /// </summary>
     internal sealed class SolverRun(
         SolverRunContext context,
         Action<SolverStatus> stateUpdated,
@@ -49,7 +53,8 @@ namespace PalCalc.Solver
             );
             var batchExecutor = new ParallelBatchExecutor(context, stateUpdateInterval);
 
-            // Apply main set of breeding passes
+            // Repeatedly breed newly useful parent pairs. Each pass only
+            // schedules combinations introduced by the previous frontier change.
 
             for (int s = 0; s < settings.MaxSolverIterations; s++)
             {
@@ -58,7 +63,7 @@ namespace PalCalc.Solver
                 var expansionContext = new CandidateExpansionContext(
                     StepIndex: s,
                     Target: spec,
-                    Admissions: new CandidateAdmissionState(
+                    PreFilter: new CandidatePreFilter(
                         target: spec,
                         maxEffort: settings.MaxEffort,
                         selectionPolicy: context.SelectionPolicy,
@@ -121,8 +126,6 @@ namespace PalCalc.Solver
                     break;
                 }
             }
-
-            // (Main breeding pass done)
 
             statusMsg = statusMsg with
             {

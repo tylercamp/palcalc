@@ -25,22 +25,24 @@ namespace PalCalc.Solver.ResultPruning
 
         public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData)
         {
-            // note: all pals within a group being pruned should:
+            // Candidates in this group are expected to:
             //
             // - all have the same `IsRelevant` for each type of IV
             //   e.g. all HP will be relevant or all HP will be irrelevant
             //
-            //   (enforced by `BreedingStateKey`)
+            //   (enforced by `EffectivePropertiesKey`)
             //
-            // - if an IV range is relevant, all its min/max values will also be relevant
+            // - have relevant IV ranges whose minimum and maximum both satisfy
+            //   the target threshold.
             //
-            //   (would be enforced by applying min-IV filter on input pals (done in
-            //   `BreedingSolver`), so the only IVs included will be relevant IVs)
+            // `InitialPalBuilder` establishes the second invariant for owned
+            // Pals. Wild IVs are irrelevant, breeding preserves the invariant
+            // when it merges ranges, and surgery leaves IVs unchanged.
             //
 
             // current impl just compares the maximum part of the IV range. filtering by min/avg
             // IVs doesn't affect whether we get a relevant result (see above), so we'll instead
-            // try to maximize the highest possible value
+            // try to maximize the highest possible value.
 
             if (token.IsCancellationRequested) return results;
 

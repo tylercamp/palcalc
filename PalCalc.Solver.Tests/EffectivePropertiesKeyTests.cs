@@ -4,7 +4,7 @@ using PalCalc.Solver.PalReference;
 namespace PalCalc.Solver.Tests;
 
 [TestClass]
-public class BreedingStateKeyTests
+public class EffectivePropertiesKeyTests
 {
     [TestMethod]
     public void PassiveSetKey_IsOrderIndependentAndPreservesDuplicates()
@@ -47,7 +47,7 @@ public class BreedingStateKeyTests
                 Defense: new IV_Value(false, 20, 90)
             )
         );
-        var provider = DefaultBreedingStateKeyProvider.Instance;
+        var provider = DefaultEffectivePropertiesKeyProvider.Instance;
 
         Assert.AreEqual(provider.KeyOf(first), provider.KeyOf(equivalent));
     }
@@ -70,7 +70,7 @@ public class BreedingStateKeyTests
             new IV_Set(),
             effectivePassivesHash: 12345
         );
-        var provider = DefaultBreedingStateKeyProvider.Instance;
+        var provider = DefaultEffectivePropertiesKeyProvider.Instance;
         var index = new FrontierIndex(provider);
 
         Assert.AreNotEqual(provider.KeyOf(first), provider.KeyOf(second));
@@ -128,7 +128,7 @@ public class BreedingStateKeyTests
                 Defense: IV_Value.Random
             )
         );
-        var provider = DefaultBreedingStateKeyProvider.Instance;
+        var provider = DefaultEffectivePropertiesKeyProvider.Instance;
         var baselineKey = provider.KeyOf(baseline);
 
         Assert.AreNotEqual(baselineKey, provider.KeyOf(differentPal));
@@ -158,8 +158,8 @@ public class BreedingStateKeyTests
             gendered.EffectivePassivesHash
         );
         Assert.AreEqual(
-            DefaultBreedingStateKeyProvider.Instance.KeyOf(wild).Passives,
-            DefaultBreedingStateKeyProvider.Instance.KeyOf(gendered).Passives
+            DefaultEffectivePropertiesKeyProvider.Instance.KeyOf(wild).Passives,
+            DefaultEffectivePropertiesKeyProvider.Instance.KeyOf(gendered).Passives
         );
     }
 

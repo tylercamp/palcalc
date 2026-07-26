@@ -70,7 +70,7 @@ public class CandidateSelectionPolicyTests
             )
         );
         Assert.AreEqual(
-            EarlyCandidateSelection.ReplaceIncumbent,
+            EarlyCandidateSelection.KeepBoth,
             policy.SelectEarlyCandidate(
                 new TestPalReference(
                     "exact-tie",
@@ -116,10 +116,14 @@ public class CandidateSelectionPolicyTests
             incumbent
         );
 
-        Assert.IsTrue(faster.IsImprovement);
-        Assert.IsTrue(faster.CanImmediatelyObsolete);
-        Assert.IsTrue(cheaper.IsImprovement);
-        Assert.IsFalse(cheaper.CanImmediatelyObsolete);
+        Assert.AreEqual(
+            FrontierCandidateAssessment.GuaranteedImprovement,
+            faster
+        );
+        Assert.AreEqual(
+            FrontierCandidateAssessment.PotentialImprovement,
+            cheaper
+        );
     }
 
     [TestMethod]
@@ -419,7 +423,7 @@ public class CandidateSelectionPolicyTests
             expansionPriorityComparer ??
             inner.ExpansionPriorityComparer;
 
-        public BreedingStateKey KeyOf(IPalReference reference) =>
+        public EffectivePropertiesKey KeyOf(IPalReference reference) =>
             inner.KeyOf(reference);
 
         public EarlyCandidateSelection SelectEarlyCandidate(
@@ -440,8 +444,10 @@ public class CandidateSelectionPolicyTests
         ) =>
             inner.SelectRetainedAlternatives(candidates);
 
-        public ResultTierKey ResultTierOf(IPalReference candidate) =>
-            inner.ResultTierOf(candidate);
+        public BreedingEffortGroupKey BreedingEffortGroupOf(
+            IPalReference candidate
+        ) =>
+            inner.BreedingEffortGroupOf(candidate);
     }
 
     private sealed class ReverseEffortComparer : IComparer<IPalReference>

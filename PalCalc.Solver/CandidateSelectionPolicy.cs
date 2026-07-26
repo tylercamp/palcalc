@@ -10,14 +10,16 @@ internal enum EarlyCandidateSelection
     KeepBoth,
 }
 
-internal readonly record struct FrontierCandidateAssessment(
-    bool IsImprovement,
-    bool CanImmediatelyObsolete
-);
+internal enum FrontierCandidateAssessment
+{
+    Inferior,
+    PotentialImprovement,
+    GuaranteedImprovement,
+}
 
-internal readonly record struct ResultTierKey(long PrimaryValue);
+internal readonly record struct BreedingEffortGroupKey(long EffortTicks);
 
-internal interface ICandidateSelectionPolicy : IBreedingStateKeyProvider
+internal interface ICandidateSelectionPolicy : IEffectivePropertiesKeyProvider
 {
     EarlyCandidateSelection SelectEarlyCandidate(
         IPalReference candidate,
@@ -33,7 +35,7 @@ internal interface ICandidateSelectionPolicy : IBreedingStateKeyProvider
         IEnumerable<IPalReference> candidates
     );
 
-    ResultTierKey ResultTierOf(IPalReference candidate);
+    BreedingEffortGroupKey BreedingEffortGroupOf(IPalReference candidate);
 
     IComparer<IPalReference> ExpansionPriorityComparer { get; }
 }
@@ -56,22 +58,27 @@ internal static class CandidateSelectionPolicyExtensions
             .ToList();
 }
 
+/// <summary>
+/// Decides which breeding paths are worth retaining among candidates with the
+/// same effective properties. Workers use its quick comparisons; the frontier
+/// later applies its complete ordered simplification rules.
+/// </summary>
 internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolicy
 {
     private readonly ResultPruningRule retainedAlternativeSelection;
-    private readonly IBreedingStateKeyProvider stateKeyProvider;
+    private readonly IEffectivePropertiesKeyProvider propertiesKeyProvider;
 
     public DefaultCandidateSelectionPolicy(
         ResultPruningPolicy resultPruning,
         CancellationToken cancellationToken,
-        IBreedingStateKeyProvider stateKeyProvider = null
+        IEffectivePropertiesKeyProvider propertiesKeyProvider = null
     )
     {
         ArgumentNullException.ThrowIfNull(resultPruning);
 
-        this.stateKeyProvider =
-            stateKeyProvider ??
-            DefaultBreedingStateKeyProvider.Instance;
+        this.propertiesKeyProvider =
+            propertiesKeyProvider ??
+            DefaultEffectivePropertiesKeyProvider.Instance;
         retainedAlternativeSelection =
             resultPruning.Create(cancellationToken);
     }
@@ -79,17 +86,16 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     public IComparer<IPalReference> ExpansionPriorityComparer { get; } =
         BreedingEffortComparer.Instance;
 
-    public BreedingStateKey KeyOf(IPalReference reference) =>
-        stateKeyProvider.KeyOf(reference);
+    public EffectivePropertiesKey KeyOf(IPalReference reference) =>
+        propertiesKeyProvider.KeyOf(reference);
 
     /// <summary>
     /// Performs the cheap comparison used by workers within one iteration.
     ///
-    /// Lower breeding effort is a safe primary-objective dominance decision.
-    /// The cost tie-break and replacement of exact ties preserve the existing
-    /// heuristic; cost is later than other rules in authoritative selection,
-    /// so this comparison is an admission optimization rather than a proof of
-    /// full dominance.
+    /// Lower breeding effort is a guaranteed improvement. When effort is equal,
+    /// lower cost replaces the candidate used for later comparisons. Candidates
+    /// tied on both values are both kept because their IVs or breeding paths may
+    /// differ; the full simplification pass decides between them.
     /// </summary>
     public EarlyCandidateSelection SelectEarlyCandidate(
         IPalReference candidate,
@@ -105,17 +111,20 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             return EarlyCandidateSelection.ReplaceIncumbent;
 
         comparison = candidate.TotalCost.CompareTo(incumbent.TotalCost);
-        return comparison > 0
-            ? EarlyCandidateSelection.RejectCandidate
-            : EarlyCandidateSelection.ReplaceIncumbent;
+        if (comparison > 0)
+            return EarlyCandidateSelection.RejectCandidate;
+        if (comparison < 0)
+            return EarlyCandidateSelection.ReplaceIncumbent;
+
+        return EarlyCandidateSelection.KeepBoth;
     }
 
     /// <summary>
     /// Performs the cheap comparison against the retained frontier.
     ///
-    /// Cost and IV comparisons preserve the existing admission heuristic, but
-    /// only strict improvement in the primary objective is safe to use for
-    /// immediate obsolescence.
+    /// Lower cost or better IVs make a candidate worth sending to the full
+    /// simplification pass. Only lower breeding effort guarantees that matching
+    /// frontier candidates can be marked as outdated immediately.
     /// </summary>
     public FrontierCandidateAssessment AssessAgainstFrontier(
         IPalReference candidate,
@@ -126,31 +135,25 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             incumbent.BreedingEffort
         );
         if (comparison != 0)
-            return new(
-                IsImprovement: comparison < 0,
-                CanImmediatelyObsolete: comparison < 0
-            );
+            return comparison < 0
+                ? FrontierCandidateAssessment.GuaranteedImprovement
+                : FrontierCandidateAssessment.Inferior;
 
         comparison = candidate.TotalCost.CompareTo(incumbent.TotalCost);
         if (comparison != 0)
-            return new(
-                IsImprovement: comparison < 0,
-                CanImmediatelyObsolete: false
-            );
+            return comparison < 0
+                ? FrontierCandidateAssessment.PotentialImprovement
+                : FrontierCandidateAssessment.Inferior;
 
         comparison = TotalMaxIV(candidate).CompareTo(TotalMaxIV(incumbent));
         if (comparison != 0)
-            return new(
-                IsImprovement: comparison > 0,
-                CanImmediatelyObsolete: false
-            );
+            return comparison > 0
+                ? FrontierCandidateAssessment.PotentialImprovement
+                : FrontierCandidateAssessment.Inferior;
 
-        return new(
-            IsImprovement:
-                TotalMinIV(candidate) >
-                TotalMinIV(incumbent),
-            CanImmediatelyObsolete: false
-        );
+        return TotalMinIV(candidate) > TotalMinIV(incumbent)
+            ? FrontierCandidateAssessment.PotentialImprovement
+            : FrontierCandidateAssessment.Inferior;
     }
 
     public IReadOnlyList<IPalReference> SelectRetainedAlternatives(
@@ -169,7 +172,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             .ToList();
     }
 
-    public ResultTierKey ResultTierOf(IPalReference candidate) =>
+    public BreedingEffortGroupKey BreedingEffortGroupOf(IPalReference candidate) =>
         new(candidate.BreedingEffort.Ticks);
 
     private static int TotalMaxIV(IPalReference candidate) =>

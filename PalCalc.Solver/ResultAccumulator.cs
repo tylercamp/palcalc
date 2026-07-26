@@ -16,7 +16,7 @@ internal sealed class ResultAccumulator(
     public IEnumerable<IPalReference> Results =>
         discovered
             .Distinct()
-            .GroupBy(selectionPolicy.ResultTierOf)
+            .GroupBy(selectionPolicy.BreedingEffortGroupOf)
             .SelectMany(selectionPolicy.SelectRetainedAlternatives);
 
     public void Observe(IEnumerable<IPalReference> candidates)

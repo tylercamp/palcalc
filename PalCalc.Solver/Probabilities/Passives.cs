@@ -64,7 +64,7 @@ namespace PalCalc.Solver.Probabilities
             //
             // ... each of these has a separate probability of getting exactly that outcome.
             //
-            // the final probability for these params (fn args) is the sum
+            // The final probability is the sum of these possible outcomes.
 
             float probabilityForNumPassives = 0.0f;
 

@@ -12,26 +12,26 @@ internal interface ICandidateFrontierView
 {
     FrontierCandidateAssessment AssessCandidate(
         IPalReference candidate,
-        BreedingStateKey stateKey
+        EffectivePropertiesKey propertiesKey
     );
 
-    void MarkStateObsolete(BreedingStateKey stateKey);
+    void MarkCandidatesOutdated(EffectivePropertiesKey propertiesKey);
 }
 
-internal readonly record struct CandidateAdmission(
-    BreedingStateKey StateKey,
+internal readonly record struct CandidatePreFilterResult(
+    EffectivePropertiesKey PropertiesKey,
     bool Accepted,
-    bool CanImmediatelyObsolete
+    bool IsGuaranteedImprovement
 )
 {
-    public static CandidateAdmission Rejected => default;
+    public static CandidatePreFilterResult Rejected => default;
 }
 
 /// <summary>
-/// Owns cheap, concurrent candidate admission for one solver iteration.
-/// Authoritative selection remains the responsibility of the frontier.
+/// Quickly filters candidates produced by parallel workers during one solver
+/// iteration. The frontier later runs the full simplification pass.
 /// </summary>
-internal sealed class CandidateAdmissionState
+internal sealed class CandidatePreFilter
 {
     private readonly PalSpecifier target;
     private readonly TimeSpan maxEffort;
@@ -39,10 +39,10 @@ internal sealed class CandidateAdmissionState
     private readonly ICandidateFrontierView frontier;
     private readonly FrozenDictionary<
         PalId,
-        ConcurrentDictionary<BreedingStateKey, IPalReference>
+        ConcurrentDictionary<EffectivePropertiesKey, IPalReference>
     > earlyCandidatesByPalId;
 
-    public CandidateAdmissionState(
+    public CandidatePreFilter(
         PalSpecifier target,
         TimeSpan maxEffort,
         ICandidateSelectionPolicy selectionPolicy,
@@ -57,33 +57,33 @@ internal sealed class CandidateAdmissionState
         earlyCandidatesByPalId = palIds.ToFrozenDictionary(
             id => id,
             _ => new ConcurrentDictionary<
-                BreedingStateKey,
+                EffectivePropertiesKey,
                 IPalReference
             >()
         );
     }
 
-    public CandidateAdmission TryAdmit(IPalReference candidate)
+    public CandidatePreFilterResult TryAdd(IPalReference candidate)
     {
         if (candidate.BreedingEffort > maxEffort)
-            return CandidateAdmission.Rejected;
+            return CandidatePreFilterResult.Rejected;
 
-        var stateKey = selectionPolicy.KeyOf(candidate);
+        var propertiesKey = selectionPolicy.KeyOf(candidate);
         var frontierAssessment = frontier.AssessCandidate(
             candidate,
-            stateKey
+            propertiesKey
         );
         if (
-            !frontierAssessment.IsImprovement &&
+            frontierAssessment == FrontierCandidateAssessment.Inferior &&
             !target.IsSatisfiedBy(candidate)
         )
-            return CandidateAdmission.Rejected;
+            return CandidatePreFilterResult.Rejected;
 
         var earlyCandidates = earlyCandidatesByPalId[candidate.Pal.Id];
-        var accepted = earlyCandidates.TryAdd(stateKey, candidate);
+        var accepted = earlyCandidates.TryAdd(propertiesKey, candidate);
         while (!accepted)
         {
-            var incumbent = earlyCandidates[stateKey];
+            var incumbent = earlyCandidates[propertiesKey];
             switch (
                 selectionPolicy.SelectEarlyCandidate(
                     candidate,
@@ -100,7 +100,7 @@ internal sealed class CandidateAdmissionState
 
                 case EarlyCandidateSelection.ReplaceIncumbent:
                     accepted = earlyCandidates.TryUpdate(
-                        stateKey,
+                        propertiesKey,
                         candidate,
                         incumbent
                     );
@@ -114,22 +114,23 @@ internal sealed class CandidateAdmissionState
 
         return accepted
             ? new(
-                StateKey: stateKey,
+                PropertiesKey: propertiesKey,
                 Accepted: true,
-                CanImmediatelyObsolete:
-                    frontierAssessment.CanImmediatelyObsolete
+                IsGuaranteedImprovement:
+                    frontierAssessment ==
+                    FrontierCandidateAssessment.GuaranteedImprovement
             )
-            : CandidateAdmission.Rejected;
+            : CandidatePreFilterResult.Rejected;
     }
 
-    public void Complete(CandidateAdmission admission)
+    public void Complete(CandidatePreFilterResult result)
     {
         if (
-            admission.Accepted &&
-            admission.CanImmediatelyObsolete
+            result.Accepted &&
+            result.IsGuaranteedImprovement
         )
         {
-            frontier.MarkStateObsolete(admission.StateKey);
+            frontier.MarkCandidatesOutdated(result.PropertiesKey);
         }
     }
 }
@@ -140,5 +141,5 @@ internal sealed class CandidateAdmissionState
 internal sealed record CandidateExpansionContext(
     int StepIndex,
     PalSpecifier Target,
-    CandidateAdmissionState Admissions
+    CandidatePreFilter PreFilter
 );

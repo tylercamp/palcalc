@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.PalReference
 {
     /// <summary>
-    /// Represents a pair of male and female instances of the same pal. This allows us to represent
-    /// Male+Female owned pals to act as "wildcard" genders. (Without this the solver will tend to prefer
-    /// redundantly breeding a pal of "opposite gender" compared to another pal step which has lots of
-    /// requirements + breeding attempts. It wouldn't directly pair it with a male or female pal, since
-    /// that would require breeding the "difficult" pal to have a specific gender.)
+    /// Represents owned male and female copies that can be used as one
+    /// wildcard-gender candidate. A later breeding step selects whichever
+    /// concrete copy has the required gender.
     /// 
-    /// These pals _should_, but are not _guaranteed_, to have the same set of passives:
+    /// This avoids breeding another copy solely to obtain the opposite gender.
+    /// The two owned Pals have the same effective properties, but may not have
+    /// exactly the same actual passives:
     /// 
     /// - If two pals have different desired passives, they should NOT be made composite.
     /// - Conversely, if one pal has a desired passive, both pals will have that desired passive.
@@ -94,7 +94,8 @@ namespace PalCalc.Solver.PalReference
         private CompositeOwnedPalReference oppositeWildcardReference;
         public IPalReference WithGuaranteedGender(PalDB db, PalGender gender, bool useReverser)
         {
-            // (we have direct reprs for both genders, no need to check useReverser)
+            // Both concrete genders are already owned, so a reverser is not
+            // needed.
 
             switch (gender)
             {

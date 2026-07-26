@@ -5,17 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-// note:
-// A lot of this logic was originally written using LINQ. This was convenient and readable, but
-// there are a lot of hot-paths in this file, and the excessive LINQ iterator + enumerator instances
-// were causing lots of GC activity which added overhead and limited concurrency.
-//
-// Similarly, there are a number of places where an enumerator (i.e. `yield return`) would be easier
-// to understand + debug, but these have the same GC overhead issues.
-//
-// An object pool is being used for any types which were found to have excessive allocations
-// while profiling.
-
 namespace PalCalc.Solver
 {
     /// <summary>
@@ -27,7 +16,12 @@ namespace PalCalc.Solver
     }
 
     /// <summary>
-    /// Expands a batch of parent pairs into relevant breeding candidates.
+    /// Breeds a batch of parent pairs and emits children that may help reach
+    /// the target. One instance belongs to each parallel worker.
+    ///
+    /// This is the solver's hottest path. Several loops and worker-local pools
+    /// intentionally avoid iterator and temporary-object allocations that
+    /// profiling showed caused significant garbage collection overhead.
     /// </summary>
     /// <param name="controller">A controller which can be used to externally control the solver behavior, i.e. pause/resume.</param>
     /// <param name="settings">General settings for the solver process</param>
@@ -106,14 +100,10 @@ namespace PalCalc.Solver
         {
             var (parent1, parent2) = p;
 
-            // (I REALLY don't like this, but now we NEED to. At some point we could declare `scoped` and assign
-            // values in if/else blocks, but some C# compiler update happened and now we get CS9203. I
-            // REALLY don't want to use this, but I REALLY don't want to do heap allocations even more.)
-            //
-            // https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/breaking-changes/compiler%20breaking%20changes%20-%20dotnet%2011
-            //
-            // (TODO - Now using ternary so we can keep using `scoped Span`, but I'm no longer confident this
-            //         actually avoids heap allocations.)
+            // Keep these few options in a scoped span because this method runs
+            // for every parent pair. The conditional expression also avoids
+            // assigning a collection expression across scopes, which newer C#
+            // compilers reject with CS9203.
             scoped Span<(IPalReference, IPalReference)> parentPairOptions =
                 parent1.Gender == PalGender.WILDCARD
                     ? (
@@ -198,8 +188,9 @@ namespace PalCalc.Solver
                     }
                 }
 
-                // shouldn't happen
-                throw new NotImplementedException();
+                throw new NotImplementedException(
+                    "No parent-gender option matched the calculated minimum effort."
+                );
             }
         }
 
@@ -292,8 +283,9 @@ namespace PalCalc.Solver
                         availableOptionalPassives.Add(passive);
                 }
 
-                // arbitrary reordering of (p1, p2) to prevent duplicate results from swapped pairs
-                // (though this shouldn't be necessary if the `ResultPruningRule` impls are working right?)
+                // Give swapped parent pairs one stable order so they produce
+                // equivalent child references.
+                // TODO: Later processing should make this unnecessary, needs testing
                 (IPalReference, IPalReference) ReorderPair((IPalReference, IPalReference) p) =>
                     p.Item1.GetHashCode() > p.Item2.GetHashCode()
                         ? (p.Item2, p.Item1)
@@ -306,7 +298,8 @@ namespace PalCalc.Solver
                 // and modify the parent genders to cover each possible child
                 {
 #if DEBUG && DEBUG_CHECKS
-                            // (shouldn't happen)
+                            // Opposite-wildcard references are resolved before
+                            // entering this expansion path.
                             if (p.Item1.Gender == PalGender.OPPOSITE_WILDCARD || p.Item2.Gender == PalGender.OPPOSITE_WILDCARD)
                                 Debugger.Break();
 #endif
@@ -442,14 +435,14 @@ namespace PalCalc.Solver
                             );
 
                             var added = false;
-                            var admission = context.Admissions.TryAdmit(res);
-                            if (admission.Accepted)
+                            var filterResult = context.PreFilter.TryAdd(res);
+                            if (filterResult.Accepted)
                             {
                                 newPassivesRef.Retain();
 
                                 yield return res;
                                 added = true;
-                                context.Admissions.Complete(admission);
+                                context.PreFilter.Complete(filterResult);
                             }
 
                             if (!added)

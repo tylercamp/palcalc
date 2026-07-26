@@ -5,8 +5,8 @@ using Serilog;
 namespace PalCalc.Solver;
 
 /// <summary>
-/// Owns the retained breeding states, pending parent-pair work, and terminal
-/// results for one solver run.
+/// Keeps the best candidates found so far, schedules the parent pairs they
+/// introduce, and collects completed results for one solver run.
 /// </summary>
 internal sealed class SearchFrontier : ICandidateFrontierView
 {
@@ -54,26 +54,23 @@ internal sealed class SearchFrontier : ICandidateFrontierView
 
     public FrontierCandidateAssessment AssessCandidate(
         IPalReference reference,
-        BreedingStateKey stateKey
+        EffectivePropertiesKey propertiesKey
     )
     {
-        var incumbent = index[stateKey]?.FirstOrDefault();
+        var incumbent = index[propertiesKey]?.FirstOrDefault();
         return incumbent == null
-            ? new(
-                IsImprovement: true,
-                CanImmediatelyObsolete: false
-            )
+            ? FrontierCandidateAssessment.PotentialImprovement
             : selectionPolicy.AssessAgainstFrontier(reference, incumbent);
     }
 
     /// <summary>
-    /// Marks the currently retained alternatives for a state as ineligible for
-    /// further expansion. The authoritative merge still decides whether the
-    /// candidate which prompted this transition is retained.
+    /// Marks candidates with the same effective properties as ineligible for
+    /// further breeding. The full simplification pass still decides whether
+    /// the candidate that prompted this change is retained.
     /// </summary>
-    public void MarkStateObsolete(BreedingStateKey stateKey)
+    public void MarkCandidatesOutdated(EffectivePropertiesKey propertiesKey)
     {
-        var alternatives = index[stateKey];
+        var alternatives = index[propertiesKey];
         if (alternatives == null) return;
 
         foreach (var alternative in alternatives)
@@ -152,8 +149,8 @@ internal sealed class SearchFrontier : ICandidateFrontierView
         }
     }
 
-    // Gives a new, reduced collection which only includes the alternatives
-    // retained by the authoritative policy for each breeding state.
+    // Keeps the breeding paths selected by the full simplification policy for
+    // each group of candidates with the same effective properties.
     private IEnumerable<IPalReference> SelectCandidates(
         IEnumerable<IPalReference> candidates
     ) =>
@@ -184,8 +181,8 @@ internal sealed class SearchFrontier : ICandidateFrontierView
         if (controller.CancellationToken.IsCancellationRequested)
             return FrontierDelta.None;
 
-        // Authoritative selection is relatively heavy. Reduce independent
-        // batches in parallel before selecting from their combined output.
+        // The full simplification pass is relatively expensive. Simplify
+        // independent batches in parallel before combining their output.
         logger.Debug(
             "performing pre-prune on {count} items",
             newCandidates.Count
