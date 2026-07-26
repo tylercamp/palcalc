@@ -5,7 +5,6 @@ namespace PalCalc.Model;
 
 /// <summary>
 /// Immutable game mechanics used to estimate breeding and capture effort.
-/// A <see cref="PalDB"/> owns one instance so customized databases can coexist.
 /// </summary>
 public sealed class BreedingMechanics
 {
@@ -20,19 +19,7 @@ public sealed class BreedingMechanics
         IReadOnlyDictionary<int, float> ivProbabilityDirect,
         IReadOnlyDictionary<int, float> passiveProbabilityDirect,
         IReadOnlyDictionary<int, float> passiveRandomAddedProbability,
-        IReadOnlyDictionary<int, float> passivesWildAtMostN,
-        TimeSpan minimumCaptureTime,
-        int capturePriceThreshold,
-        float capturePricePointsPerMinute,
-        float variantCaptureTimeBonusMinutes,
-        IReadOnlyDictionary<int, float>
-            passiveProbabilityNoRandom = null,
-        IReadOnlyDictionary<int, float>
-            passiveProbabilityAtLeastN = null,
-        IReadOnlyDictionary<int, float>
-            passiveProbabilityNoRandomAtLeastN = null,
-        IReadOnlyDictionary<int, float>
-            passiveRandomAddedAtLeastN = null
+        IReadOnlyDictionary<int, float> passivesWildAtMostN
     )
     {
         IVProbabilityDirect = CopyProbabilityTable(
@@ -56,91 +43,34 @@ public sealed class BreedingMechanics
             Enumerable.Range(0, MaxPassiveSkills + 1)
         );
 
-        if (minimumCaptureTime < TimeSpan.Zero)
-            throw new ArgumentOutOfRangeException(nameof(minimumCaptureTime));
-        if (capturePricePointsPerMinute <= 0 || !float.IsFinite(capturePricePointsPerMinute))
-            throw new ArgumentOutOfRangeException(nameof(capturePricePointsPerMinute));
-        if (variantCaptureTimeBonusMinutes < 0 || !float.IsFinite(variantCaptureTimeBonusMinutes))
-            throw new ArgumentOutOfRangeException(nameof(variantCaptureTimeBonusMinutes));
-
-        MinimumCaptureTime = minimumCaptureTime;
-        CapturePriceThreshold = capturePriceThreshold;
-        CapturePricePointsPerMinute = capturePricePointsPerMinute;
-        VariantCaptureTimeBonusMinutes = variantCaptureTimeBonusMinutes;
-
         PassiveProbabilityAtLeastN =
-            passiveProbabilityAtLeastN is null
-                ? Enumerable
-                    .Range(1, MaxPassiveSkills)
-                    .ToFrozenDictionary(
-                        count => count,
-                        count => Enumerable
-                            .Range(
-                                count,
-                                MaxPassiveSkills - count + 1
-                            )
-                            .Sum(inherited =>
-                                PassiveProbabilityDirect[inherited]
-                            )
-                    )
-                : CopyProbabilityTable(
-                    nameof(passiveProbabilityAtLeastN),
-                    passiveProbabilityAtLeastN,
-                    Enumerable.Range(1, MaxPassiveSkills)
+            Enumerable
+                .Range(1, MaxPassiveSkills)
+                .ToFrozenDictionary(
+                    count => count,
+                    count => Enumerable
+                        .Range(
+                            count,
+                            MaxPassiveSkills - count + 1
+                        )
+                        .Sum(inherited =>
+                            PassiveProbabilityDirect[inherited]
+                        )
                 );
 
-        var noRandomProbability = PassiveRandomAddedProbability[0];
-        PassiveProbabilityNoRandom =
-            passiveProbabilityNoRandom is null
-                ? Enumerable
-                    .Range(1, MaxPassiveSkills)
-                    .ToFrozenDictionary(
-                        count => count,
-                        count => count == MaxPassiveSkills
-                            ? PassiveProbabilityDirect[count]
-                            : PassiveProbabilityDirect[count] *
-                                noRandomProbability
-                    )
-                : CopyProbabilityTable(
-                    nameof(passiveProbabilityNoRandom),
-                    passiveProbabilityNoRandom,
-                    Enumerable.Range(1, MaxPassiveSkills)
-                );
-        PassiveProbabilityNoRandomAtLeastN =
-            passiveProbabilityNoRandomAtLeastN is null
-                ? Enumerable
-                    .Range(1, MaxPassiveSkills)
-                    .ToFrozenDictionary(
-                        count => count,
-                        count => count == MaxPassiveSkills
-                            ? PassiveProbabilityAtLeastN[count]
-                            : PassiveProbabilityAtLeastN[count] *
-                                noRandomProbability
-                    )
-                : CopyProbabilityTable(
-                    nameof(passiveProbabilityNoRandomAtLeastN),
-                    passiveProbabilityNoRandomAtLeastN,
-                    Enumerable.Range(1, MaxPassiveSkills)
-                );
         PassiveRandomAddedAtLeastN =
-            passiveRandomAddedAtLeastN is null
-                ? Enumerable
-                    .Range(0, MaxPassiveSkills + 1)
-                    .ToFrozenDictionary(
-                        count => count,
-                        count => Enumerable
-                            .Range(
-                                count,
-                                MaxPassiveSkills - count + 1
-                            )
-                            .Sum(added =>
-                                PassiveRandomAddedProbability[added]
-                            )
-                    )
-                : CopyProbabilityTable(
-                    nameof(passiveRandomAddedAtLeastN),
-                    passiveRandomAddedAtLeastN,
-                    Enumerable.Range(0, MaxPassiveSkills + 1)
+            Enumerable
+                .Range(0, MaxPassiveSkills + 1)
+                .ToFrozenDictionary(
+                    count => count,
+                    count => Enumerable
+                        .Range(
+                            count,
+                            MaxPassiveSkills - count + 1
+                        )
+                        .Sum(added =>
+                            PassiveRandomAddedProbability[added]
+                        )
                 );
 
         ivDesiredProbabilities = BuildDesiredIVProbabilities();
@@ -159,25 +89,7 @@ public sealed class BreedingMechanics
     public IReadOnlyDictionary<int, float> PassivesWildAtMostN { get; }
 
     [JsonProperty]
-    public TimeSpan MinimumCaptureTime { get; }
-
-    [JsonProperty]
-    public int CapturePriceThreshold { get; }
-
-    [JsonProperty]
-    public float CapturePricePointsPerMinute { get; }
-
-    [JsonProperty]
-    public float VariantCaptureTimeBonusMinutes { get; }
-
-    [JsonProperty]
-    public IReadOnlyDictionary<int, float> PassiveProbabilityNoRandom { get; }
-
-    [JsonProperty]
     public IReadOnlyDictionary<int, float> PassiveProbabilityAtLeastN { get; }
-
-    [JsonProperty]
-    public IReadOnlyDictionary<int, float> PassiveProbabilityNoRandomAtLeastN { get; }
 
     [JsonProperty]
     public IReadOnlyDictionary<int, float> PassiveRandomAddedAtLeastN { get; }
@@ -200,12 +112,9 @@ public sealed class BreedingMechanics
     {
         ArgumentNullException.ThrowIfNull(pal);
 
-        var rarityModifier =
-            Math.Max(0, pal.Price - CapturePriceThreshold) /
-            CapturePricePointsPerMinute +
-            (pal.Id.IsVariant ? VariantCaptureTimeBonusMinutes : 0);
+        var rarityModifier = Math.Max(0, pal.Price - 1000) / 100.0f + (pal.Id.IsVariant ? 5.0f : 0);
 
-        return MinimumCaptureTime + TimeSpan.FromMinutes(rarityModifier);
+        return TimeSpan.FromMinutes(3) + TimeSpan.FromMinutes(rarityModifier);
     }
 
     /// <summary>
@@ -244,42 +153,7 @@ public sealed class BreedingMechanics
                 { 2, 0.6f },
                 { 3, 0.8f },
                 { 4, 1.0f },
-            },
-            minimumCaptureTime: TimeSpan.FromMinutes(3),
-            capturePriceThreshold: 1000,
-            capturePricePointsPerMinute: 100.0f,
-            variantCaptureTimeBonusMinutes: 5.0f,
-            passiveProbabilityNoRandom: new Dictionary<int, float>
-            {
-                { 4, 0.10f },
-                { 3, 0.08f },
-                { 2, 0.12f },
-                { 1, 0.16f },
-            },
-            passiveProbabilityAtLeastN: new Dictionary<int, float>
-            {
-                { 4, 0.10f },
-                { 3, 0.30f },
-                { 2, 0.60f },
-                { 1, 1.00f },
-            },
-            passiveProbabilityNoRandomAtLeastN:
-                new Dictionary<int, float>
-                {
-                    { 4, 0.10f },
-                    { 3, 0.12f },
-                    { 2, 0.24f },
-                    { 1, 0.40f },
-                },
-            passiveRandomAddedAtLeastN:
-                new Dictionary<int, float>
-                {
-                    { 4, 0.0f },
-                    { 3, 0.10f },
-                    { 2, 0.3f },
-                    { 1, 0.6f },
-                    { 0, 1.0f },
-                }
+            }
         );
 
     private float[] BuildDesiredIVProbabilities()

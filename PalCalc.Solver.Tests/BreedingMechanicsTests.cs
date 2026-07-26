@@ -14,11 +14,6 @@ public class BreedingMechanicsTests
 
         Assert.AreEqual(0.25f, mechanics.IVProbabilityDirect[3]);
         Assert.AreEqual(0.10f, mechanics.PassiveProbabilityDirect[4]);
-        Assert.AreEqual(0.10f, mechanics.PassiveProbabilityNoRandom[4]);
-        Assert.AreEqual(
-            0.12f,
-            mechanics.PassiveProbabilityNoRandomAtLeastN[3]
-        );
         Assert.AreEqual(0.30f, mechanics.PassiveProbabilityAtLeastN[3]);
         Assert.AreEqual(0.60f, mechanics.PassiveRandomAddedAtLeastN[1]);
         Assert.AreEqual(0.80f, mechanics.PassivesWildAtMostN[3]);
@@ -46,10 +41,6 @@ public class BreedingMechanicsTests
             1.0f / 3.0f,
             roundTripped.BreedingMechanics
                 .ProbabilityOfInheritingDesiredIVs(1)
-        );
-        Assert.AreEqual(
-            TimeSpan.FromMinutes(7),
-            roundTripped.BreedingMechanics.MinimumCaptureTime
         );
     }
 
@@ -252,17 +243,7 @@ public class BreedingMechanicsTests
                 defaults.PassiveRandomAddedProbability,
             passivesWildAtMostN:
                 passivesWildAtMostN ??
-                defaults.PassivesWildAtMostN,
-            minimumCaptureTime:
-                minimumCaptureTime ??
-                defaults.MinimumCaptureTime,
-            capturePriceThreshold:
-                capturePriceThreshold ??
-                defaults.CapturePriceThreshold,
-            capturePricePointsPerMinute:
-                defaults.CapturePricePointsPerMinute,
-            variantCaptureTimeBonusMinutes:
-                defaults.VariantCaptureTimeBonusMinutes
+                defaults.PassivesWildAtMostN
         );
     }
 }
