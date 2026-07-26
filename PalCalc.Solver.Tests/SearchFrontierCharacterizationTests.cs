@@ -18,7 +18,7 @@ public class SearchFrontierCharacterizationTests
         var slower = new TestPalReference("slower", targetPal, TimeSpan.FromMinutes(10));
         var frontier = FrontierFor(targetPal, [faster, slower]);
 
-        var results = frontier.Results.ToList();
+        var results = frontier.TerminalResults.Results.ToList();
 
         CollectionAssert.AreEquivalent(new[] { faster, slower }, results);
     }
@@ -108,7 +108,10 @@ public class SearchFrontierCharacterizationTests
 
         Assert.IsFalse(delta.Changed);
         Assert.IsFalse(frontier.CurrentContent.Contains(completedTarget));
-        CollectionAssert.Contains(frontier.Results.ToList(), completedTarget);
+        CollectionAssert.Contains(
+            frontier.TerminalResults.Results.ToList(),
+            completedTarget
+        );
     }
 
     [TestMethod]
@@ -128,7 +131,10 @@ public class SearchFrontierCharacterizationTests
 
         Assert.IsTrue(delta.Changed);
         CollectionAssert.Contains(frontier.CurrentContent.ToList(), incompleteTarget);
-        CollectionAssert.Contains(frontier.Results.ToList(), incompleteTarget);
+        CollectionAssert.Contains(
+            frontier.TerminalResults.Results.ToList(),
+            incompleteTarget
+        );
     }
 
     [TestMethod]

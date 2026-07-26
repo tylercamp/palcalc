@@ -21,7 +21,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
     private readonly int maxThreads;
     private readonly PalSpecifier target;
 
-    public IEnumerable<IPalReference> Results => resultAccumulator.Results;
+    public ResultAccumulator TerminalResults => resultAccumulator;
 
     public IEnumerable<IPalReference> CurrentContent => index.All;
 
