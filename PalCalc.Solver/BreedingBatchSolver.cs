@@ -30,29 +30,26 @@ namespace PalCalc.Solver
         public long NumProcessed;
     }
 
-    internal record struct BreedingSolverEfficiencyMetric(
-        TimeSpan Effort,
-        int GoldCost
-    );
-
     /// <summary>
     /// Represents the shared state of a single solver iteration.
     /// </summary>
     /// <param name="StepIndex">The current step num. being processed</param>
     /// <param name="Spec">The target pal being solved for</param>
     /// <param name="WorkingSet">The current set of finalized optimal pals</param>
-    /// <param name="WorkingOptimalTimesByPalId">
-    /// A rough map of pals and their properties, to the fastest time seen for that pair during this step.
+    /// <param name="WorkingEarlyCandidatesByPalId">
+    /// A rough map of breeding states to the candidate retained by cheap early
+    /// selection during this step.
     /// 
-    /// While the `WorkingSet` has the final say in which "optimal" pals are kept, this acts as an extra "soft"
-    /// set of optimal times to reduce the number results returned to the working set for processing.
+    /// While the `WorkingSet` and selection policy have the final say in which
+    /// alternatives are kept, this reduces the number returned for authoritative
+    /// processing.
     /// </param>
     internal record class BreedingSolverStepState(
         int StepIndex,
         PalSpecifier Spec,
         WorkingSet WorkingSet,
-        IBreedingStateKeyProvider StateKeyProvider,
-        FrozenDictionary<PalId, ConcurrentDictionary<BreedingStateKey, BreedingSolverEfficiencyMetric>> WorkingOptimalTimesByPalId
+        ICandidateSelectionPolicy SelectionPolicy,
+        FrozenDictionary<PalId, ConcurrentDictionary<BreedingStateKey, IPalReference>> WorkingEarlyCandidatesByPalId
     );
 
     /// <summary>
@@ -459,35 +456,68 @@ namespace PalCalc.Solver
                                 ivsProbability
                             );
 
-                            var workingOptimalResults = state.WorkingOptimalTimesByPalId[res.Pal.Id];
+                            var workingEarlyCandidates =
+                                state.WorkingEarlyCandidatesByPalId[res.Pal.Id];
 
                             var added = false;
                             var effort = res.BreedingEffort;
-                            var cost = res.TotalCost;
-                            var efficiency = new BreedingSolverEfficiencyMetric(effort, cost);
-                            var resultId = state.StateKeyProvider.KeyOf(res);
-                            bool isOptimal = state.WorkingSet.IsOptimal(res, resultId);
-                            if (effort <= settings.MaxEffort && (isOptimal || state.Spec.IsSatisfiedBy(res)))
+                            var resultId = state.SelectionPolicy.KeyOf(res);
+                            bool improvesFrontier =
+                                state.WorkingSet.IsFrontierImprovement(
+                                    res,
+                                    resultId
+                                );
+                            if (
+                                effort <= settings.MaxEffort &&
+                                (
+                                    improvesFrontier ||
+                                    state.Spec.IsSatisfiedBy(res)
+                                )
+                            )
                             {
-                                bool updated = workingOptimalResults.TryAdd(resultId, efficiency);
-                                while (!updated)
+                                bool accepted = workingEarlyCandidates.TryAdd(
+                                    resultId,
+                                    res
+                                );
+                                while (!accepted)
                                 {
-                                    var v = workingOptimalResults[resultId];
+                                    var incumbent = workingEarlyCandidates[resultId];
+                                    switch (
+                                        state.SelectionPolicy.SelectEarlyCandidate(
+                                            res,
+                                            incumbent
+                                        )
+                                    )
+                                    {
+                                        case EarlyCandidateSelection.RejectCandidate:
+                                            break;
 
-                                    if (v.Effort < effort) break;
-                                    if (v.Effort == effort && v.GoldCost < cost) break;
+                                        case EarlyCandidateSelection.KeepBoth:
+                                            accepted = true;
+                                            break;
 
-                                    updated = workingOptimalResults.TryUpdate(resultId, efficiency, v);
+                                        case EarlyCandidateSelection.ReplaceIncumbent:
+                                            accepted = workingEarlyCandidates.TryUpdate(
+                                                resultId,
+                                                res,
+                                                incumbent
+                                            );
+                                            if (!accepted)
+                                                continue;
+                                            break;
+                                    }
+
+                                    break;
                                 }
 
-                                if (updated && res.BreedingEffort <= settings.MaxEffort)
+                                if (accepted && res.BreedingEffort <= settings.MaxEffort)
                                 {
                                     newPassivesRef.Retain();
 
                                     yield return res;
                                     added = true;
 
-                                    if (isOptimal)
+                                    if (improvesFrontier)
                                     {
                                         var oldContent = state.WorkingSet.CurrentStateIndex[resultId];
                                         if (oldContent != null)

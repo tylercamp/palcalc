@@ -167,11 +167,10 @@ namespace PalCalc.Solver
 
             var workingSet = new WorkingSet(
                 spec,
-                settings.PruningBuilder,
                 BuildInitialContent(spec),
                 settings.MaxThreads,
                 controller,
-                context.StateKeyProvider
+                context.SelectionPolicy
             );
             var batchExecutor = new ParallelBatchExecutor(context, stateUpdateInterval);
 
@@ -185,12 +184,12 @@ namespace PalCalc.Solver
                     StepIndex: s,
                     Spec: spec,
                     WorkingSet: workingSet,
-                    StateKeyProvider: context.StateKeyProvider,
-                    WorkingOptimalTimesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(
+                    SelectionPolicy: context.SelectionPolicy,
+                    WorkingEarlyCandidatesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(
                         id => id,
                         _ => new ConcurrentDictionary<
                             BreedingStateKey,
-                            BreedingSolverEfficiencyMetric
+                            IPalReference
                         >()
                     )
                 );

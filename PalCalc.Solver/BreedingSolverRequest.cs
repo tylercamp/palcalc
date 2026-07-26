@@ -23,32 +23,40 @@ internal sealed class SolverRunContext
     private SolverRunContext(
         PalSpecifier target,
         BreedingSolverSettings settings,
-        SolverStateController controller
+        SolverStateController controller,
+        ICandidateSelectionPolicy selectionPolicy
     )
     {
         Target = target;
         Settings = settings;
         Controller = controller;
-        StateKeyProvider = DefaultBreedingStateKeyProvider.Instance;
+        SelectionPolicy = selectionPolicy;
     }
 
     public PalSpecifier Target { get; }
     public BreedingSolverSettings Settings { get; }
     public SolverStateController Controller { get; }
-    public IBreedingStateKeyProvider StateKeyProvider { get; }
+    public ICandidateSelectionPolicy SelectionPolicy { get; }
 
     public static SolverRunContext Create(
         BreedingSolverRequest request,
-        SolverStateController controller
+        SolverStateController controller,
+        ICandidateSelectionPolicy selectionPolicy = null
     )
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(controller);
 
+        selectionPolicy ??= new DefaultCandidateSelectionPolicy(
+            request.Settings.PruningBuilder,
+            controller.CancellationToken
+        );
+
         return new(
             target: request.Target,
             settings: request.Settings,
-            controller: controller
+            controller: controller,
+            selectionPolicy: selectionPolicy
         );
     }
 }

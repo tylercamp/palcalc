@@ -112,17 +112,17 @@ public class ParallelBatchExecutorTests
         );
         var workingSet = new WorkingSet(
             target,
-            configuredSolver.Settings.PruningBuilder,
             [healthyReference],
             configuredSolver.Settings.MaxThreads,
-            controller
+            controller,
+            context.SelectionPolicy
         );
         var stepState = new BreedingSolverStepState(
             StepIndex: 0,
             Spec: target,
             WorkingSet: workingSet,
-            StateKeyProvider: context.StateKeyProvider,
-            WorkingOptimalTimesByPalId: configuredSolver
+            SelectionPolicy: context.SelectionPolicy,
+            WorkingEarlyCandidatesByPalId: configuredSolver
                 .Settings
                 .DB
                 .PalsById
@@ -131,7 +131,7 @@ public class ParallelBatchExecutorTests
                     id => id,
                     _ => new ConcurrentDictionary<
                         BreedingStateKey,
-                        BreedingSolverEfficiencyMetric
+                        IPalReference
                     >()
                 )
         );

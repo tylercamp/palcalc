@@ -1,16 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using PalCalc.Model;
+﻿using PalCalc.Model;
 using PalCalc.Solver.PalReference;
-using PalCalc.Solver.ResultPruning;
 using Serilog;
-using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PalCalc.Solver
 {
@@ -18,19 +8,24 @@ namespace PalCalc.Solver
     {
         private static ILogger logger = Log.ForContext<WorkingSet>();
 
-        private SolverStateController controller;
-        private IBreedingStateKeyProvider stateKeyProvider;
-        private BreedingStateIndex content;
+        private readonly SolverStateController controller;
+        private readonly ICandidateSelectionPolicy selectionPolicy;
+        private readonly BreedingStateIndex content;
         private ILazyCartesianProduct<IPalReference> remainingParentPairs;
 
-        int maxThreads;
-        PalSpecifier target;
-        private List<IPalReference> discoveredResults = new List<IPalReference>();
+        private readonly int maxThreads;
+        private readonly PalSpecifier target;
+        private readonly List<IPalReference> discoveredResults = [];
         public IEnumerable<IPalReference> Result
         {
             get
             {
-                return discoveredResults.Distinct().GroupBy(r => r.BreedingEffort).SelectMany(g => PruningFunc(g, new CachedResultData(g)));
+                return discoveredResults
+                    .Distinct()
+                    .GroupBy(selectionPolicy.ResultTierOf)
+                    .SelectMany(group =>
+                        selectionPolicy.SelectRetainedAlternatives(group)
+                    );
             }
         }
         
@@ -38,26 +33,21 @@ namespace PalCalc.Solver
 
         public BreedingStateIndex CurrentStateIndex => content;
 
-        Func<IEnumerable<IPalReference>, CachedResultData, IEnumerable<IPalReference>> PruningFunc;
-
         public WorkingSet(
             PalSpecifier target,
-            PruningRulesBuilder pruningRulesBuilder,
             IEnumerable<IPalReference> initialContent,
             int maxThreads,
             SolverStateController controller,
-            IBreedingStateKeyProvider stateKeyProvider = null
+            ICandidateSelectionPolicy selectionPolicy
         )
         {
+            ArgumentNullException.ThrowIfNull(selectionPolicy);
+
             this.target = target;
             this.controller = controller;
-            this.stateKeyProvider =
-                stateKeyProvider ??
-                DefaultBreedingStateKeyProvider.Instance;
+            this.selectionPolicy = selectionPolicy;
 
-            PruningFunc = pruningRulesBuilder.BuildAggregate(controller.CancellationToken).Apply;
-
-            content = new BreedingStateIndex(this.stateKeyProvider);
+            content = new BreedingStateIndex(this.selectionPolicy);
             content.AddRange(initialContent);
 
             discoveredResults.AddRange(content.All.Where(target.IsSatisfiedBy));
@@ -70,42 +60,14 @@ namespace PalCalc.Solver
             this.maxThreads = maxThreads;
         }
 
-        public bool IsOptimal(IPalReference reference) =>
-            IsOptimal(reference, stateKeyProvider.KeyOf(reference));
-
-        public bool IsOptimal(
+        public bool IsFrontierImprovement(
             IPalReference reference,
             BreedingStateKey stateKey
         )
         {
-            int TotalMaxValue(IV_Set ivs) => ivs.Attack.Max + ivs.Defense.Max + ivs.HP.Max;
-            int TotalMinValue(IV_Set ivs) => ivs.Attack.Min + ivs.Defense.Min + ivs.HP.Min;
-
             var match = content[stateKey]?.FirstOrDefault();
-            if (match == null) return true;
-
-            switch (reference.BreedingEffort.CompareTo(match.BreedingEffort))
-            {
-                // pick the one with lower effort
-                case -1: return true;
-                case 1: return false;
-            }
-
-            switch (reference.TotalCost.CompareTo(match.TotalCost))
-            {
-                // pick the one with lower cost
-                case -1: return true;
-                case 1: return false;
-            }
-
-            switch (TotalMaxValue(reference.IVs).CompareTo(TotalMaxValue(match.IVs)))
-            {
-                // pick the one with higher IVs
-                case 1: return true;
-                case -1: return false;
-                // same max IVs between the two, `p` is optimal if its avg IVs are higher
-                default: return TotalMinValue(reference.IVs) > TotalMinValue(match.IVs);
-            }
+            return match == null ||
+                selectionPolicy.IsFrontierImprovement(reference, match);
         }
 
         /// <summary>
@@ -128,7 +90,15 @@ namespace PalCalc.Solver
             existingContent.RemoveAll(changeset.Removed.Contains);
             
             remainingParentPairs = new ConcatenatedLazyCartesianProduct<IPalReference>([
-                (existingContent.OrderBy(p => p.BreedingEffort).ToList(), changeset.Added),
+                (
+                    existingContent
+                        .OrderBy(
+                            reference => reference,
+                            selectionPolicy.ExpansionPriorityComparer
+                        )
+                        .ToList(),
+                    changeset.Added
+                ),
                 (changeset.Added, changeset.Added)
             ]);
 
@@ -154,7 +124,13 @@ namespace PalCalc.Solver
             var newItems = doWork(content.All).ToList();
             if (!newItems.Any()) return false;
 
-            var existingContent = content.All.OrderBy(p => p.BreedingEffort).ToList();
+            var existingContent = content
+                .All
+                .OrderBy(
+                    reference => reference,
+                    selectionPolicy.ExpansionPriorityComparer
+                )
+                .ToList();
             var changeset = MergeWithResults(newItems);
             existingContent.RemoveAll(changeset.Removed.Contains);
 
@@ -182,12 +158,10 @@ namespace PalCalc.Solver
                     if (controller.IsPaused) controller.PauseIfRequested();
                     return !controller.CancellationToken.IsCancellationRequested;
                 })
-                .GroupBy(stateKeyProvider.KeyOf)
+                .GroupBy(selectionPolicy.KeyOf)
                 .SelectMany(g =>
-                {
-                    var group = g.Distinct().ToList();
-                    return PruningFunc(group, new CachedResultData(group));
-                });
+                    selectionPolicy.SelectRetainedAlternatives(g)
+                );
 
         private record class MergeChangeset(bool Changed, List<IPalReference> Added, HashSet<IPalReference> Removed);
 
@@ -231,7 +205,7 @@ namespace PalCalc.Solver
 
             foreach (
                 var newGroup in pruned
-                    .GroupBy(stateKeyProvider.KeyOf)
+                    .GroupBy(selectionPolicy.KeyOf)
                     .ToList()
             )
             {
@@ -260,7 +234,8 @@ namespace PalCalc.Solver
                 if (refInst != null)
                 {
                     var allInstances = existingInstances.Concat(newInstances.Except(existingInstances));
-                    var newSelection = PruningFunc(allInstances, new CachedResultData(allInstances));
+                    var newSelection =
+                        selectionPolicy.SelectRetainedAlternatives(allInstances);
 
                     var added = newInstances.Intersect(newSelection).Except(existingInstances);
                     var removed = existingInstances.Except(newSelection);
@@ -289,10 +264,15 @@ namespace PalCalc.Solver
             }
 
             
-            // sort by breeding effort so the most efficient parents are bred to produce new efficient children
-            // early on. newly-discovered efficient children will quickly invalidate less efficient parents in the
-            // set and allow them to be skipped as the breeding continues
-            allAdded = allAdded.OrderBy(p => p.BreedingEffort).ToList();
+            // Apply the policy's expansion priority. With the default policy,
+            // newly-discovered efficient children are processed early so they
+            // can invalidate less efficient parents.
+            allAdded = allAdded
+                .OrderBy(
+                    reference => reference,
+                    selectionPolicy.ExpansionPriorityComparer
+                )
+                .ToList();
 
             return new MergeChangeset(changed, allAdded, new HashSet<IPalReference>(allRemoved));
         }

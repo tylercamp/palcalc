@@ -167,21 +167,28 @@ public class WorkingSetCharacterizationTests
         Pal targetPal,
         IEnumerable<IPalReference> initialContent,
         IEnumerable<PassiveSkill>? optionalPassives = null
-    ) =>
-        new(
+    )
+    {
+        var controller = new SolverStateController
+        {
+            CancellationToken = CancellationToken.None,
+        };
+
+        return new(
             target: new PalSpecifier
             {
                 Pal = targetPal,
                 OptionalPassives = optionalPassives?.ToList() ?? [],
             },
-            pruningRulesBuilder: MinimumEffortOnly,
             initialContent: initialContent,
             maxThreads: 1,
-            controller: new SolverStateController
-            {
-                CancellationToken = CancellationToken.None,
-            }
+            controller: controller,
+            selectionPolicy: new DefaultCandidateSelectionPolicy(
+                MinimumEffortOnly,
+                controller.CancellationToken
+            )
         );
+    }
 
     /*
      * Deliberately minimal reference used to characterize WorkingSet mechanics without
