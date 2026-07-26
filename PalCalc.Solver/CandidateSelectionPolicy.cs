@@ -58,22 +58,22 @@ internal static class CandidateSelectionPolicyExtensions
 
 internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolicy
 {
-    private readonly IResultPruning retainedAlternativeSelection;
+    private readonly ResultPruningRule retainedAlternativeSelection;
     private readonly IBreedingStateKeyProvider stateKeyProvider;
 
     public DefaultCandidateSelectionPolicy(
-        PruningRulesBuilder pruningRules,
+        ResultPruningPolicy resultPruning,
         CancellationToken cancellationToken,
         IBreedingStateKeyProvider stateKeyProvider = null
     )
     {
-        ArgumentNullException.ThrowIfNull(pruningRules);
+        ArgumentNullException.ThrowIfNull(resultPruning);
 
         this.stateKeyProvider =
             stateKeyProvider ??
             DefaultBreedingStateKeyProvider.Instance;
         retainedAlternativeSelection =
-            pruningRules.BuildAggregate(cancellationToken);
+            resultPruning.Create(cancellationToken);
     }
 
     public IComparer<IPalReference> ExpansionPriorityComparer { get; } =
@@ -88,8 +88,8 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     /// Lower breeding effort is a safe primary-objective dominance decision.
     /// The cost tie-break and replacement of exact ties preserve the existing
     /// heuristic; cost is later than other rules in authoritative selection,
-    /// so this portion is intentionally legacy-compatible rather than a proof
-    /// of full dominance.
+    /// so this comparison is an admission optimization rather than a proof of
+    /// full dominance.
     /// </summary>
     public EarlyCandidateSelection SelectEarlyCandidate(
         IPalReference candidate,

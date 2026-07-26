@@ -7,8 +7,8 @@ namespace PalCalc.Solver;
 
 internal readonly record struct ParallelBatchProgress(
     long WorkProcessedCount,
-    bool Paused,
-    bool Canceled
+    bool IsPaused,
+    bool IsCanceled
 );
 
 internal readonly record struct ParallelBatchExecutionResult(
@@ -52,8 +52,8 @@ internal sealed class ParallelBatchExecutor(
             {
                 var progress = new ParallelBatchProgress(
                     WorkProcessedCount: ProcessedCount(),
-                    Paused: controller.IsPaused,
-                    Canceled: controller.CancellationToken.IsCancellationRequested
+                    IsPaused: controller.IsPaused,
+                    IsCanceled: controller.CancellationToken.IsCancellationRequested
                 );
 
                 if (progress == lastProgress)

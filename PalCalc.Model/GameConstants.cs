@@ -50,70 +50,8 @@ namespace PalCalc.Model
          * - What's the formula for how long breeding will take?
          * - What's the probability of wild pals having a specific gender?
          * - What's the probability of wild pals having exactly N passives?
-         */
-
-        public static readonly int MaxTotalPassives = 4;
-
-        // (note: changing these from dictionaries to arrays has negligible impact on performance. dictionaries are more legible in this case)
-
-        // Compatibility accessors for mechanics which are now owned by PalDB.
-        // Solver runs use their PalDB's mechanics rather than these defaults.
-        public static IReadOnlyDictionary<int, float> IVProbabilityDirect =>
-            BreedingMechanics.Default.IVProbabilityDirect;
-
-        // roughly estimate time to catch a given pal
-        public static TimeSpan TimeToCatch(Pal pal) =>
-            BreedingMechanics.Default.TimeToCatch(pal);
-
-        // https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/
-        // supposedly the child will always inherit at least 1 passive directly from a parent?
-
-        /*
-         * TODO - Could scrape some of this from game files - `BP_PalGameSetting`
-              "Combi_TalentInheritNum": [
-                3.0,
-                2.0,
-                1.0
-              ],
-              "Combi_PassiveInheritNum": [
-                4.0,
-                3.0,
-                2.0,
-                1.0
-              ],
-              "Combi_PassiveRandomAddNum": [
-                4.0,
-                3.0,
-                2.0,
-                1.0
-              ],
         */
 
-        // probability of getting N passives from parent pool
-        public static IReadOnlyDictionary<int, float> PassiveProbabilityDirect =>
-            BreedingMechanics.Default.PassiveProbabilityDirect;
-
-        // probability of getting N passives from parent pool without any random passives
-        public static IReadOnlyDictionary<int, float> PassiveProbabilityNoRandom =>
-            BreedingMechanics.Default.PassiveProbabilityNoRandom;
-
-        public static IReadOnlyDictionary<int, float> PassiveProbabilityAtLeastN =>
-            BreedingMechanics.Default.PassiveProbabilityAtLeastN;
-
-        public static IReadOnlyDictionary<int, float> PassiveProbabilityNoRandomAtLeastN =>
-            BreedingMechanics.Default.PassiveProbabilityNoRandomAtLeastN;
-
-        // probability of getting N additional random passives added
-        public static IReadOnlyDictionary<int, float> PassiveRandomAddedProbability =>
-            BreedingMechanics.Default.PassiveRandomAddedProbability;
-
-        public static IReadOnlyDictionary<int, float> PassiveRandomAddedAtLeastN =>
-            BreedingMechanics.Default.PassiveRandomAddedAtLeastN;
-
-        // probability of a wild pal having, at most, N random passives
-        // (assume equal probability of gaining anywhere from 0 through 4 random passives)
-        // (20% chance of exactly N passives)
-        public static IReadOnlyDictionary<int, float> PassivesWildAtMostN =>
-            BreedingMechanics.Default.PassivesWildAtMostN;
+        public static readonly int MaxTotalPassives = 4;
     }
 }

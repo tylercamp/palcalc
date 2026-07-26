@@ -1,31 +1,35 @@
-﻿using Newtonsoft.Json.Bson;
-using Newtonsoft.Json.Linq;
-using PalCalc.Model;
 using PalCalc.Solver.PalReference;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PalCalc.Solver.ResultPruning
 {
-    public class CachedResultData(IEnumerable<IPalReference> results)
+    public sealed class CachedResultData(
+        IEnumerable<IPalReference> results
+    )
     {
-        public Dictionary<IPalReference, List<IPalReference>> InnerReferences { get; } = results.ToDictionary(r => r, r => r.AllReferences().ToList());
+        public Dictionary<
+            IPalReference,
+            List<IPalReference>
+        > InnerReferences
+        { get; } =
+            results.ToDictionary(
+                result => result,
+                result => result.AllReferences().ToList()
+            );
     }
 
-    public abstract class IResultPruning
+    public abstract class ResultPruningRule
     {
-        protected CancellationToken token;
-        public IResultPruning(CancellationToken token)
+        protected readonly CancellationToken token;
+
+        protected ResultPruningRule(CancellationToken token)
         {
             this.token = token;
         }
 
-        public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData);
+        public abstract IEnumerable<IPalReference> Apply(
+            IEnumerable<IPalReference> results,
+            CachedResultData cachedData
+        );
 
         protected IEnumerable<IPalReference> MinGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)
         {
@@ -73,14 +77,20 @@ namespace PalCalc.Solver.ResultPruning
             }
         }
 
-        public abstract class ForceDeterministic : IResultPruning
+        public abstract class ForceDeterministic : ResultPruningRule
         {
             protected ForceDeterministic(CancellationToken token) : base(token)
             {
             }
 
-            public sealed override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
-                ApplyNonDeterministic(results.OrderBy(r => r.GetHashCode()), cachedData);
+            public sealed override IEnumerable<IPalReference> Apply(
+                IEnumerable<IPalReference> results,
+                CachedResultData cachedData
+            ) =>
+                ApplyNonDeterministic(
+                    results.OrderBy(result => result.GetHashCode()),
+                    cachedData
+                );
 
             protected abstract IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results, CachedResultData cachedData);
         }

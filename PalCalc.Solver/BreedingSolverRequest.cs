@@ -7,17 +7,25 @@ namespace PalCalc.Solver;
 /// </summary>
 public sealed class BreedingSolverRequest
 {
+    private readonly PalSpecifier target;
+
     public BreedingSolverRequest(PalSpecifier target, BreedingSolverSettings settings)
     {
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(settings);
 
-        Target = target.NormalizedCopy();
+        this.target = target.NormalizedCopy();
         Settings = settings;
     }
 
-    internal PalSpecifier Target { get; }
-    internal BreedingSolverSettings Settings { get; }
+    /// <summary>
+    /// Returns a copy of the normalized target captured by this request.
+    /// </summary>
+    public PalSpecifier Target => target.NormalizedCopy();
+
+    public BreedingSolverSettings Settings { get; }
+
+    internal PalSpecifier CapturedTarget => target;
 }
 
 internal sealed class SolverRunContext
@@ -53,12 +61,12 @@ internal sealed class SolverRunContext
         ArgumentNullException.ThrowIfNull(controller);
 
         selectionPolicy ??= new DefaultCandidateSelectionPolicy(
-            request.Settings.PruningBuilder,
+            request.Settings.ResultPruning,
             controller.CancellationToken
         );
 
         return new(
-            target: request.Target,
+            target: request.CapturedTarget,
             settings: request.Settings,
             // Mechanics is immutable. Capturing the current PalDB-owned value
             // makes replacing it affect later runs without changing this run.

@@ -1,22 +1,23 @@
-﻿using PalCalc.Solver.PalReference;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PalCalc.Solver.PalReference;
 
 namespace PalCalc.Solver.ResultPruning
 {
-    public class AggregatePruning : IResultPruning
+    internal sealed class AggregatePruning : ResultPruningRule
     {
-        List<IResultPruning> contents;
+        private readonly IReadOnlyList<ResultPruningRule> contents;
 
-        public AggregatePruning(CancellationToken token, IEnumerable<IResultPruning> contents) : base(token)
+        public AggregatePruning(CancellationToken token, IEnumerable<ResultPruningRule> contents) : base(token)
         {
             this.contents = contents.ToList();
         }
 
-        public override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
-            contents.Aggregate(results, (r, p) => p.Apply(r, cachedData));
+        public override IEnumerable<IPalReference> Apply(
+            IEnumerable<IPalReference> results,
+            CachedResultData cachedData
+        ) =>
+            contents.Aggregate(
+                results,
+                (retained, rule) => rule.Apply(retained, cachedData)
+            );
     }
 }

@@ -1,4 +1,4 @@
-﻿using PalCalc.Model;
+using PalCalc.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace PalCalc.Solver.Tests
         {
             Assert.AreEqual(
                 1,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     new IV_Set { HP = RealValue_Irrelevant, Attack = RealValue_Irrelevant, Defense = RealValue_Irrelevant },
                     new IV_Set { HP = RealValue_Irrelevant, Attack = RealValue_Irrelevant, Defense = RealValue_Irrelevant }
                 )
@@ -33,7 +33,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 1,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     new IV_Set { HP = RandomValue, Attack = RandomValue, Defense = RandomValue },
                     new IV_Set { HP = RandomValue, Attack = RandomValue, Defense = RandomValue }
                 )
@@ -47,7 +47,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[1] // inherited 1 IV
+                    BreedingMechanics.Default.IVProbabilityDirect[1] // inherited 1 IV
                     *
                     (1 / 3.0) // it was the HP IV
                     *
@@ -55,7 +55,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (2 / 3.0) // one of them was the HP IV
                     *
@@ -63,7 +63,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get the HP IV
                     *
@@ -73,7 +73,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant),
                     MkIVs()
                 ),
@@ -82,7 +82,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(),
                     MkIVs(hp: RealValue_Relevant)
                 ),
@@ -95,7 +95,7 @@ namespace PalCalc.Solver.Tests
         {
             Assert.AreEqual(
                 (
-                    GameConstants.IVProbabilityDirect[1] // inherited 1 IV
+                    BreedingMechanics.Default.IVProbabilityDirect[1] // inherited 1 IV
                     *
                     (1 / 3.0) // it was the HP IV
                     *
@@ -103,7 +103,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (2 / 3.0) // one of them was the HP IV
                     *
@@ -111,13 +111,13 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get the HP IV
                     *
                     (2 / 2.0) // either parent is ok
                 ),
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant)
                 ),
@@ -130,7 +130,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[1] // inherited 1 IV
+                    BreedingMechanics.Default.IVProbabilityDirect[1] // inherited 1 IV
                     *
                     (1 / 3.0) // it was the Attack IV
                     *
@@ -138,7 +138,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (2 / 3.0) // one of them was the Attack IV
                     *
@@ -146,7 +146,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get the Attack IV
                     *
@@ -156,7 +156,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant),
                     MkIVs()
                 ),
@@ -165,7 +165,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(),
                     MkIVs(attack: RealValue_Relevant)
                 ),
@@ -178,7 +178,7 @@ namespace PalCalc.Solver.Tests
         {
             Assert.AreEqual(
                 (
-                    GameConstants.IVProbabilityDirect[1] // inherited 1 IV
+                    BreedingMechanics.Default.IVProbabilityDirect[1] // inherited 1 IV
                     *
                     (1 / 3.0) // it was the Attack IV
                     *
@@ -186,7 +186,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (2 / 3.0) // one of them was the Attack IV
                     *
@@ -194,13 +194,13 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get the Attack IV
                     *
                     (2 / 2.0) // either parent is ok
                 ),
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant)
                 ),
@@ -213,7 +213,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[1] // inherited 1 IV
+                    BreedingMechanics.Default.IVProbabilityDirect[1] // inherited 1 IV
                     *
                     (1 / 3.0) // it was the Defense IV
                     *
@@ -221,7 +221,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (2 / 3.0) // one of them was the Defense IV
                     *
@@ -229,7 +229,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get the Defense IV
                     *
@@ -239,7 +239,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(defense: RealValue_Relevant),
                     MkIVs()
                 ),
@@ -248,7 +248,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(),
                     MkIVs(defense: RealValue_Relevant)
                 ),
@@ -261,7 +261,7 @@ namespace PalCalc.Solver.Tests
         {
             Assert.AreEqual(
                 (
-                    GameConstants.IVProbabilityDirect[1] // inherited 1 IV
+                    BreedingMechanics.Default.IVProbabilityDirect[1] // inherited 1 IV
                     *
                     (1 / 3.0) // it was the Defense IV
                     *
@@ -269,7 +269,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (2 / 3.0) // one of them was the Defense IV
                     *
@@ -277,13 +277,13 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get the Defense IV
                     *
                     (2 / 2.0) // either parent is ok
                 ),
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(defense: RealValue_Relevant),
                     MkIVs(defense: RealValue_Relevant)
                 ),
@@ -300,7 +300,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                     (
-                        GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                        BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                         *
                         (1 / 3.0) // they're the desired IVs
                         *
@@ -312,7 +312,7 @@ namespace PalCalc.Solver.Tests
                     )
                     + // OR
                     (
-                        GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                        BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                         *
                         (3 / 3.0) // will always get both IVs
                         *
@@ -326,7 +326,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
                     MkIVs()
                 ),
@@ -335,7 +335,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant)
                 ),
@@ -344,7 +344,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant)
                 ),
@@ -353,7 +353,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(),
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
                 ),
@@ -366,7 +366,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (1 / 3.0) // they're the desired IVs
                     *
@@ -378,7 +378,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get both IVs
                     *
@@ -392,7 +392,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant)
                 ),
@@ -401,7 +401,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
                 ),
@@ -414,7 +414,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (1 / 3.0) // they're the desired IVs
                     *
@@ -426,7 +426,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get both IVs
                     *
@@ -440,7 +440,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant)
                 ),
@@ -449,7 +449,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
                 ),
@@ -462,7 +462,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (1 / 3.0) // they're the desired IVs
                     *
@@ -474,7 +474,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get both IVs
                     *
@@ -488,7 +488,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
                 ),
@@ -505,7 +505,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                     (
-                        GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                        BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                         *
                         (1 / 3.0) // they're the desired IVs
                         *
@@ -517,7 +517,7 @@ namespace PalCalc.Solver.Tests
                     )
                     + // OR
                     (
-                        GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                        BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                         *
                         (3 / 3.0) // will always get both IVs
                         *
@@ -531,7 +531,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs()
                 ),
@@ -540,7 +540,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(defense: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant)
                 ),
@@ -549,7 +549,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant),
                     MkIVs(defense: RealValue_Relevant)
                 ),
@@ -558,7 +558,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(),
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -571,7 +571,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (1 / 3.0) // they're the desired IVs
                     *
@@ -583,7 +583,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get both IVs
                     *
@@ -597,7 +597,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant)
                 ),
@@ -606,7 +606,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -619,7 +619,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (1 / 3.0) // they're the desired IVs
                     *
@@ -631,7 +631,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get both IVs
                     *
@@ -645,7 +645,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(defense: RealValue_Relevant)
                 ),
@@ -654,7 +654,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(defense: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -667,7 +667,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (1 / 3.0) // they're the desired IVs
                     *
@@ -679,7 +679,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get both IVs
                     *
@@ -693,7 +693,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -710,7 +710,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                     (
-                        GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                        BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                         *
                         (1 / 3.0) // they're the desired IVs
                         *
@@ -722,7 +722,7 @@ namespace PalCalc.Solver.Tests
                     )
                     + // OR
                     (
-                        GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                        BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                         *
                         (3 / 3.0) // will always get both IVs
                         *
@@ -736,7 +736,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs()
                 ),
@@ -745,7 +745,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(defense: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant)
                 ),
@@ -754,7 +754,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant),
                     MkIVs(defense: RealValue_Relevant)
                 ),
@@ -763,7 +763,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(),
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -776,7 +776,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (1 / 3.0) // they're the desired IVs
                     *
@@ -788,7 +788,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get both IVs
                     *
@@ -802,7 +802,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant)
                 ),
@@ -811,7 +811,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -824,7 +824,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (1 / 3.0) // they're the desired IVs
                     *
@@ -836,7 +836,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get both IVs
                     *
@@ -850,7 +850,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(defense: RealValue_Relevant)
                 ),
@@ -859,7 +859,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(defense: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -872,7 +872,7 @@ namespace PalCalc.Solver.Tests
         {
             var probability = (
                 (
-                    GameConstants.IVProbabilityDirect[2] // inherited 2 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[2] // inherited 2 IVs
                     *
                     (1 / 3.0) // they're the desired IVs
                     *
@@ -884,7 +884,7 @@ namespace PalCalc.Solver.Tests
                 )
                 + // OR
                 (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (3 / 3.0) // will always get both IVs
                     *
@@ -898,7 +898,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -914,7 +914,7 @@ namespace PalCalc.Solver.Tests
         public void IVs_HP_1_Atk_1_Def_1()
         {
             var probability = (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (
                         (1 / 2.0) // first is from the desired parent
@@ -927,7 +927,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs()
                 ),
@@ -936,7 +936,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant)
                 ),
@@ -945,7 +945,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant)
                 ),
@@ -954,7 +954,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
                     MkIVs(defense: RealValue_Relevant)
                 ),
@@ -963,7 +963,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(defense: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
                 ),
@@ -972,7 +972,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -981,7 +981,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -990,7 +990,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(),
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -1002,7 +1002,7 @@ namespace PalCalc.Solver.Tests
         public void IVs_HP_2_Atk_1_Def_1()
         {
             var probability = (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (
                         (2 / 2.0) // first is from the desired parent
@@ -1015,7 +1015,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant)
                 ),
@@ -1024,7 +1024,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
                 ),
@@ -1033,7 +1033,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -1042,7 +1042,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -1054,7 +1054,7 @@ namespace PalCalc.Solver.Tests
         public void IVs_HP_1_Atk_2_Def_1()
         {
             var probability = (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (
                         (1 / 2.0) // first is from the desired parent
@@ -1067,7 +1067,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant, hp: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant)
                 ),
@@ -1076,7 +1076,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant, hp: RealValue_Relevant)
                 ),
@@ -1085,7 +1085,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant, hp: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -1094,7 +1094,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant, hp: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -1106,7 +1106,7 @@ namespace PalCalc.Solver.Tests
         public void IVs_HP_1_Atk_1_Def_2()
         {
             var probability = (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (
                         (1 / 2.0) // first is from the desired parent
@@ -1119,7 +1119,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(defense: RealValue_Relevant, hp: RealValue_Relevant, attack: RealValue_Relevant),
                     MkIVs(defense: RealValue_Relevant)
                 ),
@@ -1128,7 +1128,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(defense: RealValue_Relevant, hp: RealValue_Relevant),
                     MkIVs(defense: RealValue_Relevant, attack: RealValue_Relevant)
                 ),
@@ -1137,7 +1137,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(defense: RealValue_Relevant, attack: RealValue_Relevant),
                     MkIVs(defense: RealValue_Relevant, hp: RealValue_Relevant)
                 ),
@@ -1146,7 +1146,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(defense: RealValue_Relevant),
                     MkIVs(defense: RealValue_Relevant, hp: RealValue_Relevant, attack: RealValue_Relevant)
                 ),
@@ -1158,7 +1158,7 @@ namespace PalCalc.Solver.Tests
         public void IVs_HP_2_Atk_2_Def_1()
         {
             var probability = (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (
                         (2 / 2.0) // first is from the desired parent
@@ -1171,7 +1171,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
                 ),
@@ -1180,7 +1180,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -1192,7 +1192,7 @@ namespace PalCalc.Solver.Tests
         public void IVs_HP_2_Atk_1_Def_2()
         {
             var probability = (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (
                         (2 / 2.0) // first is from the desired parent
@@ -1205,7 +1205,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant, attack: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -1214,7 +1214,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant, attack: RealValue_Relevant)
                 ),
@@ -1226,7 +1226,7 @@ namespace PalCalc.Solver.Tests
         public void IVs_HP_1_Atk_2_Def_2()
         {
             var probability = (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (
                         (1 / 2.0) // first is from the desired parent
@@ -1239,7 +1239,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant, hp: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
                 ),
@@ -1248,7 +1248,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant, hp: RealValue_Relevant)
                 ),
@@ -1260,7 +1260,7 @@ namespace PalCalc.Solver.Tests
         public void IVs_HP_2_Atk_2_Def_2()
         {
             var probability = (
-                    GameConstants.IVProbabilityDirect[3] // inherited 3 IVs
+                    BreedingMechanics.Default.IVProbabilityDirect[3] // inherited 3 IVs
                     *
                     (
                         (2 / 2.0) // first is from the desired parent
@@ -1273,7 +1273,7 @@ namespace PalCalc.Solver.Tests
 
             Assert.AreEqual(
                 probability,
-                Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                Probabilities.IVs.ProbabilityInheritedTargetIVs(BreedingMechanics.Default,
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant),
                     MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant)
                 ),

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
@@ -29,7 +29,7 @@ namespace PalCalc.UI.ViewModel.Solver
             var settings = new BreedingSolverSettings(
                     gameSettings: new GameSettings(),
                     db: db,
-                    pruningBuilder: PruningRulesBuilder.Default,
+                    resultPruning: ResultPruningPolicy.Default,
                     ownedPals: saveGame.OwnedPals,
                     maxBreedingSteps: 3,
                     maxSolverIterations: 5,
@@ -59,8 +59,9 @@ namespace PalCalc.UI.ViewModel.Solver
             DisplayedResult = solver
                 .Solve(
                     new BreedingSolverRequest(targetInstance, settings),
-                    new SolverStateController { CancellationToken = CancellationToken.None }
+                    new SolverStateController(CancellationToken.None)
                 )
+                .Results
                 .MaxBy(r => r.NumTotalBreedingSteps);
 
             IVs = new IVSetViewModel(

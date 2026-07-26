@@ -31,7 +31,10 @@ namespace PalCalc.Solver.PalReference
 
         public override string ToString() => $"AddPassive({AddedPassive.Name})";
 
-        private static ConcurrentDictionary<PassiveSkill, AddPassiveSurgeryOperation> cachedOps = [];
+        private static readonly ConcurrentDictionary<
+            PassiveSkill,
+            AddPassiveSurgeryOperation
+        > cachedOps = [];
         public static AddPassiveSurgeryOperation NewCached(PassiveSkill addedPassive)
         {
 #if DEBUG_CHECKS
@@ -58,7 +61,10 @@ namespace PalCalc.Solver.PalReference
 
         public override string ToString() => $"ReplacePassive(rem: {RemovedPassive.Name}, add: {AddedPassive.Name})";
 
-        private static ConcurrentDictionary<int, ReplacePassiveSurgeryOperation> cachedOps = [];
+        private static readonly ConcurrentDictionary<
+            int,
+            ReplacePassiveSurgeryOperation
+        > cachedOps = [];
         public static ReplacePassiveSurgeryOperation NewCached(PassiveSkill removedPassive, PassiveSkill addedPassive)
         {
 #if DEBUG_CHECKS

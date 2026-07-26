@@ -39,22 +39,10 @@ namespace PalCalc.Solver.Probabilities
         /// </remarks>
         /// 
         public static float ProbabilityInheritedTargetPassives(
+            BreedingMechanics mechanics,
             List<PassiveSkill> parentPassives,
             List<PassiveSkill> desiredParentPassives,
             int numFinalPassives
-        ) =>
-            ProbabilityInheritedTargetPassives(
-                parentPassives,
-                desiredParentPassives,
-                numFinalPassives,
-                BreedingMechanics.Default
-            );
-
-        public static float ProbabilityInheritedTargetPassives(
-            List<PassiveSkill> parentPassives,
-            List<PassiveSkill> desiredParentPassives,
-            int numFinalPassives,
-            BreedingMechanics mechanics
         )
         {
             ArgumentNullException.ThrowIfNull(mechanics);

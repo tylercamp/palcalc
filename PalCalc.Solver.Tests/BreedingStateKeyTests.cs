@@ -6,14 +6,6 @@ namespace PalCalc.Solver.Tests;
 [TestClass]
 public class BreedingStateKeyTests
 {
-    private static readonly PalProperty.GroupIdFn LegacyGroupId =
-        PalProperty.Combine(
-            PalProperty.Pal,
-            PalProperty.Gender,
-            PalProperty.EffectivePassives,
-            PalProperty.IvRelevance
-        );
-
     [TestMethod]
     public void PassiveSetKey_IsOrderIndependentAndPreservesDuplicates()
     {
@@ -30,7 +22,7 @@ public class BreedingStateKeyTests
     }
 
     [TestMethod]
-    public void KeyProvider_PreservesLegacyDefaultGroupingDimensions()
+    public void KeyProvider_GroupsEquivalentDefaultStates()
     {
         var swift = "Swift".ToStandardPassive(SolverTestScenario.DB);
         var runner = "Runner".ToStandardPassive(SolverTestScenario.DB);
@@ -57,12 +49,11 @@ public class BreedingStateKeyTests
         );
         var provider = DefaultBreedingStateKeyProvider.Instance;
 
-        Assert.AreEqual(LegacyGroupId(first), LegacyGroupId(equivalent));
         Assert.AreEqual(provider.KeyOf(first), provider.KeyOf(equivalent));
     }
 
     [TestMethod]
-    public void FrontierIndex_DoesNotMergeCollidingLegacyGroupIds()
+    public void FrontierIndex_DoesNotMergeCollidingPassiveHashes()
     {
         var pal = "Katress".ToPal(SolverTestScenario.DB);
         var first = new TestPalReference(
@@ -82,7 +73,6 @@ public class BreedingStateKeyTests
         var provider = DefaultBreedingStateKeyProvider.Instance;
         var index = new FrontierIndex(provider);
 
-        Assert.AreEqual(LegacyGroupId(first), LegacyGroupId(second));
         Assert.AreNotEqual(provider.KeyOf(first), provider.KeyOf(second));
 
         index.Add(first);
@@ -148,12 +138,13 @@ public class BreedingStateKeyTests
     }
 
     [TestMethod]
-    public void WildPalReference_GenderVariantPreservesLegacyPassiveIdentity()
+    public void WildPalReference_GenderVariantPreservesStructuralPassiveIdentity()
     {
         var wild = new WildPalReference(
             "Katress".ToPal(SolverTestScenario.DB),
             guaranteedPassives: [],
-            numRandomPassives: 2
+            numRandomPassives: 2,
+            mechanics: SolverTestScenario.DB.BreedingMechanics
         );
 
         var gendered = wild.WithGuaranteedGender(

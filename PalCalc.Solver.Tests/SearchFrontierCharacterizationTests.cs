@@ -7,7 +7,7 @@ namespace PalCalc.Solver.Tests;
 [TestClass]
 public class SearchFrontierCharacterizationTests
 {
-    private static readonly PruningRulesBuilder MinimumEffortOnly =
+    private static readonly ResultPruningPolicy MinimumEffortOnly =
         new(token => [new MinimumEffortPruning(token)]);
 
     [TestMethod]
@@ -256,10 +256,9 @@ public class SearchFrontierCharacterizationTests
         IEnumerable<PassiveSkill>? optionalPassives = null
     )
     {
-        var controller = new SolverStateController
-        {
-            CancellationToken = CancellationToken.None,
-        };
+        var controller = new SolverStateController(
+            CancellationToken.None
+        );
 
         return new(
             target: new PalSpecifier

@@ -1,4 +1,4 @@
-﻿using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.ResultPruning
 {
-    public class MinimumBreedingStepsPruning : IResultPruning
+    public class MinimumBreedingStepsPruning : ResultPruningRule
     {
         public MinimumBreedingStepsPruning(CancellationToken token) : base(token)
         {

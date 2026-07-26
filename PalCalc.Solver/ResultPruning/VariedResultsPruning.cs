@@ -1,4 +1,4 @@
-﻿using PalCalc.Model;
+using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.ResultPruning
 {
     // avoid generating lots of very similar results
-    public class VariedResultsPruning : IResultPruning.ForceDeterministic
+    public class VariedResultsPruning : ResultPruningRule.ForceDeterministic
     {
         float maxSimilarityPercent; // 0 - 1
         public VariedResultsPruning(CancellationToken token, float maxSimilarityPercent) : base(token)

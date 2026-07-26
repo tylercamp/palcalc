@@ -3,17 +3,22 @@ using PalCalc.Solver.ResultPruning;
 
 namespace PalCalc.Solver;
 
-public class SolverStateController
+public sealed class SolverStateController(
+    CancellationToken cancellationToken = default
+)
 {
-    public CancellationToken CancellationToken { get; set; }
-    public bool IsPaused { get; private set; }
+    private volatile bool isPaused;
 
-    public void Pause() => IsPaused = true;
-    public void Resume() => IsPaused = false;
+    public CancellationToken CancellationToken { get; } =
+        cancellationToken;
+    public bool IsPaused => isPaused;
+
+    public void Pause() => isPaused = true;
+    public void Resume() => isPaused = false;
 
     internal void PauseIfRequested()
     {
-        while (IsPaused) Thread.Sleep(10);
+        while (isPaused) Thread.Sleep(10);
     }
 }
 
@@ -27,7 +32,7 @@ public sealed class BreedingSolverSettings
         PalDB db,
         GameSettings gameSettings,
         IEnumerable<PalInstance> ownedPals,
-        PruningRulesBuilder pruningBuilder,
+        ResultPruningPolicy resultPruning,
         int maxBreedingSteps,
         int maxSolverIterations,
         int maxWildPals,
@@ -45,7 +50,7 @@ public sealed class BreedingSolverSettings
         ArgumentNullException.ThrowIfNull(db);
         ArgumentNullException.ThrowIfNull(gameSettings);
         ArgumentNullException.ThrowIfNull(ownedPals);
-        ArgumentNullException.ThrowIfNull(pruningBuilder);
+        ArgumentNullException.ThrowIfNull(resultPruning);
         ArgumentNullException.ThrowIfNull(allowedWildPals);
         ArgumentNullException.ThrowIfNull(bannedBredPals);
         ArgumentNullException.ThrowIfNull(allowedSurgeryPassives);
@@ -53,7 +58,7 @@ public sealed class BreedingSolverSettings
         DB = db;
         GameSettings = gameSettings;
         OwnedPals = ownedPals.Where(p => p.Gender != PalGender.NONE).ToList();
-        PruningBuilder = pruningBuilder;
+        ResultPruning = resultPruning;
         MaxBreedingSteps = maxBreedingSteps;
         MaxSolverIterations = maxSolverIterations;
         MaxWildPals = maxWildPals;
@@ -81,7 +86,7 @@ public sealed class BreedingSolverSettings
     public PalDB DB { get; }
     public GameSettings GameSettings { get; }
     public IReadOnlyList<PalInstance> OwnedPals { get; }
-    public PruningRulesBuilder PruningBuilder { get; }
+    public ResultPruningPolicy ResultPruning { get; }
     public int MaxBreedingSteps { get; }
     public int MaxSolverIterations { get; }
     public int MaxWildPals { get; }

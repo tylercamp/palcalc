@@ -11,7 +11,7 @@ public class ParallelBatchExecutorTests
     {
         var configuredSolver = OneStepSolver();
         var statuses = new List<SolverStatus>();
-        configuredSolver.Solver.SolverStateUpdated += statuses.Add;
+        configuredSolver.Solver.StatusUpdated += statuses.Add;
 
         SolverTestScenario.Solve(configuredSolver, "Wixen Noct");
 
@@ -32,12 +32,11 @@ public class ParallelBatchExecutorTests
         using var cancellation = new CancellationTokenSource();
         var configuredSolver = OneStepSolver();
         var request = RequestFor(configuredSolver);
-        var controller = new SolverStateController
-        {
-            CancellationToken = cancellation.Token,
-        };
+        var controller = new SolverStateController(
+            cancellation.Token
+        );
         SolverStatus? finalStatus = null;
-        configuredSolver.Solver.SolverStateUpdated += status =>
+        configuredSolver.Solver.StatusUpdated += status =>
         {
             if (status.CurrentPhase == SolverPhase.Breeding)
                 cancellation.Cancel();
@@ -46,10 +45,14 @@ public class ParallelBatchExecutorTests
                 finalStatus = status;
         };
 
-        configuredSolver.Solver.Solve(request, controller);
+        var result = configuredSolver.Solver.Solve(
+            request,
+            controller
+        );
 
         Assert.IsNotNull(finalStatus);
-        Assert.IsTrue(finalStatus.Canceled);
+        Assert.IsTrue(finalStatus.IsCanceled);
+        Assert.IsTrue(result.IsCanceled);
     }
 
     [TestMethod]
@@ -58,11 +61,10 @@ public class ParallelBatchExecutorTests
         using var cancellation = new CancellationTokenSource();
         using var enteredBreeding = new ManualResetEventSlim();
         var configuredSolver = OneStepSolver();
-        var controller = new SolverStateController
-        {
-            CancellationToken = cancellation.Token,
-        };
-        configuredSolver.Solver.SolverStateUpdated += status =>
+        var controller = new SolverStateController(
+            cancellation.Token
+        );
+        configuredSolver.Solver.StatusUpdated += status =>
         {
             if (status.CurrentPhase == SolverPhase.Breeding)
                 enteredBreeding.Set();
@@ -81,7 +83,7 @@ public class ParallelBatchExecutorTests
             controller.Resume();
 
             Assert.IsTrue(solveTask.Wait(TimeSpan.FromSeconds(10)));
-            Assert.IsTrue(solveTask.Result.Count > 0);
+            Assert.IsTrue(solveTask.Result.Results.Count > 0);
         }
         finally
         {
@@ -95,10 +97,9 @@ public class ParallelBatchExecutorTests
     {
         var configuredSolver = OneStepSolver(maxThreads: 2);
         var target = Target();
-        var controller = new SolverStateController
-        {
-            CancellationToken = CancellationToken.None,
-        };
+        var controller = new SolverStateController(
+            CancellationToken.None
+        );
         var context = SolverRunContext.Create(
             new BreedingSolverRequest(target, configuredSolver.Settings),
             controller

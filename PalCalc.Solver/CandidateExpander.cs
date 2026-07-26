@@ -1,4 +1,4 @@
-﻿using PalCalc.Model;
+using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
@@ -60,7 +60,7 @@ namespace PalCalc.Solver
 
         /// <summary>
         /// Creates a list of desired combinations of passives. Meant to handle the case where there are over MAX_PASSIVES desired passives.
-        /// The `requiredPassives` should never have more than MAX_PASSIVES due to a check in `SolveFor`, so this logic is only really
+        /// The `requiredPassives` should never have more than MAX_PASSIVES due to request validation, so this logic is only really
         /// necessary if `requiredPassives` + `optionalPassives` brings us over MAX_PASSIVES.
         /// </summary>
         /// <param name="requiredPassives">The list of passives that will be contained in all permutations.</param>
@@ -267,9 +267,9 @@ namespace PalCalc.Solver
 
                 var ivsProbability =
                     Probabilities.IVs.ProbabilityInheritedTargetIVs(
+                        mechanics,
                         p.Item1.IVs,
-                        p.Item2.IVs,
-                        mechanics
+                        p.Item2.IVs
                     );
 
                 using var parentPassivesRef = passiveListPool.BorrowWith(p.Item1.ActualPassives);
@@ -294,7 +294,7 @@ namespace PalCalc.Solver
                 }
 
                 // arbitrary reordering of (p1, p2) to prevent duplicate results from swapped pairs
-                // (though this shouldn't be necessary if the `IResultPruning` impls are working right?)
+                // (though this shouldn't be necessary if the `ResultPruningRule` impls are working right?)
                 (IPalReference, IPalReference) ReorderPair((IPalReference, IPalReference) p) =>
                     p.Item1.GetHashCode() > p.Item2.GetHashCode()
                         ? (p.Item2, p.Item1)
@@ -406,10 +406,10 @@ namespace PalCalc.Solver
                             probabilityForUpToNumPassives +=
                                 Probabilities.Passives
                                     .ProbabilityInheritedTargetPassives(
+                                        mechanics,
                                         parentPassives,
                                         targetPassives,
-                                        numFinalPassives,
-                                        mechanics
+                                        numFinalPassives
                                     );
 
                             if (probabilityForUpToNumPassives <= 0)

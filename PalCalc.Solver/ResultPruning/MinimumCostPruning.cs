@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace PalCalc.Solver.ResultPruning
 {
-    public class MinimumCostPruning : IResultPruning.ForceDeterministic
+    public class MinimumCostPruning : ResultPruningRule.ForceDeterministic
     {
         public MinimumCostPruning(CancellationToken token) : base(token) { }
 

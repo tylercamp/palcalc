@@ -20,17 +20,20 @@ internal sealed class InitialPalBuilder(
         // This reduction remains before the frontier because it selects concrete
         // owned instances and constructs composite-gender references. Those
         // choices cannot be recovered from frontier state keys alone.
-        var allPropertiesGroupFn = PalProperty.Combine(
-            PalProperty.Pal,
-            PalProperty.RelevantPassives,
-            PalProperty.IvRelevance,
-            PalProperty.Gender
-        );
-        var allExceptGenderGroupFn = PalProperty.Combine(
-            PalProperty.Pal,
-            PalProperty.RelevantPassives,
-            PalProperty.IvRelevance
-        );
+        static (
+            Pal Pal,
+            PassiveSetKey Passives,
+            RelevantIVKey IVs
+        ) StateWithoutGender(OwnedPalReference reference) =>
+            (
+                reference.Pal,
+                new PassiveSetKey(
+                    reference.ActualPassives
+                        .Intersect(reference.EffectivePassives)
+                        .ToList()
+                ),
+                new RelevantIVKey(reference.IVs)
+            );
 
         bool WithinBreedingSteps(Pal pal) =>
             breedingDB.MinBreedingSteps[pal][target.Pal] <=
@@ -72,7 +75,10 @@ internal sealed class InitialPalBuilder(
                     }
                 )
             )
-            .GroupBy(pal => allPropertiesGroupFn(pal))
+            .GroupBy(pal => (
+                State: StateWithoutGender(pal),
+                pal.Gender
+            ))
             .Select(group =>
                 group
                     .OrderBy(p => p.ActualPassives.Count)
@@ -88,7 +94,7 @@ internal sealed class InitialPalBuilder(
                     )
                     .First()
             )
-            .GroupBy(pal => allExceptGenderGroupFn(pal))
+            .GroupBy(StateWithoutGender)
             .Select(group => group.ToList())
             .SelectMany<
                 List<OwnedPalReference>,

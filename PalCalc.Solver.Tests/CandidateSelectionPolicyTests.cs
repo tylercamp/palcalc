@@ -8,10 +8,10 @@ namespace PalCalc.Solver.Tests;
 public class CandidateSelectionPolicyTests
 {
     [TestMethod]
-    public void DefaultPolicy_PreservesLegacyEarlyEffortAndCostComparison()
+    public void DefaultPolicy_UsesEarlyEffortAndCostComparison()
     {
         var policy = new DefaultCandidateSelectionPolicy(
-            PruningRulesBuilder.Default,
+            ResultPruningPolicy.Default,
             CancellationToken.None
         );
         var incumbent = new TestPalReference(
@@ -87,7 +87,7 @@ public class CandidateSelectionPolicyTests
     public void DefaultPolicy_OnlyPrimaryImprovementAllowsImmediateObsolescence()
     {
         var policy = new DefaultCandidateSelectionPolicy(
-            PruningRulesBuilder.Default,
+            ResultPruningPolicy.Default,
             CancellationToken.None
         );
         var incumbent = new TestPalReference(
@@ -126,7 +126,7 @@ public class CandidateSelectionPolicyTests
     public void DefaultPolicy_AppliesConfiguredPruningRulesInOrder()
     {
         var calls = new List<string>();
-        var builder = new PruningRulesBuilder(
+        var resultPruning = new ResultPruningPolicy(
             token =>
             [
                 new RecordingPruning(token, "first", calls),
@@ -135,7 +135,7 @@ public class CandidateSelectionPolicyTests
             ]
         );
         var policy = new DefaultCandidateSelectionPolicy(
-            builder,
+            resultPruning,
             CancellationToken.None
         );
 
@@ -153,7 +153,7 @@ public class CandidateSelectionPolicyTests
     public void ExpansionOrdering_PreservesDiscoveryOrderForEqualPriorities()
     {
         var policy = new DefaultCandidateSelectionPolicy(
-            PruningRulesBuilder.Default,
+            ResultPruningPolicy.Default,
             CancellationToken.None
         );
         var candidates = Enumerable
@@ -303,10 +303,9 @@ public class CandidateSelectionPolicyTests
             ],
             IV_Attack = 90,
         };
-        var controller = new SolverStateController
-        {
-            CancellationToken = CancellationToken.None,
-        };
+        var controller = new SolverStateController(
+            CancellationToken.None
+        );
         var context = SolverRunContext.Create(
             new BreedingSolverRequest(target, configuredSolver.Settings),
             controller,
@@ -327,13 +326,12 @@ public class CandidateSelectionPolicyTests
         > policyFactory
     )
     {
-        var controller = new SolverStateController
-        {
-            CancellationToken = CancellationToken.None,
-        };
+        var controller = new SolverStateController(
+            CancellationToken.None
+        );
         var policy = policyFactory(
             new DefaultCandidateSelectionPolicy(
-                PruningRulesBuilder.Default,
+                ResultPruningPolicy.Default,
                 controller.CancellationToken
             )
         );
@@ -392,7 +390,7 @@ public class CandidateSelectionPolicyTests
         BreedingSolverSettings settings
     ) =>
         new(
-            settings.PruningBuilder,
+            settings.ResultPruning,
             CancellationToken.None
         );
 
@@ -458,7 +456,7 @@ public class CandidateSelectionPolicyTests
         CancellationToken token,
         string name,
         List<string> calls
-    ) : IResultPruning(token)
+    ) : ResultPruningRule(token)
     {
         public override IEnumerable<IPalReference> Apply(
             IEnumerable<IPalReference> results,

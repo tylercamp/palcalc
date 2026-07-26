@@ -81,12 +81,11 @@ public class CandidateExpanderTests
             maxSolverIterations: 1
         );
         var settings = configuredSolver.Settings;
-        var controller = new SolverStateController
-        {
-            CancellationToken = CancellationToken.None,
-        };
+        var controller = new SolverStateController(
+            CancellationToken.None
+        );
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
-            PruningRulesBuilder.Default,
+            ResultPruningPolicy.Default,
             controller.CancellationToken
         );
         var firstReference = ReferenceFor(first, target);

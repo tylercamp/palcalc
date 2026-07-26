@@ -13,19 +13,6 @@ namespace PalCalc.Solver.PalReference
         public WildPalReference(
             Pal pal,
             IEnumerable<PassiveSkill> guaranteedPassives,
-            int numRandomPassives
-        ) : this(
-            pal,
-            guaranteedPassives,
-            numRandomPassives,
-            BreedingMechanics.Default
-        )
-        {
-        }
-
-        public WildPalReference(
-            Pal pal,
-            IEnumerable<PassiveSkill> guaranteedPassives,
             int numRandomPassives,
             BreedingMechanics mechanics
         )

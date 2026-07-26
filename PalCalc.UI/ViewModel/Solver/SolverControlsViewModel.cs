@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
@@ -271,7 +271,7 @@ namespace PalCalc.UI.ViewModel.Solver
             new BreedingSolverSettings(
                 db: PalDB.LoadEmbedded(),
                 gameSettings: gameSettings,
-                pruningBuilder: PruningRulesBuilder.Default,
+                resultPruning: ResultPruningPolicy.Default,
                 ownedPals: pals,
                 maxBreedingSteps: MaxBreedingSteps,
                 maxSolverIterations: MaxSolverIterations,

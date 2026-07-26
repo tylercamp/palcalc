@@ -8,7 +8,7 @@ namespace PalCalc.Solver.Tests;
 public class BreedingMechanicsTests
 {
     [TestMethod]
-    public void DefaultMechanics_PreserveLegacyProbabilityTables()
+    public void DefaultMechanics_UseExpectedProbabilityTables()
     {
         var mechanics = BreedingMechanics.Default;
 
@@ -23,18 +23,6 @@ public class BreedingMechanicsTests
         Assert.AreEqual(0.60f, mechanics.PassiveRandomAddedAtLeastN[1]);
         Assert.AreEqual(0.80f, mechanics.PassivesWildAtMostN[3]);
 
-        CollectionAssert.AreEqual(
-            GameConstants.IVProbabilityDirect.ToArray(),
-            mechanics.IVProbabilityDirect.ToArray()
-        );
-        CollectionAssert.AreEqual(
-            GameConstants.PassiveProbabilityDirect.ToArray(),
-            mechanics.PassiveProbabilityDirect.ToArray()
-        );
-        CollectionAssert.AreEqual(
-            GameConstants.PassiveRandomAddedProbability.ToArray(),
-            mechanics.PassiveRandomAddedProbability.ToArray()
-        );
     }
 
     [TestMethod]
@@ -120,10 +108,7 @@ public class BreedingMechanicsTests
 
         var context = SolverRunContext.Create(
             request,
-            new SolverStateController
-            {
-                CancellationToken = CancellationToken.None,
-            }
+            new SolverStateController(CancellationToken.None)
         );
         db.BreedingMechanics = BreedingMechanics.CreateDefault();
 
@@ -190,11 +175,8 @@ public class BreedingMechanicsTests
                 },
                 settings
             ),
-            new SolverStateController
-            {
-                CancellationToken = CancellationToken.None,
-            }
-        );
+            new SolverStateController(CancellationToken.None)
+        ).Results;
 
         return results.OfType<BredPalReference>().Single();
     }
@@ -207,7 +189,7 @@ public class BreedingMechanicsTests
             db: db,
             gameSettings: new GameSettings(),
             ownedPals: ownedPals,
-            pruningBuilder: PruningRulesBuilder.Default,
+            resultPruning: ResultPruningPolicy.Default,
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxWildPals: 0,

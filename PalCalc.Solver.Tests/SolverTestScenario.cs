@@ -62,7 +62,7 @@ internal static class SolverTestScenario
                 db: DB,
                 gameSettings: gameSettings ?? new GameSettings(),
                 ownedPals: ownedPals.ToList(),
-                pruningBuilder: PruningRulesBuilder.Default,
+                resultPruning: ResultPruningPolicy.Default,
                 maxBreedingSteps: maxBreedingSteps,
                 maxSolverIterations: maxSolverIterations,
                 maxWildPals: maxWildPals,
@@ -102,11 +102,8 @@ internal static class SolverTestScenario
                 },
                 solver.Settings
             ),
-            new SolverStateController
-            {
-                CancellationToken = CancellationToken.None,
-            }
-        );
+            new SolverStateController(CancellationToken.None)
+        ).Results.ToList();
 
     internal sealed class ConfiguredSolver(
         BreedingSolver solver,
@@ -116,10 +113,10 @@ internal static class SolverTestScenario
         public BreedingSolver Solver { get; } = solver;
         public BreedingSolverSettings Settings { get; } = settings;
 
-        public event Action<SolverStatus> SolverStateUpdated
+        public event Action<SolverStatus> StatusUpdated
         {
-            add => Solver.SolverStateUpdated += value;
-            remove => Solver.SolverStateUpdated -= value;
+            add => Solver.StatusUpdated += value;
+            remove => Solver.StatusUpdated -= value;
         }
     }
 

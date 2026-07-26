@@ -1,4 +1,4 @@
-﻿
+
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
@@ -18,34 +18,6 @@ internal class Program
         var db = PalDB.LoadEmbedded();
         Console.WriteLine("Loaded Pal DB");
 
-        var reptyro = new OwnedPalReference(
-            new PalInstance()
-            {
-                Gender = PalGender.MALE,
-                Pal = "Reptyro Cryst".ToPal(db),
-                PassiveSkills = ["Brave".ToStandardPassive(db), "Workaholic".ToStandardPassive(db), "Runner".ToStandardPassive(db)]
-            },
-            ["Runner".ToStandardPassive(db), new RandomPassiveSkill(), new RandomPassiveSkill()],
-            new IV_Set()
-        );
-
-        var wixen = new OwnedPalReference(
-            new PalInstance()
-            {
-                Gender = PalGender.FEMALE,
-                Pal = "Wixen".ToPal(db),
-                PassiveSkills = ["Lucky".ToStandardPassive(db), "Brave".ToStandardPassive(db)]
-            },
-            ["Lucky".ToStandardPassive(db), "Brave".ToStandardPassive(db)],
-            new IV_Set()
-        );
-
-        var parentPassives = reptyro.ActualPassives.Concat(wixen.ActualPassives).Distinct().ToList();
-        var targetPassives = new List<PassiveSkill>() { "Lucky".ToStandardPassive(db), "Runner".ToStandardPassive(db) };
-        var numFinalPassives = 3;
-
-        var prob = PalCalc.Solver.Probabilities.Passives.ProbabilityInheritedTargetPassives(parentPassives, targetPassives, numFinalPassives);
-
         var saveGame = DirectSavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LevelMeta.ReadGameOptions().PlayerLevel);
         Console.WriteLine("Using {0}", saveGame);
 
@@ -55,7 +27,7 @@ internal class Program
         var solverSettings = new BreedingSolverSettings(
                 gameSettings: new GameSettings(),
                 db: db,
-                pruningBuilder: PruningRulesBuilder.Default,
+                resultPruning: ResultPruningPolicy.Default,
                 ownedPals: savedInstances,
                 maxBreedingSteps: 99,
                 maxSolverIterations: 99,
@@ -72,8 +44,8 @@ internal class Program
         );
         var solver = new BreedingSolver();
 
-        solver.SolverStateUpdateInterval = TimeSpan.FromSeconds(1);
-        solver.SolverStateUpdated += ev => Console.WriteLine($"{ev.CurrentPhase} ({ev.CurrentStepIndex}) - {ev.WorkProcessedCount} / {ev.CurrentWorkSize}");
+        solver.StatusUpdateInterval = TimeSpan.FromSeconds(1);
+        solver.StatusUpdated += ev => Console.WriteLine($"{ev.CurrentPhase} ({ev.CurrentStepIndex}) - {ev.WorkProcessedCount} / {ev.CurrentWorkSize}");
 
         var targetInstance = new PalSpecifier
         {
@@ -84,14 +56,20 @@ internal class Program
             //IV_HP = 90
         };
 
-        var controller = new SolverStateController()
-        {
-            CancellationToken = CancellationToken.None,
-        };
-        var matches = solver.Solve(
+        var controller = new SolverStateController(
+            CancellationToken.None
+        );
+        var solveResult = solver.Solve(
             new BreedingSolverRequest(targetInstance, solverSettings),
             controller
         );
+        var matches = solveResult.Results;
+
+        if (solveResult.IsCanceled)
+        {
+            Console.WriteLine("Solver was canceled");
+            return;
+        }
 
         Console.WriteLine("Took {0}", TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds));
 

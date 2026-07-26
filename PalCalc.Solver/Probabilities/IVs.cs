@@ -17,19 +17,9 @@ namespace PalCalc.Solver.Probabilities
         /// A desired IV is determined by whether it's a "relevant" IV. (i.e. targetted during solving)
         /// </summary>
         public static float ProbabilityInheritedTargetIVs(
+            BreedingMechanics mechanics,
             IV_Set a,
             IV_Set b
-        ) =>
-            ProbabilityInheritedTargetIVs(
-                a,
-                b,
-                BreedingMechanics.Default
-            );
-
-        public static float ProbabilityInheritedTargetIVs(
-            IV_Set a,
-            IV_Set b,
-            BreedingMechanics mechanics
         )
         {
             ArgumentNullException.ThrowIfNull(mechanics);

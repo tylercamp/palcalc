@@ -1,4 +1,5 @@
 using PalCalc.Model;
+using PalCalc.Solver.PalReference;
 using PalCalc.Solver.ResultPruning;
 
 namespace PalCalc.Solver.Tests;
@@ -31,6 +32,9 @@ public class BreedingSolverRequestTests
         Assert.AreEqual(target.Pal, snapshot.Pal);
         Assert.AreEqual(PalGender.MALE, snapshot.RequiredGender);
         Assert.AreEqual(90, snapshot.IV_Attack);
+
+        snapshot.RequiredPassives.Clear();
+        Assert.AreEqual(1, request.Target.RequiredPassives.Count);
     }
 
     [TestMethod]
@@ -54,7 +58,7 @@ public class BreedingSolverRequestTests
             db: db,
             gameSettings: gameSettings,
             ownedPals: ownedPals,
-            pruningBuilder: PruningRulesBuilder.Default,
+            resultPruning: ResultPruningPolicy.Default,
             maxBreedingSteps: 3,
             maxSolverIterations: 4,
             maxWildPals: 2,
@@ -102,7 +106,7 @@ public class BreedingSolverRequestTests
 
         var context = SolverRunContext.Create(
             request,
-            new SolverStateController { CancellationToken = CancellationToken.None }
+            new SolverStateController(CancellationToken.None)
         );
 
         Assert.AreEqual(1, context.Target.RequiredPassives.Count);
@@ -132,6 +136,41 @@ public class BreedingSolverRequestTests
             firstResults.Any(first =>
                 secondResults.Any(second => ReferenceEquals(first, second))
             )
+        );
+    }
+
+    [TestMethod]
+    public void BreedingSolver_ReturnsReadOnlyCompletedResult()
+    {
+        var configuredSolver = SolverTestScenario.Solver(
+            [
+                SolverTestScenario.Owned(
+                    "Wixen Noct",
+                    PalGender.MALE
+                ),
+            ],
+            maxBreedingSteps: 0,
+            maxSolverIterations: 0
+        );
+
+        var result = configuredSolver.Solver.Solve(
+            new BreedingSolverRequest(
+                new PalSpecifier
+                {
+                    Pal = "Wixen Noct".ToPal(
+                        SolverTestScenario.DB
+                    ),
+                },
+                configuredSolver.Settings
+            ),
+            new SolverStateController(CancellationToken.None)
+        );
+
+        Assert.IsFalse(result.IsCanceled);
+        Assert.AreEqual(1, result.Results.Count);
+        Assert.ThrowsException<NotSupportedException>(() =>
+            ((IList<IPalReference>)result.Results)
+                .Add(result.Results[0])
         );
     }
 }

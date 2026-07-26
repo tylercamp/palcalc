@@ -28,7 +28,7 @@ public class BreedingSolverCharacterizationTests
     [DataTestMethod]
     [DataRow(PalGender.MALE, PalGender.FEMALE, "Wixen Noct")]
     [DataRow(PalGender.FEMALE, PalGender.MALE, "Katress Ignis")]
-    public void SolveFor_UsesGenderSpecificBreedingResult(
+    public void Solve_UsesGenderSpecificBreedingResult(
         PalGender katressGender,
         PalGender wixenGender,
         string expectedChild
@@ -57,7 +57,7 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
-    public void SolveFor_StopsAfterFrontierConverges()
+    public void Solve_StopsAfterFrontierConverges()
     {
         var solver = SolverTestScenario.Solver(
             [
@@ -69,7 +69,7 @@ public class BreedingSolverCharacterizationTests
         );
         var observedBreedingSteps = new HashSet<int>();
 
-        solver.SolverStateUpdated += status =>
+        solver.StatusUpdated += status =>
         {
             if (status.CurrentPhase == SolverPhase.Breeding)
                 observedBreedingSteps.Add(status.CurrentStepIndex);
@@ -82,7 +82,7 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
-    public void SolveFor_PreservesOwnedAndBredResultEffortTiers()
+    public void Solve_PreservesOwnedAndBredResultEffortTiers()
     {
         var solver = SolverTestScenario.Solver(
             [
@@ -102,7 +102,7 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
-    public void SolveFor_RespectsMaximumBreedingSteps()
+    public void Solve_RespectsMaximumBreedingSteps()
     {
         var solver = SolverTestScenario.Solver(
             [
@@ -119,7 +119,7 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
-    public void SolveFor_RespectsMaximumEffort()
+    public void Solve_RespectsMaximumEffort()
     {
         var solver = SolverTestScenario.Solver(
             [
@@ -137,7 +137,7 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
-    public void SolveFor_RespectsMaximumWildPalCount()
+    public void Solve_RespectsMaximumWildPalCount()
     {
         var allowedWildPals = new[]
         {
@@ -171,7 +171,7 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
-    public void SolveFor_RespectsBannedBredPals()
+    public void Solve_RespectsBannedBredPals()
     {
         var wixenNoct = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var solver = SolverTestScenario.Solver(
@@ -190,7 +190,7 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
-    public void SolveFor_ProducesRequiredPassiveAndIVState()
+    public void Solve_ProducesRequiredPassiveAndIVState()
     {
         var swift = "Swift".ToStandardPassive(SolverTestScenario.DB);
         var solver = SolverTestScenario.Solver(
@@ -221,7 +221,7 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
-    public void SolveFor_AppliesConfiguredPassiveSurgeryAfterBreeding()
+    public void Solve_AppliesConfiguredPassiveSurgeryAfterBreeding()
     {
         var surgeryPassive = SolverTestScenario.DB.SurgeryPassiveSkills.First();
         var solver = SolverTestScenario.Solver(
@@ -248,7 +248,7 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
-    public void SolveFor_DoesNotExceedConfiguredSurgeryCost()
+    public void Solve_DoesNotExceedConfiguredSurgeryCost()
     {
         var surgeryPassive = SolverTestScenario.DB.SurgeryPassiveSkills.First();
         var solver = SolverTestScenario.Solver(
@@ -272,7 +272,7 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
-    public void SolveFor_EnforcesRequiredGenderOnWildcardBredResult()
+    public void Solve_EnforcesRequiredGenderOnWildcardBredResult()
     {
         var wildcardSolver = SolverTestScenario.Solver(
             [
@@ -306,7 +306,7 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
-    public void SolveFor_SingleAndMultipleWorkersProduceSameSemanticResults()
+    public void Solve_SingleAndMultipleWorkersProduceSameSemanticResults()
     {
         var swift = "Swift".ToStandardPassive(SolverTestScenario.DB);
         var runner = "Runner".ToStandardPassive(SolverTestScenario.DB);

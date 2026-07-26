@@ -1,4 +1,4 @@
-﻿using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace PalCalc.Solver.ResultPruning
     /// <param name="maxIvDifference">
     /// Given a pal with the highest IVs, other pals will only be kept if their IVs differ by at most this much.
     /// </param>
-    public class OptimalIVsPruning(CancellationToken token, int maxIvDifference) : IResultPruning(token)
+    public class OptimalIVsPruning(CancellationToken token, int maxIvDifference) : ResultPruningRule(token)
     {
         static int ValueOf(IV_Value value, int fallback, Func<IV_Value, int> map) =>
             value == IV_Value.Random ? fallback : map(value);

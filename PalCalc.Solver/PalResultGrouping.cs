@@ -9,22 +9,48 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver
 {
-    public static class PalProperty
+    /// <summary>
+    /// Hash-based property selectors intended for presentation-level result
+    /// grouping. Solver state identity uses structural keys instead.
+    /// </summary>
+    public static class PalResultProperty
     {
         public delegate int GroupIdFn(IPalReference p);
 
-        public static GroupIdFn Pal = p => p.Pal.Id.GetHashCode();
-        public static GroupIdFn Gender = p => (int)p.Gender;
-        public static GroupIdFn WildPalCount = p => p.NumTotalWildPals;
-        public static GroupIdFn NumBreedingSteps = p => p.NumTotalBreedingSteps;
-        public static GroupIdFn EffectivePassives = p => p.EffectivePassivesHash;
-        public static GroupIdFn RelevantPassives = p => p.ActualPassives.Intersect(p.EffectivePassives).SetHash();
-        public static GroupIdFn ActualPassives = p => p.ActualPassives.SetHash();
-        public static GroupIdFn TotalEffort = p => p.BreedingEffort.GetHashCode();
-        public static GroupIdFn LocationType = p => p.Location.GetType().GetHashCode();
-        public static GroupIdFn IvRelevance = p => HashCode.Combine(p.IVs.HP.IsRelevant, p.IVs.Attack.IsRelevant, p.IVs.Defense.IsRelevant);
-        public static GroupIdFn IvExact = p => HashCode.Combine(p.IVs.HP, p.IVs.Attack, p.IVs.Defense);
-        public static GroupIdFn GoldCost = p => p.TotalCost;
+        public static GroupIdFn Pal { get; } =
+            reference => reference.Pal.Id.GetHashCode();
+        public static GroupIdFn Gender { get; } =
+            reference => (int)reference.Gender;
+        public static GroupIdFn WildPalCount { get; } =
+            reference => reference.NumTotalWildPals;
+        public static GroupIdFn NumBreedingSteps { get; } =
+            reference => reference.NumTotalBreedingSteps;
+        public static GroupIdFn EffectivePassives { get; } =
+            reference => reference.EffectivePassivesHash;
+        public static GroupIdFn RelevantPassives { get; } =
+            reference => reference.ActualPassives
+                .Intersect(reference.EffectivePassives)
+                .SetHash();
+        public static GroupIdFn ActualPassives { get; } =
+            reference => reference.ActualPassives.SetHash();
+        public static GroupIdFn TotalEffort { get; } =
+            reference => reference.BreedingEffort.GetHashCode();
+        public static GroupIdFn LocationType { get; } =
+            reference => reference.Location.GetType().GetHashCode();
+        public static GroupIdFn IvRelevance { get; } =
+            reference => HashCode.Combine(
+                reference.IVs.HP.IsRelevant,
+                reference.IVs.Attack.IsRelevant,
+                reference.IVs.Defense.IsRelevant
+            );
+        public static GroupIdFn IvExact { get; } =
+            reference => HashCode.Combine(
+                reference.IVs.HP,
+                reference.IVs.Attack,
+                reference.IVs.Defense
+            );
+        public static GroupIdFn GoldCost { get; } =
+            reference => reference.TotalCost;
 
         /// <summary>
         /// Makes a grouping function based on the result of applying `mainFn` to all
@@ -47,9 +73,16 @@ namespace PalCalc.Solver
         };
     }
 
-    public class PalPropertyGrouping(PalProperty.GroupIdFn groupIdFn)
+    /// <summary>
+    /// Presentation utility for reducing result clutter after a solve.
+    /// This is not used as solver frontier identity.
+    /// </summary>
+    public sealed class PalResultGrouping(
+        PalResultProperty.GroupIdFn groupIdFn
+    )
     {
-        private Dictionary<int, List<IPalReference>> content = new Dictionary<int, List<IPalReference>>();
+        private readonly Dictionary<int, List<IPalReference>> content =
+            [];
 
         public void Add(IPalReference p)
         {
@@ -84,9 +117,9 @@ namespace PalCalc.Solver
                 content[group] = filterFn(content[group]).ToList();
         }
 
-        public void FilterAll(PruningRulesBuilder prb, CancellationToken token)
+        public void FilterAll(ResultPruningPolicy policy, CancellationToken token)
         {
-            var pruner = prb.BuildAggregate(token);
+            var pruner = policy.Create(token);
             foreach (var group in content.Keys.TakeWhile(_ => !token.IsCancellationRequested))
                 content[group] = pruner.Apply(content[group], new CachedResultData(content[group])).ToList();
         }
@@ -101,9 +134,9 @@ namespace PalCalc.Solver
 
         public void Filter(IPalReference key, FilterFunc filterFn) => Filter(groupIdFn(key), filterFn);
 
-        public PalPropertyGrouping BuildNew(PalProperty.GroupIdFn newIdFn)
+        public PalResultGrouping BuildNew(PalResultProperty.GroupIdFn newIdFn)
         {
-            var res = new PalPropertyGrouping(newIdFn);
+            var res = new PalResultGrouping(newIdFn);
             foreach (var r in All)
                 res.Add(r);
             return res;

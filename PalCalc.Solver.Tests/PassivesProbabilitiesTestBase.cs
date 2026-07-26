@@ -1,4 +1,4 @@
-﻿using PalCalc.Model;
+using PalCalc.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,9 +32,9 @@ namespace PalCalc.Solver.Tests
         protected float PassiveProbabilityDirectUpTo(int numAvailable, int numRequired)
         {
             if (numRequired >= numAvailable)
-                return GameConstants.PassiveProbabilityAtLeastN[numRequired];
+                return BreedingMechanics.Default.PassiveProbabilityAtLeastN[numRequired];
             else
-                return GameConstants.PassiveProbabilityDirect[numRequired];
+                return BreedingMechanics.Default.PassiveProbabilityDirect[numRequired];
         }
     }
 }

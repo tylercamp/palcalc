@@ -1,14 +1,13 @@
-using PalCalc.Solver.PalReference;
-
 namespace PalCalc.Solver;
 
 public sealed class BreedingSolver
 {
-    public event Action<SolverStatus> SolverStateUpdated;
+    public event Action<SolverStatus> StatusUpdated;
 
-    public TimeSpan SolverStateUpdateInterval { get; set; } = TimeSpan.FromMilliseconds(100);
+    public TimeSpan StatusUpdateInterval { get; set; } =
+        TimeSpan.FromMilliseconds(100);
 
-    public List<IPalReference> Solve(
+    public BreedingSolverResult Solve(
         BreedingSolverRequest request,
         SolverStateController controller
     )
@@ -16,10 +15,13 @@ public sealed class BreedingSolver
         var context = SolverRunContext.Create(request, controller);
         var run = new SolverRun(
             context,
-            status => SolverStateUpdated?.Invoke(status),
-            SolverStateUpdateInterval
+            status => StatusUpdated?.Invoke(status),
+            StatusUpdateInterval
         );
 
-        return run.Execute();
+        return new(
+            run.Execute(),
+            controller.CancellationToken.IsCancellationRequested
+        );
     }
 }

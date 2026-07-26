@@ -88,7 +88,8 @@ public class ResultPostProcessorTests
             new WildPalReference(
                 target.Pal,
                 guaranteedPassives: [],
-                numRandomPassives: 0
+                numRandomPassives: 0,
+                mechanics: SolverTestScenario.DB.BreedingMechanics
             ),
         ]);
         var processor = new ResultPostProcessor(
@@ -144,16 +145,13 @@ public class ResultPostProcessorTests
     }
 
     private static SolverStateController Controller() =>
-        new()
-        {
-            CancellationToken = CancellationToken.None,
-        };
+        new(CancellationToken.None);
 
     private static DefaultCandidateSelectionPolicy Policy(
         SolverStateController controller
     ) =>
         new(
-            PruningRulesBuilder.Default,
+            ResultPruningPolicy.Default,
             controller.CancellationToken
         );
 }

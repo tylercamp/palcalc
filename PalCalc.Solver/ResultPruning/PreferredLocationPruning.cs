@@ -1,4 +1,4 @@
-﻿using PalCalc.Model;
+using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.ResultPruning
 {
     // choose results where the inputs are in preferred locations
-    public class PreferredLocationPruning : IResultPruning
+    public class PreferredLocationPruning : ResultPruningRule
     {
         public PreferredLocationPruning(CancellationToken token) : base(token)
         {

@@ -1,4 +1,4 @@
-﻿using PalCalc.Model;
+using PalCalc.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +15,8 @@ namespace PalCalc.Solver.Tests
         {
             Assert.AreEqual(
                 // nothing to inherit, just the chance of inheriting 3 random
-                expected: GameConstants.PassiveRandomAddedProbability[3],
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                expected: BreedingMechanics.Default.PassiveRandomAddedProbability[3],
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [],
                     desiredParentPassives: [],
                     numFinalPassives: 3
@@ -33,12 +33,12 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: (
                     // random 3, inherit 0
-                    (GameConstants.PassiveRandomAddedProbability[3] * PassiveProbabilityDirectUpTo(numAvailable: 1, numRequired: 0)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[3] * PassiveProbabilityDirectUpTo(numAvailable: 1, numRequired: 0)) +
 
                     // random 2, inherit 1
-                    (GameConstants.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 1, numRequired: 1))
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 1, numRequired: 1))
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 3
@@ -54,12 +54,12 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 2, inherit 1
                     (
-                        (GameConstants.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 1, numRequired: 1))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 1, numRequired: 1))
                         *
                         SubCombinationProbability(numAvail: 1, numDesired: 1, numChosen: 1)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner],
                     desiredParentPassives: [Runner],
                     numFinalPassives: 3
@@ -78,15 +78,15 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: (
                     // random 3, inherit 0
-                    (GameConstants.PassiveRandomAddedProbability[3] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 0)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[3] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 0)) +
 
                     // random 2, inherit 1
-                    (GameConstants.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 1)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 1)) +
 
                     // random 1, inherit 2
-                    (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 2))
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 2))
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 3
@@ -102,18 +102,18 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 2, inherit 1
                     (
-                        (GameConstants.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 1))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 1))
                         *
                         SubCombinationProbability(numAvail: 2, numDesired: 1, numChosen: 1)
                     ) +
                     // random 1, inherit 2
                     (
-                        (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 2))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 2))
                         *
                         SubCombinationProbability(numAvail: 2, numDesired: 1, numChosen: 2)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner, Irrelevant],
                     desiredParentPassives: [Runner],
                     numFinalPassives: 3
@@ -129,12 +129,12 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 1, inherit 2
                     (
-                        (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 2))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 2))
                         *
                         SubCombinationProbability(numAvail: 2, numDesired: 2, numChosen: 2)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner, Swift],
                     desiredParentPassives: [Runner, Swift],
                     numFinalPassives: 3
@@ -153,18 +153,18 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: (
                     // random 3, inherit 0
-                    (GameConstants.PassiveRandomAddedProbability[3] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 0)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[3] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 0)) +
 
                     // random 2, inherit 1
-                    (GameConstants.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 1)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 1)) +
 
                     // random 1, inherit 2
-                    (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 2)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 2)) +
 
                     // random 0, inherit 3
-                    (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 3))
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 3))
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 3
@@ -180,24 +180,24 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 2, inherit 1
                     (
-                        (GameConstants.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 1))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 1))
                         *
                         SubCombinationProbability(numAvail: 3, numDesired: 1, numChosen: 1)
                     ) +
                     // random 1, inherit 2
                     (
-                        (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 2))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 2))
                         *
                         SubCombinationProbability(numAvail: 3, numDesired: 1, numChosen: 2)
                     ) +
                     // random 0, inherit 3
                     (
-                        (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 3))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 3))
                         *
                         SubCombinationProbability(numAvail: 3, numDesired: 1, numChosen: 3)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner],
                     numFinalPassives: 3
@@ -213,18 +213,18 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 1, inherit 2
                     (
-                        (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 2))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 2))
                         *
                         SubCombinationProbability(numAvail: 3, numDesired: 2, numChosen: 2)
                     ) +
                     // random 0, inherit 3
                     (
-                        (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 3))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 3))
                         *
                         SubCombinationProbability(numAvail: 3, numDesired: 2, numChosen: 3)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner, Swift, Irrelevant],
                     desiredParentPassives: [Runner, Swift],
                     numFinalPassives: 3
@@ -240,12 +240,12 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 0, inherit 3
                     (
-                        (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 3))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 3))
                         *
                         SubCombinationProbability(numAvail: 3, numDesired: 3, numChosen: 3)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner, Swift, Nimble],
                     desiredParentPassives: [Runner, Swift, Nimble],
                     numFinalPassives: 3
@@ -264,18 +264,18 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: (
                     // random 3, inherit 0
-                    (GameConstants.PassiveRandomAddedProbability[3] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 0)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[3] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 0)) +
 
                     // random 2, inherit 1
-                    (GameConstants.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 1)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 1)) +
 
                     // random 1, inherit 2
-                    (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 2)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 2)) +
 
                     // random 0, inherit 3
-                    (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 3))
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 3))
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 3
@@ -291,24 +291,24 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 2, inherit 1
                     (
-                        (GameConstants.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 1))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 1))
                         *
                         SubCombinationProbability(numAvail: 4, numDesired: 1, numChosen: 1)
                     ) +
                     // random 1, inherit 2
                     (
-                        (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 2))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 2))
                         *
                         SubCombinationProbability(numAvail: 4, numDesired: 1, numChosen: 2)
                     ) +
                     // random 0, inherit 3
                     (
-                        (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 3))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 3))
                         *
                         SubCombinationProbability(numAvail: 4, numDesired: 1, numChosen: 3)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner],
                     numFinalPassives: 3
@@ -324,18 +324,18 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 1, inherit 2
                     (
-                        (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 2))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 2))
                         *
                         SubCombinationProbability(numAvail: 4, numDesired: 2, numChosen: 2)
                     ) +
                     // random 0, inherit 3
                     (
-                        (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 3))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 3))
                         *
                         SubCombinationProbability(numAvail: 4, numDesired: 2, numChosen: 3)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner, Swift, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner, Swift],
                     numFinalPassives: 3
@@ -351,12 +351,12 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 0, inherit 3
                     (
-                        (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 3))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 3))
                         *
                         SubCombinationProbability(numAvail: 4, numDesired: 3, numChosen: 3)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner, Swift, Nimble, Irrelevant],
                     desiredParentPassives: [Runner, Swift, Nimble],
                     numFinalPassives: 3
@@ -375,18 +375,18 @@ namespace PalCalc.Solver.Tests
             Assert.AreEqual(
                 expected: (
                     // random 3, inherit 0
-                    (GameConstants.PassiveRandomAddedProbability[3] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 0)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[3] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 0)) +
 
                     // random 2, inherit 1
-                    (GameConstants.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 1)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 1)) +
 
                     // random 1, inherit 2
-                    (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 2)) +
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 2)) +
 
                     // random 0, inherit 3
-                    (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 3))
+                    (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 3))
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 3
@@ -402,24 +402,24 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 2, inherit 1
                     (
-                        (GameConstants.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 1))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[2] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 1))
                         *
                         SubCombinationProbability(numAvail: 5, numDesired: 1, numChosen: 1)
                     ) +
                     // random 1, inherit 2
                     (
-                        (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 2))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 2))
                         *
                         SubCombinationProbability(numAvail: 5, numDesired: 1, numChosen: 2)
                     ) +
                     // random 0, inherit 3
                     (
-                        (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 3))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 3))
                         *
                         SubCombinationProbability(numAvail: 5, numDesired: 1, numChosen: 3)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner, Irrelevant, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner],
                     numFinalPassives: 3
@@ -435,18 +435,18 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 1, inherit 2
                     (
-                        (GameConstants.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 2))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[1] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 2))
                         *
                         SubCombinationProbability(numAvail: 5, numDesired: 2, numChosen: 2)
                     ) +
                     // random 0, inherit 3
                     (
-                        (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 3))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 3))
                         *
                         SubCombinationProbability(numAvail: 5, numDesired: 2, numChosen: 3)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner, Swift, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner, Swift],
                     numFinalPassives: 3
@@ -462,12 +462,12 @@ namespace PalCalc.Solver.Tests
                 expected: (
                     // random 0, inherit 3
                     (
-                        (GameConstants.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 3))
+                        (BreedingMechanics.Default.PassiveRandomAddedProbability[0] * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 3))
                         *
                         SubCombinationProbability(numAvail: 5, numDesired: 3, numChosen: 3)
                     )
                 ),
-                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                actual: Probabilities.Passives.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
                     parentPassives: [Runner, Swift, Nimble, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner, Swift, Nimble],
                     numFinalPassives: 3

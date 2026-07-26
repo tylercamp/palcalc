@@ -10,7 +10,8 @@ namespace PalCalc.Solver
         TimeSpan stateUpdateInterval
     )
     {
-        private static ILogger logger = Log.ForContext<BreedingSolver>();
+        private static readonly ILogger logger =
+            Log.ForContext<SolverRun>();
 
         private BreedingSolverSettings settings => context.Settings;
 
@@ -29,8 +30,9 @@ namespace PalCalc.Solver
                 CurrentPhase = SolverPhase.Initializing,
                 CurrentStepIndex = 0,
                 TargetSteps = settings.MaxSolverIterations,
-                Canceled = controller.CancellationToken.IsCancellationRequested,
-                Paused = controller.IsPaused,
+                IsCanceled =
+                    controller.CancellationToken.IsCancellationRequested,
+                IsPaused = controller.IsPaused,
             };
             stateUpdated?.Invoke(statusMsg);
 
@@ -72,8 +74,9 @@ namespace PalCalc.Solver
                     {
                         CurrentPhase = SolverPhase.Breeding,
                         CurrentStepIndex = s,
-                        Canceled = controller.CancellationToken.IsCancellationRequested,
-                        Paused = controller.IsPaused,
+                        IsCanceled =
+                            controller.CancellationToken.IsCancellationRequested,
+                        IsPaused = controller.IsPaused,
                         CurrentWorkSize = work.Count,
                         WorkProcessedCount = 0,
                     };
@@ -87,8 +90,8 @@ namespace PalCalc.Solver
                             statusMsg = statusMsg with
                             {
                                 WorkProcessedCount = progress.WorkProcessedCount,
-                                Paused = progress.Paused,
-                                Canceled = progress.Canceled,
+                                IsPaused = progress.IsPaused,
+                                IsCanceled = progress.IsCanceled,
                             };
                             stateUpdated?.Invoke(statusMsg);
                         }
@@ -100,8 +103,9 @@ namespace PalCalc.Solver
                         TotalWorkProcessedCount =
                             statusMsg.TotalWorkProcessedCount +
                             execution.WorkProcessedCount,
-                        Canceled = controller.CancellationToken.IsCancellationRequested,
-                        Paused = controller.IsPaused,
+                        IsCanceled =
+                            controller.CancellationToken.IsCancellationRequested,
+                        IsPaused = controller.IsPaused,
                     };
                     stateUpdated?.Invoke(statusMsg);
 
@@ -121,8 +125,9 @@ namespace PalCalc.Solver
 
             statusMsg = statusMsg with
             {
-                Canceled = controller.CancellationToken.IsCancellationRequested,
-                Paused = controller.IsPaused,
+                IsCanceled =
+                    controller.CancellationToken.IsCancellationRequested,
+                IsPaused = controller.IsPaused,
                 CurrentPhase = SolverPhase.Finished,
             };
             stateUpdated?.Invoke(statusMsg);
