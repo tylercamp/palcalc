@@ -8,6 +8,27 @@ namespace PalCalc.Model;
 /// </summary>
 public sealed class BreedingMechanics
 {
+    /*
+         * TODO - Could scrape some of this from game files - `BP_PalGameSetting`
+              "Combi_TalentInheritNum": [
+                3.0,
+                2.0,
+                1.0
+              ],
+              "Combi_PassiveInheritNum": [
+                4.0,
+                3.0,
+                2.0,
+                1.0
+              ],
+              "Combi_PassiveRandomAddNum": [
+                4.0,
+                3.0,
+                2.0,
+                1.0
+              ],
+        */
+
     public const int MaxInheritedIVs = 3;
     private static int MaxPassiveSkills =>
         GameConstants.MaxTotalPassives;
@@ -146,6 +167,9 @@ public sealed class BreedingMechanics
                 { 1, 0.30f },
                 { 0, 0.40f },
             },
+            // probability of a wild pal having, at most, N random passives
+            // (assume equal probability of gaining anywhere from 0 through 4 random passives)
+            // (20% chance of exactly N passives)
             passivesWildAtMostN: new Dictionary<int, float>
             {
                 { 0, 0.2f },

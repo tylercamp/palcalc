@@ -26,8 +26,7 @@ namespace PalCalc.Model
 
         public Dictionary<Pal, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
 
-        private BreedingMechanics breedingMechanics =
-            BreedingMechanics.CreateDefault();
+        private BreedingMechanics breedingMechanics = BreedingMechanics.CreateDefault();
         public BreedingMechanics BreedingMechanics
         {
             get => breedingMechanics;
