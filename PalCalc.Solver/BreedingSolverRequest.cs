@@ -34,6 +34,7 @@ internal sealed class SolverRunContext
         PalSpecifier target,
         BreedingSolverSettings settings,
         BreedingMechanics mechanics,
+        PalBreedingDB breedingDB,
         SolverStateController controller,
         ICandidateSelectionPolicy selectionPolicy
     )
@@ -41,6 +42,7 @@ internal sealed class SolverRunContext
         Target = target;
         Settings = settings;
         Mechanics = mechanics;
+        BreedingDB = breedingDB;
         Controller = controller;
         SelectionPolicy = selectionPolicy;
     }
@@ -48,6 +50,7 @@ internal sealed class SolverRunContext
     public PalSpecifier Target { get; }
     public BreedingSolverSettings Settings { get; }
     public BreedingMechanics Mechanics { get; }
+    public PalBreedingDB BreedingDB { get; }
     public SolverStateController Controller { get; }
     public ICandidateSelectionPolicy SelectionPolicy { get; }
 
@@ -71,6 +74,7 @@ internal sealed class SolverRunContext
             // Mechanics is immutable. Capturing the current PalDB-owned value
             // makes replacing it affect later runs without changing this run.
             mechanics: request.Settings.DB.BreedingMechanics,
+            breedingDB: request.Settings.BreedingDB,
             controller: controller,
             selectionPolicy: selectionPolicy
         );

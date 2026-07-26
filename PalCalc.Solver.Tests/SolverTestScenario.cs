@@ -60,6 +60,7 @@ internal static class SolverTestScenario
             solver: new BreedingSolver(),
             settings: new BreedingSolverSettings(
                 db: DB,
+                breedingDB: PalBreedingDB.LoadEmbedded(DB),
                 gameSettings: gameSettings ?? new GameSettings(),
                 ownedPals: ownedPals.ToList(),
                 resultPruning: ResultPruningPolicy.Default,

@@ -40,7 +40,8 @@ namespace PalCalc.Solver
                 spec,
                 new InitialPalBuilder(
                     settings,
-                    context.Mechanics
+                    context.Mechanics,
+                    context.BreedingDB
                 ).Build(spec),
                 settings.MaxThreads,
                 controller,

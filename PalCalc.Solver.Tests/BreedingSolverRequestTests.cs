@@ -56,6 +56,7 @@ public class BreedingSolverRequestTests
 
         var settings = new BreedingSolverSettings(
             db: db,
+            breedingDB: PalBreedingDB.LoadEmbedded(db),
             gameSettings: gameSettings,
             ownedPals: ownedPals,
             resultPruning: ResultPruningPolicy.Default,

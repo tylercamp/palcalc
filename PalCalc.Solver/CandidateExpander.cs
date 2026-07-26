@@ -36,7 +36,8 @@ namespace PalCalc.Solver
         SolverStateController controller,
         BreedingSolverSettings settings,
         ObjectPoolFactory poolFactory,
-        BreedingMechanics mechanics
+        BreedingMechanics mechanics,
+        PalBreedingDB breedingDB
     )
     {
         private readonly PalDB db = settings.DB;
@@ -209,8 +210,6 @@ namespace PalCalc.Solver
             CandidateExpansionContext context
         )
         {
-            var breedingdb = PalBreedingDB.LoadEmbedded(db);
-
             foreach (var p in workBatch)
             {
                 if (controller.IsPaused) controller.PauseIfRequested();
@@ -225,7 +224,7 @@ namespace PalCalc.Solver
                 if (p.Item1.NumTotalBreedingSteps + p.Item2.NumTotalBreedingSteps >= settings.MaxBreedingSteps) continue;
                 if (p.Item1.TotalCost + p.Item2.TotalCost > settings.MaxSurgeryCost) continue;
 
-                var breedingResults = breedingdb.BreedingByParent[p.Item1.Pal][p.Item2.Pal];
+                var breedingResults = breedingDB.BreedingByParent[p.Item1.Pal][p.Item2.Pal];
 
                 {
                     // don't bother checking the child pal if it's impossible for them to reach the target within the remaining
@@ -234,7 +233,7 @@ namespace PalCalc.Solver
 
                     foreach (var result in breedingResults)
                     {
-                        if (breedingdb.MinBreedingSteps[result.Child][context.Target.Pal] <= settings.MaxSolverIterations - context.StepIndex - 1)
+                        if (breedingDB.MinBreedingSteps[result.Child][context.Target.Pal] <= settings.MaxSolverIterations - context.StepIndex - 1)
                         {
                             canReach = true;
                             break;

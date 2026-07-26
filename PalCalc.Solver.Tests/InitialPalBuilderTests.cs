@@ -24,7 +24,8 @@ public class InitialPalBuilderTests
 
         var seeds = new InitialPalBuilder(
             configuredSolver.Settings,
-            configuredSolver.Settings.DB.BreedingMechanics
+            configuredSolver.Settings.DB.BreedingMechanics,
+            configuredSolver.Settings.BreedingDB
         ).Build(Target());
 
         Assert.AreEqual(1, seeds.Count);
@@ -56,7 +57,8 @@ public class InitialPalBuilderTests
 
         var seeds = new InitialPalBuilder(
             configuredSolver.Settings,
-            configuredSolver.Settings.DB.BreedingMechanics
+            configuredSolver.Settings.DB.BreedingMechanics,
+            configuredSolver.Settings.BreedingDB
         ).Build(Target());
 
         Assert.AreEqual(1, seeds.Count);
@@ -78,7 +80,8 @@ public class InitialPalBuilderTests
 
         var seeds = new InitialPalBuilder(
             configuredSolver.Settings,
-            configuredSolver.Settings.DB.BreedingMechanics
+            configuredSolver.Settings.DB.BreedingMechanics,
+            configuredSolver.Settings.BreedingDB
         ).Build(Target());
 
         CollectionAssert.AreEqual(

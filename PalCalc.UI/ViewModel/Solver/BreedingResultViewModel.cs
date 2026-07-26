@@ -29,6 +29,7 @@ namespace PalCalc.UI.ViewModel.Solver
             var settings = new BreedingSolverSettings(
                     gameSettings: new GameSettings(),
                     db: db,
+                    breedingDB: PalBreedingDB.LoadEmbedded(db),
                     resultPruning: ResultPruningPolicy.Default,
                     ownedPals: saveGame.OwnedPals,
                     maxBreedingSteps: 3,

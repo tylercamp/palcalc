@@ -27,6 +27,7 @@ internal class Program
         var solverSettings = new BreedingSolverSettings(
                 gameSettings: new GameSettings(),
                 db: db,
+                breedingDB: PalBreedingDB.LoadEmbedded(db),
                 resultPruning: ResultPruningPolicy.Default,
                 ownedPals: savedInstances,
                 maxBreedingSteps: 99,

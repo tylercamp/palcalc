@@ -270,6 +270,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public BreedingSolverSettings ConfiguredSolverSettings(GameSettings gameSettings, List<PalInstance> pals) =>
             new BreedingSolverSettings(
                 db: PalDB.LoadEmbedded(),
+                breedingDB: PalBreedingDB.LoadEmbedded(PalDB.LoadEmbedded()),
                 gameSettings: gameSettings,
                 resultPruning: ResultPruningPolicy.Default,
                 ownedPals: pals,

@@ -187,6 +187,7 @@ public class BreedingMechanicsTests
     ) =>
         new(
             db: db,
+            breedingDB: PalBreedingDB.LoadEmbedded(db),
             gameSettings: new GameSettings(),
             ownedPals: ownedPals,
             resultPruning: ResultPruningPolicy.Default,

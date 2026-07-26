@@ -9,12 +9,10 @@ namespace PalCalc.Solver;
 /// </summary>
 internal sealed class InitialPalBuilder(
     BreedingSolverSettings settings,
-    BreedingMechanics mechanics
+    BreedingMechanics mechanics,
+    PalBreedingDB breedingDB
 )
 {
-    private readonly PalBreedingDB breedingDB =
-        PalBreedingDB.LoadEmbedded(settings.DB);
-
     public List<IPalReference> Build(PalSpecifier target)
     {
         // This reduction remains before the frontier because it selects concrete

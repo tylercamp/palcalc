@@ -30,6 +30,7 @@ public sealed class BreedingSolverSettings
     /// </summary>
     public BreedingSolverSettings(
         PalDB db,
+        PalBreedingDB breedingDB,
         GameSettings gameSettings,
         IEnumerable<PalInstance> ownedPals,
         ResultPruningPolicy resultPruning,
@@ -48,6 +49,7 @@ public sealed class BreedingSolverSettings
     )
     {
         ArgumentNullException.ThrowIfNull(db);
+        ArgumentNullException.ThrowIfNull(breedingDB);
         ArgumentNullException.ThrowIfNull(gameSettings);
         ArgumentNullException.ThrowIfNull(ownedPals);
         ArgumentNullException.ThrowIfNull(resultPruning);
@@ -56,6 +58,7 @@ public sealed class BreedingSolverSettings
         ArgumentNullException.ThrowIfNull(allowedSurgeryPassives);
 
         DB = db;
+        BreedingDB = breedingDB;
         GameSettings = gameSettings;
         OwnedPals = ownedPals.Where(p => p.Gender != PalGender.NONE).ToList();
         ResultPruning = resultPruning;
@@ -84,6 +87,7 @@ public sealed class BreedingSolverSettings
     }
 
     public PalDB DB { get; }
+    public PalBreedingDB BreedingDB { get; }
     public GameSettings GameSettings { get; }
     public IReadOnlyList<PalInstance> OwnedPals { get; }
     public ResultPruningPolicy ResultPruning { get; }
