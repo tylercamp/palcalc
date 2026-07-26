@@ -10,6 +10,11 @@ internal enum EarlyCandidateSelection
     KeepBoth,
 }
 
+internal readonly record struct FrontierCandidateAssessment(
+    bool IsImprovement,
+    bool CanImmediatelyObsolete
+);
+
 internal readonly record struct ResultTierKey(long PrimaryValue);
 
 internal interface ICandidateSelectionPolicy : IBreedingStateKeyProvider
@@ -19,7 +24,7 @@ internal interface ICandidateSelectionPolicy : IBreedingStateKeyProvider
         IPalReference incumbent
     );
 
-    bool IsFrontierImprovement(
+    FrontierCandidateAssessment AssessAgainstFrontier(
         IPalReference candidate,
         IPalReference incumbent
     );
@@ -106,12 +111,13 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     }
 
     /// <summary>
-    /// Preserves the existing cheap frontier-improvement hint used before
-    /// authoritative pruning. Only the breeding-effort comparison is strict
-    /// primary-objective dominance; the cost and IV ordering are retained as a
-    /// legacy-compatible scheduling optimization.
+    /// Performs the cheap comparison against the retained frontier.
+    ///
+    /// Cost and IV comparisons preserve the existing admission heuristic, but
+    /// only strict improvement in the primary objective is safe to use for
+    /// immediate obsolescence.
     /// </summary>
-    public bool IsFrontierImprovement(
+    public FrontierCandidateAssessment AssessAgainstFrontier(
         IPalReference candidate,
         IPalReference incumbent
     )
@@ -120,17 +126,31 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             incumbent.BreedingEffort
         );
         if (comparison != 0)
-            return comparison < 0;
+            return new(
+                IsImprovement: comparison < 0,
+                CanImmediatelyObsolete: comparison < 0
+            );
 
         comparison = candidate.TotalCost.CompareTo(incumbent.TotalCost);
         if (comparison != 0)
-            return comparison < 0;
+            return new(
+                IsImprovement: comparison < 0,
+                CanImmediatelyObsolete: false
+            );
 
         comparison = TotalMaxIV(candidate).CompareTo(TotalMaxIV(incumbent));
         if (comparison != 0)
-            return comparison > 0;
+            return new(
+                IsImprovement: comparison > 0,
+                CanImmediatelyObsolete: false
+            );
 
-        return TotalMinIV(candidate) > TotalMinIV(incumbent);
+        return new(
+            IsImprovement:
+                TotalMinIV(candidate) >
+                TotalMinIV(incumbent),
+            CanImmediatelyObsolete: false
+        );
     }
 
     public IReadOnlyList<IPalReference> SelectRetainedAlternatives(

@@ -23,7 +23,7 @@ internal sealed class ParallelBatchExecutor(
 {
     public ParallelBatchExecutionResult Execute(
         ILazyCartesianProduct<IPalReference> work,
-        BreedingSolverStepState stepState,
+        CandidateExpansionContext expansionContext,
         Action<ParallelBatchProgress> progressUpdated
     )
     {
@@ -75,9 +75,9 @@ internal sealed class ParallelBatchExecutor(
         {
             try
             {
-                // Pools remain worker-local. Neither the factory nor the batch solver
+                // Pools remain worker-local. Neither the factory nor the expander
                 // is shared with another worker.
-                var batchSolver = new BreedingBatchSolver(
+                var expander = new CandidateExpander(
                     controller,
                     settings,
                     new ObjectPoolFactory()
@@ -104,8 +104,8 @@ internal sealed class ParallelBatchExecutor(
                         progressEntries.Add(progress);
 
                     results.Add(
-                        batchSolver
-                            .ProcessBatch(batch, progress, stepState)
+                        expander
+                            .ExpandBatch(batch, progress, expansionContext)
                             .ToList()
                     );
                 }

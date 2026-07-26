@@ -3,8 +3,6 @@ using PalCalc.Solver.PalReference;
 using PalCalc.Solver.Probabilities;
 using PalCalc.Solver.ResultPruning;
 using Serilog;
-using System.Collections.Concurrent;
-using System.Collections.Frozen;
 using System.Diagnostics;
 
 namespace PalCalc.Solver
@@ -180,17 +178,15 @@ namespace PalCalc.Solver
             {
                 if (controller.CancellationToken.IsCancellationRequested) break;
 
-                var stepState = new BreedingSolverStepState(
+                var expansionContext = new CandidateExpansionContext(
                     StepIndex: s,
-                    Spec: spec,
-                    Frontier: frontier,
-                    SelectionPolicy: context.SelectionPolicy,
-                    WorkingEarlyCandidatesByPalId: settings.DB.PalsById.Keys.ToFrozenDictionary(
-                        id => id,
-                        _ => new ConcurrentDictionary<
-                            BreedingStateKey,
-                            IPalReference
-                        >()
+                    Target: spec,
+                    Admissions: new CandidateAdmissionState(
+                        target: spec,
+                        maxEffort: settings.MaxEffort,
+                        selectionPolicy: context.SelectionPolicy,
+                        frontier: frontier,
+                        palIds: settings.DB.PalsById.Keys
                     )
                 );
 
@@ -211,7 +207,7 @@ namespace PalCalc.Solver
 
                     var execution = batchExecutor.Execute(
                         work,
-                        stepState,
+                        expansionContext,
                         progress =>
                         {
                             statusMsg = statusMsg with

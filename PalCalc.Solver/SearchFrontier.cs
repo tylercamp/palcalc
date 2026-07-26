@@ -8,7 +8,7 @@ namespace PalCalc.Solver;
 /// Owns the retained breeding states, pending parent-pair work, and terminal
 /// results for one solver run.
 /// </summary>
-internal sealed class SearchFrontier
+internal sealed class SearchFrontier : ICandidateFrontierView
 {
     private static readonly ILogger logger = Log.ForContext<SearchFrontier>();
 
@@ -52,14 +52,18 @@ internal sealed class SearchFrontier
             : maxThreads;
     }
 
-    public bool IsImprovement(
+    public FrontierCandidateAssessment AssessCandidate(
         IPalReference reference,
         BreedingStateKey stateKey
     )
     {
         var incumbent = index[stateKey]?.FirstOrDefault();
-        return incumbent == null ||
-            selectionPolicy.IsFrontierImprovement(reference, incumbent);
+        return incumbent == null
+            ? new(
+                IsImprovement: true,
+                CanImmediatelyObsolete: false
+            )
+            : selectionPolicy.AssessAgainstFrontier(reference, incumbent);
     }
 
     /// <summary>

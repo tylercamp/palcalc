@@ -1,7 +1,5 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
-using System.Collections.Concurrent;
-using System.Collections.Frozen;
 
 namespace PalCalc.Solver.Tests;
 
@@ -117,23 +115,16 @@ public class ParallelBatchExecutorTests
             controller,
             context.SelectionPolicy
         );
-        var stepState = new BreedingSolverStepState(
+        var expansionContext = new CandidateExpansionContext(
             StepIndex: 0,
-            Spec: target,
-            Frontier: frontier,
-            SelectionPolicy: context.SelectionPolicy,
-            WorkingEarlyCandidatesByPalId: configuredSolver
-                .Settings
-                .DB
-                .PalsById
-                .Keys
-                .ToFrozenDictionary(
-                    id => id,
-                    _ => new ConcurrentDictionary<
-                        BreedingStateKey,
-                        IPalReference
-                    >()
-                )
+            Target: target,
+            Admissions: new CandidateAdmissionState(
+                target,
+                configuredSolver.Settings.MaxEffort,
+                context.SelectionPolicy,
+                frontier,
+                configuredSolver.Settings.DB.PalsById.Keys
+            )
         );
         var failingReference = new FailingPalReference(
             "Katress".ToPal(SolverTestScenario.DB)
@@ -148,7 +139,7 @@ public class ParallelBatchExecutorTests
         );
 
         Assert.ThrowsException<TestWorkerException>(
-            () => executor.Execute(work, stepState, _ => { })
+            () => executor.Execute(work, expansionContext, _ => { })
         );
     }
 

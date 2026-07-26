@@ -2,7 +2,7 @@ namespace PalCalc.Solver
 {
     // ty chatgpt
 
-    // `BreedingBatchSolver` includes an early "IsOutdated" check which gets updated as new optimal
+    // `CandidateExpander` includes an early "IsOutdated" check which gets updated as new optimal
     // pals are discovered. We want to process the high-efficiency parent pairs first to produce
     // high-efficiency children, which should let us quickly rule out the low-efficiency remaining
     // in the set.

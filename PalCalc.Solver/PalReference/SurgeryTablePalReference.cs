@@ -10,7 +10,7 @@ using System.Transactions;
 namespace PalCalc.Solver.PalReference
 {
     // Note: ChangeGenderSurgeryOperation was added initially but later removed. It was used as another way to enforce
-    //       gender requirements in the main BreedingBatchSolver loop, but it added too many new unique options
+    //       gender requirements in the main CandidateExpander loop, but it added too many new unique options
     //       and caused working-set size to blow up. Therefore we won't formally represent gender-change surgery
     //       here, and will instead just use a flag in the solver settings which will affect how specific-gender
     //       restrictions affect the final estimates.

@@ -1,13 +1,9 @@
 ﻿using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 // note:
 // A lot of this logic was originally written using LINQ. This was convenient and readable, but
@@ -23,7 +19,7 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver
 {
     /// <summary>
-    /// Stores the work progress of a single BreedingBatchSolver.
+    /// Stores the work progress of a single CandidateExpander.
     /// </summary>
     internal class WorkBatchProgress
     {
@@ -31,45 +27,22 @@ namespace PalCalc.Solver
     }
 
     /// <summary>
-    /// Represents the shared state of a single solver iteration.
-    /// </summary>
-    /// <param name="StepIndex">The current step num. being processed</param>
-    /// <param name="Spec">The target pal being solved for</param>
-    /// <param name="Frontier">The current set of finalized optimal pals</param>
-    /// <param name="WorkingEarlyCandidatesByPalId">
-    /// A rough map of breeding states to the candidate retained by cheap early
-    /// selection during this step.
-    /// 
-    /// While the search frontier and selection policy have the final say in which
-    /// alternatives are kept, this reduces the number returned for authoritative
-    /// processing.
-    /// </param>
-    internal record class BreedingSolverStepState(
-        int StepIndex,
-        PalSpecifier Spec,
-        SearchFrontier Frontier,
-        ICandidateSelectionPolicy SelectionPolicy,
-        FrozenDictionary<PalId, ConcurrentDictionary<BreedingStateKey, IPalReference>> WorkingEarlyCandidatesByPalId
-    );
-
-    /// <summary>
-    /// Main work processor for the breeding solver. Used to process a single batch of (parent, parent) pairs
-    /// and return relevant children based on settings.
+    /// Expands a batch of parent pairs into relevant breeding candidates.
     /// </summary>
     /// <param name="controller">A controller which can be used to externally control the solver behavior, i.e. pause/resume.</param>
     /// <param name="settings">General settings for the solver process</param>
     /// <param name="poolFactory">An object pool factory used for frequently-created, transient objects.</param>
-    internal class BreedingBatchSolver(
+    internal sealed class CandidateExpander(
         SolverStateController controller,
         BreedingSolverSettings settings,
         ObjectPoolFactory poolFactory
     )
     {
-        private PalDB db = settings.DB;
+        private readonly PalDB db = settings.DB;
 
-        private LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();
-        private LocalListPool<(IPalReference, IPalReference)> palPairListPool = poolFactory.GetListPool<(IPalReference, IPalReference)>();
-        private LocalObjectPool<RandomPassiveSkill> randomPassivePool = poolFactory.GetObjectPool<RandomPassiveSkill>();
+        private readonly LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();
+        private readonly LocalListPool<(IPalReference, IPalReference)> palPairListPool = poolFactory.GetListPool<(IPalReference, IPalReference)>();
+        private readonly LocalObjectPool<RandomPassiveSkill> randomPassivePool = poolFactory.GetObjectPool<RandomPassiveSkill>();
 
         static IV_Value MergeIVs(IV_Value a, IV_Value b)
         {
@@ -229,10 +202,10 @@ namespace PalCalc.Solver
         }
 
         // (actual method which processes parent pairs and collects their children)
-        public IEnumerable<IPalReference> ProcessBatch(
+        public IEnumerable<IPalReference> ExpandBatch(
             IEnumerable<(IPalReference, IPalReference)> workBatch,
             WorkBatchProgress progress,
-            BreedingSolverStepState state
+            CandidateExpansionContext context
         )
         {
             var breedingdb = PalBreedingDB.LoadEmbedded(db);
@@ -260,7 +233,7 @@ namespace PalCalc.Solver
 
                     foreach (var result in breedingResults)
                     {
-                        if (breedingdb.MinBreedingSteps[result.Child][state.Spec.Pal] <= settings.MaxSolverIterations - state.StepIndex - 1)
+                        if (breedingdb.MinBreedingSteps[result.Child][context.Target.Pal] <= settings.MaxSolverIterations - context.StepIndex - 1)
                         {
                             canReach = true;
                             break;
@@ -281,7 +254,7 @@ namespace PalCalc.Solver
                     {
                         foreach (var passive in parent.EffectivePassives)
                         {
-                            if (state.Spec.RequiredPassives.Contains(passive)) return true;
+                            if (context.Target.RequiredPassives.Contains(passive)) return true;
                         }
 
                         return parent.EffectivePassives.Count == 0;
@@ -307,10 +280,10 @@ namespace PalCalc.Solver
 
                 foreach (var passive in parentPassives)
                 {
-                    if (state.Spec.RequiredPassives.Contains(passive))
+                    if (context.Target.RequiredPassives.Contains(passive))
                         availableRequiredPassives.Add(passive);
 
-                    if (state.Spec.OptionalPassives.Contains(passive))
+                    if (context.Target.OptionalPassives.Contains(passive))
                         availableOptionalPassives.Add(passive);
                 }
 
@@ -456,70 +429,15 @@ namespace PalCalc.Solver
                                 ivsProbability
                             );
 
-                            var workingEarlyCandidates =
-                                state.WorkingEarlyCandidatesByPalId[res.Pal.Id];
-
                             var added = false;
-                            var effort = res.BreedingEffort;
-                            var resultId = state.SelectionPolicy.KeyOf(res);
-                            bool improvesFrontier =
-                                state.Frontier.IsImprovement(
-                                    res,
-                                    resultId
-                                );
-                            if (
-                                effort <= settings.MaxEffort &&
-                                (
-                                    improvesFrontier ||
-                                    state.Spec.IsSatisfiedBy(res)
-                                )
-                            )
+                            var admission = context.Admissions.TryAdmit(res);
+                            if (admission.Accepted)
                             {
-                                bool accepted = workingEarlyCandidates.TryAdd(
-                                    resultId,
-                                    res
-                                );
-                                while (!accepted)
-                                {
-                                    var incumbent = workingEarlyCandidates[resultId];
-                                    switch (
-                                        state.SelectionPolicy.SelectEarlyCandidate(
-                                            res,
-                                            incumbent
-                                        )
-                                    )
-                                    {
-                                        case EarlyCandidateSelection.RejectCandidate:
-                                            break;
+                                newPassivesRef.Retain();
 
-                                        case EarlyCandidateSelection.KeepBoth:
-                                            accepted = true;
-                                            break;
-
-                                        case EarlyCandidateSelection.ReplaceIncumbent:
-                                            accepted = workingEarlyCandidates.TryUpdate(
-                                                resultId,
-                                                res,
-                                                incumbent
-                                            );
-                                            if (!accepted)
-                                                continue;
-                                            break;
-                                    }
-
-                                    break;
-                                }
-
-                                if (accepted && res.BreedingEffort <= settings.MaxEffort)
-                                {
-                                    newPassivesRef.Retain();
-
-                                    yield return res;
-                                    added = true;
-
-                                    if (improvesFrontier)
-                                        state.Frontier.MarkStateObsolete(resultId);
-                                }
+                                yield return res;
+                                added = true;
+                                context.Admissions.Complete(admission);
                             }
 
                             if (!added)

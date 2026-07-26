@@ -84,6 +84,45 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
+    public void DefaultPolicy_OnlyPrimaryImprovementAllowsImmediateObsolescence()
+    {
+        var policy = new DefaultCandidateSelectionPolicy(
+            PruningRulesBuilder.Default,
+            CancellationToken.None
+        );
+        var incumbent = new TestPalReference(
+            "incumbent",
+            "Katress".ToPal(SolverTestScenario.DB),
+            TimeSpan.FromMinutes(10),
+            totalCost: 100
+        );
+
+        var faster = policy.AssessAgainstFrontier(
+            new TestPalReference(
+                "faster",
+                incumbent.Pal,
+                TimeSpan.FromMinutes(9),
+                totalCost: 1_000
+            ),
+            incumbent
+        );
+        var cheaper = policy.AssessAgainstFrontier(
+            new TestPalReference(
+                "cheaper",
+                incumbent.Pal,
+                incumbent.BreedingEffort,
+                totalCost: 99
+            ),
+            incumbent
+        );
+
+        Assert.IsTrue(faster.IsImprovement);
+        Assert.IsTrue(faster.CanImmediatelyObsolete);
+        Assert.IsTrue(cheaper.IsImprovement);
+        Assert.IsFalse(cheaper.CanImmediatelyObsolete);
+    }
+
+    [TestMethod]
     public void DefaultPolicy_AppliesConfiguredPruningRulesInOrder()
     {
         var calls = new List<string>();
@@ -392,11 +431,11 @@ public class CandidateSelectionPolicyTests
             earlySelection?.Invoke(candidate, incumbent) ??
             inner.SelectEarlyCandidate(candidate, incumbent);
 
-        public bool IsFrontierImprovement(
+        public FrontierCandidateAssessment AssessAgainstFrontier(
             IPalReference candidate,
             IPalReference incumbent
         ) =>
-            inner.IsFrontierImprovement(candidate, incumbent);
+            inner.AssessAgainstFrontier(candidate, incumbent);
 
         public IReadOnlyList<IPalReference> SelectRetainedAlternatives(
             IEnumerable<IPalReference> candidates
