@@ -1,4 +1,5 @@
 using PalCalc.Model;
+using PalCalc.Solver.Processing.Search;
 
 namespace PalCalc.Solver;
 

@@ -1,5 +1,6 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;

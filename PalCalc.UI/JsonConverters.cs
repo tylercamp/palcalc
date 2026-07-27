@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Probabilities;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;

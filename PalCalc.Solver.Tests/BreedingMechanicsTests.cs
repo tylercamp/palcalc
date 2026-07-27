@@ -31,8 +31,7 @@ public class BreedingMechanicsTests
                 { 1, 1 },
                 { 2, 0 },
                 { 3, 0 },
-            },
-            minimumCaptureTime: TimeSpan.FromMinutes(7)
+            }
         );
 
         var roundTripped = PalDB.FromJson(db.ToJson());
@@ -41,36 +40,6 @@ public class BreedingMechanicsTests
             1.0f / 3.0f,
             roundTripped.BreedingMechanics
                 .ProbabilityOfInheritingDesiredIVs(1)
-        );
-    }
-
-    [TestMethod]
-    public void WildPalReference_UsesSuppliedCaptureMechanics()
-    {
-        var pal = "Katress".ToPal(SolverTestScenario.DB);
-        var mechanics = MechanicsWith(
-            passivesWildAtMostN: new Dictionary<int, float>
-            {
-                { 0, 0.5f },
-                { 1, 0.6f },
-                { 2, 0.7f },
-                { 3, 0.8f },
-                { 4, 1.0f },
-            },
-            minimumCaptureTime: TimeSpan.FromMinutes(10),
-            capturePriceThreshold: pal.Price
-        );
-
-        var reference = new WildPalReference(
-            pal,
-            guaranteedPassives: [],
-            numRandomPassives: 0,
-            mechanics: mechanics
-        );
-
-        Assert.AreEqual(
-            TimeSpan.FromMinutes(20),
-            reference.SelfBreedingEffort
         );
     }
 
@@ -139,8 +108,7 @@ public class BreedingMechanicsTests
         Assert.AreEqual(3, baseline.AvgRequiredBreedings);
         Assert.AreEqual(1, customized.AvgRequiredBreedings);
 
-        baselineDb.BreedingMechanics =
-            MechanicsWith(minimumCaptureTime: TimeSpan.FromHours(1));
+        baselineDb.BreedingMechanics = MechanicsWith();
 
         Assert.AreEqual(
             1,
@@ -226,9 +194,7 @@ public class BreedingMechanicsTests
         IReadOnlyDictionary<int, float>?
             passiveRandomAddedProbability = null,
         IReadOnlyDictionary<int, float>?
-            passivesWildAtMostN = null,
-        TimeSpan? minimumCaptureTime = null,
-        int? capturePriceThreshold = null
+            passivesWildAtMostN = null
     )
     {
         var defaults = BreedingMechanics.Default;

@@ -1,5 +1,6 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.Processing;
 
 namespace PalCalc.Solver.Tests;
 

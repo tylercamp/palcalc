@@ -1,4 +1,4 @@
-﻿using PalCalc.Solver;
+﻿using PalCalc.Solver.PalReference.Properties;
 using QuickGraph;
 using System;
 using System.Collections.Generic;

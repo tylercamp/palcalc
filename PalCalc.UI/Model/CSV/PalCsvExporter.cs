@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
 using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using System;

@@ -1,3 +1,5 @@
+using PalCalc.Solver.Processing;
+
 namespace PalCalc.Solver;
 
 /// <summary>

@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

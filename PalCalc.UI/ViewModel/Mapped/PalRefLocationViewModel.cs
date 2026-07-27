@@ -1,5 +1,5 @@
 ﻿using PalCalc.Model;
-using PalCalc.Solver;
+using PalCalc.Solver.PalReference.Properties;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.PalDerived;
