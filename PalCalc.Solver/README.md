@@ -25,12 +25,12 @@ When the frontier changes, only parent combinations introduced by that change
 need to be explored. A **frontier delta** records the candidates added and
 removed by one simplification pass.
 
-## Essential vocabulary
+## Terms
 
 ### Candidates and effective properties
 
-A **candidate** is an owned, wild, bred, composite, or surgery-based Pal that
-can appear in a breeding path.
+A **candidate** is an owned, wild, bred, composite, or surgery-based Pal discovered
+by the solver's breeding processes.
 
 Candidates are grouped by the **effective properties** that affect future
 breeding for the current target:
@@ -40,7 +40,6 @@ breeding for the current target:
 - Effective passives
 - Whether each IV can satisfy its target threshold
 
-Effort, cost, location, and breeding history are not effective properties.
 Candidates that share effective properties can be used interchangeably in
 future breeding, so the simplification rules decide which paths among them are
 worth retaining.
@@ -67,8 +66,8 @@ An IV is **relevant** when it can satisfy the threshold requested for the
 current target. This describes relevance to the request, not the general value
 of that stat.
 
-Some references hold an IV range because they represent more than one concrete
-Pal. Choosing a specific gender or owned instance can later narrow that range.
+Pals may have an IV _range_ if they represent more than one concrete Pal or
+if they are bred from other Pals.
 
 ### Gender representations
 
@@ -98,72 +97,6 @@ The solver applies surgery after the main breeding search. Considering every
 surgery option during every breeding step would model more combinations but
 would substantially increase search cost.
 
-## Public API
-
-A solve is defined by a `BreedingSolverRequest`, executed by
-`BreedingSolver`, and returned as a read-only `BreedingSolverResult`.
-
-```csharp
-var settings = new BreedingSolverSettings(
-    db: db,
-    breedingDB: breedingDB,
-    gameSettings: gameSettings,
-    ownedPals: ownedPals,
-    resultPruning: ResultPruningPolicy.Default,
-    maxBreedingSteps: 8,
-    maxSolverIterations: 8,
-    maxWildPals: 2,
-    allowedWildPals: db.Pals,
-    bannedBredPals: [],
-    maxInputIrrelevantPassives: 2,
-    maxBredIrrelevantPassives: 1,
-    maxEffort: TimeSpan.FromDays(7),
-    maxThreads: 0,
-    maxSurgeryCost: 0,
-    allowedSurgeryPassives: [],
-    useGenderReversers: false
-);
-
-var request = new BreedingSolverRequest(
-    new PalSpecifier
-    {
-        Pal = targetPal,
-        RequiredPassives = requiredPassives,
-        OptionalPassives = optionalPassives,
-        IV_HP = 90,
-    },
-    settings
-);
-
-using var cancellation = new CancellationTokenSource();
-var controller = new SolverStateController(cancellation.Token);
-var solver = new BreedingSolver();
-
-solver.StatusUpdated += status =>
-{
-    // Status objects are immutable snapshots.
-};
-
-var result = solver.Solve(request, controller);
-if (!result.IsCanceled)
-{
-    foreach (var palReference in result.Results)
-    {
-        // Display or inspect the breeding path.
-    }
-}
-```
-
-The request normalizes and captures its target without mutating the caller's
-`PalSpecifier`. `BreedingSolverSettings` copies mutable configuration
-collections. Database and model objects are treated as shared, read-only data
-for the duration of a run.
-
-`SolverStateController.Pause()` and `Resume()` use a lock-free flag.
-Cancellation is supplied through its constructor. Cancellation may leave
-partial results in `BreedingSolverResult`, but normal consumers discard them
-when `IsCanceled` is true.
-
 ## Architecture
 
 One solve has the following flow:
@@ -183,14 +116,6 @@ BreedingSolver
        -> ResultPostProcessor
   -> BreedingSolverResult
 ```
-
-### Run-scoped data
-
-`SolverRunContext` captures the request data used throughout one solve,
-including `PalDB`, `PalBreedingDB`, and the current `BreedingMechanics`.
-Changing database mechanics affects later solves without changing one already
-in progress. Injecting the breeding database also allows callers to supply
-custom breeding combinations.
 
 ### Starting candidates
 
@@ -219,19 +144,16 @@ limits, resolves gender-specific recipes, determines possible children,
 calculates inheritance probability, and emits promising candidates.
 
 Workers apply a quick pre-filter to reduce obviously unhelpful candidates. The
-frontier later applies the complete ordered simplification rules. Object pools
-remain worker-local because profiling showed that allocations and shared-pool
-contention added substantial overhead in this path.
+frontier later applies the complete ordered simplification rules.
 
 ### Candidate simplification
 
 `DefaultCandidateSelectionPolicy` coordinates:
 
-- effective-property grouping;
-- the worker-side quick pre-filter;
-- the full simplification pass;
-- the order in which retained candidates are bred;
-- grouping completed results with the same breeding effort.
+- effective-property grouping
+- the worker-side quick pre-filter
+- the full simplification pass
+- the order in which retained candidates are bred
 
 Lower breeding effort is a guaranteed improvement and can immediately mark
 matching frontier candidates as outdated. Better cost or IVs make a candidate
@@ -240,8 +162,7 @@ complete breeding path is retained.
 
 `ResultPruningPolicy` configures that full pass. The default rules consider
 effort, steps, IV quality, cost, location, reuse, wild Pals, referenced players,
-variety, and a final result limit. `MinimumReusePruning` currently favors paths
-that reuse the same Pal references across multiple steps.
+variety, and a final result limit.
 
 ### Completed results and post-processing
 
@@ -256,26 +177,12 @@ hundreds of similarly efficient paths. `PalResultGrouping` and
 `PalResultProperty` serve that presentation purpose only; they do not affect
 solver correctness.
 
-## Search coverage and limitations
+## Search coverage
 
-Within its retained-candidate model, the solver schedules all parent
-combinations introduced by frontier changes and normally stops well before
-`MaxSolverIterations` because no new useful candidates are found. For the
-default optimization goal of breeding effort, this normally explores all
-useful optimized effective-property groups.
-
-The result remains subject to intentional modeling assumptions:
-
-- Probability models estimate game behavior.
-- Some bred candidates represent irrelevant passives approximately.
-- Surgery is applied once after the breeding search.
-- Only a limited set of equally efficient breeding paths is retained for each
-  effective-property group.
-- A low `MaxSolverIterations` can stop the search before the frontier settles.
-
-These assumptions can affect probability accuracy or which equivalent path is
-shown. The solver does not arbitrarily cap the number of Pal-property groups
-considered during each pass.
+The solver runs through all parent combination and normally stops well
+before reaching `MaxSolverIterations`. Since it only preserves the optimal
+results as they are discovered, it eventually and naturally reaches the limit
+of how "optimal" breeding results can be.
 
 ## Additional details
 
