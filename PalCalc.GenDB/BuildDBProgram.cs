@@ -717,6 +717,16 @@ namespace PalCalc.GenDB
             provider.Mount();
             provider.LoadVirtualPaths();
 
+            // quick diagnostic: verify GameSettingReader against real game files without a full DB build
+            if (args.Contains("--dump-inheritance"))
+            {
+                var gs = GameSettingReader.ReadGameSettings(provider);
+                logger.Information("Combi_TalentInheritNum    = [{v}]", string.Join(", ", gs?.TalentInheritNum ?? new List<int>()));
+                logger.Information("Combi_PassiveInheritNum   = [{v}]", string.Join(", ", gs?.PassiveInheritNum ?? new List<int>()));
+                logger.Information("Combi_PassiveRandomAddNum = [{v}]", string.Join(", ", gs?.PassiveRandomAddNum ?? new List<int>()));
+                return;
+            }
+
             logger.Information("Reading localizations, pals, and passives...");
             var localizations = LocalizationsReader.FetchLocalizations(provider);
 
@@ -793,6 +803,11 @@ namespace PalCalc.GenDB
                 p => p,
                 p => genderProbabilities[p.InternalName]
             );
+
+            var rawGameSettings = GameSettingReader.ReadGameSettings(provider);
+            db.CombiTalentInheritNum = rawGameSettings?.TalentInheritNum;
+            db.CombiPassiveInheritNum = rawGameSettings?.PassiveInheritNum;
+            db.CombiPassiveRandomAddNum = rawGameSettings?.PassiveRandomAddNum;
 
             File.WriteAllText("../PalCalc.Model/db.json", db.ToJson());
 
