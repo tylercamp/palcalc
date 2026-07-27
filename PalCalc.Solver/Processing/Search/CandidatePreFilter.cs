@@ -56,10 +56,7 @@ internal sealed class CandidatePreFilter
         this.frontier = frontier;
         earlyCandidatesByPalId = palIds.ToFrozenDictionary(
             id => id,
-            _ => new ConcurrentDictionary<
-                EffectivePropertiesKey,
-                IPalReference
-            >()
+            _ => new ConcurrentDictionary<EffectivePropertiesKey, IPalReference>()
         );
     }
 
@@ -84,12 +81,7 @@ internal sealed class CandidatePreFilter
         while (!accepted)
         {
             var incumbent = earlyCandidates[propertiesKey];
-            switch (
-                selectionPolicy.SelectEarlyCandidate(
-                    candidate,
-                    incumbent
-                )
-            )
+            switch (selectionPolicy.SelectEarlyCandidate(candidate, incumbent))
             {
                 case EarlyCandidateSelection.RejectCandidate:
                     break;
@@ -99,11 +91,7 @@ internal sealed class CandidatePreFilter
                     break;
 
                 case EarlyCandidateSelection.ReplaceIncumbent:
-                    accepted = earlyCandidates.TryUpdate(
-                        propertiesKey,
-                        candidate,
-                        incumbent
-                    );
+                    accepted = earlyCandidates.TryUpdate(propertiesKey, candidate, incumbent);
                     if (!accepted)
                         continue;
                     break;

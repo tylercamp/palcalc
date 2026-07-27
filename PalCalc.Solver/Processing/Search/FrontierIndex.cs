@@ -3,7 +3,7 @@ using PalCalc.Solver.PalReference;
 namespace PalCalc.Solver.Processing.Search;
 
 /// <summary>
-/// Indexes the alternatives currently retained by the search frontier.
+/// Stores the candidates retained by the search frontier, indexed by effective properties.
 /// </summary>
 internal sealed class FrontierIndex(IEffectivePropertiesKeyProvider keyProvider)
 {

@@ -21,14 +21,15 @@ namespace PalCalc.Solver.Processing
     /// <summary>
     /// Breeds a batch of parent pairs and emits children that may help reach
     /// the target. One instance belongs to each parallel worker.
-    ///
-    /// This is the solver's hottest path. Several loops and worker-local pools
-    /// intentionally avoid iterator and temporary-object allocations that
-    /// profiling showed caused significant garbage collection overhead.
     /// </summary>
     /// <param name="controller">A controller which can be used to externally control the solver behavior, i.e. pause/resume.</param>
     /// <param name="settings">General settings for the solver process</param>
     /// <param name="poolFactory">An object pool factory used for frequently-created, transient objects.</param>
+    /// <remarks>
+    /// This is the solver's hottest path. Several loops and worker-local pools
+    /// intentionally avoid iterator and temporary-object allocations which caused
+    /// significant GC overhead (according to profiling.)
+    /// </remarks>
     internal sealed class CandidateExpander(
         SolverStateController controller,
         BreedingSolverSettings settings,

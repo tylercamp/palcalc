@@ -3,8 +3,9 @@ using PalCalc.Solver.PalReference;
 namespace PalCalc.Solver.Processing.Search;
 
 /// <summary>
-/// Records which candidates one simplification pass added to and removed from
-/// the frontier. The parent-pair schedule uses this change to find new work.
+/// Records which candidates were added to/removed from the frontier after a processing pass.
+/// 
+/// The parent-pair schedule uses this change to find new work.
 /// </summary>
 internal sealed class FrontierDelta
 {

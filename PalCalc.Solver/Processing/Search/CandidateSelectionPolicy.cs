@@ -3,6 +3,15 @@ using PalCalc.Solver.ResultPruning;
 
 namespace PalCalc.Solver.Processing.Search;
 
+// TODO - Conceptual simplifications
+//
+// This was structured to reflect and preserve the original solver logic, but
+// there isn't a great distinction between "early candidate" and "frontier assessment"
+// comparisons. In the future, we could move to the notion of "primary metrics"
+// and "secondary metrics", which are expected to be consistent with the pruning
+// rules applied by `SelectRetainedAlternatives`, but this will carry some
+// behavioral changes which are outside the scope of the current refactor.
+
 internal enum EarlyCandidateSelection
 {
     RejectCandidate,

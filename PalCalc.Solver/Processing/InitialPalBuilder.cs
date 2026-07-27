@@ -58,14 +58,8 @@ internal sealed class InitialPalBuilder(
                     effectiveIVs: new IV_Set
                     {
                         HP = MakeIV(target.IV_HP, p.IV_HP),
-                        Attack = MakeIV(
-                            target.IV_Attack,
-                            p.IV_Attack
-                        ),
-                        Defense = MakeIV(
-                            target.IV_Defense,
-                            p.IV_Defense
-                        ),
+                        Attack = MakeIV(target.IV_Attack, p.IV_Attack),
+                        Defense = MakeIV(target.IV_Defense, p.IV_Defense),
                     }
                 )
             )

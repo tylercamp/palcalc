@@ -131,6 +131,8 @@ public sealed class BreedingMechanics
 
     public TimeSpan TimeToCatch(Pal pal)
     {
+        // TODO - tweak
+
         ArgumentNullException.ThrowIfNull(pal);
 
         var rarityModifier = Math.Max(0, pal.Price - 1000) / 100.0f + (pal.Id.IsVariant ? 5.0f : 0);
@@ -138,10 +140,6 @@ public sealed class BreedingMechanics
         return TimeSpan.FromMinutes(3) + TimeSpan.FromMinutes(rarityModifier);
     }
 
-    /// <summary>
-    /// Creates a distinct instance containing the mechanics used by the
-    /// unmodified game.
-    /// </summary>
     public static BreedingMechanics CreateDefault() =>
         new(
             ivProbabilityDirect: new Dictionary<int, float>

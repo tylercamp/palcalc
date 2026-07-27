@@ -7,8 +7,8 @@ using Serilog;
 namespace PalCalc.Solver.Processing.Search;
 
 /// <summary>
-/// Keeps the best candidates found so far, schedules the parent pairs they
-/// introduce, and collects completed results for one solver run.
+/// Keeps the best candidates found so far, provides methods for processing those pairs
+/// of candidates, and collects completed results for a full solver run.
 /// </summary>
 internal sealed class SearchFrontier : ICandidateFrontierView
 {
@@ -67,8 +67,11 @@ internal sealed class SearchFrontier : ICandidateFrontierView
 
     /// <summary>
     /// Marks candidates with the same effective properties as ineligible for
-    /// further breeding. The full simplification pass still decides whether
-    /// the candidate that prompted this change is retained.
+    /// further breeding. This allows us to skip older, less efficient candidates
+    /// when a better one is found in the middle of a search.
+    /// 
+    /// The full simplification pass still decides whether the candidate that
+    /// prompted this change is retained.
     /// </summary>
     public void MarkCandidatesOutdated(EffectivePropertiesKey propertiesKey)
     {
