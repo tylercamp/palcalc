@@ -21,10 +21,6 @@ public sealed class SolverStateController(CancellationToken cancellationToken = 
 
 public sealed class BreedingSolverSettings
 {
-    /// <summary>
-    /// Creates a settings snapshot. Mutable configuration collections are
-    /// copied; model objects are treated as shared, read-only domain objects.
-    /// </summary>
     public BreedingSolverSettings(
         PalDB db,
         PalBreedingDB breedingDB,

@@ -51,7 +51,7 @@ namespace PalCalc.Solver.Utils
     /// <summary>
     /// Helper for grouping pals by various properties. Not meant for internal solver
     /// use (it uses `EffectivePropertyKey`), but makes it easier to do additional
-    /// pruning of provided by the solver.
+    /// pruning of results from the solver.
     /// </summary>
     public sealed class PalResultGrouping(PalResultProperty.GroupIdFn groupIdFn)
     {

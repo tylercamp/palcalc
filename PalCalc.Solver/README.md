@@ -13,7 +13,7 @@ the requested Pal.
 ## How a solve works
 
 1. Build the starting candidates from allowed owned and wild Pals.
-2. Pair candidates that have not previously been tried together.
+2. Breed candidates that have not previously been tried together.
 3. Keep children that can still contribute to the target.
 4. Simplify the working candidates and schedule the newly useful parent pairs.
 5. Stop when a pass finds no new useful candidates or reaches the configured
