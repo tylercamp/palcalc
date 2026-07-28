@@ -15,8 +15,7 @@ namespace PalCalc.Solver.Processing
         TimeSpan stateUpdateInterval
     )
     {
-        private static readonly ILogger logger =
-            Log.ForContext<SolverRun>();
+        private static readonly ILogger logger = Log.ForContext<SolverRun>();
 
         private BreedingSolverSettings settings => context.Settings;
 
@@ -133,9 +132,7 @@ namespace PalCalc.Solver.Processing
 
             var resultPostProcessor = new ResultPostProcessor(spec, settings, controller);
             resultPostProcessor.ApplySurgery(frontier);
-            return resultPostProcessor.Finalize(
-                frontier.TerminalResults
-            );
+            return resultPostProcessor.Finalize(frontier.TerminalResults);
         }
     }
 }

@@ -29,11 +29,8 @@ namespace PalCalc.Solver.ResultPruning
                         break;
 
                     case CompositeOwnedPalReference copr:
-                        // Count both owners because either concrete Pal may be
-                        // selected later. This can make composite candidates
-                        // less preferable than otherwise equivalent paths.
-                        // TODO: determine whether a composite should instead
-                        // choose one owner for this simplification rule.
+                        // TODO - this will end up avoiding results which use composite refs; construction of composites
+                        //        has no way to know which player to "prefer" for selection
                         var mpid = copr.Male.UnderlyingInstance.OwnerPlayerId;
                         if (!playerIds.Contains(mpid))
                             playerIds.Add(mpid);

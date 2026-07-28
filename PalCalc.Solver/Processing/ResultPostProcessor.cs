@@ -36,14 +36,9 @@ internal sealed class ResultPostProcessor(
             palReferences
                 .Where(reference => reference.Pal == target.Pal)
                 .Where(reference =>
-                    reference.EffectivePassives.Count <
-                        GameConstants.MaxTotalPassives ||
-                    reference.EffectivePassives.Any(
-                        passive => passive is RandomPassiveSkill
-                    ) ||
-                    reference.EffectivePassives.Any(
-                        target.OptionalPassives.Contains
-                    )
+                    reference.EffectivePassives.Count < GameConstants.MaxTotalPassives ||
+                    reference.EffectivePassives.Any(passive => passive is RandomPassiveSkill) ||
+                    reference.EffectivePassives.Any(target.OptionalPassives.Contains)
                 )
                 .TakeUntilCancelled(controller.CancellationToken)
                 .Select(reference =>
@@ -61,9 +56,7 @@ internal sealed class ResultPostProcessor(
         );
     }
 
-    public List<IPalReference> Finalize(
-        ResultAccumulator terminalResults
-    ) =>
+    public List<IPalReference> Finalize(ResultAccumulator terminalResults) =>
         terminalResults
             .Results
             // Bred candidates are constrained in the expansion kernel. Apply
@@ -90,17 +83,11 @@ internal sealed class ResultPostProcessor(
             .ToList();
         if (
             missingRequiredPassives.Count == 0 ||
-            missingRequiredPassives.Sum(
-                passive => passive.SurgeryCost
-            ) +
-                reference.TotalCost >
-            settings.MaxSurgeryCost
+            missingRequiredPassives.Sum(passive => passive.SurgeryCost) + reference.TotalCost > settings.MaxSurgeryCost
         )
             return reference;
 
-        var removablePassives = new Queue<PassiveSkill>(
-            reference.EffectivePassives.OfType<RandomPassiveSkill>()
-        );
+        var removablePassives = new Queue<PassiveSkill>(reference.EffectivePassives.OfType<RandomPassiveSkill>());
         foreach (
             var optional in reference.EffectivePassives.Where(
                 target.OptionalPassives.Contains
@@ -111,32 +98,20 @@ internal sealed class ResultPostProcessor(
         }
 
         var operations = new List<ISurgeryOperation>();
-        var modifiedPassives = new List<PassiveSkill>(
-            reference.EffectivePassives
-        );
+        var modifiedPassives = new List<PassiveSkill>(reference.EffectivePassives);
 
         foreach (var toAdd in missingRequiredPassives)
         {
-            if (
-                modifiedPassives.Count <
-                GameConstants.MaxTotalPassives
-            )
+            if (modifiedPassives.Count < GameConstants.MaxTotalPassives)
             {
                 modifiedPassives.Add(toAdd);
-                operations.Add(
-                    AddPassiveSurgeryOperation.NewCached(toAdd)
-                );
+                operations.Add(AddPassiveSurgeryOperation.NewCached(toAdd));
             }
             else if (removablePassives.TryDequeue(out var toRemove))
             {
                 modifiedPassives.Remove(toRemove);
                 modifiedPassives.Add(toAdd);
-                operations.Add(
-                    ReplacePassiveSurgeryOperation.NewCached(
-                        toRemove,
-                        toAdd
-                    )
-                );
+                operations.Add(ReplacePassiveSurgeryOperation.NewCached(toRemove, toAdd));
             }
         }
 
@@ -152,11 +127,9 @@ internal sealed class ResultPostProcessor(
             .Where(target.OptionalPassives.Contains)
             .Except(reference.EffectivePassives)
             .ToList();
-        var numAddablePassives =
-            GameConstants.MaxTotalPassives -
-            reference.EffectivePassives.Count(
-                passive => passive is not RandomPassiveSkill
-            );
+
+        var numUsedSlots = reference.EffectivePassives.Count(passive => passive is not RandomPassiveSkill);
+        var numAddablePassives = GameConstants.MaxTotalPassives - numUsedSlots;
 
         // Required surgery candidates were produced in this same frontier pass,
         // so include the input reference in the returned alternatives.
@@ -166,49 +139,29 @@ internal sealed class ResultPostProcessor(
             var passives in missingOptionalPassives
                 .Combinations(numAddablePassives, null)
                 .Where(passives =>
-                    reference.TotalCost +
-                        passives.Sum(
-                            passive => passive.SurgeryCost
-                        ) <=
-                    settings.MaxSurgeryCost
+                    reference.TotalCost + passives.Sum(passive => passive.SurgeryCost) <= settings.MaxSurgeryCost
                 )
                 .Where(passives => passives.Any())
                 .Select(passives => passives.ToList())
         )
         {
-            var removablePassives = new Queue<PassiveSkill>(
-                reference.EffectivePassives
-                    .OfType<RandomPassiveSkill>()
-            );
-            var modifiedPassives = new List<PassiveSkill>(
-                reference.EffectivePassives
-            );
+            var removablePassives = new Queue<PassiveSkill>(reference.EffectivePassives.OfType<RandomPassiveSkill>());
+            var modifiedPassives = new List<PassiveSkill>(reference.EffectivePassives);
             var operations = new List<ISurgeryOperation>();
 
             foreach (var toAdd in passives)
             {
-                if (
-                    modifiedPassives.Count <
-                    GameConstants.MaxTotalPassives
+                if (modifiedPassives.Count < GameConstants.MaxTotalPassives
                 )
                 {
                     modifiedPassives.Add(toAdd);
-                    operations.Add(
-                        AddPassiveSurgeryOperation.NewCached(toAdd)
-                    );
+                    operations.Add(AddPassiveSurgeryOperation.NewCached(toAdd));
                 }
-                else if (
-                    removablePassives.TryDequeue(out var toRemove)
-                )
+                else if (removablePassives.TryDequeue(out var toRemove))
                 {
                     modifiedPassives.Remove(toRemove);
                     modifiedPassives.Add(toAdd);
-                    operations.Add(
-                        ReplacePassiveSurgeryOperation.NewCached(
-                            toRemove,
-                            toAdd
-                        )
-                    );
+                    operations.Add(ReplacePassiveSurgeryOperation.NewCached(toRemove, toAdd));
                 }
                 else
                 {
@@ -218,27 +171,17 @@ internal sealed class ResultPostProcessor(
                 }
             }
 
-            results.Add(
-                new SurgeryTablePalReference(reference, operations)
-            );
+            results.Add(new SurgeryTablePalReference(reference, operations));
         }
 
         return results;
     }
 
-    private IEnumerable<IPalReference> EnforceRequiredGender(
-        IPalReference input
-    )
+    private IEnumerable<IPalReference> EnforceRequiredGender(IPalReference input)
     {
-        if (
-            target.RequiredGender != PalGender.WILDCARD &&
-            input.Gender != target.RequiredGender
-        )
+        if (target.RequiredGender != PalGender.WILDCARD && input.Gender != target.RequiredGender)
         {
-            if (
-                input.Gender == PalGender.WILDCARD ||
-                settings.UseGenderReversers
-            )
+            if (input.Gender == PalGender.WILDCARD || settings.UseGenderReversers)
             {
                 yield return input.WithGuaranteedGender(
                     settings.DB,

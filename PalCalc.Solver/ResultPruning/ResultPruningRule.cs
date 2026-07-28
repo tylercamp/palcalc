@@ -3,19 +3,10 @@ using PalCalc.Solver.Utils;
 
 namespace PalCalc.Solver.ResultPruning
 {
-    public sealed class CachedResultData(
-        IEnumerable<IPalReference> results
-    )
+    public sealed class CachedResultData(IEnumerable<IPalReference> results)
     {
-        public Dictionary<
-            IPalReference,
-            List<IPalReference>
-        > InnerReferences
-        { get; } =
-            results.ToDictionary(
-                result => result,
-                result => result.AllReferences().ToList()
-            );
+        public Dictionary<IPalReference, List<IPalReference>> InnerReferences { get; } =
+            results.ToDictionary(result => result, result => result.AllReferences().ToList());
     }
 
     public abstract class ResultPruningRule
@@ -27,10 +18,7 @@ namespace PalCalc.Solver.ResultPruning
             this.token = token;
         }
 
-        public abstract IEnumerable<IPalReference> Apply(
-            IEnumerable<IPalReference> results,
-            CachedResultData cachedData
-        );
+        public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData);
 
         protected IEnumerable<IPalReference> MinGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)
         {
@@ -84,14 +72,8 @@ namespace PalCalc.Solver.ResultPruning
             {
             }
 
-            public sealed override IEnumerable<IPalReference> Apply(
-                IEnumerable<IPalReference> results,
-                CachedResultData cachedData
-            ) =>
-                ApplyNonDeterministic(
-                    results.OrderBy(result => result.GetHashCode()),
-                    cachedData
-                );
+            public sealed override IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData) =>
+                ApplyNonDeterministic(results.OrderBy(result => result.GetHashCode()), cachedData);
 
             protected abstract IEnumerable<IPalReference> ApplyNonDeterministic(IEnumerable<IPalReference> results, CachedResultData cachedData);
         }

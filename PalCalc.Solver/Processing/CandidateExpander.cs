@@ -104,10 +104,14 @@ namespace PalCalc.Solver.Processing
         {
             var (parent1, parent2) = p;
 
-            // Keep these few options in a scoped span because this method runs
-            // for every parent pair. The conditional expression also avoids
-            // assigning a collection expression across scopes, which newer C#
-            // compilers reject with CS9203.
+            // (I REALLY don't like this, but now we NEED to. At some point we could declare `scoped` and assign
+            // values in if/else blocks, but some C# compiler update happened and now we get CS9203. I
+            // REALLY don't want to use this, but I REALLY don't want to do heap allocations even more.)
+            //
+            // https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/breaking-changes/compiler%20breaking%20changes%20-%20dotnet%2011
+            //
+            // (TODO - Now using ternary so we can keep using `scoped Span`, but I'm no longer confident this
+            //         actually avoids heap allocations.)
             scoped Span<(IPalReference, IPalReference)> parentPairOptions =
                 parent1.Gender == PalGender.WILDCARD
                     ? (
@@ -441,7 +445,7 @@ namespace PalCalc.Solver.Processing
 
                                 yield return res;
                                 added = true;
-                                context.PreFilter.Complete(filterResult);
+                                context.PreFilter.Propagate(filterResult);
                             }
 
                             if (!added)

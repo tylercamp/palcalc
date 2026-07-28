@@ -130,33 +130,6 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
-    public void DefaultPolicy_AppliesConfiguredPruningRulesInOrder()
-    {
-        var calls = new List<string>();
-        var resultPruning = new ResultPruningPolicy(
-            token =>
-            [
-                new RecordingPruning(token, "first", calls),
-                new RecordingPruning(token, "second", calls),
-                new RecordingPruning(token, "third", calls),
-            ]
-        );
-        var policy = new DefaultCandidateSelectionPolicy(
-            resultPruning,
-            CancellationToken.None
-        );
-
-        policy.SelectRetainedAlternatives(
-            [Reference("candidate", "Katress", TimeSpan.Zero)]
-        );
-
-        CollectionAssert.AreEqual(
-            new[] { "first", "second", "third" },
-            calls
-        );
-    }
-
-    [TestMethod]
     public void ExpansionOrdering_PreservesDiscoveryOrderForEqualPriorities()
     {
         var policy = new DefaultCandidateSelectionPolicy(

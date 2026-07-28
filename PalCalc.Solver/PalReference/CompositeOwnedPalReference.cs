@@ -14,9 +14,7 @@ namespace PalCalc.Solver.PalReference
     /// wildcard-gender candidate. A later breeding step selects whichever
     /// concrete copy has the required gender.
     /// 
-    /// This avoids breeding another copy solely to obtain the opposite gender.
-    /// The two owned Pals have the same effective properties, but may not have
-    /// exactly the same actual passives:
+    /// These pals _should_, but are not _guaranteed_, to have the same set of passives:
     /// 
     /// - If two pals have different desired passives, they should NOT be made composite.
     /// - Conversely, if one pal has a desired passive, both pals will have that desired passive.

@@ -3,14 +3,11 @@ using PalCalc.Solver.ResultPruning;
 
 namespace PalCalc.Solver;
 
-public sealed class SolverStateController(
-    CancellationToken cancellationToken = default
-)
+public sealed class SolverStateController(CancellationToken cancellationToken = default)
 {
     private volatile bool isPaused;
 
-    public CancellationToken CancellationToken { get; } =
-        cancellationToken;
+    public CancellationToken CancellationToken { get; } = cancellationToken;
     public bool IsPaused => isPaused;
 
     public void Pause() => isPaused = true;
@@ -67,16 +64,8 @@ public sealed class BreedingSolverSettings
         MaxWildPals = maxWildPals;
         AllowedWildPals = allowedWildPals.ToList();
         BannedBredPals = bannedBredPals.ToList();
-        MaxInputIrrelevantPassives = Math.Clamp(
-            maxInputIrrelevantPassives,
-            0,
-            GameConstants.MaxTotalPassives
-        );
-        MaxBredIrrelevantPassives = Math.Clamp(
-            maxBredIrrelevantPassives,
-            0,
-            GameConstants.MaxTotalPassives
-        );
+        MaxInputIrrelevantPassives = Math.Clamp(maxInputIrrelevantPassives, 0, GameConstants.MaxTotalPassives);
+        MaxBredIrrelevantPassives = Math.Clamp(maxBredIrrelevantPassives, 0, GameConstants.MaxTotalPassives);
         MaxEffort = maxEffort;
         MaxThreads = maxThreads <= 0
             ? Environment.ProcessorCount

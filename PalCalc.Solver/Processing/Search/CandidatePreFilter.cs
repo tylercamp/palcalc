@@ -104,19 +104,14 @@ internal sealed class CandidatePreFilter
             ? new(
                 PropertiesKey: propertiesKey,
                 Accepted: true,
-                IsGuaranteedImprovement:
-                    frontierAssessment ==
-                    FrontierCandidateAssessment.GuaranteedImprovement
+                IsGuaranteedImprovement: frontierAssessment == FrontierCandidateAssessment.GuaranteedImprovement
             )
             : CandidatePreFilterResult.Rejected;
     }
 
-    public void Complete(CandidatePreFilterResult result)
+    public void Propagate(CandidatePreFilterResult result)
     {
-        if (
-            result.Accepted &&
-            result.IsGuaranteedImprovement
-        )
+        if (result.Accepted && result.IsGuaranteedImprovement)
         {
             frontier.MarkCandidatesOutdated(result.PropertiesKey);
         }

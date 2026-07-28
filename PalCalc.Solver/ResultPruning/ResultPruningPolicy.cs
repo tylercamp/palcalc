@@ -7,17 +7,9 @@ namespace PalCalc.Solver.ResultPruning
     /// </summary>
     public sealed class ResultPruningPolicy
     {
-        private readonly Func<
-            CancellationToken,
-            IEnumerable<ResultPruningRule>
-        > createRules;
+        private readonly Func<CancellationToken, IEnumerable<ResultPruningRule>> createRules;
 
-        public ResultPruningPolicy(
-            Func<
-                CancellationToken,
-                IEnumerable<ResultPruningRule>
-            > createRules
-        )
+        public ResultPruningPolicy(Func<CancellationToken, IEnumerable<ResultPruningRule>> createRules)
         {
             ArgumentNullException.ThrowIfNull(createRules);
             this.createRules = createRules;
@@ -26,32 +18,25 @@ namespace PalCalc.Solver.ResultPruning
         public ResultPruningRule Create(CancellationToken token) =>
             new AggregatePruning(token, createRules(token));
 
-        public ResultPruningPolicy WithRule(
-            Func<CancellationToken, ResultPruningRule> createRule
-        )
+        public ResultPruningPolicy WithRule(Func<CancellationToken, ResultPruningRule> createRule)
         {
             ArgumentNullException.ThrowIfNull(createRule);
-            return new(
-                token =>
-                    createRules(token).Append(createRule(token))
-            );
+            return new(token => createRules(token).Append(createRule(token)));
         }
 
         public static ResultPruningPolicy Default { get; } = new(
-            token =>
-                new List<ResultPruningRule>
-                {
-                    new MinimumEffortPruning(token),
-                    new MinimumBreedingStepsPruning(token),
-                    new OptimalIVsPruning(token, maxIvDifference: 10),
-                    new MinimumCostPruning(token),
-                    new PreferredLocationPruning(token),
-                    new MinimumReusePruning(token),
-                    new MinimumWildPalsPruning(token),
-                    new MinimumReferencedPlayersPruning(token),
-                    new VariedResultsPruning(token, maxSimilarityPercent: 0.1f),
-                    new ResultLimitPruning(token, maxResults: 3),
-                }
+            token => [
+                new MinimumEffortPruning(token),
+                new MinimumBreedingStepsPruning(token),
+                new OptimalIVsPruning(token, maxIvDifference: 10),
+                new MinimumCostPruning(token),
+                new PreferredLocationPruning(token),
+                new MinimumReusePruning(token),
+                new MinimumWildPalsPruning(token),
+                new MinimumReferencedPlayersPruning(token),
+                new VariedResultsPruning(token, maxSimilarityPercent: 0.1f),
+                new ResultLimitPruning(token, maxResults: 3),
+            ]
         );
     }
 }

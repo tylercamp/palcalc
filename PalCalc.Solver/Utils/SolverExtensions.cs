@@ -64,9 +64,7 @@ namespace PalCalc.Solver.Utils
         {
             var timeFactor = 1.0f;
 
-            // Only Philanthropist currently affects breeding time. If another
-            // effect is added, its interaction with Philanthropist must be
-            // defined here.
+            // TODO - atm only Philanthropist affects breeding time. if another is added, how do they interact if both are on a given pal?
             foreach (var p in passives)
             {
                 foreach (var e in p.TrackedEffects)

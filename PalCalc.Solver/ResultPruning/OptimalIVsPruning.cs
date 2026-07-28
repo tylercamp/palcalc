@@ -34,11 +34,10 @@ namespace PalCalc.Solver.ResultPruning
             //   (enforced by `EffectivePropertiesKey`)
             //
             // - have relevant IV ranges whose minimum and maximum both satisfy
-            //   the target threshold.
+            //   the target threshold
             //
-            // `InitialPalBuilder` establishes the second invariant for owned
-            // Pals. Wild IVs are irrelevant, breeding preserves the invariant
-            // when it merges ranges, and surgery leaves IVs unchanged.
+            //   (enforced by `InitialPalBuilder` for owned pals, wild IVs are
+            //   always irrelevant, surgery leaves IVs unchanged)
             //
 
             // current impl just compares the maximum part of the IV range. filtering by min/avg

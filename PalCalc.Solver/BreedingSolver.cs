@@ -3,15 +3,14 @@ using PalCalc.Solver.Processing;
 namespace PalCalc.Solver;
 
 /// <summary>
-/// Runs one breeding-path search and reports progress through immutable status
+/// Runs a full breeding-path search and reports progress through status
 /// snapshots. The request supplies all run-specific data and constraints.
 /// </summary>
 public sealed class BreedingSolver
 {
     public event Action<SolverStatus> StatusUpdated;
 
-    public TimeSpan StatusUpdateInterval { get; set; } =
-        TimeSpan.FromMilliseconds(100);
+    public TimeSpan StatusUpdateInterval { get; set; } = TimeSpan.FromMilliseconds(100);
 
     public BreedingSolverResult Solve(
         BreedingSolverRequest request,
