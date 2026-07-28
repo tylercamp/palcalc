@@ -11,6 +11,11 @@ public class EffectivePropertiesKeyTests
     [TestMethod]
     public void PassiveSetKey_IsOrderIndependentAndPreservesDuplicates()
     {
+        // note: "preserves duplicates" check just sets expectations on behavior,
+        //       it's not actually a desired property.
+        //
+        // TODO - debug-check to ensure passives aren't duplicated
+
         var swift = "Swift".ToStandardPassive(SolverTestScenario.DB);
         var runner = "Runner".ToStandardPassive(SolverTestScenario.DB);
 

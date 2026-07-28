@@ -259,12 +259,7 @@ namespace PalCalc.Solver.Processing
                         continue;
                 }
 
-                var ivsProbability =
-                    Probabilities.IVs.ProbabilityInheritedTargetIVs(
-                        mechanics,
-                        p.Item1.IVs,
-                        p.Item2.IVs
-                    );
+                var ivsProbability = Probabilities.IVs.ProbabilityInheritedTargetIVs(mechanics, p.Item1.IVs, p.Item2.IVs);
 
                 using var parentPassivesRef = passiveListPool.BorrowWith(p.Item1.ActualPassives);
                 using var availableRequiredPassivesRef = passiveListPool.Borrow();

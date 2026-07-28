@@ -54,10 +54,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
             : maxThreads;
     }
 
-    public FrontierCandidateAssessment AssessCandidate(
-        IPalReference reference,
-        EffectivePropertiesKey propertiesKey
-    )
+    public FrontierCandidateAssessment AssessCandidate(IPalReference reference, EffectivePropertiesKey propertiesKey)
     {
         var incumbent = index[propertiesKey]?.FirstOrDefault();
         return incumbent == null
@@ -143,11 +140,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
 
     private void AddToIndex(IEnumerable<IPalReference> additions)
     {
-        foreach (
-            var addition in additions.TakeUntilCancelled(
-                controller.CancellationToken
-            )
-        )
+        foreach (var addition in additions.TakeUntilCancelled(controller.CancellationToken))
         {
             if (controller.IsPaused) controller.PauseIfRequested();
             index.Add(addition);
@@ -156,9 +149,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
 
     // Keeps the breeding paths selected by the full simplification policy for
     // each group of candidates with the same effective properties.
-    private IEnumerable<IPalReference> SelectCandidates(
-        IEnumerable<IPalReference> candidates
-    ) =>
+    private IEnumerable<IPalReference> SelectCandidates(IEnumerable<IPalReference> candidates) =>
         candidates
             .TakeWhile(_ =>
             {

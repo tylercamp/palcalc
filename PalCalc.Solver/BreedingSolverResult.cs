@@ -13,9 +13,7 @@ public sealed class BreedingSolverResult
         bool isCanceled
     )
     {
-        Results = new ReadOnlyCollection<IPalReference>(
-            results.ToList()
-        );
+        Results = new ReadOnlyCollection<IPalReference>([.. results]);
         IsCanceled = isCanceled;
     }
 

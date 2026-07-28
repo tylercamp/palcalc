@@ -17,14 +17,8 @@ namespace PalCalc.Solver.Probabilities
         /// 
         /// A desired IV is determined by whether it's a "relevant" IV. (i.e. targetted during solving)
         /// </summary>
-        public static float ProbabilityInheritedTargetIVs(
-            BreedingMechanics mechanics,
-            IV_Set a,
-            IV_Set b
-        )
+        public static float ProbabilityInheritedTargetIVs(BreedingMechanics mechanics, IV_Set a, IV_Set b)
         {
-            ArgumentNullException.ThrowIfNull(mechanics);
-
             int numRelevantHP = 0;
             if (a.HP.IsRelevant) numRelevantHP++;
             if (b.HP.IsRelevant) numRelevantHP++;
@@ -45,8 +39,7 @@ namespace PalCalc.Solver.Probabilities
             if (numRequiredIVs == 0) return 1.0f;
 
             // base probability is the chance of getting the IV categories we want
-            float result =
-                mechanics.ProbabilityOfInheritingDesiredIVs(numRequiredIVs);
+            float result = mechanics.ProbabilityOfInheritingDesiredIVs(numRequiredIVs);
 
             // even if we got the right IV categories, we might not get the right parents/values
             //

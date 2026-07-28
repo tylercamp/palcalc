@@ -3,9 +3,6 @@ using System.Collections.Frozen;
 
 namespace PalCalc.Model;
 
-/// <summary>
-/// Immutable game mechanics used to estimate breeding and capture effort.
-/// </summary>
 public sealed class BreedingMechanics
 {
     /*
@@ -15,27 +12,6 @@ public sealed class BreedingMechanics
     * - What's the probability of wild pals having a specific gender?
     * - What's the probability of wild pals having exactly N passives?
     */
-
-    /*
-         * TODO - Could scrape some of this from game files - `BP_PalGameSetting`
-              "Combi_TalentInheritNum": [
-                3.0,
-                2.0,
-                1.0
-              ],
-              "Combi_PassiveInheritNum": [
-                4.0,
-                3.0,
-                2.0,
-                1.0
-              ],
-              "Combi_PassiveRandomAddNum": [
-                4.0,
-                3.0,
-                2.0,
-                1.0
-              ],
-        */
 
     public const int MaxInheritedIVs = 3;
     private static int MaxPassiveSkills =>

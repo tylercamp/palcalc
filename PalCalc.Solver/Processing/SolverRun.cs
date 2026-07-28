@@ -35,8 +35,7 @@ namespace PalCalc.Solver.Processing
                 CurrentPhase = SolverPhase.Initializing,
                 CurrentStepIndex = 0,
                 TargetSteps = settings.MaxSolverIterations,
-                IsCanceled =
-                    controller.CancellationToken.IsCancellationRequested,
+                IsCanceled = controller.CancellationToken.IsCancellationRequested,
                 IsPaused = controller.IsPaused,
             };
             stateUpdated?.Invoke(statusMsg);
@@ -81,8 +80,7 @@ namespace PalCalc.Solver.Processing
                     {
                         CurrentPhase = SolverPhase.Breeding,
                         CurrentStepIndex = s,
-                        IsCanceled =
-                            controller.CancellationToken.IsCancellationRequested,
+                        IsCanceled = controller.CancellationToken.IsCancellationRequested,
                         IsPaused = controller.IsPaused,
                         CurrentWorkSize = work.Count,
                         WorkProcessedCount = 0,
@@ -107,11 +105,8 @@ namespace PalCalc.Solver.Processing
                     statusMsg = statusMsg with
                     {
                         WorkProcessedCount = execution.WorkProcessedCount,
-                        TotalWorkProcessedCount =
-                            statusMsg.TotalWorkProcessedCount +
-                            execution.WorkProcessedCount,
-                        IsCanceled =
-                            controller.CancellationToken.IsCancellationRequested,
+                        TotalWorkProcessedCount = statusMsg.TotalWorkProcessedCount + execution.WorkProcessedCount,
+                        IsCanceled = controller.CancellationToken.IsCancellationRequested,
                         IsPaused = controller.IsPaused,
                     };
                     stateUpdated?.Invoke(statusMsg);
@@ -130,18 +125,13 @@ namespace PalCalc.Solver.Processing
 
             statusMsg = statusMsg with
             {
-                IsCanceled =
-                    controller.CancellationToken.IsCancellationRequested,
+                IsCanceled = controller.CancellationToken.IsCancellationRequested,
                 IsPaused = controller.IsPaused,
                 CurrentPhase = SolverPhase.Finished,
             };
             stateUpdated?.Invoke(statusMsg);
 
-            var resultPostProcessor = new ResultPostProcessor(
-                spec,
-                settings,
-                controller
-            );
+            var resultPostProcessor = new ResultPostProcessor(spec, settings, controller);
             resultPostProcessor.ApplySurgery(frontier);
             return resultPostProcessor.Finalize(
                 frontier.TerminalResults
