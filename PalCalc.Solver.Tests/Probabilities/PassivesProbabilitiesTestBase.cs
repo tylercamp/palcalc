@@ -13,6 +13,7 @@ namespace PalCalc.Solver.Tests.Probabilities
     public class PassivesProbabilitiesTestBase
     {
         protected PalDB db = PalDB.LoadEmbedded();
+        protected BreedingMechanics mechanics => db.BreedingMechanics;
 
         protected PassiveSkill Runner => "Runner".ToStandardPassive(db);
         protected PassiveSkill Swift => "Swift".ToStandardPassive(db);
@@ -34,9 +35,9 @@ namespace PalCalc.Solver.Tests.Probabilities
         protected float PassiveProbabilityDirectUpTo(int numAvailable, int numRequired)
         {
             if (numRequired >= numAvailable)
-                return BreedingMechanics.Default.PassiveProbabilityAtLeastN[numRequired];
+                return mechanics.PassiveProbabilityAtLeastN[numRequired];
             else
-                return BreedingMechanics.Default.PassiveProbabilityDirect[numRequired];
+                return mechanics.PassiveProbabilityDirect[numRequired];
         }
     }
 }

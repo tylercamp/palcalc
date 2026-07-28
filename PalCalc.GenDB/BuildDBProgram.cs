@@ -794,6 +794,16 @@ namespace PalCalc.GenDB
                 p => genderProbabilities[p.InternalName]
             );
 
+            var rawGameSettings = GameSettingReader.ReadGameSettings(provider);
+            db.BreedingMechanics = new BreedingMechanics(
+                // this array has 3 entries, and we empirically know at least 1 IV will always be inherited, so starting index must be 1
+                ivInheritanceWeights: Enumerable.Range(1, 3).ToDictionary(n => n, n => rawGameSettings.TalentInheritNum[n - 1]),
+                // this array has 4 entries, and we empirically know it's possible to inherit 4 passives, so starting index must be 1
+                passiveInheritanceWeights: Enumerable.Range(1, 4).ToDictionary(n => n, n => rawGameSettings.PassiveInheritNum[n - 1]),
+                // this array has 4 entries, and we empirically know it's possible to get 0 random passives, so starting index must be 0
+                passiveRandomWeights: Enumerable.Range(0, 4).ToDictionary(n => n, n => rawGameSettings.PassiveRandomAddNum[n])
+            );
+
             File.WriteAllText("../PalCalc.Model/db.json", db.ToJson());
 
             var breedingdb = new PalBreedingDB(db);

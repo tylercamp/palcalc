@@ -44,14 +44,6 @@ namespace PalCalc.Model
             { 0, 0, 1 }
         };
 
-        /*
-         * Outstanding questions:
-         * 
-         * - What's the formula for how long breeding will take?
-         * - What's the probability of wild pals having a specific gender?
-         * - What's the probability of wild pals having exactly N passives?
-        */
-
         public static readonly int MaxTotalPassives = 4;
     }
 }

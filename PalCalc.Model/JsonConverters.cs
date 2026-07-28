@@ -180,9 +180,7 @@ namespace PalCalc.Model
             var attacks = asToken["ActiveSkills"].ToObject<List<ActiveSkill>>();
             var elements = asToken["Elements"].ToObject<List<PalElement>>();
             var breedingGenderProbability = asToken["BreedingGenderProbability"].ToObject<Dictionary<string, Dictionary<PalGender, float>>>();
-            // TODO - properly parse this from game files in `PalCalc.GenDB`
-            var breedingMechanics = asToken["BreedingMechanics"]?.ToObject<BreedingMechanics>()
-                ?? BreedingMechanics.CreateDefault();
+            var breedingMechanics = asToken["BreedingMechanics"].ToObject<BreedingMechanics>();
 
             foreach (var attack in attacks)
                 attack.Element = elements.Single(e => e.InternalName == attack.ElementInternalName);

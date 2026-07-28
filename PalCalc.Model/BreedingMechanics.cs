@@ -9,6 +9,14 @@ namespace PalCalc.Model;
 public sealed class BreedingMechanics
 {
     /*
+    * Outstanding questions:
+    * 
+    * - What's the formula for how long breeding will take?
+    * - What's the probability of wild pals having a specific gender?
+    * - What's the probability of wild pals having exactly N passives?
+    */
+
+    /*
          * TODO - Could scrape some of this from game files - `BP_PalGameSetting`
               "Combi_TalentInheritNum": [
                 3.0,
@@ -33,36 +41,44 @@ public sealed class BreedingMechanics
     private static int MaxPassiveSkills =>
         GameConstants.MaxTotalPassives;
 
-    public static BreedingMechanics Default { get; } = CreateDefault();
-
     [JsonConstructor]
     public BreedingMechanics(
-        IReadOnlyDictionary<int, float> ivProbabilityDirect,
-        IReadOnlyDictionary<int, float> passiveProbabilityDirect,
-        IReadOnlyDictionary<int, float> passiveRandomAddedProbability,
-        IReadOnlyDictionary<int, float> passivesWildAtMostN
+        Dictionary<int, int> ivInheritanceWeights,
+        Dictionary<int, int> passiveInheritanceWeights,
+        Dictionary<int, int> passiveRandomWeights
     )
     {
-        IVProbabilityDirect = CopyProbabilityTable(
-            nameof(ivProbabilityDirect),
-            ivProbabilityDirect,
-            Enumerable.Range(0, MaxInheritedIVs + 1)
-        );
-        PassiveProbabilityDirect = CopyProbabilityTable(
-            nameof(passiveProbabilityDirect),
-            passiveProbabilityDirect,
-            Enumerable.Range(0, MaxPassiveSkills + 1)
-        );
-        PassiveRandomAddedProbability = CopyProbabilityTable(
-            nameof(passiveRandomAddedProbability),
-            passiveRandomAddedProbability,
-            Enumerable.Range(0, MaxPassiveSkills + 1)
-        );
-        PassivesWildAtMostN = CopyProbabilityTable(
-            nameof(passivesWildAtMostN),
-            passivesWildAtMostN,
-            Enumerable.Range(0, MaxPassiveSkills + 1)
-        );
+        IVInheritanceWeights = ivInheritanceWeights;
+        PassiveInheritanceWeights = passiveInheritanceWeights;
+        PassiveRandomWeights = passiveRandomWeights;
+
+        static FrozenDictionary<int, float> NormFromWeights(int minKey, int maxKey, Dictionary<int, int> weights)
+        {
+            // (keys not in weights are kept as 0 probabilities)
+            var sum = weights.Sum(i => i.Value);
+            return Enumerable
+                .Range(minKey, maxKey - minKey + 1)
+                .ToFrozenDictionary(
+                    k => k,
+                    k => weights.TryGetValue(k, out int value) ? value / (float)sum : 0
+                );
+        }
+
+        IVProbabilityDirect = NormFromWeights(0, 3, ivInheritanceWeights);
+        PassiveProbabilityDirect = NormFromWeights(0, 4, passiveInheritanceWeights);
+        PassiveRandomAddedProbability = NormFromWeights(0, 4, passiveRandomWeights);
+
+        // probability of a wild pal having, at most, N random passives
+        // (not scrapable - assume equal probability of gaining anywhere from 0 through 4 random passives)
+        // (20% chance of exactly N passives)
+        PassivesWildAtMostN = new Dictionary<int, float>
+        {
+            { 0, 0.2f },
+            { 1, 0.4f },
+            { 2, 0.6f },
+            { 3, 0.8f },
+            { 4, 1.0f },
+        };
 
         PassiveProbabilityAtLeastN =
             Enumerable
@@ -98,21 +114,31 @@ public sealed class BreedingMechanics
     }
 
     [JsonProperty]
+    public Dictionary<int, int> IVInheritanceWeights { get; set; }
+
+    [JsonProperty]
+    public Dictionary<int, int> PassiveInheritanceWeights { get; set; }
+
+    [JsonProperty]
+    public Dictionary<int, int> PassiveRandomWeights { get; set; }
+
+    // direct probability helpers
+    [JsonIgnore]
     public IReadOnlyDictionary<int, float> IVProbabilityDirect { get; }
 
-    [JsonProperty]
+    [JsonIgnore]
     public IReadOnlyDictionary<int, float> PassiveProbabilityDirect { get; }
 
-    [JsonProperty]
+    [JsonIgnore]
     public IReadOnlyDictionary<int, float> PassiveRandomAddedProbability { get; }
 
-    [JsonProperty]
+    [JsonIgnore]
     public IReadOnlyDictionary<int, float> PassivesWildAtMostN { get; }
 
-    [JsonProperty]
+    [JsonIgnore]
     public IReadOnlyDictionary<int, float> PassiveProbabilityAtLeastN { get; }
 
-    [JsonProperty]
+    [JsonIgnore]
     public IReadOnlyDictionary<int, float> PassiveRandomAddedAtLeastN { get; }
 
     private readonly float[] ivDesiredProbabilities;
@@ -140,76 +166,16 @@ public sealed class BreedingMechanics
         return TimeSpan.FromMinutes(3) + TimeSpan.FromMinutes(rarityModifier);
     }
 
-    public static BreedingMechanics CreateDefault() =>
-        new(
-            ivProbabilityDirect: new Dictionary<int, float>
-            {
-                { 0, 0.0f },
-                { 1, 0.5f },
-                { 2, 0.25f },
-                { 3, 0.25f },
-            },
-            passiveProbabilityDirect: new Dictionary<int, float>
-            {
-                { 4, 0.10f },
-                { 3, 0.20f },
-                { 2, 0.30f },
-                { 1, 0.40f },
-                { 0, 0.0f },
-            },
-            passiveRandomAddedProbability: new Dictionary<int, float>
-            {
-                { 4, 0.0f },
-                { 3, 0.10f },
-                { 2, 0.20f },
-                { 1, 0.30f },
-                { 0, 0.40f },
-            },
-            // probability of a wild pal having, at most, N random passives
-            // (assume equal probability of gaining anywhere from 0 through 4 random passives)
-            // (20% chance of exactly N passives)
-            passivesWildAtMostN: new Dictionary<int, float>
-            {
-                { 0, 0.2f },
-                { 1, 0.4f },
-                { 2, 0.6f },
-                { 3, 0.8f },
-                { 4, 1.0f },
-            }
-        );
-
     private float[] BuildDesiredIVProbabilities()
     {
+        // IV desired-count probabilities: chance of getting `numDesired` specific IVs given the
+        // inherited-count distribution. combinations table is fixed (there are 3 IV stats).
         var combinationsProbabilityTable =
             new Dictionary<int, Dictionary<int, float>>
             {
-                {
-                    1,
-                    new()
-                    {
-                        { 1, 1.0f / 3.0f },
-                        { 2, 0.0f },
-                        { 3, 0.0f },
-                    }
-                },
-                {
-                    2,
-                    new()
-                    {
-                        { 1, 2.0f / 3.0f },
-                        { 2, 1.0f / 3.0f },
-                        { 3, 0.0f },
-                    }
-                },
-                {
-                    3,
-                    new()
-                    {
-                        { 1, 1.0f },
-                        { 2, 1.0f },
-                        { 3, 1.0f },
-                    }
-                },
+                { 1, new() { { 1, 1f / 3f }, { 2, 0f },      { 3, 0f } } },
+                { 2, new() { { 1, 2f / 3f }, { 2, 1f / 3f }, { 3, 0f } } },
+                { 3, new() { { 1, 1f },      { 2, 1f },      { 3, 1f } } },
             };
 
         var result = new float[MaxInheritedIVs];
@@ -224,40 +190,5 @@ public sealed class BreedingMechanics
         }
 
         return result;
-    }
-
-    private static FrozenDictionary<int, float> CopyProbabilityTable(
-        string parameterName,
-        IReadOnlyDictionary<int, float> source,
-        IEnumerable<int> requiredKeys
-    )
-    {
-        ArgumentNullException.ThrowIfNull(source, parameterName);
-
-        foreach (var key in requiredKeys)
-        {
-            if (!source.ContainsKey(key))
-                throw new ArgumentException(
-                    $"Probability table must contain key {key}.",
-                    parameterName
-                );
-        }
-
-        foreach (var probability in source.Values)
-        {
-            if (
-                probability < 0 ||
-                probability > 1 ||
-                !float.IsFinite(probability)
-            )
-            {
-                throw new ArgumentOutOfRangeException(
-                    parameterName,
-                    "Probabilities must be finite values from zero through one."
-                );
-            }
-        }
-
-        return source.ToFrozenDictionary();
     }
 }

@@ -7,14 +7,15 @@ namespace PalCalc.Solver.Tests.Probabilities
     [TestClass]
     public sealed class PassivesProbabilitiesTests_Final0 : PassivesProbabilitiesTestBase
     {
+
         /* If the final number of child passives is 0, the probability is just the chance of 0 random AND 0 inherited */
 
         [TestMethod]
         public void Parents_None__Desired_None()
         {
             Assert.AreEqual(
-                expected: BreedingMechanics.Default.PassiveRandomAddedProbability[0],
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                expected: mechanics.PassiveRandomAddedProbability[0],
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [],
                     desiredParentPassives: [],
                     numFinalPassives: 0
@@ -27,8 +28,8 @@ namespace PalCalc.Solver.Tests.Probabilities
         public void Parents_1__Desired_None()
         {
             Assert.AreEqual(
-                expected: BreedingMechanics.Default.PassiveRandomAddedProbability[0] * BreedingMechanics.Default.PassiveProbabilityDirect[0],
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                expected: mechanics.PassiveRandomAddedProbability[0] * mechanics.PassiveProbabilityDirect[0],
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 0
@@ -41,8 +42,8 @@ namespace PalCalc.Solver.Tests.Probabilities
         public void Parents_2__Desired_None()
         {
             Assert.AreEqual(
-                expected: BreedingMechanics.Default.PassiveRandomAddedProbability[0] * BreedingMechanics.Default.PassiveProbabilityDirect[0],
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                expected: mechanics.PassiveRandomAddedProbability[0] * mechanics.PassiveProbabilityDirect[0],
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 0
@@ -55,8 +56,8 @@ namespace PalCalc.Solver.Tests.Probabilities
         public void Parents_3__Desired_None()
         {
             Assert.AreEqual(
-                expected: BreedingMechanics.Default.PassiveRandomAddedProbability[0] * BreedingMechanics.Default.PassiveProbabilityDirect[0],
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                expected: mechanics.PassiveRandomAddedProbability[0] * mechanics.PassiveProbabilityDirect[0],
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 0
@@ -69,8 +70,8 @@ namespace PalCalc.Solver.Tests.Probabilities
         public void Parents_4__Desired_None()
         {
             Assert.AreEqual(
-                expected: BreedingMechanics.Default.PassiveRandomAddedProbability[0] * BreedingMechanics.Default.PassiveProbabilityDirect[0],
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                expected: mechanics.PassiveRandomAddedProbability[0] * mechanics.PassiveProbabilityDirect[0],
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 0
@@ -83,8 +84,8 @@ namespace PalCalc.Solver.Tests.Probabilities
         public void Parents_5__Desired_None()
         {
             Assert.AreEqual(
-                expected: BreedingMechanics.Default.PassiveRandomAddedProbability[0] * BreedingMechanics.Default.PassiveProbabilityDirect[0],
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                expected: mechanics.PassiveRandomAddedProbability[0] * mechanics.PassiveProbabilityDirect[0],
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 0

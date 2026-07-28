@@ -22,7 +22,7 @@ namespace PalCalc.Solver.Tests.Probabilities
             float res = 0.0f;
             for (int i = numRequired; i <= GameConstants.MaxTotalPassives; i++)
             {
-                res += BreedingMechanics.Default.PassiveRandomAddedProbability[i];
+                res += mechanics.PassiveRandomAddedProbability[i];
             }
 
             return res;
@@ -34,7 +34,7 @@ namespace PalCalc.Solver.Tests.Probabilities
             Assert.AreEqual(
                 // nothing to inherit, just the chance of inheriting 4 random
                 expected: RandomProbabilityAddedAtLeast(4),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [],
                     desiredParentPassives: [],
                     numFinalPassives: 4
@@ -56,7 +56,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                     // random 3, inherit 1
                     (RandomProbabilityAddedAtLeast(3) * PassiveProbabilityDirectUpTo(numAvailable: 1, numRequired: 1))
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 4
@@ -77,7 +77,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 1, numDesired: 1, numChosen: 1)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner],
                     desiredParentPassives: [Runner],
                     numFinalPassives: 4
@@ -104,7 +104,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                     // random 2, inherit 2
                     (RandomProbabilityAddedAtLeast(2) * PassiveProbabilityDirectUpTo(numAvailable: 2, numRequired: 2))
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 4
@@ -131,7 +131,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 2, numDesired: 1, numChosen: 2)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Irrelevant],
                     desiredParentPassives: [Runner],
                     numFinalPassives: 4
@@ -152,7 +152,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 2, numDesired: 2, numChosen: 2)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Swift],
                     desiredParentPassives: [Runner, Swift],
                     numFinalPassives: 4
@@ -182,7 +182,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                     // random 1, inherit 3
                     (RandomProbabilityAddedAtLeast(1) * PassiveProbabilityDirectUpTo(numAvailable: 3, numRequired: 3))
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 4
@@ -215,7 +215,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 3, numDesired: 1, numChosen: 3)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner],
                     numFinalPassives: 4
@@ -242,7 +242,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 3, numDesired: 2, numChosen: 3)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Swift, Irrelevant],
                     desiredParentPassives: [Runner, Swift],
                     numFinalPassives: 4
@@ -263,7 +263,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 3, numDesired: 3, numChosen: 3)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Swift, Nimble],
                     desiredParentPassives: [Runner, Swift, Nimble],
                     numFinalPassives: 4
@@ -296,7 +296,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                     // random 0, inherit 4
                     (RandomProbabilityAddedAtLeast(0) * PassiveProbabilityDirectUpTo(numAvailable: 4, numRequired: 4))
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 4
@@ -335,7 +335,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 4, numDesired: 1, numChosen: 4)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner],
                     numFinalPassives: 4
@@ -368,7 +368,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 4, numDesired: 2, numChosen: 4)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Swift, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner, Swift],
                     numFinalPassives: 4
@@ -395,7 +395,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 4, numDesired: 3, numChosen: 4)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Swift, Nimble, Irrelevant],
                     desiredParentPassives: [Runner, Swift, Nimble],
                     numFinalPassives: 4
@@ -416,7 +416,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 4, numDesired: 4, numChosen: 4)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Swift, Nimble, Lucky],
                     desiredParentPassives: [Runner, Swift, Nimble, Lucky],
                     numFinalPassives: 4
@@ -449,7 +449,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                     // random 0, inherit 4
                     (RandomProbabilityAddedAtLeast(0) * PassiveProbabilityDirectUpTo(numAvailable: 5, numRequired: 4))
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Irrelevant, Irrelevant, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [],
                     numFinalPassives: 4
@@ -488,7 +488,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 5, numDesired: 1, numChosen: 4)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Irrelevant, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner],
                     numFinalPassives: 4
@@ -521,7 +521,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 5, numDesired: 2, numChosen: 4)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Swift, Irrelevant, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner, Swift],
                     numFinalPassives: 4
@@ -548,7 +548,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 5, numDesired: 3, numChosen: 4)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Swift, Nimble, Irrelevant, Irrelevant],
                     desiredParentPassives: [Runner, Swift, Nimble],
                     numFinalPassives: 4
@@ -569,7 +569,7 @@ namespace PalCalc.Solver.Tests.Probabilities
                         SubCombinationProbability(numAvail: 5, numDesired: 4, numChosen: 4)
                     )
                 ),
-                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(BreedingMechanics.Default,
+                actual: PassiveProbabilities.ProbabilityInheritedTargetPassives(mechanics,
                     parentPassives: [Runner, Swift, Nimble, Lucky, Irrelevant],
                     desiredParentPassives: [Runner, Swift, Nimble, Lucky],
                     numFinalPassives: 4
