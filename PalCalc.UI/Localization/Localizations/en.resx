@@ -120,6 +120,9 @@
   <data name="LC_ABOUT_APP" xml:space="preserve">
     <value>About Pal Calc</value>
   </data>
+  <data name="LC_RESET_LAYOUT" xml:space="preserve">
+    <value>Reset Window Layout</value>
+  </data>
   <data name="LC_ADD_FAKE_SAVE" xml:space="preserve">
     <value>Add a fake save...</value>
   </data>

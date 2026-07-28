@@ -23,6 +23,8 @@ namespace PalCalc.UI.View.Inspector
         public SaveDetailsView()
         {
             InitializeComponent();
+            PalCalc.UI.Model.WindowStatePersistence.AttachColumns(this, "saveDetails",
+                () => new[] { LeftColumn, CenterColumn, RightColumn });
         }
     }
 }

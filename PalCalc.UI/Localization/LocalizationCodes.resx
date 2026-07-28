@@ -120,6 +120,9 @@
   <data name="LC_ABOUT_APP" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_RESET_LAYOUT" xml:space="preserve">
+    <value />
+  </data>
   <data name="LC_ADD_NEW_SAVE" xml:space="preserve">
     <value />
   </data>

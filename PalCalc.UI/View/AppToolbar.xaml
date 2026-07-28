@@ -32,6 +32,8 @@
             <MenuItem Command="{Binding ExportCrashLogCommand}" Header="{itl:LocalizedText LC_EXPORT_CRASH_LOG}" />
             <MenuItem Command="{Binding ForceCheckForUpdatesCommand}" Header="{itl:LocalizedText LC_NAV_FORCE_CHECK_UPDATES}" />
             <MenuItem Command="{Binding OpenAboutWindowCommand}" Header="{itl:LocalizedText LC_ABOUT_APP}" />
+            <Separator />
+            <MenuItem Command="{Binding ResetLayoutCommand}" Header="{itl:LocalizedText LC_RESET_LAYOUT}" />
         </MenuItem>
     </Menu>
 </UserControl>

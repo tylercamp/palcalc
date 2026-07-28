@@ -26,6 +26,8 @@ namespace PalCalc.UI.View.Inspector
         public SearchView()
         {
             InitializeComponent();
+            PalCalc.UI.Model.WindowStatePersistence.AttachColumns(this, "search",
+                () => new[] { TreeColumn, ResultsColumn });
         }
 
         public SearchViewModel ViewModel => DataContext as SearchViewModel;

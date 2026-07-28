@@ -30,6 +30,7 @@ namespace PalCalc.UI
         internal SolverPage()
         {
             InitializeComponent();
+            WindowStatePersistence.AttachGrid(this, "solver", () => Columns, () => Rows);
 
             DataContext = new SolverPageViewModel(Dispatcher, null, null, null);
         }
@@ -37,10 +38,24 @@ namespace PalCalc.UI
         internal SolverPage(SolverPageViewModel vm)
         {
             InitializeComponent();
+            WindowStatePersistence.AttachGrid(this, "solver", () => Columns, () => Rows);
             DataContext = vm;
         }
 
         private SolverPageViewModel ViewModel => DataContext as SolverPageViewModel;
+
+        private IReadOnlyList<ColumnDefinition> Columns => new[] { LeftColumn, CenterColumn, RightColumn };
+        private IReadOnlyList<RowDefinition> Rows => new[] { SourcePalsRow, ResultsRow };
+
+        // Default sizes from SolverPage.xaml — used by the Reset Window Layout action.
+        public void ResetLayout()
+        {
+            LeftColumn.Width = new GridLength(300);
+            CenterColumn.Width = new GridLength(232, GridUnitType.Star);
+            RightColumn.Width = new GridLength(80, GridUnitType.Star);
+            SourcePalsRow.Height = new GridLength(30, GridUnitType.Star);
+            ResultsRow.Height = new GridLength(60, GridUnitType.Star);
+        }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {

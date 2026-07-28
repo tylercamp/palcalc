@@ -24,6 +24,7 @@ namespace PalCalc.UI.View.Inspector
         public SaveInspectorWindow()
         {
             InitializeComponent();
+            PalCalc.UI.Model.WindowStatePersistence.AttachWindow(this, "saveInspector");
         }
 
         protected override void OnClosing(CancelEventArgs e)

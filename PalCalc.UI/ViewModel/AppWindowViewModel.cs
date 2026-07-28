@@ -177,6 +177,9 @@ namespace PalCalc.UI.ViewModel
             page.DataContext = vm;
 
             Content = page;
+
+            // Save selection uses the default window size; remembered size applies on the solver page.
+            WindowStatePersistence.ApplyDefaultSize(App.Current.MainWindow);
         }
 
         private void NavigateSolverPage(SaveGameViewModel selectedSave)
@@ -192,6 +195,9 @@ namespace PalCalc.UI.ViewModel
             var saveOperations = new CommonSaveOperationsViewModel(BeginNavigateSaveSelectionPageCommand, selectedSave.Parent, selectedSave);
             var vm = new SolverPageViewModel(Dispatcher.CurrentDispatcher, saveOperations, selectedSave, LoadPalTargets(selectedSave));
             Content = new SolverPage(vm);
+
+            // Apply the size the user last used on the solver page.
+            WindowStatePersistence.ApplySolverSize(App.Current.MainWindow);
         }
 
         private PalTargetListViewModel LoadPalTargets(SaveGameViewModel sg)

@@ -66,6 +66,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_ABOUT_APP,
         /// <summary>
+        ///   Looks up a localized string similar to Reset Window Layout.
+        /// </summary>
+        LC_RESET_LAYOUT,
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_ADD_FAKE_SAVE,

@@ -59,9 +59,28 @@ namespace PalCalc.UI.Model
         public List<string> ColumnOrder { get; set; } = new();
     }
 
+    public class WindowLayoutState
+    {
+        // GridLength strings ("300", "232*") for the resizable columns, in column order. Null when unused.
+        public List<string> ColumnWidths { get; set; }
+        // GridLength strings for the resizable rows, in row order. Null when unused.
+        public List<string> RowHeights { get; set; }
+
+        // Main-window layout (WPF DIPs). Position + maximized are remembered on every screen;
+        // Width/Height (the resizable size) are remembered only from the solver page.
+        public double? Left { get; set; }
+        public double? Top { get; set; }
+        public double? Width { get; set; }
+        public double? Height { get; set; }
+        public bool? Maximized { get; set; }
+    }
+
     public class AppSettings
     {
         public static AppSettings Current = null;
+
+        // Keyed by a stable UI id ("main", "solver", "saveInspector", "saveDetails", "search").
+        public Dictionary<string, WindowLayoutState> UILayouts { get; set; } = new();
 
         public List<string> ExtraSaveLocations { get; set; } = [];
 

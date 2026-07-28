@@ -21,6 +21,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 
@@ -60,6 +61,21 @@ namespace PalCalc.UI.ViewModel
                     AdonisMessageBox.Show(LocalizationCodes.LC_CRASHLOG_FAILED.Bind().Value, caption: "");
                 }
             }
+        }
+
+        [RelayCommand]
+        private void ResetLayout()
+        {
+            AppSettings.Current.UILayouts.Clear();
+            Storage.SaveAppSettings(AppSettings.Current);
+
+            // Re-apply defaults live to the open main window + solver page.
+            if (App.Current.MainWindow is Window main)
+                WindowStatePersistence.ResetToDefault(main, 1280, 720);
+
+            if (App.Current.MainWindow?.DataContext is AppWindowViewModel appVm &&
+                appVm.Content is SolverPage solver)
+                solver.ResetLayout();
         }
 
         [RelayCommand]

@@ -27,11 +27,11 @@
             </CollectionViewSource>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="149*" MinWidth="100" MaxWidth="400" />
+            <ColumnDefinition x:Name="LeftColumn" Width="149*" MinWidth="100" MaxWidth="400" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="651*" MinWidth="100" />
+            <ColumnDefinition x:Name="CenterColumn" Width="651*" MinWidth="100" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="300*" MinWidth="100" MaxWidth="600" />
+            <ColumnDefinition x:Name="RightColumn" Width="300*" MinWidth="100" MaxWidth="600" />
         </Grid.ColumnDefinitions>
         <ListBox Grid.Column="0" ItemsSource="{Binding Source={StaticResource GroupedContainers}}" SelectedItem="{Binding SelectedContainer}" IsSynchronizedWithCurrentItem="True" adonisExtensions:ScrollViewerExtension.VerticalScrollBarExpansionMode="AlwaysExpand" HorizontalContentAlignment="Stretch">
             <ListBox.ItemContainerStyle>

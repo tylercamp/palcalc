@@ -29,11 +29,11 @@
         <DockPanel>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition MinWidth="220" Width="300"/>
+                    <ColumnDefinition x:Name="LeftColumn" MinWidth="220" Width="300"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="232*" MinWidth="250" />
+                    <ColumnDefinition x:Name="CenterColumn" Width="232*" MinWidth="250" />
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="80*" MinWidth="280"/>
+                    <ColumnDefinition x:Name="RightColumn" Width="80*" MinWidth="280"/>
                 </Grid.ColumnDefinitions>
                 <!-- Left-hand Pane -->
                 <DockPanel Grid.Column="0">
@@ -161,9 +161,9 @@
 
                     <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="30*" />
+                            <RowDefinition x:Name="SourcePalsRow" Height="30*" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="60*" MinHeight="150" />
+                            <RowDefinition x:Name="ResultsRow" Height="60*" MinHeight="150" />
                         </Grid.RowDefinitions>
 
                         <!-- "Source Pals" section -->

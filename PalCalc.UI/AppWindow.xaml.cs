@@ -43,6 +43,9 @@ namespace PalCalc.UI
         {
             DataContext = new AppWindowViewModel(Dispatcher);
             InitializeComponent();
+            SourceInitialized += (_, _) => WindowStatePersistence.RestoreMainWindow(this);
+            Closing += (_, _) => WindowStatePersistence.SaveMainWindow(
+                this, (DataContext as AppWindowViewModel)?.Content is SolverPage);
         }
     }
 }
