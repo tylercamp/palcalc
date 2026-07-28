@@ -73,6 +73,23 @@ public class CandidateExpanderTests
         );
     }
 
+    [TestMethod]
+    public void ExpandBatch_TreatsKnownZeroIVAsRealValue()
+    {
+        var expansion = Expand(
+            SolverTestScenario.Owned("Katress", PalGender.MALE, ivHp: 0),
+            SolverTestScenario.Owned("Wixen", PalGender.FEMALE, ivHp: 98),
+            new PalSpecifier
+            {
+                Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
+            }
+        );
+
+        var childHP = expansion.Candidates.Single().IVs.HP;
+        Assert.AreEqual(0, childHP.Min);
+        Assert.AreEqual(98, childHP.Max);
+    }
+
     private static ExpansionResult Expand(
         PalInstance first,
         PalInstance second,
