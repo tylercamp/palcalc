@@ -18,7 +18,7 @@ namespace PalCalc.Solver.ResultPruning
             MinGroupOf(results, r =>
             {
                 var observed = cachedData.InnerReferences[r];
-                return -(observed.Count - observed.Distinct().Count());
+                return observed.Count - observed.Distinct().Count();
             });
     }
 }
