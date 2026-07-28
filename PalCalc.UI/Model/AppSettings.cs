@@ -59,6 +59,44 @@ namespace PalCalc.UI.Model
         public List<string> ColumnOrder { get; set; } = new();
     }
 
+    public class WindowPlacementSettings
+    {
+        public int Version { get; set; } = 1;
+
+        public int Left { get; set; }
+        public int Top { get; set; }
+        public int Right { get; set; }
+        public int Bottom { get; set; }
+
+        public bool IsMaximized { get; set; }
+    }
+
+    public enum LayoutGridUnit
+    {
+        Auto,
+        Pixel,
+        Star,
+    }
+
+    public class GridLengthSettings
+    {
+        public LayoutGridUnit Unit { get; set; }
+        public double Value { get; set; }
+    }
+
+    public class GridLayoutSettings
+    {
+        public int Version { get; set; } = 1;
+        public List<GridLengthSettings> Columns { get; set; } = new();
+        public List<GridLengthSettings> Rows { get; set; } = new();
+    }
+
+    public class UiLayoutSettings
+    {
+        public Dictionary<string, WindowPlacementSettings> Windows { get; set; } = new();
+        public Dictionary<string, GridLayoutSettings> Grids { get; set; } = new();
+    }
+
     public class AppSettings
     {
         public static AppSettings Current = null;
@@ -78,6 +116,8 @@ namespace PalCalc.UI.Model
         public TranslationLocale Locale { get; set; } = TranslationLocale.en;
 
         public BreedingResultListColumnSettings BreedingResultListColumns { get; set; } = new();
+
+        public UiLayoutSettings UiLayout { get; set; } = new();
 
         public string SkippedAppVersion { get; set; } = null;
     }

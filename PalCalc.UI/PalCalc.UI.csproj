@@ -793,6 +793,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="PalCalc.UI.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Localization\LocalizationCodes.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

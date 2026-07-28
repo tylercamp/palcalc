@@ -9,10 +9,12 @@
                              xmlns:vmc="clr-namespace:PalCalc.UI.ViewModel.Converters"
                              xmlns:v="clr-namespace:PalCalc.UI.View"
                              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+                             xmlns:behaviors="clr-namespace:PalCalc.UI.View.Behaviors"
                              d:DataContext="{d:DesignInstance Type=vm:AppWindowViewModel}"
                              mc:Ignorable="d"
                              Title="{itl:LocalizedText LC_WINDOW_TITLE}"
                              Width="1280" Height="720"
+                             behaviors:WindowPlacementBehavior.Key="MainWindow"
                              IconVisibility="Collapsed">
     <Window.Resources>
         <vmc:ValueVisibilityConverter x:Key="VVC" />

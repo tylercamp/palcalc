@@ -1056,4 +1056,10 @@ When connecting to another person's multiplayer world, Palworld does not downloa
   <data name="LC_PALWORLD_SAVE_FILES" xml:space="preserve">
     <value>Palworld Save Files</value>
   </data>
+  <data name="LC_RESET_UI_LAYOUT" xml:space="preserve">
+    <value>Reset Window Layout</value>
+  </data>
+  <data name="LC_UI_LAYOUT_RESET_NOTICE" xml:space="preserve">
+    <value>Saved window and panel layouts were reset. The defaults will be used the next time Pal Calc starts.</value>
+  </data>
 </root>

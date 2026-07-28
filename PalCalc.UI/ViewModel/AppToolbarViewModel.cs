@@ -6,6 +6,7 @@ using PalCalc.SaveReader.SaveFile;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.Model.CSV;
+using PalCalc.UI.Model.Service;
 using PalCalc.UI.View;
 using PalCalc.UI.View.Inspector;
 using PalCalc.UI.ViewModel.Inspector;
@@ -68,6 +69,16 @@ namespace PalCalc.UI.ViewModel
             var window = new AboutWindow();
             window.Owner = App.Current.MainWindow;
             window.ShowDialog();
+        }
+
+        [RelayCommand]
+        private void ResetUiLayout()
+        {
+            UILayoutStore.Reset();
+            AdonisMessageBox.Show(
+                App.Current.MainWindow,
+                LocalizationCodes.LC_UI_LAYOUT_RESET_NOTICE.Bind().Value
+            );
         }
 
         [RelayCommand]

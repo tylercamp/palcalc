@@ -43,6 +43,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdonisUI.ClassicTheme", "ad
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalCalc.Model.Tests", "PalCalc.Model.Tests\PalCalc.Model.Tests.csproj", "{712B99CA-8B44-4E7B-A2F6-4FD198532268}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalCalc.UI.Tests", "PalCalc.UI.Tests\PalCalc.UI.Tests.csproj", "{56E6666E-BD4C-443D-A180-F476D5AF2EB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -134,6 +136,12 @@ Global
 		{712B99CA-8B44-4E7B-A2F6-4FD198532268}.Release_NoBundle|x64.Build.0 = Release|Any CPU
 		{712B99CA-8B44-4E7B-A2F6-4FD198532268}.Release|x64.ActiveCfg = Release|Any CPU
 		{712B99CA-8B44-4E7B-A2F6-4FD198532268}.Release|x64.Build.0 = Release|Any CPU
+		{56E6666E-BD4C-443D-A180-F476D5AF2EB0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{56E6666E-BD4C-443D-A180-F476D5AF2EB0}.Debug|x64.Build.0 = Debug|Any CPU
+		{56E6666E-BD4C-443D-A180-F476D5AF2EB0}.Release_NoBundle|x64.ActiveCfg = Release|Any CPU
+		{56E6666E-BD4C-443D-A180-F476D5AF2EB0}.Release_NoBundle|x64.Build.0 = Release|Any CPU
+		{56E6666E-BD4C-443D-A180-F476D5AF2EB0}.Release|x64.ActiveCfg = Release|Any CPU
+		{56E6666E-BD4C-443D-A180-F476D5AF2EB0}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

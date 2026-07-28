@@ -12,6 +12,7 @@
                              xmlns:util="clr-namespace:Wpf.Util"
                              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
                              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+                             xmlns:behaviors="clr-namespace:PalCalc.UI.View.Behaviors"
                              mc:Ignorable="d"
                              d:DataContext="{x:Static vm:PalCheckListViewModel.DesignerInstance}"
                              IconVisibility="Collapsed"
@@ -19,6 +20,7 @@
                              WindowStartupLocation="CenterOwner"
                              Title="{Binding Title.Value}"
                              Height="450" Width="450"
+                             behaviors:WindowPlacementBehavior.Mode="Size"
                              >
     <Grid>
         <Grid.Resources>

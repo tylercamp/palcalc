@@ -991,4 +991,10 @@
   <data name="LC_PALWORLD_SAVE_FILES" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_RESET_UI_LAYOUT" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_UI_LAYOUT_RESET_NOTICE" xml:space="preserve">
+    <value />
+  </data>
 </root>

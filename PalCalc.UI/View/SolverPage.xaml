@@ -13,6 +13,7 @@
              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
+             xmlns:layout="clr-namespace:PalCalc.UI.View.Behaviors"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
@@ -27,7 +28,9 @@
     </UserControl.Resources>
     <Border Padding="5">
         <DockPanel>
-            <Grid>
+            <Grid layout:GridLayoutBehavior.Key="Solver.MainPanes"
+                  layout:GridLayoutBehavior.PrimaryColumn="2"
+                  layout:GridLayoutBehavior.PrimaryMinimum="250">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition MinWidth="220" Width="300"/>
                     <ColumnDefinition Width="Auto"/>
@@ -85,7 +88,11 @@
                             <v:PalTargetListView BorderThickness="0" DataContext="{Binding PalTargetList}" />
                         </GroupBox>
 
-                        <Grid Visibility="{Binding SolverQueue.QueuedItems.Count, Converter={StaticResource VVC}}" Grid.Row="1">
+                        <Grid Visibility="{Binding SolverQueue.QueuedItems.Count, Converter={StaticResource VVC}}"
+                              Grid.Row="1"
+                              layout:GridLayoutBehavior.Key="Solver.JobQueue"
+                              layout:GridLayoutBehavior.PrimaryRow="0"
+                              layout:GridLayoutBehavior.PrimaryMinimum="100">
                             <Grid.RowDefinitions>
                                 <RowDefinition />
                                 <RowDefinition Height="Auto"/>
@@ -159,7 +166,10 @@
                         </Border>
                     </Expander>
 
-                    <Grid Grid.Row="1">
+                    <Grid Grid.Row="1"
+                          layout:GridLayoutBehavior.Key="Solver.SourceAndResults"
+                          layout:GridLayoutBehavior.PrimaryRow="2"
+                          layout:GridLayoutBehavior.PrimaryMinimum="150">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30*" />
                             <RowDefinition Height="Auto" />

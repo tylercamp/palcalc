@@ -6,6 +6,7 @@ using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
+using PalCalc.UI.View.Behaviors;
 using PalCalc.UI.ViewModel.Presets;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,7 @@ namespace PalCalc.UI.ViewModel.Solver
             ChangeBredPals = new RelayCommand(() =>
             {
                 var window = new PalCheckListWindow();
+                WindowPlacementBehavior.SetKey(window, "AllowedBredPals");
                 window.DataContext = new PalCheckListViewModel(
                     presets: PalListPresets,
                     onCancel: null,
@@ -72,6 +74,7 @@ namespace PalCalc.UI.ViewModel.Solver
             ChangeWildPals = new RelayCommand(() =>
             {
                 var window = new PalCheckListWindow();
+                WindowPlacementBehavior.SetKey(window, "AllowedWildPals");
                 window.DataContext = new PalCheckListViewModel(
                     presets: PalListPresets,
                     onCancel: null,
