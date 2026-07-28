@@ -10,7 +10,9 @@ namespace PalCalc.Solver.PalReference.Properties
     {
         public bool Satisfies(int minValue) => Min >= minValue;
 
-        public static readonly IV_Value Random = new(false, 0, 0);
+        // Min/Max of -1 keeps this distinct from a known IV of 0, which is a real
+        // value that must still be merged as a possible inherited result.
+        public static readonly IV_Value Random = new(false, -1, -1);
 
         public static IV_Value Merge(IV_Value a, IV_Value b)
         {

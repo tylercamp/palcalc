@@ -1,4 +1,5 @@
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.ResultPruning;
 
 namespace PalCalc.Solver.Processing.Search;
@@ -184,15 +185,19 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     public BreedingEffortGroupKey BreedingEffortGroupOf(IPalReference candidate) =>
         new(candidate.BreedingEffort.Ticks);
 
+    // random IVs have no known value and score as zero
+    private static int ScoreOf(IV_Value iv, Func<IV_Value, int> select) =>
+        iv == IV_Value.Random ? 0 : select(iv);
+
     private static int TotalMaxIV(IPalReference candidate) =>
-        candidate.IVs.HP.Max +
-        candidate.IVs.Attack.Max +
-        candidate.IVs.Defense.Max;
+        ScoreOf(candidate.IVs.HP, iv => iv.Max) +
+        ScoreOf(candidate.IVs.Attack, iv => iv.Max) +
+        ScoreOf(candidate.IVs.Defense, iv => iv.Max);
 
     private static int TotalMinIV(IPalReference candidate) =>
-        candidate.IVs.HP.Min +
-        candidate.IVs.Attack.Min +
-        candidate.IVs.Defense.Min;
+        ScoreOf(candidate.IVs.HP, iv => iv.Min) +
+        ScoreOf(candidate.IVs.Attack, iv => iv.Min) +
+        ScoreOf(candidate.IVs.Defense, iv => iv.Min);
 
     private sealed class BreedingEffortComparer : IComparer<IPalReference>
     {
