@@ -1,9 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.ResultPruning;
+using PalCalc.Solver.Utils;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.GraphSharp;
@@ -26,11 +28,11 @@ namespace PalCalc.UI.ViewModel.Solver
             var db = PalDB.LoadEmbedded();
             var saveGame = CachedSaveGame.SampleForDesignerView;
 
-            var solver = new BreedingSolver(
-                new BreedingSolverSettings(
+            var settings = new BreedingSolverSettings(
                     gameSettings: new GameSettings(),
                     db: db,
-                    pruningBuilder: PruningRulesBuilder.Default,
+                    breedingDB: PalBreedingDB.LoadEmbedded(db),
+                    resultPruning: ResultPruningPolicy.Default,
                     ownedPals: saveGame.OwnedPals,
                     maxBreedingSteps: 3,
                     maxSolverIterations: 5,
@@ -44,8 +46,8 @@ namespace PalCalc.UI.ViewModel.Solver
                     maxSurgeryCost: 0,
                     allowedSurgeryPassives: [],
                     useGenderReversers: false
-                )
             );
+            var solver = new BreedingSolver();
 
             var targetInstance = new PalSpecifier
             {
@@ -57,7 +59,13 @@ namespace PalCalc.UI.ViewModel.Solver
                 },
             };
 
-            DisplayedResult = solver.SolveFor(targetInstance, new SolverStateController() { CancellationToken = CancellationToken.None }).MaxBy(r => r.NumTotalBreedingSteps);
+            DisplayedResult = solver
+                .Solve(
+                    new BreedingSolverRequest(targetInstance, settings),
+                    new SolverStateController(CancellationToken.None)
+                )
+                .Results
+                .MaxBy(r => r.NumTotalBreedingSteps);
 
             IVs = new IVSetViewModel(
                 HP: new IVDirectValueViewModel(true, 80),

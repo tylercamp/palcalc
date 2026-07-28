@@ -1,74 +1,91 @@
-﻿using PalCalc.Model;
+using PalCalc.Model;
 using PalCalc.Solver.ResultPruning;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PalCalc.Solver
+namespace PalCalc.Solver;
+
+public sealed class SolverStateController(CancellationToken cancellationToken = default)
 {
-    public class SolverStateController
+    private volatile bool isPaused;
+
+    public CancellationToken CancellationToken { get; } = cancellationToken;
+    public bool IsPaused => isPaused;
+
+    public void Pause() => isPaused = true;
+    public void Resume() => isPaused = false;
+
+    internal void PauseIfRequested()
     {
-        public CancellationToken CancellationToken { get; set; }
-        public bool IsPaused { get; private set; }
-
-        public void Pause() => IsPaused = true;
-        public void Resume() => IsPaused = false;
-
-        internal void PauseIfRequested()
-        {
-            while (IsPaused) Thread.Sleep(10);
-        }
+        while (isPaused) Thread.Sleep(10);
     }
+}
 
-    public class BreedingSolverSettings(
+public sealed class BreedingSolverSettings
+{
+    public BreedingSolverSettings(
         PalDB db,
+        PalBreedingDB breedingDB,
         GameSettings gameSettings,
-        List<PalInstance> ownedPals,
-
-        PruningRulesBuilder pruningBuilder,
-
+        IEnumerable<PalInstance> ownedPals,
+        ResultPruningPolicy resultPruning,
         int maxBreedingSteps,
         int maxSolverIterations,
         int maxWildPals,
-
-        List<Pal> allowedWildPals,
-        List<Pal> bannedBredPals,
-
+        IEnumerable<Pal> allowedWildPals,
+        IEnumerable<Pal> bannedBredPals,
         int maxInputIrrelevantPassives,
         int maxBredIrrelevantPassives,
-
         TimeSpan maxEffort,
         int maxThreads,
-
         int maxSurgeryCost,
-        List<PassiveSkill> allowedSurgeryPassives,
+        IEnumerable<PassiveSkill> allowedSurgeryPassives,
         bool useGenderReversers
     )
     {
-        public PalDB DB => db;
-        public GameSettings GameSettings => gameSettings;
-        public List<PalInstance> OwnedPals { get; } = ownedPals.Where(p => p.Gender != PalGender.NONE).ToList();
+        ArgumentNullException.ThrowIfNull(db);
+        ArgumentNullException.ThrowIfNull(breedingDB);
+        ArgumentNullException.ThrowIfNull(gameSettings);
+        ArgumentNullException.ThrowIfNull(ownedPals);
+        ArgumentNullException.ThrowIfNull(resultPruning);
+        ArgumentNullException.ThrowIfNull(allowedWildPals);
+        ArgumentNullException.ThrowIfNull(bannedBredPals);
+        ArgumentNullException.ThrowIfNull(allowedSurgeryPassives);
 
-        public PruningRulesBuilder PruningBuilder => pruningBuilder;
-
-        public int MaxBreedingSteps => maxBreedingSteps;
-        public int MaxSolverIterations => maxSolverIterations;
-        public int MaxWildPals => maxWildPals;
-
-        public List<Pal> AllowedWildPals => allowedWildPals;
-        public List<Pal> BannedBredPals => bannedBredPals;
-
-        public int MaxInputIrrelevantPassives { get; } = Math.Clamp(maxInputIrrelevantPassives, 0, GameConstants.MaxTotalPassives);
-        public int MaxBredIrrelevantPassives { get; } = Math.Clamp(maxBredIrrelevantPassives, 0, GameConstants.MaxTotalPassives);
-
-        public TimeSpan MaxEffort => maxEffort;
-        public int MaxThreads { get; } = maxThreads <= 0 ? Environment.ProcessorCount : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
-
-        // Surgery settings
-        public int MaxSurgeryCost => maxSurgeryCost;
-        public List<PassiveSkill> SurgeryPassives => allowedSurgeryPassives ?? [];
-        public bool UseGenderReversers => useGenderReversers;
+        DB = db;
+        BreedingDB = breedingDB;
+        GameSettings = gameSettings;
+        OwnedPals = ownedPals.Where(p => p.Gender != PalGender.NONE).ToList();
+        ResultPruning = resultPruning;
+        MaxBreedingSteps = maxBreedingSteps;
+        MaxSolverIterations = maxSolverIterations;
+        MaxWildPals = maxWildPals;
+        AllowedWildPals = allowedWildPals.ToList();
+        BannedBredPals = bannedBredPals.ToList();
+        MaxInputIrrelevantPassives = Math.Clamp(maxInputIrrelevantPassives, 0, GameConstants.MaxTotalPassives);
+        MaxBredIrrelevantPassives = Math.Clamp(maxBredIrrelevantPassives, 0, GameConstants.MaxTotalPassives);
+        MaxEffort = maxEffort;
+        MaxThreads = maxThreads <= 0
+            ? Environment.ProcessorCount
+            : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
+        MaxSurgeryCost = maxSurgeryCost;
+        SurgeryPassives = allowedSurgeryPassives.ToList();
+        UseGenderReversers = useGenderReversers;
     }
+
+    public PalDB DB { get; }
+    public PalBreedingDB BreedingDB { get; }
+    public GameSettings GameSettings { get; }
+    public IReadOnlyList<PalInstance> OwnedPals { get; }
+    public ResultPruningPolicy ResultPruning { get; }
+    public int MaxBreedingSteps { get; }
+    public int MaxSolverIterations { get; }
+    public int MaxWildPals { get; }
+    public IReadOnlyList<Pal> AllowedWildPals { get; }
+    public IReadOnlyList<Pal> BannedBredPals { get; }
+    public int MaxInputIrrelevantPassives { get; }
+    public int MaxBredIrrelevantPassives { get; }
+    public TimeSpan MaxEffort { get; }
+    public int MaxThreads { get; }
+    public int MaxSurgeryCost { get; }
+    public IReadOnlyList<PassiveSkill> SurgeryPassives { get; }
+    public bool UseGenderReversers { get; }
 }

@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,8 +39,15 @@ namespace PalCalc.Solver.Probabilities
         /// Should be used repeatedly to calculate probabilities for all possible counts of passive skills (max 4)
         /// </remarks>
         /// 
-        public static float ProbabilityInheritedTargetPassives(List<PassiveSkill> parentPassives, List<PassiveSkill> desiredParentPassives, int numFinalPassives)
+        public static float ProbabilityInheritedTargetPassives(
+            BreedingMechanics mechanics,
+            List<PassiveSkill> parentPassives,
+            List<PassiveSkill> desiredParentPassives,
+            int numFinalPassives
+        )
         {
+            ArgumentNullException.ThrowIfNull(mechanics);
+
 #if DEBUG && DEBUG_CHECKS
             if (parentPassives.Count != parentPassives.Distinct().Count()) Debugger.Break();
             if (desiredParentPassives.Count != desiredParentPassives.Distinct().Count()) Debugger.Break();
@@ -57,7 +65,7 @@ namespace PalCalc.Solver.Probabilities
             //
             // ... each of these has a separate probability of getting exactly that outcome.
             //
-            // the final probability for these params (fn args) is the sum
+            // The final probability is the sum of these possible outcomes.
 
             float probabilityForNumPassives = 0.0f;
 
@@ -86,12 +94,15 @@ namespace PalCalc.Solver.Probabilities
                 if (desiredParentPassives.Count == 0)
                 {
                     // just the chance of getting this number of passives from parents
-                    probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent];
+                    probabilityGotRequiredFromParent =
+                        mechanics.PassiveProbabilityDirect[numInheritedFromParent];
                 }
                 else if (numIrrelevantFromParent == 0)
                 {
                     // chance of getting exactly the required passives
-                    probabilityGotRequiredFromParent = GameConstants.PassiveProbabilityDirect[numInheritedFromParent] / Choose(parentPassives.Count, desiredParentPassives.Count);
+                    probabilityGotRequiredFromParent =
+                        mechanics.PassiveProbabilityDirect[numInheritedFromParent] /
+                        Choose(parentPassives.Count, desiredParentPassives.Count);
                 }
                 else
                 {
@@ -115,7 +126,9 @@ namespace PalCalc.Solver.Probabilities
                     var probabilityCombinationWithDesiredPassives =
                         numCombinationsWithIrrelevantPassive / numCombinationsWithAnyPassives;
 
-                    probabilityGotRequiredFromParent = probabilityCombinationWithDesiredPassives * GameConstants.PassiveProbabilityDirect[numInheritedFromParent];
+                    probabilityGotRequiredFromParent =
+                        probabilityCombinationWithDesiredPassives *
+                        mechanics.PassiveProbabilityDirect[numInheritedFromParent];
                 }
 
 #if DEBUG && DEBUG_CHECKS
@@ -129,8 +142,8 @@ namespace PalCalc.Solver.Probabilities
                 // at all - no additional random passives would be added. in that case we don't need exactly `N`
                 // random passives, we just need _at least_ `N` random passives
                 var probabilityGotExactRequiredRandom = numFinalPassives == GameConstants.MaxTotalPassives
-                    ? GameConstants.PassiveRandomAddedAtLeastN[numIrrelevantFromRandom]
-                    : GameConstants.PassiveRandomAddedProbability[numIrrelevantFromRandom];
+                    ? mechanics.PassiveRandomAddedAtLeastN[numIrrelevantFromRandom]
+                    : mechanics.PassiveRandomAddedProbability[numIrrelevantFromRandom];
 
                 probabilityForNumPassives += probabilityGotRequiredFromParent * probabilityGotExactRequiredRandom;
             }

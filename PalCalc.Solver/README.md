@@ -1,104 +1,370 @@
-# Solving Overview
+# Solver Overview
 
-The solver maintains a list of all "relevant pals" for reaching the target, called the "working set".
+Pal Calc finds practical breeding paths from the Pals a player already has, or
+is willing to capture, to a target Pal with the requested passives, IVs, and
+gender.
 
-It starts from all owned pals and wild pals (if enabled), and filters out duplicate and irrelevant pals. This first step looks for at least one of each pal, each gender, and each subset of the desired passive skills.
+For example, you might ask for an Anubis with Legend, Earth Emperor, and at
+least 90 attack IV. Pal Calc will work through all the possibilities and
+return complete breeding trees: which owned or wild Pals to start with, which
+parents to breed at each step, and roughly how much effort each path should
+take.
 
-Then, for each breeding step, all pals in the working set are combined as parent to produce pals which inherit the desired passives. 
+The shortest tree is not always the fastest one. A two-step path with poor
+inheritance odds may take longer than a three-step path whose children are much
+more likely to have the right traits. The solver compares paths by their
+estimated effort and keeps a small selection of useful alternatives.
 
-Terms:
+## Concepts at a Glance
 
-- `Desired Passive` - A required or optional passive skill
-- `Working Set` - The accumulated list of pals which are being compared. Contains owned, wild, and bred pals. Will only keep the "optimal" (fastest) instance of each pal+gender+passive combo.
-- `Pal Reference` - A reference to any type of pal, e.g. owned, bred, and wild. Maintains a breeding effort - an estimated time to acquire that pal - where owned pals have zero effort, wild pals have effort estimated based on their properties (sell price, etc.).
-  - Breeding effort for bred pals is based on the effort of its parents and the effort for breeding the child itself.
-  - The child's self-breeding effort is calculated during solving.
-  - If "Multiple Breeding Farms" is disabled, the total effort of the child is its self-effort + the effort of both parents.
-  - If "Multiple Breeding Farms" is enabled, the total effort of the child is its self-effort + the largest effort of either parent.
-- `Wildcard Gender` - A pal reference without a designated gender. May be resolved to a specific gender.
-- `Gender Resolution` - A pal reference with wildcard gender is copied and the copy is set to a specific gender. The effort estimation of the copy is modified depending on the pal's specific gender probabilities.
+- **Target** - The Pal being requested, including its required and optional
+  passives, IV thresholds, gender, and any limits placed on the search.
+- **Candidate** - A Pal the solver might use in a breeding tree. It can be one
+  you own, one you can catch, or a child from an earlier step. Sometimes one
+  candidate stands for several actual Pals.
+- **Frontier** - The useful candidates found so far. Any Pal in the frontier
+  may become a parent in a later breeding step.
+- **Effective properties** - The parts of a Pal that matter for the current
+  target: species, gender representation, useful passives, and whether each
+  requested IV threshold can be met. If two Pals have the same effective
+  properties, either one will work in the same future breeding steps.
+- **Breeding effort** - An estimate of the work needed to obtain a Pal.
+  `BreedingEffort` covers its complete breeding tree, while
+  `SelfBreedingEffort` covers only the work introduced by that candidate.
+- **Simplification** - Dropping paths that are slower or do not add anything
+  new, while keeping the best paths and a few useful alternatives. This is also
+  called *pruning*.
+- **Completed result** - A Pal that matches the target. It is saved even when
+  the solver does not need it as a parent.
 
-### Effort Estimation
+After each round, the solver records what changed in the frontier. This change
+is called a **frontier delta**. It lets the solver try the new parent pairs
+without repeating work it has already done.
 
-When Pal Calc finds a set of parents to breed, it will produce children which inherit all desired passives from the parents. Each child will have an effort estimation, which is the amount of time needed to produce that child which inherits those specific passives.
+## Building a Breeding Tree
 
-The effort estimate is largely possible thanks to [this reverse engineering of the Palworld inheritance calculation by /u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/comment/kppjq4n/). It provides the complete process as well as probabilities of inheriting different numbers of passives from parents. (See [the other README in this folder](./README-BREED-ESTIMATE.md) for details on the exact calculation.)
+Imagine trying to find a breeding tree by hand. You would begin with the Pals
+available to you, choose two that could make a useful child, and add that child
+to the list of possible parents. You would keep doing this until one of the
+children matched your target.
 
-These probabilities are used when estimating breeding effort. If the child has, e.g., an 8% chance of inheriting all the desired passives from its parents, that's roughly a 1 in 13 chance of success, i.e. on average 13 attempts would be needed to produce that child. At 5 minutes per breeding attempt, that comes to ~65 minutes. (Though Pal Calc will internally double the Breeding Time setting - 10 minutes instead of 5 - to account for lost productivity at night.)
+The solver follows the same general process, but it can consider many possible
+trees at once.
 
-Producing a child which _only_ inherits the desired passives may have an 8% chance, but a child with desired passives and one undesired passive may have a 15% chance. Depending on the "Max Bred Irrelevant Passives" setting, Pal Calc may also produce children including these undesired passives which have a higher probability to obtain. Note that while the undesired passive improves the probability of getting that child, it also reduces the probability of passing on the desired passives from that child.
+It first builds a frontier from the owned and wild Pals allowed by the solver
+settings. It skips Pals that cannot help with the target. When several owned
+Pals would work the same way, it picks one to represent them. It can also
+combine matching male and female Pals so either gender is available later.
 
-If "Max Bred Irrelevant Passives" is set, Pal Calc will produce multiple children from the parents which include these higher-probability children with irrelevant passives. All of these children will be considered equally in future breeding steps.
+The solver then breeds the Pals in the frontier. Useful children are added back
+to the frontier, so they can become parents in the next round. Children that
+already satisfy the target are also saved as completed results.
 
-### Result Pruning
+This repeats until a round produces no useful new Pals, or until the configured
+iteration limit is reached.
 
-The largest technical challenge in Pal Calc was reducing runtime, so that solving could complete in minutes rather than months. If we start with 500 pals and breed them, we get approx. 25,000 (500\*500) children. The next breeding step could have 625,000,000 children (25000\*25000), and the step after that would have several trillion children to check. (Numbers not exactly correct, but the amount of work needed after each step would still scale very quickly.)
+### What makes a child useful?
 
-To get around this Pal Calc will prune its results at each step to reduce the number of breeding calculations it makes. This primarily checks against breeding effort, i.e. a child with a high breeding effort will be ignored if it has already found an equivalent pal (same type of pal, gender, passives) which has lower effort.
+A child is useful when it adds a new or better way to reach the target. It may
+introduce the right Pal for a later breeding combination, collect useful
+passives in one place, carry an IV that can meet a requested threshold, or
+provide the gender needed for another pair.
 
-This greatly helps, but we still often end up with multiple children which take the same effort. Previous logic would just take the first child that was found, but this added a lot of randomness to the results since the order in which children were produced could change. This would also prevent Pal Calc from offering multiple equivalent paths to the same pal, e.g. in case a pal in the discovered path was being used for something and we didn't want it for breeding. We'd prefer to have consistent results and multiple options for breeding, and there are still other parameters that we might want to consider (e.g. location of pals involved, we'd prefer paths which only use pals in Palboxes.)
+The meaning of "useful" depends on the target. If the request only requires an
+attack IV, exact health and defense IVs are ignored when comparing two
+candidates. Likewise, a passive that is valuable in general may still be
+irrelevant for the final target pal.
 
-When Pal Calc produces children in the breeding process it will _always_ skip children which take more effort / are less efficient than children that were previously found. For cases where multiple children have the same effort, Pal Calc has a set of additional pruning steps to pare down the list:
+The solver calls this smaller, target-specific view of a Pal its **effective
+properties**. Grouping candidates this way lets it compare paths that will have
+the same effect on every future breeding step.
 
-- Sort by total breeding steps
-- Sort by number of players involved
-- Sort by locations of pals (prefer palbox over base over party)
-- etc.
-- ... pick the top 3 from this multi-sorted list
+#### Passives
 
-(See [PruningRulesBuilder.cs](./ResultPruning/PruningRulesBuilder.cs).)
+The solver uses two views of a Pal's passives. Its **actual passives** are the
+passives it really has. These are used whenever possible when calculating
+inheritance odds, matching how Palworld uses the parents' real passives in its
+own calculations. Keeping that information also avoids double-counting
+passives or checking the wrong inheritance probabilities.
 
-This pruning is applied at the end of each breeding step before building the next list of parent pairs for breeding. (See [WorkingSet.cs](./WorkingSet.cs).)
+For the broader search, the solver usually condenses those into **effective
+passives**. Desired passives keep their names, while irrelevant or unknown
+passives are replaced with placeholders. This smaller view makes it much
+easier to compare the large number of Pals found during a solve without losing
+the actual passive information needed for probability calculations.
 
-(Unfortunately there is still some randomness even after applying this pruning, since e.g. there may be multiple paths with the same effort estimate, same total breeding steps, same pal locations, etc.)
+**Desired passives** are the required and optional passives requested for the
+target. Required passives must appear on the breeding result. Optional passives
+are preferred when there is room for them, but are not needed for a valid
+result.
 
-### Other Notes
+It does not matter how the desired passives are divided between the parents.
+Palworld combines and deduplicates both parents' passives before rolling
+inheritance, so a 2/2 split is no better than a 1/3 or 0/4 split.
 
-There's a common idea that the distribution of desired passives betweens parents, e.g. a 0/4, 1/3, 2/2 split, affects which passives are inherited by the child. This is [apparently false](https://www.reddit.com/r/Palworld/comments/1af9in7/comment/kppjq4n/). Palworld will make a combined, deduplicated list of passives from the parents, and the inherited passives are based on that combined list.
+#### IVs
 
-Pal Calc does not have any preference for how passives are distributed amongst parents, etc. when searching through breeding paths. It will always consider _all_ possible breeding combinations between _all_ discovered parents, and will preserve the fastest option it's found, whatever that may be.
+An IV is relevant when it can satisfy a threshold in the current request.
+"Relevant" describes its usefulness for this target, not whether the stat is
+generally good.
 
-The solver was written to try to ensure that it will always output the same results if you use the same save data and settings, but there will still be some amount of randomness in the results it produces [due to the pruning process](#result-pruning).
+Some candidates stand for more than one individual Pal, so the solver records
+their IVs as ranges. During the search, the important question is usually
+whether that range can meet the requested threshold. Exact values can still
+help choose between otherwise similar paths.
 
-Regardless of randomness or choices in pruning logic, the main indicator of which options are kept is based on breeding time estimates, so Pal Calc will always output the fastest method. But since there are typically many other breeding paths equivalent to that "fastest method", the specific path shown may change when the solver runs again.
+#### Gender
 
-### Detailed Solver Steps
+The solver does not always need to choose a candidate's gender right away. A
+wildcard gender means it can choose the required gender later and include the
+chance of obtaining that gender in the effort estimate. An opposite-wildcard
+simply takes whichever gender is opposite the other parent.
 
-_This may become outdated in later updates._
+If the player owns equivalent male and female Pals, the solver can combine them
+into a composite owned candidate. A later step can use whichever owned Pal has
+the required gender instead of breeding another copy just for its gender.
 
-- **(1) Prepare the starting list of pals, add to the working set**
-  - _The list of available pals is reduced to contain one of each pal with a given gender, and a unique subset of the list of desired passives. Pals are filtered based on "Max Input Irrelevant Passives"._
-  - _If there are multiple pals with the same pal type, gender, and list of traits, then a single pal will be chosen based on highest IVs and its stored location. It will try to pick pals in your palbox, base, and party, in that order. See `BreedingSolver.RelevantInstancesForPassiveSkills`._
-  - _If there is a male and female of the same pal with the same set of desired passives, a composite reference is made which combines them and has "wildcard" gender. Both pals, and the composite reference, are preserved in the final list._
-  - _If "Num Wild Pals" > 0, a wild representation of any unowned pal is added to the list with "wildcard" gender. For each wild pal, multiples of that pal may be added with up to "Max Input Irrelevant Passives" random passives. (Wild pals with more random passives have a higher probability / lower effort to acquire.)_
-- **(2) Begin breeding loop**
-  - **(2.1) Build the list of child pals from the working set**
-     - **(2.1.1) Filter parent pairs**
-       - _Parents with the same gender are skipped._
-       - _Bred parents whose combined wild pal participants exceed "Num Wild Pals" are skipped._
-       - _Bred parents whose combined breeding steps exceed "Max Breeding Steps" are skipped._
-       - _Parents which cannot reach the target pal within the remaining number of breeding steps are skipped._
-       - _If "Max Irrelevant Passives" is zero, parents are skipped if either of them have at least one passive and neither parent has any relevant passives. (It's impossible to produce a child with zero passives if either parent has at least one passive.)_
-     - **(2.1.2) Resolve parent genders for bred + wild pals with "wildcard" gender**
-       - _If both parents are wildcards and the type of child pal depends on the gender of the parents (e.g. Katress + Wixen), make two new parent pairs with (Male, Female) and (Female, Male) resolved genders to cover both results._
-       - _If either parent is still a wildcard, resolve them to specific genders._
-         - _If either parent is not a wildcard, the wildcard parent takes the opposite gender._
-         - _If both parents are wildcards, the parents may be assigned specific genders depending on their pal-specific gender probabilities, and/or the least-effort parent may be assigned "Opposite Wildcard". See `BreedingSolver.PreferredParentGenders`._
-     - **(2.1.3) Create list of relevant children which inherit desired passives, calculate probability of producing a child with those passives**
-       - _The list of desired passives is collected from the parents, and a list of permutations of these desired passives (where each permutation still contains all required passives) is made. (This is mainly to account for optional passives.)_
-       - _For each permutation of passives, create a bred pal reference whose effort is based on the probability of inheriting exactly those passives._
-         - _Multiple bred pal references may be made depending on "Max Bred Irrelevant Passives", to represent e.g. "exact desired passives", "desired passives + 1 random", etc._
-         - _The number of irrelevant passives directly affects the child's breeding self-effort. It will also affect the effort of breeding that child in a later breeding step to obtain desired passives. See `BreedingSolver.ProbabilityInheritedTargetPassiveSkills.`_
-       - _Any children which match the desired pal are added to a separate list of final results._
-     - **(2.1.4) "Non-optimal" children are skipped**
-       - _The working set is checked for matching pals with the same passives. If a pal already exists with the same passive, gender, and takes less effort than this child, the child is skipped._
-       - _This only checks against equivalent pals in the working set. Other pals produced within this breeding step will be filtered later._
-  - **(2.2) Collect any children which match the target**
-  - **(2.3) Reduce and merge the optimized children into the working set**
-    - _The full set of discovered children are grouped by pal, gender, and list of passives. If there are multiple results in a group, the list is [pruned](./ResultPruning/PruningRulesBuilder.cs) to take the "best" options from the list._
-    - _The pruned set of children are merged into the working set. (2) is repeated using the pruned children and the contents of the working set._
-      - _These pruning steps ensure we only consider the "best" options and reduce the total amount of work, which speeds up the solving process. If the working set contains a pal, then that pal is the most optimal way to make that pal that's been found so far._
-    - _If no new children were produced, i.e. working set contains all possible optimal results and additional iterations would be pointless, the breeding process exits early._
-  - **(2.4) Process repeats, up to "Max Breeding Steps" times**
-- **(3.) List of pals matching the target are returned, may be further pruned/filtered by PalCalc.UI**
-  - _Results may be grouped using [PalPropertyGrouping](./PalPropertyGrouping.cs), and each group can be reduced using common [pruning](./ResultPruning/PruningRulesBuilder.cs)._
+## Estimating the Effort of a Path
+
+Once the solver finds a possible child, it estimates how much work it should
+take to produce that child with the required properties.
+
+Suppose a child has an 8% chance of inheriting the passives and IVs needed for
+the next step. That works out to about one success per 12 or 13 attempts. The
+solver multiplies those average breeding attempts by the configured time per
+breed to estimate the time spent making that child.
+
+Depending on the solver settings, effort can include:
+
+- the effort already spent obtaining both parents
+- passive and IV inheritance probabilities
+- the chance of obtaining the required gender
+- breeding and incubation time
+- the effort needed to capture a wild Pal
+- the number of breeding facilities available
+
+This is why the fewest breeding steps do not always produce the fastest path.
+It is also why an extra irrelevant passive can matter: even when two children
+have the same desired passives, their actual passives may give them different
+inheritance odds in the next step.
+
+`SelfBreedingEffort` is the work introduced by one candidate, such as the
+attempts needed to breed that child. `BreedingEffort` includes that work and
+the effort of the complete parent paths leading to it.
+
+The estimate is an average, not a promise. You might get the desired child on
+the first egg, or you might need many more attempts than expected. The estimate
+gives the solver a consistent way to compare whole breeding trees.
+
+See [Passive inheritance estimation](./README-BREED-ESTIMATE.md) for the
+probability calculations used by the solver.
+
+## Keeping the Search Manageable
+
+The number of possible breeding trees explodes as the search continues. Every
+useful child becomes another possible parent, and every new parent can be
+paired with the Pals already found. Keeping every possible way of reaching
+every child would massively expand the pool of paths the solver has to search.
+
+Pal Calc simplifies the frontier after each round. If two candidates have the
+same effective properties, they are equally useful in future breeding. The
+solver compares the paths that produced them and can drop one that clearly
+takes longer.
+
+Lower breeding effort is the clearest improvement. If the solver finds the
+same effective Pal through a faster path, the slower path can be ignored
+entirely.
+
+Effort is not the only useful difference, however. Two paths may take the same
+estimated effort while differing in the number of steps, IV quality, cost, Pal
+locations, and other practical details. The solver uses those differences to
+decide which alternatives are worth keeping instead of simply taking whichever
+path it found first.
+
+Completed results are handled separately. A Pal can be a good final answer
+even when another equivalent Pal would make a better parent, so the solver
+saves results before simplifying the frontier.
+
+## Search Coverage and Limits
+
+The solver tries every new parent combination among the candidates it retains.
+When simplification changes the frontier, only pairs involving those changes
+need to be scheduled; combinations between unchanged candidates have already
+been considered.
+
+`MaxSolverIterations` puts a hard limit on the number of rounds, but the solver
+typically finishes much earlier. Since it only preserves the optimal results
+as they are discovered, it eventually and naturally reaches the limit of how
+"optimal" the breeding results can be. At that point, every child it can
+produce is equivalent to or worse than something it has already kept, so the
+frontier stops changing and there are no new parent pairs to try.
+
+"Optimal" therefore means optimal according to the solver's effort model and
+candidate-selection rules. Pal Calc does not preserve every possible ancestry
+for every Pal. It preserves the fastest useful candidates it finds, along with
+a limited selection of alternatives that differ in practical ways.
+
+## Finishing the Results
+
+A completed breeding path still needs a final pass before it is returned.
+
+Surgery can add, remove, or change passives at a cost. The solver applies it
+after the main breeding search. Considering every possible surgery during
+every breeding round could uncover more intermediate combinations, but it
+would also multiply the number of paths the solver has to search.
+
+After applying surgery options, the solver checks that each path has the
+requested passives and gender, then returns the paths that remain. The UI may
+group or reduce those alternatives further so the player is not shown hundreds
+of similarly efficient trees. `PalResultGrouping` and `PalResultProperty` are
+used for that presentation step, but aren't used in the breeding search itself.
+
+## Detailed Solver Walkthrough
+
+The following is a complete walkthrough of the steps, in order.
+
+### 1. Prepare the solve
+
+1. `BreedingSolver` receives a `BreedingSolverRequest` containing the target
+   and settings.
+2. The request keeps a normalized copy of the target so later changes by the
+   caller cannot affect a running solve.
+3. `SolverRunContext` stores the target, settings, breeding mechanics,
+   breeding database, run controller, and candidate-selection policy used for
+   this run.
+4. `SolverRun` runs the search and finishes the results.
+
+### 2. Build the starting candidates
+
+`InitialPalBuilder` creates the owned and wild candidates that can contribute
+to the target.
+
+1. Apply the request's input limits and discard Pals that cannot help reach the
+   target.
+2. When owned Pals have the same useful properties, choose one to represent
+   them.
+3. Represent allowed wild Pals, including the effort needed to capture them.
+4. Create wildcard gender representations where gender can be resolved later.
+5. When the player owns matching male and female Pals, create a composite
+   candidate that can supply either gender.
+6. Add the resulting candidates to the initial frontier.
+
+### 3. Create the frontier and first parent schedule
+
+`SearchFrontier` keeps track of the candidates retained for future breeding,
+the pending parent pairs, and the completed results found during the run.
+
+1. `FrontierIndex` groups the initial candidates by
+   `EffectivePropertiesKey`.
+2. `ResultAccumulator` checks whether any starting candidate already satisfies
+   the target.
+3. `ParentPairSchedule` creates the initial set of parent combinations.
+4. The ordering supplied by the candidate-selection policy determines which
+   retained candidates are expanded first.
+
+### 4. Expand the pending parent pairs
+
+`ParallelBatchExecutor` divides the scheduled pairs among workers. Each worker
+uses its own `CandidateExpander` and object pools so pair expansion can run in
+parallel without sharing temporary objects.
+
+For each pair, `CandidateExpander`:
+
+1. Checks whether the parents are compatible.
+2. Applies request limits, such as breeding-step and wild-Pal restrictions,
+   that can reject the pair early.
+3. Resolves wildcard genders and handles recipes whose child depends on which
+   parent is male or female.
+4. Finds the child species the pair can produce.
+5. Determines the useful passive and IV outcomes for that child.
+6. Calculates the probability and effort of producing each relevant outcome.
+7. Produces candidates that may add a new or better path.
+
+Workers use a quick assessment from the selection policy to avoid returning
+children that are already known to be unhelpful. This is only a pre-filter;
+the frontier performs the complete simplification after collecting the batch.
+
+### 5. Save completed results
+
+`ResultAccumulator` checks each produced candidate before the frontier is
+simplified.
+
+Any candidate that satisfies the target is saved as a completed result. This
+happens separately because a valid result may not be one of the candidates
+worth retaining as a future parent.
+
+Completed results are grouped and simplified independently from the frontier.
+Paths with the same breeding effort can be reduced using the result-selection
+rules without changing which effort levels have been discovered.
+
+### 6. Simplify and update the frontier
+
+The frontier merges the children from the batch with the candidates already
+retained. `DefaultCandidateSelectionPolicy` runs the simplification using the
+rules configured by `ResultPruningPolicy`.
+
+1. Group candidates by their effective properties.
+2. Treat lower breeding effort as a guaranteed improvement over matching
+   candidates.
+3. Treat better cost or IVs as possible improvements that still need the full
+   simplification pass.
+4. Apply the ordered rules from `ResultPruningPolicy`, including effort, steps,
+   IV quality, cost, location, reuse, wild Pals, referenced players, variety,
+   and the configured result limit.
+5. Keep the selected paths for each effective-property group.
+6. Produce a `FrontierDelta` containing the candidates added to and removed
+   from the frontier.
+
+`FrontierIndex` is updated from that delta. `ParentPairSchedule` then adds the
+new combinations introduced by the change and removes work that is no longer
+relevant. Pairs between unchanged candidates are not repeated.
+
+### 7. Repeat or stop
+
+The solver expands the new parent pairs and simplifies the frontier again.
+Each successful round can introduce intermediates that make another generation
+of breeding possible.
+
+The loop stops when:
+
+- simplification produces no newly useful candidates and no new parent pairs,
+- the configured iteration limit is reached, or
+- the run is cancelled or stopped because of an error.
+
+### 8. Apply surgery and return the results
+
+`ResultPostProcessor` handles the completed paths collected during the search.
+
+1. Apply the allowed surgery operations and their costs.
+2. Check the final required and optional passive rules.
+3. Check that the result has the requested gender.
+4. Return the remaining paths as a `BreedingSolverResult`.
+
+The UI may use `PalResultGrouping` and `PalResultProperty` to reduce or group
+the returned paths for display. This does not change which candidates were
+explored during the solve.
+
+## Implementation Map
+
+```text
+BreedingSolver
+  -> SolverRunContext
+  -> SolverRun
+       -> InitialPalBuilder
+       -> SearchFrontier
+            -> FrontierIndex
+            -> ParentPairSchedule
+            -> ResultAccumulator
+       -> ParallelBatchExecutor
+            -> CandidateExpander per worker
+                 -> worker-local object pools
+       -> ResultPostProcessor
+  -> BreedingSolverResult
+```
+
+Further references:
+
+- [Passive inheritance estimation](./README-BREED-ESTIMATE.md)
+- [Miscellaneous optimization notes](./README-MISC.md)
+- [`PalCalc.Solver.CLI/Program.cs`](../PalCalc.Solver.CLI/Program.cs) contains
+  an end-to-end usage example.

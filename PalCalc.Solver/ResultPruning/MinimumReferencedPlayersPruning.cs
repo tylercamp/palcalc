@@ -1,4 +1,4 @@
-﻿using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.ResultPruning
 {
     // prefer options where we don't need to borrow pals from multiple players
-    public class MinimumReferencedPlayersPruning : IResultPruning
+    public class MinimumReferencedPlayersPruning : ResultPruningRule
     {
         public MinimumReferencedPlayersPruning(CancellationToken token) : base(token)
         {

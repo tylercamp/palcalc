@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
+using PalCalc.Solver;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View.Inspector;
@@ -373,7 +374,13 @@ namespace PalCalc.UI.ViewModel
             var originalGameSettings = SelectedGameSettings.ModelObject;
             var job = new SolverJobViewModel(
                 dispatcher,
-                SolverControls.ConfiguredSolver(originalGameSettings, PalTargetList.SourcePals.AvailablePals.ToList()),
+                new BreedingSolverRequest(
+                    currentSpec.ModelObject,
+                    SolverControls.ConfiguredSolverSettings(
+                        originalGameSettings,
+                        PalTargetList.SourcePals.AvailablePals.ToList()
+                    )
+                ),
                 currentSpec,
                 cachedData.StateId
             );

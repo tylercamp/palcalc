@@ -1,4 +1,4 @@
-﻿using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.ResultPruning
 {
-    public class MinimumWildPalsPruning : IResultPruning
+    public class MinimumWildPalsPruning : ResultPruningRule
     {
         public MinimumWildPalsPruning(CancellationToken token) : base(token)
         {

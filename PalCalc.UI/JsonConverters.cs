@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Probabilities;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
@@ -379,7 +380,16 @@ namespace PalCalc.UI
                 ?.ToList()
                 ?? Enumerable.Empty<PassiveSkill>();
 
-            return (WildPalReference)new WildPalReference(pal, guaranteedPassives, numPassives).WithGuaranteedGender(db, gender, solverSettings.UseGenderReversers);
+            return (WildPalReference)new WildPalReference(
+                pal,
+                guaranteedPassives,
+                numPassives,
+                db.BreedingMechanics
+            ).WithGuaranteedGender(
+                db,
+                gender,
+                solverSettings.UseGenderReversers
+            );
         }
     }
 

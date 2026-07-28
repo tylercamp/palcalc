@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.PalReference.Properties;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,16 +12,12 @@ namespace PalCalc.Solver.Probabilities
     // https://github.com/tylercamp/palcalc/issues/22#issuecomment-2509171056
     public static class IVs
     {
-        // The probability of ending up with N desired IVs (indexed [numDesired - 1]) is computed
-        // centrally in GameConstants.IVDesiredProbabilities, from the scraped inherited-count
-        // distribution. (Does not include the 50/50 chance of inheriting from a specific parent.)
-
         /// <summary>
         /// Given the IVs from two parents, returns the probability of inheriting all desired IVs from the parents.
         /// 
         /// A desired IV is determined by whether it's a "relevant" IV. (i.e. targetted during solving)
         /// </summary>
-        public static float ProbabilityInheritedTargetIVs(IV_Set a, IV_Set b)
+        public static float ProbabilityInheritedTargetIVs(BreedingMechanics mechanics, IV_Set a, IV_Set b)
         {
             int numRelevantHP = 0;
             if (a.HP.IsRelevant) numRelevantHP++;
@@ -42,7 +39,7 @@ namespace PalCalc.Solver.Probabilities
             if (numRequiredIVs == 0) return 1.0f;
 
             // base probability is the chance of getting the IV categories we want
-            float result = GameConstants.IVDesiredProbabilities[numRequiredIVs - 1];
+            float result = mechanics.ProbabilityOfInheritingDesiredIVs(numRequiredIVs);
 
             // even if we got the right IV categories, we might not get the right parents/values
             //

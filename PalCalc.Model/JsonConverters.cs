@@ -180,6 +180,7 @@ namespace PalCalc.Model
             var attacks = asToken["ActiveSkills"].ToObject<List<ActiveSkill>>();
             var elements = asToken["Elements"].ToObject<List<PalElement>>();
             var breedingGenderProbability = asToken["BreedingGenderProbability"].ToObject<Dictionary<string, Dictionary<PalGender, float>>>();
+            var breedingMechanics = asToken["BreedingMechanics"].ToObject<BreedingMechanics>();
 
             foreach (var attack in attacks)
                 attack.Element = elements.Single(e => e.InternalName == attack.ElementInternalName);
@@ -192,15 +193,12 @@ namespace PalCalc.Model
                 PassiveSkills = passives,
                 ActiveSkills = attacks,
                 Elements = elements,
+                BreedingMechanics = breedingMechanics,
 
                 BreedingGenderProbability = breedingGenderProbability.ToDictionary(
                     kvp => kvp.Key.InternalToPal(pals),
                     kvp => kvp.Value
                 ),
-
-                CombiTalentInheritNum = asToken["CombiTalentInheritNum"]?.ToObject<List<int>>(),
-                CombiPassiveInheritNum = asToken["CombiPassiveInheritNum"]?.ToObject<List<int>>(),
-                CombiPassiveRandomAddNum = asToken["CombiPassiveRandomAddNum"]?.ToObject<List<int>>(),
             };
         }
 
@@ -214,10 +212,8 @@ namespace PalCalc.Model
                 PassiveSkills = value.PassiveSkills,
                 ActiveSkills = value.ActiveSkills,
                 Elements = value.Elements,
+                BreedingMechanics = value.BreedingMechanics,
                 BreedingGenderProbability = value.BreedingGenderProbability.ToDictionary(kvp => kvp.Key.InternalName, kvp => kvp.Value),
-                CombiTalentInheritNum = value.CombiTalentInheritNum,
-                CombiPassiveInheritNum = value.CombiPassiveInheritNum,
-                CombiPassiveRandomAddNum = value.CombiPassiveRandomAddNum,
             }).WriteTo(writer);
         }
     }

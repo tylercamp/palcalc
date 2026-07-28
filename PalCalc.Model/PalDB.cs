@@ -26,6 +26,8 @@ namespace PalCalc.Model
 
         public Dictionary<Pal, Dictionary<PalGender, float>> BreedingGenderProbability { get; set; }
 
+        public BreedingMechanics BreedingMechanics { get; set; }
+
         public List<PassiveSkill> PassiveSkills { get; set; }
 
         // passive skills which most users would expect, does *not* include passive effects
@@ -36,12 +38,6 @@ namespace PalCalc.Model
 
         public List<PalElement> Elements { get; set; }
         public List<ActiveSkill> ActiveSkills { get; set; }
-
-        // raw inheritance weight arrays scraped from PalGameSetting (see GameConstants + GenDB.GameSettingReader).
-        // null in DBs generated before scraping was added; GameConstants falls back to datamined defaults.
-        public List<int> CombiTalentInheritNum { get; set; }
-        public List<int> CombiPassiveInheritNum { get; set; }
-        public List<int> CombiPassiveRandomAddNum { get; set; }
 
         public IEnumerable<Pal> Pals => PalsById.Values;
 
@@ -96,9 +92,6 @@ namespace PalCalc.Model
             PalDB result;
             using (var streamReader = new StreamReader(stream, Encoding.UTF8))
                 result = FromJson(streamReader.ReadToEnd());
-
-            // apply scraped inheritance weights (falls back to datamined defaults if absent)
-            GameConstants.ApplyScrapedInheritance(result.CombiTalentInheritNum, result.CombiPassiveInheritNum, result.CombiPassiveRandomAddNum);
 
             logger.Information("Successfully loaded embedded pal DB in {ms}ms", sw.ElapsedMilliseconds);
             return result;

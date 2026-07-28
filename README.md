@@ -91,7 +91,7 @@ Save file parsing is in `PalCalc.SaveReader`, which is a partial C# port of [pal
 
 Data collected from Palworld or a save file are represented by types in `PalCalc.Model`. Instances of an owned pal within the game are represented by `PalInstance`.
 
-The solver logic in `PalCalc.Solver` wraps this type with `IPalReference` types, which can represent owned, wild, and bred pals. The `IPalReference` types are returned by `PalCalc.Solver.BreedingSolver`, but you can use `OwnedPalReference` results to fetch underlying owned instances.
+The solver logic in `PalCalc.Solver` wraps this type with `IPalReference` types, which can represent owned, wild, and bred pals. `PalCalc.Solver.BreedingSolver` returns a `BreedingSolverResult` containing these references; `OwnedPalReference` values provide access to their underlying owned instances.
 
 The overall solver process is described in the project's [README](./PalCalc.Solver/).
 

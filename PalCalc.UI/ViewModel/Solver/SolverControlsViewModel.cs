@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
@@ -267,11 +267,12 @@ namespace PalCalc.UI.ViewModel.Solver
         [ObservableProperty]
         private List<PassiveSkill> bannedSurgeryPassives = new List<PassiveSkill>();
 
-        public BreedingSolver ConfiguredSolver(GameSettings gameSettings, List<PalInstance> pals) => new BreedingSolver(
+        public BreedingSolverSettings ConfiguredSolverSettings(GameSettings gameSettings, List<PalInstance> pals) =>
             new BreedingSolverSettings(
                 db: PalDB.LoadEmbedded(),
+                breedingDB: PalBreedingDB.LoadEmbedded(PalDB.LoadEmbedded()),
                 gameSettings: gameSettings,
-                pruningBuilder: PruningRulesBuilder.Default,
+                resultPruning: ResultPruningPolicy.Default,
                 ownedPals: pals,
                 maxBreedingSteps: MaxBreedingSteps,
                 maxSolverIterations: MaxSolverIterations,
@@ -286,8 +287,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 maxSurgeryCost: MaxGoldCost,
                 allowedSurgeryPassives: PalDB.LoadEmbedded().SurgeryPassiveSkills.Except(BannedSurgeryPassives).ToList(),
                 useGenderReversers: UseGenderReversers
-            )
-        );
+            );
 
         public SerializableSolverSettings AsModel => new SerializableSolverSettings()
         {

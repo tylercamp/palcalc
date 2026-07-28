@@ -10,7 +10,7 @@ namespace PalCalc.GenDB.GameDataReaders
 {
     public class RawGameSettings
     {
-        // weight arrays governing breeding inheritance (see PalCalc.Model.GameConstants)
+        // weight arrays governing breeding inheritance (see PalCalc.Model.BreedingMechanics)
         public List<int> TalentInheritNum { get; set; }
         public List<int> PassiveInheritNum { get; set; }
         public List<int> PassiveRandomAddNum { get; set; }
@@ -56,14 +56,7 @@ namespace PalCalc.GenDB.GameDataReaders
         private static List<int> ReadIntArray(UObject obj, string name)
         {
             var prop = obj.Properties.FirstOrDefault(p => p.Name.Text == name);
-            if (prop == null)
-            {
-                logger.Warning("PalGameSetting property {name} not found", name);
-                return null;
-            }
-
             var arr = prop.Tag?.GetValue<UScriptArray>();
-            if (arr == null) return null;
 
             // stored as floats (e.g. 3.0, 2.0, 1.0); these are integer weights
             return arr.Properties.Select(p => (int)Math.Round(p.GetValue<float>())).ToList();
