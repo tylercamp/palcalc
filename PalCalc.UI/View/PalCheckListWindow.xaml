@@ -19,7 +19,8 @@
                              WindowStyle="ToolWindow"
                              WindowStartupLocation="CenterOwner"
                              Title="{Binding Title.Value}"
-                             Height="450" Width="450"
+                             Width="450" Height="450"
+                             MinWidth="200" MinHeight="200"
                              behaviors:WindowPlacementBehavior.Mode="Size"
                              >
     <Grid>

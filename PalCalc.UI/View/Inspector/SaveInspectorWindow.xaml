@@ -16,7 +16,8 @@
                              d:DataContext="{x:Static svm:SaveInspectorWindowViewModel.DesignerInstance}"
                              IconVisibility="Collapsed"
                              Title="{Binding WindowTitle.Value}"
-                             Height="550" Width="900"
+                             Width="900" Height="550"
+                             MinWidth="480" MinHeight="320"
                              behaviors:WindowPlacementBehavior.Key="SaveInspector"
                              behaviors:WindowPlacementBehavior.Mode="SizeAndState"
                              >

@@ -15,7 +15,8 @@
                              IconVisibility="Collapsed"
                              DataContext="{Binding RelativeSource={RelativeSource Self}}"
                              Title="{itl:LocalizedText Code=LC_TRAITS_SEARCH_TITLE}"
-                             Height="450" Width="800"
+                             Width="800" Height="450"
+                             MinWidth="400" MinHeight="200"
                              behaviors:WindowPlacementBehavior.Key="PassivesSearch"
                              behaviors:WindowPlacementBehavior.Mode="Size"
                              >

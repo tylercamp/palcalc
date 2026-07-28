@@ -52,7 +52,11 @@ namespace PalCalc.UI.View.Behaviors
         private static void KeyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
             if (obj is not Window window)
-                throw new InvalidOperationException($"{nameof(WindowPlacementBehavior)} can only be applied to a Window");
+            {
+                // (don't throw an exception - VS XAML Preview doesn't provide a real `Window`)
+                logger.Warning($"{nameof(WindowPlacementBehavior)} can only be applied to a Window, not a {obj.GetType().FullName}");
+                return;
+            }
 
             if (!string.IsNullOrWhiteSpace(e.OldValue as string))
             {
