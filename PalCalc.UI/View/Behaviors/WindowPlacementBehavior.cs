@@ -3,9 +3,7 @@ using PalCalc.UI.Model.Service;
 using Serilog;
 using System;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Interop;
 
 namespace PalCalc.UI.View.Behaviors
 {
@@ -18,11 +16,7 @@ namespace PalCalc.UI.View.Behaviors
 
     public static class WindowPlacementBehavior
     {
-        private const int CurrentSettingsVersion = 1;
-        private const int SwShowNormal = 1;
-        private const int SwShowMinimized = 2;
-        private const int SwShowMaximized = 3;
-        private const int WpfRestoreToMaximized = 0x0002;
+        private const int CurrentSettingsVersion = 2;
         private static readonly ILogger logger = Log.ForContext(typeof(WindowPlacementBehavior));
 
         public static readonly DependencyProperty KeyProperty = DependencyProperty.RegisterAttached(
@@ -38,6 +32,14 @@ namespace PalCalc.UI.View.Behaviors
             typeof(WindowPlacementBehavior),
             new PropertyMetadata(WindowPlacementMode.Full)
         );
+
+        private static readonly DependencyProperty LastNonMinimizedStateProperty =
+            DependencyProperty.RegisterAttached(
+                "LastNonMinimizedState",
+                typeof(WindowState),
+                typeof(WindowPlacementBehavior),
+                new PropertyMetadata(WindowState.Normal)
+            );
 
         public static string GetKey(DependencyObject obj) => (string)obj.GetValue(KeyProperty);
 
@@ -62,13 +64,25 @@ namespace PalCalc.UI.View.Behaviors
             {
                 window.SourceInitialized -= Window_SourceInitialized;
                 window.Closing -= Window_Closing;
+                window.StateChanged -= Window_StateChanged;
             }
 
             if (!string.IsNullOrWhiteSpace(e.NewValue as string))
             {
+                if (window.WindowState != WindowState.Minimized)
+                    window.SetValue(LastNonMinimizedStateProperty, window.WindowState);
+
                 window.SourceInitialized += Window_SourceInitialized;
                 window.Closing += Window_Closing;
+                window.StateChanged += Window_StateChanged;
             }
+        }
+
+        private static void Window_StateChanged(object sender, EventArgs e)
+        {
+            var window = (Window)sender;
+            if (window.WindowState != WindowState.Minimized)
+                window.SetValue(LastNonMinimizedStateProperty, window.WindowState);
         }
 
         private static void Window_SourceInitialized(object sender, EventArgs e)
@@ -86,133 +100,49 @@ namespace PalCalc.UI.View.Behaviors
             var restoreMaximized =
                 savedPlacement.IsMaximized &&
                 mode is WindowPlacementMode.Full or WindowPlacementMode.SizeAndState;
-            var placement = new NativeWindowPlacement
-            {
-                Length = Marshal.SizeOf<NativeWindowPlacement>(),
-                Flags = 0,
-                ShowCommand = restoreMaximized ? SwShowMaximized : SwShowNormal,
-                NormalPosition = new NativeRect
-                {
-                    Left = savedPlacement.Left,
-                    Top = savedPlacement.Top,
-                    Right = savedPlacement.Right,
-                    Bottom = savedPlacement.Bottom,
-                },
-            };
 
-            var handle = new WindowInteropHelper(window).Handle;
-            if (mode != WindowPlacementMode.Full &&
-                !TryKeepCurrentPosition(handle, ref placement))
+            window.Width = savedPlacement.Right - savedPlacement.Left;
+            window.Height = savedPlacement.Bottom - savedPlacement.Top;
+
+            if (mode == WindowPlacementMode.Full)
             {
-                logger.Warning("Unable to restore window size for {WindowLayoutKey}", key);
-                return;
+                window.WindowStartupLocation = WindowStartupLocation.Manual;
+                window.Left = savedPlacement.Left;
+                window.Top = savedPlacement.Top;
             }
 
-            if (!SetWindowPlacement(handle, ref placement))
-                logger.Warning("Unable to restore window placement for {WindowLayoutKey}", key);
-        }
-
-        private static bool TryKeepCurrentPosition(IntPtr handle, ref NativeWindowPlacement placement)
-        {
-            var currentPlacement = new NativeWindowPlacement
-            {
-                Length = Marshal.SizeOf<NativeWindowPlacement>(),
-            };
-
-            if (!GetWindowPlacement(handle, ref currentPlacement))
-                return false;
-
-            var width = placement.NormalPosition.Right - placement.NormalPosition.Left;
-            var height = placement.NormalPosition.Bottom - placement.NormalPosition.Top;
-            var horizontalCenter = (long)currentPlacement.NormalPosition.Left +
-                                   currentPlacement.NormalPosition.Right;
-            var verticalCenter = (long)currentPlacement.NormalPosition.Top +
-                                 currentPlacement.NormalPosition.Bottom;
-
-            var left = horizontalCenter / 2 - width / 2;
-            var top = verticalCenter / 2 - height / 2;
-
-            left = Math.Clamp(left, int.MinValue, (long)int.MaxValue - width);
-            top = Math.Clamp(top, int.MinValue, (long)int.MaxValue - height);
-
-            placement.NormalPosition = new NativeRect
-            {
-                Left = (int)left,
-                Top = (int)top,
-                Right = (int)left + width,
-                Bottom = (int)top + height,
-            };
-            return true;
+            if (restoreMaximized)
+                window.WindowState = WindowState.Maximized;
         }
 
         private static void Window_Closing(object sender, CancelEventArgs e)
         {
             var window = (Window)sender;
-            var handle = new WindowInteropHelper(window).Handle;
-
-            var placement = new NativeWindowPlacement
-            {
-                Length = Marshal.SizeOf<NativeWindowPlacement>(),
-            };
-
-            if (!GetWindowPlacement(handle, ref placement))
+            var bounds = window.RestoreBounds;
+            if (bounds.IsEmpty ||
+                !double.IsFinite(bounds.Left) ||
+                !double.IsFinite(bounds.Top) ||
+                !double.IsFinite(bounds.Width) ||
+                !double.IsFinite(bounds.Height))
             {
                 logger.Warning("Unable to capture window placement for {WindowLayoutKey}", GetKey(window));
                 return;
             }
 
-            var isMaximized =
-                placement.ShowCommand == SwShowMaximized ||
-                (placement.ShowCommand == SwShowMinimized &&
-                 (placement.Flags & WpfRestoreToMaximized) != 0);
-
             var savedPlacement = new WindowPlacementSettings
             {
                 Version = CurrentSettingsVersion,
-                Left = placement.NormalPosition.Left,
-                Top = placement.NormalPosition.Top,
-                Right = placement.NormalPosition.Right,
-                Bottom = placement.NormalPosition.Bottom,
-                IsMaximized = isMaximized,
+                Left = (int)Math.Round(bounds.Left),
+                Top = (int)Math.Round(bounds.Top),
+                Right = (int)Math.Round(bounds.Right),
+                Bottom = (int)Math.Round(bounds.Bottom),
+                IsMaximized =
+                    (WindowState)window.GetValue(LastNonMinimizedStateProperty) ==
+                    WindowState.Maximized,
             };
 
             if (UILayoutValidation.IsValidWindowPlacement(savedPlacement, CurrentSettingsVersion))
                 UILayoutStore.SaveWindowPlacement(GetKey(window), savedPlacement);
-        }
-
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GetWindowPlacement(IntPtr windowHandle, ref NativeWindowPlacement placement);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool SetWindowPlacement(IntPtr windowHandle, [In] ref NativeWindowPlacement placement);
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct NativePoint
-        {
-            public int X;
-            public int Y;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct NativeRect
-        {
-            public int Left;
-            public int Top;
-            public int Right;
-            public int Bottom;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct NativeWindowPlacement
-        {
-            public int Length;
-            public int Flags;
-            public int ShowCommand;
-            public NativePoint MinPosition;
-            public NativePoint MaxPosition;
-            public NativeRect NormalPosition;
         }
     }
 }
