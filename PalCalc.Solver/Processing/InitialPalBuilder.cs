@@ -118,6 +118,8 @@ internal sealed class InitialPalBuilder(
         initialContent.AddRange(
             settings.AllowedWildPals
                 .Where(p => !settings.OwnedPals.Any(instance => instance.Pal == p))
+                // we're being asked to find a breeding path to the target pal, don't consider catching a wild one
+                .Where(p => p != target.Pal)
                 .Where(withinBreedingSteps)
                 .SelectMany(p =>
                 {
