@@ -111,6 +111,8 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Pal.Name.Value}" />
                             <vp:PalGenderView DataContext="{Binding Gender}" Height="14" Margin="2,0,0,0" />
+                            <!-- Placeholder to ensure we have enough space for the "Is Complete" checkbox -->
+                            <Border Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}" Width="16" Margin="0,0,8,0" Height="0" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">
