@@ -18,7 +18,6 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         bool IsCheckable { get; }
         bool IsChecked { get; set; }
         bool IsComplete { get; }
-        event Action IsCheckedChanged;
         IRelayCommand ToggleCheckedCommand { get; }
 
         /// <summary>

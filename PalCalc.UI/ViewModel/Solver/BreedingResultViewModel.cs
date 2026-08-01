@@ -13,6 +13,7 @@ using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.PalDerived;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -172,16 +173,22 @@ namespace PalCalc.UI.ViewModel.Solver
                 InputLocations = Translator.Join.Bind(descriptionParts);
 
                 foreach (var node in Graph.Nodes)
-                    node.IsCheckedChanged += () => CheckedStateChanged?.Invoke();
+                    PropertyChangedEventManager.AddHandler(node, OnNodeIsCheckedPropertyChanged, nameof(node.IsChecked));
             }
         }
 
-        public event Action CheckedStateChanged;
+        private void OnNodeIsCheckedPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(CheckedNodes));
+        }
 
         public ILocalizedText Label { get; }
         public ILocalizedText InputLocations { get; }
 
         public BreedingGraph Graph { get; }
+
+        public IEnumerable<IBreedingTreeNodeViewModel> CheckedNodes =>
+            Graph.Nodes.Where(n => n.IsChecked);
 
         public IPalReference DisplayedResult { get; }
 

@@ -185,11 +185,9 @@ namespace PalCalc.UI.ViewModel
             // wire checked-state auto-save for all loaded targets            
             foreach (var target in PalTargetList.Targets)
             {
-                // TODO - disconnect event listener where necessary
-                if (target.CurrentResults != null)
+                if (!target.IsReadOnly)
                 {
-                    var capturedTarget = target;
-                    target.CurrentResults.CheckedStateChanged += () => SaveTarget(capturedTarget);
+                    WeakEventManager<PalSpecifierViewModel, EventArgs>.AddHandler(target, nameof(target.ResultsCheckedStateChanged), PalSpecifierCheckedStateChanged);
                 }
             }
         }
@@ -344,6 +342,9 @@ namespace PalCalc.UI.ViewModel
             File.WriteAllText(outputFile, JsonConvert.SerializeObject(list, converter));
         }
 
+        private void PalSpecifierCheckedStateChanged(object sender, EventArgs args) =>
+            SaveTarget(sender as PalSpecifierViewModel);
+
         public void SaveTarget(PalSpecifierViewModel item)
         {
             if (Storage.DEBUG_DisableStorage) return;
@@ -426,8 +427,7 @@ namespace PalCalc.UI.ViewModel
                     UpdatePalTarget();
                 }
 
-                // TODO - disconnect where appropriate
-                currentSpec.CurrentResults.CheckedStateChanged += () => SaveTarget(currentSpec);
+                WeakEventManager<PalSpecifierViewModel, EventArgs>.AddHandler(currentSpec, nameof(currentSpec.ResultsCheckedStateChanged), PalSpecifierCheckedStateChanged);
 
                 SaveTarget(currentSpec);
                 SaveTargetList(PalTargetList);

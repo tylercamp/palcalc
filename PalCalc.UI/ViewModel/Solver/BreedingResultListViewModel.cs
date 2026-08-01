@@ -8,6 +8,7 @@ using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -28,13 +29,18 @@ namespace PalCalc.UI.ViewModel.Solver
     {
         public BreedingResultListViewModelSettingsSnapshot SettingsSnapshot { get; set; }
 
-        public event Action CheckedStateChanged;
+        public event Action<object, EventArgs> CheckedStateChanged;
 
         private void SubscribeCheckedEvents(List<BreedingResultViewModel> resultList)
         {
             if (resultList == null) return;
             foreach (var r in resultList)
-                r.CheckedStateChanged += () => CheckedStateChanged?.Invoke();
+                PropertyChangedEventManager.AddHandler(r, OnResultCheckStateChanged, nameof(r.CheckedNodes));
+        }
+
+        private void OnResultCheckStateChanged(object sender, PropertyChangedEventArgs args)
+        {
+            CheckedStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private List<BreedingResultViewModel> results;

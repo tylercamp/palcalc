@@ -52,16 +52,10 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             ToggleCheckedCommand = new RelayCommand(() => IsChecked = !IsChecked);
         }
 
+        [NotifyPropertyChangedFor(nameof(IsComplete))]
         [ObservableProperty]
         private bool isChecked;
 
-        partial void OnIsCheckedChanged(bool value)
-        {
-            IsCheckedChanged?.Invoke();
-            OnPropertyChanged(nameof(IsComplete));
-        }
-
-        public event Action IsCheckedChanged;
         public IRelayCommand ToggleCheckedCommand { get; }
 
         public bool IsCheckable { get; }
