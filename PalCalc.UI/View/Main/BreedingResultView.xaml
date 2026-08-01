@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PalCalc.UI.View"
+             xmlns:local="clr-namespace:PalCalc.UI.View.Main"
              xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
@@ -21,270 +21,273 @@
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              TextOptions.TextFormattingMode="Ideal"
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance vms:BreedingResultViewModel, IsDesignTimeCreatable=True}"
              >
-    <UserControl.Resources>
-        <c:ValueBoolConverter x:Key="VBC" />
-        <c:ValueVisibilityConverter x:Key="VVC" />
+    <UserControl DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult}" d:DataContext="{d:DesignInstance vms:BreedingResultViewModel, IsDesignTimeCreatable=True}">
+        <UserControl.Resources>
+            <c:ValueBoolConverter x:Key="VBC" />
+            <c:ValueBoolConverter x:Key="VBC_Negated" Negate="True" />
+            <c:ValueVisibilityConverter x:Key="VVC" />
 
-        <Style TargetType="Label">
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
-            <Setter Property="Padding" Value="0" />
-        </Style>
+            <Style TargetType="Label">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
 
-        <DataTemplate DataType="{x:Type gsvm:AddPassiveSurgeryOperationViewModel}">
-            <vu:LocalizedEmbeddedText Code="LC_SURGERY_ADD_PASSIVE">
-                <vu:EmbeddedParam Key="AddedPassive">
-                    <vp:PassiveSkillView DataContext="{Binding AddedPassive}" />
-                </vu:EmbeddedParam>
-            </vu:LocalizedEmbeddedText>
-        </DataTemplate>
+            <DataTemplate DataType="{x:Type gsvm:AddPassiveSurgeryOperationViewModel}">
+                <vu:LocalizedEmbeddedText Code="LC_SURGERY_ADD_PASSIVE">
+                    <vu:EmbeddedParam Key="AddedPassive">
+                        <vp:PassiveSkillView DataContext="{Binding AddedPassive}" />
+                    </vu:EmbeddedParam>
+                </vu:LocalizedEmbeddedText>
+            </DataTemplate>
 
-        <DataTemplate DataType="{x:Type gsvm:ReplacePassiveSurgeryOperationViewModel}">
-            <vu:LocalizedEmbeddedText Code="LC_SURGERY_REPLACE_PASSIVE">
-                <vu:EmbeddedParam Key="AddedPassive">
-                    <vp:PassiveSkillView DataContext="{Binding AddedPassive}" />
-                </vu:EmbeddedParam>
-                <vu:EmbeddedParam Key="RemovedPassive">
-                    <vp:PassiveSkillView DataContext="{Binding RemovedPassive}" />
-                </vu:EmbeddedParam>
-            </vu:LocalizedEmbeddedText>
-        </DataTemplate>
+            <DataTemplate DataType="{x:Type gsvm:ReplacePassiveSurgeryOperationViewModel}">
+                <vu:LocalizedEmbeddedText Code="LC_SURGERY_REPLACE_PASSIVE">
+                    <vu:EmbeddedParam Key="AddedPassive">
+                        <vp:PassiveSkillView DataContext="{Binding AddedPassive}" />
+                    </vu:EmbeddedParam>
+                    <vu:EmbeddedParam Key="RemovedPassive">
+                        <vp:PassiveSkillView DataContext="{Binding RemovedPassive}" />
+                    </vu:EmbeddedParam>
+                </vu:LocalizedEmbeddedText>
+            </DataTemplate>
 
-        <DataTemplate DataType="{x:Type gsvm:SurgeryBreedingTreeNodeViewModel}">
-            <StackPanel Margin="5" Orientation="Horizontal">
-                <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0">
-                    <Border.Background>
-                        <ImageBrush>
-                            <ImageBrush.ImageSource>
-                                <BitmapImage UriSource="pack://application:,,,/PalCalc.UI;component/Resources/SurgeryTable.png" />
-                            </ImageBrush.ImageSource>
-                        </ImageBrush>
-                    </Border.Background>
-                </Border>
+            <DataTemplate DataType="{x:Type gsvm:SurgeryBreedingTreeNodeViewModel}">
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0">
+                        <Border.Background>
+                            <ImageBrush>
+                                <ImageBrush.ImageSource>
+                                    <BitmapImage UriSource="pack://application:,,,/PalCalc.UI;component/Resources/SurgeryTable.png" />
+                                </ImageBrush.ImageSource>
+                            </ImageBrush>
+                        </Border.Background>
+                    </Border>
 
-                <StackPanel>
-                    <Label Content="{itl:LocalizedText Code=LC_SURGERY_STEP_TITLE}" />
-                    <ItemsControl ItemsSource="{Binding Operations}">
-                        <ItemsControl.Resources>
-                            <Style TargetType="vu:LocalizedEmbeddedText">
-                                <Setter Property="Margin" Value="0,5,0,0" />
-                                <Setter Property="FontSize" Value="10" />
-                            </Style>
-                        </ItemsControl.Resources>
-                    </ItemsControl>
-                </StackPanel>
-            </StackPanel>
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type gsvm:StandardBreedingTreeNodeViewModel}">
-            <StackPanel Orientation="Vertical" Margin="5" MinWidth="180" UseLayoutRounding="True">
-                <DockPanel HorizontalAlignment="Stretch">
-                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
-                    <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Stretch">
-                        <StackPanel.Resources>
-                            <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel" x:Key="LocationPopupContent">
-                                <vu:PopupToolTipContent Background="#040F15">
-                                    <StackPanel>
-                                        <!-- (some nodes, like composites, have styles which override text size - ensure consistent size in popups) -->
-                                        <StackPanel.Resources>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="FontSize" Value="13" />
-                                            </Style>
-                                        </StackPanel.Resources>
-                                        <vp:PalLocationView DataContext="{Binding MapLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" Width="300" Height="300" />
-                                        <vp:PalLocationView DataContext="{Binding ContainerLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" />
-                                    </StackPanel>
-                                </vu:PopupToolTipContent>
-                            </DataTemplate>
-
-                            <Style TargetType="vu:PopupToolTipTrigger" x:Key="LocationStyle" x:Shared="False">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding HasPreview, Converter={StaticResource VBC}, FallbackValue=False}" Value="True">
-                                        <Setter Property="Cursor" Value="Hand" />
-                                        <Setter Property="InitialShowDelay" Value="200" />
-                                        <Setter Property="PopupAnimation" Value="None" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </StackPanel.Resources>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Pal.Name.Value}" />
-                            <vp:PalGenderView DataContext="{Binding Gender}" Height="14" Margin="2,0,0,0" />
-                            <!-- Placeholder to ensure we have enough space for the "Is Complete" checkbox -->
-                            <Border Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}" Width="16" Margin="0,0,8,0" Height="0" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">
-                                <Run Text="{Binding AvgRequiredAttemptsDescription.Value, Mode=OneWay}" />
-                                <!-- Note: The text between <Run /> elements seems to be interpreted as a space, so we don't need a space before the "-" below -->
-                                <Run Text="- " />
-                            </TextBlock>
-                            <TextBlock Text="{Binding Effort}" FontSize="10" Visibility="{Binding EffortVisibility}" />
-                        </StackPanel>
-                        <ContentControl Content="{Binding Location}">
-                            <ContentControl.Resources>
-                                <DataTemplate DataType="{x:Type mvm:SpecificPalRefLocationViewModel}">
-                                    <Grid>
-                                        <vu:PopupToolTipTrigger Visibility="{Binding Visibility}" Style="{StaticResource LocationStyle}" ToolTipContentTemplate="{StaticResource LocationPopupContent}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <StackPanel Orientation="Vertical" DataContext="{Binding}">
-                                                    <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" Visibility="{Binding OwnerVisibility}"/>
-                                                    <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" />
-                                                </StackPanel>
-
-                                                <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                            </StackPanel>
-                                        </vu:PopupToolTipTrigger>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type mvm:CompositePalRefLocationViewModel}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <StackPanel.Resources>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="FontSize" Value="8" />
-                                            </Style>
-                                        </StackPanel.Resources>
-
-                                        <ContentControl Content="{Binding MaleViewModel}">
-                                            <ContentControl.ContentTemplate>
-                                                <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel">
-                                                    <vu:PopupToolTipTrigger Style="{StaticResource LocationStyle}" ToolTipContentTemplate="{StaticResource ResourceKey=LocationPopupContent}">
-                                                        <StackPanel Orientation="Horizontal" Grid.Column="0" MaxWidth="100">
-                                                            <StackPanel.Resources>
-                                                                <Style TargetType="TextBlock">
-                                                                    <Setter Property="FontSize" Value="8" />
-                                                                </Style>
-                                                            </StackPanel.Resources>
-                                                            <StackPanel Orientation="Vertical">
-                                                                <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_MALE}" />
-                                                                <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
-                                                                <TextBlock Text="{Binding LocationCoordDescription.Value}" />
-                                                            </StackPanel>
-                                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                                        </StackPanel>
-                                                    </vu:PopupToolTipTrigger>
-                                                </DataTemplate>
-                                            </ContentControl.ContentTemplate>
-                                        </ContentControl>
-
-                                        <Border Width="1" BorderThickness="1" Margin="10,5,10,5" Grid.Column="1" VerticalAlignment="Stretch" />
-
-                                        <ContentControl Content="{Binding FemaleViewModel}">
-                                            <ContentControl.ContentTemplate>
-                                                <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel">
-                                                    <vu:PopupToolTipTrigger Style="{StaticResource LocationStyle}" ToolTipContentTemplate="{StaticResource ResourceKey=LocationPopupContent}">
-                                                        <StackPanel Orientation="Horizontal" Grid.Column="2" MaxWidth="100">
-                                                            <StackPanel.Resources>
-                                                                <Style TargetType="TextBlock">
-                                                                    <Setter Property="FontSize" Value="8" />
-                                                                </Style>
-                                                            </StackPanel.Resources>
-                                                            
-                                                            <StackPanel Orientation="Vertical">
-                                                                <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_FEMALE}" />
-                                                                <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
-                                                                <TextBlock Text="{Binding LocationCoordDescription.Value}" />
-                                                            </StackPanel>
-
-                                                            <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                                        </StackPanel>
-                                                    </vu:PopupToolTipTrigger>
-                                                </DataTemplate>
-                                            </ContentControl.ContentTemplate>
-                                        </ContentControl>
-                                    </StackPanel>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type mvm:WildPalRefLocationViewModel}">
-                                    <TextBlock FontSize="10" Text="{itl:LocalizedText LC_PAL_LOC_CAPTURED}" />
-                                </DataTemplate>
-                            </ContentControl.Resources>
-                        </ContentControl>
-                        <vp:PalIVsView Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" FontSize="9" IV_HP="{Binding IVs.HP}" IV_Attack="{Binding IVs.Attack}" IV_Defense="{Binding IVs.Defense}" />
+                    <StackPanel>
+                        <Label Content="{itl:LocalizedText Code=LC_SURGERY_STEP_TITLE}" />
+                        <ItemsControl ItemsSource="{Binding Operations}">
+                            <ItemsControl.Resources>
+                                <Style TargetType="vu:LocalizedEmbeddedText">
+                                    <Setter Property="Margin" Value="0,5,0,0" />
+                                    <Setter Property="FontSize" Value="10" />
+                                </Style>
+                            </ItemsControl.Resources>
+                        </ItemsControl>
                     </StackPanel>
-                </DockPanel>
-                <Grid Visibility="{Binding PassiveSkillsVisibility}">
-                    <vp:PassiveSkillCollectionView Margin="0,5,0,0" DataContext="{Binding PassiveSkillsCollection}" Width="Auto" />
-                </Grid>
-            </StackPanel>
-        </DataTemplate>
+                </StackPanel>
+            </DataTemplate>
 
-        <Style TargetType="{x:Type graphSharp:VertexControl}">
-            <Setter Property="ab:DragBehaviour.IsDragEnabled" Value="False" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type graphSharp:VertexControl}">
-                        <Border x:Name="NodeBorder"
-                                DataContext="{Binding Vertex, RelativeSource={RelativeSource TemplatedParent}}"
-                                BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
-                                Background="#111217"
-                                BorderThickness="2"
-                                CornerRadius="10,10,10,10"
-                                Padding="{TemplateBinding Padding}">
-                            <Grid>
-                                <ContentPresenter x:Name="NodeContent" Content="{TemplateBinding Vertex}" />
-                                <Button x:Name="ToggleButton"
-                                    Command="{Binding ToggleCheckedCommand}"
-                                    Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}"
-                                    HorizontalAlignment="Right" VerticalAlignment="Top"
-                                    Background="Transparent" BorderThickness="0" Padding="0"
-                                    Margin="0,4,4,0" Cursor="Hand" Opacity="0.6">
+            <DataTemplate DataType="{x:Type gsvm:StandardBreedingTreeNodeViewModel}">
+                <StackPanel Orientation="Vertical" Margin="5" MinWidth="180" UseLayoutRounding="True">
+                    <DockPanel HorizontalAlignment="Stretch">
+                        <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
+                        <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Stretch">
+                            <StackPanel.Resources>
+                                <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel" x:Key="LocationPopupContent">
+                                    <vu:PopupToolTipContent Background="#040F15">
+                                        <StackPanel>
+                                            <!-- (some nodes, like composites, have styles which override text size - ensure consistent size in popups) -->
+                                            <StackPanel.Resources>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="FontSize" Value="13" />
+                                                </Style>
+                                            </StackPanel.Resources>
+                                            <vp:PalLocationView DataContext="{Binding MapLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" Width="300" Height="300" />
+                                            <vp:PalLocationView DataContext="{Binding ContainerLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" />
+                                        </StackPanel>
+                                    </vu:PopupToolTipContent>
+                                </DataTemplate>
 
-                                    <Button.Style>
-                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsChecked}" Value="True">
-                                                    <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText Code=LC_GRAPH_UNCHECK_STEP_DESCRIPTION}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsChecked}" Value="False">
-                                                    <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText Code=LC_GRAPH_CHECK_STEP_DESCRIPTION}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
+                                <Style TargetType="vu:PopupToolTipTrigger" x:Key="LocationStyle" x:Shared="False">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasPreview, Converter={StaticResource VBC}, FallbackValue=False}" Value="True">
+                                            <Setter Property="Cursor" Value="Hand" />
+                                            <Setter Property="InitialShowDelay" Value="200" />
+                                            <Setter Property="PopupAnimation" Value="None" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Resources>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Pal.Name.Value}" />
+                                <vp:PalGenderView DataContext="{Binding Gender}" Height="14" Margin="2,0,0,0" />
+                                <!-- Placeholder to ensure we have enough space for the "Is Complete" checkbox -->
+                                <Border Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}" Width="16" Margin="0,0,8,0" Height="0" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">
+                                    <Run Text="{Binding AvgRequiredAttemptsDescription.Value, Mode=OneWay}" />
+                                    <!-- Note: The text between <Run /> elements seems to be interpreted as a space, so we don't need a space before the "-" below -->
+                                    <Run Text="- " />
+                                </TextBlock>
+                                <TextBlock Text="{Binding Effort}" FontSize="10" Visibility="{Binding EffortVisibility}" />
+                            </StackPanel>
+                            <ContentControl Content="{Binding Location}">
+                                <ContentControl.Resources>
+                                    <DataTemplate DataType="{x:Type mvm:SpecificPalRefLocationViewModel}">
+                                        <Grid>
+                                            <vu:PopupToolTipTrigger Visibility="{Binding Visibility}" Style="{StaticResource LocationStyle}" ToolTipContentTemplate="{StaticResource LocationPopupContent}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <StackPanel Orientation="Vertical" DataContext="{Binding}">
+                                                        <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" Visibility="{Binding OwnerVisibility}"/>
+                                                        <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" />
+                                                    </StackPanel>
 
-                                    <Grid>
-                                        <materialIcons:MaterialIcon x:Name="UncheckedIcon"
-                                            Kind="CircleOutline"
-                                            Width="16" Height="16" Foreground="#999" />
-                                        <materialIcons:MaterialIcon x:Name="CheckedIcon"
-                                            Kind="CheckCircle"
-                                            Width="16" Height="16" Foreground="#4CAF50"
-                                            Visibility="Collapsed" />
-                                    </Grid>
-                                </Button>
-                            </Grid>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <DataTrigger Binding="{Binding IsComplete}" Value="True">
-                                <Setter TargetName="NodeContent" Property="Opacity" Value="0.4" />
-                                <Setter TargetName="NodeBorder" Property="BorderBrush" Value="#4CAF50" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding IsChecked}" Value="True">
-                                <Setter TargetName="ToggleButton" Property="Opacity" Value="1.0" />
-                                <Setter TargetName="UncheckedIcon" Property="Visibility" Value="Collapsed" />
-                                <Setter TargetName="CheckedIcon" Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="{x:Type graphSharp:EdgeControl}">
+                                                    <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                                </StackPanel>
+                                            </vu:PopupToolTipTrigger>
+                                        </Grid>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="{x:Type mvm:CompositePalRefLocationViewModel}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <StackPanel.Resources>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="FontSize" Value="8" />
+                                                </Style>
+                                            </StackPanel.Resources>
 
-        </Style>
-    </UserControl.Resources>
-    <zoom:ZoomControl Grid.Column="1"
-                      Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}"
-                      Mode="Fill"
-                      FillMarginPercent="0.05"
-                      FillLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_FILL}"
-                      CustomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_CUSTOM}"
-                      ZoomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_PERCENT}">
-        <gsvm:BreedingGraphLayout
-            Graph="{Binding Graph}"
-            AnimationLength="0"
-            IsAnimationEnabled="False"
-        />
-    </zoom:ZoomControl>
+                                            <ContentControl Content="{Binding MaleViewModel}">
+                                                <ContentControl.ContentTemplate>
+                                                    <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel">
+                                                        <vu:PopupToolTipTrigger Style="{StaticResource LocationStyle}" ToolTipContentTemplate="{StaticResource ResourceKey=LocationPopupContent}">
+                                                            <StackPanel Orientation="Horizontal" Grid.Column="0" MaxWidth="100">
+                                                                <StackPanel.Resources>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="FontSize" Value="8" />
+                                                                    </Style>
+                                                                </StackPanel.Resources>
+                                                                <StackPanel Orientation="Vertical">
+                                                                    <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_MALE}" />
+                                                                    <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
+                                                                    <TextBlock Text="{Binding LocationCoordDescription.Value}" />
+                                                                </StackPanel>
+                                                                <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                                            </StackPanel>
+                                                        </vu:PopupToolTipTrigger>
+                                                    </DataTemplate>
+                                                </ContentControl.ContentTemplate>
+                                            </ContentControl>
+
+                                            <Border Width="1" BorderThickness="1" Margin="10,5,10,5" Grid.Column="1" VerticalAlignment="Stretch" />
+
+                                            <ContentControl Content="{Binding FemaleViewModel}">
+                                                <ContentControl.ContentTemplate>
+                                                    <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel">
+                                                        <vu:PopupToolTipTrigger Style="{StaticResource LocationStyle}" ToolTipContentTemplate="{StaticResource ResourceKey=LocationPopupContent}">
+                                                            <StackPanel Orientation="Horizontal" Grid.Column="2" MaxWidth="100">
+                                                                <StackPanel.Resources>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="FontSize" Value="8" />
+                                                                    </Style>
+                                                                </StackPanel.Resources>
+                                                            
+                                                                <StackPanel Orientation="Vertical">
+                                                                    <TextBlock Text="{itl:LocalizedText LC_COMMON_GENDER_FEMALE}" />
+                                                                    <TextBlock Text="{Binding LocationOwner.Value}" TextWrapping="WrapWithOverflow" Visibility="{Binding OwnerVisibility}" />
+                                                                    <TextBlock Text="{Binding LocationCoordDescription.Value}" />
+                                                                </StackPanel>
+
+                                                                <materialIcons:MaterialIcon Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                                            </StackPanel>
+                                                        </vu:PopupToolTipTrigger>
+                                                    </DataTemplate>
+                                                </ContentControl.ContentTemplate>
+                                            </ContentControl>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="{x:Type mvm:WildPalRefLocationViewModel}">
+                                        <TextBlock FontSize="10" Text="{itl:LocalizedText LC_PAL_LOC_CAPTURED}" />
+                                    </DataTemplate>
+                                </ContentControl.Resources>
+                            </ContentControl>
+                            <vp:PalIVsView Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" FontSize="9" IV_HP="{Binding IVs.HP}" IV_Attack="{Binding IVs.Attack}" IV_Defense="{Binding IVs.Defense}" />
+                        </StackPanel>
+                    </DockPanel>
+                    <Grid Visibility="{Binding PassiveSkillsVisibility}">
+                        <vp:PassiveSkillCollectionView Margin="0,5,0,0" DataContext="{Binding PassiveSkillsCollection}" Width="Auto" />
+                    </Grid>
+                </StackPanel>
+            </DataTemplate>
+
+            <Style TargetType="{x:Type graphSharp:VertexControl}">
+                <Setter Property="ab:DragBehaviour.IsDragEnabled" Value="False" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type graphSharp:VertexControl}">
+                            <Border x:Name="NodeBorder"
+                                    DataContext="{Binding Vertex, RelativeSource={RelativeSource TemplatedParent}}"
+                                    BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
+                                    Background="#111217"
+                                    BorderThickness="2"
+                                    CornerRadius="10,10,10,10"
+                                    Padding="{TemplateBinding Padding}">
+                                <Grid>
+                                    <ContentPresenter x:Name="NodeContent" Content="{TemplateBinding Vertex}" />
+                                    <Button x:Name="ToggleButton"
+                                        Command="{Binding ToggleCheckedCommand}"
+                                        Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}"
+                                        IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=IsReadOnly, Converter={StaticResource VBC_Negated}}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Top"
+                                        Background="Transparent" BorderThickness="0" Padding="0"
+                                        Margin="0,4,4,0" Cursor="Hand" Opacity="0.6">
+
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                                                        <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText Code=LC_GRAPH_UNCHECK_STEP_DESCRIPTION}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsChecked}" Value="False">
+                                                        <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText Code=LC_GRAPH_CHECK_STEP_DESCRIPTION}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+
+                                        <Grid>
+                                            <materialIcons:MaterialIcon x:Name="UncheckedIcon"
+                                                Kind="CircleOutline"
+                                                Width="16" Height="16" Foreground="#999" />
+                                            <materialIcons:MaterialIcon x:Name="CheckedIcon"
+                                                Kind="CheckCircle"
+                                                Width="16" Height="16" Foreground="#4CAF50"
+                                                Visibility="Collapsed" />
+                                        </Grid>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsComplete}" Value="True">
+                                    <Setter TargetName="NodeContent" Property="Opacity" Value="0.4" />
+                                    <Setter TargetName="NodeBorder" Property="BorderBrush" Value="#4CAF50" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                                    <Setter TargetName="ToggleButton" Property="Opacity" Value="1.0" />
+                                    <Setter TargetName="UncheckedIcon" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="CheckedIcon" Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="{x:Type graphSharp:EdgeControl}">
+
+            </Style>
+        </UserControl.Resources>
+        <zoom:ZoomControl Grid.Column="1"
+                          Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}"
+                          Mode="Fill"
+                          FillMarginPercent="0.05"
+                          FillLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_FILL}"
+                          CustomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_CUSTOM}"
+                          ZoomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_PERCENT}">
+            <gsvm:BreedingGraphLayout
+                Graph="{Binding Graph}"
+                AnimationLength="0"
+                IsAnimationEnabled="False"
+            />
+        </zoom:ZoomControl>
+    </UserControl>
 </UserControl>
