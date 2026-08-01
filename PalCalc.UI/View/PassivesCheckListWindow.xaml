@@ -13,6 +13,7 @@
                              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
                              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
                              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+                             xmlns:behaviors="clr-namespace:PalCalc.UI.View.Behaviors"
                              mc:Ignorable="d"
                              d:DataContext="{x:Static vm:PassivesCheckListViewModel.DesignerInstance}"
                              IconVisibility="Collapsed"
@@ -20,6 +21,8 @@
                              WindowStartupLocation="CenterOwner"
                              Title="{Binding Title.Value}"
                              Height="450" Width="700"
+                             behaviors:WindowPlacementBehavior.Key="SurgeryPassives"
+                             behaviors:WindowPlacementBehavior.Mode="Size"
                              >
     <Grid>
         <Grid.Resources>

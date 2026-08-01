@@ -77,6 +77,12 @@ namespace PalCalc.Model
             {
                 lock (loadEmbeddedLock)
                 {
+                    if (embedded != null)
+                    {
+                        logger.Verbose("Breeding DB already loaded");
+                        return;
+                    }
+
                     embedded = _LoadEmbedded(paldb);
                 }
             });

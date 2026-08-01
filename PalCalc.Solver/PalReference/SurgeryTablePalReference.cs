@@ -1,4 +1,6 @@
 using PalCalc.Model;
+using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,8 +12,8 @@ using System.Transactions;
 namespace PalCalc.Solver.PalReference
 {
     // Note: ChangeGenderSurgeryOperation was added initially but later removed. It was used as another way to enforce
-    //       gender requirements in the main BreedingBatchSolver loop, but it added too many new unique options
-    //       and caused working-set size to blow up. Therefore we won't formally represent gender-change surgery
+    //       gender requirements in the main CandidateExpander loop, but it added too many new unique options
+    //       and caused frontier size to blow up. Therefore we won't formally represent gender-change surgery
     //       here, and will instead just use a flag in the solver settings which will affect how specific-gender
     //       restrictions affect the final estimates.
 
@@ -31,7 +33,7 @@ namespace PalCalc.Solver.PalReference
 
         public override string ToString() => $"AddPassive({AddedPassive.Name})";
 
-        private static ConcurrentDictionary<PassiveSkill, AddPassiveSurgeryOperation> cachedOps = [];
+        private static readonly ConcurrentDictionary<PassiveSkill, AddPassiveSurgeryOperation> cachedOps = [];
         public static AddPassiveSurgeryOperation NewCached(PassiveSkill addedPassive)
         {
 #if DEBUG_CHECKS
@@ -58,7 +60,7 @@ namespace PalCalc.Solver.PalReference
 
         public override string ToString() => $"ReplacePassive(rem: {RemovedPassive.Name}, add: {AddedPassive.Name})";
 
-        private static ConcurrentDictionary<int, ReplacePassiveSurgeryOperation> cachedOps = [];
+        private static readonly ConcurrentDictionary<int, ReplacePassiveSurgeryOperation> cachedOps = [];
         public static ReplacePassiveSurgeryOperation NewCached(PassiveSkill removedPassive, PassiveSkill addedPassive)
         {
 #if DEBUG_CHECKS
@@ -216,6 +218,8 @@ namespace PalCalc.Solver.PalReference
         public float TimeFactor { get; }
         public TimeSpan BreedingEffort => Input.BreedingEffort;
         public TimeSpan SelfBreedingEffort => Input.SelfBreedingEffort;
+
+        public bool IsOutdated { get; set; }
 
         ConcurrentDictionary<PalGender, IPalReference> cachedGenders = null;
 

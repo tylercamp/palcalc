@@ -1,9 +1,25 @@
 ﻿using AdonisUI.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ICSharpCode.SharpZipLib.Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using PalCalc.Model;
+using PalCalc.SaveReader;
+using PalCalc.UI.Localization;
+using PalCalc.UI.Model;
+using PalCalc.UI.Model.Service;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel;
+using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.Mapped.Saves;
+using PalCalc.UI.ViewModel.SaveSelection;
+using Serilog;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,51 +30,10 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace PalCalc.UI
 {
-    internal partial class AppWindowViewModel : ObservableObject
-    {
-        public AppWindowViewModel(Dispatcher dispatcher)
-        {
-            var loadingPage = new LoadingPage();
-            Content = loadingPage;
-
-            Task.Run(() =>
-            {
-                try
-                {
-                    var loadingVm = new LoadingPageViewModel();
-                    var vm = new MainWindowViewModel(dispatcher, progress =>
-                    {
-                        dispatcher.BeginInvoke(() =>
-                        {
-                            loadingVm.ProgressPercent = progress.ProgressPercent;
-
-                            if (loadingPage.DataContext == null)
-                                loadingPage.DataContext = loadingVm;
-                        });
-                    });
-
-                    dispatcher.BeginInvoke(() => Content = new MainPage(vm), DispatcherPriority.ContextIdle);
-                }
-                catch (Exception e)
-                {
-                    // (exceptions in Tasks are handled differently - re-send exceptions on UI Dispatcher so it gets handled like a normal error)
-                    dispatcher.BeginInvoke(() =>
-                    {
-                        throw new Exception("An error occurred while loading the main window data", e);
-                    });
-                }
-            });
-        }
-
-        [ObservableProperty]
-        private Page content;
-    }
-
     /// <summary>
     /// Interaction logic for AppWindow.xaml
     /// </summary>
@@ -68,9 +43,6 @@ namespace PalCalc.UI
         {
             DataContext = new AppWindowViewModel(Dispatcher);
             InitializeComponent();
-
-            // (`Content` inherits the DataContext of the window, but we don't want `LoadingPage` to inherit that)
-            (Content as LoadingPage).DataContext = null;
         }
     }
 }

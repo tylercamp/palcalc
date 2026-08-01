@@ -1,4 +1,4 @@
-﻿using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.ResultPruning
 {
     // main default pruning
-    public class MinimumEffortPruning : IResultPruning.ForceDeterministic
+    public class MinimumEffortPruning : ResultPruningRule.ForceDeterministic
     {
         public MinimumEffortPruning(CancellationToken token) : base(token)
         {

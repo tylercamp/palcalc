@@ -1,4 +1,4 @@
-﻿using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.ResultPruning
 {
     // if the same pal is used for multiple steps it may become a bottleneck
-    public class MinimumReusePruning : IResultPruning
+    public class MinimumReusePruning : ResultPruningRule
     {
         public MinimumReusePruning(CancellationToken token) : base(token)
         {
@@ -18,7 +18,7 @@ namespace PalCalc.Solver.ResultPruning
             MinGroupOf(results, r =>
             {
                 var observed = cachedData.InnerReferences[r];
-                return -(observed.Count - observed.Distinct().Count());
+                return observed.Count - observed.Distinct().Count();
             });
     }
 }

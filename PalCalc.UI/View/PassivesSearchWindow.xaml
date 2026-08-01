@@ -9,12 +9,16 @@
                              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
                              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+                             xmlns:behaviors="clr-namespace:PalCalc.UI.View.Behaviors"
                              mc:Ignorable="d"
                              WindowStartupLocation="CenterOwner"
                              IconVisibility="Collapsed"
                              DataContext="{Binding RelativeSource={RelativeSource Self}}"
                              Title="{itl:LocalizedText Code=LC_TRAITS_SEARCH_TITLE}"
-                             Height="450" Width="800"
+                             Width="800" Height="450"
+                             MinWidth="400" MinHeight="200"
+                             behaviors:WindowPlacementBehavior.Key="PassivesSearch"
+                             behaviors:WindowPlacementBehavior.Mode="Size"
                              >
     <Window.Style>
         <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}" />

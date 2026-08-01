@@ -25,7 +25,7 @@ namespace PalCalc.UI
     /// <summary>
     /// Interaction logic for LoadingPage.xaml
     /// </summary>
-    public partial class LoadingPage : Page
+    public partial class LoadingPage : UserControl
     {
         public LoadingPage()
         {

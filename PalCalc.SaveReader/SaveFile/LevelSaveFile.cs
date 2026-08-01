@@ -37,6 +37,8 @@ namespace PalCalc.SaveReader.SaveFile
 
         public virtual RawLevelSaveData ReadRawCharacterData()
         {
+            logger.Debug("Reading raw Level.sav data");
+
             var containerVisitor = new PalContainerVisitor();
             var instanceVisitor = new WorldSaveData_CharacterInstanceVisitor();
             var groupVisitor = new GroupVisitor();
@@ -267,7 +269,8 @@ namespace PalCalc.SaveReader.SaveFile
                     }
 
                     var container = parsed.ContainerContents.Single(c => c.Id == gvasInstance.ContainerId.ToString());
-                    if (!container.Slots.Any(s => s.InstanceId == gvasInstance.InstanceId))
+                    var containerSlot = container.Slots.FirstOrDefault(s => s.InstanceId == gvasInstance.InstanceId);
+                    if (containerSlot == null)
                     {
                         logger.Debug("pal instance data '{palId}' references container '{containerId}' but the container has no record of this pal, skipping", gvasInstance.InstanceId, container.Id);
                         continue;
@@ -276,6 +279,8 @@ namespace PalCalc.SaveReader.SaveFile
                     var pal = gvasInstance.ToPalInstance(db, containerTypeById[gvasInstance.ContainerId.ToString()]);
                     if (pal != null)
                     {
+                        pal.Location.Index = containerSlot.SlotIndex;
+
                         if (pal.OwnerPlayerId == null)
                         {
                             // #198 - `OwnerPlayerId` may be null and `OldOwnerPlayerIds` may be empty

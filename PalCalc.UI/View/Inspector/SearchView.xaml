@@ -19,6 +19,7 @@
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:layout="clr-namespace:PalCalc.UI.View.Behaviors"
              mc:Ignorable="d" 
              d:DataContext="{x:Static ivm:SearchViewModel.DesignerInstance}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -27,7 +28,9 @@
         <c:ValueVisibilityConverter x:Key="VVC_Negate" Negate="True" />
         <c:ValueBoolConverter x:Key="VBC" />
     </UserControl.Resources>
-    <Grid>
+    <Grid layout:GridLayoutBehavior.Key="Inspector.Search"
+          layout:GridLayoutBehavior.PrimaryColumn="2"
+          layout:GridLayoutBehavior.PrimaryMinimum="100">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" MinWidth="100"/>
             <ColumnDefinition Width="Auto" />

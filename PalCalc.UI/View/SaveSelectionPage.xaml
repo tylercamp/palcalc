@@ -1,0 +1,387 @@
+﻿<UserControl x:Class="PalCalc.UI.View.SaveSelectionPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:v="clr-namespace:PalCalc.UI.View"
+             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
+             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+             xmlns:msvm="clr-namespace:PalCalc.UI.ViewModel.Mapped.Saves"
+             xmlns:vmc="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+             xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+             mc:Ignorable="d"
+             d:DataContext="{x:Static vm:SaveSelectionPageViewModel.DesignerInstance}"
+             d:DesignHeight="450" d:DesignWidth="900">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BVC" />
+        <vmc:ValueVisibilityConverter x:Key="VVC" />
+        <vmc:ValueVisibilityConverter x:Key="VVC_Negate" Negate="True" />
+        <vmc:CollectionVisibilityConverter x:Key="CVC" />
+        <vmc:CollectionVisibilityConverter x:Key="CVC_Negate" Negate="True" />
+
+        <DataTemplate x:Key="EmptyTemplate" />
+
+        <!-- ICON TEMPLATES -->
+        <DataTemplate x:Key="SteamIconTemplate">
+            <svgc:SvgBitmap UriSource="/Resources/Steam_icon_logo.svg" AppName="PalCalc.UI" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="XboxIconTemplate">
+            <svgc:SvgBitmap UriSource="/Resources/Xbox_app_logo.svg" AppName="PalCalc.UI" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="ManualSavesIconTemplate">
+            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="FakeSavesIconTemplate">
+            <materialIcons:MaterialIcon Kind="FileEdit" Foreground="LightSteelBlue" />
+        </DataTemplate>
+
+        <msvm:SaveTypeTemplateSelector x:Key="IconTemplateSelector"
+                                       SteamTemplate="{StaticResource SteamIconTemplate}"
+                                       XboxTemplate="{StaticResource XboxIconTemplate}"
+                                       ManualSaveTemplate="{StaticResource ManualSavesIconTemplate}"
+                                       VirtualSaveTemplate="{StaticResource FakeSavesIconTemplate}"
+                                       />
+        
+        <!-- LOCATION NOTICE TEMPLATES - NO SAVES -->
+        <DataTemplate x:Key="SteamNoSavesTemplate" DataType="ssvm:SavesCollectionViewModel">
+            <TextBlock Text="{itl:LocalizedText LC_SAVE_LOCATION_STEAM_INSTALL}"
+                       TextWrapping="Wrap"
+                       Padding="{adonisUi:Space 2}"
+                       Visibility="{Binding AvailableSaves, Converter={StaticResource CVC_Negate}}"
+                       Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                       />
+        </DataTemplate>
+        
+        <DataTemplate x:Key="XboxNoSavesTemplate" DataType="ssvm:SavesCollectionViewModel">
+            <TextBlock TextWrapping="Wrap"
+                       Padding="{adonisUi:Space 2}"
+                       Visibility="{Binding AvailableSaves, Converter={StaticResource CVC_Negate}}"
+                       Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                       >
+                <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_1}" />
+                <Hyperlink NavigateUri="https://apps.microsoft.com/detail/9mv0b5hzvk9z"
+                           RequestNavigate="Hyperlink_RequestNavigate">
+                    <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_2}" />
+                </Hyperlink>
+                <Run Text="{itl:LocalizedText Code=LC_SAVE_LOCATION_XBOX_INSTALL_3}" />
+            </TextBlock>
+        </DataTemplate>
+
+        <msvm:SaveTypeTemplateSelector x:Key="NoSavesNoticeTemplateSelector"
+                                       DefaultTemplate="{StaticResource EmptyTemplate}"
+                                       SteamTemplate="{StaticResource SteamNoSavesTemplate}"
+                                       XboxTemplate="{StaticResource XboxNoSavesTemplate}"
+                                       />
+        
+        <!-- LOCATION INSTRUCTION TEMPLATES -->
+
+        <DataTemplate x:Key="SteamSaveInstructionsTemplate">
+            <TextBlock Padding="{adonisUi:Space 2}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_LOCATION_STEAM_INSTRUCTIONS}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="XboxSaveInstructionsTemplate">
+            <TextBlock Padding="{adonisUi:Space 2}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_LOCATION_XBOX_INSTRUCTIONS}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="ManualSaveInstructionsTemplate">
+            <TextBlock Padding="{adonisUi:Space 2}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_LOCATION_MANUAL_SAVES_INSTRUCTIONS}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="VirtualSaveInstructionsTemplate">
+            <TextBlock Padding="{adonisUi:Space 2}" TextWrapping="Wrap" Text="{itl:LocalizedText LC_LOCATION_FAKE_SAVES_INSTRUCTIONS}" />
+        </DataTemplate>
+
+        <msvm:SaveTypeTemplateSelector x:Key="SaveTypeInstructionsTemplateSelector"
+                                       DefaultTemplate="{StaticResource EmptyTemplate}"
+                                       SteamTemplate="{StaticResource SteamSaveInstructionsTemplate}"
+                                       XboxTemplate="{StaticResource XboxSaveInstructionsTemplate}"
+                                       ManualSaveTemplate="{StaticResource ManualSaveInstructionsTemplate}"
+                                       VirtualSaveTemplate="{StaticResource VirtualSaveInstructionsTemplate}"
+                                       />
+
+    </UserControl.Resources>
+
+    <GroupBox MaxWidth="1500"
+              MaxHeight="700"
+              Header="{itl:LocalizedText LC_PALWORLD_SAVE_FILES}"
+              BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
+              BorderThickness="{adonisUi:Space 0.5}"
+            >
+        <!--
+        Offset margin so the GroupBox content can take up the entire space.
+        Default padding is {adonisUi:Space 1, 1}.
+        Offset the that by 0.5 to account for the `BorderThickness` we set above.
+        Offset the top by another 0.5 (for some reason?)
+        -->
+        <Grid Margin="{adonisUi:Space -0.5, -1, -0.5, -0.5}">
+        
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Left pane: Save locations -->
+            <ListBox Grid.Column="0"
+                     ItemsSource="{Binding AvailableSaveGameCollections}"
+                     SelectedItem="{Binding SelectedCollection}"
+                     d:SelectedIndex="1"
+                     Margin="{adonisUi:Space 1, 1}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="ssvm:SavesCollectionViewModel">
+                        <StackPanel Margin="4,6" Orientation="Horizontal" vu:StackPanelExtensions.Spacing="12">
+                            <ContentPresenter Content="{Binding SaveType}"
+                                              ContentTemplateSelector="{StaticResource IconTemplateSelector}"
+                                              Width="48"
+                                              />
+
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="8">
+                                    <TextBlock Text="{Binding TypeLabel.Value}" FontWeight="SemiBold" FontSize="20" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding AvailableSaves.Count, StringFormat='({0})'}" VerticalAlignment="Center"  Foreground="Gray" FontSize="20" />
+                                </StackPanel>
+                                <Grid MaxWidth="200">
+                                    <TextBlock Text="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}}" TextWrapping="Wrap" />
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Border Grid.Column="1"
+                    Width="{adonisUi:Space 0.5}"
+                    Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
+                    HorizontalAlignment="Center"
+                    />
+
+            <!-- Middle pane: Save games -->
+            <Grid Grid.Column="2" Visibility="{Binding SelectedCollection, Converter={StaticResource VVC}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Location header with folder button -->
+                <Grid Grid.Row="0" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}" Name="SaveGameSelectorHeader">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0"
+                           Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                           Content="{Binding SelectedCollection.TypeLabel.Value}"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           Padding="{adonisUi:Space 1}"/>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="{adonisUi:Space 0.5}"
+                                adonisExtensions:LayerExtension.Layer="0"
+                                vu:StackPanelExtensions.Spacing="5">
+                        <Button Command="{Binding OpenLocationHelpMenuCommand}">
+                            <materialIcons:MaterialIcon Kind="TooltipHelp" Width="18" />
+                        </Button>
+                        
+                        <Button Command="{Binding SelectedCollection.AddSaveCommand}" Visibility="{Binding SelectedCollection.AddSaveCommand, Converter={StaticResource VVC}}">
+                            <materialIcons:MaterialIcon Kind="Add" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Width="18" />
+                        </Button>
+                    
+                        <Button Command="{Binding SelectedCollection.OpenFolderCommand}" Visibility="{Binding SelectedCollection.OpenFolderCommand, Converter={StaticResource VVC}}">
+                            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <Popup PlacementTarget="{Binding ElementName=SaveGameSelectorHeader}"
+                       HorizontalOffset="{adonisUi:Space -1}"
+                       IsOpen="{Binding IsLocationHelpMenuOpen}"
+                       StaysOpen="False"
+                       HorizontalAlignment="Stretch"
+                       MaxWidth="600"
+                       AllowsTransparency="True"
+                       >
+                    <vu:AdonisPopupContent>
+                        <ContentPresenter Grid.Row="2"
+                                          Content="{Binding SelectedCollection}"
+                                          ContentTemplateSelector="{StaticResource SaveTypeInstructionsTemplateSelector}" />
+                    </vu:AdonisPopupContent>
+                </Popup>
+
+                <!-- Notices for the save location, e.g. instructions for syncing Xbox saves if no save-games are found -->
+                <ContentPresenter Grid.Row="1"
+                                  Content="{Binding SelectedCollection}"
+                                  ContentTemplateSelector="{StaticResource NoSavesNoticeTemplateSelector}" />
+
+                <!-- Save games list -->
+                <ListBox Grid.Row="3"
+                         Margin="{adonisUi:Space 1}"
+                         ItemsSource="{Binding SelectedCollection.AvailableSaves}"
+                         SelectedItem="{Binding SelectedSave}"
+                         d:SelectedIndex="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="ssvm:SaveGameViewModel">
+                            <StackPanel Orientation="Horizontal" Margin="4,6">
+                                <TextBlock Text="{itl:LocalizedText LC_SAVE_WARNING}"
+                                           Visibility="{Binding IsValid, Converter={StaticResource VVC_Negate}}"
+                                           Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}"
+                                           Margin="0,0,5,0" />
+                                <TextBlock Text="{Binding CombinedLabel.Value}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
+            <Border Grid.Column="3"
+                    Width="{adonisUi:Space 0.5}"
+                    HorizontalAlignment="Center"
+                    Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
+                    />
+
+            <!-- Right pane: Save game properties -->
+            <Grid Grid.Column="4" Visibility="{Binding SelectedSave, Converter={StaticResource VVC}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Action buttons -->
+                <Grid Grid.Row="0"
+                      Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}"
+                      >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <Label Padding="{adonisUi:Space 1}"
+                               Content="{itl:LocalizedText LC_SELECTED_SAVE}"
+                               VerticalAlignment="Center"
+                               />
+
+                        <v:CommonSaveControlsButton DataContext="{Binding CommonSelectedSaveOperations}"
+                                                    Margin="{adonisUi:Space 0, 0.5}"
+                                                    adonisExtensions:LayerExtension.Layer="0"
+                                                    />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="6" Margin="{adonisUi:Space 0.5}" adonisExtensions:LayerExtension.Layer="0">
+                        <Button Command="{Binding LoadSaveCommand}"
+                                CommandParameter="{Binding SelectedSave}"
+                                >
+                            <TextBlock FontWeight="Bold" Text="{itl:LocalizedText LC_NAV_OPEN_IN_SOLVER}" />
+                        </Button>
+
+                        <Button Command="{Binding SelectedCollection.RemoveSaveCommand}"
+                                CommandParameter="{Binding SelectedSave}"
+                                Visibility="{Binding SelectedCollection.RemoveSaveCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                                Content="{itl:LocalizedText LC_SAVE_GAME_REMOVE_BTN_LABEL}" />
+
+                        <Button Command="{Binding SelectedSave.OpenFolderCommand}"
+                                Visibility="{Binding SelectedSave.OpenFolderCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
+                                ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
+                            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Warnings -->
+                <ItemsControl ItemsSource="{Binding SelectedSave.Warnings}" Grid.Row="1" Margin="0,0,0,12" Visibility="{Binding SelectedSave.Warnings, Converter={StaticResource CVC}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock TextWrapping="Wrap"
+                                       Foreground="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
+                                       Text="{Binding Value}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Properties -->
+                <StackPanel Grid.Row="2" Margin="{adonisUi:Space 1}">
+                    <!-- TODO - Better general styling + XAML structure -->
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_PLAYER_NAME}" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.MainPlayerName}" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_PLAYER_LEVEL}" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.MainPlayerLevel}" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_WORLD_NAME}" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.WorldName}" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_WORLD_DAY}" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.DayNumber}" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_LAST_MODIFIED}" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.LastModified, StringFormat={}{0:G}}" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{itl:LocalizedText LC_SAVE_PROPERTY_SAVE_ID}" Foreground="Gray" />
+                        <TextBlock Grid.Column="2" Text="{Binding SelectedSave.Value.GameId}" />
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </GroupBox>
+</UserControl>

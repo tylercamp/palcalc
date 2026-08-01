@@ -37,5 +37,24 @@ namespace PalCalc.Solver
             RequiredPassives = RequiredPassives.Distinct().ToList();
             OptionalPassives = OptionalPassives.Except(RequiredPassives).Distinct().ToList();
         }
+
+        internal PalSpecifier NormalizedCopy()
+        {
+            var requiredPassives = RequiredPassives.Distinct().ToList();
+
+            return new PalSpecifier
+            {
+                Pal = Pal,
+                RequiredPassives = requiredPassives,
+                RequiredGender = RequiredGender,
+                OptionalPassives = OptionalPassives
+                    .Except(requiredPassives)
+                    .Distinct()
+                    .ToList(),
+                IV_HP = IV_HP,
+                IV_Attack = IV_Attack,
+                IV_Defense = IV_Defense,
+            };
+        }
     }
 }

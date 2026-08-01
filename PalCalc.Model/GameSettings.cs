@@ -23,7 +23,7 @@ namespace PalCalc.Model
         [JsonIgnore]
         public TimeSpan AvgBreedingTime => BreedingTime * 2;
 
-        public bool MultipleBreedingFarms { get; set; } = true;
+        public bool MultipleBreedingFarms { get; set; } = false;
 
         // base time for incubating a massive egg without any e.g. temperature buffs
         public TimeSpan MassiveEggIncubationTime { get; set; } = TimeSpan.FromHours(2);

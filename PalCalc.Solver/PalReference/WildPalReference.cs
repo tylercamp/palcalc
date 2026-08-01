@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.PalReference.Properties;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,10 +11,19 @@ namespace PalCalc.Solver.PalReference
 {
     public class WildPalReference : IPalReference
     {
-        public WildPalReference(Pal pal, IEnumerable<PassiveSkill> guaranteedPassives, int numRandomPassives)
+        public WildPalReference(
+            Pal pal,
+            IEnumerable<PassiveSkill> guaranteedPassives,
+            int numRandomPassives,
+            BreedingMechanics mechanics
+        )
         {
+            ArgumentNullException.ThrowIfNull(mechanics);
+
             Pal = pal;
-            SelfBreedingEffort = GameConstants.TimeToCatch(pal) / GameConstants.PassivesWildAtMostN[numRandomPassives];
+            SelfBreedingEffort =
+                mechanics.TimeToCatch(pal) /
+                mechanics.PassivesWildAtMostN[numRandomPassives];
             EffectivePassives = guaranteedPassives.Concat(Enumerable.Range(0, numRandomPassives).Select(i => new RandomPassiveSkill())).ToList();
             Gender = PalGender.WILDCARD;
             CapturesRequiredForGender = 1;
@@ -61,7 +71,9 @@ namespace PalCalc.Solver.PalReference
 
         public int NumTotalWildPals => 1;
 
-        public int EffectivePassivesHash { get; }
+        public int EffectivePassivesHash { get; private set; }
+
+        public bool IsOutdated { get; set; }
 
         private WildPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
         {
@@ -70,6 +82,7 @@ namespace PalCalc.Solver.PalReference
                 SelfBreedingEffort = SelfBreedingEffort,
                 Gender = gender,
                 EffectivePassives = EffectivePassives,
+                EffectivePassivesHash = this.EffectivePassivesHash,
                 IVs = IVs,
                 CapturesRequiredForGender = useReverser ? 1 : gender switch
                 {

@@ -1,4 +1,6 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -57,6 +59,8 @@ namespace PalCalc.Solver.PalReference
         public int NumTotalEggs => 0;
 
         public int NumTotalWildPals => 0;
+
+        public bool IsOutdated { get; set; }
 
         private OwnedPalReference cachedFemaleRef, cachedMaleRef, cachedWildcardRef, cachedOppositeWildcardRef;
 

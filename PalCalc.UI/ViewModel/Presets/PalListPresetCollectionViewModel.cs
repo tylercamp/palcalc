@@ -44,13 +44,13 @@ namespace PalCalc.UI.ViewModel.Presets
             );
         }
 
-        public PalListPresetCollectionViewModel(CachedSaveGame context, List<IPalSourceTreeSelection> palSelections, IEnumerable<PalListPreset> initialOptions)
+        public PalListPresetCollectionViewModel(PalSourceViewModel sourcePals, IEnumerable<PalListPreset> initialOptions)
         {
             Options = new ObservableCollection<CustomPalListPresetViewModel>(
                 (initialOptions ?? []).Select(p => new CustomPalListPresetViewModel(p)).OrderBy(o => o.Name)
             );
 
-            BuiltInOptions = new ObservableCollection<BuiltInPalListPresetViewModel>(BuiltInPalListPresetViewModel.BuildAll(context, palSelections));
+            BuiltInOptions = new ObservableCollection<BuiltInPalListPresetViewModel>(BuiltInPalListPresetViewModel.BuildAll(sourcePals));
 
             CreateCommand = new RelayCommand<EditableListMenu.CreateCommandArgs>(
                 (ev) =>

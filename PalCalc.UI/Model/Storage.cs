@@ -265,6 +265,11 @@ namespace PalCalc.UI.Model
                 {
                     var res = LoadSaveFromCache(save, db);
 
+                    // A malformed cache is deleted by LoadSaveFromCache. Fall through to a
+                    // fresh save-file load, which owns the normal load lifecycle events.
+                    if (res == null)
+                        return LoadSave(containerLocation, save, db, settings);
+
                     if (!res.IsValid)
                     {
                         // TODO - no longer necessary? should have been covered by check at top of this method
@@ -293,7 +298,10 @@ namespace PalCalc.UI.Model
                             File.WriteAllText(path, res.ToJson(db));
                     }
 
-                    // TODO - adding `null` entries will prevent re-adding a save at the same path until the app is restarted
+                    // Keep failed loads as null entries. SaveGameViewModel.CachedValue is used
+                    // by several components, and negative caching prevents each access from
+                    // retrying the load and raising another error notification. ReloadSave
+                    // explicitly removes this entry before retrying.
                     if (InMemorySaves.ContainsKey(identifier))
                         InMemorySaves.Remove(identifier);
 
@@ -328,10 +336,11 @@ namespace PalCalc.UI.Model
                 var originalCachedSave = InMemorySaves.GetValueOrDefault(identifier);
 
                 if (originalCachedSave != null)
-                {
                     CrashSupport.ReferencedCachedSave(originalCachedSave);
-                    InMemorySaves.Remove(identifier);
-                }
+
+                // Remove successful and negatively cached results alike so an explicit reload
+                // always performs a new load attempt.
+                InMemorySaves.Remove(identifier);
 
                 var path = SaveCachePathFor(save);
                 var wasStored = !DEBUG_DisableStorage && File.Exists(path);

@@ -1,4 +1,4 @@
-﻿using PalCalc.Model;
+using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.ResultPruning
 {
     // avoid generating lots of very similar results
-    public class VariedResultsPruning : IResultPruning.ForceDeterministic
+    public class VariedResultsPruning : ResultPruningRule.ForceDeterministic
     {
         float maxSimilarityPercent; // 0 - 1
         public VariedResultsPruning(CancellationToken token, float maxSimilarityPercent) : base(token)
@@ -61,8 +61,10 @@ namespace PalCalc.Solver.ResultPruning
                 var resultOccurrences = palOccurrences[currentResult];
                 var resultTotalPals = resultOccurrences.Sum(kvp => kvp.Value);
 
-                // TODO - this checks for similarity of `currentResult` contents vs `prunedResult` contents, but maybe it's better
-                //        to do the opposite?
+                // Normalize the difference by the current result's size.
+                // Note: This makes similarity asymmetric when the two paths have different
+                //       numbers of Pals.
+                // TODO: check whether that asymmetry is beneficial
                 var lowestDifferenceScore = prunedResults.Min(prunedResult =>
                 {
                     var differenceCount = 0;

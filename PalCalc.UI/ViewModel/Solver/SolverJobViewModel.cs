@@ -1,8 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.Processing;
 using PalCalc.Solver.ResultPruning;
+using PalCalc.Solver.Utils;
 using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
@@ -28,7 +30,8 @@ namespace PalCalc.UI.ViewModel.Solver
         // (dispatcher.HasShutdownStarted checks added in case a job fails, causes UI shutdown, and remaining
         // jobs continue due to Dispose but throw more errors due to UI env. shutdown)
         private Dispatcher dispatcher;
-        private BreedingSolver solver;
+        private BreedingSolver solver = new();
+        private BreedingSolverRequest solverRequest;
         private CancellationTokenSource tokenSource;
         private SolverStateController solverController;
 
@@ -113,23 +116,22 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public SolverJobViewModel(
             Dispatcher dispatcher,
-            BreedingSolver solver,
+            BreedingSolverRequest solverRequest,
             PalSpecifierViewModel spec,
             int saveStateId
         )
         {
             this.dispatcher = dispatcher;
-            this.solver = solver;
+            this.solverRequest = solverRequest;
 
             Specifier = spec;
 
             tokenSource = new CancellationTokenSource();
-            solverController = new SolverStateController()
-            {
-                CancellationToken = tokenSource.Token
-            };
+            solverController = new SolverStateController(
+                tokenSource.Token
+            );
 
-            solver.SolverStateUpdated += Solver_SolverStateUpdated;
+            solver.StatusUpdated += Solver_StatusUpdated;
 
             SaveStateId = saveStateId;
             CurrentState = SolverState.Paused;
@@ -139,7 +141,7 @@ namespace PalCalc.UI.ViewModel.Solver
         {
             if (thread == null)
             {
-                thread = new Thread(() => RunSolver(Specifier.ModelObject));
+                thread = new Thread(RunSolver);
 
                 thread.Priority = ThreadPriority.BelowNormal;
                 thread.Start();
@@ -155,8 +157,8 @@ namespace PalCalc.UI.ViewModel.Solver
 
             solverController.Pause();
 
-            // we'd prefer to get the current state from the solver's update events,
-            // but not everything is wired up to emit those events (namely `WorkingSet`)
+            // Reflect the requested state immediately rather than waiting for
+            // the next periodic solver status update.
             CurrentState = SolverState.Paused;
         }
 
@@ -182,14 +184,17 @@ namespace PalCalc.UI.ViewModel.Solver
             tokenSource.Dispose();
         }
 
-        private void RunSolver(PalSpecifier spec)
+        private void RunSolver()
         {
             try
             {
                 List<IPalReference> results;
                 try
                 {
-                    results = solver.SolveFor(spec, solverController);
+                    results = solver
+                        .Solve(solverRequest, solverController)
+                        .Results
+                        .ToList();
                 }
                 catch (OperationCanceledException)
                 {
@@ -200,17 +205,17 @@ namespace PalCalc.UI.ViewModel.Solver
 
                 // general simplification pass, get the best result for each potentially
                 // interesting combination of result properties
-                var resultsTable = new PalPropertyGrouping(PalProperty.Combine(
-                    PalProperty.EffectivePassives,
-                    PalProperty.NumBreedingSteps,
+                var resultsTable = new PalResultGrouping(PalResultProperty.Combine(
+                    PalResultProperty.EffectivePassives,
+                    PalResultProperty.NumBreedingSteps,
                     p => p.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
                 ));
                 resultsTable.AddRange(results);
-                resultsTable.FilterAll(PruningRulesBuilder.Default, tokenSource.Token);
+                resultsTable.FilterAll(ResultPruningPolicy.Default, tokenSource.Token);
 
                 // final simplification pass, ignore any results which are over 2x the effort of the fastest option
-                resultsTable = resultsTable.BuildNew(PalProperty.Combine(
-                    PalProperty.EffectivePassives
+                resultsTable = resultsTable.BuildNew(PalResultProperty.Combine(
+                    PalResultProperty.EffectivePassives
                 ));
                 resultsTable.FilterAll(g =>
                 {
@@ -256,7 +261,7 @@ namespace PalCalc.UI.ViewModel.Solver
             }
         }
 
-        private void Solver_SolverStateUpdated(SolverStatus obj)
+        private void Solver_StatusUpdated(SolverStatus obj)
         {
             if (dispatcher.HasShutdownStarted) return;
 
@@ -267,8 +272,10 @@ namespace PalCalc.UI.ViewModel.Solver
 
             dispatcher.BeginInvoke(() =>
             {
-                if (!obj.Canceled)
-                    CurrentState = obj.Paused ? SolverState.Paused : SolverState.Running;
+                if (!obj.IsCanceled)
+                    CurrentState = obj.IsPaused
+                        ? SolverState.Paused
+                        : SolverState.Running;
 
                 var numTotalSteps = (double)(1 + obj.TargetSteps);
                 int overallStep = 0;
@@ -305,7 +312,7 @@ namespace PalCalc.UI.ViewModel.Solver
                         break;
 
                     case SolverPhase.Finished:
-                        if (obj.Canceled)
+                        if (obj.IsCanceled)
                         {
                             SolverStatusMessage = null;
                         }

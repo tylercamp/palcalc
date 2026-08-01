@@ -1,4 +1,5 @@
-﻿using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference;
+using PalCalc.Solver.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.ResultPruning
 {
-    public class ResultLimitPruning : IResultPruning.ForceDeterministic
+    public class ResultLimitPruning : ResultPruningRule.ForceDeterministic
     {
         int maxResults;
         public ResultLimitPruning(CancellationToken token, int maxResults) : base(token)

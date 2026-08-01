@@ -81,6 +81,7 @@ namespace PalCalc.UI.View.Utils
         {
             if (e.Key == Key.Escape)
             {
+                e.Handled = true;
                 CancelCommand.Execute(null);
             }
             else
@@ -93,6 +94,7 @@ namespace PalCalc.UI.View.Utils
         {
             if (e.Key == Key.Enter && SaveCommand.CanExecute(null))
             {
+                e.Handled = true;
                 SaveCommand.Execute(null);
             }
         }

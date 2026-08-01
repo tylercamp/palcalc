@@ -328,6 +328,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_HELP,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_INCLUDE_CUSTOM_PALS,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -415,6 +419,22 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_LOCATION_FAKE_SAVES_INSTRUCTIONS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_LOCATION_MANUAL_SAVES_INSTRUCTIONS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_LOCATION_STEAM_INSTRUCTIONS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_LOCATION_XBOX_INSTRUCTIONS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_MANUAL_SAVE_ALREADY_REGISTERED,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -444,6 +464,18 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_MULTIPLE_BREEDING_FARMS_DESC,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_NAV_BACK_TO_SAVE_SELECTOR,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_NAV_FORCE_CHECK_UPDATES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_NAV_OPEN_IN_SOLVER,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -603,6 +635,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_PALWORLD_SAVE_FILES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_PASSIVES_CHECKLIST_COST,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -656,6 +692,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to TraitsList.
         /// </summary>
         LC_REQUIRED_TRAITS_SUMMARY,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_RESET_UI_LAYOUT,
         /// <summary>
         ///   Looks up a localized string similar to AvgAttempts.
         /// </summary>
@@ -759,6 +799,22 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SAVE_KIND_TITLE_LOCAL_FILES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_KIND_TITLE_STEAM,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_KIND_TITLE_VIRTUAL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_KIND_TITLE_XBOX,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SAVE_LOCATION,
         /// <summary>
         ///   Looks up a localized string similar to UserId | NumValidSaves.
@@ -779,6 +835,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SAVE_LOCATION_STEAM_INSTALL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SAVE_LOCATION_XBOX_EMPTY,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -792,6 +852,30 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVE_LOCATION_XBOX_INSTALL_3,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_LAST_MODIFIED,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_PLAYER_LEVEL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_PLAYER_NAME,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_SAVE_ID,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_WORLD_DAY,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVE_PROPERTY_WORLD_NAME,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -868,6 +952,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to SaveLabel.
         /// </summary>
         LC_SAVEWINDOW_TITLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SELECTED_SAVE,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -1119,6 +1207,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_UI_LAYOUT_RESET_NOTICE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_UNKNOWN_GUILD,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -1128,6 +1220,22 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_UPDATE_AVAILABLE,
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        LC_UPDATES_CHECK_BODY,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_UPDATES_CHECK_OPTION_SKIP,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_UPDATES_CHECK_RESULT_FAILED,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_UPDATES_CHECK_RESULT_ON_LATEST,
         /// <summary>
         ///   Looks up a localized string similar to CageId.
         /// </summary>

@@ -1,6 +1,7 @@
 ﻿using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace PalCalc.UI
     /// </summary>
     public partial class App : Application
     {
-        public static string Version => "v1.17.7";
+        public static string Version => "v1.18.3";
         public static string RepositoryUrl => "https://github.com/tylercamp/palcalc/";
 
         private static ILogger logger;
@@ -65,6 +66,12 @@ namespace PalCalc.UI
             Translator.Init();
 
             base.OnStartup(e);
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            SaveCustomizationsViewModel.FlushAll();
+            base.OnExit(e);
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

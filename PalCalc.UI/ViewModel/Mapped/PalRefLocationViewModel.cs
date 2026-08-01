@@ -1,5 +1,5 @@
 ﻿using PalCalc.Model;
-using PalCalc.Solver;
+using PalCalc.Solver.PalReference.Properties;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.PalDerived;
@@ -71,7 +71,21 @@ namespace PalCalc.UI.ViewModel.Mapped
 
                 if (ownedLoc.Location.Type != LocationType.Custom && ownedLoc.Location.Type != LocationType.GlobalPalStorage)
                 {
-                    var rawOwnerName = source?.PlayersById?.GetValueOrDefault(ownedLoc.OwnerId)?.Name;
+                    // In Dimensional Pal Storage ("DPS") a pal's OwnerPlayerId may differ from whose
+                    // storage it physically sits in, because players can hold each other's pals there.
+                    // The location label should name the holder - the storage you actually open -
+                    // matching how the source tree already groups DPS pals by container. For other
+                    // location types owner == holder.
+                    var ownerLookupId = ownedLoc.OwnerId;
+                    if (ownedLoc.Location.Type == LocationType.DimensionalPalStorage)
+                    {
+                        var holderId = source?.PalContainers
+                            ?.OfType<DimensionalPalStorageContainer>()
+                            .FirstOrDefault(c => c.Id == ownedLoc.Location.ContainerId)?.PlayerId;
+                        if (holderId != null) ownerLookupId = holderId;
+                    }
+
+                    var rawOwnerName = source?.PlayersById?.GetValueOrDefault(ownerLookupId)?.Name;
 
                     ILocalizedText ownerName = rawOwnerName != null
                         ? new HardCodedText(rawOwnerName)

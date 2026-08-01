@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AdonisUI.Controls
 {
-    internal class MessageBoxButtonLabels
+    public class MessageBoxButtonLabels
     {
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern IntPtr MB_GetString(uint wBtn);

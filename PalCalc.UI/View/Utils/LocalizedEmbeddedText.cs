@@ -1,11 +1,8 @@
 ﻿using PalCalc.UI.Localization;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -68,7 +65,7 @@ namespace PalCalc.UI.View.Utils
             Build();
         }
 
-        // Re-create the inline list every time Code or Displays changes
+        // Re-create the inline list every time the selected translation or embedded content changes.
         private void Build()
         {
             if (_host == null) return;
@@ -92,8 +89,21 @@ namespace PalCalc.UI.View.Utils
                 }
                 else
                 {
-                    _host.Inlines.Add(new Run(segment));
+                    AddText(segment);
                 }
+            }
+        }
+
+        private void AddText(string text)
+        {
+            var lines = Regex.Split(text, @"\r\n|\r|\n");
+            for (var i = 0; i < lines.Length; i++)
+            {
+                if (i > 0)
+                    _host.Inlines.Add(new LineBreak());
+
+                if (lines[i].Length > 0)
+                    _host.Inlines.Add(new Run(lines[i]));
             }
         }
 
@@ -102,6 +112,7 @@ namespace PalCalc.UI.View.Utils
         {
             base.OnInitialized(e);
             Params.CollectionChanged += (_, __) => Build();
+            Translator.LocaleUpdated += Build;
         }
     }
 }

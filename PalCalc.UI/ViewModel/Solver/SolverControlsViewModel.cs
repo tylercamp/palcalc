@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
@@ -6,6 +6,7 @@ using PalCalc.Solver.ResultPruning;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.View;
+using PalCalc.UI.View.Behaviors;
 using PalCalc.UI.ViewModel.Presets;
 using System;
 using System.Collections.Generic;
@@ -29,21 +30,23 @@ namespace PalCalc.UI.ViewModel.Solver
 
     public partial class SolverControlsViewModel : ObservableObject
     {
-        public static SolverControlsViewModel DesignerInstance { get; } = new SolverControlsViewModel(null, null, null, null);
+        public static SolverControlsViewModel DesignerInstance { get; } = new SolverControlsViewModel(null, null, null, null, null);
 
         private PalListPresetCollectionViewModel PalListPresets => new(
-            CurrentTarget?.PalSource?.Save,
-            CurrentTarget?.PalSource?.Selections,
+            SourcePals,
             AppSettings.Current?.PalListPresets
         );
 
         public SolverControlsViewModel(
+            PalSourceViewModel sourcePals,
             ICommand runSolverCommand,
             ICommand cancelSolverCommand,
             ICommand pauseSolverCommand,
             ICommand resumeSolverCommand
         )
         {
+            SourcePals = sourcePals;
+
             MaxBreedingSteps = 6;
             MaxWildPals = 1;
             MaxInputIrrelevantPassives = 2;
@@ -53,6 +56,7 @@ namespace PalCalc.UI.ViewModel.Solver
             ChangeBredPals = new RelayCommand(() =>
             {
                 var window = new PalCheckListWindow();
+                WindowPlacementBehavior.SetKey(window, "AllowedBredPals");
                 window.DataContext = new PalCheckListViewModel(
                     presets: PalListPresets,
                     onCancel: null,
@@ -70,6 +74,7 @@ namespace PalCalc.UI.ViewModel.Solver
             ChangeWildPals = new RelayCommand(() =>
             {
                 var window = new PalCheckListWindow();
+                WindowPlacementBehavior.SetKey(window, "AllowedWildPals");
                 window.DataContext = new PalCheckListViewModel(
                     presets: PalListPresets,
                     onCancel: null,
@@ -177,6 +182,8 @@ namespace PalCalc.UI.ViewModel.Solver
             OnPropertyChanged(nameof(CanEditSettings));
         }
 
+        public PalSourceViewModel SourcePals { get; }
+
         private SolverJobViewModel currentJob;
         public SolverJobViewModel CurrentJob
         {
@@ -263,11 +270,12 @@ namespace PalCalc.UI.ViewModel.Solver
         [ObservableProperty]
         private List<PassiveSkill> bannedSurgeryPassives = new List<PassiveSkill>();
 
-        public BreedingSolver ConfiguredSolver(GameSettings gameSettings, List<PalInstance> pals) => new BreedingSolver(
+        public BreedingSolverSettings ConfiguredSolverSettings(GameSettings gameSettings, List<PalInstance> pals) =>
             new BreedingSolverSettings(
                 db: PalDB.LoadEmbedded(),
+                breedingDB: PalBreedingDB.LoadEmbedded(PalDB.LoadEmbedded()),
                 gameSettings: gameSettings,
-                pruningBuilder: PruningRulesBuilder.Default,
+                resultPruning: ResultPruningPolicy.Default,
                 ownedPals: pals,
                 maxBreedingSteps: MaxBreedingSteps,
                 maxSolverIterations: MaxSolverIterations,
@@ -282,8 +290,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 maxSurgeryCost: MaxGoldCost,
                 allowedSurgeryPassives: PalDB.LoadEmbedded().SurgeryPassiveSkills.Except(BannedSurgeryPassives).ToList(),
                 useGenderReversers: UseGenderReversers
-            )
-        );
+            );
 
         public SerializableSolverSettings AsModel => new SerializableSolverSettings()
         {

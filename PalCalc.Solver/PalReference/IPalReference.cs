@@ -1,4 +1,5 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.PalReference.Properties;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -61,5 +62,7 @@ namespace PalCalc.Solver.PalReference
         int NumTotalEggs { get; }
 
         int NumTotalWildPals { get; }
+
+        bool IsOutdated { get; set; }
     }
 }

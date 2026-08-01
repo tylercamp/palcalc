@@ -35,6 +35,8 @@ namespace PalCalc.GenDB.GameDataReaders
 
         public const string ACTIVE_SKILLS_PATH = "Pal/Content/Pal/DataTable/Waza/DT_WazaDataTable";
         public const string ACTIVE_SKILLS_PAL_LEVEL_PATH = "Pal/Content/Pal/DataTable/Waza/DT_WazaMasterLevel";
+        // DT_WazaMasterTamago is available, "Tamago" apparently translates to "Egg"?
+        // All pals referenced here are `BOSS_`, but `BOSS_` entries also appear in `DT_WazaMasterLevel`
 
         public const string PAL_ICONS_MAPPING_PATH = "Pal/Content/Pal/DataTable/Character/DT_PalCharacterIconDataTable";
         public const string PAL_SPAWNERS_PATH = "Pal/Content/Pal/DataTable/Spawner/DT_PalWildSpawner";

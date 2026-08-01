@@ -1,4 +1,6 @@
 ﻿using PalCalc.Model;
+using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -177,6 +179,8 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> ActualPassives => EffectivePassives;
 
+        public bool IsOutdated { get; set; }
+
         private BredPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
         {
             if (gender == PalGender.WILDCARD)
@@ -230,7 +234,7 @@ namespace PalCalc.Solver.PalReference
         {
             // this exception isn't really necessary, we'd be okay without it, but we should only expect this to be called on
             // bred pals in the outer pool which don't have a requested gender. these specific-gender pals should only be used
-            // as specialized parents of new pals. if these make it back into the broader working set, there's likely a bug elsewhere
+            // as specialized parents of new pals. if these make it back into the broader frontier, there's likely a bug elsewhere
             if (Gender != PalGender.WILDCARD) throw new Exception("A bred pal with already-guaranteed gender should not be asked to change its gender again");
 
             switch (gender)

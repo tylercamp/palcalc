@@ -10,7 +10,7 @@ namespace PalCalc.UI.Model
 {
     internal static class FakeSaveGame
     {
-        public static ISaveGame Create(string name) =>
+        public static VirtualSaveGame Create(string name) =>
             new VirtualSaveGame(
                 "Fake User",
                 name,

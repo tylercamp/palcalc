@@ -12,13 +12,16 @@
                              xmlns:util="clr-namespace:Wpf.Util"
                              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
                              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+                             xmlns:behaviors="clr-namespace:PalCalc.UI.View.Behaviors"
                              mc:Ignorable="d"
                              d:DataContext="{x:Static vm:PalCheckListViewModel.DesignerInstance}"
                              IconVisibility="Collapsed"
                              WindowStyle="ToolWindow"
                              WindowStartupLocation="CenterOwner"
                              Title="{Binding Title.Value}"
-                             Height="450" Width="450"
+                             Width="450" Height="450"
+                             MinWidth="200" MinHeight="200"
+                             behaviors:WindowPlacementBehavior.Mode="Size"
                              >
     <Grid>
         <Grid.Resources>

@@ -11,12 +11,12 @@ Nonetheless, the work by /u/mgxts is the best information we have at the moment.
 
 ## Probability References
 
-The main Reddit post includes a table of probabilities for inheriting different numbers of traits from the list of parents. These are reflected in [`GameConstants.cs`](../PalCalc.Model/GameConstants.cs).
+The main Reddit post includes a table of probabilities for inheriting different numbers of traits from the list of parents. The default values are represented by [`BreedingMechanics`](../PalCalc.Model/BreedingMechanics.cs). Each `PalDB` owns a mechanics instance, so customized databases can supply different probabilities.
 
 Pal Calc uses these probabilities:
 
-- Chance of inheriting exactly `N` passives from the parents (`Probability` column in the table from the Reddit post) (`GameConstants.PassiveProbabilityDirect`)
-- Chance of inheriting `N` random passives (not represented in any table; pulled from the "RANDOM PASSIVE SKILLS" section of their pseudocode) (`PassiveRandomAddedProbability`)
+- Chance of inheriting exactly `N` passives from the parents (`Probability` column in the table from the Reddit post) (`BreedingMechanics.PassiveProbabilityDirect`)
+- Chance of inheriting `N` random passives (not represented in any table; pulled from the "RANDOM PASSIVE SKILLS" section of their pseudocode) (`BreedingMechanics.PassiveRandomAddedProbability`)
   - The `Combi_PassiveRandomAddNum` contains 4 elements, and `select_weighted_random_index` can return `[0, Size-1]`, i.e. from 0 - 3. This means it's impossible to inherit 4 random passives.
 
 ## Calculating Probabilities
@@ -96,4 +96,4 @@ In that case we can combine the probabilities for [1] and [2], giving us a 7.5% 
 
 **This gives us our final result - from these two parents we create two children, one with an ~8 hour estimate, and the other with a ~2 hour estimate.**
 
-(The logic involving `P(Direct)` and `P(Random)` are implemented in `Probabilities.Passives.ProbabilityInheritedTargetPassives`. The logic for accumulating and assigning these probabilities is in `BreedingSolver.SolveFor`.)
+(The logic involving `P(Direct)` and `P(Random)` is implemented in `Probabilities.Passives.ProbabilityInheritedTargetPassives`. `CandidateExpander` accumulates these probabilities and assigns them to candidate children.)
