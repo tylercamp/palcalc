@@ -25,11 +25,35 @@ namespace PalCalc.UI.View.Main
     /// </summary>
     public partial class BreedingResultView : UserControl
     {
+        public static readonly DependencyProperty IsReadOnlyProperty =
+            DependencyProperty.Register(
+                nameof(IsReadOnly),
+                typeof(bool),
+                typeof(BreedingResultView),
+                new PropertyMetadata(false));
+
+        public bool IsReadOnly
+        {
+            get => (bool)GetValue(IsReadOnlyProperty);
+            set => SetValue(IsReadOnlyProperty, value);
+        }
+
+        public static readonly DependencyProperty DisplayedResultProperty =
+            DependencyProperty.Register(
+                nameof(DisplayedResult),
+                typeof(BreedingResultViewModel),
+                typeof(BreedingResultView),
+                new PropertyMetadata(null));
+
+        public BreedingResultViewModel DisplayedResult
+        {
+            get => (BreedingResultViewModel)GetValue(DisplayedResultProperty);
+            set => SetValue(DisplayedResultProperty, value);
+        }
+
         public BreedingResultView()
         {
             InitializeComponent();
         }
-
-        public BreedingResultViewModel ViewModel => DataContext as BreedingResultViewModel;
     }
 }

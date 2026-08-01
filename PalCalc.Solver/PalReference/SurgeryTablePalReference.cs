@@ -171,8 +171,9 @@ namespace PalCalc.Solver.PalReference
                         break;
 
                     case ReplacePassiveSurgeryOperation rpso:
-                        int removedEffectiveIdx = rpso.RemovedPassive is RandomPassiveSkill ? EffectivePassives.FindIndex(p => p is RandomPassiveSkill) : EffectivePassives.IndexOf(rpso.RemovedPassive);
-                        int removedActualIdx = rpso.RemovedPassive is RandomPassiveSkill ? ActualPassives.FindIndex(p => p is RandomPassiveSkill || !EffectivePassives.Contains(p)) : EffectivePassives.IndexOf(rpso.RemovedPassive);
+                        bool isRemovalAmbiguous = rpso.RemovedPassive is RandomPassiveSkill || !EffectivePassives.Contains(rpso.RemovedPassive);
+                        int removedEffectiveIdx = isRemovalAmbiguous ? EffectivePassives.FindIndex(p => p is RandomPassiveSkill) : EffectivePassives.IndexOf(rpso.RemovedPassive);
+                        int removedActualIdx = isRemovalAmbiguous ? ActualPassives.FindIndex(p => p is RandomPassiveSkill || !EffectivePassives.Contains(p)) : EffectivePassives.IndexOf(rpso.RemovedPassive);
 
 #if DEBUG && DEBUG_CHECKS
                         // we shouldn't be adding passives which already exist on the pal

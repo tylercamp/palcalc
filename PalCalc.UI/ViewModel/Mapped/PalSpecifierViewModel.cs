@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace PalCalc.UI.ViewModel.Mapped
@@ -126,8 +127,25 @@ namespace PalCalc.UI.ViewModel.Mapped
         public bool Iv_Attack_IsValid => MinIv_Attack <= MaxIv_Attack;
         public bool Iv_Defense_IsValid => MinIv_Defense <= MaxIv_Defense;
 
-        [ObservableProperty]
         private BreedingResultListViewModel currentResults;
+        public BreedingResultListViewModel CurrentResults
+        {
+            get => currentResults;
+            set
+            {
+                currentResults = value;
+
+                if (currentResults != null)
+                    WeakEventManager<BreedingResultListViewModel, EventArgs>.AddHandler(currentResults, nameof(currentResults.CheckedStateChanged), CurrentResults_CheckedStateChanged);
+            }
+        }
+
+        private void CurrentResults_CheckedStateChanged(object sender, EventArgs args)
+        {
+            ResultsCheckedStateChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public event Action<object, EventArgs> ResultsCheckedStateChanged;
 
         [ObservableProperty]
         private PalGenderViewModel requiredGender;

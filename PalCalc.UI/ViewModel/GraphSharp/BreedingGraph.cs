@@ -43,8 +43,16 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
             // breeding tree is upside down relative to breeding direction
             foreach (var (child, _) in tree.AllNodes)
+            {
+                var childNode = result.NodeFor(child);
                 foreach (var parent in child.Children)
-                    result.AddEdge(new BreedingEdge(parent: result.NodeFor(parent), child: result.NodeFor(child)));
+                {
+                    var parentNode = result.NodeFor(parent);
+                    result.AddEdge(new BreedingEdge(parent: parentNode, child: childNode));
+                    // parentNode (input) feeds into childNode (output), so parentNode's consumer is childNode
+                    parentNode.SetConsumer(childNode);
+                }
+            }
 
             return result;
         }

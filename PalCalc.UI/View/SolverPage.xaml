@@ -142,7 +142,8 @@
                     </StackPanel>
 
                     <!-- Graph view -->
-                    <v:BreedingResultView DataContext="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
+                    <v:BreedingResultView IsReadOnly="{Binding PalTarget.CanEdit, Converter={StaticResource NegatedVBC}}"
+                                          DisplayedResult="{Binding PalTarget.CurrentPalSpecifier.CurrentResults.SelectedResult}" />
                 </DockPanel>
 
                 <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />

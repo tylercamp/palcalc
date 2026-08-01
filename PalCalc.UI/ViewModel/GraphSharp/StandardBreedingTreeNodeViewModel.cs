@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
@@ -46,6 +47,34 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             AvgRequiredAttemptsDescription = LocalizationCodes.LC_RESULT_BREEDING_ATTEMPTS.Bind(AvgRequiredAttempts);
 
             IVs = IVSetViewModel.FromIVs(node.PalRef.IVs);
+
+            IsCheckable = node.PalRef is BredPalReference or WildPalReference or SurgeryTablePalReference;
+            ToggleCheckedCommand = new RelayCommand(() => IsChecked = !IsChecked);
+        }
+
+        [NotifyPropertyChangedFor(nameof(IsComplete))]
+        [ObservableProperty]
+        private bool isChecked;
+
+        public IRelayCommand ToggleCheckedCommand { get; }
+
+        public bool IsCheckable { get; }
+
+        private IBreedingTreeNodeViewModel consumer;
+
+        public bool IsComplete => IsChecked || (consumer?.IsComplete ?? false);
+
+        public void SetConsumer(IBreedingTreeNodeViewModel node)
+        {
+            consumer = node;
+            if (consumer is ObservableObject obs)
+            {
+                obs.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(IsComplete))
+                        OnPropertyChanged(nameof(IsComplete));
+                };
+            }
         }
 
         public PalViewModel Pal { get; }

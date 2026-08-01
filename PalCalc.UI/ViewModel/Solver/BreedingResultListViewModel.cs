@@ -8,6 +8,7 @@ using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -28,6 +29,20 @@ namespace PalCalc.UI.ViewModel.Solver
     {
         public BreedingResultListViewModelSettingsSnapshot SettingsSnapshot { get; set; }
 
+        public event Action<object, EventArgs> CheckedStateChanged;
+
+        private void SubscribeCheckedEvents(List<BreedingResultViewModel> resultList)
+        {
+            if (resultList == null) return;
+            foreach (var r in resultList)
+                PropertyChangedEventManager.AddHandler(r, OnResultCheckStateChanged, nameof(r.CheckedNodes));
+        }
+
+        private void OnResultCheckStateChanged(object sender, PropertyChangedEventArgs args)
+        {
+            CheckedStateChanged?.Invoke(this, EventArgs.Empty);
+        }
+
         private List<BreedingResultViewModel> results;
         public List<BreedingResultViewModel> Results
         {
@@ -36,6 +51,7 @@ namespace PalCalc.UI.ViewModel.Solver
             {
                 if (SetProperty(ref results, value))
                 {
+                    SubscribeCheckedEvents(results);
                     SelectedResult = results.OrderBy(r => r.TimeEstimate).FirstOrDefault();
                     OnPropertyChanged(nameof(EffortWidth));
                     OnPropertyChanged(nameof(NumStepsWidth));
@@ -91,7 +107,22 @@ namespace PalCalc.UI.ViewModel.Solver
         // before display
         public void UpdateCachedData(CachedSaveGame csg, GameSettings settings)
         {
+            // preserve checked state across rebuild
+            var oldCheckedState = Results
+                .Select(r => r.Graph?.Nodes.Select(n => n.IsChecked).ToArray())
+                .ToList();
+
             Results = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult)).ToList();
+
+            for (int i = 0; i < Results.Count && i < oldCheckedState.Count; i++)
+            {
+                var checkedArr = oldCheckedState[i];
+                if (checkedArr == null || Results[i].Graph == null) continue;
+
+                var nodes = Results[i].Graph.Nodes;
+                for (int j = 0; j < nodes.Count && j < checkedArr.Length; j++)
+                    nodes[j].IsChecked = checkedArr[j];
+            }
         }
 
         [JsonIgnore]
