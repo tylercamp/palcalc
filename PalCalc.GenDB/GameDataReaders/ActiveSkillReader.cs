@@ -57,7 +57,17 @@ namespace PalCalc.GenDB.GameDataReaders
             foreach (var row in rawAttacks.RowMap)
             {
                 var attack = row.Value.ToObject<UActiveSkill>();
-                if (attack.DisabledData || !availableAttackIds.Contains(attack.WazaType)) continue;
+                if (attack.DisabledData)
+                {
+                    logger.Warning("Attack {InternalName} was disabled, skipping", attack.WazaType);
+                    continue;
+                }
+
+                if (!availableAttackIds.Contains(attack.WazaType))
+                {
+                    logger.Warning("Attack {InternalName} was not in the list of attack levels, skipping", attack.WazaType);
+                    continue;
+                }
 
                 res.Add(attack);
             }
