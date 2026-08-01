@@ -144,6 +144,16 @@ namespace DotNetKit.Windows.Controls
                 lastValidSelectedItem = SelectedItem;
         }
 
+        protected override void OnDropDownClosed(EventArgs e)
+        {
+            base.OnDropDownClosed(e);
+
+            using (Items.DeferRefresh())
+            {
+                Items.Filter = defaultItemsFilter;
+            }
+        }
+
         #region OnTextChanged
         long revisionId;
         string previousText;
