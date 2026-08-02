@@ -523,6 +523,8 @@ namespace PalCalc.UI
 
     internal class BredPalReferenceConverter : IPalReferenceConverterBase<BredPalReference>
     {
+        // TODO: Persist actual/effective attacks and attack probability when saved solver
+        // results need to round-trip attack-targeted breeding paths.
         SerializableSolverSettings solverSettings;
         public BredPalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, PalReferenceConverter genericConverter) : base(db, gameSettings, "BRED_PAL")
         {

@@ -98,6 +98,8 @@ internal sealed class InitialPalBuilder(
         return initialContent;
     }
 
+    // TODO: Defer owned loadout selection to each pairing once references carry their
+    // full mastered attack set; include skill-fruit acquisition as a planned source.
     private static ActiveSkill SelectOwnedAttack(PalInstance pal, ActiveSkill requiredAttack)
     {
         var mastered = pal.ActiveSkills ?? [];
@@ -175,6 +177,8 @@ internal sealed class InitialPalBuilder(
         );
     }
 
+    // TODO: Model naturally learned attacks above level 1 for hypothetical wild pals
+    // once their capture-level/loadout distribution is known.
     private ActiveSkill SelectWildAttack(Pal pal, ActiveSkill requiredAttack)
     {
         var level1Attacks = pal.Level1ActiveSkills(settings.DB).ToList();

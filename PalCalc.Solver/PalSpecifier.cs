@@ -12,6 +12,10 @@ namespace PalCalc.Solver
     {
         public Pal Pal { get; set; }
         public List<PassiveSkill> RequiredPassives { get; set; } = new List<PassiveSkill>();
+
+        // TODO: Generalize this singular target to required and optional attack collections
+        // when breeding can produce more than one targeted attack. Add the corresponding
+        // request serialization and UI selection/display at the same time.
         public ActiveSkill RequiredAttack { get; set; }
         public PalGender RequiredGender { get; set; } = PalGender.WILDCARD;
 
