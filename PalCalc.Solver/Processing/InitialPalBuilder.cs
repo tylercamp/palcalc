@@ -24,7 +24,8 @@ internal sealed class InitialPalBuilder(
         static (
             Pal Pal,
             PassiveSetKey Passives,
-            RelevantIVKey IVs
+            RelevantIVKey IVs,
+            string EffectiveAttack
         ) StateWithoutGender(OwnedPalReference reference) =>
             (
                 reference.Pal,
@@ -33,7 +34,8 @@ internal sealed class InitialPalBuilder(
                         .Intersect(reference.EffectivePassives)
                         .ToList()
                 ),
-                new RelevantIVKey(reference.IVs)
+                new RelevantIVKey(reference.IVs),
+                reference.EffectiveAttack?.InternalName
             );
 
         bool WithinBreedingSteps(Pal pal) =>
@@ -52,7 +54,9 @@ internal sealed class InitialPalBuilder(
                 p.PassiveSkills.Except(target.DesiredPassives).Count() <= settings.MaxInputIrrelevantPassives
             )
             .Select(p =>
-                new OwnedPalReference(
+            {
+                var attack = SelectOwnedAttack(p, target.RequiredAttack);
+                return new OwnedPalReference(
                     instance: p,
                     effectivePassives: p.PassiveSkills.ToDedicatedPassives(target.DesiredPassives),
                     effectiveIVs: new IV_Set
@@ -60,16 +64,19 @@ internal sealed class InitialPalBuilder(
                         HP = MakeIV(target.IV_HP, p.IV_HP),
                         Attack = MakeIV(target.IV_Attack, p.IV_Attack),
                         Defense = MakeIV(target.IV_Defense, p.IV_Defense),
-                    }
-                )
-            )
+                    },
+                    actualAttack: attack,
+                    effectiveAttack: EffectiveAttack(attack, target.RequiredAttack)
+                );
+            })
             .GroupBy(pal => (
                 State: StateWithoutGender(pal),
                 pal.Gender
             ))
             .Select(group =>
                 group
-                    .OrderBy(p => p.ActualPassives.Count)
+                    .OrderBy(p => p.ActualAttack == null ? 2 : p.ActualAttack.CanInherit ? 1 : 0)
+                    .ThenBy(p => p.ActualPassives.Count)
                     .ThenBy(p =>
                         PreferredLocationPruning.LocationOrderingOf(p.UnderlyingInstance.Location.Type)
                     )
@@ -90,6 +97,25 @@ internal sealed class InitialPalBuilder(
 
         return initialContent;
     }
+
+    private static ActiveSkill SelectOwnedAttack(PalInstance pal, ActiveSkill requiredAttack)
+    {
+        var mastered = pal.ActiveSkills ?? [];
+        return mastered.FirstOrDefault(attack => attack == requiredAttack)
+            ?? mastered.FirstOrDefault(attack => !attack.CanInherit)
+            ?? (pal.EquippedActiveSkills ?? []).FirstOrDefault(attack => attack.CanInherit)
+            ?? mastered
+                .Where(attack => attack.CanInherit)
+                .OrderBy(attack => attack.InternalName, StringComparer.Ordinal)
+                .FirstOrDefault();
+    }
+
+    private static ActiveSkill EffectiveAttack(ActiveSkill attack, ActiveSkill requiredAttack) =>
+        attack == requiredAttack
+            ? requiredAttack
+            : attack?.CanInherit == true
+                ? new RandomActiveSkill()
+                : null;
 
     private static IEnumerable<IPalReference> CombineGenders(
         List<OwnedPalReference> group
@@ -124,6 +150,7 @@ internal sealed class InitialPalBuilder(
                 .SelectMany(p =>
                 {
                     var guaranteedPassives = p.GuaranteedPassiveSkills(settings.DB);
+                    var attack = SelectWildAttack(p, target.RequiredAttack);
                     var numIrrelevantGuaranteed = guaranteedPassives.Except(target.DesiredPassives).Count();
                     var numAllowedRandomPassives = Math.Clamp(
                         value: settings.MaxInputIrrelevantPassives - numIrrelevantGuaranteed,
@@ -138,11 +165,24 @@ internal sealed class InitialPalBuilder(
                                 p,
                                 guaranteedPassives,
                                 numRandomPassives,
-                                mechanics
+                                mechanics,
+                                actualAttack: attack,
+                                effectiveAttack: EffectiveAttack(attack, target.RequiredAttack)
                             )
                         );
                 })
                 .Where(candidate => candidate.BreedingEffort <= settings.MaxEffort)
         );
+    }
+
+    private ActiveSkill SelectWildAttack(Pal pal, ActiveSkill requiredAttack)
+    {
+        var level1Attacks = pal.Level1ActiveSkills(settings.DB).ToList();
+        return level1Attacks.FirstOrDefault(attack => attack == requiredAttack)
+            ?? level1Attacks.FirstOrDefault(attack => !attack.CanInherit)
+            ?? level1Attacks
+                .Where(attack => attack.CanInherit)
+                .OrderBy(attack => attack.InternalName, StringComparer.Ordinal)
+                .FirstOrDefault();
     }
 }
