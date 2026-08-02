@@ -112,17 +112,21 @@ namespace PalCalc.UI.ViewModel.Solver
                 .Select(r => r.Graph?.Nodes.Select(n => n.IsChecked).ToArray())
                 .ToList();
 
-            Results = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult)).ToList();
+            var newResults = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult)).ToList();
 
-            for (int i = 0; i < Results.Count && i < oldCheckedState.Count; i++)
+            for (int i = 0; i < newResults.Count && i < oldCheckedState.Count; i++)
             {
                 var checkedArr = oldCheckedState[i];
-                if (checkedArr == null || Results[i].Graph == null) continue;
+                if (checkedArr == null || newResults[i].Graph == null) continue;
 
-                var nodes = Results[i].Graph.Nodes;
+                var nodes = newResults[i].Graph.Nodes;
                 for (int j = 0; j < nodes.Count && j < checkedArr.Length; j++)
                     nodes[j].IsChecked = checkedArr[j];
             }
+
+            // Assign only after restoring state: the setter subscribes to checkbox changes,
+            // and replaying saved state must not be treated as a user edit.
+            Results = newResults;
         }
 
         [JsonIgnore]
