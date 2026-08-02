@@ -89,7 +89,8 @@ internal static class SolverTestScenario
         PalGender requiredGender = PalGender.WILDCARD,
         int ivHp = 0,
         int ivAttack = 0,
-        int ivDefense = 0
+        int ivDefense = 0,
+        ActiveSkill? requiredAttack = null
     ) =>
         solver.Solver.Solve(
             new BreedingSolverRequest(
@@ -102,6 +103,7 @@ internal static class SolverTestScenario
                     IV_HP = ivHp,
                     IV_Attack = ivAttack,
                     IV_Defense = ivDefense,
+                    RequiredAttack = requiredAttack,
                 },
                 solver.Settings
             ),
@@ -130,6 +132,7 @@ internal static class SolverTestScenario
             .OrderBy(r => r.PalInternalName, StringComparer.Ordinal)
             .ThenBy(r => r.Gender)
             .ThenBy(r => r.Passives, StringComparer.Ordinal)
+            .ThenBy(r => r.EffectiveAttackInternalName, StringComparer.Ordinal)
             .ThenBy(r => r.IVs.HP.Min)
             .ThenBy(r => r.IVs.Attack.Min)
             .ThenBy(r => r.IVs.Defense.Min)
@@ -143,6 +146,7 @@ internal static class SolverTestScenario
         string PalInternalName,
         PalGender Gender,
         string Passives,
+        string? EffectiveAttackInternalName,
         IV_Set IVs,
         long EffortTicks,
         int GoldCost,
@@ -161,6 +165,7 @@ internal static class SolverTestScenario
                         .OrderBy(g => g.Key, StringComparer.Ordinal)
                         .Select(g => $"{g.Key}:{g.Count()}")
                 ),
+                EffectiveAttackInternalName: result.EffectiveAttack?.InternalName,
                 IVs: result.IVs,
                 EffortTicks: result.BreedingEffort.Ticks,
                 GoldCost: result.TotalCost,
