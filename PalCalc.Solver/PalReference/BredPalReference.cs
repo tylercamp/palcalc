@@ -275,14 +275,17 @@ namespace PalCalc.Solver.PalReference
         }
 
         public override int GetHashCode() => HashCode.Combine(
-            nameof(BredPalReference),
-            Pal,
-            Parent1.GetHashCode() ^ Parent2.GetHashCode(),
-            EffectivePassivesHash,
-            BreedingEffort,
-            SelfBreedingEffort,
-            Gender,
-            IVs
+            HashCode.Combine(
+                nameof(BredPalReference),
+                Pal,
+                Parent1.GetHashCode() ^ Parent2.GetHashCode(),
+                EffectivePassivesHash,
+                BreedingEffort,
+                SelfBreedingEffort,
+                Gender,
+                IVs
+            ),
+            EffectiveAttack?.InternalName
         );
     }
 }

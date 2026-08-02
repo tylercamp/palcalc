@@ -60,6 +60,40 @@ public class EffectivePropertiesKeyTests
     }
 
     [TestMethod]
+    public void KeyProvider_GroupsAttacksByEffectiveIdentity()
+    {
+        var pal = "Katress".ToPal(SolverTestScenario.DB);
+        var requiredAttack = SolverTestScenario.DB.ActiveSkills.First(attack => attack.CanInherit);
+        var withoutAttack = new TestPalReference(pal, PalGender.MALE, [], new IV_Set());
+        var withRequiredAttack = new TestPalReference(
+            pal,
+            PalGender.MALE,
+            [],
+            new IV_Set(),
+            effectiveAttack: requiredAttack
+        );
+        var withRandomAttack = new TestPalReference(
+            pal,
+            PalGender.MALE,
+            [],
+            new IV_Set(),
+            effectiveAttack: new RandomActiveSkill()
+        );
+        var withOtherRandomAttack = new TestPalReference(
+            pal,
+            PalGender.MALE,
+            [],
+            new IV_Set(),
+            effectiveAttack: new RandomActiveSkill()
+        );
+        var provider = DefaultEffectivePropertiesKeyProvider.Instance;
+
+        Assert.AreNotEqual(provider.KeyOf(withoutAttack), provider.KeyOf(withRandomAttack));
+        Assert.AreNotEqual(provider.KeyOf(withRequiredAttack), provider.KeyOf(withRandomAttack));
+        Assert.AreEqual(provider.KeyOf(withRandomAttack), provider.KeyOf(withOtherRandomAttack));
+    }
+
+    [TestMethod]
     public void FrontierIndex_DoesNotMergeCollidingPassiveHashes()
     {
         var pal = "Katress".ToPal(SolverTestScenario.DB);
@@ -177,7 +211,8 @@ public class EffectivePropertiesKeyTests
             PalGender gender,
             IEnumerable<PassiveSkill> effectivePassives,
             IV_Set ivs,
-            int? effectivePassivesHash = null
+            int? effectivePassivesHash = null,
+            ActiveSkill effectiveAttack = null!
         )
         {
             Pal = pal;
@@ -187,6 +222,7 @@ public class EffectivePropertiesKeyTests
                 effectivePassivesHash ??
                 EffectivePassives.SetHash(passive => passive.InternalName);
             IVs = ivs;
+            EffectiveAttack = effectiveAttack;
         }
 
         public Pal Pal { get; }
@@ -195,7 +231,7 @@ public class EffectivePropertiesKeyTests
         public IV_Set IVs { get; }
         public List<PassiveSkill> ActualPassives => EffectivePassives;
         public ActiveSkill ActualAttack => null!;
-        public ActiveSkill EffectiveAttack => null!;
+        public ActiveSkill EffectiveAttack { get; }
         public PalGender Gender { get; }
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

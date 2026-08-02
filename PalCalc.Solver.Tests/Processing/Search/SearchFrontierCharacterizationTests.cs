@@ -49,6 +49,60 @@ public class SearchFrontierCharacterizationTests
     }
 
     [TestMethod]
+    public void ExpandSingles_ReplacesInferiorCandidateWithSameEffectiveAttack()
+    {
+        var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
+        var statePal = "Katress".ToPal(SolverTestScenario.DB);
+        var attack = SolverTestScenario.DB.ActiveSkills.First(skill => skill.CanInherit);
+        var slower = new TestPalReference(
+            "slower",
+            statePal,
+            TimeSpan.FromMinutes(10),
+            effectiveAttack: attack
+        );
+        var faster = new TestPalReference(
+            "faster",
+            statePal,
+            TimeSpan.FromMinutes(5),
+            effectiveAttack: attack
+        );
+        var frontier = FrontierFor(targetPal, [slower]);
+
+        frontier.ExpandSingles(_ => [faster]);
+
+        CollectionAssert.AreEquivalent(new[] { faster }, frontier.CurrentContent.ToList());
+    }
+
+    [TestMethod]
+    public void ExpandSingles_DoesNotReplaceTargetAttackWithIrrelevantAttack()
+    {
+        var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
+        var statePal = "Katress".ToPal(SolverTestScenario.DB);
+        var attack = SolverTestScenario.DB.ActiveSkills.First(skill => skill.CanInherit);
+        var withTargetAttack = new TestPalReference(
+            "target",
+            statePal,
+            TimeSpan.FromMinutes(10),
+            effectiveAttack: attack
+        );
+        var irrelevant = new TestPalReference(
+            "irrelevant",
+            statePal,
+            TimeSpan.FromMinutes(5),
+            effectiveAttack: new RandomActiveSkill()
+        );
+        var frontier = FrontierFor(targetPal, [withTargetAttack]);
+
+        frontier.ExpandSingles(_ => [irrelevant]);
+
+        CollectionAssert.AreEquivalent(
+            new[] { withTargetAttack, irrelevant },
+            frontier.CurrentContent.ToList()
+        );
+        Assert.IsFalse(withTargetAttack.IsOutdated);
+    }
+
+    [TestMethod]
     public void ExpandPairs_SchedulesOnlyPairsMadeRelevantByAddedCandidate()
     {
         var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
@@ -286,7 +340,8 @@ public class SearchFrontierCharacterizationTests
         string name,
         Pal pal,
         TimeSpan breedingEffort,
-        PalGender gender = PalGender.MALE
+        PalGender gender = PalGender.MALE,
+        ActiveSkill effectiveAttack = null!
     ) : IPalReference
     {
         public string Name { get; } = name;
@@ -296,7 +351,7 @@ public class SearchFrontierCharacterizationTests
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
         public ActiveSkill ActualAttack => null!;
-        public ActiveSkill EffectiveAttack => null!;
+        public ActiveSkill EffectiveAttack { get; } = effectiveAttack;
         public PalGender Gender { get; } = gender;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;
@@ -311,7 +366,7 @@ public class SearchFrontierCharacterizationTests
         public IPalReference WithGuaranteedGender(PalDB db, PalGender requestedGender, bool useReverser) =>
             requestedGender == Gender
                 ? this
-                : new TestPalReference(Name, Pal, BreedingEffort, requestedGender);
+                : new TestPalReference(Name, Pal, BreedingEffort, requestedGender, EffectiveAttack);
 
         public override string ToString() => Name;
     }

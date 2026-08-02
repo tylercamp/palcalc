@@ -130,7 +130,8 @@ internal readonly struct EffectivePropertiesKey : IEquatable<EffectiveProperties
         PalId palId,
         PalGender gender,
         PassiveSetKey passives,
-        RelevantIVKey ivs
+        RelevantIVKey ivs,
+        string effectiveAttackInternalName
     )
     {
         ArgumentNullException.ThrowIfNull(palId);
@@ -140,12 +141,14 @@ internal readonly struct EffectivePropertiesKey : IEquatable<EffectiveProperties
         Gender = gender;
         Passives = passives;
         IVs = ivs;
+        EffectiveAttackInternalName = effectiveAttackInternalName;
         hashCode = HashCode.Combine(
             PalDexNo,
             IsPalVariant,
             Gender,
             Passives,
-            IVs
+            IVs,
+            EffectiveAttackInternalName
         );
     }
 
@@ -154,13 +157,18 @@ internal readonly struct EffectivePropertiesKey : IEquatable<EffectiveProperties
     public PalGender Gender { get; }
     public PassiveSetKey Passives { get; }
     public RelevantIVKey IVs { get; }
+    public string EffectiveAttackInternalName { get; }
 
     public bool Equals(EffectivePropertiesKey other) =>
         PalDexNo == other.PalDexNo &&
         IsPalVariant == other.IsPalVariant &&
         Gender == other.Gender &&
         Passives == other.Passives &&
-        IVs == other.IVs;
+        IVs == other.IVs &&
+        StringComparer.Ordinal.Equals(
+            EffectiveAttackInternalName,
+            other.EffectiveAttackInternalName
+        );
 
     public override bool Equals(object obj) =>
         obj is EffectivePropertiesKey other && Equals(other);
@@ -190,6 +198,7 @@ internal sealed class DefaultEffectivePropertiesKeyProvider : IEffectiveProperti
             palId: reference.Pal.Id,
             gender: reference.Gender,
             passives: new PassiveSetKey(reference.EffectivePassives),
-            ivs: new RelevantIVKey(reference.IVs)
+            ivs: new RelevantIVKey(reference.IVs),
+            effectiveAttackInternalName: reference.EffectiveAttack?.InternalName
         );
 }
