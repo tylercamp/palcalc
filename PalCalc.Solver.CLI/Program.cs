@@ -18,7 +18,7 @@ internal class Program
         var db = PalDB.LoadEmbedded();
         Console.WriteLine("Loaded Pal DB");
 
-        var saveGame = DirectSavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LevelMeta.ReadGameOptions().PlayerLevel);
+        var saveGame = DirectSavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LastModified);
         Console.WriteLine("Using {0}", saveGame);
 
         var savedInstances = saveGame.Level.ReadCharacterData(db, GameSettings.Defaults, [], null).Pals;
@@ -46,13 +46,16 @@ internal class Program
         var solver = new BreedingSolver();
 
         solver.StatusUpdateInterval = TimeSpan.FromSeconds(1);
-        solver.StatusUpdated += ev => Console.WriteLine($"{ev.CurrentPhase} ({ev.CurrentStepIndex}) - {ev.WorkProcessedCount} / {ev.CurrentWorkSize}");
+        solver.StatusUpdated += ev => Console.WriteLine($"{ev.CurrentPhase} ({ev.CurrentStepIndex:N0}) - {ev.WorkProcessedCount:N0} / {ev.CurrentWorkSize:N0}");
+
+        var requiredAttack = "PowerShot".InternalToActive(db);
 
         var targetInstance = new PalSpecifier
         {
             Pal = "Beakon".ToPal(db),
-            RequiredPassives = new List<PassiveSkill> { "Lord of the Sea".ToStandardPassive(db), "Lord of the Underworld".ToStandardPassive(db), "Nimble".ToStandardPassive(db), "Legend".ToStandardPassive(db) },
-            IV_Attack = 90,
+            RequiredPassives = new List<PassiveSkill> { "Nimble".ToStandardPassive(db) },
+            RequiredAttack = requiredAttack,
+            //IV_Attack = 90,
             //IV_Defense = 90,
             //IV_HP = 90
         };
@@ -73,12 +76,25 @@ internal class Program
         }
 
         Console.WriteLine("Took {0}", TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds));
+        Console.WriteLine("Required attack: {0} ({1})", requiredAttack.Name, requiredAttack.InternalName);
 
         Console.WriteLine("\n\nRESULTS:");
         foreach (var match in matches.OrderBy(m => m.BreedingEffort))
         {
             var tree = new BreedingTree(match);
             tree.Print();
+            foreach (var bred in tree.AllNodes.Select(node => node.Item1.PalRef).OfType<BredPalReference>())
+            {
+                Console.WriteLine(
+                    "{0} attack: {1}; chance: {2:P2}; expected attempts: {3}; step effort: {4}",
+                    bred.Pal.Name,
+                    bred.EffectiveAttack?.Name ?? "None",
+                    bred.AttacksProbability,
+                    bred.AvgRequiredBreedings,
+                    bred.SelfBreedingEffort
+                );
+            }
+            Console.WriteLine("Selected result attack: {0}", match.EffectiveAttack?.Name ?? "None");
             Console.WriteLine("Should take: {0}\n", match.BreedingEffort);
         }
     }
