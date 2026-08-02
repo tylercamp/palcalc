@@ -338,7 +338,7 @@ namespace PalCalc.UI.ViewModel
                 Directory.CreateDirectory(outputFolder);
 
             var outputFile = Path.Join(outputFolder, "pal-target-ids.json");
-            var converter = new PalTargetListViewModelConverter(db, new GameSettings(), OpenedSave, OpenedSave.CachedValue, list.Targets.Where(t => !t.IsReadOnly).ToDictionary(t => t.Id));
+            var converter = new PalTargetListViewModelWriter(db, new GameSettings());
             File.WriteAllText(outputFile, JsonConvert.SerializeObject(list, converter));
         }
 
@@ -354,7 +354,7 @@ namespace PalCalc.UI.ViewModel
                 Directory.CreateDirectory(outputFolder);
 
             var outputFile = Path.Join(outputFolder, $"{item.Id}.json");
-            var converter = new PalSpecifierViewModelConverter(db, SelectedGameSettings.ModelObject, OpenedSave.CachedValue);
+            var converter = new PalSpecifierViewModelWriter(db, SelectedGameSettings.ModelObject);
             File.WriteAllText(outputFile, JsonConvert.SerializeObject(item, converter));
         }
 

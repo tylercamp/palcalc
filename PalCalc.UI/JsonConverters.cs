@@ -66,6 +66,26 @@ namespace PalCalc.UI
         protected abstract void WriteTypeJson(JsonWriter writer, T value, JsonSerializer serializer);
     }
 
+    internal abstract class PalReadOnlyConverterBase<T> : PalConverterBase<T>
+    {
+        protected PalReadOnlyConverterBase(PalDB db, GameSettings gameSettings) : base(db, gameSettings) { }
+
+        public sealed override bool CanWrite => false;
+
+        protected sealed override void WriteTypeJson(JsonWriter writer, T value, JsonSerializer serializer) =>
+            throw new NotSupportedException();
+    }
+
+    internal abstract class PalWriteOnlyConverterBase<T> : PalConverterBase<T>
+    {
+        protected PalWriteOnlyConverterBase(PalDB db, GameSettings gameSettings) : base(db, gameSettings) { }
+
+        public sealed override bool CanRead => false;
+
+        protected sealed override T ReadTypeJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer) =>
+            throw new NotSupportedException();
+    }
+
     // not meant to be used, just for debugging to ensure localized text isn't serialized
     internal class ILocalizedTextConverter : PalConverterBase<ILocalizedText>
     {
@@ -638,15 +658,16 @@ namespace PalCalc.UI
         }
     }
 
-    // NOTE - This converter injects other converters (namely BreedingResultListViewModelConverter) whose dependents
+    // NOTE - These converters inject result-list converters whose dependents
     //        expect a specific pal target. Multiple PalSpecifierViewModels should _not_ be stored in the same JSON
     //        data, and JsonSerializers should either be reset or newly created during each operation.
-    internal class PalSpecifierViewModelConverter : PalConverterBase<PalSpecifierViewModel>
+    internal sealed class PalSpecifierViewModelReader : PalReadOnlyConverterBase<PalSpecifierViewModel>
     {
-        private CachedSaveGame source;
+        private readonly CachedSaveGame source;
 
-        public PalSpecifierViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source) : base(db, gameSettings)
+        public PalSpecifierViewModelReader(PalDB db, GameSettings gameSettings, CachedSaveGame source) : base(db, gameSettings)
         {
+            ArgumentNullException.ThrowIfNull(source);
             this.source = source;
 
             dependencyConverters = new JsonConverter[]
@@ -697,7 +718,7 @@ namespace PalCalc.UI
 
             // (this converter is created during deserialization since it requires a `PalSpecifier`, which can only
             // be obtained while parsing this object)
-            var resultsConverter = new BreedingResultListViewModelConverter(db, gameSettings, source, modelSpecifier);
+            var resultsConverter = new BreedingResultListViewModelReader(db, gameSettings, source, modelSpecifier);
             serializer.Converters.Add(resultsConverter);
             var currentResults = obj["CurrentResults"].ToObject<BreedingResultListViewModel>(serializer);
             serializer.Converters.Remove(resultsConverter);
@@ -714,10 +735,23 @@ namespace PalCalc.UI
                 CurrentResults = currentResults,
             };
         }
+    }
+
+    internal sealed class PalSpecifierViewModelWriter : PalWriteOnlyConverterBase<PalSpecifierViewModel>
+    {
+        public PalSpecifierViewModelWriter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        {
+            dependencyConverters = new JsonConverter[]
+            {
+                new PalViewModelConverter(db, gameSettings),
+                new PassiveSkillViewModelConverter(db, gameSettings),
+                new ILocalizedTextConverter(db, gameSettings),
+            };
+        }
 
         protected override void WriteTypeJson(JsonWriter writer, PalSpecifierViewModel value, JsonSerializer serializer)
         {
-            var resultsConverter = new BreedingResultListViewModelConverter(db, gameSettings, source, value.ModelObject);
+            var resultsConverter = new BreedingResultListViewModelWriter(db, gameSettings, value.ModelObject);
             serializer.Converters.Add(resultsConverter);
 
             serializer.Serialize(writer, new
@@ -743,19 +777,18 @@ namespace PalCalc.UI
         }
     }
 
-    internal class BreedingResultViewModelConverter : PalConverterBase<BreedingResultViewModel>
+    internal sealed class BreedingResultViewModelReader : PalReadOnlyConverterBase<BreedingResultViewModel>
     {
-        private CachedSaveGame source;
-        private SerializableSolverSettings solverSettings;
-        public BreedingResultViewModelConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, CachedSaveGame source, PalSpecifier target) : base(db, gameSettings)
+        private readonly CachedSaveGame source;
+
+        public BreedingResultViewModelReader(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, CachedSaveGame source, PalSpecifier target) : base(db, gameSettings)
         {
+            ArgumentNullException.ThrowIfNull(source);
             dependencyConverters = new JsonConverter[]
             {
                 new PalReferenceConverter(db, gameSettings, solverSettings, target),
                 new ILocalizedTextConverter(db, gameSettings),
             };
-
-            this.solverSettings = solverSettings;
             this.source = source;
         }
 
@@ -790,6 +823,18 @@ namespace PalCalc.UI
 
             return vm;
         }
+    }
+
+    internal sealed class BreedingResultViewModelWriter : PalWriteOnlyConverterBase<BreedingResultViewModel>
+    {
+        public BreedingResultViewModelWriter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, PalSpecifier target) : base(db, gameSettings)
+        {
+            dependencyConverters = new JsonConverter[]
+            {
+                new PalReferenceConverter(db, gameSettings, solverSettings, target),
+                new ILocalizedTextConverter(db, gameSettings),
+            };
+        }
 
         protected override void WriteTypeJson(JsonWriter writer, BreedingResultViewModel value, JsonSerializer serializer)
         {
@@ -814,13 +859,14 @@ namespace PalCalc.UI
         }
     }
 
-    internal class BreedingResultListViewModelConverter : PalConverterBase<BreedingResultListViewModel>
+    internal sealed class BreedingResultListViewModelReader : PalReadOnlyConverterBase<BreedingResultListViewModel>
     {
         bool didInjectConverters;
-        CachedSaveGame source;
-        PalSpecifier target;
-        public BreedingResultListViewModelConverter(PalDB db, GameSettings gameSettings, CachedSaveGame source, PalSpecifier target) : base(db, gameSettings)
+        readonly CachedSaveGame source;
+        readonly PalSpecifier target;
+        public BreedingResultListViewModelReader(PalDB db, GameSettings gameSettings, CachedSaveGame source, PalSpecifier target) : base(db, gameSettings)
         {
+            ArgumentNullException.ThrowIfNull(source);
             this.didInjectConverters = false;
             this.source = source;
             this.target = target;
@@ -830,10 +876,10 @@ namespace PalCalc.UI
         {
             if (didInjectConverters) return;
 
-            // The `Settings` required for `BreedingResultViewModelConverter` aren't available until we deserialize them, so
+            // The settings required for the result reader aren't available until we deserialize them, so
             // we'll need to inject them while reading
             dependencyConverters = [
-                new BreedingResultViewModelConverter(db, gameSettings, fullSettings.SolverSettings, source, target),
+                new BreedingResultViewModelReader(db, gameSettings, fullSettings.SolverSettings, source, target),
                 new ILocalizedTextConverter(db, gameSettings),
             ];
 
@@ -871,6 +917,32 @@ namespace PalCalc.UI
                 SettingsSnapshot = fullSettings,
             };
         }
+    }
+
+    internal sealed class BreedingResultListViewModelWriter : PalWriteOnlyConverterBase<BreedingResultListViewModel>
+    {
+        private bool didInjectConverters;
+        private readonly PalSpecifier target;
+
+        public BreedingResultListViewModelWriter(PalDB db, GameSettings gameSettings, PalSpecifier target) : base(db, gameSettings)
+        {
+            this.target = target;
+        }
+
+        private void InjectBreedingResultDependencyConverters(JsonSerializer serializer, BreedingResultListViewModelSettingsSnapshot fullSettings)
+        {
+            if (didInjectConverters) return;
+
+            dependencyConverters = [
+                new BreedingResultViewModelWriter(db, gameSettings, fullSettings.SolverSettings, target),
+                new ILocalizedTextConverter(db, gameSettings),
+            ];
+
+            foreach (var c in dependencyConverters)
+                serializer.Converters.Add(c);
+
+            didInjectConverters = true;
+        }
 
         protected override void WriteTypeJson(JsonWriter writer, BreedingResultListViewModel value, JsonSerializer serializer)
         {
@@ -888,13 +960,14 @@ namespace PalCalc.UI
         }
     }
 
-    internal class PalSourceViewModelConverter : PalConverterBase<PalSourceViewModel>
+    internal sealed class PalSourceViewModelReader : PalReadOnlyConverterBase<PalSourceViewModel>
     {
-        SaveGameViewModel sourceSave;
-        CachedSaveGame cachedSourceSave;
+        private readonly SaveGameViewModel sourceSave;
+        private readonly CachedSaveGame cachedSourceSave;
 
-        public PalSourceViewModelConverter(PalDB db, GameSettings gameSettings, SaveGameViewModel sourceSave, CachedSaveGame cachedSourceSave) : base(db, gameSettings)
+        public PalSourceViewModelReader(PalDB db, GameSettings gameSettings, SaveGameViewModel sourceSave, CachedSaveGame cachedSourceSave) : base(db, gameSettings)
         {
+            ArgumentNullException.ThrowIfNull(cachedSourceSave);
             this.sourceSave = sourceSave;
             this.cachedSourceSave = cachedSourceSave;
         }
@@ -919,6 +992,12 @@ namespace PalCalc.UI
             };
         }
 
+    }
+
+    internal sealed class PalSourceViewModelWriter : PalWriteOnlyConverterBase<PalSourceViewModel>
+    {
+        public PalSourceViewModelWriter(PalDB db, GameSettings gameSettings) : base(db, gameSettings) { }
+
         protected override void WriteTypeJson(JsonWriter writer, PalSourceViewModel value, JsonSerializer serializer)
         {
             serializer.Serialize(writer, new
@@ -933,25 +1012,20 @@ namespace PalCalc.UI
         }
     }
 
-    internal class PalTargetListViewModelConverter : PalConverterBase<PalTargetListViewModel>
+    internal sealed class PalTargetListViewModelReader : PalReadOnlyConverterBase<PalTargetListViewModel>
     {
-        private Dictionary<string, PalSpecifierViewModel> expectedSpecifiers;
-        private SaveGameViewModel sourceSave;
+        private readonly Dictionary<string, PalSpecifierViewModel> expectedSpecifiers;
+        private readonly SaveGameViewModel sourceSave;
 
-        // Separate `SaveGameViewModel` and `CachedSaveGame` params seem redundant, but accessing `source.CachedSave`
-        // might trigger a full re-parse of the save file. We don't want to trigger that here, so we accept a direct
-        // `CachedSaveGame` which should have been loaded directly from disk without an "is-up-to-date" check.
-        //
-        // TODO - Maybe rename `CachedValue` to `LatestCachedValue`, and add another `CachedValue` which is just a strict
-        //        load from disk?
-        public PalTargetListViewModelConverter(PalDB db, GameSettings gameSettings, SaveGameViewModel source, CachedSaveGame cachedSource, Dictionary<string, PalSpecifierViewModel> specifiersById) : base(db, gameSettings)
+        public PalTargetListViewModelReader(PalDB db, GameSettings gameSettings, SaveGameViewModel source, CachedSaveGame cachedSource, Dictionary<string, PalSpecifierViewModel> specifiersById) : base(db, gameSettings)
         {
+            ArgumentNullException.ThrowIfNull(cachedSource);
             sourceSave = source;
             expectedSpecifiers = specifiersById;
             dependencyConverters = new JsonConverter[]
             {
-                new PalSpecifierViewModelConverter(db, gameSettings, cachedSource),
-                new PalSourceViewModelConverter(db, gameSettings, source, cachedSource),
+                new PalSpecifierViewModelReader(db, gameSettings, cachedSource),
+                new PalSourceViewModelReader(db, gameSettings, source, cachedSource),
                 new ILocalizedTextConverter(db, gameSettings),
             };
         }
@@ -966,6 +1040,19 @@ namespace PalCalc.UI
                 sourcePals: sourcePals ?? new PalSourceViewModel(sourceSave, [new SourceTreeAllSelection()]),
                 existingSpecs: expectedSpecifiers.Values.OrderBy(s => orderedIds.Contains(s.Id) ? orderedIds.IndexOf(s.Id) : int.MaxValue)
             );
+        }
+
+    }
+
+    internal sealed class PalTargetListViewModelWriter : PalWriteOnlyConverterBase<PalTargetListViewModel>
+    {
+        public PalTargetListViewModelWriter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        {
+            dependencyConverters = new JsonConverter[]
+            {
+                new PalSourceViewModelWriter(db, gameSettings),
+                new ILocalizedTextConverter(db, gameSettings),
+            };
         }
 
         protected override void WriteTypeJson(JsonWriter writer, PalTargetListViewModel value, JsonSerializer serializer)
