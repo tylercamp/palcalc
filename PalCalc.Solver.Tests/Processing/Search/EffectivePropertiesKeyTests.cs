@@ -194,6 +194,8 @@ public class EffectivePropertiesKeyTests
         public int EffectivePassivesHash { get; }
         public IV_Set IVs { get; }
         public List<PassiveSkill> ActualPassives => EffectivePassives;
+        public ActiveSkill ActualAttack => null!;
+        public ActiveSkill EffectiveAttack => null!;
         public PalGender Gender { get; }
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

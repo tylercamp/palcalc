@@ -12,11 +12,13 @@ public class BreedingSolverRequestTests
     {
         var swift = "Swift".ToStandardPassive(SolverTestScenario.DB);
         var runner = "Runner".ToStandardPassive(SolverTestScenario.DB);
+        var requiredAttack = SolverTestScenario.DB.ActiveSkills.First();
         var target = new PalSpecifier
         {
             Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
             RequiredPassives = [swift, swift],
             OptionalPassives = [swift, runner, runner],
+            RequiredAttack = requiredAttack,
             RequiredGender = PalGender.MALE,
             IV_Attack = 90,
         };
@@ -30,11 +32,28 @@ public class BreedingSolverRequestTests
         CollectionAssert.AreEqual(new[] { swift }, snapshot.RequiredPassives);
         CollectionAssert.AreEqual(new[] { runner }, snapshot.OptionalPassives);
         Assert.AreEqual(target.Pal, snapshot.Pal);
+        Assert.AreSame(requiredAttack, snapshot.RequiredAttack);
         Assert.AreEqual(PalGender.MALE, snapshot.RequiredGender);
         Assert.AreEqual(90, snapshot.IV_Attack);
 
         snapshot.RequiredPassives.Clear();
         Assert.AreEqual(1, request.Target.RequiredPassives.Count);
+    }
+
+    [TestMethod]
+    public void PalSpecifier_RequiresEffectiveAttackWhenSpecified()
+    {
+        var targetPal = "Wixen Noct".ToPal(SolverTestScenario.DB);
+        var requiredAttack = SolverTestScenario.DB.ActiveSkills.First();
+        var target = new PalSpecifier
+        {
+            Pal = targetPal,
+            RequiredAttack = requiredAttack,
+        };
+        var instance = SolverTestScenario.Owned("Wixen Noct", PalGender.MALE);
+
+        Assert.IsTrue(target.IsSatisfiedBy(new OwnedPalReference(instance, [], new(), requiredAttack, requiredAttack)));
+        Assert.IsFalse(target.IsSatisfiedBy(new OwnedPalReference(instance, [], new(), requiredAttack, new RandomActiveSkill())));
     }
 
     [TestMethod]

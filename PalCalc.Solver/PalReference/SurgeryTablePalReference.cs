@@ -208,6 +208,8 @@ namespace PalCalc.Solver.PalReference
         public Pal Pal => Input.Pal;
         public int EffectivePassivesHash { get; }
         public IV_Set IVs => Input.IVs;
+        public ActiveSkill ActualAttack => Input.ActualAttack;
+        public ActiveSkill EffectiveAttack => Input.EffectiveAttack;
 
         public int NumTotalBreedingSteps => Input.NumTotalBreedingSteps;
         public int NumTotalEggs => Input.NumTotalEggs;

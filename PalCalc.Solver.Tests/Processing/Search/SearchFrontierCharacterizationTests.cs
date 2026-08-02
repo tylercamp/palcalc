@@ -295,6 +295,8 @@ public class SearchFrontierCharacterizationTests
         public int EffectivePassivesHash { get; } = Array.Empty<PassiveSkill>().SetHash();
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
+        public ActiveSkill ActualAttack => null!;
+        public ActiveSkill EffectiveAttack => null!;
         public PalGender Gender { get; } = gender;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

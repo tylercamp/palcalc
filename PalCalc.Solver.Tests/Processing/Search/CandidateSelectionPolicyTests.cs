@@ -463,6 +463,8 @@ public class CandidateSelectionPolicyTests
         public int EffectivePassivesHash => 0;
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
+        public ActiveSkill ActualAttack => null!;
+        public ActiveSkill EffectiveAttack => null!;
         public PalGender Gender => PalGender.MALE;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

@@ -15,7 +15,9 @@ namespace PalCalc.Solver.PalReference
             Pal pal,
             IEnumerable<PassiveSkill> guaranteedPassives,
             int numRandomPassives,
-            BreedingMechanics mechanics
+            BreedingMechanics mechanics,
+            ActiveSkill actualAttack = null,
+            ActiveSkill effectiveAttack = null
         )
         {
             ArgumentNullException.ThrowIfNull(mechanics);
@@ -26,6 +28,8 @@ namespace PalCalc.Solver.PalReference
                 mechanics.PassivesWildAtMostN[numRandomPassives];
             EffectivePassives = guaranteedPassives.Concat(Enumerable.Range(0, numRandomPassives).Select(i => new RandomPassiveSkill())).ToList();
             Gender = PalGender.WILDCARD;
+            ActualAttack = actualAttack;
+            EffectiveAttack = effectiveAttack;
             CapturesRequiredForGender = 1;
 
             if (guaranteedPassives.Any(t => !pal.GuaranteedPassivesInternalIds.Contains(t.InternalName))) throw new InvalidOperationException();
@@ -49,6 +53,10 @@ namespace PalCalc.Solver.PalReference
         public PalGender Gender { get; private set; }
 
         public List<PassiveSkill> ActualPassives => EffectivePassives;
+
+        public ActiveSkill ActualAttack { get; private set; }
+
+        public ActiveSkill EffectiveAttack { get; private set; }
 
         public float TimeFactor => 1.0f;
 
@@ -84,6 +92,8 @@ namespace PalCalc.Solver.PalReference
                 EffectivePassives = EffectivePassives,
                 EffectivePassivesHash = this.EffectivePassivesHash,
                 IVs = IVs,
+                ActualAttack = ActualAttack,
+                EffectiveAttack = EffectiveAttack,
                 CapturesRequiredForGender = useReverser ? 1 : gender switch
                 {
                     PalGender.WILDCARD => 1,
