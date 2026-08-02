@@ -90,6 +90,130 @@ public class CandidateExpanderTests
         Assert.AreEqual(98, childHP.Max);
     }
 
+    [TestMethod]
+    public void ExpandBatch_AppliesAttackProbabilityAndState()
+    {
+        var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
+        var targetAttack = InheritableAttackNotInnateTo(child);
+        var otherAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
+            attack.CanInherit && attack != targetAttack
+        );
+        var target = new PalSpecifier
+        {
+            Pal = child,
+            RequiredAttack = targetAttack,
+        };
+
+        var candidate = (BredPalReference)Expand(
+            WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), targetAttack),
+            WithAttack(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), otherAttack),
+            target
+        ).Candidates.Single();
+
+        Assert.AreSame(targetAttack, candidate.ActualAttack);
+        Assert.AreSame(targetAttack, candidate.EffectiveAttack);
+        Assert.AreEqual(0.5f, candidate.AttacksProbability);
+        Assert.AreEqual(
+            (int)Math.Ceiling(1f / (candidate.PassivesProbability * candidate.IVsProbability * candidate.AttacksProbability)),
+            candidate.AvgRequiredBreedings
+        );
+
+        var gendered = (BredPalReference)candidate.WithGuaranteedGender(SolverTestScenario.DB, PalGender.MALE, false);
+        Assert.AreSame(candidate.ActualAttack, gendered.ActualAttack);
+        Assert.AreSame(candidate.EffectiveAttack, gendered.EffectiveAttack);
+        Assert.AreEqual(candidate.AttacksProbability, gendered.AttacksProbability);
+    }
+
+    [TestMethod]
+    public void ExpandBatch_LevelOneTargetIsGuaranteed()
+    {
+        var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
+        var targetAttack = child.Level1ActiveSkills(SolverTestScenario.DB).First();
+        var otherAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
+            attack.CanInherit && attack != targetAttack
+        );
+
+        var candidate = (BredPalReference)Expand(
+            WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), otherAttack),
+            WithAttack(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), otherAttack),
+            new PalSpecifier { Pal = child, RequiredAttack = targetAttack }
+        ).Candidates.Single();
+
+        Assert.AreSame(targetAttack, candidate.EffectiveAttack);
+        Assert.AreEqual(1, candidate.AttacksProbability);
+    }
+
+    [TestMethod]
+    public void ExpandBatch_NonInheritableFillerDoesNotDiluteTarget()
+    {
+        var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
+        var targetAttack = InheritableAttackNotInnateTo(child);
+        var neutral = SolverTestScenario.DB.ActiveSkills.First(attack => !attack.CanInherit);
+
+        var candidate = (BredPalReference)Expand(
+            WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), targetAttack),
+            WithAttack(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutral),
+            new PalSpecifier { Pal = child, RequiredAttack = targetAttack }
+        ).Candidates.Single();
+
+        Assert.AreSame(targetAttack, candidate.EffectiveAttack);
+        Assert.AreEqual(1, candidate.AttacksProbability);
+    }
+
+    [TestMethod]
+    public void ExpandBatch_MissingTargetStillEmitsRoutingChild()
+    {
+        var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
+        var targetAttack = InheritableAttackNotInnateTo(child);
+        var otherAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
+            attack.CanInherit && attack != targetAttack
+        );
+
+        var expansion = Expand(
+            WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), otherAttack),
+            WithAttack(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), otherAttack),
+            new PalSpecifier { Pal = child, RequiredAttack = targetAttack }
+        );
+        var candidate = (BredPalReference)expansion.Candidates.Single();
+
+        Assert.AreNotSame(targetAttack, candidate.EffectiveAttack);
+        Assert.AreEqual(1, candidate.AttacksProbability);
+    }
+
+    [TestMethod]
+    public void ExpandBatch_UsesGenderResolvedCompositeAttack()
+    {
+        var child = "Katress Ignis".ToPal(SolverTestScenario.DB);
+        var targetAttack = InheritableAttackNotInnateTo(child);
+        var otherAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
+            attack.CanInherit && attack != targetAttack
+        );
+        var neutral = SolverTestScenario.DB.ActiveSkills.First(attack => !attack.CanInherit);
+        var target = new PalSpecifier { Pal = child, RequiredAttack = targetAttack };
+        var male = WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), otherAttack);
+        var female = WithAttack(SolverTestScenario.Owned("Katress", PalGender.FEMALE), targetAttack);
+        var wixen = WithAttack(SolverTestScenario.Owned("Wixen", PalGender.MALE), neutral);
+        var configuredSolver = SolverTestScenario.Solver([male, female, wixen], maxBreedingSteps: 1, maxSolverIterations: 1);
+        var composite = new CompositeOwnedPalReference(ReferenceFor(male, target), ReferenceFor(female, target));
+
+        var candidate = (BredPalReference)Expand(
+            composite,
+            ReferenceFor(wixen, target),
+            target,
+            configuredSolver.Settings
+        ).Candidates.Single();
+
+        Assert.AreSame(targetAttack, candidate.EffectiveAttack);
+        Assert.AreEqual(1, candidate.AttacksProbability);
+        Assert.AreSame(
+            female,
+            new[] { candidate.Parent1, candidate.Parent2 }
+                .OfType<OwnedPalReference>()
+                .Single(parent => parent.Pal == female.Pal)
+                .UnderlyingInstance
+        );
+    }
+
     private static ExpansionResult Expand(
         PalInstance first,
         PalInstance second,
@@ -102,6 +226,21 @@ public class CandidateExpanderTests
             maxSolverIterations: 1
         );
         var settings = configuredSolver.Settings;
+        return Expand(
+            ReferenceFor(first, target),
+            ReferenceFor(second, target),
+            target,
+            settings
+        );
+    }
+
+    private static ExpansionResult Expand(
+        IPalReference firstReference,
+        IPalReference secondReference,
+        PalSpecifier target,
+        BreedingSolverSettings settings
+    )
+    {
         var controller = new SolverStateController(
             CancellationToken.None
         );
@@ -109,8 +248,6 @@ public class CandidateExpanderTests
             ResultPruningPolicy.Default,
             controller.CancellationToken
         );
-        var firstReference = ReferenceFor(first, target);
-        var secondReference = ReferenceFor(second, target);
         var frontier = new SearchFrontier(
             target,
             [firstReference, secondReference],
@@ -152,8 +289,16 @@ public class CandidateExpanderTests
     private static OwnedPalReference ReferenceFor(
         PalInstance instance,
         PalSpecifier target
-    ) =>
-        new(
+    )
+    {
+        var actualAttack = instance.EquippedActiveSkills.FirstOrDefault();
+        var effectiveAttack = actualAttack == target.RequiredAttack
+            ? actualAttack
+            : actualAttack?.CanInherit == true
+                ? new RandomActiveSkill()
+                : null;
+
+        return new(
             instance,
             instance.PassiveSkills.ToDedicatedPassives(
                 target.DesiredPassives
@@ -168,7 +313,22 @@ public class CandidateExpanderTests
                     target.IV_Defense,
                     instance.IV_Defense
                 )
-            )
+            ),
+            actualAttack,
+            effectiveAttack
+        );
+    }
+
+    private static PalInstance WithAttack(PalInstance instance, ActiveSkill attack)
+    {
+        instance.ActiveSkills = [attack];
+        instance.EquippedActiveSkills = [attack];
+        return instance;
+    }
+
+    private static ActiveSkill InheritableAttackNotInnateTo(Pal pal) =>
+        SolverTestScenario.DB.ActiveSkills.First(attack =>
+            attack.CanInherit && !pal.Level1AttackInternalIds.Contains(attack.InternalName)
         );
 
     private static IV_Value EffectiveIV(int minimum, int value) =>

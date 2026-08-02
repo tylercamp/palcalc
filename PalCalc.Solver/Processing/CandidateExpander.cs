@@ -361,6 +361,13 @@ namespace PalCalc.Solver.Processing
                         Attack: MergeIVs(parent1.IVs.Attack, parent2.IVs.Attack),
                         Defense: MergeIVs(parent1.IVs.Defense, parent2.IVs.Defense)
                     );
+                    var attackOutcome = Probabilities.Attacks.InheritanceOutcome(
+                        db,
+                        context.Target.RequiredAttack,
+                        childPalType,
+                        parent1,
+                        parent2
+                    );
 
                     // Note: We need to use `ActualPassives` for inheritance calc, NOT `EffectivePassives`. If we have:
                     //
@@ -434,7 +441,10 @@ namespace PalCalc.Solver.Processing
                                 newPassives,
                                 probabilityForUpToNumPassives,
                                 finalIVs,
-                                ivsProbability
+                                ivsProbability,
+                                actualAttack: attackOutcome.ActualAttack,
+                                effectiveAttack: attackOutcome.EffectiveAttack,
+                                attacksProbability: attackOutcome.Probability
                             );
 
                             var added = false;

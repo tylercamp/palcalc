@@ -76,11 +76,12 @@ namespace PalCalc.Solver.PalReference
             IV_Set ivs,
             float ivsProbability,
             ActiveSkill actualAttack = null,
-            ActiveSkill effectiveAttack = null
+            ActiveSkill effectiveAttack = null,
+            float attacksProbability = 1
         ) : this(gameSettings, pal, parent1, parent2, passives, ivs, actualAttack, effectiveAttack)
         {
             Gender = PalGender.WILDCARD;
-            if (passivesProbability <= 0 || ivsProbability <= 0)
+            if (passivesProbability <= 0 || ivsProbability <= 0 || attacksProbability <= 0)
             {
                 // don't think this is actually needed anymore, keeping just in case
 #if DEBUG
@@ -88,10 +89,11 @@ namespace PalCalc.Solver.PalReference
 #endif
                 AvgRequiredBreedings = int.MaxValue;
             }
-            else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / (passivesProbability * ivsProbability));
+            else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / (passivesProbability * ivsProbability * attacksProbability));
 
             PassivesProbability = passivesProbability;
             IVsProbability = ivsProbability;
+            AttacksProbability = attacksProbability;
         }
 
         public float PassivesProbability { get; private set; }
@@ -106,6 +108,8 @@ namespace PalCalc.Solver.PalReference
 
         public IV_Set IVs { get; private set; }
         public float IVsProbability { get; private set; }
+
+        public float AttacksProbability { get; private set; }
 
         public float TimeFactor { get; }
 
@@ -209,6 +213,7 @@ namespace PalCalc.Solver.PalReference
                         Gender = gender,
                         PassivesProbability = PassivesProbability,
                         IVsProbability = IVsProbability,
+                        AttacksProbability = AttacksProbability,
                     };
                 }
                 else
@@ -220,6 +225,7 @@ namespace PalCalc.Solver.PalReference
                         Gender = gender,
                         PassivesProbability = PassivesProbability,
                         IVsProbability = IVsProbability,
+                        AttacksProbability = AttacksProbability,
                     };
                 }
             }
@@ -232,6 +238,7 @@ namespace PalCalc.Solver.PalReference
                     Gender = gender,
                     PassivesProbability = PassivesProbability,
                     IVsProbability = IVsProbability,
+                    AttacksProbability = AttacksProbability,
                 };
             }
         }
@@ -257,7 +264,7 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
-        public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectivePassives.PassiveSkillListToString()})";
+        public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectivePassives.PassiveSkillListToString()}), attack: {EffectiveAttack?.ToString() ?? "None"}";
 
         public override bool Equals(object obj)
         {
