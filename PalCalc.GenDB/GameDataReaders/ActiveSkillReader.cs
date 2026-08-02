@@ -13,10 +13,17 @@ namespace PalCalc.GenDB.GameDataReaders
     class UActiveSkillLevel
     {
         [FStructProperty]
-        public string PalID { get; set; }
+        public string PalId { get; set; }
         [FStructProperty]
         public string WazaID { get; set; }
+        [FStructProperty]
+        public int Level { get; set; }
     }
+
+    internal record ActiveSkillData(
+        List<UActiveSkill> Skills,
+        List<UActiveSkillLevel> Levels
+    );
 
     class UActiveSkill
     {
@@ -43,11 +50,16 @@ namespace PalCalc.GenDB.GameDataReaders
     {
         private static ILogger logger = Log.ForContext<ActiveSkillReader>();
 
-        public static List<UActiveSkill> ReadActiveSkills(IFileProvider provider)
+        public static ActiveSkillData ReadActiveSkills(IFileProvider provider)
         {
             logger.Information("Reading active skills");
             var rawAttackLevels = provider.LoadPackageObject<UCompositeDataTable>(AssetPaths.ACTIVE_SKILLS_PAL_LEVEL_PATH);
-            var availableAttackIds = rawAttackLevels.RowMap.Select(r => r.Value.ToObject<UActiveSkillLevel>().WazaID).Distinct().ToList();
+            var levels = rawAttackLevels.RowMap
+                .Select(row => row.Value.ToObject<UActiveSkillLevel>())
+                .ToList();
+            var availableAttackIds = levels
+                .Select(level => level.WazaID)
+                .ToHashSet();
 
             var rawAttacks = provider.LoadPackageObject<UCompositeDataTable>(AssetPaths.ACTIVE_SKILLS_PATH);
 
@@ -72,7 +84,7 @@ namespace PalCalc.GenDB.GameDataReaders
                 res.Add(attack);
             }
 
-            return res;
+            return new(res, levels);
         }
     }
 }

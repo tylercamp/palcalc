@@ -35,7 +35,7 @@ namespace PalCalc.Model
 
         public static PalElement ToElement(this string s, PalDB db) => db.Elements.SingleOrDefault(el => el.InternalName == s) ?? new UnrecognizedPalElement(s);
 
-        public static ActiveSkill ToActive(this string s, PalDB db) => db.ActiveSkills.SingleOrDefault(a => a.InternalName == s) ?? new UnrecognizedActiveSkill(s);
+        public static ActiveSkill InternalToActive(this string s, PalDB db) => db.ActiveSkills.SingleOrDefault(a => a.InternalName == s) ?? new UnrecognizedActiveSkill(s);
 
         public static PalGender OppositeGender(this PalGender gender)
         {
