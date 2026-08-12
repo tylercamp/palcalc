@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using PalCalc.UI.Localization;
+using PalCalc.Solver.PalReference;
 using PalCalc.UI.Model;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                 instances = PalDB.LoadEmbedded().ActiveSkills.ToDictionary(s => s, s => new ActiveSkillViewModel(s, NameLocalizer.Bind(s)));
             }
 
-            if (skill is UnrecognizedActiveSkill)
+            if (skill is UnrecognizedActiveSkill or RandomActiveSkill)
             {
                 return new ActiveSkillViewModel(skill, new HardCodedText(skill.Name));
             }
@@ -56,7 +57,9 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public ActiveSkill ModelObject { get; }
 
-        public ImageSource SkillElementImage => SkillElementIcon.Images.GetValueOrElse(ModelObject.Element.InternalName, SkillElementIcon.DefaultImage);
+        public ImageSource SkillElementImage => ModelObject.Element == null
+            ? SkillElementIcon.DefaultImage
+            : SkillElementIcon.Images.GetValueOrElse(ModelObject.Element.InternalName, SkillElementIcon.DefaultImage);
 
         public ILocalizedText Name { get; }
     }

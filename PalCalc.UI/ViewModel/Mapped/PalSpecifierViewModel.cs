@@ -35,6 +35,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             else
             {
                 TargetPal = PalViewModel.Make(underlyingSpec.Pal);
+                RequiredAttack = ActiveSkillViewModel.Make(underlyingSpec.RequiredAttack);
 
                 RequiredPassives = new(underlyingSpec.RequiredPassives);
                 OptionalPassives = new(underlyingSpec.OptionalPassives);
@@ -75,6 +76,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             ? new PalSpecifier()
             {
                 Pal = TargetPal.ModelObject,
+                RequiredAttack = RequiredAttack?.ModelObject,
                 RequiredPassives = RequiredPassives.AsModelEnumerable().ToList(),
                 OptionalPassives = OptionalPassives.AsModelEnumerable().ToList(),
                 RequiredGender = RequiredGender.Value,
@@ -88,6 +90,9 @@ namespace PalCalc.UI.ViewModel.Mapped
         [NotifyPropertyChangedFor(nameof(IsValid))]
         [ObservableProperty]
         private PalViewModel targetPal;
+
+        [ObservableProperty]
+        private ActiveSkillViewModel requiredAttack;
 
         public PalSpecifierPassiveSkillCollectionViewModel RequiredPassives { get; private set; }
         public PalSpecifierPassiveSkillCollectionViewModel OptionalPassives { get; private set; }
@@ -194,6 +199,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             new PalSpecifier()
             {
                 Pal = TargetPal.ModelObject,
+                RequiredAttack = RequiredAttack?.ModelObject,
                 RequiredPassives = RequiredPassives.AsModelEnumerable().ToList(),
                 OptionalPassives = OptionalPassives.AsModelEnumerable().ToList(),
                 RequiredGender = RequiredGender.Value,
@@ -219,6 +225,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                     new PalSpecifier()
                     {
                         Pal = "Beakon".ToPal(db),
+                        RequiredAttack = db.ActiveSkills.FirstOrDefault(),
                         RequiredPassives = ["Runner".ToStandardPassive(db), "Swift".ToStandardPassive(db)],
                         OptionalPassives = ["Aggressive".ToStandardPassive(db)],
                         IV_Attack = 90,

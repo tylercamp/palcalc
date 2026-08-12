@@ -125,6 +125,33 @@ namespace PalCalc.UI
         }
     }
 
+    internal class ActiveSkillConverter : PalConverterBase<ActiveSkill>
+    {
+        public ActiveSkillConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        {
+        }
+
+        protected override ActiveSkill ReadTypeJson(JsonReader reader, Type objectType, ActiveSkill existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var token = JToken.ReadFrom(reader);
+            if (token.Type == JTokenType.Null)
+                return null;
+
+            var internalName = token.Type == JTokenType.String
+                ? token.ToObject<string>()
+                : token["InternalName"]?.ToObject<string>() ?? token.ToObject<ActiveSkill>().InternalName;
+
+            return internalName == "__VIRT_RAND__"
+                ? new RandomActiveSkill()
+                : internalName?.InternalToActive(db);
+        }
+
+        protected override void WriteTypeJson(JsonWriter writer, ActiveSkill value, JsonSerializer serializer)
+        {
+            JToken.FromObject(value.InternalName, serializer).WriteTo(writer, dependencyConverters);
+        }
+    }
+
     internal abstract class IPalReferenceConverterBase<T> : PalConverterBase<T>
     {
         private string typeLabel;
@@ -640,6 +667,31 @@ namespace PalCalc.UI
         }
     }
 
+    internal class ActiveSkillViewModelConverter : PalConverterBase<ActiveSkillViewModel>
+    {
+        public ActiveSkillViewModelConverter(PalDB db, GameSettings gameSettings) : base(db, gameSettings)
+        {
+            dependencyConverters = new JsonConverter[]
+            {
+                new ActiveSkillConverter(db, gameSettings),
+                new ILocalizedTextConverter(db, gameSettings),
+            };
+        }
+
+        protected override ActiveSkillViewModel ReadTypeJson(JsonReader reader, Type objectType, ActiveSkillViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var skill = JToken.ReadFrom(reader).ToObject<ActiveSkill>(serializer);
+            return skill != null
+                ? ActiveSkillViewModel.Make(skill)
+                : null;
+        }
+
+        protected override void WriteTypeJson(JsonWriter writer, ActiveSkillViewModel value, JsonSerializer serializer)
+        {
+            JToken.FromObject(value.ModelObject, serializer).WriteTo(writer, dependencyConverters);
+        }
+    }
+
     // NOTE - This converter injects other converters (namely BreedingResultListViewModelConverter) whose dependents
     //        expect a specific pal target. Multiple PalSpecifierViewModels should _not_ be stored in the same JSON
     //        data, and JsonSerializers should either be reset or newly created during each operation.
@@ -655,6 +707,7 @@ namespace PalCalc.UI
             {
                 new PalViewModelConverter(db, gameSettings),
                 new PassiveSkillViewModelConverter(db, gameSettings),
+                new ActiveSkillViewModelConverter(db, gameSettings),
                 new ILocalizedTextConverter(db, gameSettings),
             };
         }
@@ -666,6 +719,7 @@ namespace PalCalc.UI
             var modelSpecifier = new PalSpecifier()
             {
                 Pal = obj["TargetPal"].ToObject<PalViewModel>(serializer).ModelObject,
+                RequiredAttack = obj["RequiredAttack"]?.ToObject<ActiveSkillViewModel>(serializer)?.ModelObject,
                 RequiredPassives = [
                     (obj["Passive1"] ?? obj["Trait1"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
                     (obj["Passive2"] ?? obj["Trait2"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
@@ -726,6 +780,7 @@ namespace PalCalc.UI
             {
                 Id = value.Id,
                 TargetPal = value.TargetPal,
+                RequiredAttack = value.RequiredAttack,
                 Passive1 = value.RequiredPassives.Passive1,
                 Passive2 = value.RequiredPassives.Passive2,
                 Passive3 = value.RequiredPassives.Passive3,
