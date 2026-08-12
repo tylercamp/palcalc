@@ -210,7 +210,7 @@ namespace PalCalc.UI.ViewModel
                         // old format where pal targets were all stored in a single file, split into multiple files instead
                         Directory.CreateDirectory(targetsFolder);
 
-                        var vmEntryConverter = new PalSpecifierViewModelConverter(db, gameSettings, originalCachedSave);
+                        var vmEntryConverter = new PalSpecifierViewModelReader(db, gameSettings, originalCachedSave);
                         var oldData = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(Path.Join(dataPath, "pal-targets.json")));
                         var oldTargets = oldData["Targets"]?.ToObject<List<PalSpecifierViewModel>>(JsonSerializer.Create(new JsonSerializerSettings() { Converters = [vmEntryConverter] }));
 
@@ -222,7 +222,7 @@ namespace PalCalc.UI.ViewModel
                         var res = new PalTargetListViewModel(new PalSourceViewModel(sg, null), oldTargets);
                         File.WriteAllText(
                             Path.Join(dataPath, "pal-target-ids.json"),
-                            JsonConvert.SerializeObject(res, new PalTargetListViewModelConverter(db, gameSettings, sg, originalCachedSave, oldTargets.ToDictionary(t => t.Id)))
+                            JsonConvert.SerializeObject(res, new PalTargetListViewModelWriter(db, gameSettings))
                         );
 
                         File.Delete(Path.Join(dataPath, "pal-targets.json"));
@@ -242,7 +242,7 @@ namespace PalCalc.UI.ViewModel
                     {
                         var targetFiles = Directory.Exists(targetsFolder) ? Directory.EnumerateFiles(targetsFolder) : [];
 
-                        var entryConverter = new PalSpecifierViewModelConverter(db, gameSettings, originalCachedSave);
+                        var entryConverter = new PalSpecifierViewModelReader(db, gameSettings, originalCachedSave);
                         var targetEntries = targetFiles.Select<string, PalSpecifierViewModel>(f =>
                         {
                             return PCDebug.HandleErrors(
@@ -255,7 +255,7 @@ namespace PalCalc.UI.ViewModel
                             );
                         }).SkipNull().ToList();
 
-                        var converter = new PalTargetListViewModelConverter(db, GameSettingsViewModel.Load(sg.Value).ModelObject, sg, originalCachedSave, targetEntries.ToDictionary(e => e.Id));
+                        var converter = new PalTargetListViewModelReader(db, GameSettingsViewModel.Load(sg.Value).ModelObject, sg, originalCachedSave, targetEntries.ToDictionary(e => e.Id));
                         return JsonConvert.DeserializeObject<PalTargetListViewModel>(File.ReadAllText(Path.Join(dataPath, "pal-target-ids.json")), [converter]);
                     },
                     handleErr: (ex) =>
