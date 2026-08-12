@@ -115,6 +115,11 @@
                                 <!-- Placeholder to ensure we have enough space for the "Is Complete" checkbox -->
                                 <Border Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}" Width="16" Margin="0,0,8,0" Height="0" />
                             </StackPanel>
+                            <vp:ActiveSkillView
+                                DataContext="{Binding ActualAttack}"
+                                Margin="0,2,0,0"
+                                Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult.HasAttack, Converter={StaticResource VVC}}"
+                                />
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">
                                     <Run Text="{Binding AvgRequiredAttemptsDescription.Value, Mode=OneWay}" />
@@ -122,6 +127,22 @@
                                     <Run Text="- " />
                                 </TextBlock>
                                 <TextBlock Text="{Binding Effort}" FontSize="10" Visibility="{Binding EffortVisibility}" />
+                                <TextBlock Text="{Binding AttackInheritanceProbabilityLabel}" FontSize="10" Margin="5,0,0,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding AttackInheritanceProbabilityVisibility}" Value="Visible" />
+                                                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult.HasAttack}" Value="True" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </StackPanel>
                             <ContentControl Content="{Binding Location}">
                                 <ContentControl.Resources>

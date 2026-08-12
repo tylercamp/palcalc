@@ -124,6 +124,7 @@ namespace PalCalc.UI.View.Main
                 "NumBreedingSteps" => vm.NumStepsWidth,
                 "NumEggs" => vm.NumEggsWidth,
                 "EffectivePassives" => vm.PassiveSkillsWidth,
+                "AttackName" => vm.AttackWidth,
                 "InputLocations" => vm.LocationsWidth,
                 "IV_HP" or "IV_Attack" or "IV_Defense" or "IV_Average" => vm.IVsWidth,
                 _ => double.NaN // Default to auto-width

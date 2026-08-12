@@ -7,6 +7,7 @@
              xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:m="clr-namespace:PalCalc.UI.Model"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
@@ -156,8 +157,18 @@
                     Grid.Row="2"
                     />
 
-                <Grid
+                <StackPanel
                     Grid.Row="3"
+                    Orientation="Horizontal"
+                    Visibility="{Binding HasRequiredAttack, Converter={StaticResource BVC}}"
+                    >
+                    <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" FontWeight="Bold" />
+                    <TextBlock Text=": " />
+                    <TextBlock Text="{Binding RequiredAttack.Name.Value}" />
+                </StackPanel>
+
+                <Grid
+                    Grid.Row="4"
                     Visibility="{Binding HasIVs, Converter={StaticResource BVC}}"
                     >
                     <Grid.Resources>
