@@ -25,6 +25,8 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         {
             Value = node;
             Pal = PalViewModel.Make(node.PalRef.Pal);
+            ActualAttack = ActiveSkillViewModel.Make(node.PalRef.ActualAttack);
+            EffectiveAttack = ActiveSkillViewModel.Make(node.PalRef.EffectiveAttack);
             PassiveSkills = node.PalRef.ActualPassives.Select(PassiveSkillViewModel.Make).ToList();
             PassiveSkillsCollection = new PassiveSkillCollectionViewModel(PassiveSkills);
 
@@ -79,6 +81,9 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
         public PalViewModel Pal { get; }
 
+        public ActiveSkillViewModel ActualAttack { get; }
+        public ActiveSkillViewModel EffectiveAttack { get; }
+
         public IBreedingTreeNode Value { get; }
 
         public List<PassiveSkillViewModel> PassiveSkills { get; }
@@ -107,6 +112,10 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
         public int AvgRequiredAttempts => (Value.PalRef as BredPalReference)?.AvgRequiredBreedings ?? 0;
         public ILocalizedText AvgRequiredAttemptsDescription { get; }
+
+        public float? AttackInheritanceProbability => (Value.PalRef as BredPalReference)?.AttacksProbability;
+        public string AttackInheritanceProbabilityLabel => AttackInheritanceProbability is float probability ? probability.ToString("P0") : null;
+        public Visibility AttackInheritanceProbabilityVisibility => AttackInheritanceProbability.HasValue ? Visibility.Visible : Visibility.Collapsed;
 
         public Visibility AvgRequiredAttemptsVisibility => Value.PalRef is BredPalReference ? Visibility.Visible : Visibility.Collapsed;
 

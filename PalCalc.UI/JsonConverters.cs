@@ -266,6 +266,7 @@ namespace PalCalc.UI
             {
                 new IV_IValueConverter(),
                 new PassiveSkillConverter(db, gameSettings),
+                new ActiveSkillConverter(db, gameSettings),
                 new PalInstanceJsonConverter(db),
                 new ILocalizedTextConverter(db, gameSettings),
             };
@@ -284,7 +285,9 @@ namespace PalCalc.UI
                     HP = value.IVs.HP,
                     Attack = value.IVs.Attack,
                     Defense = value.IVs.Defense
-                }
+                },
+                ActualAttack = value.ActualAttack,
+                EffectiveAttack = value.EffectiveAttack,
             }, serializer);
         }
 
@@ -325,7 +328,9 @@ namespace PalCalc.UI
                     HP = hp,
                     Attack = attack,
                     Defense = defense
-                }
+                },
+                actualAttack: token["ActualAttack"]?.ToObject<ActiveSkill>(serializer),
+                effectiveAttack: token["EffectiveAttack"]?.ToObject<ActiveSkill>(serializer)
             );
 
             if (solverSettings.UseGenderReversers && inst.Gender != actualGender)
@@ -379,6 +384,7 @@ namespace PalCalc.UI
             dependencyConverters = [
                 new ILocalizedTextConverter(db, gameSettings),
                 new PassiveSkillConverter(db, gameSettings),
+                new ActiveSkillConverter(db, gameSettings),
             ];
         }
 
@@ -390,6 +396,8 @@ namespace PalCalc.UI
                 GuaranteedPassives = value.EffectivePassives.Where(t => t is not RandomPassiveSkill).ToList(),
                 NumPassives = value.EffectivePassives.Count(t => t is RandomPassiveSkill),
                 Gender = value.Gender,
+                ActualAttack = value.ActualAttack,
+                EffectiveAttack = value.EffectiveAttack,
             }, serializer);
         }
 
@@ -411,7 +419,9 @@ namespace PalCalc.UI
                 pal,
                 guaranteedPassives,
                 numPassives,
-                db.BreedingMechanics
+                db.BreedingMechanics,
+                actualAttack: token["ActualAttack"]?.ToObject<ActiveSkill>(serializer),
+                effectiveAttack: token["EffectiveAttack"]?.ToObject<ActiveSkill>(serializer)
             ).WithGuaranteedGender(
                 db,
                 gender,
@@ -550,8 +560,6 @@ namespace PalCalc.UI
 
     internal class BredPalReferenceConverter : IPalReferenceConverterBase<BredPalReference>
     {
-        // TODO: Persist actual/effective attacks and attack probability when saved solver
-        // results need to round-trip attack-targeted breeding paths.
         SerializableSolverSettings solverSettings;
         public BredPalReferenceConverter(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, PalReferenceConverter genericConverter) : base(db, gameSettings, "BRED_PAL")
         {
@@ -560,6 +568,7 @@ namespace PalCalc.UI
             {
                 genericConverter,
                 new PassiveSkillConverter(db, gameSettings),
+                new ActiveSkillConverter(db, gameSettings),
                 new ILocalizedTextConverter(db, gameSettings),
                 new IV_IValueConverter(),
             };
@@ -580,13 +589,29 @@ namespace PalCalc.UI
             var gender = token["Gender"].ToObject<PalGender>(serializer);
             var passivesProbability = (token["PassivesProbability"] ?? token["TraitsProbability"]).ToObject<float>(serializer);
             var ivsProbability = token["IVsProbability"]?.ToObject<float>(serializer) ?? 1.0f;
+            var attacksProbability = token["AttacksProbability"]?.ToObject<float?>(serializer) ?? 1.0f;
+
+            var actualAttack = token["ActualAttack"]?.ToObject<ActiveSkill>(serializer);
+            var effectiveAttack = token["EffectiveAttack"]?.ToObject<ActiveSkill>(serializer);
 
             var IV_hp = token["IV_HP"]?.ToObject<IV_Value>(serializer) ?? IV_Value.Random;
             var IV_attack = token["IV_Attack"]?.ToObject<IV_Value>(serializer) ?? IV_Value.Random;
             var IV_defense = token["IV_Defense"]?.ToObject<IV_Value>(serializer) ?? IV_Value.Random;
             var ivs = new IV_Set() { HP = IV_hp, Attack = IV_attack, Defense = IV_defense };
 
-            return new BredPalReference(gameSettings, pal, parent1, parent2, passives, passivesProbability, ivs, ivsProbability).WithGuaranteedGender(db, gender, solverSettings.UseGenderReversers) as BredPalReference;
+            return new BredPalReference(
+                gameSettings,
+                pal,
+                parent1,
+                parent2,
+                passives,
+                passivesProbability,
+                ivs,
+                ivsProbability,
+                actualAttack,
+                effectiveAttack,
+                attacksProbability
+            ).WithGuaranteedGender(db, gender, solverSettings.UseGenderReversers) as BredPalReference;
         }
 
         internal override JToken MakeRefJson(BredPalReference value, JsonSerializer serializer)
@@ -603,7 +628,10 @@ namespace PalCalc.UI
                 IV_HP = value.IVs.HP,
                 IV_Attack = value.IVs.Attack,
                 IV_Defense = value.IVs.Defense,
-                IVsProbability = value.IVsProbability
+                IVsProbability = value.IVsProbability,
+                ActualAttack = value.ActualAttack,
+                EffectiveAttack = value.EffectiveAttack,
+                AttacksProbability = value.AttacksProbability,
 
             }, serializer);
         }

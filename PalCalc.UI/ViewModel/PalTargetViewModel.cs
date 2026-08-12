@@ -64,6 +64,7 @@ namespace PalCalc.UI.ViewModel
             
             Presets = presets;
             OpenPresetsMenuCommand = new RelayCommand(() => PresetsMenuIsOpen = true);
+            ClearRequiredAttackCommand = new RelayCommand(() => CurrentPalSpecifier.RequiredAttack = null);
 
             presets.PresetSelected += (_) => PresetsMenuIsOpen = false;
 
@@ -151,6 +152,8 @@ namespace PalCalc.UI.ViewModel
         private bool presetsMenuIsOpen = false;
 
         public IRelayCommand OpenPresetsMenuCommand { get; }
+
+        public IRelayCommand ClearRequiredAttackCommand { get; }
 
         public IRelayCommand OpenPassivesSearchCommand { get; }
     }

@@ -91,8 +91,11 @@ namespace PalCalc.UI.ViewModel.Mapped
         [ObservableProperty]
         private PalViewModel targetPal;
 
+        [NotifyPropertyChangedFor(nameof(HasRequiredAttack))]
         [ObservableProperty]
         private ActiveSkillViewModel requiredAttack;
+
+        public bool HasRequiredAttack => RequiredAttack != null;
 
         public PalSpecifierPassiveSkillCollectionViewModel RequiredPassives { get; private set; }
         public PalSpecifierPassiveSkillCollectionViewModel OptionalPassives { get; private set; }

@@ -3,6 +3,8 @@ using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
+using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 
 namespace PalCalc.UI.Tests;
@@ -75,6 +77,88 @@ public class PalSpecifierAttackTests
 
         Assert.IsInstanceOfType<RandomActiveSkill>(viewModelReloaded!.ModelObject);
     }
+
+    [TestMethod]
+    public void BredReferenceAttackStateRoundTrips()
+    {
+        var db = PalDB.LoadEmbedded();
+        var gameSettings = new GameSettings();
+        var attack = db.ActiveSkills.First();
+        var random = new RandomActiveSkill();
+        var parent1 = Owned(db.Pals.First(), "parent-1", attack, 1);
+        var parent2 = Owned(db.Pals.First(), "parent-2", attack, 2);
+        var original = new BredPalReference(
+            gameSettings,
+            db.Pals.First(),
+            parent1,
+            parent2,
+            new List<PassiveSkill>(),
+            passivesProbability: 0.5f,
+            new IV_Set
+            {
+                HP = new IV_Value(true, 10, 20),
+                Attack = IV_Value.Random,
+                Defense = IV_Value.Random,
+            },
+            ivsProbability: 0.75f,
+            actualAttack: attack,
+            effectiveAttack: random,
+            attacksProbability: 0.25f
+        );
+
+        var settings = new JsonSerializerSettings
+        {
+            Converters =
+            {
+                new PalReferenceConverter(db, gameSettings, new SerializableSolverSettings(), new PalSpecifier { Pal = db.Pals.First() })
+            }
+        };
+
+        var json = JsonConvert.SerializeObject(new { Ref = (IPalReference)original }, settings);
+        var restored = JObject.Parse(json)["Ref"]!.ToObject<IPalReference>(JsonSerializer.Create(settings))!;
+
+        var restoredBred = (BredPalReference)restored;
+        Assert.AreEqual(attack.InternalName, restoredBred.ActualAttack.InternalName);
+        Assert.IsInstanceOfType<RandomActiveSkill>(restoredBred.EffectiveAttack);
+        Assert.AreEqual(original.AttacksProbability, restoredBred.AttacksProbability);
+        Assert.AreEqual(original.AvgRequiredBreedings, restoredBred.AvgRequiredBreedings);
+
+        var oldJson = JObject.Parse(json);
+        foreach (var obj in oldJson.DescendantsAndSelf().OfType<JObject>())
+        {
+            obj.Remove("ActualAttack");
+            obj.Remove("EffectiveAttack");
+            obj.Remove("AttacksProbability");
+        }
+
+        var oldResult = (BredPalReference)oldJson["Ref"]!.ToObject<IPalReference>(JsonSerializer.Create(settings))!;
+        Assert.IsNull(oldResult.ActualAttack);
+        Assert.IsNull(oldResult.EffectiveAttack);
+        Assert.AreEqual(1.0f, oldResult.AttacksProbability);
+    }
+
+    private static OwnedPalReference Owned(Pal pal, string instanceId, ActiveSkill attack, int index) =>
+        new(
+            new PalInstance
+            {
+                InstanceId = instanceId,
+                Pal = pal,
+                Gender = PalGender.WILDCARD,
+                PassiveSkills = new List<PassiveSkill>(),
+                ActiveSkills = new List<ActiveSkill> { attack },
+                EquippedActiveSkills = new List<ActiveSkill> { attack },
+                Location = new PalLocation { Type = LocationType.Palbox, Index = index },
+            },
+            new List<PassiveSkill>(),
+            new IV_Set
+            {
+                HP = IV_Value.Random,
+                Attack = IV_Value.Random,
+                Defense = IV_Value.Random,
+            },
+            actualAttack: attack,
+            effectiveAttack: attack
+        );
 
     private static JsonSerializerSettings Settings(PalDB db) => new()
     {

@@ -57,6 +57,7 @@ namespace PalCalc.UI.ViewModel.Solver
                     OnPropertyChanged(nameof(NumStepsWidth));
                     OnPropertyChanged(nameof(LocationsWidth));
                     OnPropertyChanged(nameof(PassiveSkillsWidth));
+                    OnPropertyChanged(nameof(AttackWidth));
                     OnPropertyChanged(nameof(NumEggsWidth));
                     OnPropertyChanged(nameof(IVsWidth));
                 }
@@ -83,6 +84,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public double NumStepsWidth => HiddenIfRedundant(vm => vm.NumBreedingSteps);
         public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
         public double PassiveSkillsWidth => HiddenIfRedundant(vm => vm.EffectivePassives.Description);
+        public double AttackWidth => Results?.Any(r => r.HasAttack) == true ? DEFAULT : WIDTH_HIDDEN;
         public double NumEggsWidth => HiddenIfRedundant(vm => vm.NumEggs);
         public double IVsWidth
         {
