@@ -112,6 +112,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMMON_DELETE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMMON_ENABLED,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -184,6 +188,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMMON_NO,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMMON_OWNER,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -200,6 +208,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMMON_RENAME,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMMON_SAVE,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -213,6 +225,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_COMMON_WILD_LEVEL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMMON_YES,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -901,9 +917,57 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_SAVEINSPECT_DETECTED_PROPERTIES,
         /// <summary>
+        ///   Looks up a localized string similar to Count.
+        /// </summary>
+        LC_SAVEINSPECT_GROUP_DIMENSIONAL_STORAGE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVEINSPECT_GROUP_GLOBAL_PALBOX,
+        /// <summary>
+        ///   Looks up a localized string similar to Count.
+        /// </summary>
+        LC_SAVEINSPECT_GROUP_STANDARD_CONTAINERS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVEINSPECT_MAP_COORDS,
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEINSPECT_ON_EXPEDITION,
+        /// <summary>
+        ///   Looks up a localized string similar to Index.
+        /// </summary>
+        LC_SAVEINSPECT_PROPERTY_ACTIVE_SKILL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVEINSPECT_PROPERTY_DETECTED_OWNER_ID,
+        /// <summary>
+        ///   Looks up a localized string similar to Index.
+        /// </summary>
+        LC_SAVEINSPECT_PROPERTY_EQUIPPED_ACTIVE_SKILL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVEINSPECT_PROPERTY_GENDER,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVEINSPECT_PROPERTY_PAL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVEINSPECT_PROPERTY_PALDEX_IS_VARIANT,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVEINSPECT_PROPERTY_PALDEX_NUM,
+        /// <summary>
+        ///   Looks up a localized string similar to Index.
+        /// </summary>
+        LC_SAVEINSPECT_PROPERTY_PASSIVE_SKILL,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -912,6 +976,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_SAVEINSPECT_SLOT_EMPTY,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SAVEINSPECT_WORLD_COORDS,
         /// <summary>
         ///   Looks up a localized string similar to Label | NumMatches.
         /// </summary>

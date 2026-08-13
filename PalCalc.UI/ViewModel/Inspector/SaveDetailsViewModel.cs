@@ -106,7 +106,7 @@ namespace PalCalc.UI.ViewModel.Inspector
 
             return [
                 new InspectedContainerDetailsViewModel(
-                    "Global Palbox",
+                    LocalizationCodes.LC_SAVEINSPECT_GROUP_GLOBAL_PALBOX.Bind().Value,
                     null,
                     containedPals,
                     rawGpsPals,
@@ -119,7 +119,7 @@ namespace PalCalc.UI.ViewModel.Inspector
 
         private List<InspectedContainerDetailsViewModel> CollectDimensionalPalStorageContainers(CachedSaveGame csg, RawLevelSaveData rawLevelData, List<(PlayerMeta, List<GvasCharacterInstance>)> rawDpsData)
         {
-            var displayGroupName = $"Dimensional Pal Storage ({rawDpsData.Count})";
+            var displayGroupName = LocalizationCodes.LC_SAVEINSPECT_GROUP_DIMENSIONAL_STORAGE.Bind(rawDpsData.Count).Value;
 
             // (need to `.GroupBy` and `.First` since players can sometimes have duplicate entries in the character list for some reason)
             var playerNamesById = rawLevelData.Characters.Where(c => c.IsPlayer).GroupBy(c => c.PlayerId.ToString()).ToDictionary(g => g.Key, g => g.First().NickName);
@@ -162,7 +162,7 @@ namespace PalCalc.UI.ViewModel.Inspector
 
         private List<InspectedContainerDetailsViewModel> CollectNativeContainers(CachedSaveGame csg, RawLevelSaveData rawData, List<PlayerMeta> rawPlayers)
         {
-            var displayGroupName = $"Standard Pal Containers ({rawData.ContainerContents.Count})";
+            var displayGroupName = LocalizationCodes.LC_SAVEINSPECT_GROUP_STANDARD_CONTAINERS.Bind(rawData.ContainerContents.Count).Value;
 
             var playerNamesById = rawData.Characters.Where(c => c.IsPlayer).GroupBy(c => c.PlayerId.ToString()).ToDictionary(g => g.Key, g => g.First().NickName);
 

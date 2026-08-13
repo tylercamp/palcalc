@@ -66,11 +66,11 @@
 
                         <StackPanel Visibility="{Binding Coord, Converter={StaticResource VVC}}">
                             <TextBlock>
-                                <Run Text="World Coords:" />
+                                <Run Text="{itl:LocalizedText LC_SAVEINSPECT_WORLD_COORDS}" />
                                 <Run Text="{Binding Coord.WorldCoordsText, Mode=OneTime}" />
                             </TextBlock>
                             <TextBlock>
-                                <Run Text="Map Coords:" />
+                                <Run Text="{itl:LocalizedText LC_SAVEINSPECT_MAP_COORDS}" />
                                 <Run Text="{Binding Coord.DisplayCoordsText, Mode=OneTime}" />
                             </TextBlock>
                         </StackPanel>
@@ -163,8 +163,8 @@
                           HorizontalScrollBarVisibility="Disabled"
                           >
                     <DataGrid.Columns>
-                        <DataGridTextColumn Width="Auto" Binding="{Binding Key}" />
-                        <DataGridTextColumn Width="1*" Binding="{Binding Value}" />
+                        <DataGridTextColumn Width="Auto" Binding="{Binding Key.Value}" />
+                        <DataGridTextColumn Width="1*" Binding="{Binding Value.Value}" />
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>
@@ -180,8 +180,8 @@
                           HorizontalScrollBarVisibility="Disabled"
                           >
                     <DataGrid.Columns>
-                        <DataGridTextColumn Width="Auto" Binding="{Binding Key}" />
-                        <DataGridTextColumn Width="1*" Binding="{Binding Value}" />
+                        <DataGridTextColumn Width="Auto" Binding="{Binding Key.Value}" />
+                        <DataGridTextColumn Width="1*" Binding="{Binding Value.Value}" />
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>
