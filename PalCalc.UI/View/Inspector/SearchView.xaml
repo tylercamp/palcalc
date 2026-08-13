@@ -113,11 +113,11 @@
                         <TextBlock Text="{Binding SearchedLabel.Value}">
                             <TextBlock.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="Rename"
+                                    <MenuItem Header="{itl:LocalizedText LC_COMMON_RENAME}"
                                                   Command="{Binding CustomContainer.RenameCommand}"
                                                   CommandParameter="{Binding Container}"
                                         />
-                                    <MenuItem Header="Delete"
+                                    <MenuItem Header="{itl:LocalizedText LC_COMMON_DELETE}"
                                                   Command="{Binding CustomContainer.DeleteCommand}"
                                                   CommandParameter="{Binding Container}"
                                         />
@@ -284,7 +284,7 @@
                                                 Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=iv:SearchView}, Path=ViewModel.DeleteSlotCommand}"
                                                 CommandParameter="{Binding}"
                                         >
-                                            Delete
+                                            <TextBlock Text="{itl:LocalizedText LC_COMMON_DELETE}" />
                                         </Button>
                                     </Grid>
                                 </StackPanel>
