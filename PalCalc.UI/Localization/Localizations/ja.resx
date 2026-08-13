@@ -123,4 +123,383 @@
   <data name="LC_LANGUAGE" xml:space="preserve">
     <value>言語</value>
   </data>
+  <data name="LC_ABOUT_APP" xml:space="preserve"><value>Pal Calc について</value></data>
+  <data name="LC_ADD_FAKE_SAVE" xml:space="preserve"><value>仮想セーブを追加...</value></data>
+  <data name="LC_ADD_NEW_SAVE" xml:space="preserve"><value>セーブデータを追加...</value></data>
+  <data name="LC_ANY_GUILD" xml:space="preserve"><value>すべてのギルド</value></data>
+  <data name="LC_ANY_PLAYER" xml:space="preserve"><value>すべてのプレイヤー</value></data>
+  <data name="LC_BASE_ASSIGNED_LABEL" xml:space="preserve"><value>拠点に配置中</value></data>
+  <data name="LC_BASE_LABEL" xml:space="preserve"><value>拠点（{BaseName}）</value></data>
+  <data name="LC_BREEDING_TIME" xml:space="preserve"><value>配合時間（秒）</value></data>
+  <data name="LC_BREEDING_TIME_DESC" xml:space="preserve"><value>タマゴが1個できるまでの平均時間です。指定した条件のパルを作るまでの時間の見積もりに使用します。
+夜間にパルが作業しない時間を考慮するため、内部的にはこの値を2倍にします。</value></data>
+  <data name="LC_COMMON_ALL_ATTACK_SKILLS" xml:space="preserve"><value>習得済みアクティブスキル</value></data>
+  <data name="LC_COMMON_ATTACK_SKILLS" xml:space="preserve"><value>アクティブスキル</value></data>
+  <data name="LC_COMMON_CANCEL" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="LC_COMMON_DELETE" xml:space="preserve"><value>削除</value></data>
+  <data name="LC_COMMON_ENABLED" xml:space="preserve"><value>有効</value></data>
+  <data name="LC_COMMON_EQUIPPED_ATTACK_SKILLS" xml:space="preserve"><value>装備中アクティブスキル</value></data>
+  <data name="LC_COMMON_GENDER" xml:space="preserve"><value>性別</value></data>
+  <data name="LC_COMMON_GENDER_FEMALE" xml:space="preserve"><value>メス</value></data>
+  <data name="LC_COMMON_GENDER_MALE" xml:space="preserve"><value>オス</value></data>
+  <data name="LC_COMMON_GENDER_NONE" xml:space="preserve"><value>性別なし</value></data>
+  <data name="LC_COMMON_GENDER_OPPOSITE_WILDCARD" xml:space="preserve"><value>反対の性別</value></data>
+  <data name="LC_COMMON_GENDER_WILDCARD" xml:space="preserve"><value>性別指定なし</value></data>
+  <data name="LC_COMMON_IVS" xml:space="preserve"><value>個体値</value></data>
+  <data name="LC_COMMON_IV_ATTACK" xml:space="preserve"><value>攻撃</value></data>
+  <data name="LC_COMMON_IV_ATTACK_SHORT" xml:space="preserve"><value>攻撃</value></data>
+  <data name="LC_COMMON_IV_DEFENSE" xml:space="preserve"><value>防御</value></data>
+  <data name="LC_COMMON_IV_DEFENSE_SHORT" xml:space="preserve"><value>防御</value></data>
+  <data name="LC_COMMON_IV_HP" xml:space="preserve"><value>HP</value></data>
+  <data name="LC_COMMON_IV_HP_SHORT" xml:space="preserve"><value>HP</value></data>
+  <data name="LC_COMMON_LEVEL" xml:space="preserve"><value>レベル</value></data>
+  <data name="LC_COMMON_RANK" xml:space="preserve"><value>ランク</value></data>
+  <data name="LC_COMMON_RENAME" xml:space="preserve"><value>名前を変更</value></data>
+  <data name="LC_COMMON_WILD_LEVEL" xml:space="preserve"><value>レベル</value></data>
+  <data name="LC_COMMON_LOCATION" xml:space="preserve"><value>場所</value></data>
+  <data name="LC_COMMON_MAP_COORDS" xml:space="preserve"><value>マップ座標</value></data>
+  <data name="LC_COMMON_OWNER" xml:space="preserve"><value>所有者</value></data>
+  <data name="LC_COMMON_PAL" xml:space="preserve"><value>パル</value></data>
+  <data name="LC_COMMON_PALDEX_NUM_SHORT" xml:space="preserve"><value>#</value></data>
+  <data name="LC_COMMON_SAVE" xml:space="preserve"><value>セーブ</value></data>
+  <data name="LC_COMMON_TRAITS" xml:space="preserve"><value>パッシブスキル</value></data>
+  <data name="LC_COMMON_UNKNOWN" xml:space="preserve"><value>不明</value></data>
+  <data name="LC_CRASHLOG_FAILED" xml:space="preserve"><value>クラッシュログを作成できませんでした。</value></data>
+  <data name="LC_CUSTOM_CONTAINER" xml:space="preserve"><value>{Label}（カスタム）</value></data>
+  <data name="LC_CUSTOM_CONTAINERS" xml:space="preserve"><value>カスタムコンテナ</value></data>
+  <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve"><value>変更内容はPal Calcに自動保存されます。カスタムコンテナはPalworldのセーブデータに影響しません。</value></data>
+  <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve"><value>新規追加...</value></data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_FIELD" xml:space="preserve"><value>名前</value></data>
+  <data name="LC_CUSTOM_CONTAINER_NEW_TITLE" xml:space="preserve"><value>新しいカスタムコンテナ</value></data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_FIELD" xml:space="preserve"><value>名前</value></data>
+  <data name="LC_CUSTOM_CONTAINER_RENAME_TITLE" xml:space="preserve"><value>カスタムコンテナの名前変更</value></data>
+  <data name="LC_CUSTOM_SAVE_GAME_NAME" xml:space="preserve"><value>新しいセーブデータ名</value></data>
+  <data name="LC_CUSTOM_SAVE_GAME_NAME_LABEL" xml:space="preserve"><value>名前</value></data>
+  <data name="LC_DELETE_PAL_TARGET_MSG" xml:space="preserve"><value>{PalName} の目標設定を削除しますか？</value></data>
+  <data name="LC_DELETE_PAL_TARGET_TITLE" xml:space="preserve"><value>目標パルを削除</value></data>
+  <data name="LC_ERROR_HARD_CRASH" xml:space="preserve"><value>処理されていないエラーが発生しました。
+
+サポートへ問い合わせる場合は、作成された次のZIPファイルを添付してください。
+
+{CrashlogPath}</value></data>
+  <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve"><value>セーブデータの読み込み中にエラーが発生しました。
+
+新しいバージョンのPalworldのセーブデータには、Pal Calcの更新が必要な場合があります。
+
+古いバージョンのセーブデータはサポート対象外の場合があり、古いPal Calcが必要になることがあります。
+
+サポートへ問い合わせる場合は、作成された次のZIPファイルを添付してください。
+
+{CrashlogPath}</value></data>
+  <data name="LC_EXPORT_CRASH_LOG" xml:space="preserve"><value>クラッシュログをエクスポート</value></data>
+  <data name="LC_EXPORT_CRASH_LOG_DESCRIPTION" xml:space="preserve"><value>最近参照したセーブデータ、キャッシュ、設定をZIPとして出力します。</value></data>
+  <data name="LC_EXPORT_SAVE" xml:space="preserve"><value>セーブデータをエクスポート</value></data>
+  <data name="LC_EXPORT_SAVE_CSV" xml:space="preserve"><value>CSVで出力</value></data>
+  <data name="LC_EXPORT_SAVE_CSV_DESCRIPTION" xml:space="preserve"><value>セーブデータ内の全パルをCSV形式の表として出力します。</value></data>
+  <data name="LC_EXPORT_SAVE_DESCRIPTION" xml:space="preserve"><value>選択したセーブデータにある既知のPalworldファイルをすべてZIPとして出力します。</value></data>
+  <data name="LC_GAME_SETTINGS" xml:space="preserve"><value>ゲーム設定</value></data>
+  <data name="LC_GRAPH_ZOOM_CUSTOM" xml:space="preserve"><value>カスタム</value></data>
+  <data name="LC_GRAPH_ZOOM_FILL" xml:space="preserve"><value>全体表示</value></data>
+  <data name="LC_GRAPH_ZOOM_PERCENT" xml:space="preserve"><value>ズーム:</value></data>
+  <data name="LC_GUILD_LABEL" xml:space="preserve"><value>ギルド「{GuildName}」</value></data>
+  <data name="LC_INCLUDE_CUSTOM_PALS" xml:space="preserve"><value>カスタムコンテナのパルを含める</value></data>
+  <data name="LC_INCLUDE_PALS_AT_BASE" xml:space="preserve"><value>拠点にいるパルを含める</value></data>
+  <data name="LC_INCLUDE_PALS_GPS" xml:space="preserve"><value>グローバルパルボックスのパルを含める</value></data>
+  <data name="LC_INCLUDE_PALS_IN_CAGES" xml:space="preserve"><value>鑑賞用ケージのパルを含める</value></data>
+  <data name="LC_INCLUDE_PALS_ON_EXPEDITIONS" xml:space="preserve"><value>遠征中のパルを含める</value></data>
+  <data name="LC_INSPECT_SAVE" xml:space="preserve"><value>確認</value></data>
+  <data name="LC_JOB_QUEUE_CLOSING_MSG" xml:space="preserve"><value>Pal Calcを閉じると、残っているジョブはすべてキャンセルされます。終了しますか？</value></data>
+  <data name="LC_JOB_QUEUE_CLOSING_TITLE" xml:space="preserve"><value>未完了のジョブ</value></data>
+  <data name="LC_JOB_QUEUE_HEADER" xml:space="preserve"><value>ジョブ（{Count}）</value></data>
+  <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve"><value>新しい言語を完全に適用するには、Pal Calcを再起動してください。</value></data>
+  <data name="LC_LIST_SEPARATOR" xml:space="preserve"><value>、</value></data>
+  <data name="LC_LOC_COORD_BASE" xml:space="preserve"><value>拠点、スロット（{X}, {Y}）</value></data>
+  <data name="LC_LOC_COORD_DPS" xml:space="preserve"><value>パル次元ストレージ、タブ {Tab}（{X}, {Y}）</value></data>
+  <data name="LC_LOC_COORD_GPS" xml:space="preserve"><value>グローバルパルボックス、タブ {Tab}（{X}, {Y}）</value></data>
+  <data name="LC_LOC_COORD_PALBOX" xml:space="preserve"><value>パルボックス、タブ {Tab}（{X}, {Y}）</value></data>
+  <data name="LC_LOC_COORD_PARTY" xml:space="preserve"><value>手持ちパル、スロット {SlotNum}</value></data>
+  <data name="LC_LOC_COORD_VIEWING_CAGE" xml:space="preserve"><value>鑑賞用ケージ（{X}, {Y}）</value></data>
+  <data name="LC_LOC_OWNED_BY" xml:space="preserve"><value>所有者: {Owner}</value></data>
+  <data name="LC_LOC_PALBOX_TAB" xml:space="preserve"><value>タブ {Tab}</value></data>
+  <data name="LC_MANUAL_SAVE_ALREADY_REGISTERED" xml:space="preserve"><value>選択したファイルはすでに登録されています。</value></data>
+  <data name="LC_MANUAL_SAVE_EXTENSION_LBL" xml:space="preserve"><value>Level.sav ファイル</value></data>
+  <data name="LC_MANUAL_SAVE_INCOMPLETE" xml:space="preserve"><value>選択したファイルは無効か、完全なセーブデータフォルダ内にありません。</value></data>
+  <data name="LC_MANUAL_SAVE_SELECTOR_TITLE" xml:space="preserve"><value>セーブフォルダ内の「Level.sav」を選択</value></data>
+  <data name="LC_MEMORY_WARNING_MSG" xml:space="preserve"><value>お知らせ: システムの空きメモリが不足しているため、配合ルート検索を一時停止しました。このメッセージを閉じると処理を再開します。
+
+この実行中は以後の警告を表示しないようにしますか？</value></data>
+  <data name="LC_MEMORY_WARNING_TITLE" xml:space="preserve"><value>メモリ不足の警告</value></data>
+  <data name="LC_MULTIPLE_BREEDING_FARMS" xml:space="preserve"><value>複数の配合牧場</value></data>
+  <data name="LC_MULTIPLE_BREEDING_FARMS_DESC" xml:space="preserve"><value>複数の配合牧場を使用するかどうかです。
+有効の場合、配合で生まれた2体のパルからさらに配合する時間は、親2体のうち長い方の配合時間を基準にします。
+無効の場合、パルの配合時間は常に親に必要な時間の合計を基準にします。</value></data>
+  <data name="LC_NEW_TARGET_PAL" xml:space="preserve"><value>新規</value></data>
+  <data name="LC_NO_RESULTS_FAQ_1" xml:space="preserve"><value>結果がありませんか？原因については</value></data>
+  <data name="LC_NO_RESULTS_FAQ_2" xml:space="preserve"><value>よくある質問</value></data>
+  <data name="LC_NO_RESULTS_FAQ_3" xml:space="preserve"><value>をご確認ください。</value></data>
+  <data name="LC_NO_TRAITS" xml:space="preserve"><value>パッシブスキルなし</value></data>
+  <data name="LC_OPEN_IN_FILE_EXPLORER" xml:space="preserve"><value>フォルダーを開く</value></data>
+  <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve"><value>任意: {TraitsList}</value></data>
+  <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve"><value>検索</value></data>
+  <data name="LC_PAL_LABEL" xml:space="preserve"><value>{PalName}（#{PaldexNum}）</value></data>
+  <data name="LC_PAL_LIST_PRESETS" xml:space="preserve"><value>プリセット</value></data>
+  <data name="LC_PAL_LIST_PRESETS_ADD" xml:space="preserve"><value>選択したパルを新しいプリセットとして保存...</value></data>
+  <data name="LC_PAL_LIST_PRESETS_ADD_TITLE" xml:space="preserve"><value>新しいプリセット名</value></data>
+  <data name="LC_PAL_LIST_PRESETS_BUILTIN_NOT_OWNED" xml:space="preserve"><value>未所有のパル</value></data>
+  <data name="LC_PAL_LIST_PRESETS_BUILTIN_OWNED" xml:space="preserve"><value>所有中のパル</value></data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_BTN_DESCRIPTION" xml:space="preserve"><value>プリセットを削除</value></data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_MSG" xml:space="preserve"><value>プリセット「{PresetName}」を削除しますか？</value></data>
+  <data name="LC_PAL_LIST_PRESETS_DELETE_TITLE" xml:space="preserve"><value>プリセットを削除</value></data>
+  <data name="LC_PAL_LIST_PRESETS_NAME" xml:space="preserve"><value>名前</value></data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_BTN_DESCRIPTION" xml:space="preserve"><value>プリセットを上書き</value></data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_MSG" xml:space="preserve"><value>現在選択中のパルでプリセット「{PresetName}」を上書きしますか？</value></data>
+  <data name="LC_PAL_LIST_PRESETS_OVERWRITE_TITLE" xml:space="preserve"><value>プリセットを上書き</value></data>
+  <data name="LC_PAL_LIST_PRESETS_RENAME_BTN_DESCRIPTION" xml:space="preserve"><value>プリセット名を変更</value></data>
+  <data name="LC_PAL_LIST_PRESETS_RENAME_TITLE" xml:space="preserve"><value>プリセット「{PresetName}」の名前変更</value></data>
+  <data name="LC_PAL_LOC_BASE" xml:space="preserve"><value>拠点</value></data>
+  <data name="LC_PAL_LOC_CAPTURED" xml:space="preserve"><value>捕獲済み</value></data>
+  <data name="LC_PAL_LOC_COUNT" xml:space="preserve"><value>{LocType}: {Count}体</value></data>
+  <data name="LC_PAL_LOC_CUSTOM" xml:space="preserve"><value>（カスタム）</value></data>
+  <data name="LC_PAL_LOC_DPS_FULL" xml:space="preserve"><value>パル次元ストレージ</value></data>
+  <data name="LC_PAL_LOC_DPS_SHORT" xml:space="preserve"><value>パル次元ストレージ</value></data>
+  <data name="LC_PAL_LOC_GPS_FULL" xml:space="preserve"><value>グローバルパルボックス</value></data>
+  <data name="LC_PAL_LOC_GPS_SHORT" xml:space="preserve"><value>グローバルパルボックス</value></data>
+  <data name="LC_PAL_LOC_PALBOX" xml:space="preserve"><value>パルボックス</value></data>
+  <data name="LC_PAL_LOC_PARTY" xml:space="preserve"><value>手持ちパル</value></data>
+  <data name="LC_PAL_LOC_VIEWING_CAGE" xml:space="preserve"><value>鑑賞用ケージ</value></data>
+  <data name="LC_PAL_SRC_ANY_GUILD_MEMBER" xml:space="preserve"><value>すべてのギルドメンバー</value></data>
+  <data name="LC_PAL_SRC_ANY_PLAYER_GUILD" xml:space="preserve"><value>すべてのギルドの全プレイヤー</value></data>
+  <data name="LC_PAL_TARGET_OPTIONAL_TRAITS" xml:space="preserve"><value>任意</value></data>
+  <data name="LC_PAL_TARGET_REQUIRED_TRAITS" xml:space="preserve"><value>必須</value></data>
+  <data name="LC_PAL_WILD_COUNT" xml:space="preserve"><value>野生 {NumWild}体</value></data>
+  <data name="LC_PLAYER_LABEL" xml:space="preserve"><value>プレイヤー「{PlayerName}」</value></data>
+  <data name="LC_POPUP_TITLE_LOADING_SAVE_FILE" xml:space="preserve"><value>セーブデータを読み込み中</value></data>
+  <data name="LC_RANDOM_TRAIT" xml:space="preserve"><value>（ランダム）</value></data>
+  <data name="LC_REMOVE_CUSTOM_CONTAINER_DESCRIPTION" xml:space="preserve"><value>カスタムコンテナ「{Label}」を削除します。</value></data>
+  <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve"><value>Pal Calcからこのセーブデータを削除しますか？
+
+{SaveLabel}
+
+PC上のセーブファイルは削除されません。</value></data>
+  <data name="LC_REMOVE_SAVE_TITLE" xml:space="preserve"><value>手動追加したセーブデータを削除しますか？</value></data>
+  <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve"><value>必須: {TraitsList}</value></data>
+  <data name="LC_RESULT_BREEDING_ATTEMPTS" xml:space="preserve"><value>平均 {AvgAttempts} 回の配合</value></data>
+  <data name="LC_RESULT_INPUT_LOCS" xml:space="preserve"><value>親パルの場所</value></data>
+  <data name="LC_RESULT_IV_ATTACK" xml:space="preserve"><value>攻撃個体値</value></data>
+  <data name="LC_RESULT_IV_AVERAGE" xml:space="preserve"><value>平均個体値</value></data>
+  <data name="LC_RESULT_IV_DEFENSE" xml:space="preserve"><value>防御個体値</value></data>
+  <data name="LC_RESULT_IV_HP" xml:space="preserve"><value>HP個体値</value></data>
+  <data name="LC_RESULT_LABEL" xml:space="preserve"><value>{PalName}（{TraitsList}）、目安: {TimeEstimate}</value></data>
+  <data name="LC_RESULT_LIST_TITLE_COUNT" xml:space="preserve"><value>結果（{NumResults}件）</value></data>
+  <data name="LC_RESULT_LIST_TITLE_EMPTY" xml:space="preserve"><value>結果</value></data>
+  <data name="LC_RESULT_NUM_CAKES" xml:space="preserve"><value>ケーキ数</value></data>
+  <data name="LC_RESULT_NUM_STEPS" xml:space="preserve"><value>配合回数</value></data>
+  <data name="LC_RESULT_TIME_ESTIMATE" xml:space="preserve"><value>予想所要時間</value></data>
+  <data name="LC_SAVEINSPECT_CONTAINER_ID" xml:space="preserve"><value>ID:</value></data>
+  <data name="LC_SAVEINSPECT_CONTAINER_OWNER" xml:space="preserve"><value>所有者:</value></data>
+  <data name="LC_SAVEINSPECT_CONTAINER_SLOTS_USED" xml:space="preserve"><value>スロット使用中</value></data>
+  <data name="LC_SAVEINSPECT_CONTAINER_TYPE" xml:space="preserve"><value>種類:</value></data>
+  <data name="LC_SAVEINSPECT_GROUP_GLOBAL_PALBOX" xml:space="preserve"><value>グローバルパルボックス</value></data>
+  <data name="LC_SAVEINSPECT_GROUP_DIMENSIONAL_STORAGE" xml:space="preserve"><value>パル次元ストレージ（{Count}）</value></data>
+  <data name="LC_SAVEINSPECT_GROUP_STANDARD_CONTAINERS" xml:space="preserve"><value>通常のパル保管場所（{Count}）</value></data>
+  <data name="LC_SAVEINSPECT_DETECTED_PROPERTIES" xml:space="preserve"><value>検出された情報</value></data>
+  <data name="LC_SAVEINSPECT_PROPERTY_PAL" xml:space="preserve"><value>パル</value></data>
+  <data name="LC_SAVEINSPECT_PROPERTY_PALDEX_NUM" xml:space="preserve"><value>パル図鑑No.</value></data>
+  <data name="LC_SAVEINSPECT_PROPERTY_PALDEX_IS_VARIANT" xml:space="preserve"><value>亜種</value></data>
+  <data name="LC_SAVEINSPECT_PROPERTY_GENDER" xml:space="preserve"><value>性別</value></data>
+  <data name="LC_SAVEINSPECT_PROPERTY_DETECTED_OWNER_ID" xml:space="preserve"><value>検出された所有者ID</value></data>
+  <data name="LC_SAVEINSPECT_PROPERTY_PASSIVE_SKILL" xml:space="preserve"><value>パッシブスキル {Index}</value></data>
+  <data name="LC_SAVEINSPECT_PROPERTY_EQUIPPED_ACTIVE_SKILL" xml:space="preserve"><value>装備中アクティブスキル {Index}</value></data>
+  <data name="LC_SAVEINSPECT_PROPERTY_ACTIVE_SKILL" xml:space="preserve"><value>アクティブスキル {Index}</value></data>
+  <data name="LC_SAVEINSPECT_WORLD_COORDS" xml:space="preserve"><value>ワールド座標:</value></data>
+  <data name="LC_SAVEINSPECT_MAP_COORDS" xml:space="preserve"><value>マップ座標:</value></data>
+  <data name="LC_COMMON_YES" xml:space="preserve"><value>はい</value></data>
+  <data name="LC_COMMON_NO" xml:space="preserve"><value>いいえ</value></data>
+  <data name="LC_SAVEINSPECT_ON_EXPEDITION" xml:space="preserve"><value>遠征中</value></data>
+  <data name="LC_SAVEINSPECT_RAW_PROPERTIES" xml:space="preserve"><value>生データ</value></data>
+  <data name="LC_SAVEINSPECT_SLOT_EMPTY" xml:space="preserve"><value>空き</value></data>
+  <data name="LC_SAVESEARCH_CONTAINER_LABEL" xml:space="preserve"><value>{Label}（{NumMatches}件一致）</value></data>
+  <data name="LC_SAVESEARCH_GRP_PAL_CONTAINERS" xml:space="preserve"><value>保管場所</value></data>
+  <data name="LC_SAVESEARCH_GRP_SEARCH_SETTINGS" xml:space="preserve"><value>検索条件</value></data>
+  <data name="LC_SAVESEARCH_SETTINGS_MAX_IVS" xml:space="preserve"><value>最高個体値</value></data>
+  <data name="LC_SAVESEARCH_SETTINGS_MIN_IVS" xml:space="preserve"><value>最低個体値</value></data>
+  <data name="LC_SAVESEARCH_SETTINGS_RESET" xml:space="preserve"><value>リセット</value></data>
+  <data name="LC_SAVESEARCH_NO_MATCHES" xml:space="preserve"><value>一致するパルはありません</value></data>
+  <data name="LC_SAVEWINDOW_TAB_DETAILS" xml:space="preserve"><value>詳細</value></data>
+  <data name="LC_SAVEWINDOW_TAB_SEARCH" xml:space="preserve"><value>検索</value></data>
+  <data name="LC_SAVEWINDOW_TITLE" xml:space="preserve"><value>セーブデータ確認 - {SaveLabel}</value></data>
+  <data name="LC_SAVE_FILE" xml:space="preserve"><value>セーブファイル</value></data>
+  <data name="LC_SAVE_FILE_RELOADING" xml:space="preserve"><value>セーブファイルがまだキャッシュされていないか、キャッシュが古いため、内容を読み込んでいます...</value></data>
+  <data name="LC_SAVE_FILE_RELOAD_DESCRIPTION" xml:space="preserve"><value>このセーブデータの一部ファイルが変更されています。クリックして最新データを読み込みます。</value></data>
+  <data name="LC_SAVE_GAME" xml:space="preserve"><value>ゲーム</value></data>
+  <data name="LC_SAVE_GAME_ERROR" xml:space="preserve"><value>セーブデータが選択されていないか、選択したセーブデータを読み込めませんでした。セーブファイルがない場合は、「場所: 手動追加」と「ゲーム: 仮想セーブを追加...」を選択してください。「確認」ボタンとカスタムコンテナを使って、パルを手動で追加できます。</value></data>
+  <data name="LC_SAVE_GAME_INVALID" xml:space="preserve"><value>選択したセーブファイルは無効です。</value></data>
+  <data name="LC_SAVE_GAME_LBL" xml:space="preserve"><value>{WorldName}、{PlayerName} Lv.{PlayerLevel}、{DayNumber}日目</value></data>
+  <data name="LC_SAVE_GAME_LBL_NO_METADATA" xml:space="preserve"><value>{GameId}（メタデータを読み取れません）</value></data>
+  <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve"><value>{WorldName}、{DayNumber}日目</value></data>
+  <data name="LC_SAVE_GAME_REMOVE_BTN_LABEL" xml:space="preserve"><value>削除</value></data>
+  <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve"><value>Xboxのセーブファイルは不完全ですが、機能は引き続き利用できます。Palworldを数分間終了してからPal Calcを再起動すると、自動的に解消されます。</value></data>
+  <data name="LC_SAVE_INSPECTOR_LOADING" xml:space="preserve"><value>生のセーブデータを読み込み中...</value></data>
+  <data name="LC_SAVE_LOCATION" xml:space="preserve"><value>場所</value></data>
+  <data name="LC_SAVE_LOCATION_LBL_STEAM" xml:space="preserve"><value>Steam ユーザー {UserId} - 有効なセーブデータ {NumValidSaves}件</value></data>
+  <data name="LC_SAVE_LOCATION_LBL_XBOX" xml:space="preserve"><value>Xbox ユーザー {UserId} - 有効なセーブデータ {NumValidSaves}件</value></data>
+  <data name="LC_SAVE_LOCATION_MANUAL" xml:space="preserve"><value>手動追加</value></data>
+  <data name="LC_SAVE_LOCATION_STEAM_EMPTY" xml:space="preserve"><value>Steam</value></data>
+  <data name="LC_SAVE_LOCATION_XBOX_EMPTY" xml:space="preserve"><value>Xbox</value></data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_1" xml:space="preserve"><value>Xboxのセーブデータが見つかりません。PCにPalworldを</value></data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_2" xml:space="preserve"><value>Xbox アプリ / Game Pass</value></data>
+  <data name="LC_SAVE_LOCATION_XBOX_INSTALL_3" xml:space="preserve"><value>からインストールする必要があります。ゲームを起動するとセーブファイルがPCに同期されます。</value></data>
+  <data name="LC_SAVE_WARNING" xml:space="preserve"><value>（!）</value></data>
+  <data name="LC_SETTINGS_MASSIVE_EGG_INCUBATION" xml:space="preserve"><value>巨大なタマゴの孵化時間（分）</value></data>
+  <data name="LC_SETTINGS_MASSIVE_EGG_INCUBATION_DESC" xml:space="preserve"><value>ボーナス（温度補正）なしで巨大なタマゴを孵化させる時間です。</value></data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE" xml:space="preserve"><value>パルボックスのタブサイズ</value></data>
+  <data name="LC_SETTINGS_PALBOX_TAB_SIZE_DESC" xml:space="preserve"><value>パルボックス内の1タブの大きさです。パルボックス内のパルの場所を表示する際に使用します。
+
+初期値は6×5です。パルボックスのタブサイズを変更するMODを使用している場合以外は変更しないでください。
+
+この設定を完全に適用するには再起動が必要です。</value></data>
+  <data name="LC_SETTINGS_RESTART_REQUIRED_MSG" xml:space="preserve"><value>一部の変更を完全に反映するには再起動が必要です。</value></data>
+  <data name="LC_SOLVER_PAUSE" xml:space="preserve"><value>一時停止</value></data>
+  <data name="LC_SOLVER_RESUME" xml:space="preserve"><value>再開</value></data>
+  <data name="LC_SOLVER_RUN" xml:space="preserve"><value>配合ルートを検索</value></data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS" xml:space="preserve"><value>使用を許可する配合パル</value></data>
+  <data name="LC_SOLVER_SETTINGS_ALLOWED_WILD_PALS" xml:space="preserve"><value>使用を許可する野生パル</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS" xml:space="preserve"><value>子パルの不要パッシブ上限</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve"><value>最終配合結果を含む、配合で生まれた各パルに許可する不要なパッシブスキルの最大数です。
+
+最終パルに未使用のパッシブスキル枠がある場合、1より大きい値にすると通常はより短い配合経路が追加されます。
+
+値を大きくすると、必要時間に指数関数的な影響があります。</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS" xml:space="preserve"><value>最大配合ステップ数</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_BREEDING_STEPS_DESCRIPTION" xml:space="preserve"><value>目標パルに到達するまでに許可する配合手順の最大数です。
+
+（通常は「最大探索回数」より小さく設定してください。）
+
+値を大きくすると、Pal Calcがより多くの選択肢を検討し、計算時間に比例して影響します。</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve"><value>最大CPUスレッド数</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION" xml:space="preserve"><value>配合ルート検索が使用できるCPUスレッド数です。0の場合はすべてのCPUスレッドを使用します。</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS" xml:space="preserve"><value>親パルの不要パッシブ上限</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve"><value>親として使用する所有パルに許可する不要なパッシブスキルの最大数です。
+
+値を小さくすると、有用な経路を見落とす可能性はあるものの、計算量を多少減らせます。
+
+値を大きくすると、計算時間に比例して影響します。</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS" xml:space="preserve"><value>最大探索回数</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION" xml:space="preserve"><value>配合ルート検索を実行する最大回数です。値を大きくすると、最適な配合経路の検索でより多くの選択肢を見つけられる場合があります。
+
+（追加の配合試行が必要かどうかはPal Calcが検出するため、この上限に達する前に停止することがあります。）
+
+（通常は「配合手順数の上限」と同じか、それ以上に設定してください。）
+
+値を大きくすると、計算時間に比例して影響します。</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS" xml:space="preserve"><value>最大野生パル数</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION" xml:space="preserve"><value>配合経路に許可する野生パルの最大数です。
+値を大きくすると、所有しているパルの種類数に応じて必要時間に比例して影響します。</value></data>
+  <data name="LC_SOLVER_STATUS_BREEDING" xml:space="preserve"><value>配合手順 {StepNum}: {WorkSize}組の親ペアから子パルと確率を計算中</value></data>
+  <data name="LC_SOLVER_STATUS_FINISHED" xml:space="preserve"><value>完了（{Duration}）</value></data>
+  <data name="LC_SOLVER_STATUS_INITIALIZING" xml:space="preserve"><value>初期化中</value></data>
+  <data name="LC_SOLVER_STEP_STATUS_BREEDING" xml:space="preserve"><value>{WorkSize}組の配合ペアを処理中: {NumProcessed}</value></data>
+  <data name="LC_SOLVER_STEP_STATUS_DONE" xml:space="preserve"><value>合計 {TotalSize}組の配合ペアを処理しました</value></data>
+  <data name="LC_SOURCE_PALS" xml:space="preserve"><value>親候補パル</value></data>
+  <data name="LC_SOURCE_PALS_FILTERS" xml:space="preserve"><value>フィルター</value></data>
+  <data name="LC_SOURCE_PALS_PLAYERS_AND_GUILDS" xml:space="preserve"><value>所有者</value></data>
+  <data name="LC_STARTUP_LOADING" xml:space="preserve"><value>読み込み中...</value></data>
+  <data name="LC_SURGERY_ADD_PASSIVE" xml:space="preserve"><value>{AddedPassive} を追加</value></data>
+  <data name="LC_SURGERY_CHANGE_GENDER" xml:space="preserve"><value>性別を {NewGender} に変更</value></data>
+  <data name="LC_SURGERY_REPLACE_PASSIVE" xml:space="preserve"><value>{RemovedPassive} を {AddedPassive} に変更</value></data>
+  <data name="LC_TARGET_PAL" xml:space="preserve"><value>目標パル</value></data>
+  <data name="LC_TARGET_PALS" xml:space="preserve"><value>目標パル</value></data>
+  <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve"><value>パッシブスキルなし</value></data>
+  <data name="LC_TRAITS_COUNT_RANDOM" xml:space="preserve"><value>ランダム {NumRandom}個</value></data>
+  <data name="LC_TRAITS_COUNT_UNRECOGNIZED" xml:space="preserve"><value>未認識 {NumUnrecognized}個</value></data>
+  <data name="LC_TRAITS_PRESETS" xml:space="preserve"><value>プリセット</value></data>
+  <data name="LC_TRAITS_PRESETS_ADD" xml:space="preserve"><value>パッシブスキルを新しいプリセットとして保存...</value></data>
+  <data name="LC_TRAITS_PRESETS_ADD_TITLE" xml:space="preserve"><value>新しいプリセット名</value></data>
+  <data name="LC_TRAITS_PRESETS_DELETE_BTN_DESCRIPTION" xml:space="preserve"><value>プリセットを削除</value></data>
+  <data name="LC_TRAITS_PRESETS_DELETE_MSG" xml:space="preserve"><value>プリセット「{PresetName}」を削除しますか？</value></data>
+  <data name="LC_TRAITS_PRESETS_DELETE_TITLE" xml:space="preserve"><value>プリセットを削除</value></data>
+  <data name="LC_TRAITS_PRESETS_NAME" xml:space="preserve"><value>名前</value></data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_BTN_DESCRIPTION" xml:space="preserve"><value>プリセットを上書き</value></data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_MSG" xml:space="preserve"><value>現在選択中の必須・任意パッシブスキルでプリセット「{PresetName}」を上書きしますか？</value></data>
+  <data name="LC_TRAITS_PRESETS_OVERWRITE_TITLE" xml:space="preserve"><value>プリセットを上書き</value></data>
+  <data name="LC_TRAITS_PRESETS_RENAME_BTN_DESCRIPTION" xml:space="preserve"><value>プリセット名を変更</value></data>
+  <data name="LC_TRAITS_PRESETS_RENAME_TITLE" xml:space="preserve"><value>プリセット「{PresetName}」の名前変更</value></data>
+  <data name="LC_TRAITS_SEARCH_DESCRIPTION" xml:space="preserve"><value>説明</value></data>
+  <data name="LC_TRAITS_SEARCH_NAME" xml:space="preserve"><value>名前</value></data>
+  <data name="LC_TRAITS_SEARCH_SEARCH" xml:space="preserve"><value>検索</value></data>
+  <data name="LC_TRAITS_SEARCH_TITLE" xml:space="preserve"><value>パッシブスキルを検索</value></data>
+  <data name="LC_TRAIT_LABEL_UNRECOGNIZED" xml:space="preserve"><value>{InternalName}（未認識）</value></data>
+  <data name="LC_UNKNOWN_GUILD" xml:space="preserve"><value>不明なギルド</value></data>
+  <data name="LC_UNKNOWN_PLAYER" xml:space="preserve"><value>不明なプレイヤー</value></data>
+  <data name="LC_UPDATE_AVAILABLE" xml:space="preserve"><value>アップデートがあります！</value></data>
+  <data name="LC_VIEWING_CAGE_LABEL" xml:space="preserve"><value>鑑賞用ケージ（{CageId}）</value></data>
+  <data name="LC_WINDOW_TITLE" xml:space="preserve"><value>Pal Calc</value></data>
+  <data name="LC_SURGERY_STEP_TITLE" xml:space="preserve"><value>手術</value></data>
+  <data name="LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS" xml:space="preserve"><value>パルリバーサーを使用する</value></data>
+  <data name="LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION" xml:space="preserve"><value>配合の予想所要時間を計算するとき、パルリバーサーを使用する前提にします。有効にするとPal Calcは性別確率を計算に含めず、通常は性別が合わないパル同士も配合できるものとして扱います。
+
+性別変更薬は配合グラフには表示されません。有効にすると、グラフ内の所有パルが実際と異なる性別で表示されることがあります。</value></data>
+  <data name="LC_SOLVER_SETTINGS_SURGERY_ALLOWED_PASSIVES" xml:space="preserve"><value>手術で追加・変更を許可するパッシブスキル</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_GOLD_COST" xml:space="preserve"><value>ゴールド消費上限</value></data>
+  <data name="LC_SOLVER_SETTINGS_MAX_GOLD_COST_DESCRIPTION" xml:space="preserve"><value>パッシブスキルの追加・変更に手術台を使う配合経路で許可する、合計ゴールド消費の上限です。
+
+0にすると、パッシブスキルに手術台を使用しません。
+
+値を大きくしても、必要時間への影響はわずかです。</value></data>
+  <data name="LC_PASSIVES_CHECKLIST_COST" xml:space="preserve"><value>手術費用</value></data>
+  <data name="LC_PASSIVES_CHECKLIST_DESCRIPTION" xml:space="preserve"><value>説明</value></data>
+  <data name="LC_PASSIVES_CHECKLIST_NAME" xml:space="preserve"><value>名前</value></data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_ITEM" xml:space="preserve"><value>必要アイテム</value></data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_TITLE" xml:space="preserve"><value>手術で使用可能なパッシブスキル</value></data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_ITEM_NO" xml:space="preserve"><value>いいえ</value></data>
+  <data name="LC_PASSIVES_CHECKLIST_SURGERY_ITEM_YES" xml:space="preserve"><value>はい</value></data>
+  <data name="LC_RESULT_COLUMNS_RESET" xml:space="preserve"><value>すべての列をリセット</value></data>
+  <data name="LC_GRAPH_CHECK_STEP_DESCRIPTION" xml:space="preserve"><value>クリックしてこの手順を完了にします。
+これは表示上の操作のみで、配合ルート検索や見積もりには影響しません。
+この目標パルで再度配合ルート検索を実行するとリセットされます。</value></data>
+  <data name="LC_GRAPH_UNCHECK_STEP_DESCRIPTION" xml:space="preserve"><value>クリックしてこの手順を未完了に戻します。
+これは表示上の操作のみで、配合ルート検索や見積もりには影響しません。</value></data>
+  <data name="LC_NAV_BACK_TO_SAVE_SELECTOR" xml:space="preserve"><value>セーブデータ選択に戻る</value></data>
+  <data name="LC_NAV_FORCE_CHECK_UPDATES" xml:space="preserve"><value>アップデートを確認</value></data>
+  <data name="LC_NAV_OPEN_IN_SOLVER" xml:space="preserve"><value>配合ルート検索で開く</value></data>
+  <data name="LC_SAVE_KIND_TITLE_LOCAL_FILES" xml:space="preserve"><value>ローカルファイル</value></data>
+  <data name="LC_SAVE_KIND_TITLE_STEAM" xml:space="preserve"><value>Steam</value></data>
+  <data name="LC_SAVE_KIND_TITLE_XBOX" xml:space="preserve"><value>Xbox</value></data>
+  <data name="LC_SAVE_KIND_TITLE_VIRTUAL" xml:space="preserve"><value>仮想セーブ</value></data>
+  <data name="LC_UPDATES_CHECK_RESULT_FAILED" xml:space="preserve"><value>最新バージョンを取得できませんでした。時間をおいて再試行してください。</value></data>
+  <data name="LC_UPDATES_CHECK_RESULT_ON_LATEST" xml:space="preserve"><value>Pal Calcは最新です！</value></data>
+  <data name="LC_UPDATES_CHECK_OPTION_SKIP" xml:space="preserve"><value>このバージョンをスキップ</value></data>
+  <data name="LC_UPDATES_CHECK_BODY" xml:space="preserve"><value>Pal Calc {Version} が利用可能です。ダウンロードページを開きますか？</value></data>
+  <data name="LC_HELP" xml:space="preserve"><value>ヘルプ</value></data>
+  <data name="LC_SAVE_LOCATION_STEAM_INSTALL" xml:space="preserve"><value>Steamのセーブファイルが見つかりません。Palworldをインストールして一度起動すると、Steamがセーブファイルを自動的にダウンロードします。</value></data>
+  <data name="LC_LOCATION_MANUAL_SAVES_INSTRUCTIONS" xml:space="preserve"><value>手動で共有されたセーブファイルはここから追加できます。Palworldのセーブデータは、次を含むフォルダです。
+
+1. Level.sav - メインのセーブデータです。
+2. LevelMeta.sav - ホストのプレイヤー名やゲーム内の日数などの情報です。
+3. 1つ以上の.savファイルを含むPlayerフォルダ - 各プレイヤーと、そのプレイヤーが所有する保管場所を識別します。
+
+Level.savは必須です。Pal Calcはその他のファイルがあると便利ですが、なくても動作します。
+
+P2Pマルチプレイ（「マルチプレイ」が「オン」）では、ホストがPal CalcでセーブファイルをZIPにエクスポートして他のプレイヤーと共有できます。
+
+専用サーバーでは、これらのファイルを手動で集める必要があります。サーバーホストにコピーを依頼してください。セーブファイルは通常、サーバーデータのバックアップに含まれています。</value></data>
+  <data name="LC_LOCATION_FAKE_SAVES_INSTRUCTIONS" xml:space="preserve"><value>「仮想セーブ」は、セーブデータをPal Calcへ読み込めないプレイヤー用の代替データです（例: PlayStationのセーブデータ、またはサーバーホストがセーブデータを提供しないサーバーのセーブデータ）。
+
+他のセーブデータ形式と同様に、セーブデータ確認（「選択中のセーブ」メニュー → 「確認」）を使って、配合ルート検索で使用するパルを手動追加できます。左側の「保管場所」にある「カスタムコンテナ」からパルを追加・編集してください。</value></data>
+  <data name="LC_LOCATION_STEAM_INSTRUCTIONS" xml:space="preserve"><value>Pal CalcはSteamが管理する標準的なセーブファイルを自動検出します。Palworldのセーブデータを持つユーザーごとに、Steamの場所がPal Calcに表示されます。
+
+他人のマルチプレイワールドに接続した場合、Palworldは完全なセーブファイルをダウンロードしません。データを手動で収集し、「ローカルファイル」に追加する必要があります。詳しくはそちらの説明をご覧ください。</value></data>
+  <data name="LC_LOCATION_XBOX_INSTRUCTIONS" xml:space="preserve"><value>Pal CalcはXbox Game Passが管理する標準的なセーブファイルを自動検出します。Palworldのセーブデータを持つユーザーごとに、Xboxの場所がPal Calcに表示されます。
+
+他人のマルチプレイワールドに接続した場合、Palworldは完全なセーブファイルをダウンロードしません。データを手動で収集し、「ローカルファイル」に追加する必要があります。詳しくはそちらの説明をご覧ください。</value></data>
+  <data name="LC_SELECTED_SAVE" xml:space="preserve"><value>選択中のセーブデータ</value></data>
+  <data name="LC_SAVE_PROPERTY_PLAYER_NAME" xml:space="preserve"><value>プレイヤー</value></data>
+  <data name="LC_SAVE_PROPERTY_PLAYER_LEVEL" xml:space="preserve"><value>レベル</value></data>
+  <data name="LC_SAVE_PROPERTY_WORLD_NAME" xml:space="preserve"><value>ワールド</value></data>
+  <data name="LC_SAVE_PROPERTY_WORLD_DAY" xml:space="preserve"><value>日数</value></data>
+  <data name="LC_SAVE_PROPERTY_LAST_MODIFIED" xml:space="preserve"><value>更新日時</value></data>
+  <data name="LC_SAVE_PROPERTY_SAVE_ID" xml:space="preserve"><value>ゲームID</value></data>
+  <data name="LC_PALWORLD_SAVE_FILES" xml:space="preserve"><value>Palworld セーブファイル</value></data>
+  <data name="LC_RESET_UI_LAYOUT" xml:space="preserve"><value>画面レイアウトをリセット</value></data>
+  <data name="LC_UI_LAYOUT_RESET_NOTICE" xml:space="preserve"><value>保存されたウィンドウとパネルの配置をリセットしました。次回Pal Calcの起動時に初期配置が使用されます。</value></data>
 </root>
