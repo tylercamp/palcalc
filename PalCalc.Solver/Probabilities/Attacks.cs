@@ -40,6 +40,8 @@ public static class Attacks
         if (requiredAttack.Equals(first) || requiredAttack.Equals(second))
             return new(requiredAttack, requiredAttack, 1f / count);
 
+        // No desired attacks are available for inheritance, use a generic fallback result
+
         return Fallback(db, child, first, second);
     }
 

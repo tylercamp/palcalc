@@ -69,16 +69,6 @@
             TextSearch.TextPath="Name.Value"
             ItemTemplate="{StaticResource ActiveTemplate}"
             />
-        <Button
-            Grid.Column="4"
-            Command="{Binding ClearRequiredAttackCommand}"
-            IsEnabled="{Binding CurrentPalSpecifier.HasRequiredAttack}"
-            Padding="2"
-            Background="{x:Null}"
-            BorderBrush="{x:Null}"
-            >
-            <materialIcons:MaterialIcon Kind="HighlightOff" Width="15" />
-        </Button>
     </Grid>
     <GroupBox adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="{x:Null}" Margin="0,5,0,0">
         <GroupBox.Header>

@@ -57,9 +57,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public ActiveSkill ModelObject { get; }
 
-        public ImageSource SkillElementImage => ModelObject.Element == null
-            ? SkillElementIcon.DefaultImage
-            : SkillElementIcon.Images.GetValueOrElse(ModelObject.Element.InternalName, SkillElementIcon.DefaultImage);
+        public ImageSource SkillElementImage => SkillElementIcon.Images.GetValueOrElse(ModelObject.Element?.InternalName, SkillElementIcon.DefaultImage);
 
         public ILocalizedText Name { get; }
     }

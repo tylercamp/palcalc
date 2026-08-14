@@ -17,11 +17,11 @@ namespace PalCalc.Model
         public static Pal ToPal(this PalId id, PalDB db) => db.PalsById.GetValueFromAny(id, id.InvertedVariant);
         public static Pal ToPal(this PalId id, IEnumerable<Pal> pals) => pals.Single(p => p.Id == id);
 
-        private static PassiveSkill RAND_REF = new RandomPassiveSkill();
+        private static PassiveSkill PASSIVE_RAND_REF = new RandomPassiveSkill();
         public static PassiveSkill ToStandardPassive(this string s, PalDB db)
         {
             if (s == null) return null;
-            else if (s == RAND_REF.Name) return new RandomPassiveSkill();
+            else if (s == PASSIVE_RAND_REF.Name) return new RandomPassiveSkill();
             else if (db.StandardPassiveSkillsByName.ContainsKey(s)) return db.StandardPassiveSkillsByName[s];
             else if (db.StandardPassiveSkills.Any(t => t.InternalName == s)) return db.StandardPassiveSkills.Single(t => t.InternalName == s);
             else return new UnrecognizedPassiveSkill(s);
@@ -29,13 +29,19 @@ namespace PalCalc.Model
         public static PassiveSkill InternalToStandardPassive(this string s, PalDB db)
         {
             if (s == null) return null;
-            else if (s == RAND_REF.InternalName) return new RandomPassiveSkill();
+            else if (s == PASSIVE_RAND_REF.InternalName) return new RandomPassiveSkill();
             else return db.StandardPassiveSkills.SingleOrDefault(t => t.InternalName == s) ?? new UnrecognizedPassiveSkill(s);
         }
 
         public static PalElement ToElement(this string s, PalDB db) => db.Elements.SingleOrDefault(el => el.InternalName == s) ?? new UnrecognizedPalElement(s);
 
-        public static ActiveSkill InternalToActive(this string s, PalDB db) => db.ActiveSkills.SingleOrDefault(a => a.InternalName == s) ?? new UnrecognizedActiveSkill(s);
+        private static ActiveSkill ACTIVE_RAND_REF = new RandomActiveSkill();
+        public static ActiveSkill InternalToActive(this string s, PalDB db)
+        {
+            if (s == null) return null;
+            else if (s == ACTIVE_RAND_REF.InternalName) return new RandomActiveSkill();
+            else return db.ActiveSkills.SingleOrDefault(a => a.InternalName == s) ?? new UnrecognizedActiveSkill(s);
+        }
 
         public static PalGender OppositeGender(this PalGender gender)
         {

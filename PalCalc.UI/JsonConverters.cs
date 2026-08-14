@@ -157,13 +157,8 @@ namespace PalCalc.UI
             if (token.Type == JTokenType.Null)
                 return null;
 
-            var internalName = token.Type == JTokenType.String
-                ? token.ToObject<string>()
-                : token["InternalName"]?.ToObject<string>() ?? token.ToObject<ActiveSkill>().InternalName;
-
-            return internalName == "__VIRT_RAND__"
-                ? new RandomActiveSkill()
-                : internalName?.InternalToActive(db);
+            var internalName = token.ToObject<string>();
+            return internalName.InternalToActive(db);
         }
 
         protected override void WriteTypeJson(JsonWriter writer, ActiveSkill value, JsonSerializer serializer)

@@ -24,8 +24,8 @@ public class PalSpecifierAttackTests
         };
         var viewModel = new PalSpecifierViewModel("target", target);
 
-        var json = JsonConvert.SerializeObject(viewModel, Settings(db));
-        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json, Settings(db));
+        var json = JsonConvert.SerializeObject(viewModel, ReadOnlySettings(db));
+        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json, ReadOnlySettings(db));
 
         Assert.IsNotNull(reloaded);
         Assert.AreEqual(attack.InternalName, reloaded.RequiredAttack.ModelObject.InternalName);
@@ -43,10 +43,10 @@ public class PalSpecifierAttackTests
             RequiredAttack = db.ActiveSkills.First(),
         };
         var viewModel = new PalSpecifierViewModel("target", target);
-        var json = JObject.Parse(JsonConvert.SerializeObject(viewModel, Settings(db)));
+        var json = JObject.Parse(JsonConvert.SerializeObject(viewModel, ReadOnlySettings(db)));
         json.Remove("RequiredAttack");
 
-        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json.ToString(), Settings(db));
+        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json.ToString(), ReadOnlySettings(db));
 
         Assert.IsNotNull(reloaded);
         Assert.IsNull(reloaded.RequiredAttack);
@@ -160,8 +160,8 @@ public class PalSpecifierAttackTests
             effectiveAttack: attack
         );
 
-    private static JsonSerializerSettings Settings(PalDB db) => new()
+    private static JsonSerializerSettings ReadOnlySettings(PalDB db) => new()
     {
-        Converters = { new PalSpecifierViewModelConverter(db, new GameSettings(), null) }
+        Converters = { new PalSpecifierViewModelReader(db, new GameSettings(), null) }
     };
 }

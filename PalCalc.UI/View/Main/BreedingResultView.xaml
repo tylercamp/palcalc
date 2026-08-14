@@ -127,22 +127,6 @@
                                     <Run Text="- " />
                                 </TextBlock>
                                 <TextBlock Text="{Binding Effort}" FontSize="10" Visibility="{Binding EffortVisibility}" />
-                                <TextBlock Text="{Binding AttackInheritanceProbabilityLabel}" FontSize="10" Margin="5,0,0,0">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                            <Style.Triggers>
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding AttackInheritanceProbabilityVisibility}" Value="Visible" />
-                                                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult.HasAttack}" Value="True" />
-                                                    </MultiDataTrigger.Conditions>
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                </MultiDataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
                             </StackPanel>
                             <ContentControl Content="{Binding Location}">
                                 <ContentControl.Resources>
