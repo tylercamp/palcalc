@@ -158,6 +158,7 @@
                     Grid.Row="2"
                     />
 
+                <!-- TODO: Bind the future attack collection description when multiple required attacks are supported. -->
                 <StackPanel
                     Grid.Row="3"
                     Orientation="Horizontal"

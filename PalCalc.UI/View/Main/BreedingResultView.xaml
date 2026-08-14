@@ -27,6 +27,7 @@
             <c:ValueBoolConverter x:Key="VBC" />
             <c:ValueBoolConverter x:Key="VBC_Negated" Negate="True" />
             <c:ValueVisibilityConverter x:Key="VVC" />
+            <c:CollectionVisibilityConverter x:Key="CVC" />
 
             <Style TargetType="Label">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
@@ -115,10 +116,11 @@
                                 <!-- Placeholder to ensure we have enough space for the "Is Complete" checkbox -->
                                 <Border Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}" Width="16" Margin="0,0,8,0" Height="0" />
                             </StackPanel>
+                            <!-- TODO: Render an attack collection when solver results support multiple actual attacks. -->
                             <vp:ActiveSkillView
                                 DataContext="{Binding ActualAttack}"
                                 Margin="0,2,0,0"
-                                Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult.HasAttack, Converter={StaticResource VVC}}"
+                                Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult.EffectiveAttacks.Attacks, Converter={StaticResource CVC}}"
                                 />
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">

@@ -25,6 +25,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         {
             Value = node;
             Pal = PalViewModel.Make(node.PalRef.Pal);
+            // TODO: Replace singular actual/effective attack properties with collections when solver references support multiple attacks.
             ActualAttack = ActiveSkillViewModel.Make(node.PalRef.ActualAttack);
             EffectiveAttack = ActiveSkillViewModel.Make(node.PalRef.EffectiveAttack);
             PassiveSkills = node.PalRef.ActualPassives.Select(PassiveSkillViewModel.Make).ToList();

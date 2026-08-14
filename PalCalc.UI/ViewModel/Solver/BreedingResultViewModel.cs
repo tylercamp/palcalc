@@ -93,6 +93,11 @@ namespace PalCalc.UI.ViewModel.Solver
                 Graph = BreedingGraph.FromPalReference(source, settings, displayedResult);
                 EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
 
+                if (DisplayedResult.EffectiveAttack != null)
+                    EffectiveAttacks = new AttackSkillCollectionViewModel([ActiveSkillViewModel.Make(DisplayedResult.EffectiveAttack)]);
+                else
+                    EffectiveAttacks = new AttackSkillCollectionViewModel([]);
+
                 IVs = IVSetViewModel.FromIVs(displayedResult.IVs);
 
                 var validIVs = new[]
@@ -193,6 +198,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public IPalReference DisplayedResult { get; }
 
         public PassiveSkillCollectionViewModel EffectivePassives { get; }
+        public AttackSkillCollectionViewModel EffectiveAttacks { get; }
 
         public TimeSpan TimeEstimate => DisplayedResult?.BreedingEffort ?? TimeSpan.Zero;
         public string TimeEstimateLabel => TimeEstimate.TimeSpanSecondsStr();

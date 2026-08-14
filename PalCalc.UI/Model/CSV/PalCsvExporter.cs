@@ -34,14 +34,14 @@ namespace PalCalc.UI.Model.CSV
         {
             public List<string> ColumnsReservations(IEnumerable<PalInstanceViewModel> items)
             {
-                var maxActives = items.Select(i => i.ModelObject.ActiveSkills.Count).DefaultIfEmpty(0).Max();
+                var maxActives = items.Select(i => i.ActiveSkills.Attacks.Count).DefaultIfEmpty(0).Max();
                 return [
                     LocalizationCodes.LC_COMMON_ATTACK_SKILLS.Bind().Value,
                     .. Enumerable.Repeat("", maxActives - 1)
                 ];
             }
 
-            public List<string> ValuesOf(PalInstanceViewModel item) => item.ActiveSkills.Select(s => s.Name.Value).ToList();
+            public List<string> ValuesOf(PalInstanceViewModel item) => item.ActiveSkills.Attacks.Select(s => s.Name.Value).ToList();
         }
 
         public static string Export(CachedSaveGame csg, GameSettings settings)

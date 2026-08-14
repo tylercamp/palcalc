@@ -91,6 +91,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         [ObservableProperty]
         private PalViewModel targetPal;
 
+        // TODO: Replace the singular required attack with an AttackSkillCollectionViewModel when the solver supports multiple required attacks.
         [ObservableProperty]
         private ActiveSkillViewModel requiredAttack;
 

@@ -33,6 +33,7 @@ namespace PalCalc.Model
 
         public static V GetValueOrElse<K, V>(this IDictionary<K, V> dict, K key, V fallback)
         {
+            if (key == null) return fallback;
             if (dict.ContainsKey(key)) return dict[key];
             else return fallback;
         }

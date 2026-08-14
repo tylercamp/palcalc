@@ -738,6 +738,7 @@ namespace PalCalc.UI
     // NOTE - This converter injects other converters (namely BreedingResultListViewModelConverter) whose dependents
     //        expect a specific pal target. Multiple PalSpecifierViewModels should _not_ be stored in the same JSON
     //        data, and JsonSerializers should either be reset or newly created during each operation.
+    // TODO: Serialize and deserialize an attack collection when PalSpecifier supports multiple required attacks.
     internal sealed class PalSpecifierViewModelReader : PalReadOnlyConverterBase<PalSpecifierViewModel>
     {
         private readonly CachedSaveGame source;
@@ -824,6 +825,7 @@ namespace PalCalc.UI
             {
                 new PalViewModelConverter(db, gameSettings),
                 new PassiveSkillViewModelConverter(db, gameSettings),
+                new ActiveSkillViewModelConverter(db, gameSettings),
                 new ILocalizedTextConverter(db, gameSettings),
             };
         }

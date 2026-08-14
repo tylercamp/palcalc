@@ -61,6 +61,7 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
+        <!-- TODO: Replace the single attack selector with a collection editor when multiple required attacks are supported. -->
         <Label Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" Style="{StaticResource ComboBoxAlignedLabelStyle}" />
         <dnkc:AutoCompleteComboBox
             Grid.Column="2"

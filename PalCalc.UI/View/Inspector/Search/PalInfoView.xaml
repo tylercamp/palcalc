@@ -66,7 +66,7 @@
 
             <StackPanel Margin="0,0,25,0">
                 <Label HorizontalAlignment="Center" FontWeight="Bold" Padding="1" Margin="0,0,0,4" Content="{itl:LocalizedText Code=LC_COMMON_EQUIPPED_ATTACK_SKILLS}" />
-                <ItemsControl ItemsSource="{Binding PalInstance.EquippedActiveSkills}">
+                <ItemsControl ItemsSource="{Binding PalInstance.EquippedActiveSkills.Attacks}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="mvm:ActiveSkillViewModel">
                             <vp:ActiveSkillView DataContext="{Binding}" Width="175" Height="22" Margin="0,0,0,4" />
@@ -93,7 +93,7 @@
         </WrapPanel>
         <StackPanel Margin="0,5,0,0">
             <Label FontWeight="Bold" Padding="1" Content="{itl:LocalizedText Code=LC_COMMON_ALL_ATTACK_SKILLS}" />
-            <ItemsControl ItemsSource="{Binding PalInstance.ActiveSkills}">
+            <ItemsControl ItemsSource="{Binding PalInstance.ActiveSkills.Attacks}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
