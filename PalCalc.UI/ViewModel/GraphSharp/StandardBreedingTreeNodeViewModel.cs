@@ -113,10 +113,6 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         public int AvgRequiredAttempts => (Value.PalRef as BredPalReference)?.AvgRequiredBreedings ?? 0;
         public ILocalizedText AvgRequiredAttemptsDescription { get; }
 
-        public float? AttackInheritanceProbability => (Value.PalRef as BredPalReference)?.AttacksProbability;
-        public string AttackInheritanceProbabilityLabel => AttackInheritanceProbability is float probability ? probability.ToString("P0") : null;
-        public Visibility AttackInheritanceProbabilityVisibility => AttackInheritanceProbability.HasValue ? Visibility.Visible : Visibility.Collapsed;
-
         public Visibility AvgRequiredAttemptsVisibility => Value.PalRef is BredPalReference ? Visibility.Visible : Visibility.Collapsed;
 
         public IVSetViewModel IVs { get; }

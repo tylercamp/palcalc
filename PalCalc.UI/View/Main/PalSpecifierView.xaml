@@ -16,6 +16,7 @@
     <UserControl.Resources>
         <c:CollectionVisibilityConverter x:Key="CVC" />
         <c:IntToIVConverter x:Key="IIVC" />
+        <c:ValueVisibilityConverter x:Key="VVC" />
         <BooleanToVisibilityConverter x:Key="BVC" />
 
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
@@ -160,7 +161,7 @@
                 <StackPanel
                     Grid.Row="3"
                     Orientation="Horizontal"
-                    Visibility="{Binding HasRequiredAttack, Converter={StaticResource BVC}}"
+                    Visibility="{Binding RequiredAttack, Converter={StaticResource VVC}}"
                     >
                     <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" FontWeight="Bold" />
                     <TextBlock Text=": " />
