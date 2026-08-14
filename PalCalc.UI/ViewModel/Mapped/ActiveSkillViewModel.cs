@@ -11,6 +11,9 @@ using System.Windows.Media;
 
 namespace PalCalc.UI.ViewModel.Mapped
 {
+    // TODO - It's possible to have multiple attack skills with the same name, e.g. "Fierce Fang"
+    //        has Unique_AmaterasuWolf_Dark_Bite and Unique_BlackPuppy_Bite
+
     public class ActiveSkillViewModel
     {
         private static readonly DerivedLocalizableText<ActiveSkill> NameLocalizer = new DerivedLocalizableText<ActiveSkill>(
