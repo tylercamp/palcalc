@@ -47,7 +47,7 @@ namespace PalCalc.UI
                 .MinimumLevel.Verbose()
                 .PalCommon()
 #if RELEASE
-                .WriteTo.File(Logging.MessageFormat, $"{LogFolder}/log.txt", rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
+                .WriteTo.File(Logging.MessageFormat, $"{LogFolder}/log.txt", rollingInterval: RollingInterval.Day, levelSwitch: PCDebug.FileLogLevel)
 #endif
                 .CreateLogger();
 

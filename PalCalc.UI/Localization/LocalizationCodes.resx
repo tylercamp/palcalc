@@ -1054,4 +1054,7 @@
   <data name="LC_UI_LAYOUT_RESET_NOTICE" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_DEBUG_LOGGING" xml:space="preserve">
+    <value />
+  </data>
 </root>

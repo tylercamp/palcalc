@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.SaveReader.SaveFile;
 using PalCalc.UI.Localization;
@@ -39,6 +40,12 @@ namespace PalCalc.UI.ViewModel
                 .GetValues<TranslationLocale>()
                 .Select(l => new TranslationLocaleViewModel(l))
                 .ToList();
+
+        public bool IsDebugLoggingEnabled
+        {
+            get => PCDebug.FileLogLevel.MinimumLevel == Serilog.Events.LogEventLevel.Debug;
+            set => PCDebug.FileLogLevel.MinimumLevel = value ? Serilog.Events.LogEventLevel.Debug : PCDebug.DefaultFileLogLevel;
+        }
 
         [RelayCommand]
         private void ExportCrashLog()
