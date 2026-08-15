@@ -170,6 +170,7 @@ namespace PalCalc.SaveReader
         public static void WithDecompressedSave(Stream inputStream, Action<Stream> action)
         {
             var header = CompressedSAVHeader.Read(inputStream);
+            logger.Debug("Reading with decompression method {Type}; CompressedLength={Compressed}; UncompressedLength={Uncompressed}", header.CompressionType, header.CompressedLength, header.UncompressedLength);
 
             switch (header.CompressionType)
             {

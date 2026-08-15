@@ -1,5 +1,6 @@
 ﻿using PalCalc.SaveReader.FArchive;
 using PalCalc.SaveReader.GVAS;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +11,38 @@ namespace PalCalc.SaveReader.SaveFile
 {
     public abstract class ISaveFile(IFileSource files)
     {
+        private static ILogger logger = Log.ForContext<ISaveFile>();
+
         // ("Save Files" can sometimes be split across several actual files on disk)
         public IEnumerable<string> FilePaths => files.Content.ToList();
 
         public bool Exists => files.Content.Any(File.Exists);
 
         private bool? isValid = null;
-        public bool IsValid => isValid ??= Exists && GvasFile.IsValidGvas(files);
+        public bool IsValid
+        {
+            get
+            {
+                if (isValid == null)
+                {
+                    if (!Exists)
+                    {
+                        isValid = false;
+                        logger.Debug("One or more specified files doesn't exist: {Paths}", string.Join(", ", FilePaths));
+                    }
+                    else if (!GvasFile.IsValidGvas(files))
+                    {
+                        logger.Debug("IsValidGvas file check returned false");
+                    }
+                    else
+                    {
+                        isValid = true;
+                    }
+                }
+
+                return isValid.Value;
+            }
+        }
 
         public DateTime LastModified => files.Content.Select(File.GetLastWriteTime).Max();
 
