@@ -1,0 +1,34 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="PalCalcBreedingPopupBackgroundColor">#F5F7FA</Color>
+    <SolidColorBrush x:Key="PalCalcBreedingPopupBackgroundBrush"
+                     Color="{DynamicResource PalCalcBreedingPopupBackgroundColor}" />
+
+    <Color x:Key="PalCalcBreedingNodeBackgroundColor">#F7F8FA</Color>
+    <SolidColorBrush x:Key="PalCalcBreedingNodeBackgroundBrush"
+                     Color="{DynamicResource PalCalcBreedingNodeBackgroundColor}" />
+
+    <Color x:Key="PalCalcBreedingUncheckedIconColor">#5F6368</Color>
+    <SolidColorBrush x:Key="PalCalcBreedingUncheckedIconBrush"
+                     Color="{DynamicResource PalCalcBreedingUncheckedIconColor}" />
+
+    <Color x:Key="PalCalcBreedingCompleteColor">#2E8B57</Color>
+    <SolidColorBrush x:Key="PalCalcBreedingCompleteBrush"
+                     Color="{DynamicResource PalCalcBreedingCompleteColor}" />
+
+    <Color x:Key="PalCalcBreedingEdgeColor">#606060</Color>
+    <SolidColorBrush x:Key="PalCalcBreedingEdgeBrush"
+                     Color="{DynamicResource PalCalcBreedingEdgeColor}" />
+
+    <Color x:Key="PalCalcLocationForegroundColor">#20252B</Color>
+    <SolidColorBrush x:Key="PalCalcLocationForegroundBrush"
+                     Color="{DynamicResource PalCalcLocationForegroundColor}" />
+
+    <Color x:Key="PalCalcLocationSlotBackgroundColor">#FFFFFF</Color>
+    <SolidColorBrush x:Key="PalCalcLocationSlotBackgroundBrush"
+                     Color="{DynamicResource PalCalcLocationSlotBackgroundColor}" />
+
+    <Color x:Key="PalCalcLocationSlotBorderColor">#AEB7C2</Color>
+    <SolidColorBrush x:Key="PalCalcLocationSlotBorderBrush"
+                     Color="{DynamicResource PalCalcLocationSlotBorderColor}" />
+</ResourceDictionary>

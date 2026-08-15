@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AdonisUI;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using PalCalc.Model;
@@ -23,6 +24,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 
@@ -30,10 +32,15 @@ namespace PalCalc.UI.ViewModel
 {
     internal partial class AppToolbarViewModel(Dispatcher dispatcher) : ObservableObject
     {
+        private static readonly Uri palCalcDarkColorScheme = new("pack://application:,,,/PalCalc.UI;component/Themes/PalCalcDark.xaml", UriKind.Absolute);
+        private static readonly Uri palCalcLightColorScheme = new("pack://application:,,,/PalCalc.UI;component/Themes/PalCalcLight.xaml", UriKind.Absolute);
+
         private static ILogger logger = Log.ForContext<AppToolbarViewModel>();
 
         private static AppToolbarViewModel designerInstance;
         public static AppToolbarViewModel DesignerInstance => designerInstance ??= new(Dispatcher.CurrentDispatcher);
+
+        private Uri currentPalCalcColorScheme = palCalcDarkColorScheme;
 
         public List<TranslationLocaleViewModel> Locales { get; } =
             Enum
@@ -115,6 +122,25 @@ namespace PalCalc.UI.ViewModel
                 }, DispatcherPriority.ContextIdle);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             });
+        }
+
+        [RelayCommand]
+        private void UseDarkTheme()
+        {
+            SetTheme(ResourceLocator.DarkColorScheme, palCalcDarkColorScheme);
+        }
+
+        [RelayCommand]
+        private void UseLightTheme()
+        {
+            SetTheme(ResourceLocator.LightColorScheme, palCalcLightColorScheme);
+        }
+
+        private void SetTheme(Uri adonisColorScheme, Uri palCalcColorScheme)
+        {
+            ResourceLocator.SetColorScheme(Application.Current.Resources, adonisColorScheme);
+            ResourceLocator.SetColorScheme(Application.Current.Resources, palCalcColorScheme, currentPalCalcColorScheme);
+            currentPalCalcColorScheme = palCalcColorScheme;
         }
     }
 }
