@@ -62,7 +62,7 @@ namespace PalCalc.UI.ViewModel
                 }
             };
 
-            toolbarVM = new AppToolbarViewModel(dispatcher);
+            toolbarVM = new AppToolbarViewModel(dispatcher, settings);
 
             CachedSaveGame.SaveFileLoadError += CachedSaveGame_SaveFileLoadError;
 

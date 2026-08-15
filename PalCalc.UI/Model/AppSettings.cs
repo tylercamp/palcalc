@@ -115,6 +115,8 @@ namespace PalCalc.UI.Model
 
         public TranslationLocale Locale { get; set; } = TranslationLocale.en;
 
+        public bool IsDarkTheme { get; set; } = true;
+
         public BreedingResultListColumnSettings BreedingResultListColumns { get; set; } = new();
 
         public UiLayoutSettings UiLayout { get; set; } = new();

@@ -26,8 +26,14 @@
             </MenuItem.ItemContainerStyle>
         </MenuItem>
         <MenuItem Header="Theme" Padding="5">
-            <MenuItem Header="Light" Command="{Binding UseLightThemeCommand}" />
-            <MenuItem Header="Dark" Command="{Binding UseDarkThemeCommand}" />
+            <MenuItem Header="Light"
+                      IsCheckable="True"
+                      IsChecked="{Binding IsLightTheme, Mode=OneWay}"
+                      Command="{Binding UseLightThemeCommand}" />
+            <MenuItem Header="Dark"
+                      IsCheckable="True"
+                      IsChecked="{Binding IsDarkTheme, Mode=OneWay}"
+                      Command="{Binding UseDarkThemeCommand}" />
         </MenuItem>
         <MenuItem Header="Debug" Padding="5" Name="DebugMenuItem">
             <MenuItem Header="Translation Debugger" Click="TranslationDebugger_Click" />

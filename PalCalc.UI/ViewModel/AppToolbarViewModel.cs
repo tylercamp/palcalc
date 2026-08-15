@@ -30,7 +30,7 @@ using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 
 namespace PalCalc.UI.ViewModel
 {
-    internal partial class AppToolbarViewModel(Dispatcher dispatcher) : ObservableObject
+    internal partial class AppToolbarViewModel : ObservableObject
     {
         private static readonly Uri palCalcDarkColorScheme = new("pack://application:,,,/PalCalc.UI;component/Themes/PalCalcDark.xaml", UriKind.Absolute);
         private static readonly Uri palCalcLightColorScheme = new("pack://application:,,,/PalCalc.UI;component/Themes/PalCalcLight.xaml", UriKind.Absolute);
@@ -38,9 +38,18 @@ namespace PalCalc.UI.ViewModel
         private static ILogger logger = Log.ForContext<AppToolbarViewModel>();
 
         private static AppToolbarViewModel designerInstance;
-        public static AppToolbarViewModel DesignerInstance => designerInstance ??= new(Dispatcher.CurrentDispatcher);
+        public static AppToolbarViewModel DesignerInstance => designerInstance ??= new(Dispatcher.CurrentDispatcher, new AppSettings());
 
+        private readonly Dispatcher dispatcher;
+        private readonly AppSettings settings;
         private Uri currentPalCalcColorScheme = palCalcDarkColorScheme;
+
+        public AppToolbarViewModel(Dispatcher dispatcher, AppSettings settings)
+        {
+            this.dispatcher = dispatcher;
+            this.settings = settings;
+            ApplyTheme(settings.IsDarkTheme, saveSettings: false);
+        }
 
         public List<TranslationLocaleViewModel> Locales { get; } =
             Enum
@@ -53,6 +62,9 @@ namespace PalCalc.UI.ViewModel
             get => PCDebug.FileLogLevel.MinimumLevel == Serilog.Events.LogEventLevel.Debug;
             set => PCDebug.FileLogLevel.MinimumLevel = value ? Serilog.Events.LogEventLevel.Debug : PCDebug.DefaultFileLogLevel;
         }
+
+        public bool IsDarkTheme => settings.IsDarkTheme;
+        public bool IsLightTheme => !settings.IsDarkTheme;
 
         [RelayCommand]
         private void ExportCrashLog()
@@ -127,13 +139,28 @@ namespace PalCalc.UI.ViewModel
         [RelayCommand]
         private void UseDarkTheme()
         {
-            SetTheme(ResourceLocator.DarkColorScheme, palCalcDarkColorScheme);
+            ApplyTheme(isDarkTheme: true, saveSettings: true);
         }
 
         [RelayCommand]
         private void UseLightTheme()
         {
-            SetTheme(ResourceLocator.LightColorScheme, palCalcLightColorScheme);
+            ApplyTheme(isDarkTheme: false, saveSettings: true);
+        }
+
+        private void ApplyTheme(bool isDarkTheme, bool saveSettings)
+        {
+            SetTheme(
+                isDarkTheme ? ResourceLocator.DarkColorScheme : ResourceLocator.LightColorScheme,
+                isDarkTheme ? palCalcDarkColorScheme : palCalcLightColorScheme
+            );
+
+            settings.IsDarkTheme = isDarkTheme;
+            if (saveSettings)
+                Storage.SaveAppSettings(settings);
+
+            OnPropertyChanged(nameof(IsDarkTheme));
+            OnPropertyChanged(nameof(IsLightTheme));
         }
 
         private void SetTheme(Uri adonisColorScheme, Uri palCalcColorScheme)
