@@ -1,0 +1,22 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="BreedingPopupBackgroundColor">#F5F7FA</Color>
+    <SolidColorBrush x:Key="BreedingPopupBackgroundBrush"
+                     Color="{DynamicResource BreedingPopupBackgroundColor}" />
+
+    <Color x:Key="BreedingNodeBackgroundColor">#F7F8FA</Color>
+    <SolidColorBrush x:Key="BreedingNodeBackgroundBrush"
+                     Color="{DynamicResource BreedingNodeBackgroundColor}" />
+
+    <Color x:Key="BreedingUncheckedIconColor">#5F6368</Color>
+    <SolidColorBrush x:Key="BreedingUncheckedIconBrush"
+                     Color="{DynamicResource BreedingUncheckedIconColor}" />
+
+    <Color x:Key="BreedingCompleteColor">#2E8B57</Color>
+    <SolidColorBrush x:Key="BreedingCompleteBrush"
+                     Color="{DynamicResource BreedingCompleteColor}" />
+
+    <Color x:Key="BreedingEdgeColor">#606060</Color>
+    <SolidColorBrush x:Key="BreedingEdgeBrush"
+                     Color="{DynamicResource BreedingEdgeColor}" />
+</ResourceDictionary>

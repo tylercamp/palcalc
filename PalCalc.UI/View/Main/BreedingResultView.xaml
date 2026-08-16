@@ -85,7 +85,7 @@
                         <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Stretch">
                             <StackPanel.Resources>
                                 <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel" x:Key="LocationPopupContent">
-                                    <vu:PopupToolTipContent Background="{DynamicResource PalCalcBreedingPopupBackgroundBrush}">
+                                    <vu:PopupToolTipContent Background="{DynamicResource BreedingPopupBackgroundBrush}">
                                         <StackPanel>
                                             <!-- (some nodes, like composites, have styles which override text size - ensure consistent size in popups) -->
                                             <StackPanel.Resources>
@@ -218,7 +218,7 @@
                             <Border x:Name="NodeBorder"
                                     DataContext="{Binding Vertex, RelativeSource={RelativeSource TemplatedParent}}"
                                     BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
-                                    Background="{DynamicResource PalCalcBreedingNodeBackgroundBrush}"
+                                    Background="{DynamicResource BreedingNodeBackgroundBrush}"
                                     BorderThickness="2"
                                     CornerRadius="10,10,10,10"
                                     Padding="{TemplateBinding Padding}">
@@ -248,10 +248,10 @@
                                         <Grid>
                                             <materialIcons:MaterialIcon x:Name="UncheckedIcon"
                                                 Kind="CircleOutline"
-                                                Width="16" Height="16" Foreground="{DynamicResource PalCalcBreedingUncheckedIconBrush}" />
+                                                Width="16" Height="16" Foreground="{DynamicResource BreedingUncheckedIconBrush}" />
                                             <materialIcons:MaterialIcon x:Name="CheckedIcon"
                                                 Kind="CheckCircle"
-                                                Width="16" Height="16" Foreground="{DynamicResource PalCalcBreedingCompleteBrush}"
+                                                Width="16" Height="16" Foreground="{DynamicResource BreedingCompleteBrush}"
                                                 Visibility="Collapsed" />
                                         </Grid>
                                     </Button>
@@ -260,7 +260,7 @@
                             <ControlTemplate.Triggers>
                                 <DataTrigger Binding="{Binding IsComplete}" Value="True">
                                     <Setter TargetName="NodeContent" Property="Opacity" Value="0.4" />
-                                    <Setter TargetName="NodeBorder" Property="BorderBrush" Value="{DynamicResource PalCalcBreedingCompleteBrush}" />
+                                    <Setter TargetName="NodeBorder" Property="BorderBrush" Value="{DynamicResource BreedingCompleteBrush}" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsChecked}" Value="True">
                                     <Setter TargetName="ToggleButton" Property="Opacity" Value="1.0" />
@@ -273,7 +273,7 @@
                 </Setter>
             </Style>
             <Style TargetType="{x:Type graphSharp:EdgeControl}">
-                <Setter Property="Foreground" Value="{DynamicResource PalCalcBreedingEdgeBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource BreedingEdgeBrush}" />
                 <Setter Property="Opacity" Value="0.8" />
             </Style>
         </UserControl.Resources>
