@@ -1057,4 +1057,13 @@
   <data name="LC_DEBUG_LOGGING" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_LIBOOZ_VC_REDIST_MISSING" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LIBOOZ_VC_REDIST_BTN_DOWNLOAD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_LIBOOZ_VC_REDIST_BTN_MORE_INFO" xml:space="preserve">
+    <value />
+  </data>
 </root>

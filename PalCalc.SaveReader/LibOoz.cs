@@ -40,5 +40,23 @@ namespace PalCalc.SaveReader
                 logger.Warning("LibOoz reported a decompression error!");
             return resBuf;
         }
+
+        // libooz requires VC++ redistributable: https://aka.ms/vc14/vc_redist.x64.exe
+        // missing files cause DllNotFoundException: https://github.com/tylercamp/palcalc/issues/241
+        public static bool IsMissingDependencies
+        {
+            get
+            {
+                try
+                {
+                    Ooz_Decompress(new byte[0], 0);
+                    return false;
+                }
+                catch (DllNotFoundException)
+                {
+                    return true;
+                }
+            }
+        }
     }
 }

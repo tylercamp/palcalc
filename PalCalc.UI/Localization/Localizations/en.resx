@@ -1125,4 +1125,17 @@ When connecting to another person's multiplayer world, Palworld does not downloa
   <data name="LC_DEBUG_LOGGING" xml:space="preserve">
     <value>Debug Logging</value>
   </data>
+  <data name="LC_LIBOOZ_VC_REDIST_MISSING" xml:space="preserve">
+    <value>Microsoft Visual C++ Redistributable (x64) is not installed. This is required when reading modern Palworld saves.
+
+Would you like to download the installer now?
+
+(Pal Calc must be restarted after installation.)</value>
+  </data>
+  <data name="LC_LIBOOZ_VC_REDIST_BTN_DOWNLOAD" xml:space="preserve">
+    <value>Download Now</value>
+  </data>
+  <data name="LC_LIBOOZ_VC_REDIST_BTN_MORE_INFO" xml:space="preserve">
+    <value>More Information</value>
+  </data>
 </root>

@@ -403,6 +403,18 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_LIBOOZ_VC_REDIST_BTN_DOWNLOAD,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_LIBOOZ_VC_REDIST_BTN_MORE_INFO,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_LIBOOZ_VC_REDIST_MISSING,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_LIST_SEPARATOR,
         /// <summary>
         ///   Looks up a localized string similar to X | Y.
