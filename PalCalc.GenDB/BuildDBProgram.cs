@@ -672,6 +672,8 @@ namespace PalCalc.GenDB
             ExportImage(icons.DungeonIconSmall, "../PalCalc.UI/Resources/DungeonSmall.png", SKEncodedImageFormat.Png);
 
             ExportImage(icons.SurgeryTableIcon, "../PalCalc.UI/Resources/SurgeryTable.png", 256, 256, SKEncodedImageFormat.Png);
+
+            ExportImage(icons.PassiveSkillSpecialBackground, "../PalCalc.UI/Resources/PassiveSpecialBackground.png", SKEncodedImageFormat.Png);
         }
 
         private static void ExportPalIcons(List<Pal> pals, Dictionary<string, UTexture2D> palIcons, int iconSize)

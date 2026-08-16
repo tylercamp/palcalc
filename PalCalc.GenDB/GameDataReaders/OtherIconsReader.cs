@@ -33,6 +33,8 @@ namespace PalCalc.GenDB.GameDataReaders
         public UTexture2D DungeonIconSmall { get; set; }
 
         public UTexture2D SurgeryTableIcon { get; set; }
+
+        public UTexture2D PassiveSkillSpecialBackground { get; set; }
     }
 
     internal class OtherIconsReader
@@ -78,6 +80,8 @@ namespace PalCalc.GenDB.GameDataReaders
             result.DungeonIconSmall = provider.LoadPackageObject<UTexture2D>(AssetPaths.DUNGEON_ICON_SMALL_PATH);
 
             result.SurgeryTableIcon = provider.LoadPackageObject<UTexture2D>(AssetPaths.SURGERY_TABLE_ICON_PATH);
+
+            result.PassiveSkillSpecialBackground = provider.LoadPackageObject<UTexture2D>(AssetPaths.PASSIVE_SKILLS_SPECIAL_BACKGROUND_PATH);
 
             return result;
         }

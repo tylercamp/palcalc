@@ -283,6 +283,7 @@
     <None Remove="Resources\Pals\Smokie Cryst.png" />
     <None Remove="Resources\Pals\Smokie.png" />
     <None Remove="Resources\Pals\Snock Lux.png" />
+    <None Remove="Resources\Pals\Snock Terra.png" />
     <None Remove="Resources\Pals\Snock.png" />
     <None Remove="Resources\Pals\Snugloo.png" />
     <None Remove="Resources\Pals\Solenne.png" />
@@ -336,6 +337,7 @@
     <None Remove="Resources\Pals\Xenolord.png" />
     <None Remove="Resources\Pals\Xenovader.png" />
     <None Remove="Resources\Pals\Yakumo.png" />
+    <None Remove="Resources\PassiveSpecialBackground.png" />
     <None Remove="Resources\SkillElements\Dark.png" />
     <None Remove="Resources\SkillElements\Dragon.png" />
     <None Remove="Resources\SkillElements\Earth.png" />
@@ -647,6 +649,7 @@
     <Resource Include="Resources\Pals\Smokie Cryst.png" />
     <Resource Include="Resources\Pals\Smokie.png" />
     <Resource Include="Resources\Pals\Snock Lux.png" />
+    <Resource Include="Resources\Pals\Snock Terra.png" />
     <Resource Include="Resources\Pals\Snock.png" />
     <Resource Include="Resources\Pals\Snugloo.png" />
     <Resource Include="Resources\Pals\Solenne.png" />
@@ -700,6 +703,7 @@
     <Resource Include="Resources\Pals\Xenolord.png" />
     <Resource Include="Resources\Pals\Xenovader.png" />
     <Resource Include="Resources\Pals\Yakumo.png" />
+    <Resource Include="Resources\PassiveSpecialBackground.png" />
     <Resource Include="Resources\SkillElements\Dark.png" />
     <Resource Include="Resources\SkillElements\Dragon.png" />
     <Resource Include="Resources\SkillElements\Earth.png" />

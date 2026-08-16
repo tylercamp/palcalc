@@ -83,7 +83,7 @@ Wellness Watcher,PlayerSP_DecreaseRate_Passive,3,True
 Lucky,Rare,4,True
 Reload Master,ReloadSpeedUp_Passive,3,True
 Lightfooted,RideJumpCount_Increase1,4,True
-Skymarcher,RideJumpCount_Increase2,4,True
+Sky Strider,RideJumpCount_Increase2,4,True
 Shabby,SalePrice_Down_1,-1,True
 Noble,SalePrice_Up_1,3,True
 Fine Furs,SalePrice_Up_2,1,True
@@ -111,7 +111,7 @@ Twin-Edged Holy Blade,WorldTree_ATK,5,True
 God of Destruction,WorldTree_ATK_DEF,5,True
 Demon’s Hand,WorldTree_CraftSpeed,5,True
 Sanctified Meat Shield,WorldTree_DEF,5,True
-World Tree Seedbed,WorldTree_FullStomach,5,True
+World Tree's Bounty,WorldTree_FullStomach,5,True
 Dimensional Leap,WorldTree_MoveSpeed,5,True
 Hermit Sage,WorldTree_Sanity,5,True
 en Text,AccuracyDecrease,1,False
@@ -364,7 +364,7 @@ AttackUpTrainer_IfAttackerPoison,AttackUpTrainer_IfAttackerPoison,1,False
 AttackUpTrainer_IfAttackerWetness,AttackUpTrainer_IfAttackerWetness,1,False
 AutoHPRegeneRateUP,AutoHPRegeneRateUP,1,False
 AvoidDurationUp_EquipSkill_1,AvoidDurationUp_EquipSkill_1,1,False
-Extended Dodge Immunity,AvoidDurationUp_EquipSkill_2,1,False
+Extended Dodge Invincibility,AvoidDurationUp_EquipSkill_2,1,False
 AvoidDurationUp_PartnerSkill_1,AvoidDurationUp_PartnerSkill_1,1,False
 AvoidDurationUp_PartnerSkill_2,AvoidDurationUp_PartnerSkill_2,1,False
 AvoidDurationUp_PartnerSkill_RedFlowerBird_1,AvoidDurationUp_PartnerSkill_RedFlowerBird_1,1,False
@@ -1162,7 +1162,7 @@ FoxExorcist_PlayerInflictEffect_PartnerSkill_2,FoxExorcist_PlayerInflictEffect_P
 FoxExorcist_PlayerInflictEffect_PartnerSkill_3,FoxExorcist_PlayerInflictEffect_PartnerSkill_3,1,False
 FoxExorcist_PlayerInflictEffect_PartnerSkill_4,FoxExorcist_PlayerInflictEffect_PartnerSkill_4,1,False
 FoxExorcist_PlayerInflictEffect_PartnerSkill_5,FoxExorcist_PlayerInflictEffect_PartnerSkill_5,1,False
-Party Pals Bond Boost,FriendshipPoint_Increase_EquipSkill,-1,False
+Party Pal Trust Boost,FriendshipPoint_Increase_EquipSkill,-1,False
 FullStomach_Down_1_BossDefeat,FullStomach_Down_1_BossDefeat,1,False
 FullStomatch_Decrease_BaseCamp_1,FullStomatch_Decrease_BaseCamp_1,0,False
 FullStomatch_Decrease_BaseCamp_2,FullStomatch_Decrease_BaseCamp_2,0,False
