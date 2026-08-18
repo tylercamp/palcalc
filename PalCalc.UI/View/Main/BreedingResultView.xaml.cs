@@ -6,6 +6,7 @@ using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace PalCalc.UI.View.Main
     /// </summary>
     public partial class BreedingResultView : UserControl
     {
-        private const int CacheRefreshBatchSize = 6;
+        private const double CacheRefreshZoomRatio = 1.25;
 
         private readonly Queue<VertexControl> pendingCacheRefresh = new();
         private bool isCacheRefreshActive;
@@ -68,7 +69,19 @@ namespace PalCalc.UI.View.Main
         public BreedingResultView()
         {
             InitializeComponent();
-            Unloaded += (_, _) => StopCacheRefresh();
+            Loaded += BreedingResultView_Loaded;
+            Unloaded += BreedingResultView_Unloaded;
+        }
+
+        private void BreedingResultView_Loaded(object sender, RoutedEventArgs e)
+        {
+            CompositionTarget.Rendering += RefreshCaches;
+        }
+
+        private void BreedingResultView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            CompositionTarget.Rendering -= RefreshCaches;
+            StopCacheRefresh();
         }
 
         private void GraphZoom_ZoomSettled(object sender, EventArgs e)
@@ -86,8 +99,6 @@ namespace PalCalc.UI.View.Main
 
         private void StartCacheRefresh()
         {
-            /* Dynamically cache the rendered results when zoom animations finish */
-
             StopCacheRefresh();
 
             var dpiScale = VisualTreeHelper.GetDpi(GraphLayout).DpiScaleX;
@@ -99,29 +110,59 @@ namespace PalCalc.UI.View.Main
                 ? BitmapScalingMode.NearestNeighbor
                 : BitmapScalingMode.Linear;
 
-            foreach (var vertex in GraphLayout.Children.OfType<VertexControl>())
+            foreach (var vertex in GraphLayout.Children
+                         .OfType<VertexControl>()
+                         .OrderByDescending(IsOnScreen)
+                         .ThenByDescending(CacheScaleDifference))
                 pendingCacheRefresh.Enqueue(vertex);
 
-            if (pendingCacheRefresh.Count == 0)
-                return;
-
-            CompositionTarget.Rendering += RefreshCacheBatch;
-            isCacheRefreshActive = true;
+            isCacheRefreshActive = pendingCacheRefresh.Count > 0;
         }
 
-        private void RefreshCacheBatch(object sender, EventArgs e)
+        private void RefreshCaches(object sender, EventArgs e)
         {
-            if (Math.Abs(GraphZoom.Zoom - pendingZoom) > 0.001)
-            {
-                StopCacheRefresh();
-                return;
-            }
+            if (pendingZoom > 0 && ZoomRatio(GraphZoom.Zoom, pendingZoom) >= CacheRefreshZoomRatio)
+                StartCacheRefresh();
 
-            for (var i = 0; i < CacheRefreshBatchSize && pendingCacheRefresh.TryDequeue(out var vertex); i++)
+            if (!isCacheRefreshActive)
+                return;
+
+            if (pendingCacheRefresh.TryDequeue(out var vertex))
+            {
                 RefreshCache(vertex);
+            }
 
             if (pendingCacheRefresh.Count == 0)
                 StopCacheRefresh();
+        }
+
+        private bool IsOnScreen(VertexControl vertex)
+        {
+            if (!vertex.IsVisible || vertex.ActualWidth <= 0 || vertex.ActualHeight <= 0)
+                return false;
+
+            try
+            {
+                var bounds = vertex.TransformToAncestor(GraphZoom)
+                    .TransformBounds(new Rect(vertex.RenderSize));
+                return bounds.IntersectsWith(new Rect(GraphZoom.RenderSize));
+            }
+            catch (InvalidOperationException)
+            {
+                return false;
+            }
+        }
+
+        private double CacheScaleDifference(VertexControl vertex)
+        {
+            return vertex.CacheMode is BitmapCache { RenderAtScale: > 0 } cache
+                ? ZoomRatio(cache.RenderAtScale, pendingRenderScale)
+                : double.PositiveInfinity;
+        }
+
+        private static double ZoomRatio(double first, double second)
+        {
+            return Math.Max(first / second, second / first);
         }
 
         private void RefreshCache(VertexControl vertex)
@@ -144,12 +185,7 @@ namespace PalCalc.UI.View.Main
 
         private void StopCacheRefresh()
         {
-            if (isCacheRefreshActive)
-            {
-                CompositionTarget.Rendering -= RefreshCacheBatch;
-                isCacheRefreshActive = false;
-            }
-
+            isCacheRefreshActive = false;
             pendingCacheRefresh.Clear();
         }
     }
