@@ -11,7 +11,7 @@
              mc:Ignorable="d"
              Height="18"
              TextOptions.TextFormattingMode="Ideal"
-             d:DataContext="{d:DesignInstance mvm:PassiveSkillViewModel, IsDesignTimeCreatable=True}">
+             d:DataContext="{x:Static mvm:PassiveSkillViewModel.DesignerInstance_TN3}">
     <UserControl.Resources>
         <ResourceDictionary>
             <mvm:RankColorConverter x:Key="RCC" />
@@ -28,6 +28,9 @@
                 <GradientStop Color="#88111111" Offset="0" />
                 <GradientStop Color="#FF111111" Offset="1" />
             </LinearGradientBrush>
+            <SolidColorBrush x:Key="BasicPassiveBackgroundBrush"
+                             Color="#111217"
+                             />
             <SolidColorBrush x:Key="Tier23OverlayBrush" Color="#20FFDD00" />
             <LinearGradientBrush x:Key="Tier4OverlayBrush" StartPoint="0,0.5" EndPoint="1,0.5">
                 <GradientStop Color="#3D59BB65" Offset="0" />
@@ -112,7 +115,7 @@
     <local:SkillEntryView BorderBrush="{Binding Rank, Converter={StaticResource RCC}}" ToolTipService.ToolTip="{Binding Description.Value}" ToolTipService.ShowOnDisabled="True">
         <local:SkillEntryView.Style>
             <Style TargetType="local:SkillEntryView">
-                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Background" Value="{StaticResource BasicPassiveBackgroundBrush}" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Description, Converter={StaticResource VBC}}" Value="True">
                         <Setter Property="Cursor" Value="Hand" />
@@ -142,13 +145,13 @@
 
             <Rectangle Grid.ColumnSpan="3" Style="{StaticResource SpecialTierBackgroundStyle}" IsHitTestVisible="False" />
             
-            <!-- Note: No drop shadows on text -- they make cached bitmaps extra blurry -->
+            <!-- Note: No drop shadows on text - they make cached bitmaps extra blurry -->
 
             <Viewbox Grid.Column="0" StretchDirection="DownOnly" Stretch="Uniform" HorizontalAlignment="Left" Margin="4,2,2,2">
                 <TextBlock Text="{Binding Name.Value}" VerticalAlignment="Center">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+                            <Setter Property="Foreground" Value="#f0f0f0" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Rank}" Value="2">
                                     <Setter Property="Foreground" Value="#FFFFD83F" />

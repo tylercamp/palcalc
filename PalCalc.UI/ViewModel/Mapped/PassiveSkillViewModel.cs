@@ -93,7 +93,29 @@ namespace PalCalc.UI.ViewModel.Mapped
             allPassives = new ObservableCollection<PassiveSkillViewModel>(PalDB.LoadEmbedded().StandardPassiveSkills.Select(Make).OrderBy(p => p.Name.Value));
 
             All = new ReadOnlyObservableCollection<PassiveSkillViewModel>(allPassives);
+
+            PassiveSkillViewModel MakeTier(int tier) => new(new PassiveSkill($"Tier {tier}", $"Tier {tier}", tier), new HardCodedText($"Tier {tier}"), new HardCodedText("Description"));
+
+            DesignerInstance_TN1 = MakeTier(-1);
+            DesignerInstance_TN2 = MakeTier(-2);
+            DesignerInstance_TN3 = MakeTier(-3);
+
+            DesignerInstance_T1 = MakeTier(1);
+            DesignerInstance_T2 = MakeTier(2);
+            DesignerInstance_T3 = MakeTier(3);
+            DesignerInstance_T4 = MakeTier(4);
+            DesignerInstance_T5 = MakeTier(5);
         }
+
+        public static readonly PassiveSkillViewModel DesignerInstance_TN1;
+        public static readonly PassiveSkillViewModel DesignerInstance_TN2;
+        public static readonly PassiveSkillViewModel DesignerInstance_TN3;
+
+        public static readonly PassiveSkillViewModel DesignerInstance_T1;
+        public static readonly PassiveSkillViewModel DesignerInstance_T2;
+        public static readonly PassiveSkillViewModel DesignerInstance_T3;
+        public static readonly PassiveSkillViewModel DesignerInstance_T4;
+        public static readonly PassiveSkillViewModel DesignerInstance_T5;
 
         private static ObservableCollection<PassiveSkillViewModel> allPassives;
         public static ReadOnlyObservableCollection<PassiveSkillViewModel> All { get; }
