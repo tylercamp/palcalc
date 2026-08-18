@@ -67,6 +67,7 @@ namespace PalCalc.UI
 
             Translator.OnTranslationError += TranslationErrors.Add;
             Translator.Init();
+            PassiveSkillIcon.Initialize();
 
             Dispatcher.BeginInvoke(() =>
             {

@@ -156,13 +156,7 @@
                     </TextBlock.Style>
                 </TextBlock>
             </Viewbox>
-            <Grid Grid.Column="2">
-                <Rectangle Margin="1,2,3,2" Width="14" Height="14" Fill="{Binding Rank, Converter={StaticResource RCC}}">
-                    <Rectangle.OpacityMask>
-                        <ImageBrush ImageSource="{Binding RankIcon}" />
-                    </Rectangle.OpacityMask>
-                </Rectangle>
-            </Grid>
+            <Image Grid.Column="2" Margin="1,2,3,2" Width="14" Height="14" Source="{Binding RankIcon}" />
         </Grid>
     </local:SkillEntryView>
 </UserControl>

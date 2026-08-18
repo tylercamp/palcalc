@@ -214,6 +214,11 @@
 
             <Style TargetType="{x:Type graphSharp:VertexControl}">
                 <Setter Property="ab:DragBehaviour.IsDragEnabled" Value="False" />
+                <!--<Setter Property="CacheMode">
+                    <Setter.Value>
+                        <BitmapCache RenderAtScale="2" />
+                    </Setter.Value>
+                </Setter>-->
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type graphSharp:VertexControl}">
