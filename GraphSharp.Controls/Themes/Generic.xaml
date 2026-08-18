@@ -329,7 +329,7 @@
                                 </UniformGrid>
                                 <TextBlock HorizontalAlignment="Center" Margin="0,4,0,2">
                                     <Run Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=ZoomLabel}" />
-                                    <Run Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Zoom,StringFormat='\{0:P0}'}" />
+                                    <Run Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=DisplayZoom,StringFormat='\{0:P0}'}" />
                                 </TextBlock>
                             </StackPanel>
                         </Border>

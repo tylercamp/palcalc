@@ -36,49 +36,74 @@
                 <GradientStop Color="#3D59BB65" Offset="0" />
                 <GradientStop Color="#7A4D09CB" Offset="1" />
             </LinearGradientBrush>
+            <DrawingBrush x:Key="Tier23BackgroundBrush" Viewbox="0,0,1,1" ViewboxUnits="Absolute" Stretch="Fill">
+                <DrawingBrush.Drawing>
+                    <DrawingGroup>
+                        <GeometryDrawing Brush="{StaticResource PassiveDarkOverlayBrush}">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="0,0,1,1" />
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                        <GeometryDrawing Brush="{StaticResource Tier23OverlayBrush}">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="0,0,1,1" />
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingGroup>
+                </DrawingBrush.Drawing>
+            </DrawingBrush>
+            <DrawingBrush x:Key="Tier4BackgroundBrush" Viewbox="0,0,1,1" ViewboxUnits="Absolute" Stretch="Fill">
+                <DrawingBrush.Drawing>
+                    <DrawingGroup>
+                        <GeometryDrawing Brush="{StaticResource PassiveDarkOverlayBrush}">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="0,0,1,1" />
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                        <GeometryDrawing Brush="{StaticResource Tier4OverlayBrush}">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="0,0,1,1" />
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingGroup>
+                </DrawingBrush.Drawing>
+            </DrawingBrush>
+            <DrawingBrush x:Key="Tier5BackgroundBrush" Viewbox="0,0,1,1" ViewboxUnits="Absolute" Stretch="Fill">
+                <DrawingBrush.Drawing>
+                    <DrawingGroup>
+                        <GeometryDrawing Brush="{StaticResource PassiveDarkOverlayBrush}">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="0,0,1,1" />
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                        <GeometryDrawing Brush="{StaticResource Tier5OverlayBrush}">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="0,0,1,1" />
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingGroup>
+                </DrawingBrush.Drawing>
+            </DrawingBrush>
             <!--<DropShadowEffect x:Key="PassiveTextShadow" Color="#FF000000" BlurRadius="0" ShadowDepth="1" Direction="315" />-->
 
-            <Style x:Key="SpecialTierVisibilityStyle" TargetType="Rectangle">
+            <Style x:Key="SpecialTierBackgroundStyle" TargetType="Rectangle">
                 <Setter Property="Visibility" Value="Collapsed" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Rank}" Value="2">
                         <Setter Property="Visibility" Value="Visible" />
+                        <Setter Property="Fill" Value="{StaticResource Tier23BackgroundBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Rank}" Value="3">
                         <Setter Property="Visibility" Value="Visible" />
+                        <Setter Property="Fill" Value="{StaticResource Tier23BackgroundBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Rank}" Value="4">
                         <Setter Property="Visibility" Value="Visible" />
+                        <Setter Property="Fill" Value="{StaticResource Tier4BackgroundBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Rank}" Value="5">
                         <Setter Property="Visibility" Value="Visible" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-            <Style x:Key="Tier23VisibilityStyle" TargetType="Rectangle">
-                <Setter Property="Visibility" Value="Collapsed" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Rank}" Value="2">
-                        <Setter Property="Visibility" Value="Visible" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Rank}" Value="3">
-                        <Setter Property="Visibility" Value="Visible" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-            <Style x:Key="Tier4VisibilityStyle" TargetType="Rectangle">
-                <Setter Property="Visibility" Value="Collapsed" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Rank}" Value="4">
-                        <Setter Property="Visibility" Value="Visible" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-            <Style x:Key="Tier5VisibilityStyle" TargetType="Rectangle">
-                <Setter Property="Visibility" Value="Collapsed" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Rank}" Value="5">
-                        <Setter Property="Visibility" Value="Visible" />
+                        <Setter Property="Fill" Value="{StaticResource Tier5BackgroundBrush}" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -102,13 +127,9 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!--<Rectangle HorizontalAlignment="Stretch" Grid.ColumnSpan="3" Fill="{StaticResource PassiveSpecialBackgroundBrush}" Style="{StaticResource SpecialTierVisibilityStyle}" IsHitTestVisible="False" />-->
-            <Rectangle Grid.ColumnSpan="3" Fill="{StaticResource PassiveDarkOverlayBrush}" Style="{StaticResource SpecialTierVisibilityStyle}" IsHitTestVisible="False" />
-            <Rectangle Grid.ColumnSpan="3" Fill="{StaticResource Tier23OverlayBrush}" Style="{StaticResource Tier23VisibilityStyle}" IsHitTestVisible="False" />
-            <Rectangle Grid.ColumnSpan="3" Fill="{StaticResource Tier4OverlayBrush}" Style="{StaticResource Tier4VisibilityStyle}" IsHitTestVisible="False" />
-            <Rectangle Grid.ColumnSpan="3" Fill="{StaticResource Tier5OverlayBrush}" Style="{StaticResource Tier5VisibilityStyle}" IsHitTestVisible="False" />
+            <Rectangle Grid.ColumnSpan="3" Style="{StaticResource SpecialTierBackgroundStyle}" IsHitTestVisible="False" />
 
-            <Viewbox Grid.Column="0" StretchDirection="Both" Stretch="Uniform" HorizontalAlignment="Left" Margin="4,2,2,2">
+            <Viewbox Grid.Column="0" StretchDirection="DownOnly" Stretch="Uniform" HorizontalAlignment="Left" Margin="4,2,2,2">
                 <TextBlock Text="{Binding Name.Value}" VerticalAlignment="Center">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
@@ -136,13 +157,11 @@
                 </TextBlock>
             </Viewbox>
             <Grid Grid.Column="2">
-                <Viewbox Margin="1,2,3,2" Stretch="Uniform" VerticalAlignment="Stretch" StretchDirection="Both">
-                    <Rectangle Width="10" Height="10" Fill="{Binding Rank, Converter={StaticResource RCC}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                        <Rectangle.OpacityMask>
-                            <ImageBrush ImageSource="{Binding RankIcon}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </Viewbox>
+                <Rectangle Margin="1,2,3,2" Width="14" Height="14" Fill="{Binding Rank, Converter={StaticResource RCC}}">
+                    <Rectangle.OpacityMask>
+                        <ImageBrush ImageSource="{Binding RankIcon}" />
+                    </Rectangle.OpacityMask>
+                </Rectangle>
             </Grid>
         </Grid>
     </local:SkillEntryView>

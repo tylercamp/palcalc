@@ -15,6 +15,7 @@
              mc:Ignorable="d" 
              xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
              xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
+             xmlns:graphSharpConverters="clr-namespace:GraphSharp.Converters;assembly=GraphSharp.Controls"
              xmlns:ab="clr-namespace:GraphSharp.AttachedBehaviours;assembly=GraphSharp.Controls"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
@@ -27,6 +28,7 @@
             <c:ValueBoolConverter x:Key="VBC" />
             <c:ValueBoolConverter x:Key="VBC_Negated" Negate="True" />
             <c:ValueVisibilityConverter x:Key="VVC" />
+            <graphSharpConverters:EdgeRouteToPathConverter x:Key="BreedingEdgeRouteToPathConverter" />
 
             <Style TargetType="Label">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
@@ -275,6 +277,39 @@
             <Style TargetType="{x:Type graphSharp:EdgeControl}">
                 <Setter Property="Foreground" Value="{DynamicResource BreedingEdgeBrush}" />
                 <Setter Property="Opacity" Value="0.8" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <!-- (Copy of the original EdgeControl template, but with the unnecessary text label removed) -->
+                        <ControlTemplate TargetType="{x:Type graphSharp:EdgeControl}">
+                            <Canvas>
+                                <Path Stroke="{TemplateBinding Foreground}"
+                                      StrokeThickness="{TemplateBinding StrokeThickness}"
+                                      Fill="{TemplateBinding Fill}"
+                                      MinWidth="1"
+                                      MinHeight="1"
+                                      ToolTip="{TemplateBinding ToolTip}">
+                                    <Path.Data>
+                                        <PathGeometry>
+                                            <PathGeometry.Figures>
+                                                <MultiBinding Converter="{StaticResource BreedingEdgeRouteToPathConverter}">
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Source.(graphSharp:GraphCanvas.X)" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Source.(graphSharp:GraphCanvas.Y)" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Source.ActualWidth" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Source.ActualHeight" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Target.(graphSharp:GraphCanvas.X)" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Target.(graphSharp:GraphCanvas.Y)" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Target.ActualWidth" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Target.ActualHeight" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="RoutePoints" />
+                                                </MultiBinding>
+                                            </PathGeometry.Figures>
+                                        </PathGeometry>
+                                    </Path.Data>
+                                </Path>
+                            </Canvas>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
         </UserControl.Resources>
         <zoom:ZoomControl Grid.Column="1"

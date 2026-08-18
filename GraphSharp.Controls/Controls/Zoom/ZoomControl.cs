@@ -70,6 +70,10 @@ namespace GraphSharp.Controls.Zoom
             DependencyProperty.Register("Zoom", typeof(double), typeof(ZoomControl),
                                         new UIPropertyMetadata(1.0, ZoomPropertyChanged));
 
+        public static readonly DependencyProperty DisplayZoomProperty =
+            DependencyProperty.Register("DisplayZoom", typeof(double), typeof(ZoomControl),
+                                        new UIPropertyMetadata(1.0));
+
         public static readonly DependencyProperty FillMarginPercentProperty =
             DependencyProperty.Register("FillMarginPercent", typeof(double), typeof(ZoomControl),
                                         new UIPropertyMetadata(0.0, FillMarginPercentChanged));
@@ -150,6 +154,12 @@ namespace GraphSharp.Controls.Zoom
                 BeginAnimation(ZoomProperty, null);
                 SetValue(ZoomProperty, value);
             }
+        }
+
+        public double DisplayZoom
+        {
+            get { return (double)GetValue(DisplayZoomProperty); }
+            private set { SetValue(DisplayZoomProperty, value); }
         }
 
         public string FillLabel
@@ -305,6 +315,7 @@ namespace GraphSharp.Controls.Zoom
             zc._scaleTransform.ScaleY = zoom;
             if (!zc._isZooming)
             {
+                zc.DisplayZoom = zoom;
                 double delta = (double)e.NewValue / (double)e.OldValue;
                 zc.TranslateX *= delta;
                 zc.TranslateY *= delta;
@@ -374,6 +385,7 @@ namespace GraphSharp.Controls.Zoom
             var animation = new DoubleAnimation(toValue, duration);
             if (dp == ZoomProperty)
             {
+                DisplayZoom = toValue;
                 _zoomAnimCount++;
                 animation.Completed += (s, args) =>
                                            {
