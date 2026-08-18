@@ -107,7 +107,7 @@ namespace PalCalc.UI.View.Main
             pendingZoom = GraphZoom.Zoom;
             pendingRenderScale = Math.Clamp(pendingZoom, 0.05, 6.0) * qualityScale;
             pendingScalingMode = dpiScale <= 1.001
-                ? BitmapScalingMode.NearestNeighbor
+                ? BitmapScalingMode.HighQuality
                 : BitmapScalingMode.Linear;
 
             foreach (var vertex in GraphLayout.Children
