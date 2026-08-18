@@ -1,4 +1,5 @@
-﻿using PalCalc.Model;
+﻿using GraphSharp.Controls;
+using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.UI.Model;
@@ -54,6 +55,30 @@ namespace PalCalc.UI.View.Main
         public BreedingResultView()
         {
             InitializeComponent();
+        }
+
+        private void GraphZoom_ZoomSettled(object sender, EventArgs e)
+        {
+            /* Dynamically cache the rendered results when zoom animations finish */
+
+            // (use a slightly higher resolution to avoid issues with bluriness)
+            var renderScale = Math.Clamp(GraphZoom.Zoom, 0.05, 3.0) * 1.5;
+
+            foreach (var vertex in GraphLayout.Children.OfType<VertexControl>())
+            {
+                if (vertex.CacheMode is not BitmapCache cache || cache.IsFrozen)
+                {
+                    cache = new BitmapCache
+                    {
+                        EnableClearType = true,
+                        SnapsToDevicePixels = true,
+                    };
+                    vertex.CacheMode = cache;
+                }
+
+                if (Math.Abs(cache.RenderAtScale - renderScale) > 0.001)
+                    cache.RenderAtScale = renderScale;
+            }
         }
     }
 }

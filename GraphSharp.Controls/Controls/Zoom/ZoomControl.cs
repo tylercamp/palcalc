@@ -93,6 +93,8 @@ namespace GraphSharp.Controls.Zoom
         private int _zoomAnimCount;
         private bool _isZooming;
 
+        public event EventHandler ZoomSettled;
+
         static ZoomControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ZoomControl), new FrameworkPropertyMetadata(typeof(ZoomControl)));
@@ -394,10 +396,11 @@ namespace GraphSharp.Controls.Zoom
                                                    return;
 
                                                var zoom = Zoom;
-                                               BeginAnimation(ZoomProperty, null);
-                                               SetValue(ZoomProperty, zoom);
-                                               _isZooming = false;
-                                           };
+                                                BeginAnimation(ZoomProperty, null);
+                                                SetValue(ZoomProperty, zoom);
+                                                _isZooming = false;
+                                                ZoomSettled?.Invoke(this, EventArgs.Empty);
+                                            };
             }
             BeginAnimation(dp, animation, HandoffBehavior.Compose);
         }

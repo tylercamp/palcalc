@@ -213,12 +213,9 @@
             </DataTemplate>
 
             <Style TargetType="{x:Type graphSharp:VertexControl}">
+                <Setter Property="UseLayoutRounding" Value="True" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
                 <Setter Property="ab:DragBehaviour.IsDragEnabled" Value="False" />
-                <!--<Setter Property="CacheMode">
-                    <Setter.Value>
-                        <BitmapCache RenderAtScale="2" />
-                    </Setter.Value>
-                </Setter>-->
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type graphSharp:VertexControl}">
@@ -317,14 +314,16 @@
                 </Setter>
             </Style>
         </UserControl.Resources>
-        <zoom:ZoomControl Grid.Column="1"
+        <zoom:ZoomControl x:Name="GraphZoom"
+                          Grid.Column="1"
                           Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}"
                           Mode="Fill"
                           FillMarginPercent="0.05"
                           FillLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_FILL}"
                           CustomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_CUSTOM}"
-                          ZoomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_PERCENT}">
-            <gsvm:BreedingGraphLayout
+                          ZoomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_PERCENT}"
+                          ZoomSettled="GraphZoom_ZoomSettled">
+            <gsvm:BreedingGraphLayout x:Name="GraphLayout"
                 Graph="{Binding Graph}"
                 AnimationLength="0"
                 IsAnimationEnabled="False"
