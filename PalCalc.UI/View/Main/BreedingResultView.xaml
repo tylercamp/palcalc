@@ -21,6 +21,7 @@
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              TextOptions.TextFormattingMode="Ideal"
+             UseLayoutRounding="True"
              d:DesignHeight="450" d:DesignWidth="800"
              >
     <UserControl DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult}" d:DataContext="{d:DesignInstance vms:BreedingResultViewModel, IsDesignTimeCreatable=True}">
@@ -31,6 +32,8 @@
             <graphSharpConverters:EdgeRouteToPathConverter x:Key="BreedingEdgeRouteToPathConverter" />
 
             <Style TargetType="Label">
+                <Setter Property="UseLayoutRounding" Value="True" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
                 <Setter Property="Padding" Value="0" />
             </Style>
@@ -215,6 +218,7 @@
             <Style TargetType="{x:Type graphSharp:VertexControl}">
                 <Setter Property="UseLayoutRounding" Value="True" />
                 <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="RenderOptions.BitmapScalingMode" Value="NearestNeighbor" />
                 <Setter Property="ab:DragBehaviour.IsDragEnabled" Value="False" />
                 <Setter Property="Template">
                     <Setter.Value>
