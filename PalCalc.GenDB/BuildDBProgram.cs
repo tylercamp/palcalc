@@ -315,6 +315,7 @@ namespace PalCalc.GenDB
                     RandomInheritanceWeight = rawPassive.LotteryWeight,
                     TrackedEffects = trackedEffects,
                     IsStandardPassiveSkill = rawPassive.IsStandardPassiveSkill,
+                    SupportsSurgery = surgeryData != null,
                     SurgeryCost = surgeryData?.Price ?? 0,
                     // ("no required item" is indicated as a value of "None", but handle nullability just in case that changes)
                     SurgeryRequiredItem = (surgeryData?.RequireItemId ?? "None") == "None" ? null : surgeryData.RequireItemId,
