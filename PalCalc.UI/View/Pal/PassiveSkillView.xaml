@@ -16,6 +16,72 @@
         <ResourceDictionary>
             <mvm:RankColorConverter x:Key="RCC" />
             <c:ValueBoolConverter x:Key="VBC" />
+
+            <!--<ImageBrush x:Key="PassiveSpecialBackgroundBrush"
+                        ImageSource="/PalCalc.UI;component/Resources/PassiveSpecialBackground.png"
+                        Stretch="UniformToFill"
+                        AlignmentX="Left"
+                        TileMode="Tile"
+                        ViewportUnits="RelativeToBoundingBox" />-->
+            <LinearGradientBrush x:Key="PassiveDarkOverlayBrush" StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#88111111" Offset="0" />
+                <GradientStop Color="#FF111111" Offset="1" />
+            </LinearGradientBrush>
+            <SolidColorBrush x:Key="Tier23OverlayBrush" Color="#20FFDD00" />
+            <LinearGradientBrush x:Key="Tier4OverlayBrush" StartPoint="0,0.5" EndPoint="1,0.5">
+                <GradientStop Color="#3D59BB65" Offset="0" />
+                <GradientStop Color="#7A5958CC" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="Tier5OverlayBrush" StartPoint="0,0.5" EndPoint="1,0.5">
+                <GradientStop Color="#3D59BB65" Offset="0" />
+                <GradientStop Color="#7A4D09CB" Offset="1" />
+            </LinearGradientBrush>
+            <!--<DropShadowEffect x:Key="PassiveTextShadow" Color="#FF000000" BlurRadius="0" ShadowDepth="1" Direction="315" />-->
+
+            <Style x:Key="SpecialTierVisibilityStyle" TargetType="Rectangle">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Rank}" Value="2">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Rank}" Value="3">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Rank}" Value="4">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Rank}" Value="5">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="Tier23VisibilityStyle" TargetType="Rectangle">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Rank}" Value="2">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Rank}" Value="3">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="Tier4VisibilityStyle" TargetType="Rectangle">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Rank}" Value="4">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="Tier5VisibilityStyle" TargetType="Rectangle">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Rank}" Value="5">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <local:SkillEntryView Background="Transparent" BorderBrush="{Binding Rank, Converter={StaticResource RCC}}" ToolTipService.ToolTip="{Binding Description.Value}" ToolTipService.ShowOnDisabled="True">
@@ -36,8 +102,38 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Viewbox Grid.Column="0" StretchDirection="Both" Stretch="Uniform" HorizontalAlignment="Left" Margin="0,2,2,2">
-                <TextBlock Text="{Binding Name.Value}" VerticalAlignment="Center" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+            <!--<Rectangle HorizontalAlignment="Stretch" Grid.ColumnSpan="3" Fill="{StaticResource PassiveSpecialBackgroundBrush}" Style="{StaticResource SpecialTierVisibilityStyle}" IsHitTestVisible="False" />-->
+            <Rectangle Grid.ColumnSpan="3" Fill="{StaticResource PassiveDarkOverlayBrush}" Style="{StaticResource SpecialTierVisibilityStyle}" IsHitTestVisible="False" />
+            <Rectangle Grid.ColumnSpan="3" Fill="{StaticResource Tier23OverlayBrush}" Style="{StaticResource Tier23VisibilityStyle}" IsHitTestVisible="False" />
+            <Rectangle Grid.ColumnSpan="3" Fill="{StaticResource Tier4OverlayBrush}" Style="{StaticResource Tier4VisibilityStyle}" IsHitTestVisible="False" />
+            <Rectangle Grid.ColumnSpan="3" Fill="{StaticResource Tier5OverlayBrush}" Style="{StaticResource Tier5VisibilityStyle}" IsHitTestVisible="False" />
+
+            <Viewbox Grid.Column="0" StretchDirection="Both" Stretch="Uniform" HorizontalAlignment="Left" Margin="4,2,2,2">
+                <TextBlock Text="{Binding Name.Value}" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Rank}" Value="2">
+                                    <Setter Property="Foreground" Value="#FFFFD83F" />
+                                    <!--<Setter Property="Effect" Value="{StaticResource PassiveTextShadow}" />-->
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Rank}" Value="3">
+                                    <Setter Property="Foreground" Value="#FFFFD83F" />
+                                    <!--<Setter Property="Effect" Value="{StaticResource PassiveTextShadow}" />-->
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Rank}" Value="4">
+                                    <Setter Property="Foreground" Value="#FF68FFD8" />
+                                    <!--<Setter Property="Effect" Value="{StaticResource PassiveTextShadow}" />-->
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Rank}" Value="5">
+                                    <Setter Property="Foreground" Value="#FF68FFD8" />
+                                    <!--<Setter Property="Effect" Value="{StaticResource PassiveTextShadow}" />-->
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </Viewbox>
             <Grid Grid.Column="2">
                 <Viewbox Margin="1,2,3,2" Stretch="Uniform" VerticalAlignment="Stretch" StretchDirection="Both">

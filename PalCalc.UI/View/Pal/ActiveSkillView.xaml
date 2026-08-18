@@ -19,7 +19,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Viewbox Grid.Column="0" StretchDirection="Both" Stretch="Uniform" Margin="0,2,2,2" HorizontalAlignment="Left">
+            <Viewbox Grid.Column="0" StretchDirection="Both" Stretch="Uniform" Margin="4,2,2,2" HorizontalAlignment="Left">
                 <TextBlock Text="{Binding Name.Value}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
             </Viewbox>
 
