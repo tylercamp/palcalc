@@ -17,12 +17,13 @@
             <mvm:RankColorConverter x:Key="RCC" />
             <c:ValueBoolConverter x:Key="VBC" />
 
-            <!--<ImageBrush x:Key="PassiveSpecialBackgroundBrush"
+            <ImageBrush x:Key="PassiveSpecialBackgroundBrush"
                         ImageSource="/PalCalc.UI;component/Resources/PassiveSpecialBackground.png"
-                        Stretch="UniformToFill"
+                        Stretch="Fill"
                         AlignmentX="Left"
                         TileMode="Tile"
-                        ViewportUnits="RelativeToBoundingBox" />-->
+                        Viewport="0,0,148.5,18"
+                        ViewportUnits="Absolute" />
             <LinearGradientBrush x:Key="PassiveDarkOverlayBrush" StartPoint="0,0" EndPoint="0,1">
                 <GradientStop Color="#88111111" Offset="0" />
                 <GradientStop Color="#FF111111" Offset="1" />
@@ -84,7 +85,6 @@
                     </DrawingGroup>
                 </DrawingBrush.Drawing>
             </DrawingBrush>
-            <!--<DropShadowEffect x:Key="PassiveTextShadow" Color="#FF000000" BlurRadius="0" ShadowDepth="1" Direction="315" />-->
 
             <Style x:Key="SpecialTierBackgroundStyle" TargetType="Rectangle">
                 <Setter Property="Visibility" Value="Collapsed" />
@@ -109,12 +109,25 @@
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
-    <local:SkillEntryView Background="Transparent" BorderBrush="{Binding Rank, Converter={StaticResource RCC}}" ToolTipService.ToolTip="{Binding Description.Value}" ToolTipService.ShowOnDisabled="True">
+    <local:SkillEntryView BorderBrush="{Binding Rank, Converter={StaticResource RCC}}" ToolTipService.ToolTip="{Binding Description.Value}" ToolTipService.ShowOnDisabled="True">
         <local:SkillEntryView.Style>
             <Style TargetType="local:SkillEntryView">
+                <Setter Property="Background" Value="Transparent" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Description, Converter={StaticResource VBC}}" Value="True">
                         <Setter Property="Cursor" Value="Hand" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Rank}" Value="2">
+                        <Setter Property="Background" Value="{StaticResource PassiveSpecialBackgroundBrush}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Rank}" Value="3">
+                        <Setter Property="Background" Value="{StaticResource PassiveSpecialBackgroundBrush}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Rank}" Value="4">
+                        <Setter Property="Background" Value="{StaticResource PassiveSpecialBackgroundBrush}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Rank}" Value="5">
+                        <Setter Property="Background" Value="{StaticResource PassiveSpecialBackgroundBrush}" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -128,6 +141,8 @@
             </Grid.ColumnDefinitions>
 
             <Rectangle Grid.ColumnSpan="3" Style="{StaticResource SpecialTierBackgroundStyle}" IsHitTestVisible="False" />
+            
+            <!-- Note: No drop shadows on text -- they make cached bitmaps extra blurry -->
 
             <Viewbox Grid.Column="0" StretchDirection="DownOnly" Stretch="Uniform" HorizontalAlignment="Left" Margin="4,2,2,2">
                 <TextBlock Text="{Binding Name.Value}" VerticalAlignment="Center">
@@ -137,19 +152,15 @@
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Rank}" Value="2">
                                     <Setter Property="Foreground" Value="#FFFFD83F" />
-                                    <!--<Setter Property="Effect" Value="{StaticResource PassiveTextShadow}" />-->
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Rank}" Value="3">
                                     <Setter Property="Foreground" Value="#FFFFD83F" />
-                                    <!--<Setter Property="Effect" Value="{StaticResource PassiveTextShadow}" />-->
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Rank}" Value="4">
                                     <Setter Property="Foreground" Value="#FF68FFD8" />
-                                    <!--<Setter Property="Effect" Value="{StaticResource PassiveTextShadow}" />-->
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Rank}" Value="5">
                                     <Setter Property="Foreground" Value="#FF68FFD8" />
-                                    <!--<Setter Property="Effect" Value="{StaticResource PassiveTextShadow}" />-->
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
