@@ -105,7 +105,7 @@ namespace PalCalc.UI.View.Main
             var qualityScale = Math.Clamp(dpiScale, 1.0, 2.0);
 
             pendingZoom = GraphZoom.Zoom;
-            pendingRenderScale = Math.Clamp(pendingZoom, 0.05, 3.0) * qualityScale;
+            pendingRenderScale = Math.Clamp(pendingZoom, 0.05, 6.0) * qualityScale;
             pendingScalingMode = dpiScale <= 1.001
                 ? BitmapScalingMode.NearestNeighbor
                 : BitmapScalingMode.Linear;
