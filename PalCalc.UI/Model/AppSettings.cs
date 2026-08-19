@@ -43,7 +43,32 @@ namespace PalCalc.UI.Model
             "PlantSlime_Flower", // flower gumoss
         ];
 
-        public List<string> BannedSurgeryPassiveInternalNames { get; set; } = [];
+        public List<string> BannedSurgeryPassiveInternalNames { get; set; } = [
+            // Passives from Disposable Implants, which require specific items
+            // (list as of 8/2026)
+
+            "SwimSpeed_up_3", // King of the Waves
+            "Vampire", // Vampiric
+            "WorldTree_ATK", // Twin-Edged Holy Blade
+            "MoveSpeed_up_3", // Swift
+            "RideJumpCount_Increase2", // Sky Strider
+            "WorldTree_DEF", // Sanctified Meat Shield
+            "CraftSpeed_up3", // Remarkable Craftsmanship
+            "PAL_FullStomach_Down_3", // Mastery of Fasting
+            "MutationPal_Immortal", // Immortality
+            "MutationPal_Mutant", // Idiosyncratic
+            "WorldTree_Sanity", // Hermit Sage
+            "MutationPal_ExplosionResist", // Heavily Armored
+            "PAL_Sanity_Down_3", // Heart of the Immovable King
+            "WorldTree_ATK_DEF", // God of Destruction
+            "WorldTree_FullStomach", // World Tree's Bounty
+            "Stamina_Up_3", // Eternal Engine
+            "WorldTree_MoveSpeed", // Dimensional Leap
+            "Deffence_up3", // Diamond Body
+            "Demon's Hand", // Demon's Hand
+            "MutationPal_Babysitter", // Babysitter
+            "PAL_ALLAttack_up3", // Demon God
+        ];
 
         public List<Pal> BannedBredPals(PalDB db) => BannedBredPalInternalNames.Select(n => n.InternalToPal(db)).ToList();
         public List<Pal> BannedWildPals(PalDB db) => BannedWildPalInternalNames.Select(n => n.InternalToPal(db)).ToList();
