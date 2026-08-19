@@ -60,6 +60,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border CornerRadius="99"
+                                            Background="{DynamicResource BasicPassiveBackgroundBrush}"
                                             Padding="2"
                                             BorderThickness="0"
                                             VerticalAlignment="Center"

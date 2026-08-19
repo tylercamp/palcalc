@@ -105,7 +105,7 @@
             </ListBox.GroupStyle>
         </ListBox>
 
-        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" />
+        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBrush}}" />
 
         <vu:CachingContentPresenter Grid.Column="2" Content="{Binding SelectedContainer}">
             <vu:CachingContentPresenter.ContentTemplate>
@@ -143,7 +143,7 @@
             </vu:CachingContentPresenter.ContentTemplate>
         </vu:CachingContentPresenter>
 
-        <GridSplitter Grid.Column="3" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" />
+        <GridSplitter Grid.Column="3" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="5" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBrush}}" />
 
         <Grid Grid.Column="4"
               layout:GridLayoutBehavior.Key="Inspector.PropertyDetails"

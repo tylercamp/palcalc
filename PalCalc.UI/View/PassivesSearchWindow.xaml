@@ -7,8 +7,9 @@
                              xmlns:util="clr-namespace:Wpf.Util"
                              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
                              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
-                             xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
-                             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
+                              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+                              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                              xmlns:behaviors="clr-namespace:PalCalc.UI.View.Behaviors"
                              mc:Ignorable="d"
                              WindowStartupLocation="CenterOwner"
@@ -57,6 +58,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate DataType="{x:Type mvm:PassiveSkillViewModel}">
                                     <Border CornerRadius="99"
+                                            Background="{DynamicResource BasicPassiveBackgroundBrush}"
                                             Padding="2"
                                             BorderThickness="0"
                                             VerticalAlignment="Center"

@@ -28,9 +28,6 @@
                 <GradientStop Color="#88111111" Offset="0" />
                 <GradientStop Color="#FF111111" Offset="1" />
             </LinearGradientBrush>
-            <SolidColorBrush x:Key="BasicPassiveBackgroundBrush"
-                             Color="#111217"
-                             />
             <SolidColorBrush x:Key="Tier23OverlayBrush" Color="#20FFDD00" />
             <LinearGradientBrush x:Key="Tier4OverlayBrush" StartPoint="0,0.5" EndPoint="1,0.5">
                 <GradientStop Color="#3D59BB65" Offset="0" />
@@ -115,7 +112,7 @@
     <local:SkillEntryView BorderBrush="{Binding Rank, Converter={StaticResource RCC}}" ToolTipService.ToolTip="{Binding Description.Value}" ToolTipService.ShowOnDisabled="True">
         <local:SkillEntryView.Style>
             <Style TargetType="local:SkillEntryView">
-                <Setter Property="Background" Value="{StaticResource BasicPassiveBackgroundBrush}" />
+                <Setter Property="Background" Value="{DynamicResource BasicPassiveBackgroundBrush}" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Description, Converter={StaticResource VBC}}" Value="True">
                         <Setter Property="Cursor" Value="Hand" />
@@ -151,7 +148,7 @@
                 <TextBlock Text="{Binding Name.Value}" VerticalAlignment="Center">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Foreground" Value="#f0f0f0" />
+                            <Setter Property="Foreground" Value="{DynamicResource BasicPassiveForegroundBrush}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Rank}" Value="2">
                                     <Setter Property="Foreground" Value="#FFFFD83F" />

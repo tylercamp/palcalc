@@ -1,5 +1,10 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI">
+    <SolidColorBrush x:Key="GraphZoomControlsBackgroundBrush"
+                     Color="{DynamicResource {x:Static adonisUi:Colors.Layer1BackgroundColor}}"
+                     Opacity="0.85" />
+
     <Color x:Key="BreedingPopupBackgroundColor">#F5F7FA</Color>
     <SolidColorBrush x:Key="BreedingPopupBackgroundBrush"
                      Color="{DynamicResource BreedingPopupBackgroundColor}" />

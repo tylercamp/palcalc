@@ -133,7 +133,10 @@
             </TreeView>
         </GroupBox>
 
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" />
+        <GridSplitter Grid.Column="1"
+                      Width="5"
+                      HorizontalAlignment="Stretch"
+                      Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBrush}}" />
 
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>

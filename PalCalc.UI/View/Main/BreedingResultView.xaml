@@ -86,7 +86,7 @@
             <DataTemplate DataType="{x:Type gsvm:StandardBreedingTreeNodeViewModel}">
                 <StackPanel Orientation="Vertical" Margin="5" MinWidth="180" UseLayoutRounding="True">
                     <DockPanel HorizontalAlignment="Stretch">
-                        <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
+                        <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
                         <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Stretch">
                             <StackPanel.Resources>
                                 <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel" x:Key="LocationPopupContent">

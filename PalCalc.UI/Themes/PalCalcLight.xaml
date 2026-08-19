@@ -2,6 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PalCalc.UI;component/View/Main/BreedingResultView.Light.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PalCalc.UI;component/View/Pal/ActiveSkillView.Light.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PalCalc.UI;component/View/Pal/PalLocationView.Light.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PalCalc.UI;component/View/Pal/PassiveSkillView.Light.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PalCalc.UI;component/View/SaveSelectionPage.Light.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
