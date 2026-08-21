@@ -425,6 +425,81 @@ namespace PalCalc.UI.Tests
         }
     }
 
+    [TestMethod]
+    public void OwnedPalResultRoundTripPreservesRealSaveLocation()
+    {
+        var db = PalDB.LoadEmbedded();
+        var containerId = Guid.NewGuid().ToString();
+        var original = new OwnedPalReference(
+            new PalInstance
+            {
+                Pal = "Beakon".ToPal(db),
+                Location = new PalLocation
+                {
+                    ContainerId = containerId,
+                    Type = LocationType.Base,
+                    Index = 7,
+                },
+                Gender = PalGender.MALE,
+                PassiveSkills = [],
+                ActiveSkills = [],
+                EquippedActiveSkills = [],
+            },
+            [],
+            new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random));
+
+        var dto = JsonConvert.DeserializeObject<PalReferenceDto>(
+            JsonConvert.SerializeObject(ResultJsonSerializer.ToDto(original)));
+        var restored = (OwnedPalReference)ResultJsonSerializer.FromDto(
+            dto,
+            db,
+            GameSettings.Defaults,
+            new SerializableSolverSettings());
+
+        Assert.AreEqual(LocationType.Base, restored.UnderlyingInstance.Location.Type);
+        Assert.AreEqual(containerId, restored.UnderlyingInstance.Location.ContainerId);
+        Assert.AreEqual(original.UnderlyingInstance.Location.ToString(), restored.UnderlyingInstance.Location.ToString());
+    }
+
+    [TestMethod]
+    public void CustomContentsUseTheirOwningContainerLocation()
+    {
+        var db = PalDB.LoadEmbedded();
+        var pal = "Beakon".ToPal(db);
+        var dto = new SaveCustomizationsDto
+        {
+            CustomContainers =
+            [
+                new CustomContainerDto
+                {
+                    Label = "favorites",
+                    Contents =
+                    [
+                        new PalInstanceSnapshotDto
+                        {
+                            InternalName = pal.InternalName,
+                            Location = new PalLocationDto
+                            {
+                                ContainerId = "real-save-container",
+                                Type = LocationType.Palbox,
+                                Index = 2,
+                            },
+                            Gender = PalGender.MALE,
+                            PassiveSkills = [],
+                            ActiveSkills = [],
+                            EquippedActiveSkills = [],
+                        },
+                    ],
+                },
+            ],
+        };
+
+        var restored = CustomizationsJsonSerializer.ToRuntime(dto, db).CustomContainers.Single().Contents.Single();
+
+        Assert.AreEqual(LocationType.Custom, restored.Location.Type);
+        Assert.AreEqual("favorites", restored.Location.ContainerId);
+    }
+
     private static void WithTemporaryDirectory(Action<string> action)
     {
         var path = Path.Combine(Path.GetTempPath(), "palcalc-persistence-" + Guid.NewGuid().ToString("N"));

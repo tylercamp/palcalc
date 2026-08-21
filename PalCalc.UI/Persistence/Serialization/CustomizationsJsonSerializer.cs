@@ -59,15 +59,15 @@ namespace PalCalc.UI.Persistence.Serialization
             IsOnExpedition = value.IsOnExpedition,
         };
 
-        internal static PalInstance FromDto(PalInstanceSnapshotDto value, PalDB db) => FromDto(value, db, value.Location.ContainerId);
+        internal static PalInstance FromDto(PalInstanceSnapshotDto value, PalDB db) => FromDto(value, db, null);
 
-        private static PalInstance FromDto(PalInstanceSnapshotDto value, PalDB db, string owningContainerId) => new()
+        private static PalInstance FromDto(PalInstanceSnapshotDto value, PalDB db, string customContainerLabel) => new()
         {
             Pal = value.InternalName.InternalToPal(db),
             Location = new PalLocation
             {
-                ContainerId = owningContainerId,
-                Type = owningContainerId != null ? LocationType.Custom : value.Location.Type,
+                ContainerId = customContainerLabel ?? value.Location.ContainerId,
+                Type = customContainerLabel != null ? LocationType.Custom : value.Location.Type,
                 Index = value.Location.Index,
             },
             Gender = value.Gender,

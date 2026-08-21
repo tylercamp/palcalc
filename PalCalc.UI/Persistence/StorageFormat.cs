@@ -23,7 +23,7 @@ namespace PalCalc.UI.Persistence
                 return false;
 
             return Directory.EnumerateFiles(dataPath, "*", SearchOption.AllDirectories)
-                .Any(path => !string.Equals(Path.GetFileName(path), ManifestFileName, StringComparison.OrdinalIgnoreCase));
+                .Any(path => !string.Equals(Path.GetFileName(path), "settings.json", StringComparison.OrdinalIgnoreCase));
         }
     }
 
