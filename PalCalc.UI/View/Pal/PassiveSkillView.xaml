@@ -136,7 +136,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="3" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
@@ -144,10 +144,10 @@
             
             <!-- Note: No drop shadows on text - they make cached bitmaps extra blurry -->
 
-            <Viewbox Grid.Column="0" StretchDirection="DownOnly" Stretch="Uniform" HorizontalAlignment="Left" Margin="4,2,2,2">
-                <TextBlock Text="{Binding Name.Value}" VerticalAlignment="Center">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
+            <Viewbox Grid.Column="0" StretchDirection="DownOnly" Stretch="Uniform" HorizontalAlignment="Left" Margin="4,2,0,2">
+                <Label Content="{Binding Name.Value}" VerticalAlignment="Center" Margin="0" Padding="0" VerticalContentAlignment="Center">
+                    <Label.Style>
+                        <Style TargetType="Label">
                             <Setter Property="Foreground" Value="{DynamicResource BasicPassiveForegroundBrush}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Rank}" Value="2">
@@ -164,10 +164,10 @@
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </TextBlock.Style>
-                </TextBlock>
+                    </Label.Style>
+                </Label>
             </Viewbox>
-            <Image Grid.Column="2" Margin="1,2,3,2" Width="14" Height="14" Source="{Binding RankIcon}" />
+            <Image Grid.Column="2" Margin="0,0,3,0" Width="14" Height="14" Source="{Binding RankIcon}" VerticalAlignment="Center" />
         </Grid>
     </local:SkillEntryView>
 </UserControl>
