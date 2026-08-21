@@ -8,6 +8,7 @@
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d" 
              d:DesignHeight="208.272" d:DesignWidth="766.148">
     <UserControl.Resources>
@@ -27,17 +28,13 @@
         <DataTemplate DataType="{x:Type mvm:IVDirectValueViewModel}">
             <TextBlock Text="{Binding Value, Mode=OneWay}" />
         </DataTemplate>
-
-        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
-            <Setter Property="Padding" Value="0" />
-        </Style>
     </UserControl.Resources>
     <UniformGrid Columns="3">
         <StackPanel
             Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
             Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Converter={StaticResource RTOC}}"
         >
-            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_HP_SHORT}" Margin="{StaticResource SpacingMargin}" />
+            <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_IV_HP_SHORT}" Margin="{StaticResource SpacingMargin}" />
             <ContentPresenter
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Mode=OneWay}"
                 VerticalAlignment="Center"
@@ -49,7 +46,7 @@
             Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
             Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Converter={StaticResource RTOC}}"
         >
-            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK_SHORT}" Margin="{StaticResource SpacingMargin}" />
+            <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK_SHORT}" Margin="{StaticResource SpacingMargin}" />
             <ContentPresenter
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Attack, Mode=OneWay}"
                 VerticalAlignment="Center"
@@ -61,7 +58,7 @@
             Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
             Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Converter={StaticResource RTOC}}"
         >
-            <Label Content="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE_SHORT}" Margin="{StaticResource SpacingMargin}" />
+            <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE_SHORT}" Margin="{StaticResource SpacingMargin}" />
             <ContentPresenter
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_Defense, Mode=OneWay}"
                 VerticalAlignment="Center"

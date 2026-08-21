@@ -132,12 +132,26 @@
                                 Visibility="{Binding PalTarget.CurrentPalSpecifier.LatestJob, Converter={StaticResource VVC}, FallbackValue=Collapsed, Mode=OneWay}"
                                 >
                         <Grid>
-                            <ProgressBar Value="{Binding PalTarget.CurrentPalSpecifier.LatestJob.SolverProgress, Mode=OneWay}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
-                            <TextBlock Text="{Binding PalTarget.CurrentPalSpecifier.LatestJob.SolverStatusMessage.Value}" Margin="10,5,0,5" />
+                            <ProgressBar Value="{Binding PalTarget.CurrentPalSpecifier.LatestJob.SolverProgress, Mode=OneWay}"
+                                         Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2HighlightBorderBrush}}"
+                                         BorderThickness="0"
+                                         adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False"
+                                         />
+                            <TextBlock Text="{Binding PalTarget.CurrentPalSpecifier.LatestJob.SolverStatusMessage.Value}"
+                                       Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentForegroundBrush}}"
+                                       Margin="10,5,0,5"
+                                       />
                         </Grid>
                         <Grid Margin="0,0,0,0">
-                            <ProgressBar Value="{Binding PalTarget.CurrentPalSpecifier.LatestJob.StepProgress, Mode=OneWay}" adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False" />
-                            <TextBlock Text="{Binding PalTarget.CurrentPalSpecifier.LatestJob.StepStatusMessage.Value}" Margin="10,5,0,5" />
+                            <ProgressBar Value="{Binding PalTarget.CurrentPalSpecifier.LatestJob.StepProgress, Mode=OneWay}"
+                                         Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2HighlightBorderBrush}}"
+                                         BorderThickness="0"
+                                         adonisExtensions:ProgressBarExtension.IsProgressAnimationEnabled="False"
+                                         />
+                            <TextBlock Text="{Binding PalTarget.CurrentPalSpecifier.LatestJob.StepStatusMessage.Value}"
+                                       Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentForegroundBrush}}"
+                                       Margin="10,5,0,5"
+                                       />
                         </Grid>
                     </StackPanel>
 

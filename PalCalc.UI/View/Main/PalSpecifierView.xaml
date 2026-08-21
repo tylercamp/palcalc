@@ -61,7 +61,7 @@
                         Padding="5"
                         Visibility="{Binding LatestJob.IsActive, FallbackValue=Collapsed, Converter={StaticResource BVC}}">
                     <Border.Background>
-                        <SolidColorBrush Color="{DynamicResource {x:Static adonisUi:Colors.Layer0BackgroundColor}}" Opacity="0.85" />
+                        <SolidColorBrush Color="{DynamicResource {x:Static adonisUi:Colors.Layer3BorderColor}}" Opacity="0.85" />
                     </Border.Background>
 
                     <ContentControl Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"

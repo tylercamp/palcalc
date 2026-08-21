@@ -20,6 +20,7 @@
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              TextOptions.TextFormattingMode="Ideal"
              UseLayoutRounding="True"
              d:DesignHeight="450" d:DesignWidth="800"
@@ -319,6 +320,7 @@
             </Style>
         </UserControl.Resources>
         <zoom:ZoomControl x:Name="GraphZoom"
+                          adonisExtensions:LayerExtension.Layer="2"
                           Grid.Column="1"
                           Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}"
                           Mode="Fill"
