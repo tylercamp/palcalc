@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using PalCalc.Model;
 using PalCalc.SaveReader;
+using PalCalc.UI.Persistence;
+using PalCalc.UI.Persistence.Serialization;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -30,7 +32,7 @@ namespace PalCalc.UI.Model
             get
             {
                 Init();
-                return $"{DataPath}/settings.json";
+                return Path.Combine(DataPath, "settings.json");
             }
         }
 
@@ -38,14 +40,14 @@ namespace PalCalc.UI.Model
         public static string SaveCachePathFor(ISaveGame forSaveFile)
         {
             Init();
-            return $"{SaveCachePath}/{CachedSaveGame.IdentifierFor(forSaveFile)}.json";
+            return Path.Combine(SaveCachePath, $"{CachedSaveGame.IdentifierFor(forSaveFile)}.json");
         }
 
         // path for storing data associated with a specific save file
         public static string SaveFileDataPath(ISaveGame forSaveFile)
         {
             Init();
-            var path = $"{DataPath}/{CachedSaveGame.IdentifierFor(forSaveFile)}";
+            var path = Path.Combine(DataPath, CachedSaveGame.IdentifierFor(forSaveFile));
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
             return path;
         }
@@ -56,13 +58,13 @@ namespace PalCalc.UI.Model
         public static string GameSettingsPath(ISaveGame forSaveFile)
         {
             Init();
-            return SaveFileDataPath(forSaveFile) + "/game-settings.json";
+            return Path.Combine(SaveFileDataPath(forSaveFile), "game-settings.json");
         }
 
         public static string CustomContainerPath(ISaveGame forSaveFile)
         {
             Init();
-            return SaveFileDataPath(forSaveFile) + "/custom-containers.json";
+            return Path.Combine(SaveFileDataPath(forSaveFile), "custom-containers.json");
         }
 
         private static bool didInit = false;
@@ -74,24 +76,7 @@ namespace PalCalc.UI.Model
             if (!Directory.Exists(SaveCachePath)) Directory.CreateDirectory(SaveCachePath);
             if (!Directory.Exists(DataPath)) Directory.CreateDirectory(DataPath);
 
-            // migrate file locations from before beta-v0.5
-            if (Directory.Exists($"{DataPath}/results"))
-            {
-                foreach (var entry in Directory.EnumerateFileSystemEntries($"{DataPath}/results"))
-                {
-                    var newPath = $"{DataPath}/{Path.GetFileName(entry)}";
-                    if (File.GetAttributes(entry).HasFlag(FileAttributes.Directory))
-                    {
-                        Directory.Move(entry, newPath);
-                    }
-                    else
-                    {
-                        File.Move(entry, newPath);
-                    }
-                }
-
-                Directory.Delete($"{DataPath}/results");
-            }
+            StorageMigrationRunner.EnsureCurrent(DataPath);
 
             didInit = true;
         }
@@ -104,12 +89,9 @@ namespace PalCalc.UI.Model
             {
                 try
                 {
-                    var res = JsonConvert.DeserializeObject<AppSettings>(
-                        File.ReadAllText(AppSettingsPath),
-                        // `res.SolverSettings.BannedWildPalInternalNames` has a non-empty-list default value, base Newtonsoft JSON
-                        // behavior is to *MERGE* the deserialized list with the default value, leading to a bunch of duplicates.
-                        new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace }
-                    ) ?? new();
+                    var res = AppSettingsJsonSerializer.FromDto(
+                        AppSettingsJsonSerializer.FromCurrentJson(File.ReadAllText(AppSettingsPath))
+                    );
 
                     // remove duplicates caused by missing `ObjectCreationHandling` in older versions
                     res.SolverSettings.BannedBredPalInternalNames = res.SolverSettings.BannedBredPalInternalNames.Distinct().ToList();
@@ -119,10 +101,10 @@ namespace PalCalc.UI.Model
                 }
                 catch (Exception e)
                 {
-                    logger.Error(e, "error reading app settings files, resetting");
+                    logger.Error(e, "error reading app settings files, keeping the file and using defaults");
 
-                    File.Delete(AppSettingsPath);
-                    return LoadAppSettings();
+                    // Leave malformed authoritative data in place so it can be recovered manually.
+                    return new();
                 }
             }
             else
@@ -131,7 +113,15 @@ namespace PalCalc.UI.Model
             }
         }
 
-        public static void SaveAppSettings(AppSettings settings) => File.WriteAllText(AppSettingsPath, JsonConvert.SerializeObject(settings));
+        public static void SaveAppSettings(AppSettings settings)
+        {
+            if (DEBUG_DisableStorage) return;
+
+            Init();
+            var dto = AppSettingsJsonSerializer.ToDto(settings);
+            var json = AppSettingsJsonSerializer.ToJson(dto);
+            File.WriteAllText(AppSettingsPath, json);
+        }
 
         public static void ClearForSave(ISaveGame save)
         {
@@ -165,18 +155,13 @@ namespace PalCalc.UI.Model
             if (!File.Exists(filePath)) return new SaveCustomizations();
 
             SaveCustomizations res = PCDebug.HandleErrors(
-                action: () => JsonConvert.DeserializeObject<SaveCustomizations>(File.ReadAllText(filePath), new PalInstanceJsonConverter(db)),
+                action: () => CustomizationsJsonSerializer.ToRuntime(
+                    CustomizationsJsonSerializer.FromCurrentJson(File.ReadAllText(filePath)),
+                    db
+                ),
                 handleErr: (re) =>
                 {
                     logger.Warning(re, "failed to load save customizations for {label}, clearing", CachedSaveGame.IdentifierFor(forSaveGame));
-                    try
-                    {
-                        File.Delete(filePath);
-                    }
-                    catch (Exception fe)
-                    {
-                        logger.Warning(fe, "failed to delete customizations file");
-                    }
                     return null;
                 }
             );
@@ -190,10 +175,8 @@ namespace PalCalc.UI.Model
         {
             if (DEBUG_DisableStorage) return;
 
-            File.WriteAllText(
-                CustomContainerPath(forSaveGame),
-                JsonConvert.SerializeObject(custom, new PalInstanceJsonConverter(db))
-            );
+            var json = CustomizationsJsonSerializer.ToJson(CustomizationsJsonSerializer.ToDto(custom));
+            File.WriteAllText(CustomContainerPath(forSaveGame), json);
         }
 
         #region Cached Game Save Files

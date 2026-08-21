@@ -1,12 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.Model.Service;
+using PalCalc.UI.Persistence;
 using PalCalc.UI.View;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Mapped.Saves;
@@ -196,81 +195,8 @@ namespace PalCalc.UI.ViewModel
 
         private PalTargetListViewModel LoadPalTargets(SaveGameViewModel sg)
         {
-            var gameSettings = GameSettingsViewModel.Load(sg.Value).ModelObject;
             var originalCachedSave = Storage.LoadSaveFromCache(sg.Value, db);
-            var dataPath = Storage.SaveFileDataPath(sg.Value);
-
-            var targetsFolder = Storage.SaveFileTargetsDataPath(sg.Value);
-            PalTargetListViewModel result = null;
-            if (File.Exists(Path.Join(dataPath, "pal-targets.json")))
-            {
-                result = PCDebug.HandleErrors(
-                    action: () =>
-                    {
-                        // old format where pal targets were all stored in a single file, split into multiple files instead
-                        Directory.CreateDirectory(targetsFolder);
-
-                        var vmEntryConverter = new PalSpecifierViewModelReader(db, gameSettings, originalCachedSave);
-                        var oldData = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(Path.Join(dataPath, "pal-targets.json")));
-                        var oldTargets = oldData["Targets"]?.ToObject<List<PalSpecifierViewModel>>(JsonSerializer.Create(new JsonSerializerSettings() { Converters = [vmEntryConverter] }));
-
-                        foreach (var target in oldTargets)
-                        {
-                            File.WriteAllText(Path.Join(targetsFolder, $"{target.Id}.json"), JsonConvert.SerializeObject(target, vmEntryConverter));
-                        }
-
-                        var res = new PalTargetListViewModel(new PalSourceViewModel(sg, null), oldTargets);
-                        File.WriteAllText(
-                            Path.Join(dataPath, "pal-target-ids.json"),
-                            JsonConvert.SerializeObject(res, new PalTargetListViewModelWriter(db, gameSettings))
-                        );
-
-                        File.Delete(Path.Join(dataPath, "pal-targets.json"));
-                        return res;
-                    },
-                    handleErr: (ex) =>
-                    {
-                        logger.Warning(ex, "an error occurred loading the old targets list for {saveId}, skipping", CachedSaveGame.IdentifierFor(sg.Value));
-                        return new PalTargetListViewModel(new PalSourceViewModel(sg, null));
-                    }
-                );
-            }
-            else if (File.Exists(Path.Join(dataPath, "pal-target-ids.json")))
-            {
-                result = PCDebug.HandleErrors(
-                    action: () =>
-                    {
-                        var targetFiles = Directory.Exists(targetsFolder) ? Directory.EnumerateFiles(targetsFolder) : [];
-
-                        var entryConverter = new PalSpecifierViewModelReader(db, gameSettings, originalCachedSave);
-                        var targetEntries = targetFiles.Select<string, PalSpecifierViewModel>(f =>
-                        {
-                            return PCDebug.HandleErrors(
-                                action: () => JsonConvert.DeserializeObject<PalSpecifierViewModel>(File.ReadAllText(f), entryConverter),
-                                handleErr: (ex) =>
-                                {
-                                    logger.Warning(ex, "an error occurred loading target for {saveId} at {path}, skipping", CachedSaveGame.IdentifierFor(sg.Value), f);
-                                    return null;
-                                }
-                            );
-                        }).SkipNull().ToList();
-
-                        var converter = new PalTargetListViewModelReader(db, GameSettingsViewModel.Load(sg.Value).ModelObject, sg, originalCachedSave, targetEntries.ToDictionary(e => e.Id));
-                        return JsonConvert.DeserializeObject<PalTargetListViewModel>(File.ReadAllText(Path.Join(dataPath, "pal-target-ids.json")), [converter]);
-                    },
-                    handleErr: (ex) =>
-                    {
-                        logger.Warning(ex, "an error occurred loading targets list for {saveId}, skipping", CachedSaveGame.IdentifierFor(sg.Value));
-                        return new PalTargetListViewModel(new PalSourceViewModel(sg, null));
-                    }
-                );
-            }
-            else
-            {
-                result = new PalTargetListViewModel(new PalSourceViewModel(sg, null));
-            }
-
-            return result;
+            return TargetPersistenceService.Load(sg, originalCachedSave, db);
         }
 
         private void CachedSaveGame_SaveFileLoadError(ISaveGame obj, Exception ex)

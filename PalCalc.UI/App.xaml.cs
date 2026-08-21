@@ -42,8 +42,6 @@ namespace PalCalc.UI
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #endif
 
-            Storage.Init();
-
             if (!Directory.Exists(LogFolder)) Directory.CreateDirectory(LogFolder);
 
             Log.Logger = new LoggerConfiguration()
@@ -56,6 +54,10 @@ namespace PalCalc.UI
 
             logger = Log.ForContext<App>();
             logger.Information($"Pal Calc version {Version}");
+
+            // Storage initialization runs migrations. Keep logging available before it touches
+            // any authoritative data so failures are diagnosable and manifest updates stay last.
+            Storage.Init();
 
             PalDB.BeginLoadEmbedded();
             Task.Run(() =>

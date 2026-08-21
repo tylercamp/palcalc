@@ -27,10 +27,18 @@ namespace PalCalc.UI.ViewModel.Solver
 
         private void OnTreeSelectionChanged(object sender, PropertyChangedEventArgs e)
         {
+            PersistedSelectionIds = null;
             OnPropertyChanged(nameof(AvailablePals));
         }
 
         public PalSourceTreeViewModel PlayerSources { get; }
+
+        // Keep source IDs that cannot currently be resolved against cached save data. They are
+        // authoritative user input and must survive a cache refresh or a later rewrite.
+        internal List<string> PersistedSelectionIds { get; set; }
+
+        internal IEnumerable<string> SerializedSelectionIds =>
+            PersistedSelectionIds ?? PlayerSources.Selections.Select(selection => selection.SerializedId);
 
         [NotifyPropertyChangedFor(nameof(AvailablePals))]
         [ObservableProperty]

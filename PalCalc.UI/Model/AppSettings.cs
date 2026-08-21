@@ -29,24 +29,9 @@ namespace PalCalc.UI.Model
 
     public class SerializableSolverSettings
     {
-        public int MaxBreedingSteps { get; set; } = 10;
-        public int MaxSolverIterations { get; set; } = 20;
-        public int MaxWildPals { get; set; } = 1;
-        public int MaxInputIrrelevantPassives { get; set; } = 3;
-        public int MaxBredIrrelevantPassives { get; set; } = 1;
-        public int MaxThreads { get; set; } = 0;
-        public int MaxGoldCost { get; set; } = 0;
-        public bool UseGenderReversers { get; set; } = false;
-
-        public List<string> BannedBredPalInternalNames { get; set; } = [];
-        public List<string> BannedWildPalInternalNames { get; set; } = [
-            "PlantSlime_Flower", // flower gumoss
-        ];
-
-        public List<string> BannedSurgeryPassiveInternalNames { get; set; } = [
-            // Passives from Disposable Implants, which require specific items
-            // (list as of 8/2026)
-
+        // Passives from Disposable Implants, which require specific items
+        // (list as of 8/2026)
+        public static IReadOnlyList<string> DisposableImplantPassiveInternalNames { get; } = [
             "SwimSpeed_up_3", // King of the Waves
             "Vampire", // Vampiric
             "WorldTree_ATK", // Twin-Edged Holy Blade
@@ -69,6 +54,22 @@ namespace PalCalc.UI.Model
             "MutationPal_Babysitter", // Babysitter
             "PAL_ALLAttack_up3", // Demon God
         ];
+
+        public int MaxBreedingSteps { get; set; } = 10;
+        public int MaxSolverIterations { get; set; } = 20;
+        public int MaxWildPals { get; set; } = 1;
+        public int MaxInputIrrelevantPassives { get; set; } = 3;
+        public int MaxBredIrrelevantPassives { get; set; } = 1;
+        public int MaxThreads { get; set; } = 0;
+        public int MaxGoldCost { get; set; } = 0;
+        public bool UseGenderReversers { get; set; } = false;
+
+        public List<string> BannedBredPalInternalNames { get; set; } = [];
+        public List<string> BannedWildPalInternalNames { get; set; } = [
+            "PlantSlime_Flower", // flower gumoss
+        ];
+
+        public List<string> BannedSurgeryPassiveInternalNames { get; set; } = new(DisposableImplantPassiveInternalNames);
 
         public List<Pal> BannedBredPals(PalDB db) => BannedBredPalInternalNames.Select(n => n.InternalToPal(db)).ToList();
         public List<Pal> BannedWildPals(PalDB db) => BannedWildPalInternalNames.Select(n => n.InternalToPal(db)).ToList();
