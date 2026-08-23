@@ -76,7 +76,7 @@ namespace PalCalc.Solver.PalReference
             int SkillHash(PassiveSkill skill) => skill switch
             {
                 RandomPassiveSkill => 0,
-                _ => removedPassive.GetHashCode()
+                _ => skill.GetHashCode()
             };
 
             int hash = HashCode.Combine(SkillHash(removedPassive), SkillHash(addedPassive));
