@@ -11,6 +11,9 @@ namespace PalCalc.UI.Persistence.Dto
         public GameSettingsSnapshotDto GameSettings { get; init; }
         public SolverSettingsSnapshotDto SolverSettings { get; init; }
         public List<BreedingResultDto> Results { get; init; }
+
+        // Negative values retain the default selection for result lists migrated from older storage.
+        public int SelectedResultIndex { get; init; }
     }
 
     [JsonObject(ItemRequired = Required.Always)]

@@ -96,7 +96,9 @@ namespace PalCalc.UI.Tests
     {
         WithTemporaryDirectory(path =>
         {
-            File.WriteAllText(Path.Combine(path, StorageFormat.ManifestFileName), "{\"version\":3}");
+            File.WriteAllText(
+                Path.Combine(path, StorageFormat.ManifestFileName),
+                JsonConvert.SerializeObject(new StorageManifest { Version = StorageFormat.CurrentVersion + 1 }));
             File.WriteAllText(Path.Combine(path, "settings.json"), "keep");
 
             Assert.Throws<StorageFormatException>(() => StorageMigrationRunner.EnsureCurrent(path));
@@ -152,6 +154,7 @@ namespace PalCalc.UI.Tests
             CollectionAssert.AreEqual(new[] { "Swift_Internal", null, null, null }, dto.RequiredPassiveInternalNames);
             Assert.AreEqual(25, dto.MinimumIV_Attack);
             Assert.IsNotNull(dto.CurrentResults);
+            Assert.AreEqual(-1, dto.CurrentResults.SelectedResultIndex);
             Assert.AreEqual(300, dto.CurrentResults.GameSettings.BreedingTimeSeconds);
             CollectionAssert.AreEqual(
                 new[] { "Bred_Internal" },
@@ -459,6 +462,39 @@ namespace PalCalc.UI.Tests
         Assert.AreEqual(LocationType.Base, restored.UnderlyingInstance.Location.Type);
         Assert.AreEqual(containerId, restored.UnderlyingInstance.Location.ContainerId);
         Assert.AreEqual(original.UnderlyingInstance.Location.ToString(), restored.UnderlyingInstance.Location.ToString());
+    }
+
+    [TestMethod]
+    public void SelectedResultRoundTrips()
+    {
+        var db = PalDB.LoadEmbedded();
+        var pal = "Beakon".ToPal(db);
+        var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics);
+        var dto = new BreedingResultListDto
+        {
+            GameSettings = ResultJsonSerializer.ToDto(GameSettings.Defaults),
+            SolverSettings = ResultJsonSerializer.ToDto(new SerializableSolverSettings()),
+            Results =
+            [
+                new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(wild) },
+                new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(wild) },
+            ],
+            SelectedResultIndex = 1,
+        };
+
+        var json = JsonConvert.SerializeObject(dto);
+        var restoredDto = JsonConvert.DeserializeObject<BreedingResultListDto>(json);
+        Assert.AreEqual(1, restoredDto!.SelectedResultIndex);
+
+        var restored = ResultJsonSerializer.FromDto(
+            restoredDto,
+            db,
+            null,
+            GameSettings.Defaults,
+            null,
+            null,
+            null);
+        Assert.AreSame(restored.Results[1], restored.SelectedResult);
     }
 
     [TestMethod]

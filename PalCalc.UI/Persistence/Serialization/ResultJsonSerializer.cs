@@ -37,7 +37,8 @@ namespace PalCalc.UI.Persistence.Serialization
             {
                 GameSettings = ResultJsonSerializer.ToDto(settings.GameSettings ?? currentGameSettings),
                 SolverSettings = ResultJsonSerializer.ToDto(settings.SolverSettings ?? new SerializableSolverSettings()),
-                Results = (value.Results ?? []).Select(result => ToDto(result)).ToList(),
+                Results = (value.Results ?? []).Select(ToDto).ToList(),
+                SelectedResultIndex = value.Results == null ? -1 : value.Results.IndexOf(value.SelectedResult),
             };
 
             BreedingResultDto ToDto(BreedingResultViewModel result) => new()
@@ -86,6 +87,9 @@ namespace PalCalc.UI.Persistence.Serialization
                     return vm;
                 }).ToList(),
             };
+
+            if (value.SelectedResultIndex >= 0 && value.SelectedResultIndex < result.Results.Count)
+                result.SelectedResult = result.Results[value.SelectedResultIndex];
 
             return result;
         }
