@@ -263,10 +263,10 @@ namespace PalCalc.UI.Persistence.Serialization
 
         private static ISurgeryOperation FromDto(SurgeryOperationDto value, PalDB db) => value.Type switch
         {
-            "ADD_PASSIVE" => AddPassiveSurgeryOperation.NewCached(value.AddedPassiveInternalName.InternalToStandardPassive(db)),
-            "REPLACE_PASSIVE" => ReplacePassiveSurgeryOperation.NewCached(
-                value.RemovedPassiveInternalName.InternalToStandardPassive(db),
-                value.AddedPassiveInternalName.InternalToStandardPassive(db)
+            "ADD_PASSIVE" => new AddPassiveSurgeryOperation(value.AddedPassiveInternalName.InternalToStandardPassive(db)),
+            "REPLACE_PASSIVE" => new ReplacePassiveSurgeryOperation(
+                removedPassive: value.RemovedPassiveInternalName.InternalToStandardPassive(db),
+                addedPassive: value.AddedPassiveInternalName.InternalToStandardPassive(db)
             ),
             _ => throw new InvalidOperationException($"Unsupported surgery operation discriminator '{value.Type}'."),
         };

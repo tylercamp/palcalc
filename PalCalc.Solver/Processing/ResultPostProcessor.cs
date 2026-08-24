@@ -105,13 +105,13 @@ internal sealed class ResultPostProcessor(
             if (modifiedPassives.Count < GameConstants.MaxTotalPassives)
             {
                 modifiedPassives.Add(toAdd);
-                operations.Add(AddPassiveSurgeryOperation.NewCached(toAdd));
+                operations.Add(new AddPassiveSurgeryOperation(toAdd));
             }
             else if (removablePassives.TryDequeue(out var toRemove))
             {
                 modifiedPassives.Remove(toRemove);
                 modifiedPassives.Add(toAdd);
-                operations.Add(ReplacePassiveSurgeryOperation.NewCached(toRemove, toAdd));
+                operations.Add(new ReplacePassiveSurgeryOperation(toRemove, toAdd));
             }
         }
 
@@ -155,13 +155,13 @@ internal sealed class ResultPostProcessor(
                 )
                 {
                     modifiedPassives.Add(toAdd);
-                    operations.Add(AddPassiveSurgeryOperation.NewCached(toAdd));
+                    operations.Add(new AddPassiveSurgeryOperation(toAdd));
                 }
                 else if (removablePassives.TryDequeue(out var toRemove))
                 {
                     modifiedPassives.Remove(toRemove);
                     modifiedPassives.Add(toAdd);
-                    operations.Add(ReplacePassiveSurgeryOperation.NewCached(toRemove, toAdd));
+                    operations.Add(new ReplacePassiveSurgeryOperation(toRemove, toAdd));
                 }
                 else
                 {

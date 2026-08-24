@@ -32,20 +32,6 @@ namespace PalCalc.Solver.PalReference
         public override bool Equals(object obj) => obj?.GetHashCode() == GetHashCode();
 
         public override string ToString() => $"AddPassive({AddedPassive.Name})";
-
-        private static readonly ConcurrentDictionary<PassiveSkill, AddPassiveSurgeryOperation> cachedOps = [];
-        public static AddPassiveSurgeryOperation NewCached(PassiveSkill addedPassive)
-        {
-#if DEBUG_CHECKS
-            if (addedPassive is RandomPassiveSkill)
-                Debugger.Break();
-#endif
-
-            if (!cachedOps.ContainsKey(addedPassive))
-                cachedOps.TryAdd(addedPassive, new AddPassiveSurgeryOperation(addedPassive));
-
-            return cachedOps[addedPassive];
-        }
     }
 
     public class ReplacePassiveSurgeryOperation(PassiveSkill removedPassive, PassiveSkill addedPassive) : ISurgeryOperation
@@ -59,32 +45,6 @@ namespace PalCalc.Solver.PalReference
         public override bool Equals(object obj) => obj?.GetHashCode() == GetHashCode();
 
         public override string ToString() => $"ReplacePassive(rem: {RemovedPassive.Name}, add: {AddedPassive.Name})";
-
-        private static readonly ConcurrentDictionary<int, ReplacePassiveSurgeryOperation> cachedOps = [];
-        public static ReplacePassiveSurgeryOperation NewCached(PassiveSkill removedPassive, PassiveSkill addedPassive)
-        {
-#if DEBUG_CHECKS
-            if (addedPassive is RandomPassiveSkill)
-                Debugger.Break();
-#endif
-
-            // RandomPassiveSkill is reference-compared, not equality-compared, so we need to preserve exact references
-            // to any RandomPassiveSkill instances we get (and cannot cache)
-            if (removedPassive is RandomPassiveSkill || addedPassive is RandomPassiveSkill)
-                return new ReplacePassiveSurgeryOperation(removedPassive, addedPassive);
-
-            int SkillHash(PassiveSkill skill) => skill switch
-            {
-                RandomPassiveSkill => 0,
-                _ => skill.GetHashCode()
-            };
-
-            int hash = HashCode.Combine(SkillHash(removedPassive), SkillHash(addedPassive));
-            if (!cachedOps.ContainsKey(hash))
-                cachedOps.TryAdd(hash, new ReplacePassiveSurgeryOperation(removedPassive, addedPassive));
-
-            return cachedOps[hash];
-        }
     }
 
     /// <summary>
@@ -103,9 +63,6 @@ namespace PalCalc.Solver.PalReference
         public List<PassiveSkill> ActualPassives { get; }
 
         public int TotalCost { get; }
-
-        private int operationsHash;
-        private int inputHash;
 
         public SurgeryTablePalReference(IPalReference input, List<ISurgeryOperation> rawOperations)
         {
@@ -137,9 +94,6 @@ namespace PalCalc.Solver.PalReference
 
             Gender = input.Gender;
             TotalCost = input.TotalCost;
-
-            operationsHash = Operations.ListSetHash();
-            inputHash = Input.GetHashCode();
 
             // replace-passive operations are only valid when the pal's passive slots are all occupied
 #if DEBUG && DEBUG_CHECKS
@@ -242,7 +196,7 @@ namespace PalCalc.Solver.PalReference
                 {
                     if (op is ReplacePassiveSurgeryOperation rpso && numToSimplify > 0)
                     {
-                        newOperations.Add(AddPassiveSurgeryOperation.NewCached(rpso.AddedPassive));
+                        newOperations.Add(new AddPassiveSurgeryOperation(rpso.AddedPassive));
                         --numToSimplify;
                     }
                     else
@@ -277,6 +231,6 @@ namespace PalCalc.Solver.PalReference
         }
 
         public override int GetHashCode() =>
-            HashCode.Combine(nameof(SurgeryTablePalReference), inputHash, operationsHash);
+            HashCode.Combine(nameof(SurgeryTablePalReference), Input, Operations.ListSetHash());
     }
 }
