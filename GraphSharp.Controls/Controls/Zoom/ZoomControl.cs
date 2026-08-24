@@ -90,7 +90,7 @@ namespace GraphSharp.Controls.Zoom
         private TranslateTransform _translateTransform;
 
         private double _fillMarginPercent;
-        private int _zoomAnimCount;
+        private int _zoomAnimationVersion;
         private bool _isZooming;
 
         public event EventHandler ZoomSettled;
@@ -371,10 +371,10 @@ namespace GraphSharp.Controls.Zoom
             var duration = new Duration(AnimationLength);
             StartAnimation(TranslateXProperty, transformX, duration);
             StartAnimation(TranslateYProperty, transformY, duration);
-            StartAnimation(ZoomProperty, targetZoom, duration);
+            StartAnimation(ZoomProperty, targetZoom, duration, ++_zoomAnimationVersion);
         }
 
-        private void StartAnimation(DependencyProperty dp, double toValue, Duration duration)
+        private void StartAnimation(DependencyProperty dp, double toValue, Duration duration, int animationVersion = 0)
         {
             if (double.IsNaN(toValue) || double.IsInfinity(toValue))
             {
@@ -388,21 +388,19 @@ namespace GraphSharp.Controls.Zoom
             if (dp == ZoomProperty)
             {
                 DisplayZoom = toValue;
-                _zoomAnimCount++;
                 animation.Completed += (s, args) =>
                                            {
-                                               _zoomAnimCount--;
-                                               if (_zoomAnimCount > 0)
+                                               if (animationVersion != _zoomAnimationVersion)
                                                    return;
 
                                                var zoom = Zoom;
-                                                BeginAnimation(ZoomProperty, null);
-                                                SetValue(ZoomProperty, zoom);
-                                                _isZooming = false;
-                                                ZoomSettled?.Invoke(this, EventArgs.Empty);
-                                            };
+                                               BeginAnimation(ZoomProperty, null);
+                                               SetValue(ZoomProperty, zoom);
+                                               _isZooming = false;
+                                               ZoomSettled?.Invoke(this, EventArgs.Empty);
+                                           };
             }
-            BeginAnimation(dp, animation, HandoffBehavior.Compose);
+            BeginAnimation(dp, animation, HandoffBehavior.SnapshotAndReplace);
         }
 
         private void DoZoomToOriginal()
