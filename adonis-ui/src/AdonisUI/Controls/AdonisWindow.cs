@@ -219,16 +219,23 @@ namespace AdonisUI.Controls
 
         private BitmapSource GetApplicationIcon()
         {
-            string appFilePath = Process.GetCurrentProcess().MainModule.FileName;
-            if (!File.Exists(appFilePath))
+            try
+            {
+                string appFilePath = Process.GetCurrentProcess().MainModule.FileName;
+                if (!File.Exists(appFilePath))
+                    return null;
+
+                Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(appFilePath);
+
+                if (appIcon == null)
+                    return null;
+
+                return Imaging.CreateBitmapSourceFromHIcon(appIcon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            }
+            catch (Win32Exception)
+            {
                 return null;
-
-            Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(appFilePath);
-
-            if (appIcon == null)
-                return null;
-
-            return Imaging.CreateBitmapSourceFromHIcon(appIcon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            }
         }
 
         private Thickness GetSystemMaximizeBorderThickness()
