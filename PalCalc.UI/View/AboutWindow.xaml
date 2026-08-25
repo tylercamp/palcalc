@@ -102,7 +102,7 @@
         <Separator />
 
         <Label FontWeight="Bold" FontSize="12">Translations</Label>
-        <Grid>
+        <Grid Margin="0,8,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="Auto" />
@@ -110,9 +110,15 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition />
+                <RowDefinition Height="8" />
+                <RowDefinition />
+                <RowDefinition Height="8" />
+                <RowDefinition />
+                <RowDefinition Height="8" />
+                <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Border Grid.Column="1" Grid.RowSpan="999" Width="1" Margin="0,5,0,5" Background="Gray" />
+            <Border Grid.Column="1" Grid.RowSpan="999" Width="1" Background="Gray" />
 
             <!-- zh-Hans -->
             <Label Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center">
@@ -126,6 +132,39 @@
                 <TextBlock>
                     Narugakuruga
                     <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/87" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- ko -->
+            <Label Grid.Row="2" Grid.Column="0" VerticalContentAlignment="Center">
+                한국어 | ko
+            </Label>
+            <StackPanel Grid.Row="2" Grid.Column="2">
+                <TextBlock>
+                    moroa2017
+                    <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/158" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- tr -->
+            <Label Grid.Row="4" Grid.Column="0" VerticalContentAlignment="Center">
+                Türkçe | tr
+            </Label>
+            <StackPanel Grid.Row="4" Grid.Column="2">
+                <TextBlock>
+                    Elderly-Emre
+                    <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/180" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- ja -->
+            <Label Grid.Row="6" Grid.Column="0" VerticalContentAlignment="Center">
+                日本語 | ja
+            </Label>
+            <StackPanel Grid.Row="6" Grid.Column="2">
+                <TextBlock>
+                    yknn-888
+                    <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/240" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
                 </TextBlock>
             </StackPanel>
         </Grid>
