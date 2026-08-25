@@ -125,9 +125,13 @@ namespace PalCalc.Solver.PalReference
                         break;
 
                     case ReplacePassiveSurgeryOperation rpso:
-                        bool isRemovalAmbiguous = rpso.RemovedPassive is RandomPassiveSkill || !EffectivePassives.Contains(rpso.RemovedPassive);
-                        int removedEffectiveIdx = isRemovalAmbiguous ? EffectivePassives.FindIndex(p => p is RandomPassiveSkill) : EffectivePassives.IndexOf(rpso.RemovedPassive);
-                        int removedActualIdx = isRemovalAmbiguous ? ActualPassives.FindIndex(p => p is RandomPassiveSkill || !EffectivePassives.Contains(p)) : EffectivePassives.IndexOf(rpso.RemovedPassive);
+                        int removedEffectiveIdx = EffectivePassives.IndexOf(rpso.RemovedPassive);
+                        if (removedEffectiveIdx < 0)
+                            removedEffectiveIdx = EffectivePassives.FindIndex(p => p is RandomPassiveSkill);
+
+                        int removedActualIdx = ActualPassives.IndexOf(rpso.RemovedPassive);
+                        if (removedActualIdx < 0)
+                            removedActualIdx = ActualPassives.FindIndex(p => p is RandomPassiveSkill || !EffectivePassives.Contains(p));
 
 #if DEBUG && DEBUG_CHECKS
                         // we shouldn't be adding passives which already exist on the pal
@@ -183,6 +187,15 @@ namespace PalCalc.Solver.PalReference
             if (cachedGenders.ContainsKey(gender)) return cachedGenders[gender];
 
             IPalReference result;
+
+            // Surgery should be planned against the concrete owned children of
+            // a composite before reaching this point. Keep this fallback for
+            // defensive compatibility with older or externally-created data.
+#if DEBUG
+            if (Input is CompositeOwnedPalReference)
+                Debugger.Break();
+#endif
+
             var newParent = Input.WithGuaranteedGender(db, gender, useReverser);
 
             // Composite references may resolve to a pal with fewer (but never more) passives than the original Input,

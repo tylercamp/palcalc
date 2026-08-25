@@ -73,6 +73,147 @@ public class ResultPostProcessorTests
     }
 
     [TestMethod]
+    public void ApplySurgery_PreservesKnownRemovedPassive()
+    {
+        var surgeryPassive = SolverTestScenario.DB.SurgeryPassiveSkills.First();
+        var actualPassives = SolverTestScenario.DB.StandardPassiveSkills
+            .Where(passive => passive != surgeryPassive)
+            .Take(GameConstants.MaxTotalPassives)
+            .ToList();
+        var owned = SolverTestScenario.Owned(
+            "Wixen Noct",
+            PalGender.FEMALE,
+            passives: actualPassives
+        );
+        var configuredSolver = SolverTestScenario.Solver(
+            [owned],
+            maxBreedingSteps: 0,
+            maxBredIrrelevantPassives: GameConstants.MaxTotalPassives,
+            maxSurgeryCost: surgeryPassive.SurgeryCost,
+            allowedSurgeryPassives: [surgeryPassive]
+        );
+        var target = new PalSpecifier
+        {
+            Pal = owned.Pal,
+            RequiredPassives = [surgeryPassive],
+        };
+        var controller = Controller();
+        var policy = Policy(controller);
+        var ownedReference = new OwnedPalReference(
+            owned,
+            actualPassives.ToDedicatedPassives(target.DesiredPassives),
+            new IV_Set()
+        );
+        var frontier = new SearchFrontier(
+            target,
+            [ownedReference],
+            maxThreads: 1,
+            controller,
+            policy
+        );
+        var processor = new ResultPostProcessor(
+            target,
+            configuredSolver.Settings,
+            controller
+        );
+
+        processor.ApplySurgery(frontier);
+        var surgery = processor
+            .Finalize(frontier.TerminalResults)
+            .OfType<SurgeryTablePalReference>()
+            .Single();
+        var replacement = surgery.Operations
+            .OfType<ReplacePassiveSurgeryOperation>()
+            .Single();
+
+        Assert.AreSame(actualPassives[0], replacement.RemovedPassive);
+        Assert.IsFalse(replacement.RemovedPassive is RandomPassiveSkill);
+        Assert.IsFalse(surgery.ActualPassives.Contains(actualPassives[0]));
+        Assert.IsTrue(surgery.EffectivePassives.Contains(surgeryPassive));
+    }
+
+    [TestMethod]
+    public void ApplySurgery_DecomposesCompositeBeforeSurgery()
+    {
+        var requiredPassive = SolverTestScenario.DB.SurgeryPassiveSkills.First();
+        var optionalPassive = SolverTestScenario.DB.SurgeryPassiveSkills.Skip(1).First();
+        var sharedPassives = SolverTestScenario.DB.StandardPassiveSkills
+            .Where(passive => passive != requiredPassive && passive != optionalPassive)
+            .Take(2)
+            .ToList();
+        var maleOnlyPassives = SolverTestScenario.DB.StandardPassiveSkills
+            .Where(passive =>
+                passive != requiredPassive &&
+                passive != optionalPassive &&
+                !sharedPassives.Contains(passive)
+            )
+            .Take(1)
+            .ToList();
+        var male = SolverTestScenario.Owned(
+            "Wixen Noct",
+            PalGender.MALE,
+            passives: [optionalPassive, .. sharedPassives, .. maleOnlyPassives]
+        );
+        var female = SolverTestScenario.Owned(
+            "Wixen Noct",
+            PalGender.FEMALE,
+            passives: sharedPassives
+        );
+        var target = new PalSpecifier
+        {
+            Pal = male.Pal,
+            RequiredPassives = [requiredPassive, .. sharedPassives],
+            OptionalPassives = [optionalPassive],
+        };
+        var configuredSolver = SolverTestScenario.Solver(
+            [male, female],
+            maxBreedingSteps: 0,
+            maxBredIrrelevantPassives: GameConstants.MaxTotalPassives,
+            maxSurgeryCost: requiredPassive.SurgeryCost,
+            allowedSurgeryPassives: [requiredPassive, optionalPassive]
+        );
+        var controller = Controller();
+        var policy = Policy(controller);
+        var maleReference = new OwnedPalReference(
+            male,
+            male.PassiveSkills.ToDedicatedPassives(target.DesiredPassives),
+            new IV_Set()
+        );
+        var femaleReference = new OwnedPalReference(
+            female,
+            female.PassiveSkills.ToDedicatedPassives(target.DesiredPassives),
+            new IV_Set()
+        );
+        var frontier = new SearchFrontier(
+            target,
+            [new CompositeOwnedPalReference(maleReference, femaleReference)],
+            maxThreads: 1,
+            controller,
+            policy
+        );
+        var processor = new ResultPostProcessor(
+            target,
+            configuredSolver.Settings,
+            controller
+        );
+
+        processor.ApplySurgery(frontier);
+        var surgeries = processor
+            .Finalize(frontier.TerminalResults)
+            .OfType<SurgeryTablePalReference>()
+            .ToList();
+
+        Assert.IsTrue(surgeries.Count > 0);
+        Assert.IsTrue(
+            surgeries.All(surgery =>
+                surgery.Input is OwnedPalReference &&
+                surgery.Operations.Count > 0 &&
+                surgery.EffectivePassives.Contains(requiredPassive)
+            )
+        );
+    }
+
+    [TestMethod]
     public void Finalize_EnforcesRequiredGender()
     {
         var target = new PalSpecifier
