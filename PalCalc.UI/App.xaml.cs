@@ -38,6 +38,11 @@ namespace PalCalc.UI
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            // Working directory may change depending on how the app is run, e.g. from File Explorer vs. Start Menu
+            // All paths in PalCalc are relative, so enforce a consistent working directory in the app folder
+            var launchDirectory = Environment.CurrentDirectory;
+            Directory.SetCurrentDirectory(AppContext.BaseDirectory);
+
 #if RELEASE
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #endif
@@ -54,6 +59,11 @@ namespace PalCalc.UI
 
             logger = Log.ForContext<App>();
             logger.Information($"Pal Calc version {Version}");
+            logger.Information(
+                "Using {AppDirectory} as application directory (launched from {LaunchDirectory})",
+                AppContext.BaseDirectory,
+                launchDirectory
+            );
 
             // Storage initialization runs migrations. Keep logging available before it touches
             // any authoritative data so failures are diagnosable and manifest updates stay last.
