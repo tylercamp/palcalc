@@ -17,13 +17,12 @@ namespace PalCalc.UI.Persistence
 
         public static string ManifestPath(string dataPath) => Path.Combine(dataPath, ManifestFileName);
 
-        public static bool HasAuthoritativeDocuments(string dataPath)
+        public static bool HasDataFiles(string dataPath)
         {
             if (!Directory.Exists(dataPath))
                 return false;
 
-            return Directory.EnumerateFiles(dataPath, "*", SearchOption.AllDirectories)
-                .Any(path => !string.Equals(Path.GetFileName(path), "settings.json", StringComparison.OrdinalIgnoreCase));
+            return File.Exists(Path.Combine(dataPath, "settings.json"));
         }
     }
 
@@ -123,15 +122,15 @@ namespace PalCalc.UI.Persistence
             if (!File.Exists(manifestPath))
             {
                 logger.Information("Persistent version manifest file missing");
-                if (!StorageFormat.HasAuthoritativeDocuments(dataPath))
+                if (!StorageFormat.HasDataFiles(dataPath))
                 {
-                    logger.Information("No settings files found, assuming fresh install");
+                    logger.Information("No data files found, assuming fresh install");
                     new StorageMigrationContext(dataPath).WriteManifest(StorageFormat.CurrentVersion);
                     return;
                 }
                 else
                 {
-                    logger.Information("Some old settings files found");
+                    logger.Information("Data files found");
                 }
             }
 
