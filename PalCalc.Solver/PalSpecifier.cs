@@ -13,22 +13,21 @@ namespace PalCalc.Solver
         public Pal Pal { get; set; }
         public List<PassiveSkill> RequiredPassives { get; set; } = new List<PassiveSkill>();
 
-        // TODO: Generalize this singular target to required and optional attack collections
-        // when breeding can produce more than one targeted attack. Add the corresponding
-        // request serialization and UI selection/display at the same time.
-        public ActiveSkill RequiredAttack { get; set; }
+        public List<ActiveSkill> RequiredAttacks { get; set; } = new List<ActiveSkill>();
         public PalGender RequiredGender { get; set; } = PalGender.WILDCARD;
 
         public List<PassiveSkill> OptionalPassives { get; set; } = new List<PassiveSkill>();
 
         public IEnumerable<PassiveSkill> DesiredPassives => RequiredPassives.Concat(OptionalPassives);
 
+        internal ActiveSkill RequiredAttack => RequiredAttacks.FirstOrDefault();
+
         public int IV_HP { get; set; }
         public int IV_Attack { get; set; }
         public int IV_Defense { get; set; }
 
         public override string ToString() => $"{Pal.Name} with {RequiredPassives.PassiveSkillListToString()}" +
-            (RequiredAttack == null ? "" : $" and {RequiredAttack}");
+            (RequiredAttacks.Count == 0 ? "" : $" and {string.Join(", ", RequiredAttacks)}");
 
         public bool IsSatisfiedBy(IPalReference palRef) =>
             Pal == palRef.Pal &&
@@ -42,6 +41,7 @@ namespace PalCalc.Solver
         public void Normalize()
         {
             RequiredPassives = RequiredPassives.Distinct().ToList();
+            RequiredAttacks = RequiredAttacks.Distinct().ToList();
             OptionalPassives = OptionalPassives.Except(RequiredPassives).Distinct().ToList();
         }
 
@@ -53,7 +53,7 @@ namespace PalCalc.Solver
             {
                 Pal = Pal,
                 RequiredPassives = requiredPassives,
-                RequiredAttack = RequiredAttack,
+                RequiredAttacks = RequiredAttacks.Distinct().ToList(),
                 RequiredGender = RequiredGender,
                 OptionalPassives = OptionalPassives
                     .Except(requiredPassives)

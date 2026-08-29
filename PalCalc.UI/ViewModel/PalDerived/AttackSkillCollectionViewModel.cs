@@ -1,3 +1,4 @@
+using PalCalc.Model;
 using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using System.Collections.Generic;
@@ -16,5 +17,12 @@ namespace PalCalc.UI.ViewModel.PalDerived
         public List<ActiveSkillViewModel> Attacks { get; }
 
         public ILocalizedText Description { get; }
+
+        public bool HasItems => Attacks.Any();
+
+        public IEnumerable<ActiveSkillViewModel> AsEnumerable() => Attacks;
+
+        public IEnumerable<ActiveSkill> AsModelEnumerable() =>
+            AsEnumerable().Select(attack => attack.ModelObject).Distinct();
     }
 }

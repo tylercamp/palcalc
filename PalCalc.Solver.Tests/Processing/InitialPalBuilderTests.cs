@@ -155,6 +155,6 @@ public class InitialPalBuilderTests
         new()
         {
             Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
-            RequiredAttack = requiredAttack,
+            RequiredAttacks = [requiredAttack],
         };
 }

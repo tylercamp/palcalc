@@ -17,6 +17,9 @@ public sealed class BreedingSolver
         SolverStateController controller
     )
     {
+        if (request.Target.RequiredAttacks.Count > 1)
+            throw new NotSupportedException("Only one required attack is currently supported");
+
         var context = SolverRunContext.Create(request, controller);
         var run = new SolverRun(
             context,

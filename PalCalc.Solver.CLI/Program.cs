@@ -54,7 +54,7 @@ internal class Program
         {
             Pal = "Beakon".ToPal(db),
             RequiredPassives = new List<PassiveSkill> { "Nimble".ToStandardPassive(db) },
-            RequiredAttack = requiredAttack,
+            RequiredAttacks = [requiredAttack],
             //IV_Attack = 90,
             //IV_Defense = 90,
             //IV_HP = 90

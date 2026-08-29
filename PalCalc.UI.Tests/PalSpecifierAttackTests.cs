@@ -13,44 +13,77 @@ namespace PalCalc.UI.Tests;
 public class PalSpecifierAttackTests
 {
     [TestMethod]
-    public void RequiredAttackRoundTripsThroughTargetJson()
+    public void RequiredAttackSelectorUpdatesCollection()
     {
         var db = PalDB.LoadEmbedded();
-        var attack = db.ActiveSkills.First();
-        var target = new PalSpecifier
-        {
-            Pal = db.Pals.First(),
-            RequiredAttack = attack,
-        };
-        var viewModel = new PalSpecifierViewModel("target", target);
+        var attacks = db.ActiveSkills.Take(2).ToList();
+        var viewModel = new PalSpecifierViewModel(
+            "target",
+            new PalSpecifier
+            {
+                Pal = db.Pals.First(),
+                RequiredAttacks = [attacks[0]],
+            }
+        );
 
-        var json = JsonConvert.SerializeObject(viewModel, ReadOnlySettings(db));
-        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json, ReadOnlySettings(db));
+        viewModel.RequiredAttack = ActiveSkillViewModel.Make(attacks[1]);
 
-        Assert.IsNotNull(reloaded);
-        Assert.AreEqual(attack.InternalName, reloaded.RequiredAttack.ModelObject.InternalName);
-        Assert.AreEqual(attack.InternalName, reloaded.ModelObject.RequiredAttack.InternalName);
-        Assert.AreEqual(attack.InternalName, viewModel.Copy().ModelObject.RequiredAttack.InternalName);
+        Assert.IsTrue(viewModel.RequiredAttacks.HasItems);
+        Assert.AreEqual(attacks[1].InternalName, viewModel.RequiredAttacks.AsModelEnumerable().Single().InternalName);
+
+        viewModel.RequiredAttack = null;
+
+        Assert.IsFalse(viewModel.RequiredAttacks.HasItems);
     }
 
     [TestMethod]
-    public void MissingRequiredAttackLoadsAsNull()
+    public void RequiredAttacksRoundTripThroughTargetJson()
+    {
+        var db = PalDB.LoadEmbedded();
+        var attacks = db.ActiveSkills.Take(2).ToList();
+        var target = new PalSpecifier
+        {
+            Pal = db.Pals.First(),
+            RequiredAttacks = attacks,
+        };
+        var viewModel = new PalSpecifierViewModel("target", target);
+
+        var json = JsonConvert.SerializeObject(viewModel, WriteSettings(db));
+        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json, ReadSettings(db));
+
+        Assert.IsNotNull(reloaded);
+        CollectionAssert.AreEqual(
+            attacks.Select(attack => attack.InternalName).ToArray(),
+            reloaded.RequiredAttacks.Attacks.Select(attack => attack.ModelObject.InternalName).ToArray()
+        );
+        CollectionAssert.AreEqual(
+            attacks.Select(attack => attack.InternalName).ToArray(),
+            reloaded.ModelObject.RequiredAttacks.Select(attack => attack.InternalName).ToArray()
+        );
+        CollectionAssert.AreEqual(
+            attacks.Select(attack => attack.InternalName).ToArray(),
+            viewModel.Copy().ModelObject.RequiredAttacks.Select(attack => attack.InternalName).ToArray()
+        );
+    }
+
+    [TestMethod]
+    public void MissingRequiredAttacksLoadAsEmpty()
     {
         var db = PalDB.LoadEmbedded();
         var target = new PalSpecifier
         {
             Pal = db.Pals.First(),
-            RequiredAttack = db.ActiveSkills.First(),
+            RequiredAttacks = [db.ActiveSkills.First()],
         };
         var viewModel = new PalSpecifierViewModel("target", target);
-        var json = JObject.Parse(JsonConvert.SerializeObject(viewModel, ReadOnlySettings(db)));
-        json.Remove("RequiredAttack");
+        var json = JObject.Parse(JsonConvert.SerializeObject(viewModel, WriteSettings(db)));
+        json.Remove("RequiredAttacks");
 
-        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json.ToString(), ReadOnlySettings(db));
+        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json.ToString(), ReadSettings(db));
 
         Assert.IsNotNull(reloaded);
         Assert.IsNull(reloaded.RequiredAttack);
-        Assert.IsNull(reloaded.ModelObject.RequiredAttack);
+        Assert.IsEmpty(reloaded.ModelObject.RequiredAttacks);
     }
 
     [TestMethod]
@@ -160,8 +193,13 @@ public class PalSpecifierAttackTests
             effectiveAttack: attack
         );
 
-    private static JsonSerializerSettings ReadOnlySettings(PalDB db) => new()
+    private static JsonSerializerSettings ReadSettings(PalDB db) => new()
     {
-        Converters = { new PalSpecifierViewModelReader(db, new GameSettings(), null) }
+        Converters = { new PalSpecifierViewModelReader(db, new GameSettings(), new CachedSaveGame(null)) }
+    };
+
+    private static JsonSerializerSettings WriteSettings(PalDB db) => new()
+    {
+        Converters = { new PalSpecifierViewModelWriter(db, new GameSettings()) }
     };
 }

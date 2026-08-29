@@ -738,7 +738,6 @@ namespace PalCalc.UI
     // NOTE - This converter injects other converters (namely BreedingResultListViewModelConverter) whose dependents
     //        expect a specific pal target. Multiple PalSpecifierViewModels should _not_ be stored in the same JSON
     //        data, and JsonSerializers should either be reset or newly created during each operation.
-    // TODO: Serialize and deserialize an attack collection when PalSpecifier supports multiple required attacks.
     internal sealed class PalSpecifierViewModelReader : PalReadOnlyConverterBase<PalSpecifierViewModel>
     {
         private readonly CachedSaveGame source;
@@ -764,7 +763,11 @@ namespace PalCalc.UI
             var modelSpecifier = new PalSpecifier()
             {
                 Pal = obj["TargetPal"].ToObject<PalViewModel>(serializer).ModelObject,
-                RequiredAttack = obj["RequiredAttack"]?.ToObject<ActiveSkillViewModel>(serializer)?.ModelObject,
+                RequiredAttacks = obj["RequiredAttacks"]
+                    ?.ToObject<List<ActiveSkillViewModel>>(serializer)
+                    ?.Select(attack => attack?.ModelObject)
+                    .SkipNull()
+                    .ToList() ?? [],
                 RequiredPassives = [
                     (obj["Passive1"] ?? obj["Trait1"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
                     (obj["Passive2"] ?? obj["Trait2"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
@@ -839,7 +842,7 @@ namespace PalCalc.UI
             {
                 Id = value.Id,
                 TargetPal = value.TargetPal,
-                RequiredAttack = value.RequiredAttack,
+                RequiredAttacks = value.RequiredAttacks.AsEnumerable(),
                 Passive1 = value.RequiredPassives.Passive1,
                 Passive2 = value.RequiredPassives.Passive2,
                 Passive3 = value.RequiredPassives.Passive3,

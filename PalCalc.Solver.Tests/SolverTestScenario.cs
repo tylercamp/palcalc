@@ -103,7 +103,7 @@ internal static class SolverTestScenario
                     IV_HP = ivHp,
                     IV_Attack = ivAttack,
                     IV_Defense = ivDefense,
-                    RequiredAttack = requiredAttack,
+                    RequiredAttacks = requiredAttack == null ? [] : [requiredAttack],
                 },
                 solver.Settings
             ),

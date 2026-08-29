@@ -8,6 +8,24 @@ namespace PalCalc.Solver.Tests;
 public class BreedingSolverRequestTests
 {
     [TestMethod]
+    public void BreedingSolver_RejectsMoreThanOneRequiredAttack()
+    {
+        var settings = SolverTestScenario.Solver([]).Settings;
+        var target = new PalSpecifier
+        {
+            Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
+            RequiredAttacks = SolverTestScenario.DB.ActiveSkills.Take(2).ToList(),
+        };
+
+        Assert.ThrowsException<NotSupportedException>(() =>
+            new BreedingSolver().Solve(
+                new BreedingSolverRequest(target, settings),
+                new SolverStateController(CancellationToken.None)
+            )
+        );
+    }
+
+    [TestMethod]
     public void Constructor_NormalizesTargetSnapshotWithoutMutatingCaller()
     {
         var swift = "Swift".ToStandardPassive(SolverTestScenario.DB);
@@ -18,7 +36,7 @@ public class BreedingSolverRequestTests
             Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
             RequiredPassives = [swift, swift],
             OptionalPassives = [swift, runner, runner],
-            RequiredAttack = requiredAttack,
+            RequiredAttacks = [requiredAttack],
             RequiredGender = PalGender.MALE,
             IV_Attack = 90,
         };
@@ -32,7 +50,7 @@ public class BreedingSolverRequestTests
         CollectionAssert.AreEqual(new[] { swift }, snapshot.RequiredPassives);
         CollectionAssert.AreEqual(new[] { runner }, snapshot.OptionalPassives);
         Assert.AreEqual(target.Pal, snapshot.Pal);
-        Assert.AreSame(requiredAttack, snapshot.RequiredAttack);
+        CollectionAssert.AreEqual(new[] { requiredAttack }, snapshot.RequiredAttacks);
         Assert.AreEqual(PalGender.MALE, snapshot.RequiredGender);
         Assert.AreEqual(90, snapshot.IV_Attack);
 
@@ -48,7 +66,7 @@ public class BreedingSolverRequestTests
         var target = new PalSpecifier
         {
             Pal = targetPal,
-            RequiredAttack = requiredAttack,
+            RequiredAttacks = [requiredAttack],
         };
         var instance = SolverTestScenario.Owned("Wixen Noct", PalGender.MALE);
 

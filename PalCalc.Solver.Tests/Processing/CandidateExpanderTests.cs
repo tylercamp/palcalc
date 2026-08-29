@@ -101,7 +101,7 @@ public class CandidateExpanderTests
         var target = new PalSpecifier
         {
             Pal = child,
-            RequiredAttack = targetAttack,
+            RequiredAttacks = [targetAttack],
         };
 
         var candidate = (BredPalReference)Expand(
@@ -136,7 +136,7 @@ public class CandidateExpanderTests
         var candidate = (BredPalReference)Expand(
             WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), otherAttack),
             WithAttack(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), otherAttack),
-            new PalSpecifier { Pal = child, RequiredAttack = targetAttack }
+            new PalSpecifier { Pal = child, RequiredAttacks = [targetAttack] }
         ).Candidates.Single();
 
         Assert.AreSame(targetAttack, candidate.EffectiveAttack);
@@ -153,7 +153,7 @@ public class CandidateExpanderTests
         var candidate = (BredPalReference)Expand(
             WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), targetAttack),
             WithAttack(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutral),
-            new PalSpecifier { Pal = child, RequiredAttack = targetAttack }
+            new PalSpecifier { Pal = child, RequiredAttacks = [targetAttack] }
         ).Candidates.Single();
 
         Assert.AreSame(targetAttack, candidate.EffectiveAttack);
@@ -172,7 +172,7 @@ public class CandidateExpanderTests
         var expansion = Expand(
             WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), otherAttack),
             WithAttack(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), otherAttack),
-            new PalSpecifier { Pal = child, RequiredAttack = targetAttack }
+            new PalSpecifier { Pal = child, RequiredAttacks = [targetAttack] }
         );
         var candidate = (BredPalReference)expansion.Candidates.Single();
 
@@ -189,7 +189,7 @@ public class CandidateExpanderTests
             attack.CanInherit && attack != targetAttack
         );
         var neutral = SolverTestScenario.DB.ActiveSkills.First(attack => !attack.CanInherit);
-        var target = new PalSpecifier { Pal = child, RequiredAttack = targetAttack };
+        var target = new PalSpecifier { Pal = child, RequiredAttacks = [targetAttack] };
         var male = WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), otherAttack);
         var female = WithAttack(SolverTestScenario.Owned("Katress", PalGender.FEMALE), targetAttack);
         var wixen = WithAttack(SolverTestScenario.Owned("Wixen", PalGender.MALE), neutral);

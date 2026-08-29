@@ -27,6 +27,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             if (underlyingSpec == null)
             {
                 TargetPal = null;
+                RequiredAttacks = new([]);
                 RequiredPassives = new();
                 OptionalPassives = new();
 
@@ -35,7 +36,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             else
             {
                 TargetPal = PalViewModel.Make(underlyingSpec.Pal);
-                RequiredAttack = ActiveSkillViewModel.Make(underlyingSpec.RequiredAttack);
+                RequiredAttacks = new(underlyingSpec.RequiredAttacks.Select(ActiveSkillViewModel.Make));
 
                 RequiredPassives = new(underlyingSpec.RequiredPassives);
                 OptionalPassives = new(underlyingSpec.OptionalPassives);
@@ -76,7 +77,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             ? new PalSpecifier()
             {
                 Pal = TargetPal.ModelObject,
-                RequiredAttack = RequiredAttack?.ModelObject,
+                RequiredAttacks = RequiredAttacks.AsModelEnumerable().ToList(),
                 RequiredPassives = RequiredPassives.AsModelEnumerable().ToList(),
                 OptionalPassives = OptionalPassives.AsModelEnumerable().ToList(),
                 RequiredGender = RequiredGender.Value,
@@ -91,9 +92,29 @@ namespace PalCalc.UI.ViewModel.Mapped
         [ObservableProperty]
         private PalViewModel targetPal;
 
-        // TODO: Replace the singular required attack with an AttackSkillCollectionViewModel when the solver supports multiple required attacks.
-        [ObservableProperty]
-        private ActiveSkillViewModel requiredAttack;
+        public AttackSkillCollectionViewModel RequiredAttacks { get; private set; } = new([]);
+
+        public ActiveSkillViewModel RequiredAttack
+        {
+            get => RequiredAttacks.AsEnumerable().FirstOrDefault();
+            set
+            {
+                if (ReferenceEquals(value, RequiredAttack))
+                    return;
+
+                var attacks = RequiredAttacks.Attacks.ToList();
+                if (value == null)
+                    attacks.Clear();
+                else if (attacks.Count == 0)
+                    attacks.Add(value);
+                else
+                    attacks[0] = value;
+
+                RequiredAttacks = new(attacks);
+                OnPropertyChanged(nameof(RequiredAttack));
+                OnPropertyChanged(nameof(RequiredAttacks));
+            }
+        }
 
         public PalSpecifierPassiveSkillCollectionViewModel RequiredPassives { get; private set; }
         public PalSpecifierPassiveSkillCollectionViewModel OptionalPassives { get; private set; }
@@ -200,7 +221,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             new PalSpecifier()
             {
                 Pal = TargetPal.ModelObject,
-                RequiredAttack = RequiredAttack?.ModelObject,
+                RequiredAttacks = RequiredAttacks.AsModelEnumerable().ToList(),
                 RequiredPassives = RequiredPassives.AsModelEnumerable().ToList(),
                 OptionalPassives = OptionalPassives.AsModelEnumerable().ToList(),
                 RequiredGender = RequiredGender.Value,
@@ -226,7 +247,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                     new PalSpecifier()
                     {
                         Pal = "Beakon".ToPal(db),
-                        RequiredAttack = db.ActiveSkills.FirstOrDefault(),
+                        RequiredAttacks = [db.ActiveSkills.FirstOrDefault()],
                         RequiredPassives = ["Runner".ToStandardPassive(db), "Swift".ToStandardPassive(db)],
                         OptionalPassives = ["Aggressive".ToStandardPassive(db)],
                         IV_Attack = 90,
