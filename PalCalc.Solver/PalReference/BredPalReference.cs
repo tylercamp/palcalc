@@ -120,34 +120,9 @@ namespace PalCalc.Solver.PalReference
             set
             {
                 _avgRequiredBreedings = value;
-
-                var timePerBreed = gameSettings.AvgBreedingTime * Parent1.TimeFactor * Parent2.TimeFactor;
-                var totalBreedingTime = _avgRequiredBreedings * timePerBreed;
-
-                var incubationTime = Pal.EggSize.IncubationTime(gameSettings);
-                var totalIncubationTime = _avgRequiredBreedings * incubationTime;
-
-                if (gameSettings.MultipleIncubators)
-                {
-                    // time to get the desired pal is just time to produce the egg + time to incubate it
-                    SelfBreedingEffort = totalBreedingTime + incubationTime;
-                }
-                else
-                {
-                    // either breeding time will outweigh incubation time, or vice-versa. regardless of which part
-                    // is the bottleneck, we'll always need to do the other part at least once.
-                    //
-                    // (though, realistically, incubation will always take longer than breeding, unless incubation
-                    // time is turned off entirely)
-
-                    var allIncubationWithBreeding = totalIncubationTime + timePerBreed;
-                    var allBreedingWithIncubation = totalBreedingTime + incubationTime;
-
-                    if (allIncubationWithBreeding > allBreedingWithIncubation)
-                        SelfBreedingEffort = allIncubationWithBreeding;
-                    else
-                        SelfBreedingEffort = allBreedingWithIncubation;
-                }
+                SelfBreedingEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
+                    gameSettings, Pal, Parent1.TimeFactor, Parent2.TimeFactor, _avgRequiredBreedings
+                );
             }
         }
 
@@ -201,40 +176,11 @@ namespace PalCalc.Solver.PalReference
             {
                 return this;
             }
-            else if (gender == PalGender.OPPOSITE_WILDCARD)
-            {
-                // should only happen if the other parent has the same gender probabilities as this parent
-                if (db.BreedingMostLikelyGender[Pal] != PalGender.WILDCARD)
-                {
-                    // assume that the other parent has the more likely gender
-                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs, ActualAttack, EffectiveAttack)
-                    {
-                        AvgRequiredBreedings = useReverser ? AvgRequiredBreedings : (int)Math.Ceiling(AvgRequiredBreedings / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
-                        Gender = gender,
-                        PassivesProbability = PassivesProbability,
-                        IVsProbability = IVsProbability,
-                        AttacksProbability = AttacksProbability,
-                    };
-                }
-                else
-                {
-                    // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
-                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs, ActualAttack, EffectiveAttack)
-                    {
-                        AvgRequiredBreedings = useReverser ? AvgRequiredBreedings : AvgRequiredBreedings * 2,
-                        Gender = gender,
-                        PassivesProbability = PassivesProbability,
-                        IVsProbability = IVsProbability,
-                        AttacksProbability = AttacksProbability,
-                    };
-                }
-            }
             else
             {
-                var genderProbability = db.BreedingGenderProbability[Pal][gender];
                 return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs, ActualAttack, EffectiveAttack)
                 {
-                    AvgRequiredBreedings = useReverser ? AvgRequiredBreedings : (int)Math.Ceiling(AvgRequiredBreedings / genderProbability),
+                    AvgRequiredBreedings = BredPalReferenceEffort.WithGuaranteedGender(AvgRequiredBreedings, Pal, db, gender, useReverser),
                     Gender = gender,
                     PassivesProbability = PassivesProbability,
                     IVsProbability = IVsProbability,
