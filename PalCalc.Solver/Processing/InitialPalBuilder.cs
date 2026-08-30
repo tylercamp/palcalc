@@ -1,6 +1,7 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.ResultPruning;
 using PalCalc.Solver.Utils;
@@ -13,7 +14,8 @@ namespace PalCalc.Solver.Processing;
 internal sealed class InitialPalBuilder(
     BreedingSolverSettings settings,
     BreedingMechanics mechanics,
-    PalBreedingDB breedingDB
+    PalBreedingDB breedingDB,
+    AttackTargetContext attackTargets
 )
 {
     public List<IPalReference> Build(PalSpecifier target)
@@ -21,13 +23,8 @@ internal sealed class InitialPalBuilder(
         // This step selects concrete owned instances and creates composite
         // gender candidates before the frontier simplifies breeding paths.
         // Those choices cannot be recovered from effective properties alone.
-        static (
-            Pal Pal,
-            PassiveSetKey Passives,
-            RelevantIVKey IVs,
-            string EffectiveAttack
-        ) StateWithoutGender(OwnedPalReference reference) =>
-            (
+        InitialOwnedState StateWithoutGender(OwnedPalReference reference) =>
+            new(
                 reference.Pal,
                 new PassiveSetKey(
                     reference.ActualPassives
@@ -35,7 +32,9 @@ internal sealed class InitialPalBuilder(
                         .ToList()
                 ),
                 new RelevantIVKey(reference.IVs),
-                reference.EffectiveAttack?.InternalName
+                attackTargets.IsActive ? null : reference.EffectiveAttack?.InternalName,
+                reference.AttackProfile,
+                reference.HasNeutralAttack
             );
 
         bool WithinBreedingSteps(Pal pal) =>
@@ -56,6 +55,7 @@ internal sealed class InitialPalBuilder(
             .Select(p =>
             {
                 var attack = SelectOwnedAttack(p, target.RequiredAttack);
+                var masteredAttacks = p.ActiveSkills ?? [];
                 return new OwnedPalReference(
                     instance: p,
                     effectivePassives: p.PassiveSkills.ToDedicatedPassives(target.DesiredPassives),
@@ -66,7 +66,11 @@ internal sealed class InitialPalBuilder(
                         Defense = MakeIV(target.IV_Defense, p.IV_Defense),
                     },
                     actualAttack: attack,
-                    effectiveAttack: EffectiveAttack(attack, target.RequiredAttack)
+                    effectiveAttack: EffectiveAttack(attack, target.RequiredAttack),
+                    attackProfile: attackTargets.IsActive
+                        ? new(new AttackProfileEntry(attackTargets.MaskOf(masteredAttacks), 0, TimeSpan.Zero, 0, false))
+                        : AttackProfile.Inactive,
+                    hasNeutralAttack: attackTargets.IsActive && masteredAttacks.Any(attack => !attack.CanInherit)
                 );
             })
             .GroupBy(pal => (
@@ -130,8 +134,12 @@ internal sealed class InitialPalBuilder(
 
         var male = group.SingleOrDefault(pal => pal.Gender == PalGender.MALE);
         var female = group.SingleOrDefault(pal => pal.Gender == PalGender.FEMALE);
-        var composite = new CompositeOwnedPalReference(male, female);
 
+        if (!male.AttackProfile.Equals(female.AttackProfile) ||
+            male.HasNeutralAttack != female.HasNeutralAttack)
+            return [male, female];
+
+        var composite = new CompositeOwnedPalReference(male, female);
         return male.EffectivePassivesHash == female.EffectivePassivesHash
             ? [composite]
             : [male, female, composite];
@@ -153,6 +161,7 @@ internal sealed class InitialPalBuilder(
                 {
                     var guaranteedPassives = p.GuaranteedPassiveSkills(settings.DB);
                     var attack = SelectWildAttack(p, target.RequiredAttack);
+                    var attackState = attackTargets.StateOf(p);
                     var numIrrelevantGuaranteed = guaranteedPassives.Except(target.DesiredPassives).Count();
                     var numAllowedRandomPassives = Math.Clamp(
                         value: settings.MaxInputIrrelevantPassives - numIrrelevantGuaranteed,
@@ -169,7 +178,17 @@ internal sealed class InitialPalBuilder(
                                 numRandomPassives,
                                 mechanics,
                                 actualAttack: attack,
-                                effectiveAttack: EffectiveAttack(attack, target.RequiredAttack)
+                                effectiveAttack: EffectiveAttack(attack, target.RequiredAttack),
+                                attackProfile: attackTargets.IsActive
+                                    ? new(new AttackProfileEntry(
+                                        attackState.Level1TargetMask,
+                                        0,
+                                        mechanics.TimeToCatch(p) / mechanics.PassivesWildAtMostN[numRandomPassives],
+                                        0,
+                                        false
+                                    ))
+                                    : AttackProfile.Inactive,
+                                hasNeutralAttack: attackTargets.IsActive && attackState.HasNeutralLevel1Attack
                             )
                         );
                 })
@@ -189,4 +208,13 @@ internal sealed class InitialPalBuilder(
                 .OrderBy(attack => attack.InternalName, StringComparer.Ordinal)
                 .FirstOrDefault();
     }
+
+    private readonly record struct InitialOwnedState(
+        Pal Pal,
+        PassiveSetKey Passives,
+        RelevantIVKey IVs,
+        string EffectiveAttack,
+        AttackProfile AttackProfile,
+        bool HasNeutralAttack
+    );
 }

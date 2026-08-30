@@ -180,6 +180,8 @@ public class ParallelBatchExecutorTests
         public List<PassiveSkill> ActualPassives { get; } = [];
         public ActiveSkill ActualAttack => null!;
         public ActiveSkill EffectiveAttack => null!;
+        public AttackProfile AttackProfile => AttackProfile.Inactive;
+        public bool HasNeutralAttack => false;
         public PalGender Gender => PalGender.MALE;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

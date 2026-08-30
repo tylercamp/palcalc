@@ -44,7 +44,8 @@ namespace PalCalc.Solver.Processing
                 new InitialPalBuilder(
                     settings,
                     context.Mechanics,
-                    context.BreedingDB
+                    context.BreedingDB,
+                    context.AttackTargets
                 ).Build(spec),
                 settings.MaxThreads,
                 controller,

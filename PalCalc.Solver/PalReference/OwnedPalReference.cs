@@ -20,7 +20,9 @@ namespace PalCalc.Solver.PalReference
             List<PassiveSkill> effectivePassives,
             IV_Set effectiveIVs,
             ActiveSkill actualAttack = null,
-            ActiveSkill effectiveAttack = null
+            ActiveSkill effectiveAttack = null,
+            AttackProfile attackProfile = default,
+            bool hasNeutralAttack = false
         )
         {
             this.instance = instance;
@@ -32,6 +34,8 @@ namespace PalCalc.Solver.PalReference
             ActualPassives = instance.PassiveSkills;
             ActualAttack = actualAttack;
             EffectiveAttack = effectiveAttack;
+            AttackProfile = attackProfile;
+            HasNeutralAttack = hasNeutralAttack;
 
             IVs = effectiveIVs;
 
@@ -51,6 +55,10 @@ namespace PalCalc.Solver.PalReference
         public ActiveSkill ActualAttack { get; }
 
         public ActiveSkill EffectiveAttack { get; }
+
+        public AttackProfile AttackProfile { get; }
+
+        public bool HasNeutralAttack { get; }
 
         public float TimeFactor { get; }
 
@@ -78,7 +86,7 @@ namespace PalCalc.Solver.PalReference
 
         private OwnedPalReference MakeGuaranteedGenderImpl(PalGender gender)
         {
-            var res = new OwnedPalReference(instance, EffectivePassives, IVs, ActualAttack, EffectiveAttack);
+            var res = new OwnedPalReference(instance, EffectivePassives, IVs, ActualAttack, EffectiveAttack, AttackProfile, HasNeutralAttack);
             res.Gender = gender;
             return res;
         }

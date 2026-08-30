@@ -371,6 +371,8 @@ public class SearchFrontierCharacterizationTests
         public List<PassiveSkill> ActualPassives { get; } = [];
         public ActiveSkill ActualAttack => null!;
         public ActiveSkill EffectiveAttack { get; } = effectiveAttack;
+        public AttackProfile AttackProfile => AttackProfile.Inactive;
+        public bool HasNeutralAttack => false;
         public PalGender Gender { get; } = gender;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

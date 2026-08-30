@@ -17,7 +17,9 @@ namespace PalCalc.Solver.PalReference
             int numRandomPassives,
             BreedingMechanics mechanics,
             ActiveSkill actualAttack = null,
-            ActiveSkill effectiveAttack = null
+            ActiveSkill effectiveAttack = null,
+            AttackProfile attackProfile = default,
+            bool hasNeutralAttack = false
         )
         {
             ArgumentNullException.ThrowIfNull(mechanics);
@@ -30,6 +32,8 @@ namespace PalCalc.Solver.PalReference
             Gender = PalGender.WILDCARD;
             ActualAttack = actualAttack;
             EffectiveAttack = effectiveAttack;
+            AttackProfile = attackProfile;
+            HasNeutralAttack = hasNeutralAttack;
             CapturesRequiredForGender = 1;
 
             if (guaranteedPassives.Any(t => !pal.GuaranteedPassivesInternalIds.Contains(t.InternalName))) throw new InvalidOperationException();
@@ -58,6 +62,10 @@ namespace PalCalc.Solver.PalReference
 
         public ActiveSkill EffectiveAttack { get; private set; }
 
+        public AttackProfile AttackProfile { get; private set; }
+
+        public bool HasNeutralAttack { get; private set; }
+
         public float TimeFactor => 1.0f;
 
         public IPalRefLocation Location { get; } = new CapturedRefLocation();
@@ -85,6 +93,21 @@ namespace PalCalc.Solver.PalReference
 
         private WildPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
         {
+            var capturesRequiredForGender = useReverser ? 1 : gender switch
+            {
+                PalGender.WILDCARD => 1,
+                PalGender.OPPOSITE_WILDCARD =>
+                    (int)Math.Round(
+                        1 / Math.Min(
+                            db.BreedingGenderProbability[Pal][PalGender.MALE],
+                            db.BreedingGenderProbability[Pal][PalGender.FEMALE]
+                        )
+                    ),
+                PalGender.MALE => (int)Math.Round(1 / db.BreedingGenderProbability[Pal][PalGender.MALE]),
+                PalGender.FEMALE => (int)Math.Round(1 / db.BreedingGenderProbability[Pal][PalGender.FEMALE]),
+                _ => throw new NotImplementedException()
+            };
+
             return new WildPalReference(Pal)
             {
                 SelfBreedingEffort = SelfBreedingEffort,
@@ -94,20 +117,15 @@ namespace PalCalc.Solver.PalReference
                 IVs = IVs,
                 ActualAttack = ActualAttack,
                 EffectiveAttack = EffectiveAttack,
-                CapturesRequiredForGender = useReverser ? 1 : gender switch
-                {
-                    PalGender.WILDCARD => 1,
-                    PalGender.OPPOSITE_WILDCARD =>
-                        (int)Math.Round(
-                            1 / Math.Min(
-                                db.BreedingGenderProbability[Pal][PalGender.MALE],
-                                db.BreedingGenderProbability[Pal][PalGender.FEMALE]
-                            )
-                        ),
-                    PalGender.MALE => (int)Math.Round(1 / db.BreedingGenderProbability[Pal][PalGender.MALE]),
-                    PalGender.FEMALE => (int)Math.Round(1 / db.BreedingGenderProbability[Pal][PalGender.FEMALE]),
-                    _ => throw new NotImplementedException()
-                }
+                AttackProfile = AttackProfile.Equals(PalCalc.Solver.PalReference.Properties.AttackProfile.Inactive)
+                    ? PalCalc.Solver.PalReference.Properties.AttackProfile.Inactive
+                    : new AttackProfile(AttackProfile.Entries.Select(entry => entry with
+                    {
+                        BreedingEffort = entry.BreedingEffort - BreedingEffort +
+                            SelfBreedingEffort * capturesRequiredForGender
+                    }).ToArray()),
+                HasNeutralAttack = HasNeutralAttack,
+                CapturesRequiredForGender = capturesRequiredForGender
             };
         }
 

@@ -40,7 +40,7 @@ public readonly record struct AttackProfileEntry(
     }
 }
 
-public readonly struct AttackProfile
+public readonly struct AttackProfile : IEquatable<AttackProfile>
 {
     private readonly AttackProfileEntry[] entries;
 
@@ -56,4 +56,38 @@ public readonly struct AttackProfile
     public bool Contains(byte requiredMask) => entries?.Any(entry =>
         (entry.MasteredTargetMask & requiredMask) == requiredMask
     ) == true;
+
+    public bool Equals(AttackProfile other)
+    {
+        if (ReferenceEquals(entries, other.entries))
+            return true;
+        if (entries is null || other.entries is null)
+            return false;
+        return entries.SequenceEqual(other.entries);
+    }
+
+    public override bool Equals(object obj) => obj is AttackProfile other && Equals(other);
+
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.Add(entries is null);
+        foreach (var entry in Entries)
+            hash.Add(entry);
+        return hash.ToHashCode();
+    }
+
+    internal AttackProfile WithGuaranteedGender(
+        GameSettings gameSettings,
+        Pal pal,
+        float parent1TimeFactor,
+        float parent2TimeFactor,
+        PalDB db,
+        PalGender gender,
+        bool useReverser
+    ) => entries is null
+        ? Inactive
+        : new AttackProfile(entries.Select(entry => entry.WithGuaranteedGender(
+            gameSettings, pal, parent1TimeFactor, parent2TimeFactor, db, gender, useReverser
+        )).ToArray());
 }

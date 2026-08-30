@@ -36,6 +36,10 @@ namespace PalCalc.Solver.PalReference
 
         ActiveSkill EffectiveAttack { get; }
 
+        AttackProfile AttackProfile { get; }
+
+        bool HasNeutralAttack { get; }
+
         PalGender Gender { get; }
 
         /// <summary>

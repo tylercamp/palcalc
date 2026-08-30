@@ -23,7 +23,9 @@ namespace PalCalc.Solver.PalReference
             List<PassiveSkill> passives,
             IV_Set ivs,
             ActiveSkill actualAttack,
-            ActiveSkill effectiveAttack
+            ActiveSkill effectiveAttack,
+            AttackProfile attackProfile,
+            bool hasNeutralAttack
         )
         {
             this.gameSettings = gameSettings;
@@ -53,6 +55,8 @@ namespace PalCalc.Solver.PalReference
             IVs = ivs;
             ActualAttack = actualAttack;
             EffectiveAttack = effectiveAttack;
+            AttackProfile = attackProfile;
+            HasNeutralAttack = hasNeutralAttack;
 
             EffectivePassives = passives;
             EffectivePassivesHash = passives.SetHash(p => p.InternalName);
@@ -77,8 +81,10 @@ namespace PalCalc.Solver.PalReference
             float ivsProbability,
             ActiveSkill actualAttack = null,
             ActiveSkill effectiveAttack = null,
-            float attacksProbability = 1
-        ) : this(gameSettings, pal, parent1, parent2, passives, ivs, actualAttack, effectiveAttack)
+            float attacksProbability = 1,
+            AttackProfile attackProfile = default,
+            bool hasNeutralAttack = false
+        ) : this(gameSettings, pal, parent1, parent2, passives, ivs, actualAttack, effectiveAttack, attackProfile, hasNeutralAttack)
         {
             Gender = PalGender.WILDCARD;
             if (passivesProbability <= 0 || ivsProbability <= 0 || attacksProbability <= 0)
@@ -168,6 +174,10 @@ namespace PalCalc.Solver.PalReference
 
         public ActiveSkill EffectiveAttack { get; }
 
+        public AttackProfile AttackProfile { get; }
+
+        public bool HasNeutralAttack { get; }
+
         public bool IsOutdated { get; set; }
 
         private BredPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
@@ -178,7 +188,8 @@ namespace PalCalc.Solver.PalReference
             }
             else
             {
-                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs, ActualAttack, EffectiveAttack)
+                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs, ActualAttack, EffectiveAttack,
+                    AttackProfile.WithGuaranteedGender(gameSettings, Pal, Parent1.TimeFactor, Parent2.TimeFactor, db, gender, useReverser), HasNeutralAttack)
                 {
                     AvgRequiredBreedings = BredPalReferenceEffort.WithGuaranteedGender(AvgRequiredBreedings, Pal, db, gender, useReverser),
                     Gender = gender,
