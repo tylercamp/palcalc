@@ -122,6 +122,14 @@ public class CandidateExpanderTests
         Assert.AreSame(candidate.ActualAttack, gendered.ActualAttack);
         Assert.AreSame(candidate.EffectiveAttack, gendered.EffectiveAttack);
         Assert.AreEqual(candidate.AttacksProbability, gendered.AttacksProbability);
+        Assert.AreEqual(
+            (int)Math.Ceiling(
+                candidate.AvgRequiredBreedings /
+                SolverTestScenario.DB.BreedingGenderProbability[candidate.Pal][PalGender.MALE]
+            ),
+            gendered.AvgRequiredBreedings
+        );
+        Assert.IsTrue(gendered.AvgRequiredBreedings > candidate.AvgRequiredBreedings);
     }
 
     [TestMethod]

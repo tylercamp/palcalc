@@ -26,6 +26,25 @@ public class SearchFrontierCharacterizationTests
     }
 
     [TestMethod]
+    public void ResultLimitPruning_LimitsAlternativesToThree()
+    {
+        var pal = "Katress".ToPal(SolverTestScenario.DB);
+        var alternatives = Enumerable.Range(1, 4)
+            .Select(index => (IPalReference)new TestPalReference(
+                $"alternative-{index}",
+                pal,
+                TimeSpan.FromMinutes(index)
+            ))
+            .ToList();
+
+        var results = new ResultLimitPruning(CancellationToken.None, maxResults: 3)
+            .Apply(alternatives, new CachedResultData(alternatives))
+            .ToList();
+
+        Assert.AreEqual(3, results.Count);
+    }
+
+    [TestMethod]
     public void ExpandSingles_ReplacesInferiorCandidateAndReportsDelta()
     {
         var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
