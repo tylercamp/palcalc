@@ -1,6 +1,7 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Processing.Attacks;
 
 namespace PalCalc.Solver.Processing.Search;
 
@@ -189,9 +190,15 @@ internal interface IEffectivePropertiesKeyProvider
 
 internal sealed class DefaultEffectivePropertiesKeyProvider : IEffectivePropertiesKeyProvider
 {
-    public static DefaultEffectivePropertiesKeyProvider Instance { get; } = new();
+    public static DefaultEffectivePropertiesKeyProvider Instance { get; } = new(false);
 
-    private DefaultEffectivePropertiesKeyProvider() { }
+    private readonly bool attackProfilesActive;
+
+    internal DefaultEffectivePropertiesKeyProvider(AttackTargetContext attackTargets) :
+        this(attackTargets?.IsActive ?? false) { }
+
+    private DefaultEffectivePropertiesKeyProvider(bool attackProfilesActive) =>
+        this.attackProfilesActive = attackProfilesActive;
 
     public EffectivePropertiesKey KeyOf(IPalReference reference) =>
         new(
@@ -199,6 +206,8 @@ internal sealed class DefaultEffectivePropertiesKeyProvider : IEffectiveProperti
             gender: reference.Gender,
             passives: new PassiveSetKey(reference.EffectivePassives),
             ivs: new RelevantIVKey(reference.IVs),
-            effectiveAttackInternalName: reference.EffectiveAttack?.InternalName
+            effectiveAttackInternalName: attackProfilesActive
+                ? null
+                : reference.EffectiveAttack?.InternalName
         );
 }

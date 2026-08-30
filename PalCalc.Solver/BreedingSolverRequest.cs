@@ -69,9 +69,11 @@ internal sealed class SolverRunContext
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(controller);
 
+        var attackTargets = new AttackTargetContext(request.CapturedTarget, request.Settings.DB);
         selectionPolicy ??= new DefaultCandidateSelectionPolicy(
             request.Settings.ResultPruning,
-            controller.CancellationToken
+            controller.CancellationToken,
+            attackTargets: attackTargets
         );
 
         return new(
@@ -83,7 +85,7 @@ internal sealed class SolverRunContext
             breedingDB: request.Settings.BreedingDB,
             controller: controller,
             selectionPolicy: selectionPolicy,
-            attackTargets: new AttackTargetContext(request.CapturedTarget, request.Settings.DB)
+            attackTargets: attackTargets
         );
     }
 }

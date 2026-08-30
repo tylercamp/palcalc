@@ -56,10 +56,21 @@ internal sealed class SearchFrontier : ICandidateFrontierView
 
     public FrontierCandidateAssessment AssessCandidate(IPalReference reference, EffectivePropertiesKey propertiesKey)
     {
-        var incumbent = index[propertiesKey]?.FirstOrDefault();
-        return incumbent == null
-            ? FrontierCandidateAssessment.PotentialImprovement
-            : selectionPolicy.AssessAgainstFrontier(reference, incumbent);
+        var incumbents = index[propertiesKey];
+        if (incumbents is null || incumbents.Count == 0)
+            return FrontierCandidateAssessment.PotentialImprovement;
+
+        var assessments = incumbents
+            .Select(incumbent => selectionPolicy.AssessAgainstFrontier(reference, incumbent))
+            .ToList();
+        if (assessments.All(assessment =>
+            assessment == FrontierCandidateAssessment.GuaranteedImprovement
+        ))
+            return FrontierCandidateAssessment.GuaranteedImprovement;
+
+        return assessments.All(assessment => assessment == FrontierCandidateAssessment.Inferior)
+            ? FrontierCandidateAssessment.Inferior
+            : FrontierCandidateAssessment.PotentialImprovement;
     }
 
     /// <summary>

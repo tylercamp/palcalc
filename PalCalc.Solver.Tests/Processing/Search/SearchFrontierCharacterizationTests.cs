@@ -1,6 +1,7 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.ResultPruning;
 
@@ -119,6 +120,95 @@ public class SearchFrontierCharacterizationTests
             frontier.CurrentContent.ToList()
         );
         Assert.IsFalse(withTargetAttack.IsOutdated);
+    }
+
+    [TestMethod]
+    public void AssessCandidate_RequiresCoverageOfEveryIncumbentForGuaranteedImprovement()
+    {
+        var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
+        var requiredAttack = SolverTestScenario.DB.ActiveSkills.First(attack => attack.CanInherit);
+        var policy = new DefaultCandidateSelectionPolicy(
+            MinimumEffortOnly,
+            CancellationToken.None,
+            attackTargets: new AttackTargetContext(
+                new PalSpecifier { RequiredAttacks = [requiredAttack] },
+                SolverTestScenario.DB
+            )
+        );
+        var first = new TestPalReference(
+            "first",
+            "Katress".ToPal(SolverTestScenario.DB),
+            TimeSpan.FromMinutes(10),
+            attackProfile: Profile(1)
+        );
+        var second = new TestPalReference(
+            "second",
+            "Katress".ToPal(SolverTestScenario.DB),
+            TimeSpan.FromMinutes(10),
+            attackProfile: Profile(2)
+        );
+        var frontier = FrontierFor(targetPal, [first, second], selectionPolicy: policy);
+        var complete = new TestPalReference(
+            "complete",
+            first.Pal,
+            TimeSpan.FromMinutes(5),
+            attackProfile: Profile(3)
+        );
+        var partial = new TestPalReference(
+            "partial",
+            first.Pal,
+            TimeSpan.FromMinutes(5),
+            attackProfile: Profile(1)
+        );
+
+        Assert.AreEqual(
+            FrontierCandidateAssessment.GuaranteedImprovement,
+            frontier.AssessCandidate(complete, policy.KeyOf(complete))
+        );
+        Assert.AreEqual(
+            FrontierCandidateAssessment.PotentialImprovement,
+            frontier.AssessCandidate(partial, policy.KeyOf(partial))
+        );
+    }
+
+    [TestMethod]
+    public void ExpandSingles_PreservesAttackEnvelopeAcrossPrePruningAndMerge()
+    {
+        var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
+        var attackTargets = new AttackTargetContext(
+            new PalSpecifier
+            {
+                RequiredAttacks =
+                [.. SolverTestScenario.DB.ActiveSkills.Where(attack => attack.CanInherit).Take(6)],
+            },
+            SolverTestScenario.DB
+        );
+        var policy = new DefaultCandidateSelectionPolicy(
+            new(token => [new ResultLimitPruning(token, maxResults: 3)]),
+            CancellationToken.None,
+            attackTargets: attackTargets
+        );
+        var initial = new TestPalReference(
+            "initial",
+            "Katress".ToPal(SolverTestScenario.DB),
+            TimeSpan.FromMinutes(1),
+            attackProfile: Profile(1, 2)
+        );
+        var additions = new[]
+        {
+            new TestPalReference("third", initial.Pal, TimeSpan.FromMinutes(3), attackProfile: Profile(4)),
+            new TestPalReference("fourth", initial.Pal, TimeSpan.FromMinutes(4), attackProfile: Profile(8)),
+            new TestPalReference("fifth", initial.Pal, TimeSpan.FromMinutes(5), attackProfile: Profile(16)),
+            new TestPalReference("sixth", initial.Pal, TimeSpan.FromMinutes(6), attackProfile: Profile(32)),
+        };
+        var frontier = FrontierFor(targetPal, [initial], selectionPolicy: policy);
+
+        frontier.ExpandSingles(_ => additions);
+
+        CollectionAssert.AreEquivalent(
+            new[] { initial }.Concat(additions).ToArray(),
+            frontier.CurrentContent.ToArray()
+        );
     }
 
     [TestMethod]
@@ -328,7 +418,8 @@ public class SearchFrontierCharacterizationTests
     private static SearchFrontier FrontierFor(
         Pal targetPal,
         IEnumerable<IPalReference> initialContent,
-        IEnumerable<PassiveSkill>? optionalPassives = null
+        IEnumerable<PassiveSkill>? optionalPassives = null,
+        ICandidateSelectionPolicy? selectionPolicy = null
     )
     {
         var controller = new SolverStateController(
@@ -344,12 +435,16 @@ public class SearchFrontierCharacterizationTests
             initialContent: initialContent,
             maxThreads: 1,
             controller: controller,
-            selectionPolicy: new DefaultCandidateSelectionPolicy(
+            selectionPolicy: selectionPolicy ?? new DefaultCandidateSelectionPolicy(
                 MinimumEffortOnly,
                 controller.CancellationToken
             )
         );
     }
+
+    private static AttackProfile Profile(params byte[] masks) => new(masks.Select(mask =>
+        new AttackProfileEntry(mask, 0, TimeSpan.Zero, 0, false)
+    ).ToArray());
 
     /*
      * Deliberately minimal reference used to characterize frontier mechanics without
@@ -360,7 +455,9 @@ public class SearchFrontierCharacterizationTests
         Pal pal,
         TimeSpan breedingEffort,
         PalGender gender = PalGender.MALE,
-        ActiveSkill effectiveAttack = null!
+        ActiveSkill effectiveAttack = null!,
+        AttackProfile attackProfile = default,
+        bool hasNeutralAttack = false
     ) : IPalReference
     {
         public string Name { get; } = name;
@@ -371,8 +468,8 @@ public class SearchFrontierCharacterizationTests
         public List<PassiveSkill> ActualPassives { get; } = [];
         public ActiveSkill ActualAttack => null!;
         public ActiveSkill EffectiveAttack { get; } = effectiveAttack;
-        public AttackProfile AttackProfile => AttackProfile.Inactive;
-        public bool HasNeutralAttack => false;
+        public AttackProfile AttackProfile { get; } = attackProfile;
+        public bool HasNeutralAttack { get; } = hasNeutralAttack;
         public PalGender Gender { get; } = gender;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

@@ -1,6 +1,7 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 
 namespace PalCalc.Solver.Tests.Processing.Search;
@@ -91,6 +92,29 @@ public class EffectivePropertiesKeyTests
         Assert.AreNotEqual(provider.KeyOf(withoutAttack), provider.KeyOf(withRandomAttack));
         Assert.AreNotEqual(provider.KeyOf(withRequiredAttack), provider.KeyOf(withRandomAttack));
         Assert.AreEqual(provider.KeyOf(withRandomAttack), provider.KeyOf(withOtherRandomAttack));
+    }
+
+    [TestMethod]
+    public void KeyProvider_ActiveAttackRunOmitsSingularAttackIdentity()
+    {
+        var pal = "Katress".ToPal(SolverTestScenario.DB);
+        var requiredAttack = SolverTestScenario.DB.ActiveSkills.First(attack => attack.CanInherit);
+        var provider = new DefaultEffectivePropertiesKeyProvider(
+            new AttackTargetContext(
+                new PalSpecifier { RequiredAttacks = [requiredAttack] },
+                SolverTestScenario.DB
+            )
+        );
+        var withoutAttack = new TestPalReference(pal, PalGender.MALE, [], new IV_Set());
+        var withAttack = new TestPalReference(
+            pal,
+            PalGender.MALE,
+            [],
+            new IV_Set(),
+            effectiveAttack: requiredAttack
+        );
+
+        Assert.AreEqual(provider.KeyOf(withoutAttack), provider.KeyOf(withAttack));
     }
 
     [TestMethod]

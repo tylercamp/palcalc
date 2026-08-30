@@ -2,6 +2,7 @@ using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Processing;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.ResultPruning;
 
@@ -127,6 +128,108 @@ public class CandidateSelectionPolicyTests
             FrontierCandidateAssessment.PotentialImprovement,
             cheaper
         );
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_RetainUniqueEnvelopeContributorsBeyondResultLimit()
+    {
+        var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 3)]));
+        var candidates = new[]
+        {
+            Reference("first", "Katress", TimeSpan.FromMinutes(1), Profile(1, 2)),
+            Reference("second", "Katress", TimeSpan.FromMinutes(2), Profile(4)),
+            Reference("third", "Katress", TimeSpan.FromMinutes(3), Profile(8)),
+            Reference("fourth", "Katress", TimeSpan.FromMinutes(4), Profile(16)),
+        };
+
+        var retained = policy.SelectRetainedAlternatives(candidates);
+
+        CollectionAssert.AreEquivalent(candidates, retained.ToArray());
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_StillApplyExistingPruningToRedundantCandidates()
+    {
+        var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 3)]));
+        var candidates = Enumerable.Range(1, 4)
+            .Select(index => Reference(
+                $"candidate-{index}",
+                "Katress",
+                TimeSpan.FromMinutes(index),
+                Profile(1)
+            ))
+            .ToList();
+
+        var retained = policy.SelectRetainedAlternatives(candidates);
+
+        Assert.AreEqual(3, retained.Count);
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_PreserveIncomparableEarlyCandidates()
+    {
+        var policy = ActivePolicy();
+        var incumbent = Reference("incumbent", "Katress", TimeSpan.FromMinutes(5), Profile(1));
+        var slowerUnique = Reference("unique", "Katress", TimeSpan.FromMinutes(10), Profile(2));
+        var neutral = Reference(
+            "neutral",
+            "Katress",
+            TimeSpan.FromMinutes(5),
+            Profile(1),
+            totalCost: 100,
+            hasNeutralAttack: true
+        );
+        var cheaperNonNeutral = Reference(
+            "non-neutral",
+            "Katress",
+            TimeSpan.FromMinutes(5),
+            Profile(1),
+            totalCost: 1
+        );
+
+        Assert.AreEqual(
+            EarlyCandidateSelection.KeepBoth,
+            policy.SelectEarlyCandidate(slowerUnique, incumbent)
+        );
+        Assert.AreEqual(
+            EarlyCandidateSelection.KeepBoth,
+            policy.SelectEarlyCandidate(cheaperNonNeutral, neutral)
+        );
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_RequireCompleteCoverageForFrontierImprovement()
+    {
+        var policy = ActivePolicy();
+        var incumbent = Reference(
+            "incumbent",
+            "Katress",
+            TimeSpan.FromMinutes(10),
+            Profile(1, 2)
+        );
+        var fasterPartial = Reference(
+            "partial",
+            "Katress",
+            TimeSpan.FromMinutes(5),
+            Profile(1)
+        );
+
+        Assert.AreEqual(
+            FrontierCandidateAssessment.PotentialImprovement,
+            policy.AssessAgainstFrontier(fasterPartial, incumbent)
+        );
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_AllowExistingEffortPruningForIdenticalCapability()
+    {
+        var policy = ActivePolicy(new(token => [new MinimumEffortPruning(token)]));
+        var faster = Reference("faster", "Katress", TimeSpan.FromMinutes(5), Profile(1));
+        var slower = Reference("slower", "Katress", TimeSpan.FromMinutes(10), Profile(1));
+
+        var retained = policy.SelectRetainedAlternatives([slower, faster]);
+
+        CollectionAssert.AreEqual(new[] { faster }, retained.ToArray());
     }
 
     [TestMethod]
@@ -374,15 +477,41 @@ public class CandidateSelectionPolicyTests
             CancellationToken.None
         );
 
+    private static DefaultCandidateSelectionPolicy ActivePolicy(
+        ResultPruningPolicy? pruning = null
+    ) =>
+        new(
+            pruning ?? ResultPruningPolicy.Default,
+            CancellationToken.None,
+            attackTargets: new AttackTargetContext(
+                new PalSpecifier
+                {
+                    RequiredAttacks =
+                    [.. SolverTestScenario.DB.ActiveSkills.Where(attack => attack.CanInherit).Take(6)],
+                },
+                SolverTestScenario.DB
+            )
+        );
+
+    private static AttackProfile Profile(params byte[] masks) => new(masks.Select(mask =>
+        new AttackProfileEntry(mask, 0, TimeSpan.Zero, 0, false)
+    ).ToArray());
+
     private static TestPalReference Reference(
         string name,
         string pal,
-        TimeSpan effort
+        TimeSpan effort,
+        AttackProfile attackProfile = default,
+        int totalCost = 0,
+        bool hasNeutralAttack = false
     ) =>
         new(
             name,
             pal.ToPal(SolverTestScenario.DB),
-            effort
+            effort,
+            totalCost,
+            attackProfile,
+            hasNeutralAttack
         );
 
     private sealed class DelegatingPolicy(
@@ -454,7 +583,9 @@ public class CandidateSelectionPolicyTests
         string name,
         Pal pal,
         TimeSpan breedingEffort,
-        int totalCost = 0
+        int totalCost = 0,
+        AttackProfile attackProfile = default,
+        bool hasNeutralAttack = false
     ) : IPalReference
     {
         public string Name { get; } = name;
@@ -465,8 +596,8 @@ public class CandidateSelectionPolicyTests
         public List<PassiveSkill> ActualPassives { get; } = [];
         public ActiveSkill ActualAttack => null!;
         public ActiveSkill EffectiveAttack => null!;
-        public AttackProfile AttackProfile => AttackProfile.Inactive;
-        public bool HasNeutralAttack => false;
+        public AttackProfile AttackProfile { get; } = attackProfile;
+        public bool HasNeutralAttack { get; } = hasNeutralAttack;
         public PalGender Gender => PalGender.MALE;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;
