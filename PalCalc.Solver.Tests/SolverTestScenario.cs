@@ -56,7 +56,8 @@ internal static class SolverTestScenario
         int maxSurgeryCost = 0,
         IEnumerable<PassiveSkill>? allowedSurgeryPassives = null,
         IEnumerable<Pal>? allowedWildPals = null,
-        IEnumerable<Pal>? bannedBredPals = null
+        IEnumerable<Pal>? bannedBredPals = null,
+        int? maxSpecialCakes = 0
     ) =>
         new(
             solver: new BreedingSolver(),
@@ -77,7 +78,8 @@ internal static class SolverTestScenario
                 maxThreads: maxThreads,
                 maxSurgeryCost: maxSurgeryCost,
                 allowedSurgeryPassives: allowedSurgeryPassives?.ToList() ?? [],
-                useGenderReversers: false
+                useGenderReversers: false,
+                maxSpecialCakes: maxSpecialCakes
             )
         );
 

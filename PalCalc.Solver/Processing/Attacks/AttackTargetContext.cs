@@ -1,0 +1,87 @@
+using PalCalc.Model;
+
+namespace PalCalc.Solver.Processing.Attacks;
+
+/// <summary>
+/// Maps the normalized required attacks for one solver run to bit positions.
+/// A mask from this context is not meaningful in another run.
+/// </summary>
+internal sealed class AttackTargetContext
+{
+    public const int MaxRequiredAttacks = 6;
+
+    private readonly PalDB db;
+    private readonly ActiveSkill[] requiredAttacks;
+    private readonly Dictionary<Pal, SpeciesAttackState> speciesStates;
+
+    public AttackTargetContext(PalSpecifier target, PalDB db)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(db);
+
+        this.db = db;
+        requiredAttacks = target.RequiredAttacks.Distinct().ToArray();
+        if (requiredAttacks.Length > MaxRequiredAttacks)
+            throw new ArgumentOutOfRangeException(nameof(target), $"At most {MaxRequiredAttacks} required attacks are supported.");
+
+        IsActive = requiredAttacks.Length != 0;
+        FullTargetMask = (byte)((1 << requiredAttacks.Length) - 1);
+        InheritableTargetMask = MaskOf(requiredAttacks.Where(attack => attack.CanInherit));
+        speciesStates = db.Pals.ToDictionary(pal => pal, CreateSpeciesState);
+    }
+
+    public bool IsActive { get; }
+    public byte FullTargetMask { get; }
+    public byte InheritableTargetMask { get; }
+
+    public byte MaskOf(IEnumerable<ActiveSkill> attacks)
+    {
+        ArgumentNullException.ThrowIfNull(attacks);
+
+        byte mask = 0;
+        foreach (var attack in attacks)
+        {
+            var index = Array.IndexOf(requiredAttacks, attack);
+            if (index >= 0)
+                mask |= (byte)(1 << index);
+        }
+
+        return mask;
+    }
+
+    public ActiveSkill AttackForBit(byte singleBit)
+    {
+        if (singleBit == 0 || (singleBit & (singleBit - 1)) != 0)
+            throw new ArgumentOutOfRangeException(nameof(singleBit));
+
+        var index = 0;
+        while ((singleBit >>= 1) != 0)
+            index++;
+
+        return index < requiredAttacks.Length
+            ? requiredAttacks[index]
+            : throw new ArgumentOutOfRangeException(nameof(singleBit));
+    }
+
+    public SpeciesAttackState StateOf(Pal pal)
+    {
+        ArgumentNullException.ThrowIfNull(pal);
+        return speciesStates.TryGetValue(pal, out var state)
+            ? state
+            : CreateSpeciesState(pal);
+    }
+
+    private SpeciesAttackState CreateSpeciesState(Pal pal)
+    {
+        var level1Attacks = pal.Level1ActiveSkills(db).ToArray();
+        return new(
+            Level1TargetMask: MaskOf(level1Attacks),
+            HasNeutralLevel1Attack: level1Attacks.Any(attack => !attack.CanInherit)
+        );
+    }
+}
+
+internal readonly record struct SpeciesAttackState(
+    byte Level1TargetMask,
+    bool HasNeutralLevel1Attack
+);

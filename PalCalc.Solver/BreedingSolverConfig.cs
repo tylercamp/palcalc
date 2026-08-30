@@ -38,7 +38,8 @@ public sealed class BreedingSolverSettings
         int maxThreads,
         int maxSurgeryCost,
         IEnumerable<PassiveSkill> allowedSurgeryPassives,
-        bool useGenderReversers
+        bool useGenderReversers,
+        int? maxSpecialCakes = 0
     )
     {
         ArgumentNullException.ThrowIfNull(db);
@@ -49,6 +50,8 @@ public sealed class BreedingSolverSettings
         ArgumentNullException.ThrowIfNull(allowedWildPals);
         ArgumentNullException.ThrowIfNull(bannedBredPals);
         ArgumentNullException.ThrowIfNull(allowedSurgeryPassives);
+        if (maxSpecialCakes < 0)
+            throw new ArgumentOutOfRangeException(nameof(maxSpecialCakes));
 
         DB = db;
         BreedingDB = breedingDB;
@@ -69,6 +72,7 @@ public sealed class BreedingSolverSettings
         MaxSurgeryCost = maxSurgeryCost;
         SurgeryPassives = allowedSurgeryPassives.ToList();
         UseGenderReversers = useGenderReversers;
+        MaxSpecialCakes = maxSpecialCakes;
     }
 
     public PalDB DB { get; }
@@ -88,4 +92,5 @@ public sealed class BreedingSolverSettings
     public int MaxSurgeryCost { get; }
     public IReadOnlyList<PassiveSkill> SurgeryPassives { get; }
     public bool UseGenderReversers { get; }
+    public int? MaxSpecialCakes { get; }
 }
