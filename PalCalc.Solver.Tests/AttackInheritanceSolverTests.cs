@@ -64,7 +64,7 @@ public class AttackInheritanceSolverTests
     }
 
     [TestMethod]
-    public void Solve_CombinesDilutedAttackPassiveAndIVProbabilities()
+    public void Solve_StoresDilutedAttackPassiveAndIVProbabilitiesInTheProfile()
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var requiredAttack = InheritableAttackNotInnateTo(child);
@@ -101,15 +101,19 @@ public class AttackInheritanceSolverTests
             ivAttack: 90,
             requiredAttack: requiredAttack
         ).OfType<BredPalReference>().First();
-        var expectedEggs = (int)Math.Ceiling(
+        var expectedProfileEggs = (int)Math.Ceiling(
             1f /
-            (result.PassivesProbability * result.IVsProbability * result.AttacksProbability)
+            (result.PassivesProbability * result.IVsProbability * 0.5f)
         );
+        var inherited = result.AttackProfile.Entries.Single(entry => entry.MasteredTargetMask == 1);
 
-        Assert.AreEqual(0.5f, result.AttacksProbability);
-        Assert.AreEqual(expectedEggs, result.AvgRequiredBreedings);
-        Assert.AreEqual(expectedEggs, result.NumTotalEggs);
-        Assert.IsTrue(expectedEggs > 2);
+        Assert.AreEqual(1f, result.AttacksProbability);
+        Assert.AreEqual(expectedProfileEggs, inherited.SelfBreedings);
+        Assert.AreEqual(
+            (int)Math.Ceiling(1f / (result.PassivesProbability * result.IVsProbability)),
+            result.AvgRequiredBreedings
+        );
+        Assert.IsTrue(inherited.SelfBreedings > result.AvgRequiredBreedings);
     }
 
     [TestMethod]

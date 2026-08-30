@@ -1,6 +1,7 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.Utils;
 using System;
@@ -35,10 +36,12 @@ namespace PalCalc.Solver.Processing
         BreedingSolverSettings settings,
         ObjectPoolFactory poolFactory,
         BreedingMechanics mechanics,
-        PalBreedingDB breedingDB
+        PalBreedingDB breedingDB,
+        AttackTargetContext attackTargets
     )
     {
         private readonly PalDB db = settings.DB;
+        private readonly AttackProfileComposer attackProfileComposer = new(attackTargets, settings, poolFactory);
 
         private readonly LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();
         private readonly LocalListPool<(IPalReference, IPalReference)> palPairListPool = poolFactory.GetListPool<(IPalReference, IPalReference)>();
@@ -361,14 +364,6 @@ namespace PalCalc.Solver.Processing
                         Attack: MergeIVs(parent1.IVs.Attack, parent2.IVs.Attack),
                         Defense: MergeIVs(parent1.IVs.Defense, parent2.IVs.Defense)
                     );
-                    var attackOutcome = Probabilities.Attacks.InheritanceOutcome(
-                        db,
-                        context.Target.RequiredAttack,
-                        childPalType,
-                        parent1,
-                        parent2
-                    );
-
                     // Note: We need to use `ActualPassives` for inheritance calc, NOT `EffectivePassives`. If we have:
                     //
                     //    Parent 1: [A, B, D]
@@ -433,7 +428,9 @@ namespace PalCalc.Solver.Processing
                             for (int i = 0; i < numRandomPassivesNeeded; i++)
                                 newPassives.Add(randomPassivePool.BorrowRaw());
 
-                            var res = new BredPalReference(
+                            // Keep the structural estimate independent of attack probability. Active
+                            // profiles carry the actual effort of each attainable attack realization.
+                            var structuralChild = new BredPalReference(
                                 settings.GameSettings,
                                 childPalType,
                                 parent1,
@@ -441,21 +438,78 @@ namespace PalCalc.Solver.Processing
                                 newPassives,
                                 probabilityForUpToNumPassives,
                                 finalIVs,
-                                ivsProbability,
-                                actualAttack: attackOutcome.ActualAttack,
-                                effectiveAttack: attackOutcome.EffectiveAttack,
-                                attacksProbability: attackOutcome.Probability
+                                ivsProbability
                             );
 
                             var added = false;
-                            var filterResult = context.PreFilter.TryAdd(res);
-                            if (filterResult.Accepted)
+                            if (structuralChild.BreedingEffort <= settings.MaxEffort)
                             {
-                                newPassivesRef.Retain();
+                                BredPalReference res = null;
+                                if (context.AttackTargets.IsActive)
+                                {
+                                    var attackProfile = attackProfileComposer.Compose(
+                                        childPalType,
+                                        parent1,
+                                        parent2,
+                                        probabilityForUpToNumPassives,
+                                        ivsProbability
+                                    );
+                                    if (attackProfile.Entries.Count != 0)
+                                        res = new BredPalReference(
+                                            settings.GameSettings,
+                                            childPalType,
+                                            parent1,
+                                            parent2,
+                                            newPassives,
+                                            probabilityForUpToNumPassives,
+                                            finalIVs,
+                                            ivsProbability,
+                                            actualAttack: attackProfile.Contains(context.AttackTargets.FullTargetMask)
+                                                ? context.Target.RequiredAttack
+                                                : null,
+                                            effectiveAttack: attackProfile.Contains(context.AttackTargets.FullTargetMask)
+                                                ? context.Target.RequiredAttack
+                                                : null,
+                                            attackProfile: attackProfile,
+                                            hasNeutralAttack: context.AttackTargets.StateOf(childPalType).HasNeutralLevel1Attack
+                                        );
+                                }
+                                else
+                                {
+                                    var attackOutcome = Probabilities.Attacks.InheritanceOutcome(
+                                        db,
+                                        context.Target.RequiredAttack,
+                                        childPalType,
+                                        parent1,
+                                        parent2
+                                    );
+                                    res = new BredPalReference(
+                                        settings.GameSettings,
+                                        childPalType,
+                                        parent1,
+                                        parent2,
+                                        newPassives,
+                                        probabilityForUpToNumPassives,
+                                        finalIVs,
+                                        ivsProbability,
+                                        actualAttack: attackOutcome.ActualAttack,
+                                        effectiveAttack: attackOutcome.EffectiveAttack,
+                                        attacksProbability: attackOutcome.Probability
+                                    );
+                                }
 
-                                yield return res;
-                                added = true;
-                                context.PreFilter.Propagate(filterResult);
+                                if (res is not null)
+                                {
+                                    var filterResult = context.PreFilter.TryAdd(res);
+                                    if (filterResult.Accepted)
+                                    {
+                                        newPassivesRef.Retain();
+
+                                        yield return res;
+                                        added = true;
+                                        context.PreFilter.Propagate(filterResult);
+                                    }
+                                }
                             }
 
                             if (!added)

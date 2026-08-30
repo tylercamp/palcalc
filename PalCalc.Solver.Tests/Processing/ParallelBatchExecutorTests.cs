@@ -128,7 +128,8 @@ public class ParallelBatchExecutorTests
                 context.SelectionPolicy,
                 frontier,
                 configuredSolver.Settings.DB.PalsById.Keys
-            )
+            ),
+            AttackTargets: context.AttackTargets
         );
         var failingReference = new FailingPalReference(
             "Katress".ToPal(SolverTestScenario.DB)

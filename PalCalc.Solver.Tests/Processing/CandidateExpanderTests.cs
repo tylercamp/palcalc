@@ -2,6 +2,7 @@ using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Processing;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.ResultPruning;
 using PalCalc.Solver.Utils;
@@ -91,7 +92,7 @@ public class CandidateExpanderTests
     }
 
     [TestMethod]
-    public void ExpandBatch_AppliesAttackProbabilityAndState()
+    public void ExpandBatch_ComposesAttackProfilesWithoutDilutingStructuralEffort()
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var targetAttack = InheritableAttackNotInnateTo(child);
@@ -110,26 +111,22 @@ public class CandidateExpanderTests
             target
         ).Candidates.Single();
 
-        Assert.AreSame(targetAttack, candidate.ActualAttack);
-        Assert.AreSame(targetAttack, candidate.EffectiveAttack);
-        Assert.AreEqual(0.5f, candidate.AttacksProbability);
+        var inherited = candidate.AttackProfile.Entries.Single(entry => entry.MasteredTargetMask == 1);
+        Assert.IsTrue(candidate.AttackProfile.Entries.Count > 1);
         Assert.AreEqual(
-            (int)Math.Ceiling(1f / (candidate.PassivesProbability * candidate.IVsProbability * candidate.AttacksProbability)),
+            (int)Math.Ceiling(1f / (candidate.PassivesProbability * candidate.IVsProbability * 0.5f)),
+            inherited.SelfBreedings
+        );
+        Assert.AreEqual(
+            (int)Math.Ceiling(1f / (candidate.PassivesProbability * candidate.IVsProbability)),
             candidate.AvgRequiredBreedings
         );
+        Assert.IsTrue(inherited.BreedingEffort > candidate.BreedingEffort);
 
         var gendered = (BredPalReference)candidate.WithGuaranteedGender(SolverTestScenario.DB, PalGender.MALE, false);
-        Assert.AreSame(candidate.ActualAttack, gendered.ActualAttack);
-        Assert.AreSame(candidate.EffectiveAttack, gendered.EffectiveAttack);
-        Assert.AreEqual(candidate.AttacksProbability, gendered.AttacksProbability);
-        Assert.AreEqual(
-            (int)Math.Ceiling(
-                candidate.AvgRequiredBreedings /
-                SolverTestScenario.DB.BreedingGenderProbability[candidate.Pal][PalGender.MALE]
-            ),
-            gendered.AvgRequiredBreedings
-        );
-        Assert.IsTrue(gendered.AvgRequiredBreedings > candidate.AvgRequiredBreedings);
+        var genderedInherited = gendered.AttackProfile.Entries.Single(entry => entry.MasteredTargetMask == 1);
+        Assert.IsTrue(genderedInherited.SelfBreedings > inherited.SelfBreedings);
+        Assert.IsTrue(genderedInherited.BreedingEffort > inherited.BreedingEffort);
     }
 
     [TestMethod]
@@ -147,8 +144,8 @@ public class CandidateExpanderTests
             new PalSpecifier { Pal = child, RequiredAttacks = [targetAttack] }
         ).Candidates.Single();
 
-        Assert.AreSame(targetAttack, candidate.EffectiveAttack);
-        Assert.AreEqual(1, candidate.AttacksProbability);
+        Assert.AreEqual(1, candidate.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual(candidate.AvgRequiredBreedings, candidate.AttackProfile.Entries.Single().SelfBreedings);
     }
 
     [TestMethod]
@@ -164,8 +161,10 @@ public class CandidateExpanderTests
             new PalSpecifier { Pal = child, RequiredAttacks = [targetAttack] }
         ).Candidates.Single();
 
-        Assert.AreSame(targetAttack, candidate.EffectiveAttack);
-        Assert.AreEqual(1, candidate.AttacksProbability);
+        Assert.AreEqual(
+            candidate.AvgRequiredBreedings,
+            candidate.AttackProfile.Entries.Single(entry => entry.MasteredTargetMask == 1).SelfBreedings
+        );
     }
 
     [TestMethod]
@@ -184,8 +183,7 @@ public class CandidateExpanderTests
         );
         var candidate = (BredPalReference)expansion.Candidates.Single();
 
-        Assert.AreNotSame(targetAttack, candidate.EffectiveAttack);
-        Assert.AreEqual(1, candidate.AttacksProbability);
+        Assert.AreEqual(0, candidate.AttackProfile.Entries.Single().MasteredTargetMask);
     }
 
     [TestMethod]
@@ -202,17 +200,20 @@ public class CandidateExpanderTests
         var female = WithAttack(SolverTestScenario.Owned("Katress", PalGender.FEMALE), targetAttack);
         var wixen = WithAttack(SolverTestScenario.Owned("Wixen", PalGender.MALE), neutral);
         var configuredSolver = SolverTestScenario.Solver([male, female, wixen], maxBreedingSteps: 1, maxSolverIterations: 1);
-        var composite = new CompositeOwnedPalReference(ReferenceFor(male, target), ReferenceFor(female, target));
+        var attackTargets = new AttackTargetContext(target, configuredSolver.Settings.DB);
+        var composite = new CompositeOwnedPalReference(
+            ReferenceFor(male, target, attackTargets),
+            ReferenceFor(female, target, attackTargets)
+        );
 
         var candidate = (BredPalReference)Expand(
             composite,
-            ReferenceFor(wixen, target),
+            ReferenceFor(wixen, target, attackTargets),
             target,
             configuredSolver.Settings
         ).Candidates.Single();
 
-        Assert.AreSame(targetAttack, candidate.EffectiveAttack);
-        Assert.AreEqual(1, candidate.AttacksProbability);
+        Assert.IsTrue(candidate.AttackProfile.Contains(1));
         Assert.AreSame(
             female,
             new[] { candidate.Parent1, candidate.Parent2 }
@@ -234,9 +235,10 @@ public class CandidateExpanderTests
             maxSolverIterations: 1
         );
         var settings = configuredSolver.Settings;
+        var attackTargets = new AttackTargetContext(target, settings.DB);
         return Expand(
-            ReferenceFor(first, target),
-            ReferenceFor(second, target),
+            ReferenceFor(first, target, attackTargets),
+            ReferenceFor(second, target, attackTargets),
             target,
             settings
         );
@@ -252,9 +254,11 @@ public class CandidateExpanderTests
         var controller = new SolverStateController(
             CancellationToken.None
         );
+        var attackTargets = new AttackTargetContext(target, settings.DB);
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
-            controller.CancellationToken
+            controller.CancellationToken,
+            attackTargets: attackTargets
         );
         var frontier = new SearchFrontier(
             target,
@@ -272,7 +276,8 @@ public class CandidateExpanderTests
                 selectionPolicy,
                 frontier,
                 settings.DB.PalsById.Keys
-            )
+            ),
+            AttackTargets: attackTargets
         );
         var progress = new WorkBatchProgress();
         var expander = new CandidateExpander(
@@ -280,7 +285,8 @@ public class CandidateExpanderTests
             settings,
             new ObjectPoolFactory(),
             settings.DB.BreedingMechanics,
-            settings.BreedingDB
+            settings.BreedingDB,
+            attackTargets
         );
 
         var candidates = expander
@@ -296,7 +302,8 @@ public class CandidateExpanderTests
 
     private static OwnedPalReference ReferenceFor(
         PalInstance instance,
-        PalSpecifier target
+        PalSpecifier target,
+        AttackTargetContext? attackTargets = null
     )
     {
         var actualAttack = instance.EquippedActiveSkills.FirstOrDefault();
@@ -323,7 +330,17 @@ public class CandidateExpanderTests
                 )
             ),
             actualAttack,
-            effectiveAttack
+            effectiveAttack,
+            attackProfile: attackTargets?.IsActive == true
+                ? new(new AttackProfileEntry(
+                    attackTargets.MaskOf(instance.ActiveSkills ?? []),
+                    0,
+                    TimeSpan.Zero,
+                    0,
+                    false
+                ))
+                : AttackProfile.Inactive,
+            hasNeutralAttack: attackTargets?.IsActive == true && (instance.ActiveSkills ?? []).Any(attack => !attack.CanInherit)
         );
     }
 

@@ -69,7 +69,8 @@ namespace PalCalc.Solver.Processing
                         selectionPolicy: context.SelectionPolicy,
                         frontier: frontier,
                         palIds: settings.DB.PalsById.Keys
-                    )
+                    ),
+                    AttackTargets: context.AttackTargets
                 );
 
                 var delta = frontier.ExpandPairs(work =>

@@ -1,4 +1,5 @@
 using PalCalc.Model;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.PalReference;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
@@ -124,5 +125,6 @@ internal sealed class CandidatePreFilter
 internal sealed record CandidateExpansionContext(
     int StepIndex,
     PalSpecifier Target,
-    CandidatePreFilter PreFilter
+    CandidatePreFilter PreFilter,
+    AttackTargetContext AttackTargets
 );
