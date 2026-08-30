@@ -25,23 +25,16 @@ namespace PalCalc.Solver.PalReference
             ActiveSkill actualAttack,
             ActiveSkill effectiveAttack,
             AttackProfile attackProfile,
-            bool hasNeutralAttack
+            bool hasNeutralAttack,
+            MaterializedAttackInheritance materializedAttackInheritance
         )
         {
             this.gameSettings = gameSettings;
 
             Pal = pal;
-            if (parent1.Pal.InternalIndex > parent2.Pal.InternalIndex)
-            {
-                Parent1 = parent1;
-                Parent2 = parent2;
-            }
-            else if (parent1.Pal.InternalIndex < parent2.Pal.InternalIndex)
-            {
-                Parent1 = parent2;
-                Parent2 = parent1;
-            }
-            else if (parent1.GetHashCode() < parent2.GetHashCode())
+            var parentOrderReversed = parent1.Pal.InternalIndex > parent2.Pal.InternalIndex ||
+                parent1.Pal.InternalIndex == parent2.Pal.InternalIndex && parent1.GetHashCode() < parent2.GetHashCode();
+            if (parentOrderReversed)
             {
                 Parent1 = parent1;
                 Parent2 = parent2;
@@ -57,6 +50,13 @@ namespace PalCalc.Solver.PalReference
             EffectiveAttack = effectiveAttack;
             AttackProfile = attackProfile;
             HasNeutralAttack = hasNeutralAttack;
+            MaterializedAttackInheritance = parentOrderReversed || materializedAttackInheritance is null
+                ? materializedAttackInheritance
+                : materializedAttackInheritance with
+                {
+                    Parent1Loadout = materializedAttackInheritance.Parent2Loadout,
+                    Parent2Loadout = materializedAttackInheritance.Parent1Loadout,
+                };
 
             EffectivePassives = passives;
             EffectivePassivesHash = passives.SetHash(p => p.InternalName);
@@ -83,11 +83,18 @@ namespace PalCalc.Solver.PalReference
             ActiveSkill effectiveAttack = null,
             float attacksProbability = 1,
             AttackProfile attackProfile = default,
-            bool hasNeutralAttack = false
-        ) : this(gameSettings, pal, parent1, parent2, passives, ivs, actualAttack, effectiveAttack, attackProfile, hasNeutralAttack)
+            bool hasNeutralAttack = false,
+            MaterializedAttackInheritance materializedAttackInheritance = null,
+            int? avgRequiredBreedings = null,
+            PalGender gender = PalGender.WILDCARD
+        ) : this(gameSettings, pal, parent1, parent2, passives, ivs, actualAttack, effectiveAttack, attackProfile, hasNeutralAttack, materializedAttackInheritance)
         {
-            Gender = PalGender.WILDCARD;
-            if (passivesProbability <= 0 || ivsProbability <= 0 || attacksProbability <= 0)
+            Gender = gender;
+            if (avgRequiredBreedings is int materializedBreedings)
+            {
+                AvgRequiredBreedings = materializedBreedings;
+            }
+            else if (passivesProbability <= 0 || ivsProbability <= 0 || attacksProbability <= 0)
             {
                 // don't think this is actually needed anymore, keeping just in case
 #if DEBUG
@@ -178,6 +185,8 @@ namespace PalCalc.Solver.PalReference
 
         public bool HasNeutralAttack { get; }
 
+        public MaterializedAttackInheritance MaterializedAttackInheritance { get; }
+
         public bool IsOutdated { get; set; }
 
         private BredPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
@@ -189,7 +198,8 @@ namespace PalCalc.Solver.PalReference
             else
             {
                 return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs, ActualAttack, EffectiveAttack,
-                    AttackProfile.WithGuaranteedGender(gameSettings, Pal, Parent1.TimeFactor, Parent2.TimeFactor, db, gender, useReverser), HasNeutralAttack)
+                    AttackProfile.WithGuaranteedGender(gameSettings, Pal, Parent1.TimeFactor, Parent2.TimeFactor, db, gender, useReverser), HasNeutralAttack,
+                    MaterializedAttackInheritance)
                 {
                     AvgRequiredBreedings = BredPalReferenceEffort.WithGuaranteedGender(AvgRequiredBreedings, Pal, db, gender, useReverser),
                     Gender = gender,

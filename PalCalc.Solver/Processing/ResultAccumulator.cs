@@ -1,4 +1,5 @@
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 
 namespace PalCalc.Solver.Processing;
@@ -9,19 +10,26 @@ namespace PalCalc.Solver.Processing;
 /// </summary>
 internal sealed class ResultAccumulator(
     PalSpecifier target,
-    ICandidateSelectionPolicy selectionPolicy
+    ICandidateSelectionPolicy selectionPolicy,
+    AttackTargetContext attackTargets = null
 )
 {
     private readonly List<IPalReference> discovered = [];
 
-    public IEnumerable<IPalReference> Results =>
-        discovered
+    // Attack-profile effort is selected only after terminal gender adjustment,
+    // so structural effort cannot group terminal candidates here.
+    public IEnumerable<IPalReference> Results => discovered.Distinct();
+
+    public IEnumerable<IPalReference> SelectFinalResults(IEnumerable<IPalReference> candidates) =>
+        candidates
             .Distinct()
             .GroupBy(selectionPolicy.BreedingEffortGroupOf)
             .SelectMany(selectionPolicy.SelectRetainedAlternatives);
 
     public void Observe(IEnumerable<IPalReference> candidates)
     {
-        discovered.AddRange(candidates.Where(target.IsSatisfiedBy));
+        discovered.AddRange(candidates.Where(candidate =>
+            attackTargets?.Satisfies(candidate) ?? target.IsSatisfiedBy(candidate)
+        ));
     }
 }

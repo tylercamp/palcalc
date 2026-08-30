@@ -1,5 +1,7 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.Utils;
 using System.Diagnostics;
@@ -13,7 +15,8 @@ namespace PalCalc.Solver.Processing;
 internal sealed class ResultPostProcessor(
     PalSpecifier target,
     BreedingSolverSettings settings,
-    SolverStateController controller
+    SolverStateController controller,
+    AttackTargetContext attackTargets = null
 )
 {
     public void ApplySurgery(SearchFrontier frontier)
@@ -56,8 +59,9 @@ internal sealed class ResultPostProcessor(
         );
     }
 
-    public List<IPalReference> Finalize(ResultAccumulator terminalResults) =>
-        terminalResults
+    public List<IPalReference> Finalize(ResultAccumulator terminalResults)
+    {
+        var candidates = terminalResults
             .Results
             // Bred candidates are constrained in the expansion kernel. Apply
             // the same output constraint to owned candidates which already
@@ -69,8 +73,37 @@ internal sealed class ResultPostProcessor(
                 settings.MaxBredIrrelevantPassives
             )
             .SelectMany(EnforceRequiredGender)
-            .Distinct()
-            .ToList();
+            .Where(SatisfiesTerminalTarget);
+
+        if (attackTargets?.IsActive != true)
+            return terminalResults.SelectFinalResults(candidates).ToList();
+
+        var materializer = new AttackResultMaterializer(attackTargets, settings);
+        return terminalResults.SelectFinalResults(
+            candidates
+                .Select(reference => (Reference: reference, Entry: SelectRootEntry(reference)))
+                .Where(result => result.Entry is not null)
+                .Select(result => materializer.Materialize(result.Reference, result.Entry!.Value))
+        ).ToList();
+    }
+
+    private bool SatisfiesTerminalTarget(IPalReference reference) =>
+        attackTargets?.Satisfies(reference) ?? target.IsSatisfiedBy(reference);
+
+    private AttackProfileEntry? SelectRootEntry(IPalReference reference) =>
+        reference.AttackProfile.Entries
+            .Where(entry =>
+                (entry.MasteredTargetMask & attackTargets.FullTargetMask) == attackTargets.FullTargetMask &&
+                entry.BreedingEffort <= settings.MaxEffort &&
+                (settings.MaxSpecialCakes is not int maxCakes || entry.TotalSpecialCakes <= maxCakes)
+            )
+            .OrderBy(entry => entry.BreedingEffort)
+            .ThenBy(entry => entry.TotalSpecialCakes)
+            .ThenBy(entry => entry.SelfBreedings)
+            .ThenBy(entry => entry.SelfUsesSpecialCake)
+            .ThenBy(entry => entry.MasteredTargetMask)
+            .Cast<AttackProfileEntry?>()
+            .FirstOrDefault();
 
     private IPalReference AddRequiredPassives(
         IPalReference reference,

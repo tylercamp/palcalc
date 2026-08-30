@@ -49,7 +49,8 @@ namespace PalCalc.Solver.Processing
                 ).Build(spec),
                 settings.MaxThreads,
                 controller,
-                context.SelectionPolicy
+                context.SelectionPolicy,
+                context.AttackTargets
             );
             var batchExecutor = new ParallelBatchExecutor(context, stateUpdateInterval);
 
@@ -68,7 +69,8 @@ namespace PalCalc.Solver.Processing
                         maxEffort: settings.MaxEffort,
                         selectionPolicy: context.SelectionPolicy,
                         frontier: frontier,
-                        palIds: settings.DB.PalsById.Keys
+                        palIds: settings.DB.PalsById.Keys,
+                        attackTargets: context.AttackTargets
                     ),
                     AttackTargets: context.AttackTargets
                 );
@@ -132,7 +134,7 @@ namespace PalCalc.Solver.Processing
             };
             stateUpdated?.Invoke(statusMsg);
 
-            var resultPostProcessor = new ResultPostProcessor(spec, settings, controller);
+            var resultPostProcessor = new ResultPostProcessor(spec, settings, controller, context.AttackTargets);
             resultPostProcessor.ApplySurgery(frontier);
             return resultPostProcessor.Finalize(frontier.TerminalResults);
         }

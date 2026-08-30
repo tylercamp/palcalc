@@ -107,13 +107,10 @@ public class AttackInheritanceSolverTests
         );
         var inherited = result.AttackProfile.Entries.Single(entry => entry.MasteredTargetMask == 1);
 
-        Assert.AreEqual(1f, result.AttacksProbability);
+        Assert.AreEqual(0.5f, result.AttacksProbability);
         Assert.AreEqual(expectedProfileEggs, inherited.SelfBreedings);
-        Assert.AreEqual(
-            (int)Math.Ceiling(1f / (result.PassivesProbability * result.IVsProbability)),
-            result.AvgRequiredBreedings
-        );
-        Assert.IsTrue(inherited.SelfBreedings > result.AvgRequiredBreedings);
+        Assert.AreEqual(expectedProfileEggs, result.AvgRequiredBreedings);
+        Assert.AreEqual(inherited.BreedingEffort, result.BreedingEffort);
     }
 
     [TestMethod]

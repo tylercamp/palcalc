@@ -1,4 +1,5 @@
 using PalCalc.Model;
+using PalCalc.Solver.PalReference;
 
 namespace PalCalc.Solver.Processing.Attacks;
 
@@ -11,6 +12,7 @@ internal sealed class AttackTargetContext
     public const int MaxRequiredAttacks = 6;
 
     private readonly PalDB db;
+    private readonly PalSpecifier target;
     private readonly ActiveSkill[] requiredAttacks;
     private readonly Dictionary<Pal, SpeciesAttackState> speciesStates;
 
@@ -20,6 +22,7 @@ internal sealed class AttackTargetContext
         ArgumentNullException.ThrowIfNull(db);
 
         this.db = db;
+        this.target = target;
         requiredAttacks = target.RequiredAttacks.Distinct().ToArray();
         if (requiredAttacks.Length > MaxRequiredAttacks)
             throw new ArgumentOutOfRangeException(nameof(target), $"At most {MaxRequiredAttacks} required attacks are supported.");
@@ -62,6 +65,10 @@ internal sealed class AttackTargetContext
             ? requiredAttacks[index]
             : throw new ArgumentOutOfRangeException(nameof(singleBit));
     }
+
+    public bool Satisfies(IPalReference reference) =>
+        target.IsSatisfiedByIgnoringAttacks(reference) &&
+        (!IsActive || reference.AttackProfile.Contains(FullTargetMask));
 
     public SpeciesAttackState StateOf(Pal pal)
     {

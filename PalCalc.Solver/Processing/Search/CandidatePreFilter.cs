@@ -35,6 +35,7 @@ internal readonly record struct CandidatePreFilterResult(
 internal sealed class CandidatePreFilter
 {
     private readonly PalSpecifier target;
+    private readonly AttackTargetContext attackTargets;
     private readonly TimeSpan maxEffort;
     private readonly ICandidateSelectionPolicy selectionPolicy;
     private readonly ICandidateFrontierView frontier;
@@ -48,10 +49,12 @@ internal sealed class CandidatePreFilter
         TimeSpan maxEffort,
         ICandidateSelectionPolicy selectionPolicy,
         ICandidateFrontierView frontier,
-        IEnumerable<PalId> palIds
+        IEnumerable<PalId> palIds,
+        AttackTargetContext attackTargets = null
     )
     {
         this.target = target;
+        this.attackTargets = attackTargets;
         this.maxEffort = maxEffort;
         this.selectionPolicy = selectionPolicy;
         this.frontier = frontier;
@@ -73,7 +76,7 @@ internal sealed class CandidatePreFilter
         );
         if (
             frontierAssessment == FrontierCandidateAssessment.Inferior &&
-            !target.IsSatisfiedBy(candidate)
+            !(attackTargets?.Satisfies(candidate) ?? target.IsSatisfiedBy(candidate))
         )
             return CandidatePreFilterResult.Rejected;
 

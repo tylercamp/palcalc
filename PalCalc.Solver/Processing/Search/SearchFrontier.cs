@@ -1,6 +1,7 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.Processing;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Utils;
 using Serilog;
 
@@ -22,6 +23,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
 
     private readonly int maxThreads;
     private readonly PalSpecifier target;
+    private readonly AttackTargetContext attackTargets;
 
     public ResultAccumulator TerminalResults => resultAccumulator;
 
@@ -32,12 +34,14 @@ internal sealed class SearchFrontier : ICandidateFrontierView
         IEnumerable<IPalReference> initialContent,
         int maxThreads,
         SolverStateController controller,
-        ICandidateSelectionPolicy selectionPolicy
+        ICandidateSelectionPolicy selectionPolicy,
+        AttackTargetContext attackTargets = null
     )
     {
         ArgumentNullException.ThrowIfNull(selectionPolicy);
 
         this.target = target;
+        this.attackTargets = attackTargets;
         this.controller = controller;
         this.selectionPolicy = selectionPolicy;
 
@@ -45,7 +49,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
         index = new FrontierIndex(selectionPolicy);
         index.AddRange(initialList);
 
-        resultAccumulator = new ResultAccumulator(target, selectionPolicy);
+        resultAccumulator = new ResultAccumulator(target, selectionPolicy, attackTargets);
         resultAccumulator.Observe(index.All);
         pairSchedule = ParentPairSchedule.Initial(initialList);
 
@@ -278,7 +282,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
             reference is not SurgeryTablePalReference
         )
             return false;
-        if (!target.IsSatisfiedBy(reference))
+        if (!(attackTargets?.Satisfies(reference) ?? target.IsSatisfiedBy(reference)))
             return false;
 
         return
