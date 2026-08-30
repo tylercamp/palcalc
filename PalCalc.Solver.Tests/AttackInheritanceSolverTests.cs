@@ -1,5 +1,6 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
 
 namespace PalCalc.Solver.Tests;
 
@@ -235,6 +236,100 @@ public class AttackInheritanceSolverTests
     }
 
     [TestMethod]
+    public void Solve_TwoNonInnateAttacksRequireCakeAndRespectItsLimit()
+    {
+        var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
+        var attacks = InheritableAttacksNotInnateTo(2, child);
+        var neutralAttack = NonInheritableAttackNotInnateTo(child);
+
+        SolverTestScenario.ConfiguredSolver Configure(int? maxSpecialCakes) => SolverTestScenario.Solver(
+            [
+                WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), attacks[0]),
+                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), attacks[1]),
+            ],
+            maxBreedingSteps: 1,
+            maxSolverIterations: 1,
+            maxSpecialCakes: maxSpecialCakes
+        );
+
+        Assert.AreEqual(0, SolverTestScenario.Solve(Configure(0), child.Name, attacks).Count);
+        Assert.AreEqual(0, SolverTestScenario.Solve(Configure(0), child.Name, [attacks[0], attacks[0], attacks[1]]).Count);
+        Assert.AreEqual(0, SolverTestScenario.Solve(Configure(1), child.Name, attacks).Count);
+
+        var limited = SolverTestScenario.Solve(Configure(100), child.Name, attacks)
+            .OfType<BredPalReference>()
+            .Single();
+        var duplicateTargets = SolverTestScenario.Solve(
+                Configure(100),
+                child.Name,
+                [attacks[0], attacks[0], attacks[1]]
+            )
+            .OfType<BredPalReference>()
+            .Single();
+        var unlimited = SolverTestScenario.Solve(Configure(null), child.Name, attacks)
+            .OfType<BredPalReference>()
+            .Single();
+
+        Assert.AreEqual(0b11, limited.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.IsTrue(limited.MaterializedAttackInheritance.SpecialCakes > 1);
+        Assert.AreEqual(AttackInheritanceMode.InheritAll, limited.MaterializedAttackInheritance.Mode);
+        Assert.AreEqual(0b11, duplicateTargets.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual(0b11, unlimited.AttackProfile.Entries.Single().MasteredTargetMask);
+    }
+
+    [TestMethod]
+    public void Solve_CakeTransfersAtMostThreeTargetAttacksPerParent()
+    {
+        var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
+        var attacks = InheritableAttacksNotInnateTo(6, child);
+        var neutralAttack = NonInheritableAttackNotInnateTo(child);
+
+        SolverTestScenario.ConfiguredSolver Configure(IEnumerable<ActiveSkill> first, IEnumerable<ActiveSkill> second) =>
+            SolverTestScenario.Solver(
+                [
+                    WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), first.First(), first.Skip(1).ToArray()),
+                    WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), second.First(), second.Skip(1).ToArray()),
+                ],
+                maxBreedingSteps: 1,
+                maxSolverIterations: 1,
+                maxSpecialCakes: 100
+            );
+
+        var split = SolverTestScenario.Solve(Configure(attacks[..3], attacks[3..]), child.Name, attacks)
+            .OfType<BredPalReference>()
+            .Single();
+        var concentrated = SolverTestScenario.Solve(Configure(attacks[..4], [neutralAttack]), child.Name, attacks[..4]);
+
+        Assert.AreEqual(0b11_1111, split.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual(0, concentrated.Count);
+    }
+
+    [TestMethod]
+    public void Solve_CakeAddsInheritedAttacksToTheChildsInnateTargets()
+    {
+        var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
+        var innate = child.Level1ActiveSkills(SolverTestScenario.DB).First();
+        var inherited = InheritableAttacksNotInnateTo(3, child);
+        var neutralAttack = NonInheritableAttackNotInnateTo(child);
+        var solver = SolverTestScenario.Solver(
+            [
+                WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), inherited[0], inherited[1], inherited[2]),
+                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutralAttack),
+            ],
+            maxBreedingSteps: 1,
+            maxSolverIterations: 1,
+            maxSpecialCakes: 100
+        );
+
+        var result = SolverTestScenario.Solve(solver, child.Name, [innate, .. inherited])
+            .OfType<BredPalReference>()
+            .Single();
+
+        Assert.AreEqual(4, result.MaterializedAttackInheritance.ChildMasteredAttacks.Count);
+        Assert.AreEqual(3, result.MaterializedAttackInheritance.InheritedAttacks.Count);
+    }
+
+    [TestMethod]
     public void Solve_WithoutRequiredAttackRetainsDeterministicOneStepResults()
     {
         static IReadOnlyList<SolverTestScenario.ResultSignature> Run() =>
@@ -275,6 +370,13 @@ public class AttackInheritanceSolverTests
             attack.CanInherit &&
             pals.All(pal => !pal.Level1ActiveSkills(SolverTestScenario.DB).Contains(attack))
         );
+
+    private static ActiveSkill[] InheritableAttacksNotInnateTo(int count, params Pal[] pals) =>
+        SolverTestScenario.DB.ActiveSkills
+            .Where(attack => attack.CanInherit)
+            .Where(attack => pals.All(pal => !pal.Level1ActiveSkills(SolverTestScenario.DB).Contains(attack)))
+            .Take(count)
+            .ToArray();
 
     private static ActiveSkill NonInheritableAttackNotInnateTo(params Pal[] pals) =>
         SolverTestScenario.DB.ActiveSkills.First(attack =>

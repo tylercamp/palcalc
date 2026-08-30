@@ -86,6 +86,12 @@ internal static class SolverTestScenario
     public static List<IPalReference> Solve(
         ConfiguredSolver solver,
         string targetPal,
+        IEnumerable<ActiveSkill> requiredAttacks
+    ) => Solve(solver, targetPal, requiredAttacks, null, null, PalGender.WILDCARD, 0, 0, 0);
+
+    public static List<IPalReference> Solve(
+        ConfiguredSolver solver,
+        string targetPal,
         IEnumerable<PassiveSkill>? requiredPassives = null,
         IEnumerable<PassiveSkill>? optionalPassives = null,
         PalGender requiredGender = PalGender.WILDCARD,
@@ -93,6 +99,19 @@ internal static class SolverTestScenario
         int ivAttack = 0,
         int ivDefense = 0,
         ActiveSkill? requiredAttack = null
+    ) => Solve(solver, targetPal, requiredAttack is null ? [] : [requiredAttack], requiredPassives,
+        optionalPassives, requiredGender, ivHp, ivAttack, ivDefense);
+
+    private static List<IPalReference> Solve(
+        ConfiguredSolver solver,
+        string targetPal,
+        IEnumerable<ActiveSkill> requiredAttacks,
+        IEnumerable<PassiveSkill>? requiredPassives,
+        IEnumerable<PassiveSkill>? optionalPassives,
+        PalGender requiredGender,
+        int ivHp,
+        int ivAttack,
+        int ivDefense
     ) =>
         solver.Solver.Solve(
             new BreedingSolverRequest(
@@ -105,7 +124,7 @@ internal static class SolverTestScenario
                     IV_HP = ivHp,
                     IV_Attack = ivAttack,
                     IV_Defense = ivDefense,
-                    RequiredAttacks = requiredAttack == null ? [] : [requiredAttack],
+                    RequiredAttacks = requiredAttacks?.ToList() ?? [],
                 },
                 solver.Settings
             ),

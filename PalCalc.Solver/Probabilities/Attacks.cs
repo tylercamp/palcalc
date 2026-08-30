@@ -11,9 +11,6 @@ public readonly record struct AttackInheritanceOutcome(
 
 public static class Attacks
 {
-    // TODO: Extend this outcome model for inherit-all effects: choose up to three
-    // equipped attacks per parent, inherit every distinct eligible attack (up to six
-    // mastered attacks), and allow later pairings to choose a new equipped loadout.
     public static AttackInheritanceOutcome InheritanceOutcome(
         PalDB db,
         ActiveSkill requiredAttack,
@@ -31,8 +28,6 @@ public static class Attacks
         var first = Eligible(parent1.ActualAttack);
         var second = Eligible(parent2.ActualAttack);
 
-        // TODO: Full mastered attack state and exact irrelevant bred identities will
-        // allow duplicate irrelevant attacks from different parents to collapse here.
         if (first?.Equals(second) == true)
             second = null;
 

@@ -20,6 +20,12 @@ internal sealed class InitialPalBuilder(
 {
     public List<IPalReference> Build(PalSpecifier target)
     {
+        // Singular attack properties are retained only for legacy presentation.
+        // Active attack-profile search does not use them for grouping or correctness.
+        var compatibilityAttack = attackTargets.IsActive && target.RequiredAttacks.Count == 1
+            ? target.RequiredAttacks[0]
+            : null;
+
         // This step selects concrete owned instances and creates composite
         // gender candidates before the frontier simplifies breeding paths.
         // Those choices cannot be recovered from effective properties alone.
@@ -54,7 +60,7 @@ internal sealed class InitialPalBuilder(
             )
             .Select(p =>
             {
-                var attack = SelectOwnedAttack(p, target.RequiredAttack);
+                var attack = SelectOwnedAttack(p, compatibilityAttack);
                 var masteredAttacks = p.ActiveSkills ?? [];
                 return new OwnedPalReference(
                     instance: p,
@@ -66,7 +72,7 @@ internal sealed class InitialPalBuilder(
                         Defense = MakeIV(target.IV_Defense, p.IV_Defense),
                     },
                     actualAttack: attack,
-                    effectiveAttack: EffectiveAttack(attack, target.RequiredAttack),
+                    effectiveAttack: EffectiveAttack(attack, compatibilityAttack),
                     attackProfile: attackTargets.IsActive
                         ? new(new AttackProfileEntry(attackTargets.MaskOf(masteredAttacks), 0, TimeSpan.Zero, 0, false))
                         : AttackProfile.Inactive,
@@ -97,13 +103,11 @@ internal sealed class InitialPalBuilder(
             .ToList();
 
         if (settings.MaxWildPals > 0)
-            AddWildCandidates(initialContent, target, WithinBreedingSteps);
+            AddWildCandidates(initialContent, target, WithinBreedingSteps, compatibilityAttack);
 
         return initialContent;
     }
 
-    // TODO: Defer owned loadout selection to each pairing once references carry their
-    // full mastered attack set; include skill-fruit acquisition as a planned source.
     private static ActiveSkill SelectOwnedAttack(PalInstance pal, ActiveSkill requiredAttack)
     {
         var mastered = pal.ActiveSkills ?? [];
@@ -148,7 +152,8 @@ internal sealed class InitialPalBuilder(
     private void AddWildCandidates(
         List<IPalReference> initialContent,
         PalSpecifier target,
-        Func<Pal, bool> withinBreedingSteps
+        Func<Pal, bool> withinBreedingSteps,
+        ActiveSkill compatibilityAttack
     )
     {
         initialContent.AddRange(
@@ -160,7 +165,7 @@ internal sealed class InitialPalBuilder(
                 .SelectMany(p =>
                 {
                     var guaranteedPassives = p.GuaranteedPassiveSkills(settings.DB);
-                    var attack = SelectWildAttack(p, target.RequiredAttack);
+                    var attack = SelectWildAttack(p, compatibilityAttack);
                     var attackState = attackTargets.StateOf(p);
                     var numIrrelevantGuaranteed = guaranteedPassives.Except(target.DesiredPassives).Count();
                     var numAllowedRandomPassives = Math.Clamp(
@@ -178,7 +183,7 @@ internal sealed class InitialPalBuilder(
                                 numRandomPassives,
                                 mechanics,
                                 actualAttack: attack,
-                                effectiveAttack: EffectiveAttack(attack, target.RequiredAttack),
+                                effectiveAttack: EffectiveAttack(attack, compatibilityAttack),
                                 attackProfile: attackTargets.IsActive
                                     ? new(new AttackProfileEntry(
                                         attackState.Level1TargetMask,

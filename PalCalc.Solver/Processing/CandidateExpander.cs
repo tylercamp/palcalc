@@ -464,12 +464,6 @@ namespace PalCalc.Solver.Processing
                                             probabilityForUpToNumPassives,
                                             finalIVs,
                                             ivsProbability,
-                                            actualAttack: attackProfile.Contains(context.AttackTargets.FullTargetMask)
-                                                ? context.Target.RequiredAttack
-                                                : null,
-                                            effectiveAttack: attackProfile.Contains(context.AttackTargets.FullTargetMask)
-                                                ? context.Target.RequiredAttack
-                                                : null,
                                             attackProfile: attackProfile,
                                             hasNeutralAttack: context.AttackTargets.StateOf(childPalType).HasNeutralLevel1Attack
                                         );
@@ -478,7 +472,7 @@ namespace PalCalc.Solver.Processing
                                 {
                                     var attackOutcome = Probabilities.Attacks.InheritanceOutcome(
                                         db,
-                                        context.Target.RequiredAttack,
+                                        null,
                                         childPalType,
                                         parent1,
                                         parent2

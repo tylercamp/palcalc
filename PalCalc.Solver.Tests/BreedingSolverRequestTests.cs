@@ -8,21 +8,38 @@ namespace PalCalc.Solver.Tests;
 public class BreedingSolverRequestTests
 {
     [TestMethod]
-    public void BreedingSolver_RejectsMoreThanOneRequiredAttack()
+    public void BreedingSolver_AcceptsUpToSixRequiredAttacks()
     {
         var settings = SolverTestScenario.Solver([]).Settings;
         var target = new PalSpecifier
         {
             Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
-            RequiredAttacks = SolverTestScenario.DB.ActiveSkills.Take(2).ToList(),
+            RequiredAttacks = SolverTestScenario.DB.ActiveSkills.Take(6).ToList(),
         };
 
-        Assert.ThrowsException<NotSupportedException>(() =>
+        new BreedingSolver().Solve(
+            new BreedingSolverRequest(target, settings),
+            new SolverStateController(CancellationToken.None)
+        );
+    }
+
+    [TestMethod]
+    public void BreedingSolver_RejectsSevenDistinctRequiredAttacks()
+    {
+        var settings = SolverTestScenario.Solver([]).Settings;
+        var target = new PalSpecifier
+        {
+            Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
+            RequiredAttacks = SolverTestScenario.DB.ActiveSkills.Take(7).ToList(),
+        };
+
+        var exception = Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
             new BreedingSolver().Solve(
                 new BreedingSolverRequest(target, settings),
                 new SolverStateController(CancellationToken.None)
             )
         );
+        StringAssert.Contains(exception.Message, "At most 6 required attacks");
     }
 
     [TestMethod]

@@ -20,8 +20,6 @@ namespace PalCalc.Solver
 
         public IEnumerable<PassiveSkill> DesiredPassives => RequiredPassives.Concat(OptionalPassives);
 
-        internal ActiveSkill RequiredAttack => RequiredAttacks.FirstOrDefault();
-
         public int IV_HP { get; set; }
         public int IV_Attack { get; set; }
         public int IV_Defense { get; set; }
@@ -39,7 +37,7 @@ namespace PalCalc.Solver
 
         public bool IsSatisfiedBy(IPalReference palRef) =>
             IsSatisfiedByIgnoringAttacks(palRef) &&
-            (RequiredAttack == null || palRef.EffectiveAttack == RequiredAttack);
+            (RequiredAttacks.Count == 0 || RequiredAttacks.All(attack => palRef.EffectiveAttack == attack));
 
         public void Normalize()
         {

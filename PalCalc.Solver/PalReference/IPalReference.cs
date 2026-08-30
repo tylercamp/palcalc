@@ -29,9 +29,8 @@ namespace PalCalc.Solver.PalReference
 
         List<PassiveSkill> ActualPassives { get; }
 
-        // TODO: Replace this singular materialized loadout with the full mastered attack
-        // set when supporting multiple/inherit-all attacks. Select the best equipped
-        // attack(s) lazily for each pairing and retain exact irrelevant bred identities.
+        // Compatibility presentation properties. Active attack-profile search uses
+        // AttackProfile rather than either singular value for correctness.
         ActiveSkill ActualAttack { get; }
 
         ActiveSkill EffectiveAttack { get; }

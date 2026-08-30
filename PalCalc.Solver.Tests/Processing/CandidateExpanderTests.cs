@@ -307,7 +307,7 @@ public class CandidateExpanderTests
     )
     {
         var actualAttack = instance.EquippedActiveSkills.FirstOrDefault();
-        var effectiveAttack = actualAttack == target.RequiredAttack
+        var effectiveAttack = actualAttack == target.RequiredAttacks.SingleOrDefault()
             ? actualAttack
             : actualAttack?.CanInherit == true
                 ? new RandomActiveSkill()

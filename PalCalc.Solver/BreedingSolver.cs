@@ -17,10 +17,6 @@ public sealed class BreedingSolver
         SolverStateController controller
     )
     {
-        if (request.Target.RequiredAttacks.Count > 1)
-            // Phase 8 replaces this temporary guard with the final six-attack validation.
-            throw new NotSupportedException("Only one required attack is currently supported");
-
         var context = SolverRunContext.Create(request, controller);
         var run = new SolverRun(
             context,
