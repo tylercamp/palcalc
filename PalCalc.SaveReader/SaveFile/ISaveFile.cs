@@ -32,6 +32,7 @@ namespace PalCalc.SaveReader.SaveFile
                     }
                     else if (!GvasFile.IsValidGvas(files))
                     {
+                        isValid = false;
                         logger.Debug("IsValidGvas file check returned false");
                     }
                     else
