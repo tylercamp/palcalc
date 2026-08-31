@@ -39,7 +39,7 @@ public sealed class BreedingSolverSettings
         int maxSurgeryCost,
         IEnumerable<PassiveSkill> allowedSurgeryPassives,
         bool useGenderReversers,
-        int? maxSpecialCakes = 0
+        int? maxSpecialCakes
     )
     {
         ArgumentNullException.ThrowIfNull(db);

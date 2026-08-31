@@ -50,7 +50,7 @@ internal sealed class CandidatePreFilter
         ICandidateSelectionPolicy selectionPolicy,
         ICandidateFrontierView frontier,
         IEnumerable<PalId> palIds,
-        AttackTargetContext attackTargets = null
+        AttackTargetContext attackTargets
     )
     {
         this.target = target;

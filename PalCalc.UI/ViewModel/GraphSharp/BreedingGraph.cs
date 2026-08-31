@@ -34,14 +34,15 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
         public IBreedingTreeNodeViewModel NodeFor(IBreedingTreeNode pref) => Nodes.Single(n => n.Value == pref);
 
-        public static BreedingGraph FromPalReference(CachedSaveGame source, GameSettings settings, IPalReference palRef, IEnumerable<ActiveSkill> terminalAttacks = null)
+        public static BreedingGraph FromPalReference(CachedSaveGame source, GameSettings settings, IPalReference palRef, IEnumerable<ActiveSkill> terminalAttacks)
         {
             var tree = new BreedingTree(palRef);
             var result = new BreedingGraph(source, settings, tree);
+            var terminalAttackList = terminalAttacks.ToArray();
 
             result.AddVertexRange(result.Nodes);
-            if (terminalAttacks?.Any() == true && result.NodeFor(tree.Root) is StandardBreedingTreeNodeViewModel terminalNode)
-                terminalNode.SetEquippedAttacks(terminalAttacks);
+            if (terminalAttackList.Length > 0 && result.NodeFor(tree.Root) is StandardBreedingTreeNodeViewModel terminalNode)
+                terminalNode.SetEquippedAttacks(terminalAttackList);
 
             // breeding tree is upside down relative to breeding direction
             foreach (var (child, _) in tree.AllNodes)

@@ -41,7 +41,8 @@ internal class Program
                 maxThreads: 0,
                 maxSurgeryCost: 1_000_000,
                 allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
-                useGenderReversers: true
+                useGenderReversers: true,
+                maxSpecialCakes: 0
         );
         var solver = new BreedingSolver();
 

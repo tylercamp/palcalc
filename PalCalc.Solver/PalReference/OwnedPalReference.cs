@@ -19,10 +19,10 @@ namespace PalCalc.Solver.PalReference
             PalInstance instance,
             List<PassiveSkill> effectivePassives,
             IV_Set effectiveIVs,
-            ActiveSkill actualAttack = null,
-            ActiveSkill effectiveAttack = null,
-            AttackProfile attackProfile = default,
-            bool hasNeutralAttack = false
+            ActiveSkill actualAttack,
+            ActiveSkill effectiveAttack,
+            AttackProfile attackProfile,
+            bool hasNeutralAttack
         )
         {
             this.instance = instance;

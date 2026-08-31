@@ -15,7 +15,7 @@ public class AttackProfileComposerTests
     public void Compose_BaselineContainsOnlyInnateTargets()
     {
         var innate = Child.Level1ActiveSkills(SolverTestScenario.DB).First();
-        var profile = Compose([innate], Entry(0), Entry(0));
+        var profile = Compose([innate], Entry(0), Entry(0), cakes: 0);
 
         Assert.AreEqual(1, profile.Entries.Count);
         Assert.AreEqual(1, profile.Entries.Single().MasteredTargetMask);
@@ -26,7 +26,7 @@ public class AttackProfileComposerTests
     public void Compose_NormalInheritanceAddsExactlyOneNonInnateAttack()
     {
         var attacks = Attacks(2);
-        var profile = Compose(attacks, Entry(0b11), Entry(0));
+        var profile = Compose(attacks, Entry(0b11), Entry(0), cakes: 0);
 
         CollectionAssert.AreEquivalent(
             new byte[] { 0, 0b01, 0b10 },
@@ -38,9 +38,9 @@ public class AttackProfileComposerTests
     public void Compose_NormalInheritanceUsesExpectedCarrierProbabilities()
     {
         var attack = Attacks(1);
-        var bothParents = Choices(attack, Entry(1), Entry(1));
-        var neutralMate = Choices(attack, Entry(1), Entry(0), parent2Neutral: true);
-        var inheritableFiller = Choices(attack, Entry(1), Entry(0));
+        var bothParents = Choices(attack, Entry(1), Entry(1), cakes: 0);
+        var neutralMate = Choices(attack, Entry(1), Entry(0), cakes: 0, parent2Neutral: true);
+        var inheritableFiller = Choices(attack, Entry(1), Entry(0), cakes: 0);
 
         Assert.AreEqual(1f, Normal(bothParents).AttackProbability);
         Assert.AreEqual(1f, Normal(neutralMate).AttackProbability);
@@ -53,7 +53,7 @@ public class AttackProfileComposerTests
         var nonInheritable = SolverTestScenario.DB.ActiveSkills.First(attack => !attack.CanInherit &&
             !Child.Level1AttackInternalIds.Contains(attack.InternalName));
         var inheritable = Attacks(1).Single();
-        var profile = Compose([nonInheritable, inheritable], Entry(0b11), Entry(0));
+        var profile = Compose([nonInheritable, inheritable], Entry(0b11), Entry(0), cakes: 0);
 
         CollectionAssert.AreEquivalent(
             new byte[] { 0, 0b10 },
@@ -141,7 +141,7 @@ public class AttackProfileComposerTests
     [TestMethod]
     public void Compose_RemovesEntriesOverTheEffortLimit()
     {
-        var settings = Settings(maxEffort: TimeSpan.Zero);
+        var settings = Settings(cakes: 0, maxEffort: TimeSpan.Zero);
         var composer = new AttackProfileComposer(Context(Attacks(1)), settings, new ObjectPoolFactory());
 
         Assert.AreEqual(0, composer.Compose(Child, Reference(new(Entry(0))), Reference(new(Entry(0))), 1, 1).Entries.Count);
@@ -152,7 +152,7 @@ public class AttackProfileComposerTests
     {
         var attack = Attacks(1);
         var gameSettings = new GameSettings { MultipleBreedingFarms = true };
-        var settings = Settings(gameSettings: gameSettings);
+        var settings = Settings(cakes: 0, gameSettings: gameSettings);
         var context = Context(attack);
         var profile1 = new AttackProfile(Entry(0, effortMinutes: 10));
         var profile2 = new AttackProfile(Entry(0, effortMinutes: 20));
@@ -171,7 +171,7 @@ public class AttackProfileComposerTests
         IEnumerable<ActiveSkill> attacks,
         AttackProfileEntry parent1,
         AttackProfileEntry parent2,
-        int? cakes = 0,
+        int? cakes,
         float passivesProbability = 1
     )
     {
@@ -184,7 +184,7 @@ public class AttackProfileComposerTests
         IEnumerable<ActiveSkill> attacks,
         AttackProfileEntry parent1,
         AttackProfileEntry parent2,
-        int? cakes = 0,
+        int? cakes,
         bool parent2Neutral = false,
         float passivesProbability = 1
     )
@@ -201,7 +201,7 @@ public class AttackProfileComposerTests
         new(new PalSpecifier { RequiredAttacks = attacks.ToList() }, SolverTestScenario.DB);
 
     private static BreedingSolverSettings Settings(
-        int? cakes = 0,
+        int? cakes,
         GameSettings? gameSettings = null,
         TimeSpan? maxEffort = null
     ) => SolverTestScenario.Solver(
@@ -213,6 +213,8 @@ public class AttackProfileComposerTests
             SolverTestScenario.Owned("Katress", PalGender.MALE),
             [],
             new IV_Set(),
+            actualAttack: null,
+            effectiveAttack: null,
             attackProfile: profile,
             hasNeutralAttack: neutral
         );
@@ -220,8 +222,24 @@ public class AttackProfileComposerTests
     private static BredPalReference BredReference(BreedingSolverSettings settings, AttackProfile profile)
     {
         var first = Reference(new AttackProfile(Entry(0)));
-        var second = new OwnedPalReference(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), [], new IV_Set());
-        return new BredPalReference(settings.GameSettings, Child, first, second, [], 1, new IV_Set(), 1, attackProfile: profile);
+        var second = new OwnedPalReference(
+            SolverTestScenario.Owned("Wixen", PalGender.FEMALE), [], new IV_Set(),
+            actualAttack: null,
+            effectiveAttack: null,
+            attackProfile: AttackProfile.Inactive,
+            hasNeutralAttack: false
+        );
+        return new BredPalReference(
+            settings.GameSettings, Child, first, second, [], 1, new IV_Set(), 1,
+            actualAttack: null,
+            effectiveAttack: null,
+            attacksProbability: 1,
+            attackProfile: profile,
+            hasNeutralAttack: false,
+            materializedAttackInheritance: null,
+            avgRequiredBreedings: null,
+            gender: PalGender.WILDCARD
+        );
     }
 
     private static AttackProfileEntry Entry(byte mask, int cakes = 0, int effortMinutes = 0) =>

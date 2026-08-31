@@ -29,6 +29,7 @@ public class AttackResultMaterializerTests
         var result = SolverTestScenario.Solve(
             SolverTestScenario.Solver(
                 [carrier, mate],
+                maxSpecialCakes: 0,
                 maxBreedingSteps: 1,
                 maxSolverIterations: 1
             ),
@@ -67,6 +68,7 @@ public class AttackResultMaterializerTests
         var result = SolverTestScenario.Solve(
             SolverTestScenario.Solver(
                 [carrier, mate],
+                maxSpecialCakes: 0,
                 maxBreedingSteps: 1,
                 maxSolverIterations: 1
             ),

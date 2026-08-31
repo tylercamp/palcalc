@@ -11,7 +11,7 @@ namespace PalCalc.Solver.Processing;
 internal sealed class ResultAccumulator(
     PalSpecifier target,
     ICandidateSelectionPolicy selectionPolicy,
-    AttackTargetContext attackTargets = null
+    AttackTargetContext attackTargets
 )
 {
     private readonly List<IPalReference> discovered = [];

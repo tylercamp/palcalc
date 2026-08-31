@@ -209,7 +209,11 @@ public class EffectivePropertiesKeyTests
             "Katress".ToPal(SolverTestScenario.DB),
             guaranteedPassives: [],
             numRandomPassives: 2,
-            mechanics: SolverTestScenario.DB.BreedingMechanics
+            mechanics: SolverTestScenario.DB.BreedingMechanics,
+            actualAttack: null,
+            effectiveAttack: null,
+            attackProfile: AttackProfile.Inactive,
+            hasNeutralAttack: false
         );
 
         var gendered = wild.WithGuaranteedGender(

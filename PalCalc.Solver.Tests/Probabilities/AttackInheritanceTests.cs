@@ -105,6 +105,8 @@ public class AttackInheritanceTests
             [],
             new IV_Set(),
             actualAttack: attack,
-            effectiveAttack: attack
+            effectiveAttack: attack,
+            attackProfile: AttackProfile.Inactive,
+            hasNeutralAttack: false
         );
 }

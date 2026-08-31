@@ -199,7 +199,7 @@ public class CandidateExpanderTests
         var male = WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), otherAttack);
         var female = WithAttack(SolverTestScenario.Owned("Katress", PalGender.FEMALE), targetAttack);
         var wixen = WithAttack(SolverTestScenario.Owned("Wixen", PalGender.MALE), neutral);
-        var configuredSolver = SolverTestScenario.Solver([male, female, wixen], maxBreedingSteps: 1, maxSolverIterations: 1);
+        var configuredSolver = SolverTestScenario.Solver([male, female, wixen], maxSpecialCakes: 0, maxBreedingSteps: 1, maxSolverIterations: 1);
         var attackTargets = new AttackTargetContext(target, configuredSolver.Settings.DB);
         var composite = new CompositeOwnedPalReference(
             ReferenceFor(male, target, attackTargets),
@@ -231,6 +231,7 @@ public class CandidateExpanderTests
     {
         var configuredSolver = SolverTestScenario.Solver(
             [first, second],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1
         );
@@ -265,7 +266,8 @@ public class CandidateExpanderTests
             [firstReference, secondReference],
             maxThreads: 1,
             controller,
-            selectionPolicy
+            selectionPolicy,
+            attackTargets
         );
         var context = new CandidateExpansionContext(
             StepIndex: 0,
@@ -275,7 +277,8 @@ public class CandidateExpanderTests
                 settings.MaxEffort,
                 selectionPolicy,
                 frontier,
-                settings.DB.PalsById.Keys
+                settings.DB.PalsById.Keys,
+                attackTargets
             ),
             AttackTargets: attackTargets
         );

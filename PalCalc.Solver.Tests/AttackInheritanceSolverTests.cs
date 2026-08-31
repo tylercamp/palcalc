@@ -20,7 +20,7 @@ public class AttackInheritanceSolverTests
         );
 
         var results = SolverTestScenario.Solve(
-            SolverTestScenario.Solver([owned], maxBreedingSteps: 0),
+            SolverTestScenario.Solver([owned], maxSpecialCakes: 0, maxBreedingSteps: 0),
             targetPal.Name,
             requiredAttack: requiredAttack
         );
@@ -43,6 +43,7 @@ public class AttackInheritanceSolverTests
                 WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), requiredAttack),
                 WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutralAttack),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1
         );
@@ -91,6 +92,7 @@ public class AttackInheritanceSolverTests
                     irrelevantAttack
                 ),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1
         );
@@ -127,6 +129,7 @@ public class AttackInheritanceSolverTests
                 WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutralAttack),
                 WithAttacks(SolverTestScenario.Owned("Kingpaca", PalGender.FEMALE), neutralAttack),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 2,
             maxSolverIterations: 2
         );
@@ -155,6 +158,7 @@ public class AttackInheritanceSolverTests
                 WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), neutralAttack),
                 WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutralAttack),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1
         );
@@ -186,6 +190,7 @@ public class AttackInheritanceSolverTests
         var inheritedResults = SolverTestScenario.Solve(
             SolverTestScenario.Solver(
                 [carrier, mate],
+                maxSpecialCakes: 0,
                 maxBreedingSteps: 1,
                 maxSolverIterations: 1
             ),
@@ -195,6 +200,7 @@ public class AttackInheritanceSolverTests
         var ownedResults = SolverTestScenario.Solve(
             SolverTestScenario.Solver(
                 [WithAttacks(SolverTestScenario.Owned(target.Name, PalGender.FEMALE), requiredAttack)],
+                maxSpecialCakes: 0,
                 maxBreedingSteps: 0
             ),
             target.Name,
@@ -218,6 +224,7 @@ public class AttackInheritanceSolverTests
                 WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutralAttack),
                 WithAttacks(SolverTestScenario.Owned("Kingpaca", PalGender.FEMALE), requiredAttack),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 2,
             maxSolverIterations: 2
         );
@@ -340,6 +347,7 @@ public class AttackInheritanceSolverTests
                             SolverTestScenario.Owned("Katress", PalGender.MALE),
                             SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
                         ],
+                        maxSpecialCakes: 0,
                         maxBreedingSteps: 1,
                         maxSolverIterations: 1
                     ),

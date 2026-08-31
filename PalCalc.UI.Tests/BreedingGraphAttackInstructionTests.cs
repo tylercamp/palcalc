@@ -20,7 +20,7 @@ public class BreedingGraphAttackInstructionTests
         var result = Bred(pals[0], Owned(pals[0], "first", attacks[0], 1), Owned(pals[^1], "second", attacks[1], 2),
             new(AttackInheritanceMode.InheritAll, [attacks[0]], [attacks[1]], [attacks[0], attacks[1]], [attacks[0], attacks[1], attacks[2]], 7, .25f));
 
-        var graph = BreedingGraph.FromPalReference(null, new GameSettings(), result);
+        var graph = BreedingGraph.FromPalReference(null, new GameSettings(), result, []);
         var root = (BredPalNode)graph.Tree.Root;
         var parent1 = (StandardBreedingTreeNodeViewModel)graph.NodeFor(root.ParentNode1);
         var parent2 = (StandardBreedingTreeNodeViewModel)graph.NodeFor(root.ParentNode2);
@@ -69,7 +69,7 @@ public class BreedingGraphAttackInstructionTests
         var result = Bred(db.Pals.Last(), surgery, Owned(db.Pals.Last(), "other", attacks[1], 2),
             new(AttackInheritanceMode.Normal, [attacks[0]], [attacks[1]], [attacks[0]], [attacks[0]], 0, 1));
 
-        var graph = BreedingGraph.FromPalReference(null, new GameSettings(), result);
+        var graph = BreedingGraph.FromPalReference(null, new GameSettings(), result, []);
         var root = (BredPalNode)graph.Tree.Root;
         var surgeryResult = (StandardBreedingTreeNodeViewModel)graph.NodeFor(root.ParentNode1);
 
@@ -85,7 +85,7 @@ public class BreedingGraphAttackInstructionTests
         var attack = db.ActiveSkills.First();
         var result = Bred(db.Pals.First(), Owned(db.Pals.First(), "first", attack, 1), Owned(db.Pals.Last(), "second", attack, 2), null, actualAttack: attack);
 
-        var graph = BreedingGraph.FromPalReference(null, new GameSettings(), result);
+        var graph = BreedingGraph.FromPalReference(null, new GameSettings(), result, []);
         var node = (StandardBreedingTreeNodeViewModel)graph.NodeFor(graph.Tree.Root);
 
         AssertAttacks([attack], node.MasteredAttacks);
@@ -100,8 +100,8 @@ public class BreedingGraphAttackInstructionTests
     {
         var db = PalDB.LoadEmbedded();
         var attack = db.ActiveSkills.First();
-        var withoutCake = new BreedingResultViewModel(null, new GameSettings(), Owned(db.Pals.First(), "owned", attack, 1));
-        var withCake = new BreedingResultViewModel(null, new GameSettings(), Bred(db.Pals.Last(), Owned(db.Pals.First(), "first", attack, 2), Owned(db.Pals.Last(), "second", attack, 3), new(AttackInheritanceMode.InheritAll, [attack], [attack], [attack], [attack], 1, 1)));
+        var withoutCake = new BreedingResultViewModel(null, new GameSettings(), Owned(db.Pals.First(), "owned", attack, 1), []);
+        var withCake = new BreedingResultViewModel(null, new GameSettings(), Bred(db.Pals.Last(), Owned(db.Pals.First(), "first", attack, 2), Owned(db.Pals.Last(), "second", attack, 3), new(AttackInheritanceMode.InheritAll, [attack], [attack], [attack], [attack], 1, 1)), []);
         var results = new BreedingResultListViewModel { Results = [withoutCake] };
 
         Assert.AreEqual(0, results.NumSpecialCakesWidth);
@@ -116,12 +116,21 @@ public class BreedingGraphAttackInstructionTests
         new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random }, 1,
         actualAttack: actualAttack ?? inheritance?.ChildMasteredAttacks.FirstOrDefault(),
         effectiveAttack: actualAttack ?? inheritance?.ChildMasteredAttacks.FirstOrDefault(),
-        materializedAttackInheritance: inheritance
+        attacksProbability: inheritance?.AttackProbability ?? 1,
+        attackProfile: AttackProfile.Inactive,
+        hasNeutralAttack: false,
+        materializedAttackInheritance: inheritance,
+        avgRequiredBreedings: null,
+        gender: PalGender.WILDCARD
     );
 
     private static OwnedPalReference Owned(Pal pal, string id, ActiveSkill attack, int index) => new(
         new PalInstance { InstanceId = id, Pal = pal, Gender = PalGender.WILDCARD, PassiveSkills = [], ActiveSkills = [attack], EquippedActiveSkills = [attack], Location = new PalLocation { Type = LocationType.Palbox, Index = index } },
-        [], new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random }, actualAttack: attack, effectiveAttack: attack
+        [], new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
+        actualAttack: attack,
+        effectiveAttack: attack,
+        attackProfile: AttackProfile.Inactive,
+        hasNeutralAttack: false
     );
 
     private static void AssertAttacks(IEnumerable<ActiveSkill> expected, PalCalc.UI.ViewModel.PalDerived.AttackSkillCollectionViewModel actual) =>

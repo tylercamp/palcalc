@@ -159,8 +159,12 @@ namespace PalCalc.UI.ViewModel.Solver
                         HP = new IV_Value(true, 80, 90),
                         Attack = IV_Value.Random,
                         Defense = IV_Value.Random
-                    }
-                ))
+                    },
+                    actualAttack: null,
+                    effectiveAttack: null,
+                    attackProfile: AttackProfile.Inactive,
+                    hasNeutralAttack: false
+                ), [])
             }
         };
     }

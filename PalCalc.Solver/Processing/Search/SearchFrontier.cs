@@ -35,7 +35,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
         int maxThreads,
         SolverStateController controller,
         ICandidateSelectionPolicy selectionPolicy,
-        AttackTargetContext attackTargets = null
+        AttackTargetContext attackTargets
     )
     {
         ArgumentNullException.ThrowIfNull(selectionPolicy);

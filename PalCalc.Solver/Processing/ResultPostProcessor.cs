@@ -16,7 +16,7 @@ internal sealed class ResultPostProcessor(
     PalSpecifier target,
     BreedingSolverSettings settings,
     SolverStateController controller,
-    AttackTargetContext attackTargets = null
+    AttackTargetContext attackTargets
 )
 {
     public void ApplySurgery(SearchFrontier frontier)

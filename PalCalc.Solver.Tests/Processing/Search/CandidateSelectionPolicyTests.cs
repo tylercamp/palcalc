@@ -16,7 +16,8 @@ public class CandidateSelectionPolicyTests
     {
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
-            CancellationToken.None
+            CancellationToken.None,
+            attackTargets: null
         );
         var incumbent = new TestPalReference(
             "incumbent",
@@ -92,7 +93,8 @@ public class CandidateSelectionPolicyTests
     {
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
-            CancellationToken.None
+            CancellationToken.None,
+            attackTargets: null
         );
         var incumbent = new TestPalReference(
             "incumbent",
@@ -237,7 +239,8 @@ public class CandidateSelectionPolicyTests
     {
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
-            CancellationToken.None
+            CancellationToken.None,
+            attackTargets: null
         );
         var candidates = Enumerable
             .Range(0, 32)
@@ -362,6 +365,7 @@ public class CandidateSelectionPolicyTests
                     passives: [runner]
                 ),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxThreads: 2
@@ -415,7 +419,8 @@ public class CandidateSelectionPolicyTests
         var policy = policyFactory(
             new DefaultCandidateSelectionPolicy(
                 ResultPruningPolicy.Default,
-                controller.CancellationToken
+                controller.CancellationToken,
+                attackTargets: null
             )
         );
         var first = Reference(
@@ -441,7 +446,8 @@ public class CandidateSelectionPolicyTests
             initialContent: [first, second],
             maxThreads: 1,
             controller: controller,
-            selectionPolicy: policy
+            selectionPolicy: policy,
+            attackTargets: null
         );
 
         frontier.ExpandPairs(_ => [added]);
@@ -474,7 +480,8 @@ public class CandidateSelectionPolicyTests
     ) =>
         new(
             settings.ResultPruning,
-            CancellationToken.None
+            CancellationToken.None,
+            attackTargets: null
         );
 
     private static DefaultCandidateSelectionPolicy ActivePolicy(

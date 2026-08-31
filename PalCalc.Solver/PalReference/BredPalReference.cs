@@ -79,14 +79,14 @@ namespace PalCalc.Solver.PalReference
             float passivesProbability,
             IV_Set ivs,
             float ivsProbability,
-            ActiveSkill actualAttack = null,
-            ActiveSkill effectiveAttack = null,
-            float attacksProbability = 1,
-            AttackProfile attackProfile = default,
-            bool hasNeutralAttack = false,
-            MaterializedAttackInheritance materializedAttackInheritance = null,
-            int? avgRequiredBreedings = null,
-            PalGender gender = PalGender.WILDCARD
+            ActiveSkill actualAttack,
+            ActiveSkill effectiveAttack,
+            float attacksProbability,
+            AttackProfile attackProfile,
+            bool hasNeutralAttack,
+            MaterializedAttackInheritance materializedAttackInheritance,
+            int? avgRequiredBreedings,
+            PalGender gender
         ) : this(gameSettings, pal, parent1, parent2, passives, ivs, actualAttack, effectiveAttack, attackProfile, hasNeutralAttack, materializedAttackInheritance)
         {
             Gender = gender;

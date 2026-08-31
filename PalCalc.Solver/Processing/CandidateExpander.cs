@@ -438,7 +438,15 @@ namespace PalCalc.Solver.Processing
                                 newPassives,
                                 probabilityForUpToNumPassives,
                                 finalIVs,
-                                ivsProbability
+                                ivsProbability,
+                                actualAttack: null,
+                                effectiveAttack: null,
+                                attacksProbability: 1,
+                                attackProfile: AttackProfile.Inactive,
+                                hasNeutralAttack: false,
+                                materializedAttackInheritance: null,
+                                avgRequiredBreedings: null,
+                                gender: PalGender.WILDCARD
                             );
 
                             var added = false;
@@ -464,8 +472,14 @@ namespace PalCalc.Solver.Processing
                                             probabilityForUpToNumPassives,
                                             finalIVs,
                                             ivsProbability,
+                                            actualAttack: null,
+                                            effectiveAttack: null,
+                                            attacksProbability: 1,
                                             attackProfile: attackProfile,
-                                            hasNeutralAttack: context.AttackTargets.StateOf(childPalType).HasNeutralLevel1Attack
+                                            hasNeutralAttack: context.AttackTargets.StateOf(childPalType).HasNeutralLevel1Attack,
+                                            materializedAttackInheritance: null,
+                                            avgRequiredBreedings: null,
+                                            gender: PalGender.WILDCARD
                                         );
                                 }
                                 else
@@ -488,7 +502,12 @@ namespace PalCalc.Solver.Processing
                                         ivsProbability,
                                         actualAttack: attackOutcome.ActualAttack,
                                         effectiveAttack: attackOutcome.EffectiveAttack,
-                                        attacksProbability: attackOutcome.Probability
+                                        attacksProbability: attackOutcome.Probability,
+                                        attackProfile: AttackProfile.Inactive,
+                                        hasNeutralAttack: false,
+                                        materializedAttackInheritance: null,
+                                        avgRequiredBreedings: null,
+                                        gender: PalGender.WILDCARD
                                     );
                                 }
 

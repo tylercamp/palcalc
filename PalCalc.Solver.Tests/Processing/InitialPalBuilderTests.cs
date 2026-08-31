@@ -22,6 +22,7 @@ public class InitialPalBuilderTests
         );
         var configuredSolver = SolverTestScenario.Solver(
             [male, female],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1
         );
 
@@ -56,6 +57,7 @@ public class InitialPalBuilderTests
         );
         var configuredSolver = SolverTestScenario.Solver(
             [noisy, clean],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1
         );
 
@@ -78,6 +80,7 @@ public class InitialPalBuilderTests
         var katress = "Katress".ToPal(SolverTestScenario.DB);
         var configuredSolver = SolverTestScenario.Solver(
             ownedPals: [],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxWildPals: 1,
             allowedWildPals: [katress]
@@ -114,6 +117,7 @@ public class InitialPalBuilderTests
         );
         var configuredSolver = SolverTestScenario.Solver(
             ownedPals: [],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxWildPals: 1,
             allowedWildPals: [wildPal]
@@ -173,7 +177,7 @@ public class InitialPalBuilderTests
         );
         var target = Target(level1, later);
         var configuredSolver = SolverTestScenario.Solver(
-            ownedPals: [], maxBreedingSteps: 1, maxWildPals: 1, allowedWildPals: [pal]
+            ownedPals: [], maxSpecialCakes: 0, maxBreedingSteps: 1, maxWildPals: 1, allowedWildPals: [pal]
         );
 
         var wild = NewBuilder(configuredSolver, target).Build(target).OfType<WildPalReference>().First();
@@ -224,11 +228,30 @@ public class InitialPalBuilderTests
     {
         var pal = "Katress".ToPal(SolverTestScenario.DB);
         var profile = new AttackProfile(new AttackProfileEntry(1, 0, TimeSpan.Zero, 0, false));
-        var owned = new OwnedPalReference(SolverTestScenario.Owned(pal.Name, PalGender.MALE), [], new(), attackProfile: profile, hasNeutralAttack: true);
-        var wild = new WildPalReference(pal, [], 0, SolverTestScenario.DB.BreedingMechanics, attackProfile: profile, hasNeutralAttack: true);
+        var owned = new OwnedPalReference(
+            SolverTestScenario.Owned(pal.Name, PalGender.MALE), [], new(),
+            actualAttack: null,
+            effectiveAttack: null,
+            attackProfile: profile,
+            hasNeutralAttack: true
+        );
+        var wild = new WildPalReference(
+            pal, [], 0, SolverTestScenario.DB.BreedingMechanics,
+            actualAttack: null,
+            effectiveAttack: null,
+            attackProfile: profile,
+            hasNeutralAttack: true
+        );
         var bred = new BredPalReference(
             new GameSettings(), pal, owned, owned, [], 1, new(), 1,
-            attackProfile: profile, hasNeutralAttack: true
+            actualAttack: null,
+            effectiveAttack: null,
+            attacksProbability: 1,
+            attackProfile: profile,
+            hasNeutralAttack: true,
+            materializedAttackInheritance: null,
+            avgRequiredBreedings: null,
+            gender: PalGender.WILDCARD
         );
 
         foreach (var reference in new IPalReference[]
@@ -245,7 +268,7 @@ public class InitialPalBuilderTests
 
     private static List<IPalReference> Build(IEnumerable<PalInstance> owned, PalSpecifier target)
     {
-        var configuredSolver = SolverTestScenario.Solver(owned, maxBreedingSteps: 4);
+        var configuredSolver = SolverTestScenario.Solver(owned, maxSpecialCakes: 0, maxBreedingSteps: 4);
         return NewBuilder(configuredSolver, target).Build(target);
     }
 

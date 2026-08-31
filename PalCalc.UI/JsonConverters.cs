@@ -345,7 +345,9 @@ namespace PalCalc.UI
                     Defense = defense
                 },
                 actualAttack: token["ActualAttack"]?.ToObject<ActiveSkill>(serializer),
-                effectiveAttack: token["EffectiveAttack"]?.ToObject<ActiveSkill>(serializer)
+                effectiveAttack: token["EffectiveAttack"]?.ToObject<ActiveSkill>(serializer),
+                attackProfile: AttackProfile.Inactive,
+                hasNeutralAttack: false
             );
 
             if (solverSettings.UseGenderReversers && inst.Gender != actualGender)
@@ -436,7 +438,9 @@ namespace PalCalc.UI
                 numPassives,
                 db.BreedingMechanics,
                 actualAttack: token["ActualAttack"]?.ToObject<ActiveSkill>(serializer),
-                effectiveAttack: token["EffectiveAttack"]?.ToObject<ActiveSkill>(serializer)
+                effectiveAttack: token["EffectiveAttack"]?.ToObject<ActiveSkill>(serializer),
+                attackProfile: AttackProfile.Inactive,
+                hasNeutralAttack: false
             ).WithGuaranteedGender(
                 db,
                 gender,
@@ -639,6 +643,8 @@ namespace PalCalc.UI
                 actualAttack,
                 effectiveAttack,
                 attacksProbability,
+                attackProfile: AttackProfile.Inactive,
+                hasNeutralAttack: false,
                 materializedAttackInheritance: materializedAttackInheritance,
                 avgRequiredBreedings: avgRequiredBreedings,
                 gender: avgRequiredBreedings is null ? PalGender.WILDCARD : gender

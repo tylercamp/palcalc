@@ -9,7 +9,7 @@ public class AttackTargetContextTests
     [TestMethod]
     public void Settings_CapturesZeroFiniteAndUnlimitedCakeLimits()
     {
-        Assert.AreEqual(0, SolverTestScenario.Solver([]).Settings.MaxSpecialCakes);
+        Assert.AreEqual(0, SolverTestScenario.Solver([], maxSpecialCakes: 0).Settings.MaxSpecialCakes);
         Assert.AreEqual(12, SolverTestScenario.Solver([], maxSpecialCakes: 12).Settings.MaxSpecialCakes);
         Assert.IsNull(SolverTestScenario.Solver([], maxSpecialCakes: null).Settings.MaxSpecialCakes);
     }
@@ -98,7 +98,7 @@ public class AttackTargetContextTests
     {
         var attack = SolverTestScenario.DB.ActiveSkills.First();
         var target = Target(attack, attack);
-        var request = new BreedingSolverRequest(target, SolverTestScenario.Solver([]).Settings);
+        var request = new BreedingSolverRequest(target, SolverTestScenario.Solver([], maxSpecialCakes: 0).Settings);
 
         var runContext = SolverRunContext.Create(
             request,

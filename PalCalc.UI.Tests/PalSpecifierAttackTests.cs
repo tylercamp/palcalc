@@ -202,7 +202,12 @@ public class PalSpecifierAttackTests
             ivsProbability: 0.75f,
             actualAttack: attack,
             effectiveAttack: random,
-            attacksProbability: 0.25f
+            attacksProbability: 0.25f,
+            attackProfile: AttackProfile.Inactive,
+            hasNeutralAttack: false,
+            materializedAttackInheritance: null,
+            avgRequiredBreedings: null,
+            gender: PalGender.WILDCARD
         );
 
         var settings = new JsonSerializerSettings
@@ -265,7 +270,14 @@ public class PalSpecifierAttackTests
             passivesProbability: 1,
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
             ivsProbability: 1,
-            materializedAttackInheritance: inheritance
+            actualAttack: inheritance.ChildMasteredAttacks.FirstOrDefault(),
+            effectiveAttack: inheritance.ChildMasteredAttacks.FirstOrDefault(),
+            attacksProbability: inheritance.AttackProbability,
+            attackProfile: AttackProfile.Inactive,
+            hasNeutralAttack: false,
+            materializedAttackInheritance: inheritance,
+            avgRequiredBreedings: 1,
+            gender: PalGender.WILDCARD
         );
 
         Assert.AreSame(secondParent, bred.Parent1);
@@ -287,10 +299,18 @@ public class PalSpecifierAttackTests
             [],
             passivesProbability: 1,
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
-            ivsProbability: 1
+            ivsProbability: 1,
+            actualAttack: null,
+            effectiveAttack: null,
+            attacksProbability: 1,
+            attackProfile: AttackProfile.Inactive,
+            hasNeutralAttack: false,
+            materializedAttackInheritance: null,
+            avgRequiredBreedings: null,
+            gender: PalGender.WILDCARD
         );
 
-        var display = new BreedingResultViewModel(null, new GameSettings(), result);
+        var display = new BreedingResultViewModel(null, new GameSettings(), result, []);
 
         Assert.IsFalse(display.EffectiveAttacks.HasItems);
         Assert.AreEqual(result.NumTotalEggs, display.NumEggs);
@@ -316,7 +336,9 @@ public class PalSpecifierAttackTests
                 Defense = IV_Value.Random,
             },
             actualAttack: attack,
-            effectiveAttack: attack
+            effectiveAttack: attack,
+            attackProfile: AttackProfile.Inactive,
+            hasNeutralAttack: false
         );
 
     private static JsonSerializerSettings ReadSettings(PalDB db) => new()

@@ -22,6 +22,7 @@ public class ResultPostProcessorTests
         );
         var configuredSolver = SolverTestScenario.Solver(
             [owned],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 0,
             maxSurgeryCost: surgeryPassive.SurgeryCost,
             allowedSurgeryPassives: [surgeryPassive]
@@ -36,19 +37,25 @@ public class ResultPostProcessorTests
         var ownedReference = new OwnedPalReference(
             owned,
             effectivePassives: [],
-            effectiveIVs: new IV_Set()
+            effectiveIVs: new IV_Set(),
+            actualAttack: null,
+            effectiveAttack: null,
+            attackProfile: AttackProfile.Inactive,
+            hasNeutralAttack: false
         );
         var frontier = new SearchFrontier(
             target,
             [ownedReference],
             maxThreads: 1,
             controller,
-            policy
+            policy,
+            attackTargets: null
         );
         var processor = new ResultPostProcessor(
             target,
             configuredSolver.Settings,
-            controller
+            controller,
+            attackTargets: null
         );
 
         processor.ApplySurgery(frontier);
@@ -81,25 +88,32 @@ public class ResultPostProcessorTests
             RequiredGender = PalGender.MALE,
         };
         var configuredSolver = SolverTestScenario.Solver(
-            ownedPals: []
+            ownedPals: [],
+            maxSpecialCakes: 0
         );
         var controller = Controller();
         var accumulator = new ResultAccumulator(
             target,
-            Policy(controller)
+            Policy(controller),
+            attackTargets: null
         );
         accumulator.Observe([
             new WildPalReference(
                 target.Pal,
                 guaranteedPassives: [],
                 numRandomPassives: 0,
-                mechanics: SolverTestScenario.DB.BreedingMechanics
+                mechanics: SolverTestScenario.DB.BreedingMechanics,
+                actualAttack: null,
+                effectiveAttack: null,
+                attackProfile: AttackProfile.Inactive,
+                hasNeutralAttack: false
             ),
         ]);
         var processor = new ResultPostProcessor(
             target,
             configuredSolver.Settings,
-            controller
+            controller,
+            attackTargets: null
         );
 
         var results = processor.Finalize(accumulator);
@@ -122,11 +136,12 @@ public class ResultPostProcessorTests
         {
             Pal = owned.Pal,
         };
-        var configuredSolver = SolverTestScenario.Solver([owned]);
+        var configuredSolver = SolverTestScenario.Solver([owned], maxSpecialCakes: 0);
         var controller = Controller();
         var accumulator = new ResultAccumulator(
             target,
-            Policy(controller)
+            Policy(controller),
+            attackTargets: null
         );
         accumulator.Observe([
             new OwnedPalReference(
@@ -134,13 +149,18 @@ public class ResultPostProcessorTests
                 owned.PassiveSkills.ToDedicatedPassives(
                     target.DesiredPassives
                 ),
-                new IV_Set()
+                new IV_Set(),
+                actualAttack: null,
+                effectiveAttack: null,
+                attackProfile: AttackProfile.Inactive,
+                hasNeutralAttack: false
             ),
         ]);
         var processor = new ResultPostProcessor(
             target,
             configuredSolver.Settings,
-            controller
+            controller,
+            attackTargets: null
         );
 
         var results = processor.Finalize(accumulator);
@@ -156,6 +176,7 @@ public class ResultPostProcessorTests
     ) =>
         new(
             ResultPruningPolicy.Default,
-            controller.CancellationToken
+            controller.CancellationToken,
+            attackTargets: null
         );
 }

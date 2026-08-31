@@ -390,12 +390,20 @@ public class SearchFrontierCharacterizationTests
             new OwnedPalReference(
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 effectivePassives: [],
-                effectiveIVs: new IV_Set()
+                effectiveIVs: new IV_Set(),
+                actualAttack: null,
+                effectiveAttack: null,
+                attackProfile: AttackProfile.Inactive,
+                hasNeutralAttack: false
             ),
             new OwnedPalReference(
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
                 effectivePassives: [],
-                effectiveIVs: new IV_Set()
+                effectiveIVs: new IV_Set(),
+                actualAttack: null,
+                effectiveAttack: null,
+                attackProfile: AttackProfile.Inactive,
+                hasNeutralAttack: false
             )
         );
 
@@ -412,7 +420,15 @@ public class SearchFrontierCharacterizationTests
             passives: [],
             passivesProbability: 1,
             ivs: new IV_Set(),
-            ivsProbability: 1
+            ivsProbability: 1,
+            actualAttack: null,
+            effectiveAttack: null,
+            attacksProbability: 1,
+            attackProfile: AttackProfile.Inactive,
+            hasNeutralAttack: false,
+            materializedAttackInheritance: null,
+            avgRequiredBreedings: null,
+            gender: PalGender.WILDCARD
         );
 
     private static SearchFrontier FrontierFor(
@@ -437,8 +453,10 @@ public class SearchFrontierCharacterizationTests
             controller: controller,
             selectionPolicy: selectionPolicy ?? new DefaultCandidateSelectionPolicy(
                 MinimumEffortOnly,
-                controller.CancellationToken
-            )
+                controller.CancellationToken,
+                attackTargets: null
+            ),
+            attackTargets: null
         );
     }
 

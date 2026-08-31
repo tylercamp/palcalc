@@ -16,10 +16,10 @@ namespace PalCalc.Solver.PalReference
             IEnumerable<PassiveSkill> guaranteedPassives,
             int numRandomPassives,
             BreedingMechanics mechanics,
-            ActiveSkill actualAttack = null,
-            ActiveSkill effectiveAttack = null,
-            AttackProfile attackProfile = default,
-            bool hasNeutralAttack = false
+            ActiveSkill actualAttack,
+            ActiveSkill effectiveAttack,
+            AttackProfile attackProfile,
+            bool hasNeutralAttack
         )
         {
             ArgumentNullException.ThrowIfNull(mechanics);

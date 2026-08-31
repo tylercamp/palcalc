@@ -110,14 +110,19 @@ public class ParallelBatchExecutorTests
         var healthyReference = new OwnedPalReference(
             SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             effectivePassives: [],
-            effectiveIVs: new IV_Set()
+            effectiveIVs: new IV_Set(),
+            actualAttack: null,
+            effectiveAttack: null,
+            attackProfile: AttackProfile.Inactive,
+            hasNeutralAttack: false
         );
         var frontier = new SearchFrontier(
             target,
             [healthyReference],
             configuredSolver.Settings.MaxThreads,
             controller,
-            context.SelectionPolicy
+            context.SelectionPolicy,
+            context.AttackTargets
         );
         var expansionContext = new CandidateExpansionContext(
             StepIndex: 0,
@@ -127,7 +132,8 @@ public class ParallelBatchExecutorTests
                 configuredSolver.Settings.MaxEffort,
                 context.SelectionPolicy,
                 frontier,
-                configuredSolver.Settings.DB.PalsById.Keys
+                configuredSolver.Settings.DB.PalsById.Keys,
+                context.AttackTargets
             ),
             AttackTargets: context.AttackTargets
         );
@@ -154,6 +160,7 @@ public class ParallelBatchExecutorTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxThreads: maxThreads

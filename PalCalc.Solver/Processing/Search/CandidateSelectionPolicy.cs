@@ -83,8 +83,8 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     public DefaultCandidateSelectionPolicy(
         ResultPruningPolicy resultPruning,
         CancellationToken cancellationToken,
-        IEffectivePropertiesKeyProvider propertiesKeyProvider = null,
-        AttackTargetContext attackTargets = null
+        AttackTargetContext attackTargets,
+        IEffectivePropertiesKeyProvider propertiesKeyProvider = null
     )
     {
         ArgumentNullException.ThrowIfNull(resultPruning);
