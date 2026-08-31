@@ -69,10 +69,6 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> ActualPassives { get; }
 
-        public ActiveSkill ActualAttack => Male.ActualAttack;
-
-        public ActiveSkill EffectiveAttack => Male.EffectiveAttack;
-
         public AttackProfile AttackProfile => Male.AttackProfile;
 
         public bool HasNeutralAttack => Male.HasNeutralAttack;

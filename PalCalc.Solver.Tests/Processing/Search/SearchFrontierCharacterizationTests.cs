@@ -69,57 +69,25 @@ public class SearchFrontierCharacterizationTests
     }
 
     [TestMethod]
-    public void ExpandSingles_ReplacesInferiorCandidateWithSameEffectiveAttack()
+    public void ExpandSingles_ReplacesInferiorCandidateWithSameProperties()
     {
         var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
         var statePal = "Katress".ToPal(SolverTestScenario.DB);
-        var attack = SolverTestScenario.DB.ActiveSkills.First(skill => skill.CanInherit);
         var slower = new TestPalReference(
             "slower",
             statePal,
-            TimeSpan.FromMinutes(10),
-            effectiveAttack: attack
+            TimeSpan.FromMinutes(10)
         );
         var faster = new TestPalReference(
             "faster",
             statePal,
-            TimeSpan.FromMinutes(5),
-            effectiveAttack: attack
+            TimeSpan.FromMinutes(5)
         );
         var frontier = FrontierFor(targetPal, [slower]);
 
         frontier.ExpandSingles(_ => [faster]);
 
         CollectionAssert.AreEquivalent(new[] { faster }, frontier.CurrentContent.ToList());
-    }
-
-    [TestMethod]
-    public void ExpandSingles_DoesNotReplaceTargetAttackWithIrrelevantAttack()
-    {
-        var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
-        var statePal = "Katress".ToPal(SolverTestScenario.DB);
-        var attack = SolverTestScenario.DB.ActiveSkills.First(skill => skill.CanInherit);
-        var withTargetAttack = new TestPalReference(
-            "target",
-            statePal,
-            TimeSpan.FromMinutes(10),
-            effectiveAttack: attack
-        );
-        var irrelevant = new TestPalReference(
-            "irrelevant",
-            statePal,
-            TimeSpan.FromMinutes(5),
-            effectiveAttack: new RandomActiveSkill()
-        );
-        var frontier = FrontierFor(targetPal, [withTargetAttack]);
-
-        frontier.ExpandSingles(_ => [irrelevant]);
-
-        CollectionAssert.AreEquivalent(
-            new[] { withTargetAttack, irrelevant },
-            frontier.CurrentContent.ToList()
-        );
-        Assert.IsFalse(withTargetAttack.IsOutdated);
     }
 
     [TestMethod]
@@ -391,8 +359,6 @@ public class SearchFrontierCharacterizationTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 effectivePassives: [],
                 effectiveIVs: new IV_Set(),
-                actualAttack: null,
-                effectiveAttack: null,
                 attackProfile: AttackProfile.Inactive,
                 hasNeutralAttack: false
             ),
@@ -400,8 +366,6 @@ public class SearchFrontierCharacterizationTests
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
                 effectivePassives: [],
                 effectiveIVs: new IV_Set(),
-                actualAttack: null,
-                effectiveAttack: null,
                 attackProfile: AttackProfile.Inactive,
                 hasNeutralAttack: false
             )
@@ -421,9 +385,6 @@ public class SearchFrontierCharacterizationTests
             passivesProbability: 1,
             ivs: new IV_Set(),
             ivsProbability: 1,
-            actualAttack: null,
-            effectiveAttack: null,
-            attacksProbability: 1,
             attackProfile: AttackProfile.Inactive,
             hasNeutralAttack: false,
             materializedAttackInheritance: null,
@@ -473,7 +434,6 @@ public class SearchFrontierCharacterizationTests
         Pal pal,
         TimeSpan breedingEffort,
         PalGender gender = PalGender.MALE,
-        ActiveSkill effectiveAttack = null!,
         AttackProfile attackProfile = default,
         bool hasNeutralAttack = false
     ) : IPalReference
@@ -484,8 +444,6 @@ public class SearchFrontierCharacterizationTests
         public int EffectivePassivesHash { get; } = Array.Empty<PassiveSkill>().SetHash();
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
-        public ActiveSkill ActualAttack => null!;
-        public ActiveSkill EffectiveAttack { get; } = effectiveAttack;
         public AttackProfile AttackProfile { get; } = attackProfile;
         public bool HasNeutralAttack { get; } = hasNeutralAttack;
         public PalGender Gender { get; } = gender;
@@ -502,7 +460,7 @@ public class SearchFrontierCharacterizationTests
         public IPalReference WithGuaranteedGender(PalDB db, PalGender requestedGender, bool useReverser) =>
             requestedGender == Gender
                 ? this
-                : new TestPalReference(Name, Pal, BreedingEffort, requestedGender, EffectiveAttack);
+                : new TestPalReference(Name, Pal, BreedingEffort, requestedGender, AttackProfile, HasNeutralAttack);
 
         public override string ToString() => Name;
     }

@@ -39,7 +39,9 @@ namespace PalCalc.Solver
 
         public bool IsSatisfiedBy(IPalReference palRef) =>
             IsSatisfiedByIgnoringAttacks(palRef) &&
-            (RequiredAttacks.Count == 0 || RequiredAttacks.All(attack => palRef.EffectiveAttack == attack));
+            (RequiredAttacks.Count == 0 || palRef.AttackProfile.Contains(
+                (byte)((1 << RequiredAttacks.Count) - 1)
+            ));
 
         public void Normalize()
         {

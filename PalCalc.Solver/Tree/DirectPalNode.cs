@@ -32,14 +32,14 @@ namespace PalCalc.Solver.Tree
                 switch (PalRef)
                 {
                     case WildPalReference wild:
-                        yield return $"Wild {wild.Pal.Name}; atk {wild.ActualAttack?.Name}";
+                        yield return $"Wild {wild.Pal.Name}";
                         yield return $"{wild.Gender} gender w/ up to {wild.EffectivePassives.Count} random passives";
                         break;
 
                     case OwnedPalReference owned:
                         yield return $"Owned {owned.Pal.Name}";
                         yield return $"in {owned.Location}";
-                        yield return $"{owned.Gender} w/ {owned.EffectivePassives.PassiveSkillListToString()}; atk {owned.ActualAttack?.Name}";
+                        yield return $"{owned.Gender} w/ {owned.EffectivePassives.PassiveSkillListToString()}";
                         break;
 
                     default: throw new NotImplementedException();

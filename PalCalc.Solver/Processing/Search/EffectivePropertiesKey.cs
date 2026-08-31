@@ -1,7 +1,6 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
-using PalCalc.Solver.Processing.Attacks;
 
 namespace PalCalc.Solver.Processing.Search;
 
@@ -131,8 +130,7 @@ internal readonly struct EffectivePropertiesKey : IEquatable<EffectiveProperties
         PalId palId,
         PalGender gender,
         PassiveSetKey passives,
-        RelevantIVKey ivs,
-        string effectiveAttackInternalName
+        RelevantIVKey ivs
     )
     {
         ArgumentNullException.ThrowIfNull(palId);
@@ -142,14 +140,12 @@ internal readonly struct EffectivePropertiesKey : IEquatable<EffectiveProperties
         Gender = gender;
         Passives = passives;
         IVs = ivs;
-        EffectiveAttackInternalName = effectiveAttackInternalName;
         hashCode = HashCode.Combine(
             PalDexNo,
             IsPalVariant,
             Gender,
             Passives,
-            IVs,
-            EffectiveAttackInternalName
+            IVs
         );
     }
 
@@ -158,18 +154,12 @@ internal readonly struct EffectivePropertiesKey : IEquatable<EffectiveProperties
     public PalGender Gender { get; }
     public PassiveSetKey Passives { get; }
     public RelevantIVKey IVs { get; }
-    public string EffectiveAttackInternalName { get; }
-
     public bool Equals(EffectivePropertiesKey other) =>
         PalDexNo == other.PalDexNo &&
         IsPalVariant == other.IsPalVariant &&
         Gender == other.Gender &&
         Passives == other.Passives &&
-        IVs == other.IVs &&
-        StringComparer.Ordinal.Equals(
-            EffectiveAttackInternalName,
-            other.EffectiveAttackInternalName
-        );
+        IVs == other.IVs;
 
     public override bool Equals(object obj) =>
         obj is EffectivePropertiesKey other && Equals(other);
@@ -190,24 +180,13 @@ internal interface IEffectivePropertiesKeyProvider
 
 internal sealed class DefaultEffectivePropertiesKeyProvider : IEffectivePropertiesKeyProvider
 {
-    public static DefaultEffectivePropertiesKeyProvider Instance { get; } = new(false);
-
-    private readonly bool attackProfilesActive;
-
-    internal DefaultEffectivePropertiesKeyProvider(AttackTargetContext attackTargets) :
-        this(attackTargets?.IsActive ?? false) { }
-
-    private DefaultEffectivePropertiesKeyProvider(bool attackProfilesActive) =>
-        this.attackProfilesActive = attackProfilesActive;
+    public static DefaultEffectivePropertiesKeyProvider Instance { get; } = new();
 
     public EffectivePropertiesKey KeyOf(IPalReference reference) =>
         new(
             palId: reference.Pal.Id,
             gender: reference.Gender,
             passives: new PassiveSetKey(reference.EffectivePassives),
-            ivs: new RelevantIVKey(reference.IVs),
-            effectiveAttackInternalName: attackProfilesActive
-                ? null
-                : reference.EffectiveAttack?.InternalName
+            ivs: new RelevantIVKey(reference.IVs)
         );
 }

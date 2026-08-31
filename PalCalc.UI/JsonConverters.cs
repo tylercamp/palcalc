@@ -301,8 +301,6 @@ namespace PalCalc.UI
                     Attack = value.IVs.Attack,
                     Defense = value.IVs.Defense
                 },
-                ActualAttack = value.ActualAttack,
-                EffectiveAttack = value.EffectiveAttack,
             }, serializer);
         }
 
@@ -344,8 +342,6 @@ namespace PalCalc.UI
                     Attack = attack,
                     Defense = defense
                 },
-                actualAttack: token["ActualAttack"]?.ToObject<ActiveSkill>(serializer),
-                effectiveAttack: token["EffectiveAttack"]?.ToObject<ActiveSkill>(serializer),
                 attackProfile: AttackProfile.Inactive,
                 hasNeutralAttack: false
             );
@@ -413,8 +409,6 @@ namespace PalCalc.UI
                 GuaranteedPassives = value.EffectivePassives.Where(t => t is not RandomPassiveSkill).ToList(),
                 NumPassives = value.EffectivePassives.Count(t => t is RandomPassiveSkill),
                 Gender = value.Gender,
-                ActualAttack = value.ActualAttack,
-                EffectiveAttack = value.EffectiveAttack,
             }, serializer);
         }
 
@@ -437,8 +431,6 @@ namespace PalCalc.UI
                 guaranteedPassives,
                 numPassives,
                 db.BreedingMechanics,
-                actualAttack: token["ActualAttack"]?.ToObject<ActiveSkill>(serializer),
-                effectiveAttack: token["EffectiveAttack"]?.ToObject<ActiveSkill>(serializer),
                 attackProfile: AttackProfile.Inactive,
                 hasNeutralAttack: false
             ).WithGuaranteedGender(
@@ -608,10 +600,6 @@ namespace PalCalc.UI
             var gender = token["Gender"].ToObject<PalGender>(serializer);
             var passivesProbability = (token["PassivesProbability"] ?? token["TraitsProbability"]).ToObject<float>(serializer);
             var ivsProbability = token["IVsProbability"]?.ToObject<float>(serializer) ?? 1.0f;
-            var attacksProbability = token["AttacksProbability"]?.ToObject<float?>(serializer) ?? 1.0f;
-
-            var actualAttack = token["ActualAttack"]?.ToObject<ActiveSkill>(serializer);
-            var effectiveAttack = token["EffectiveAttack"]?.ToObject<ActiveSkill>(serializer);
 
             var IV_hp = token["IV_HP"]?.ToObject<IV_Value>(serializer) ?? IV_Value.Random;
             var IV_attack = token["IV_Attack"]?.ToObject<IV_Value>(serializer) ?? IV_Value.Random;
@@ -640,9 +628,6 @@ namespace PalCalc.UI
                 passivesProbability,
                 ivs,
                 ivsProbability,
-                actualAttack,
-                effectiveAttack,
-                attacksProbability,
                 attackProfile: AttackProfile.Inactive,
                 hasNeutralAttack: false,
                 materializedAttackInheritance: materializedAttackInheritance,
@@ -670,9 +655,6 @@ namespace PalCalc.UI
                 IV_Attack = value.IVs.Attack,
                 IV_Defense = value.IVs.Defense,
                 IVsProbability = value.IVsProbability,
-                ActualAttack = value.ActualAttack,
-                EffectiveAttack = value.EffectiveAttack,
-                AttacksProbability = value.AttacksProbability,
                 AvgRequiredBreedings = value.AvgRequiredBreedings,
                 MaterializedAttackInheritance = value.MaterializedAttackInheritance is { } inheritance
                     ? new

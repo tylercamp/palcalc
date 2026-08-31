@@ -153,7 +153,7 @@ internal static class SolverTestScenario
             .OrderBy(r => r.PalInternalName, StringComparer.Ordinal)
             .ThenBy(r => r.Gender)
             .ThenBy(r => r.Passives, StringComparer.Ordinal)
-            .ThenBy(r => r.EffectiveAttackInternalName, StringComparer.Ordinal)
+            .ThenBy(r => r.AttackProfile, StringComparer.Ordinal)
             .ThenBy(r => r.IVs.HP.Min)
             .ThenBy(r => r.IVs.Attack.Min)
             .ThenBy(r => r.IVs.Defense.Min)
@@ -167,7 +167,7 @@ internal static class SolverTestScenario
         string PalInternalName,
         PalGender Gender,
         string Passives,
-        string? EffectiveAttackInternalName,
+        string AttackProfile,
         IV_Set IVs,
         long EffortTicks,
         int GoldCost,
@@ -186,7 +186,12 @@ internal static class SolverTestScenario
                         .OrderBy(g => g.Key, StringComparer.Ordinal)
                         .Select(g => $"{g.Key}:{g.Count()}")
                 ),
-                EffectiveAttackInternalName: result.EffectiveAttack?.InternalName,
+                AttackProfile: string.Join(
+                    "|",
+                    result.AttackProfile.Entries.Select(entry =>
+                        $"{entry.MasteredTargetMask}:{entry.TotalSpecialCakes}:{entry.BreedingEffort.Ticks}:{entry.SelfBreedings}:{entry.SelfUsesSpecialCake}"
+                    )
+                ),
                 IVs: result.IVs,
                 EffortTicks: result.BreedingEffort.Ticks,
                 GoldCost: result.TotalCost,

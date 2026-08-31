@@ -20,12 +20,6 @@ internal sealed class InitialPalBuilder(
 {
     public List<IPalReference> Build(PalSpecifier target)
     {
-        // Singular attack properties are retained only for legacy presentation.
-        // Active attack-profile search does not use them for grouping or correctness.
-        var compatibilityAttack = attackTargets.IsActive && target.RequiredAttacks.Count == 1
-            ? target.RequiredAttacks[0]
-            : null;
-
         // This step selects concrete owned instances and creates composite
         // gender candidates before the frontier simplifies breeding paths.
         // Those choices cannot be recovered from effective properties alone.
@@ -38,7 +32,6 @@ internal sealed class InitialPalBuilder(
                         .ToList()
                 ),
                 new RelevantIVKey(reference.IVs),
-                attackTargets.IsActive ? null : reference.EffectiveAttack?.InternalName,
                 reference.AttackProfile,
                 reference.HasNeutralAttack
             );
@@ -60,7 +53,6 @@ internal sealed class InitialPalBuilder(
             )
             .Select(p =>
             {
-                var attack = SelectOwnedAttack(p, compatibilityAttack);
                 var masteredAttacks = p.ActiveSkills ?? [];
                 return new OwnedPalReference(
                     instance: p,
@@ -71,8 +63,6 @@ internal sealed class InitialPalBuilder(
                         Attack = MakeIV(target.IV_Attack, p.IV_Attack),
                         Defense = MakeIV(target.IV_Defense, p.IV_Defense),
                     },
-                    actualAttack: attack,
-                    effectiveAttack: EffectiveAttack(attack, compatibilityAttack),
                     attackProfile: attackTargets.IsActive
                         ? new(new AttackProfileEntry(attackTargets.MaskOf(masteredAttacks), 0, TimeSpan.Zero, 0, false))
                         : AttackProfile.Inactive,
@@ -85,8 +75,7 @@ internal sealed class InitialPalBuilder(
             ))
             .Select(group =>
                 group
-                    .OrderBy(p => p.ActualAttack == null ? 2 : p.ActualAttack.CanInherit ? 1 : 0)
-                    .ThenBy(p => p.ActualPassives.Count)
+                    .OrderBy(p => p.ActualPassives.Count)
                     .ThenBy(p =>
                         PreferredLocationPruning.LocationOrderingOf(p.UnderlyingInstance.Location.Type)
                     )
@@ -103,29 +92,10 @@ internal sealed class InitialPalBuilder(
             .ToList();
 
         if (settings.MaxWildPals > 0)
-            AddWildCandidates(initialContent, target, WithinBreedingSteps, compatibilityAttack);
+            AddWildCandidates(initialContent, target, WithinBreedingSteps);
 
         return initialContent;
     }
-
-    private static ActiveSkill SelectOwnedAttack(PalInstance pal, ActiveSkill requiredAttack)
-    {
-        var mastered = pal.ActiveSkills ?? [];
-        return mastered.FirstOrDefault(attack => attack == requiredAttack)
-            ?? mastered.FirstOrDefault(attack => !attack.CanInherit)
-            ?? (pal.EquippedActiveSkills ?? []).FirstOrDefault(attack => attack.CanInherit)
-            ?? mastered
-                .Where(attack => attack.CanInherit)
-                .OrderBy(attack => attack.InternalName, StringComparer.Ordinal)
-                .FirstOrDefault();
-    }
-
-    private static ActiveSkill EffectiveAttack(ActiveSkill attack, ActiveSkill requiredAttack) =>
-        attack == requiredAttack
-            ? requiredAttack
-            : attack?.CanInherit == true
-                ? new RandomActiveSkill()
-                : null;
 
     private static IEnumerable<IPalReference> CombineGenders(
         List<OwnedPalReference> group
@@ -152,8 +122,7 @@ internal sealed class InitialPalBuilder(
     private void AddWildCandidates(
         List<IPalReference> initialContent,
         PalSpecifier target,
-        Func<Pal, bool> withinBreedingSteps,
-        ActiveSkill compatibilityAttack
+        Func<Pal, bool> withinBreedingSteps
     )
     {
         initialContent.AddRange(
@@ -165,7 +134,6 @@ internal sealed class InitialPalBuilder(
                 .SelectMany(p =>
                 {
                     var guaranteedPassives = p.GuaranteedPassiveSkills(settings.DB);
-                    var attack = SelectWildAttack(p, compatibilityAttack);
                     var attackState = attackTargets.StateOf(p);
                     var numIrrelevantGuaranteed = guaranteedPassives.Except(target.DesiredPassives).Count();
                     var numAllowedRandomPassives = Math.Clamp(
@@ -182,8 +150,6 @@ internal sealed class InitialPalBuilder(
                                 guaranteedPassives,
                                 numRandomPassives,
                                 mechanics,
-                                actualAttack: attack,
-                                effectiveAttack: EffectiveAttack(attack, compatibilityAttack),
                                 attackProfile: attackTargets.IsActive
                                     ? new(new AttackProfileEntry(
                                         attackState.Level1TargetMask,
@@ -201,24 +167,10 @@ internal sealed class InitialPalBuilder(
         );
     }
 
-    // TODO: Model naturally learned attacks above level 1 for hypothetical wild pals
-    // once their capture-level/loadout distribution is known.
-    private ActiveSkill SelectWildAttack(Pal pal, ActiveSkill requiredAttack)
-    {
-        var level1Attacks = pal.Level1ActiveSkills(settings.DB).ToList();
-        return level1Attacks.FirstOrDefault(attack => attack == requiredAttack)
-            ?? level1Attacks.FirstOrDefault(attack => !attack.CanInherit)
-            ?? level1Attacks
-                .Where(attack => attack.CanInherit)
-                .OrderBy(attack => attack.InternalName, StringComparer.Ordinal)
-                .FirstOrDefault();
-    }
-
     private readonly record struct InitialOwnedState(
         Pal Pal,
         PassiveSetKey Passives,
         RelevantIVKey IVs,
-        string EffectiveAttack,
         AttackProfile AttackProfile,
         bool HasNeutralAttack
     );

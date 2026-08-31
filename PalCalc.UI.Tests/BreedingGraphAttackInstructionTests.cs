@@ -79,20 +79,22 @@ public class BreedingGraphAttackInstructionTests
     }
 
     [TestMethod]
-    public void LegacyReferencesUseTheirSingularAttackWithoutCakeDetails()
+    public void WildPalDisplaysItsLevelOneMasteredAttacks()
     {
         var db = PalDB.LoadEmbedded();
-        var attack = db.ActiveSkills.First();
-        var result = Bred(db.Pals.First(), Owned(db.Pals.First(), "first", attack, 1), Owned(db.Pals.Last(), "second", attack, 2), null, actualAttack: attack);
-
-        var graph = BreedingGraph.FromPalReference(null, new GameSettings(), result, []);
+        var pal = db.Pals.First(candidate => candidate.Level1AttackInternalIds.Count > 0);
+        var wild = new WildPalReference(
+            pal,
+            [],
+            0,
+            db.BreedingMechanics,
+            AttackProfile.Inactive,
+            hasNeutralAttack: false
+        );
+        var graph = BreedingGraph.FromPalReference(null, new GameSettings(), wild, []);
         var node = (StandardBreedingTreeNodeViewModel)graph.NodeFor(graph.Tree.Root);
 
-        AssertAttacks([attack], node.MasteredAttacks);
-        AssertAttacks([attack], node.EquippedAttacks);
-        Assert.IsFalse(node.InheritedAttacks.HasItems);
-        Assert.AreEqual(0, node.SpecialCakes);
-        Assert.IsFalse(node.UsesSpecialCake);
+        AssertAttacks(pal.Level1ActiveSkills(db), node.MasteredAttacks);
     }
 
     [TestMethod]
@@ -111,12 +113,9 @@ public class BreedingGraphAttackInstructionTests
         Assert.IsTrue(double.IsNaN(results.NumSpecialCakesWidth));
     }
 
-    private static BredPalReference Bred(Pal pal, IPalReference parent1, IPalReference parent2, MaterializedAttackInheritance? inheritance, ActiveSkill? actualAttack = null) => new(
+    private static BredPalReference Bred(Pal pal, IPalReference parent1, IPalReference parent2, MaterializedAttackInheritance? inheritance) => new(
         new GameSettings(), pal, parent1, parent2, [], 1,
         new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random }, 1,
-        actualAttack: actualAttack ?? inheritance?.ChildMasteredAttacks.FirstOrDefault(),
-        effectiveAttack: actualAttack ?? inheritance?.ChildMasteredAttacks.FirstOrDefault(),
-        attacksProbability: inheritance?.AttackProbability ?? 1,
         attackProfile: AttackProfile.Inactive,
         hasNeutralAttack: false,
         materializedAttackInheritance: inheritance,
@@ -127,8 +126,6 @@ public class BreedingGraphAttackInstructionTests
     private static OwnedPalReference Owned(Pal pal, string id, ActiveSkill attack, int index) => new(
         new PalInstance { InstanceId = id, Pal = pal, Gender = PalGender.WILDCARD, PassiveSkills = [], ActiveSkills = [attack], EquippedActiveSkills = [attack], Location = new PalLocation { Type = LocationType.Palbox, Index = index } },
         [], new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
-        actualAttack: attack,
-        effectiveAttack: attack,
         attackProfile: AttackProfile.Inactive,
         hasNeutralAttack: false
     );

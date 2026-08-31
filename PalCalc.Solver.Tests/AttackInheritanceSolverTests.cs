@@ -27,8 +27,8 @@ public class AttackInheritanceSolverTests
 
         var result = results.Single();
         Assert.IsInstanceOfType<OwnedPalReference>(result);
-        Assert.AreSame(requiredAttack, result.ActualAttack);
-        Assert.AreSame(requiredAttack, result.EffectiveAttack);
+        var ownedResult = (OwnedPalReference)result;
+        CollectionAssert.Contains(ownedResult.UnderlyingInstance.ActiveSkills, requiredAttack);
         Assert.AreEqual(0, result.NumTotalBreedingSteps);
     }
 
@@ -54,12 +54,12 @@ public class AttackInheritanceSolverTests
             requiredAttack: requiredAttack
         ).OfType<BredPalReference>().First();
 
-        Assert.AreSame(requiredAttack, result.EffectiveAttack);
-        Assert.AreEqual(1f, result.AttacksProbability);
+        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
+        Assert.AreEqual(1f, result.MaterializedAttackInheritance.AttackProbability);
         Assert.AreEqual(
             (int)Math.Ceiling(
                 1f /
-                (result.PassivesProbability * result.IVsProbability * result.AttacksProbability)
+                (result.PassivesProbability * result.IVsProbability * result.MaterializedAttackInheritance.AttackProbability)
             ),
             result.AvgRequiredBreedings
         );
@@ -110,7 +110,7 @@ public class AttackInheritanceSolverTests
         );
         var inherited = result.AttackProfile.Entries.Single(entry => entry.MasteredTargetMask == 1);
 
-        Assert.AreEqual(0.5f, result.AttacksProbability);
+        Assert.AreEqual(0.5f, result.MaterializedAttackInheritance.AttackProbability);
         Assert.AreEqual(expectedProfileEggs, inherited.SelfBreedings);
         Assert.AreEqual(expectedProfileEggs, result.AvgRequiredBreedings);
         Assert.AreEqual(inherited.BreedingEffort, result.BreedingEffort);
@@ -143,8 +143,8 @@ public class AttackInheritanceSolverTests
             .OfType<BredPalReference>()
             .Single(parent => parent.Pal == intermediate);
 
-        Assert.AreSame(requiredAttack, bredIntermediate.EffectiveAttack);
-        Assert.AreSame(requiredAttack, result.EffectiveAttack);
+        CollectionAssert.Contains(bredIntermediate.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
+        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
     }
 
     [TestMethod]
@@ -169,8 +169,8 @@ public class AttackInheritanceSolverTests
             requiredAttack: requiredAttack
         ).OfType<BredPalReference>().First();
 
-        Assert.AreSame(requiredAttack, result.EffectiveAttack);
-        Assert.AreEqual(1f, result.AttacksProbability);
+        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
+        Assert.AreEqual(1f, result.MaterializedAttackInheritance.AttackProbability);
     }
 
     [TestMethod]
@@ -238,8 +238,8 @@ public class AttackInheritanceSolverTests
             .OfType<BredPalReference>()
             .Single(parent => parent.Pal == intermediate);
 
-        Assert.AreNotSame(requiredAttack, bredIntermediate.EffectiveAttack);
-        Assert.AreSame(requiredAttack, result.EffectiveAttack);
+        CollectionAssert.DoesNotContain(bredIntermediate.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
+        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
     }
 
     [TestMethod]

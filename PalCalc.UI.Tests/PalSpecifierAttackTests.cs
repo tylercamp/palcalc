@@ -178,12 +178,11 @@ public class PalSpecifierAttackTests
     }
 
     [TestMethod]
-    public void BredReferenceAttackStateRoundTrips()
+    public void BredReferenceStateRoundTrips()
     {
         var db = PalDB.LoadEmbedded();
         var gameSettings = new GameSettings();
         var attack = db.ActiveSkills.First();
-        var random = new RandomActiveSkill();
         var parent1 = Owned(db.Pals.First(), "parent-1", attack, 1);
         var parent2 = Owned(db.Pals.First(), "parent-2", attack, 2);
         var original = new BredPalReference(
@@ -200,9 +199,6 @@ public class PalSpecifierAttackTests
                 Defense = IV_Value.Random,
             },
             ivsProbability: 0.75f,
-            actualAttack: attack,
-            effectiveAttack: random,
-            attacksProbability: 0.25f,
             attackProfile: AttackProfile.Inactive,
             hasNeutralAttack: false,
             materializedAttackInheritance: null,
@@ -222,26 +218,7 @@ public class PalSpecifierAttackTests
         var restored = JObject.Parse(json)["Ref"]!.ToObject<IPalReference>(JsonSerializer.Create(settings))!;
 
         var restoredBred = (BredPalReference)restored;
-        Assert.AreEqual(attack.InternalName, restoredBred.ActualAttack.InternalName);
-        Assert.IsInstanceOfType<RandomActiveSkill>(restoredBred.EffectiveAttack);
-        Assert.AreEqual(original.AttacksProbability, restoredBred.AttacksProbability);
         Assert.AreEqual(original.AvgRequiredBreedings, restoredBred.AvgRequiredBreedings);
-
-        var oldJson = JObject.Parse(json);
-        foreach (var obj in oldJson.DescendantsAndSelf().OfType<JObject>())
-        {
-            obj.Remove("ActualAttack");
-            obj.Remove("EffectiveAttack");
-            obj.Remove("AttacksProbability");
-            obj.Remove("AvgRequiredBreedings");
-            obj.Remove("MaterializedAttackInheritance");
-        }
-
-        var oldResult = (BredPalReference)oldJson["Ref"]!.ToObject<IPalReference>(JsonSerializer.Create(settings))!;
-        Assert.IsNull(oldResult.ActualAttack);
-        Assert.IsNull(oldResult.EffectiveAttack);
-        Assert.IsNull(oldResult.MaterializedAttackInheritance);
-        Assert.AreEqual(1.0f, oldResult.AttacksProbability);
     }
 
     [TestMethod]
@@ -270,9 +247,6 @@ public class PalSpecifierAttackTests
             passivesProbability: 1,
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
             ivsProbability: 1,
-            actualAttack: inheritance.ChildMasteredAttacks.FirstOrDefault(),
-            effectiveAttack: inheritance.ChildMasteredAttacks.FirstOrDefault(),
-            attacksProbability: inheritance.AttackProbability,
             attackProfile: AttackProfile.Inactive,
             hasNeutralAttack: false,
             materializedAttackInheritance: inheritance,
@@ -300,9 +274,6 @@ public class PalSpecifierAttackTests
             passivesProbability: 1,
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
             ivsProbability: 1,
-            actualAttack: null,
-            effectiveAttack: null,
-            attacksProbability: 1,
             attackProfile: AttackProfile.Inactive,
             hasNeutralAttack: false,
             materializedAttackInheritance: null,
@@ -335,8 +306,6 @@ public class PalSpecifierAttackTests
                 Attack = IV_Value.Random,
                 Defense = IV_Value.Random,
             },
-            actualAttack: attack,
-            effectiveAttack: attack,
             attackProfile: AttackProfile.Inactive,
             hasNeutralAttack: false
         );

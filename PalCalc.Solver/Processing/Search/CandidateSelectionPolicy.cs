@@ -91,10 +91,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
 
         attackProfilesActive = attackTargets?.IsActive == true;
         this.propertiesKeyProvider =
-            propertiesKeyProvider ??
-            (attackTargets is null
-                ? DefaultEffectivePropertiesKeyProvider.Instance
-                : new DefaultEffectivePropertiesKeyProvider(attackTargets));
+            propertiesKeyProvider ?? DefaultEffectivePropertiesKeyProvider.Instance;
         retainedAlternativeSelection =
             resultPruning.Create(cancellationToken);
     }

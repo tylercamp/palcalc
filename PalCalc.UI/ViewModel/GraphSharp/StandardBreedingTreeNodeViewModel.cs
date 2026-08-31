@@ -26,7 +26,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             Value = node;
             Pal = PalViewModel.Make(node.PalRef.Pal);
             var inheritance = (node.PalRef as BredPalReference)?.MaterializedAttackInheritance;
-            MasteredAttacks = new AttackSkillCollectionViewModel((inheritance?.ChildMasteredAttacks ?? [node.PalRef.ActualAttack]).Where(attack => attack != null).Select(ActiveSkillViewModel.Make));
+            MasteredAttacks = new AttackSkillCollectionViewModel(MasteredAttacksFor(node.PalRef, inheritance).Select(ActiveSkillViewModel.Make));
             InheritedAttacks = new AttackSkillCollectionViewModel((inheritance?.InheritedAttacks ?? []).Select(ActiveSkillViewModel.Make));
             EquippedAttacks = MasteredAttacks;
             SpecialCakes = inheritance?.SpecialCakes ?? 0;
@@ -98,6 +98,18 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             OnPropertyChanged(nameof(EquippedAttacks));
             OnPropertyChanged(nameof(MasteredAttacksDifferFromEquipped));
         }
+
+        private static IEnumerable<ActiveSkill> MasteredAttacksFor(
+            IPalReference reference,
+            MaterializedAttackInheritance inheritance
+        ) => inheritance?.ChildMasteredAttacks ?? reference switch
+        {
+            OwnedPalReference owned => owned.UnderlyingInstance.ActiveSkills ?? [],
+            CompositeOwnedPalReference composite => composite.Male.UnderlyingInstance.ActiveSkills ?? [],
+            WildPalReference wild => wild.Pal.Level1ActiveSkills(PalDB.LoadEmbedded()),
+            SurgeryTablePalReference surgery => MasteredAttacksFor(surgery.Input, null),
+            _ => [],
+        };
 
         public IBreedingTreeNode Value { get; }
 

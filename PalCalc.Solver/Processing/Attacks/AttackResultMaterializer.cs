@@ -66,8 +66,6 @@ internal sealed class AttackResultMaterializer
             .Concat(bred.Pal.Level1ActiveSkills(settings.DB))
             .Distinct()
             .ToArray();
-        var actualAttack = AttackForMask(selectedEntry.MasteredTargetMask) ??
-            childMasteredAttacks.FirstOrDefault();
         var inheritance = new MaterializedAttackInheritance(
             (AttackInheritanceMode)choice.Mode,
             LoadoutFor(parent1, choice.Parent1TargetMask),
@@ -87,11 +85,6 @@ internal sealed class AttackResultMaterializer
             bred.PassivesProbability,
             bred.IVs,
             bred.IVsProbability,
-            actualAttack: actualAttack,
-            effectiveAttack: selectedEntry.MasteredTargetMask == targets.FullTargetMask
-                ? actualAttack
-                : actualAttack?.CanInherit == true ? new RandomActiveSkill() : null,
-            attacksProbability: choice.AttackProbability,
             attackProfile: new AttackProfile(selectedEntry),
             hasNeutralAttack: bred.HasNeutralAttack,
             materializedAttackInheritance: inheritance,
@@ -136,9 +129,6 @@ internal sealed class AttackResultMaterializer
                 bred.MaterializedAttackInheritance.ChildMasteredAttacks,
             _ => reference.Pal.Level1ActiveSkills(settings.DB),
         };
-
-    private ActiveSkill AttackForMask(byte mask) =>
-        mask == 0 ? null : AttacksForMask(mask).First();
 
     private AttackProfileEntry MaterializedEntryFor(
         BredPalReference reference,

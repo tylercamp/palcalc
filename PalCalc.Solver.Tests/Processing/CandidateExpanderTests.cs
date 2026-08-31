@@ -309,13 +309,6 @@ public class CandidateExpanderTests
         AttackTargetContext? attackTargets = null
     )
     {
-        var actualAttack = instance.EquippedActiveSkills.FirstOrDefault();
-        var effectiveAttack = actualAttack == target.RequiredAttacks.SingleOrDefault()
-            ? actualAttack
-            : actualAttack?.CanInherit == true
-                ? new RandomActiveSkill()
-                : null;
-
         return new(
             instance,
             instance.PassiveSkills.ToDedicatedPassives(
@@ -332,8 +325,6 @@ public class CandidateExpanderTests
                     instance.IV_Defense
                 )
             ),
-            actualAttack,
-            effectiveAttack,
             attackProfile: attackTargets?.IsActive == true
                 ? new(new AttackProfileEntry(
                     attackTargets.MaskOf(instance.ActiveSkills ?? []),

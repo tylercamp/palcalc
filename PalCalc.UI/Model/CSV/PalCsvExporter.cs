@@ -54,8 +54,6 @@ namespace PalCalc.UI.Model.CSV
                     p.ModelObject,
                     [],
                     new IV_Set(),
-                    actualAttack: null,
-                    effectiveAttack: null,
                     attackProfile: AttackProfile.Inactive,
                     hasNeutralAttack: false
                 )));

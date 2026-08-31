@@ -126,8 +126,7 @@ public class InitialPalBuilderTests
         var target = Target(laterAttack);
         var wild = NewBuilder(configuredSolver, target).Build(target).OfType<WildPalReference>().First();
 
-        Assert.AreSame(level1, wild.ActualAttack);
-        Assert.IsInstanceOfType<RandomActiveSkill>(wild.EffectiveAttack);
+        Assert.AreEqual((byte)0, wild.AttackProfile.Entries.Single().MasteredTargetMask);
     }
 
 
@@ -144,8 +143,10 @@ public class InitialPalBuilderTests
         var seeds = Build([targetBearer, other], Target(required)).OfType<OwnedPalReference>().ToList();
 
         Assert.AreEqual(2, seeds.Count);
-        Assert.IsTrue(seeds.Any(seed => seed.EffectiveAttack == required));
-        Assert.IsTrue(seeds.Any(seed => seed.EffectiveAttack is RandomActiveSkill));
+        CollectionAssert.AreEquivalent(
+            new byte[] { 0, 1 },
+            seeds.Select(seed => seed.AttackProfile.Entries.Single().MasteredTargetMask).ToArray()
+        );
     }
 
     [TestMethod]
@@ -230,23 +231,16 @@ public class InitialPalBuilderTests
         var profile = new AttackProfile(new AttackProfileEntry(1, 0, TimeSpan.Zero, 0, false));
         var owned = new OwnedPalReference(
             SolverTestScenario.Owned(pal.Name, PalGender.MALE), [], new(),
-            actualAttack: null,
-            effectiveAttack: null,
             attackProfile: profile,
             hasNeutralAttack: true
         );
         var wild = new WildPalReference(
             pal, [], 0, SolverTestScenario.DB.BreedingMechanics,
-            actualAttack: null,
-            effectiveAttack: null,
             attackProfile: profile,
             hasNeutralAttack: true
         );
         var bred = new BredPalReference(
             new GameSettings(), pal, owned, owned, [], 1, new(), 1,
-            actualAttack: null,
-            effectiveAttack: null,
-            attacksProbability: 1,
             attackProfile: profile,
             hasNeutralAttack: true,
             materializedAttackInheritance: null,

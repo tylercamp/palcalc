@@ -111,8 +111,6 @@ public class ParallelBatchExecutorTests
             SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             effectivePassives: [],
             effectiveIVs: new IV_Set(),
-            actualAttack: null,
-            effectiveAttack: null,
             attackProfile: AttackProfile.Inactive,
             hasNeutralAttack: false
         );
@@ -186,8 +184,6 @@ public class ParallelBatchExecutorTests
         public int EffectivePassivesHash => 0;
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
-        public ActiveSkill ActualAttack => null!;
-        public ActiveSkill EffectiveAttack => null!;
         public AttackProfile AttackProfile => AttackProfile.Inactive;
         public bool HasNeutralAttack => false;
         public PalGender Gender => PalGender.MALE;

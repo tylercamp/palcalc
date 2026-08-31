@@ -439,9 +439,6 @@ namespace PalCalc.Solver.Processing
                                 probabilityForUpToNumPassives,
                                 finalIVs,
                                 ivsProbability,
-                                actualAttack: null,
-                                effectiveAttack: null,
-                                attacksProbability: 1,
                                 attackProfile: AttackProfile.Inactive,
                                 hasNeutralAttack: false,
                                 materializedAttackInheritance: null,
@@ -472,9 +469,6 @@ namespace PalCalc.Solver.Processing
                                             probabilityForUpToNumPassives,
                                             finalIVs,
                                             ivsProbability,
-                                            actualAttack: null,
-                                            effectiveAttack: null,
-                                            attacksProbability: 1,
                                             attackProfile: attackProfile,
                                             hasNeutralAttack: context.AttackTargets.StateOf(childPalType).HasNeutralLevel1Attack,
                                             materializedAttackInheritance: null,
@@ -484,13 +478,6 @@ namespace PalCalc.Solver.Processing
                                 }
                                 else
                                 {
-                                    var attackOutcome = Probabilities.Attacks.InheritanceOutcome(
-                                        db,
-                                        null,
-                                        childPalType,
-                                        parent1,
-                                        parent2
-                                    );
                                     res = new BredPalReference(
                                         settings.GameSettings,
                                         childPalType,
@@ -500,9 +487,6 @@ namespace PalCalc.Solver.Processing
                                         probabilityForUpToNumPassives,
                                         finalIVs,
                                         ivsProbability,
-                                        actualAttack: attackOutcome.ActualAttack,
-                                        effectiveAttack: attackOutcome.EffectiveAttack,
-                                        attacksProbability: attackOutcome.Probability,
                                         attackProfile: AttackProfile.Inactive,
                                         hasNeutralAttack: false,
                                         materializedAttackInheritance: null,

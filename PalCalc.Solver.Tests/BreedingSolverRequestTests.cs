@@ -77,7 +77,7 @@ public class BreedingSolverRequestTests
     }
 
     [TestMethod]
-    public void PalSpecifier_RequiresEffectiveAttackWhenSpecified()
+    public void PalSpecifier_RequiresCompleteAttackProfileWhenSpecified()
     {
         var targetPal = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var requiredAttack = SolverTestScenario.DB.ActiveSkills.First();
@@ -89,10 +89,10 @@ public class BreedingSolverRequestTests
         var instance = SolverTestScenario.Owned("Wixen Noct", PalGender.MALE);
 
         Assert.IsTrue(target.IsSatisfiedBy(new OwnedPalReference(
-            instance, [], new(), requiredAttack, requiredAttack, AttackProfile.Inactive, false
+            instance, [], new(), new AttackProfile(new AttackProfileEntry(1, 0, TimeSpan.Zero, 0, false)), false
         )));
         Assert.IsFalse(target.IsSatisfiedBy(new OwnedPalReference(
-            instance, [], new(), requiredAttack, new RandomActiveSkill(), AttackProfile.Inactive, false
+            instance, [], new(), new AttackProfile(new AttackProfileEntry(0, 0, TimeSpan.Zero, 0, false)), false
         )));
     }
 

@@ -29,12 +29,6 @@ namespace PalCalc.Solver.PalReference
 
         List<PassiveSkill> ActualPassives { get; }
 
-        // Compatibility presentation properties. Active attack-profile search uses
-        // AttackProfile rather than either singular value for correctness.
-        ActiveSkill ActualAttack { get; }
-
-        ActiveSkill EffectiveAttack { get; }
-
         AttackProfile AttackProfile { get; }
 
         bool HasNeutralAttack { get; }

@@ -213,8 +213,6 @@ public class AttackProfileComposerTests
             SolverTestScenario.Owned("Katress", PalGender.MALE),
             [],
             new IV_Set(),
-            actualAttack: null,
-            effectiveAttack: null,
             attackProfile: profile,
             hasNeutralAttack: neutral
         );
@@ -224,16 +222,11 @@ public class AttackProfileComposerTests
         var first = Reference(new AttackProfile(Entry(0)));
         var second = new OwnedPalReference(
             SolverTestScenario.Owned("Wixen", PalGender.FEMALE), [], new IV_Set(),
-            actualAttack: null,
-            effectiveAttack: null,
             attackProfile: AttackProfile.Inactive,
             hasNeutralAttack: false
         );
         return new BredPalReference(
             settings.GameSettings, Child, first, second, [], 1, new IV_Set(), 1,
-            actualAttack: null,
-            effectiveAttack: null,
-            attacksProbability: 1,
             attackProfile: profile,
             hasNeutralAttack: false,
             materializedAttackInheritance: null,

@@ -16,8 +16,6 @@ namespace PalCalc.Solver.PalReference
             IEnumerable<PassiveSkill> guaranteedPassives,
             int numRandomPassives,
             BreedingMechanics mechanics,
-            ActiveSkill actualAttack,
-            ActiveSkill effectiveAttack,
             AttackProfile attackProfile,
             bool hasNeutralAttack
         )
@@ -30,8 +28,6 @@ namespace PalCalc.Solver.PalReference
                 mechanics.PassivesWildAtMostN[numRandomPassives];
             EffectivePassives = guaranteedPassives.Concat(Enumerable.Range(0, numRandomPassives).Select(i => new RandomPassiveSkill())).ToList();
             Gender = PalGender.WILDCARD;
-            ActualAttack = actualAttack;
-            EffectiveAttack = effectiveAttack;
             AttackProfile = attackProfile;
             HasNeutralAttack = hasNeutralAttack;
             CapturesRequiredForGender = 1;
@@ -57,10 +53,6 @@ namespace PalCalc.Solver.PalReference
         public PalGender Gender { get; private set; }
 
         public List<PassiveSkill> ActualPassives => EffectivePassives;
-
-        public ActiveSkill ActualAttack { get; private set; }
-
-        public ActiveSkill EffectiveAttack { get; private set; }
 
         public AttackProfile AttackProfile { get; private set; }
 
@@ -115,8 +107,6 @@ namespace PalCalc.Solver.PalReference
                 EffectivePassives = EffectivePassives,
                 EffectivePassivesHash = this.EffectivePassivesHash,
                 IVs = IVs,
-                ActualAttack = ActualAttack,
-                EffectiveAttack = EffectiveAttack,
                 AttackProfile = AttackProfile.Equals(PalCalc.Solver.PalReference.Properties.AttackProfile.Inactive)
                     ? PalCalc.Solver.PalReference.Properties.AttackProfile.Inactive
                     : new AttackProfile(AttackProfile.Entries.Select(entry => entry with

@@ -112,11 +112,12 @@ internal sealed class AttackProfileComposer(
 
                 var parent1HasAttack = (parent1Mask & bit) != 0;
                 var parent2HasAttack = (parent2Mask & bit) != 0;
-                var probability = parent1HasAttack && parent2HasAttack ||
-                    parent1HasAttack && parent2.HasNeutralAttack ||
-                    parent2HasAttack && parent1.HasNeutralAttack
-                    ? 1
-                    : 0.5f;
+                var probability = Probabilities.Attacks.ProbabilityInheritedTargetAttack(
+                    parent1HasAttack,
+                    parent2HasAttack,
+                    parent1.HasNeutralAttack,
+                    parent2.HasNeutralAttack
+                );
                 Emit(
                     parent1Entry,
                     parent2Entry,

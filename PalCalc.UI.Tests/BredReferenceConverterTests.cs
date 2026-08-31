@@ -40,8 +40,8 @@ public class BredReferenceConverterTests
         Assert.AreEqual(original.AvgRequiredBreedings, reloaded.AvgRequiredBreedings);
         Assert.AreEqual(original.NumTotalEggs, reloaded.NumTotalEggs);
         Assert.AreEqual(original.BreedingEffort, reloaded.BreedingEffort);
-        Assert.AreEqual(reloaded.Parent1.ActualAttack, reloaded.MaterializedAttackInheritance.Parent1Loadout.Single());
-        Assert.AreEqual(reloaded.Parent2.ActualAttack, reloaded.MaterializedAttackInheritance.Parent2Loadout.Single());
+        Assert.AreEqual(((OwnedPalReference)reloaded.Parent1).UnderlyingInstance.ActiveSkills.Single(), reloaded.MaterializedAttackInheritance.Parent1Loadout.Single());
+        Assert.AreEqual(((OwnedPalReference)reloaded.Parent2).UnderlyingInstance.ActiveSkills.Single(), reloaded.MaterializedAttackInheritance.Parent2Loadout.Single());
     }
 
     [TestMethod]
@@ -146,9 +146,6 @@ public class BredReferenceConverterTests
         passivesProbability: 0.5f,
         new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
         ivsProbability: 0.5f,
-        actualAttack: inheritance.ChildMasteredAttacks.FirstOrDefault(),
-        effectiveAttack: inheritance.ChildMasteredAttacks.FirstOrDefault(),
-        attacksProbability: inheritance.AttackProbability,
         attackProfile: AttackProfile.Inactive,
         hasNeutralAttack: false,
         materializedAttackInheritance: inheritance,
@@ -169,8 +166,6 @@ public class BredReferenceConverterTests
         },
         [],
         new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
-        actualAttack: attack,
-        effectiveAttack: attack,
         attackProfile: AttackProfile.Inactive,
         hasNeutralAttack: false
     );

@@ -22,8 +22,6 @@ namespace PalCalc.Solver.PalReference
             IPalReference parent2,
             List<PassiveSkill> passives,
             IV_Set ivs,
-            ActiveSkill actualAttack,
-            ActiveSkill effectiveAttack,
             AttackProfile attackProfile,
             bool hasNeutralAttack,
             MaterializedAttackInheritance materializedAttackInheritance
@@ -46,8 +44,6 @@ namespace PalCalc.Solver.PalReference
             }
 
             IVs = ivs;
-            ActualAttack = actualAttack;
-            EffectiveAttack = effectiveAttack;
             AttackProfile = attackProfile;
             HasNeutralAttack = hasNeutralAttack;
             MaterializedAttackInheritance = parentOrderReversed || materializedAttackInheritance is null
@@ -79,22 +75,19 @@ namespace PalCalc.Solver.PalReference
             float passivesProbability,
             IV_Set ivs,
             float ivsProbability,
-            ActiveSkill actualAttack,
-            ActiveSkill effectiveAttack,
-            float attacksProbability,
             AttackProfile attackProfile,
             bool hasNeutralAttack,
             MaterializedAttackInheritance materializedAttackInheritance,
             int? avgRequiredBreedings,
             PalGender gender
-        ) : this(gameSettings, pal, parent1, parent2, passives, ivs, actualAttack, effectiveAttack, attackProfile, hasNeutralAttack, materializedAttackInheritance)
+        ) : this(gameSettings, pal, parent1, parent2, passives, ivs, attackProfile, hasNeutralAttack, materializedAttackInheritance)
         {
             Gender = gender;
             if (avgRequiredBreedings is int materializedBreedings)
             {
                 AvgRequiredBreedings = materializedBreedings;
             }
-            else if (passivesProbability <= 0 || ivsProbability <= 0 || attacksProbability <= 0)
+            else if (passivesProbability <= 0 || ivsProbability <= 0)
             {
                 // don't think this is actually needed anymore, keeping just in case
 #if DEBUG
@@ -102,11 +95,10 @@ namespace PalCalc.Solver.PalReference
 #endif
                 AvgRequiredBreedings = int.MaxValue;
             }
-            else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / (passivesProbability * ivsProbability * attacksProbability));
+            else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / (passivesProbability * ivsProbability));
 
             PassivesProbability = passivesProbability;
             IVsProbability = ivsProbability;
-            AttacksProbability = attacksProbability;
         }
 
         public float PassivesProbability { get; private set; }
@@ -121,8 +113,6 @@ namespace PalCalc.Solver.PalReference
 
         public IV_Set IVs { get; private set; }
         public float IVsProbability { get; private set; }
-
-        public float AttacksProbability { get; private set; }
 
         public float TimeFactor { get; }
 
@@ -177,10 +167,6 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> ActualPassives => EffectivePassives;
 
-        public ActiveSkill ActualAttack { get; }
-
-        public ActiveSkill EffectiveAttack { get; }
-
         public AttackProfile AttackProfile { get; }
 
         public bool HasNeutralAttack { get; }
@@ -197,7 +183,7 @@ namespace PalCalc.Solver.PalReference
             }
             else
             {
-                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs, ActualAttack, EffectiveAttack,
+                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs,
                     AttackProfile.WithGuaranteedGender(gameSettings, Pal, Parent1.TimeFactor, Parent2.TimeFactor, db, gender, useReverser), HasNeutralAttack,
                     MaterializedAttackInheritance)
                 {
@@ -205,7 +191,6 @@ namespace PalCalc.Solver.PalReference
                     Gender = gender,
                     PassivesProbability = PassivesProbability,
                     IVsProbability = IVsProbability,
-                    AttacksProbability = AttacksProbability,
                 };
             }
         }
@@ -231,7 +216,7 @@ namespace PalCalc.Solver.PalReference
             }
         }
 
-        public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectivePassives.PassiveSkillListToString()}), attack: {EffectiveAttack?.ToString() ?? "None"}";
+        public override string ToString() => $"Bred {Gender} {Pal} w/ ({EffectivePassives.PassiveSkillListToString()})";
 
         public override bool Equals(object obj)
         {
@@ -242,17 +227,14 @@ namespace PalCalc.Solver.PalReference
         }
 
         public override int GetHashCode() => HashCode.Combine(
-            HashCode.Combine(
-                nameof(BredPalReference),
-                Pal,
-                Parent1.GetHashCode() ^ Parent2.GetHashCode(),
-                EffectivePassivesHash,
-                BreedingEffort,
-                SelfBreedingEffort,
-                Gender,
-                IVs
-            ),
-            EffectiveAttack?.InternalName
+            nameof(BredPalReference),
+            Pal,
+            Parent1.GetHashCode() ^ Parent2.GetHashCode(),
+            EffectivePassivesHash,
+            BreedingEffort,
+            SelfBreedingEffort,
+            Gender,
+            IVs
         );
     }
 }

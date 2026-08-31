@@ -38,8 +38,6 @@ public class ResultPostProcessorTests
             owned,
             effectivePassives: [],
             effectiveIVs: new IV_Set(),
-            actualAttack: null,
-            effectiveAttack: null,
             attackProfile: AttackProfile.Inactive,
             hasNeutralAttack: false
         );
@@ -103,8 +101,6 @@ public class ResultPostProcessorTests
                 guaranteedPassives: [],
                 numRandomPassives: 0,
                 mechanics: SolverTestScenario.DB.BreedingMechanics,
-                actualAttack: null,
-                effectiveAttack: null,
                 attackProfile: AttackProfile.Inactive,
                 hasNeutralAttack: false
             ),
@@ -150,8 +146,6 @@ public class ResultPostProcessorTests
                     target.DesiredPassives
                 ),
                 new IV_Set(),
-                actualAttack: null,
-                effectiveAttack: null,
                 attackProfile: AttackProfile.Inactive,
                 hasNeutralAttack: false
             ),

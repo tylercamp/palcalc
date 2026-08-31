@@ -87,15 +87,23 @@ internal class Program
             foreach (var bred in tree.AllNodes.Select(node => node.Item1.PalRef).OfType<BredPalReference>())
             {
                 Console.WriteLine(
-                    "{0} attack: {1}; chance: {2:P2}; expected attempts: {3}; step effort: {4}",
+                    "{0} attacks: {1}; chance: {2:P2}; expected attempts: {3}; step effort: {4}",
                     bred.Pal.Name,
-                    bred.EffectiveAttack?.Name ?? "None",
-                    bred.AttacksProbability,
+                    string.Join(", ", bred.MaterializedAttackInheritance?.ChildMasteredAttacks.Select(attack => attack.Name) ?? []),
+                    bred.MaterializedAttackInheritance?.AttackProbability ?? 1,
                     bred.AvgRequiredBreedings,
                     bred.SelfBreedingEffort
                 );
             }
-            Console.WriteLine("Selected result attack: {0}", match.EffectiveAttack?.Name ?? "None");
+            Console.WriteLine(
+                "Selected result attacks: {0}",
+                string.Join(", ", match switch
+                {
+                    BredPalReference bred => bred.MaterializedAttackInheritance?.ChildMasteredAttacks.Select(attack => attack.Name) ?? [],
+                    OwnedPalReference owned => (owned.UnderlyingInstance.ActiveSkills ?? []).Select(attack => attack.Name),
+                    _ => [],
+                })
+            );
             Console.WriteLine("Should take: {0}\n", match.BreedingEffort);
         }
     }
