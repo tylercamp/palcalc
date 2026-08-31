@@ -23,7 +23,6 @@ namespace PalCalc.Solver.PalReference
             List<PassiveSkill> passives,
             IV_Set ivs,
             AttackProfile attackProfile,
-            bool hasNeutralAttack,
             MaterializedAttackInheritance materializedAttackInheritance
         )
         {
@@ -45,7 +44,6 @@ namespace PalCalc.Solver.PalReference
 
             IVs = ivs;
             AttackProfile = attackProfile;
-            HasNeutralAttack = hasNeutralAttack;
             MaterializedAttackInheritance = parentOrderReversed || materializedAttackInheritance is null
                 ? materializedAttackInheritance
                 : materializedAttackInheritance with
@@ -76,11 +74,10 @@ namespace PalCalc.Solver.PalReference
             IV_Set ivs,
             float ivsProbability,
             AttackProfile attackProfile,
-            bool hasNeutralAttack,
             MaterializedAttackInheritance materializedAttackInheritance,
             int? avgRequiredBreedings,
             PalGender gender
-        ) : this(gameSettings, pal, parent1, parent2, passives, ivs, attackProfile, hasNeutralAttack, materializedAttackInheritance)
+        ) : this(gameSettings, pal, parent1, parent2, passives, ivs, attackProfile, materializedAttackInheritance)
         {
             Gender = gender;
             if (avgRequiredBreedings is int materializedBreedings)
@@ -169,8 +166,6 @@ namespace PalCalc.Solver.PalReference
 
         public AttackProfile AttackProfile { get; }
 
-        public bool HasNeutralAttack { get; }
-
         public MaterializedAttackInheritance MaterializedAttackInheritance { get; }
 
         public bool IsOutdated { get; set; }
@@ -184,7 +179,7 @@ namespace PalCalc.Solver.PalReference
             else
             {
                 return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs,
-                    AttackProfile.WithGuaranteedGender(gameSettings, Pal, Parent1.TimeFactor, Parent2.TimeFactor, db, gender, useReverser), HasNeutralAttack,
+                    AttackProfile.WithGuaranteedGender(gameSettings, Pal, Parent1.TimeFactor, Parent2.TimeFactor, db, gender, useReverser),
                     MaterializedAttackInheritance)
                 {
                     AvgRequiredBreedings = BredPalReferenceEffort.WithGuaranteedGender(AvgRequiredBreedings, Pal, db, gender, useReverser),

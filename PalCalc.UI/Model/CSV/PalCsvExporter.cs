@@ -54,8 +54,7 @@ namespace PalCalc.UI.Model.CSV
                     p.ModelObject,
                     [],
                     new IV_Set(),
-                    attackProfile: AttackProfile.Inactive,
-                    hasNeutralAttack: false
+                    attackProfile: AttackProfile.Inactive
                 )));
 
             SimpleCSVPropertySerializer<PalInstanceViewModel> SimplePalLoc(string col, Func<SpecificPalRefLocationViewModel, object> sel) =>

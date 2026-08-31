@@ -517,8 +517,9 @@ public class CandidateSelectionPolicyTests
             pal.ToPal(SolverTestScenario.DB),
             effort,
             totalCost,
-            attackProfile,
             hasNeutralAttack
+                ? new AttackProfile(true, attackProfile.Entries.ToArray())
+                : attackProfile
         );
 
     private sealed class DelegatingPolicy(
@@ -591,8 +592,7 @@ public class CandidateSelectionPolicyTests
         Pal pal,
         TimeSpan breedingEffort,
         int totalCost = 0,
-        AttackProfile attackProfile = default,
-        bool hasNeutralAttack = false
+        AttackProfile attackProfile = default
     ) : IPalReference
     {
         public string Name { get; } = name;
@@ -602,7 +602,6 @@ public class CandidateSelectionPolicyTests
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
         public AttackProfile AttackProfile { get; } = attackProfile;
-        public bool HasNeutralAttack { get; } = hasNeutralAttack;
         public PalGender Gender => PalGender.MALE;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

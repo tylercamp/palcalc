@@ -160,8 +160,7 @@ namespace PalCalc.UI.ViewModel.Solver
                         Attack = IV_Value.Random,
                         Defense = IV_Value.Random
                     },
-                    attackProfile: AttackProfile.Inactive,
-                    hasNeutralAttack: false
+                    attackProfile: AttackProfile.Inactive
                 ), [])
             }
         };

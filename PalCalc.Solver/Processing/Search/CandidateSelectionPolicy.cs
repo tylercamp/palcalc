@@ -236,7 +236,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         IPalReference required,
         AttackProfileEntry requiredEntry
     ) =>
-        (provider.HasNeutralAttack || !required.HasNeutralAttack) &&
+        (provider.AttackProfile.HasNeutralAttack || !required.AttackProfile.HasNeutralAttack) &&
         provider.AttackProfile.Entries.Any(providerEntry =>
             AttackProfileReducer.Covers(providerEntry, requiredEntry)
         );

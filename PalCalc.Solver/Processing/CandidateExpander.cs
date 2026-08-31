@@ -440,7 +440,6 @@ namespace PalCalc.Solver.Processing
                                 finalIVs,
                                 ivsProbability,
                                 attackProfile: AttackProfile.Inactive,
-                                hasNeutralAttack: false,
                                 materializedAttackInheritance: null,
                                 avgRequiredBreedings: null,
                                 gender: PalGender.WILDCARD
@@ -470,7 +469,6 @@ namespace PalCalc.Solver.Processing
                                             finalIVs,
                                             ivsProbability,
                                             attackProfile: attackProfile,
-                                            hasNeutralAttack: context.AttackTargets.StateOf(childPalType).HasNeutralLevel1Attack,
                                             materializedAttackInheritance: null,
                                             avgRequiredBreedings: null,
                                             gender: PalGender.WILDCARD
@@ -488,7 +486,6 @@ namespace PalCalc.Solver.Processing
                                         finalIVs,
                                         ivsProbability,
                                         attackProfile: AttackProfile.Inactive,
-                                        hasNeutralAttack: false,
                                         materializedAttackInheritance: null,
                                         avgRequiredBreedings: null,
                                         gender: PalGender.WILDCARD

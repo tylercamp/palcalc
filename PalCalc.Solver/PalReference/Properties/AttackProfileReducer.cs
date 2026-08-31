@@ -9,7 +9,10 @@ internal static class AttackProfileReducer
         provider.SelfBreedings <= required.SelfBreedings &&
         (!provider.SelfUsesSpecialCake || required.SelfUsesSpecialCake);
 
-    public static AttackProfile Reduce(ReadOnlySpan<AttackProfileEntry> entries)
+    public static AttackProfile Reduce(ReadOnlySpan<AttackProfileEntry> entries) =>
+        Reduce(hasNeutralAttack: false, entries);
+
+    public static AttackProfile Reduce(bool hasNeutralAttack, ReadOnlySpan<AttackProfileEntry> entries)
     {
         var retainedCount = 0;
         for (var i = 0; i < entries.Length; i++)
@@ -21,7 +24,7 @@ internal static class AttackProfileReducer
             if (!IsCovered(entries, i))
                 retained[destination++] = entries[i];
 
-        return new AttackProfile(retained);
+        return new AttackProfile(hasNeutralAttack, retained);
     }
 
     private static bool IsCovered(ReadOnlySpan<AttackProfileEntry> entries, int requiredIndex)

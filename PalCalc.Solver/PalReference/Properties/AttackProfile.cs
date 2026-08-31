@@ -44,12 +44,31 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
 {
     private readonly AttackProfileEntry[] entries;
 
-    private AttackProfile(bool inactive) => entries = null;
+    private AttackProfile(bool inactive)
+    {
+        entries = null;
+        HasNeutralAttack = false;
+    }
 
-    public AttackProfile(params AttackProfileEntry[] entries) =>
+    private AttackProfile(AttackProfileEntry[] entries, bool hasNeutralAttack)
+    {
         this.entries = entries ?? throw new ArgumentNullException(nameof(entries));
+        HasNeutralAttack = hasNeutralAttack;
+    }
+
+    public AttackProfile(params AttackProfileEntry[] entries)
+        : this(entries, hasNeutralAttack: false)
+    {
+    }
+
+    public AttackProfile(bool hasNeutralAttack, params AttackProfileEntry[] entries)
+        : this(entries, hasNeutralAttack)
+    {
+    }
 
     public static AttackProfile Inactive { get; } = new(true);
+
+    public bool HasNeutralAttack { get; }
 
     public IReadOnlyList<AttackProfileEntry> Entries => entries ?? Array.Empty<AttackProfileEntry>();
 
@@ -59,6 +78,8 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
 
     public bool Equals(AttackProfile other)
     {
+        if (HasNeutralAttack != other.HasNeutralAttack)
+            return false;
         if (ReferenceEquals(entries, other.entries))
             return true;
         if (entries is null || other.entries is null)
@@ -71,6 +92,7 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
     public override int GetHashCode()
     {
         var hash = new HashCode();
+        hash.Add(HasNeutralAttack);
         hash.Add(entries is null);
         foreach (var entry in Entries)
             hash.Add(entry);
@@ -87,7 +109,7 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
         bool useReverser
     ) => entries is null
         ? Inactive
-        : new AttackProfile(entries.Select(entry => entry.WithGuaranteedGender(
+        : new AttackProfile(HasNeutralAttack, entries.Select(entry => entry.WithGuaranteedGender(
             gameSettings, pal, parent1TimeFactor, parent2TimeFactor, db, gender, useReverser
         )).ToArray());
 }

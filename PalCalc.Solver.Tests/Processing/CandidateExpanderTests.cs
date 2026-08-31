@@ -326,15 +326,17 @@ public class CandidateExpanderTests
                 )
             ),
             attackProfile: attackTargets?.IsActive == true
-                ? new(new AttackProfileEntry(
+                ? new(
+                    attackTargets.IsActive && (instance.ActiveSkills ?? []).Any(attack => !attack.CanInherit),
+                    new AttackProfileEntry(
                     attackTargets.MaskOf(instance.ActiveSkills ?? []),
                     0,
                     TimeSpan.Zero,
                     0,
                     false
-                ))
-                : AttackProfile.Inactive,
-            hasNeutralAttack: attackTargets?.IsActive == true && (instance.ActiveSkills ?? []).Any(attack => !attack.CanInherit)
+                    )
+                )
+                : AttackProfile.Inactive
         );
     }
 

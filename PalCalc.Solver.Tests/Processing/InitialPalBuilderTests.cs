@@ -164,7 +164,7 @@ public class InitialPalBuilderTests
         var context = new AttackTargetContext(target, SolverTestScenario.DB);
 
         Assert.AreEqual(context.FullTargetMask, seed.AttackProfile.Entries.Single().MasteredTargetMask);
-        Assert.IsTrue(seed.HasNeutralAttack);
+        Assert.IsTrue(seed.AttackProfile.HasNeutralAttack);
         Assert.AreEqual(0, context.MaskOf([nonInheritable]) & context.InheritableTargetMask);
     }
 
@@ -228,21 +228,18 @@ public class InitialPalBuilderTests
     public void WithGuaranteedGender_PreservesAttackProfileCapabilities()
     {
         var pal = "Katress".ToPal(SolverTestScenario.DB);
-        var profile = new AttackProfile(new AttackProfileEntry(1, 0, TimeSpan.Zero, 0, false));
+        var profile = new AttackProfile(true, new AttackProfileEntry(1, 0, TimeSpan.Zero, 0, false));
         var owned = new OwnedPalReference(
             SolverTestScenario.Owned(pal.Name, PalGender.MALE), [], new(),
-            attackProfile: profile,
-            hasNeutralAttack: true
+            attackProfile: profile
         );
         var wild = new WildPalReference(
             pal, [], 0, SolverTestScenario.DB.BreedingMechanics,
-            attackProfile: profile,
-            hasNeutralAttack: true
+            attackProfile: profile
         );
         var bred = new BredPalReference(
             new GameSettings(), pal, owned, owned, [], 1, new(), 1,
             attackProfile: profile,
-            hasNeutralAttack: true,
             materializedAttackInheritance: null,
             avgRequiredBreedings: null,
             gender: PalGender.WILDCARD
@@ -256,7 +253,7 @@ public class InitialPalBuilderTests
         })
         {
             Assert.AreEqual((byte)1, reference.AttackProfile.Entries.Single().MasteredTargetMask);
-            Assert.IsTrue(reference.HasNeutralAttack);
+            Assert.IsTrue(reference.AttackProfile.HasNeutralAttack);
         }
     }
 

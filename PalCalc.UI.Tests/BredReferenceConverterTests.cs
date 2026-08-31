@@ -147,7 +147,6 @@ public class BredReferenceConverterTests
         new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
         ivsProbability: 0.5f,
         attackProfile: AttackProfile.Inactive,
-        hasNeutralAttack: false,
         materializedAttackInheritance: inheritance,
         avgRequiredBreedings: avgRequiredBreedings,
         gender: gender
@@ -166,8 +165,7 @@ public class BredReferenceConverterTests
         },
         [],
         new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
-        attackProfile: AttackProfile.Inactive,
-        hasNeutralAttack: false
+        attackProfile: AttackProfile.Inactive
     );
 
     private static IEnumerable<BredPalReference> BredReferences(IPalReference reference)

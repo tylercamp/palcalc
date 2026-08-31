@@ -85,8 +85,7 @@ internal sealed class AttackResultMaterializer
             bred.PassivesProbability,
             bred.IVs,
             bred.IVsProbability,
-            attackProfile: new AttackProfile(selectedEntry),
-            hasNeutralAttack: bred.HasNeutralAttack,
+            attackProfile: new AttackProfile(bred.AttackProfile.HasNeutralAttack, selectedEntry),
             materializedAttackInheritance: inheritance,
             avgRequiredBreedings: selectedEntry.SelfBreedings,
             gender: bred.Gender

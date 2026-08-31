@@ -111,8 +111,7 @@ public class ParallelBatchExecutorTests
             SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             effectivePassives: [],
             effectiveIVs: new IV_Set(),
-            attackProfile: AttackProfile.Inactive,
-            hasNeutralAttack: false
+            attackProfile: AttackProfile.Inactive
         );
         var frontier = new SearchFrontier(
             target,
@@ -185,7 +184,6 @@ public class ParallelBatchExecutorTests
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
         public AttackProfile AttackProfile => AttackProfile.Inactive;
-        public bool HasNeutralAttack => false;
         public PalGender Gender => PalGender.MALE;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

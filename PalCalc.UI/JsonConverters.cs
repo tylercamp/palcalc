@@ -342,8 +342,7 @@ namespace PalCalc.UI
                     Attack = attack,
                     Defense = defense
                 },
-                attackProfile: AttackProfile.Inactive,
-                hasNeutralAttack: false
+                attackProfile: AttackProfile.Inactive
             );
 
             if (solverSettings.UseGenderReversers && inst.Gender != actualGender)
@@ -431,8 +430,7 @@ namespace PalCalc.UI
                 guaranteedPassives,
                 numPassives,
                 db.BreedingMechanics,
-                attackProfile: AttackProfile.Inactive,
-                hasNeutralAttack: false
+                attackProfile: AttackProfile.Inactive
             ).WithGuaranteedGender(
                 db,
                 gender,
@@ -629,7 +627,6 @@ namespace PalCalc.UI
                 ivs,
                 ivsProbability,
                 attackProfile: AttackProfile.Inactive,
-                hasNeutralAttack: false,
                 materializedAttackInheritance: materializedAttackInheritance,
                 avgRequiredBreedings: avgRequiredBreedings,
                 gender: avgRequiredBreedings is null ? PalGender.WILDCARD : gender

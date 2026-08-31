@@ -71,8 +71,6 @@ namespace PalCalc.Solver.PalReference
 
         public AttackProfile AttackProfile => Male.AttackProfile;
 
-        public bool HasNeutralAttack => Male.HasNeutralAttack;
-
         public IV_Set IVs { get; }
 
         public PalGender Gender { get; private set; } = PalGender.WILDCARD;

@@ -209,7 +209,6 @@ namespace PalCalc.Solver.PalReference
         public int EffectivePassivesHash { get; }
         public IV_Set IVs => Input.IVs;
         public AttackProfile AttackProfile => Input.AttackProfile;
-        public bool HasNeutralAttack => Input.HasNeutralAttack;
 
         public int NumTotalBreedingSteps => Input.NumTotalBreedingSteps;
         public int NumTotalEggs => Input.NumTotalEggs;

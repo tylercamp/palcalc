@@ -153,8 +153,7 @@ public class EffectivePropertiesKeyTests
             guaranteedPassives: [],
             numRandomPassives: 2,
             mechanics: SolverTestScenario.DB.BreedingMechanics,
-            attackProfile: AttackProfile.Inactive,
-            hasNeutralAttack: false
+            attackProfile: AttackProfile.Inactive
         );
 
         var gendered = wild.WithGuaranteedGender(
@@ -198,7 +197,6 @@ public class EffectivePropertiesKeyTests
         public IV_Set IVs { get; }
         public List<PassiveSkill> ActualPassives => EffectivePassives;
         public AttackProfile AttackProfile => AttackProfile.Inactive;
-        public bool HasNeutralAttack => false;
         public PalGender Gender { get; }
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

@@ -359,15 +359,13 @@ public class SearchFrontierCharacterizationTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 effectivePassives: [],
                 effectiveIVs: new IV_Set(),
-                attackProfile: AttackProfile.Inactive,
-                hasNeutralAttack: false
+                attackProfile: AttackProfile.Inactive
             ),
             new OwnedPalReference(
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
                 effectivePassives: [],
                 effectiveIVs: new IV_Set(),
-                attackProfile: AttackProfile.Inactive,
-                hasNeutralAttack: false
+                attackProfile: AttackProfile.Inactive
             )
         );
 
@@ -386,7 +384,6 @@ public class SearchFrontierCharacterizationTests
             ivs: new IV_Set(),
             ivsProbability: 1,
             attackProfile: AttackProfile.Inactive,
-            hasNeutralAttack: false,
             materializedAttackInheritance: null,
             avgRequiredBreedings: null,
             gender: PalGender.WILDCARD
@@ -434,8 +431,7 @@ public class SearchFrontierCharacterizationTests
         Pal pal,
         TimeSpan breedingEffort,
         PalGender gender = PalGender.MALE,
-        AttackProfile attackProfile = default,
-        bool hasNeutralAttack = false
+        AttackProfile attackProfile = default
     ) : IPalReference
     {
         public string Name { get; } = name;
@@ -445,7 +441,6 @@ public class SearchFrontierCharacterizationTests
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
         public AttackProfile AttackProfile { get; } = attackProfile;
-        public bool HasNeutralAttack { get; } = hasNeutralAttack;
         public PalGender Gender { get; } = gender;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;
@@ -460,7 +455,7 @@ public class SearchFrontierCharacterizationTests
         public IPalReference WithGuaranteedGender(PalDB db, PalGender requestedGender, bool useReverser) =>
             requestedGender == Gender
                 ? this
-                : new TestPalReference(Name, Pal, BreedingEffort, requestedGender, AttackProfile, HasNeutralAttack);
+                : new TestPalReference(Name, Pal, BreedingEffort, requestedGender, AttackProfile);
 
         public override string ToString() => Name;
     }

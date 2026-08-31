@@ -213,8 +213,9 @@ public class AttackProfileComposerTests
             SolverTestScenario.Owned("Katress", PalGender.MALE),
             [],
             new IV_Set(),
-            attackProfile: profile,
-            hasNeutralAttack: neutral
+            attackProfile: neutral
+                ? new AttackProfile(true, profile.Entries.ToArray())
+                : profile
         );
 
     private static BredPalReference BredReference(BreedingSolverSettings settings, AttackProfile profile)
@@ -222,13 +223,11 @@ public class AttackProfileComposerTests
         var first = Reference(new AttackProfile(Entry(0)));
         var second = new OwnedPalReference(
             SolverTestScenario.Owned("Wixen", PalGender.FEMALE), [], new IV_Set(),
-            attackProfile: AttackProfile.Inactive,
-            hasNeutralAttack: false
+            attackProfile: AttackProfile.Inactive
         );
         return new BredPalReference(
             settings.GameSettings, Child, first, second, [], 1, new IV_Set(), 1,
             attackProfile: profile,
-            hasNeutralAttack: false,
             materializedAttackInheritance: null,
             avgRequiredBreedings: null,
             gender: PalGender.WILDCARD

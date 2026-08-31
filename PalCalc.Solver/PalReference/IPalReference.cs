@@ -31,8 +31,6 @@ namespace PalCalc.Solver.PalReference
 
         AttackProfile AttackProfile { get; }
 
-        bool HasNeutralAttack { get; }
-
         PalGender Gender { get; }
 
         /// <summary>

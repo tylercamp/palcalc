@@ -88,8 +88,7 @@ public class BreedingGraphAttackInstructionTests
             [],
             0,
             db.BreedingMechanics,
-            AttackProfile.Inactive,
-            hasNeutralAttack: false
+            AttackProfile.Inactive
         );
         var graph = BreedingGraph.FromPalReference(null, new GameSettings(), wild, []);
         var node = (StandardBreedingTreeNodeViewModel)graph.NodeFor(graph.Tree.Root);
@@ -117,7 +116,6 @@ public class BreedingGraphAttackInstructionTests
         new GameSettings(), pal, parent1, parent2, [], 1,
         new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random }, 1,
         attackProfile: AttackProfile.Inactive,
-        hasNeutralAttack: false,
         materializedAttackInheritance: inheritance,
         avgRequiredBreedings: null,
         gender: PalGender.WILDCARD
@@ -126,8 +124,7 @@ public class BreedingGraphAttackInstructionTests
     private static OwnedPalReference Owned(Pal pal, string id, ActiveSkill attack, int index) => new(
         new PalInstance { InstanceId = id, Pal = pal, Gender = PalGender.WILDCARD, PassiveSkills = [], ActiveSkills = [attack], EquippedActiveSkills = [attack], Location = new PalLocation { Type = LocationType.Palbox, Index = index } },
         [], new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
-        attackProfile: AttackProfile.Inactive,
-        hasNeutralAttack: false
+        attackProfile: AttackProfile.Inactive
     );
 
     private static void AssertAttacks(IEnumerable<ActiveSkill> expected, PalCalc.UI.ViewModel.PalDerived.AttackSkillCollectionViewModel actual) =>

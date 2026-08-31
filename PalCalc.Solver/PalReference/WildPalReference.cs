@@ -16,8 +16,7 @@ namespace PalCalc.Solver.PalReference
             IEnumerable<PassiveSkill> guaranteedPassives,
             int numRandomPassives,
             BreedingMechanics mechanics,
-            AttackProfile attackProfile,
-            bool hasNeutralAttack
+            AttackProfile attackProfile
         )
         {
             ArgumentNullException.ThrowIfNull(mechanics);
@@ -29,7 +28,6 @@ namespace PalCalc.Solver.PalReference
             EffectivePassives = guaranteedPassives.Concat(Enumerable.Range(0, numRandomPassives).Select(i => new RandomPassiveSkill())).ToList();
             Gender = PalGender.WILDCARD;
             AttackProfile = attackProfile;
-            HasNeutralAttack = hasNeutralAttack;
             CapturesRequiredForGender = 1;
 
             if (guaranteedPassives.Any(t => !pal.GuaranteedPassivesInternalIds.Contains(t.InternalName))) throw new InvalidOperationException();
@@ -55,8 +53,6 @@ namespace PalCalc.Solver.PalReference
         public List<PassiveSkill> ActualPassives => EffectivePassives;
 
         public AttackProfile AttackProfile { get; private set; }
-
-        public bool HasNeutralAttack { get; private set; }
 
         public float TimeFactor => 1.0f;
 
@@ -109,12 +105,11 @@ namespace PalCalc.Solver.PalReference
                 IVs = IVs,
                 AttackProfile = AttackProfile.Equals(PalCalc.Solver.PalReference.Properties.AttackProfile.Inactive)
                     ? PalCalc.Solver.PalReference.Properties.AttackProfile.Inactive
-                    : new AttackProfile(AttackProfile.Entries.Select(entry => entry with
+                    : new AttackProfile(AttackProfile.HasNeutralAttack, AttackProfile.Entries.Select(entry => entry with
                     {
                         BreedingEffort = entry.BreedingEffort - BreedingEffort +
                             SelfBreedingEffort * capturesRequiredForGender
                     }).ToArray()),
-                HasNeutralAttack = HasNeutralAttack,
                 CapturesRequiredForGender = capturesRequiredForGender
             };
         }

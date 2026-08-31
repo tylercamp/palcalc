@@ -52,7 +52,10 @@ internal sealed class AttackProfileComposer(
 
         using var entriesRef = entryListPool.Borrow();
         Enumerate(child, parent1, parent2, passivesProbability, ivsProbability, entriesRef.Value, null);
-        return AttackProfileReducer.Reduce(CollectionsMarshal.AsSpan(entriesRef.Value));
+        return AttackProfileReducer.Reduce(
+            targets.StateOf(child).HasNeutralLevel1Attack,
+            CollectionsMarshal.AsSpan(entriesRef.Value)
+        );
     }
 
     public IReadOnlyList<AttackCompositionChoice> EnumerateChoices(
@@ -115,8 +118,8 @@ internal sealed class AttackProfileComposer(
                 var probability = Probabilities.Attacks.ProbabilityInheritedTargetAttack(
                     parent1HasAttack,
                     parent2HasAttack,
-                    parent1.HasNeutralAttack,
-                    parent2.HasNeutralAttack
+                    parent1.AttackProfile.HasNeutralAttack,
+                    parent2.AttackProfile.HasNeutralAttack
                 );
                 Emit(
                     parent1Entry,

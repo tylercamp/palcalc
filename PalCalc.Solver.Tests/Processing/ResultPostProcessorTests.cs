@@ -38,8 +38,7 @@ public class ResultPostProcessorTests
             owned,
             effectivePassives: [],
             effectiveIVs: new IV_Set(),
-            attackProfile: AttackProfile.Inactive,
-            hasNeutralAttack: false
+            attackProfile: AttackProfile.Inactive
         );
         var frontier = new SearchFrontier(
             target,
@@ -101,8 +100,7 @@ public class ResultPostProcessorTests
                 guaranteedPassives: [],
                 numRandomPassives: 0,
                 mechanics: SolverTestScenario.DB.BreedingMechanics,
-                attackProfile: AttackProfile.Inactive,
-                hasNeutralAttack: false
+                attackProfile: AttackProfile.Inactive
             ),
         ]);
         var processor = new ResultPostProcessor(
@@ -146,8 +144,7 @@ public class ResultPostProcessorTests
                     target.DesiredPassives
                 ),
                 new IV_Set(),
-                attackProfile: AttackProfile.Inactive,
-                hasNeutralAttack: false
+                attackProfile: AttackProfile.Inactive
             ),
         ]);
         var processor = new ResultPostProcessor(

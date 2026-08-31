@@ -32,8 +32,7 @@ internal sealed class InitialPalBuilder(
                         .ToList()
                 ),
                 new RelevantIVKey(reference.IVs),
-                reference.AttackProfile,
-                reference.HasNeutralAttack
+                reference.AttackProfile
             );
 
         bool WithinBreedingSteps(Pal pal) =>
@@ -64,9 +63,11 @@ internal sealed class InitialPalBuilder(
                         Defense = MakeIV(target.IV_Defense, p.IV_Defense),
                     },
                     attackProfile: attackTargets.IsActive
-                        ? new(new AttackProfileEntry(attackTargets.MaskOf(masteredAttacks), 0, TimeSpan.Zero, 0, false))
-                        : AttackProfile.Inactive,
-                    hasNeutralAttack: attackTargets.IsActive && masteredAttacks.Any(attack => !attack.CanInherit)
+                        ? new(
+                            attackTargets.IsActive && masteredAttacks.Any(attack => !attack.CanInherit),
+                            new AttackProfileEntry(attackTargets.MaskOf(masteredAttacks), 0, TimeSpan.Zero, 0, false)
+                        )
+                        : AttackProfile.Inactive
                 );
             })
             .GroupBy(pal => (
@@ -109,8 +110,7 @@ internal sealed class InitialPalBuilder(
         var male = group.SingleOrDefault(pal => pal.Gender == PalGender.MALE);
         var female = group.SingleOrDefault(pal => pal.Gender == PalGender.FEMALE);
 
-        if (!male.AttackProfile.Equals(female.AttackProfile) ||
-            male.HasNeutralAttack != female.HasNeutralAttack)
+        if (!male.AttackProfile.Equals(female.AttackProfile))
             return [male, female];
 
         var composite = new CompositeOwnedPalReference(male, female);
@@ -151,15 +151,17 @@ internal sealed class InitialPalBuilder(
                                 numRandomPassives,
                                 mechanics,
                                 attackProfile: attackTargets.IsActive
-                                    ? new(new AttackProfileEntry(
+                                    ? new(
+                                        attackTargets.IsActive && attackState.HasNeutralLevel1Attack,
+                                        new AttackProfileEntry(
                                         attackState.Level1TargetMask,
                                         0,
                                         mechanics.TimeToCatch(p) / mechanics.PassivesWildAtMostN[numRandomPassives],
                                         0,
                                         false
-                                    ))
-                                    : AttackProfile.Inactive,
-                                hasNeutralAttack: attackTargets.IsActive && attackState.HasNeutralLevel1Attack
+                                        )
+                                    )
+                                    : AttackProfile.Inactive
                             )
                         );
                 })
@@ -171,7 +173,6 @@ internal sealed class InitialPalBuilder(
         Pal Pal,
         PassiveSetKey Passives,
         RelevantIVKey IVs,
-        AttackProfile AttackProfile,
-        bool HasNeutralAttack
+        AttackProfile AttackProfile
     );
 }

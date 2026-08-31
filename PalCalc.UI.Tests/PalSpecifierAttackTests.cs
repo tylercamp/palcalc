@@ -200,7 +200,6 @@ public class PalSpecifierAttackTests
             },
             ivsProbability: 0.75f,
             attackProfile: AttackProfile.Inactive,
-            hasNeutralAttack: false,
             materializedAttackInheritance: null,
             avgRequiredBreedings: null,
             gender: PalGender.WILDCARD
@@ -248,7 +247,6 @@ public class PalSpecifierAttackTests
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
             ivsProbability: 1,
             attackProfile: AttackProfile.Inactive,
-            hasNeutralAttack: false,
             materializedAttackInheritance: inheritance,
             avgRequiredBreedings: 1,
             gender: PalGender.WILDCARD
@@ -275,7 +273,6 @@ public class PalSpecifierAttackTests
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
             ivsProbability: 1,
             attackProfile: AttackProfile.Inactive,
-            hasNeutralAttack: false,
             materializedAttackInheritance: null,
             avgRequiredBreedings: null,
             gender: PalGender.WILDCARD
@@ -306,8 +303,7 @@ public class PalSpecifierAttackTests
                 Attack = IV_Value.Random,
                 Defense = IV_Value.Random,
             },
-            attackProfile: AttackProfile.Inactive,
-            hasNeutralAttack: false
+            attackProfile: AttackProfile.Inactive
         );
 
     private static JsonSerializerSettings ReadSettings(PalDB db) => new()
