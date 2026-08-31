@@ -727,6 +727,21 @@
   <data name="LC_RESULT_NUM_CAKES" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_RESULT_NUM_SPECIAL_CAKES" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_RESULT_EQUIPPED_ATTACKS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_RESULT_MASTERED_ATTACKS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_RESULT_INHERITED_ATTACKS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_RESULT_USE_SPECIAL_CAKE" xml:space="preserve">
+    <value>NumCakes</value>
+  </data>
   <data name="LC_COMMON_GENDER_NONE" xml:space="preserve">
     <value />
   </data>
@@ -887,6 +902,12 @@
     <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_GOLD_COST_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SPECIAL_CAKES" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_MAX_SPECIAL_CAKES_DESCRIPTION" xml:space="preserve">
     <value />
   </data>
   <data name="LC_SOLVER_SETTINGS_SURGERY_ALLOWED_PASSIVES" xml:space="preserve">

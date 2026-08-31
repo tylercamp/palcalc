@@ -401,7 +401,7 @@ namespace PalCalc.UI.ViewModel
             {
                 currentSpec.CurrentResults = new BreedingResultListViewModel()
                 {
-                    Results = job.Results.Select(r => new BreedingResultViewModel(cachedData, originalGameSettings, r)).ToList(),
+                    Results = job.Results.Select(r => new BreedingResultViewModel(cachedData, originalGameSettings, r, currentSpec.ModelObject.RequiredAttacks)).ToList(),
                     SettingsSnapshot = new BreedingResultListViewModelSettingsSnapshot()
                     {
                         GameSettings = originalGameSettings,

@@ -116,12 +116,29 @@
                                 <!-- Placeholder to ensure we have enough space for the "Is Complete" checkbox -->
                                 <Border Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}" Width="16" Margin="0,0,8,0" Height="0" />
                             </StackPanel>
-                            <!-- TODO: Render an attack collection when solver results support multiple actual attacks. -->
-                            <vp:ActiveSkillView
-                                DataContext="{Binding ActualAttack}"
-                                Margin="0,2,0,0"
-                                Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult.EffectiveAttacks.Attacks, Converter={StaticResource CVC}}"
-                                />
+                            <StackPanel Margin="0,2,0,0" Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult.EffectiveAttacks.Attacks, Converter={StaticResource CVC}}">
+                                <TextBlock Text="{itl:LocalizedText LC_RESULT_EQUIPPED_ATTACKS}" FontSize="9" />
+                                <ItemsControl ItemsSource="{Binding EquippedAttacks.Attacks}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <vp:ActiveSkillView DataContext="{Binding}" Margin="0,1,0,0" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <StackPanel Orientation="Horizontal" Visibility="{Binding MasteredAttacksDifferFromEquipped, Converter={StaticResource VVC}}">
+                                    <TextBlock Text="{itl:LocalizedText LC_RESULT_MASTERED_ATTACKS}" FontSize="9" Margin="0,1,4,0" />
+                                    <TextBlock Text="{Binding MasteredAttacks.Description.Value}" FontSize="9" Margin="0,1,0,0" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Visibility="{Binding InheritedAttacks.Attacks, Converter={StaticResource CVC}}">
+                                    <TextBlock Text="{itl:LocalizedText LC_RESULT_INHERITED_ATTACKS}" FontSize="9" Margin="0,1,4,0" />
+                                    <TextBlock Text="{Binding InheritedAttacks.Description.Value}" FontSize="9" Margin="0,1,0,0" />
+                                </StackPanel>
+                                <vu:LocalizedEmbeddedText Code="LC_RESULT_USE_SPECIAL_CAKE" Visibility="{Binding UsesSpecialCake, Converter={StaticResource VVC}}">
+                                    <vu:EmbeddedParam Key="NumCakes">
+                                        <TextBlock Text="{Binding SpecialCakes}" FontSize="9" />
+                                    </vu:EmbeddedParam>
+                                </vu:LocalizedEmbeddedText>
+                            </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">
                                     <Run Text="{Binding AvgRequiredAttemptsDescription.Value, Mode=OneWay}" />

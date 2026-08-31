@@ -58,6 +58,7 @@ namespace PalCalc.UI.ViewModel.Solver
                     OnPropertyChanged(nameof(LocationsWidth));
                     OnPropertyChanged(nameof(PassiveSkillsWidth));
                     OnPropertyChanged(nameof(NumEggsWidth));
+                    OnPropertyChanged(nameof(NumSpecialCakesWidth));
                     OnPropertyChanged(nameof(IVsWidth));
                 }
             }
@@ -84,6 +85,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public double LocationsWidth => HiddenIfRedundant(vm => vm.InputLocations);
         public double PassiveSkillsWidth => HiddenIfRedundant(vm => vm.EffectivePassives.Description);
         public double NumEggsWidth => HiddenIfRedundant(vm => vm.NumEggs);
+        public double NumSpecialCakesWidth => Results?.All(vm => vm.NumSpecialCakes == 0) == true ? WIDTH_HIDDEN : DEFAULT;
         public double IVsWidth
         {
             get
@@ -112,7 +114,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 .Select(r => r.Graph?.Nodes.Select(n => n.IsChecked).ToArray())
                 .ToList();
 
-            var newResults = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult)).ToList();
+            var newResults = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult, r.EffectiveAttacks.AsModelEnumerable())).ToList();
 
             for (int i = 0; i < newResults.Count && i < oldCheckedState.Count; i++)
             {

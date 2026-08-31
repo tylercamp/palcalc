@@ -613,8 +613,21 @@ namespace PalCalc.UI
             var IV_attack = token["IV_Attack"]?.ToObject<IV_Value>(serializer) ?? IV_Value.Random;
             var IV_defense = token["IV_Defense"]?.ToObject<IV_Value>(serializer) ?? IV_Value.Random;
             var ivs = new IV_Set() { HP = IV_hp, Attack = IV_attack, Defense = IV_defense };
+            var inheritanceToken = token["MaterializedAttackInheritance"];
+            var materializedAttackInheritance = inheritanceToken?.Type == JTokenType.Object
+                ? new MaterializedAttackInheritance(
+                    inheritanceToken["Mode"].ToObject<AttackInheritanceMode>(serializer),
+                    inheritanceToken["Parent1Loadout"]?.ToObject<List<ActiveSkill>>(serializer) ?? [],
+                    inheritanceToken["Parent2Loadout"]?.ToObject<List<ActiveSkill>>(serializer) ?? [],
+                    inheritanceToken["InheritedAttacks"]?.ToObject<List<ActiveSkill>>(serializer) ?? [],
+                    inheritanceToken["ChildMasteredAttacks"]?.ToObject<List<ActiveSkill>>(serializer) ?? [],
+                    inheritanceToken["SpecialCakes"]?.ToObject<int>() ?? 0,
+                    inheritanceToken["AttackProbability"]?.ToObject<float>() ?? 1
+                )
+                : null;
+            var avgRequiredBreedings = token["AvgRequiredBreedings"]?.ToObject<int?>();
 
-            return new BredPalReference(
+            var reference = new BredPalReference(
                 gameSettings,
                 pal,
                 parent1,
@@ -625,8 +638,15 @@ namespace PalCalc.UI
                 ivsProbability,
                 actualAttack,
                 effectiveAttack,
-                attacksProbability
-            ).WithGuaranteedGender(db, gender, solverSettings.UseGenderReversers) as BredPalReference;
+                attacksProbability,
+                materializedAttackInheritance: materializedAttackInheritance,
+                avgRequiredBreedings: avgRequiredBreedings,
+                gender: avgRequiredBreedings is null ? PalGender.WILDCARD : gender
+            );
+
+            return avgRequiredBreedings is null
+                ? reference.WithGuaranteedGender(db, gender, solverSettings.UseGenderReversers) as BredPalReference
+                : reference;
         }
 
         internal override JToken MakeRefJson(BredPalReference value, JsonSerializer serializer)
@@ -647,6 +667,19 @@ namespace PalCalc.UI
                 ActualAttack = value.ActualAttack,
                 EffectiveAttack = value.EffectiveAttack,
                 AttacksProbability = value.AttacksProbability,
+                AvgRequiredBreedings = value.AvgRequiredBreedings,
+                MaterializedAttackInheritance = value.MaterializedAttackInheritance is { } inheritance
+                    ? new
+                    {
+                        inheritance.Mode,
+                        inheritance.Parent1Loadout,
+                        inheritance.Parent2Loadout,
+                        inheritance.InheritedAttacks,
+                        inheritance.ChildMasteredAttacks,
+                        inheritance.SpecialCakes,
+                        inheritance.AttackProbability,
+                    }
+                    : null,
 
             }, serializer);
         }
@@ -760,14 +793,18 @@ namespace PalCalc.UI
         {
             var obj = JToken.ReadFrom(reader);
 
+            var requiredAttacks = obj["RequiredAttacks"]
+                ?.ToObject<List<ActiveSkillViewModel>>(serializer)
+                ?.Select(attack => attack?.ModelObject)
+                .SkipNull()
+                .ToList() ?? [];
+            if (requiredAttacks.Count > PalSpecifier.MaxRequiredAttacks)
+                throw new JsonSerializationException($"A target can require at most {PalSpecifier.MaxRequiredAttacks} attacks.");
+
             var modelSpecifier = new PalSpecifier()
             {
                 Pal = obj["TargetPal"].ToObject<PalViewModel>(serializer).ModelObject,
-                RequiredAttacks = obj["RequiredAttacks"]
-                    ?.ToObject<List<ActiveSkillViewModel>>(serializer)
-                    ?.Select(attack => attack?.ModelObject)
-                    .SkipNull()
-                    .ToList() ?? [],
+                RequiredAttacks = requiredAttacks,
                 RequiredPassives = [
                     (obj["Passive1"] ?? obj["Trait1"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
                     (obj["Passive2"] ?? obj["Trait2"]).ToObject<PassiveSkillViewModel>(serializer)?.ModelObject,
@@ -865,6 +902,7 @@ namespace PalCalc.UI
     internal sealed class BreedingResultViewModelReader : PalReadOnlyConverterBase<BreedingResultViewModel>
     {
         private readonly CachedSaveGame source;
+        private readonly PalSpecifier target;
 
         public BreedingResultViewModelReader(PalDB db, GameSettings gameSettings, SerializableSolverSettings solverSettings, CachedSaveGame source, PalSpecifier target) : base(db, gameSettings)
         {
@@ -875,6 +913,7 @@ namespace PalCalc.UI
                 new ILocalizedTextConverter(db, gameSettings),
             };
             this.source = source;
+            this.target = target;
         }
 
         protected override BreedingResultViewModel ReadTypeJson(JsonReader reader, Type objectType, BreedingResultViewModel existingValue, bool hasExistingValue, JsonSerializer serializer)
@@ -894,7 +933,7 @@ namespace PalCalc.UI
                 palRef = token.ToObject<IPalReference>(serializer);
             }
 
-            var vm = new BreedingResultViewModel(source, gameSettings, palRef);
+            var vm = new BreedingResultViewModel(source, gameSettings, palRef, target.RequiredAttacks);
 
             if (checkedNodes != null && vm.Graph != null)
             {

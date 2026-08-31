@@ -707,6 +707,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_RESULT_EQUIPPED_ATTACKS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_RESULT_INHERITED_ATTACKS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_RESULT_INPUT_LOCS,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -739,7 +747,15 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_RESULT_MASTERED_ATTACKS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_RESULT_NUM_CAKES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_RESULT_NUM_SPECIAL_CAKES,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -748,6 +764,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_RESULT_TIME_ESTIMATE,
+        /// <summary>
+        ///   Looks up a localized string similar to NumCakes.
+        /// </summary>
+        LC_RESULT_USE_SPECIAL_CAKE,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -1044,6 +1064,14 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_SETTINGS_MAX_SPECIAL_CAKES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_SETTINGS_MAX_SPECIAL_CAKES_DESCRIPTION,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

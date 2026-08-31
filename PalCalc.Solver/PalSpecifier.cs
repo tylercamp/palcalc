@@ -10,6 +10,8 @@ namespace PalCalc.Solver
 {
     public class PalSpecifier
     {
+        public const int MaxRequiredAttacks = 6;
+
         public Pal Pal { get; set; }
         public List<PassiveSkill> RequiredPassives { get; set; } = new List<PassiveSkill>();
 

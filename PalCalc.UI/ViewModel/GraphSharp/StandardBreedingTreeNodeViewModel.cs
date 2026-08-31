@@ -25,9 +25,12 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         {
             Value = node;
             Pal = PalViewModel.Make(node.PalRef.Pal);
-            // TODO: Replace singular actual/effective attack properties with collections when solver references support multiple attacks.
-            ActualAttack = ActiveSkillViewModel.Make(node.PalRef.ActualAttack);
-            EffectiveAttack = ActiveSkillViewModel.Make(node.PalRef.EffectiveAttack);
+            var inheritance = (node.PalRef as BredPalReference)?.MaterializedAttackInheritance;
+            MasteredAttacks = new AttackSkillCollectionViewModel((inheritance?.ChildMasteredAttacks ?? [node.PalRef.ActualAttack]).Where(attack => attack != null).Select(ActiveSkillViewModel.Make));
+            InheritedAttacks = new AttackSkillCollectionViewModel((inheritance?.InheritedAttacks ?? []).Select(ActiveSkillViewModel.Make));
+            EquippedAttacks = MasteredAttacks;
+            SpecialCakes = inheritance?.SpecialCakes ?? 0;
+            UsesSpecialCake = inheritance?.Mode == AttackInheritanceMode.InheritAll;
             PassiveSkills = node.PalRef.ActualPassives.Select(PassiveSkillViewModel.Make).ToList();
             PassiveSkillsCollection = new PassiveSkillCollectionViewModel(PassiveSkills);
 
@@ -82,8 +85,19 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
         public PalViewModel Pal { get; }
 
-        public ActiveSkillViewModel ActualAttack { get; }
-        public ActiveSkillViewModel EffectiveAttack { get; }
+        public AttackSkillCollectionViewModel MasteredAttacks { get; }
+        public AttackSkillCollectionViewModel EquippedAttacks { get; private set; }
+        public AttackSkillCollectionViewModel InheritedAttacks { get; }
+        public bool MasteredAttacksDifferFromEquipped => !MasteredAttacks.AsModelEnumerable().SequenceEqual(EquippedAttacks.AsModelEnumerable());
+        public int SpecialCakes { get; }
+        public bool UsesSpecialCake { get; }
+
+        public void SetEquippedAttacks(IEnumerable<ActiveSkill> attacks)
+        {
+            EquippedAttacks = new AttackSkillCollectionViewModel(attacks.Select(ActiveSkillViewModel.Make));
+            OnPropertyChanged(nameof(EquippedAttacks));
+            OnPropertyChanged(nameof(MasteredAttacksDifferFromEquipped));
+        }
 
         public IBreedingTreeNode Value { get; }
 

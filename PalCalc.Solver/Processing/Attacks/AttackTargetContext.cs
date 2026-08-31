@@ -9,8 +9,6 @@ namespace PalCalc.Solver.Processing.Attacks;
 /// </summary>
 internal sealed class AttackTargetContext
 {
-    public const int MaxRequiredAttacks = 6;
-
     private readonly PalDB db;
     private readonly PalSpecifier target;
     private readonly ActiveSkill[] requiredAttacks;
@@ -24,8 +22,8 @@ internal sealed class AttackTargetContext
         this.db = db;
         this.target = target;
         requiredAttacks = target.RequiredAttacks.Distinct().ToArray();
-        if (requiredAttacks.Length > MaxRequiredAttacks)
-            throw new ArgumentOutOfRangeException(nameof(target), $"At most {MaxRequiredAttacks} required attacks are supported.");
+        if (requiredAttacks.Length > PalSpecifier.MaxRequiredAttacks)
+            throw new ArgumentOutOfRangeException(nameof(target), $"At most {PalSpecifier.MaxRequiredAttacks} required attacks are supported.");
 
         IsActive = requiredAttacks.Length != 0;
         FullTargetMask = (byte)((1 << requiredAttacks.Length) - 1);

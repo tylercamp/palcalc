@@ -6,6 +6,7 @@ using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.Solver;
 
 namespace PalCalc.UI.Tests;
 
@@ -13,7 +14,7 @@ namespace PalCalc.UI.Tests;
 public class PalSpecifierAttackTests
 {
     [TestMethod]
-    public void RequiredAttackSelectorUpdatesCollection()
+    public void AttackSlotsProduceRequiredAttacks()
     {
         var db = PalDB.LoadEmbedded();
         var attacks = db.ActiveSkills.Take(2).ToList();
@@ -22,25 +23,25 @@ public class PalSpecifierAttackTests
             new PalSpecifier
             {
                 Pal = db.Pals.First(),
-                RequiredAttacks = [attacks[0]],
             }
         );
 
-        viewModel.RequiredAttack = ActiveSkillViewModel.Make(attacks[1]);
+        viewModel.RequiredAttacks.Attack2 = ActiveSkillViewModel.Make(attacks[1]);
 
         Assert.IsTrue(viewModel.RequiredAttacks.HasItems);
-        Assert.AreEqual(attacks[1].InternalName, viewModel.RequiredAttacks.AsModelEnumerable().Single().InternalName);
+        Assert.AreEqual(attacks[1].InternalName, viewModel.ModelObject.RequiredAttacks.Single().InternalName);
 
-        viewModel.RequiredAttack = null;
+        viewModel.RequiredAttacks.Attack2 = null!;
 
         Assert.IsFalse(viewModel.RequiredAttacks.HasItems);
+        Assert.IsEmpty(viewModel.ModelObject.RequiredAttacks);
     }
 
     [TestMethod]
     public void RequiredAttacksRoundTripThroughTargetJson()
     {
         var db = PalDB.LoadEmbedded();
-        var attacks = db.ActiveSkills.Take(2).ToList();
+        var attacks = db.ActiveSkills.Take(PalSpecifier.MaxRequiredAttacks).ToList();
         var target = new PalSpecifier
         {
             Pal = db.Pals.First(),
@@ -54,7 +55,7 @@ public class PalSpecifierAttackTests
         Assert.IsNotNull(reloaded);
         CollectionAssert.AreEqual(
             attacks.Select(attack => attack.InternalName).ToArray(),
-            reloaded.RequiredAttacks.Attacks.Select(attack => attack.ModelObject.InternalName).ToArray()
+            reloaded.RequiredAttacks.AsEnumerable().Select(attack => attack.ModelObject.InternalName).ToArray()
         );
         CollectionAssert.AreEqual(
             attacks.Select(attack => attack.InternalName).ToArray(),
@@ -82,8 +83,73 @@ public class PalSpecifierAttackTests
         var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json.ToString(), ReadSettings(db));
 
         Assert.IsNotNull(reloaded);
-        Assert.IsNull(reloaded.RequiredAttack);
+        Assert.IsFalse(reloaded.RequiredAttacks.HasItems);
         Assert.IsEmpty(reloaded.ModelObject.RequiredAttacks);
+    }
+
+    [TestMethod]
+    public void NullGapsAndDuplicateSlotsNormalizeForTheModel()
+    {
+        var db = PalDB.LoadEmbedded();
+        var attacks = db.ActiveSkills.Take(2).ToArray();
+        var viewModel = new PalSpecifierViewModel("target", new PalSpecifier { Pal = db.Pals.First() });
+
+        viewModel.RequiredAttacks.Attack1 = ActiveSkillViewModel.Make(attacks[0]);
+        viewModel.RequiredAttacks.Attack3 = ActiveSkillViewModel.Make(attacks[1]);
+        viewModel.RequiredAttacks.Attack6 = ActiveSkillViewModel.Make(attacks[0]);
+
+        CollectionAssert.AreEqual(
+            attacks.Select(attack => attack.InternalName).ToArray(),
+            viewModel.ModelObject.RequiredAttacks.Select(attack => attack.InternalName).ToArray()
+        );
+
+        var copy = viewModel.Copy();
+        Assert.AreEqual(viewModel.RequiredAttacks.Attack1, copy.RequiredAttacks.Attack1);
+        Assert.IsNull(copy.RequiredAttacks.Attack2);
+        Assert.AreEqual(viewModel.RequiredAttacks.Attack3, copy.RequiredAttacks.Attack3);
+        Assert.AreEqual(viewModel.RequiredAttacks.Attack6, copy.RequiredAttacks.Attack6);
+    }
+
+    [TestMethod]
+    public void SingleAttackTargetJsonPopulatesTheFirstSlot()
+    {
+        var db = PalDB.LoadEmbedded();
+        var attack = db.ActiveSkills.First();
+        var json = JObject.Parse(JsonConvert.SerializeObject(
+            new PalSpecifierViewModel("target", new PalSpecifier { Pal = db.Pals.First(), RequiredAttacks = [attack] }),
+            WriteSettings(db)
+        ));
+
+        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json.ToString(), ReadSettings(db));
+
+        Assert.AreEqual(attack.InternalName, reloaded!.RequiredAttacks.Attack1!.ModelObject.InternalName);
+        Assert.IsNull(reloaded.RequiredAttacks.Attack2);
+    }
+
+    [TestMethod]
+    public void ImportedTargetsWithMoreThanSixAttacksAreRejected()
+    {
+        var db = PalDB.LoadEmbedded();
+        var json = JObject.Parse(JsonConvert.SerializeObject(
+            new PalSpecifierViewModel("target", new PalSpecifier { Pal = db.Pals.First() }),
+            WriteSettings(db)
+        ));
+        json["RequiredAttacks"] = new JArray(db.ActiveSkills.Take(PalSpecifier.MaxRequiredAttacks + 1).Select(attack => attack.InternalName));
+
+        Assert.Throws<JsonSerializationException>(() =>
+            JsonConvert.DeserializeObject<PalSpecifierViewModel>(json.ToString(), ReadSettings(db))
+        );
+    }
+
+    [TestMethod]
+    public void LegacySettingsKeepSpecialCakesDisabled()
+    {
+        var legacySettings = JsonConvert.DeserializeObject<SerializableSolverSettings>("{ \"MaxBreedingSteps\": 3 }");
+        var controls = new SolverControlsViewModel(null, null, null, null, null);
+
+        controls.CopyFrom(legacySettings!);
+
+        Assert.AreEqual(0, controls.ConfiguredSolverSettings(new GameSettings(), []).MaxSpecialCakes);
     }
 
     [TestMethod]
@@ -162,12 +228,72 @@ public class PalSpecifierAttackTests
             obj.Remove("ActualAttack");
             obj.Remove("EffectiveAttack");
             obj.Remove("AttacksProbability");
+            obj.Remove("AvgRequiredBreedings");
+            obj.Remove("MaterializedAttackInheritance");
         }
 
         var oldResult = (BredPalReference)oldJson["Ref"]!.ToObject<IPalReference>(JsonSerializer.Create(settings))!;
         Assert.IsNull(oldResult.ActualAttack);
         Assert.IsNull(oldResult.EffectiveAttack);
+        Assert.IsNull(oldResult.MaterializedAttackInheritance);
         Assert.AreEqual(1.0f, oldResult.AttacksProbability);
+    }
+
+    [TestMethod]
+    public void MaterializedParentLoadoutsFollowNormalizedParentOrder()
+    {
+        var db = PalDB.LoadEmbedded();
+        var attacks = db.ActiveSkills.Take(2).ToArray();
+        var pals = db.Pals.OrderBy(pal => pal.InternalIndex).ToArray();
+        var firstParent = Owned(pals[0], "parent-1", attacks[0], 1);
+        var secondParent = Owned(pals[^1], "parent-2", attacks[1], 2);
+        var inheritance = new MaterializedAttackInheritance(
+            AttackInheritanceMode.Normal,
+            [attacks[0]],
+            [attacks[1]],
+            [],
+            [],
+            SpecialCakes: 0,
+            AttackProbability: 1
+        );
+        var bred = new BredPalReference(
+            new GameSettings(),
+            pals[0],
+            firstParent,
+            secondParent,
+            [],
+            passivesProbability: 1,
+            new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
+            ivsProbability: 1,
+            materializedAttackInheritance: inheritance
+        );
+
+        Assert.AreSame(secondParent, bred.Parent1);
+        Assert.AreSame(firstParent, bred.Parent2);
+        Assert.AreEqual(attacks[1], bred.MaterializedAttackInheritance!.Parent1Loadout.Single());
+        Assert.AreEqual(attacks[0], bred.MaterializedAttackInheritance.Parent2Loadout.Single());
+    }
+
+    [TestMethod]
+    public void NoAttackResultDisplayKeepsCakeCountAsTotalEggs()
+    {
+        var db = PalDB.LoadEmbedded();
+        var attack = db.ActiveSkills.First();
+        var result = new BredPalReference(
+            new GameSettings(),
+            db.Pals.First(),
+            Owned(db.Pals.First(), "parent-1", attack, 1),
+            Owned(db.Pals.First(), "parent-2", attack, 2),
+            [],
+            passivesProbability: 1,
+            new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
+            ivsProbability: 1
+        );
+
+        var display = new BreedingResultViewModel(null, new GameSettings(), result);
+
+        Assert.IsFalse(display.EffectiveAttacks.HasItems);
+        Assert.AreEqual(result.NumTotalEggs, display.NumEggs);
     }
 
     private static OwnedPalReference Owned(Pal pal, string instanceId, ActiveSkill attack, int index) =>

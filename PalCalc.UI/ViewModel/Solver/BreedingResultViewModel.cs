@@ -77,7 +77,7 @@ namespace PalCalc.UI.ViewModel.Solver
         }
 
         private CachedSaveGame source;
-        public BreedingResultViewModel(CachedSaveGame source, GameSettings settings, IPalReference displayedResult)
+        public BreedingResultViewModel(CachedSaveGame source, GameSettings settings, IPalReference displayedResult, IEnumerable<ActiveSkill> requiredAttacks = null)
         {
             this.source = source;
 
@@ -89,14 +89,12 @@ namespace PalCalc.UI.ViewModel.Solver
             }
             else
             {
+                var normalizedRequiredAttacks = (requiredAttacks ?? []).Where(attack => attack != null).Distinct().ToArray();
                 DisplayedResult = displayedResult;
-                Graph = BreedingGraph.FromPalReference(source, settings, displayedResult);
+                Graph = BreedingGraph.FromPalReference(source, settings, displayedResult, normalizedRequiredAttacks);
                 EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
 
-                if (DisplayedResult.EffectiveAttack != null)
-                    EffectiveAttacks = new AttackSkillCollectionViewModel([ActiveSkillViewModel.Make(DisplayedResult.EffectiveAttack)]);
-                else
-                    EffectiveAttacks = new AttackSkillCollectionViewModel([]);
+                EffectiveAttacks = new AttackSkillCollectionViewModel(normalizedRequiredAttacks.Select(ActiveSkillViewModel.Make));
 
                 IVs = IVSetViewModel.FromIVs(displayedResult.IVs);
 
@@ -208,6 +206,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public int NumWildPals => DisplayedResult.NumTotalWildPals;
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
         public int NumEggs => DisplayedResult.NumTotalEggs;
+        public int NumSpecialCakes => DisplayedResult.AllReferences().OfType<BredPalReference>().Sum(reference => reference.MaterializedAttackInheritance?.SpecialCakes ?? 0);
 
         public IVSetViewModel IVs { get; }
         // (needed for BreedingResultListView which uses `util:GridViewSort.PropertyName`)

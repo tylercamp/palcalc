@@ -97,10 +97,10 @@ namespace PalCalc.UI.View.Main
                     var column = kvp.Value;
 
                     // Check if user has a preference for this column
-                    if (settings.ColumnVisibility.TryGetValue(columnKey, out var userPreference) && !userPreference)
+                    if (settings.ColumnVisibility.TryGetValue(columnKey, out var userPreference))
                     {
                         // User preference takes precedence
-                        column.Width = 0;
+                        column.Width = userPreference ? double.NaN : 0;
                     }
                     else if (vm != null)
                     {
@@ -123,6 +123,7 @@ namespace PalCalc.UI.View.Main
                 "TimeEstimate" => vm.EffortWidth,
                 "NumBreedingSteps" => vm.NumStepsWidth,
                 "NumEggs" => vm.NumEggsWidth,
+                "NumSpecialCakes" => vm.NumSpecialCakesWidth,
                 "EffectivePassives" => vm.PassiveSkillsWidth,
                 "InputLocations" => vm.LocationsWidth,
                 "IV_HP" or "IV_Attack" or "IV_Defense" or "IV_Average" => vm.IVsWidth,

@@ -42,6 +42,11 @@
                                 Width="{Binding NumEggsWidth}"
                                 util:GridViewSort.PropertyName="NumEggs"
                                 />
+                <GridViewColumn Header="{itl:LocalizedText LC_RESULT_NUM_SPECIAL_CAKES}"
+                                DisplayMemberBinding="{Binding NumSpecialCakes}"
+                                Width="{Binding NumSpecialCakesWidth}"
+                                util:GridViewSort.PropertyName="NumSpecialCakes"
+                                />
                 <GridViewColumn Header="{itl:LocalizedText LC_COMMON_TRAITS}"
                                 DisplayMemberBinding="{Binding EffectivePassives.Description.Value}"
                                 Width="{Binding PassiveSkillsWidth}"
