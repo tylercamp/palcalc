@@ -61,6 +61,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             if (isReadOnly)
             {
                 TargetPal = null;
+                RequiredAttacks = new();
                 RequiredPassives = new();
                 OptionalPassives = new();
             }
@@ -92,7 +93,7 @@ namespace PalCalc.UI.ViewModel.Mapped
         [ObservableProperty]
         private PalViewModel targetPal;
 
-        public PalSpecifierAttackSkillCollectionViewModel RequiredAttacks { get; private set; } = new();
+        public PalSpecifierAttackSkillCollectionViewModel RequiredAttacks { get; private set; }
 
         public PalSpecifierPassiveSkillCollectionViewModel RequiredPassives { get; private set; }
         public PalSpecifierPassiveSkillCollectionViewModel OptionalPassives { get; private set; }

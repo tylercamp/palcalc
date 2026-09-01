@@ -42,6 +42,9 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public static IReadOnlyList<ActiveSkillViewModel> All { get; } = PalDB.LoadEmbedded().ActiveSkills.Select(Make).OrderBy(s => s.Name.Value).ToList();
 
+        // TODO - Should this also check for any skills which can *only* be obtained from skill fruits?
+        public static IReadOnlyList<ActiveSkillViewModel> Inheritable { get; } = PalDB.LoadEmbedded().ActiveSkills.Where(s => s.CanInherit).Select(Make).OrderBy(s => s.Name.Value).ToList();
+
         private static ActiveSkillViewModel designerInstance;
         public static ActiveSkillViewModel DesignerInstance =>
             designerInstance ??= new ActiveSkillViewModel(

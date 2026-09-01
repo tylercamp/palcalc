@@ -55,7 +55,7 @@
     <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="{x:Null}" Margin="0,5,0,0">
         <GroupBox.Resources>
             <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
-                <Setter Property="ItemsSource" Value="{x:Static mvm:ActiveSkillViewModel.All}" />
+                <Setter Property="ItemsSource" Value="{x:Static mvm:ActiveSkillViewModel.Inheritable}" />
                 <Setter Property="ItemTemplate" Value="{StaticResource ActiveTemplate}" />
                 <Setter Property="TextSearch.TextPath" Value="Name.Value" />
             </Style>
