@@ -152,7 +152,7 @@ internal sealed class InitialPalBuilder(
                                 mechanics,
                                 attackProfile: attackTargets.IsActive
                                     ? new(
-                                        attackTargets.IsActive && attackState.HasNeutralLevel1Attack,
+                                        attackTargets.IsActive && attackState.HasNooplLevel1Attack,
                                         new AttackProfileEntry(
                                         attackState.Level1TargetMask,
                                         0,

@@ -15,8 +15,8 @@ internal enum AttackCompositionMode
 }
 
 /// <summary>
-/// A transient, fully-selected inheritance outcome. Search retains only its child entry;
-/// final reconstruction can use this to select concrete parent loadouts.
+/// A transient, fully-selected inheritance outcome. The solver only retains the final possible properties for
+/// each child; once complete, this data can be used to reconstruct the appropriate parent loadouts.
 /// </summary>
 internal readonly record struct AttackCompositionChoice(
     AttackProfileEntry Parent1Entry,
@@ -29,7 +29,7 @@ internal readonly record struct AttackCompositionChoice(
 );
 
 /// <summary>
-/// Composes the attainable required-attack profiles for one breeding edge.
+/// Composes the attainable required-attack profiles for one breeding result.
 /// </summary>
 internal sealed class AttackProfileComposer(
     AttackTargetContext targets,
@@ -53,7 +53,7 @@ internal sealed class AttackProfileComposer(
         using var entriesRef = entryListPool.Borrow();
         Enumerate(child, parent1, parent2, passivesProbability, ivsProbability, entriesRef.Value, null);
         return AttackProfileReducer.Reduce(
-            targets.StateOf(child).HasNeutralLevel1Attack,
+            targets.StateOf(child).HasNooplLevel1Attack,
             CollectionsMarshal.AsSpan(entriesRef.Value)
         );
     }
@@ -134,13 +134,13 @@ internal sealed class AttackProfileComposer(
             }
 
             if (settings.MaxSpecialCakes != 0)
-                EnumerateCakeMasks(parent1Mask, parent2Mask, mask => Emit(
+                EnumerateCakeMasks(parent1Mask, parent2Mask, (parent1Loadout, parent2Loadout) => Emit(
                     parent1Entry,
                     parent2Entry,
                     AttackCompositionMode.InheritAll,
-                    (byte)(mask & parent1Mask),
-                    (byte)(mask & parent2Mask),
-                    (byte)(innateMask | mask),
+                    parent1Loadout,
+                    parent2Loadout,
+                    (byte)(innateMask | parent1Loadout | parent2Loadout),
                     attackProbability: 1,
                     usesSpecialCake: true
                 ));
@@ -191,16 +191,27 @@ internal sealed class AttackProfileComposer(
         }
     }
 
-    private static void EnumerateCakeMasks(byte parent1Mask, byte parent2Mask, Action<byte> emit)
+    private static void EnumerateCakeMasks(
+        byte parent1Mask,
+        byte parent2Mask,
+        Action<byte, byte> emit
+    )
     {
         ulong feasibleMasks = 0;
+        Span<ushort> loadoutsByMask = stackalloc ushort[64];
         for (var subset1 = parent1Mask; ; subset1 = (byte)((subset1 - 1) & parent1Mask))
         {
             if (BitOperations.PopCount((uint)subset1) <= 3)
                 for (var subset2 = parent2Mask; ; subset2 = (byte)((subset2 - 1) & parent2Mask))
                 {
                     if (BitOperations.PopCount((uint)subset2) <= 3)
-                        feasibleMasks |= 1UL << (subset1 | subset2);
+                    {
+                        var mask = (byte)(subset1 | subset2);
+                        var maskBit = 1UL << mask;
+                        if ((feasibleMasks & maskBit) == 0)
+                            loadoutsByMask[mask] = (ushort)((subset1 << 8) | subset2);
+                        feasibleMasks |= maskBit;
+                    }
                     if (subset2 == 0)
                         break;
                 }
@@ -224,7 +235,10 @@ internal sealed class AttackProfileComposer(
             }
 
             if (!hasStrictSuperset)
-                emit(mask);
+            {
+                var loadouts = loadoutsByMask[mask];
+                emit((byte)(loadouts >> 8), (byte)loadouts);
+            }
         }
     }
 }

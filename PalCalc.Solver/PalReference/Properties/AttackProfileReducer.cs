@@ -2,6 +2,10 @@ namespace PalCalc.Solver.PalReference.Properties;
 
 internal static class AttackProfileReducer
 {
+    /// <summary>
+    /// Returns whether the capabilities in `required` are also covered by `provider`. i.e.,
+    /// by satisfying `provider`, we also satisfy `required`.
+    /// </summary>
     public static bool Covers(in AttackProfileEntry provider, in AttackProfileEntry required) =>
         (provider.MasteredTargetMask & required.MasteredTargetMask) == required.MasteredTargetMask &&
         provider.TotalSpecialCakes <= required.TotalSpecialCakes &&
@@ -12,6 +16,10 @@ internal static class AttackProfileReducer
     public static AttackProfile Reduce(ReadOnlySpan<AttackProfileEntry> entries) =>
         Reduce(hasNoopAttack: false, entries);
 
+    /// <summary>
+    /// Returns a combined `AttackProfile` containing a minimal representation of possible
+    /// attack profiles described by `entries`.
+    /// </summary>
     public static AttackProfile Reduce(bool hasNoopAttack, ReadOnlySpan<AttackProfileEntry> entries)
     {
         var retainedCount = 0;
@@ -27,6 +35,10 @@ internal static class AttackProfileReducer
         return new AttackProfile(hasNoopAttack, retained);
     }
 
+    /// <summary>
+    /// Checks the list of attack profiles, and returns whether the profile at `requiredIndex`
+    /// is already covered by some other profile in the list.
+    /// </summary>
     private static bool IsCovered(ReadOnlySpan<AttackProfileEntry> entries, int requiredIndex)
     {
         for (var providerIndex = 0; providerIndex < entries.Length; providerIndex++)

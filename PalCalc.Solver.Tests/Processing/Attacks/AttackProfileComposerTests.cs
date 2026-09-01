@@ -100,11 +100,16 @@ public class AttackProfileComposerTests
         var splitParents = Choices(attacks, Entry(0b000111), Entry(0b111000), cakes: null)
             .Where(choice => choice.Mode == AttackCompositionMode.InheritAll)
             .ToArray();
+        var overlappingParents = Choices(attacks.Take(4), Entry(0b1111), Entry(0b1000), cakes: null)
+            .Single(choice => choice.Mode == AttackCompositionMode.InheritAll);
 
         Assert.AreEqual(4, oneParent.Length);
         Assert.IsTrue(oneParent.All(choice => BitCount(choice.ChildEntry.MasteredTargetMask) == 3));
         Assert.AreEqual(1, splitParents.Length);
         Assert.AreEqual(0b111111, splitParents.Single().ChildEntry.MasteredTargetMask);
+        Assert.AreEqual(0b1111, overlappingParents.ChildEntry.MasteredTargetMask);
+        Assert.IsTrue(BitCount(overlappingParents.Parent1TargetMask) <= 3);
+        Assert.IsTrue(BitCount(overlappingParents.Parent2TargetMask) <= 3);
     }
 
     [TestMethod]

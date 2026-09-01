@@ -4,8 +4,7 @@ using PalCalc.Solver.PalReference;
 namespace PalCalc.Solver.Processing.Attacks;
 
 /// <summary>
-/// Maps the normalized required attacks for one solver run to bit positions.
-/// A mask from this context is not meaningful in another run.
+/// Used by a single solver run to map required attacks to a bitfield.
 /// </summary>
 internal sealed class AttackTargetContext
 {
@@ -81,12 +80,12 @@ internal sealed class AttackTargetContext
         var level1Attacks = pal.Level1ActiveSkills(db).ToArray();
         return new(
             Level1TargetMask: MaskOf(level1Attacks),
-            HasNeutralLevel1Attack: level1Attacks.Any(attack => !attack.CanInherit)
+            HasNooplLevel1Attack: level1Attacks.Any(attack => !attack.CanInherit)
         );
     }
 }
 
 internal readonly record struct SpeciesAttackState(
     byte Level1TargetMask,
-    bool HasNeutralLevel1Attack
+    bool HasNooplLevel1Attack
 );

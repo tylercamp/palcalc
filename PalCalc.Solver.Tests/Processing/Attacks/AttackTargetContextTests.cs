@@ -89,7 +89,7 @@ public class AttackTargetContextTests
         var state = context.StateOf(pal);
 
         Assert.AreEqual(1, state.Level1TargetMask);
-        Assert.AreEqual(level1Attacks.Any(attack => !attack.CanInherit), state.HasNeutralLevel1Attack);
+        Assert.AreEqual(level1Attacks.Any(attack => !attack.CanInherit), state.HasNooplLevel1Attack);
         Assert.AreEqual(state, context.StateOf(pal));
     }
 
