@@ -47,28 +47,41 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
     private AttackProfile(bool inactive)
     {
         entries = null;
-        HasNeutralAttack = false;
+        HasNoopAttack = false;
     }
 
-    private AttackProfile(AttackProfileEntry[] entries, bool hasNeutralAttack)
+    private AttackProfile(AttackProfileEntry[] entries, bool hasNoopAttack)
     {
         this.entries = entries ?? throw new ArgumentNullException(nameof(entries));
-        HasNeutralAttack = hasNeutralAttack;
+        HasNoopAttack = hasNoopAttack;
     }
 
     public AttackProfile(params AttackProfileEntry[] entries)
-        : this(entries, hasNeutralAttack: false)
+        : this(entries, hasNoopAttack: false)
     {
     }
 
-    public AttackProfile(bool hasNeutralAttack, params AttackProfileEntry[] entries)
-        : this(entries, hasNeutralAttack)
+    public AttackProfile(bool hasNoopAttack, params AttackProfileEntry[] entries)
+        : this(entries, hasNoopAttack)
     {
     }
 
     public static AttackProfile Inactive { get; } = new(true);
 
-    public bool HasNeutralAttack { get; }
+    /// <summary>
+    /// Whether the pal has a unique, "non-inheritable" attack.
+    /// 
+    /// When Palworld has to roll for attack inheritance and it builds the list of selectable
+    /// attacks, a non-inheritable attack will be ignored, making it a "no-op" on the final
+    /// list of available attacks.
+    /// 
+    /// This is important - if there are two parent pals, and each has 1 attack equipped, the
+    /// parent with a non-inheritable attack is basically skipped. This means the attack from
+    /// the other parent gets a 100% chance to be inherited.
+    /// 
+    /// (This is only relevant for single-attack inheritance, i.e., no special cakes.)
+    /// </summary>
+    public bool HasNoopAttack { get; }
 
     public IReadOnlyList<AttackProfileEntry> Entries => entries ?? Array.Empty<AttackProfileEntry>();
 
@@ -78,7 +91,7 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
 
     public bool Equals(AttackProfile other)
     {
-        if (HasNeutralAttack != other.HasNeutralAttack)
+        if (HasNoopAttack != other.HasNoopAttack)
             return false;
         if (ReferenceEquals(entries, other.entries))
             return true;
@@ -92,7 +105,7 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
     public override int GetHashCode()
     {
         var hash = new HashCode();
-        hash.Add(HasNeutralAttack);
+        hash.Add(HasNoopAttack);
         hash.Add(entries is null);
         foreach (var entry in Entries)
             hash.Add(entry);
@@ -109,7 +122,7 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
         bool useReverser
     ) => entries is null
         ? Inactive
-        : new AttackProfile(HasNeutralAttack, entries.Select(entry => entry.WithGuaranteedGender(
+        : new AttackProfile(HasNoopAttack, entries.Select(entry => entry.WithGuaranteedGender(
             gameSettings, pal, parent1TimeFactor, parent2TimeFactor, db, gender, useReverser
         )).ToArray());
 }

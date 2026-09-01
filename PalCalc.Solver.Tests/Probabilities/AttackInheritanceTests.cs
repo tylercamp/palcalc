@@ -15,16 +15,16 @@ public class AttackInheritanceTests
     public void ProbabilityUsesBestLegalOneAttackLoadouts(
         bool parent1HasTarget,
         bool parent2HasTarget,
-        bool parent1HasNeutralAttack,
-        bool parent2HasNeutralAttack,
+        bool parent1HasNoopAttack,
+        bool parent2HasNoopAttack,
         float expected
     ) => Assert.AreEqual(
         expected,
         Attacks.ProbabilityInheritedTargetAttack(
             parent1HasTarget,
             parent2HasTarget,
-            parent1HasNeutralAttack,
-            parent2HasNeutralAttack
+            parent1HasNoopAttack,
+            parent2HasNoopAttack
         )
     );
 }

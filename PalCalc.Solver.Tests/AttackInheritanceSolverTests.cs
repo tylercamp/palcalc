@@ -12,10 +12,10 @@ public class AttackInheritanceSolverTests
     {
         var targetPal = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var requiredAttack = InheritableAttackNotInnateTo(targetPal);
-        var neutralAttack = NonInheritableAttackNotInnateTo(targetPal);
+        var noopAttack = NonInheritableAttackNotInnateTo(targetPal);
         var owned = WithAttacks(
             SolverTestScenario.Owned(targetPal.Name, PalGender.FEMALE),
-            neutralAttack,
+            noopAttack,
             requiredAttack
         );
 
@@ -37,11 +37,11 @@ public class AttackInheritanceSolverTests
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var requiredAttack = InheritableAttackNotInnateTo(child);
-        var neutralAttack = NonInheritableAttackNotInnateTo(child);
+        var noopAttack = NonInheritableAttackNotInnateTo(child);
         var solver = SolverTestScenario.Solver(
             [
                 WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), requiredAttack),
-                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutralAttack),
+                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), noopAttack),
             ],
             maxSpecialCakes: 0,
             maxBreedingSteps: 1,
@@ -122,12 +122,12 @@ public class AttackInheritanceSolverTests
         var intermediate = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var target = "Azurobe".ToPal(SolverTestScenario.DB);
         var requiredAttack = InheritableAttackNotInnateTo(intermediate, target);
-        var neutralAttack = NonInheritableAttackNotInnateTo(intermediate, target);
+        var noopAttack = NonInheritableAttackNotInnateTo(intermediate, target);
         var solver = SolverTestScenario.Solver(
             [
                 WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), requiredAttack),
-                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutralAttack),
-                WithAttacks(SolverTestScenario.Owned("Kingpaca", PalGender.FEMALE), neutralAttack),
+                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), noopAttack),
+                WithAttacks(SolverTestScenario.Owned("Kingpaca", PalGender.FEMALE), noopAttack),
             ],
             maxSpecialCakes: 0,
             maxBreedingSteps: 2,
@@ -152,11 +152,11 @@ public class AttackInheritanceSolverTests
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var requiredAttack = child.Level1ActiveSkills(SolverTestScenario.DB).First();
-        var neutralAttack = NonInheritableAttackNotInnateTo(child);
+        var noopAttack = NonInheritableAttackNotInnateTo(child);
         var solver = SolverTestScenario.Solver(
             [
-                WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), neutralAttack),
-                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutralAttack),
+                WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), noopAttack),
+                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), noopAttack),
             ],
             maxSpecialCakes: 0,
             maxBreedingSteps: 1,
@@ -217,11 +217,11 @@ public class AttackInheritanceSolverTests
         var intermediate = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var target = "Azurobe".ToPal(SolverTestScenario.DB);
         var requiredAttack = InheritableAttackNotInnateTo(intermediate, target);
-        var neutralAttack = NonInheritableAttackNotInnateTo(intermediate, target);
+        var noopAttack = NonInheritableAttackNotInnateTo(intermediate, target);
         var solver = SolverTestScenario.Solver(
             [
-                WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), neutralAttack),
-                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutralAttack),
+                WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), noopAttack),
+                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), noopAttack),
                 WithAttacks(SolverTestScenario.Owned("Kingpaca", PalGender.FEMALE), requiredAttack),
             ],
             maxSpecialCakes: 0,
@@ -247,7 +247,6 @@ public class AttackInheritanceSolverTests
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var attacks = InheritableAttacksNotInnateTo(2, child);
-        var neutralAttack = NonInheritableAttackNotInnateTo(child);
 
         SolverTestScenario.ConfiguredSolver Configure(int? maxSpecialCakes) => SolverTestScenario.Solver(
             [
@@ -289,7 +288,7 @@ public class AttackInheritanceSolverTests
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var attacks = InheritableAttacksNotInnateTo(6, child);
-        var neutralAttack = NonInheritableAttackNotInnateTo(child);
+        var noopAttack = NonInheritableAttackNotInnateTo(child);
 
         SolverTestScenario.ConfiguredSolver Configure(IEnumerable<ActiveSkill> first, IEnumerable<ActiveSkill> second) =>
             SolverTestScenario.Solver(
@@ -305,7 +304,7 @@ public class AttackInheritanceSolverTests
         var split = SolverTestScenario.Solve(Configure(attacks[..3], attacks[3..]), child.Name, attacks)
             .OfType<BredPalReference>()
             .Single();
-        var concentrated = SolverTestScenario.Solve(Configure(attacks[..4], [neutralAttack]), child.Name, attacks[..4]);
+        var concentrated = SolverTestScenario.Solve(Configure(attacks[..4], [noopAttack]), child.Name, attacks[..4]);
 
         Assert.AreEqual(0b11_1111, split.AttackProfile.Entries.Single().MasteredTargetMask);
         Assert.AreEqual(0, concentrated.Count);
@@ -317,11 +316,11 @@ public class AttackInheritanceSolverTests
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var innate = child.Level1ActiveSkills(SolverTestScenario.DB).First();
         var inherited = InheritableAttacksNotInnateTo(3, child);
-        var neutralAttack = NonInheritableAttackNotInnateTo(child);
+        var noopAttack = NonInheritableAttackNotInnateTo(child);
         var solver = SolverTestScenario.Solver(
             [
                 WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), inherited[0], inherited[1], inherited[2]),
-                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutralAttack),
+                WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), noopAttack),
             ],
             maxBreedingSteps: 1,
             maxSolverIterations: 1,

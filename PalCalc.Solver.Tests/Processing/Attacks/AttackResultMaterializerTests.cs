@@ -15,7 +15,7 @@ public class AttackResultMaterializerTests
             attack.CanInherit &&
             !child.Level1ActiveSkills(SolverTestScenario.DB).Contains(attack)
         );
-        var neutralAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
+        var noopAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
             !attack.CanInherit &&
             !child.Level1ActiveSkills(SolverTestScenario.DB).Contains(attack)
         );
@@ -23,8 +23,8 @@ public class AttackResultMaterializerTests
         carrier.ActiveSkills = [requiredAttack];
         carrier.EquippedActiveSkills = [requiredAttack];
         var mate = SolverTestScenario.Owned("Wixen", PalGender.FEMALE);
-        mate.ActiveSkills = [neutralAttack];
-        mate.EquippedActiveSkills = [neutralAttack];
+        mate.ActiveSkills = [noopAttack];
+        mate.EquippedActiveSkills = [noopAttack];
 
         var result = SolverTestScenario.Solve(
             SolverTestScenario.Solver(
@@ -54,7 +54,7 @@ public class AttackResultMaterializerTests
             attack.CanInherit &&
             !child.Level1ActiveSkills(SolverTestScenario.DB).Contains(attack)
         );
-        var neutralAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
+        var noopAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
             !attack.CanInherit &&
             !child.Level1ActiveSkills(SolverTestScenario.DB).Contains(attack)
         );
@@ -62,8 +62,8 @@ public class AttackResultMaterializerTests
         carrier.ActiveSkills = [requiredAttack];
         carrier.EquippedActiveSkills = [requiredAttack];
         var mate = SolverTestScenario.Owned("Wixen", PalGender.FEMALE);
-        mate.ActiveSkills = [neutralAttack];
-        mate.EquippedActiveSkills = [neutralAttack];
+        mate.ActiveSkills = [noopAttack];
+        mate.EquippedActiveSkills = [noopAttack];
 
         var result = SolverTestScenario.Solve(
             SolverTestScenario.Solver(

@@ -164,7 +164,7 @@ public class InitialPalBuilderTests
         var context = new AttackTargetContext(target, SolverTestScenario.DB);
 
         Assert.AreEqual(context.FullTargetMask, seed.AttackProfile.Entries.Single().MasteredTargetMask);
-        Assert.IsTrue(seed.AttackProfile.HasNeutralAttack);
+        Assert.IsTrue(seed.AttackProfile.HasNoopAttack);
         Assert.AreEqual(0, context.MaskOf([nonInheritable]) & context.InheritableTargetMask);
     }
 
@@ -253,7 +253,7 @@ public class InitialPalBuilderTests
         })
         {
             Assert.AreEqual((byte)1, reference.AttackProfile.Entries.Single().MasteredTargetMask);
-            Assert.IsTrue(reference.AttackProfile.HasNeutralAttack);
+            Assert.IsTrue(reference.AttackProfile.HasNoopAttack);
         }
     }
 

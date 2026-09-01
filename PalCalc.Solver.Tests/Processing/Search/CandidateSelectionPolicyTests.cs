@@ -173,15 +173,15 @@ public class CandidateSelectionPolicyTests
         var policy = ActivePolicy();
         var incumbent = Reference("incumbent", "Katress", TimeSpan.FromMinutes(5), Profile(1));
         var slowerUnique = Reference("unique", "Katress", TimeSpan.FromMinutes(10), Profile(2));
-        var neutral = Reference(
+        var noop = Reference(
             "neutral",
             "Katress",
             TimeSpan.FromMinutes(5),
             Profile(1),
             totalCost: 100,
-            hasNeutralAttack: true
+            hasNoopAttack: true
         );
-        var cheaperNonNeutral = Reference(
+        var cheaperNormal = Reference(
             "non-neutral",
             "Katress",
             TimeSpan.FromMinutes(5),
@@ -195,7 +195,7 @@ public class CandidateSelectionPolicyTests
         );
         Assert.AreEqual(
             EarlyCandidateSelection.KeepBoth,
-            policy.SelectEarlyCandidate(cheaperNonNeutral, neutral)
+            policy.SelectEarlyCandidate(cheaperNormal, noop)
         );
     }
 
@@ -510,14 +510,14 @@ public class CandidateSelectionPolicyTests
         TimeSpan effort,
         AttackProfile attackProfile = default,
         int totalCost = 0,
-        bool hasNeutralAttack = false
+        bool hasNoopAttack = false
     ) =>
         new(
             name,
             pal.ToPal(SolverTestScenario.DB),
             effort,
             totalCost,
-            hasNeutralAttack
+            hasNoopAttack
                 ? new AttackProfile(true, attackProfile.Entries.ToArray())
                 : attackProfile
         );

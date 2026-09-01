@@ -105,7 +105,7 @@ namespace PalCalc.Solver.PalReference
                 IVs = IVs,
                 AttackProfile = AttackProfile.Equals(PalCalc.Solver.PalReference.Properties.AttackProfile.Inactive)
                     ? PalCalc.Solver.PalReference.Properties.AttackProfile.Inactive
-                    : new AttackProfile(AttackProfile.HasNeutralAttack, AttackProfile.Entries.Select(entry => entry with
+                    : new AttackProfile(AttackProfile.HasNoopAttack, AttackProfile.Entries.Select(entry => entry with
                     {
                         BreedingEffort = entry.BreedingEffort - BreedingEffort +
                             SelfBreedingEffort * capturesRequiredForGender

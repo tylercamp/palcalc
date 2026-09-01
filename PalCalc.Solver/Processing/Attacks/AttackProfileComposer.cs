@@ -118,8 +118,8 @@ internal sealed class AttackProfileComposer(
                 var probability = Probabilities.Attacks.ProbabilityInheritedTargetAttack(
                     parent1HasAttack,
                     parent2HasAttack,
-                    parent1.AttackProfile.HasNeutralAttack,
-                    parent2.AttackProfile.HasNeutralAttack
+                    parent1.AttackProfile.HasNoopAttack,
+                    parent2.AttackProfile.HasNoopAttack
                 );
                 Emit(
                     parent1Entry,
