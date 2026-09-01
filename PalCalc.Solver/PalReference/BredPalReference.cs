@@ -55,11 +55,13 @@ namespace PalCalc.Solver.PalReference
             EffectivePassives = passives;
             EffectivePassivesHash = passives.SetHash(p => p.InternalName);
 
-            parentBreedingEffort = gameSettings.MultipleBreedingFarms && Parent1 is BredPalReference && Parent2 is BredPalReference
-                ? Parent1.BreedingEffort > Parent2.BreedingEffort
-                    ? Parent1.BreedingEffort
-                    : Parent2.BreedingEffort
-                : Parent1.BreedingEffort + Parent2.BreedingEffort;
+            parentBreedingEffort = BredPalReferenceEffort.CombineParentEffort(
+                gameSettings,
+                Parent1,
+                Parent2,
+                Parent1.BreedingEffort,
+                Parent2.BreedingEffort
+            );
 
             TimeFactor = EffectivePassives.ToTimeFactor();
         }
@@ -221,15 +223,19 @@ namespace PalCalc.Solver.PalReference
             return GetHashCode() == obj.GetHashCode();
         }
 
-        public override int GetHashCode() => HashCode.Combine(
-            nameof(BredPalReference),
-            Pal,
-            Parent1.GetHashCode() ^ Parent2.GetHashCode(),
-            EffectivePassivesHash,
-            BreedingEffort,
-            SelfBreedingEffort,
-            Gender,
-            IVs
-        );
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(nameof(BredPalReference));
+            hash.Add(Pal);
+            hash.Add(Parent1.GetHashCode() ^ Parent2.GetHashCode());
+            hash.Add(EffectivePassivesHash);
+            hash.Add(BreedingEffort);
+            hash.Add(SelfBreedingEffort);
+            hash.Add(Gender);
+            hash.Add(IVs);
+            hash.Add(AttackProfile);
+            return hash.ToHashCode();
+        }
     }
 }

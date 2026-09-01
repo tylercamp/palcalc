@@ -430,51 +430,45 @@ namespace PalCalc.Solver.Processing
 
                             // Keep the structural estimate independent of attack probability. Active
                             // profiles carry the actual effort of each attainable attack realization.
-                            var structuralChild = new BredPalReference(
-                                settings.GameSettings,
-                                childPalType,
-                                parent1,
-                                parent2,
-                                newPassives,
-                                probabilityForUpToNumPassives,
-                                finalIVs,
-                                ivsProbability,
-                                attackProfile: AttackProfile.Inactive,
-                                materializedAttackInheritance: null,
-                                avgRequiredBreedings: null,
-                                gender: PalGender.WILDCARD
-                            );
+                            var structuralProbability = probabilityForUpToNumPassives * ivsProbability;
+                            var structuralEffort = TimeSpan.MaxValue;
+                            if (structuralProbability > 0)
+                            {
+                                var structuralBreedings = (int)Math.Ceiling(1.0f / structuralProbability);
+                                structuralEffort = BredPalReferenceEffort.CombineParentEffort(
+                                    settings.GameSettings,
+                                    parent1,
+                                    parent2,
+                                    parent1.BreedingEffort,
+                                    parent2.BreedingEffort
+                                ) + BredPalReferenceEffort.CalculateSelfBreedingEffort(
+                                    settings.GameSettings,
+                                    childPalType,
+                                    parent1.TimeFactor,
+                                    parent2.TimeFactor,
+                                    structuralBreedings
+                                );
+                            }
 
                             var added = false;
-                            if (structuralChild.BreedingEffort <= settings.MaxEffort)
+                            if (structuralProbability > 0 && structuralEffort <= settings.MaxEffort)
                             {
-                                BredPalReference res = null;
+                                var attackProfile = AttackProfile.Inactive;
+                                var hasValidAttackProfile = !context.AttackTargets.IsActive;
                                 if (context.AttackTargets.IsActive)
                                 {
-                                    var attackProfile = attackProfileComposer.Compose(
+                                    attackProfile = attackProfileComposer.Compose(
                                         childPalType,
                                         parent1,
                                         parent2,
                                         probabilityForUpToNumPassives,
                                         ivsProbability
                                     );
-                                    if (attackProfile.Entries.Count != 0)
-                                        res = new BredPalReference(
-                                            settings.GameSettings,
-                                            childPalType,
-                                            parent1,
-                                            parent2,
-                                            newPassives,
-                                            probabilityForUpToNumPassives,
-                                            finalIVs,
-                                            ivsProbability,
-                                            attackProfile: attackProfile,
-                                            materializedAttackInheritance: null,
-                                            avgRequiredBreedings: null,
-                                            gender: PalGender.WILDCARD
-                                        );
+                                    hasValidAttackProfile = attackProfile.Entries.Count != 0;
                                 }
-                                else
+
+                                BredPalReference res = null;
+                                if (hasValidAttackProfile)
                                 {
                                     res = new BredPalReference(
                                         settings.GameSettings,
@@ -485,7 +479,7 @@ namespace PalCalc.Solver.Processing
                                         probabilityForUpToNumPassives,
                                         finalIVs,
                                         ivsProbability,
-                                        attackProfile: AttackProfile.Inactive,
+                                        attackProfile: attackProfile,
                                         materializedAttackInheritance: null,
                                         avgRequiredBreedings: null,
                                         gender: PalGender.WILDCARD

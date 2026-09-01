@@ -163,12 +163,13 @@ internal sealed class AttackProfileComposer(
             if (settings.MaxSpecialCakes is int maxSpecialCakes && totalCakes > maxSpecialCakes)
                 return;
 
-            var parentEffort = settings.GameSettings.MultipleBreedingFarms &&
-                parent1 is BredPalReference && parent2 is BredPalReference
-                ? parent1Entry.BreedingEffort > parent2Entry.BreedingEffort
-                    ? parent1Entry.BreedingEffort
-                    : parent2Entry.BreedingEffort
-                : parent1Entry.BreedingEffort + parent2Entry.BreedingEffort;
+            var parentEffort = BredPalReferenceEffort.CombineParentEffort(
+                settings.GameSettings,
+                parent1,
+                parent2,
+                parent1Entry.BreedingEffort,
+                parent2Entry.BreedingEffort
+            );
             var childEntry = new AttackProfileEntry(
                 childMask,
                 totalCakes,

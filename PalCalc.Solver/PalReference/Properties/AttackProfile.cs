@@ -69,10 +69,10 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
     public static AttackProfile Inactive { get; } = new(true);
 
     /// <summary>
-    /// Whether the pal has a unique, "non-inheritable" attack.
+    /// Whether the pal has a pal-specific, "non-inheritable" attack.
     /// 
     /// When Palworld has to roll for attack inheritance and it builds the list of selectable
-    /// attacks, a non-inheritable attack will be ignored, making it a "no-op" on the final
+    /// attacks, a non-inheritable attack will be ignored, which is a "no-op" on the final
     /// list of available attacks.
     /// 
     /// This is important - if there are two parent pals, and each has 1 attack equipped, the

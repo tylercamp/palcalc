@@ -168,6 +168,37 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
+    public void ActiveProfiles_DoNotDeduplicateDistinctBredCapabilities()
+    {
+        var policy = ActivePolicy();
+        var parent1 = Reference("parent-1", "Katress", TimeSpan.Zero);
+        var parent2 = Reference("parent-2", "Wixen", TimeSpan.Zero);
+        var settings = new GameSettings();
+
+        BredPalReference BredWith(AttackProfile profile) => new(
+            settings,
+            "Wixen Noct".ToPal(SolverTestScenario.DB),
+            parent1,
+            parent2,
+            passives: [],
+            passivesProbability: 1,
+            ivs: new IV_Set(),
+            ivsProbability: 1,
+            attackProfile: profile,
+            materializedAttackInheritance: null,
+            avgRequiredBreedings: null,
+            gender: PalGender.WILDCARD
+        );
+
+        var first = BredWith(Profile(1));
+        var second = BredWith(Profile(2));
+
+        var retained = policy.SelectRetainedAlternatives([first, second]);
+
+        CollectionAssert.AreEquivalent(new[] { first, second }, retained.ToArray());
+    }
+
+    [TestMethod]
     public void ActiveProfiles_PreserveIncomparableEarlyCandidates()
     {
         var policy = ActivePolicy();
