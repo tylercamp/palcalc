@@ -223,19 +223,24 @@ namespace PalCalc.Solver.PalReference
             return GetHashCode() == obj.GetHashCode();
         }
 
+        private int hash = 0;
         public override int GetHashCode()
         {
-            var hash = new HashCode();
-            hash.Add(nameof(BredPalReference));
-            hash.Add(Pal);
-            hash.Add(Parent1.GetHashCode() ^ Parent2.GetHashCode());
-            hash.Add(EffectivePassivesHash);
-            hash.Add(BreedingEffort);
-            hash.Add(SelfBreedingEffort);
-            hash.Add(Gender);
-            hash.Add(IVs);
-            hash.Add(AttackProfile);
-            return hash.ToHashCode();
+            if (hash == 0)
+            {
+                hash = HashCode.Combine(
+                    nameof(BredPalReference),
+                    Pal,
+                    Parent1.GetHashCode() ^ Parent2.GetHashCode(),
+                    EffectivePassivesHash,
+                    HashCode.Combine(BreedingEffort, SelfBreedingEffort),
+                    Gender,
+                    IVs,
+                    AttackProfile
+                );
+            }
+
+            return hash;
         }
     }
 }

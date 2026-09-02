@@ -100,17 +100,26 @@ public readonly record struct AttackProfileEntry(
 public readonly struct AttackProfile : IEquatable<AttackProfile>
 {
     private readonly AttackProfileEntry[] entries;
+    private readonly int hash;
 
     private AttackProfile(bool inactive)
     {
         entries = null;
         HasNoopAttack = false;
+        hash = 0;
     }
 
     private AttackProfile(AttackProfileEntry[] entries, bool hasNoopAttack)
     {
         this.entries = entries ?? throw new ArgumentNullException(nameof(entries));
         HasNoopAttack = hasNoopAttack;
+
+        hash = 0b01;
+        if (HasNoopAttack)
+            hash |= 0b10;
+        
+        foreach (var entry in entries)
+            hash = HashCode.Combine(hash, entry);
     }
 
     public AttackProfile(params AttackProfileEntry[] entries)
@@ -143,11 +152,27 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
     /// </summary>
     public bool HasNoopAttack { get; }
 
-    public IReadOnlyList<AttackProfileEntry> Entries => entries ?? Array.Empty<AttackProfileEntry>();
+    /// <summary>
+    /// WARNING: Provided for convenience, actual solver code should use `EntriesSpan`
+    /// </summary>
+    public IReadOnlyList<AttackProfileEntry> Entries => entries ?? [];
 
-    public bool Contains(byte requiredMask) => entries?.Any(entry =>
-        (entry.LearnedTargetMask & requiredMask) == requiredMask
-    ) == true;
+    public ReadOnlySpan<AttackProfileEntry> EntriesSpan => entries ?? [];
+
+    public bool Contains(byte requiredMask)
+    {
+        if (entries == null)
+            return false;
+
+        // Unfolded `.Any()`
+        foreach (var entry in entries)
+        {
+            if ((entry.LearnedTargetMask & requiredMask) == requiredMask)
+                return true;
+        }
+
+        return false;
+    }
 
     public bool Equals(AttackProfile other)
     {
@@ -162,15 +187,7 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
 
     public override bool Equals(object obj) => obj is AttackProfile other && Equals(other);
 
-    public override int GetHashCode()
-    {
-        var hash = new HashCode();
-        hash.Add(HasNoopAttack);
-        hash.Add(entries is null);
-        foreach (var entry in Entries)
-            hash.Add(entry);
-        return hash.ToHashCode();
-    }
+    public override int GetHashCode() => hash;
 
     internal AttackProfile WithGuaranteedGender(
         GameSettings gameSettings,
@@ -180,9 +197,15 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
         PalDB db,
         PalGender gender,
         bool useReverser
-    ) => entries is null
-        ? Inactive
-        : new AttackProfile(HasNoopAttack, entries.Select(entry => entry.WithGuaranteedGender(
-            gameSettings, pal, parent1TimeFactor, parent2TimeFactor, db, gender, useReverser
-        )).ToArray());
+    )
+    {
+        if (entries is null)
+            return Inactive;
+
+        var resultEntries = new AttackProfileEntry[entries.Length];
+        for (int i = 0; i < entries.Length; i++)
+            resultEntries[i] = entries[i].WithGuaranteedGender(gameSettings, pal, parent1TimeFactor, parent2TimeFactor, db, gender, useReverser);
+
+        return new AttackProfile(HasNoopAttack, resultEntries);
+    }
 }

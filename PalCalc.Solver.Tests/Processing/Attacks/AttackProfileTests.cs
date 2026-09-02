@@ -45,6 +45,16 @@ public class AttackProfileTests
     }
 
     [TestMethod]
+    public void Reducer_LargeProfileUsesSameCoverageRules()
+    {
+        var duplicate = Entry(mask: 1, cakes: 2, effort: 10, breedings: 2);
+        var profile = AttackProfileReducer.Reduce(Enumerable.Repeat(duplicate, 257).ToArray());
+
+        Assert.AreEqual(1, profile.Entries.Count);
+        Assert.AreEqual(duplicate, profile.Entries.Single());
+    }
+
+    [TestMethod]
     public void GenderTransformation_PreservesCoverageFromLowerSelfBreedings()
     {
         var (pal, gender) = GenderedPal();

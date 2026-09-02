@@ -103,8 +103,8 @@ namespace PalCalc.Solver.PalReference
                 EffectivePassives = EffectivePassives,
                 EffectivePassivesHash = this.EffectivePassivesHash,
                 IVs = IVs,
-                AttackProfile = AttackProfile.Equals(PalCalc.Solver.PalReference.Properties.AttackProfile.Inactive)
-                    ? PalCalc.Solver.PalReference.Properties.AttackProfile.Inactive
+                AttackProfile = AttackProfile.Equals(AttackProfile.Inactive)
+                    ? AttackProfile.Inactive
                     : new AttackProfile(AttackProfile.HasNoopAttack, AttackProfile.Entries.Select(entry => entry with
                     {
                         BreedingEffort = entry.BreedingEffort - BreedingEffort +

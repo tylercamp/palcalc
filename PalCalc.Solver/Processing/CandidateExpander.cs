@@ -485,7 +485,7 @@ namespace PalCalc.Solver.Processing
                                         probabilityForUpToNumPassives,
                                         ivsProbability
                                     );
-                                    hasValidAttackProfile = attackProfile.Entries.Count != 0;
+                                    hasValidAttackProfile = attackProfile.EntriesSpan.Length != 0;
                                 }
 
                                 BredPalReference res = null;

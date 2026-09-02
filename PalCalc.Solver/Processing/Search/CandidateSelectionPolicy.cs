@@ -231,20 +231,38 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     private bool CoversAttackCapability(
         IPalReference provider,
         IPalReference required
-    ) =>
-        !attackProfilesActive || required.AttackProfile.Entries.All(entry =>
-            CoversAttackEntry(provider, required, entry)
-        );
+    )
+    {
+        if (!attackProfilesActive) return true;
+
+        // Unfolded `.All()`
+        foreach (var entry in required.AttackProfile.EntriesSpan)
+        {
+            if (!CoversAttackEntry(provider, required, entry))
+                return false;
+        }
+
+        return true;
+    }
 
     private static bool CoversAttackEntry(
         IPalReference provider,
         IPalReference required,
         AttackProfileEntry requiredEntry
-    ) =>
-        (provider.AttackProfile.HasNoopAttack || !required.AttackProfile.HasNoopAttack) &&
-        provider.AttackProfile.Entries.Any(providerEntry =>
-            AttackProfileReducer.Covers(providerEntry, requiredEntry)
-        );
+    )
+    {
+        if (!provider.AttackProfile.HasNoopAttack && required.AttackProfile.HasNoopAttack)
+            return false;
+
+        // Unfolded `.Any()`
+        foreach (var providerEntry in provider.AttackProfile.EntriesSpan)
+        {
+            if (AttackProfileReducer.Covers(providerEntry, requiredEntry))
+                return true;
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// Finds the profile entries which are not covered by another candidate in
@@ -255,11 +273,10 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         IReadOnlyList<IPalReference> candidates
     )
     {
-        var capabilities = candidates
-            .SelectMany(candidate => candidate.AttackProfile.Entries.Select(entry =>
-                new AttackCapability(candidate, entry)
-            ))
-            .ToList();
+        var capabilities = new List<AttackCapability>(candidates.Sum(c => c.AttackProfile.EntriesSpan.Length));
+        foreach (var candidate in candidates)
+        foreach (var entry in candidate.AttackProfile.EntriesSpan)
+            capabilities.Add(new AttackCapability(candidate, entry));
 
         var envelope = new List<AttackCapability>();
         for (var requiredIndex = 0; requiredIndex < capabilities.Count; requiredIndex++)

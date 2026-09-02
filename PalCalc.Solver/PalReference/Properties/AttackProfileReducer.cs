@@ -2,6 +2,8 @@ namespace PalCalc.Solver.PalReference.Properties;
 
 internal static class AttackProfileReducer
 {
+    private const int MaxStackEntries = 256;
+
     /// <summary>
     /// Returns whether the capabilities in `required` are also covered by `provider`. i.e.,
     /// by satisfying `provider`, we also satisfy `required`.
@@ -11,9 +13,9 @@ internal static class AttackProfileReducer
         // for `ref` by the caller and prevents the param value from being overwritten.)
         (provider.LearnedTargetMask & required.LearnedTargetMask) == required.LearnedTargetMask &&
         provider.TotalSpecialCakes <= required.TotalSpecialCakes &&
-        provider.BreedingEffort <= required.BreedingEffort &&
         provider.SelfBreedings <= required.SelfBreedings &&
-        (!provider.SelfUsesSpecialCake || required.SelfUsesSpecialCake);
+        (!provider.SelfUsesSpecialCake || required.SelfUsesSpecialCake) &&
+        provider.BreedingEffort <= required.BreedingEffort;
 
     public static AttackProfile Reduce(ReadOnlySpan<AttackProfileEntry> entries) =>
         Reduce(hasNoopAttack: false, entries);
@@ -24,14 +26,21 @@ internal static class AttackProfileReducer
     /// </summary>
     public static AttackProfile Reduce(bool hasNoopAttack, ReadOnlySpan<AttackProfileEntry> entries)
     {
+        // `IsCovered` is an expensive call, do one pass up-front and track the results, then copy the un-covered items
+        Span<bool> covered = entries.Length <= MaxStackEntries
+            ? stackalloc bool[entries.Length]
+            : new bool[entries.Length];
         var retainedCount = 0;
         for (var i = 0; i < entries.Length; i++)
-            if (!IsCovered(entries, i))
+        {
+            covered[i] = IsCovered(entries, i);
+            if (!covered[i])
                 retainedCount++;
+        }
 
         var retained = new AttackProfileEntry[retainedCount];
         for (int i = 0, destination = 0; i < entries.Length; i++)
-            if (!IsCovered(entries, i))
+            if (!covered[i])
                 retained[destination++] = entries[i];
 
         return new AttackProfile(hasNoopAttack, retained);

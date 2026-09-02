@@ -106,8 +106,8 @@ internal sealed class AttackProfileComposer(
             settings.GameSettings, child, parent1.TimeFactor, parent2.TimeFactor, dilutedBreedings
         );
         Span<ushort> cakeLoadouts = stackalloc ushort[64];
-        foreach (var parent1Entry in parent1.AttackProfile.Entries)
-        foreach (var parent2Entry in parent2.AttackProfile.Entries)
+        foreach (var parent1Entry in parent1.AttackProfile.EntriesSpan)
+        foreach (var parent2Entry in parent2.AttackProfile.EntriesSpan)
         {
             var parentCakes = parent1Entry.TotalSpecialCakes + parent2Entry.TotalSpecialCakes;
             var parentEffort = BredPalReferenceEffort.CombineParentEffort(

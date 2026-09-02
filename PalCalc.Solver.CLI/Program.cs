@@ -18,10 +18,21 @@ internal class Program
         var db = PalDB.LoadEmbedded();
         Console.WriteLine("Loaded Pal DB");
 
-        var saveGame = DirectSavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LastModified);
+        var saveLocation = DirectSavesLocation.AllLocal.MaxBy(l => l.ValidSaveGames.Max(s => s.LastModified));
+        var saveGame = saveLocation.ValidSaveGames.MaxBy(g => g.LastModified);
         Console.WriteLine("Using {0}", saveGame);
 
         var savedInstances = saveGame.Level.ReadCharacterData(db, GameSettings.Defaults, [], null).Pals;
+        Console.WriteLine("{0} native pals", savedInstances.Count);
+
+        var fromGps = saveLocation.GlobalPalStorage.ReadPals("GPS").Pals;
+        savedInstances.AddRange(fromGps);
+        Console.WriteLine("{0} GPS pals", fromGps.Count);
+
+        var fromDps = saveGame.Players.SelectMany(p => p.DimensionalPalStorageSaveFile?.ReadPals("DPS")?.Pals ?? []).ToList();
+        savedInstances.AddRange(fromDps);
+        Console.WriteLine("{0} DPS pals", fromDps.Count);
+
         Console.WriteLine("Loaded save game");
 
         var solverSettings = new BreedingSolverSettings(
@@ -30,19 +41,19 @@ internal class Program
                 breedingDB: PalBreedingDB.LoadEmbedded(db),
                 resultPruning: ResultPruningPolicy.Default,
                 ownedPals: savedInstances,
-                maxBreedingSteps: 99,
+                maxBreedingSteps: 6,
                 maxSolverIterations: 99,
-                maxWildPals: 99,
+                maxWildPals: 0,
                 allowedWildPals: db.Pals.ToList(),
                 bannedBredPals: new List<Pal>(),
-                maxBredIrrelevantPassives: 2,
+                maxBredIrrelevantPassives: 0,
                 maxInputIrrelevantPassives: 4,
                 maxEffort: TimeSpan.FromDays(7),
-                maxThreads: 0,
+                maxThreads: 1,
                 maxSurgeryCost: 1_000_000,
                 allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
                 useGenderReversers: true,
-                maxSpecialCakes: 0
+                maxSpecialCakes: 1000000
         );
         var solver = new BreedingSolver();
 
@@ -61,11 +72,21 @@ internal class Program
             //IV_HP = 90
         };
 
+        var targetInstance2 = new PalSpecifier
+        {
+            Pal = "Broncherry".ToPal(db),
+            RequiredPassives = [],
+            RequiredAttacks = [ "Bog Blast".ToActive(db), "Bubble Blast".ToActive(db) /*, "Aqua Gun".ToActive(db) */ ],
+            //IV_Attack = 90,
+            //IV_Defense = 90,
+            //IV_HP = 90
+        };
+
         var controller = new SolverStateController(
             CancellationToken.None
         );
         var solveResult = solver.Solve(
-            new BreedingSolverRequest(targetInstance, solverSettings),
+            new BreedingSolverRequest(targetInstance2, solverSettings),
             controller
         );
         var matches = solveResult.Results;
