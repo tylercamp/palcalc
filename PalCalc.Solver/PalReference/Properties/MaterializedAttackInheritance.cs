@@ -10,7 +10,8 @@ public enum AttackInheritanceMode
 }
 
 /// <summary>
-/// Concrete attack instructions for one materialized breeding edge.
+/// A specific set of attack-inheritance choices. Derived from an `AttackProfile` using
+/// a `AttackResultMaterializer`.
 /// </summary>
 public sealed record MaterializedAttackInheritance(
     AttackInheritanceMode Mode,

@@ -6,8 +6,9 @@ using PalCalc.Solver.Utils;
 namespace PalCalc.Solver.Processing.Attacks;
 
 /// <summary>
-/// Rebuilds one symbolic attack-profile path as a concrete breeding tree.
-/// TODO: Generalize only if another result dimension needs its own realization.
+/// Used by the `ResultPostProcessor` in a finalization step. Takes a `IPalReference`
+/// with a generic attack profile, and resolves to a new `IPalReference`
+/// with specific inheritance instructions.
 /// </summary>
 internal sealed class AttackResultMaterializer
 {
@@ -22,6 +23,18 @@ internal sealed class AttackResultMaterializer
         composer = new AttackProfileComposer(targets, settings, new ObjectPoolFactory());
     }
 
+    /// <summary>
+    /// <para>Reconstructs the given `IPalReference` to satisfy the given `AttackProfileEntry`.</para>
+    /// <para>
+    ///     During the solver process, an `IPalReference` only tracks its <em>potential</em> attack outcomes. This
+    ///     method does the work of traversing the tree, choosing the specific attack-breeding paths as necessary,
+    ///     all while respecting Palworld's general limits for attack inheritance.
+    /// </para>
+    /// </summary>
+    /// <remarks>
+    ///     `reference.AttackProfile` is a cummulative record of possible attack inheritance outcomes. The `selectedEntry`
+    ///     MUST be covered by one of the profiles entries.
+    /// </remarks>
     public IPalReference Materialize(IPalReference reference, AttackProfileEntry selectedEntry) =>
         reference switch
         {
@@ -49,8 +62,8 @@ internal sealed class AttackResultMaterializer
             .OrderBy(choice => choice.Mode)
             .ThenBy(choice => choice.Parent1TargetMask)
             .ThenBy(choice => choice.Parent2TargetMask)
-            .ThenBy(choice => choice.Parent1Entry.MasteredTargetMask)
-            .ThenBy(choice => choice.Parent2Entry.MasteredTargetMask)
+            .ThenBy(choice => choice.Parent1Entry.LearnedTargetMask)
+            .ThenBy(choice => choice.Parent2Entry.LearnedTargetMask)
             .ThenBy(choice => choice.Parent1Entry.TotalSpecialCakes)
             .ThenBy(choice => choice.Parent2Entry.TotalSpecialCakes)
             .FirstOrDefault();
@@ -62,7 +75,7 @@ internal sealed class AttackResultMaterializer
         var inheritedAttacks = AttacksForMask((byte)(
             choice.Parent1TargetMask | choice.Parent2TargetMask
         ));
-        var childMasteredAttacks = inheritedAttacks
+        var childLearnedAttacks = inheritedAttacks
             .Concat(bred.Pal.Level1ActiveSkills(settings.DB))
             .Distinct()
             .ToArray();
@@ -71,7 +84,7 @@ internal sealed class AttackResultMaterializer
             LoadoutFor(parent1, choice.Parent1TargetMask),
             LoadoutFor(parent2, choice.Parent2TargetMask),
             inheritedAttacks,
-            childMasteredAttacks,
+            childLearnedAttacks,
             choice.ChildEntry.SelfUsesSpecialCake ? choice.ChildEntry.SelfBreedings : 0,
             choice.AttackProbability
         );
@@ -106,7 +119,7 @@ internal sealed class AttackResultMaterializer
         var loadout = AttacksForMask(targetMask).ToList();
         if (loadout.Count == 0)
         {
-            var filler = MasteredAttacks(parent)
+            var filler = LearnedAttacks(parent)
                 .OrderBy(attack => attack.CanInherit)
                 .ThenBy(attack => attack.InternalName, StringComparer.Ordinal)
                 .FirstOrDefault() ?? new RandomActiveSkill();
@@ -118,14 +131,14 @@ internal sealed class AttackResultMaterializer
         return loadout;
     }
 
-    private IEnumerable<ActiveSkill> MasteredAttacks(IPalReference reference) =>
+    private IEnumerable<ActiveSkill> LearnedAttacks(IPalReference reference) =>
         reference switch
         {
-            SurgeryTablePalReference surgery => MasteredAttacks(surgery.Input),
+            SurgeryTablePalReference surgery => LearnedAttacks(surgery.Input),
             OwnedPalReference owned => owned.UnderlyingInstance.ActiveSkills ?? [],
             CompositeOwnedPalReference composite => composite.Male.UnderlyingInstance.ActiveSkills ?? [],
             BredPalReference { MaterializedAttackInheritance: not null } bred =>
-                bred.MaterializedAttackInheritance.ChildMasteredAttacks,
+                bred.MaterializedAttackInheritance.ChildLearnedAttacks,
             _ => reference.Pal.Level1ActiveSkills(settings.DB),
         };
 

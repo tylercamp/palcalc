@@ -7,6 +7,8 @@ internal static class AttackProfileReducer
     /// by satisfying `provider`, we also satisfy `required`.
     /// </summary>
     public static bool Covers(in AttackProfileEntry provider, in AttackProfileEntry required) =>
+        // (The use of `in` on the param acts like `ref`, avoiding a copy, but prevents the need
+        // for `ref` by the caller and prevents the param value from being overwritten.)
         (provider.LearnedTargetMask & required.LearnedTargetMask) == required.LearnedTargetMask &&
         provider.TotalSpecialCakes <= required.TotalSpecialCakes &&
         provider.BreedingEffort <= required.BreedingEffort &&

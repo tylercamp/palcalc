@@ -119,11 +119,18 @@ internal readonly struct RelevantIVKey : IEquatable<RelevantIVKey>
 
 /// <summary>
 /// Groups candidates that are interchangeable in future breeding steps.
-/// Effort, cost, and breeding history are intentionally excluded because the
-/// selection policy compares those details within each group.
 /// </summary>
 internal readonly struct EffectivePropertiesKey : IEquatable<EffectivePropertiesKey>
 {
+    /*
+     * Note:
+     * 
+     * The following are intentionally excluded since they are compared directly
+     * as part of the candidate-selection policy:
+     *       
+     * Effort, cost, breeding history, attack profiles
+     */
+
     private readonly int hashCode;
 
     public EffectivePropertiesKey(

@@ -190,6 +190,11 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         if (!attackProfilesActive)
             return preferred;
 
+        // TODO - This is a bit of a hackfix, should have a more cohesive approach
+
+        // Ordinary pruning may apply a hard result limit. Add back the providers
+        // required to preserve the group's nondominated attack envelope, even if
+        // that makes an attack-sensitive group exceed the usual limit.
         // TODO: Generalize this seam if non-attack realization profiles are added.
         var providers = preferred.ToList();
         var orderedCandidates = distinctCandidates
@@ -241,6 +246,11 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             AttackProfileReducer.Covers(providerEntry, requiredEntry)
         );
 
+    /// <summary>
+    /// Finds the profile entries which are not covered by another candidate in
+    /// the same structural group. Mutually equivalent entries use stable input
+    /// order so only one representative is required.
+    /// </summary>
     private static IReadOnlyList<AttackCapability> BuildAttackEnvelope(
         IReadOnlyList<IPalReference> candidates
     )
