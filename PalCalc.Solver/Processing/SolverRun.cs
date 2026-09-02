@@ -136,7 +136,10 @@ namespace PalCalc.Solver.Processing
 
             var resultPostProcessor = new ResultPostProcessor(spec, settings, controller, context.AttackTargets);
             resultPostProcessor.ApplySurgery(frontier);
-            return resultPostProcessor.Finalize(frontier.TerminalResults);
+            var results = resultPostProcessor.Finalize(frontier.TerminalResults);
+            if (context.SelectionPolicy is DefaultCandidateSelectionPolicy defaultPolicy)
+                defaultPolicy.LogAttackSelectionDiagnostics();
+            return results;
         }
     }
 }

@@ -168,6 +168,48 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
+    public void ActiveProfiles_PreferBundledSupersetBeyondResultLimit()
+    {
+        var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 1)]));
+        var subset = Reference("subset", "Katress", TimeSpan.FromMinutes(1), Profile(1));
+        var superset = Reference("superset", "Katress", TimeSpan.FromMinutes(2), Profile(1, 2));
+
+        var retained = policy.SelectRetainedAlternatives([subset, superset]);
+
+        Assert.IsTrue(retained.Any(candidate => candidate.AttackProfile.Contains(2)));
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_RetainOverlappingIncomparableProfilesBeyondResultLimit()
+    {
+        var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 1)]));
+        var first = Reference("first", "Katress", TimeSpan.FromMinutes(1), Profile(1, 2));
+        var second = Reference("second", "Katress", TimeSpan.FromMinutes(2), Profile(2, 4));
+
+        var retained = policy.SelectRetainedAlternatives([first, second]);
+
+        CollectionAssert.AreEquivalent(new[] { first, second }, retained.ToArray());
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_RetainNoopCapabilityBeyondResultLimit()
+    {
+        var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 1)]));
+        var ordinary = Reference("ordinary", "Katress", TimeSpan.FromMinutes(1), Profile(1));
+        var noop = Reference(
+            "noop",
+            "Katress",
+            TimeSpan.FromMinutes(2),
+            Profile(1),
+            hasNoopAttack: true
+        );
+
+        var retained = policy.SelectRetainedAlternatives([ordinary, noop]);
+
+        CollectionAssert.AreEquivalent(new[] { ordinary, noop }, retained.ToArray());
+    }
+
+    [TestMethod]
     public void ActiveProfiles_DoNotDeduplicateDistinctBredCapabilities()
     {
         var policy = ActivePolicy();

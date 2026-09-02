@@ -26,41 +26,41 @@ internal static class AttackProfileReducer
     /// </summary>
     public static AttackProfile Reduce(bool hasNoopAttack, ReadOnlySpan<AttackProfileEntry> entries)
     {
-        // `IsCovered` is an expensive call, do one pass up-front and track the results, then copy the un-covered items
-        Span<bool> covered = entries.Length <= MaxStackEntries
-            ? stackalloc bool[entries.Length]
-            : new bool[entries.Length];
+        Span<int> retainedIndexes = entries.Length <= MaxStackEntries
+            ? stackalloc int[entries.Length]
+            : new int[entries.Length];
         var retainedCount = 0;
-        for (var i = 0; i < entries.Length; i++)
+        for (var candidateIndex = 0; candidateIndex < entries.Length; candidateIndex++)
         {
-            covered[i] = IsCovered(entries, i);
-            if (!covered[i])
-                retainedCount++;
+            var isCovered = false;
+            for (var i = 0; i < retainedCount; i++)
+            {
+                if (!Covers(entries[retainedIndexes[i]], entries[candidateIndex]))
+                    continue;
+
+                isCovered = true;
+                break;
+            }
+
+            if (isCovered)
+                continue;
+
+            var destination = 0;
+            for (var i = 0; i < retainedCount; i++)
+            {
+                var retainedIndex = retainedIndexes[i];
+                if (!Covers(entries[candidateIndex], entries[retainedIndex]))
+                    retainedIndexes[destination++] = retainedIndex;
+            }
+
+            retainedIndexes[destination] = candidateIndex;
+            retainedCount = destination + 1;
         }
 
         var retained = new AttackProfileEntry[retainedCount];
-        for (int i = 0, destination = 0; i < entries.Length; i++)
-            if (!covered[i])
-                retained[destination++] = entries[i];
+        for (var i = 0; i < retainedCount; i++)
+            retained[i] = entries[retainedIndexes[i]];
 
         return new AttackProfile(hasNoopAttack, retained);
-    }
-
-    /// <summary>
-    /// Checks the list of attack profiles, and returns whether the profile at `requiredIndex`
-    /// is already covered by some other profile in the list.
-    /// </summary>
-    private static bool IsCovered(ReadOnlySpan<AttackProfileEntry> entries, int requiredIndex)
-    {
-        for (var providerIndex = 0; providerIndex < entries.Length; providerIndex++)
-        {
-            if (providerIndex == requiredIndex || !Covers(entries[providerIndex], entries[requiredIndex]))
-                continue;
-
-            if (entries[providerIndex] != entries[requiredIndex] || providerIndex < requiredIndex)
-                return true;
-        }
-
-        return false;
     }
 }
