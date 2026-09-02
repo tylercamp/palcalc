@@ -97,15 +97,31 @@ internal sealed class AttackProfileComposer(
             return;
 
         var innateMask = targets.StateOf(child).Level1TargetMask;
+        var guaranteedBreedings = (int)Math.Ceiling(1f / baseProbability);
+        var dilutedBreedings = (int)Math.Ceiling(1f / (baseProbability * 0.5f));
+        var guaranteedSelfEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
+            settings.GameSettings, child, parent1.TimeFactor, parent2.TimeFactor, guaranteedBreedings
+        );
+        var dilutedSelfEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
+            settings.GameSettings, child, parent1.TimeFactor, parent2.TimeFactor, dilutedBreedings
+        );
+        Span<ushort> cakeLoadouts = stackalloc ushort[64];
         foreach (var parent1Entry in parent1.AttackProfile.Entries)
         foreach (var parent2Entry in parent2.AttackProfile.Entries)
         {
+            var parentCakes = parent1Entry.TotalSpecialCakes + parent2Entry.TotalSpecialCakes;
+            var parentEffort = BredPalReferenceEffort.CombineParentEffort(
+                settings.GameSettings,
+                parent1,
+                parent2,
+                parent1Entry.BreedingEffort,
+                parent2Entry.BreedingEffort
+            );
+
             Emit(
-                parent1Entry,
-                parent2Entry,
                 AttackCompositionMode.Baseline,
-                parent1Mask: 0,
-                parent2Mask: 0,
+                parent1Loadout: 0,
+                parent2Loadout: 0,
                 childMask: innateMask,
                 attackProbability: 1,
                 usesSpecialCake: false
@@ -128,8 +144,6 @@ internal sealed class AttackProfileComposer(
                     parent2.AttackProfile.HasNoopAttack
                 );
                 Emit(
-                    parent1Entry,
-                    parent2Entry,
                     AttackCompositionMode.Normal,
                     parent1HasAttack ? bit : (byte)0,
                     parent2HasAttack ? bit : (byte)0,
@@ -140,117 +154,130 @@ internal sealed class AttackProfileComposer(
             }
 
             if (settings.MaxSpecialCakes != 0)
-                EnumerateCakeMasks(parent1Mask, parent2Mask, (parent1Loadout, parent2Loadout) => Emit(
-                    parent1Entry,
-                    parent2Entry,
-                    AttackCompositionMode.InheritAll,
-                    parent1Loadout,
-                    parent2Loadout,
-                    (byte)(innateMask | parent1Loadout | parent2Loadout),
-                    attackProbability: 1,
-                    usesSpecialCake: true
-                ));
-        }
+            {
+                var cakeLoadoutCount = EnumerateCakeMasks(parent1Mask, parent2Mask, cakeLoadouts);
+                for (var i = 0; i < cakeLoadoutCount; i++)
+                {
+                    var loadouts = cakeLoadouts[i];
+                    var parent1Loadout = (byte)(loadouts >> 8);
+                    var parent2Loadout = (byte)loadouts;
+                    Emit(
+                        AttackCompositionMode.InheritAll,
+                        parent1Loadout,
+                        parent2Loadout,
+                        (byte)(innateMask | parent1Loadout | parent2Loadout),
+                        attackProbability: 1,
+                        usesSpecialCake: true
+                    );
+                }
+            }
 
-        void Emit(
-            AttackProfileEntry parent1Entry,
-            AttackProfileEntry parent2Entry,
-            AttackCompositionMode mode,
-            byte parent1Mask,
-            byte parent2Mask,
-            byte childMask,
-            float attackProbability,
-            bool usesSpecialCake
-        )
-        {
-            var selfBreedings = (int)Math.Ceiling(1f / (baseProbability * attackProbability));
-            var totalCakes = parent1Entry.TotalSpecialCakes + parent2Entry.TotalSpecialCakes +
-                (usesSpecialCake ? selfBreedings : 0);
-            if (settings.MaxSpecialCakes is int maxSpecialCakes && totalCakes > maxSpecialCakes)
-                return;
+            void Emit(
+                AttackCompositionMode mode,
+                byte parent1Loadout,
+                byte parent2Loadout,
+                byte childMask,
+                float attackProbability,
+                bool usesSpecialCake
+            )
+            {
+                var guaranteed = attackProbability == 1;
+                var selfBreedings = guaranteed ? guaranteedBreedings : dilutedBreedings;
+                var totalCakes = parentCakes + (usesSpecialCake ? selfBreedings : 0);
+                if (settings.MaxSpecialCakes is int maxSpecialCakes && totalCakes > maxSpecialCakes)
+                    return;
 
-            var parentEffort = BredPalReferenceEffort.CombineParentEffort(
-                settings.GameSettings,
-                parent1,
-                parent2,
-                parent1Entry.BreedingEffort,
-                parent2Entry.BreedingEffort
-            );
-            var childEntry = new AttackProfileEntry(
-                childMask,
-                totalCakes,
-                parentEffort + BredPalReferenceEffort.CalculateSelfBreedingEffort(
-                    settings.GameSettings, child, parent1.TimeFactor, parent2.TimeFactor, selfBreedings
-                ),
-                selfBreedings,
-                usesSpecialCake
-            );
-            if (childEntry.BreedingEffort > settings.MaxEffort)
-                return;
+                var childEntry = new AttackProfileEntry(
+                    childMask,
+                    totalCakes,
+                    parentEffort + (guaranteed ? guaranteedSelfEffort : dilutedSelfEffort),
+                    selfBreedings,
+                    usesSpecialCake
+                );
+                if (childEntry.BreedingEffort > settings.MaxEffort)
+                    return;
 
-            if (entries is not null)
-                entries.Add(childEntry);
-            else
-                choices!.Add(new(
-                    parent1Entry, parent2Entry, mode, parent1Mask, parent2Mask, childEntry, attackProbability
-                ));
+                if (entries is not null)
+                    entries.Add(childEntry);
+                else
+                    choices!.Add(new(
+                        parent1Entry,
+                        parent2Entry,
+                        mode,
+                        parent1Loadout,
+                        parent2Loadout,
+                        childEntry,
+                        attackProbability
+                    ));
+            }
         }
     }
 
     /// <summary>
-    /// Emits the inclusion-maximal attack unions attainable with at most three
-    /// attacks equipped by each parent. One legal parent-loadout witness is
-    /// retained for every union so overlapping parent masks cannot reconstruct
-    /// an impossible four-or-more-attack loadout later.
+    /// Writes the inclusion-maximal attack unions attainable with at most three
+    /// attacks equipped by each parent. Each packed result contains one legal
+    /// parent-loadout witness: parent 1 in the high byte and parent 2 in the low byte.
     /// </summary>
-    private static void EnumerateCakeMasks(
+    internal static int EnumerateCakeMasks(
         byte parent1Mask,
         byte parent2Mask,
-        Action<byte, byte> emit
+        Span<ushort> destination
     )
     {
-        ulong feasibleMasks = 0;
-        Span<ushort> loadoutsByMask = stackalloc ushort[64];
-        for (var subset1 = parent1Mask; ; subset1 = (byte)((subset1 - 1) & parent1Mask))
+        var count = 0;
+        var availableMask = (byte)(parent1Mask | parent2Mask);
+        for (var candidate = 0; candidate < 64; candidate++)
         {
-            if (BitOperations.PopCount((uint)subset1) <= 3)
-                for (var subset2 = parent2Mask; ; subset2 = (byte)((subset2 - 1) & parent2Mask))
-                {
-                    if (BitOperations.PopCount((uint)subset2) <= 3)
-                    {
-                        var mask = (byte)(subset1 | subset2);
-                        var maskBit = 1UL << mask;
-                        if ((feasibleMasks & maskBit) == 0)
-                            loadoutsByMask[mask] = (ushort)((subset1 << 8) | subset2);
-                        feasibleMasks |= maskBit;
-                    }
-                    if (subset2 == 0)
-                        break;
-                }
-            if (subset1 == 0)
-                break;
-        }
-
-        for (byte mask = 0; mask < 64; mask++)
-        {
-            if ((feasibleMasks & (1UL << mask)) == 0)
+            var childMask = (byte)candidate;
+            if ((childMask & ~availableMask) != 0 ||
+                !IsCakeMaskFeasible(parent1Mask, parent2Mask, childMask))
                 continue;
 
-            var hasStrictSuperset = false;
-            for (byte other = 0; other < 64; other++)
+            var isMaximal = true;
+            var missingMask = (byte)(availableMask & ~childMask);
+            for (var bit = 1; bit < 64; bit <<= 1)
             {
-                if (other != mask && (feasibleMasks & (1UL << other)) != 0 && (other & mask) == mask)
+                if ((missingMask & bit) != 0 && IsCakeMaskFeasible(
+                    parent1Mask, parent2Mask, (byte)(childMask | bit)
+                ))
                 {
-                    hasStrictSuperset = true;
+                    isMaximal = false;
                     break;
                 }
             }
 
-            if (!hasStrictSuperset)
-            {
-                var loadouts = loadoutsByMask[mask];
-                emit((byte)(loadouts >> 8), (byte)loadouts);
-            }
+            if (!isMaximal)
+                continue;
+            if (count == destination.Length)
+                throw new ArgumentException("The destination is too small.", nameof(destination));
+
+            destination[count++] = CreateCakeLoadouts(parent1Mask, parent2Mask, childMask);
+        }
+
+        return count;
+    }
+
+    private static bool IsCakeMaskFeasible(byte parent1Mask, byte parent2Mask, byte childMask) =>
+        BitOperations.PopCount((uint)childMask) <= 6 &&
+        BitOperations.PopCount((uint)(childMask & ~parent2Mask)) <= 3 &&
+        BitOperations.PopCount((uint)(childMask & ~parent1Mask)) <= 3;
+
+    private static ushort CreateCakeLoadouts(byte parent1Mask, byte parent2Mask, byte childMask)
+    {
+        var parent1Loadout = (byte)(childMask & parent1Mask);
+        var parent2Loadout = (byte)(childMask & parent2Mask);
+        TrimDuplicateAttacks(ref parent1Loadout, parent2Loadout);
+        TrimDuplicateAttacks(ref parent2Loadout, parent1Loadout);
+        return (ushort)((parent1Loadout << 8) | parent2Loadout);
+    }
+
+    private static void TrimDuplicateAttacks(ref byte loadout, byte otherLoadout)
+    {
+        while (BitOperations.PopCount((uint)loadout) > 3)
+        {
+            var duplicateMask = (byte)(loadout & otherLoadout);
+            var duplicateBit = 1 << BitOperations.TrailingZeroCount((uint)duplicateMask);
+            loadout = (byte)(loadout & ~duplicateBit);
         }
     }
 }

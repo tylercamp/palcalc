@@ -3,6 +3,7 @@ using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Utils;
+using System.Numerics;
 
 namespace PalCalc.Solver.Tests.Processing.Attacks;
 
@@ -110,6 +111,36 @@ public class AttackProfileComposerTests
         Assert.AreEqual(0b1111, overlappingParents.ChildEntry.LearnedTargetMask);
         Assert.IsTrue(BitCount(overlappingParents.Parent1TargetMask) <= 3);
         Assert.IsTrue(BitCount(overlappingParents.Parent2TargetMask) <= 3);
+    }
+
+    [TestMethod]
+    public void CakeMasks_MatchBruteForceForEveryParentMaskPair()
+    {
+        Span<ushort> actualLoadouts = stackalloc ushort[64];
+        for (byte parent1Mask = 0; parent1Mask < 64; parent1Mask++)
+        for (byte parent2Mask = 0; parent2Mask < 64; parent2Mask++)
+        {
+            var actualCount = AttackProfileComposer.EnumerateCakeMasks(
+                parent1Mask, parent2Mask, actualLoadouts
+            );
+            var actualMasks = new HashSet<byte>();
+            for (var i = 0; i < actualCount; i++)
+            {
+                var parent1Loadout = (byte)(actualLoadouts[i] >> 8);
+                var parent2Loadout = (byte)actualLoadouts[i];
+                Assert.AreEqual(0, parent1Loadout & ~parent1Mask);
+                Assert.AreEqual(0, parent2Loadout & ~parent2Mask);
+                Assert.IsTrue(BitOperations.PopCount((uint)parent1Loadout) <= 3);
+                Assert.IsTrue(BitOperations.PopCount((uint)parent2Loadout) <= 3);
+                Assert.IsTrue(actualMasks.Add((byte)(parent1Loadout | parent2Loadout)));
+            }
+
+            CollectionAssert.AreEquivalent(
+                BruteForceMaximalCakeMasks(parent1Mask, parent2Mask),
+                actualMasks.ToArray(),
+                $"Parent masks: {parent1Mask}, {parent2Mask}"
+            );
+        }
     }
 
     [TestMethod]
@@ -253,5 +284,22 @@ public class AttackProfileComposerTests
         for (; mask != 0; mask >>= 1)
             count += mask & 1;
         return count;
+    }
+
+    private static byte[] BruteForceMaximalCakeMasks(byte parent1Mask, byte parent2Mask)
+    {
+        var feasible = new HashSet<byte>();
+        for (var parent1Loadout = 0; parent1Loadout < 64; parent1Loadout++)
+        {
+            if ((parent1Loadout & ~parent1Mask) != 0 || BitCount((byte)parent1Loadout) > 3)
+                continue;
+            for (var parent2Loadout = 0; parent2Loadout < 64; parent2Loadout++)
+                if ((parent2Loadout & ~parent2Mask) == 0 && BitCount((byte)parent2Loadout) <= 3)
+                    feasible.Add((byte)(parent1Loadout | parent2Loadout));
+        }
+
+        return feasible
+            .Where(mask => !feasible.Any(other => other != mask && (other & mask) == mask))
+            .ToArray();
     }
 }
