@@ -202,7 +202,7 @@ public class BredReferenceConverterTests
         CollectionAssert.AreEqual(expected.Parent1Loadout.Select(attack => attack.InternalName).ToArray(), actual.Parent1Loadout.Select(attack => attack.InternalName).ToArray());
         CollectionAssert.AreEqual(expected.Parent2Loadout.Select(attack => attack.InternalName).ToArray(), actual.Parent2Loadout.Select(attack => attack.InternalName).ToArray());
         CollectionAssert.AreEqual(expected.InheritedAttacks.Select(attack => attack.InternalName).ToArray(), actual.InheritedAttacks.Select(attack => attack.InternalName).ToArray());
-        CollectionAssert.AreEqual(expected.ChildMasteredAttacks.Select(attack => attack.InternalName).ToArray(), actual.ChildMasteredAttacks.Select(attack => attack.InternalName).ToArray());
+        CollectionAssert.AreEqual(expected.ChildLearnedAttacks.Select(attack => attack.InternalName).ToArray(), actual.ChildLearnedAttacks.Select(attack => attack.InternalName).ToArray());
         Assert.AreEqual(expected.SpecialCakes, actual.SpecialCakes);
         Assert.AreEqual(expected.AttackProbability, actual.AttackProbability);
     }

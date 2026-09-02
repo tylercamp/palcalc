@@ -18,7 +18,7 @@ public class AttackProfileComposerTests
         var profile = Compose([innate], Entry(0), Entry(0), cakes: 0);
 
         Assert.AreEqual(1, profile.Entries.Count);
-        Assert.AreEqual(1, profile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual(1, profile.Entries.Single().LearnedTargetMask);
         Assert.IsFalse(profile.Entries.Single().SelfUsesSpecialCake);
     }
 
@@ -30,7 +30,7 @@ public class AttackProfileComposerTests
 
         CollectionAssert.AreEquivalent(
             new byte[] { 0, 0b01, 0b10 },
-            profile.Entries.Select(entry => entry.MasteredTargetMask).ToArray()
+            profile.Entries.Select(entry => entry.LearnedTargetMask).ToArray()
         );
     }
 
@@ -57,11 +57,11 @@ public class AttackProfileComposerTests
 
         CollectionAssert.AreEquivalent(
             new byte[] { 0, 0b10 },
-            profile.Entries.Select(entry => entry.MasteredTargetMask).ToArray()
+            profile.Entries.Select(entry => entry.LearnedTargetMask).ToArray()
         );
         Assert.IsTrue(Choices([nonInheritable, inheritable], Entry(0b11), Entry(0), cakes: null)
             .Where(choice => choice.Mode == AttackCompositionMode.InheritAll)
-            .All(choice => choice.ChildEntry.MasteredTargetMask == 0b10));
+            .All(choice => choice.ChildEntry.LearnedTargetMask == 0b10));
     }
 
     [TestMethod]
@@ -74,7 +74,7 @@ public class AttackProfileComposerTests
             .ToArray();
 
         Assert.AreEqual(4, choices.Length);
-        Assert.IsTrue(choices.All(choice => (choice.ChildEntry.MasteredTargetMask & 1) != 0));
+        Assert.IsTrue(choices.All(choice => (choice.ChildEntry.LearnedTargetMask & 1) != 0));
         Assert.IsTrue(choices.All(choice => BitCount(choice.Parent1TargetMask) == 3));
     }
 
@@ -85,7 +85,7 @@ public class AttackProfileComposerTests
         var choices = Choices(attacks, Entry(0b011), Entry(0b110), cakes: null);
         var cake = choices.Single(choice => choice.Mode == AttackCompositionMode.InheritAll);
 
-        Assert.AreEqual(0b111, cake.ChildEntry.MasteredTargetMask);
+        Assert.AreEqual(0b111, cake.ChildEntry.LearnedTargetMask);
         Assert.AreEqual(0b011, cake.Parent1TargetMask);
         Assert.AreEqual(0b110, cake.Parent2TargetMask);
     }
@@ -104,10 +104,10 @@ public class AttackProfileComposerTests
             .Single(choice => choice.Mode == AttackCompositionMode.InheritAll);
 
         Assert.AreEqual(4, oneParent.Length);
-        Assert.IsTrue(oneParent.All(choice => BitCount(choice.ChildEntry.MasteredTargetMask) == 3));
+        Assert.IsTrue(oneParent.All(choice => BitCount(choice.ChildEntry.LearnedTargetMask) == 3));
         Assert.AreEqual(1, splitParents.Length);
-        Assert.AreEqual(0b111111, splitParents.Single().ChildEntry.MasteredTargetMask);
-        Assert.AreEqual(0b1111, overlappingParents.ChildEntry.MasteredTargetMask);
+        Assert.AreEqual(0b111111, splitParents.Single().ChildEntry.LearnedTargetMask);
+        Assert.AreEqual(0b1111, overlappingParents.ChildEntry.LearnedTargetMask);
         Assert.IsTrue(BitCount(overlappingParents.Parent1TargetMask) <= 3);
         Assert.IsTrue(BitCount(overlappingParents.Parent2TargetMask) <= 3);
     }
@@ -139,8 +139,8 @@ public class AttackProfileComposerTests
             cakes: null
         );
 
-        Assert.IsTrue(profile.Entries.Any(entry => entry.MasteredTargetMask == 1 && !entry.SelfUsesSpecialCake));
-        Assert.IsTrue(profile.Entries.Any(entry => entry.MasteredTargetMask == 1 && entry.SelfUsesSpecialCake));
+        Assert.IsTrue(profile.Entries.Any(entry => entry.LearnedTargetMask == 1 && !entry.SelfUsesSpecialCake));
+        Assert.IsTrue(profile.Entries.Any(entry => entry.LearnedTargetMask == 1 && entry.SelfUsesSpecialCake));
     }
 
     [TestMethod]

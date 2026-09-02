@@ -8,7 +8,7 @@ namespace PalCalc.Solver.Tests;
 public class AttackInheritanceSolverTests
 {
     [TestMethod]
-    public void Solve_UsesOwnedMasteredAttackWithoutBreeding()
+    public void Solve_UsesOwnedLearnedAttackWithoutBreeding()
     {
         var targetPal = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var requiredAttack = InheritableAttackNotInnateTo(targetPal);
@@ -54,7 +54,7 @@ public class AttackInheritanceSolverTests
             requiredAttack: requiredAttack
         ).OfType<BredPalReference>().First();
 
-        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
+        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildLearnedAttacks.ToList(), requiredAttack);
         Assert.AreEqual(1f, result.MaterializedAttackInheritance.AttackProbability);
         Assert.AreEqual(
             (int)Math.Ceiling(
@@ -108,7 +108,7 @@ public class AttackInheritanceSolverTests
             1f /
             (result.PassivesProbability * result.IVsProbability * 0.5f)
         );
-        var inherited = result.AttackProfile.Entries.Single(entry => entry.MasteredTargetMask == 1);
+        var inherited = result.AttackProfile.Entries.Single(entry => entry.LearnedTargetMask == 1);
 
         Assert.AreEqual(0.5f, result.MaterializedAttackInheritance.AttackProbability);
         Assert.AreEqual(expectedProfileEggs, inherited.SelfBreedings);
@@ -143,8 +143,8 @@ public class AttackInheritanceSolverTests
             .OfType<BredPalReference>()
             .Single(parent => parent.Pal == intermediate);
 
-        CollectionAssert.Contains(bredIntermediate.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
-        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
+        CollectionAssert.Contains(bredIntermediate.MaterializedAttackInheritance.ChildLearnedAttacks.ToList(), requiredAttack);
+        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildLearnedAttacks.ToList(), requiredAttack);
     }
 
     [TestMethod]
@@ -169,7 +169,7 @@ public class AttackInheritanceSolverTests
             requiredAttack: requiredAttack
         ).OfType<BredPalReference>().First();
 
-        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
+        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildLearnedAttacks.ToList(), requiredAttack);
         Assert.AreEqual(1f, result.MaterializedAttackInheritance.AttackProbability);
     }
 
@@ -238,8 +238,8 @@ public class AttackInheritanceSolverTests
             .OfType<BredPalReference>()
             .Single(parent => parent.Pal == intermediate);
 
-        CollectionAssert.DoesNotContain(bredIntermediate.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
-        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildMasteredAttacks.ToList(), requiredAttack);
+        CollectionAssert.DoesNotContain(bredIntermediate.MaterializedAttackInheritance.ChildLearnedAttacks.ToList(), requiredAttack);
+        CollectionAssert.Contains(result.MaterializedAttackInheritance.ChildLearnedAttacks.ToList(), requiredAttack);
     }
 
     [TestMethod]
@@ -276,11 +276,11 @@ public class AttackInheritanceSolverTests
             .OfType<BredPalReference>()
             .Single();
 
-        Assert.AreEqual(0b11, limited.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual(0b11, limited.AttackProfile.Entries.Single().LearnedTargetMask);
         Assert.IsTrue(limited.MaterializedAttackInheritance.SpecialCakes > 1);
         Assert.AreEqual(AttackInheritanceMode.InheritAll, limited.MaterializedAttackInheritance.Mode);
-        Assert.AreEqual(0b11, duplicateTargets.AttackProfile.Entries.Single().MasteredTargetMask);
-        Assert.AreEqual(0b11, unlimited.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual(0b11, duplicateTargets.AttackProfile.Entries.Single().LearnedTargetMask);
+        Assert.AreEqual(0b11, unlimited.AttackProfile.Entries.Single().LearnedTargetMask);
     }
 
     [TestMethod]
@@ -306,7 +306,7 @@ public class AttackInheritanceSolverTests
             .Single();
         var concentrated = SolverTestScenario.Solve(Configure(attacks[..4], [noopAttack]), child.Name, attacks[..4]);
 
-        Assert.AreEqual(0b11_1111, split.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual(0b11_1111, split.AttackProfile.Entries.Single().LearnedTargetMask);
         Assert.AreEqual(0, concentrated.Count);
     }
 
@@ -331,7 +331,7 @@ public class AttackInheritanceSolverTests
             .OfType<BredPalReference>()
             .Single();
 
-        Assert.AreEqual(4, result.MaterializedAttackInheritance.ChildMasteredAttacks.Count);
+        Assert.AreEqual(4, result.MaterializedAttackInheritance.ChildLearnedAttacks.Count);
         Assert.AreEqual(3, result.MaterializedAttackInheritance.InheritedAttacks.Count);
     }
 
@@ -364,10 +364,10 @@ public class AttackInheritanceSolverTests
     private static PalInstance WithAttacks(
         PalInstance pal,
         ActiveSkill equippedAttack,
-        params ActiveSkill[] otherMasteredAttacks
+        params ActiveSkill[] otherLearnedAttacks
     )
     {
-        pal.ActiveSkills = [equippedAttack, .. otherMasteredAttacks];
+        pal.ActiveSkills = [equippedAttack, .. otherLearnedAttacks];
         pal.EquippedActiveSkills = [equippedAttack];
         return pal;
     }

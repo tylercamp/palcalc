@@ -610,7 +610,7 @@ namespace PalCalc.UI
                     inheritanceToken["Parent1Loadout"]?.ToObject<List<ActiveSkill>>(serializer) ?? [],
                     inheritanceToken["Parent2Loadout"]?.ToObject<List<ActiveSkill>>(serializer) ?? [],
                     inheritanceToken["InheritedAttacks"]?.ToObject<List<ActiveSkill>>(serializer) ?? [],
-                    inheritanceToken["ChildMasteredAttacks"]?.ToObject<List<ActiveSkill>>(serializer) ?? [],
+                    inheritanceToken["ChildLearnedAttacks"]?.ToObject<List<ActiveSkill>>(serializer) ?? [],
                     inheritanceToken["SpecialCakes"]?.ToObject<int>() ?? 0,
                     inheritanceToken["AttackProbability"]?.ToObject<float>() ?? 1
                 )
@@ -660,7 +660,7 @@ namespace PalCalc.UI
                         inheritance.Parent1Loadout,
                         inheritance.Parent2Loadout,
                         inheritance.InheritedAttacks,
-                        inheritance.ChildMasteredAttacks,
+                        inheritance.ChildLearnedAttacks,
                         inheritance.SpecialCakes,
                         inheritance.AttackProbability,
                     }

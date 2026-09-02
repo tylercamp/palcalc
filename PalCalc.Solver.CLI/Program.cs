@@ -89,7 +89,7 @@ internal class Program
                 Console.WriteLine(
                     "{0} attacks: {1}; chance: {2:P2}; expected attempts: {3}; step effort: {4}",
                     bred.Pal.Name,
-                    string.Join(", ", bred.MaterializedAttackInheritance?.ChildMasteredAttacks.Select(attack => attack.Name) ?? []),
+                    string.Join(", ", bred.MaterializedAttackInheritance?.ChildLearnedAttacks.Select(attack => attack.Name) ?? []),
                     bred.MaterializedAttackInheritance?.AttackProbability ?? 1,
                     bred.AvgRequiredBreedings,
                     bred.SelfBreedingEffort
@@ -99,7 +99,7 @@ internal class Program
                 "Selected result attacks: {0}",
                 string.Join(", ", match switch
                 {
-                    BredPalReference bred => bred.MaterializedAttackInheritance?.ChildMasteredAttacks.Select(attack => attack.Name) ?? [],
+                    BredPalReference bred => bred.MaterializedAttackInheritance?.ChildLearnedAttacks.Select(attack => attack.Name) ?? [],
                     OwnedPalReference owned => (owned.UnderlyingInstance.ActiveSkills ?? []).Select(attack => attack.Name),
                     _ => [],
                 })

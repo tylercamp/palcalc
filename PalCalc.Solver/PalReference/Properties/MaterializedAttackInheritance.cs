@@ -17,7 +17,7 @@ public sealed record MaterializedAttackInheritance(
     IReadOnlyList<ActiveSkill> Parent1Loadout,
     IReadOnlyList<ActiveSkill> Parent2Loadout,
     IReadOnlyList<ActiveSkill> InheritedAttacks,
-    IReadOnlyList<ActiveSkill> ChildMasteredAttacks,
+    IReadOnlyList<ActiveSkill> ChildLearnedAttacks,
     int SpecialCakes,
     float AttackProbability
 );

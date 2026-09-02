@@ -85,7 +85,7 @@ public class AttackResultMaterializerTests
         Assert.AreEqual(AttackInheritanceMode.Normal, inheritance.Mode);
         Assert.AreEqual(1f, inheritance.AttackProbability);
         Assert.IsTrue(inheritance.InheritedAttacks.Contains(requiredAttack));
-        Assert.IsTrue(inheritance.ChildMasteredAttacks.Contains(requiredAttack));
+        Assert.IsTrue(inheritance.ChildLearnedAttacks.Contains(requiredAttack));
         Assert.IsTrue(inheritance.Parent1Loadout.Count is >= 1 and <= 3);
         Assert.IsTrue(inheritance.Parent2Loadout.Count is >= 1 and <= 3);
         Assert.IsTrue(result.Parent1.AttackProfile.Entries.Count == 1);

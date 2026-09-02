@@ -1,7 +1,17 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
+using System.Collections.Frozen;
 
 namespace PalCalc.Solver.Processing.Attacks;
+
+/// <summary>
+/// The requested-attack state guaranteed for a Pal species, based on
+/// their Lv1 attacks and whether those attacks can be inherited.
+/// </summary>
+internal readonly record struct SpeciesAttackState(
+    byte Level1TargetMask,
+    bool HasNooplLevel1Attack
+);
 
 /// <summary>
 /// Used by a single solver run to map required attacks to a bitfield.
@@ -11,7 +21,7 @@ internal sealed class AttackTargetContext
     private readonly PalDB db;
     private readonly PalSpecifier target;
     private readonly ActiveSkill[] requiredAttacks;
-    private readonly Dictionary<Pal, SpeciesAttackState> speciesStates;
+    private readonly FrozenDictionary<Pal, SpeciesAttackState> speciesStates;
 
     public AttackTargetContext(PalSpecifier target, PalDB db)
     {
@@ -27,7 +37,7 @@ internal sealed class AttackTargetContext
         IsActive = requiredAttacks.Length != 0;
         FullTargetMask = (byte)((1 << requiredAttacks.Length) - 1);
         InheritableTargetMask = MaskOf(requiredAttacks.Where(attack => attack.CanInherit));
-        speciesStates = db.Pals.ToDictionary(pal => pal, CreateSpeciesState);
+        speciesStates = db.Pals.ToFrozenDictionary(pal => pal, CreateSpeciesState);
     }
 
     public bool IsActive { get; }
@@ -84,8 +94,3 @@ internal sealed class AttackTargetContext
         );
     }
 }
-
-internal readonly record struct SpeciesAttackState(
-    byte Level1TargetMask,
-    bool HasNooplLevel1Attack
-);

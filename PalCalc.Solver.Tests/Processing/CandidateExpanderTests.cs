@@ -111,7 +111,7 @@ public class CandidateExpanderTests
             target
         ).Candidates.Single();
 
-        var inherited = candidate.AttackProfile.Entries.Single(entry => entry.MasteredTargetMask == 1);
+        var inherited = candidate.AttackProfile.Entries.Single(entry => entry.LearnedTargetMask == 1);
         Assert.IsTrue(candidate.AttackProfile.Entries.Count > 1);
         Assert.AreEqual(
             (int)Math.Ceiling(1f / (candidate.PassivesProbability * candidate.IVsProbability * 0.5f)),
@@ -124,7 +124,7 @@ public class CandidateExpanderTests
         Assert.IsTrue(inherited.BreedingEffort > candidate.BreedingEffort);
 
         var gendered = (BredPalReference)candidate.WithGuaranteedGender(SolverTestScenario.DB, PalGender.MALE, false);
-        var genderedInherited = gendered.AttackProfile.Entries.Single(entry => entry.MasteredTargetMask == 1);
+        var genderedInherited = gendered.AttackProfile.Entries.Single(entry => entry.LearnedTargetMask == 1);
         Assert.IsTrue(genderedInherited.SelfBreedings > inherited.SelfBreedings);
         Assert.IsTrue(genderedInherited.BreedingEffort > inherited.BreedingEffort);
     }
@@ -144,7 +144,7 @@ public class CandidateExpanderTests
             new PalSpecifier { Pal = child, RequiredAttacks = [targetAttack] }
         ).Candidates.Single();
 
-        Assert.AreEqual(1, candidate.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual(1, candidate.AttackProfile.Entries.Single().LearnedTargetMask);
         Assert.AreEqual(candidate.AvgRequiredBreedings, candidate.AttackProfile.Entries.Single().SelfBreedings);
     }
 
@@ -163,7 +163,7 @@ public class CandidateExpanderTests
 
         Assert.AreEqual(
             candidate.AvgRequiredBreedings,
-            candidate.AttackProfile.Entries.Single(entry => entry.MasteredTargetMask == 1).SelfBreedings
+            candidate.AttackProfile.Entries.Single(entry => entry.LearnedTargetMask == 1).SelfBreedings
         );
     }
 
@@ -183,7 +183,7 @@ public class CandidateExpanderTests
         );
         var candidate = (BredPalReference)expansion.Candidates.Single();
 
-        Assert.AreEqual(0, candidate.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual(0, candidate.AttackProfile.Entries.Single().LearnedTargetMask);
     }
 
     [TestMethod]

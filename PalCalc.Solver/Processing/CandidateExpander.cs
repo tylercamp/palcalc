@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace PalCalc.Solver.Processing
 {
@@ -428,30 +429,50 @@ namespace PalCalc.Solver.Processing
                             for (int i = 0; i < numRandomPassivesNeeded; i++)
                                 newPassives.Add(randomPassivePool.BorrowRaw());
 
-                            // Keep the structural estimate independent of attack probability. Active
-                            // profiles carry the actual effort of each attainable attack realization.
-                            var structuralProbability = probabilityForUpToNumPassives * ivsProbability;
-                            var structuralEffort = TimeSpan.MaxValue;
-                            if (structuralProbability > 0)
+                            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                            void ReturnRandomPassives()
                             {
-                                var structuralBreedings = (int)Math.Ceiling(1.0f / structuralProbability);
-                                structuralEffort = BredPalReferenceEffort.CombineParentEffort(
-                                    settings.GameSettings,
-                                    parent1,
-                                    parent2,
-                                    parent1.BreedingEffort,
-                                    parent2.BreedingEffort
-                                ) + BredPalReferenceEffort.CalculateSelfBreedingEffort(
-                                    settings.GameSettings,
-                                    childPalType,
-                                    parent1.TimeFactor,
-                                    parent2.TimeFactor,
-                                    structuralBreedings
-                                );
+                                // Return borrowed RandomPassiveSkill instances to the pool
+                                for (int i = randomPassivesStart; i < newPassives.Count; i++)
+                                {
+                                    if (newPassives[i] is RandomPassiveSkill rps)
+                                        randomPassivePool.Return(rps);
+                                }
                             }
 
+                            // Slight extra abstraction related to attack inheritance, where multiple variants
+                            // can be attached to each bred pal:
+                            //
+                            // Build up the base effort for this type of pal "structure" (i.e., with these
+                            // passives and these IVs.) The "structural" effort is used for most relative
+                            // calculations, regardless of attack solving (TODO confirm), and the effort
+                            // for individual attack profiles are resolved/materialized once the rest of the
+                            // solver process is done.
+                            var structuralProbability = probabilityForUpToNumPassives * ivsProbability;
+                            if (structuralProbability <= 0)
+                            {
+                                ReturnRandomPassives();
+                                continue;
+                            }
+
+                            // TODO - Is this pre-calc actually valuable? Most of the time, `MaxEffort` is infinite
+                            var structuralBreedings = (int)Math.Ceiling(1.0f / structuralProbability);
+                            var structuralEffort = BredPalReferenceEffort.CombineParentEffort(
+                                settings.GameSettings,
+                                parent1,
+                                parent2,
+                                parent1.BreedingEffort,
+                                parent2.BreedingEffort
+                            ) + BredPalReferenceEffort.CalculateSelfBreedingEffort(
+                                settings.GameSettings,
+                                childPalType,
+                                parent1.TimeFactor,
+                                parent2.TimeFactor,
+                                structuralBreedings
+                            );
+
                             var added = false;
-                            if (structuralProbability > 0 && structuralEffort <= settings.MaxEffort)
+                            if (structuralEffort <= settings.MaxEffort)
                             {
                                 var attackProfile = AttackProfile.Inactive;
                                 var hasValidAttackProfile = !context.AttackTargets.IsActive;
@@ -502,12 +523,7 @@ namespace PalCalc.Solver.Processing
 
                             if (!added)
                             {
-                                // Return borrowed RandomPassiveSkill instances to the pool
-                                for (int i = randomPassivesStart; i < newPassives.Count; i++)
-                                {
-                                    if (newPassives[i] is RandomPassiveSkill rps)
-                                        randomPassivePool.Return(rps);
-                                }
+                                ReturnRandomPassives();
                             }
                         }
 

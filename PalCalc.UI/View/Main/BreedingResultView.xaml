@@ -125,9 +125,9 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <StackPanel Orientation="Horizontal" Visibility="{Binding MasteredAttacksDifferFromEquipped, Converter={StaticResource VVC}}">
+                                <StackPanel Orientation="Horizontal" Visibility="{Binding LearnedAttacksDifferFromEquipped, Converter={StaticResource VVC}}">
                                     <TextBlock Text="{itl:LocalizedText LC_RESULT_MASTERED_ATTACKS}" FontSize="9" Margin="0,1,4,0" />
-                                    <TextBlock Text="{Binding MasteredAttacks.Description.Value}" FontSize="9" Margin="0,1,0,0" />
+                                    <TextBlock Text="{Binding LearnedAttacks.Description.Value}" FontSize="9" Margin="0,1,0,0" />
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Visibility="{Binding InheritedAttacks.Attacks, Converter={StaticResource CVC}}">
                                     <TextBlock Text="{itl:LocalizedText LC_RESULT_INHERITED_ATTACKS}" FontSize="9" Margin="0,1,4,0" />

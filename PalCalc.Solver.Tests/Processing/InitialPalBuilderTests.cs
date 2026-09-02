@@ -126,7 +126,7 @@ public class InitialPalBuilderTests
         var target = Target(laterAttack);
         var wild = NewBuilder(configuredSolver, target).Build(target).OfType<WildPalReference>().First();
 
-        Assert.AreEqual((byte)0, wild.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual((byte)0, wild.AttackProfile.Entries.Single().LearnedTargetMask);
     }
 
 
@@ -145,12 +145,12 @@ public class InitialPalBuilderTests
         Assert.AreEqual(2, seeds.Count);
         CollectionAssert.AreEquivalent(
             new byte[] { 0, 1 },
-            seeds.Select(seed => seed.AttackProfile.Entries.Single().MasteredTargetMask).ToArray()
+            seeds.Select(seed => seed.AttackProfile.Entries.Single().LearnedTargetMask).ToArray()
         );
     }
 
     [TestMethod]
-    public void Build_OwnedProfileUsesAllMasteredAttacksAndNeutralCapability()
+    public void Build_OwnedProfileUsesAllLearnedAttacksAndNeutralCapability()
     {
         var pal = "Katress".ToPal(SolverTestScenario.DB);
         var inheritable = InheritableAttackNotInnateTo(pal);
@@ -163,7 +163,7 @@ public class InitialPalBuilderTests
         var seed = Build([owned], target).OfType<OwnedPalReference>().Single();
         var context = new AttackTargetContext(target, SolverTestScenario.DB);
 
-        Assert.AreEqual(context.FullTargetMask, seed.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual(context.FullTargetMask, seed.AttackProfile.Entries.Single().LearnedTargetMask);
         Assert.IsTrue(seed.AttackProfile.HasNoopAttack);
         Assert.AreEqual(0, context.MaskOf([nonInheritable]) & context.InheritableTargetMask);
     }
@@ -186,7 +186,7 @@ public class InitialPalBuilderTests
 
         Assert.AreEqual(
             context.MaskOf(pal.Level1ActiveSkills(SolverTestScenario.DB)),
-            wild.AttackProfile.Entries.Single().MasteredTargetMask
+            wild.AttackProfile.Entries.Single().LearnedTargetMask
         );
     }
 
@@ -205,7 +205,7 @@ public class InitialPalBuilderTests
 
         Assert.AreEqual(2, seeds.Count);
         Assert.IsFalse(seeds.Any(seed => seed is CompositeOwnedPalReference));
-        Assert.AreEqual(2, seeds.Select(seed => seed.AttackProfile.Entries.Single().MasteredTargetMask).Distinct().Count());
+        Assert.AreEqual(2, seeds.Select(seed => seed.AttackProfile.Entries.Single().LearnedTargetMask).Distinct().Count());
     }
 
     [TestMethod]
@@ -221,7 +221,7 @@ public class InitialPalBuilderTests
         var composite = Build([male, female], target).Single() as CompositeOwnedPalReference;
 
         Assert.IsNotNull(composite);
-        Assert.AreEqual((byte)1, composite.AttackProfile.Entries.Single().MasteredTargetMask);
+        Assert.AreEqual((byte)1, composite.AttackProfile.Entries.Single().LearnedTargetMask);
     }
 
     [TestMethod]
@@ -252,7 +252,7 @@ public class InitialPalBuilderTests
             bred.WithGuaranteedGender(SolverTestScenario.DB, PalGender.FEMALE, true),
         })
         {
-            Assert.AreEqual((byte)1, reference.AttackProfile.Entries.Single().MasteredTargetMask);
+            Assert.AreEqual((byte)1, reference.AttackProfile.Entries.Single().LearnedTargetMask);
             Assert.IsTrue(reference.AttackProfile.HasNoopAttack);
         }
     }

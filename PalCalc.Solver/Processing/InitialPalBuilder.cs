@@ -52,7 +52,7 @@ internal sealed class InitialPalBuilder(
             )
             .Select(p =>
             {
-                var masteredAttacks = p.ActiveSkills ?? [];
+                var learnedAttacks = p.ActiveSkills ?? [];
                 return new OwnedPalReference(
                     instance: p,
                     effectivePassives: p.PassiveSkills.ToDedicatedPassives(target.DesiredPassives),
@@ -64,8 +64,8 @@ internal sealed class InitialPalBuilder(
                     },
                     attackProfile: attackTargets.IsActive
                         ? new(
-                            attackTargets.IsActive && masteredAttacks.Any(attack => !attack.CanInherit),
-                            new AttackProfileEntry(attackTargets.MaskOf(masteredAttacks), 0, TimeSpan.Zero, 0, false)
+                            attackTargets.IsActive && learnedAttacks.Any(attack => !attack.CanInherit),
+                            new AttackProfileEntry(attackTargets.MaskOf(learnedAttacks), 0, TimeSpan.Zero, 0, false)
                         )
                         : AttackProfile.Inactive
                 );
@@ -150,15 +150,14 @@ internal sealed class InitialPalBuilder(
                                 guaranteedPassives,
                                 numRandomPassives,
                                 mechanics,
+                                // Assume wild pals only have their Lv1 attack(s)
+                                // TODO: Eventually reference wild pal level ranges
                                 attackProfile: attackTargets.IsActive
                                     ? new(
                                         attackTargets.IsActive && attackState.HasNooplLevel1Attack,
-                                        new AttackProfileEntry(
-                                        attackState.Level1TargetMask,
-                                        0,
-                                        mechanics.TimeToCatch(p) / mechanics.PassivesWildAtMostN[numRandomPassives],
-                                        0,
-                                        false
+                                        AttackProfileEntry.WildPalLevel1Attack(
+                                            attackMask: attackState.Level1TargetMask,
+                                            captureEffort: mechanics.TimeToCatch(p) / mechanics.PassivesWildAtMostN[numRandomPassives]
                                         )
                                     )
                                     : AttackProfile.Inactive

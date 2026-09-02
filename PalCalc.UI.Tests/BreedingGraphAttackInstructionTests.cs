@@ -28,7 +28,7 @@ public class BreedingGraphAttackInstructionTests
 
         AssertAttacks(result.MaterializedAttackInheritance!.Parent1Loadout, parent1.EquippedAttacks);
         AssertAttacks(result.MaterializedAttackInheritance.Parent2Loadout, parent2.EquippedAttacks);
-        AssertAttacks(result.MaterializedAttackInheritance.ChildMasteredAttacks, child.MasteredAttacks);
+        AssertAttacks(result.MaterializedAttackInheritance.ChildLearnedAttacks, child.LearnedAttacks);
         AssertAttacks(result.MaterializedAttackInheritance.InheritedAttacks, child.InheritedAttacks);
         Assert.AreEqual(7, child.SpecialCakes);
         Assert.IsTrue(child.UsesSpecialCake);
@@ -47,7 +47,7 @@ public class BreedingGraphAttackInstructionTests
         var display = new BreedingResultViewModel(null, new GameSettings(), outer, [attacks[0], attacks[2]]);
         var intermediate = display.Graph.Nodes.OfType<StandardBreedingTreeNodeViewModel>().Single(node => node.Value.PalRef == inner);
 
-        AssertAttacks(inner.MaterializedAttackInheritance!.ChildMasteredAttacks, intermediate.MasteredAttacks);
+        AssertAttacks(inner.MaterializedAttackInheritance!.ChildLearnedAttacks, intermediate.LearnedAttacks);
         AssertAttacks(
             ReferenceEquals(outer.Parent1, inner)
                 ? outer.MaterializedAttackInheritance!.Parent1Loadout
@@ -79,7 +79,7 @@ public class BreedingGraphAttackInstructionTests
     }
 
     [TestMethod]
-    public void WildPalDisplaysItsLevelOneMasteredAttacks()
+    public void WildPalDisplaysItsLevelOneLearnedAttacks()
     {
         var db = PalDB.LoadEmbedded();
         var pal = db.Pals.First(candidate => candidate.Level1AttackInternalIds.Count > 0);
@@ -93,7 +93,7 @@ public class BreedingGraphAttackInstructionTests
         var graph = BreedingGraph.FromPalReference(null, new GameSettings(), wild, []);
         var node = (StandardBreedingTreeNodeViewModel)graph.NodeFor(graph.Tree.Root);
 
-        AssertAttacks(pal.Level1ActiveSkills(db), node.MasteredAttacks);
+        AssertAttacks(pal.Level1ActiveSkills(db), node.LearnedAttacks);
     }
 
     [TestMethod]

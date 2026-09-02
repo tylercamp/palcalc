@@ -93,7 +93,7 @@ internal sealed class ResultPostProcessor(
     private AttackProfileEntry? SelectRootEntry(IPalReference reference) =>
         reference.AttackProfile.Entries
             .Where(entry =>
-                (entry.MasteredTargetMask & attackTargets.FullTargetMask) == attackTargets.FullTargetMask &&
+                (entry.LearnedTargetMask & attackTargets.FullTargetMask) == attackTargets.FullTargetMask &&
                 entry.BreedingEffort <= settings.MaxEffort &&
                 (settings.MaxSpecialCakes is not int maxCakes || entry.TotalSpecialCakes <= maxCakes)
             )
@@ -101,7 +101,7 @@ internal sealed class ResultPostProcessor(
             .ThenBy(entry => entry.TotalSpecialCakes)
             .ThenBy(entry => entry.SelfBreedings)
             .ThenBy(entry => entry.SelfUsesSpecialCake)
-            .ThenBy(entry => entry.MasteredTargetMask)
+            .ThenBy(entry => entry.LearnedTargetMask)
             .Cast<AttackProfileEntry?>()
             .FirstOrDefault();
 

@@ -15,8 +15,8 @@ internal enum AttackCompositionMode
 }
 
 /// <summary>
-/// A transient, fully-selected inheritance outcome. The solver only retains the final possible properties for
-/// each child; once complete, this data can be used to reconstruct the appropriate parent loadouts.
+/// <para>>A fully selected inheritance outcome used to reconstruct a full attack profile.</para
+/// <para>The search process gathers possibilities for each child, and this is used to select a specific outcome.</para>
 /// </summary>
 internal readonly record struct AttackCompositionChoice(
     AttackProfileEntry Parent1Entry,
@@ -29,7 +29,8 @@ internal readonly record struct AttackCompositionChoice(
 );
 
 /// <summary>
-/// Composes the attainable required-attack profiles for one breeding result.
+/// <para>Used to combine the attack profiles of two parents into a single, merged attack profile.</para>
+/// <para>A single profile can cover a range of possible outcomes (profile "entries".)</para>
 /// </summary>
 internal sealed class AttackProfileComposer(
     AttackTargetContext targets,
@@ -39,6 +40,11 @@ internal sealed class AttackProfileComposer(
 {
     private readonly LocalListPool<AttackProfileEntry> entryListPool = poolFactory.GetListPool<AttackProfileEntry>();
 
+    /// <summary>
+    /// Calculates a combined attack profile from the given parents. Profile entries which require multiple attempts
+    /// (e.g. 50/50 odds instead of 100%) will include other mechanics which also require multiple attempts
+    /// for accurate weighting (e.g. passive and IV probabilities.)
+    /// </summary>
     public AttackProfile Compose(
         Pal child,
         IPalReference parent1,
@@ -105,8 +111,8 @@ internal sealed class AttackProfileComposer(
                 usesSpecialCake: false
             );
 
-            var parent1Mask = (byte)(parent1Entry.MasteredTargetMask & targets.InheritableTargetMask);
-            var parent2Mask = (byte)(parent2Entry.MasteredTargetMask & targets.InheritableTargetMask);
+            var parent1Mask = (byte)(parent1Entry.LearnedTargetMask & targets.InheritableTargetMask);
+            var parent2Mask = (byte)(parent2Entry.LearnedTargetMask & targets.InheritableTargetMask);
             var normalTargets = (byte)((parent1Mask | parent2Mask) & ~innateMask);
             for (var bit = (byte)1; bit != 0 && bit <= targets.FullTargetMask; bit <<= 1)
             {
@@ -191,6 +197,12 @@ internal sealed class AttackProfileComposer(
         }
     }
 
+    /// <summary>
+    /// Emits the inclusion-maximal attack unions attainable with at most three
+    /// attacks equipped by each parent. One legal parent-loadout witness is
+    /// retained for every union so overlapping parent masks cannot reconstruct
+    /// an impossible four-or-more-attack loadout later.
+    /// </summary>
     private static void EnumerateCakeMasks(
         byte parent1Mask,
         byte parent2Mask,

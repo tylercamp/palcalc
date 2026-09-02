@@ -3,14 +3,40 @@ using PalCalc.Solver.PalReference;
 
 namespace PalCalc.Solver.PalReference.Properties;
 
+/// <summary>
+///     Describes a set of desired attacks that can be obtained by a Pal, and the
+///     various costs involved in obtaining this result.
+/// </summary>
+/// 
+/// <param name="LearnedTargetMask">
+///     A bit-mask describing which desired attacks are covered by this entry. The structure
+///     of this mask is decided by the `AttackTargetContext` for the current solver run.
+/// </param>
+/// 
+/// <param name="TotalSpecialCakes">
+///     The total number of Special Cakes needed throughout the complete breeding tree for this result.
+/// </param>
+/// 
+/// <param name="BreedingEffort">
+///     The total breeding effort to produce the complete breeding tree for this result.
+/// </param>
+/// 
+/// <param name="SelfBreedings">
+///     The number of breeding attempts needed at the final step to produce this Pal.
+/// </param>
+/// 
+/// <param name="SelfUsesSpecialCake">
+///     Whether the final breeding step requires the use of Special Cakes.
+/// </param>
 public readonly record struct AttackProfileEntry(
-    byte MasteredTargetMask,
+    byte LearnedTargetMask,
     int TotalSpecialCakes,
     TimeSpan BreedingEffort,
     int SelfBreedings,
     bool SelfUsesSpecialCake
 )
 {
+    // TODO - adjust param order, add comments
     internal AttackProfileEntry WithGuaranteedGender(
         GameSettings gameSettings,
         Pal pal,
@@ -38,8 +64,39 @@ public readonly record struct AttackProfileEntry(
             TotalSpecialCakes = TotalSpecialCakes + (SelfUsesSpecialCake ? adjustedBreedings - SelfBreedings : 0),
         };
     }
+
+    public static AttackProfileEntry WildPalLevel1Attack(byte attackMask, TimeSpan captureEffort) =>
+        new(
+            LearnedTargetMask: attackMask,
+            TotalSpecialCakes: 0,
+            BreedingEffort: captureEffort,
+            SelfBreedings: 0,
+            SelfUsesSpecialCake: false
+        );
 }
 
+/// <summary>
+/// <para>
+///     Manages a distinct list of possible attack outcomes for a given Pal. As children
+///     are bred, the profiles of the parents are accumulated to track available paths.
+/// </para>
+/// <para>
+///     These attack outcomes are exclusive; i.e., though the profile
+///     entries may cover all desired attacks, it might not be possible for the child Pal
+///     to actually obtain all the attacks at once. This is affected by Palworld's
+///     limit of 3 attacks per parent, and the specific distribution of attacks among
+///     this Pal's parents.
+/// </para>
+/// <para>
+///     These attack outcomes are distinct; i.e., if the resource-cost and opportunity-cost
+///     of two outcomes are the same, and one outcome is strictly better (covers more attacks),
+///     the two will be merged to simplify the list.
+/// </para>
+/// <para>
+///     The final, exact choice of attacks is decided in the final solver steps, using
+///     `AttackResultMaterializer` and `MaterializedAttackInheritance`.
+/// </para>
+/// </summary>
 public readonly struct AttackProfile : IEquatable<AttackProfile>
 {
     private readonly AttackProfileEntry[] entries;
@@ -66,6 +123,9 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
     {
     }
 
+    /// <summary>
+    /// The attack profile used when attack solving is disabled for the current run.
+    /// </summary>
     public static AttackProfile Inactive { get; } = new(true);
 
     /// <summary>
@@ -86,7 +146,7 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
     public IReadOnlyList<AttackProfileEntry> Entries => entries ?? Array.Empty<AttackProfileEntry>();
 
     public bool Contains(byte requiredMask) => entries?.Any(entry =>
-        (entry.MasteredTargetMask & requiredMask) == requiredMask
+        (entry.LearnedTargetMask & requiredMask) == requiredMask
     ) == true;
 
     public bool Equals(AttackProfile other)

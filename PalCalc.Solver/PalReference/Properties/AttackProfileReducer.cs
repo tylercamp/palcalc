@@ -7,7 +7,7 @@ internal static class AttackProfileReducer
     /// by satisfying `provider`, we also satisfy `required`.
     /// </summary>
     public static bool Covers(in AttackProfileEntry provider, in AttackProfileEntry required) =>
-        (provider.MasteredTargetMask & required.MasteredTargetMask) == required.MasteredTargetMask &&
+        (provider.LearnedTargetMask & required.LearnedTargetMask) == required.LearnedTargetMask &&
         provider.TotalSpecialCakes <= required.TotalSpecialCakes &&
         provider.BreedingEffort <= required.BreedingEffort &&
         provider.SelfBreedings <= required.SelfBreedings &&
