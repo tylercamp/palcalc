@@ -103,6 +103,9 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
     // bounds every profile to the 64 possible values of a byte-sized target mask.
     internal const int TargetMaskCount = 1 << PalSpecifier.MaxRequiredAttacks;
 
+    private static readonly ulong[] StructurallyCoveredMasksByEntry =
+        BuildStructurallyCoveredMasksByEntry();
+
     private readonly AttackProfileEntry[] entries;
     private readonly int hash;
 
@@ -110,6 +113,8 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
     {
         entries = null;
         HasNoopAttack = false;
+        EntryTargetMasks = 0;
+        StructurallyCoveredTargetMasks = 0;
         hash = 0;
     }
 
@@ -123,7 +128,12 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
             hash |= 0b10;
         
         foreach (var entry in entries)
+        {
+            EntryTargetMasks |= 1UL << entry.LearnedTargetMask;
+            StructurallyCoveredTargetMasks |=
+                StructurallyCoveredMasksByEntry[entry.LearnedTargetMask];
             hash = HashCode.Combine(hash, entry);
+        }
     }
 
     public AttackProfile(params AttackProfileEntry[] entries)
@@ -155,6 +165,13 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
     /// (This is only relevant for single-attack inheritance, i.e., no special cakes.)
     /// </summary>
     public bool HasNoopAttack { get; }
+
+    // Bit N records whether this profile contains an entry for exact target mask N.
+    internal ulong EntryTargetMasks { get; }
+
+    // Bit N records whether any entry is a superset of target mask N. This is a
+    // cost-agnostic rejection guard; passing it does not imply actual coverage.
+    internal ulong StructurallyCoveredTargetMasks { get; }
 
     /// <summary>
     /// WARNING: Provided for convenience, actual solver code should use `EntriesSpan`
@@ -211,5 +228,18 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
             resultEntries[i] = entries[i].WithGuaranteedGender(gameSettings, pal, parent1TimeFactor, parent2TimeFactor, db, gender, useReverser);
 
         return new AttackProfile(HasNoopAttack, resultEntries);
+    }
+
+    private static ulong[] BuildStructurallyCoveredMasksByEntry()
+    {
+        var result = new ulong[TargetMaskCount];
+        for (var entryMask = 0; entryMask < TargetMaskCount; entryMask++)
+        for (var requiredMask = 0; requiredMask < TargetMaskCount; requiredMask++)
+        {
+            if ((entryMask & requiredMask) == requiredMask)
+                result[entryMask] |= 1UL << requiredMask;
+        }
+
+        return result;
     }
 }

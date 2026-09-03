@@ -80,6 +80,12 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     private const int NoopSlotOffset = AttackProfile.TargetMaskCount;
     private const int AttackSlotCount = NoopSlotOffset * 2;
     private const int TargetMaskBits = NoopSlotOffset - 1;
+    private const int ExhaustiveProviderMetricsThreshold = 32;
+    private const int ProviderSampleRate = 64;
+    private const int ProviderSampleMask = ProviderSampleRate - 1;
+
+    [ThreadStatic]
+    private static int providerSampleCounter;
 
     private static readonly ILogger logger = Log.ForContext<DefaultCandidateSelectionPolicy>();
 
@@ -93,12 +99,18 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     private long profileEntries;
     private long championSlots;
     private long addedAttackProviders;
+    private long providerSamples;
+    private long sampledDirectExactRetainedCandidates;
+    private long sampledCurrentRetainedCandidates;
     private int maxInputCandidates;
     private int maxPreferredCandidates;
     private int maxRetainedCandidates;
     private int maxProfileEntries;
     private int maxCandidateProfileEntries;
     private int maxChampionSlots;
+    private int maxSampledCurrentRetainedCandidates;
+    private int maxSampledDirectExactRetainedCandidates;
+    private int maxSampledDirectExactIncrease;
 
     public DefaultCandidateSelectionPolicy(
         ResultPruningPolicy resultPruning,
@@ -217,6 +229,12 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         // supersets cover those slots. This can intentionally exceed that limit.
         var exactChampions = new AttackCapability[AttackSlotCount];
         Span<bool> occupied = stackalloc bool[AttackSlotCount];
+        var sampleProviderCounts =
+            distinctCandidates.Count >= ExhaustiveProviderMetricsThreshold ||
+            ((++providerSampleCounter & ProviderSampleMask) == 0);
+        HashSet<IPalReference> directExactRetainedSample = sampleProviderCounts
+            ? new(preferred)
+            : null;
         var entryCount = 0;
         var maxCandidateEntries = 0;
         foreach (var candidate in distinctCandidates)
@@ -242,6 +260,8 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         {
             if (!occupied[requiredSlot])
                 continue;
+
+            directExactRetainedSample?.Add(exactChampions[requiredSlot].Candidate);
 
             AttackCapability best = default;
             var found = false;
@@ -280,7 +300,9 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             entryCount,
             maxCandidateEntries,
             selectedSlots,
-            providers.Count - preferredCount
+            providers.Count - preferredCount,
+            directExactRetainedSample?.Count,
+            sampleProviderCounts ? providers.Count : null
         );
 
         return providers;
@@ -324,6 +346,10 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             return true;
 
         if (!provider.HasNoopAttack && required.HasNoopAttack)
+            return false;
+
+        if ((provider.StructurallyCoveredTargetMasks & required.EntryTargetMasks) !=
+            required.EntryTargetMasks)
             return false;
 
         // Unfolded `.All(CoversAttackEntry)`
@@ -376,7 +402,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             return;
 
         logger.Debug(
-            "Attack selection profile: calls={Calls}, candidates={InputCandidates}->{PreferredCandidates}->{RetainedCandidates}, profileEntries={ProfileEntries}, championSlots={ChampionSlots}, addedAttackProviders={AddedAttackProviders}, maxGroup={MaxInputCandidates}->{MaxPreferredCandidates}->{MaxRetainedCandidates}, maxGroupProfileEntries={MaxProfileEntries}, maxCandidateProfileEntries={MaxCandidateProfileEntries}, maxChampionSlots={MaxChampionSlots}",
+            "Attack selection profile: calls={Calls}, candidates={InputCandidates}->{PreferredCandidates}->{RetainedCandidates}, profileEntries={ProfileEntries}, championSlots={ChampionSlots}, addedAttackProviders={AddedAttackProviders}, retainedIfExact=all>={ExhaustiveThreshold}+1/{ProviderSampleRate}small:{ProviderSamples}:{CurrentRetained}->{DirectExactRetained}, maxRetainedIfExact={MaxCurrentRetained}->{MaxDirectExactRetained}(+{MaxDirectExactIncrease}), maxGroup={MaxInputCandidates}->{MaxPreferredCandidates}->{MaxRetainedCandidates}, maxGroupProfileEntries={MaxProfileEntries}, maxCandidateProfileEntries={MaxCandidateProfileEntries}, maxChampionSlots={MaxChampionSlots}",
             calls,
             Interlocked.Read(ref inputCandidates),
             Interlocked.Read(ref preferredCandidates),
@@ -384,6 +410,14 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             Interlocked.Read(ref profileEntries),
             Interlocked.Read(ref championSlots),
             Interlocked.Read(ref addedAttackProviders),
+            ExhaustiveProviderMetricsThreshold,
+            ProviderSampleRate,
+            Interlocked.Read(ref providerSamples),
+            Interlocked.Read(ref sampledCurrentRetainedCandidates),
+            Interlocked.Read(ref sampledDirectExactRetainedCandidates),
+            Volatile.Read(ref maxSampledCurrentRetainedCandidates),
+            Volatile.Read(ref maxSampledDirectExactRetainedCandidates),
+            Volatile.Read(ref maxSampledDirectExactIncrease),
             Volatile.Read(ref maxInputCandidates),
             Volatile.Read(ref maxPreferredCandidates),
             Volatile.Read(ref maxRetainedCandidates),
@@ -400,7 +434,9 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         int entryCount,
         int maxCandidateEntries,
         int selectedSlotCount,
-        int addedProviderCount
+        int addedProviderCount,
+        int? directExactRetainedCount,
+        int? currentRetainedCount
     )
     {
         Interlocked.Increment(ref profileSelectionCalls);
@@ -410,6 +446,16 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         Interlocked.Add(ref profileEntries, entryCount);
         Interlocked.Add(ref championSlots, selectedSlotCount);
         Interlocked.Add(ref addedAttackProviders, addedProviderCount);
+        if (directExactRetainedCount is int directExactCount &&
+            currentRetainedCount is int currentCount)
+        {
+            Interlocked.Increment(ref providerSamples);
+            Interlocked.Add(ref sampledDirectExactRetainedCandidates, directExactCount);
+            Interlocked.Add(ref sampledCurrentRetainedCandidates, currentCount);
+            UpdateMax(ref maxSampledCurrentRetainedCandidates, currentCount);
+            UpdateMax(ref maxSampledDirectExactRetainedCandidates, directExactCount);
+            UpdateMax(ref maxSampledDirectExactIncrease, directExactCount - currentCount);
+        }
         UpdateMax(ref maxInputCandidates, inputCount);
         UpdateMax(ref maxPreferredCandidates, preferredCount);
         UpdateMax(ref maxRetainedCandidates, retainedCount);

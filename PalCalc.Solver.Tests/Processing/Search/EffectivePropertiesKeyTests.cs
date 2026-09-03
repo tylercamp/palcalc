@@ -98,6 +98,46 @@ public class EffectivePropertiesKeyTests
     }
 
     [TestMethod]
+    public void FrontierIndex_PromotesOnlyTheBestLikelyDominator()
+    {
+        var pal = "Katress".ToPal(SolverTestScenario.DB);
+        var profile = new AttackProfile(
+            new AttackProfileEntry(1, 0, TimeSpan.Zero, 0, false)
+        );
+        var initial = new TestPalReference(
+            pal, PalGender.MALE, [], new IV_Set(),
+            attackProfile: profile,
+            breedingEffort: TimeSpan.FromMinutes(2)
+        );
+        var broader = new TestPalReference(
+            pal, PalGender.MALE, [], new IV_Set(),
+            attackProfile: new AttackProfile(
+                true,
+                new AttackProfileEntry(3, 0, TimeSpan.Zero, 0, false)
+            ),
+            breedingEffort: TimeSpan.FromMinutes(2)
+        );
+        var fastest = new TestPalReference(
+            pal, PalGender.MALE, [], new IV_Set(),
+            attackProfile: profile,
+            breedingEffort: TimeSpan.FromMinutes(1)
+        );
+        var index = new FrontierIndex(DefaultEffectivePropertiesKeyProvider.Instance);
+
+        index.Add(initial);
+        index.Add(broader);
+        Assert.AreSame(broader, index[broader][0]);
+
+        index.Add(fastest);
+
+        Assert.AreSame(fastest, index[fastest][0]);
+        CollectionAssert.AreEquivalent(
+            new[] { initial, broader, fastest },
+            index[fastest].ToArray()
+        );
+    }
+
+    [TestMethod]
     public void KeyProvider_DistinguishesEveryDefaultGroupingDimension()
     {
         var db = SolverTestScenario.DB;
@@ -179,7 +219,10 @@ public class EffectivePropertiesKeyTests
             PalGender gender,
             IEnumerable<PassiveSkill> effectivePassives,
             IV_Set ivs,
-            int? effectivePassivesHash = null
+            int? effectivePassivesHash = null,
+            AttackProfile attackProfile = default,
+            TimeSpan? breedingEffort = null,
+            int totalCost = 0
         )
         {
             Pal = pal;
@@ -189,6 +232,9 @@ public class EffectivePropertiesKeyTests
                 effectivePassivesHash ??
                 EffectivePassives.SetHash(passive => passive.InternalName);
             IVs = ivs;
+            AttackProfile = attackProfile;
+            BreedingEffort = breedingEffort ?? TimeSpan.Zero;
+            TotalCost = totalCost;
         }
 
         public Pal Pal { get; }
@@ -196,13 +242,13 @@ public class EffectivePropertiesKeyTests
         public int EffectivePassivesHash { get; }
         public IV_Set IVs { get; }
         public List<PassiveSkill> ActualPassives => EffectivePassives;
-        public AttackProfile AttackProfile => AttackProfile.Inactive;
+        public AttackProfile AttackProfile { get; }
         public PalGender Gender { get; }
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;
-        public TimeSpan BreedingEffort => TimeSpan.Zero;
+        public TimeSpan BreedingEffort { get; }
         public TimeSpan SelfBreedingEffort => TimeSpan.Zero;
-        public int TotalCost => 0;
+        public int TotalCost { get; }
         public int NumTotalBreedingSteps => 0;
         public int NumTotalEggs => 0;
         public int NumTotalWildPals => 0;

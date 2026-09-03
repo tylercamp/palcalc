@@ -178,6 +178,25 @@ public class AttackProfileTests
         Assert.IsTrue(active.Contains(0));
     }
 
+    [TestMethod]
+    public void Profile_CachesExactAndStructurallyCoveredTargetMasks()
+    {
+        var profile = new AttackProfile(
+            Entry(mask: 0b000110, cakes: 0, effort: 0, breedings: 0),
+            Entry(mask: 0b001000, cakes: 0, effort: 0, breedings: 0)
+        );
+
+        Assert.AreEqual((1UL << 0b000110) | (1UL << 0b001000), profile.EntryTargetMasks);
+        Assert.AreEqual(
+            (1UL << 0b000000) |
+            (1UL << 0b000010) |
+            (1UL << 0b000100) |
+            (1UL << 0b000110) |
+            (1UL << 0b001000),
+            profile.StructurallyCoveredTargetMasks
+        );
+    }
+
     private static AttackProfileEntry Entry(byte mask, int cakes, int effort, int breedings, bool usesCake = false) =>
         new(mask, cakes, TimeSpan.FromMinutes(effort), breedings, usesCake);
 

@@ -28,6 +28,9 @@ internal sealed class AttackSolverDiagnostics
     private long sampledBaselinePrunedAttempts;
     private long sampledNormalPrunedAttempts;
     private long sampledCakePrunedAttempts;
+    private long maxEffortFallbacks;
+    private long maxEffortFallbackSuccesses;
+    private long maxEffortFallbackPairs;
     private long emittedEntries;
     private long retainedEntries;
     private int maxParentEntryPairs;
@@ -51,6 +54,9 @@ internal sealed class AttackSolverDiagnostics
         long baselinePrunedAttemptCount,
         long normalPrunedAttemptCount,
         long cakePrunedAttemptCount,
+        long maxEffortFallbackCount,
+        long maxEffortFallbackSuccessCount,
+        long maxEffortFallbackPairCount,
         int emittedEntryCount,
         int retainedEntryCount
     )
@@ -71,6 +77,9 @@ internal sealed class AttackSolverDiagnostics
             Interlocked.Add(ref sampledNormalPrunedAttempts, normalPrunedAttemptCount);
             Interlocked.Add(ref sampledCakePrunedAttempts, cakePrunedAttemptCount);
         }
+        Interlocked.Add(ref maxEffortFallbacks, maxEffortFallbackCount);
+        Interlocked.Add(ref maxEffortFallbackSuccesses, maxEffortFallbackSuccessCount);
+        Interlocked.Add(ref maxEffortFallbackPairs, maxEffortFallbackPairCount);
         Interlocked.Add(ref emittedEntries, emittedEntryCount);
         Interlocked.Add(ref retainedEntries, retainedEntryCount);
         UpdateMax(
@@ -109,6 +118,9 @@ internal sealed class AttackSolverDiagnostics
             Interlocked.Read(ref sampledBaselinePrunedAttempts),
             Interlocked.Read(ref sampledNormalPrunedAttempts),
             Interlocked.Read(ref sampledCakePrunedAttempts),
+            Interlocked.Read(ref maxEffortFallbacks),
+            Interlocked.Read(ref maxEffortFallbackSuccesses),
+            Interlocked.Read(ref maxEffortFallbackPairs),
             Interlocked.Read(ref emittedEntries),
             Interlocked.Read(ref retainedEntries)
         );
@@ -118,7 +130,7 @@ internal sealed class AttackSolverDiagnostics
             return;
 
         logger.Debug(
-            "Attack composition step profile: step={Step}, calls={Calls}, parentEntryPairs={ParentEntryPairs}, attempts={BaselineAttempts}+{NormalAttempts}+{CakeAttempts}, cakeFirstPruned={CakeFirstPruned}, pruneSample=1/{SampleRate}:{PruneSamples}:{BaselinePruned}+{NormalPruned}+{CakePruned}, entries={EmittedEntries}->{RetainedEntries}",
+            "Attack composition step profile: step={Step}, calls={Calls}, parentEntryPairs={ParentEntryPairs}, attempts={BaselineAttempts}+{NormalAttempts}+{CakeAttempts}, cakeFirstPruned={CakeFirstPruned}, pruneSample=1/{SampleRate}:{PruneSamples}:{BaselinePruned}+{NormalPruned}+{CakePruned}, maxEffortFallback={Fallbacks}->{FallbackSuccesses}:{FallbackPairs}, entries={EmittedEntries}->{RetainedEntries}",
             step,
             delta.Calls,
             delta.ParentEntryPairs,
@@ -131,6 +143,9 @@ internal sealed class AttackSolverDiagnostics
             delta.SampledBaselinePrunedAttempts,
             delta.SampledNormalPrunedAttempts,
             delta.SampledCakePrunedAttempts,
+            delta.MaxEffortFallbacks,
+            delta.MaxEffortFallbackSuccesses,
+            delta.MaxEffortFallbackPairs,
             delta.EmittedEntries,
             delta.RetainedEntries
         );
@@ -143,7 +158,7 @@ internal sealed class AttackSolverDiagnostics
             return;
 
         logger.Debug(
-            "Attack composition profile: calls={Calls}, parentEntryPairs={ParentEntryPairs}, attempts={BaselineAttempts}+{NormalAttempts}+{CakeAttempts}, cakeFirstPruned={CakeFirstPruned}, pruneSample=1/{SampleRate}:{PruneSamples}:{BaselinePruned}+{NormalPruned}+{CakePruned}, entries={EmittedEntries}->{RetainedEntries}, maxParentEntryPairs={MaxParentEntryPairs}, maxEntries={MaxEmittedEntries}->{MaxRetainedEntries}",
+            "Attack composition profile: calls={Calls}, parentEntryPairs={ParentEntryPairs}, attempts={BaselineAttempts}+{NormalAttempts}+{CakeAttempts}, cakeFirstPruned={CakeFirstPruned}, pruneSample=1/{SampleRate}:{PruneSamples}:{BaselinePruned}+{NormalPruned}+{CakePruned}, maxEffortFallback={Fallbacks}->{FallbackSuccesses}:{FallbackPairs}, entries={EmittedEntries}->{RetainedEntries}, maxParentEntryPairs={MaxParentEntryPairs}, maxEntries={MaxEmittedEntries}->{MaxRetainedEntries}",
             calls,
             Interlocked.Read(ref parentEntryPairs),
             Interlocked.Read(ref baselineAttempts),
@@ -155,6 +170,9 @@ internal sealed class AttackSolverDiagnostics
             Interlocked.Read(ref sampledBaselinePrunedAttempts),
             Interlocked.Read(ref sampledNormalPrunedAttempts),
             Interlocked.Read(ref sampledCakePrunedAttempts),
+            Interlocked.Read(ref maxEffortFallbacks),
+            Interlocked.Read(ref maxEffortFallbackSuccesses),
+            Interlocked.Read(ref maxEffortFallbackPairs),
             Interlocked.Read(ref emittedEntries),
             Interlocked.Read(ref retainedEntries),
             Volatile.Read(ref maxParentEntryPairs),
@@ -198,6 +216,9 @@ internal sealed class AttackSolverDiagnostics
         long SampledBaselinePrunedAttempts,
         long SampledNormalPrunedAttempts,
         long SampledCakePrunedAttempts,
+        long MaxEffortFallbacks,
+        long MaxEffortFallbackSuccesses,
+        long MaxEffortFallbackPairs,
         long EmittedEntries,
         long RetainedEntries
     )
@@ -216,6 +237,9 @@ internal sealed class AttackSolverDiagnostics
             left.SampledBaselinePrunedAttempts - right.SampledBaselinePrunedAttempts,
             left.SampledNormalPrunedAttempts - right.SampledNormalPrunedAttempts,
             left.SampledCakePrunedAttempts - right.SampledCakePrunedAttempts,
+            left.MaxEffortFallbacks - right.MaxEffortFallbacks,
+            left.MaxEffortFallbackSuccesses - right.MaxEffortFallbackSuccesses,
+            left.MaxEffortFallbackPairs - right.MaxEffortFallbackPairs,
             left.EmittedEntries - right.EmittedEntries,
             left.RetainedEntries - right.RetainedEntries
         );

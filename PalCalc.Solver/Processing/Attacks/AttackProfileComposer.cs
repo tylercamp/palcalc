@@ -96,6 +96,9 @@ internal sealed class AttackProfileComposer(
             metrics.BaselinePrunedAttempts,
             metrics.NormalPrunedAttempts,
             metrics.CakePrunedAttempts,
+            metrics.MaxEffortFallbacks,
+            metrics.MaxEffortFallbackSuccesses,
+            metrics.MaxEffortFallbackPairs,
             accumulator.InputCount,
             result.EntriesSpan.Length
         );
@@ -462,6 +465,7 @@ internal sealed class AttackProfileComposer(
 
             // A cake-heavier parent pair can still be the only pair under MaxEffort.
             // Fall back only for that constrained case; the normal path remains O(1).
+            metrics.MaxEffortFallbacks++;
             var found = false;
             for (var parent1CandidateIndex = 0; parent1CandidateIndex < firstEntries.Length; parent1CandidateIndex++)
             {
@@ -471,6 +475,7 @@ internal sealed class AttackProfileComposer(
 
                 for (var parent2CandidateIndex = 0; parent2CandidateIndex < secondEntries.Length; parent2CandidateIndex++)
                 {
+                    metrics.MaxEffortFallbackPairs++;
                     metrics.ParentEntryPairs++;
                     ref readonly var parent2Candidate = ref secondEntries[parent2CandidateIndex];
                     if (!MatchesCategory(parent2Candidate, parent2Category))
@@ -500,6 +505,8 @@ internal sealed class AttackProfileComposer(
                 }
             }
 
+            if (found)
+                metrics.MaxEffortFallbackSuccesses++;
             return found;
         }
 
@@ -626,6 +633,9 @@ internal sealed class AttackProfileComposer(
         public long BaselinePrunedAttempts;
         public long NormalPrunedAttempts;
         public long CakePrunedAttempts;
+        public long MaxEffortFallbacks;
+        public long MaxEffortFallbackSuccesses;
+        public long MaxEffortFallbackPairs;
     }
 
     /// <summary>
