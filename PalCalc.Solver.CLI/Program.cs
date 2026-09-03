@@ -76,7 +76,14 @@ internal class Program
         {
             Pal = "Broncherry".ToPal(db),
             RequiredPassives = [],
-            RequiredAttacks = [ "Bog Blast".ToActive(db), "Bubble Blast".ToActive(db), "Aqua Gun".ToActive(db), "Dark Ball".ToActive(db) ],
+            RequiredAttacks = [
+                "Bog Blast".ToActive(db),
+                "Bubble Blast".ToActive(db),
+                "Aqua Gun".ToActive(db),
+                "Dark Ball".ToActive(db),
+                "Dragon Cannon".ToActive(db),
+                "Flare Storm".ToActive(db),
+            ],
             //IV_Attack = 90,
             //IV_Defense = 90,
             //IV_HP = 90

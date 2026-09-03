@@ -101,6 +101,18 @@ public class AttackProfileTests
     }
 
     [TestMethod]
+    public void Accumulator_CakePrecheckRejectsOnlyStrictlyHeavierOutcome()
+    {
+        var accumulator = new AttackProfileReducer.Accumulator();
+        accumulator.Reset(hasNoop: false);
+        accumulator.Add(Entry(mask: 1, cakes: 2, effort: 10, breedings: 1));
+
+        Assert.IsFalse(accumulator.CouldImprove(mask: 1, totalSpecialCakes: 3));
+        Assert.IsTrue(accumulator.CouldImprove(mask: 1, totalSpecialCakes: 2));
+        Assert.IsTrue(accumulator.CouldImprove(mask: 2, totalSpecialCakes: 3));
+    }
+
+    [TestMethod]
     public void GenderTransformation_PreservesCoverageFromLowerSelfBreedings()
     {
         var (pal, gender) = GenderedPal();

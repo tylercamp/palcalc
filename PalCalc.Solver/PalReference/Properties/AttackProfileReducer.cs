@@ -54,6 +54,14 @@ internal static class AttackProfileReducer
 
         public void Add(in AttackProfileEntry candidate) => Add(candidate, candidate);
 
+        /// <summary>
+        /// Cheap cake-only rejection used before the caller calculates the
+        /// remaining entry costs. Equal cake counts may still improve effort.
+        /// </summary>
+        public bool CouldImprove(byte mask, int totalSpecialCakes) =>
+            (occupiedMasks & (1UL << mask)) == 0 ||
+            totalSpecialCakes <= champions[mask].TotalSpecialCakes;
+
         public void Add(in AttackProfileEntry value, in AttackProfileEntry comparisonValue)
         {
             inputCount++;

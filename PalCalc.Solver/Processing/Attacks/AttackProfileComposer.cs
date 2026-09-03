@@ -89,6 +89,7 @@ internal sealed class AttackProfileComposer(
             metrics.BaselineAttempts,
             metrics.NormalAttempts,
             metrics.CakeAttempts,
+            metrics.CakeFirstPrunedAttempts,
             accumulator.InputCount,
             result.EntriesSpan.Length
         );
@@ -224,6 +225,33 @@ internal sealed class AttackProfileComposer(
                 if (settings.MaxSpecialCakes is int maxSpecialCakes && totalCakes > maxSpecialCakes)
                     return;
 
+                var ordinaryCouldImprove = entries?.CouldImprove(childMask, totalCakes) != false;
+                var adjustedTotalCakes = totalCakes;
+                var terminalCouldImprove = false;
+                if (terminalGenderEntries is not null)
+                {
+                    var adjustedBreedings = BredPalReferenceEffort.WithGuaranteedGender(
+                        selfBreedings,
+                        child,
+                        settings.DB,
+                        terminalTarget.RequiredGender,
+                        settings.UseGenderReversers
+                    );
+                    adjustedTotalCakes += usesSpecialCake
+                        ? adjustedBreedings - selfBreedings
+                        : 0;
+                    terminalCouldImprove = terminalGenderEntries.CouldImprove(
+                        childMask,
+                        adjustedTotalCakes
+                    );
+                }
+
+                if (entries is not null && !ordinaryCouldImprove && !terminalCouldImprove)
+                {
+                    metrics.CakeFirstPrunedAttempts++;
+                    return;
+                }
+
                 var childEntry = new AttackProfileEntry(
                     childMask,
                     totalCakes,
@@ -236,8 +264,9 @@ internal sealed class AttackProfileComposer(
 
                 if (entries is not null)
                 {
-                    entries.Add(childEntry);
-                    if (terminalGenderEntries is not null)
+                    if (ordinaryCouldImprove)
+                        entries.Add(childEntry);
+                    if (terminalCouldImprove)
                     {
                         var adjusted = childEntry.WithGuaranteedGender(
                             settings.GameSettings,
@@ -292,6 +321,7 @@ internal sealed class AttackProfileComposer(
         public long BaselineAttempts;
         public long NormalAttempts;
         public long CakeAttempts;
+        public long CakeFirstPrunedAttempts;
     }
 
     /// <summary>

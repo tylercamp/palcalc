@@ -15,6 +15,7 @@ internal sealed class AttackSolverDiagnostics
     private long baselineAttempts;
     private long normalAttempts;
     private long cakeAttempts;
+    private long cakeFirstPrunedAttempts;
     private long emittedEntries;
     private long retainedEntries;
     private int maxParentEntryPairs;
@@ -35,6 +36,7 @@ internal sealed class AttackSolverDiagnostics
         long baselineAttemptCount,
         long normalAttemptCount,
         long cakeAttemptCount,
+        long cakeFirstPrunedAttemptCount,
         int emittedEntryCount,
         int retainedEntryCount
     )
@@ -45,6 +47,7 @@ internal sealed class AttackSolverDiagnostics
         Interlocked.Add(ref baselineAttempts, baselineAttemptCount);
         Interlocked.Add(ref normalAttempts, normalAttemptCount);
         Interlocked.Add(ref cakeAttempts, cakeAttemptCount);
+        Interlocked.Add(ref cakeFirstPrunedAttempts, cakeFirstPrunedAttemptCount);
         Interlocked.Add(ref emittedEntries, emittedEntryCount);
         Interlocked.Add(ref retainedEntries, retainedEntryCount);
         UpdateMax(ref maxParentEntryPairs, pairCount > int.MaxValue ? int.MaxValue : (int)pairCount);
@@ -74,12 +77,13 @@ internal sealed class AttackSolverDiagnostics
             return;
 
         logger.Debug(
-            "Attack composition profile: calls={Calls}, parentEntryPairs={ParentEntryPairs}, attempts={BaselineAttempts}+{NormalAttempts}+{CakeAttempts}, entries={EmittedEntries}->{RetainedEntries}, maxParentEntryPairs={MaxParentEntryPairs}, maxEntries={MaxEmittedEntries}->{MaxRetainedEntries}",
+            "Attack composition profile: calls={Calls}, parentEntryPairs={ParentEntryPairs}, attempts={BaselineAttempts}+{NormalAttempts}+{CakeAttempts}, cakeFirstPruned={CakeFirstPrunedAttempts}, entries={EmittedEntries}->{RetainedEntries}, maxParentEntryPairs={MaxParentEntryPairs}, maxEntries={MaxEmittedEntries}->{MaxRetainedEntries}",
             calls,
             Interlocked.Read(ref parentEntryPairs),
             Interlocked.Read(ref baselineAttempts),
             Interlocked.Read(ref normalAttempts),
             Interlocked.Read(ref cakeAttempts),
+            Interlocked.Read(ref cakeFirstPrunedAttempts),
             Interlocked.Read(ref emittedEntries),
             Interlocked.Read(ref retainedEntries),
             Volatile.Read(ref maxParentEntryPairs),
