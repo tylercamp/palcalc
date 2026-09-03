@@ -39,16 +39,14 @@ namespace PalCalc.Solver.Processing
         BreedingMechanics mechanics,
         PalBreedingDB breedingDB,
         AttackTargetContext attackTargets,
-        AttackSolverDiagnostics attackDiagnostics = null,
-        PalSpecifier terminalTarget = null
+        AttackSolverDiagnostics attackDiagnostics = null
     )
     {
         private readonly PalDB db = settings.DB;
         private readonly AttackProfileComposer attackProfileComposer = new(
             attackTargets,
             settings,
-            attackDiagnostics,
-            terminalTarget
+            attackDiagnostics
         );
 
         private readonly LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();

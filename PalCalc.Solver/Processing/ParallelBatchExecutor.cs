@@ -90,8 +90,7 @@ internal sealed class ParallelBatchExecutor(
                     context.Mechanics,
                     context.BreedingDB,
                     expansionContext.AttackTargets,
-                    context.AttackDiagnostics,
-                    expansionContext.Target
+                    context.AttackDiagnostics
                 );
 
                 while (Volatile.Read(ref workerFailure) == null)

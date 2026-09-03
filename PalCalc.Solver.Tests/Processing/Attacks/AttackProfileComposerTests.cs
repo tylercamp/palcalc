@@ -118,29 +118,29 @@ public class AttackProfileComposerTests
     {
         Span<ushort> actualLoadouts = stackalloc ushort[64];
         for (byte parent1Mask = 0; parent1Mask < 64; parent1Mask++)
-        for (byte parent2Mask = 0; parent2Mask < 64; parent2Mask++)
-        {
-            var actualCount = AttackProfileComposer.EnumerateCakeMasks(
-                parent1Mask, parent2Mask, actualLoadouts
-            );
-            var actualMasks = new HashSet<byte>();
-            for (var i = 0; i < actualCount; i++)
+            for (byte parent2Mask = 0; parent2Mask < 64; parent2Mask++)
             {
-                var parent1Loadout = (byte)(actualLoadouts[i] >> 8);
-                var parent2Loadout = (byte)actualLoadouts[i];
-                Assert.AreEqual(0, parent1Loadout & ~parent1Mask);
-                Assert.AreEqual(0, parent2Loadout & ~parent2Mask);
-                Assert.IsTrue(BitOperations.PopCount((uint)parent1Loadout) <= 3);
-                Assert.IsTrue(BitOperations.PopCount((uint)parent2Loadout) <= 3);
-                Assert.IsTrue(actualMasks.Add((byte)(parent1Loadout | parent2Loadout)));
-            }
+                var actualCount = AttackProfileComposer.EnumerateCakeMasks(
+                    parent1Mask, parent2Mask, actualLoadouts
+                );
+                var actualMasks = new HashSet<byte>();
+                for (var i = 0; i < actualCount; i++)
+                {
+                    var parent1Loadout = (byte)(actualLoadouts[i] >> 8);
+                    var parent2Loadout = (byte)actualLoadouts[i];
+                    Assert.AreEqual(0, parent1Loadout & ~parent1Mask);
+                    Assert.AreEqual(0, parent2Loadout & ~parent2Mask);
+                    Assert.IsTrue(BitOperations.PopCount((uint)parent1Loadout) <= 3);
+                    Assert.IsTrue(BitOperations.PopCount((uint)parent2Loadout) <= 3);
+                    Assert.IsTrue(actualMasks.Add((byte)(parent1Loadout | parent2Loadout)));
+                }
 
-            CollectionAssert.AreEquivalent(
-                BruteForceMaximalCakeMasks(parent1Mask, parent2Mask),
-                actualMasks.ToArray(),
-                $"Parent masks: {parent1Mask}, {parent2Mask}"
-            );
-        }
+                CollectionAssert.AreEquivalent(
+                    BruteForceMaximalCakeMasks(parent1Mask, parent2Mask),
+                    actualMasks.ToArray(),
+                    $"Parent masks: {parent1Mask}, {parent2Mask}"
+                );
+            }
     }
 
     [TestMethod]
@@ -208,7 +208,8 @@ public class AttackProfileComposerTests
     {
         var attacks = Attacks(2);
         var settings = Settings(cakes: 0);
-        var composer = new AttackProfileComposer(Context(attacks), settings);
+        var context = Context(attacks);
+        var composer = new AttackProfileComposer(context, settings);
         var parent1 = Reference(new AttackProfile(
             Entry(0b00, effortMinutes: 7),
             Entry(0b01, effortMinutes: 4),
@@ -222,7 +223,7 @@ public class AttackProfileComposerTests
         ));
 
         var optimized = composer.Compose(Child, parent1, parent2, 1, 1);
-        var exhaustive = AttackProfileReducer.Reduce(composer
+        var exhaustive = AttackProfileReducer.Reduce(new AttackResultMaterializer(context, settings)
             .EnumerateChoices(Child, parent1, parent2, 1, 1)
             .Select(choice => choice.ChildEntry)
             .ToArray());
@@ -274,8 +275,9 @@ public class AttackProfileComposerTests
     )
     {
         var settings = Settings(cakes: cakes);
-        return new AttackProfileComposer(Context(attacks), settings)
-            .EnumerateChoices(Child, Reference(new(parent1)), Reference(new(parent2), parent2Neutral), passivesProbability, 1);
+        return new AttackResultMaterializer(Context(attacks), settings)
+            .EnumerateChoices(Child, Reference(new(parent1)), Reference(new(parent2), parent2Neutral), passivesProbability, 1)
+            .ToArray();
     }
 
     private static AttackCompositionChoice Normal(IEnumerable<AttackCompositionChoice> choices) =>

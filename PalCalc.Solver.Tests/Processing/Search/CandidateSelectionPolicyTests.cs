@@ -168,7 +168,7 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
-    public void ActiveProfiles_PreferBundledSupersetBeyondResultLimit()
+    public void ActiveProfiles_RetainExactChampionsBeyondResultLimit()
     {
         var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 1)]));
         var subset = Reference("subset", "Katress", TimeSpan.FromMinutes(1), Profile(1));
@@ -176,7 +176,7 @@ public class CandidateSelectionPolicyTests
 
         var retained = policy.SelectRetainedAlternatives([subset, superset]);
 
-        Assert.IsTrue(retained.Any(candidate => candidate.AttackProfile.Contains(2)));
+        CollectionAssert.AreEquivalent(new[] { subset, superset }, retained.ToArray());
     }
 
     [TestMethod]
@@ -210,7 +210,7 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
-    public void ActiveProfiles_PreferOneProviderCoveringMultipleSkylineEntries()
+    public void ActiveProfiles_RetainEachExactChampion()
     {
         var policy = ActivePolicy(new(token => [new MinimumEffortPruning(token)]));
         var baseline = Reference("baseline", "Katress", TimeSpan.Zero, Profile(0));
@@ -220,7 +220,7 @@ public class CandidateSelectionPolicyTests
 
         var retained = policy.SelectRetainedAlternatives([baseline, first, second, bundled]);
 
-        CollectionAssert.AreEquivalent(new[] { baseline, bundled }, retained.ToArray());
+        CollectionAssert.AreEquivalent(new[] { baseline, first, second }, retained.ToArray());
     }
 
     [TestMethod]
