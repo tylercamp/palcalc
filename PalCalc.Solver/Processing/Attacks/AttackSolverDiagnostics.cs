@@ -9,7 +9,11 @@ namespace PalCalc.Solver.Processing.Attacks;
 internal sealed class AttackSolverDiagnostics
 {
     private static readonly ILogger logger = Serilog.Log.ForContext<AttackSolverDiagnostics>();
-    private const int PruneSampleMask = 0xff;
+    private const int PruneSampleRate = 256;
+    // The rate is a power of two, allowing a thread-local bitmask check instead
+    // of a modulo in this hot path. Exact aggregate counts are still recorded;
+    // only the per-inheritance-mode breakdown is sampled to avoid three atomics.
+    private const int PruneSampleMask = PruneSampleRate - 1;
 
     [ThreadStatic]
     private static int pruneSampleCounter;
@@ -122,7 +126,7 @@ internal sealed class AttackSolverDiagnostics
             delta.NormalAttempts,
             delta.CakeAttempts,
             delta.CakeFirstPrunedAttempts,
-            PruneSampleMask + 1,
+            PruneSampleRate,
             delta.PruneSamples,
             delta.SampledBaselinePrunedAttempts,
             delta.SampledNormalPrunedAttempts,
@@ -146,7 +150,7 @@ internal sealed class AttackSolverDiagnostics
             Interlocked.Read(ref normalAttempts),
             Interlocked.Read(ref cakeAttempts),
             Interlocked.Read(ref cakeFirstPrunedAttempts),
-            PruneSampleMask + 1,
+            PruneSampleRate,
             Interlocked.Read(ref pruneSamples),
             Interlocked.Read(ref sampledBaselinePrunedAttempts),
             Interlocked.Read(ref sampledNormalPrunedAttempts),

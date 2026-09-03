@@ -10,6 +10,11 @@ namespace PalCalc.Solver
 {
     public class PalSpecifier
     {
+        /// <summary>
+        /// Two parents can equip at most three attacks each, so an inherit-all
+        /// breeding step can transfer at most six distinct requested attacks.
+        /// This also keeps attack profiles representable as one 64-value mask table.
+        /// </summary>
         public const int MaxRequiredAttacks = 6;
 
         public Pal Pal { get; set; }

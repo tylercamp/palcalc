@@ -38,6 +38,11 @@ internal sealed class AttackProfileComposer(
     PalSpecifier terminalTarget = null
 )
 {
+    private const int TargetMaskBitCount = PalSpecifier.MaxRequiredAttacks;
+    private const int TargetMaskCount = AttackProfile.TargetMaskCount;
+    private const int MaxEquippedAttacksPerParent = 3;
+    private const int PackedParentLoadoutShift = 8;
+
     private readonly AttackProfileReducer.Accumulator accumulator = new(diagnostics);
     private readonly AttackProfileReducer.Accumulator terminalGenderAccumulator = new();
 
@@ -151,9 +156,13 @@ internal sealed class AttackProfileComposer(
 
         var parent1Entries = parent1Profile.EntriesSpan;
         var parent2Entries = parent2Profile.EntriesSpan;
-        const int anyCategory = 12;
-        Span<int> parent1CategoryChampions = stackalloc int[13];
-        Span<int> parent2CategoryChampions = stackalloc int[13];
+        // Normal inheritance only cares whether each parent can supply the one
+        // target attack, plus the profile-wide noop flag. Track the cheapest
+        // with/without entry for each target, and one unrestricted baseline entry.
+        const int normalCategoryCount = TargetMaskBitCount * 2;
+        const int anyCategory = normalCategoryCount;
+        Span<int> parent1CategoryChampions = stackalloc int[normalCategoryCount + 1];
+        Span<int> parent2CategoryChampions = stackalloc int[normalCategoryCount + 1];
         parent1CategoryChampions.Fill(-1);
         parent2CategoryChampions.Fill(-1);
 
@@ -198,6 +207,8 @@ internal sealed class AttackProfileComposer(
                 var withoutAttack = bitIndex << 1;
                 var withAttack = withoutAttack + 1;
 
+                // At least one parent must carry the target. These are the only
+                // three presence combinations which can produce it.
                 EmitBestNormal(
                     parent1Entries, parent2Entries,
                     parent1CategoryChampions, parent2CategoryChampions,
@@ -291,12 +302,14 @@ internal sealed class AttackProfileComposer(
 
             if (maxSpecialCakes != 0)
             {
-                var cakeLoadouts = CakeMaskCache.Values[(parent1Mask << 6) | parent2Mask];
+                var cakeLoadouts = CakeMaskCache.Values[
+                    (parent1Mask << TargetMaskBitCount) | parent2Mask
+                ];
                 for (var i = 0; i < cakeLoadouts.Length; i++)
                 {
                     metrics.CakeAttempts++;
                     var loadouts = cakeLoadouts[i];
-                    var parent1Loadout = (byte)(loadouts >> 8);
+                    var parent1Loadout = (byte)(loadouts >> PackedParentLoadoutShift);
                     var parent2Loadout = (byte)loadouts;
                     if (!Emit(
                             parent1Entry,
@@ -328,7 +341,7 @@ internal sealed class AttackProfileComposer(
                 UpdateChampion(anyCategory, entryIndex, entry, profileEntries, champions);
 
                 var entryMask = (byte)(entry.LearnedTargetMask & inheritableTargetMask);
-                for (var bitIndex = 0; bitIndex < 6; bitIndex++)
+                for (var bitIndex = 0; bitIndex < TargetMaskBitCount; bitIndex++)
                 {
                     var category = (bitIndex << 1) + ((entryMask >> bitIndex) & 1);
                     UpdateChampion(category, entryIndex, entry, profileEntries, champions);
@@ -402,6 +415,10 @@ internal sealed class AttackProfileComposer(
                 metrics.NormalPrunedAttempts++;
         }
 
+        // Parent effort combines monotonically (sum, or max with parallel farms),
+        // so the cheapest entry from each presence category forms the best pair.
+        // MaxEffort is the exception: a cake-heavier but faster pair may be the
+        // only feasible one, which is why that case falls back to a full scan.
         bool TryGetBestPair(
             ReadOnlySpan<AttackProfileEntry> firstEntries,
             ReadOnlySpan<AttackProfileEntry> secondEntries,
@@ -624,7 +641,7 @@ internal sealed class AttackProfileComposer(
     {
         var count = 0;
         var availableMask = (byte)(parent1Mask | parent2Mask);
-        for (var candidate = 0; candidate < 64; candidate++)
+        for (var candidate = 0; candidate < TargetMaskCount; candidate++)
         {
             var childMask = (byte)candidate;
             if ((childMask & ~availableMask) != 0 ||
@@ -633,7 +650,7 @@ internal sealed class AttackProfileComposer(
 
             var isMaximal = true;
             var missingMask = (byte)(availableMask & ~childMask);
-            for (var bit = 1; bit < 64; bit <<= 1)
+            for (var bit = 1; bit < TargetMaskCount; bit <<= 1)
             {
                 if ((missingMask & bit) != 0 && IsCakeMaskFeasible(
                     parent1Mask, parent2Mask, (byte)(childMask | bit)
@@ -655,10 +672,13 @@ internal sealed class AttackProfileComposer(
         return count;
     }
 
+    // Attacks available from only one parent must fit that parent's three equipped
+    // slots. Shared attacks may be assigned to either parent; the six-total check
+    // guarantees the remaining shared attacks can be split between them.
     private static bool IsCakeMaskFeasible(byte parent1Mask, byte parent2Mask, byte childMask) =>
-        BitOperations.PopCount((uint)childMask) <= 6 &&
-        BitOperations.PopCount((uint)(childMask & ~parent2Mask)) <= 3 &&
-        BitOperations.PopCount((uint)(childMask & ~parent1Mask)) <= 3;
+        BitOperations.PopCount((uint)childMask) <= TargetMaskBitCount &&
+        BitOperations.PopCount((uint)(childMask & ~parent2Mask)) <= MaxEquippedAttacksPerParent &&
+        BitOperations.PopCount((uint)(childMask & ~parent1Mask)) <= MaxEquippedAttacksPerParent;
 
     private static ushort CreateCakeLoadouts(byte parent1Mask, byte parent2Mask, byte childMask)
     {
@@ -666,12 +686,12 @@ internal sealed class AttackProfileComposer(
         var parent2Loadout = (byte)(childMask & parent2Mask);
         TrimDuplicateAttacks(ref parent1Loadout, parent2Loadout);
         TrimDuplicateAttacks(ref parent2Loadout, parent1Loadout);
-        return (ushort)((parent1Loadout << 8) | parent2Loadout);
+        return (ushort)((parent1Loadout << PackedParentLoadoutShift) | parent2Loadout);
     }
 
     private static void TrimDuplicateAttacks(ref byte loadout, byte otherLoadout)
     {
-        while (BitOperations.PopCount((uint)loadout) > 3)
+        while (BitOperations.PopCount((uint)loadout) > MaxEquippedAttacksPerParent)
         {
             var duplicateMask = (byte)(loadout & otherLoadout);
             var duplicateBit = 1 << BitOperations.TrailingZeroCount((uint)duplicateMask);
@@ -681,21 +701,24 @@ internal sealed class AttackProfileComposer(
 
     private static class CakeMaskCache
     {
+        // Loadout feasibility depends only on the two six-bit learned masks, so
+        // precompute all 64 x 64 combinations once. Only maximal unions are kept:
+        // extra desired attacks never hurt, and the player may equip a subset later.
         public static readonly ushort[][] Values = Build();
 
         private static ushort[][] Build()
         {
-            var result = new ushort[64 * 64][];
-            Span<ushort> buffer = stackalloc ushort[64];
-            for (var parent1Mask = 0; parent1Mask < 64; parent1Mask++)
-            for (var parent2Mask = 0; parent2Mask < 64; parent2Mask++)
+            var result = new ushort[TargetMaskCount * TargetMaskCount][];
+            Span<ushort> buffer = stackalloc ushort[TargetMaskCount];
+            for (var parent1Mask = 0; parent1Mask < TargetMaskCount; parent1Mask++)
+            for (var parent2Mask = 0; parent2Mask < TargetMaskCount; parent2Mask++)
             {
                 var count = EnumerateCakeMasks(
                     (byte)parent1Mask,
                     (byte)parent2Mask,
                     buffer
                 );
-                result[(parent1Mask << 6) | parent2Mask] = buffer[..count].ToArray();
+                result[(parent1Mask << TargetMaskBitCount) | parent2Mask] = buffer[..count].ToArray();
             }
 
             return result;

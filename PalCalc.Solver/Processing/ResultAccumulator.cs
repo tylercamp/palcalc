@@ -33,6 +33,7 @@ internal sealed class ResultAccumulator(
         // Materialized attack results have already had required gender applied.
         // Keep only the minimum-cake tier before ordinary result pruning; this is
         // the accepted trade-off that makes cake use the primary optimization goal.
+        // Materialization also reduces each result to its one selected profile entry.
         var minimumCakes = distinct.Count == 0
             ? 0
             : distinct.Min(reference => reference.AttackProfile.EntriesSpan[0].TotalSpecialCakes);

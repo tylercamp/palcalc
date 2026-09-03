@@ -99,6 +99,10 @@ public readonly record struct AttackProfileEntry(
 /// </summary>
 public readonly struct AttackProfile : IEquatable<AttackProfile>
 {
+    // Required attacks occupy one bit each. The six-attack request limit therefore
+    // bounds every profile to the 64 possible values of a byte-sized target mask.
+    internal const int TargetMaskCount = 1 << PalSpecifier.MaxRequiredAttacks;
+
     private readonly AttackProfileEntry[] entries;
     private readonly int hash;
 

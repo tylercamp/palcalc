@@ -5,6 +5,11 @@ namespace PalCalc.Solver.PalReference.Properties;
 
 internal static class AttackProfileReducer
 {
+    private const int TargetMaskCount = AttackProfile.TargetMaskCount;
+
+    // Bit N identifies the exact target-mask value N. All 64 profile masks fit
+    // in one ulong, making superset removal a small bitset scan rather than an
+    // entry-by-entry allocation-heavy reduction.
     private static readonly ulong[] StrictSupersetMasks = BuildStrictSupersetMasks();
 
     /// <summary>
@@ -39,8 +44,8 @@ internal static class AttackProfileReducer
     /// </summary>
     internal sealed class Accumulator(AttackSolverDiagnostics diagnostics = null)
     {
-        private readonly AttackProfileEntry[] champions = new AttackProfileEntry[64];
-        private readonly AttackProfileEntry[] values = new AttackProfileEntry[64];
+        private readonly AttackProfileEntry[] champions = new AttackProfileEntry[TargetMaskCount];
+        private readonly AttackProfileEntry[] values = new AttackProfileEntry[TargetMaskCount];
         private bool hasNoopAttack;
         private ulong occupiedMasks;
         private int inputCount;
@@ -64,6 +69,12 @@ internal static class AttackProfileReducer
             (occupiedMasks & (1UL << mask)) == 0 ||
             totalSpecialCakes <= champions[mask].TotalSpecialCakes;
 
+        /// <summary>
+        /// Selects using <paramref name="comparisonValue"/> while retaining
+        /// <paramref name="value"/>. They differ for terminal-gender selection:
+        /// the adjusted cost chooses the champion, but the original entry must
+        /// remain available for later inheritance-path reconstruction.
+        /// </summary>
         public void Add(in AttackProfileEntry value, in AttackProfileEntry comparisonValue)
         {
             inputCount++;
@@ -82,6 +93,8 @@ internal static class AttackProfileReducer
         {
             var retainedMasks = occupiedMasks;
             var candidates = occupiedMasks;
+            // Exact-mask champions are already selected. A subset is redundant
+            // when a strict superset is available at an equal-or-better cost.
             while (candidates != 0)
             {
                 var requiredMask = BitOperations.TrailingZeroCount(candidates);
@@ -123,9 +136,9 @@ internal static class AttackProfileReducer
 
     private static ulong[] BuildStrictSupersetMasks()
     {
-        var result = new ulong[64];
-        for (var requiredMask = 0; requiredMask < 64; requiredMask++)
-        for (var providerMask = 0; providerMask < 64; providerMask++)
+        var result = new ulong[TargetMaskCount];
+        for (var requiredMask = 0; requiredMask < TargetMaskCount; requiredMask++)
+        for (var providerMask = 0; providerMask < TargetMaskCount; providerMask++)
         {
             if (providerMask != requiredMask &&
                 (providerMask & requiredMask) == requiredMask)

@@ -50,6 +50,9 @@ internal sealed class AttackResultMaterializer
         AttackProfileEntry selectedEntry
     )
     {
+        // Several concrete parent loadouts may reconstruct the same packed
+        // profile entry. Use the search's cake-first ordering before the stable
+        // loadout/mask tie-breakers so materialization preserves its objective.
         var choice = composer
             .EnumerateChoices(
                 bred.Pal,

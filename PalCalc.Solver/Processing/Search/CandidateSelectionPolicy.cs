@@ -77,6 +77,10 @@ internal static class CandidateSelectionPolicyExtensions
 /// </summary>
 internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolicy
 {
+    private const int NoopSlotOffset = AttackProfile.TargetMaskCount;
+    private const int AttackSlotCount = NoopSlotOffset * 2;
+    private const int TargetMaskBits = NoopSlotOffset - 1;
+
     private static readonly ILogger logger = Log.ForContext<DefaultCandidateSelectionPolicy>();
 
     private readonly ResultPruningRule retainedAlternativeSelection;
@@ -208,8 +212,11 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
 
         var providers = preferred.ToList();
         var preferredCount = providers.Count;
-        var exactChampions = new AttackCapability[128];
-        Span<bool> occupied = stackalloc bool[128];
+        // Ordinary pruning may enforce a hard result limit. Preserve one best
+        // provider for every exact mask/noop capability, then let equal-or-better
+        // supersets cover those slots. This can intentionally exceed that limit.
+        var exactChampions = new AttackCapability[AttackSlotCount];
+        Span<bool> occupied = stackalloc bool[AttackSlotCount];
         var entryCount = 0;
         var maxCandidateEntries = 0;
         foreach (var candidate in distinctCandidates)
@@ -221,7 +228,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             {
                 var capability = new AttackCapability(candidate, entry);
                 var slot = entry.LearnedTargetMask +
-                    (candidate.AttackProfile.HasNoopAttack ? 64 : 0);
+                    (candidate.AttackProfile.HasNoopAttack ? NoopSlotOffset : 0);
                 if (!occupied[slot] || CompareCapabilities(capability, exactChampions[slot]) < 0)
                 {
                     exactChampions[slot] = capability;
@@ -231,21 +238,23 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         }
 
         var selectedSlots = 0;
-        for (var requiredSlot = 0; requiredSlot < 128; requiredSlot++)
+        for (var requiredSlot = 0; requiredSlot < AttackSlotCount; requiredSlot++)
         {
             if (!occupied[requiredSlot])
                 continue;
 
             AttackCapability best = default;
             var found = false;
-            var requiredMask = requiredSlot & 63;
-            var requiresNoop = requiredSlot >= 64;
-            for (var providerSlot = 0; providerSlot < 128; providerSlot++)
+            var requiredMask = requiredSlot & TargetMaskBits;
+            var requiresNoop = requiredSlot >= NoopSlotOffset;
+            for (var providerSlot = 0; providerSlot < AttackSlotCount; providerSlot++)
             {
                 if (!occupied[providerSlot])
                     continue;
-                var providerMask = providerSlot & 63;
-                var hasNoop = providerSlot >= 64;
+                var providerMask = providerSlot & TargetMaskBits;
+                var hasNoop = providerSlot >= NoopSlotOffset;
+                // Noop is an additional capability: a Pal that has one can act
+                // like a Pal without one, but the reverse substitution is unsafe.
                 if ((providerMask & requiredMask) != requiredMask || requiresNoop && !hasNoop)
                     continue;
 
@@ -347,6 +356,8 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     {
         var comparison = AttackProfileEntryComparer.Instance.Compare(left.Entry, right.Entry);
         if (comparison != 0) return comparison;
+        // Prefer a candidate that can champion more slots, reducing the number
+        // of extra providers retained after the ordinary result limit.
         comparison = right.Candidate.AttackProfile.EntriesSpan.Length.CompareTo(
             left.Candidate.AttackProfile.EntriesSpan.Length
         );

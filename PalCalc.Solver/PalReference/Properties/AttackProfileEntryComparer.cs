@@ -24,6 +24,8 @@ internal sealed class AttackProfileEntryComparer : IComparer<AttackProfileEntry>
         comparison = left.BreedingEffort.CompareTo(right.BreedingEffort);
         if (comparison != 0) return comparison;
 
+        // These do not change the primary cake/effort objective, but prefer the
+        // simpler final-edge witness when two complete paths otherwise tie.
         comparison = left.SelfBreedings.CompareTo(right.SelfBreedings);
         if (comparison != 0) return comparison;
 

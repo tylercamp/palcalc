@@ -75,6 +75,8 @@ internal sealed class CandidatePreFilter
             return CandidatePreFilterResult.Rejected;
 
         var isTerminal = attackTargets?.Satisfies(candidate) ?? target.IsSatisfiedBy(candidate);
+        // A completed result may be a poor future parent and be rejected below.
+        // Preserve its best final path before applying frontier-oriented filters.
         if (isTerminal && attackTargets?.IsActive == true)
             RetainTerminal(candidate);
 
@@ -165,8 +167,15 @@ internal sealed class CandidatePreFilter
 
     private sealed class EarlyCandidateGroup
     {
-        private readonly IPalReference[] attackChampions = new IPalReference[128];
-        private readonly AttackProfileEntry[] attackEntries = new AttackProfileEntry[128];
+        private const int NoopSlotOffset = AttackProfile.TargetMaskCount;
+        private const int AttackSlotCount = NoopSlotOffset * 2;
+        private const int TargetMaskBits = NoopSlotOffset - 1;
+
+        // Each exact target mask has two independent capabilities: with and
+        // without a noop attack. A candidate remains useful while it champions
+        // at least one such slot, even if another candidate replaces its others.
+        private readonly IPalReference[] attackChampions = new IPalReference[AttackSlotCount];
+        private readonly AttackProfileEntry[] attackEntries = new AttackProfileEntry[AttackSlotCount];
         private readonly Dictionary<IPalReference, int> championCounts =
             new(ReferenceEqualityComparer.Instance);
         private IPalReference ordinaryIncumbent;
@@ -184,12 +193,12 @@ internal sealed class CandidatePreFilter
 
                 var attackProfile = candidate.AttackProfile;
 
-                Span<bool> improved = stackalloc bool[128];
+                Span<bool> improved = stackalloc bool[AttackSlotCount];
                 var improvesAny = false;
                 foreach (ref readonly var entry in attackProfile.EntriesSpan)
                 {
                     var slot = entry.LearnedTargetMask +
-                        (attackProfile.HasNoopAttack ? 64 : 0);
+                        (attackProfile.HasNoopAttack ? NoopSlotOffset : 0);
                     if (attackChampions[slot] is not null &&
                         Compare(candidate, entry, attackChampions[slot], attackEntries[slot]) >= 0)
                         continue;
@@ -248,14 +257,14 @@ internal sealed class CandidatePreFilter
 
         private static AttackProfileEntry BestEntryForSlot(IPalReference candidate, int slot)
         {
-            var mask = (byte)(slot & 63);
+            var mask = (byte)(slot & TargetMaskBits);
             AttackProfileEntry best = default;
             var found = false;
             var attackProfile = candidate.AttackProfile;
             foreach (ref readonly var entry in attackProfile.EntriesSpan)
             {
                 if (entry.LearnedTargetMask != mask ||
-                    attackProfile.HasNoopAttack != (slot >= 64))
+                    attackProfile.HasNoopAttack != (slot >= NoopSlotOffset))
                     continue;
                 if (!found || AttackProfileEntryComparer.Instance.Compare(entry, best) < 0)
                 {

@@ -14,7 +14,10 @@ namespace PalCalc.Solver.Processing.Search;
 internal sealed class SearchFrontier : ICandidateFrontierView
 {
     private static readonly ILogger logger = Log.ForContext<SearchFrontier>();
-    private const int AssessmentSampleMask = 0xff;
+    private const int AssessmentSampleRate = 256;
+    // Power-of-two sampling keeps the diagnostic check cheap enough for every
+    // frontier assessment; each worker maintains its own counter to avoid contention.
+    private const int AssessmentSampleMask = AssessmentSampleRate - 1;
 
     [ThreadStatic]
     private static int assessmentSampleCounter;
@@ -158,7 +161,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
         logger.Debug(
             "Attack frontier profile: step={Step}, sampleRate=1/{SampleRate}, samples={Samples}, outcomes={NoIncumbent}+{Inferior}+{Potential}+{Guaranteed}, incumbents={AvailableIncumbents}->{VisitedIncumbents}, attackEntryPairUpperBound={AttackEntryPairUpperBound}, incumbentBuckets={One}+{TwoToThree}+{FourToSeven}+{EightToFifteen}+{SixteenPlus}, maxIncumbents={MaxAvailable}->{MaxVisited}, maxProfileEntries={MaxCandidate}+{MaxVisitedIncumbents}",
             step,
-            AssessmentSampleMask + 1,
+            AssessmentSampleRate,
             samples,
             Interlocked.Exchange(ref noIncumbentSamples, 0),
             Interlocked.Exchange(ref inferiorSamples, 0),
@@ -210,6 +213,8 @@ internal sealed class SearchFrontier : ICandidateFrontierView
                     break;
             }
 
+            // Logarithmic buckets keep the aggregate compact while separating
+            // the small groups where early-exit behavior differs most.
             if (available == 1)
                 Interlocked.Increment(ref singleIncumbentSamples);
             else if (available <= 3)
