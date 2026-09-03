@@ -133,11 +133,11 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     {
         var comparison = CompareScalarPreference(candidate, incumbent);
         if (comparison < 0)
-            return CoversAttackCapability(candidate, incumbent)
+            return CoversAttackCapability(candidate.AttackProfile, incumbent.AttackProfile)
                 ? EarlyCandidateSelection.ReplaceIncumbent
                 : EarlyCandidateSelection.KeepBoth;
         if (comparison > 0)
-            return CoversAttackCapability(incumbent, candidate)
+            return CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
                 ? EarlyCandidateSelection.RejectCandidate
                 : EarlyCandidateSelection.KeepBoth;
 
@@ -158,11 +158,11 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     {
         var comparison = candidate.BreedingEffort.CompareTo(incumbent.BreedingEffort);
         if (comparison < 0)
-            return CoversAttackCapability(candidate, incumbent)
+            return CoversAttackCapability(candidate.AttackProfile, incumbent.AttackProfile)
                 ? FrontierCandidateAssessment.GuaranteedImprovement
                 : FrontierCandidateAssessment.PotentialImprovement;
         if (comparison > 0)
-            return CoversAttackCapability(incumbent, candidate)
+            return CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
                 ? FrontierCandidateAssessment.Inferior
                 : FrontierCandidateAssessment.PotentialImprovement;
 
@@ -170,7 +170,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         if (comparison < 0)
             return FrontierCandidateAssessment.PotentialImprovement;
         if (comparison > 0)
-            return CoversAttackCapability(incumbent, candidate)
+            return CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
                 ? FrontierCandidateAssessment.Inferior
                 : FrontierCandidateAssessment.PotentialImprovement;
 
@@ -178,13 +178,13 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         if (comparison != 0)
             return comparison > 0
                 ? FrontierCandidateAssessment.PotentialImprovement
-                : CoversAttackCapability(incumbent, candidate)
+                : CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
                     ? FrontierCandidateAssessment.Inferior
                     : FrontierCandidateAssessment.PotentialImprovement;
 
         return TotalMinIV(candidate) > TotalMinIV(incumbent)
             ? FrontierCandidateAssessment.PotentialImprovement
-            : CoversAttackCapability(incumbent, candidate)
+            : CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
                 ? FrontierCandidateAssessment.Inferior
                 : FrontierCandidateAssessment.PotentialImprovement;
     }
@@ -296,12 +296,32 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         IPalReference required
     )
     {
-        if (!attackProfilesActive) return true;
+        if (!attackProfilesActive)
+            return true;
 
-        // Unfolded `.All()`
-        foreach (var entry in required.AttackProfile.EntriesSpan)
+        return CoversAttackCapability(
+            provider.AttackProfile,
+            required.AttackProfile
+        );
+    }
+
+    private static bool CoversAttackCapability(
+        AttackProfile provider,
+        AttackProfile required
+    )
+    {
+        var requiredEntries = required.EntriesSpan;
+        if (requiredEntries.IsEmpty)
+            return true;
+
+        if (!provider.HasNoopAttack && required.HasNoopAttack)
+            return false;
+
+        // Unfolded `.All(CoversAttackEntry)`
+        var providerEntries = provider.EntriesSpan;
+        foreach (ref readonly var requiredEntry in requiredEntries)
         {
-            if (!CoversAttackEntry(provider, required, entry))
+            if (!CoversAttackEntry(providerEntries, requiredEntry))
                 return false;
         }
 
@@ -309,16 +329,12 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     }
 
     private static bool CoversAttackEntry(
-        IPalReference provider,
-        IPalReference required,
-        AttackProfileEntry requiredEntry
+        ReadOnlySpan<AttackProfileEntry> providerEntries,
+        in AttackProfileEntry requiredEntry
     )
     {
-        if (!provider.AttackProfile.HasNoopAttack && required.AttackProfile.HasNoopAttack)
-            return false;
-
-        // Unfolded `.Any()`
-        foreach (var providerEntry in provider.AttackProfile.EntriesSpan)
+        // Unfolded `.Any(Covers)`
+        foreach (ref readonly var providerEntry in providerEntries)
         {
             if (AttackProfileReducer.Covers(providerEntry, requiredEntry))
                 return true;

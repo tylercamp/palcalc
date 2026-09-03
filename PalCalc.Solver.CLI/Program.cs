@@ -41,7 +41,7 @@ internal class Program
                 breedingDB: PalBreedingDB.LoadEmbedded(db),
                 resultPruning: ResultPruningPolicy.Default,
                 ownedPals: savedInstances,
-                maxBreedingSteps: 40,
+                maxBreedingSteps: 8,
                 maxSolverIterations: 99,
                 maxWildPals: 15,
                 allowedWildPals: db.Pals.ToList(),
@@ -57,8 +57,25 @@ internal class Program
         );
         var solver = new BreedingSolver();
 
+        long lastCount = 0;
+        DateTime lastTime = DateTime.Now;
         solver.StatusUpdateInterval = TimeSpan.FromSeconds(1);
-        solver.StatusUpdated += ev => Console.WriteLine($"{ev.CurrentPhase} ({ev.CurrentStepIndex:N0}) - {ev.WorkProcessedCount:N0} / {ev.CurrentWorkSize:N0}");
+        solver.StatusUpdated += ev =>
+        {
+            var diff = ev.WorkProcessedCount - lastCount;
+            if (diff < 0)
+            {
+                lastCount = ev.WorkProcessedCount;
+                diff = 0;
+            }
+
+            var now = DateTime.Now;
+            var throughput = diff / (now - lastTime).TotalSeconds;
+            Console.WriteLine($"{ev.CurrentPhase} ({ev.CurrentStepIndex:N0}) - {ev.WorkProcessedCount:N0} / {ev.CurrentWorkSize:N0} ({(int)throughput:N0}/s)");
+
+            lastTime = now;
+            lastCount = ev.WorkProcessedCount;
+        };
 
         var requiredAttack = "PowerShot".InternalToActive(db);
 
