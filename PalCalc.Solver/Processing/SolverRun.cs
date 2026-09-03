@@ -119,6 +119,8 @@ namespace PalCalc.Solver.Processing
 
                     return execution.Candidates;
                 });
+                frontier.LogAssessmentDiagnostics(s + 1);
+                context.AttackDiagnostics.LogCompositionStep(s + 1);
 
                 if (controller.CancellationToken.IsCancellationRequested) break;
 

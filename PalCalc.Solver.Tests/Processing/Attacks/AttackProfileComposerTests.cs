@@ -203,6 +203,54 @@ public class AttackProfileComposerTests
         Assert.AreEqual(TimeSpan.FromMinutes(20) + self, composer.Compose(Child, bred1, bred2, 1, 1).Entries.Single().BreedingEffort);
     }
 
+    [TestMethod]
+    public void Compose_CategoryChampionsMatchExhaustiveNormalComposition()
+    {
+        var attacks = Attacks(2);
+        var settings = Settings(cakes: 0);
+        var composer = new AttackProfileComposer(Context(attacks), settings);
+        var parent1 = Reference(new AttackProfile(
+            Entry(0b00, effortMinutes: 7),
+            Entry(0b01, effortMinutes: 4),
+            Entry(0b10, effortMinutes: 2),
+            Entry(0b11, effortMinutes: 6)
+        ));
+        var parent2 = Reference(new AttackProfile(
+            Entry(0b00, effortMinutes: 5),
+            Entry(0b01, effortMinutes: 3),
+            Entry(0b10, effortMinutes: 8)
+        ));
+
+        var optimized = composer.Compose(Child, parent1, parent2, 1, 1);
+        var exhaustive = AttackProfileReducer.Reduce(composer
+            .EnumerateChoices(Child, parent1, parent2, 1, 1)
+            .Select(choice => choice.ChildEntry)
+            .ToArray());
+
+        Assert.AreEqual(exhaustive, optimized);
+    }
+
+    [TestMethod]
+    public void Compose_CategoryChampionsFallBackWhenMinimumCakePairExceedsEffortLimit()
+    {
+        var attack = Attacks(1);
+        var settings = Settings(cakes: 10, maxEffort: TimeSpan.FromHours(2));
+        var composer = new AttackProfileComposer(Context(attack), settings);
+        var parent1 = Reference(new AttackProfile(
+            Entry(0b01, cakes: 0, effortMinutes: 1_000),
+            Entry(0b01, cakes: 1, effortMinutes: 0)
+        ));
+        var parent2 = Reference(new AttackProfile(Entry(0)));
+
+        var profile = composer.Compose(Child, parent1, parent2, 1, 1);
+
+        Assert.IsTrue(profile.Entries.Any(entry =>
+            entry.LearnedTargetMask == 0b01 &&
+            entry.TotalSpecialCakes == 1 &&
+            !entry.SelfUsesSpecialCake
+        ));
+    }
+
     private static AttackProfile Compose(
         IEnumerable<ActiveSkill> attacks,
         AttackProfileEntry parent1,

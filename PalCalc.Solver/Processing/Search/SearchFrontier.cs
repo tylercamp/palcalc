@@ -14,6 +14,10 @@ namespace PalCalc.Solver.Processing.Search;
 internal sealed class SearchFrontier : ICandidateFrontierView
 {
     private static readonly ILogger logger = Log.ForContext<SearchFrontier>();
+    private const int AssessmentSampleMask = 0xff;
+
+    [ThreadStatic]
+    private static int assessmentSampleCounter;
 
     private readonly SolverStateController controller;
     private readonly ICandidateSelectionPolicy selectionPolicy;
@@ -24,6 +28,24 @@ internal sealed class SearchFrontier : ICandidateFrontierView
     private readonly int maxThreads;
     private readonly PalSpecifier target;
     private readonly AttackTargetContext attackTargets;
+
+    private long assessmentSamples;
+    private long noIncumbentSamples;
+    private long inferiorSamples;
+    private long potentialSamples;
+    private long guaranteedSamples;
+    private long availableIncumbents;
+    private long visitedIncumbents;
+    private long attackEntryPairUpperBound;
+    private long singleIncumbentSamples;
+    private long twoToThreeIncumbentSamples;
+    private long fourToSevenIncumbentSamples;
+    private long eightToFifteenIncumbentSamples;
+    private long sixteenPlusIncumbentSamples;
+    private int maxAvailableIncumbents;
+    private int maxVisitedIncumbents;
+    private int maxCandidateProfileEntries;
+    private int maxVisitedIncumbentProfileEntries;
 
     public ResultAccumulator TerminalResults => resultAccumulator;
 
@@ -61,22 +83,161 @@ internal sealed class SearchFrontier : ICandidateFrontierView
     public FrontierCandidateAssessment AssessCandidate(IPalReference reference, EffectivePropertiesKey propertiesKey)
     {
         var incumbents = index[propertiesKey];
+        var sample = attackTargets?.IsActive == true &&
+            ((++assessmentSampleCounter & AssessmentSampleMask) == 0);
         if (incumbents is null || incumbents.Count == 0)
+        {
+            if (sample)
+                RecordAssessment(FrontierCandidateAssessment.PotentialImprovement, 0, 0, 0, 0, 0);
             return FrontierCandidateAssessment.PotentialImprovement;
+        }
 
         var guaranteedImprovement = true;
+        var visited = 0;
+        var candidateProfileEntries = sample
+            ? reference.AttackProfile.EntriesSpan.Length
+            : 0;
+        var visitedProfileEntries = 0;
+        long entryPairs = 0;
         foreach (var incumbent in incumbents)
         {
+            if (sample)
+            {
+                visited++;
+                var incumbentProfileEntries = incumbent.AttackProfile.EntriesSpan.Length;
+                visitedProfileEntries += incumbentProfileEntries;
+                entryPairs += (long)candidateProfileEntries * incumbentProfileEntries;
+            }
+
             var assessment = selectionPolicy.AssessAgainstFrontier(reference, incumbent);
             if (assessment == FrontierCandidateAssessment.Inferior)
+            {
+                if (sample)
+                    RecordAssessment(
+                        assessment,
+                        incumbents.Count,
+                        visited,
+                        candidateProfileEntries,
+                        visitedProfileEntries,
+                        entryPairs
+                    );
                 return FrontierCandidateAssessment.Inferior;
+            }
             if (assessment != FrontierCandidateAssessment.GuaranteedImprovement)
                 guaranteedImprovement = false;
         }
 
-        return guaranteedImprovement
+        var result = guaranteedImprovement
             ? FrontierCandidateAssessment.GuaranteedImprovement
             : FrontierCandidateAssessment.PotentialImprovement;
+        if (sample)
+            RecordAssessment(
+                result,
+                incumbents.Count,
+                visited,
+                candidateProfileEntries,
+                visitedProfileEntries,
+                entryPairs
+            );
+        return result;
+    }
+
+    /// <summary>
+    /// Logs a small sample of frontier scans. Sampling keeps diagnostics out of
+    /// the comparison hot path while still exposing growth between iterations.
+    /// </summary>
+    public void LogAssessmentDiagnostics(int step)
+    {
+        if (attackTargets?.IsActive != true)
+            return;
+
+        var samples = Interlocked.Exchange(ref assessmentSamples, 0);
+        if (samples == 0)
+            return;
+
+        logger.Debug(
+            "Attack frontier profile: step={Step}, sampleRate=1/{SampleRate}, samples={Samples}, outcomes={NoIncumbent}+{Inferior}+{Potential}+{Guaranteed}, incumbents={AvailableIncumbents}->{VisitedIncumbents}, attackEntryPairUpperBound={AttackEntryPairUpperBound}, incumbentBuckets={One}+{TwoToThree}+{FourToSeven}+{EightToFifteen}+{SixteenPlus}, maxIncumbents={MaxAvailable}->{MaxVisited}, maxProfileEntries={MaxCandidate}+{MaxVisitedIncumbents}",
+            step,
+            AssessmentSampleMask + 1,
+            samples,
+            Interlocked.Exchange(ref noIncumbentSamples, 0),
+            Interlocked.Exchange(ref inferiorSamples, 0),
+            Interlocked.Exchange(ref potentialSamples, 0),
+            Interlocked.Exchange(ref guaranteedSamples, 0),
+            Interlocked.Exchange(ref availableIncumbents, 0),
+            Interlocked.Exchange(ref visitedIncumbents, 0),
+            Interlocked.Exchange(ref attackEntryPairUpperBound, 0),
+            Interlocked.Exchange(ref singleIncumbentSamples, 0),
+            Interlocked.Exchange(ref twoToThreeIncumbentSamples, 0),
+            Interlocked.Exchange(ref fourToSevenIncumbentSamples, 0),
+            Interlocked.Exchange(ref eightToFifteenIncumbentSamples, 0),
+            Interlocked.Exchange(ref sixteenPlusIncumbentSamples, 0),
+            Interlocked.Exchange(ref maxAvailableIncumbents, 0),
+            Interlocked.Exchange(ref maxVisitedIncumbents, 0),
+            Interlocked.Exchange(ref maxCandidateProfileEntries, 0),
+            Interlocked.Exchange(ref maxVisitedIncumbentProfileEntries, 0)
+        );
+    }
+
+    private void RecordAssessment(
+        FrontierCandidateAssessment assessment,
+        int available,
+        int visited,
+        int candidateProfileEntries,
+        int visitedProfileEntries,
+        long entryPairs
+    )
+    {
+        Interlocked.Increment(ref assessmentSamples);
+        Interlocked.Add(ref availableIncumbents, available);
+        Interlocked.Add(ref visitedIncumbents, visited);
+        Interlocked.Add(ref attackEntryPairUpperBound, entryPairs);
+
+        if (available == 0)
+            Interlocked.Increment(ref noIncumbentSamples);
+        else
+        {
+            switch (assessment)
+            {
+                case FrontierCandidateAssessment.Inferior:
+                    Interlocked.Increment(ref inferiorSamples);
+                    break;
+                case FrontierCandidateAssessment.GuaranteedImprovement:
+                    Interlocked.Increment(ref guaranteedSamples);
+                    break;
+                default:
+                    Interlocked.Increment(ref potentialSamples);
+                    break;
+            }
+
+            if (available == 1)
+                Interlocked.Increment(ref singleIncumbentSamples);
+            else if (available <= 3)
+                Interlocked.Increment(ref twoToThreeIncumbentSamples);
+            else if (available <= 7)
+                Interlocked.Increment(ref fourToSevenIncumbentSamples);
+            else if (available <= 15)
+                Interlocked.Increment(ref eightToFifteenIncumbentSamples);
+            else
+                Interlocked.Increment(ref sixteenPlusIncumbentSamples);
+        }
+
+        UpdateMax(ref maxAvailableIncumbents, available);
+        UpdateMax(ref maxVisitedIncumbents, visited);
+        UpdateMax(ref maxCandidateProfileEntries, candidateProfileEntries);
+        UpdateMax(ref maxVisitedIncumbentProfileEntries, visitedProfileEntries);
+    }
+
+    private static void UpdateMax(ref int maximum, int value)
+    {
+        var current = Volatile.Read(ref maximum);
+        while (value > current)
+        {
+            var previous = Interlocked.CompareExchange(ref maximum, value, current);
+            if (previous == current)
+                return;
+            current = previous;
+        }
     }
 
     public void ObserveTerminal(IEnumerable<IPalReference> candidates) =>

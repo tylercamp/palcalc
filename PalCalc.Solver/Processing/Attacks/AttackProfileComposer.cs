@@ -84,12 +84,13 @@ internal sealed class AttackProfileComposer(
         if (preserveTerminalGenderChoice)
             result = Merge(result, terminalGenderAccumulator.Build());
         diagnostics?.RecordComposition(
-            parent1.AttackProfile.EntriesSpan.Length,
-            parent2.AttackProfile.EntriesSpan.Length,
+            metrics.ParentEntryPairs,
             metrics.BaselineAttempts,
             metrics.NormalAttempts,
             metrics.CakeAttempts,
-            metrics.CakeFirstPrunedAttempts,
+            metrics.BaselinePrunedAttempts,
+            metrics.NormalPrunedAttempts,
+            metrics.CakePrunedAttempts,
             accumulator.InputCount,
             result.EntriesSpan.Length
         );
@@ -147,10 +148,85 @@ internal sealed class AttackProfileComposer(
         var dilutedSelfEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
             settings.GameSettings, child, parent1.TimeFactor, parent2.TimeFactor, dilutedBreedings
         );
-        foreach (var parent1Entry in parent1Profile.EntriesSpan)
-        foreach (var parent2Entry in parent2Profile.EntriesSpan)
+
+        var parent1Entries = parent1Profile.EntriesSpan;
+        var parent2Entries = parent2Profile.EntriesSpan;
+        const int anyCategory = 12;
+        Span<int> parent1CategoryChampions = stackalloc int[13];
+        Span<int> parent2CategoryChampions = stackalloc int[13];
+        parent1CategoryChampions.Fill(-1);
+        parent2CategoryChampions.Fill(-1);
+
+        if (entries is not null)
         {
+            BuildCategoryChampions(parent1Entries, parent1CategoryChampions);
+            BuildCategoryChampions(parent2Entries, parent2CategoryChampions);
+
             metrics.BaselineAttempts++;
+            if (TryGetBestPair(
+                    parent1Entries,
+                    parent2Entries,
+                    parent1CategoryChampions,
+                    parent2CategoryChampions,
+                    anyCategory,
+                    anyCategory,
+                    guaranteedSelfEffort,
+                    out var baselineParent1Entry,
+                    out var baselineParent2Entry,
+                    out var baselineParentCakes,
+                    out var baselineParentEffort
+                ) && !Emit(
+                    baselineParent1Entry,
+                    baselineParent2Entry,
+                    baselineParentCakes,
+                    baselineParentEffort,
+                    AttackCompositionMode.Baseline,
+                    parent1Loadout: 0,
+                    parent2Loadout: 0,
+                    childMask: innateMask,
+                    attackProbability: 1,
+                    usesSpecialCake: false
+                ))
+                metrics.BaselinePrunedAttempts++;
+
+            var normalTargetBits = (byte)(inheritableTargetMask & ~innateMask);
+            while (normalTargetBits != 0)
+            {
+                var bit = (byte)(normalTargetBits & -normalTargetBits);
+                normalTargetBits &= (byte)~bit;
+                var bitIndex = BitOperations.TrailingZeroCount((uint)bit);
+                var withoutAttack = bitIndex << 1;
+                var withAttack = withoutAttack + 1;
+
+                EmitBestNormal(
+                    parent1Entries, parent2Entries,
+                    parent1CategoryChampions, parent2CategoryChampions,
+                    withAttack, withoutAttack, bit
+                );
+                EmitBestNormal(
+                    parent1Entries, parent2Entries,
+                    parent1CategoryChampions, parent2CategoryChampions,
+                    withoutAttack, withAttack, bit
+                );
+                EmitBestNormal(
+                    parent1Entries, parent2Entries,
+                    parent1CategoryChampions, parent2CategoryChampions,
+                    withAttack, withAttack, bit
+                );
+            }
+        }
+
+        // Materialization needs concrete witnesses for every possible outcome.
+        // Search composition only needs the category champions above when cake
+        // inheritance is disabled, so avoid entering the parent cross-product.
+        if (choices is null && maxSpecialCakes == 0)
+            return metrics;
+
+        foreach (var parent1Entry in parent1Entries)
+        foreach (var parent2Entry in parent2Entries)
+        {
+            if (entries is not null)
+                metrics.ParentEntryPairs++;
             var parentCakes = parent1Entry.TotalSpecialCakes + parent2Entry.TotalSpecialCakes;
             var parentEffort = BredPalReferenceEffort.CombineParentEffort(
                 settings.GameSettings,
@@ -160,18 +236,29 @@ internal sealed class AttackProfileComposer(
                 parent2Entry.BreedingEffort
             );
 
-            Emit(
-                AttackCompositionMode.Baseline,
-                parent1Loadout: 0,
-                parent2Loadout: 0,
-                childMask: innateMask,
-                attackProbability: 1,
-                usesSpecialCake: false
-            );
+            if (choices is not null)
+            {
+                metrics.BaselineAttempts++;
+                if (!Emit(
+                        parent1Entry,
+                        parent2Entry,
+                        parentCakes,
+                        parentEffort,
+                        AttackCompositionMode.Baseline,
+                        parent1Loadout: 0,
+                        parent2Loadout: 0,
+                        childMask: innateMask,
+                        attackProbability: 1,
+                        usesSpecialCake: false
+                    ))
+                    metrics.BaselinePrunedAttempts++;
+            }
 
             var parent1Mask = (byte)(parent1Entry.LearnedTargetMask & inheritableTargetMask);
             var parent2Mask = (byte)(parent2Entry.LearnedTargetMask & inheritableTargetMask);
-            var normalTargets = (byte)((parent1Mask | parent2Mask) & ~innateMask);
+            var normalTargets = choices is null
+                ? (byte)0
+                : (byte)((parent1Mask | parent2Mask) & ~innateMask);
             while (normalTargets != 0)
             {
                 var bit = (byte)(normalTargets & -normalTargets);
@@ -187,14 +274,19 @@ internal sealed class AttackProfileComposer(
                     parent1HasNoopAttack,
                     parent2HasNoopAttack
                 );
-                Emit(
-                    AttackCompositionMode.Normal,
-                    parent1HasAttack ? bit : (byte)0,
-                    parent2HasAttack ? bit : (byte)0,
-                    (byte)(innateMask | bit),
-                    probability,
-                    usesSpecialCake: false
-                );
+                if (!Emit(
+                        parent1Entry,
+                        parent2Entry,
+                        parentCakes,
+                        parentEffort,
+                        AttackCompositionMode.Normal,
+                        parent1HasAttack ? bit : (byte)0,
+                        parent2HasAttack ? bit : (byte)0,
+                        (byte)(innateMask | bit),
+                        probability,
+                        usesSpecialCake: false
+                    ))
+                    metrics.NormalPrunedAttempts++;
             }
 
             if (maxSpecialCakes != 0)
@@ -206,101 +298,286 @@ internal sealed class AttackProfileComposer(
                     var loadouts = cakeLoadouts[i];
                     var parent1Loadout = (byte)(loadouts >> 8);
                     var parent2Loadout = (byte)loadouts;
-                    Emit(
-                        AttackCompositionMode.InheritAll,
-                        parent1Loadout,
-                        parent2Loadout,
-                        (byte)(innateMask | parent1Loadout | parent2Loadout),
-                        attackProbability: 1,
-                        usesSpecialCake: true
-                    );
+                    if (!Emit(
+                            parent1Entry,
+                            parent2Entry,
+                            parentCakes,
+                            parentEffort,
+                            AttackCompositionMode.InheritAll,
+                            parent1Loadout,
+                            parent2Loadout,
+                            (byte)(innateMask | parent1Loadout | parent2Loadout),
+                            attackProbability: 1,
+                            usesSpecialCake: true
+                        ))
+                        metrics.CakePrunedAttempts++;
                 }
-            }
-
-            void Emit(
-                AttackCompositionMode mode,
-                byte parent1Loadout,
-                byte parent2Loadout,
-                byte childMask,
-                float attackProbability,
-                bool usesSpecialCake
-            )
-            {
-                var guaranteed = attackProbability == 1;
-                var selfBreedings = guaranteed ? guaranteedBreedings : dilutedBreedings;
-                var totalCakes = parentCakes + (usesSpecialCake ? selfBreedings : 0);
-                if (maxSpecialCakes is int maximumSpecialCakes && totalCakes > maximumSpecialCakes)
-                    return;
-
-                var ordinaryCouldImprove = entries?.CouldImprove(childMask, totalCakes) != false;
-                var adjustedTotalCakes = totalCakes;
-                var terminalCouldImprove = false;
-                if (terminalGenderEntries is not null)
-                {
-                    var adjustedBreedings = BredPalReferenceEffort.WithGuaranteedGender(
-                        selfBreedings,
-                        child,
-                        settings.DB,
-                        terminalTarget.RequiredGender,
-                        settings.UseGenderReversers
-                    );
-                    adjustedTotalCakes += usesSpecialCake
-                        ? adjustedBreedings - selfBreedings
-                        : 0;
-                    terminalCouldImprove = terminalGenderEntries.CouldImprove(
-                        childMask,
-                        adjustedTotalCakes
-                    );
-                }
-
-                if (entries is not null && !ordinaryCouldImprove && !terminalCouldImprove)
-                {
-                    metrics.CakeFirstPrunedAttempts++;
-                    return;
-                }
-
-                var childEntry = new AttackProfileEntry(
-                    childMask,
-                    totalCakes,
-                    parentEffort + (guaranteed ? guaranteedSelfEffort : dilutedSelfEffort),
-                    selfBreedings,
-                    usesSpecialCake
-                );
-                if (childEntry.BreedingEffort > settings.MaxEffort)
-                    return;
-
-                if (entries is not null)
-                {
-                    if (ordinaryCouldImprove)
-                        entries.Add(childEntry);
-                    if (terminalCouldImprove)
-                    {
-                        var adjusted = childEntry.WithGuaranteedGender(
-                            settings.GameSettings,
-                            child,
-                            parent1.TimeFactor,
-                            parent2.TimeFactor,
-                            settings.DB,
-                            terminalTarget.RequiredGender,
-                            settings.UseGenderReversers
-                        );
-                        terminalGenderEntries.Add(childEntry, adjusted);
-                    }
-                }
-                else
-                    choices!.Add(new(
-                        parent1Entry,
-                        parent2Entry,
-                        mode,
-                        parent1Loadout,
-                        parent2Loadout,
-                        childEntry,
-                        attackProbability
-                    ));
             }
         }
 
         return metrics;
+
+        void BuildCategoryChampions(
+            ReadOnlySpan<AttackProfileEntry> profileEntries,
+            Span<int> champions
+        )
+        {
+            for (var entryIndex = 0; entryIndex < profileEntries.Length; entryIndex++)
+            {
+                ref readonly var entry = ref profileEntries[entryIndex];
+                UpdateChampion(anyCategory, entryIndex, entry, profileEntries, champions);
+
+                var entryMask = (byte)(entry.LearnedTargetMask & inheritableTargetMask);
+                for (var bitIndex = 0; bitIndex < 6; bitIndex++)
+                {
+                    var category = (bitIndex << 1) + ((entryMask >> bitIndex) & 1);
+                    UpdateChampion(category, entryIndex, entry, profileEntries, champions);
+                }
+            }
+        }
+
+        static void UpdateChampion(
+            int category,
+            int entryIndex,
+            in AttackProfileEntry entry,
+            ReadOnlySpan<AttackProfileEntry> profileEntries,
+            Span<int> champions
+        )
+        {
+            var incumbentIndex = champions[category];
+            if (incumbentIndex < 0 || AttackProfileEntryComparer.CompareCosts(
+                    entry,
+                    profileEntries[incumbentIndex]
+                ) < 0)
+                champions[category] = entryIndex;
+        }
+
+        void EmitBestNormal(
+            ReadOnlySpan<AttackProfileEntry> firstEntries,
+            ReadOnlySpan<AttackProfileEntry> secondEntries,
+            ReadOnlySpan<int> firstChampions,
+            ReadOnlySpan<int> secondChampions,
+            int parent1Category,
+            int parent2Category,
+            byte bit
+        )
+        {
+            if (firstChampions[parent1Category] < 0 || secondChampions[parent2Category] < 0)
+                return;
+
+            metrics.NormalAttempts++;
+            var parent1HasAttack = (parent1Category & 1) != 0;
+            var parent2HasAttack = (parent2Category & 1) != 0;
+            var probability = Probabilities.Attacks.ProbabilityInheritedTargetAttack(
+                parent1HasAttack,
+                parent2HasAttack,
+                parent1HasNoopAttack,
+                parent2HasNoopAttack
+            );
+            var selfEffort = probability == 1 ? guaranteedSelfEffort : dilutedSelfEffort;
+            if (TryGetBestPair(
+                    firstEntries,
+                    secondEntries,
+                    firstChampions,
+                    secondChampions,
+                    parent1Category,
+                    parent2Category,
+                    selfEffort,
+                    out var parent1Entry,
+                    out var parent2Entry,
+                    out var parentCakes,
+                    out var parentEffort
+                ) && !Emit(
+                    parent1Entry,
+                    parent2Entry,
+                    parentCakes,
+                    parentEffort,
+                    AttackCompositionMode.Normal,
+                    parent1HasAttack ? bit : (byte)0,
+                    parent2HasAttack ? bit : (byte)0,
+                    (byte)(innateMask | bit),
+                    probability,
+                    usesSpecialCake: false
+                ))
+                metrics.NormalPrunedAttempts++;
+        }
+
+        bool TryGetBestPair(
+            ReadOnlySpan<AttackProfileEntry> firstEntries,
+            ReadOnlySpan<AttackProfileEntry> secondEntries,
+            ReadOnlySpan<int> firstChampions,
+            ReadOnlySpan<int> secondChampions,
+            int parent1Category,
+            int parent2Category,
+            TimeSpan selfEffort,
+            out AttackProfileEntry parent1Entry,
+            out AttackProfileEntry parent2Entry,
+            out int parentCakes,
+            out TimeSpan parentEffort
+        )
+        {
+            var parent1Index = firstChampions[parent1Category];
+            var parent2Index = secondChampions[parent2Category];
+            if (parent1Index < 0 || parent2Index < 0)
+            {
+                parent1Entry = default;
+                parent2Entry = default;
+                parentCakes = default;
+                parentEffort = default;
+                return false;
+            }
+
+            parent1Entry = firstEntries[parent1Index];
+            parent2Entry = secondEntries[parent2Index];
+            parentCakes = parent1Entry.TotalSpecialCakes + parent2Entry.TotalSpecialCakes;
+            parentEffort = BredPalReferenceEffort.CombineParentEffort(
+                settings.GameSettings,
+                parent1,
+                parent2,
+                parent1Entry.BreedingEffort,
+                parent2Entry.BreedingEffort
+            );
+
+            if (maxSpecialCakes is int maximumSpecialCakes && parentCakes > maximumSpecialCakes)
+                return false;
+            if (parentEffort + selfEffort <= settings.MaxEffort)
+                return true;
+
+            // A cake-heavier parent pair can still be the only pair under MaxEffort.
+            // Fall back only for that constrained case; the normal path remains O(1).
+            var found = false;
+            for (var parent1CandidateIndex = 0; parent1CandidateIndex < firstEntries.Length; parent1CandidateIndex++)
+            {
+                ref readonly var parent1Candidate = ref firstEntries[parent1CandidateIndex];
+                if (!MatchesCategory(parent1Candidate, parent1Category))
+                    continue;
+
+                for (var parent2CandidateIndex = 0; parent2CandidateIndex < secondEntries.Length; parent2CandidateIndex++)
+                {
+                    metrics.ParentEntryPairs++;
+                    ref readonly var parent2Candidate = ref secondEntries[parent2CandidateIndex];
+                    if (!MatchesCategory(parent2Candidate, parent2Category))
+                        continue;
+
+                    var candidateCakes = parent1Candidate.TotalSpecialCakes + parent2Candidate.TotalSpecialCakes;
+                    if (maxSpecialCakes is int maxCakes && candidateCakes > maxCakes)
+                        continue;
+                    var candidateEffort = BredPalReferenceEffort.CombineParentEffort(
+                        settings.GameSettings,
+                        parent1,
+                        parent2,
+                        parent1Candidate.BreedingEffort,
+                        parent2Candidate.BreedingEffort
+                    );
+                    if (candidateEffort + selfEffort > settings.MaxEffort)
+                        continue;
+                    if (found && (candidateCakes > parentCakes ||
+                        candidateCakes == parentCakes && candidateEffort >= parentEffort))
+                        continue;
+
+                    found = true;
+                    parent1Entry = parent1Candidate;
+                    parent2Entry = parent2Candidate;
+                    parentCakes = candidateCakes;
+                    parentEffort = candidateEffort;
+                }
+            }
+
+            return found;
+        }
+
+        bool MatchesCategory(in AttackProfileEntry entry, int category)
+        {
+            if (category == anyCategory)
+                return true;
+            var bit = 1 << (category >> 1);
+            var hasAttack = (category & 1) != 0;
+            return ((entry.LearnedTargetMask & inheritableTargetMask & bit) != 0) == hasAttack;
+        }
+
+        bool Emit(
+            in AttackProfileEntry parent1Entry,
+            in AttackProfileEntry parent2Entry,
+            int parentCakes,
+            TimeSpan parentEffort,
+            AttackCompositionMode mode,
+            byte parent1Loadout,
+            byte parent2Loadout,
+            byte childMask,
+            float attackProbability,
+            bool usesSpecialCake
+        )
+        {
+            var guaranteed = attackProbability == 1;
+            var selfBreedings = guaranteed ? guaranteedBreedings : dilutedBreedings;
+            var totalCakes = parentCakes + (usesSpecialCake ? selfBreedings : 0);
+            if (maxSpecialCakes is int maximumSpecialCakes && totalCakes > maximumSpecialCakes)
+                return true;
+
+            var ordinaryCouldImprove = entries?.CouldImprove(childMask, totalCakes) != false;
+            var adjustedTotalCakes = totalCakes;
+            var terminalCouldImprove = false;
+            if (terminalGenderEntries is not null)
+            {
+                var adjustedBreedings = BredPalReferenceEffort.WithGuaranteedGender(
+                    selfBreedings,
+                    child,
+                    settings.DB,
+                    terminalTarget.RequiredGender,
+                    settings.UseGenderReversers
+                );
+                adjustedTotalCakes += usesSpecialCake
+                    ? adjustedBreedings - selfBreedings
+                    : 0;
+                terminalCouldImprove = terminalGenderEntries.CouldImprove(
+                    childMask,
+                    adjustedTotalCakes
+                );
+            }
+
+            if (entries is not null && !ordinaryCouldImprove && !terminalCouldImprove)
+                return false;
+
+            var childEntry = new AttackProfileEntry(
+                childMask,
+                totalCakes,
+                parentEffort + (guaranteed ? guaranteedSelfEffort : dilutedSelfEffort),
+                selfBreedings,
+                usesSpecialCake
+            );
+            if (childEntry.BreedingEffort > settings.MaxEffort)
+                return true;
+
+            if (entries is not null)
+            {
+                if (ordinaryCouldImprove)
+                    entries.Add(childEntry);
+                if (terminalCouldImprove)
+                {
+                    var adjusted = childEntry.WithGuaranteedGender(
+                        settings.GameSettings,
+                        child,
+                        parent1.TimeFactor,
+                        parent2.TimeFactor,
+                        settings.DB,
+                        terminalTarget.RequiredGender,
+                        settings.UseGenderReversers
+                    );
+                    terminalGenderEntries.Add(childEntry, adjusted);
+                }
+            }
+            else
+                choices!.Add(new(
+                    parent1Entry,
+                    parent2Entry,
+                    mode,
+                    parent1Loadout,
+                    parent2Loadout,
+                    childEntry,
+                    attackProbability
+                ));
+            return true;
+        }
     }
 
     private static AttackProfile Merge(AttackProfile primary, AttackProfile terminal)
@@ -325,10 +602,13 @@ internal sealed class AttackProfileComposer(
 
     private struct CompositionMetrics
     {
+        public long ParentEntryPairs;
         public long BaselineAttempts;
         public long NormalAttempts;
         public long CakeAttempts;
-        public long CakeFirstPrunedAttempts;
+        public long BaselinePrunedAttempts;
+        public long NormalPrunedAttempts;
+        public long CakePrunedAttempts;
     }
 
     /// <summary>
