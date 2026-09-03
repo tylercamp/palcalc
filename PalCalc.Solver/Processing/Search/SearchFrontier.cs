@@ -64,18 +64,23 @@ internal sealed class SearchFrontier : ICandidateFrontierView
         if (incumbents is null || incumbents.Count == 0)
             return FrontierCandidateAssessment.PotentialImprovement;
 
-        var assessments = incumbents
-            .Select(incumbent => selectionPolicy.AssessAgainstFrontier(reference, incumbent))
-            .ToList();
-        if (assessments.All(assessment =>
-            assessment == FrontierCandidateAssessment.GuaranteedImprovement
-        ))
-            return FrontierCandidateAssessment.GuaranteedImprovement;
+        var guaranteedImprovement = true;
+        foreach (var incumbent in incumbents)
+        {
+            var assessment = selectionPolicy.AssessAgainstFrontier(reference, incumbent);
+            if (assessment == FrontierCandidateAssessment.Inferior)
+                return FrontierCandidateAssessment.Inferior;
+            if (assessment != FrontierCandidateAssessment.GuaranteedImprovement)
+                guaranteedImprovement = false;
+        }
 
-        return assessments.All(assessment => assessment == FrontierCandidateAssessment.Inferior)
-            ? FrontierCandidateAssessment.Inferior
+        return guaranteedImprovement
+            ? FrontierCandidateAssessment.GuaranteedImprovement
             : FrontierCandidateAssessment.PotentialImprovement;
     }
+
+    public void ObserveTerminal(IEnumerable<IPalReference> candidates) =>
+        resultAccumulator.Observe(candidates);
 
     /// <summary>
     /// Marks candidates with the same effective properties as ineligible for
@@ -182,13 +187,17 @@ internal sealed class SearchFrontier : ICandidateFrontierView
 
         // Terminal results are accumulated before frontier selection because a
         // completed result need not remain useful as a future parent.
-        resultAccumulator.Observe(
-            newCandidates.TakeWhile(_ =>
-            {
-                if (controller.IsPaused) controller.PauseIfRequested();
-                return !controller.CancellationToken.IsCancellationRequested;
-            })
-        );
+        if (attackTargets?.IsActive != true)
+        {
+            resultAccumulator.Observe(
+                newCandidates.TakeWhile(_ =>
+                {
+                    if (controller.IsPaused) controller.PauseIfRequested();
+                    return !controller.CancellationToken.IsCancellationRequested;
+                })
+            );
+        }
+        newCandidates.RemoveAll(candidate => candidate.IsOutdated);
         if (controller.CancellationToken.IsCancellationRequested)
             return FrontierDelta.None;
 

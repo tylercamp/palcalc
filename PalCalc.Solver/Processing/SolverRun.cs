@@ -70,7 +70,8 @@ namespace PalCalc.Solver.Processing
                         selectionPolicy: context.SelectionPolicy,
                         frontier: frontier,
                         palIds: settings.DB.PalsById.Keys,
-                        attackTargets: context.AttackTargets
+                        attackTargets: context.AttackTargets,
+                        settings: settings
                     ),
                     AttackTargets: context.AttackTargets
                 );
@@ -104,6 +105,8 @@ namespace PalCalc.Solver.Processing
                             stateUpdated?.Invoke(statusMsg);
                         }
                     );
+
+                    frontier.ObserveTerminal(expansionContext.PreFilter.TerminalCandidates);
 
                     statusMsg = statusMsg with
                     {
@@ -139,6 +142,7 @@ namespace PalCalc.Solver.Processing
             var results = resultPostProcessor.Finalize(frontier.TerminalResults);
             if (context.SelectionPolicy is DefaultCandidateSelectionPolicy defaultPolicy)
                 defaultPolicy.LogAttackSelectionDiagnostics();
+            context.AttackDiagnostics.Log();
             return results;
         }
     }

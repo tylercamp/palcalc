@@ -160,7 +160,7 @@ public class AttackProfileComposerTests
     }
 
     [TestMethod]
-    public void Compose_DominanceRetainsTimeCakeTradeoffs()
+    public void Compose_PrefersFewerCakesOverFasterOutcomeForSameMask()
     {
         var attack = Attacks(1);
         var profile = Compose(
@@ -171,14 +171,14 @@ public class AttackProfileComposerTests
         );
 
         Assert.IsTrue(profile.Entries.Any(entry => entry.LearnedTargetMask == 1 && !entry.SelfUsesSpecialCake));
-        Assert.IsTrue(profile.Entries.Any(entry => entry.LearnedTargetMask == 1 && entry.SelfUsesSpecialCake));
+        Assert.IsFalse(profile.Entries.Any(entry => entry.LearnedTargetMask == 1 && entry.SelfUsesSpecialCake));
     }
 
     [TestMethod]
     public void Compose_RemovesEntriesOverTheEffortLimit()
     {
         var settings = Settings(cakes: 0, maxEffort: TimeSpan.Zero);
-        var composer = new AttackProfileComposer(Context(Attacks(1)), settings, new ObjectPoolFactory());
+        var composer = new AttackProfileComposer(Context(Attacks(1)), settings);
 
         Assert.AreEqual(0, composer.Compose(Child, Reference(new(Entry(0))), Reference(new(Entry(0))), 1, 1).Entries.Count);
     }
@@ -196,7 +196,7 @@ public class AttackProfileComposerTests
         var owned2 = Reference(profile2);
         var bred1 = BredReference(settings, profile1);
         var bred2 = BredReference(settings, profile2);
-        var composer = new AttackProfileComposer(context, settings, new ObjectPoolFactory());
+        var composer = new AttackProfileComposer(context, settings);
         var self = BredPalReferenceEffort.CalculateSelfBreedingEffort(gameSettings, Child, 1, 1, 1);
 
         Assert.AreEqual(TimeSpan.FromMinutes(30) + self, composer.Compose(Child, owned1, owned2, 1, 1).Entries.Single().BreedingEffort);
@@ -212,7 +212,7 @@ public class AttackProfileComposerTests
     )
     {
         var settings = Settings(cakes: cakes);
-        return new AttackProfileComposer(Context(attacks), settings, new ObjectPoolFactory())
+        return new AttackProfileComposer(Context(attacks), settings)
             .Compose(Child, Reference(new(parent1)), Reference(new(parent2)), passivesProbability, 1);
     }
 
@@ -226,7 +226,7 @@ public class AttackProfileComposerTests
     )
     {
         var settings = Settings(cakes: cakes);
-        return new AttackProfileComposer(Context(attacks), settings, new ObjectPoolFactory())
+        return new AttackProfileComposer(Context(attacks), settings)
             .EnumerateChoices(Child, Reference(new(parent1)), Reference(new(parent2), parent2Neutral), passivesProbability, 1);
     }
 

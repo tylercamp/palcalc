@@ -130,7 +130,8 @@ public class ParallelBatchExecutorTests
                 context.SelectionPolicy,
                 frontier,
                 configuredSolver.Settings.DB.PalsById.Keys,
-                context.AttackTargets
+                context.AttackTargets,
+                configuredSolver.Settings
             ),
             AttackTargets: context.AttackTargets
         );

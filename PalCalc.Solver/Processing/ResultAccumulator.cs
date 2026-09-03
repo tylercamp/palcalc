@@ -20,11 +20,28 @@ internal sealed class ResultAccumulator(
     // so structural effort cannot group terminal candidates here.
     public IEnumerable<IPalReference> Results => discovered.Distinct();
 
-    public IEnumerable<IPalReference> SelectFinalResults(IEnumerable<IPalReference> candidates) =>
-        candidates
-            .Distinct()
-            .GroupBy(selectionPolicy.BreedingEffortGroupOf)
-            .SelectMany(selectionPolicy.SelectRetainedAlternatives);
+    public IEnumerable<IPalReference> SelectFinalResults(IEnumerable<IPalReference> candidates)
+    {
+        var distinct = candidates.Distinct().ToList();
+        if (attackTargets?.IsActive != true)
+        {
+            return distinct
+                .GroupBy(selectionPolicy.BreedingEffortGroupOf)
+                .SelectMany(selectionPolicy.SelectRetainedAlternatives);
+        }
+
+        // Materialized attack results have already had required gender applied.
+        // Keep only the minimum-cake tier before ordinary result pruning; this is
+        // the accepted trade-off that makes cake use the primary optimization goal.
+        var minimumCakes = distinct.Count == 0
+            ? 0
+            : distinct.Min(reference => reference.AttackProfile.EntriesSpan[0].TotalSpecialCakes);
+        return selectionPolicy.SelectRetainedAlternatives(
+            distinct.Where(reference =>
+                reference.AttackProfile.EntriesSpan[0].TotalSpecialCakes == minimumCakes
+            )
+        );
+    }
 
     public void Observe(IEnumerable<IPalReference> candidates)
     {

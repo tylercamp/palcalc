@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Runtime.InteropServices;
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
@@ -35,10 +34,12 @@ internal readonly record struct AttackCompositionChoice(
 internal sealed class AttackProfileComposer(
     AttackTargetContext targets,
     BreedingSolverSettings settings,
-    ObjectPoolFactory poolFactory
+    AttackSolverDiagnostics diagnostics = null,
+    PalSpecifier terminalTarget = null
 )
 {
-    private readonly LocalListPool<AttackProfileEntry> entryListPool = poolFactory.GetListPool<AttackProfileEntry>();
+    private readonly AttackProfileReducer.Accumulator accumulator = new(diagnostics);
+    private readonly AttackProfileReducer.Accumulator terminalGenderAccumulator = new();
 
     /// <summary>
     /// Calculates a combined attack profile from the given parents. Profile entries which require multiple attempts
@@ -56,12 +57,42 @@ internal sealed class AttackProfileComposer(
         if (!targets.IsActive)
             return AttackProfile.Inactive;
 
-        using var entriesRef = entryListPool.Borrow();
-        Enumerate(child, parent1, parent2, passivesProbability, ivsProbability, entriesRef.Value, null);
-        return AttackProfileReducer.Reduce(
-            targets.StateOf(child).HasNooplLevel1Attack,
-            CollectionsMarshal.AsSpan(entriesRef.Value)
+        var hasNoopAttack = targets.StateOf(child).HasNooplLevel1Attack;
+        accumulator.Reset(hasNoopAttack);
+        // Required gender can change both expected cakes and effort at the final
+        // edge. Preserve that mask champion alongside the ordinary parent-use
+        // champion so applying gender after the search cannot reverse a choice
+        // which was already discarded.
+        var preserveTerminalGenderChoice =
+            terminalTarget is not null &&
+            terminalTarget.RequiredGender != PalGender.WILDCARD &&
+            child == terminalTarget.Pal;
+        if (preserveTerminalGenderChoice)
+            terminalGenderAccumulator.Reset(hasNoopAttack);
+
+        var metrics = Enumerate(
+            child,
+            parent1,
+            parent2,
+            passivesProbability,
+            ivsProbability,
+            accumulator,
+            preserveTerminalGenderChoice ? terminalGenderAccumulator : null,
+            null
         );
+        var result = accumulator.Build();
+        if (preserveTerminalGenderChoice)
+            result = Merge(result, terminalGenderAccumulator.Build());
+        diagnostics?.RecordComposition(
+            parent1.AttackProfile.EntriesSpan.Length,
+            parent2.AttackProfile.EntriesSpan.Length,
+            metrics.BaselineAttempts,
+            metrics.NormalAttempts,
+            metrics.CakeAttempts,
+            accumulator.InputCount,
+            result.EntriesSpan.Length
+        );
+        return result;
     }
 
     public IReadOnlyList<AttackCompositionChoice> EnumerateChoices(
@@ -74,17 +105,18 @@ internal sealed class AttackProfileComposer(
     {
         var choices = new List<AttackCompositionChoice>();
         if (targets.IsActive)
-            Enumerate(child, parent1, parent2, passivesProbability, ivsProbability, null, choices);
+            Enumerate(child, parent1, parent2, passivesProbability, ivsProbability, null, null, choices);
         return choices;
     }
 
-    private void Enumerate(
+    private CompositionMetrics Enumerate(
         Pal child,
         IPalReference parent1,
         IPalReference parent2,
         float passivesProbability,
         float ivsProbability,
-        List<AttackProfileEntry> entries,
+        AttackProfileReducer.Accumulator entries,
+        AttackProfileReducer.Accumulator terminalGenderEntries,
         List<AttackCompositionChoice> choices
     )
     {
@@ -94,7 +126,9 @@ internal sealed class AttackProfileComposer(
 
         var baseProbability = passivesProbability * ivsProbability;
         if (baseProbability <= 0)
-            return;
+            return default;
+
+        var metrics = new CompositionMetrics();
 
         var innateMask = targets.StateOf(child).Level1TargetMask;
         var guaranteedBreedings = (int)Math.Ceiling(1f / baseProbability);
@@ -105,10 +139,10 @@ internal sealed class AttackProfileComposer(
         var dilutedSelfEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
             settings.GameSettings, child, parent1.TimeFactor, parent2.TimeFactor, dilutedBreedings
         );
-        Span<ushort> cakeLoadouts = stackalloc ushort[64];
         foreach (var parent1Entry in parent1.AttackProfile.EntriesSpan)
         foreach (var parent2Entry in parent2.AttackProfile.EntriesSpan)
         {
+            metrics.BaselineAttempts++;
             var parentCakes = parent1Entry.TotalSpecialCakes + parent2Entry.TotalSpecialCakes;
             var parentEffort = BredPalReferenceEffort.CombineParentEffort(
                 settings.GameSettings,
@@ -135,6 +169,8 @@ internal sealed class AttackProfileComposer(
                 if ((normalTargets & bit) == 0)
                     continue;
 
+                metrics.NormalAttempts++;
+
                 var parent1HasAttack = (parent1Mask & bit) != 0;
                 var parent2HasAttack = (parent2Mask & bit) != 0;
                 var probability = Probabilities.Attacks.ProbabilityInheritedTargetAttack(
@@ -155,9 +191,10 @@ internal sealed class AttackProfileComposer(
 
             if (settings.MaxSpecialCakes != 0)
             {
-                var cakeLoadoutCount = EnumerateCakeMasks(parent1Mask, parent2Mask, cakeLoadouts);
-                for (var i = 0; i < cakeLoadoutCount; i++)
+                var cakeLoadouts = CakeMaskCache.Values[(parent1Mask << 6) | parent2Mask];
+                for (var i = 0; i < cakeLoadouts.Length; i++)
                 {
+                    metrics.CakeAttempts++;
                     var loadouts = cakeLoadouts[i];
                     var parent1Loadout = (byte)(loadouts >> 8);
                     var parent2Loadout = (byte)loadouts;
@@ -198,7 +235,22 @@ internal sealed class AttackProfileComposer(
                     return;
 
                 if (entries is not null)
+                {
                     entries.Add(childEntry);
+                    if (terminalGenderEntries is not null)
+                    {
+                        var adjusted = childEntry.WithGuaranteedGender(
+                            settings.GameSettings,
+                            child,
+                            parent1.TimeFactor,
+                            parent2.TimeFactor,
+                            settings.DB,
+                            terminalTarget.RequiredGender,
+                            settings.UseGenderReversers
+                        );
+                        terminalGenderEntries.Add(childEntry, adjusted);
+                    }
+                }
                 else
                     choices!.Add(new(
                         parent1Entry,
@@ -211,6 +263,35 @@ internal sealed class AttackProfileComposer(
                     ));
             }
         }
+
+        return metrics;
+    }
+
+    private static AttackProfile Merge(AttackProfile primary, AttackProfile terminal)
+    {
+        var result = new AttackProfileEntry[
+            primary.EntriesSpan.Length + terminal.EntriesSpan.Length
+        ];
+        var count = 0;
+        foreach (ref readonly var entry in primary.EntriesSpan)
+            result[count++] = entry;
+        foreach (ref readonly var entry in terminal.EntriesSpan)
+        {
+            if (primary.EntriesSpan.Contains(entry))
+                continue;
+            result[count++] = entry;
+        }
+
+        if (count != result.Length)
+            Array.Resize(ref result, count);
+        return new AttackProfile(primary.HasNoopAttack, result);
+    }
+
+    private struct CompositionMetrics
+    {
+        public long BaselineAttempts;
+        public long NormalAttempts;
+        public long CakeAttempts;
     }
 
     /// <summary>
@@ -278,6 +359,29 @@ internal sealed class AttackProfileComposer(
             var duplicateMask = (byte)(loadout & otherLoadout);
             var duplicateBit = 1 << BitOperations.TrailingZeroCount((uint)duplicateMask);
             loadout = (byte)(loadout & ~duplicateBit);
+        }
+    }
+
+    private static class CakeMaskCache
+    {
+        public static readonly ushort[][] Values = Build();
+
+        private static ushort[][] Build()
+        {
+            var result = new ushort[64 * 64][];
+            Span<ushort> buffer = stackalloc ushort[64];
+            for (var parent1Mask = 0; parent1Mask < 64; parent1Mask++)
+            for (var parent2Mask = 0; parent2Mask < 64; parent2Mask++)
+            {
+                var count = EnumerateCakeMasks(
+                    (byte)parent1Mask,
+                    (byte)parent2Mask,
+                    buffer
+                );
+                result[(parent1Mask << 6) | parent2Mask] = buffer[..count].ToArray();
+            }
+
+            return result;
         }
     }
 }

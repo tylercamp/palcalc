@@ -140,6 +140,50 @@ public class SearchFrontierCharacterizationTests
     }
 
     [TestMethod]
+    public void AssessCandidate_RejectsWhenAnyIncumbentDefinitelyDominates()
+    {
+        var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
+        var requiredAttack = SolverTestScenario.DB.ActiveSkills.First(attack => attack.CanInherit);
+        var policy = new DefaultCandidateSelectionPolicy(
+            MinimumEffortOnly,
+            CancellationToken.None,
+            attackTargets: new AttackTargetContext(
+                new PalSpecifier { RequiredAttacks = [requiredAttack] },
+                SolverTestScenario.DB
+            )
+        );
+        var statePal = "Katress".ToPal(SolverTestScenario.DB);
+        var dominating = new TestPalReference(
+            "dominating",
+            statePal,
+            TimeSpan.FromMinutes(5),
+            attackProfile: Profile(1)
+        );
+        var incomparable = new TestPalReference(
+            "incomparable",
+            statePal,
+            TimeSpan.FromMinutes(5),
+            attackProfile: Profile(2)
+        );
+        var candidate = new TestPalReference(
+            "candidate",
+            statePal,
+            TimeSpan.FromMinutes(10),
+            attackProfile: Profile(1)
+        );
+        var frontier = FrontierFor(
+            targetPal,
+            [dominating, incomparable],
+            selectionPolicy: policy
+        );
+
+        Assert.AreEqual(
+            FrontierCandidateAssessment.Inferior,
+            frontier.AssessCandidate(candidate, policy.KeyOf(candidate))
+        );
+    }
+
+    [TestMethod]
     public void ExpandSingles_PreservesAttackEnvelopeAcrossPrePruningAndMerge()
     {
         var targetPal = "Anubis".ToPal(SolverTestScenario.DB);

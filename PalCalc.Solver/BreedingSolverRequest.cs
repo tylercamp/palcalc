@@ -50,6 +50,7 @@ internal sealed class SolverRunContext
         Controller = controller;
         SelectionPolicy = selectionPolicy;
         AttackTargets = attackTargets;
+        AttackDiagnostics = new AttackSolverDiagnostics();
     }
 
     public PalSpecifier Target { get; }
@@ -59,6 +60,7 @@ internal sealed class SolverRunContext
     public SolverStateController Controller { get; }
     public ICandidateSelectionPolicy SelectionPolicy { get; }
     public AttackTargetContext AttackTargets { get; }
+    public AttackSolverDiagnostics AttackDiagnostics { get; }
 
     public static SolverRunContext Create(
         BreedingSolverRequest request,

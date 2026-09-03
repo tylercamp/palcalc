@@ -8,6 +8,15 @@ namespace PalCalc.Solver.Tests.Processing.Attacks;
 public class AttackProfileTests
 {
     [TestMethod]
+    public void EntryComparison_PrefersFewerCakesBeforeLowerEffort()
+    {
+        var fewerCakes = Entry(mask: 1, cakes: 1, effort: 20, breedings: 2);
+        var faster = Entry(mask: 1, cakes: 2, effort: 10, breedings: 1);
+
+        Assert.IsTrue(AttackProfileEntryComparer.Instance.Compare(fewerCakes, faster) < 0);
+    }
+
+    [TestMethod]
     public void Reducer_FasterEqualCakeSupersetCoversSlowerSubset()
     {
         var provider = Entry(mask: 0b11, cakes: 2, effort: 10, breedings: 2);
@@ -52,6 +61,43 @@ public class AttackProfileTests
 
         Assert.AreEqual(1, profile.Entries.Count);
         Assert.AreEqual(duplicate, profile.Entries.Single());
+    }
+
+    [TestMethod]
+    public void Reducer_KeepsAtMostOneChampionPerMask()
+    {
+        var random = new Random(1729);
+        for (var sample = 0; sample < 100; sample++)
+        {
+            var entries = Enumerable.Range(0, random.Next(1, 65))
+                .Select(_ => Entry(
+                    mask: (byte)random.Next(64),
+                    cakes: random.Next(5),
+                    effort: random.Next(20),
+                    breedings: random.Next(5),
+                    usesCake: random.Next(2) == 0
+                ))
+                .ToArray();
+
+            var reduced = AttackProfileReducer.Reduce(entries).Entries;
+
+            Assert.IsTrue(reduced.Count <= 64, $"Sample {sample}");
+            Assert.AreEqual(reduced.Count, reduced.Select(entry => entry.LearnedTargetMask).Distinct().Count());
+        }
+    }
+
+    [TestMethod]
+    public void Accumulator_CanPreserveOriginalEntryChosenByAdjustedCosts()
+    {
+        var accumulator = new AttackProfileReducer.Accumulator();
+        accumulator.Reset(hasNoop: false);
+        var ordinaryChampion = Entry(mask: 1, cakes: 1, effort: 10, breedings: 1);
+        var genderChampion = Entry(mask: 1, cakes: 2, effort: 20, breedings: 2);
+
+        accumulator.Add(ordinaryChampion, Entry(mask: 1, cakes: 3, effort: 30, breedings: 3));
+        accumulator.Add(genderChampion, Entry(mask: 1, cakes: 2, effort: 25, breedings: 2));
+
+        Assert.AreEqual(genderChampion, accumulator.Build().Entries.Single());
     }
 
     [TestMethod]

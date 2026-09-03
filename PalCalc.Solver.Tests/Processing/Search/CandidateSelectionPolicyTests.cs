@@ -206,7 +206,21 @@ public class CandidateSelectionPolicyTests
 
         var retained = policy.SelectRetainedAlternatives([ordinary, noop]);
 
-        CollectionAssert.AreEquivalent(new[] { ordinary, noop }, retained.ToArray());
+        Assert.IsTrue(retained.Any(candidate => candidate.AttackProfile.HasNoopAttack));
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_PreferOneProviderCoveringMultipleSkylineEntries()
+    {
+        var policy = ActivePolicy(new(token => [new MinimumEffortPruning(token)]));
+        var baseline = Reference("baseline", "Katress", TimeSpan.Zero, Profile(0));
+        var first = Reference("first", "Katress", TimeSpan.FromMinutes(1), Profile(1));
+        var second = Reference("second", "Katress", TimeSpan.FromMinutes(2), Profile(2));
+        var bundled = Reference("bundled", "Katress", TimeSpan.FromMinutes(3), Profile(1, 2));
+
+        var retained = policy.SelectRetainedAlternatives([baseline, first, second, bundled]);
+
+        CollectionAssert.AreEquivalent(new[] { baseline, bundled }, retained.ToArray());
     }
 
     [TestMethod]

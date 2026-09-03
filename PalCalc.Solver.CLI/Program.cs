@@ -41,18 +41,18 @@ internal class Program
                 breedingDB: PalBreedingDB.LoadEmbedded(db),
                 resultPruning: ResultPruningPolicy.Default,
                 ownedPals: savedInstances,
-                maxBreedingSteps: 6,
+                maxBreedingSteps: 40,
                 maxSolverIterations: 99,
-                maxWildPals: 0,
+                maxWildPals: 15,
                 allowedWildPals: db.Pals.ToList(),
                 bannedBredPals: new List<Pal>(),
                 maxBredIrrelevantPassives: 0,
-                maxInputIrrelevantPassives: 4,
+                maxInputIrrelevantPassives: 3,
                 maxEffort: TimeSpan.FromDays(7),
-                maxThreads: 1,
+                maxThreads: 0,
                 maxSurgeryCost: 1_000_000,
                 allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
-                useGenderReversers: true,
+                useGenderReversers: false,
                 maxSpecialCakes: 1000000
         );
         var solver = new BreedingSolver();
@@ -76,7 +76,7 @@ internal class Program
         {
             Pal = "Broncherry".ToPal(db),
             RequiredPassives = [],
-            RequiredAttacks = [ "Bog Blast".ToActive(db) /* , "Bubble Blast".ToActive(db) , "Aqua Gun".ToActive(db) */ ],
+            RequiredAttacks = [ "Bog Blast".ToActive(db), "Bubble Blast".ToActive(db), "Aqua Gun".ToActive(db), "Dark Ball".ToActive(db) ],
             //IV_Attack = 90,
             //IV_Defense = 90,
             //IV_HP = 90

@@ -1,6 +1,7 @@
 using PalCalc.Model;
 using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 
@@ -37,12 +38,14 @@ internal sealed class CandidatePreFilter
     private readonly PalSpecifier target;
     private readonly AttackTargetContext attackTargets;
     private readonly TimeSpan maxEffort;
+    private readonly BreedingSolverSettings settings;
     private readonly ICandidateSelectionPolicy selectionPolicy;
     private readonly ICandidateFrontierView frontier;
     private readonly FrozenDictionary<
         PalId,
-        ConcurrentDictionary<EffectivePropertiesKey, IPalReference>
+        ConcurrentDictionary<EffectivePropertiesKey, EarlyCandidateGroup>
     > earlyCandidatesByPalId;
+    private readonly ConcurrentDictionary<EffectivePropertiesKey, IPalReference> terminalCandidates = new();
 
     public CandidatePreFilter(
         PalSpecifier target,
@@ -50,17 +53,19 @@ internal sealed class CandidatePreFilter
         ICandidateSelectionPolicy selectionPolicy,
         ICandidateFrontierView frontier,
         IEnumerable<PalId> palIds,
-        AttackTargetContext attackTargets
+        AttackTargetContext attackTargets,
+        BreedingSolverSettings settings
     )
     {
         this.target = target;
         this.attackTargets = attackTargets;
         this.maxEffort = maxEffort;
+        this.settings = settings;
         this.selectionPolicy = selectionPolicy;
         this.frontier = frontier;
         earlyCandidatesByPalId = palIds.ToFrozenDictionary(
             id => id,
-            _ => new ConcurrentDictionary<EffectivePropertiesKey, IPalReference>()
+            _ => new ConcurrentDictionary<EffectivePropertiesKey, EarlyCandidateGroup>()
         );
     }
 
@@ -69,6 +74,10 @@ internal sealed class CandidatePreFilter
         if (candidate.BreedingEffort > maxEffort)
             return CandidatePreFilterResult.Rejected;
 
+        var isTerminal = attackTargets?.Satisfies(candidate) ?? target.IsSatisfiedBy(candidate);
+        if (isTerminal && attackTargets?.IsActive == true)
+            RetainTerminal(candidate);
+
         var propertiesKey = selectionPolicy.KeyOf(candidate);
         var frontierAssessment = frontier.AssessCandidate(
             candidate,
@@ -76,33 +85,13 @@ internal sealed class CandidatePreFilter
         );
         if (
             frontierAssessment == FrontierCandidateAssessment.Inferior &&
-            !(attackTargets?.Satisfies(candidate) ?? target.IsSatisfiedBy(candidate))
+            !isTerminal
         )
             return CandidatePreFilterResult.Rejected;
 
         var earlyCandidates = earlyCandidatesByPalId[candidate.Pal.Id];
-        var accepted = earlyCandidates.TryAdd(propertiesKey, candidate);
-        while (!accepted)
-        {
-            var incumbent = earlyCandidates[propertiesKey];
-            switch (selectionPolicy.SelectEarlyCandidate(candidate, incumbent))
-            {
-                case EarlyCandidateSelection.RejectCandidate:
-                    break;
-
-                case EarlyCandidateSelection.KeepBoth:
-                    accepted = true;
-                    break;
-
-                case EarlyCandidateSelection.ReplaceIncumbent:
-                    accepted = earlyCandidates.TryUpdate(propertiesKey, candidate, incumbent);
-                    if (!accepted)
-                        continue;
-                    break;
-            }
-
-            break;
-        }
+        var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new());
+        var accepted = group.TryAdd(candidate, selectionPolicy, attackTargets?.IsActive == true);
 
         return accepted
             ? new(
@@ -113,11 +102,181 @@ internal sealed class CandidatePreFilter
             : CandidatePreFilterResult.Rejected;
     }
 
+    public IReadOnlyList<IPalReference> TerminalCandidates => terminalCandidates.Values.ToArray();
+
+    private void RetainTerminal(IPalReference candidate)
+    {
+        if (target.RequiredGender != PalGender.WILDCARD && candidate.Gender != target.RequiredGender)
+        {
+            if (candidate.Gender != PalGender.WILDCARD && !settings.UseGenderReversers)
+                return;
+            candidate = candidate.WithGuaranteedGender(
+                settings.DB,
+                target.RequiredGender,
+                settings.UseGenderReversers
+            );
+        }
+
+        var key = selectionPolicy.KeyOf(candidate);
+        terminalCandidates.AddOrUpdate(
+            key,
+            candidate,
+            (_, incumbent) => CompareTerminal(candidate, incumbent) < 0
+                ? candidate
+                : incumbent
+        );
+    }
+
+    private int CompareTerminal(IPalReference left, IPalReference right)
+    {
+        var leftEntry = BestTerminalEntry(left);
+        var rightEntry = BestTerminalEntry(right);
+        var comparison = AttackProfileEntryComparer.Instance.Compare(leftEntry, rightEntry);
+        if (comparison != 0) return comparison;
+        comparison = left.TotalCost.CompareTo(right.TotalCost);
+        if (comparison != 0) return comparison;
+        return left.GetHashCode().CompareTo(right.GetHashCode());
+    }
+
+    private AttackProfileEntry BestTerminalEntry(IPalReference candidate)
+    {
+        AttackProfileEntry best = default;
+        var found = false;
+        foreach (ref readonly var entry in candidate.AttackProfile.EntriesSpan)
+        {
+            if ((entry.LearnedTargetMask & attackTargets.FullTargetMask) != attackTargets.FullTargetMask)
+                continue;
+            if (!found || AttackProfileEntryComparer.Instance.Compare(entry, best) < 0)
+            {
+                best = entry;
+                found = true;
+            }
+        }
+        return best;
+    }
+
     public void Propagate(CandidatePreFilterResult result)
     {
         if (result.Accepted && result.IsGuaranteedImprovement)
         {
             frontier.MarkCandidatesOutdated(result.PropertiesKey);
+        }
+    }
+
+    private sealed class EarlyCandidateGroup
+    {
+        private readonly IPalReference[] attackChampions = new IPalReference[128];
+        private readonly AttackProfileEntry[] attackEntries = new AttackProfileEntry[128];
+        private readonly Dictionary<IPalReference, int> championCounts =
+            new(ReferenceEqualityComparer.Instance);
+        private IPalReference ordinaryIncumbent;
+
+        public bool TryAdd(
+            IPalReference candidate,
+            ICandidateSelectionPolicy selectionPolicy,
+            bool attacksActive
+        )
+        {
+            lock (this)
+            {
+                if (!attacksActive)
+                    return TryAddOrdinary(candidate, selectionPolicy);
+
+                Span<bool> improved = stackalloc bool[128];
+                var improvesAny = false;
+                foreach (ref readonly var entry in candidate.AttackProfile.EntriesSpan)
+                {
+                    var slot = entry.LearnedTargetMask +
+                        (candidate.AttackProfile.HasNoopAttack ? 64 : 0);
+                    if (attackChampions[slot] is not null &&
+                        Compare(candidate, entry, attackChampions[slot], attackEntries[slot]) >= 0)
+                        continue;
+
+                    improved[slot] = true;
+                    improvesAny = true;
+                }
+
+                if (!improvesAny)
+                    return false;
+
+                for (var slot = 0; slot < improved.Length; slot++)
+                {
+                    if (!improved[slot])
+                        continue;
+
+                    var previous = attackChampions[slot];
+                    if (previous is not null && --championCounts[previous] == 0)
+                    {
+                        championCounts.Remove(previous);
+                        previous.IsOutdated = true;
+                    }
+
+                    attackChampions[slot] = candidate;
+                    attackEntries[slot] = BestEntryForSlot(candidate, slot);
+                    championCounts.TryGetValue(candidate, out var count);
+                    championCounts[candidate] = count + 1;
+                }
+
+                return true;
+            }
+        }
+
+        private bool TryAddOrdinary(
+            IPalReference candidate,
+            ICandidateSelectionPolicy selectionPolicy
+        )
+        {
+            if (ordinaryIncumbent is null)
+            {
+                ordinaryIncumbent = candidate;
+                return true;
+            }
+
+            switch (selectionPolicy.SelectEarlyCandidate(candidate, ordinaryIncumbent))
+            {
+                case EarlyCandidateSelection.RejectCandidate:
+                    return false;
+                case EarlyCandidateSelection.ReplaceIncumbent:
+                    ordinaryIncumbent = candidate;
+                    return true;
+                default:
+                    return true;
+            }
+        }
+
+        private static AttackProfileEntry BestEntryForSlot(IPalReference candidate, int slot)
+        {
+            var mask = (byte)(slot & 63);
+            AttackProfileEntry best = default;
+            var found = false;
+            foreach (ref readonly var entry in candidate.AttackProfile.EntriesSpan)
+            {
+                if (entry.LearnedTargetMask != mask ||
+                    candidate.AttackProfile.HasNoopAttack != (slot >= 64))
+                    continue;
+                if (!found || AttackProfileEntryComparer.Instance.Compare(entry, best) < 0)
+                {
+                    best = entry;
+                    found = true;
+                }
+            }
+            return best;
+        }
+
+        private static int Compare(
+            IPalReference left,
+            in AttackProfileEntry leftEntry,
+            IPalReference right,
+            in AttackProfileEntry rightEntry
+        )
+        {
+            var comparison = AttackProfileEntryComparer.Instance.Compare(leftEntry, rightEntry);
+            if (comparison != 0) return comparison;
+            comparison = left.BreedingEffort.CompareTo(right.BreedingEffort);
+            if (comparison != 0) return comparison;
+            comparison = left.TotalCost.CompareTo(right.TotalCost);
+            if (comparison != 0) return comparison;
+            return left.GetHashCode().CompareTo(right.GetHashCode());
         }
     }
 }

@@ -97,11 +97,7 @@ internal sealed class ResultPostProcessor(
                 entry.BreedingEffort <= settings.MaxEffort &&
                 (settings.MaxSpecialCakes is not int maxCakes || entry.TotalSpecialCakes <= maxCakes)
             )
-            .OrderBy(entry => entry.BreedingEffort)
-            .ThenBy(entry => entry.TotalSpecialCakes)
-            .ThenBy(entry => entry.SelfBreedings)
-            .ThenBy(entry => entry.SelfUsesSpecialCake)
-            .ThenBy(entry => entry.LearnedTargetMask)
+            .Order(AttackProfileEntryComparer.Instance)
             .Cast<AttackProfileEntry?>()
             .FirstOrDefault();
 

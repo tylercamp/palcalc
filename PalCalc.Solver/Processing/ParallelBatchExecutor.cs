@@ -89,7 +89,9 @@ internal sealed class ParallelBatchExecutor(
                     new ObjectPoolFactory(),
                     context.Mechanics,
                     context.BreedingDB,
-                    expansionContext.AttackTargets
+                    expansionContext.AttackTargets,
+                    context.AttackDiagnostics,
+                    expansionContext.Target
                 );
 
                 while (Volatile.Read(ref workerFailure) == null)

@@ -278,7 +278,8 @@ public class CandidateExpanderTests
                 selectionPolicy,
                 frontier,
                 settings.DB.PalsById.Keys,
-                attackTargets
+                attackTargets,
+                settings
             ),
             AttackTargets: attackTargets
         );

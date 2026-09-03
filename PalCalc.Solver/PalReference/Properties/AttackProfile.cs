@@ -88,9 +88,9 @@ public readonly record struct AttackProfileEntry(
 ///     this Pal's parents.
 /// </para>
 /// <para>
-///     These attack outcomes are distinct; i.e., if the resource-cost and opportunity-cost
-///     of two outcomes are the same, and one outcome is strictly better (covers more attacks),
-///     the two will be merged to simplify the list.
+///     Profiles are deliberately bounded. For each requested-attack mask the solver keeps
+///     the outcome using the fewest Special Cakes, then the least breeding effort. An
+///     equal-or-better superset can replace a subset outcome.
 /// </para>
 /// <para>
 ///     The final, exact choice of attacks is decided in the final solver steps, using

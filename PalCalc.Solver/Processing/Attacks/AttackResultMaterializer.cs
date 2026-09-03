@@ -20,7 +20,7 @@ internal sealed class AttackResultMaterializer
     {
         this.targets = targets;
         this.settings = settings;
-        composer = new AttackProfileComposer(targets, settings, new ObjectPoolFactory());
+        composer = new AttackProfileComposer(targets, settings);
     }
 
     /// <summary>
@@ -59,7 +59,8 @@ internal sealed class AttackResultMaterializer
                 bred.IVsProbability
             )
             .Where(choice => MaterializedEntryFor(bred, choice.ChildEntry).Equals(selectedEntry))
-            .OrderBy(choice => choice.Mode)
+            .OrderBy(choice => choice.ChildEntry, AttackProfileEntryComparer.Instance)
+            .ThenBy(choice => choice.Mode)
             .ThenBy(choice => choice.Parent1TargetMask)
             .ThenBy(choice => choice.Parent2TargetMask)
             .ThenBy(choice => choice.Parent1Entry.LearnedTargetMask)
