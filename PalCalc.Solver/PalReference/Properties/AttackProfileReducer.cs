@@ -1,5 +1,4 @@
 using System.Numerics;
-using PalCalc.Solver.Processing.Attacks;
 
 namespace PalCalc.Solver.PalReference.Properties;
 
@@ -25,11 +24,10 @@ internal static class AttackProfileReducer
 
     public static AttackProfile Reduce(
         bool hasNoopAttack,
-        ReadOnlySpan<AttackProfileEntry> entries,
-        AttackSolverDiagnostics diagnostics = null
+        ReadOnlySpan<AttackProfileEntry> entries
     )
     {
-        var accumulator = new Accumulator(diagnostics);
+        var accumulator = new Accumulator();
         accumulator.Reset(hasNoopAttack);
         foreach (ref readonly var entry in entries)
             accumulator.Add(entry);
@@ -42,7 +40,7 @@ internal static class AttackProfileReducer
     /// Cakes are the primary resource, and bounding every profile is required
     /// to keep multi-attack search tractable.
     /// </summary>
-    internal sealed class Accumulator(AttackSolverDiagnostics diagnostics = null)
+    internal sealed class Accumulator
     {
         private readonly AttackProfileEntry[] champions = new AttackProfileEntry[TargetMaskCount];
         private readonly AttackProfileEntry[] values = new AttackProfileEntry[TargetMaskCount];
@@ -124,12 +122,6 @@ internal static class AttackProfileReducer
                 retained[destination++] = values[mask];
             }
 
-            var occupiedCount = BitOperations.PopCount(occupiedMasks);
-            diagnostics?.RecordReduction(
-                inputCount,
-                retained.Length,
-                occupiedCount
-            );
             return new AttackProfile(hasNoopAttack, retained);
         }
     }

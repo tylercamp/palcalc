@@ -119,7 +119,6 @@ namespace PalCalc.Solver.Processing
 
                     return execution.Candidates;
                 });
-                frontier.LogAssessmentDiagnostics(s + 1);
                 context.AttackDiagnostics.LogCompositionStep(s + 1);
 
                 if (controller.CancellationToken.IsCancellationRequested) break;
@@ -142,8 +141,6 @@ namespace PalCalc.Solver.Processing
             var resultPostProcessor = new ResultPostProcessor(spec, settings, controller, context.AttackTargets);
             resultPostProcessor.ApplySurgery(frontier);
             var results = resultPostProcessor.Finalize(frontier.TerminalResults);
-            if (context.SelectionPolicy is DefaultCandidateSelectionPolicy defaultPolicy)
-                defaultPolicy.LogAttackSelectionDiagnostics();
             context.AttackDiagnostics.Log();
             return results;
         }

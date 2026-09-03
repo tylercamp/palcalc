@@ -43,7 +43,7 @@ internal sealed class AttackProfileComposer(
     private const int MaxEquippedAttacksPerParent = 3;
     private const int PackedParentLoadoutShift = 8;
 
-    private readonly AttackProfileReducer.Accumulator accumulator = new(diagnostics);
+    private readonly AttackProfileReducer.Accumulator accumulator = new();
     private readonly AttackProfileReducer.Accumulator terminalGenderAccumulator = new();
 
     /// <summary>
@@ -90,12 +90,6 @@ internal sealed class AttackProfileComposer(
             result = Merge(result, terminalGenderAccumulator.Build());
         diagnostics?.RecordComposition(
             metrics.ParentEntryPairs,
-            metrics.BaselineAttempts,
-            metrics.NormalAttempts,
-            metrics.CakeAttempts,
-            metrics.BaselinePrunedAttempts,
-            metrics.NormalPrunedAttempts,
-            metrics.CakePrunedAttempts,
             metrics.MaxEffortFallbacks,
             metrics.MaxEffortFallbackSuccesses,
             metrics.MaxEffortFallbackPairs,
@@ -159,9 +153,12 @@ internal sealed class AttackProfileComposer(
 
         var parent1Entries = parent1Profile.EntriesSpan;
         var parent2Entries = parent2Profile.EntriesSpan;
-        // Normal inheritance only cares whether each parent can supply the one
-        // target attack, plus the profile-wide noop flag. Track the cheapest
-        // with/without entry for each target, and one unrestricted baseline entry.
+        // Normal inheritance transfers at most one target attack. For each parent,
+        // the categories below retain its cheapest unrestricted entry plus its
+        // cheapest entry with and without each of the six target bits. Those
+        // thirteen champions are sufficient to evaluate the baseline and the
+        // three parent-presence combinations which can transfer each target,
+        // without evaluating the full parent-profile Cartesian product.
         const int normalCategoryCount = TargetMaskBitCount * 2;
         const int anyCategory = normalCategoryCount;
         Span<int> parent1CategoryChampions = stackalloc int[normalCategoryCount + 1];
@@ -174,7 +171,6 @@ internal sealed class AttackProfileComposer(
             BuildCategoryChampions(parent1Entries, parent1CategoryChampions);
             BuildCategoryChampions(parent2Entries, parent2CategoryChampions);
 
-            metrics.BaselineAttempts++;
             if (TryGetBestPair(
                     parent1Entries,
                     parent2Entries,
@@ -187,7 +183,8 @@ internal sealed class AttackProfileComposer(
                     out var baselineParent2Entry,
                     out var baselineParentCakes,
                     out var baselineParentEffort
-                ) && !Emit(
+                ))
+                Emit(
                     baselineParent1Entry,
                     baselineParent2Entry,
                     baselineParentCakes,
@@ -198,8 +195,7 @@ internal sealed class AttackProfileComposer(
                     childMask: innateMask,
                     attackProbability: 1,
                     usesSpecialCake: false
-                ))
-                metrics.BaselinePrunedAttempts++;
+                );
 
             var normalTargetBits = (byte)(inheritableTargetMask & ~innateMask);
             while (normalTargetBits != 0)
@@ -252,8 +248,7 @@ internal sealed class AttackProfileComposer(
 
             if (choices is not null)
             {
-                metrics.BaselineAttempts++;
-                if (!Emit(
+                Emit(
                         parent1Entry,
                         parent2Entry,
                         parentCakes,
@@ -264,8 +259,7 @@ internal sealed class AttackProfileComposer(
                         childMask: innateMask,
                         attackProbability: 1,
                         usesSpecialCake: false
-                    ))
-                    metrics.BaselinePrunedAttempts++;
+                    );
             }
 
             var parent1Mask = (byte)(parent1Entry.LearnedTargetMask & inheritableTargetMask);
@@ -278,8 +272,6 @@ internal sealed class AttackProfileComposer(
                 var bit = (byte)(normalTargets & -normalTargets);
                 normalTargets &= (byte)~bit;
 
-                metrics.NormalAttempts++;
-
                 var parent1HasAttack = (parent1Mask & bit) != 0;
                 var parent2HasAttack = (parent2Mask & bit) != 0;
                 var probability = Probabilities.Attacks.ProbabilityInheritedTargetAttack(
@@ -288,7 +280,7 @@ internal sealed class AttackProfileComposer(
                     parent1HasNoopAttack,
                     parent2HasNoopAttack
                 );
-                if (!Emit(
+                Emit(
                         parent1Entry,
                         parent2Entry,
                         parentCakes,
@@ -299,8 +291,7 @@ internal sealed class AttackProfileComposer(
                         (byte)(innateMask | bit),
                         probability,
                         usesSpecialCake: false
-                    ))
-                    metrics.NormalPrunedAttempts++;
+                    );
             }
 
             if (maxSpecialCakes != 0)
@@ -310,11 +301,10 @@ internal sealed class AttackProfileComposer(
                 ];
                 for (var i = 0; i < cakeLoadouts.Length; i++)
                 {
-                    metrics.CakeAttempts++;
                     var loadouts = cakeLoadouts[i];
                     var parent1Loadout = (byte)(loadouts >> PackedParentLoadoutShift);
                     var parent2Loadout = (byte)loadouts;
-                    if (!Emit(
+                    Emit(
                             parent1Entry,
                             parent2Entry,
                             parentCakes,
@@ -325,8 +315,7 @@ internal sealed class AttackProfileComposer(
                             (byte)(innateMask | parent1Loadout | parent2Loadout),
                             attackProbability: 1,
                             usesSpecialCake: true
-                        ))
-                        metrics.CakePrunedAttempts++;
+                        );
                 }
             }
         }
@@ -381,7 +370,6 @@ internal sealed class AttackProfileComposer(
             if (firstChampions[parent1Category] < 0 || secondChampions[parent2Category] < 0)
                 return;
 
-            metrics.NormalAttempts++;
             var parent1HasAttack = (parent1Category & 1) != 0;
             var parent2HasAttack = (parent2Category & 1) != 0;
             var probability = Probabilities.Attacks.ProbabilityInheritedTargetAttack(
@@ -403,7 +391,8 @@ internal sealed class AttackProfileComposer(
                     out var parent2Entry,
                     out var parentCakes,
                     out var parentEffort
-                ) && !Emit(
+                ))
+                Emit(
                     parent1Entry,
                     parent2Entry,
                     parentCakes,
@@ -414,8 +403,7 @@ internal sealed class AttackProfileComposer(
                     (byte)(innateMask | bit),
                     probability,
                     usesSpecialCake: false
-                ))
-                metrics.NormalPrunedAttempts++;
+                );
         }
 
         // Parent effort combines monotonically (sum, or max with parallel farms),
@@ -519,7 +507,7 @@ internal sealed class AttackProfileComposer(
             return ((entry.LearnedTargetMask & inheritableTargetMask & bit) != 0) == hasAttack;
         }
 
-        bool Emit(
+        void Emit(
             in AttackProfileEntry parent1Entry,
             in AttackProfileEntry parent2Entry,
             int parentCakes,
@@ -536,7 +524,7 @@ internal sealed class AttackProfileComposer(
             var selfBreedings = guaranteed ? guaranteedBreedings : dilutedBreedings;
             var totalCakes = parentCakes + (usesSpecialCake ? selfBreedings : 0);
             if (maxSpecialCakes is int maximumSpecialCakes && totalCakes > maximumSpecialCakes)
-                return true;
+                return;
 
             var ordinaryCouldImprove = entries?.CouldImprove(childMask, totalCakes) != false;
             var adjustedTotalCakes = totalCakes;
@@ -560,7 +548,7 @@ internal sealed class AttackProfileComposer(
             }
 
             if (entries is not null && !ordinaryCouldImprove && !terminalCouldImprove)
-                return false;
+                return;
 
             var childEntry = new AttackProfileEntry(
                 childMask,
@@ -570,7 +558,7 @@ internal sealed class AttackProfileComposer(
                 usesSpecialCake
             );
             if (childEntry.BreedingEffort > settings.MaxEffort)
-                return true;
+                return;
 
             if (entries is not null)
             {
@@ -600,7 +588,6 @@ internal sealed class AttackProfileComposer(
                     childEntry,
                     attackProbability
                 ));
-            return true;
         }
     }
 
@@ -627,12 +614,6 @@ internal sealed class AttackProfileComposer(
     private struct CompositionMetrics
     {
         public long ParentEntryPairs;
-        public long BaselineAttempts;
-        public long NormalAttempts;
-        public long CakeAttempts;
-        public long BaselinePrunedAttempts;
-        public long NormalPrunedAttempts;
-        public long CakePrunedAttempts;
         public long MaxEffortFallbacks;
         public long MaxEffortFallbackSuccesses;
         public long MaxEffortFallbackPairs;
