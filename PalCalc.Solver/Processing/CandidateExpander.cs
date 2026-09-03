@@ -104,10 +104,10 @@ namespace PalCalc.Solver.Processing
             return res;
         }
 
-        TimeSpan CombinedEffort(IPalReference p1, IPalReference p2) =>
+        TimeSpan CombinedEffort(TimeSpan p1Effort, TimeSpan p2Effort) =>
             settings.GameSettings.MultipleBreedingFarms
-                ? p1.BreedingEffort > p2.BreedingEffort ? p1.BreedingEffort : p2.BreedingEffort
-                : p1.BreedingEffort + p2.BreedingEffort;
+                ? p1Effort > p2Effort ? p1Effort : p2Effort
+                : p1Effort + p2Effort;
 
         // we have two parents but don't necessarily have definite genders for them, figure out which parent should have which
         // gender (if they're wild/bred pals) for the least overall effort (different pals have different gender probabilities)
@@ -156,7 +156,7 @@ namespace PalCalc.Solver.Processing
             bool hasNoPreference = true;
             foreach (var (p1, p2) in parentPairOptions)
             {
-                var effort = CombinedEffort(p1, p2);
+                var effort = CombinedEffort(p1.BreedingEffort, p2.BreedingEffort);
                 if (optimalTime == TimeSpan.Zero) optimalTime = effort;
                 else if (optimalTime != effort)
                 {
@@ -172,10 +172,13 @@ namespace PalCalc.Solver.Processing
                 var p1wildcard = parent1.Gender == PalGender.WILDCARD;
                 var p2wildcard = parent2.Gender == PalGender.WILDCARD;
 
+                var p1Effort = parent1.BreedingEffort;
+                var p2Effort = parent2.BreedingEffort;
+
                 // should we set a specific gender on p1?
                 if (p1wildcard && (
                     !p2wildcard || // p2 is a specific gender
-                    parent1.BreedingEffort < parent2.BreedingEffort // p1 takes less effort than p2
+                    p1Effort < p2Effort // p1 takes less effort than p2
                 ))
                 {
                     return (parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender(), settings.UseGenderReversers), parent2);
@@ -184,7 +187,7 @@ namespace PalCalc.Solver.Processing
                 // should we set a specific gender on p2?
                 if (p2wildcard && (
                     !p1wildcard || // p1 is a specific gender
-                    parent2.BreedingEffort <= parent1.BreedingEffort // p2 takes less effort than p1 (need <= to resolve cases where self-effort is same for both wildcards)
+                    p2Effort <= p1Effort // p2 takes less effort than p1 (need <= to resolve cases where self-effort is same for both wildcards)
                 ))
                 {
                     return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender(), settings.UseGenderReversers));
@@ -201,7 +204,7 @@ namespace PalCalc.Solver.Processing
             {
                 foreach (var opt in parentPairOptions)
                 {
-                    if (optimalTime == CombinedEffort(opt.Item1, opt.Item2))
+                    if (optimalTime == CombinedEffort(opt.Item1.BreedingEffort, opt.Item2.BreedingEffort))
                     {
                         return opt;
                     }

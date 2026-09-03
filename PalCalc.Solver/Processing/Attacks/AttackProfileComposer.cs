@@ -129,6 +129,9 @@ internal sealed class AttackProfileComposer(
         if (baseProbability <= 0)
             return default;
 
+        var parent1Profile = parent1.AttackProfile;
+        var parent2Profile = parent2.AttackProfile;
+
         var metrics = new CompositionMetrics();
 
         var innateMask = targets.StateOf(child).Level1TargetMask;
@@ -140,8 +143,8 @@ internal sealed class AttackProfileComposer(
         var dilutedSelfEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
             settings.GameSettings, child, parent1.TimeFactor, parent2.TimeFactor, dilutedBreedings
         );
-        foreach (var parent1Entry in parent1.AttackProfile.EntriesSpan)
-        foreach (var parent2Entry in parent2.AttackProfile.EntriesSpan)
+        foreach (var parent1Entry in parent1Profile.EntriesSpan)
+        foreach (var parent2Entry in parent2Profile.EntriesSpan)
         {
             metrics.BaselineAttempts++;
             var parentCakes = parent1Entry.TotalSpecialCakes + parent2Entry.TotalSpecialCakes;
@@ -177,8 +180,8 @@ internal sealed class AttackProfileComposer(
                 var probability = Probabilities.Attacks.ProbabilityInheritedTargetAttack(
                     parent1HasAttack,
                     parent2HasAttack,
-                    parent1.AttackProfile.HasNoopAttack,
-                    parent2.AttackProfile.HasNoopAttack
+                    parent1Profile.HasNoopAttack,
+                    parent2Profile.HasNoopAttack
                 );
                 Emit(
                     AttackCompositionMode.Normal,

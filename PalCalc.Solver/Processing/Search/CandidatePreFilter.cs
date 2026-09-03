@@ -182,12 +182,14 @@ internal sealed class CandidatePreFilter
                 if (!attacksActive)
                     return TryAddOrdinary(candidate, selectionPolicy);
 
+                var attackProfile = candidate.AttackProfile;
+
                 Span<bool> improved = stackalloc bool[128];
                 var improvesAny = false;
-                foreach (ref readonly var entry in candidate.AttackProfile.EntriesSpan)
+                foreach (ref readonly var entry in attackProfile.EntriesSpan)
                 {
                     var slot = entry.LearnedTargetMask +
-                        (candidate.AttackProfile.HasNoopAttack ? 64 : 0);
+                        (attackProfile.HasNoopAttack ? 64 : 0);
                     if (attackChampions[slot] is not null &&
                         Compare(candidate, entry, attackChampions[slot], attackEntries[slot]) >= 0)
                         continue;
@@ -249,10 +251,11 @@ internal sealed class CandidatePreFilter
             var mask = (byte)(slot & 63);
             AttackProfileEntry best = default;
             var found = false;
-            foreach (ref readonly var entry in candidate.AttackProfile.EntriesSpan)
+            var attackProfile = candidate.AttackProfile;
+            foreach (ref readonly var entry in attackProfile.EntriesSpan)
             {
                 if (entry.LearnedTargetMask != mask ||
-                    candidate.AttackProfile.HasNoopAttack != (slot >= 64))
+                    attackProfile.HasNoopAttack != (slot >= 64))
                     continue;
                 if (!found || AttackProfileEntryComparer.Instance.Compare(entry, best) < 0)
                 {
