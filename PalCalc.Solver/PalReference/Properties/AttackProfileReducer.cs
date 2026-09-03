@@ -5,6 +5,8 @@ namespace PalCalc.Solver.PalReference.Properties;
 
 internal static class AttackProfileReducer
 {
+    private static readonly ulong[] StrictSupersetMasks = BuildStrictSupersetMasks();
+
     /// <summary>
     /// Returns whether obtaining <paramref name="provider"/> also satisfies
     /// <paramref name="required"/> under the attack solver's cake-first objective.
@@ -85,13 +87,12 @@ internal static class AttackProfileReducer
                 var requiredMask = BitOperations.TrailingZeroCount(candidates);
                 candidates &= candidates - 1;
 
-                var providers = occupiedMasks & ~(1UL << requiredMask);
+                var providers = occupiedMasks & StrictSupersetMasks[requiredMask];
                 while (providers != 0)
                 {
                     var providerMask = BitOperations.TrailingZeroCount(providers);
                     providers &= providers - 1;
-                    if ((providerMask & requiredMask) == requiredMask &&
-                        AttackProfileEntryComparer.CompareCosts(
+                    if (AttackProfileEntryComparer.CompareCosts(
                             champions[providerMask], champions[requiredMask]
                         ) <= 0)
                     {
@@ -118,5 +119,19 @@ internal static class AttackProfileReducer
             );
             return new AttackProfile(hasNoopAttack, retained);
         }
+    }
+
+    private static ulong[] BuildStrictSupersetMasks()
+    {
+        var result = new ulong[64];
+        for (var requiredMask = 0; requiredMask < 64; requiredMask++)
+        for (var providerMask = 0; providerMask < 64; providerMask++)
+        {
+            if (providerMask != requiredMask &&
+                (providerMask & requiredMask) == requiredMask)
+                result[requiredMask] |= 1UL << providerMask;
+        }
+
+        return result;
     }
 }

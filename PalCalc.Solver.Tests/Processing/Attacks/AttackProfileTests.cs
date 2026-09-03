@@ -36,6 +36,15 @@ public class AttackProfileTests
     }
 
     [TestMethod]
+    public void Reducer_CheaperNonSupersetDoesNotCoverRequiredMask()
+    {
+        var provider = Entry(mask: 0b10, cakes: 0, effort: 1, breedings: 1);
+        var required = Entry(mask: 0b01, cakes: 1, effort: 2, breedings: 2);
+
+        Assert.AreEqual(2, AttackProfileReducer.Reduce([required, provider]).Entries.Count);
+    }
+
+    [TestMethod]
     public void Reducer_NonCakeEntryCoversOtherwiseEqualCakeEntry()
     {
         var nonCake = Entry(mask: 1, cakes: 2, effort: 10, breedings: 2, usesCake: false);

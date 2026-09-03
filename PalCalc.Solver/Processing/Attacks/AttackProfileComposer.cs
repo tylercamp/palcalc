@@ -131,6 +131,10 @@ internal sealed class AttackProfileComposer(
 
         var parent1Profile = parent1.AttackProfile;
         var parent2Profile = parent2.AttackProfile;
+        var parent1HasNoopAttack = parent1Profile.HasNoopAttack;
+        var parent2HasNoopAttack = parent2Profile.HasNoopAttack;
+        var inheritableTargetMask = targets.InheritableTargetMask;
+        var maxSpecialCakes = settings.MaxSpecialCakes;
 
         var metrics = new CompositionMetrics();
 
@@ -165,13 +169,13 @@ internal sealed class AttackProfileComposer(
                 usesSpecialCake: false
             );
 
-            var parent1Mask = (byte)(parent1Entry.LearnedTargetMask & targets.InheritableTargetMask);
-            var parent2Mask = (byte)(parent2Entry.LearnedTargetMask & targets.InheritableTargetMask);
+            var parent1Mask = (byte)(parent1Entry.LearnedTargetMask & inheritableTargetMask);
+            var parent2Mask = (byte)(parent2Entry.LearnedTargetMask & inheritableTargetMask);
             var normalTargets = (byte)((parent1Mask | parent2Mask) & ~innateMask);
-            for (var bit = (byte)1; bit != 0 && bit <= targets.FullTargetMask; bit <<= 1)
+            while (normalTargets != 0)
             {
-                if ((normalTargets & bit) == 0)
-                    continue;
+                var bit = (byte)(normalTargets & -normalTargets);
+                normalTargets &= (byte)~bit;
 
                 metrics.NormalAttempts++;
 
@@ -180,8 +184,8 @@ internal sealed class AttackProfileComposer(
                 var probability = Probabilities.Attacks.ProbabilityInheritedTargetAttack(
                     parent1HasAttack,
                     parent2HasAttack,
-                    parent1Profile.HasNoopAttack,
-                    parent2Profile.HasNoopAttack
+                    parent1HasNoopAttack,
+                    parent2HasNoopAttack
                 );
                 Emit(
                     AttackCompositionMode.Normal,
@@ -193,7 +197,7 @@ internal sealed class AttackProfileComposer(
                 );
             }
 
-            if (settings.MaxSpecialCakes != 0)
+            if (maxSpecialCakes != 0)
             {
                 var cakeLoadouts = CakeMaskCache.Values[(parent1Mask << 6) | parent2Mask];
                 for (var i = 0; i < cakeLoadouts.Length; i++)
@@ -225,7 +229,7 @@ internal sealed class AttackProfileComposer(
                 var guaranteed = attackProbability == 1;
                 var selfBreedings = guaranteed ? guaranteedBreedings : dilutedBreedings;
                 var totalCakes = parentCakes + (usesSpecialCake ? selfBreedings : 0);
-                if (settings.MaxSpecialCakes is int maxSpecialCakes && totalCakes > maxSpecialCakes)
+                if (maxSpecialCakes is int maximumSpecialCakes && totalCakes > maximumSpecialCakes)
                     return;
 
                 var ordinaryCouldImprove = entries?.CouldImprove(childMask, totalCakes) != false;
