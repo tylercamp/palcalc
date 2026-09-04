@@ -119,8 +119,6 @@ namespace PalCalc.Solver.Processing
 
                     return execution.Candidates;
                 });
-                context.AttackDiagnostics.LogCompositionStep(s + 1);
-
                 if (controller.CancellationToken.IsCancellationRequested) break;
 
                 if (!delta.Changed)
@@ -142,12 +140,10 @@ namespace PalCalc.Solver.Processing
                 spec,
                 settings,
                 controller,
-                context.AttackTargets,
-                context.AttackDiagnostics
+                context.AttackTargets
             );
             resultPostProcessor.ApplySurgery(frontier);
             var results = resultPostProcessor.Finalize(frontier.TerminalResults);
-            context.AttackDiagnostics.Log();
             return results;
         }
     }

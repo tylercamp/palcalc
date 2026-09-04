@@ -16,8 +16,7 @@ internal sealed class ResultPostProcessor(
     PalSpecifier target,
     BreedingSolverSettings settings,
     SolverStateController controller,
-    AttackTargetContext attackTargets,
-    AttackSolverDiagnostics diagnostics = null
+    AttackTargetContext attackTargets
 )
 {
     public void ApplySurgery(SearchFrontier frontier)
@@ -96,8 +95,6 @@ internal sealed class ResultPostProcessor(
         var shortlisted = terminalResults
             .SelectSearchFinalists(finalists.Select(result => result.Reference))
             .ToList();
-        diagnostics?.RecordTerminalShortlist(shortlisted.Count);
-
         var materializer = new AttackResultMaterializer(attackTargets, settings);
         var materialized = new List<IPalReference>(shortlisted.Count);
         foreach (var candidate in shortlisted)
@@ -106,15 +103,10 @@ internal sealed class ResultPostProcessor(
             if (entry is null)
                 continue;
 
-            diagnostics?.RecordMaterializationAttempt();
             var result = materializer.Materialize(candidate, entry.Value);
             if (!SatisfiesMaterializedConstraints(result))
-            {
-                diagnostics?.RecordMaterializationConstraintRejection();
                 continue;
-            }
 
-            diagnostics?.RecordMaterializationSuccess();
             materialized.Add(result);
         }
 

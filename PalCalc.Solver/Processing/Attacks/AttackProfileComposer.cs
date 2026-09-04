@@ -11,8 +11,7 @@ namespace PalCalc.Solver.Processing.Attacks;
 /// </summary>
 internal sealed class AttackProfileComposer(
     AttackTargetContext targets,
-    BreedingSolverSettings settings,
-    AttackSolverDiagnostics diagnostics = null
+    BreedingSolverSettings settings
 )
 {
     private const int TargetMaskBitCount = PalSpecifier.MaxRequiredAttacks;
@@ -38,7 +37,7 @@ internal sealed class AttackProfileComposer(
             return AttackProfile.Inactive;
 
         accumulator.Reset(targets.StateOf(child).HasNooplLevel1Attack);
-        var metrics = Enumerate(
+        Enumerate(
             child,
             parent1,
             parent2,
@@ -46,17 +45,10 @@ internal sealed class AttackProfileComposer(
             ivsProbability,
             accumulator
         );
-        var result = accumulator.Build();
-        diagnostics?.RecordComposition(
-            metrics.ParentEntryPairs,
-            metrics.EmittedEntries,
-            result.EntriesSpan.Length,
-            metrics.MaxInputProfileSize
-        );
-        return result;
+        return accumulator.Build();
     }
 
-    private CompositionMetrics Enumerate(
+    private void Enumerate(
         Pal child,
         IPalReference parent1,
         IPalReference parent2,
@@ -75,15 +67,12 @@ internal sealed class AttackProfileComposer(
         var maxSpecialCakes = settings.MaxSpecialCakes;
         var baseProbability = passivesProbability * ivsProbability;
         if (baseProbability <= 0)
-            return default;
-
-        var metrics = new CompositionMetrics();
+            return;
 
         var innateMask = targets.StateOf(child).Level1TargetMask;
 
         var parent1Entries = parent1Profile.EntriesSpan;
         var parent2Entries = parent2Profile.EntriesSpan;
-        metrics.MaxInputProfileSize = Math.Max(parent1Entries.Length, parent2Entries.Length);
         // Normal inheritance transfers at most one target attack. For each parent,
         // the categories below retain its cheapest unrestricted entry plus its
         // cheapest entry with and without each of the six target bits. Those
@@ -134,14 +123,13 @@ internal sealed class AttackProfileComposer(
         }
 
         if (maxSpecialCakes == 0)
-            return metrics;
+            return;
 
         var edgeSpecialCakes = (int)Math.Ceiling(1f / baseProbability);
 
         foreach (var parent1Entry in parent1Entries)
             foreach (var parent2Entry in parent2Entries)
             {
-                metrics.ParentEntryPairs++;
                 var parentCakes = parent1Entry.TotalSpecialCakes + parent2Entry.TotalSpecialCakes;
                 var totalCakes = parentCakes + edgeSpecialCakes;
                 if (maxSpecialCakes is int maximumSpecialCakes && totalCakes > maximumSpecialCakes)
@@ -163,8 +151,6 @@ internal sealed class AttackProfileComposer(
                     );
                 }
             }
-
-        return metrics;
 
         void BuildCategoryCakes(
             ReadOnlySpan<AttackProfileEntry> profileEntries,
@@ -217,19 +203,11 @@ internal sealed class AttackProfileComposer(
             if (maxSpecialCakes is int maximumSpecialCakes && totalCakes > maximumSpecialCakes)
                 return;
 
-            metrics.EmittedEntries++;
             if (!entries.CouldImprove(childMask, totalCakes))
                 return;
 
             entries.Add(new AttackProfileEntry(childMask, totalCakes));
         }
-    }
-
-    private struct CompositionMetrics
-    {
-        public long ParentEntryPairs;
-        public long EmittedEntries;
-        public int MaxInputProfileSize;
     }
 
     /// <summary>
