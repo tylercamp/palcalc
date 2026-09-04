@@ -14,9 +14,35 @@ namespace PalCalc.Solver.Processing.Search
     /// The product is divided into roughly square tiles and the tiles are
     /// emitted along anti-diagonals to maintain that priority.
     /// </summary>
-    public class AntiDiagonalLazyCartesianProduct<T>(List<T> listA, List<T> listB) : ILazyCartesianProduct<T>
+    public class AntiDiagonalLazyCartesianProduct<T> : ILazyCartesianProduct<T>
     {
-        public long Count { get; } = ((long)listA.Count) * listB.Count;
+        private readonly List<T> listA;
+        private readonly List<T> listB;
+        private readonly bool unorderedSameList;
+
+        public AntiDiagonalLazyCartesianProduct(List<T> listA, List<T> listB)
+            : this(listA, listB, unorderedSameList: false)
+        {
+        }
+
+        private AntiDiagonalLazyCartesianProduct(
+            List<T> listA,
+            List<T> listB,
+            bool unorderedSameList
+        )
+        {
+            this.listA = listA;
+            this.listB = listB;
+            this.unorderedSameList = unorderedSameList;
+            Count = unorderedSameList
+                ? ((long)listA.Count * (listA.Count + 1)) / 2
+                : ((long)listA.Count) * listB.Count;
+        }
+
+        public static AntiDiagonalLazyCartesianProduct<T> Unordered(List<T> list) =>
+            new(list, list, unorderedSameList: true);
+
+        public long Count { get; }
 
         private IEnumerable<(T, T)> TileAt(
             int aStart,
@@ -28,7 +54,11 @@ namespace PalCalc.Solver.Processing.Search
             {
                 var elemA = listA[ia];
 
-                for (int ib = bStart; ib < bEnd; ib++)
+                for (
+                    int ib = unorderedSameList ? Math.Max(bStart, ia) : bStart;
+                    ib < bEnd;
+                    ib++
+                )
                     yield return (elemA, listB[ib]);
             }
         }
@@ -71,20 +101,29 @@ namespace PalCalc.Solver.Processing.Search
                     int aStart = aTile * tileASize;
                     int bStart = bTile * tileBSize;
 
-                    yield return TileAt(
-                        aStart,
-                        Math.Min(aStart + tileASize, listA.Count),
-                        bStart,
-                        Math.Min(bStart + tileBSize, listB.Count)
-                    );
+                    int aEnd = Math.Min(aStart + tileASize, listA.Count);
+                    int bEnd = Math.Min(bStart + tileBSize, listB.Count);
+                    if (!unorderedSameList || bEnd > aStart)
+                        yield return TileAt(aStart, aEnd, bStart, bEnd);
                 }
             }
         }
 
-        public ILazyCartesianProduct<T> Where(Func<T, bool> predicate, CancellationToken token) =>
-            new AntiDiagonalLazyCartesianProduct<T>(
+        public ILazyCartesianProduct<T> Where(Func<T, bool> predicate, CancellationToken token)
+        {
+            if (unorderedSameList)
+            {
+                var filtered = listA
+                    .Where(predicate)
+                    .TakeUntilCancelled(token)
+                    .ToList();
+                return Unordered(filtered);
+            }
+
+            return new AntiDiagonalLazyCartesianProduct<T>(
                 listA.Where(predicate).TakeUntilCancelled(token).ToList(),
                 listB.Where(predicate).TakeUntilCancelled(token).ToList()
             );
+        }
     }
 }

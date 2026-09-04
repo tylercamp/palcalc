@@ -20,6 +20,10 @@ internal sealed class AttackProfileComposer(
     private const int PackedParentLoadoutShift = 8;
 
     private readonly AttackProfileReducer.Accumulator accumulator = new();
+    private readonly Dictionary<int, AttackProfile> cachedProfiles = [];
+    private Pal cachedChild;
+    private IPalReference cachedParent1;
+    private IPalReference cachedParent2;
 
     /// <summary>
     /// Calculates the minimum estimated Special Cake cost for each available
@@ -35,6 +39,44 @@ internal sealed class AttackProfileComposer(
     {
         if (!targets.IsActive)
             return AttackProfile.Inactive;
+
+        var baseProbability = passivesProbability * ivsProbability;
+        if (
+            !ReferenceEquals(child, cachedChild) ||
+            !ReferenceEquals(parent1, cachedParent1) ||
+            !ReferenceEquals(parent2, cachedParent2)
+        )
+        {
+            cachedProfiles.Clear();
+            cachedChild = child;
+            cachedParent1 = parent1;
+            cachedParent2 = parent2;
+        }
+
+        if (baseProbability > 0)
+        {
+            // For fixed parents and child, composition depends on probability only
+            // through this rounded Special Cake cost. With cakes disabled it does
+            // not depend on probability at all.
+            var cacheKey = settings.MaxSpecialCakes == 0
+                ? 0
+                : (int)Math.Ceiling(1f / baseProbability);
+            if (cachedProfiles.TryGetValue(cacheKey, out var cached))
+                return cached;
+
+            accumulator.Reset(targets.StateOf(child).HasNooplLevel1Attack);
+            Enumerate(
+                child,
+                parent1,
+                parent2,
+                passivesProbability,
+                ivsProbability,
+                accumulator
+            );
+            var profile = accumulator.Build();
+            cachedProfiles.Add(cacheKey, profile);
+            return profile;
+        }
 
         accumulator.Reset(targets.StateOf(child).HasNooplLevel1Attack);
         Enumerate(

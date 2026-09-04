@@ -69,6 +69,15 @@ public class AttackProfileTests
     }
 
     [TestMethod]
+    public void Reducer_ReusesTheSharedEmptyEntryArray()
+    {
+        var first = AttackProfileReducer.Reduce([]);
+        var second = AttackProfileReducer.Reduce([]);
+
+        Assert.AreSame(first.Entries, second.Entries);
+    }
+
+    [TestMethod]
     public void Profile_EqualityAndHashUseOnlyNewProfileData()
     {
         var left = new AttackProfile(true, Entry(mask: 1, cakes: 2));

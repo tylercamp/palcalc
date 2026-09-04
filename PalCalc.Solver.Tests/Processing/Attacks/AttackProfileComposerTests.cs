@@ -57,6 +57,21 @@ public class AttackProfileComposerTests
     }
 
     [TestMethod]
+    public void Compose_ReusesProfileForTheSameRoundedCakeCost()
+    {
+        var context = Context(Attacks(1));
+        var settings = Settings(cakes: 100);
+        var parent1 = Reference(new AttackProfile(Entry(1)));
+        var parent2 = Reference(new AttackProfile(Entry(0)));
+        var composer = new AttackProfileComposer(context, settings);
+
+        var first = composer.Compose(Child, parent1, parent2, 0.5f, 0.5f);
+        var second = composer.Compose(Child, parent1, parent2, 0.51f, 0.5f);
+
+        Assert.AreSame(first.Entries, second.Entries);
+    }
+
+    [TestMethod]
     public void Compose_NonInheritableTargetsNeverTransfer()
     {
         var nonInheritable = SolverTestScenario.DB.ActiveSkills.First(attack =>

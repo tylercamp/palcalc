@@ -440,7 +440,7 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
-    public void PolicyCanDeclineEarlyDominanceAndStillReachExpectedFrontier()
+    public void UnorderedPairSchedulingAvoidsRedundantEarlyDominanceComparisons()
     {
         var configuredSolver = SolverWithMultipleCandidateAlternatives();
         var earlyComparisons = 0;
@@ -469,7 +469,7 @@ public class CandidateSelectionPolicyTests
             )
         );
 
-        Assert.IsTrue(earlyComparisons > 0);
+        Assert.AreEqual(0, earlyComparisons);
         CollectionAssert.AreEqual(
             SolverTestScenario.Signatures(baseline).ToArray(),
             SolverTestScenario.Signatures(noEarlyDominanceResults).ToArray()

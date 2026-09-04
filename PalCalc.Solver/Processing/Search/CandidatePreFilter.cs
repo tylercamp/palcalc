@@ -106,6 +106,15 @@ internal sealed class CandidatePreFilter
 
     public IReadOnlyList<IPalReference> TerminalCandidates => terminalCandidates.Values.ToArray();
 
+    public List<IPalReference> RetainedAttackCandidates()
+    {
+        var retained = new List<IPalReference>();
+        foreach (var candidatesByKey in earlyCandidatesByPalId.Values)
+            foreach (var group in candidatesByKey.Values)
+                group.AddRetainedAttackCandidatesTo(retained);
+        return retained;
+    }
+
     private void RetainTerminal(IPalReference candidate)
     {
         if (target.RequiredGender != PalGender.WILDCARD && candidate.Gender != target.RequiredGender)
@@ -176,6 +185,12 @@ internal sealed class CandidatePreFilter
         private readonly Dictionary<IPalReference, int> championCounts =
             new(ReferenceEqualityComparer.Instance);
         private IPalReference ordinaryIncumbent;
+
+        public void AddRetainedAttackCandidatesTo(List<IPalReference> destination)
+        {
+            lock (this)
+                destination.AddRange(championCounts.Keys);
+        }
 
         public bool TryAdd(
             IPalReference candidate,

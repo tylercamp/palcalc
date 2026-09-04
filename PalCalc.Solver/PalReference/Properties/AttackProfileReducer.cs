@@ -55,6 +55,12 @@ internal static class AttackProfileReducer
 
         public AttackProfile Build()
         {
+            if (occupiedMasks == 0)
+                return new AttackProfile(
+                    hasNoopAttack,
+                    Array.Empty<AttackProfileEntry>()
+                );
+
             var retained = new AttackProfileEntry[BitOperations.PopCount(occupiedMasks)];
             var destination = 0;
             var masks = occupiedMasks;
