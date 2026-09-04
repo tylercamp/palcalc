@@ -65,8 +65,10 @@ internal sealed class SearchFrontier : ICandidateFrontierView
             return FrontierCandidateAssessment.PotentialImprovement;
 
         var guaranteedImprovement = true;
-        foreach (var incumbent in incumbents)
+        for (int i = 0; i < incumbents.Count; i++)
         {
+            // Direct `for` loop since `List+Enumerator` was still being allocated for some reason
+            var incumbent = incumbents[i];
             var assessment = selectionPolicy.AssessAgainstFrontier(reference, incumbent);
             if (assessment == FrontierCandidateAssessment.Inferior)
                 return FrontierCandidateAssessment.Inferior;

@@ -34,13 +34,25 @@ namespace PalCalc.Solver
         public override string ToString() => $"{Pal.Name} with {RequiredPassives.PassiveSkillListToString()}" +
             (RequiredAttacks.Count == 0 ? "" : $" and {string.Join(", ", RequiredAttacks)}");
 
+        private bool PassivesMatchRequirements(List<PassiveSkill> passives)
+        {
+            // Unrolled `!RequiredPassives.Except(passives).Any()`
+            foreach (var p in RequiredPassives)
+            {
+                if (!passives.Contains(p))
+                    return false;
+            }
+
+            return true;
+        }
+
         internal bool IsSatisfiedByIgnoringAttacks(IPalReference palRef) =>
             Pal == palRef.Pal &&
-            !RequiredPassives.Except(palRef.EffectivePassives).Any() &&
             (RequiredGender == PalGender.WILDCARD || palRef.Gender == PalGender.WILDCARD || palRef.Gender == RequiredGender) &&
             (IV_HP == 0 || palRef.IVs.HP.Satisfies(IV_HP)) &&
             (IV_Attack == 0 || palRef.IVs.Attack.Satisfies(IV_Attack)) &&
-            (IV_Defense == 0 || palRef.IVs.Defense.Satisfies(IV_Defense));
+            (IV_Defense == 0 || palRef.IVs.Defense.Satisfies(IV_Defense)) &&
+            PassivesMatchRequirements(palRef.EffectivePassives);
 
         public bool IsSatisfiedBy(IPalReference palRef) =>
             IsSatisfiedByIgnoringAttacks(palRef) &&

@@ -6,6 +6,7 @@ using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.Utils;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -47,6 +48,7 @@ namespace PalCalc.Solver.Processing
         private readonly LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();
         private readonly LocalListPool<(IPalReference, IPalReference)> palPairListPool = poolFactory.GetListPool<(IPalReference, IPalReference)>();
         private readonly LocalObjectPool<RandomPassiveSkill> randomPassivePool = poolFactory.GetObjectPool<RandomPassiveSkill>();
+        private readonly ThreadLocal<List<List<PassiveSkill>>> threadLocalPassivePermutations = new(() => []);
 
         static IV_Value MergeIVs(IV_Value a, IV_Value b)
         {
@@ -69,7 +71,7 @@ namespace PalCalc.Solver.Processing
         /// <param name="requiredPassives">The list of passives that will be contained in all permutations.</param>
         /// <param name="optionalPassives">The list of passives that will appear at least once across the permutations, if possible.</param>
         /// <returns></returns>
-        List<List<PassiveSkill>> PassiveSkillPermutations(List<PassiveSkill> requiredPassives, List<PassiveSkill> optionalPassives)
+        void PassiveSkillPermutations(List<List<PassiveSkill>> targetList, List<PassiveSkill> requiredPassives, List<PassiveSkill> optionalPassives)
         {
 #if DEBUG && DEBUG_CHECKS
             if (
@@ -79,22 +81,19 @@ namespace PalCalc.Solver.Processing
                 requiredPassives.Intersect(optionalPassives).Any()
             ) Debugger.Break();
 #endif
-
             // can't add any optional passives, just return required passives
             if (optionalPassives.Count == 0 || requiredPassives.Count == GameConstants.MaxTotalPassives)
             {
-                return [passiveListPool.BorrowRawWith(requiredPassives)];
+                targetList.Add(passiveListPool.BorrowRawWith(requiredPassives));
+                return;
             }
 
-            var res = new List<List<PassiveSkill>>();
             var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count;
             foreach (var optional in optionalPassives.Combinations(maxOptionalPassives, passiveListPool))
             {
                 optional.AddRange(requiredPassives);
-                res.Add(optional);
+                targetList.Add(optional);
             }
-
-            return res;
         }
 
         TimeSpan CombinedEffort(TimeSpan p1Effort, TimeSpan p2Effort) =>
@@ -216,6 +215,8 @@ namespace PalCalc.Solver.Processing
             CandidateExpansionContext context
         )
         {
+            var passivePerms = new List<List<PassiveSkill>>();
+
             foreach (var p in workBatch)
             {
                 if (controller.IsPaused) controller.PauseIfRequested();
@@ -387,8 +388,8 @@ namespace PalCalc.Solver.Processing
                     // Desired passive chance goes up with a smaller list of combined + deduped passives,
                     // so we'd end up overestimating the effort of parents which have the same (but irrelevant)
                     // passives.
-
-                    var passivePerms = PassiveSkillPermutations(availableRequiredPassives, availableOptionalPassives);
+                    passivePerms.Clear();
+                    PassiveSkillPermutations(passivePerms, availableRequiredPassives, availableOptionalPassives);
                     foreach (var targetPassives in passivePerms)
                     {
                         // go through each potential final number of passives, accumulate the probability of any of these exact options
