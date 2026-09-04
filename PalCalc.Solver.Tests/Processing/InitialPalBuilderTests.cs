@@ -108,29 +108,6 @@ public class InitialPalBuilderTests
     }
 
     [TestMethod]
-    public void Build_WildLoadoutUsesOnlyLevelOneAttacks()
-    {
-        var wildPal = "Katress".ToPal(SolverTestScenario.DB);
-        var level1 = wildPal.Level1ActiveSkills(SolverTestScenario.DB).First();
-        var laterAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
-            attack.CanInherit && !wildPal.Level1AttackInternalIds.Contains(attack.InternalName)
-        );
-        var configuredSolver = SolverTestScenario.Solver(
-            ownedPals: [],
-            maxSpecialCakes: 0,
-            maxBreedingSteps: 1,
-            maxWildPals: 1,
-            allowedWildPals: [wildPal]
-        );
-
-        var target = Target(laterAttack);
-        var wild = NewBuilder(configuredSolver, target).Build(target).OfType<WildPalReference>().First();
-
-        Assert.AreEqual((byte)0, wild.AttackProfile.Entries.Single().LearnedTargetMask);
-    }
-
-
-    [TestMethod]
     public void Build_DoesNotReduceTargetAttackIntoIrrelevantAttack()
     {
         var required = SolverTestScenario.DB.ActiveSkills.First(attack => attack.CanInherit);

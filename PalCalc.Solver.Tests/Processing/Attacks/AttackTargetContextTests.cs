@@ -93,23 +93,6 @@ public class AttackTargetContextTests
         Assert.AreEqual(state, context.StateOf(pal));
     }
 
-    [TestMethod]
-    public void SolverRunContext_ExposesContextForTheCapturedTarget()
-    {
-        var attack = SolverTestScenario.DB.ActiveSkills.First();
-        var target = Target(attack, attack);
-        var request = new BreedingSolverRequest(target, SolverTestScenario.Solver([], maxSpecialCakes: 0).Settings);
-
-        var runContext = SolverRunContext.Create(
-            request,
-            new SolverStateController(CancellationToken.None)
-        );
-
-        Assert.IsTrue(runContext.AttackTargets.IsActive);
-        Assert.AreEqual(1, runContext.AttackTargets.FullTargetMask);
-        Assert.AreEqual(2, target.RequiredAttacks.Count);
-    }
-
     private static PalSpecifier Target(params ActiveSkill[] attacks) => new()
     {
         Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),

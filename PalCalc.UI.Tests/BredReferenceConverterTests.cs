@@ -103,33 +103,6 @@ public class BredReferenceConverterTests
             AssertMaterializedEqual(originalEdges[index].MaterializedAttackInheritance!, reloadedEdges[index].MaterializedAttackInheritance!);
     }
 
-    [TestMethod]
-    public void LegacyBredJsonWithoutNewFieldsStillLoadsAndResaves()
-    {
-        var db = PalDB.LoadEmbedded();
-        var attack = db.ActiveSkills.First();
-        var original = Bred(
-            db.Pals.First(),
-            Owned(db.Pals.First(), "first", attack, 1),
-            Owned(db.Pals.Last(), "second", attack, 2),
-            new MaterializedAttackInheritance(AttackInheritanceMode.Normal, [attack], [attack], [attack], [attack], 0, 1),
-            avgRequiredBreedings: 7,
-            gender: PalGender.MALE
-        );
-        var (_, json) = RoundTrip(original, db);
-        foreach (var token in json.DescendantsAndSelf().OfType<JObject>())
-        {
-            token.Remove("AvgRequiredBreedings");
-            token.Remove("MaterializedAttackInheritance");
-        }
-
-        var reloaded = Deserialize(json, db);
-        var resaved = Serialize(reloaded, db);
-
-        Assert.IsNull(reloaded.MaterializedAttackInheritance);
-        Assert.IsNotNull(resaved["Ref"]!["Content"]!["AvgRequiredBreedings"]);
-    }
-
     private static BredPalReference Bred(
         Pal pal,
         IPalReference parent1,

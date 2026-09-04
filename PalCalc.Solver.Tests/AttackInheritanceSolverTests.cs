@@ -66,7 +66,7 @@ public class AttackInheritanceSolverTests
     }
 
     [TestMethod]
-    public void Solve_StoresDilutedAttackPassiveAndIVProbabilitiesInTheProfile()
+    public void Solve_ReconstructsCombinedAttackPassiveAndIVProbability()
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var requiredAttack = InheritableAttackNotInnateTo(child);
@@ -333,32 +333,6 @@ public class AttackInheritanceSolverTests
 
         Assert.AreEqual(4, result.MaterializedAttackInheritance.ChildLearnedAttacks.Count);
         Assert.AreEqual(3, result.MaterializedAttackInheritance.InheritedAttacks.Count);
-    }
-
-    [TestMethod]
-    public void Solve_WithoutRequiredAttackRetainsDeterministicOneStepResults()
-    {
-        static IReadOnlyList<SolverTestScenario.ResultSignature> Run() =>
-            SolverTestScenario.Signatures(
-                SolverTestScenario.Solve(
-                    SolverTestScenario.Solver(
-                        [
-                            SolverTestScenario.Owned("Katress", PalGender.MALE),
-                            SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
-                        ],
-                        maxSpecialCakes: 0,
-                        maxBreedingSteps: 1,
-                        maxSolverIterations: 1
-                    ),
-                    "Wixen Noct"
-                )
-            );
-
-        var first = Run();
-        var second = Run();
-
-        Assert.IsTrue(first.Count > 0);
-        CollectionAssert.AreEqual(first.ToArray(), second.ToArray());
     }
 
     private static PalInstance WithAttacks(

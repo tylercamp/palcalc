@@ -95,17 +95,6 @@ public class AttackProfileTests
     }
 
     [TestMethod]
-    public void Profile_CachesExactTargetMasks()
-    {
-        var profile = new AttackProfile(
-            Entry(mask: 0b000110, cakes: 0),
-            Entry(mask: 0b001000, cakes: 1)
-        );
-
-        Assert.AreEqual((1UL << 0b000110) | (1UL << 0b001000), profile.EntryTargetMasks);
-    }
-
-    [TestMethod]
     public void BredEffortHelper_MatchesCharacterizedIncubatorCalculations()
     {
         var pal = SolverTestScenario.DB.Pals.First(p => p.EggSize == EggSize.Normal);

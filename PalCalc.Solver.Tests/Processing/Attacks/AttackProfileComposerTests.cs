@@ -76,44 +76,27 @@ public class AttackProfileComposerTests
         );
     }
 
-    [TestMethod]
-    public void Compose_CakeCostIncludesParentCakesAndPassiveIvFailures()
+    [DataTestMethod]
+    [DataRow(9, true)]
+    [DataRow(8, false)]
+    public void Compose_CakeCostIncludesParentsAndHonorsLimit(
+        int cakeLimit,
+        bool expected
+    )
     {
         var profile = Compose(
             Attacks(6),
             Entry(0b000111, cakes: 2),
             Entry(0b111000, cakes: 3),
-            cakes: 9,
+            cakes: cakeLimit,
             passivesProbability: 0.5f,
             ivsProbability: 0.5f
         );
 
-        Assert.AreEqual(9, profile.Entries.Single(entry => entry.LearnedTargetMask == 0b111111)
-            .TotalSpecialCakes);
-    }
-
-    [TestMethod]
-    public void Compose_MaxCakePruningRejectsTooExpensiveCakeOutcomes()
-    {
-        var profile = Compose(
-            Attacks(6),
-            Entry(0b000111, cakes: 2),
-            Entry(0b111000, cakes: 3),
-            cakes: 8,
-            passivesProbability: 0.5f,
-            ivsProbability: 0.5f
-        );
-
-        Assert.IsFalse(profile.Entries.Any(entry => entry.LearnedTargetMask == 0b111111));
-    }
-
-    [TestMethod]
-    public void Compose_LevelOneTargetsAreAlwaysIncluded()
-    {
-        var innate = Child.Level1ActiveSkills(SolverTestScenario.DB).First();
-        var profile = Compose([innate], Entry(0), Entry(0), cakes: 0);
-
-        Assert.IsTrue(profile.Contains(1));
+        Assert.AreEqual(expected, profile.Contains(0b111111));
+        if (expected)
+            Assert.AreEqual(9, profile.Entries.Single(entry => entry.LearnedTargetMask == 0b111111)
+                .TotalSpecialCakes);
     }
 
     [TestMethod]

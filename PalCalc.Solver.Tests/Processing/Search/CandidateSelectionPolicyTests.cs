@@ -313,80 +313,42 @@ public class CandidateSelectionPolicyTests
         );
     }
 
-    [TestMethod]
-    public void ActiveProfiles_LowerCakesCoverHigherCakesForTheSameExactMask()
+    [DataTestMethod]
+    [DataRow(1, 1, 5, 1, 2, 10, (int)EarlyCandidateSelection.ReplaceIncumbent, (int)EarlyCandidateSelection.RejectCandidate)]
+    [DataRow(1, 2, 5, 1, 2, 10, (int)EarlyCandidateSelection.ReplaceIncumbent, (int)EarlyCandidateSelection.RejectCandidate)]
+    [DataRow(1, 0, 5, 2, 0, 10, (int)EarlyCandidateSelection.KeepBoth, (int)EarlyCandidateSelection.KeepBoth)]
+    public void ActiveProfiles_CompareMaskCakeAndEffortCapabilities(
+        int firstMask,
+        int firstCakes,
+        int firstMinutes,
+        int secondMask,
+        int secondCakes,
+        int secondMinutes,
+        int expectedFirst,
+        int expectedSecond
+    )
     {
         var policy = ActivePolicy();
-        var lowerCakes = Reference(
-            "lower-cakes",
+        var first = Reference(
+            "first",
             "Katress",
-            TimeSpan.FromMinutes(5),
-            ProfileWithCakes(1, cakes: 1)
+            TimeSpan.FromMinutes(firstMinutes),
+            ProfileWithCakes((byte)firstMask, firstCakes)
         );
-        var higherCakes = Reference(
-            "higher-cakes",
+        var second = Reference(
+            "second",
             "Katress",
-            TimeSpan.FromMinutes(10),
-            ProfileWithCakes(1, cakes: 2)
+            TimeSpan.FromMinutes(secondMinutes),
+            ProfileWithCakes((byte)secondMask, secondCakes)
         );
 
         Assert.AreEqual(
-            EarlyCandidateSelection.ReplaceIncumbent,
-            policy.SelectEarlyCandidate(lowerCakes, higherCakes)
-        );
-    }
-
-    [TestMethod]
-    public void ActiveProfiles_EqualCakesLetStructuralEffortDecide()
-    {
-        var policy = ActivePolicy();
-        var faster = Reference(
-            "faster",
-            "Katress",
-            TimeSpan.FromMinutes(5),
-            ProfileWithCakes(1, cakes: 2)
-        );
-        var slower = Reference(
-            "slower",
-            "Katress",
-            TimeSpan.FromMinutes(10),
-            ProfileWithCakes(1, cakes: 2)
-        );
-
-        Assert.AreEqual(
-            EarlyCandidateSelection.ReplaceIncumbent,
-            policy.SelectEarlyCandidate(faster, slower)
+            (EarlyCandidateSelection)expectedFirst,
+            policy.SelectEarlyCandidate(first, second)
         );
         Assert.AreEqual(
-            EarlyCandidateSelection.RejectCandidate,
-            policy.SelectEarlyCandidate(slower, faster)
-        );
-    }
-
-    [TestMethod]
-    public void ActiveProfiles_DifferentExactMasksDoNotCoverOneAnother()
-    {
-        var policy = ActivePolicy();
-        var faster = Reference(
-            "faster",
-            "Katress",
-            TimeSpan.FromMinutes(5),
-            ProfileWithCakes(1, cakes: 0)
-        );
-        var slower = Reference(
-            "slower",
-            "Katress",
-            TimeSpan.FromMinutes(10),
-            ProfileWithCakes(2, cakes: 0)
-        );
-
-        Assert.AreEqual(
-            EarlyCandidateSelection.KeepBoth,
-            policy.SelectEarlyCandidate(faster, slower)
-        );
-        Assert.AreEqual(
-            EarlyCandidateSelection.KeepBoth,
-            policy.SelectEarlyCandidate(slower, faster)
+            (EarlyCandidateSelection)expectedSecond,
+            policy.SelectEarlyCandidate(second, first)
         );
     }
 

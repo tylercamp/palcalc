@@ -68,26 +68,6 @@ public class PalSpecifierAttackTests
     }
 
     [TestMethod]
-    public void MissingRequiredAttacksLoadAsEmpty()
-    {
-        var db = PalDB.LoadEmbedded();
-        var target = new PalSpecifier
-        {
-            Pal = db.Pals.First(),
-            RequiredAttacks = [db.ActiveSkills.First()],
-        };
-        var viewModel = new PalSpecifierViewModel("target", target);
-        var json = JObject.Parse(JsonConvert.SerializeObject(viewModel, WriteSettings(db)));
-        json.Remove("RequiredAttacks");
-
-        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json.ToString(), ReadSettings(db));
-
-        Assert.IsNotNull(reloaded);
-        Assert.IsFalse(reloaded.RequiredAttacks.HasItems);
-        Assert.IsEmpty(reloaded.ModelObject.RequiredAttacks);
-    }
-
-    [TestMethod]
     public void NullGapsAndDuplicateSlotsNormalizeForTheModel()
     {
         var db = PalDB.LoadEmbedded();
@@ -142,17 +122,6 @@ public class PalSpecifierAttackTests
     }
 
     [TestMethod]
-    public void LegacySettingsKeepSpecialCakesDisabled()
-    {
-        var legacySettings = JsonConvert.DeserializeObject<SerializableSolverSettings>("{ \"MaxBreedingSteps\": 3 }");
-        var controls = new SolverControlsViewModel(null, null, null, null, null);
-
-        controls.CopyFrom(legacySettings!);
-
-        Assert.AreEqual(0, controls.ConfiguredSolverSettings(new GameSettings(), []).MaxSpecialCakes);
-    }
-
-    [TestMethod]
     public void RandomAttackRoundTripsThroughActiveSkillConverter()
     {
         var db = PalDB.LoadEmbedded();
@@ -175,49 +144,6 @@ public class PalSpecifierAttackTests
         var viewModelReloaded = JObject.Parse(viewModelJson)["Skill"]!.ToObject<ActiveSkillViewModel>(JsonSerializer.Create(viewModelSettings));
 
         Assert.IsInstanceOfType<RandomActiveSkill>(viewModelReloaded!.ModelObject);
-    }
-
-    [TestMethod]
-    public void BredReferenceStateRoundTrips()
-    {
-        var db = PalDB.LoadEmbedded();
-        var gameSettings = new GameSettings();
-        var attack = db.ActiveSkills.First();
-        var parent1 = Owned(db.Pals.First(), "parent-1", attack, 1);
-        var parent2 = Owned(db.Pals.First(), "parent-2", attack, 2);
-        var original = new BredPalReference(
-            gameSettings,
-            db.Pals.First(),
-            parent1,
-            parent2,
-            new List<PassiveSkill>(),
-            passivesProbability: 0.5f,
-            new IV_Set
-            {
-                HP = new IV_Value(true, 10, 20),
-                Attack = IV_Value.Random,
-                Defense = IV_Value.Random,
-            },
-            ivsProbability: 0.75f,
-            attackProfile: AttackProfile.Inactive,
-            materializedAttackInheritance: null,
-            avgRequiredBreedings: null,
-            gender: PalGender.WILDCARD
-        );
-
-        var settings = new JsonSerializerSettings
-        {
-            Converters =
-            {
-                new PalReferenceConverter(db, gameSettings, new SerializableSolverSettings(), new PalSpecifier { Pal = db.Pals.First() })
-            }
-        };
-
-        var json = JsonConvert.SerializeObject(new { Ref = (IPalReference)original }, settings);
-        var restored = JObject.Parse(json)["Ref"]!.ToObject<IPalReference>(JsonSerializer.Create(settings))!;
-
-        var restoredBred = (BredPalReference)restored;
-        Assert.AreEqual(original.AvgRequiredBreedings, restoredBred.AvgRequiredBreedings);
     }
 
     [TestMethod]

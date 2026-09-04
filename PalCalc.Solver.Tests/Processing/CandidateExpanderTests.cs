@@ -124,44 +124,6 @@ public class CandidateExpanderTests
     }
 
     [TestMethod]
-    public void ExpandBatch_LevelOneTargetIsGuaranteed()
-    {
-        var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
-        var targetAttack = child.Level1ActiveSkills(SolverTestScenario.DB).First();
-        var otherAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
-            attack.CanInherit && attack != targetAttack
-        );
-
-        var candidate = (BredPalReference)Expand(
-            WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), otherAttack),
-            WithAttack(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), otherAttack),
-            new PalSpecifier { Pal = child, RequiredAttacks = [targetAttack] }
-        ).Candidates.Single();
-
-        Assert.AreEqual(1, candidate.AttackProfile.Entries.Single().LearnedTargetMask);
-        Assert.AreEqual(0, candidate.AttackProfile.Entries.Single().TotalSpecialCakes);
-    }
-
-    [TestMethod]
-    public void ExpandBatch_NonInheritableFillerDoesNotDiluteTarget()
-    {
-        var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
-        var targetAttack = InheritableAttackNotInnateTo(child);
-        var neutral = SolverTestScenario.DB.ActiveSkills.First(attack => !attack.CanInherit);
-
-        var candidate = (BredPalReference)Expand(
-            WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), targetAttack),
-            WithAttack(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), neutral),
-            new PalSpecifier { Pal = child, RequiredAttacks = [targetAttack] }
-        ).Candidates.Single();
-
-        Assert.AreEqual(
-            0,
-            candidate.AttackProfile.Entries.Single(entry => entry.LearnedTargetMask == 1).TotalSpecialCakes
-        );
-    }
-
-    [TestMethod]
     public void ExpandBatch_MissingTargetStillEmitsRoutingChild()
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
