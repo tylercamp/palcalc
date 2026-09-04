@@ -64,8 +64,8 @@ internal sealed class InitialPalBuilder(
                     },
                     attackProfile: attackTargets.IsActive
                         ? new(
-                            attackTargets.IsActive && learnedAttacks.Any(attack => !attack.CanInherit),
-                            new AttackProfileEntry(attackTargets.MaskOf(learnedAttacks), 0, TimeSpan.Zero, 0, false)
+                            learnedAttacks.Any(attack => !attack.CanInherit),
+                            new AttackProfileEntry(attackTargets.MaskOf(learnedAttacks), 0)
                         )
                         : AttackProfile.Inactive
                 );
@@ -154,11 +154,8 @@ internal sealed class InitialPalBuilder(
                                 // TODO: Eventually reference wild pal level ranges
                                 attackProfile: attackTargets.IsActive
                                     ? new(
-                                        attackTargets.IsActive && attackState.HasNooplLevel1Attack,
-                                        AttackProfileEntry.WildPalLevel1Attack(
-                                            attackMask: attackState.Level1TargetMask,
-                                            captureEffort: mechanics.TimeToCatch(p) / mechanics.PassivesWildAtMostN[numRandomPassives]
-                                        )
+                                        attackState.HasNooplLevel1Attack,
+                                        new AttackProfileEntry(attackState.Level1TargetMask, 0)
                                     )
                                     : AttackProfile.Inactive
                             )

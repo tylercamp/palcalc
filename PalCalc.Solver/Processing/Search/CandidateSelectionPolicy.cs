@@ -76,8 +76,7 @@ internal static class CandidateSelectionPolicyExtensions
 /// </summary>
 internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolicy
 {
-    private const int NoopSlotOffset = AttackProfile.TargetMaskCount;
-    private const int AttackSlotCount = NoopSlotOffset * 2;
+    private const int AttackSlotCount = AttackProfile.TargetMaskCount;
 
     private readonly ResultPruningRule retainedAlternativeSelection;
     private readonly IEffectivePropertiesKeyProvider propertiesKeyProvider;
@@ -195,7 +194,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
 
         var providers = preferred.ToList();
         // Ordinary pruning may enforce a hard result limit. Preserve one best
-        // provider for every exact mask/noop capability even when that exceeds it.
+        // provider for every exact mask capability even when that exceeds it.
         var exactChampions = new AttackCapability[AttackSlotCount];
         Span<bool> occupied = stackalloc bool[AttackSlotCount];
         foreach (var candidate in distinctCandidates)
@@ -203,8 +202,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             foreach (ref readonly var entry in candidate.AttackProfile.EntriesSpan)
             {
                 var capability = new AttackCapability(candidate, entry);
-                var slot = entry.LearnedTargetMask +
-                    (candidate.AttackProfile.HasNoopAttack ? NoopSlotOffset : 0);
+                var slot = entry.LearnedTargetMask;
                 if (!occupied[slot] || CompareCapabilities(capability, exactChampions[slot]) < 0)
                 {
                     exactChampions[slot] = capability;
@@ -218,7 +216,11 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             if (!occupied[slot])
                 continue;
             var champion = exactChampions[slot].Candidate;
-            if (!providers.Contains(champion))
+            if (!providers.Any(provider =>
+                    CoversAttackEntry(
+                        provider.AttackProfile.EntriesSpan,
+                        exactChampions[slot].Entry
+                    )))
                 providers.Add(champion);
         }
 
@@ -262,9 +264,6 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         if (requiredEntries.IsEmpty)
             return true;
 
-        if (!provider.HasNoopAttack && required.HasNoopAttack)
-            return false;
-
         if ((provider.EntryTargetMasks & required.EntryTargetMasks) !=
             required.EntryTargetMasks)
             return false;
@@ -289,7 +288,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         foreach (ref readonly var providerEntry in providerEntries)
         {
             if (providerEntry.LearnedTargetMask == requiredEntry.LearnedTargetMask &&
-                AttackProfileEntryComparer.CompareCosts(providerEntry, requiredEntry) <= 0)
+                providerEntry.TotalSpecialCakes <= requiredEntry.TotalSpecialCakes)
                 return true;
         }
 
@@ -298,7 +297,9 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
 
     private static int CompareCapabilities(in AttackCapability left, in AttackCapability right)
     {
-        var comparison = AttackProfileEntryComparer.Instance.Compare(left.Entry, right.Entry);
+        var comparison = left.Entry.TotalSpecialCakes.CompareTo(right.Entry.TotalSpecialCakes);
+        if (comparison == 0)
+            comparison = left.Entry.LearnedTargetMask.CompareTo(right.Entry.LearnedTargetMask);
         if (comparison != 0) return comparison;
         comparison = left.Candidate.BreedingEffort.CompareTo(right.Candidate.BreedingEffort);
         if (comparison != 0) return comparison;

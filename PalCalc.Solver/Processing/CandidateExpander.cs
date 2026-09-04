@@ -448,14 +448,9 @@ namespace PalCalc.Solver.Processing
                                 }
                             }
 
-                            // Slight extra abstraction related to attack inheritance, where multiple variants
-                            // can be attached to each bred pal:
-                            //
-                            // Build up the base effort for this type of pal "structure" (i.e., with these
-                            // passives and these IVs.) The "structural" effort is used for most relative
-                            // calculations, regardless of attack solving (TODO confirm), and the effort
-                            // for individual attack profiles are resolved/materialized once the rest of the
-                            // solver process is done.
+                            // Build the structural effort for this combination of passives and IVs.
+                            // Attack-inheritance probability is deliberately excluded; exact attack
+                            // details are reconstructed after the search.
                             var structuralProbability = probabilityForUpToNumPassives * ivsProbability;
                             if (structuralProbability <= 0)
                             {

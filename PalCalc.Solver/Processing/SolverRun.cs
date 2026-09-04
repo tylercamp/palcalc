@@ -138,7 +138,13 @@ namespace PalCalc.Solver.Processing
             };
             stateUpdated?.Invoke(statusMsg);
 
-            var resultPostProcessor = new ResultPostProcessor(spec, settings, controller, context.AttackTargets);
+            var resultPostProcessor = new ResultPostProcessor(
+                spec,
+                settings,
+                controller,
+                context.AttackTargets,
+                context.AttackDiagnostics
+            );
             resultPostProcessor.ApplySurgery(frontier);
             var results = resultPostProcessor.Finalize(frontier.TerminalResults);
             context.AttackDiagnostics.Log();

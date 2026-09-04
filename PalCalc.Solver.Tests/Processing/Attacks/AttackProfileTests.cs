@@ -8,135 +8,101 @@ namespace PalCalc.Solver.Tests.Processing.Attacks;
 public class AttackProfileTests
 {
     [TestMethod]
-    public void EntryComparison_PrefersFewerCakesBeforeLowerEffort()
+    public void Reducer_KeepsOneMinimumCakeChampionPerExactMask()
     {
-        var fewerCakes = Entry(mask: 1, cakes: 1, effort: 20, breedings: 2);
-        var faster = Entry(mask: 1, cakes: 2, effort: 10, breedings: 1);
+        var lower = Entry(mask: 1, cakes: 1);
+        var higher = Entry(mask: 1, cakes: 2);
 
-        Assert.IsTrue(AttackProfileEntryComparer.Instance.Compare(fewerCakes, faster) < 0);
+        var profile = AttackProfileReducer.Reduce([higher, lower]);
+
+        Assert.AreEqual(new AttackProfileEntry(1, 1), profile.Entries.Single());
     }
 
     [TestMethod]
-    public void Reducer_KeepsDifferentExactMasksIndependent()
+    public void Reducer_EqualCakeEntriesCollapse()
     {
-        var provider = Entry(mask: 0b11, cakes: 2, effort: 10, breedings: 2);
-        var required = Entry(mask: 0b01, cakes: 2, effort: 11, breedings: 3);
-
-        Assert.AreEqual(2, AttackProfileReducer.Reduce([required, provider]).Entries.Count);
-    }
-
-    [TestMethod]
-    public void Reducer_KeepsCakeFirstChampionForExactMask()
-    {
-        var fewerCakes = Entry(mask: 1, cakes: 1, effort: 20, breedings: 2);
-        var faster = Entry(mask: 1, cakes: 2, effort: 10, breedings: 1);
-
-        Assert.AreEqual(fewerCakes, AttackProfileReducer.Reduce([faster, fewerCakes]).Entries.Single());
-    }
-
-    [TestMethod]
-    public void Reducer_CheaperNonSupersetDoesNotCoverRequiredMask()
-    {
-        var provider = Entry(mask: 0b10, cakes: 0, effort: 1, breedings: 1);
-        var required = Entry(mask: 0b01, cakes: 1, effort: 2, breedings: 2);
-
-        Assert.AreEqual(2, AttackProfileReducer.Reduce([required, provider]).Entries.Count);
-    }
-
-    [TestMethod]
-    public void Reducer_NonCakeEntryCoversOtherwiseEqualCakeEntry()
-    {
-        var nonCake = Entry(mask: 1, cakes: 2, effort: 10, breedings: 2, usesCake: false);
-        var cake = Entry(mask: 1, cakes: 2, effort: 10, breedings: 2, usesCake: true);
-
-        Assert.AreEqual(nonCake, AttackProfileReducer.Reduce([cake, nonCake]).Entries.Single());
-    }
-
-    [TestMethod]
-    public void Reducer_CakeEntryDoesNotCoverOtherwiseEqualNonCakeEntry()
-    {
-        var cake = Entry(mask: 1, cakes: 2, effort: 10, breedings: 2, usesCake: true);
-        var nonCake = Entry(mask: 1, cakes: 2, effort: 10, breedings: 2, usesCake: false);
-
-        Assert.AreEqual(nonCake, AttackProfileReducer.Reduce([nonCake, cake]).Entries.Single());
-    }
-
-    [TestMethod]
-    public void Reducer_LargeProfileUsesSameCoverageRules()
-    {
-        var duplicate = Entry(mask: 1, cakes: 2, effort: 10, breedings: 2);
-        var profile = AttackProfileReducer.Reduce(Enumerable.Repeat(duplicate, 257).ToArray());
+        var profile = AttackProfileReducer.Reduce([
+            Entry(mask: 1, cakes: 2),
+            Entry(mask: 1, cakes: 2),
+        ]);
 
         Assert.AreEqual(1, profile.Entries.Count);
-        Assert.AreEqual(duplicate, profile.Entries.Single());
     }
 
     [TestMethod]
-    public void Reducer_KeepsAtMostOneChampionPerMask()
+    public void Reducer_DifferentExactMasksRemainIndependent()
     {
-        var random = new Random(1729);
-        for (var sample = 0; sample < 100; sample++)
-        {
-            var entries = Enumerable.Range(0, random.Next(1, 65))
-                .Select(_ => Entry(
-                    mask: (byte)random.Next(64),
-                    cakes: random.Next(5),
-                    effort: random.Next(20),
-                    breedings: random.Next(5),
-                    usesCake: random.Next(2) == 0
-                ))
-                .ToArray();
+        var profile = AttackProfileReducer.Reduce([
+            Entry(mask: 0b01, cakes: 3),
+            Entry(mask: 0b10, cakes: 1),
+        ]);
 
-            var reduced = AttackProfileReducer.Reduce(entries).Entries;
-
-            Assert.IsTrue(reduced.Count <= 64, $"Sample {sample}");
-            Assert.AreEqual(reduced.Count, reduced.Select(entry => entry.LearnedTargetMask).Distinct().Count());
-        }
+        CollectionAssert.AreEquivalent(
+            new byte[] { 0b01, 0b10 },
+            profile.Entries.Select(entry => entry.LearnedTargetMask).ToArray()
+        );
     }
 
     [TestMethod]
-    public void Accumulator_CakePrecheckRejectsOnlyStrictlyHeavierOutcome()
+    public void Reducer_CouldImproveOnlyForALowerCakeCost()
     {
         var accumulator = new AttackProfileReducer.Accumulator();
         accumulator.Reset(hasNoop: false);
-        accumulator.Add(Entry(mask: 1, cakes: 2, effort: 10, breedings: 1));
+        accumulator.Add(Entry(mask: 1, cakes: 2));
 
         Assert.IsFalse(accumulator.CouldImprove(mask: 1, totalSpecialCakes: 3));
-        Assert.IsTrue(accumulator.CouldImprove(mask: 1, totalSpecialCakes: 2));
+        Assert.IsFalse(accumulator.CouldImprove(mask: 1, totalSpecialCakes: 2));
+        Assert.IsTrue(accumulator.CouldImprove(mask: 1, totalSpecialCakes: 1));
         Assert.IsTrue(accumulator.CouldImprove(mask: 2, totalSpecialCakes: 3));
     }
 
     [TestMethod]
-    public void GenderTransformation_PreservesCoverageFromLowerSelfBreedings()
+    public void Reducer_PreservesNoopState()
     {
-        var (pal, gender) = GenderedPal();
-        var settings = Settings();
-        var faster = Entry(mask: 1, cakes: 0, effort: 17, breedings: 1);
-        var slower = Entry(mask: 1, cakes: 0, effort: 22, breedings: 2);
+        var profile = AttackProfileReducer.Reduce(
+            hasNoopAttack: true,
+            [Entry(mask: 1, cakes: 2)]
+        );
 
-        var adjustedFaster = Transform(faster, settings, pal, gender);
-        var adjustedSlower = Transform(slower, settings, pal, gender);
-
-        Assert.IsTrue(AttackProfileEntryComparer.CompareCosts(adjustedFaster, adjustedSlower) < 0);
+        Assert.IsTrue(profile.HasNoopAttack);
+        Assert.AreEqual(1, profile.Entries.Single().LearnedTargetMask);
     }
 
     [TestMethod]
-    public void GenderTransformation_AddsCurrentEdgeCakesOnlyForCakeEntries()
+    public void Profile_EqualityAndHashUseOnlyNewProfileData()
     {
-        var (pal, gender) = GenderedPal();
-        var settings = Settings();
-        var cake = Entry(mask: 1, cakes: 5, effort: 17, breedings: 1, usesCake: true);
-        var nonCake = Entry(mask: 1, cakes: 5, effort: 17, breedings: 1, usesCake: false);
+        var left = new AttackProfile(true, Entry(mask: 1, cakes: 2));
+        var equal = new AttackProfile(true, Entry(mask: 1, cakes: 2));
+        var differentCake = new AttackProfile(true, Entry(mask: 1, cakes: 3));
+        var differentNoop = new AttackProfile(false, Entry(mask: 1, cakes: 2));
 
-        var adjustedCake = Transform(cake, settings, pal, gender);
-        var adjustedNonCake = Transform(nonCake, settings, pal, gender);
+        Assert.AreEqual(left, equal);
+        Assert.AreEqual(left.GetHashCode(), equal.GetHashCode());
+        Assert.AreNotEqual(left, differentCake);
+        Assert.AreNotEqual(left, differentNoop);
+    }
 
-        Assert.AreEqual(cake.TotalSpecialCakes + adjustedCake.SelfBreedings - cake.SelfBreedings, adjustedCake.TotalSpecialCakes);
-        Assert.AreEqual(nonCake.TotalSpecialCakes, adjustedNonCake.TotalSpecialCakes);
-        Assert.AreEqual(
-            cake.BreedingEffort - SelfEffort(settings, pal, cake.SelfBreedings) + SelfEffort(settings, pal, adjustedCake.SelfBreedings),
-            adjustedCake.BreedingEffort
+    [TestMethod]
+    public void Profile_InactiveIsDistinctFromAnActiveZeroMask()
+    {
+        var inactive = AttackProfile.Inactive;
+        var active = new AttackProfile(Entry(mask: 0, cakes: 0));
+
+        Assert.AreEqual(0, inactive.Entries.Count);
+        Assert.AreEqual(1, active.Entries.Count);
+        Assert.IsFalse(inactive.Contains(0));
+        Assert.IsTrue(active.Contains(0));
+    }
+
+    [TestMethod]
+    public void Profile_CachesExactTargetMasks()
+    {
+        var profile = new AttackProfile(
+            Entry(mask: 0b000110, cakes: 0),
+            Entry(mask: 0b001000, cakes: 1)
         );
+
+        Assert.AreEqual((1UL << 0b000110) | (1UL << 0b001000), profile.EntryTargetMasks);
     }
 
     [TestMethod]
@@ -151,31 +117,7 @@ public class AttackProfileTests
         Assert.AreEqual(TimeSpan.FromMinutes(35), SelfEffort(settings, pal, 3));
     }
 
-    [TestMethod]
-    public void Profile_InactiveIsDistinctFromAnActiveZeroMask()
-    {
-        var inactive = AttackProfile.Inactive;
-        var active = new AttackProfile(Entry(mask: 0, cakes: 0, effort: 0, breedings: 0));
-
-        Assert.AreEqual(0, inactive.Entries.Count);
-        Assert.AreEqual(1, active.Entries.Count);
-        Assert.IsFalse(inactive.Contains(0));
-        Assert.IsTrue(active.Contains(0));
-    }
-
-    [TestMethod]
-    public void Profile_CachesExactTargetMasks()
-    {
-        var profile = new AttackProfile(
-            Entry(mask: 0b000110, cakes: 0, effort: 0, breedings: 0),
-            Entry(mask: 0b001000, cakes: 0, effort: 0, breedings: 0)
-        );
-
-        Assert.AreEqual((1UL << 0b000110) | (1UL << 0b001000), profile.EntryTargetMasks);
-    }
-
-    private static AttackProfileEntry Entry(byte mask, int cakes, int effort, int breedings, bool usesCake = false) =>
-        new(mask, cakes, TimeSpan.FromMinutes(effort), breedings, usesCake);
+    private static AttackProfileEntry Entry(byte mask, int cakes) => new(mask, cakes);
 
     private static GameSettings Settings() => new()
     {
@@ -186,15 +128,4 @@ public class AttackProfileTests
 
     private static TimeSpan SelfEffort(GameSettings settings, Pal pal, int breedings) =>
         BredPalReferenceEffort.CalculateSelfBreedingEffort(settings, pal, 1, 0.5f, breedings);
-
-    private static AttackProfileEntry Transform(AttackProfileEntry entry, GameSettings settings, Pal pal, PalGender gender) =>
-        entry.WithGuaranteedGender(settings, pal, 1, 0.5f, SolverTestScenario.DB, gender, useReverser: false);
-
-    private static (Pal Pal, PalGender Gender) GenderedPal()
-    {
-        var pal = SolverTestScenario.DB.Pals.First(p =>
-            SolverTestScenario.DB.BreedingGenderProbability[p][PalGender.MALE] < 1
-        );
-        return (pal, PalGender.MALE);
-    }
 }

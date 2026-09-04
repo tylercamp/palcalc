@@ -181,7 +181,7 @@ namespace PalCalc.Solver.PalReference
             else
             {
                 return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs,
-                    AttackProfile.WithGuaranteedGender(gameSettings, Pal, Parent1.TimeFactor, Parent2.TimeFactor, db, gender, useReverser),
+                    AttackProfile,
                     MaterializedAttackInheritance)
                 {
                     AvgRequiredBreedings = BredPalReferenceEffort.WithGuaranteedGender(AvgRequiredBreedings, Pal, db, gender, useReverser),

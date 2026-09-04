@@ -133,7 +133,9 @@ internal sealed class CandidatePreFilter
     {
         var leftEntry = BestTerminalEntry(left);
         var rightEntry = BestTerminalEntry(right);
-        var comparison = AttackProfileEntryComparer.Instance.Compare(leftEntry, rightEntry);
+        var comparison = CompareAttackEntries(leftEntry, rightEntry);
+        if (comparison != 0) return comparison;
+        comparison = left.BreedingEffort.CompareTo(right.BreedingEffort);
         if (comparison != 0) return comparison;
         comparison = left.TotalCost.CompareTo(right.TotalCost);
         if (comparison != 0) return comparison;
@@ -148,7 +150,7 @@ internal sealed class CandidatePreFilter
         {
             if ((entry.LearnedTargetMask & attackTargets.FullTargetMask) != attackTargets.FullTargetMask)
                 continue;
-            if (!found || AttackProfileEntryComparer.Instance.Compare(entry, best) < 0)
+            if (!found || CompareAttackEntries(entry, best) < 0)
             {
                 best = entry;
                 found = true;
@@ -167,13 +169,8 @@ internal sealed class CandidatePreFilter
 
     private sealed class EarlyCandidateGroup
     {
-        private const int NoopSlotOffset = AttackProfile.TargetMaskCount;
-        private const int AttackSlotCount = NoopSlotOffset * 2;
-        private const int TargetMaskBits = NoopSlotOffset - 1;
+        private const int AttackSlotCount = AttackProfile.TargetMaskCount;
 
-        // Each exact target mask has two independent capabilities: with and
-        // without a noop attack. A candidate remains useful while it champions
-        // at least one such slot, even if another candidate replaces its others.
         private readonly IPalReference[] attackChampions = new IPalReference[AttackSlotCount];
         private readonly AttackProfileEntry[] attackEntries = new AttackProfileEntry[AttackSlotCount];
         private readonly Dictionary<IPalReference, int> championCounts =
@@ -197,8 +194,7 @@ internal sealed class CandidatePreFilter
                 var improvesAny = false;
                 foreach (ref readonly var entry in attackProfile.EntriesSpan)
                 {
-                    var slot = entry.LearnedTargetMask +
-                        (attackProfile.HasNoopAttack ? NoopSlotOffset : 0);
+                    var slot = entry.LearnedTargetMask;
                     if (attackChampions[slot] is not null &&
                         Compare(candidate, entry, attackChampions[slot], attackEntries[slot]) >= 0)
                         continue;
@@ -257,16 +253,15 @@ internal sealed class CandidatePreFilter
 
         private static AttackProfileEntry BestEntryForSlot(IPalReference candidate, int slot)
         {
-            var mask = (byte)(slot & TargetMaskBits);
+            var mask = (byte)slot;
             AttackProfileEntry best = default;
             var found = false;
             var attackProfile = candidate.AttackProfile;
             foreach (ref readonly var entry in attackProfile.EntriesSpan)
             {
-                if (entry.LearnedTargetMask != mask ||
-                    attackProfile.HasNoopAttack != (slot >= NoopSlotOffset))
+                if (entry.LearnedTargetMask != mask)
                     continue;
-                if (!found || AttackProfileEntryComparer.Instance.Compare(entry, best) < 0)
+                if (!found || CompareAttackEntries(entry, best) < 0)
                 {
                     best = entry;
                     found = true;
@@ -282,7 +277,7 @@ internal sealed class CandidatePreFilter
             in AttackProfileEntry rightEntry
         )
         {
-            var comparison = AttackProfileEntryComparer.Instance.Compare(leftEntry, rightEntry);
+            var comparison = CompareAttackEntries(leftEntry, rightEntry);
             if (comparison != 0) return comparison;
             comparison = left.BreedingEffort.CompareTo(right.BreedingEffort);
             if (comparison != 0) return comparison;
@@ -290,6 +285,17 @@ internal sealed class CandidatePreFilter
             if (comparison != 0) return comparison;
             return left.GetHashCode().CompareTo(right.GetHashCode());
         }
+    }
+
+    private static int CompareAttackEntries(
+        in AttackProfileEntry left,
+        in AttackProfileEntry right
+    )
+    {
+        var comparison = left.TotalSpecialCakes.CompareTo(right.TotalSpecialCakes);
+        return comparison != 0
+            ? comparison
+            : left.LearnedTargetMask.CompareTo(right.LearnedTargetMask);
     }
 }
 

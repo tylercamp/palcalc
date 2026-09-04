@@ -92,7 +92,7 @@ public class CandidateExpanderTests
     }
 
     [TestMethod]
-    public void ExpandBatch_ComposesAttackProfilesWithoutDilutingStructuralEffort()
+    public void ExpandBatch_ComposesAttackProfilesWithoutEmbeddingAttackEffort()
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var targetAttack = InheritableAttackNotInnateTo(child);
@@ -113,20 +113,14 @@ public class CandidateExpanderTests
 
         var inherited = candidate.AttackProfile.Entries.Single(entry => entry.LearnedTargetMask == 1);
         Assert.IsTrue(candidate.AttackProfile.Entries.Count > 1);
-        Assert.AreEqual(
-            (int)Math.Ceiling(1f / (candidate.PassivesProbability * candidate.IVsProbability * 0.5f)),
-            inherited.SelfBreedings
-        );
+        Assert.AreEqual(0, inherited.TotalSpecialCakes);
         Assert.AreEqual(
             (int)Math.Ceiling(1f / (candidate.PassivesProbability * candidate.IVsProbability)),
             candidate.AvgRequiredBreedings
         );
-        Assert.IsTrue(inherited.BreedingEffort > candidate.BreedingEffort);
 
         var gendered = (BredPalReference)candidate.WithGuaranteedGender(SolverTestScenario.DB, PalGender.MALE, false);
-        var genderedInherited = gendered.AttackProfile.Entries.Single(entry => entry.LearnedTargetMask == 1);
-        Assert.IsTrue(genderedInherited.SelfBreedings > inherited.SelfBreedings);
-        Assert.IsTrue(genderedInherited.BreedingEffort > inherited.BreedingEffort);
+        Assert.AreEqual(candidate.AttackProfile, gendered.AttackProfile);
     }
 
     [TestMethod]
@@ -145,7 +139,7 @@ public class CandidateExpanderTests
         ).Candidates.Single();
 
         Assert.AreEqual(1, candidate.AttackProfile.Entries.Single().LearnedTargetMask);
-        Assert.AreEqual(candidate.AvgRequiredBreedings, candidate.AttackProfile.Entries.Single().SelfBreedings);
+        Assert.AreEqual(0, candidate.AttackProfile.Entries.Single().TotalSpecialCakes);
     }
 
     [TestMethod]
@@ -162,8 +156,8 @@ public class CandidateExpanderTests
         ).Candidates.Single();
 
         Assert.AreEqual(
-            candidate.AvgRequiredBreedings,
-            candidate.AttackProfile.Entries.Single(entry => entry.LearnedTargetMask == 1).SelfBreedings
+            0,
+            candidate.AttackProfile.Entries.Single(entry => entry.LearnedTargetMask == 1).TotalSpecialCakes
         );
     }
 
@@ -331,10 +325,7 @@ public class CandidateExpanderTests
                     attackTargets.IsActive && (instance.ActiveSkills ?? []).Any(attack => !attack.CanInherit),
                     new AttackProfileEntry(
                     attackTargets.MaskOf(instance.ActiveSkills ?? []),
-                    0,
-                    TimeSpan.Zero,
-                    0,
-                    false
+                    0
                     )
                 )
                 : AttackProfile.Inactive

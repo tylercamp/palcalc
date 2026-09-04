@@ -228,7 +228,7 @@ public class InitialPalBuilderTests
     public void WithGuaranteedGender_PreservesAttackProfileCapabilities()
     {
         var pal = "Katress".ToPal(SolverTestScenario.DB);
-        var profile = new AttackProfile(true, new AttackProfileEntry(1, 0, TimeSpan.Zero, 0, false));
+        var profile = new AttackProfile(true, new AttackProfileEntry(1, 0));
         var owned = new OwnedPalReference(
             SolverTestScenario.Owned(pal.Name, PalGender.MALE), [], new(),
             attackProfile: profile

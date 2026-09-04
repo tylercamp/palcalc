@@ -16,9 +16,15 @@ internal sealed class ResultAccumulator(
 {
     private readonly List<IPalReference> discovered = [];
 
-    // Attack-profile effort is selected only after terminal gender adjustment,
-    // so structural effort cannot group terminal candidates here.
     public IEnumerable<IPalReference> Results => discovered.Distinct();
+
+    /// <summary>
+    /// Applies the existing candidate-selection policy to coarse attack
+    /// finalists before any inheritance tree is materialized.
+    /// </summary>
+    public IEnumerable<IPalReference> SelectSearchFinalists(
+        IEnumerable<IPalReference> candidates
+    ) => selectionPolicy.SelectRetainedAlternatives(candidates.Distinct());
 
     public IEnumerable<IPalReference> SelectFinalResults(IEnumerable<IPalReference> candidates)
     {
@@ -30,13 +36,14 @@ internal sealed class ResultAccumulator(
                 .SelectMany(selectionPolicy.SelectRetainedAlternatives);
         }
 
-        // Materialized attack results have already had required gender applied.
-        // Keep only the minimum-cake tier before ordinary result pruning; this is
-        // the accepted trade-off that makes cake use the primary optimization goal.
-        // Materialization also reduces each result to its one selected profile entry.
+        // Search applied only the estimated cake tier. Gender adjustment and
+        // recursively selected witnesses can change the concrete total, so
+        // restore the cake-first objective using the materialized values.
         var minimumCakes = distinct.Count == 0
             ? 0
-            : distinct.Min(reference => reference.AttackProfile.EntriesSpan[0].TotalSpecialCakes);
+            : distinct.Min(reference =>
+                reference.AttackProfile.EntriesSpan[0].TotalSpecialCakes
+            );
         return selectionPolicy.SelectRetainedAlternatives(
             distinct.Where(reference =>
                 reference.AttackProfile.EntriesSpan[0].TotalSpecialCakes == minimumCakes

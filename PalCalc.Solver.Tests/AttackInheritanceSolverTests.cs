@@ -111,9 +111,9 @@ public class AttackInheritanceSolverTests
         var inherited = result.AttackProfile.Entries.Single(entry => entry.LearnedTargetMask == 1);
 
         Assert.AreEqual(0.5f, result.MaterializedAttackInheritance.AttackProbability);
-        Assert.AreEqual(expectedProfileEggs, inherited.SelfBreedings);
+        Assert.AreEqual(0, inherited.TotalSpecialCakes);
         Assert.AreEqual(expectedProfileEggs, result.AvgRequiredBreedings);
-        Assert.AreEqual(inherited.BreedingEffort, result.BreedingEffort);
+        Assert.IsTrue(result.BreedingEffort > TimeSpan.Zero);
     }
 
     [TestMethod]

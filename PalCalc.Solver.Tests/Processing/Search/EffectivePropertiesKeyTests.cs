@@ -98,11 +98,11 @@ public class EffectivePropertiesKeyTests
     }
 
     [TestMethod]
-    public void FrontierIndex_PromotesOnlyTheBestLikelyDominator()
+    public void FrontierIndex_PrioritizesCoverageAndCakesBeforeEffort()
     {
         var pal = "Katress".ToPal(SolverTestScenario.DB);
         var profile = new AttackProfile(
-            new AttackProfileEntry(1, 0, TimeSpan.Zero, 0, false)
+            new AttackProfileEntry(1, 0)
         );
         var initial = new TestPalReference(
             pal, PalGender.MALE, [], new IV_Set(),
@@ -113,7 +113,7 @@ public class EffectivePropertiesKeyTests
             pal, PalGender.MALE, [], new IV_Set(),
             attackProfile: new AttackProfile(
                 true,
-                new AttackProfileEntry(3, 0, TimeSpan.Zero, 0, false)
+                new AttackProfileEntry(3, 0)
             ),
             breedingEffort: TimeSpan.FromMinutes(2)
         );
@@ -126,7 +126,7 @@ public class EffectivePropertiesKeyTests
 
         index.Add(initial);
         index.Add(broader);
-        Assert.AreSame(broader, index[broader][0]);
+        Assert.AreSame(initial, index[broader][0]);
 
         index.Add(fastest);
 

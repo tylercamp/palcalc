@@ -1,79 +1,30 @@
-using PalCalc.Model;
-using PalCalc.Solver.PalReference;
-
 namespace PalCalc.Solver.PalReference.Properties;
 
 /// <summary>
-///     Describes a set of desired attacks that can be obtained by a Pal, and the
-///     various costs involved in obtaining this result.
+///     During search, an attack profile records only exact requested-attack
+///     availability and the minimum estimated Special Cake cost for each mask.
+///     Attack probability, attack-specific effort, exact loadouts, and
+///     gender-adjusted cake use are reconstructed after search. This deliberately
+///     lossy boundary keeps the fixed attack search state small and portable:
+///     a structurally slower path can be discarded even when its exact attack
+///     odds would have been better, and a coarse finalist can fail an exact
+///     constraint after reconstruction.
+///     Search profile = availability + estimated cakes. Materialized inheritance
+///     = exact probability + effort + cakes + loadouts.
 /// </summary>
 /// 
 /// <param name="LearnedTargetMask">
 ///     A bit-mask describing which desired attacks are covered by this entry. The structure
 ///     of this mask is decided by the `AttackTargetContext` for the current solver run.
 /// </param>
-/// 
 /// <param name="TotalSpecialCakes">
-///     The total number of Special Cakes needed throughout the complete breeding tree for this result.
-/// </param>
-/// 
-/// <param name="BreedingEffort">
-///     The total breeding effort to produce the complete breeding tree for this result.
-/// </param>
-/// 
-/// <param name="SelfBreedings">
-///     The number of breeding attempts needed at the final step to produce this Pal.
-/// </param>
-/// 
-/// <param name="SelfUsesSpecialCake">
-///     Whether the final breeding step requires the use of Special Cakes.
+///     The minimum estimated number of Special Cakes needed throughout the
+///     complete breeding tree for this exact outcome.
 /// </param>
 public readonly record struct AttackProfileEntry(
     byte LearnedTargetMask,
-    int TotalSpecialCakes,
-    TimeSpan BreedingEffort,
-    int SelfBreedings,
-    bool SelfUsesSpecialCake
-)
-{
-    // TODO - adjust param order, add comments
-    internal AttackProfileEntry WithGuaranteedGender(
-        GameSettings gameSettings,
-        Pal pal,
-        float parent1TimeFactor,
-        float parent2TimeFactor,
-        PalDB db,
-        PalGender gender,
-        bool useReverser
-    )
-    {
-        var adjustedBreedings = BredPalReferenceEffort.WithGuaranteedGender(
-            SelfBreedings, pal, db, gender, useReverser
-        );
-        var oldSelfEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
-            gameSettings, pal, parent1TimeFactor, parent2TimeFactor, SelfBreedings
-        );
-        var newSelfEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
-            gameSettings, pal, parent1TimeFactor, parent2TimeFactor, adjustedBreedings
-        );
-
-        return this with
-        {
-            SelfBreedings = adjustedBreedings,
-            BreedingEffort = BreedingEffort - oldSelfEffort + newSelfEffort,
-            TotalSpecialCakes = TotalSpecialCakes + (SelfUsesSpecialCake ? adjustedBreedings - SelfBreedings : 0),
-        };
-    }
-
-    public static AttackProfileEntry WildPalLevel1Attack(byte attackMask, TimeSpan captureEffort) =>
-        new(
-            LearnedTargetMask: attackMask,
-            TotalSpecialCakes: 0,
-            BreedingEffort: captureEffort,
-            SelfBreedings: 0,
-            SelfUsesSpecialCake: false
-        );
-}
+    int TotalSpecialCakes
+);
 
 /// <summary>
 /// <para>
@@ -88,8 +39,8 @@ public readonly record struct AttackProfileEntry(
 ///     this Pal's parents.
 /// </para>
 /// <para>
-///     Profiles are deliberately bounded. For each requested-attack mask the solver keeps
-///     the outcome using the fewest Special Cakes, then the least breeding effort.
+///     Profiles are deliberately bounded. For each requested-attack mask the
+///     solver keeps the outcome using the fewest estimated Special Cakes.
 /// </para>
 /// <para>
 ///     The final, exact choice of attacks is decided in the final solver steps, using
@@ -199,23 +150,4 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
 
     public override int GetHashCode() => hash;
 
-    internal AttackProfile WithGuaranteedGender(
-        GameSettings gameSettings,
-        Pal pal,
-        float parent1TimeFactor,
-        float parent2TimeFactor,
-        PalDB db,
-        PalGender gender,
-        bool useReverser
-    )
-    {
-        if (entries is null)
-            return Inactive;
-
-        var resultEntries = new AttackProfileEntry[entries.Length];
-        for (int i = 0; i < entries.Length; i++)
-            resultEntries[i] = entries[i].WithGuaranteedGender(gameSettings, pal, parent1TimeFactor, parent2TimeFactor, db, gender, useReverser);
-
-        return new AttackProfile(HasNoopAttack, resultEntries);
-    }
 }

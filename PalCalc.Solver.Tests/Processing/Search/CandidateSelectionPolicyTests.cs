@@ -168,7 +168,7 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
-    public void ActiveProfiles_RetainExactChampionsBeyondResultLimit()
+    public void ActiveProfiles_SupersetCapabilityCoversRedundantExactMask()
     {
         var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 1)]));
         var subset = Reference("subset", "Katress", TimeSpan.FromMinutes(1), Profile(1));
@@ -176,7 +176,7 @@ public class CandidateSelectionPolicyTests
 
         var retained = policy.SelectRetainedAlternatives([subset, superset]);
 
-        CollectionAssert.AreEquivalent(new[] { subset, superset }, retained.ToArray());
+        Assert.IsTrue(retained.Contains(superset));
     }
 
     [TestMethod]
@@ -192,7 +192,7 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
-    public void ActiveProfiles_RetainNoopCapabilityBeyondResultLimit()
+    public void ActiveProfiles_DoNotSplitCapabilitiesByNoopState()
     {
         var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 1)]));
         var ordinary = Reference("ordinary", "Katress", TimeSpan.FromMinutes(1), Profile(1));
@@ -206,7 +206,11 @@ public class CandidateSelectionPolicyTests
 
         var retained = policy.SelectRetainedAlternatives([ordinary, noop]);
 
-        Assert.IsTrue(retained.Any(candidate => candidate.AttackProfile.HasNoopAttack));
+        Assert.AreEqual(1, retained.Count);
+        CollectionAssert.AreEqual(
+            ordinary.AttackProfile.Entries.ToArray(),
+            retained[0].AttackProfile.Entries.ToArray()
+        );
     }
 
     [TestMethod]
@@ -255,7 +259,7 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
-    public void ActiveProfiles_PreserveIncomparableEarlyCandidates()
+    public void ActiveProfiles_PreserveUniqueEarlyCandidates()
     {
         var policy = ActivePolicy();
         var incumbent = Reference("incumbent", "Katress", TimeSpan.FromMinutes(5), Profile(1));
@@ -281,7 +285,7 @@ public class CandidateSelectionPolicyTests
             policy.SelectEarlyCandidate(slowerUnique, incumbent)
         );
         Assert.AreEqual(
-            EarlyCandidateSelection.KeepBoth,
+            EarlyCandidateSelection.ReplaceIncumbent,
             policy.SelectEarlyCandidate(cheaperNormal, noop)
         );
     }
@@ -306,6 +310,83 @@ public class CandidateSelectionPolicyTests
         Assert.AreEqual(
             FrontierCandidateAssessment.PotentialImprovement,
             policy.AssessAgainstFrontier(fasterPartial, incumbent)
+        );
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_LowerCakesCoverHigherCakesForTheSameExactMask()
+    {
+        var policy = ActivePolicy();
+        var lowerCakes = Reference(
+            "lower-cakes",
+            "Katress",
+            TimeSpan.FromMinutes(5),
+            ProfileWithCakes(1, cakes: 1)
+        );
+        var higherCakes = Reference(
+            "higher-cakes",
+            "Katress",
+            TimeSpan.FromMinutes(10),
+            ProfileWithCakes(1, cakes: 2)
+        );
+
+        Assert.AreEqual(
+            EarlyCandidateSelection.ReplaceIncumbent,
+            policy.SelectEarlyCandidate(lowerCakes, higherCakes)
+        );
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_EqualCakesLetStructuralEffortDecide()
+    {
+        var policy = ActivePolicy();
+        var faster = Reference(
+            "faster",
+            "Katress",
+            TimeSpan.FromMinutes(5),
+            ProfileWithCakes(1, cakes: 2)
+        );
+        var slower = Reference(
+            "slower",
+            "Katress",
+            TimeSpan.FromMinutes(10),
+            ProfileWithCakes(1, cakes: 2)
+        );
+
+        Assert.AreEqual(
+            EarlyCandidateSelection.ReplaceIncumbent,
+            policy.SelectEarlyCandidate(faster, slower)
+        );
+        Assert.AreEqual(
+            EarlyCandidateSelection.RejectCandidate,
+            policy.SelectEarlyCandidate(slower, faster)
+        );
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_DifferentExactMasksDoNotCoverOneAnother()
+    {
+        var policy = ActivePolicy();
+        var faster = Reference(
+            "faster",
+            "Katress",
+            TimeSpan.FromMinutes(5),
+            ProfileWithCakes(1, cakes: 0)
+        );
+        var slower = Reference(
+            "slower",
+            "Katress",
+            TimeSpan.FromMinutes(10),
+            ProfileWithCakes(2, cakes: 0)
+        );
+
+        Assert.AreEqual(
+            EarlyCandidateSelection.KeepBoth,
+            policy.SelectEarlyCandidate(faster, slower)
+        );
+        Assert.AreEqual(
+            EarlyCandidateSelection.KeepBoth,
+            policy.SelectEarlyCandidate(slower, faster)
         );
     }
 
@@ -588,8 +669,11 @@ public class CandidateSelectionPolicyTests
         );
 
     private static AttackProfile Profile(params byte[] masks) => new(masks.Select(mask =>
-        new AttackProfileEntry(mask, 0, TimeSpan.Zero, 0, false)
+        new AttackProfileEntry(mask, 0)
     ).ToArray());
+
+    private static AttackProfile ProfileWithCakes(byte mask, int cakes) =>
+        new(new AttackProfileEntry(mask, cakes));
 
     private static TestPalReference Reference(
         string name,

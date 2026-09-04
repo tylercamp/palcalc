@@ -463,7 +463,7 @@ public class SearchFrontierCharacterizationTests
     }
 
     private static AttackProfile Profile(params byte[] masks) => new(masks.Select(mask =>
-        new AttackProfileEntry(mask, 0, TimeSpan.Zero, 0, false)
+        new AttackProfileEntry(mask, 0)
     ).ToArray());
 
     /*

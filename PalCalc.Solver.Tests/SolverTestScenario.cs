@@ -189,7 +189,7 @@ internal static class SolverTestScenario
                 AttackProfile: string.Join(
                     "|",
                     result.AttackProfile.Entries.Select(entry =>
-                        $"{entry.LearnedTargetMask}:{entry.TotalSpecialCakes}:{entry.BreedingEffort.Ticks}:{entry.SelfBreedings}:{entry.SelfUsesSpecialCake}"
+                        $"{entry.LearnedTargetMask}:{entry.TotalSpecialCakes}"
                     )
                 ),
                 IVs: result.IVs,

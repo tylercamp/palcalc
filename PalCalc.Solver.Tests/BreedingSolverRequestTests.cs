@@ -89,10 +89,10 @@ public class BreedingSolverRequestTests
         var instance = SolverTestScenario.Owned("Wixen Noct", PalGender.MALE);
 
         Assert.IsTrue(target.IsSatisfiedBy(new OwnedPalReference(
-            instance, [], new(), new AttackProfile(new AttackProfileEntry(1, 0, TimeSpan.Zero, 0, false))
+            instance, [], new(), new AttackProfile(new AttackProfileEntry(1, 0))
         )));
         Assert.IsFalse(target.IsSatisfiedBy(new OwnedPalReference(
-            instance, [], new(), new AttackProfile(new AttackProfileEntry(0, 0, TimeSpan.Zero, 0, false))
+            instance, [], new(), new AttackProfile(new AttackProfileEntry(0, 0))
         )));
     }
 
