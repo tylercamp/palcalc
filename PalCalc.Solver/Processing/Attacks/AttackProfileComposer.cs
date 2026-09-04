@@ -6,6 +6,77 @@ using PalCalc.Solver.PalReference.Properties;
 namespace PalCalc.Solver.Processing.Attacks;
 
 /// <summary>
+/// Allocation-free view of the composer's current accumulator. A non-cached
+/// value must be consumed or materialized before the next call to <see cref="AttackProfileComposer.Prepare"/>.
+/// </summary>
+internal readonly struct PreparedAttackProfile
+{
+    private readonly AttackProfileComposer composer;
+    private readonly AttackProfile cached;
+    private readonly int cacheKey;
+    private readonly bool isCached;
+    private readonly bool isCacheable;
+
+    internal PreparedAttackProfile(
+        AttackProfileComposer composer,
+        int cacheKey,
+        bool isCacheable
+    )
+    {
+        this.composer = composer;
+        this.cacheKey = cacheKey;
+        this.isCacheable = isCacheable;
+        cached = default;
+        isCached = false;
+    }
+
+    internal PreparedAttackProfile(AttackProfile cached)
+    {
+        this.cached = cached;
+        composer = null;
+        cacheKey = 0;
+        isCached = true;
+        isCacheable = false;
+    }
+
+    public ulong EntryTargetMasks => isCached
+        ? cached.EntryTargetMasks
+        : composer.PreparedEntryTargetMasks;
+
+    public bool Contains(byte requiredMask)
+    {
+        var masks = EntryTargetMasks;
+        while (masks != 0)
+        {
+            var mask = BitOperations.TrailingZeroCount(masks);
+            masks &= masks - 1;
+            if ((mask & requiredMask) == requiredMask)
+                return true;
+        }
+        return false;
+    }
+
+    public AttackProfileEntry EntryForMask(int mask)
+    {
+        if (!isCached)
+            return composer.PreparedEntryForMask(mask);
+
+        foreach (ref readonly var entry in cached.EntriesSpan)
+            if (entry.LearnedTargetMask == mask)
+                return entry;
+        throw new ArgumentOutOfRangeException(nameof(mask));
+    }
+
+    public AttackProfile Materialize() => isCached
+        ? cached
+        : composer.MaterializePrepared(cacheKey, isCacheable);
+
+    public override int GetHashCode() => isCached
+        ? cached.GetHashCode()
+        : composer.PreparedHashCode;
+}
+
+/// <summary>
 /// Combines two parent profiles into the abstract outcomes used during search.
 /// Concrete inheritance choices are reconstructed later by <see cref="AttackResultMaterializer"/>.
 /// </summary>
@@ -36,9 +107,24 @@ internal sealed class AttackProfileComposer(
         float passivesProbability,
         float ivsProbability
     )
+        => Prepare(
+            child,
+            parent1,
+            parent2,
+            passivesProbability,
+            ivsProbability
+        ).Materialize();
+
+    internal PreparedAttackProfile Prepare(
+        Pal child,
+        IPalReference parent1,
+        IPalReference parent2,
+        float passivesProbability,
+        float ivsProbability
+    )
     {
         if (!targets.IsActive)
-            return AttackProfile.Inactive;
+            return new(AttackProfile.Inactive);
 
         var baseProbability = passivesProbability * ivsProbability;
         if (
@@ -62,7 +148,7 @@ internal sealed class AttackProfileComposer(
                 ? 0
                 : (int)Math.Ceiling(1f / baseProbability);
             if (cachedProfiles.TryGetValue(cacheKey, out var cached))
-                return cached;
+                return new(cached);
 
             accumulator.Reset(targets.StateOf(child).HasNooplLevel1Attack);
             Enumerate(
@@ -73,9 +159,7 @@ internal sealed class AttackProfileComposer(
                 ivsProbability,
                 accumulator
             );
-            var profile = accumulator.Build();
-            cachedProfiles.Add(cacheKey, profile);
-            return profile;
+            return new(this, cacheKey, isCacheable: true);
         }
 
         accumulator.Reset(targets.StateOf(child).HasNooplLevel1Attack);
@@ -87,7 +171,20 @@ internal sealed class AttackProfileComposer(
             ivsProbability,
             accumulator
         );
-        return accumulator.Build();
+        return new(this, cacheKey: 0, isCacheable: false);
+    }
+
+    internal ulong PreparedEntryTargetMasks => accumulator.OccupiedMasks;
+    internal int PreparedHashCode => accumulator.CalculateHashCode();
+    internal AttackProfileEntry PreparedEntryForMask(int mask) =>
+        accumulator.EntryForMask(mask);
+
+    internal AttackProfile MaterializePrepared(int cacheKey, bool isCacheable)
+    {
+        var profile = accumulator.Build();
+        if (isCacheable)
+            cachedProfiles.Add(cacheKey, profile);
+        return profile;
     }
 
     private void Enumerate(

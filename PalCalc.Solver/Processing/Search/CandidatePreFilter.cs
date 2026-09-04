@@ -4,6 +4,7 @@ using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
+using System.Numerics;
 
 namespace PalCalc.Solver.Processing.Search;
 
@@ -102,6 +103,52 @@ internal sealed class CandidatePreFilter
                 IsGuaranteedImprovement: frontierAssessment == FrontierCandidateAssessment.GuaranteedImprovement
             )
             : CandidatePreFilterResult.Rejected;
+    }
+
+    public CandidatePreFilterResult TryAdd(ref CandidateDraft candidate)
+    {
+        if (
+            selectionPolicy is not DefaultCandidateSelectionPolicy defaultPolicy ||
+            !defaultPolicy.SupportsCandidateDrafts ||
+            frontier is not SearchFrontier searchFrontier
+        )
+            return TryAdd(candidate.Materialize());
+
+        if (candidate.BreedingEffort > maxEffort)
+            return CandidatePreFilterResult.Rejected;
+
+        var isTerminal = target.IsSatisfiedByIgnoringAttacks(
+            candidate.Pal,
+            candidate.Gender,
+            candidate.IVs,
+            candidate.EffectivePassives
+        ) && candidate.AttackProfile.Contains(attackTargets.FullTargetMask);
+        if (isTerminal)
+            RetainTerminal(candidate.Materialize());
+
+        var propertiesKey = defaultPolicy.KeyOf(candidate);
+        var frontierAssessment = searchFrontier.AssessCandidate(
+            candidate,
+            propertiesKey,
+            defaultPolicy
+        );
+        if (
+            frontierAssessment == FrontierCandidateAssessment.Inferior &&
+            !isTerminal
+        )
+            return CandidatePreFilterResult.Rejected;
+
+        var earlyCandidates = earlyCandidatesByPalId[candidate.Pal.Id];
+        var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new());
+        if (!group.TryAdd(ref candidate))
+            return CandidatePreFilterResult.Rejected;
+
+        return new(
+            PropertiesKey: propertiesKey,
+            Accepted: true,
+            IsGuaranteedImprovement:
+                frontierAssessment == FrontierCandidateAssessment.GuaranteedImprovement
+        );
     }
 
     public IReadOnlyList<IPalReference> TerminalCandidates => terminalCandidates.Values.ToArray();
@@ -243,6 +290,52 @@ internal sealed class CandidatePreFilter
             }
         }
 
+        public bool TryAdd(ref CandidateDraft candidate)
+        {
+            lock (this)
+            {
+                Span<bool> improved = stackalloc bool[AttackSlotCount];
+                var improvesAny = false;
+                var masks = candidate.AttackProfile.EntryTargetMasks;
+                while (masks != 0)
+                {
+                    var slot = BitOperations.TrailingZeroCount(masks);
+                    masks &= masks - 1;
+                    var entry = candidate.AttackProfile.EntryForMask(slot);
+                    if (attackChampions[slot] is not null &&
+                        Compare(candidate, entry, attackChampions[slot], attackEntries[slot]) >= 0)
+                        continue;
+
+                    improved[slot] = true;
+                    improvesAny = true;
+                }
+
+                if (!improvesAny)
+                    return false;
+
+                var materialized = candidate.Materialize();
+                for (var slot = 0; slot < improved.Length; slot++)
+                {
+                    if (!improved[slot])
+                        continue;
+
+                    var previous = attackChampions[slot];
+                    if (previous is not null && --championCounts[previous] == 0)
+                    {
+                        championCounts.Remove(previous);
+                        previous.IsOutdated = true;
+                    }
+
+                    attackChampions[slot] = materialized;
+                    attackEntries[slot] = candidate.AttackProfile.EntryForMask(slot);
+                    championCounts.TryGetValue(materialized, out var count);
+                    championCounts[materialized] = count + 1;
+                }
+
+                return true;
+            }
+        }
+
         private bool TryAddOrdinary(
             IPalReference candidate,
             ICandidateSelectionPolicy selectionPolicy
@@ -287,6 +380,22 @@ internal sealed class CandidatePreFilter
 
         private static int Compare(
             IPalReference left,
+            in AttackProfileEntry leftEntry,
+            IPalReference right,
+            in AttackProfileEntry rightEntry
+        )
+        {
+            var comparison = CompareAttackEntries(leftEntry, rightEntry);
+            if (comparison != 0) return comparison;
+            comparison = left.BreedingEffort.CompareTo(right.BreedingEffort);
+            if (comparison != 0) return comparison;
+            comparison = left.TotalCost.CompareTo(right.TotalCost);
+            if (comparison != 0) return comparison;
+            return left.GetHashCode().CompareTo(right.GetHashCode());
+        }
+
+        private static int Compare(
+            in CandidateDraft left,
             in AttackProfileEntry leftEntry,
             IPalReference right,
             in AttackProfileEntry rightEntry

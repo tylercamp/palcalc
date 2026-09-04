@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,12 +48,25 @@ namespace PalCalc.Solver
         }
 
         internal bool IsSatisfiedByIgnoringAttacks(IPalReference palRef) =>
-            Pal == palRef.Pal &&
-            (RequiredGender == PalGender.WILDCARD || palRef.Gender == PalGender.WILDCARD || palRef.Gender == RequiredGender) &&
-            (IV_HP == 0 || palRef.IVs.HP.Satisfies(IV_HP)) &&
-            (IV_Attack == 0 || palRef.IVs.Attack.Satisfies(IV_Attack)) &&
-            (IV_Defense == 0 || palRef.IVs.Defense.Satisfies(IV_Defense)) &&
-            PassivesMatchRequirements(palRef.EffectivePassives);
+            IsSatisfiedByIgnoringAttacks(
+                palRef.Pal,
+                palRef.Gender,
+                palRef.IVs,
+                palRef.EffectivePassives
+            );
+
+        internal bool IsSatisfiedByIgnoringAttacks(
+            Pal pal,
+            PalGender gender,
+            IV_Set ivs,
+            List<PassiveSkill> passives
+        ) =>
+            Pal == pal &&
+            (RequiredGender == PalGender.WILDCARD || gender == PalGender.WILDCARD || gender == RequiredGender) &&
+            (IV_HP == 0 || ivs.HP.Satisfies(IV_HP)) &&
+            (IV_Attack == 0 || ivs.Attack.Satisfies(IV_Attack)) &&
+            (IV_Defense == 0 || ivs.Defense.Satisfies(IV_Defense)) &&
+            PassivesMatchRequirements(passives);
 
         public bool IsSatisfiedBy(IPalReference palRef) =>
             IsSatisfiedByIgnoringAttacks(palRef) &&

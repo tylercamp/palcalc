@@ -456,39 +456,57 @@ namespace PalCalc.Solver.Processing
 
                             // TODO - Is this pre-calc actually valuable? Most of the time, `MaxEffort` is infinite
                             var structuralBreedings = (int)Math.Ceiling(1.0f / structuralProbability);
-                            var structuralEffort = BredPalReferenceEffort.CombineParentEffort(
+                            var parentBreedingEffort = BredPalReferenceEffort.CombineParentEffort(
                                 settings.GameSettings,
                                 parent1,
                                 parent2,
                                 parent1.BreedingEffort,
                                 parent2.BreedingEffort
-                            ) + BredPalReferenceEffort.CalculateSelfBreedingEffort(
+                            );
+                            var selfBreedingEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
                                 settings.GameSettings,
                                 childPalType,
                                 parent1.TimeFactor,
                                 parent2.TimeFactor,
                                 structuralBreedings
                             );
+                            var structuralEffort = parentBreedingEffort + selfBreedingEffort;
 
                             var added = false;
                             if (structuralEffort <= settings.MaxEffort)
                             {
-                                var attackProfile = AttackProfile.Inactive;
-                                var hasValidAttackProfile = !context.AttackTargets.IsActive;
+                                BredPalReference res = null;
+                                var filterResult = CandidatePreFilterResult.Rejected;
                                 if (context.AttackTargets.IsActive)
                                 {
-                                    attackProfile = attackProfileComposer.Compose(
+                                    var preparedProfile = attackProfileComposer.Prepare(
                                         childPalType,
                                         parent1,
                                         parent2,
                                         probabilityForUpToNumPassives,
                                         ivsProbability
                                     );
-                                    hasValidAttackProfile = attackProfile.EntriesSpan.Length != 0;
+                                    if (preparedProfile.EntryTargetMasks != 0)
+                                    {
+                                        var draft = new CandidateDraft(
+                                            settings.GameSettings,
+                                            childPalType,
+                                            parent1,
+                                            parent2,
+                                            newPassives,
+                                            probabilityForUpToNumPassives,
+                                            finalIVs,
+                                            ivsProbability,
+                                            selfBreedingEffort,
+                                            structuralEffort,
+                                            preparedProfile
+                                        );
+                                        filterResult = context.PreFilter.TryAdd(ref draft);
+                                        if (filterResult.Accepted)
+                                            res = draft.Materialize();
+                                    }
                                 }
-
-                                BredPalReference res = null;
-                                if (hasValidAttackProfile)
+                                else
                                 {
                                     res = new BredPalReference(
                                         settings.GameSettings,
@@ -499,24 +517,21 @@ namespace PalCalc.Solver.Processing
                                         probabilityForUpToNumPassives,
                                         finalIVs,
                                         ivsProbability,
-                                        attackProfile: attackProfile,
+                                        attackProfile: AttackProfile.Inactive,
                                         materializedAttackInheritance: null,
                                         avgRequiredBreedings: null,
                                         gender: PalGender.WILDCARD
                                     );
+                                    filterResult = context.PreFilter.TryAdd(res);
                                 }
 
-                                if (res is not null)
+                                if (res is not null && filterResult.Accepted)
                                 {
-                                    var filterResult = context.PreFilter.TryAdd(res);
-                                    if (filterResult.Accepted)
-                                    {
-                                        newPassivesRef.Retain();
+                                    newPassivesRef.Retain();
 
-                                        yield return res;
-                                        added = true;
-                                        context.PreFilter.Propagate(filterResult);
-                                    }
+                                    yield return res;
+                                    added = true;
+                                    context.PreFilter.Propagate(filterResult);
                                 }
                             }
 

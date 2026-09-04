@@ -81,6 +81,31 @@ internal sealed class SearchFrontier : ICandidateFrontierView
             : FrontierCandidateAssessment.PotentialImprovement;
     }
 
+    internal FrontierCandidateAssessment AssessCandidate(
+        in CandidateDraft candidate,
+        EffectivePropertiesKey propertiesKey,
+        DefaultCandidateSelectionPolicy policy
+    )
+    {
+        var incumbents = index[propertiesKey];
+        if (incumbents is null || incumbents.Count == 0)
+            return FrontierCandidateAssessment.PotentialImprovement;
+
+        var guaranteedImprovement = true;
+        for (int i = 0; i < incumbents.Count; i++)
+        {
+            var assessment = policy.AssessAgainstFrontier(candidate, incumbents[i]);
+            if (assessment == FrontierCandidateAssessment.Inferior)
+                return FrontierCandidateAssessment.Inferior;
+            if (assessment != FrontierCandidateAssessment.GuaranteedImprovement)
+                guaranteedImprovement = false;
+        }
+
+        return guaranteedImprovement
+            ? FrontierCandidateAssessment.GuaranteedImprovement
+            : FrontierCandidateAssessment.PotentialImprovement;
+    }
+
     public void ObserveTerminal(IEnumerable<IPalReference> candidates) =>
         resultAccumulator.Observe(candidates);
 

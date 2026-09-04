@@ -2,6 +2,7 @@ using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.ResultPruning;
+using System.Numerics;
 
 namespace PalCalc.Solver.Processing.Search;
 
@@ -104,6 +105,20 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     public EffectivePropertiesKey KeyOf(IPalReference reference) =>
         propertiesKeyProvider.KeyOf(reference);
 
+    internal bool SupportsCandidateDrafts =>
+        ReferenceEquals(
+            propertiesKeyProvider,
+            DefaultEffectivePropertiesKeyProvider.Instance
+        );
+
+    internal EffectivePropertiesKey KeyOf(in CandidateDraft candidate) =>
+        new(
+            palId: candidate.Pal.Id,
+            gender: candidate.Gender,
+            passives: new PassiveSetKey(candidate.EffectivePassives),
+            ivs: new RelevantIVKey(candidate.IVs)
+        );
+
     /// <summary>
     /// Performs the cheap comparison used by workers within one iteration.
     ///
@@ -169,6 +184,44 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
                     : FrontierCandidateAssessment.PotentialImprovement;
 
         return TotalMinIV(candidate) > TotalMinIV(incumbent)
+            ? FrontierCandidateAssessment.PotentialImprovement
+            : CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+                ? FrontierCandidateAssessment.Inferior
+                : FrontierCandidateAssessment.PotentialImprovement;
+    }
+
+    internal FrontierCandidateAssessment AssessAgainstFrontier(
+        in CandidateDraft candidate,
+        IPalReference incumbent
+    )
+    {
+        var comparison = candidate.BreedingEffort.CompareTo(incumbent.BreedingEffort);
+        if (comparison < 0)
+            return CoversAttackCapability(candidate.AttackProfile, incumbent.AttackProfile)
+                ? FrontierCandidateAssessment.GuaranteedImprovement
+                : FrontierCandidateAssessment.PotentialImprovement;
+        if (comparison > 0)
+            return CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+                ? FrontierCandidateAssessment.Inferior
+                : FrontierCandidateAssessment.PotentialImprovement;
+
+        comparison = candidate.TotalCost.CompareTo(incumbent.TotalCost);
+        if (comparison < 0)
+            return FrontierCandidateAssessment.PotentialImprovement;
+        if (comparison > 0)
+            return CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+                ? FrontierCandidateAssessment.Inferior
+                : FrontierCandidateAssessment.PotentialImprovement;
+
+        comparison = TotalMaxIV(candidate.IVs).CompareTo(TotalMaxIV(incumbent));
+        if (comparison != 0)
+            return comparison > 0
+                ? FrontierCandidateAssessment.PotentialImprovement
+                : CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+                    ? FrontierCandidateAssessment.Inferior
+                    : FrontierCandidateAssessment.PotentialImprovement;
+
+        return TotalMinIV(candidate.IVs) > TotalMinIV(incumbent)
             ? FrontierCandidateAssessment.PotentialImprovement
             : CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
                 ? FrontierCandidateAssessment.Inferior
@@ -279,6 +332,43 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         return true;
     }
 
+    private static bool CoversAttackCapability(
+        in PreparedAttackProfile provider,
+        AttackProfile required
+    )
+    {
+        if ((provider.EntryTargetMasks & required.EntryTargetMasks) !=
+            required.EntryTargetMasks)
+            return false;
+
+        foreach (ref readonly var requiredEntry in required.EntriesSpan)
+            if (provider.EntryForMask(requiredEntry.LearnedTargetMask).TotalSpecialCakes >
+                requiredEntry.TotalSpecialCakes)
+                return false;
+        return true;
+    }
+
+    private static bool CoversAttackCapability(
+        AttackProfile provider,
+        in PreparedAttackProfile required
+    )
+    {
+        if ((provider.EntryTargetMasks & required.EntryTargetMasks) !=
+            required.EntryTargetMasks)
+            return false;
+
+        var masks = required.EntryTargetMasks;
+        var providerEntries = provider.EntriesSpan;
+        while (masks != 0)
+        {
+            var mask = BitOperations.TrailingZeroCount(masks);
+            masks &= masks - 1;
+            if (!CoversAttackEntry(providerEntries, required.EntryForMask(mask)))
+                return false;
+        }
+        return true;
+    }
+
     private static bool CoversAttackEntry(
         ReadOnlySpan<AttackProfileEntry> providerEntries,
         in AttackProfileEntry requiredEntry
@@ -313,14 +403,20 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         iv == IV_Value.Random ? 0 : select(iv);
 
     private static int TotalMaxIV(IPalReference candidate) =>
-        ScoreOf(candidate.IVs.HP, iv => iv.Max) +
-        ScoreOf(candidate.IVs.Attack, iv => iv.Max) +
-        ScoreOf(candidate.IVs.Defense, iv => iv.Max);
+        TotalMaxIV(candidate.IVs);
+
+    private static int TotalMaxIV(IV_Set ivs) =>
+        ScoreOf(ivs.HP, iv => iv.Max) +
+        ScoreOf(ivs.Attack, iv => iv.Max) +
+        ScoreOf(ivs.Defense, iv => iv.Max);
 
     private static int TotalMinIV(IPalReference candidate) =>
-        ScoreOf(candidate.IVs.HP, iv => iv.Min) +
-        ScoreOf(candidate.IVs.Attack, iv => iv.Min) +
-        ScoreOf(candidate.IVs.Defense, iv => iv.Min);
+        TotalMinIV(candidate.IVs);
+
+    private static int TotalMinIV(IV_Set ivs) =>
+        ScoreOf(ivs.HP, iv => iv.Min) +
+        ScoreOf(ivs.Attack, iv => iv.Min) +
+        ScoreOf(ivs.Defense, iv => iv.Min);
 
     private readonly record struct AttackCapability(
         IPalReference Candidate,

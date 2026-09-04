@@ -30,6 +30,9 @@ internal static class AttackProfileReducer
         private bool hasNoopAttack;
         private ulong occupiedMasks;
 
+        public bool HasNoopAttack => hasNoopAttack;
+        public ulong OccupiedMasks => occupiedMasks;
+
         public void Reset(bool hasNoop)
         {
             hasNoopAttack = hasNoop;
@@ -51,6 +54,21 @@ internal static class AttackProfileReducer
 
             champions[mask] = candidate;
             occupiedMasks |= bit;
+        }
+
+        public AttackProfileEntry EntryForMask(int mask) => champions[mask];
+
+        public int CalculateHashCode()
+        {
+            var result = HasNoopAttack ? 0b11 : 0b01;
+            var masks = occupiedMasks;
+            while (masks != 0)
+            {
+                var mask = BitOperations.TrailingZeroCount(masks);
+                masks &= masks - 1;
+                result = HashCode.Combine(result, champions[mask]);
+            }
+            return result;
         }
 
         public AttackProfile Build()
