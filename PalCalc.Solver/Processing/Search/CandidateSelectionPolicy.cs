@@ -265,7 +265,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         if (!provider.HasNoopAttack && required.HasNoopAttack)
             return false;
 
-        if ((provider.StructurallyCoveredTargetMasks & required.EntryTargetMasks) !=
+        if ((provider.EntryTargetMasks & required.EntryTargetMasks) !=
             required.EntryTargetMasks)
             return false;
 
@@ -285,10 +285,11 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         in AttackProfileEntry requiredEntry
     )
     {
-        // Unfolded `.Any(Covers)`
+        // Profiles contain at most one champion for each exact mask.
         foreach (ref readonly var providerEntry in providerEntries)
         {
-            if (AttackProfileReducer.Covers(providerEntry, requiredEntry))
+            if (providerEntry.LearnedTargetMask == requiredEntry.LearnedTargetMask &&
+                AttackProfileEntryComparer.CompareCosts(providerEntry, requiredEntry) <= 0)
                 return true;
         }
 

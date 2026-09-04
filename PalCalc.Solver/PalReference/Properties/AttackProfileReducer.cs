@@ -6,19 +6,6 @@ internal static class AttackProfileReducer
 {
     private const int TargetMaskCount = AttackProfile.TargetMaskCount;
 
-    // Bit N identifies the exact target-mask value N. All 64 profile masks fit
-    // in one ulong, making superset removal a small bitset scan rather than an
-    // entry-by-entry allocation-heavy reduction.
-    private static readonly ulong[] StrictSupersetMasks = BuildStrictSupersetMasks();
-
-    /// <summary>
-    /// Returns whether obtaining <paramref name="provider"/> also satisfies
-    /// <paramref name="required"/> under the attack solver's cake-first objective.
-    /// </summary>
-    public static bool Covers(in AttackProfileEntry provider, in AttackProfileEntry required) =>
-        (provider.LearnedTargetMask & required.LearnedTargetMask) == required.LearnedTargetMask &&
-        AttackProfileEntryComparer.CompareCosts(provider, required) <= 0;
-
     public static AttackProfile Reduce(ReadOnlySpan<AttackProfileEntry> entries) =>
         Reduce(hasNoopAttack: false, entries);
 
@@ -43,7 +30,6 @@ internal static class AttackProfileReducer
     internal sealed class Accumulator
     {
         private readonly AttackProfileEntry[] champions = new AttackProfileEntry[TargetMaskCount];
-        private readonly AttackProfileEntry[] values = new AttackProfileEntry[TargetMaskCount];
         private bool hasNoopAttack;
         private ulong occupiedMasks;
         private int inputCount;
@@ -57,8 +43,6 @@ internal static class AttackProfileReducer
             inputCount = 0;
         }
 
-        public void Add(in AttackProfileEntry candidate) => Add(candidate, candidate);
-
         /// <summary>
         /// Cheap cake-only rejection used before the caller calculates the
         /// remaining entry costs. Equal cake counts may still improve effort.
@@ -67,76 +51,32 @@ internal static class AttackProfileReducer
             (occupiedMasks & (1UL << mask)) == 0 ||
             totalSpecialCakes <= champions[mask].TotalSpecialCakes;
 
-        /// <summary>
-        /// Selects using <paramref name="comparisonValue"/> while retaining
-        /// <paramref name="value"/>. They differ for terminal-gender selection:
-        /// the adjusted cost chooses the champion, but the original entry must
-        /// remain available for later inheritance-path reconstruction.
-        /// </summary>
-        public void Add(in AttackProfileEntry value, in AttackProfileEntry comparisonValue)
+        public void Add(in AttackProfileEntry candidate)
         {
             inputCount++;
-            var mask = value.LearnedTargetMask;
+            var mask = candidate.LearnedTargetMask;
             var bit = 1UL << mask;
             if ((occupiedMasks & bit) != 0 &&
-                AttackProfileEntryComparer.CompareCosts(champions[mask], comparisonValue) <= 0)
+                AttackProfileEntryComparer.CompareCosts(champions[mask], candidate) <= 0)
                 return;
 
-            champions[mask] = comparisonValue;
-            values[mask] = value;
+            champions[mask] = candidate;
             occupiedMasks |= bit;
         }
 
         public AttackProfile Build()
         {
-            var retainedMasks = occupiedMasks;
-            var candidates = occupiedMasks;
-            // Exact-mask champions are already selected. A subset is redundant
-            // when a strict superset is available at an equal-or-better cost.
-            while (candidates != 0)
-            {
-                var requiredMask = BitOperations.TrailingZeroCount(candidates);
-                candidates &= candidates - 1;
-
-                var providers = occupiedMasks & StrictSupersetMasks[requiredMask];
-                while (providers != 0)
-                {
-                    var providerMask = BitOperations.TrailingZeroCount(providers);
-                    providers &= providers - 1;
-                    if (AttackProfileEntryComparer.CompareCosts(
-                            champions[providerMask], champions[requiredMask]
-                        ) <= 0)
-                    {
-                        retainedMasks &= ~(1UL << requiredMask);
-                        break;
-                    }
-                }
-            }
-
-            var retained = new AttackProfileEntry[BitOperations.PopCount(retainedMasks)];
+            var retained = new AttackProfileEntry[BitOperations.PopCount(occupiedMasks)];
             var destination = 0;
-            while (retainedMasks != 0)
+            var masks = occupiedMasks;
+            while (masks != 0)
             {
-                var mask = BitOperations.TrailingZeroCount(retainedMasks);
-                retainedMasks &= retainedMasks - 1;
-                retained[destination++] = values[mask];
+                var mask = BitOperations.TrailingZeroCount(masks);
+                masks &= masks - 1;
+                retained[destination++] = champions[mask];
             }
 
             return new AttackProfile(hasNoopAttack, retained);
         }
-    }
-
-    private static ulong[] BuildStrictSupersetMasks()
-    {
-        var result = new ulong[TargetMaskCount];
-        for (var requiredMask = 0; requiredMask < TargetMaskCount; requiredMask++)
-        for (var providerMask = 0; providerMask < TargetMaskCount; providerMask++)
-        {
-            if (providerMask != requiredMask &&
-                (providerMask & requiredMask) == requiredMask)
-                result[requiredMask] |= 1UL << providerMask;
-        }
-
-        return result;
     }
 }

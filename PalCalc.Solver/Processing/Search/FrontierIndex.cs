@@ -71,8 +71,8 @@ internal sealed class FrontierIndex(IEffectivePropertiesKeyProvider keyProvider)
         );
         if (comparison != 0) return comparison;
 
-        comparison = BitOperations.PopCount(right.AttackProfile.StructurallyCoveredTargetMasks)
-            .CompareTo(BitOperations.PopCount(left.AttackProfile.StructurallyCoveredTargetMasks));
+        comparison = BitOperations.PopCount(right.AttackProfile.EntryTargetMasks)
+            .CompareTo(BitOperations.PopCount(left.AttackProfile.EntryTargetMasks));
         if (comparison != 0) return comparison;
 
         comparison = left.TotalCost.CompareTo(right.TotalCost);

@@ -120,7 +120,7 @@ public class SearchFrontierCharacterizationTests
             "complete",
             first.Pal,
             TimeSpan.FromMinutes(5),
-            attackProfile: Profile(3)
+            attackProfile: Profile(1, 2)
         );
         var partial = new TestPalReference(
             "partial",

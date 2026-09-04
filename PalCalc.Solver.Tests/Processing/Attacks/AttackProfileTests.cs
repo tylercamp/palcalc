@@ -17,22 +17,21 @@ public class AttackProfileTests
     }
 
     [TestMethod]
-    public void Reducer_FasterEqualCakeSupersetCoversSlowerSubset()
+    public void Reducer_KeepsDifferentExactMasksIndependent()
     {
         var provider = Entry(mask: 0b11, cakes: 2, effort: 10, breedings: 2);
         var required = Entry(mask: 0b01, cakes: 2, effort: 11, breedings: 3);
 
-        Assert.IsTrue(AttackProfileReducer.Covers(provider, required));
-        Assert.AreEqual(1, AttackProfileReducer.Reduce([required, provider]).Entries.Count);
+        Assert.AreEqual(2, AttackProfileReducer.Reduce([required, provider]).Entries.Count);
     }
 
     [TestMethod]
-    public void Reducer_FasterCakeHeavierEntryDoesNotCoverLowerCakeEntry()
+    public void Reducer_KeepsCakeFirstChampionForExactMask()
     {
-        var provider = Entry(mask: 0b11, cakes: 3, effort: 10, breedings: 2);
-        var required = Entry(mask: 0b01, cakes: 2, effort: 11, breedings: 3);
+        var fewerCakes = Entry(mask: 1, cakes: 1, effort: 20, breedings: 2);
+        var faster = Entry(mask: 1, cakes: 2, effort: 10, breedings: 1);
 
-        Assert.IsFalse(AttackProfileReducer.Covers(provider, required));
+        Assert.AreEqual(fewerCakes, AttackProfileReducer.Reduce([faster, fewerCakes]).Entries.Single());
     }
 
     [TestMethod]
@@ -50,7 +49,7 @@ public class AttackProfileTests
         var nonCake = Entry(mask: 1, cakes: 2, effort: 10, breedings: 2, usesCake: false);
         var cake = Entry(mask: 1, cakes: 2, effort: 10, breedings: 2, usesCake: true);
 
-        Assert.IsTrue(AttackProfileReducer.Covers(nonCake, cake));
+        Assert.AreEqual(nonCake, AttackProfileReducer.Reduce([cake, nonCake]).Entries.Single());
     }
 
     [TestMethod]
@@ -59,7 +58,7 @@ public class AttackProfileTests
         var cake = Entry(mask: 1, cakes: 2, effort: 10, breedings: 2, usesCake: true);
         var nonCake = Entry(mask: 1, cakes: 2, effort: 10, breedings: 2, usesCake: false);
 
-        Assert.IsFalse(AttackProfileReducer.Covers(cake, nonCake));
+        Assert.AreEqual(nonCake, AttackProfileReducer.Reduce([nonCake, cake]).Entries.Single());
     }
 
     [TestMethod]
@@ -96,20 +95,6 @@ public class AttackProfileTests
     }
 
     [TestMethod]
-    public void Accumulator_CanPreserveOriginalEntryChosenByAdjustedCosts()
-    {
-        var accumulator = new AttackProfileReducer.Accumulator();
-        accumulator.Reset(hasNoop: false);
-        var ordinaryChampion = Entry(mask: 1, cakes: 1, effort: 10, breedings: 1);
-        var genderChampion = Entry(mask: 1, cakes: 2, effort: 20, breedings: 2);
-
-        accumulator.Add(ordinaryChampion, Entry(mask: 1, cakes: 3, effort: 30, breedings: 3));
-        accumulator.Add(genderChampion, Entry(mask: 1, cakes: 2, effort: 25, breedings: 2));
-
-        Assert.AreEqual(genderChampion, accumulator.Build().Entries.Single());
-    }
-
-    [TestMethod]
     public void Accumulator_CakePrecheckRejectsOnlyStrictlyHeavierOutcome()
     {
         var accumulator = new AttackProfileReducer.Accumulator();
@@ -132,7 +117,7 @@ public class AttackProfileTests
         var adjustedFaster = Transform(faster, settings, pal, gender);
         var adjustedSlower = Transform(slower, settings, pal, gender);
 
-        Assert.IsTrue(AttackProfileReducer.Covers(adjustedFaster, adjustedSlower));
+        Assert.IsTrue(AttackProfileEntryComparer.CompareCosts(adjustedFaster, adjustedSlower) < 0);
     }
 
     [TestMethod]
@@ -179,7 +164,7 @@ public class AttackProfileTests
     }
 
     [TestMethod]
-    public void Profile_CachesExactAndStructurallyCoveredTargetMasks()
+    public void Profile_CachesExactTargetMasks()
     {
         var profile = new AttackProfile(
             Entry(mask: 0b000110, cakes: 0, effort: 0, breedings: 0),
@@ -187,14 +172,6 @@ public class AttackProfileTests
         );
 
         Assert.AreEqual((1UL << 0b000110) | (1UL << 0b001000), profile.EntryTargetMasks);
-        Assert.AreEqual(
-            (1UL << 0b000000) |
-            (1UL << 0b000010) |
-            (1UL << 0b000100) |
-            (1UL << 0b000110) |
-            (1UL << 0b001000),
-            profile.StructurallyCoveredTargetMasks
-        );
     }
 
     private static AttackProfileEntry Entry(byte mask, int cakes, int effort, int breedings, bool usesCake = false) =>
