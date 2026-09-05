@@ -166,6 +166,130 @@ public class CandidatePreFilterTests
         );
     }
 
+    [TestMethod]
+    public void TryAdd_RetainsSurgeryFinalistRejectedFromIteration()
+    {
+        var requiredAttack = SolverTestScenario.DB.ActiveSkills.First(attack => attack.CanInherit);
+        var surgeryPassive = SolverTestScenario.DB.SurgeryPassiveSkills.First();
+        var target = new PalSpecifier
+        {
+            Pal = "Katress".ToPal(SolverTestScenario.DB),
+            RequiredPassives = [surgeryPassive],
+            RequiredAttacks = [requiredAttack],
+        };
+        var settings = SolverTestScenario.Solver(
+            [],
+            maxSpecialCakes: 0,
+            maxSurgeryCost: surgeryPassive.SurgeryCost,
+            allowedSurgeryPassives: [surgeryPassive]
+        ).Settings;
+        var attackTargets = new AttackTargetContext(target, settings.DB);
+        var selectionPolicy = new DefaultCandidateSelectionPolicy(
+            ResultPruningPolicy.Default,
+            CancellationToken.None,
+            attackTargets
+        );
+        var surgeryFinalists = SurgeryFinalistAccumulator.Create(
+            target,
+            settings,
+            attackTargets
+        );
+        var filter = new CandidatePreFilter(
+            target,
+            settings.MaxEffort,
+            selectionPolicy,
+            new PotentialImprovementFrontier(),
+            settings.DB.PalsById.Keys,
+            attackTargets,
+            settings,
+            surgeryFinalists
+        );
+        var first = new HashControlledReference(target.Pal, hash: 1, genderedHash: 1);
+        var surgeryOnly = new HashControlledReference(target.Pal, hash: 2, genderedHash: 2);
+
+        Assert.IsTrue(filter.TryAdd(first).Accepted);
+
+        var result = filter.TryAdd(surgeryOnly);
+
+        Assert.IsFalse(result.Accepted);
+        Assert.IsTrue(result.IsRetained);
+        CollectionAssert.AreEquivalent(
+            new IPalReference[] { first, surgeryOnly },
+            surgeryFinalists.Candidates.ToArray()
+        );
+    }
+
+    [TestMethod]
+    public void TryAdd_RetainsInferiorSurgeryFinalistFromDraftPath()
+    {
+        var child = "Katress".ToPal(SolverTestScenario.DB);
+        var requiredAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
+            attack.CanInherit && !child.Level1AttackInternalIds.Contains(attack.InternalName)
+        );
+        var surgeryPassive = SolverTestScenario.DB.SurgeryPassiveSkills.First();
+        var target = new PalSpecifier
+        {
+            Pal = child,
+            RequiredPassives = [surgeryPassive],
+            RequiredAttacks = [requiredAttack],
+        };
+        var settings = SolverTestScenario.Solver(
+            [],
+            maxSpecialCakes: 0,
+            maxSurgeryCost: surgeryPassive.SurgeryCost,
+            allowedSurgeryPassives: [surgeryPassive]
+        ).Settings;
+        var attackTargets = new AttackTargetContext(target, settings.DB);
+        var selectionPolicy = new DefaultCandidateSelectionPolicy(
+            ResultPruningPolicy.Default,
+            CancellationToken.None,
+            attackTargets
+        );
+        var surgeryFinalists = SurgeryFinalistAccumulator.Create(
+            target,
+            settings,
+            attackTargets
+        );
+        var filter = new CandidatePreFilter(
+            target,
+            settings.MaxEffort,
+            selectionPolicy,
+            new InferiorFrontier(),
+            settings.DB.PalsById.Keys,
+            attackTargets,
+            settings,
+            surgeryFinalists
+        );
+        var parent1 = Candidate(cakes: 0);
+        var parent2 = Candidate(cakes: 0);
+        var draft = new CandidateDraft(
+            settings.GameSettings,
+            child,
+            parent1,
+            parent2,
+            [],
+            passivesProbability: 1,
+            new IV_Set(),
+            ivsProbability: 1,
+            selfBreedingEffort: TimeSpan.FromMinutes(1),
+            breedingEffort: TimeSpan.FromMinutes(1),
+            new AttackProfileComposer(attackTargets, settings).Prepare(
+                child,
+                parent1,
+                parent2,
+                passivesProbability: 1,
+                ivsProbability: 1
+            )
+        );
+
+        var result = filter.TryAdd(ref draft);
+
+        Assert.IsFalse(result.Accepted);
+        Assert.IsTrue(result.IsRetained);
+        Assert.IsTrue(draft.IsMaterialized);
+        Assert.AreEqual(1, surgeryFinalists.Candidates.Count);
+    }
+
     private static OwnedPalReference Candidate(int cakes) =>
         new(
             SolverTestScenario.Owned("Katress", PalGender.MALE),
@@ -181,6 +305,14 @@ public class CandidatePreFilterTests
             EffectivePropertiesKey propertiesKey
         ) => FrontierCandidateAssessment.PotentialImprovement;
 
+    }
+
+    private sealed class InferiorFrontier : ICandidateFrontierView
+    {
+        public FrontierCandidateAssessment AssessCandidate(
+            IPalReference candidate,
+            EffectivePropertiesKey propertiesKey
+        ) => FrontierCandidateAssessment.Inferior;
     }
 
     private sealed class HashControlledReference(

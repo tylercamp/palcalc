@@ -39,6 +39,11 @@ namespace PalCalc.Solver.Processing
             };
             stateUpdated?.Invoke(statusMsg);
 
+            var surgeryFinalists = SurgeryFinalistAccumulator.Create(
+                spec,
+                settings,
+                context.AttackTargets
+            );
             var frontier = new SearchFrontier(
                 spec,
                 new InitialPalBuilder(
@@ -52,6 +57,7 @@ namespace PalCalc.Solver.Processing
                 context.SelectionPolicy,
                 context.AttackTargets
             );
+            surgeryFinalists?.Observe(frontier.CurrentContent);
             var batchExecutor = new ParallelBatchExecutor(context, stateUpdateInterval);
 
             // Repeatedly breed newly useful parent pairs. Each pass only
@@ -71,7 +77,8 @@ namespace PalCalc.Solver.Processing
                         frontier: frontier,
                         palIds: settings.DB.PalsById.Keys,
                         attackTargets: context.AttackTargets,
-                        settings: settings
+                        settings: settings,
+                        surgeryFinalists: surgeryFinalists
                     ),
                     AttackTargets: context.AttackTargets
                 );
@@ -134,7 +141,10 @@ namespace PalCalc.Solver.Processing
                 controller,
                 context.AttackTargets
             );
-            resultPostProcessor.ApplySurgery(frontier);
+            resultPostProcessor.ApplySurgery(
+                frontier,
+                surgeryFinalists?.Candidates
+            );
             var results = resultPostProcessor.Finalize(frontier.TerminalResults);
 
             statusMsg = statusMsg with

@@ -83,6 +83,60 @@ public class ResultPostProcessorTests
     }
 
     [TestMethod]
+    public void ApplySurgery_UsesFinalistsDiscardedFromTheSearchFrontier()
+    {
+        var surgeryPassive = SolverTestScenario.DB.SurgeryPassiveSkills.First();
+        var target = new PalSpecifier
+        {
+            Pal = TargetPal,
+            RequiredPassives = [surgeryPassive],
+        };
+        var settings = SolverTestScenario.Solver(
+            [],
+            maxSpecialCakes: 0,
+            maxSurgeryCost: surgeryPassive.SurgeryCost,
+            allowedSurgeryPassives: [surgeryPassive]
+        ).Settings;
+        var controller = Controller();
+        var attackTargets = new AttackTargetContext(target, settings.DB);
+        var policy = Policy(controller, attackTargets);
+        var profile = new AttackProfile(new AttackProfileEntry(0, 0));
+        var faster = Bred(Leaf(), Leaf(), TargetPal, profile);
+        var slower = Bred(faster, Leaf(), TargetPal, profile);
+        var frontier = new SearchFrontier(
+            target,
+            [faster],
+            maxThreads: 1,
+            controller,
+            policy,
+            attackTargets
+        );
+        var surgeryFinalists = SurgeryFinalistAccumulator.Create(
+            target,
+            settings,
+            attackTargets
+        );
+        Assert.IsTrue(surgeryFinalists.TryRetain(slower));
+        var processor = new ResultPostProcessor(
+            target,
+            settings,
+            controller,
+            attackTargets
+        );
+
+        processor.ApplySurgery(frontier, surgeryFinalists.Candidates);
+        var results = processor.Finalize(frontier.TerminalResults);
+
+        Assert.AreEqual(2, results.Count);
+        CollectionAssert.AreEquivalent(
+            new IPalReference[] { faster, slower },
+            results.OfType<SurgeryTablePalReference>()
+                .Select(surgery => surgery.Input)
+                .ToArray()
+        );
+    }
+
+    [TestMethod]
     public void ApplySurgery_PreservesKnownRemovedPassive()
     {
         var surgeryPassive = SolverTestScenario.DB.SurgeryPassiveSkills.First();

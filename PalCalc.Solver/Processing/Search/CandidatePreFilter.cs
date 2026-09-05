@@ -36,6 +36,7 @@ internal sealed class CandidatePreFilter
     private readonly BreedingSolverSettings settings;
     private readonly ICandidateSelectionPolicy selectionPolicy;
     private readonly ICandidateFrontierView frontier;
+    private readonly SurgeryFinalistAccumulator surgeryFinalists;
     private readonly FrozenDictionary<
         PalId,
         ConcurrentDictionary<EffectivePropertiesKey, EarlyCandidateGroup>
@@ -49,7 +50,8 @@ internal sealed class CandidatePreFilter
         ICandidateFrontierView frontier,
         IEnumerable<PalId> palIds,
         AttackTargetContext attackTargets,
-        BreedingSolverSettings settings
+        BreedingSolverSettings settings,
+        SurgeryFinalistAccumulator surgeryFinalists = null
     )
     {
         this.target = target;
@@ -58,6 +60,7 @@ internal sealed class CandidatePreFilter
         this.settings = settings;
         this.selectionPolicy = selectionPolicy;
         this.frontier = frontier;
+        this.surgeryFinalists = surgeryFinalists;
         earlyCandidatesByPalId = palIds.ToFrozenDictionary(
             id => id,
             _ => new ConcurrentDictionary<EffectivePropertiesKey, EarlyCandidateGroup>()
@@ -76,6 +79,7 @@ internal sealed class CandidatePreFilter
             isTerminal &&
             attackTargets?.IsActive == true &&
             RetainTerminal(candidate);
+        var surgeryRetained = surgeryFinalists?.TryRetain(candidate) == true;
 
         var propertiesKey = selectionPolicy.KeyOf(candidate);
         var frontierAssessment = frontier.AssessCandidate(
@@ -86,7 +90,9 @@ internal sealed class CandidatePreFilter
             frontierAssessment == FrontierCandidateAssessment.Inferior &&
             !isTerminal
         )
-            return CandidatePreFilterResult.Rejected;
+            return surgeryRetained
+                ? new(Accepted: false, IsRetained: true)
+                : CandidatePreFilterResult.Rejected;
 
         var earlyCandidates = earlyCandidatesByPalId[candidate.Pal.Id];
         var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new());
@@ -94,7 +100,7 @@ internal sealed class CandidatePreFilter
 
         return accepted
             ? new(Accepted: true, IsRetained: true)
-            : new(Accepted: false, IsRetained: terminalRetained);
+            : new(Accepted: false, IsRetained: terminalRetained || surgeryRetained);
     }
 
     public CandidatePreFilterResult TryAdd(ref CandidateDraft candidate)
@@ -116,6 +122,7 @@ internal sealed class CandidatePreFilter
             candidate.EffectivePassives
         ) && candidate.AttackProfile.Contains(attackTargets.FullTargetMask);
         var terminalRetained = isTerminal && RetainTerminal(candidate.Materialize());
+        var surgeryRetained = surgeryFinalists?.TryRetain(ref candidate) == true;
 
         var propertiesKey = defaultPolicy.KeyOf(candidate);
         var frontierAssessment = searchFrontier.AssessCandidate(
@@ -127,12 +134,17 @@ internal sealed class CandidatePreFilter
             frontierAssessment == FrontierCandidateAssessment.Inferior &&
             !isTerminal
         )
-            return CandidatePreFilterResult.Rejected;
+            return surgeryRetained
+                ? new(Accepted: false, IsRetained: true)
+                : CandidatePreFilterResult.Rejected;
 
         var earlyCandidates = earlyCandidatesByPalId[candidate.Pal.Id];
         var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new());
         if (!group.TryAdd(ref candidate))
-            return new(Accepted: false, IsRetained: terminalRetained);
+            return new(
+                Accepted: false,
+                IsRetained: terminalRetained || surgeryRetained
+            );
 
         return new(Accepted: true, IsRetained: true);
     }

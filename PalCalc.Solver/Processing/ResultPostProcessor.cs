@@ -19,7 +19,10 @@ internal sealed class ResultPostProcessor(
     AttackTargetContext attackTargets
 )
 {
-    public void ApplySurgery(SearchFrontier frontier)
+    public void ApplySurgery(
+        SearchFrontier frontier,
+        IEnumerable<IPalReference> retainedSurgeryFinalists = null
+    )
     {
         var surgeryCompatiblePassives = target
             .DesiredPassives
@@ -35,8 +38,11 @@ internal sealed class ResultPostProcessor(
         // Surgery runs once after breeding. Applying it during every iteration
         // would model more combinations, but would materially expand the
         // frontier and increase search cost.
+        var retained = retainedSurgeryFinalists?.ToArray() ?? [];
         frontier.ExpandSingles(palReferences =>
             palReferences
+                .Concat(retained)
+                .Distinct()
                 .Where(reference => reference.Pal == target.Pal)
                 .SelectMany(reference =>
                     reference is CompositeOwnedPalReference composite
