@@ -6,8 +6,13 @@ using PalCalc.Solver.PalReference.Properties;
 namespace PalCalc.Solver.Processing.Attacks;
 
 /// <summary>
-/// Allocation-free view of the composer's current accumulator. A non-cached
-/// value must be consumed or materialized before the next call to <see cref="AttackProfileComposer.Prepare"/>.
+/// The result of <see cref="AttackProfileComposer.Prepare"/>: either a materialized
+/// <see cref="AttackProfile"/>, or a lazy, allocation-free view over the composer's
+/// current accumulator. This lets `CandidateExpander` compare candidate profiles
+/// before materializing them (see `CandidateDraft`).
+///
+/// A value backed by the composer is only valid until the next call to
+/// <see cref="AttackProfileComposer.Prepare"/>; consume or materialize it before then.
 /// </summary>
 internal readonly struct PreparedAttackProfile
 {
@@ -77,8 +82,11 @@ internal readonly struct PreparedAttackProfile
 }
 
 /// <summary>
-/// Combines two parent profiles into the abstract outcomes used during search.
-/// Concrete inheritance choices are reconstructed later by <see cref="AttackResultMaterializer"/>.
+/// Computes the child's search-time <see cref="AttackProfile"/> from the two parents'
+/// profiles: which requested attacks can end up on the child, at the minimum
+/// estimated Special Cake cost per mask. The result is exposed lazily as a
+/// <see cref="PreparedAttackProfile"/>; concrete inheritance choices are
+/// reconstructed later by <see cref="AttackResultMaterializer"/>.
 /// </summary>
 internal sealed class AttackProfileComposer(
     AttackTargetContext targets,
@@ -95,25 +103,6 @@ internal sealed class AttackProfileComposer(
     private Pal cachedChild;
     private IPalReference cachedParent1;
     private IPalReference cachedParent2;
-
-    /// <summary>
-    /// Calculates the minimum estimated Special Cake cost for each available
-    /// exact attack mask. Attack probability and effort are reconstructed later.
-    /// </summary>
-    public AttackProfile Compose(
-        Pal child,
-        IPalReference parent1,
-        IPalReference parent2,
-        float passivesProbability,
-        float ivsProbability
-    )
-        => Prepare(
-            child,
-            parent1,
-            parent2,
-            passivesProbability,
-            ivsProbability
-        ).Materialize();
 
     internal PreparedAttackProfile Prepare(
         Pal child,
@@ -213,11 +202,11 @@ internal sealed class AttackProfileComposer(
         var parent1Entries = parent1Profile.EntriesSpan;
         var parent2Entries = parent2Profile.EntriesSpan;
         // Normal inheritance transfers at most one target attack. For each parent,
-        // the categories below retain its cheapest unrestricted entry plus its
-        // cheapest entry with and without each of the six target bits. Those
-        // thirteen champions are sufficient to evaluate the baseline and the
-        // three parent-presence combinations which can transfer each target,
-        // without evaluating the full parent-profile Cartesian product.
+        // the categories below keep its cheapest entry overall and its cheapest
+        // entry with and without each of the six target bits. Those 13 champions
+        // per parent are enough to price the baseline and the three
+        // parent-presence combinations that can transfer each target, without
+        // the full Cartesian product of the two parent profiles.
         const int normalCategoryCount = TargetMaskBitCount * 2;
         const int anyCategory = normalCategoryCount;
         Span<int> parent1CategoryCakes = stackalloc int[normalCategoryCount + 1];
@@ -350,9 +339,10 @@ internal sealed class AttackProfileComposer(
     }
 
     /// <summary>
-    /// Writes the inclusion-maximal attack unions attainable with at most three
-    /// attacks equipped by each parent. Each packed result contains one legal
-    /// parent-loadout witness: parent 1 in the high byte and parent 2 in the low byte.
+    /// For special-cake inheritance, writes the inclusion-maximal unions of target
+    /// attacks the child can inherit, given that each parent can contribute at most
+    /// three equipped attacks. Each packed result is one legal loadout witness:
+    /// parent 1 in the high byte, parent 2 in the low byte.
     /// </summary>
     internal static int EnumerateCakeMasks(
         byte parent1Mask,

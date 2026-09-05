@@ -16,7 +16,7 @@ public class AttackProfileComposerTests
     {
         var innate = Child.Level1ActiveSkills(SolverTestScenario.DB).First();
 
-        var profile = Compose([innate], Entry(0), Entry(0), cakes: 0);
+        var profile = Materialize([innate], Entry(0), Entry(0), cakes: 0);
 
         Assert.AreEqual(new AttackProfileEntry(1, 0), profile.Entries.Single());
     }
@@ -24,7 +24,7 @@ public class AttackProfileComposerTests
     [TestMethod]
     public void Compose_NormalInheritanceAddsExactlyOneNonInnateAttack()
     {
-        var profile = Compose(
+        var profile = Materialize(
             Attacks(2),
             Entry(0b11),
             Entry(0),
@@ -47,10 +47,14 @@ public class AttackProfileComposerTests
         var parent1 = new AttackProfile(Entry(1));
         var parent2 = new AttackProfile(Entry(0));
 
-        var normal = new AttackProfileComposer(context, settings)
-            .Compose(Child, Reference(parent1), Reference(parent2), 1, 1);
-        var lowProbability = new AttackProfileComposer(context, settings)
-            .Compose(Child, Reference(parent1, neutral: true), Reference(parent2), 0.01f, 1);
+        var normal = Materialize(
+            new AttackProfileComposer(context, settings),
+            Child, Reference(parent1), Reference(parent2), 1, 1
+        );
+        var lowProbability = Materialize(
+            new AttackProfileComposer(context, settings),
+            Child, Reference(parent1, neutral: true), Reference(parent2), 0.01f, 1
+        );
 
         Assert.AreEqual(normal, lowProbability);
         Assert.IsTrue(normal.Contains(1));
@@ -65,8 +69,8 @@ public class AttackProfileComposerTests
         var parent2 = Reference(new AttackProfile(Entry(0)));
         var composer = new AttackProfileComposer(context, settings);
 
-        var first = composer.Compose(Child, parent1, parent2, 0.5f, 0.5f);
-        var second = composer.Compose(Child, parent1, parent2, 0.51f, 0.5f);
+        var first = Materialize(composer, Child, parent1, parent2, 0.5f, 0.5f);
+        var second = Materialize(composer, Child, parent1, parent2, 0.51f, 0.5f);
 
         Assert.AreSame(first.Entries, second.Entries);
     }
@@ -78,7 +82,7 @@ public class AttackProfileComposerTests
             !attack.CanInherit && !Child.Level1AttackInternalIds.Contains(attack.InternalName));
         var inheritable = Attacks(1).Single();
 
-        var profile = Compose(
+        var profile = Materialize(
             [nonInheritable, inheritable],
             Entry(0b11),
             Entry(0),
@@ -99,7 +103,7 @@ public class AttackProfileComposerTests
         bool expected
     )
     {
-        var profile = Compose(
+        var profile = Materialize(
             Attacks(6),
             Entry(0b000111, cakes: 2),
             Entry(0b111000, cakes: 3),
@@ -123,8 +127,10 @@ public class AttackProfileComposerTests
         var parent1 = new AttackProfile(Entry(0b00), Entry(0b01), Entry(0b10), Entry(0b11));
         var parent2 = new AttackProfile(Entry(0b00), Entry(0b01), Entry(0b10));
 
-        var optimized = new AttackProfileComposer(context, settings)
-            .Compose(Child, Reference(parent1), Reference(parent2), 1, 1);
+        var optimized = Materialize(
+            new AttackProfileComposer(context, settings),
+            Child, Reference(parent1), Reference(parent2), 1, 1
+        );
         var expected = BruteForceNormalProfile(context, parent1, parent2);
 
         Assert.AreEqual(expected, optimized);
@@ -160,7 +166,7 @@ public class AttackProfileComposerTests
             }
     }
 
-    private static AttackProfile Compose(
+    private static AttackProfile Materialize(
         IEnumerable<ActiveSkill> attacks,
         AttackProfileEntry parent1,
         AttackProfileEntry parent2,
@@ -170,15 +176,20 @@ public class AttackProfileComposerTests
     )
     {
         var settings = Settings(cakes: cakes);
-        return new AttackProfileComposer(Context(attacks), settings)
-            .Compose(
-                Child,
-                Reference(new(parent1)),
-                Reference(new(parent2)),
-                passivesProbability,
-                ivsProbability
-            );
+        return Materialize(
+            new AttackProfileComposer(Context(attacks), settings),
+            Child, Reference(new(parent1)), Reference(new(parent2)), passivesProbability, ivsProbability
+        );
     }
+
+    private static AttackProfile Materialize(
+        AttackProfileComposer composer,
+        Pal child,
+        IPalReference parent1,
+        IPalReference parent2,
+        float passivesProbability,
+        float ivsProbability
+    ) => composer.Prepare(child, parent1, parent2, passivesProbability, ivsProbability).Materialize();
 
     private static AttackTargetContext Context(IEnumerable<ActiveSkill> attacks) =>
         new(new PalSpecifier { RequiredAttacks = attacks.ToList() }, SolverTestScenario.DB);
