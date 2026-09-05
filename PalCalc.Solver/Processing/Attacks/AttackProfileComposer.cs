@@ -90,7 +90,7 @@ internal sealed class AttackProfileComposer(
     private const int MaxEquippedAttacksPerParent = 3;
     private const int PackedParentLoadoutShift = 8;
 
-    private readonly AttackProfileReducer.Accumulator accumulator = new();
+    private readonly AttackProfileAccumulator accumulator = new();
     private readonly Dictionary<int, AttackProfile> cachedProfiles = [];
     private Pal cachedChild;
     private IPalReference cachedParent1;
@@ -193,7 +193,7 @@ internal sealed class AttackProfileComposer(
         IPalReference parent2,
         float passivesProbability,
         float ivsProbability,
-        AttackProfileReducer.Accumulator entries
+        AttackProfileAccumulator entries
     )
     {
         ArgumentNullException.ThrowIfNull(child);

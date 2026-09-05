@@ -120,36 +120,12 @@ public class AttackProfileComposerTests
         var attacks = Attacks(2);
         var settings = Settings(cakes: 0);
         var context = Context(attacks);
-        var parent1 = new AttackProfile(
-            Entry(0b00),
-            Entry(0b01),
-            Entry(0b10),
-            Entry(0b11)
-        );
-        var parent2 = new AttackProfile(
-            Entry(0b00),
-            Entry(0b01),
-            Entry(0b10)
-        );
-        var parent1Reference = Reference(parent1);
-        var parent2Reference = Reference(parent2);
+        var parent1 = new AttackProfile(Entry(0b00), Entry(0b01), Entry(0b10), Entry(0b11));
+        var parent2 = new AttackProfile(Entry(0b00), Entry(0b01), Entry(0b10));
 
         var optimized = new AttackProfileComposer(context, settings)
-            .Compose(Child, parent1Reference, parent2Reference, 1, 1);
-        var bruteForceEntries = new List<AttackProfileEntry>();
-        var innateMask = context.StateOf(Child).Level1TargetMask;
-        var inheritableMask = context.InheritableTargetMask;
-        foreach (var first in parent1.Entries)
-            foreach (var second in parent2.Entries)
-            {
-                bruteForceEntries.Add(new(innateMask, first.TotalSpecialCakes + second.TotalSpecialCakes));
-                var available = (byte)((first.LearnedTargetMask | second.LearnedTargetMask) & inheritableMask);
-                for (var bit = 1; bit <= context.FullTargetMask; bit <<= 1)
-                    if ((available & bit) != 0 && (innateMask & bit) == 0)
-                        bruteForceEntries.Add(new((byte)(innateMask | bit), first.TotalSpecialCakes + second.TotalSpecialCakes));
-            }
-
-        var expected = AttackProfileReducer.Reduce(bruteForceEntries.ToArray());
+            .Compose(Child, Reference(parent1), Reference(parent2), 1, 1);
+        var expected = BruteForceNormalProfile(context, parent1, parent2);
 
         Assert.AreEqual(expected, optimized);
     }
@@ -226,6 +202,38 @@ public class AttackProfileComposerTests
         .Where(attack => attack.CanInherit && !Child.Level1AttackInternalIds.Contains(attack.InternalName))
         .Take(count)
         .ToArray();
+
+    private static AttackProfile BruteForceNormalProfile(
+        AttackTargetContext context,
+        AttackProfile parent1,
+        AttackProfile parent2
+    )
+    {
+        var minimumCakesByMask = new Dictionary<byte, int>();
+        var innateMask = context.StateOf(Child).Level1TargetMask;
+        var inheritableMask = context.InheritableTargetMask;
+        foreach (var first in parent1.Entries)
+            foreach (var second in parent2.Entries)
+            {
+                var totalCakes = first.TotalSpecialCakes + second.TotalSpecialCakes;
+                Add(innateMask, totalCakes);
+                var available = (byte)((first.LearnedTargetMask | second.LearnedTargetMask) & inheritableMask);
+                for (var bit = 1; bit <= context.FullTargetMask; bit <<= 1)
+                    if ((available & bit) != 0 && (innateMask & bit) == 0)
+                        Add((byte)(innateMask | bit), totalCakes);
+            }
+
+        return new AttackProfile(minimumCakesByMask
+            .OrderBy(pair => pair.Key)
+            .Select(pair => new AttackProfileEntry(pair.Key, pair.Value))
+            .ToArray());
+
+        void Add(byte mask, int cakes)
+        {
+            if (!minimumCakesByMask.TryGetValue(mask, out var existing) || cakes < existing)
+                minimumCakesByMask[mask] = cakes;
+        }
+    }
 
     private static int BitCount(byte mask)
     {

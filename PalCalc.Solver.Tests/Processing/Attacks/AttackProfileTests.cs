@@ -8,34 +8,25 @@ namespace PalCalc.Solver.Tests.Processing.Attacks;
 public class AttackProfileTests
 {
     [TestMethod]
-    public void Reducer_KeepsOneMinimumCakeChampionPerExactMask()
+    public void Accumulator_KeepsOneMinimumCakeChampionPerExactMask()
     {
-        var lower = Entry(mask: 1, cakes: 1);
-        var higher = Entry(mask: 1, cakes: 2);
-
-        var profile = AttackProfileReducer.Reduce([higher, lower]);
+        var profile = Build(Entry(mask: 1, cakes: 2), Entry(mask: 1, cakes: 1));
 
         Assert.AreEqual(new AttackProfileEntry(1, 1), profile.Entries.Single());
     }
 
     [TestMethod]
-    public void Reducer_EqualCakeEntriesCollapse()
+    public void Accumulator_EqualCakeEntriesCollapse()
     {
-        var profile = AttackProfileReducer.Reduce([
-            Entry(mask: 1, cakes: 2),
-            Entry(mask: 1, cakes: 2),
-        ]);
+        var profile = Build(Entry(mask: 1, cakes: 2), Entry(mask: 1, cakes: 2));
 
         Assert.AreEqual(1, profile.Entries.Count);
     }
 
     [TestMethod]
-    public void Reducer_DifferentExactMasksRemainIndependent()
+    public void Accumulator_DifferentExactMasksRemainIndependent()
     {
-        var profile = AttackProfileReducer.Reduce([
-            Entry(mask: 0b01, cakes: 3),
-            Entry(mask: 0b10, cakes: 1),
-        ]);
+        var profile = Build(Entry(mask: 0b01, cakes: 3), Entry(mask: 0b10, cakes: 1));
 
         CollectionAssert.AreEquivalent(
             new byte[] { 0b01, 0b10 },
@@ -44,9 +35,9 @@ public class AttackProfileTests
     }
 
     [TestMethod]
-    public void Reducer_CouldImproveOnlyForALowerCakeCost()
+    public void Accumulator_CouldImproveOnlyForALowerCakeCost()
     {
-        var accumulator = new AttackProfileReducer.Accumulator();
+        var accumulator = new AttackProfileAccumulator();
         accumulator.Reset(hasNoop: false);
         accumulator.Add(Entry(mask: 1, cakes: 2));
 
@@ -57,22 +48,19 @@ public class AttackProfileTests
     }
 
     [TestMethod]
-    public void Reducer_PreservesNoopState()
+    public void Accumulator_PreservesNoopState()
     {
-        var profile = AttackProfileReducer.Reduce(
-            hasNoopAttack: true,
-            [Entry(mask: 1, cakes: 2)]
-        );
+        var profile = Build(hasNoop: true, Entry(mask: 1, cakes: 2));
 
         Assert.IsTrue(profile.HasNoopAttack);
         Assert.AreEqual(1, profile.Entries.Single().LearnedTargetMask);
     }
 
     [TestMethod]
-    public void Reducer_ReusesTheSharedEmptyEntryArray()
+    public void Accumulator_ReusesTheSharedEmptyEntryArray()
     {
-        var first = AttackProfileReducer.Reduce([]);
-        var second = AttackProfileReducer.Reduce([]);
+        var first = Build();
+        var second = Build();
 
         Assert.AreSame(first.Entries, second.Entries);
     }
@@ -116,6 +104,17 @@ public class AttackProfileTests
     }
 
     private static AttackProfileEntry Entry(byte mask, int cakes) => new(mask, cakes);
+
+    private static AttackProfile Build(params AttackProfileEntry[] entries) => Build(false, entries);
+
+    private static AttackProfile Build(bool hasNoop, params AttackProfileEntry[] entries)
+    {
+        var accumulator = new AttackProfileAccumulator();
+        accumulator.Reset(hasNoop);
+        foreach (ref readonly var entry in entries.AsSpan())
+            accumulator.Add(entry);
+        return accumulator.Build();
+    }
 
     private static GameSettings Settings() => new()
     {
