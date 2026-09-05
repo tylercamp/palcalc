@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Model;
+using PalCalc.UI.Persistence;
+using PalCalc.UI.Persistence.Dto;
+using PalCalc.UI.Persistence.Serialization;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -104,24 +106,29 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public bool AppRestartRequired { get; private set; } = false;
 
-        public string ToJson() => JsonConvert.SerializeObject(this);
+        internal PerSaveGameSettingsDto ToDto() => new()
+        {
+            BreedingTimeSeconds = BreedingTimeSeconds,
+            MassiveEggIncubationTimeMinutes = MassiveEggIncubationTimeMinutes,
+            MultipleBreedingFarms = MultipleBreedingFarms,
+            PalboxTabWidth = PalboxTabWidth,
+            PalboxTabHeight = PalboxTabHeight,
+        };
+
+        internal static GameSettingsViewModel FromDto(PerSaveGameSettingsDto value) => new GameSettingsViewModel
+        {
+            BreedingTimeSeconds = value.BreedingTimeSeconds,
+            MassiveEggIncubationTimeMinutes = value.MassiveEggIncubationTimeMinutes,
+            MultipleBreedingFarms = value.MultipleBreedingFarms,
+            PalboxTabWidth = value.PalboxTabWidth,
+            PalboxTabHeight = value.PalboxTabHeight,
+        };
+
+        public string ToJson() => GameSettingsJsonSerializer.ToJson(ToDto());
+
         public static GameSettingsViewModel FromJson(string json)
         {
-            var parsedJson = JsonConvert.DeserializeObject<JToken>(json);
-
-            var result = parsedJson.ToObject<GameSettingsViewModel>();
-            if (parsedJson["BreedingTimeMinutes"] != null)
-            {
-                result.BreedingTimeSeconds = 60 * parsedJson["BreedingTimeMinutes"].ToObject<int>();
-            }
-
-            // if we're missing this field, then the data was made before we accounted for incubation times,
-            // which is the same as setting to 0
-            if (parsedJson["MassiveEggIncubationTimeMinutes"] == null)
-            {
-                result.MassiveEggIncubationTimeMinutes = 0;
-            }
-
+            var result = FromDto(GameSettingsJsonSerializer.FromCurrentJson(json));
             result.AppRestartRequired = false;
             return result;
         }
@@ -130,7 +137,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         {
             if (Storage.DEBUG_DisableStorage) return;
 
-            File.WriteAllText(Storage.GameSettingsPath(forSave), ToJson());
+            var json = ToJson();
+            File.WriteAllText(Storage.GameSettingsPath(forSave), json);
         }
 
         public static GameSettingsViewModel Load(ISaveGame forSave)

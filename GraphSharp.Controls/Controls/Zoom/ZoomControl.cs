@@ -70,6 +70,10 @@ namespace GraphSharp.Controls.Zoom
             DependencyProperty.Register("Zoom", typeof(double), typeof(ZoomControl),
                                         new UIPropertyMetadata(1.0, ZoomPropertyChanged));
 
+        public static readonly DependencyProperty DisplayZoomProperty =
+            DependencyProperty.Register("DisplayZoom", typeof(double), typeof(ZoomControl),
+                                        new UIPropertyMetadata(1.0));
+
         public static readonly DependencyProperty FillMarginPercentProperty =
             DependencyProperty.Register("FillMarginPercent", typeof(double), typeof(ZoomControl),
                                         new UIPropertyMetadata(0.0, FillMarginPercentChanged));
@@ -86,8 +90,10 @@ namespace GraphSharp.Controls.Zoom
         private TranslateTransform _translateTransform;
 
         private double _fillMarginPercent;
-        private int _zoomAnimCount;
+        private int _zoomAnimationVersion;
         private bool _isZooming;
+
+        public event EventHandler ZoomSettled;
 
         static ZoomControl()
         {
@@ -150,6 +156,12 @@ namespace GraphSharp.Controls.Zoom
                 BeginAnimation(ZoomProperty, null);
                 SetValue(ZoomProperty, value);
             }
+        }
+
+        public double DisplayZoom
+        {
+            get { return (double)GetValue(DisplayZoomProperty); }
+            private set { SetValue(DisplayZoomProperty, value); }
         }
 
         public string FillLabel
@@ -305,6 +317,7 @@ namespace GraphSharp.Controls.Zoom
             zc._scaleTransform.ScaleY = zoom;
             if (!zc._isZooming)
             {
+                zc.DisplayZoom = zoom;
                 double delta = (double)e.NewValue / (double)e.OldValue;
                 zc.TranslateX *= delta;
                 zc.TranslateY *= delta;
@@ -358,10 +371,10 @@ namespace GraphSharp.Controls.Zoom
             var duration = new Duration(AnimationLength);
             StartAnimation(TranslateXProperty, transformX, duration);
             StartAnimation(TranslateYProperty, transformY, duration);
-            StartAnimation(ZoomProperty, targetZoom, duration);
+            StartAnimation(ZoomProperty, targetZoom, duration, ++_zoomAnimationVersion);
         }
 
-        private void StartAnimation(DependencyProperty dp, double toValue, Duration duration)
+        private void StartAnimation(DependencyProperty dp, double toValue, Duration duration, int animationVersion = 0)
         {
             if (double.IsNaN(toValue) || double.IsInfinity(toValue))
             {
@@ -374,20 +387,20 @@ namespace GraphSharp.Controls.Zoom
             var animation = new DoubleAnimation(toValue, duration);
             if (dp == ZoomProperty)
             {
-                _zoomAnimCount++;
+                DisplayZoom = toValue;
                 animation.Completed += (s, args) =>
                                            {
-                                               _zoomAnimCount--;
-                                               if (_zoomAnimCount > 0)
+                                               if (animationVersion != _zoomAnimationVersion)
                                                    return;
 
                                                var zoom = Zoom;
                                                BeginAnimation(ZoomProperty, null);
                                                SetValue(ZoomProperty, zoom);
                                                _isZooming = false;
+                                               ZoomSettled?.Invoke(this, EventArgs.Empty);
                                            };
             }
-            BeginAnimation(dp, animation, HandoffBehavior.Compose);
+            BeginAnimation(dp, animation, HandoffBehavior.SnapshotAndReplace);
         }
 
         private void DoZoomToOriginal()

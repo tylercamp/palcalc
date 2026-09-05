@@ -154,6 +154,9 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_COMMON_CANCEL" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="LC_COMMON_DELETE" xml:space="preserve">
+    <value>Delete</value>
+  </data>
   <data name="LC_COMMON_ENABLED" xml:space="preserve">
     <value>Enabled</value>
   </data>
@@ -204,6 +207,9 @@ This value is doubled internally to account for pal inactivity at night.</value>
   </data>
   <data name="LC_COMMON_RANK" xml:space="preserve">
     <value>Tier</value>
+  </data>
+  <data name="LC_COMMON_RENAME" xml:space="preserve">
+    <value>Rename</value>
   </data>
   <data name="LC_COMMON_WILD_LEVEL" xml:space="preserve">
     <value>Wild Level</value>
@@ -618,8 +624,53 @@ This will not delete the save files from your computer.</value>
   <data name="LC_SAVEINSPECT_CONTAINER_TYPE" xml:space="preserve">
     <value>Type:</value>
   </data>
+  <data name="LC_SAVEINSPECT_GROUP_GLOBAL_PALBOX" xml:space="preserve">
+    <value>Global Palbox</value>
+  </data>
+  <data name="LC_SAVEINSPECT_GROUP_DIMENSIONAL_STORAGE" xml:space="preserve">
+    <value>Dimensional Pal Storage ({Count})</value>
+  </data>
+  <data name="LC_SAVEINSPECT_GROUP_STANDARD_CONTAINERS" xml:space="preserve">
+    <value>Standard Pal Containers ({Count})</value>
+  </data>
   <data name="LC_SAVEINSPECT_DETECTED_PROPERTIES" xml:space="preserve">
     <value>Detected Properties</value>
+  </data>
+  <data name="LC_SAVEINSPECT_PROPERTY_PAL" xml:space="preserve">
+    <value>Pal</value>
+  </data>
+  <data name="LC_SAVEINSPECT_PROPERTY_PALDEX_NUM" xml:space="preserve">
+    <value>Paldex #</value>
+  </data>
+  <data name="LC_SAVEINSPECT_PROPERTY_PALDEX_IS_VARIANT" xml:space="preserve">
+    <value>Paldex Is Variant</value>
+  </data>
+  <data name="LC_SAVEINSPECT_PROPERTY_GENDER" xml:space="preserve">
+    <value>Gender</value>
+  </data>
+  <data name="LC_SAVEINSPECT_PROPERTY_DETECTED_OWNER_ID" xml:space="preserve">
+    <value>Detected Owner ID</value>
+  </data>
+  <data name="LC_SAVEINSPECT_PROPERTY_PASSIVE_SKILL" xml:space="preserve">
+    <value>Passive Skill {Index}</value>
+  </data>
+  <data name="LC_SAVEINSPECT_PROPERTY_EQUIPPED_ACTIVE_SKILL" xml:space="preserve">
+    <value>Equipped Active Skill {Index}</value>
+  </data>
+  <data name="LC_SAVEINSPECT_PROPERTY_ACTIVE_SKILL" xml:space="preserve">
+    <value>Active Skill {Index}</value>
+  </data>
+  <data name="LC_SAVEINSPECT_WORLD_COORDS" xml:space="preserve">
+    <value>World Coords:</value>
+  </data>
+  <data name="LC_SAVEINSPECT_MAP_COORDS" xml:space="preserve">
+    <value>Map Coords:</value>
+  </data>
+  <data name="LC_COMMON_YES" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="LC_COMMON_NO" xml:space="preserve">
+    <value>No</value>
   </data>
   <data name="LC_SAVEINSPECT_ON_EXPEDITION" xml:space="preserve">
     <value>On Expedition</value>
@@ -1093,5 +1144,21 @@ When connecting to another person's multiplayer world, Palworld does not downloa
   </data>
   <data name="LC_UI_LAYOUT_RESET_NOTICE" xml:space="preserve">
     <value>Saved window and panel layouts were reset. The defaults will be used the next time Pal Calc starts.</value>
+  </data>
+  <data name="LC_DEBUG_LOGGING" xml:space="preserve">
+    <value>Debug Logging</value>
+  </data>
+  <data name="LC_LIBOOZ_VC_REDIST_MISSING" xml:space="preserve">
+    <value>Microsoft Visual C++ Redistributable (x64) is not installed. This is required when reading modern Palworld saves.
+
+Would you like to download the installer now?
+
+(Pal Calc must be restarted after installation.)</value>
+  </data>
+  <data name="LC_LIBOOZ_VC_REDIST_BTN_DOWNLOAD" xml:space="preserve">
+    <value>Download Now</value>
+  </data>
+  <data name="LC_LIBOOZ_VC_REDIST_BTN_MORE_INFO" xml:space="preserve">
+    <value>More Information</value>
   </data>
 </root>

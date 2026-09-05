@@ -148,10 +148,18 @@ namespace PalCalc.SaveReader.GVAS
         public static bool IsValidGvas(FArchiveReader reader)
         {
             var magic = reader.ReadInt32();
-            if (magic != 0x53415647) return false;
+            if (magic != 0x53415647)
+            {
+                logger.Debug("Magic header hex mismatch, got {Value}", magic);
+                return false;
+            }
 
             var gameVersion = reader.ReadInt32();
-            if (gameVersion != 3) return false;
+            if (gameVersion != 3)
+            {
+                logger.Debug("gameVersion mismatch, got {Value}", gameVersion);
+                return false;
+            }
 
             reader.ReadInt32();
             reader.ReadInt32();
@@ -165,7 +173,11 @@ namespace PalCalc.SaveReader.GVAS
             
             var customVersionFormat = reader.ReadInt32();
 
-            if (customVersionFormat != 3) return false;
+            if (customVersionFormat != 3)
+            {
+                logger.Debug("customVersionFormat mismatch, got {Value}", customVersionFormat);
+                return false;
+            }
 
             return true;
         }

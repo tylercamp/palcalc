@@ -36,11 +36,11 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ManualSavesIconTemplate">
-            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" />
+            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="{DynamicResource SaveFolderIconBrush}" />
         </DataTemplate>
 
         <DataTemplate x:Key="FakeSavesIconTemplate">
-            <materialIcons:MaterialIcon Kind="FileEdit" Foreground="LightSteelBlue" />
+            <materialIcons:MaterialIcon Kind="FileEdit" Foreground="{DynamicResource SaveVirtualIconBrush}" />
         </DataTemplate>
 
         <msvm:SaveTypeTemplateSelector x:Key="IconTemplateSelector"
@@ -148,7 +148,7 @@
                             <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="8">
                                     <TextBlock Text="{Binding TypeLabel.Value}" FontWeight="SemiBold" FontSize="20" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding AvailableSaves.Count, StringFormat='({0})'}" VerticalAlignment="Center"  Foreground="Gray" FontSize="20" />
+                                    <TextBlock Text="{Binding AvailableSaves.Count, StringFormat='({0})'}" VerticalAlignment="Center"  Foreground="{DynamicResource SaveCountForegroundBrush}" FontSize="20" />
                                 </StackPanel>
                                 <Grid MaxWidth="200">
                                     <TextBlock Text="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}}" TextWrapping="Wrap" />
@@ -202,7 +202,7 @@
                         </Button>
                     
                         <Button Command="{Binding SelectedCollection.OpenFolderCommand}" Visibility="{Binding SelectedCollection.OpenFolderCommand, Converter={StaticResource VVC}}">
-                            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
+                            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="{DynamicResource SaveFolderIconBrush}" Width="18" />
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -297,7 +297,7 @@
                         <Button Command="{Binding SelectedSave.OpenFolderCommand}"
                                 Visibility="{Binding SelectedSave.OpenFolderCommand, Converter={StaticResource VVC}, FallbackValue=Collapsed}"
                                 ToolTipService.ToolTip="{itl:LocalizedText LC_OPEN_IN_FILE_EXPLORER}">
-                            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="Goldenrod" Width="18" />
+                            <materialIcons:MaterialIcon Kind="FolderOpen" Foreground="{DynamicResource SaveFolderIconBrush}" Width="18" />
                         </Button>
                     </StackPanel>
                 </Grid>

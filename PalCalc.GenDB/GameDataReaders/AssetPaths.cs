@@ -38,6 +38,8 @@ namespace PalCalc.GenDB.GameDataReaders
         // DT_WazaMasterTamago is available, "Tamago" apparently translates to "Egg"?
         // All pals referenced here are `BOSS_`, but `BOSS_` entries also appear in `DT_WazaMasterLevel`
 
+        public const string PASSIVE_SKILLS_SPECIAL_BACKGROUND_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_prt_pal_skill_base_02";
+
         public const string PAL_ICONS_MAPPING_PATH = "Pal/Content/Pal/DataTable/Character/DT_PalCharacterIconDataTable";
         public const string PAL_SPAWNERS_PATH = "Pal/Content/Pal/DataTable/Spawner/DT_PalWildSpawner";
         public const string PAL_CAGED_SPAWNERS_PATH = "Pal/Content/Pal/DataTable/Character/DT_CapturedCagePal";

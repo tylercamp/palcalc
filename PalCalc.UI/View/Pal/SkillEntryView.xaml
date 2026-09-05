@@ -9,11 +9,11 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4" />
+            <ColumnDefinition Width="3" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Rectangle Grid.Column="0" VerticalAlignment="Stretch" Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:SkillEntryView}, Path=BorderBrush, FallbackValue=White}" />
-        <Border Grid.Column="2" BorderThickness="0,1,1,1" Opacity="0.5" BorderBrush="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:SkillEntryView}, Path=BorderBrush}" />
-        <Grid Grid.Column="1" Margin="5,0,0,0" x:Name="contentGrid" />
+        <Rectangle Grid.Column="0" VerticalAlignment="Stretch" Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:SkillEntryView}, Path=BorderBrush, FallbackValue=White}" Panel.ZIndex="1" />
+        <Border Grid.Column="2" BorderThickness="0,1,1,1" Opacity="0.5" BorderBrush="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:SkillEntryView}, Path=BorderBrush}" Panel.ZIndex="1" />
+        <Grid Grid.Column="1" x:Name="contentGrid" />
     </Grid>
 </UserControl>

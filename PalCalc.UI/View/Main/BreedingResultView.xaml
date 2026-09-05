@@ -15,11 +15,14 @@
              mc:Ignorable="d" 
              xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
              xmlns:graphSharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
+             xmlns:graphSharpConverters="clr-namespace:GraphSharp.Converters;assembly=GraphSharp.Controls"
              xmlns:ab="clr-namespace:GraphSharp.AttachedBehaviours;assembly=GraphSharp.Controls"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              TextOptions.TextFormattingMode="Ideal"
+             UseLayoutRounding="True"
              d:DesignHeight="450" d:DesignWidth="800"
              >
     <UserControl DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult}" d:DataContext="{d:DesignInstance vms:BreedingResultViewModel, IsDesignTimeCreatable=True}">
@@ -28,8 +31,11 @@
             <c:ValueBoolConverter x:Key="VBC_Negated" Negate="True" />
             <c:ValueVisibilityConverter x:Key="VVC" />
             <c:CollectionVisibilityConverter x:Key="CVC" />
+            <graphSharpConverters:EdgeRouteToPathConverter x:Key="BreedingEdgeRouteToPathConverter" />
 
             <Style TargetType="Label">
+                <Setter Property="UseLayoutRounding" Value="True" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
                 <Setter Property="Padding" Value="0" />
             </Style>
@@ -82,11 +88,11 @@
             <DataTemplate DataType="{x:Type gsvm:StandardBreedingTreeNodeViewModel}">
                 <StackPanel Orientation="Vertical" Margin="5" MinWidth="180" UseLayoutRounding="True">
                     <DockPanel HorizontalAlignment="Stretch">
-                        <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
+                        <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
                         <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Stretch">
                             <StackPanel.Resources>
                                 <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel" x:Key="LocationPopupContent">
-                                    <vu:PopupToolTipContent Background="#040F15">
+                                    <vu:PopupToolTipContent Background="{DynamicResource BreedingPopupBackgroundBrush}">
                                         <StackPanel>
                                             <!-- (some nodes, like composites, have styles which override text size - ensure consistent size in popups) -->
                                             <StackPanel.Resources>
@@ -235,6 +241,9 @@
             </DataTemplate>
 
             <Style TargetType="{x:Type graphSharp:VertexControl}">
+                <Setter Property="UseLayoutRounding" Value="True" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="RenderOptions.BitmapScalingMode" Value="NearestNeighbor" />
                 <Setter Property="ab:DragBehaviour.IsDragEnabled" Value="False" />
                 <Setter Property="Template">
                     <Setter.Value>
@@ -242,7 +251,7 @@
                             <Border x:Name="NodeBorder"
                                     DataContext="{Binding Vertex, RelativeSource={RelativeSource TemplatedParent}}"
                                     BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
-                                    Background="#111217"
+                                    Background="{DynamicResource BreedingNodeBackgroundBrush}"
                                     BorderThickness="2"
                                     CornerRadius="10,10,10,10"
                                     Padding="{TemplateBinding Padding}">
@@ -272,10 +281,10 @@
                                         <Grid>
                                             <materialIcons:MaterialIcon x:Name="UncheckedIcon"
                                                 Kind="CircleOutline"
-                                                Width="16" Height="16" Foreground="#999" />
+                                                Width="16" Height="16" Foreground="{DynamicResource BreedingUncheckedIconBrush}" />
                                             <materialIcons:MaterialIcon x:Name="CheckedIcon"
                                                 Kind="CheckCircle"
-                                                Width="16" Height="16" Foreground="#4CAF50"
+                                                Width="16" Height="16" Foreground="{DynamicResource BreedingCompleteBrush}"
                                                 Visibility="Collapsed" />
                                         </Grid>
                                     </Button>
@@ -284,7 +293,7 @@
                             <ControlTemplate.Triggers>
                                 <DataTrigger Binding="{Binding IsComplete}" Value="True">
                                     <Setter TargetName="NodeContent" Property="Opacity" Value="0.4" />
-                                    <Setter TargetName="NodeBorder" Property="BorderBrush" Value="#4CAF50" />
+                                    <Setter TargetName="NodeBorder" Property="BorderBrush" Value="{DynamicResource BreedingCompleteBrush}" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsChecked}" Value="True">
                                     <Setter TargetName="ToggleButton" Property="Opacity" Value="1.0" />
@@ -297,17 +306,54 @@
                 </Setter>
             </Style>
             <Style TargetType="{x:Type graphSharp:EdgeControl}">
-
+                <Setter Property="Foreground" Value="{DynamicResource BreedingEdgeBrush}" />
+                <Setter Property="Opacity" Value="0.8" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <!-- (Copy of the original EdgeControl template, but with the unnecessary text label removed) -->
+                        <ControlTemplate TargetType="{x:Type graphSharp:EdgeControl}">
+                            <Canvas>
+                                <Path Stroke="{TemplateBinding Foreground}"
+                                      StrokeThickness="{TemplateBinding StrokeThickness}"
+                                      Fill="{TemplateBinding Fill}"
+                                      MinWidth="1"
+                                      MinHeight="1"
+                                      ToolTip="{TemplateBinding ToolTip}">
+                                    <Path.Data>
+                                        <PathGeometry>
+                                            <PathGeometry.Figures>
+                                                <MultiBinding Converter="{StaticResource BreedingEdgeRouteToPathConverter}">
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Source.(graphSharp:GraphCanvas.X)" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Source.(graphSharp:GraphCanvas.Y)" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Source.ActualWidth" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Source.ActualHeight" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Target.(graphSharp:GraphCanvas.X)" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Target.(graphSharp:GraphCanvas.Y)" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Target.ActualWidth" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Target.ActualHeight" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="RoutePoints" />
+                                                </MultiBinding>
+                                            </PathGeometry.Figures>
+                                        </PathGeometry>
+                                    </Path.Data>
+                                </Path>
+                            </Canvas>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
         </UserControl.Resources>
-        <zoom:ZoomControl Grid.Column="1"
+        <zoom:ZoomControl x:Name="GraphZoom"
+                          adonisExtensions:LayerExtension.Layer="2"
+                          Grid.Column="1"
                           Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}"
                           Mode="Fill"
                           FillMarginPercent="0.05"
                           FillLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_FILL}"
                           CustomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_CUSTOM}"
-                          ZoomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_PERCENT}">
-            <gsvm:BreedingGraphLayout
+                          ZoomLabel="{itl:LocalizedText Code=LC_GRAPH_ZOOM_PERCENT}"
+                          ZoomSettled="GraphZoom_ZoomSettled">
+            <gsvm:BreedingGraphLayout x:Name="GraphLayout"
                 Graph="{Binding Graph}"
                 AnimationLength="0"
                 IsAnimationEnabled="False"

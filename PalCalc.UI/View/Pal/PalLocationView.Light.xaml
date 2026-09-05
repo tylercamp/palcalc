@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="LocationForegroundColor">#20252B</Color>
+    <SolidColorBrush x:Key="LocationForegroundBrush"
+                     Color="{DynamicResource LocationForegroundColor}" />
+
+    <Color x:Key="LocationSlotBackgroundColor">#FFFFFF</Color>
+    <SolidColorBrush x:Key="LocationSlotBackgroundBrush"
+                     Color="{DynamicResource LocationSlotBackgroundColor}" />
+
+    <Color x:Key="LocationSlotBorderColor">#AEB7C2</Color>
+    <SolidColorBrush x:Key="LocationSlotBorderBrush"
+                     Color="{DynamicResource LocationSlotBorderColor}" />
+</ResourceDictionary>

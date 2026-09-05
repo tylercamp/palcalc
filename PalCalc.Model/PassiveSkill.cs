@@ -30,8 +30,7 @@ namespace PalCalc.Model
         public int SurgeryCost { get; set; } = 0;
         public string SurgeryRequiredItem { get; set; } = null;
 
-        [JsonIgnore]
-        public bool SupportsSurgery => SurgeryCost > 0;
+        public bool SupportsSurgery { get; set; }
 
         public string Description { get; set; }
 

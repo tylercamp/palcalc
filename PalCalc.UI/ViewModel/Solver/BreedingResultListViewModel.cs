@@ -67,6 +67,9 @@ namespace PalCalc.UI.ViewModel.Solver
         [ObservableProperty]
         private BreedingResultViewModel selectedResult;
 
+        partial void OnSelectedResultChanged(BreedingResultViewModel value) =>
+            CheckedStateChanged?.Invoke(this, EventArgs.Empty);
+
         private readonly double WIDTH_HIDDEN = 0;
         private readonly double FIT_CONTENT = double.NaN;
         private readonly double DEFAULT = double.NaN;

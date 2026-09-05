@@ -5,6 +5,8 @@ using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.UI.Model;
+using PalCalc.UI.Persistence.Dto;
+using PalCalc.UI.Persistence.Serialization;
 
 namespace PalCalc.UI.Tests;
 
@@ -34,7 +36,7 @@ public class BredReferenceConverterTests
             gender: PalGender.MALE
         );
 
-        var reloaded = RoundTrip(original, db).Reference;
+        var reloaded = RoundTrip(original, db);
 
         AssertMaterializedEqual(original.MaterializedAttackInheritance!, reloaded.MaterializedAttackInheritance!);
         Assert.AreEqual(original.AvgRequiredBreedings, reloaded.AvgRequiredBreedings);
@@ -66,7 +68,7 @@ public class BredReferenceConverterTests
             gender: PalGender.FEMALE
         );
 
-        var reloaded = RoundTrip(original, db).Reference;
+        var reloaded = RoundTrip(original, db);
 
         Assert.AreEqual(PalGender.FEMALE, reloaded.Gender);
         Assert.AreEqual(17, reloaded.AvgRequiredBreedings);
@@ -94,7 +96,7 @@ public class BredReferenceConverterTests
             avgRequiredBreedings: 9
         );
 
-        var reloaded = RoundTrip(original, db).Reference;
+        var reloaded = RoundTrip(original, db);
         var reloadedEdges = BredReferences(reloaded).OrderBy(reference => reference.MaterializedAttackInheritance!.SpecialCakes).ToArray();
         var originalEdges = BredReferences(original).OrderBy(reference => reference.MaterializedAttackInheritance!.SpecialCakes).ToArray();
 
@@ -151,23 +153,17 @@ public class BredReferenceConverterTests
             yield return parent;
     }
 
-    private static (BredPalReference Reference, JObject Json) RoundTrip(BredPalReference reference, PalDB db)
+    private static BredPalReference RoundTrip(BredPalReference reference, PalDB db)
     {
-        var json = Serialize(reference, db);
-        return (Deserialize(json, db), json);
+        var json = JsonConvert.SerializeObject(ResultJsonSerializer.ToDto(reference));
+        var dto = JsonConvert.DeserializeObject<PalReferenceDto>(json)!;
+        return (BredPalReference)ResultJsonSerializer.FromDto(
+            dto,
+            db,
+            new GameSettings(),
+            new SerializableSolverSettings()
+        );
     }
-
-    private static JObject Serialize(BredPalReference reference, PalDB db) => JObject.Parse(JsonConvert.SerializeObject(
-        new { Ref = (IPalReference)reference }, SerializerSettings(db)
-    ));
-
-    private static BredPalReference Deserialize(JObject json, PalDB db) =>
-        (BredPalReference)json["Ref"]!.ToObject<IPalReference>(JsonSerializer.Create(SerializerSettings(db)))!;
-
-    private static JsonSerializerSettings SerializerSettings(PalDB db) => new()
-    {
-        Converters = { new PalReferenceConverter(db, new GameSettings(), new SerializableSolverSettings(), new PalSpecifier { Pal = db.Pals.First() }) }
-    };
 
     private static void AssertMaterializedEqual(MaterializedAttackInheritance expected, MaterializedAttackInheritance actual)
     {

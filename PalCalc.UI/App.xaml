@@ -11,6 +11,7 @@
                 <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml"/>
 
                 <ResourceDictionary Source="Themes/StyleAdjustments.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/PalCalc.UI;component/Themes/PalCalcDark.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

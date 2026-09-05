@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using Serilog.Configuration;
+using Serilog.Core;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Templates;
@@ -18,20 +19,20 @@ namespace PalCalc.Model
             "[{@t:HH:mm:ss} {@l:u3} {SourceContext}] {@m}\n{@x}"
         );
 
-        public static void InitCommonFull(LogEventLevel consoleLogLevel = LogEventLevel.Information)
+        public static void InitCommonFull()
         {
             Log.Logger = new LoggerConfiguration()
-                .PalCommon(consoleLogLevel)
+                .PalCommon()
                 .CreateLogger();
         }
     }
 
     public static class LoggingExtensions
     {
-        public static LoggerConfiguration PalCommon(this LoggerConfiguration config, LogEventLevel consoleLogLevel = LogEventLevel.Information) =>
+        public static LoggerConfiguration PalCommon(this LoggerConfiguration config) =>
             config
                 .WriteTo.Async(a => a.Debug(Logging.MessageFormat, LogEventLevel.Debug))
-                .WriteTo.Console(Logging.MessageFormat, consoleLogLevel)
+                .WriteTo.Console(Logging.MessageFormat, LogEventLevel.Information)
                 .MinimumLevel.Verbose()
                 .Enrich.WithExceptionDetails();
     }

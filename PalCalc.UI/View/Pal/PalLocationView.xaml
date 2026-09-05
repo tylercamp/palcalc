@@ -20,8 +20,8 @@
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type vmpd:ContainerLocationPreviewViewModel}">
-                <StackPanel Background="#040F15" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Label Foreground="White"
+                <StackPanel Background="{DynamicResource BreedingPopupBackgroundBrush}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Label Foreground="{DynamicResource LocationForegroundBrush}"
                            FontSize="16"
                            Margin="0,4,0,0"
                            FontWeight="Bold"
@@ -48,9 +48,9 @@
                                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                                 <Setter Property="VerticalAlignment" Value="Stretch" />
 
-                                <Setter Property="Background" Value="#1C2124" />
+                                <Setter Property="Background" Value="{DynamicResource LocationSlotBackgroundBrush}" />
                                 <Setter Property="CornerRadius" Value="999" />
-                                <Setter Property="BorderBrush" Value="#33383a" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource LocationSlotBorderBrush}" />
                                 <Setter Property="BorderThickness" Value="2" />
 
                                 <Setter Property="Margin" Value="2" />
@@ -75,7 +75,7 @@
                                         <DataTemplate DataType="{x:Type vmpd:FocusedContainerLocationPreviewSlotViewModel}">
                                             <Border Style="{StaticResource SlotStyle}">
                                                 <Grid>
-                                                    <materialIcons:MaterialIcon Kind="HighlightOff" Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                                                    <materialIcons:MaterialIcon Kind="HighlightOff" Foreground="{DynamicResource LocationForegroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>

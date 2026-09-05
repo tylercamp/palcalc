@@ -1,6 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AdonisUI;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.SaveReader.SaveFile;
 using PalCalc.UI.Localization;
@@ -22,23 +24,47 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 
 namespace PalCalc.UI.ViewModel
 {
-    internal partial class AppToolbarViewModel(Dispatcher dispatcher) : ObservableObject
+    internal partial class AppToolbarViewModel : ObservableObject
     {
+        private static readonly Uri palCalcDarkColorScheme = new("pack://application:,,,/PalCalc.UI;component/Themes/PalCalcDark.xaml", UriKind.Absolute);
+        private static readonly Uri palCalcLightColorScheme = new("pack://application:,,,/PalCalc.UI;component/Themes/PalCalcLight.xaml", UriKind.Absolute);
+
         private static ILogger logger = Log.ForContext<AppToolbarViewModel>();
 
         private static AppToolbarViewModel designerInstance;
-        public static AppToolbarViewModel DesignerInstance => designerInstance ??= new(Dispatcher.CurrentDispatcher);
+        public static AppToolbarViewModel DesignerInstance => designerInstance ??= new(Dispatcher.CurrentDispatcher, new AppSettings());
+
+        private readonly Dispatcher dispatcher;
+        private readonly AppSettings settings;
+        private Uri currentPalCalcColorScheme = palCalcDarkColorScheme;
+
+        public AppToolbarViewModel(Dispatcher dispatcher, AppSettings settings)
+        {
+            this.dispatcher = dispatcher;
+            this.settings = settings;
+            ApplyTheme(settings.IsDarkTheme, saveSettings: false);
+        }
 
         public List<TranslationLocaleViewModel> Locales { get; } =
             Enum
                 .GetValues<TranslationLocale>()
                 .Select(l => new TranslationLocaleViewModel(l))
                 .ToList();
+
+        public bool IsDebugLoggingEnabled
+        {
+            get => PCDebug.FileLogLevel.MinimumLevel == Serilog.Events.LogEventLevel.Debug;
+            set => PCDebug.FileLogLevel.MinimumLevel = value ? Serilog.Events.LogEventLevel.Debug : PCDebug.DefaultFileLogLevel;
+        }
+
+        public bool IsDarkTheme => settings.IsDarkTheme;
+        public bool IsLightTheme => !settings.IsDarkTheme;
 
         [RelayCommand]
         private void ExportCrashLog()
@@ -108,6 +134,40 @@ namespace PalCalc.UI.ViewModel
                 }, DispatcherPriority.ContextIdle);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             });
+        }
+
+        [RelayCommand]
+        private void UseDarkTheme()
+        {
+            ApplyTheme(isDarkTheme: true, saveSettings: true);
+        }
+
+        [RelayCommand]
+        private void UseLightTheme()
+        {
+            ApplyTheme(isDarkTheme: false, saveSettings: true);
+        }
+
+        private void ApplyTheme(bool isDarkTheme, bool saveSettings)
+        {
+            SetTheme(
+                isDarkTheme ? ResourceLocator.DarkColorScheme : ResourceLocator.LightColorScheme,
+                isDarkTheme ? palCalcDarkColorScheme : palCalcLightColorScheme
+            );
+
+            settings.IsDarkTheme = isDarkTheme;
+            if (saveSettings)
+                Storage.SaveAppSettings(settings);
+
+            OnPropertyChanged(nameof(IsDarkTheme));
+            OnPropertyChanged(nameof(IsLightTheme));
+        }
+
+        private void SetTheme(Uri adonisColorScheme, Uri palCalcColorScheme)
+        {
+            ResourceLocator.SetColorScheme(Application.Current.Resources, adonisColorScheme);
+            ResourceLocator.SetColorScheme(Application.Current.Resources, palCalcColorScheme, currentPalCalcColorScheme);
+            currentPalCalcColorScheme = palCalcColorScheme;
         }
     }
 }

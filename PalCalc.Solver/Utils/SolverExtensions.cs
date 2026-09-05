@@ -52,11 +52,7 @@ namespace PalCalc.Solver.Utils
         public static List<PassiveSkill> ToDedicatedPassives(this IEnumerable<PassiveSkill> actualPassives, IEnumerable<PassiveSkill> desiredPassives)
         {
             return actualPassives
-                .Select(p =>
-                    desiredPassives.Contains(p) || p.TrackedEffects.Any(e => e.InternalName == PassiveSkillEffect.BreedSpeed)
-                        ? p
-                        : new RandomPassiveSkill()
-                )
+                .Select(p => desiredPassives.Contains(p) ? p : new RandomPassiveSkill())
                 .ToList();
         }
 

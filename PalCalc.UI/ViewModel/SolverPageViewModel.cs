@@ -1,12 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.Persistence;
 using PalCalc.UI.View.Inspector;
 using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
@@ -19,7 +18,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -268,9 +266,7 @@ namespace PalCalc.UI.ViewModel
             {
                 PalTargetList.Remove(spec);
                 SaveTargetList(PalTargetList);
-                var dataPath = Path.Join(Storage.SaveFileTargetsDataPath(OpenedSave.Value), $"{spec.Id}.json");
-                if (File.Exists(dataPath))
-                    File.Delete(dataPath);
+                TargetPersistenceService.DeleteTarget(spec, OpenedSave);
 
                 UpdatePalTarget();
             }
@@ -331,15 +327,7 @@ namespace PalCalc.UI.ViewModel
 
         private void SaveTargetList(PalTargetListViewModel list)
         {
-            if (Storage.DEBUG_DisableStorage) return;
-
-            var outputFolder = Storage.SaveFileDataPath(OpenedSave.Value);
-            if (!Directory.Exists(outputFolder))
-                Directory.CreateDirectory(outputFolder);
-
-            var outputFile = Path.Join(outputFolder, "pal-target-ids.json");
-            var converter = new PalTargetListViewModelWriter(db, new GameSettings());
-            File.WriteAllText(outputFile, JsonConvert.SerializeObject(list, converter));
+            TargetPersistenceService.SaveList(list, OpenedSave, db, SelectedGameSettings?.ModelObject ?? GameSettings.Defaults);
         }
 
         private void PalSpecifierCheckedStateChanged(object sender, EventArgs args) =>
@@ -347,15 +335,7 @@ namespace PalCalc.UI.ViewModel
 
         public void SaveTarget(PalSpecifierViewModel item)
         {
-            if (Storage.DEBUG_DisableStorage) return;
-
-            var outputFolder = Storage.SaveFileTargetsDataPath(OpenedSave.Value);
-            if (!Directory.Exists(outputFolder))
-                Directory.CreateDirectory(outputFolder);
-
-            var outputFile = Path.Join(outputFolder, $"{item.Id}.json");
-            var converter = new PalSpecifierViewModelWriter(db, SelectedGameSettings.ModelObject);
-            File.WriteAllText(outputFile, JsonConvert.SerializeObject(item, converter));
+            TargetPersistenceService.SaveTarget(item, OpenedSave, db, SelectedGameSettings?.ModelObject ?? GameSettings.Defaults);
         }
 
         private void RunSolver()

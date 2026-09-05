@@ -315,6 +315,7 @@ namespace PalCalc.GenDB
                     RandomInheritanceWeight = rawPassive.LotteryWeight,
                     TrackedEffects = trackedEffects,
                     IsStandardPassiveSkill = rawPassive.IsStandardPassiveSkill,
+                    SupportsSurgery = surgeryData != null,
                     SurgeryCost = surgeryData?.Price ?? 0,
                     // ("no required item" is indicated as a value of "None", but handle nullability just in case that changes)
                     SurgeryRequiredItem = (surgeryData?.RequireItemId ?? "None") == "None" ? null : surgeryData.RequireItemId,
@@ -726,6 +727,8 @@ namespace PalCalc.GenDB
             ExportImage(icons.DungeonIconSmall, "../PalCalc.UI/Resources/DungeonSmall.png", SKEncodedImageFormat.Png);
 
             ExportImage(icons.SurgeryTableIcon, "../PalCalc.UI/Resources/SurgeryTable.png", 256, 256, SKEncodedImageFormat.Png);
+
+            ExportImage(icons.PassiveSkillSpecialBackground, "../PalCalc.UI/Resources/PassiveSpecialBackground.png", SKEncodedImageFormat.Png);
         }
 
         private static void ExportPalIcons(List<Pal> pals, Dictionary<string, UTexture2D> palIcons, int iconSize)

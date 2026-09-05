@@ -5,6 +5,8 @@ using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.UI.Model;
+using PalCalc.UI.Persistence;
+using PalCalc.UI.Persistence.Serialization;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Solver;
 
@@ -49,8 +51,7 @@ public class PalSpecifierAttackTests
         };
         var viewModel = new PalSpecifierViewModel("target", target);
 
-        var json = JsonConvert.SerializeObject(viewModel, WriteSettings(db));
-        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json, ReadSettings(db));
+        var reloaded = RoundTrip(viewModel, db);
 
         Assert.IsNotNull(reloaded);
         CollectionAssert.AreEqual(
@@ -95,12 +96,10 @@ public class PalSpecifierAttackTests
     {
         var db = PalDB.LoadEmbedded();
         var attack = db.ActiveSkills.First();
-        var json = JObject.Parse(JsonConvert.SerializeObject(
+        var reloaded = RoundTrip(
             new PalSpecifierViewModel("target", new PalSpecifier { Pal = db.Pals.First(), RequiredAttacks = [attack] }),
-            WriteSettings(db)
-        ));
-
-        var reloaded = JsonConvert.DeserializeObject<PalSpecifierViewModel>(json.ToString(), ReadSettings(db));
+            db
+        );
 
         Assert.AreEqual(attack.InternalName, reloaded!.RequiredAttacks.Attack1!.ModelObject.InternalName);
         Assert.IsNull(reloaded.RequiredAttacks.Attack2);
@@ -110,40 +109,29 @@ public class PalSpecifierAttackTests
     public void ImportedTargetsWithMoreThanSixAttacksAreRejected()
     {
         var db = PalDB.LoadEmbedded();
-        var json = JObject.Parse(JsonConvert.SerializeObject(
+        var json = JObject.Parse(TargetJsonSerializer.ToJson(TargetJsonSerializer.ToDto(
             new PalSpecifierViewModel("target", new PalSpecifier { Pal = db.Pals.First() }),
-            WriteSettings(db)
-        ));
-        json["RequiredAttacks"] = new JArray(db.ActiveSkills.Take(PalSpecifier.MaxRequiredAttacks + 1).Select(attack => attack.InternalName));
+            db,
+            new GameSettings()
+        )));
+        json["RequiredAttackInternalNames"] = new JArray(db.ActiveSkills.Take(PalSpecifier.MaxRequiredAttacks + 1).Select(attack => attack.InternalName));
 
         Assert.Throws<JsonSerializationException>(() =>
-            JsonConvert.DeserializeObject<PalSpecifierViewModel>(json.ToString(), ReadSettings(db))
+            TargetJsonSerializer.FromDto(TargetJsonSerializer.FromCurrentTargetJson(json.ToString()), Context(db))
         );
     }
 
     [TestMethod]
-    public void RandomAttackRoundTripsThroughActiveSkillConverter()
+    public void RandomAttackRoundTripsThroughTargetDto()
     {
         var db = PalDB.LoadEmbedded();
         var random = new RandomActiveSkill();
-        var settings = new JsonSerializerSettings
-        {
-            Converters = { new ActiveSkillConverter(db, new GameSettings()) }
-        };
+        var reloaded = RoundTrip(
+            new PalSpecifierViewModel("target", new PalSpecifier { Pal = db.Pals.First(), RequiredAttacks = [random] }),
+            db
+        );
 
-        var json = JsonConvert.SerializeObject(new { Skill = (ActiveSkill)random }, settings);
-        var reloaded = JObject.Parse(json)["Skill"]!.ToObject<ActiveSkill>(JsonSerializer.Create(settings));
-
-        Assert.IsInstanceOfType<RandomActiveSkill>(reloaded);
-
-        var viewModelSettings = new JsonSerializerSettings
-        {
-            Converters = { new ActiveSkillViewModelConverter(db, new GameSettings()) }
-        };
-        var viewModelJson = JsonConvert.SerializeObject(new { Skill = ActiveSkillViewModel.Make(random) }, viewModelSettings);
-        var viewModelReloaded = JObject.Parse(viewModelJson)["Skill"]!.ToObject<ActiveSkillViewModel>(JsonSerializer.Create(viewModelSettings));
-
-        Assert.IsInstanceOfType<RandomActiveSkill>(viewModelReloaded!.ModelObject);
+        Assert.IsInstanceOfType<RandomActiveSkill>(reloaded.RequiredAttacks.Attack1!.ModelObject);
     }
 
     [TestMethod]
@@ -232,13 +220,19 @@ public class PalSpecifierAttackTests
             attackProfile: AttackProfile.Inactive
         );
 
-    private static JsonSerializerSettings ReadSettings(PalDB db) => new()
-    {
-        Converters = { new PalSpecifierViewModelReader(db, new GameSettings(), new CachedSaveGame(null)) }
-    };
+    private static PalSpecifierViewModel RoundTrip(PalSpecifierViewModel value, PalDB db) =>
+        TargetJsonSerializer.FromDto(
+            TargetJsonSerializer.FromCurrentTargetJson(
+                TargetJsonSerializer.ToJson(TargetJsonSerializer.ToDto(value, db, new GameSettings()))
+            ),
+            Context(db)
+        );
 
-    private static JsonSerializerSettings WriteSettings(PalDB db) => new()
-    {
-        Converters = { new PalSpecifierViewModelWriter(db, new GameSettings()) }
-    };
+    private static TargetRehydrationContext Context(PalDB db) => new(
+        db,
+        null!,
+        new CachedSaveGame(null),
+        new GameSettings(),
+        new SerializableSolverSettings()
+    );
 }

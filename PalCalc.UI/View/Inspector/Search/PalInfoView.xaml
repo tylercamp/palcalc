@@ -21,7 +21,7 @@
     <StackPanel Margin="10">
         <WrapPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,25,0">
-                <Border Width="64" Height="64" CornerRadius="32" Background="{Binding Pal.IconBrush}" BorderBrush="White" BorderThickness="1" />
+                <Border Width="64" Height="64" CornerRadius="32" Background="{Binding Pal.IconBrush}" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}" BorderThickness="1" />
                 <StackPanel Margin="10,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" />
@@ -39,7 +39,7 @@
                 <StackPanel.Resources>
                     <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
                         <Setter Property="Padding" Value="1" />
-                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
                     </Style>
                     <Style TargetType="StackPanel">
                         <Setter Property="Orientation" Value="Horizontal" />

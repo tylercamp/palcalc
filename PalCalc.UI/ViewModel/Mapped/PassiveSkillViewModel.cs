@@ -22,14 +22,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return MakeBrush((int)value switch
-            {
-                < 0 => new Color() { R = 247, G = 63, B = 63, A = 255 },
-                4 => new Color() { R = 104, G = 255, B = 216, A = 255 },
-                5 => new Color() { R = 14, G = 252, B = 157, A = 255 },
-                > 1 => new Color() { R = 255, G = 221, B = 0, A = 255 },
-                _ => new Color() { R = 230, G = 231, B = 223, A = 255 },
-            });
+            return MakeBrush(PassiveSkillIcon.ColorForRank((int)value));
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -100,7 +93,29 @@ namespace PalCalc.UI.ViewModel.Mapped
             allPassives = new ObservableCollection<PassiveSkillViewModel>(PalDB.LoadEmbedded().StandardPassiveSkills.Select(Make).OrderBy(p => p.Name.Value));
 
             All = new ReadOnlyObservableCollection<PassiveSkillViewModel>(allPassives);
+
+            PassiveSkillViewModel MakeTier(int tier) => new(new PassiveSkill($"Tier {tier}", $"Tier {tier}", tier), new HardCodedText($"Tier {tier}"), new HardCodedText("Description"));
+
+            DesignerInstance_TN1 = MakeTier(-1);
+            DesignerInstance_TN2 = MakeTier(-2);
+            DesignerInstance_TN3 = MakeTier(-3);
+
+            DesignerInstance_T1 = MakeTier(1);
+            DesignerInstance_T2 = MakeTier(2);
+            DesignerInstance_T3 = MakeTier(3);
+            DesignerInstance_T4 = MakeTier(4);
+            DesignerInstance_T5 = MakeTier(5);
         }
+
+        public static readonly PassiveSkillViewModel DesignerInstance_TN1;
+        public static readonly PassiveSkillViewModel DesignerInstance_TN2;
+        public static readonly PassiveSkillViewModel DesignerInstance_TN3;
+
+        public static readonly PassiveSkillViewModel DesignerInstance_T1;
+        public static readonly PassiveSkillViewModel DesignerInstance_T2;
+        public static readonly PassiveSkillViewModel DesignerInstance_T3;
+        public static readonly PassiveSkillViewModel DesignerInstance_T4;
+        public static readonly PassiveSkillViewModel DesignerInstance_T5;
 
         private static ObservableCollection<PassiveSkillViewModel> allPassives;
         public static ReadOnlyObservableCollection<PassiveSkillViewModel> All { get; }

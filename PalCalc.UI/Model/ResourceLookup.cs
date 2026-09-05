@@ -20,7 +20,7 @@ namespace PalCalc.UI.Model
             }
             else
             {
-                return Application.GetResourceStream(new Uri($"/Resources/{pathInResources}", UriKind.Relative)).Stream;
+                return Application.GetResourceStream(new Uri($"/PalCalc.UI;component/Resources/{pathInResources}", UriKind.Relative)).Stream;
             }
         }
 

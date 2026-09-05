@@ -315,7 +315,7 @@
                         </Border>
                         <Border Padding="5" Margin="5"
                                 CornerRadius="5"
-                                Background="#55C0C0C0"
+                                Background="{DynamicResource GraphZoomControlsBackgroundBrush}"
                                 Width="Auto"
                                 Height="Auto"
                                 VerticalAlignment="Bottom"
@@ -329,7 +329,7 @@
                                 </UniformGrid>
                                 <TextBlock HorizontalAlignment="Center" Margin="0,4,0,2">
                                     <Run Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=ZoomLabel}" />
-                                    <Run Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Zoom,StringFormat='\{0:P0}'}" />
+                                    <Run Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=DisplayZoom,StringFormat='\{0:P0}'}" />
                                 </TextBlock>
                             </StackPanel>
                         </Border>

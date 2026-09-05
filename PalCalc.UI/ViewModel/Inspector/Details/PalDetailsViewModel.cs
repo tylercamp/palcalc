@@ -1,5 +1,7 @@
 ﻿using PalCalc.Model;
 using PalCalc.SaveReader.SaveFile.Support.Level;
+using PalCalc.UI.Localization;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,28 +13,29 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
 {
     public class PalDetailsProperty
     {
-        public string Key { get; set; }
-        public string Value { get; set; }
+        public ILocalizedText Key { get; set; }
+        public ILocalizedText Value { get; set; }
     }
-
-    // TODO - Localize (eventually)
 
     public class PalDetailsViewModel(PalInstance pal, GvasCharacterInstance rawData)
     {
+        private static ILocalizedText RawText(object value) => new HardCodedText(value?.ToString() ?? "null");
+        private static ILocalizedText BoolText(bool value) => (value ? LocalizationCodes.LC_COMMON_YES : LocalizationCodes.LC_COMMON_NO).Bind();
+
         public List<PalDetailsProperty> PalProperties { get; } = pal == null ? [] :
-            ((ReadOnlySpan<(string, object)>)[
-                ( "Pal", pal.Pal.Name ),
-                ( "Paldex #", pal.Pal.Id.PalDexNo ),
-                ( "Paldex Is Variant", pal.Pal.Id.IsVariant ),
-                ( "Gender", pal.Gender ),
-                ( "Detected Owner ID", pal.OwnerPlayerId ),
-                ( "On Expedition", pal.IsOnExpedition ),
-                .. pal.PassiveSkills.ZipWithIndex().Select(p => ($"Passive Skill {p.Item2+1}", p.Item1.Name)),
-                .. pal.EquippedActiveSkills.ZipWithIndex().Select(s => ($"Equipped Active Skill {s.Item2+1}", s.Item1.Name)),
-                .. pal.ActiveSkills.ZipWithIndex().Select(s => ($"Active Skill {s.Item2+1}", s.Item1.Name)),
+            ((IEnumerable<(ILocalizedText, ILocalizedText)>)[
+                (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_PAL.Bind(), PalViewModel.Make(pal.Pal).Name),
+                (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_PALDEX_NUM.Bind(), RawText(pal.Pal.Id.PalDexNo)),
+                (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_PALDEX_IS_VARIANT.Bind(), BoolText(pal.Pal.Id.IsVariant)),
+                (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_GENDER.Bind(), pal.Gender.Label()),
+                (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_DETECTED_OWNER_ID.Bind(), RawText(pal.OwnerPlayerId)),
+                (LocalizationCodes.LC_SAVEINSPECT_ON_EXPEDITION.Bind(), BoolText(pal.IsOnExpedition)),
+                .. pal.PassiveSkills.ZipWithIndex().Select(p => (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_PASSIVE_SKILL.Bind(p.Item2 + 1), PassiveSkillViewModel.Make(p.Item1).Name)),
+                .. pal.EquippedActiveSkills.ZipWithIndex().Select(s => (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_EQUIPPED_ACTIVE_SKILL.Bind(s.Item2 + 1), ActiveSkillViewModel.Make(s.Item1).Name)),
+                .. pal.ActiveSkills.ZipWithIndex().Select(s => (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_ACTIVE_SKILL.Bind(s.Item2 + 1), ActiveSkillViewModel.Make(s.Item1).Name)),
             ])
             .ToArray()
-            .Select(p => new PalDetailsProperty() { Key = p.Item1, Value = p.Item2?.ToString() ?? "null" })
+            .Select(p => new PalDetailsProperty() { Key = p.Item1, Value = p.Item2 })
             .ToList();
 
         public List<PalDetailsProperty> RawProperties { get; } = rawData == null ? [] :
@@ -62,7 +65,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
                 .. rawData.ActiveSkills.ZipWithIndex().Select(s => ($"Active Skill {s.Item2+1}", s.Item1)),
             ])
             .ToArray()
-            .Select(kvp => new PalDetailsProperty() { Key = kvp.Item1, Value = kvp.Item2?.ToString() ?? "null" })
+            .Select(kvp => new PalDetailsProperty() { Key = RawText(kvp.Item1), Value = RawText(kvp.Item2) })
             .ToList();
     }
 }
