@@ -96,6 +96,31 @@ public class ParallelBatchExecutorTests
     }
 
     [TestMethod]
+    public void BreedingSolver_CancellationReleasesPausedWorkers()
+    {
+        using var cancellation = new CancellationTokenSource();
+        using var enteredBreeding = new ManualResetEventSlim();
+        var configuredSolver = OneStepSolver();
+        var controller = new SolverStateController(cancellation.Token);
+        configuredSolver.Solver.StatusUpdated += status =>
+        {
+            if (status.CurrentPhase == SolverPhase.Breeding)
+                enteredBreeding.Set();
+        };
+        controller.Pause();
+
+        var solveTask = Task.Run(
+            () => configuredSolver.Solver.Solve(RequestFor(configuredSolver), controller)
+        );
+
+        Assert.IsTrue(enteredBreeding.Wait(TimeSpan.FromSeconds(5)));
+        cancellation.Cancel();
+
+        Assert.IsTrue(solveTask.Wait(TimeSpan.FromSeconds(10)));
+        Assert.IsTrue(solveTask.Result.IsCanceled);
+    }
+
+    [TestMethod]
     public void Execute_PropagatesWorkerExceptionToCaller()
     {
         var configuredSolver = OneStepSolver(maxThreads: 2);
@@ -110,14 +135,16 @@ public class ParallelBatchExecutorTests
         var healthyReference = new OwnedPalReference(
             SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             effectivePassives: [],
-            effectiveIVs: new IV_Set()
+            effectiveIVs: new IV_Set(),
+            attackProfile: AttackProfile.Inactive
         );
         var frontier = new SearchFrontier(
             target,
             [healthyReference],
             configuredSolver.Settings.MaxThreads,
             controller,
-            context.SelectionPolicy
+            context.SelectionPolicy,
+            context.AttackTargets
         );
         var expansionContext = new CandidateExpansionContext(
             StepIndex: 0,
@@ -127,8 +154,11 @@ public class ParallelBatchExecutorTests
                 configuredSolver.Settings.MaxEffort,
                 context.SelectionPolicy,
                 frontier,
-                configuredSolver.Settings.DB.PalsById.Keys
-            )
+                configuredSolver.Settings.DB.PalsById.Keys,
+                context.AttackTargets,
+                configuredSolver.Settings
+            ),
+            AttackTargets: context.AttackTargets
         );
         var failingReference = new FailingPalReference(
             "Katress".ToPal(SolverTestScenario.DB)
@@ -153,6 +183,7 @@ public class ParallelBatchExecutorTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxThreads: maxThreads
@@ -178,6 +209,7 @@ public class ParallelBatchExecutorTests
         public int EffectivePassivesHash => 0;
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
+        public AttackProfile AttackProfile => AttackProfile.Inactive;
         public PalGender Gender => PalGender.MALE;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

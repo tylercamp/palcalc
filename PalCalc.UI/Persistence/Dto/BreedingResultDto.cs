@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using PalCalc.Model;
+using PalCalc.Solver.PalReference.Properties;
 using System.Collections.Generic;
 
 namespace PalCalc.UI.Persistence.Dto
@@ -34,12 +35,26 @@ namespace PalCalc.UI.Persistence.Dto
         public PalReferenceDto Parent2 { get; init; }
         public float? PassivesProbability { get; init; }
         public float? IVsProbability { get; init; }
+        public int? AvgRequiredBreedings { get; init; }
+        public MaterializedAttackInheritanceDto MaterializedAttackInheritance { get; init; }
 
         public PalReferenceDto Male { get; init; }
         public PalReferenceDto Female { get; init; }
 
         public PalReferenceDto Input { get; init; }
         public List<SurgeryOperationDto> Operations { get; init; }
+    }
+
+    [JsonObject(ItemRequired = Required.Always)]
+    internal sealed class MaterializedAttackInheritanceDto
+    {
+        public AttackInheritanceMode Mode { get; init; }
+        public List<string> Parent1LoadoutInternalNames { get; init; }
+        public List<string> Parent2LoadoutInternalNames { get; init; }
+        public List<string> InheritedAttackInternalNames { get; init; }
+        public List<string> ChildLearnedAttackInternalNames { get; init; }
+        public int SpecialCakes { get; init; }
+        public float AttackProbability { get; init; }
     }
 
     [JsonObject(ItemRequired = Required.Always)]

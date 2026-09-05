@@ -15,7 +15,12 @@ namespace PalCalc.Solver.PalReference
         PalInstance instance;
 
         /// <param name="effectivePassives">The list of passives held by the `instance`, filtered/re-mapped based on desired passives. (.ToDedicatedPassives())</param>
-        public OwnedPalReference(PalInstance instance, List<PassiveSkill> effectivePassives, IV_Set effectiveIVs)
+        public OwnedPalReference(
+            PalInstance instance,
+            List<PassiveSkill> effectivePassives,
+            IV_Set effectiveIVs,
+            AttackProfile attackProfile
+        )
         {
             this.instance = instance;
 
@@ -24,6 +29,7 @@ namespace PalCalc.Solver.PalReference
             TimeFactor = instance.PassiveSkills.ToTimeFactor();
 
             ActualPassives = instance.PassiveSkills;
+            AttackProfile = attackProfile;
 
             IVs = effectiveIVs;
 
@@ -39,6 +45,8 @@ namespace PalCalc.Solver.PalReference
         public int EffectivePassivesHash { get; }
 
         public List<PassiveSkill> ActualPassives { get; }
+
+        public AttackProfile AttackProfile { get; }
 
         public float TimeFactor { get; }
 
@@ -66,7 +74,7 @@ namespace PalCalc.Solver.PalReference
 
         private OwnedPalReference MakeGuaranteedGenderImpl(PalGender gender)
         {
-            var res = new OwnedPalReference(instance, EffectivePassives, IVs);
+            var res = new OwnedPalReference(instance, EffectivePassives, IVs, AttackProfile);
             res.Gender = gender;
             return res;
         }

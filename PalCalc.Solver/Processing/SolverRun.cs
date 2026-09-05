@@ -39,17 +39,25 @@ namespace PalCalc.Solver.Processing
             };
             stateUpdated?.Invoke(statusMsg);
 
+            var surgeryFinalists = SurgeryFinalistAccumulator.Create(
+                spec,
+                settings,
+                context.AttackTargets
+            );
             var frontier = new SearchFrontier(
                 spec,
                 new InitialPalBuilder(
                     settings,
                     context.Mechanics,
-                    context.BreedingDB
+                    context.BreedingDB,
+                    context.AttackTargets
                 ).Build(spec),
                 settings.MaxThreads,
                 controller,
-                context.SelectionPolicy
+                context.SelectionPolicy,
+                context.AttackTargets
             );
+            surgeryFinalists?.Observe(frontier.CurrentContent);
             var batchExecutor = new ParallelBatchExecutor(context, stateUpdateInterval);
 
             // Repeatedly breed newly useful parent pairs. Each pass only
@@ -67,8 +75,12 @@ namespace PalCalc.Solver.Processing
                         maxEffort: settings.MaxEffort,
                         selectionPolicy: context.SelectionPolicy,
                         frontier: frontier,
-                        palIds: settings.DB.PalsById.Keys
-                    )
+                        palIds: settings.DB.PalsById.Keys,
+                        attackTargets: context.AttackTargets,
+                        settings: settings,
+                        surgeryFinalists: surgeryFinalists
+                    ),
+                    AttackTargets: context.AttackTargets
                 );
 
                 var delta = frontier.ExpandPairs(work =>
@@ -101,6 +113,8 @@ namespace PalCalc.Solver.Processing
                         }
                     );
 
+                    frontier.ObserveTerminal(expansionContext.PreFilter.TerminalCandidates);
+
                     statusMsg = statusMsg with
                     {
                         WorkProcessedCount = execution.WorkProcessedCount,
@@ -112,7 +126,6 @@ namespace PalCalc.Solver.Processing
 
                     return execution.Candidates;
                 });
-
                 if (controller.CancellationToken.IsCancellationRequested) break;
 
                 if (!delta.Changed)
@@ -122,6 +135,18 @@ namespace PalCalc.Solver.Processing
                 }
             }
 
+            var resultPostProcessor = new ResultPostProcessor(
+                spec,
+                settings,
+                controller,
+                context.AttackTargets
+            );
+            resultPostProcessor.ApplySurgery(
+                frontier,
+                surgeryFinalists?.Candidates
+            );
+            var results = resultPostProcessor.Finalize(frontier.TerminalResults);
+
             statusMsg = statusMsg with
             {
                 IsCanceled = controller.CancellationToken.IsCancellationRequested,
@@ -130,9 +155,7 @@ namespace PalCalc.Solver.Processing
             };
             stateUpdated?.Invoke(statusMsg);
 
-            var resultPostProcessor = new ResultPostProcessor(spec, settings, controller);
-            resultPostProcessor.ApplySurgery(frontier);
-            return resultPostProcessor.Finalize(frontier.TerminalResults);
+            return results;
         }
     }
 }

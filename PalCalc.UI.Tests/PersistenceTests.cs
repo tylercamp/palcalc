@@ -359,6 +359,97 @@ namespace PalCalc.UI.Tests
     }
 
     [TestMethod]
+    public void VersionThreeDocumentsGainAttackInheritanceFields()
+    {
+        WithTemporaryDirectory(path =>
+        {
+            File.WriteAllText(
+                StorageFormat.ManifestPath(path),
+                JsonConvert.SerializeObject(new StorageManifest { Version = 3 })
+            );
+            File.WriteAllText(
+                Path.Combine(path, "settings.json"),
+                """{"SolverSettings":{}}"""
+            );
+            var targetsPath = Directory.CreateDirectory(Path.Combine(path, "save-1", "targets"));
+            var targetPath = Path.Combine(targetsPath.FullName, "target.json");
+            File.WriteAllText(
+                targetPath,
+                """
+                {
+                  "CurrentResults": {
+                    "SolverSettings": {},
+                    "Results": [
+                      {
+                        "PalReference": {
+                          "RefType": "BRED_PAL",
+                          "Parent1": {"RefType": "WILD_PAL"},
+                          "Parent2": {"RefType": "WILD_PAL"}
+                        }
+                      }
+                    ]
+                  }
+                }
+                """
+            );
+
+            StorageMigrationRunner.EnsureCurrent(path);
+
+            var settings = JObject.Parse(File.ReadAllText(Path.Combine(path, "settings.json")));
+            var target = JObject.Parse(File.ReadAllText(targetPath));
+            var reference = (JObject)target["CurrentResults"]!["Results"]![0]!["PalReference"]!;
+
+            Assert.AreEqual(0, settings["SolverSettings"]!["MaxSpecialCakes"]!.Value<int>());
+            Assert.IsInstanceOfType<JArray>(target["RequiredAttackInternalNames"]);
+            Assert.AreEqual(0, target["CurrentResults"]!["SolverSettings"]!["MaxSpecialCakes"]!.Value<int>());
+            Assert.AreEqual(JTokenType.Null, reference["AvgRequiredBreedings"]!.Type);
+            Assert.AreEqual(JTokenType.Null, reference["MaterializedAttackInheritance"]!.Type);
+            Assert.AreEqual(JTokenType.Null, reference["Parent1"]!["MaterializedAttackInheritance"]!.Type);
+        });
+    }
+
+    [TestMethod]
+    public void LegacyAttackSettingsAndTargetsSurviveFormalization()
+    {
+        WithTemporaryDirectory(path =>
+        {
+            File.WriteAllText(
+                Path.Combine(path, "settings.json"),
+                """{"SolverSettings":{"MaxSpecialCakes":7}}"""
+            );
+            var savePath = Directory.CreateDirectory(Path.Combine(path, "save-1"));
+            File.WriteAllText(
+                Path.Combine(savePath.FullName, "pal-targets.json"),
+                """
+                {
+                  "Targets": [
+                    {
+                      "Id": "attack-target",
+                      "TargetPal": "Pal_Internal",
+                      "RequiredAttacks": ["Attack_A", "Attack_B"],
+                      "CurrentResults": null
+                    }
+                  ]
+                }
+                """
+            );
+
+            StorageMigrationRunner.EnsureCurrent(path);
+
+            var settings = JObject.Parse(File.ReadAllText(Path.Combine(path, "settings.json")));
+            var target = JObject.Parse(File.ReadAllText(
+                Path.Combine(savePath.FullName, "targets", "attack-target.json")
+            ));
+
+            Assert.AreEqual(7, settings["SolverSettings"]!["MaxSpecialCakes"]!.Value<int>());
+            CollectionAssert.AreEqual(
+                new[] { "Attack_A", "Attack_B" },
+                target["RequiredAttackInternalNames"]!.Values<string>().ToArray()
+            );
+        });
+    }
+
+    [TestMethod]
     public void AtomicMigrationBackupPreservesTheOriginalAcrossRetries()
     {
         WithTemporaryDirectory(path =>
@@ -403,12 +494,13 @@ namespace PalCalc.UI.Tests
                 InstanceId = instanceId,
             },
             [swift],
-            ivs);
+            ivs,
+            AttackProfile.Inactive);
 
         var male = Owned(PalGender.MALE, "male");
         var female = Owned(PalGender.FEMALE, "female");
-        var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics);
-        var bred = new BredPalReference(GameSettings.Defaults, pal, male, wild, [swift], 1, ivs, 1);
+        var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics, AttackProfile.Inactive);
+        var bred = new BredPalReference(GameSettings.Defaults, pal, male, wild, [swift], 1, ivs, 1, AttackProfile.Inactive, null, null, PalGender.WILDCARD);
         var composite = new CompositeOwnedPalReference(male, female);
         var surgery = new SurgeryTablePalReference(wild, [new AddPassiveSurgeryOperation(swift)]);
         var settings = new SerializableSolverSettings();
@@ -449,7 +541,8 @@ namespace PalCalc.UI.Tests
                 EquippedActiveSkills = [],
             },
             [],
-            new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random));
+            new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random),
+            AttackProfile.Inactive);
 
         var dto = JsonConvert.DeserializeObject<PalReferenceDto>(
             JsonConvert.SerializeObject(ResultJsonSerializer.ToDto(original)));
@@ -469,7 +562,7 @@ namespace PalCalc.UI.Tests
     {
         var db = PalDB.LoadEmbedded();
         var pal = "Beakon".ToPal(db);
-        var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics);
+        var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics, AttackProfile.Inactive);
         var dto = new BreedingResultListDto
         {
             GameSettings = ResultJsonSerializer.ToDto(GameSettings.Defaults),

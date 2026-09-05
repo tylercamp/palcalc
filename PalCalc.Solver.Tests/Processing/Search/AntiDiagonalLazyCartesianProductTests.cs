@@ -57,5 +57,32 @@ namespace PalCalc.Solver.Tests.Processing.Search
             for (int i = 0; i < expected.Count; i++)
                 CollectionAssert.AreEqual(expected[i], actual[i]);
         }
+
+        [TestMethod]
+        public void Unordered_EmitsEachPairOnceIncludingSelfPairs()
+        {
+            for (int size = 0; size < 10; size++)
+            {
+                var items = Enumerable.Range(0, size).ToList();
+                var expected = items
+                    .SelectMany((left, leftIndex) =>
+                        items.Skip(leftIndex).Select(right => (left, right)))
+                    .ToList();
+                var product = AntiDiagonalLazyCartesianProduct<int>.Unordered(items);
+
+                Assert.AreEqual(expected.Count, product.Count);
+                for (int chunkSize = 1; chunkSize < 20; chunkSize++)
+                {
+                    var chunks = product.Chunks(chunkSize)
+                        .Select(chunk => chunk.ToList())
+                        .ToList();
+                    var actual = chunks.SelectMany(chunk => chunk).ToList();
+
+                    CollectionAssert.AreEquivalent(expected, actual);
+                    Assert.AreEqual(expected.Count, actual.Count);
+                    Assert.IsTrue(chunks.All(chunk => chunk.Count <= chunkSize));
+                }
+            }
+        }
     }
 }

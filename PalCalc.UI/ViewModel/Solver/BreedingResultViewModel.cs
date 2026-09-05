@@ -46,7 +46,8 @@ namespace PalCalc.UI.ViewModel.Solver
                     maxThreads: 0,
                     maxSurgeryCost: 0,
                     allowedSurgeryPassives: [],
-                    useGenderReversers: false
+                    useGenderReversers: false,
+                    maxSpecialCakes: 0
             );
             var solver = new BreedingSolver();
 
@@ -77,7 +78,7 @@ namespace PalCalc.UI.ViewModel.Solver
         }
 
         private CachedSaveGame source;
-        public BreedingResultViewModel(CachedSaveGame source, GameSettings settings, IPalReference displayedResult)
+        public BreedingResultViewModel(CachedSaveGame source, GameSettings settings, IPalReference displayedResult, IEnumerable<ActiveSkill> requiredAttacks)
         {
             this.source = source;
 
@@ -89,9 +90,15 @@ namespace PalCalc.UI.ViewModel.Solver
             }
             else
             {
+                var normalizedRequiredAttacks = (requiredAttacks ?? []).Where(attack => attack != null).Distinct().ToArray();
                 DisplayedResult = displayedResult;
-                Graph = BreedingGraph.FromPalReference(source, settings, displayedResult);
+                Graph = BreedingGraph.FromPalReference(source, settings, displayedResult, normalizedRequiredAttacks);
                 EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
+                NumSpecialCakes = DisplayedResult.AllReferences()
+                    .OfType<BredPalReference>()
+                    .Sum(reference => reference.MaterializedAttackInheritance?.SpecialCakes ?? 0);
+
+                EffectiveAttacks = new AttackSkillCollectionViewModel(normalizedRequiredAttacks.Select(ActiveSkillViewModel.Make));
 
                 IVs = IVSetViewModel.FromIVs(displayedResult.IVs);
 
@@ -193,6 +200,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public IPalReference DisplayedResult { get; }
 
         public PassiveSkillCollectionViewModel EffectivePassives { get; }
+        public AttackSkillCollectionViewModel EffectiveAttacks { get; }
 
         public TimeSpan TimeEstimate => DisplayedResult?.BreedingEffort ?? TimeSpan.Zero;
         public string TimeEstimateLabel => TimeEstimate.TimeSpanSecondsStr();
@@ -202,6 +210,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public int NumWildPals => DisplayedResult.NumTotalWildPals;
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;
         public int NumEggs => DisplayedResult.NumTotalEggs;
+        public int NumSpecialCakes { get; }
 
         public IVSetViewModel IVs { get; }
         // (needed for BreedingResultListView which uses `util:GridViewSort.PropertyName`)

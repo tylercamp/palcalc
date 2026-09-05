@@ -62,6 +62,7 @@ namespace PalCalc.UI.Model
         public int MaxBredIrrelevantPassives { get; set; } = 1;
         public int MaxThreads { get; set; } = 0;
         public int MaxGoldCost { get; set; } = 0;
+        public int MaxSpecialCakes { get; set; } = 0;
         public bool UseGenderReversers { get; set; } = false;
 
         public List<string> BannedBredPalInternalNames { get; set; } = [];

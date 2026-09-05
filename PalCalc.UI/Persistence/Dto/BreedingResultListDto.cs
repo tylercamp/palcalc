@@ -38,6 +38,7 @@ namespace PalCalc.UI.Persistence.Dto
         public int MaxBredIrrelevantPassives { get; init; }
         public int MaxThreads { get; init; }
         public int MaxGoldCost { get; init; }
+        public int MaxSpecialCakes { get; init; }
         public bool UseGenderReversers { get; init; }
         public List<string> BannedBredPalInternalNames { get; init; }
         public List<string> BannedWildPalInternalNames { get; init; }

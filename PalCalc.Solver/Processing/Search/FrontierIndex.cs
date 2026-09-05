@@ -1,4 +1,6 @@
+using System.Numerics;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
 
 namespace PalCalc.Solver.Processing.Search;
 
@@ -21,8 +23,21 @@ internal sealed class FrontierIndex(IEffectivePropertiesKeyProvider keyProvider)
             content.Add(key, group);
         }
 
-        if (!group.Contains(reference))
+        if (group.Contains(reference))
+            return;
+
+        // Assessment stops at the first incumbent which proves a candidate
+        // inferior. Keep only the most likely dominator first; sorting the rest
+        // would add insertion work without improving that first comparison.
+        if (group.Count != 0 && CompareIncumbentPriority(reference, group[0]) < 0)
+        {
+            group.Add(group[0]);
+            group[0] = reference;
+        }
+        else
+        {
             group.Add(reference);
+        }
     }
 
     public void AddRange(IEnumerable<IPalReference> references)
@@ -42,4 +57,53 @@ internal sealed class FrontierIndex(IEffectivePropertiesKeyProvider keyProvider)
 
     public IReadOnlyList<IPalReference> this[EffectivePropertiesKey key] =>
         content.GetValueOrDefault(key);
+
+    private static int CompareIncumbentPriority(
+        IPalReference left,
+        IPalReference right
+    )
+    {
+        var comparison = BitOperations.PopCount(right.AttackProfile.EntryTargetMasks)
+            .CompareTo(BitOperations.PopCount(left.AttackProfile.EntryTargetMasks));
+        if (comparison != 0) return comparison;
+
+        comparison = MinimumSpecialCakes(left.AttackProfile).CompareTo(
+            MinimumSpecialCakes(right.AttackProfile)
+        );
+        if (comparison != 0) return comparison;
+
+        comparison = left.BreedingEffort.CompareTo(right.BreedingEffort);
+        if (comparison != 0) return comparison;
+
+        comparison = left.TotalCost.CompareTo(right.TotalCost);
+        if (comparison != 0) return comparison;
+
+        comparison = TotalMaxIV(right).CompareTo(TotalMaxIV(left));
+        if (comparison != 0) return comparison;
+
+        return TotalMinIV(right).CompareTo(TotalMinIV(left));
+    }
+
+    private static int MinimumSpecialCakes(AttackProfile profile)
+    {
+        var minimum = int.MaxValue;
+        foreach (ref readonly var entry in profile.EntriesSpan)
+            minimum = Math.Min(minimum, entry.TotalSpecialCakes);
+        return minimum;
+    }
+
+    private static int TotalMaxIV(IPalReference candidate) =>
+        ScoreOf(candidate.IVs.HP, maximum: true) +
+        ScoreOf(candidate.IVs.Attack, maximum: true) +
+        ScoreOf(candidate.IVs.Defense, maximum: true);
+
+    private static int TotalMinIV(IPalReference candidate) =>
+        ScoreOf(candidate.IVs.HP, maximum: false) +
+        ScoreOf(candidate.IVs.Attack, maximum: false) +
+        ScoreOf(candidate.IVs.Defense, maximum: false);
+
+    private static int ScoreOf(IV_Value iv, bool maximum) =>
+        iv == IV_Value.Random
+            ? 0
+            : maximum ? iv.Max : iv.Min;
 }

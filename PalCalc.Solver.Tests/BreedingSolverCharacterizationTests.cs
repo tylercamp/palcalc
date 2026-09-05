@@ -40,6 +40,7 @@ public class BreedingSolverCharacterizationTests
                 SolverTestScenario.Owned("Katress", katressGender),
                 SolverTestScenario.Owned("Wixen", wixenGender),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1
         );
@@ -65,6 +66,7 @@ public class BreedingSolverCharacterizationTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 20
         );
@@ -91,6 +93,7 @@ public class BreedingSolverCharacterizationTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1
         );
@@ -110,6 +113,7 @@ public class BreedingSolverCharacterizationTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 0,
             maxSolverIterations: 5
         );
@@ -127,6 +131,7 @@ public class BreedingSolverCharacterizationTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxEffort: TimeSpan.Zero
@@ -148,6 +153,7 @@ public class BreedingSolverCharacterizationTests
         var oneWildPalResults = SolverTestScenario.Solve(
             SolverTestScenario.Solver(
                 ownedPals: [],
+                maxSpecialCakes: 0,
                 maxBreedingSteps: 1,
                 maxSolverIterations: 1,
                 maxWildPals: 1,
@@ -158,6 +164,7 @@ public class BreedingSolverCharacterizationTests
         var twoWildPalResults = SolverTestScenario.Solve(
             SolverTestScenario.Solver(
                 ownedPals: [],
+                maxSpecialCakes: 0,
                 maxBreedingSteps: 1,
                 maxSolverIterations: 1,
                 maxWildPals: 2,
@@ -180,6 +187,7 @@ public class BreedingSolverCharacterizationTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             bannedBredPals: [wixenNoct]
@@ -204,6 +212,7 @@ public class BreedingSolverCharacterizationTests
                 ),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1
         );
@@ -230,6 +239,7 @@ public class BreedingSolverCharacterizationTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxSurgeryCost: surgeryPassive.SurgeryCost,
@@ -257,6 +267,7 @@ public class BreedingSolverCharacterizationTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxSurgeryCost: surgeryPassive.SurgeryCost - 1,
@@ -280,6 +291,7 @@ public class BreedingSolverCharacterizationTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1
         );
@@ -288,6 +300,7 @@ public class BreedingSolverCharacterizationTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1
         );
@@ -329,6 +342,7 @@ public class BreedingSolverCharacterizationTests
         var singleWorkerResults = SolverTestScenario.Solve(
             SolverTestScenario.Solver(
                 ownedPals,
+                maxSpecialCakes: 0,
                 maxBreedingSteps: 1,
                 maxSolverIterations: 1,
                 maxThreads: 1
@@ -341,6 +355,7 @@ public class BreedingSolverCharacterizationTests
         var multipleWorkerResults = SolverTestScenario.Solve(
             SolverTestScenario.Solver(
                 ownedPals,
+                maxSpecialCakes: 0,
                 maxBreedingSteps: 1,
                 maxSolverIterations: 1,
                 maxThreads: 2

@@ -1,5 +1,7 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.Utils;
 using System.Diagnostics;
@@ -13,10 +15,14 @@ namespace PalCalc.Solver.Processing;
 internal sealed class ResultPostProcessor(
     PalSpecifier target,
     BreedingSolverSettings settings,
-    SolverStateController controller
+    SolverStateController controller,
+    AttackTargetContext attackTargets
 )
 {
-    public void ApplySurgery(SearchFrontier frontier)
+    public void ApplySurgery(
+        SearchFrontier frontier,
+        IEnumerable<IPalReference> retainedSurgeryFinalists = null
+    )
     {
         var surgeryCompatiblePassives = target
             .DesiredPassives
@@ -32,8 +38,11 @@ internal sealed class ResultPostProcessor(
         // Surgery runs once after breeding. Applying it during every iteration
         // would model more combinations, but would materially expand the
         // frontier and increase search cost.
+        var retained = retainedSurgeryFinalists?.ToArray() ?? [];
         frontier.ExpandSingles(palReferences =>
             palReferences
+                .Concat(retained)
+                .Distinct()
                 .Where(reference => reference.Pal == target.Pal)
                 .SelectMany(reference =>
                     reference is CompositeOwnedPalReference composite
@@ -58,8 +67,9 @@ internal sealed class ResultPostProcessor(
         );
     }
 
-    public List<IPalReference> Finalize(ResultAccumulator terminalResults) =>
-        terminalResults
+    public List<IPalReference> Finalize(ResultAccumulator terminalResults)
+    {
+        var candidates = terminalResults
             .Results
             // Bred candidates are constrained in the expansion kernel. Apply
             // the same output constraint to owned candidates which already
@@ -71,8 +81,69 @@ internal sealed class ResultPostProcessor(
                 settings.MaxBredIrrelevantPassives
             )
             .SelectMany(EnforceRequiredGender)
-            .Distinct()
+            .Where(SatisfiesTerminalTarget)
             .ToList();
+
+        if (attackTargets?.IsActive != true)
+            return terminalResults.SelectFinalResults(candidates).ToList();
+
+        var finalists = candidates
+            .Select(reference => (Reference: reference, Entry: SelectRootEntry(reference)))
+            .Where(result => result.Entry is not null)
+            .ToList();
+        var materializer = new AttackResultMaterializer(attackTargets, settings);
+        var materialized = new List<IPalReference>(finalists.Count);
+        foreach (var finalist in finalists)
+        {
+            var result = materializer.Materialize(
+                finalist.Reference,
+                finalist.Entry!.Value
+            );
+            if (!SatisfiesMaterializedConstraints(result))
+                continue;
+
+            materialized.Add(result);
+        }
+
+        return terminalResults.SelectFinalResults(materialized).ToList();
+    }
+
+    private bool SatisfiesTerminalTarget(IPalReference reference) =>
+        attackTargets?.Satisfies(reference) ?? target.IsSatisfiedBy(reference);
+
+    private AttackProfileEntry? SelectRootEntry(IPalReference reference)
+    {
+        AttackProfileEntry? best = null;
+        foreach (ref readonly var entry in reference.AttackProfile.EntriesSpan)
+        {
+            if ((entry.LearnedTargetMask & attackTargets.FullTargetMask) !=
+                    attackTargets.FullTargetMask ||
+                settings.MaxSpecialCakes is int maxCakes &&
+                    entry.TotalSpecialCakes > maxCakes)
+                continue;
+
+            if (best is null || entry.TotalSpecialCakes < best.Value.TotalSpecialCakes)
+                best = entry;
+        }
+
+        return best;
+    }
+
+    private bool SatisfiesMaterializedConstraints(IPalReference reference)
+    {
+        // Search deliberately used estimated cake costs and structural effort.
+        // Materialization has now reconstructed the exact probability, effort,
+        // gender-adjusted attempts, and cake total for the final constraint check.
+        var entries = reference.AttackProfile.EntriesSpan;
+        if (entries.Length != 1 || !SatisfiesTerminalTarget(reference))
+            return false;
+
+        if (reference.BreedingEffort > settings.MaxEffort)
+            return false;
+
+        return settings.MaxSpecialCakes is not int maxCakes ||
+            entries[0].TotalSpecialCakes <= maxCakes;
+    }
 
     private IEnumerable<IPalReference> ExpandSurgeryCandidates(
         IPalReference reference,

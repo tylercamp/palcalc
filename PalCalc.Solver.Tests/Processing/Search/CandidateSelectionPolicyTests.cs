@@ -2,6 +2,7 @@ using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Processing;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.ResultPruning;
 
@@ -15,7 +16,8 @@ public class CandidateSelectionPolicyTests
     {
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
-            CancellationToken.None
+            CancellationToken.None,
+            attackTargets: null
         );
         var incumbent = new TestPalReference(
             "incumbent",
@@ -91,7 +93,8 @@ public class CandidateSelectionPolicyTests
     {
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
-            CancellationToken.None
+            CancellationToken.None,
+            attackTargets: null
         );
         var incumbent = new TestPalReference(
             "incumbent",
@@ -130,11 +133,244 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
+    public void ActiveProfiles_RetainUniqueEnvelopeContributorsBeyondResultLimit()
+    {
+        var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 3)]));
+        var candidates = new[]
+        {
+            Reference("first", "Katress", TimeSpan.FromMinutes(1), Profile(1, 2)),
+            Reference("second", "Katress", TimeSpan.FromMinutes(2), Profile(4)),
+            Reference("third", "Katress", TimeSpan.FromMinutes(3), Profile(8)),
+            Reference("fourth", "Katress", TimeSpan.FromMinutes(4), Profile(16)),
+        };
+
+        var retained = policy.SelectRetainedAlternatives(candidates);
+
+        CollectionAssert.AreEquivalent(candidates, retained.ToArray());
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_StillApplyExistingPruningToRedundantCandidates()
+    {
+        var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 3)]));
+        var candidates = Enumerable.Range(1, 4)
+            .Select(index => Reference(
+                $"candidate-{index}",
+                "Katress",
+                TimeSpan.FromMinutes(index),
+                Profile(1)
+            ))
+            .ToList();
+
+        var retained = policy.SelectRetainedAlternatives(candidates);
+
+        Assert.AreEqual(3, retained.Count);
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_SupersetCapabilityCoversRedundantExactMask()
+    {
+        var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 1)]));
+        var subset = Reference("subset", "Katress", TimeSpan.FromMinutes(1), Profile(1));
+        var superset = Reference("superset", "Katress", TimeSpan.FromMinutes(2), Profile(1, 2));
+
+        var retained = policy.SelectRetainedAlternatives([subset, superset]);
+
+        Assert.IsTrue(retained.Contains(superset));
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_RetainOverlappingIncomparableProfilesBeyondResultLimit()
+    {
+        var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 1)]));
+        var first = Reference("first", "Katress", TimeSpan.FromMinutes(1), Profile(1, 2));
+        var second = Reference("second", "Katress", TimeSpan.FromMinutes(2), Profile(2, 4));
+
+        var retained = policy.SelectRetainedAlternatives([first, second]);
+
+        CollectionAssert.AreEquivalent(new[] { first, second }, retained.ToArray());
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_DoNotSplitCapabilitiesByNoopState()
+    {
+        var policy = ActivePolicy(new(token => [new ResultLimitPruning(token, maxResults: 1)]));
+        var ordinary = Reference("ordinary", "Katress", TimeSpan.FromMinutes(1), Profile(1));
+        var noop = Reference(
+            "noop",
+            "Katress",
+            TimeSpan.FromMinutes(2),
+            Profile(1),
+            hasNoopAttack: true
+        );
+
+        var retained = policy.SelectRetainedAlternatives([ordinary, noop]);
+
+        Assert.AreEqual(1, retained.Count);
+        CollectionAssert.AreEqual(
+            ordinary.AttackProfile.Entries.ToArray(),
+            retained[0].AttackProfile.Entries.ToArray()
+        );
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_RetainEachExactChampion()
+    {
+        var policy = ActivePolicy(new(token => [new MinimumEffortPruning(token)]));
+        var baseline = Reference("baseline", "Katress", TimeSpan.Zero, Profile(0));
+        var first = Reference("first", "Katress", TimeSpan.FromMinutes(1), Profile(1));
+        var second = Reference("second", "Katress", TimeSpan.FromMinutes(2), Profile(2));
+        var bundled = Reference("bundled", "Katress", TimeSpan.FromMinutes(3), Profile(1, 2));
+
+        var retained = policy.SelectRetainedAlternatives([baseline, first, second, bundled]);
+
+        CollectionAssert.AreEquivalent(new[] { baseline, first, second }, retained.ToArray());
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_DoNotDeduplicateDistinctBredCapabilities()
+    {
+        var policy = ActivePolicy();
+        var parent1 = Reference("parent-1", "Katress", TimeSpan.Zero);
+        var parent2 = Reference("parent-2", "Wixen", TimeSpan.Zero);
+        var settings = new GameSettings();
+
+        BredPalReference BredWith(AttackProfile profile) => new(
+            settings,
+            "Wixen Noct".ToPal(SolverTestScenario.DB),
+            parent1,
+            parent2,
+            passives: [],
+            passivesProbability: 1,
+            ivs: new IV_Set(),
+            ivsProbability: 1,
+            attackProfile: profile,
+            materializedAttackInheritance: null,
+            avgRequiredBreedings: null,
+            gender: PalGender.WILDCARD
+        );
+
+        var first = BredWith(Profile(1));
+        var second = BredWith(Profile(2));
+
+        var retained = policy.SelectRetainedAlternatives([first, second]);
+
+        CollectionAssert.AreEquivalent(new[] { first, second }, retained.ToArray());
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_PreserveUniqueEarlyCandidates()
+    {
+        var policy = ActivePolicy();
+        var incumbent = Reference("incumbent", "Katress", TimeSpan.FromMinutes(5), Profile(1));
+        var slowerUnique = Reference("unique", "Katress", TimeSpan.FromMinutes(10), Profile(2));
+        var noop = Reference(
+            "neutral",
+            "Katress",
+            TimeSpan.FromMinutes(5),
+            Profile(1),
+            totalCost: 100,
+            hasNoopAttack: true
+        );
+        var cheaperNormal = Reference(
+            "non-neutral",
+            "Katress",
+            TimeSpan.FromMinutes(5),
+            Profile(1),
+            totalCost: 1
+        );
+
+        Assert.AreEqual(
+            EarlyCandidateSelection.KeepBoth,
+            policy.SelectEarlyCandidate(slowerUnique, incumbent)
+        );
+        Assert.AreEqual(
+            EarlyCandidateSelection.ReplaceIncumbent,
+            policy.SelectEarlyCandidate(cheaperNormal, noop)
+        );
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_RequireCompleteCoverageForFrontierImprovement()
+    {
+        var policy = ActivePolicy();
+        var incumbent = Reference(
+            "incumbent",
+            "Katress",
+            TimeSpan.FromMinutes(10),
+            Profile(1, 2)
+        );
+        var fasterPartial = Reference(
+            "partial",
+            "Katress",
+            TimeSpan.FromMinutes(5),
+            Profile(1)
+        );
+
+        Assert.AreEqual(
+            FrontierCandidateAssessment.PotentialImprovement,
+            policy.AssessAgainstFrontier(fasterPartial, incumbent)
+        );
+    }
+
+    [DataTestMethod]
+    [DataRow(1, 1, 5, 1, 2, 10, (int)EarlyCandidateSelection.ReplaceIncumbent, (int)EarlyCandidateSelection.RejectCandidate)]
+    [DataRow(1, 2, 5, 1, 2, 10, (int)EarlyCandidateSelection.ReplaceIncumbent, (int)EarlyCandidateSelection.RejectCandidate)]
+    [DataRow(1, 0, 5, 2, 0, 10, (int)EarlyCandidateSelection.KeepBoth, (int)EarlyCandidateSelection.KeepBoth)]
+    public void ActiveProfiles_CompareMaskCakeAndEffortCapabilities(
+        int firstMask,
+        int firstCakes,
+        int firstMinutes,
+        int secondMask,
+        int secondCakes,
+        int secondMinutes,
+        int expectedFirst,
+        int expectedSecond
+    )
+    {
+        var policy = ActivePolicy();
+        var first = Reference(
+            "first",
+            "Katress",
+            TimeSpan.FromMinutes(firstMinutes),
+            ProfileWithCakes((byte)firstMask, firstCakes)
+        );
+        var second = Reference(
+            "second",
+            "Katress",
+            TimeSpan.FromMinutes(secondMinutes),
+            ProfileWithCakes((byte)secondMask, secondCakes)
+        );
+
+        Assert.AreEqual(
+            (EarlyCandidateSelection)expectedFirst,
+            policy.SelectEarlyCandidate(first, second)
+        );
+        Assert.AreEqual(
+            (EarlyCandidateSelection)expectedSecond,
+            policy.SelectEarlyCandidate(second, first)
+        );
+    }
+
+    [TestMethod]
+    public void ActiveProfiles_AllowExistingEffortPruningForIdenticalCapability()
+    {
+        var policy = ActivePolicy(new(token => [new MinimumEffortPruning(token)]));
+        var faster = Reference("faster", "Katress", TimeSpan.FromMinutes(5), Profile(1));
+        var slower = Reference("slower", "Katress", TimeSpan.FromMinutes(10), Profile(1));
+
+        var retained = policy.SelectRetainedAlternatives([slower, faster]);
+
+        CollectionAssert.AreEqual(new[] { faster }, retained.ToArray());
+    }
+
+    [TestMethod]
     public void ExpansionOrdering_PreservesDiscoveryOrderForEqualPriorities()
     {
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
-            CancellationToken.None
+            CancellationToken.None,
+            attackTargets: null
         );
         var candidates = Enumerable
             .Range(0, 32)
@@ -204,7 +440,7 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
-    public void PolicyCanDeclineEarlyDominanceAndStillReachExpectedFrontier()
+    public void UnorderedPairSchedulingAvoidsRedundantEarlyDominanceComparisons()
     {
         var configuredSolver = SolverWithMultipleCandidateAlternatives();
         var earlyComparisons = 0;
@@ -233,7 +469,7 @@ public class CandidateSelectionPolicyTests
             )
         );
 
-        Assert.IsTrue(earlyComparisons > 0);
+        Assert.AreEqual(0, earlyComparisons);
         CollectionAssert.AreEqual(
             SolverTestScenario.Signatures(baseline).ToArray(),
             SolverTestScenario.Signatures(noEarlyDominanceResults).ToArray()
@@ -259,6 +495,7 @@ public class CandidateSelectionPolicyTests
                     passives: [runner]
                 ),
             ],
+            maxSpecialCakes: 0,
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxThreads: 2
@@ -312,7 +549,8 @@ public class CandidateSelectionPolicyTests
         var policy = policyFactory(
             new DefaultCandidateSelectionPolicy(
                 ResultPruningPolicy.Default,
-                controller.CancellationToken
+                controller.CancellationToken,
+                attackTargets: null
             )
         );
         var first = Reference(
@@ -338,7 +576,8 @@ public class CandidateSelectionPolicyTests
             initialContent: [first, second],
             maxThreads: 1,
             controller: controller,
-            selectionPolicy: policy
+            selectionPolicy: policy,
+            attackTargets: null
         );
 
         frontier.ExpandPairs(_ => [added]);
@@ -371,18 +610,49 @@ public class CandidateSelectionPolicyTests
     ) =>
         new(
             settings.ResultPruning,
-            CancellationToken.None
+            CancellationToken.None,
+            attackTargets: null
         );
+
+    private static DefaultCandidateSelectionPolicy ActivePolicy(
+        ResultPruningPolicy? pruning = null
+    ) =>
+        new(
+            pruning ?? ResultPruningPolicy.Default,
+            CancellationToken.None,
+            attackTargets: new AttackTargetContext(
+                new PalSpecifier
+                {
+                    RequiredAttacks =
+                    [.. SolverTestScenario.DB.ActiveSkills.Where(attack => attack.CanInherit).Take(6)],
+                },
+                SolverTestScenario.DB
+            )
+        );
+
+    private static AttackProfile Profile(params byte[] masks) => new(masks.Select(mask =>
+        new AttackProfileEntry(mask, 0)
+    ).ToArray());
+
+    private static AttackProfile ProfileWithCakes(byte mask, int cakes) =>
+        new(new AttackProfileEntry(mask, cakes));
 
     private static TestPalReference Reference(
         string name,
         string pal,
-        TimeSpan effort
+        TimeSpan effort,
+        AttackProfile attackProfile = default,
+        int totalCost = 0,
+        bool hasNoopAttack = false
     ) =>
         new(
             name,
             pal.ToPal(SolverTestScenario.DB),
-            effort
+            effort,
+            totalCost,
+            hasNoopAttack
+                ? new AttackProfile(true, attackProfile.Entries.ToArray())
+                : attackProfile
         );
 
     private sealed class DelegatingPolicy(
@@ -454,7 +724,8 @@ public class CandidateSelectionPolicyTests
         string name,
         Pal pal,
         TimeSpan breedingEffort,
-        int totalCost = 0
+        int totalCost = 0,
+        AttackProfile attackProfile = default
     ) : IPalReference
     {
         public string Name { get; } = name;
@@ -463,6 +734,7 @@ public class CandidateSelectionPolicyTests
         public int EffectivePassivesHash => 0;
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
+        public AttackProfile AttackProfile { get; } = attackProfile;
         public PalGender Gender => PalGender.MALE;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

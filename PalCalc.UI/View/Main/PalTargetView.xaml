@@ -21,6 +21,9 @@
         <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
             <TextBlock Text="{Binding Name.Value}" />
         </DataTemplate>
+        <DataTemplate x:Key="ActiveTemplate" DataType="{x:Type mvm:ActiveSkillViewModel}">
+            <TextBlock Text="{Binding Name.Value}" />
+        </DataTemplate>
     </StackPanel.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -49,6 +52,92 @@
             </ComboBox>
         </StackPanel>
     </Grid>
+    <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="{x:Null}" Margin="0,5,0,0">
+        <GroupBox.Resources>
+            <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
+                <Setter Property="ItemsSource" Value="{x:Static mvm:ActiveSkillViewModel.Inheritable}" />
+                <Setter Property="ItemTemplate" Value="{StaticResource ActiveTemplate}" />
+                <Setter Property="TextSearch.TextPath" Value="Name.Value" />
+            </Style>
+
+            <DataTemplate x:Key="ThinAttacksList" DataType="mvm:PalSpecifierAttackSkillCollectionViewModel">
+                <StackPanel vu:StackPanelExtensions.Spacing="5">
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack1, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack2, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack3, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack4, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack5, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack6, Mode=TwoWay}" />
+                </StackPanel>
+            </DataTemplate>
+
+            <DataTemplate x:Key="WideAttacksList" DataType="mvm:PalSpecifierAttackSkillCollectionViewModel">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack1, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack2, Mode=TwoWay}" Grid.Column="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack3, Mode=TwoWay}" Grid.Row="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack4, Mode=TwoWay}" Grid.Row="2" Grid.Column="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack5, Mode=TwoWay}" Grid.Row="4" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack6, Mode=TwoWay}" Grid.Row="4" Grid.Column="2" />
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="ExtraWideAttacksList" DataType="mvm:PalSpecifierAttackSkillCollectionViewModel">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack1, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack2, Mode=TwoWay}" Grid.Column="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack3, Mode=TwoWay}" Grid.Column="4" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack4, Mode=TwoWay}" Grid.Row="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack5, Mode=TwoWay}" Grid.Row="2" Grid.Column="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack6, Mode=TwoWay}" Grid.Row="2" Grid.Column="4" />
+                </Grid>
+            </DataTemplate>
+
+            <c:GreaterThanConverter x:Key="AttacksWideMode" MinValue="400" />
+            <c:GreaterThanConverter x:Key="AttacksExtraWideMode" MinValue="800" />
+        </GroupBox.Resources>
+        <ContentControl Content="{Binding CurrentPalSpecifier.RequiredAttacks}">
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Setter Property="ContentTemplate" Value="{StaticResource ThinAttacksList}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=GroupBox}, Path=ActualWidth, Converter={StaticResource AttacksWideMode}}" Value="True">
+                            <Setter Property="ContentTemplate" Value="{StaticResource WideAttacksList}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=GroupBox}, Path=ActualWidth, Converter={StaticResource AttacksExtraWideMode}}" Value="True">
+                            <Setter Property="ContentTemplate" Value="{StaticResource ExtraWideAttacksList}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+    </GroupBox>
     <GroupBox adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="{x:Null}" Margin="0,5,0,0">
         <GroupBox.Header>
             <Grid adonisExtensions:LayerExtension.Layer="3">

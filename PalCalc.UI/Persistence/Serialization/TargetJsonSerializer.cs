@@ -42,6 +42,9 @@ namespace PalCalc.UI.Persistence.Serialization
         {
             Id = value.Id,
             TargetPalInternalName = value.TargetPal?.ModelObject.InternalName,
+            RequiredAttackInternalNames = value.RequiredAttacks.AsModelEnumerable()
+                .Select(attack => attack.InternalName)
+                .ToList(),
             RequiredPassiveInternalNames =
             [
                 value.RequiredPassives.Passive1?.ModelObject?.InternalName,
@@ -79,9 +82,17 @@ namespace PalCalc.UI.Persistence.Serialization
 
         public static PalSpecifierViewModel FromDto(PalSpecifierDto value, TargetRehydrationContext context)
         {
+            var requiredAttacks = value.RequiredAttackInternalNames
+                .Select(name => name.InternalToActive(context.Database))
+                .Distinct()
+                .ToList();
+            if (requiredAttacks.Count > PalSpecifier.MaxRequiredAttacks)
+                throw new JsonSerializationException($"A target can require at most {PalSpecifier.MaxRequiredAttacks} attacks.");
+
             var model = new PalSpecifier
             {
                 Pal = value.TargetPalInternalName.InternalToPal(context.Database),
+                RequiredAttacks = requiredAttacks,
                 RequiredPassives = value.RequiredPassiveInternalNames
                     .Select(name => name?.InternalToStandardPassive(context.Database))
                     .ToList(),

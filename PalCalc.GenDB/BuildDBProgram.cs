@@ -323,24 +323,42 @@ namespace PalCalc.GenDB
             }).SkipNull().ToList();
         }
 
+        private static string ActiveSkillInternalName(
+            string wazaId,
+            IReadOnlySet<string> rawWazaIds
+        )
+        {
+            var attackId = wazaId.Replace("EPalWazaID::", "");
+            if (
+                ManualFixes.ActiveSkillInternalNameOverrides.TryGetValue(attackId, out var fixedId) &&
+                !rawWazaIds.Contains("EPalWazaID::" + fixedId)
+            )
+                return fixedId;
+
+            return attackId;
+        }
+
         private static List<ActiveSkill> BuildActiveSkills(List<UActiveSkill> rawActiveSkills, List<PalElement> elements, List<UItem> allItems, Dictionary<string, Dictionary<string, string>> attackNames)
         {
+            var rawWazaIds = rawActiveSkills
+                .Select(attack => attack.WazaType)
+                .ToHashSet();
+
             return rawActiveSkills.Where(s => !s.DisabledData).Select(rawAttack =>
             {
-                var attackId = rawAttack.WazaType.Replace("EPalWazaID::", "");
+                var originalAttackId = rawAttack.WazaType.Replace("EPalWazaID::", "");
+                var attackId = ActiveSkillInternalName(rawAttack.WazaType, rawWazaIds);
 
-                if (ManualFixes.ActiveSkillInternalNameOverrides.ContainsKey(attackId))
+                if (attackId != originalAttackId)
                 {
-                    var fixedId = ManualFixes.ActiveSkillInternalNameOverrides[attackId];
-                    if (rawActiveSkills.Any(s => s.WazaType == "EPalWazaID::" +  fixedId))
-                    {
-                        logger.Warning("Attack ID {OldId} is manually reassigned to {NewId}, but that ID is already in use", attackId, fixedId);
-                    }
-                    else
-                    {
-                        logger.Information("Overriding attack ID {OldId} with {NewId}", attackId, fixedId);
-                        attackId = fixedId;
-                    }
+                    logger.Information("Overriding attack ID {OldId} with {NewId}", originalAttackId, attackId);
+                }
+                else if (
+                    ManualFixes.ActiveSkillInternalNameOverrides.TryGetValue(originalAttackId, out var fixedId) &&
+                    rawWazaIds.Contains("EPalWazaID::" + fixedId)
+                )
+                {
+                    logger.Warning("Attack ID {OldId} is manually reassigned to {NewId}, but that ID is already in use", originalAttackId, fixedId);
                 }
 
                 var localizedNames = attackNames.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetValueOrDefault(attackId));
@@ -363,6 +381,42 @@ namespace PalCalc.GenDB
                     LocalizedNames = localizedNames,
                 };
             }).SkipNull().ToList();
+        }
+
+        private static void AssignLevel1ActiveSkills(
+            List<Pal> pals,
+            List<ActiveSkill> attacks,
+            List<UActiveSkill> rawAttacks,
+            IEnumerable<UActiveSkillLevel> levels
+        )
+        {
+            var attacksByInternalName = attacks.ToDictionary(
+                attack => attack.InternalName,
+                StringComparer.Ordinal
+            );
+            var rawWazaIds = rawAttacks
+                .Select(attack => attack.WazaType)
+                .ToHashSet();
+            var level1ByPalId = levels
+                .Where(level => level.Level == 1)
+                .GroupBy(level => level.PalId, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(group => group.Key, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var pal in pals)
+            {
+                if (!level1ByPalId.TryGetValue(pal.InternalName, out var palLevels))
+                {
+                    pal.Level1AttackInternalIds = [];
+                    continue;
+                }
+
+                if (palLevels.Count() == 0)
+                {
+                    logger.Warning("Pal {Pal} has no level 1 active skills", pal.InternalName);
+                }
+
+                pal.Level1AttackInternalIds = palLevels.Select(pl => ActiveSkillInternalName(pl.WazaID, rawWazaIds)).ToList();
+            }
         }
 
         public static Dictionary<Pal, PartnerSkill> BuildPartnerSkills(List<RawPartnerSkill> rawPartnerSkills, List<Pal> pals)
@@ -762,14 +816,20 @@ namespace PalCalc.GenDB
 
             var elements = BuildElements(localizations.ToDictionary(l => l.LanguageCode, l => l.ReadElementNames(provider)));
 
-            var rawAttacks = ActiveSkillReader.ReadActiveSkills(provider);
+            var rawAttackData = ActiveSkillReader.ReadActiveSkills(provider);
             var rawItems = ItemReader.ReadItems(provider);
 
             var attacks = BuildActiveSkills(
-                rawAttacks,
+                rawAttackData.Skills,
                 elements,
                 rawItems,
                 localizations.ToDictionary(l => l.LanguageCode, l => l.ReadAttackNames(provider))
+            );
+            AssignLevel1ActiveSkills(
+                pals,
+                attacks,
+                rawAttackData.Skills,
+                rawAttackData.Levels
             );
 
             var uniqueBreedingCombos = UniqueBreedComboReader.ReadUniqueBreedCombos(provider);
@@ -778,7 +838,7 @@ namespace PalCalc.GenDB
                 uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
             );
 
-            var db = PalDB.MakeEmptyUnsafe("v27");
+            var db = PalDB.MakeEmptyUnsafe("v28");
 
             var dups = pals.GroupBy(p => p.Id).Where(g => g.Count() > 1).ToList();
             db.PalsById = pals.ToDictionary(p => p.Id);
@@ -842,7 +902,7 @@ namespace PalCalc.GenDB
                 var encoded = resized.Encode(SKEncodedImageFormat.Jpeg, 70);
 
                 using (var o = new FileStream("../PalCalc.UI/Resources/Map.jpeg", FileMode.Create))
-                        encoded.SaveTo(o);
+                    encoded.SaveTo(o);
             }
 
             // I can't find a reliable method for extracting the info tying the in-game map to game coordinates. Instead I gathered

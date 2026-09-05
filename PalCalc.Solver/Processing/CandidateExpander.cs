@@ -1,12 +1,15 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.Utils;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace PalCalc.Solver.Processing
 {
@@ -35,14 +38,17 @@ namespace PalCalc.Solver.Processing
         BreedingSolverSettings settings,
         ObjectPoolFactory poolFactory,
         BreedingMechanics mechanics,
-        PalBreedingDB breedingDB
+        PalBreedingDB breedingDB,
+        AttackTargetContext attackTargets
     )
     {
         private readonly PalDB db = settings.DB;
+        private readonly AttackProfileComposer attackProfileComposer = new(attackTargets, settings);
 
         private readonly LocalListPool<PassiveSkill> passiveListPool = poolFactory.GetListPool<PassiveSkill>();
         private readonly LocalListPool<(IPalReference, IPalReference)> palPairListPool = poolFactory.GetListPool<(IPalReference, IPalReference)>();
         private readonly LocalObjectPool<RandomPassiveSkill> randomPassivePool = poolFactory.GetObjectPool<RandomPassiveSkill>();
+        private readonly ThreadLocal<List<List<PassiveSkill>>> threadLocalPassivePermutations = new(() => []);
 
         static IV_Value MergeIVs(IV_Value a, IV_Value b)
         {
@@ -65,7 +71,7 @@ namespace PalCalc.Solver.Processing
         /// <param name="requiredPassives">The list of passives that will be contained in all permutations.</param>
         /// <param name="optionalPassives">The list of passives that will appear at least once across the permutations, if possible.</param>
         /// <returns></returns>
-        List<List<PassiveSkill>> PassiveSkillPermutations(List<PassiveSkill> requiredPassives, List<PassiveSkill> optionalPassives)
+        void PassiveSkillPermutations(List<List<PassiveSkill>> targetList, List<PassiveSkill> requiredPassives, List<PassiveSkill> optionalPassives)
         {
 #if DEBUG && DEBUG_CHECKS
             if (
@@ -75,28 +81,25 @@ namespace PalCalc.Solver.Processing
                 requiredPassives.Intersect(optionalPassives).Any()
             ) Debugger.Break();
 #endif
-
             // can't add any optional passives, just return required passives
             if (optionalPassives.Count == 0 || requiredPassives.Count == GameConstants.MaxTotalPassives)
             {
-                return [passiveListPool.BorrowRawWith(requiredPassives)];
+                targetList.Add(passiveListPool.BorrowRawWith(requiredPassives));
+                return;
             }
 
-            var res = new List<List<PassiveSkill>>();
             var maxOptionalPassives = GameConstants.MaxTotalPassives - requiredPassives.Count;
             foreach (var optional in optionalPassives.Combinations(maxOptionalPassives, passiveListPool))
             {
                 optional.AddRange(requiredPassives);
-                res.Add(optional);
+                targetList.Add(optional);
             }
-
-            return res;
         }
 
-        TimeSpan CombinedEffort(IPalReference p1, IPalReference p2) =>
+        TimeSpan CombinedEffort(TimeSpan p1Effort, TimeSpan p2Effort) =>
             settings.GameSettings.MultipleBreedingFarms
-                ? p1.BreedingEffort > p2.BreedingEffort ? p1.BreedingEffort : p2.BreedingEffort
-                : p1.BreedingEffort + p2.BreedingEffort;
+                ? p1Effort > p2Effort ? p1Effort : p2Effort
+                : p1Effort + p2Effort;
 
         // we have two parents but don't necessarily have definite genders for them, figure out which parent should have which
         // gender (if they're wild/bred pals) for the least overall effort (different pals have different gender probabilities)
@@ -145,7 +148,7 @@ namespace PalCalc.Solver.Processing
             bool hasNoPreference = true;
             foreach (var (p1, p2) in parentPairOptions)
             {
-                var effort = CombinedEffort(p1, p2);
+                var effort = CombinedEffort(p1.BreedingEffort, p2.BreedingEffort);
                 if (optimalTime == TimeSpan.Zero) optimalTime = effort;
                 else if (optimalTime != effort)
                 {
@@ -161,10 +164,13 @@ namespace PalCalc.Solver.Processing
                 var p1wildcard = parent1.Gender == PalGender.WILDCARD;
                 var p2wildcard = parent2.Gender == PalGender.WILDCARD;
 
+                var p1Effort = parent1.BreedingEffort;
+                var p2Effort = parent2.BreedingEffort;
+
                 // should we set a specific gender on p1?
                 if (p1wildcard && (
                     !p2wildcard || // p2 is a specific gender
-                    parent1.BreedingEffort < parent2.BreedingEffort // p1 takes less effort than p2
+                    p1Effort < p2Effort // p1 takes less effort than p2
                 ))
                 {
                     return (parent1.WithGuaranteedGender(db, parent2.Gender.OppositeGender(), settings.UseGenderReversers), parent2);
@@ -173,7 +179,7 @@ namespace PalCalc.Solver.Processing
                 // should we set a specific gender on p2?
                 if (p2wildcard && (
                     !p1wildcard || // p1 is a specific gender
-                    parent2.BreedingEffort <= parent1.BreedingEffort // p2 takes less effort than p1 (need <= to resolve cases where self-effort is same for both wildcards)
+                    p2Effort <= p1Effort // p2 takes less effort than p1 (need <= to resolve cases where self-effort is same for both wildcards)
                 ))
                 {
                     return (parent1, parent2.WithGuaranteedGender(db, parent1.Gender.OppositeGender(), settings.UseGenderReversers));
@@ -190,7 +196,7 @@ namespace PalCalc.Solver.Processing
             {
                 foreach (var opt in parentPairOptions)
                 {
-                    if (optimalTime == CombinedEffort(opt.Item1, opt.Item2))
+                    if (optimalTime == CombinedEffort(opt.Item1.BreedingEffort, opt.Item2.BreedingEffort))
                     {
                         return opt;
                     }
@@ -209,6 +215,8 @@ namespace PalCalc.Solver.Processing
             CandidateExpansionContext context
         )
         {
+            var passivePerms = new List<List<PassiveSkill>>();
+
             foreach (var p in workBatch)
             {
                 if (controller.IsPaused) controller.PauseIfRequested();
@@ -361,7 +369,6 @@ namespace PalCalc.Solver.Processing
                         Attack: MergeIVs(parent1.IVs.Attack, parent2.IVs.Attack),
                         Defense: MergeIVs(parent1.IVs.Defense, parent2.IVs.Defense)
                     );
-
                     // Note: We need to use `ActualPassives` for inheritance calc, NOT `EffectivePassives`. If we have:
                     //
                     //    Parent 1: [A, B, D]
@@ -381,8 +388,8 @@ namespace PalCalc.Solver.Processing
                     // Desired passive chance goes up with a smaller list of combined + deduped passives,
                     // so we'd end up overestimating the effort of parents which have the same (but irrelevant)
                     // passives.
-
-                    var passivePerms = PassiveSkillPermutations(availableRequiredPassives, availableOptionalPassives);
+                    passivePerms.Clear();
+                    PassiveSkillPermutations(passivePerms, availableRequiredPassives, availableOptionalPassives);
                     foreach (var targetPassives in passivePerms)
                     {
                         // go through each potential final number of passives, accumulate the probability of any of these exact options
@@ -426,29 +433,8 @@ namespace PalCalc.Solver.Processing
                             for (int i = 0; i < numRandomPassivesNeeded; i++)
                                 newPassives.Add(randomPassivePool.BorrowRaw());
 
-                            var res = new BredPalReference(
-                                settings.GameSettings,
-                                childPalType,
-                                parent1,
-                                parent2,
-                                newPassives,
-                                probabilityForUpToNumPassives,
-                                finalIVs,
-                                ivsProbability
-                            );
-
-                            var added = false;
-                            var filterResult = context.PreFilter.TryAdd(res);
-                            if (filterResult.Accepted)
-                            {
-                                newPassivesRef.Retain();
-
-                                yield return res;
-                                added = true;
-                                context.PreFilter.Propagate(filterResult);
-                            }
-
-                            if (!added)
+                            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                            void ReturnRandomPassives()
                             {
                                 // Return borrowed RandomPassiveSkill instances to the pool
                                 for (int i = randomPassivesStart; i < newPassives.Count; i++)
@@ -456,6 +442,104 @@ namespace PalCalc.Solver.Processing
                                     if (newPassives[i] is RandomPassiveSkill rps)
                                         randomPassivePool.Return(rps);
                                 }
+                            }
+
+                            // Build the structural effort for this combination of passives and IVs.
+                            // Attack-inheritance probability is deliberately excluded; exact attack
+                            // details are reconstructed after the search.
+                            var structuralProbability = probabilityForUpToNumPassives * ivsProbability;
+                            if (structuralProbability <= 0)
+                            {
+                                ReturnRandomPassives();
+                                continue;
+                            }
+
+                            // TODO - Is this pre-calc actually valuable? Most of the time, `MaxEffort` is infinite
+                            var structuralBreedings = (int)Math.Ceiling(1.0f / structuralProbability);
+                            var parentBreedingEffort = BredPalReferenceEffort.CombineParentEffort(
+                                settings.GameSettings,
+                                parent1,
+                                parent2,
+                                parent1.BreedingEffort,
+                                parent2.BreedingEffort
+                            );
+                            var selfBreedingEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
+                                settings.GameSettings,
+                                childPalType,
+                                parent1.TimeFactor,
+                                parent2.TimeFactor,
+                                structuralBreedings
+                            );
+                            var structuralEffort = parentBreedingEffort + selfBreedingEffort;
+
+                            var retained = false;
+                            if (structuralEffort <= settings.MaxEffort)
+                            {
+                                BredPalReference res = null;
+                                var filterResult = CandidatePreFilterResult.Rejected;
+                                if (context.AttackTargets.IsActive)
+                                {
+                                    var preparedProfile = attackProfileComposer.Prepare(
+                                        childPalType,
+                                        parent1,
+                                        parent2,
+                                        probabilityForUpToNumPassives,
+                                        ivsProbability
+                                    );
+                                    if (preparedProfile.EntryTargetMasks != 0)
+                                    {
+                                        var draft = new CandidateDraft(
+                                            settings.GameSettings,
+                                            childPalType,
+                                            parent1,
+                                            parent2,
+                                            newPassives,
+                                            probabilityForUpToNumPassives,
+                                            finalIVs,
+                                            ivsProbability,
+                                            selfBreedingEffort,
+                                            structuralEffort,
+                                            preparedProfile
+                                        );
+                                        filterResult = context.PreFilter.TryAdd(ref draft);
+                                        if (filterResult.Accepted)
+                                            res = draft.Materialize();
+                                    }
+                                }
+                                else
+                                {
+                                    res = new BredPalReference(
+                                        settings.GameSettings,
+                                        childPalType,
+                                        parent1,
+                                        parent2,
+                                        newPassives,
+                                        probabilityForUpToNumPassives,
+                                        finalIVs,
+                                        ivsProbability,
+                                        attackProfile: AttackProfile.Inactive,
+                                        materializedAttackInheritance: null,
+                                        avgRequiredBreedings: null,
+                                        gender: PalGender.WILDCARD
+                                    );
+                                    filterResult = context.PreFilter.TryAdd(res);
+                                }
+
+                                if (filterResult.IsRetained)
+                                {
+                                    newPassivesRef.Retain();
+                                    retained = true;
+                                }
+
+                                if (res is not null && filterResult.Accepted)
+                                {
+                                    yield return res;
+                                }
+                            }
+
+                            if (!retained)
+                            {
+                                ReturnRandomPassives();
                             }
                         }
 

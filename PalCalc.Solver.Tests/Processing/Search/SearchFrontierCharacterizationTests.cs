@@ -1,6 +1,7 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.ResultPruning;
 
@@ -26,6 +27,25 @@ public class SearchFrontierCharacterizationTests
     }
 
     [TestMethod]
+    public void ResultLimitPruning_LimitsAlternativesToThree()
+    {
+        var pal = "Katress".ToPal(SolverTestScenario.DB);
+        var alternatives = Enumerable.Range(1, 4)
+            .Select(index => (IPalReference)new TestPalReference(
+                $"alternative-{index}",
+                pal,
+                TimeSpan.FromMinutes(index)
+            ))
+            .ToList();
+
+        var results = new ResultLimitPruning(CancellationToken.None, maxResults: 3)
+            .Apply(alternatives, new CachedResultData(alternatives))
+            .ToList();
+
+        Assert.AreEqual(3, results.Count);
+    }
+
+    [TestMethod]
     public void ExpandSingles_ReplacesInferiorCandidateAndReportsDelta()
     {
         var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
@@ -46,6 +66,161 @@ public class SearchFrontierCharacterizationTests
             delta.Removed.ToArray()
         );
         CollectionAssert.AreEquivalent(new[] { faster }, frontier.CurrentContent.ToList());
+    }
+
+    [TestMethod]
+    public void ExpandSingles_ReplacesInferiorCandidateWithSameProperties()
+    {
+        var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
+        var statePal = "Katress".ToPal(SolverTestScenario.DB);
+        var slower = new TestPalReference(
+            "slower",
+            statePal,
+            TimeSpan.FromMinutes(10)
+        );
+        var faster = new TestPalReference(
+            "faster",
+            statePal,
+            TimeSpan.FromMinutes(5)
+        );
+        var frontier = FrontierFor(targetPal, [slower]);
+
+        frontier.ExpandSingles(_ => [faster]);
+
+        CollectionAssert.AreEquivalent(new[] { faster }, frontier.CurrentContent.ToList());
+    }
+
+    [TestMethod]
+    public void AssessCandidate_RequiresCoverageOfEveryIncumbentForGuaranteedImprovement()
+    {
+        var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
+        var requiredAttack = SolverTestScenario.DB.ActiveSkills.First(attack => attack.CanInherit);
+        var policy = new DefaultCandidateSelectionPolicy(
+            MinimumEffortOnly,
+            CancellationToken.None,
+            attackTargets: new AttackTargetContext(
+                new PalSpecifier { RequiredAttacks = [requiredAttack] },
+                SolverTestScenario.DB
+            )
+        );
+        var first = new TestPalReference(
+            "first",
+            "Katress".ToPal(SolverTestScenario.DB),
+            TimeSpan.FromMinutes(10),
+            attackProfile: Profile(1)
+        );
+        var second = new TestPalReference(
+            "second",
+            "Katress".ToPal(SolverTestScenario.DB),
+            TimeSpan.FromMinutes(10),
+            attackProfile: Profile(2)
+        );
+        var frontier = FrontierFor(targetPal, [first, second], selectionPolicy: policy);
+        var complete = new TestPalReference(
+            "complete",
+            first.Pal,
+            TimeSpan.FromMinutes(5),
+            attackProfile: Profile(1, 2)
+        );
+        var partial = new TestPalReference(
+            "partial",
+            first.Pal,
+            TimeSpan.FromMinutes(5),
+            attackProfile: Profile(1)
+        );
+
+        Assert.AreEqual(
+            FrontierCandidateAssessment.GuaranteedImprovement,
+            frontier.AssessCandidate(complete, policy.KeyOf(complete))
+        );
+        Assert.AreEqual(
+            FrontierCandidateAssessment.PotentialImprovement,
+            frontier.AssessCandidate(partial, policy.KeyOf(partial))
+        );
+    }
+
+    [TestMethod]
+    public void AssessCandidate_RejectsWhenAnyIncumbentDefinitelyDominates()
+    {
+        var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
+        var requiredAttack = SolverTestScenario.DB.ActiveSkills.First(attack => attack.CanInherit);
+        var policy = new DefaultCandidateSelectionPolicy(
+            MinimumEffortOnly,
+            CancellationToken.None,
+            attackTargets: new AttackTargetContext(
+                new PalSpecifier { RequiredAttacks = [requiredAttack] },
+                SolverTestScenario.DB
+            )
+        );
+        var statePal = "Katress".ToPal(SolverTestScenario.DB);
+        var dominating = new TestPalReference(
+            "dominating",
+            statePal,
+            TimeSpan.FromMinutes(5),
+            attackProfile: Profile(1)
+        );
+        var incomparable = new TestPalReference(
+            "incomparable",
+            statePal,
+            TimeSpan.FromMinutes(5),
+            attackProfile: Profile(2)
+        );
+        var candidate = new TestPalReference(
+            "candidate",
+            statePal,
+            TimeSpan.FromMinutes(10),
+            attackProfile: Profile(1)
+        );
+        var frontier = FrontierFor(
+            targetPal,
+            [dominating, incomparable],
+            selectionPolicy: policy
+        );
+
+        Assert.AreEqual(
+            FrontierCandidateAssessment.Inferior,
+            frontier.AssessCandidate(candidate, policy.KeyOf(candidate))
+        );
+    }
+
+    [TestMethod]
+    public void ExpandSingles_PreservesAttackEnvelopeAcrossPrePruningAndMerge()
+    {
+        var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
+        var attackTargets = new AttackTargetContext(
+            new PalSpecifier
+            {
+                RequiredAttacks =
+                [.. SolverTestScenario.DB.ActiveSkills.Where(attack => attack.CanInherit).Take(6)],
+            },
+            SolverTestScenario.DB
+        );
+        var policy = new DefaultCandidateSelectionPolicy(
+            new(token => [new ResultLimitPruning(token, maxResults: 3)]),
+            CancellationToken.None,
+            attackTargets: attackTargets
+        );
+        var initial = new TestPalReference(
+            "initial",
+            "Katress".ToPal(SolverTestScenario.DB),
+            TimeSpan.FromMinutes(1),
+            attackProfile: Profile(1, 2)
+        );
+        var additions = new[]
+        {
+            new TestPalReference("third", initial.Pal, TimeSpan.FromMinutes(3), attackProfile: Profile(4)),
+            new TestPalReference("fourth", initial.Pal, TimeSpan.FromMinutes(4), attackProfile: Profile(8)),
+            new TestPalReference("fifth", initial.Pal, TimeSpan.FromMinutes(5), attackProfile: Profile(16)),
+            new TestPalReference("sixth", initial.Pal, TimeSpan.FromMinutes(6), attackProfile: Profile(32)),
+        };
+        var frontier = FrontierFor(targetPal, [initial], selectionPolicy: policy);
+
+        frontier.ExpandSingles(_ => additions);
+
+        CollectionAssert.AreEquivalent(
+            new[] { initial }.Concat(additions).ToArray(),
+            frontier.CurrentContent.ToArray()
+        );
     }
 
     [TestMethod]
@@ -186,30 +361,91 @@ public class SearchFrontierCharacterizationTests
     }
 
     [TestMethod]
-    public void MarkCandidatesOutdated_OnlyUpdatesMatchingEffectiveProperties()
+    public void PreFilter_DoesNotRetireFrontierCandidatesBeforeMerge()
     {
         var targetPal = "Anubis".ToPal(SolverTestScenario.DB);
+        var target = new PalSpecifier { Pal = targetPal };
         var statePal = "Katress".ToPal(SolverTestScenario.DB);
-        var matching = new TestPalReference(
-            "matching",
+        var slower = new TestPalReference(
+            "slower",
             statePal,
-            TimeSpan.FromMinutes(1),
-            PalGender.MALE
+            TimeSpan.FromMinutes(10)
         );
-        var otherGender = new TestPalReference(
-            "other-gender",
+        var faster = new TestPalReference(
+            "faster",
             statePal,
-            TimeSpan.FromMinutes(1),
-            PalGender.FEMALE
+            TimeSpan.FromMinutes(5)
         );
-        var frontier = FrontierFor(targetPal, [matching, otherGender]);
-
-        frontier.MarkCandidatesOutdated(
-            DefaultEffectivePropertiesKeyProvider.Instance.KeyOf(matching)
+        var configuredSolver = SolverTestScenario.Solver([]);
+        var attackTargets = new AttackTargetContext(target, SolverTestScenario.DB);
+        var policy = new DefaultCandidateSelectionPolicy(
+            MinimumEffortOnly,
+            CancellationToken.None,
+            attackTargets
+        );
+        var frontier = new SearchFrontier(
+            target,
+            [slower],
+            maxThreads: 1,
+            new SolverStateController(CancellationToken.None),
+            policy,
+            attackTargets
+        );
+        var filter = new CandidatePreFilter(
+            target,
+            configuredSolver.Settings.MaxEffort,
+            policy,
+            frontier,
+            configuredSolver.Settings.DB.PalsById.Keys,
+            attackTargets,
+            configuredSolver.Settings
         );
 
-        Assert.IsTrue(matching.IsOutdated);
-        Assert.IsFalse(otherGender.IsOutdated);
+        var result = filter.TryAdd(faster);
+
+        Assert.IsTrue(result.Accepted);
+        Assert.IsFalse(slower.IsOutdated);
+    }
+
+    [TestMethod]
+    public void ExpandSingles_ObservesAttackEnabledSurgeryTerminal()
+    {
+        var attack = SolverTestScenario.DB.ActiveSkills.First(skill => skill.CanInherit);
+        var passive = "Swift".ToStandardPassive(SolverTestScenario.DB);
+        var target = new PalSpecifier
+        {
+            Pal = "Katress".ToPal(SolverTestScenario.DB),
+            RequiredPassives = [passive],
+            RequiredAttacks = [attack],
+        };
+        var attackTargets = new AttackTargetContext(target, SolverTestScenario.DB);
+        var policy = new DefaultCandidateSelectionPolicy(
+            MinimumEffortOnly,
+            CancellationToken.None,
+            attackTargets
+        );
+        var input = new TestPalReference(
+            "input",
+            target.Pal,
+            TimeSpan.Zero,
+            attackProfile: Profile(attackTargets.FullTargetMask)
+        );
+        var surgery = new SurgeryTablePalReference(
+            input,
+            [new AddPassiveSurgeryOperation(passive)]
+        );
+        var frontier = new SearchFrontier(
+            target,
+            [],
+            maxThreads: 1,
+            new SolverStateController(CancellationToken.None),
+            policy,
+            attackTargets
+        );
+
+        frontier.ExpandSingles(_ => [surgery]);
+
+        CollectionAssert.Contains(frontier.TerminalResults.Results.ToList(), surgery);
     }
 
     private static string NormalizedPairName((IPalReference, IPalReference) pair)
@@ -227,12 +463,14 @@ public class SearchFrontierCharacterizationTests
             new OwnedPalReference(
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 effectivePassives: [],
-                effectiveIVs: new IV_Set()
+                effectiveIVs: new IV_Set(),
+                attackProfile: AttackProfile.Inactive
             ),
             new OwnedPalReference(
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
                 effectivePassives: [],
-                effectiveIVs: new IV_Set()
+                effectiveIVs: new IV_Set(),
+                attackProfile: AttackProfile.Inactive
             )
         );
 
@@ -249,13 +487,18 @@ public class SearchFrontierCharacterizationTests
             passives: [],
             passivesProbability: 1,
             ivs: new IV_Set(),
-            ivsProbability: 1
+            ivsProbability: 1,
+            attackProfile: AttackProfile.Inactive,
+            materializedAttackInheritance: null,
+            avgRequiredBreedings: null,
+            gender: PalGender.WILDCARD
         );
 
     private static SearchFrontier FrontierFor(
         Pal targetPal,
         IEnumerable<IPalReference> initialContent,
-        IEnumerable<PassiveSkill>? optionalPassives = null
+        IEnumerable<PassiveSkill>? optionalPassives = null,
+        ICandidateSelectionPolicy? selectionPolicy = null
     )
     {
         var controller = new SolverStateController(
@@ -271,12 +514,18 @@ public class SearchFrontierCharacterizationTests
             initialContent: initialContent,
             maxThreads: 1,
             controller: controller,
-            selectionPolicy: new DefaultCandidateSelectionPolicy(
+            selectionPolicy: selectionPolicy ?? new DefaultCandidateSelectionPolicy(
                 MinimumEffortOnly,
-                controller.CancellationToken
-            )
+                controller.CancellationToken,
+                attackTargets: null
+            ),
+            attackTargets: null
         );
     }
+
+    private static AttackProfile Profile(params byte[] masks) => new(masks.Select(mask =>
+        new AttackProfileEntry(mask, 0)
+    ).ToArray());
 
     /*
      * Deliberately minimal reference used to characterize frontier mechanics without
@@ -286,7 +535,8 @@ public class SearchFrontierCharacterizationTests
         string name,
         Pal pal,
         TimeSpan breedingEffort,
-        PalGender gender = PalGender.MALE
+        PalGender gender = PalGender.MALE,
+        AttackProfile attackProfile = default
     ) : IPalReference
     {
         public string Name { get; } = name;
@@ -295,6 +545,7 @@ public class SearchFrontierCharacterizationTests
         public int EffectivePassivesHash { get; } = Array.Empty<PassiveSkill>().SetHash();
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
+        public AttackProfile AttackProfile { get; } = attackProfile;
         public PalGender Gender { get; } = gender;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;
@@ -309,7 +560,7 @@ public class SearchFrontierCharacterizationTests
         public IPalReference WithGuaranteedGender(PalDB db, PalGender requestedGender, bool useReverser) =>
             requestedGender == Gender
                 ? this
-                : new TestPalReference(Name, Pal, BreedingEffort, requestedGender);
+                : new TestPalReference(Name, Pal, BreedingEffort, requestedGender, AttackProfile);
 
         public override string ToString() => Name;
     }

@@ -52,6 +52,7 @@ namespace PalCalc.UI.ViewModel.Solver
             MaxInputIrrelevantPassives = 2;
             MaxBredIrrelevantPassives = 1;
             MaxGoldCost = 0;
+            MaxSpecialCakes = 0;
 
             ChangeBredPals = new RelayCommand(() =>
             {
@@ -166,6 +167,13 @@ namespace PalCalc.UI.ViewModel.Solver
         {
             get => maxGoldCost;
             set => SetProperty(ref maxGoldCost, Math.Max(value, 0));
+        }
+
+        private int maxSpecialCakes;
+        public int MaxSpecialCakes
+        {
+            get => maxSpecialCakes;
+            set => SetProperty(ref maxSpecialCakes, Math.Max(value, 0));
         }
 
         private bool useGenderReversers;
@@ -289,7 +297,8 @@ namespace PalCalc.UI.ViewModel.Solver
 
                 maxSurgeryCost: MaxGoldCost,
                 allowedSurgeryPassives: PalDB.LoadEmbedded().SurgeryPassiveSkills.Except(BannedSurgeryPassives).ToList(),
-                useGenderReversers: UseGenderReversers
+                useGenderReversers: UseGenderReversers,
+                maxSpecialCakes: MaxSpecialCakes
             );
 
         public SerializableSolverSettings AsModel => new SerializableSolverSettings()
@@ -304,6 +313,7 @@ namespace PalCalc.UI.ViewModel.Solver
             BannedWildPalInternalNames = BannedWildPals.Select(p => p.InternalName).ToList(),
             BannedSurgeryPassiveInternalNames = BannedSurgeryPassives.Select(p => p.InternalName).ToList(),
             MaxGoldCost = MaxGoldCost,
+            MaxSpecialCakes = MaxSpecialCakes,
             UseGenderReversers = UseGenderReversers,
         };
 
@@ -316,6 +326,7 @@ namespace PalCalc.UI.ViewModel.Solver
             MaxBredIrrelevantPassives = model.MaxBredIrrelevantPassives;
             MaxThreads = model.MaxThreads;
             MaxGoldCost = model.MaxGoldCost;
+            MaxSpecialCakes = model.MaxSpecialCakes;
             UseGenderReversers = model.UseGenderReversers;
 
             BannedBredPals = model.BannedBredPals(PalDB.LoadEmbedded());

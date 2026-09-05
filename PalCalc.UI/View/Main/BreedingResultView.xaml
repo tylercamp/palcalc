@@ -30,6 +30,7 @@
             <c:ValueBoolConverter x:Key="VBC" />
             <c:ValueBoolConverter x:Key="VBC_Negated" Negate="True" />
             <c:ValueVisibilityConverter x:Key="VVC" />
+            <c:CollectionVisibilityConverter x:Key="CVC" />
             <graphSharpConverters:EdgeRouteToPathConverter x:Key="BreedingEdgeRouteToPathConverter" />
 
             <Style TargetType="Label">
@@ -120,6 +121,22 @@
                                 <vp:PalGenderView DataContext="{Binding Gender}" Height="14" Margin="2,0,0,0" />
                                 <!-- Placeholder to ensure we have enough space for the "Is Complete" checkbox -->
                                 <Border Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}" Width="16" Margin="0,0,8,0" Height="0" />
+                            </StackPanel>
+                            <StackPanel Margin="0,2,0,0" Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult.EffectiveAttacks.Attacks, Converter={StaticResource CVC}}">
+                                <TextBlock Text="{itl:LocalizedText LC_RESULT_EQUIPPED_ATTACKS}" FontSize="9" />
+                                <ItemsControl ItemsSource="{Binding EquippedAttacks.Attacks}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <vp:ActiveSkillView DataContext="{Binding}" Margin="0,1,0,0" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <!-- TODO - Use icon -->
+                                <vu:LocalizedEmbeddedText Code="LC_RESULT_USE_SPECIAL_CAKE" Visibility="{Binding UsesSpecialCake, Converter={StaticResource VVC}}">
+                                    <vu:EmbeddedParam Key="NumCakes">
+                                        <TextBlock Text="{Binding SpecialCakes}" FontSize="9" />
+                                    </vu:EmbeddedParam>
+                                </vu:LocalizedEmbeddedText>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">

@@ -119,11 +119,18 @@ internal readonly struct RelevantIVKey : IEquatable<RelevantIVKey>
 
 /// <summary>
 /// Groups candidates that are interchangeable in future breeding steps.
-/// Effort, cost, and breeding history are intentionally excluded because the
-/// selection policy compares those details within each group.
 /// </summary>
 internal readonly struct EffectivePropertiesKey : IEquatable<EffectivePropertiesKey>
 {
+    /*
+     * Note:
+     * 
+     * The following are intentionally excluded since they are compared directly
+     * as part of the candidate-selection policy:
+     *       
+     * Effort, cost, breeding history, attack profiles
+     */
+
     private readonly int hashCode;
 
     public EffectivePropertiesKey(
@@ -154,7 +161,6 @@ internal readonly struct EffectivePropertiesKey : IEquatable<EffectiveProperties
     public PalGender Gender { get; }
     public PassiveSetKey Passives { get; }
     public RelevantIVKey IVs { get; }
-
     public bool Equals(EffectivePropertiesKey other) =>
         PalDexNo == other.PalDexNo &&
         IsPalVariant == other.IsPalVariant &&
@@ -182,8 +188,6 @@ internal interface IEffectivePropertiesKeyProvider
 internal sealed class DefaultEffectivePropertiesKeyProvider : IEffectivePropertiesKeyProvider
 {
     public static DefaultEffectivePropertiesKeyProvider Instance { get; } = new();
-
-    private DefaultEffectivePropertiesKeyProvider() { }
 
     public EffectivePropertiesKey KeyOf(IPalReference reference) =>
         new(

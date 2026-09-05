@@ -21,23 +21,17 @@ namespace PalCalc.Solver.PalReference
             IPalReference parent1,
             IPalReference parent2,
             List<PassiveSkill> passives,
-            IV_Set ivs
+            IV_Set ivs,
+            AttackProfile attackProfile,
+            MaterializedAttackInheritance materializedAttackInheritance
         )
         {
             this.gameSettings = gameSettings;
 
             Pal = pal;
-            if (parent1.Pal.InternalIndex > parent2.Pal.InternalIndex)
-            {
-                Parent1 = parent1;
-                Parent2 = parent2;
-            }
-            else if (parent1.Pal.InternalIndex < parent2.Pal.InternalIndex)
-            {
-                Parent1 = parent2;
-                Parent2 = parent1;
-            }
-            else if (parent1.GetHashCode() < parent2.GetHashCode())
+            var parentOrderReversed = parent1.Pal.InternalIndex > parent2.Pal.InternalIndex ||
+                parent1.Pal.InternalIndex == parent2.Pal.InternalIndex && parent1.GetHashCode() < parent2.GetHashCode();
+            if (parentOrderReversed)
             {
                 Parent1 = parent1;
                 Parent2 = parent2;
@@ -49,15 +43,25 @@ namespace PalCalc.Solver.PalReference
             }
 
             IVs = ivs;
+            AttackProfile = attackProfile;
+            MaterializedAttackInheritance = parentOrderReversed || materializedAttackInheritance is null
+                ? materializedAttackInheritance
+                : materializedAttackInheritance with
+                {
+                    Parent1Loadout = materializedAttackInheritance.Parent2Loadout,
+                    Parent2Loadout = materializedAttackInheritance.Parent1Loadout,
+                };
 
             EffectivePassives = passives;
             EffectivePassivesHash = passives.SetHash(p => p.InternalName);
 
-            parentBreedingEffort = gameSettings.MultipleBreedingFarms && Parent1 is BredPalReference && Parent2 is BredPalReference
-                ? Parent1.BreedingEffort > Parent2.BreedingEffort
-                    ? Parent1.BreedingEffort
-                    : Parent2.BreedingEffort
-                : Parent1.BreedingEffort + Parent2.BreedingEffort;
+            parentBreedingEffort = BredPalReferenceEffort.CombineParentEffort(
+                gameSettings,
+                Parent1,
+                Parent2,
+                Parent1.BreedingEffort,
+                Parent2.BreedingEffort
+            );
 
             TimeFactor = EffectivePassives.ToTimeFactor();
         }
@@ -70,11 +74,19 @@ namespace PalCalc.Solver.PalReference
             List<PassiveSkill> passives,
             float passivesProbability,
             IV_Set ivs,
-            float ivsProbability
-        ) : this(gameSettings, pal, parent1, parent2, passives, ivs)
+            float ivsProbability,
+            AttackProfile attackProfile,
+            MaterializedAttackInheritance materializedAttackInheritance,
+            int? avgRequiredBreedings,
+            PalGender gender
+        ) : this(gameSettings, pal, parent1, parent2, passives, ivs, attackProfile, materializedAttackInheritance)
         {
-            Gender = PalGender.WILDCARD;
-            if (passivesProbability <= 0 || ivsProbability <= 0)
+            Gender = gender;
+            if (avgRequiredBreedings is int materializedBreedings)
+            {
+                AvgRequiredBreedings = materializedBreedings;
+            }
+            else if (passivesProbability <= 0 || ivsProbability <= 0)
             {
                 // don't think this is actually needed anymore, keeping just in case
 #if DEBUG
@@ -110,34 +122,9 @@ namespace PalCalc.Solver.PalReference
             set
             {
                 _avgRequiredBreedings = value;
-
-                var timePerBreed = gameSettings.AvgBreedingTime * Parent1.TimeFactor * Parent2.TimeFactor;
-                var totalBreedingTime = _avgRequiredBreedings * timePerBreed;
-
-                var incubationTime = Pal.EggSize.IncubationTime(gameSettings);
-                var totalIncubationTime = _avgRequiredBreedings * incubationTime;
-
-                if (gameSettings.MultipleIncubators)
-                {
-                    // time to get the desired pal is just time to produce the egg + time to incubate it
-                    SelfBreedingEffort = totalBreedingTime + incubationTime;
-                }
-                else
-                {
-                    // either breeding time will outweigh incubation time, or vice-versa. regardless of which part
-                    // is the bottleneck, we'll always need to do the other part at least once.
-                    //
-                    // (though, realistically, incubation will always take longer than breeding, unless incubation
-                    // time is turned off entirely)
-
-                    var allIncubationWithBreeding = totalIncubationTime + timePerBreed;
-                    var allBreedingWithIncubation = totalBreedingTime + incubationTime;
-
-                    if (allIncubationWithBreeding > allBreedingWithIncubation)
-                        SelfBreedingEffort = allIncubationWithBreeding;
-                    else
-                        SelfBreedingEffort = allBreedingWithIncubation;
-                }
+                SelfBreedingEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
+                    gameSettings, Pal, Parent1.TimeFactor, Parent2.TimeFactor, _avgRequiredBreedings
+                );
             }
         }
 
@@ -179,6 +166,10 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> ActualPassives => EffectivePassives;
 
+        public AttackProfile AttackProfile { get; }
+
+        public MaterializedAttackInheritance MaterializedAttackInheritance { get; }
+
         public bool IsOutdated { get; set; }
 
         private BredPalReference WithGuaranteedGenderImpl(PalDB db, PalGender gender, bool useReverser)
@@ -187,38 +178,13 @@ namespace PalCalc.Solver.PalReference
             {
                 return this;
             }
-            else if (gender == PalGender.OPPOSITE_WILDCARD)
-            {
-                // should only happen if the other parent has the same gender probabilities as this parent
-                if (db.BreedingMostLikelyGender[Pal] != PalGender.WILDCARD)
-                {
-                    // assume that the other parent has the more likely gender
-                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs)
-                    {
-                        AvgRequiredBreedings = useReverser ? AvgRequiredBreedings : (int)Math.Ceiling(AvgRequiredBreedings / db.BreedingGenderProbability[Pal][db.BreedingLeastLikelyGender[Pal]]),
-                        Gender = gender,
-                        PassivesProbability = PassivesProbability,
-                        IVsProbability = IVsProbability,
-                    };
-                }
-                else
-                {
-                    // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
-                    return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs)
-                    {
-                        AvgRequiredBreedings = useReverser ? AvgRequiredBreedings : AvgRequiredBreedings * 2,
-                        Gender = gender,
-                        PassivesProbability = PassivesProbability,
-                        IVsProbability = IVsProbability,
-                    };
-                }
-            }
             else
             {
-                var genderProbability = db.BreedingGenderProbability[Pal][gender];
-                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs)
+                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs,
+                    AttackProfile,
+                    MaterializedAttackInheritance)
                 {
-                    AvgRequiredBreedings = useReverser ? AvgRequiredBreedings : (int)Math.Ceiling(AvgRequiredBreedings / genderProbability),
+                    AvgRequiredBreedings = BredPalReferenceEffort.WithGuaranteedGender(AvgRequiredBreedings, Pal, db, gender, useReverser),
                     Gender = gender,
                     PassivesProbability = PassivesProbability,
                     IVsProbability = IVsProbability,
@@ -257,15 +223,24 @@ namespace PalCalc.Solver.PalReference
             return GetHashCode() == obj.GetHashCode();
         }
 
-        public override int GetHashCode() => HashCode.Combine(
-            nameof(BredPalReference),
-            Pal,
-            Parent1.GetHashCode() ^ Parent2.GetHashCode(),
-            EffectivePassivesHash,
-            BreedingEffort,
-            SelfBreedingEffort,
-            Gender,
-            IVs
-        );
+        private int hash = 0;
+        public override int GetHashCode()
+        {
+            if (hash == 0)
+            {
+                hash = HashCode.Combine(
+                    nameof(BredPalReference),
+                    Pal,
+                    Parent1.GetHashCode() ^ Parent2.GetHashCode(),
+                    EffectivePassivesHash,
+                    HashCode.Combine(BreedingEffort, SelfBreedingEffort),
+                    Gender,
+                    IVs,
+                    AttackProfile
+                );
+            }
+
+            return hash;
+        }
     }
 }

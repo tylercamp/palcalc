@@ -17,8 +17,8 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public PassiveSkillCollectionViewModel PassiveSkills { get; } = new PassiveSkillCollectionViewModel(inst.PassiveSkills.Select(PassiveSkillViewModel.Make));
 
-        public List<ActiveSkillViewModel> EquippedActiveSkills { get; } = inst.EquippedActiveSkills.Select(ActiveSkillViewModel.Make).ToList();
-        public List<ActiveSkillViewModel> ActiveSkills { get; } = inst.ActiveSkills.Select(ActiveSkillViewModel.Make).ToList();
+        public AttackSkillCollectionViewModel EquippedActiveSkills { get; } = new(inst.EquippedActiveSkills.Select(ActiveSkillViewModel.Make));
+        public AttackSkillCollectionViewModel ActiveSkills { get; } = new(inst.ActiveSkills.Select(ActiveSkillViewModel.Make));
 
         public PalGenderViewModel Gender { get; } = PalGenderViewModel.Make(inst.Gender);
     }

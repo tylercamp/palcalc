@@ -27,6 +27,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             if (underlyingSpec == null)
             {
                 TargetPal = null;
+                RequiredAttacks = new();
                 RequiredPassives = new();
                 OptionalPassives = new();
 
@@ -35,6 +36,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             else
             {
                 TargetPal = PalViewModel.Make(underlyingSpec.Pal);
+                RequiredAttacks = new(underlyingSpec.RequiredAttacks);
 
                 RequiredPassives = new(underlyingSpec.RequiredPassives);
                 OptionalPassives = new(underlyingSpec.OptionalPassives);
@@ -59,6 +61,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             if (isReadOnly)
             {
                 TargetPal = null;
+                RequiredAttacks = new();
                 RequiredPassives = new();
                 OptionalPassives = new();
             }
@@ -75,6 +78,7 @@ namespace PalCalc.UI.ViewModel.Mapped
             ? new PalSpecifier()
             {
                 Pal = TargetPal.ModelObject,
+                RequiredAttacks = RequiredAttacks.AsModelEnumerable().ToList(),
                 RequiredPassives = RequiredPassives.AsModelEnumerable().ToList(),
                 OptionalPassives = OptionalPassives.AsModelEnumerable().ToList(),
                 RequiredGender = RequiredGender.Value,
@@ -88,6 +92,8 @@ namespace PalCalc.UI.ViewModel.Mapped
         [NotifyPropertyChangedFor(nameof(IsValid))]
         [ObservableProperty]
         private PalViewModel targetPal;
+
+        public PalSpecifierAttackSkillCollectionViewModel RequiredAttacks { get; private set; }
 
         public PalSpecifierPassiveSkillCollectionViewModel RequiredPassives { get; private set; }
         public PalSpecifierPassiveSkillCollectionViewModel OptionalPassives { get; private set; }
@@ -189,23 +195,29 @@ namespace PalCalc.UI.ViewModel.Mapped
         [ObservableProperty]
         private SolverJobViewModel latestJob;
 
-        public PalSpecifierViewModel Copy() => new PalSpecifierViewModel(
-            IsReadOnly ? Guid.NewGuid().ToString() : Id,
-            new PalSpecifier()
+        public PalSpecifierViewModel Copy()
+        {
+            var copy = new PalSpecifierViewModel(
+                IsReadOnly ? Guid.NewGuid().ToString() : Id,
+                new PalSpecifier()
+                {
+                    Pal = TargetPal.ModelObject,
+                    RequiredPassives = RequiredPassives.AsModelEnumerable().ToList(),
+                    OptionalPassives = OptionalPassives.AsModelEnumerable().ToList(),
+                    RequiredGender = RequiredGender.Value,
+                    IV_HP = MinIv_HP,
+                    IV_Attack = MinIv_Attack,
+                    IV_Defense = MinIv_Defense,
+                }
+            )
             {
-                Pal = TargetPal.ModelObject,
-                RequiredPassives = RequiredPassives.AsModelEnumerable().ToList(),
-                OptionalPassives = OptionalPassives.AsModelEnumerable().ToList(),
-                RequiredGender = RequiredGender.Value,
-                IV_HP = MinIv_HP,
-                IV_Attack = MinIv_Attack,
-                IV_Defense = MinIv_Defense,
-            }
-        ) {
-            CurrentResults = CurrentResults,
-            DeleteCommand = DeleteCommand,
-            LatestJob = LatestJob,
-        };
+                CurrentResults = CurrentResults,
+                DeleteCommand = DeleteCommand,
+                LatestJob = LatestJob,
+            };
+            copy.RequiredAttacks.CopyFrom(RequiredAttacks);
+            return copy;
+        }
 
         public static readonly PalSpecifierViewModel New = new PalSpecifierViewModel(null, null, true);
 
@@ -219,6 +231,7 @@ namespace PalCalc.UI.ViewModel.Mapped
                     new PalSpecifier()
                     {
                         Pal = "Beakon".ToPal(db),
+                        RequiredAttacks = db.ActiveSkills.Take(3).ToList(),
                         RequiredPassives = ["Runner".ToStandardPassive(db), "Swift".ToStandardPassive(db)],
                         OptionalPassives = ["Aggressive".ToStandardPassive(db)],
                         IV_Attack = 90,
