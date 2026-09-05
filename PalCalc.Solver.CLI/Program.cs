@@ -92,14 +92,17 @@ internal class Program
         var targetInstance2 = new PalSpecifier
         {
             Pal = "Broncherry".ToPal(db),
-            RequiredPassives = [],
+            RequiredPassives = [
+                "Runner".ToStandardPassive(db),
+                "Nimble".ToStandardPassive(db),
+            ],
             RequiredAttacks = [
                 "Bog Blast".ToActive(db),
                 "Bubble Blast".ToActive(db),
                 "Aqua Gun".ToActive(db),
                 "Dark Ball".ToActive(db),
                 "Dragon Cannon".ToActive(db),
-                "Flare Storm".ToActive(db),
+                //"Flare Storm".ToActive(db),
             ],
             //IV_Attack = 90,
             //IV_Defense = 90,
