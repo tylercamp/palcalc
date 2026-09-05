@@ -131,14 +131,7 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <StackPanel Orientation="Horizontal" Visibility="{Binding LearnedAttacksDifferFromEquipped, Converter={StaticResource VVC}}">
-                                    <TextBlock Text="{itl:LocalizedText LC_RESULT_MASTERED_ATTACKS}" FontSize="9" Margin="0,1,4,0" />
-                                    <TextBlock Text="{Binding LearnedAttacks.Description.Value}" FontSize="9" Margin="0,1,0,0" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Visibility="{Binding InheritedAttacks.Attacks, Converter={StaticResource CVC}}">
-                                    <TextBlock Text="{itl:LocalizedText LC_RESULT_INHERITED_ATTACKS}" FontSize="9" Margin="0,1,4,0" />
-                                    <TextBlock Text="{Binding InheritedAttacks.Description.Value}" FontSize="9" Margin="0,1,0,0" />
-                                </StackPanel>
+                                <!-- TODO - Use icon -->
                                 <vu:LocalizedEmbeddedText Code="LC_RESULT_USE_SPECIAL_CAKE" Visibility="{Binding UsesSpecialCake, Converter={StaticResource VVC}}">
                                     <vu:EmbeddedParam Key="NumCakes">
                                         <TextBlock Text="{Binding SpecialCakes}" FontSize="9" />
