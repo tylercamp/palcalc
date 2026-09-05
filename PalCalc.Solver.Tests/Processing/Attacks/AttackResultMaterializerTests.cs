@@ -271,7 +271,7 @@ public class AttackResultMaterializerTests
     }
 
     [TestMethod]
-    public void Materialize_ThrowsWhenParentCannotProvideARealLoadout()
+    public void Materialize_UsesAnyAttackWhenParentHasNoRelevantLearnedAttack()
     {
         var emptyParent = SolverTestScenario.Owned("Katress", PalGender.MALE);
         var entry = Entry(1);
@@ -286,7 +286,61 @@ public class AttackResultMaterializerTests
             new AttackProfile(entry)
         );
 
-        Assert.ThrowsException<InvalidOperationException>(() => Materialize(root, entry));
+        var result = Materialize(root, entry);
+
+        var filler = result.MaterializedAttackInheritance.Parent1Loadout
+            .Concat(result.MaterializedAttackInheritance.Parent2Loadout)
+            .Single(attack => attack is RandomActiveSkill);
+        Assert.IsInstanceOfType<RandomActiveSkill>(filler);
+        Assert.AreEqual("Any Attack", filler.Name);
+    }
+
+    [TestMethod]
+    public void Materialize_UsesAnyAttackForBothParentsWhenChildAttackIsInnate()
+    {
+        var innateAttack = Child.Level1ActiveSkills(SolverTestScenario.DB).First();
+        var context = new AttackTargetContext(
+            new PalSpecifier { RequiredAttacks = [innateAttack] },
+            SolverTestScenario.DB
+        );
+        var emptyParent1 = SolverTestScenario.Owned("Katress", PalGender.MALE);
+        var emptyParent2 = SolverTestScenario.Owned("Wixen", PalGender.FEMALE);
+        var entry = Entry(1);
+        var root = Bred(
+            new OwnedPalReference(emptyParent1, [], new IV_Set(), new AttackProfile(Entry(0))),
+            new OwnedPalReference(emptyParent2, [], new IV_Set(), new AttackProfile(Entry(0))),
+            new AttackProfile(entry)
+        );
+
+        var result = (BredPalReference)new AttackResultMaterializer(context, Settings())
+            .Materialize(root, entry);
+
+        Assert.IsInstanceOfType<RandomActiveSkill>(
+            result.MaterializedAttackInheritance.Parent1Loadout.Single()
+        );
+        Assert.IsInstanceOfType<RandomActiveSkill>(
+            result.MaterializedAttackInheritance.Parent2Loadout.Single()
+        );
+    }
+
+    [TestMethod]
+    public void Materialize_PreservesNoopAttackWhenNormalInheritanceDependsOnIt()
+    {
+        var entry = Entry(1);
+        var result = Materialize(
+            Bred(Leaf(0, hasNoop: true), Leaf(1), new AttackProfile(entry)),
+            entry
+        );
+
+        var filler = new[]
+            {
+                result.MaterializedAttackInheritance.Parent1Loadout,
+                result.MaterializedAttackInheritance.Parent2Loadout,
+            }
+            .Single(loadout => !loadout.Contains(TargetAttack))
+            .Single();
+        Assert.IsNotInstanceOfType<RandomActiveSkill>(filler);
+        Assert.IsFalse(filler.CanInherit);
     }
 
     [TestMethod]

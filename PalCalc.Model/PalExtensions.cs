@@ -46,7 +46,7 @@ namespace PalCalc.Model
         public static ActiveSkill ToActive(this string s, PalDB db)
         {
             if (s == null) return null;
-            else if (s == ACTIVE_RAND_REF.Name) return new RandomActiveSkill();
+            else if (s == ACTIVE_RAND_REF.Name || s == "(Random)") return new RandomActiveSkill();
             else return db.ActiveSkills.FirstOrDefault(a => a.Name == s) ?? InternalToActive(s, db);
         }
 

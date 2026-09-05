@@ -349,7 +349,7 @@ public class ResultPostProcessorTests
     }
 
     [TestMethod]
-    public void Finalize_MaterializesOnlyTheMinimumEstimatedCakeTier()
+    public void Finalize_SelectsMinimumCakeTierAfterMaterialization()
     {
         var target = ActiveTarget(TargetPal, TargetAttack);
         var configuredSolver = SolverTestScenario.Solver(
@@ -369,13 +369,13 @@ public class ResultPostProcessorTests
             TargetPal,
             new AttackProfile(new AttackProfileEntry(1, 0))
         );
-        var discardedHigherTier = Bred(
-            Leaf(),
-            Leaf(),
+        var higherTier = Bred(
+            Leaf(TargetAttack, mask: 1, totalSpecialCakes: 1),
+            Leaf(TargetAttack, mask: 1),
             TargetPal,
             new AttackProfile(new AttackProfileEntry(1, 1))
         );
-        accumulator.Observe([validMinimum, discardedHigherTier]);
+        accumulator.Observe([validMinimum, higherTier]);
 
         var results = new ResultPostProcessor(
             target,
@@ -407,6 +407,47 @@ public class ResultPostProcessorTests
 
         Assert.AreEqual(1, results.Count);
         Assert.AreEqual(1, results[0].AttackProfile.Entries.Single().TotalSpecialCakes);
+    }
+
+    [TestMethod]
+    public void Finalize_PreservesSeparateExactEffortTiersWithAttacks()
+    {
+        var target = ActiveTarget(TargetPal, TargetAttack);
+        var configuredSolver = SolverTestScenario.Solver(
+            [],
+            maxSpecialCakes: 0
+        );
+        var controller = Controller();
+        var attackTargets = new AttackTargetContext(target, SolverTestScenario.DB);
+        var accumulator = new ResultAccumulator(
+            target,
+            Policy(controller, attackTargets),
+            attackTargets
+        );
+        var profile = new AttackProfile(new AttackProfileEntry(1, 0));
+        var faster = Bred(
+            Leaf(TargetAttack, mask: 1),
+            Leaf(TargetAttack, mask: 1),
+            TargetPal,
+            profile
+        );
+        var slower = Bred(
+            faster,
+            Leaf(TargetAttack, mask: 1),
+            TargetPal,
+            profile
+        );
+        accumulator.Observe([faster, slower]);
+
+        var results = new ResultPostProcessor(
+            target,
+            configuredSolver.Settings,
+            controller,
+            attackTargets
+        ).Finalize(accumulator);
+
+        Assert.AreEqual(2, results.Count);
+        Assert.AreEqual(2, results.Select(result => result.BreedingEffort).Distinct().Count());
     }
 
     [TestMethod]

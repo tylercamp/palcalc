@@ -52,7 +52,7 @@ namespace PalCalc.Model
 
     public class RandomActiveSkill : ActiveSkill
     {
-        public RandomActiveSkill() : base("(Random)", "__VIRT_RAND__", null)
+        public RandomActiveSkill() : base("Any Attack", "__VIRT_RAND__", null)
         {
             CanInherit = true;
         }

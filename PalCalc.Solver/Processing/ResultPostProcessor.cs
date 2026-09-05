@@ -85,27 +85,14 @@ internal sealed class ResultPostProcessor(
             .Select(reference => (Reference: reference, Entry: SelectRootEntry(reference)))
             .Where(result => result.Entry is not null)
             .ToList();
-        if (finalists.Count != 0)
-        {
-            var minimumEstimatedCakes = finalists.Min(
-                result => result.Entry!.Value.TotalSpecialCakes
-            );
-            finalists = finalists
-                .Where(result => result.Entry!.Value.TotalSpecialCakes == minimumEstimatedCakes)
-                .ToList();
-        }
-        var shortlisted = terminalResults
-            .SelectSearchFinalists(finalists.Select(result => result.Reference))
-            .ToList();
         var materializer = new AttackResultMaterializer(attackTargets, settings);
-        var materialized = new List<IPalReference>(shortlisted.Count);
-        foreach (var candidate in shortlisted)
+        var materialized = new List<IPalReference>(finalists.Count);
+        foreach (var finalist in finalists)
         {
-            var entry = SelectRootEntry(candidate);
-            if (entry is null)
-                continue;
-
-            var result = materializer.Materialize(candidate, entry.Value);
+            var result = materializer.Materialize(
+                finalist.Reference,
+                finalist.Entry!.Value
+            );
             if (!SatisfiesMaterializedConstraints(result))
                 continue;
 

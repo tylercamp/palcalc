@@ -30,6 +30,8 @@ internal readonly record struct AttackCompositionChoice(
 /// </summary>
 internal sealed class AttackResultMaterializer
 {
+    private static readonly ActiveSkill AnyAttack = new RandomActiveSkill();
+
     private readonly AttackTargetContext targets;
     private readonly BreedingSolverSettings settings;
     private readonly Dictionary<IPalReference, Dictionary<AttackProfileEntry, MaterializedResult>> materialized =
@@ -153,10 +155,19 @@ internal sealed class AttackResultMaterializer
             choice.ChildEntry.LearnedTargetMask,
             totalCakes
         );
+        var normalInheritance = choice.Mode == AttackCompositionMode.Normal;
+        var parent1RequiresNoop = normalInheritance &&
+            choice.Parent1TargetMask == 0 &&
+            choice.Parent2TargetMask != 0 &&
+            bred.Parent1.AttackProfile.HasNoopAttack;
+        var parent2RequiresNoop = normalInheritance &&
+            choice.Parent2TargetMask == 0 &&
+            choice.Parent1TargetMask != 0 &&
+            bred.Parent2.AttackProfile.HasNoopAttack;
         var inheritance = new MaterializedAttackInheritance(
             (AttackInheritanceMode)choice.Mode,
-            LoadoutFor(parent1.Reference, choice.Parent1TargetMask),
-            LoadoutFor(parent2.Reference, choice.Parent2TargetMask),
+            LoadoutFor(parent1.Reference, choice.Parent1TargetMask, parent1RequiresNoop),
+            LoadoutFor(parent2.Reference, choice.Parent2TargetMask, parent2RequiresNoop),
             inheritedAttacks,
             childLearnedAttacks,
             usesSpecialCake ? requiredBreedings : 0,
@@ -417,19 +428,23 @@ internal sealed class AttackResultMaterializer
         return attacks.ToArray();
     }
 
-    private IReadOnlyList<ActiveSkill> LoadoutFor(IPalReference parent, byte targetMask)
+    private IReadOnlyList<ActiveSkill> LoadoutFor(
+        IPalReference parent,
+        byte targetMask,
+        bool requiresNoop
+    )
     {
         var loadout = AttacksForMask(targetMask).ToList();
         if (loadout.Count == 0)
         {
-            var filler = LearnedAttacks(parent)
-                .OrderBy(attack => attack.CanInherit)
-                .ThenBy(attack => attack.InternalName, StringComparer.Ordinal)
-                .FirstOrDefault();
-            if (filler is null)
-                throw new InvalidOperationException(
-                    "The selected attack profile entry cannot be reconstructed because the parent has no learned attack."
-                );
+            var filler = requiresNoop
+                ? LearnedAttacks(parent)
+                    .Where(attack => !attack.CanInherit)
+                    .OrderBy(attack => attack.InternalName, StringComparer.Ordinal)
+                    .FirstOrDefault() ?? throw new InvalidOperationException(
+                        "The selected attack profile entry requires a non-inheritable parent attack that cannot be reconstructed."
+                    )
+                : AnyAttack;
             loadout.Add(filler);
         }
 

@@ -40,7 +40,7 @@ internal sealed class CandidatePreFilter
         PalId,
         ConcurrentDictionary<EffectivePropertiesKey, EarlyCandidateGroup>
     > earlyCandidatesByPalId;
-    private readonly ConcurrentDictionary<EffectivePropertiesKey, IPalReference> terminalCandidates = new();
+    private readonly ConcurrentDictionary<IPalReference, byte> terminalCandidates = new();
 
     public CandidatePreFilter(
         PalSpecifier target,
@@ -137,7 +137,7 @@ internal sealed class CandidatePreFilter
         return new(Accepted: true, IsRetained: true);
     }
 
-    public IReadOnlyList<IPalReference> TerminalCandidates => terminalCandidates.Values.ToArray();
+    public IReadOnlyList<IPalReference> TerminalCandidates => terminalCandidates.Keys.ToArray();
 
     public List<IPalReference> RetainedAttackCandidates()
     {
@@ -161,45 +161,7 @@ internal sealed class CandidatePreFilter
             );
         }
 
-        var key = selectionPolicy.KeyOf(candidate);
-        var retained = terminalCandidates.AddOrUpdate(
-            key,
-            candidate,
-            (_, incumbent) => CompareTerminal(candidate, incumbent) < 0
-                ? candidate
-                : incumbent
-        );
-        return ReferenceEquals(retained, candidate);
-    }
-
-    private int CompareTerminal(IPalReference left, IPalReference right)
-    {
-        var leftEntry = BestTerminalEntry(left);
-        var rightEntry = BestTerminalEntry(right);
-        var comparison = CompareAttackEntries(leftEntry, rightEntry);
-        if (comparison != 0) return comparison;
-        comparison = left.BreedingEffort.CompareTo(right.BreedingEffort);
-        if (comparison != 0) return comparison;
-        comparison = left.TotalCost.CompareTo(right.TotalCost);
-        if (comparison != 0) return comparison;
-        return left.GetHashCode().CompareTo(right.GetHashCode());
-    }
-
-    private AttackProfileEntry BestTerminalEntry(IPalReference candidate)
-    {
-        AttackProfileEntry best = default;
-        var found = false;
-        foreach (ref readonly var entry in candidate.AttackProfile.EntriesSpan)
-        {
-            if ((entry.LearnedTargetMask & attackTargets.FullTargetMask) != attackTargets.FullTargetMask)
-                continue;
-            if (!found || CompareAttackEntries(entry, best) < 0)
-            {
-                best = entry;
-                found = true;
-            }
-        }
-        return best;
+        return terminalCandidates.TryAdd(candidate, 0);
     }
 
     private sealed class EarlyCandidateGroup

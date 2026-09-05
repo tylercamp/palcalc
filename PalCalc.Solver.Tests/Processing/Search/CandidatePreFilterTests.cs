@@ -160,7 +160,10 @@ public class CandidatePreFilterTests
 
         Assert.IsFalse(result.Accepted);
         Assert.IsTrue(result.IsRetained);
-        Assert.AreEqual(5, filter.TerminalCandidates.Single().GetHashCode());
+        CollectionAssert.AreEquivalent(
+            new[] { 10, 5 },
+            filter.TerminalCandidates.Select(candidate => candidate.GetHashCode()).ToArray()
+        );
     }
 
     private static OwnedPalReference Candidate(int cakes) =>

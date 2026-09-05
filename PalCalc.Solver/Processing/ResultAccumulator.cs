@@ -18,37 +18,23 @@ internal sealed class ResultAccumulator(
 
     public IEnumerable<IPalReference> Results => discovered.Distinct();
 
-    /// <summary>
-    /// Applies the existing candidate-selection policy to coarse attack
-    /// finalists before any inheritance tree is materialized.
-    /// </summary>
-    public IEnumerable<IPalReference> SelectSearchFinalists(
-        IEnumerable<IPalReference> candidates
-    ) => selectionPolicy.SelectRetainedAlternatives(candidates.Distinct());
-
     public IEnumerable<IPalReference> SelectFinalResults(IEnumerable<IPalReference> candidates)
     {
         var distinct = candidates.Distinct().ToList();
-        if (attackTargets?.IsActive != true)
+        IEnumerable<IPalReference> preferredCakeTier = distinct;
+        if (attackTargets?.IsActive == true && distinct.Count != 0)
         {
-            return distinct
-                .GroupBy(selectionPolicy.BreedingEffortGroupOf)
-                .SelectMany(selectionPolicy.SelectRetainedAlternatives);
-        }
-
-        // Search applied only the estimated cake tier. Gender adjustment and
-        // recursively selected witnesses can change the concrete total, so
-        // restore the cake-first objective using the materialized values.
-        var minimumCakes = distinct.Count == 0
-            ? 0
-            : distinct.Min(reference =>
+            var minimumCakes = distinct.Min(reference =>
                 reference.AttackProfile.EntriesSpan[0].TotalSpecialCakes
             );
-        return selectionPolicy.SelectRetainedAlternatives(
-            distinct.Where(reference =>
+            preferredCakeTier = distinct.Where(reference =>
                 reference.AttackProfile.EntriesSpan[0].TotalSpecialCakes == minimumCakes
-            )
-        );
+            );
+        }
+
+        return preferredCakeTier
+            .GroupBy(selectionPolicy.BreedingEffortGroupOf)
+            .SelectMany(selectionPolicy.SelectRetainedAlternatives);
     }
 
     public void Observe(IEnumerable<IPalReference> candidates)
