@@ -5,6 +5,11 @@ using PalCalc.Solver.Utils;
 
 namespace PalCalc.Solver.Processing.Attacks;
 
+/// <summary>
+/// The inheritance mode of one reconstruction witness. The declaration order
+/// mirrors <see cref="AttackInheritanceMode"/>, and the materializer converts
+/// between the two via a numeric cast, so the two enums must stay in sync.
+/// </summary>
 internal enum AttackCompositionMode
 {
     Baseline,
@@ -12,7 +17,11 @@ internal enum AttackCompositionMode
     InheritAll,
 }
 
-/// <summary>A concrete inheritance outcome used to reconstruct one selected profile entry.</summary>
+/// <summary>
+/// One concrete inheritance witness for a bred pal: which profile entry each
+/// parent uses, the inheritance mode, the target bits each parent contributes,
+/// and the resulting child entry.
+/// </summary>
 internal readonly record struct AttackCompositionChoice(
     AttackProfileEntry Parent1Entry,
     AttackProfileEntry Parent2Entry,
@@ -23,13 +32,28 @@ internal readonly record struct AttackCompositionChoice(
 );
 
 /// <summary>
-/// Used by the `ResultPostProcessor` in a finalization step. Takes an unmaterialized
-/// search entry containing only an exact mask and estimated cake total, then
-/// recursively resolves a new `IPalReference` with exact inheritance instructions,
-/// probability, effort, and cake usage.
+/// A finalization step used by <see cref="ResultPostProcessor"/>: given a
+/// search-time <see cref="IPalReference"/> and one of its profile entries, it
+/// reconstructs a materialized <see cref="IPalReference"/> for it.
+///
+/// Search-time references carry only a lossy profile (per-mask availability
+/// and an estimated Special Cake cost). Materialized references additionally
+/// carry an exact <see cref="MaterializedAttackInheritance"/> (probabilities,
+/// effort, cake totals, parent loadouts). Reconstruction is recursive: a bred
+/// pal is realized from a witness whose child outcome matches the selected
+/// entry exactly, with each parent recursively materialized for the entry that
+/// witness depends on; a leaf or surgery pal must already contain the selected
+/// entry.
+///
+/// Every reference in the reconstructed tree carries a single-entry
+/// <see cref="AttackProfile"/>, since a materialized reference has exactly one
+/// resolved attack outcome; <see cref="ResultPostProcessor"/> relies on this
+/// for its final constraint check.
 /// </summary>
 internal sealed class AttackResultMaterializer
 {
+    // Wildcard filler for a loadout slot that contributes no target attack; the
+    // user-facing "Any Attack".
     private static readonly ActiveSkill AnyAttack = new RandomActiveSkill();
 
     private readonly AttackTargetContext targets;
@@ -44,18 +68,32 @@ internal sealed class AttackResultMaterializer
     }
 
     /// <summary>
-    /// <para>Reconstructs the given `IPalReference` to satisfy the given `AttackProfileEntry`.</para>
     /// <para>
-    ///     During the solver process, an `IPalReference` only tracks its <em>potential</em> attack outcomes. This
-    ///     method does the work of traversing the tree, choosing the specific attack-breeding paths as necessary,
-    ///     all while respecting Palworld's general limits for attack inheritance. Exact parent effort and cake
-    ///     totals come from the recursively materialized results, not from search-entry metadata.
+    ///     Reconstructs a materialized <see cref="IPalReference"/> for the given
+    ///     search-time reference and one of its profile entries.
+    /// </para>
+    /// <para>
+    ///     During the solver process, an <see cref="IPalReference"/> only tracks
+    ///     its <em>potential</em> attack outcomes. This method does the work of
+    ///     traversing the tree, choosing the specific attack-breeding paths as
+    ///     necessary, all while respecting Palworld's general limits for attack
+    ///     inheritance. Exact parent effort and cake totals come from the
+    ///     recursively materialized results, not from the search-time profile,
+    ///     which only estimates them.
     /// </para>
     /// </summary>
-    /// <remarks>
-    ///     `reference.AttackProfile` is a cumulative record of possible attack inheritance outcomes. The `selectedEntry`
-    ///     MUST be covered by one of the profiles entries.
-    /// </remarks>
+    /// <param name="reference">The search-time reference to reconstruct.</param>
+    /// <param name="selectedEntry">
+    ///     The profile entry to materialize. It must be one of
+    ///     <c>reference.AttackProfile.Entries</c>, matching exactly on both
+    ///     <c>LearnedTargetMask</c> and <c>TotalSpecialCakes</c>.
+    /// </param>
+    /// <returns>
+    ///     A materialized reference for the same pal. Bred nodes additionally
+    ///     carry a <see cref="MaterializedAttackInheritance"/>, and every node
+    ///     in the reconstructed tree has a single-entry
+    ///     <see cref="AttackProfile"/>.
+    /// </returns>
     public IPalReference Materialize(IPalReference reference, AttackProfileEntry selectedEntry) =>
         MaterializeResult(reference, selectedEntry).Reference;
 
@@ -85,6 +123,11 @@ internal sealed class AttackResultMaterializer
         return result;
     }
 
+    /// <summary>
+    /// Surgery only rewrites passive skills;
+    /// <c>SurgeryTablePalReference.AttackProfile</c> delegates to its input, so
+    /// the same selected entry passes through unchanged.
+    /// </summary>
     private MaterializedResult MaterializeSurgery(
         SurgeryTablePalReference surgery,
         AttackProfileEntry selectedEntry
@@ -97,6 +140,13 @@ internal sealed class AttackResultMaterializer
         );
     }
 
+    /// <summary>
+    /// Finds the witness matching <c>selectedEntry</c> at the lowest actual
+    /// cost. Several witnesses can realize the same (mask, cake) pair with
+    /// different concrete outcomes, so every match is materialized and
+    /// <see cref="CompareChoices"/> picks the winner: exact cakes, then effort,
+    /// then deterministic tie-breaks on the witness fields.
+    /// </summary>
     private MaterializedResult MaterializeBred(
         BredPalReference bred,
         AttackProfileEntry selectedEntry
@@ -155,6 +205,11 @@ internal sealed class AttackResultMaterializer
             choice.ChildEntry.LearnedTargetMask,
             totalCakes
         );
+        // A normal-inheritance roll is guaranteed only when the parent that
+        // contributes no target attack equips a non-inheritable one: Palworld
+        // excludes it from the roll, leaving the other parent's attack the
+        // sole candidate. The search-time profile recorded only HasNoopAttack,
+        // not which attack, so the concrete filler is picked here.
         var normalInheritance = choice.Mode == AttackCompositionMode.Normal;
         var parent1RequiresNoop = normalInheritance &&
             choice.Parent1TargetMask == 0 &&
@@ -201,6 +256,9 @@ internal sealed class AttackResultMaterializer
         choice.ChildEntry.LearnedTargetMask == selectedEntry.LearnedTargetMask &&
         choice.ChildEntry.TotalSpecialCakes == selectedEntry.TotalSpecialCakes;
 
+    // Exact expected attempts for the realized outcome; unlike the search-time
+    // estimate, they include the attack probability and any guaranteed-gender
+    // adjustment.
     private int RequiredBreedings(BredPalReference bred, float attackProbability)
     {
         var requiredBreedings = (int)Math.Ceiling(
@@ -217,6 +275,12 @@ internal sealed class AttackResultMaterializer
             );
     }
 
+    /// <summary>
+    /// Probability that a single breeding attempt yields the target attack.
+    /// Baseline and special-cake inheritance need no inheritance roll (the
+    /// child keeps its level-1 attacks; cakes force the equipped ones), so
+    /// both are certain; normal inheritance follows the 100%/50% rule above.
+    /// </summary>
     private static float AttackProbabilityFor(
         in AttackCompositionChoice choice,
         IPalReference parent1,
@@ -261,8 +325,11 @@ internal sealed class AttackResultMaterializer
     );
 
     /// <summary>
-    /// Exhaustively enumerates concrete witnesses for reconstruction. Search uses
-    /// <see cref="AttackProfileComposer"/>'s optimized profile-only algorithm instead.
+    /// Exhaustively enumerates every concrete witness for the given parents and
+    /// child. Unlike search, which only needs the cheapest entry per mask (the
+    /// profile-only algorithm in <see cref="AttackProfileComposer"/>),
+    /// reconstruction must see all witnesses matching the selected entry so it
+    /// can pick the one whose recursively materialized parents cost the least.
     /// </summary>
     internal IEnumerable<AttackCompositionChoice> EnumerateChoices(
         Pal child,
@@ -428,6 +495,12 @@ internal sealed class AttackResultMaterializer
         return attacks.ToArray();
     }
 
+    /// <summary>
+    /// Builds a parent loadout of one to three attacks: the target attacks the
+    /// parent contributes, or a single filler. A roll that must be guaranteed
+    /// needs a non-inheritable filler (picked deterministically); otherwise the
+    /// filler is the <c>AnyAttack</c> wildcard.
+    /// </summary>
     private IReadOnlyList<ActiveSkill> LoadoutFor(
         IPalReference parent,
         byte targetMask,
@@ -458,6 +531,9 @@ internal sealed class AttackResultMaterializer
         {
             SurgeryTablePalReference surgery => LearnedAttacks(surgery.Input),
             OwnedPalReference owned => owned.UnderlyingInstance.ActiveSkills ?? [],
+            // A composite only exists when both copies share the same attack
+            // profile (see InitialPalBuilder), so the male's attacks stand in
+            // for the pair.
             CompositeOwnedPalReference composite => composite.Male.UnderlyingInstance.ActiveSkills ?? [],
             BredPalReference { MaterializedAttackInheritance: not null } bred =>
                 bred.MaterializedAttackInheritance.ChildLearnedAttacks,

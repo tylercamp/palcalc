@@ -11,7 +11,7 @@ public enum AttackInheritanceMode
 
 /// <summary>
 /// A specific set of attack-inheritance choices. Derived from an `AttackProfile` using
-/// a `AttackResultMaterializer`.
+/// an `AttackResultMaterializer`.
 /// </summary>
 public sealed record MaterializedAttackInheritance(
     AttackInheritanceMode Mode,

@@ -1,21 +1,14 @@
 namespace PalCalc.Solver.PalReference.Properties;
 
 /// <summary>
-///     During search, an attack profile records only exact requested-attack
-///     availability and the minimum estimated Special Cake cost for each mask.
-///     Attack probability, attack-specific effort, exact loadouts, and
-///     gender-adjusted cake use are reconstructed after search. This deliberately
-///     lossy boundary keeps the fixed attack search state small and portable:
-///     a structurally slower path can be discarded even when its exact attack
-///     odds would have been better, and a coarse finalist can fail an exact
-///     constraint after reconstruction.
-///     Search profile = availability + estimated cakes. Materialized inheritance
-///     = exact probability + effort + cakes + loadouts.
+///     One possible attack outcome: the mask of desired attacks it achieves, and
+///     the minimum estimated Special Cake cost of the complete breeding tree
+///     that reaches it.
 /// </summary>
-/// 
+///
 /// <param name="LearnedTargetMask">
-///     A bit-mask describing which desired attacks are covered by this entry. The structure
-///     of this mask is decided by the `AttackTargetContext` for the current solver run.
+///     A bit-mask of the desired attacks this entry achieves. The structure of
+///     this mask is decided by the `AttackTargetContext` for the current solver run.
 /// </param>
 /// <param name="TotalSpecialCakes">
 ///     The minimum estimated number of Special Cakes needed throughout the
@@ -41,6 +34,20 @@ public readonly record struct AttackProfileEntry(
 /// <para>
 ///     Profiles are deliberately bounded. For each requested-attack mask the
 ///     solver keeps the outcome using the fewest estimated Special Cakes.
+/// </para>
+/// <para>
+///     During search, the profile records only exact requested-attack availability
+///     and the minimum estimated Special Cake cost for each mask. Attack
+///     probability, attack-specific effort, exact loadouts, and gender-adjusted
+///     cake use are reconstructed after search. This deliberately lossy boundary
+///     keeps the fixed attack search state small and portable: a structurally
+///     slower path can be discarded even when its exact attack odds would have
+///     been better, and a coarse finalist can fail an exact constraint after
+///     reconstruction.
+/// </para>
+/// <para>
+///     Search profile = availability + estimated cakes. Materialized inheritance
+///     = exact probability + effort + cakes + loadouts.
 /// </para>
 /// <para>
 ///     The final, exact choice of attacks is decided in the final solver steps, using
