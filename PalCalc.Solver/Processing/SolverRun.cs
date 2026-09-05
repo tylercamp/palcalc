@@ -128,14 +128,6 @@ namespace PalCalc.Solver.Processing
                 }
             }
 
-            statusMsg = statusMsg with
-            {
-                IsCanceled = controller.CancellationToken.IsCancellationRequested,
-                IsPaused = controller.IsPaused,
-                CurrentPhase = SolverPhase.Finished,
-            };
-            stateUpdated?.Invoke(statusMsg);
-
             var resultPostProcessor = new ResultPostProcessor(
                 spec,
                 settings,
@@ -144,6 +136,15 @@ namespace PalCalc.Solver.Processing
             );
             resultPostProcessor.ApplySurgery(frontier);
             var results = resultPostProcessor.Finalize(frontier.TerminalResults);
+
+            statusMsg = statusMsg with
+            {
+                IsCanceled = controller.CancellationToken.IsCancellationRequested,
+                IsPaused = controller.IsPaused,
+                CurrentPhase = SolverPhase.Finished,
+            };
+            stateUpdated?.Invoke(statusMsg);
+
             return results;
         }
     }

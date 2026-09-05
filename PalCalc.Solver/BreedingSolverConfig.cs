@@ -15,7 +15,8 @@ public sealed class SolverStateController(CancellationToken cancellationToken = 
 
     internal void PauseIfRequested()
     {
-        while (isPaused) Thread.Sleep(10);
+        while (isPaused && !CancellationToken.IsCancellationRequested)
+            CancellationToken.WaitHandle.WaitOne(10);
     }
 }
 

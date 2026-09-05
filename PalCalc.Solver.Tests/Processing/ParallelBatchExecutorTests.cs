@@ -96,6 +96,31 @@ public class ParallelBatchExecutorTests
     }
 
     [TestMethod]
+    public void BreedingSolver_CancellationReleasesPausedWorkers()
+    {
+        using var cancellation = new CancellationTokenSource();
+        using var enteredBreeding = new ManualResetEventSlim();
+        var configuredSolver = OneStepSolver();
+        var controller = new SolverStateController(cancellation.Token);
+        configuredSolver.Solver.StatusUpdated += status =>
+        {
+            if (status.CurrentPhase == SolverPhase.Breeding)
+                enteredBreeding.Set();
+        };
+        controller.Pause();
+
+        var solveTask = Task.Run(
+            () => configuredSolver.Solver.Solve(RequestFor(configuredSolver), controller)
+        );
+
+        Assert.IsTrue(enteredBreeding.Wait(TimeSpan.FromSeconds(5)));
+        cancellation.Cancel();
+
+        Assert.IsTrue(solveTask.Wait(TimeSpan.FromSeconds(10)));
+        Assert.IsTrue(solveTask.Result.IsCanceled);
+    }
+
+    [TestMethod]
     public void Execute_PropagatesWorkerExceptionToCaller()
     {
         var configuredSolver = OneStepSolver(maxThreads: 2);

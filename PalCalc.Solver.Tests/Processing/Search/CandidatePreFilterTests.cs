@@ -124,6 +124,45 @@ public class CandidatePreFilterTests
         Assert.IsTrue(first.IsOutdated);
     }
 
+    [TestMethod]
+    public void TryAdd_ReportsOwnershipForTerminalCandidateRejectedFromIteration()
+    {
+        var requiredAttack = SolverTestScenario.DB.ActiveSkills.First(attack => attack.CanInherit);
+        var target = new PalSpecifier
+        {
+            Pal = "Katress".ToPal(SolverTestScenario.DB),
+            RequiredGender = PalGender.FEMALE,
+            RequiredAttacks = [requiredAttack],
+        };
+        var configuredSolver = SolverTestScenario.Solver([], maxSpecialCakes: 0);
+        var settings = configuredSolver.Settings;
+        var attackTargets = new AttackTargetContext(target, settings.DB);
+        var selectionPolicy = new DefaultCandidateSelectionPolicy(
+            ResultPruningPolicy.Default,
+            CancellationToken.None,
+            attackTargets
+        );
+        var filter = new CandidatePreFilter(
+            target,
+            settings.MaxEffort,
+            selectionPolicy,
+            new PotentialImprovementFrontier(),
+            settings.DB.PalsById.Keys,
+            attackTargets,
+            settings
+        );
+        var first = new HashControlledReference(target.Pal, hash: 1, genderedHash: 10);
+        var terminalOnly = new HashControlledReference(target.Pal, hash: 2, genderedHash: 5);
+
+        Assert.IsTrue(filter.TryAdd(first).Accepted);
+
+        var result = filter.TryAdd(terminalOnly);
+
+        Assert.IsFalse(result.Accepted);
+        Assert.IsTrue(result.IsRetained);
+        Assert.AreEqual(5, filter.TerminalCandidates.Single().GetHashCode());
+    }
+
     private static OwnedPalReference Candidate(int cakes) =>
         new(
             SolverTestScenario.Owned("Katress", PalGender.MALE),
@@ -139,8 +178,38 @@ public class CandidatePreFilterTests
             EffectivePropertiesKey propertiesKey
         ) => FrontierCandidateAssessment.PotentialImprovement;
 
-        public void MarkCandidatesOutdated(EffectivePropertiesKey propertiesKey)
-        {
-        }
+    }
+
+    private sealed class HashControlledReference(
+        Pal pal,
+        int hash,
+        int genderedHash,
+        PalGender gender = PalGender.WILDCARD
+    ) : IPalReference
+    {
+        public Pal Pal { get; } = pal;
+        public List<PassiveSkill> EffectivePassives { get; } = [];
+        public int EffectivePassivesHash => 0;
+        public IV_Set IVs { get; } = new();
+        public List<PassiveSkill> ActualPassives { get; } = [];
+        public AttackProfile AttackProfile { get; } = new(new AttackProfileEntry(1, 0));
+        public PalGender Gender { get; } = gender;
+        public float TimeFactor => 1;
+        public IPalRefLocation Location => BredRefLocation.Instance;
+        public TimeSpan BreedingEffort => TimeSpan.Zero;
+        public TimeSpan SelfBreedingEffort => TimeSpan.Zero;
+        public int TotalCost => 0;
+        public int NumTotalBreedingSteps => 0;
+        public int NumTotalEggs => 0;
+        public int NumTotalWildPals => 0;
+        public bool IsOutdated { get; set; }
+
+        public IPalReference WithGuaranteedGender(
+            PalDB db,
+            PalGender requestedGender,
+            bool useReverser
+        ) => new HashControlledReference(Pal, genderedHash, genderedHash, requestedGender);
+
+        public override int GetHashCode() => hash;
     }
 }

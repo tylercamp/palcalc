@@ -110,23 +110,6 @@ internal sealed class SearchFrontier : ICandidateFrontierView
         resultAccumulator.Observe(candidates);
 
     /// <summary>
-    /// Marks candidates with the same effective properties as ineligible for
-    /// further breeding. This allows us to skip older, less efficient candidates
-    /// when a better one is found in the middle of a search.
-    /// 
-    /// The full simplification pass still decides whether the candidate that
-    /// prompted this change is retained.
-    /// </summary>
-    public void MarkCandidatesOutdated(EffectivePropertiesKey propertiesKey)
-    {
-        var alternatives = index[propertiesKey];
-        if (alternatives == null) return;
-
-        foreach (var alternative in alternatives)
-            alternative.IsOutdated = true;
-    }
-
-    /// <summary>
     /// Expands every pending parent pair and atomically advances the frontier
     /// and its pair schedule to the resulting delta.
     /// </summary>
@@ -214,16 +197,13 @@ internal sealed class SearchFrontier : ICandidateFrontierView
 
         // Terminal results are accumulated before frontier selection because a
         // completed result need not remain useful as a future parent.
-        if (attackTargets?.IsActive != true)
-        {
-            resultAccumulator.Observe(
-                newCandidates.TakeWhile(_ =>
-                {
-                    if (controller.IsPaused) controller.PauseIfRequested();
-                    return !controller.CancellationToken.IsCancellationRequested;
-                })
-            );
-        }
+        resultAccumulator.Observe(
+            newCandidates.TakeWhile(_ =>
+            {
+                if (controller.IsPaused) controller.PauseIfRequested();
+                return !controller.CancellationToken.IsCancellationRequested;
+            })
+        );
         newCandidates.RemoveAll(candidate => candidate.IsOutdated);
         if (controller.CancellationToken.IsCancellationRequested)
             return FrontierDelta.None;
@@ -300,8 +280,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
             }
         }
 
-        // Efficient additions are expanded first so they can invalidate less
-        // efficient parents while the following batch is still running.
+        // Expand efficient additions first in the next scheduled pass.
         allAdded = selectionPolicy.OrderForExpansion(allAdded);
 
         return new FrontierDelta(

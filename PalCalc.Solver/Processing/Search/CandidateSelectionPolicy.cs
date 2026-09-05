@@ -122,10 +122,10 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     /// <summary>
     /// Performs the cheap comparison used by workers within one iteration.
     ///
-    /// Lower breeding effort is a guaranteed improvement. When effort is equal,
-    /// lower cost replaces the candidate used for later comparisons. Candidates
-    /// tied on both values are both kept because their IVs or breeding paths may
-    /// differ; the full simplification pass decides between them.
+    /// Lower breeding effort is preferred by this early projection. When effort
+    /// is equal, lower cost replaces the candidate used for later comparisons.
+    /// Candidates tied on both values are both kept because their IVs or breeding
+    /// paths may differ; the full simplification pass decides between them.
     /// </summary>
     public EarlyCandidateSelection SelectEarlyCandidate(
         IPalReference candidate,
@@ -149,8 +149,9 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     /// Performs the cheap comparison against the retained frontier.
     ///
     /// Lower cost or better IVs make a candidate worth sending to the full
-    /// simplification pass. Only lower breeding effort guarantees that matching
-    /// frontier candidates can be marked as outdated immediately.
+    /// simplification pass. A result classified as a guaranteed improvement is
+    /// preferred by this projection only; retirement is deferred to the full
+    /// frontier merge.
     /// </summary>
     public FrontierCandidateAssessment AssessAgainstFrontier(
         IPalReference candidate,

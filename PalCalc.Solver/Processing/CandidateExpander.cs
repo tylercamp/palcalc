@@ -472,7 +472,7 @@ namespace PalCalc.Solver.Processing
                             );
                             var structuralEffort = parentBreedingEffort + selfBreedingEffort;
 
-                            var added = false;
+                            var retained = false;
                             if (structuralEffort <= settings.MaxEffort)
                             {
                                 BredPalReference res = null;
@@ -525,17 +525,19 @@ namespace PalCalc.Solver.Processing
                                     filterResult = context.PreFilter.TryAdd(res);
                                 }
 
-                                if (res is not null && filterResult.Accepted)
+                                if (filterResult.IsRetained)
                                 {
                                     newPassivesRef.Retain();
+                                    retained = true;
+                                }
 
+                                if (res is not null && filterResult.Accepted)
+                                {
                                     yield return res;
-                                    added = true;
-                                    context.PreFilter.Propagate(filterResult);
                                 }
                             }
 
-                            if (!added)
+                            if (!retained)
                             {
                                 ReturnRandomPassives();
                             }

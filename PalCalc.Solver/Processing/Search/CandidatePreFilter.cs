@@ -17,15 +17,9 @@ internal interface ICandidateFrontierView
         IPalReference candidate,
         EffectivePropertiesKey propertiesKey
     );
-
-    void MarkCandidatesOutdated(EffectivePropertiesKey propertiesKey);
 }
 
-internal readonly record struct CandidatePreFilterResult(
-    EffectivePropertiesKey PropertiesKey,
-    bool Accepted,
-    bool IsGuaranteedImprovement
-)
+internal readonly record struct CandidatePreFilterResult(bool Accepted, bool IsRetained)
 {
     public static CandidatePreFilterResult Rejected => default;
 }
@@ -78,7 +72,9 @@ internal sealed class CandidatePreFilter
         var isTerminal = attackTargets?.Satisfies(candidate) ?? target.IsSatisfiedBy(candidate);
         // A completed result may be a poor future parent and be rejected below.
         // Preserve its best final path before applying frontier-oriented filters.
-        if (isTerminal && attackTargets?.IsActive == true)
+        var terminalRetained =
+            isTerminal &&
+            attackTargets?.IsActive == true &&
             RetainTerminal(candidate);
 
         var propertiesKey = selectionPolicy.KeyOf(candidate);
@@ -97,12 +93,8 @@ internal sealed class CandidatePreFilter
         var accepted = group.TryAdd(candidate, selectionPolicy, attackTargets?.IsActive == true);
 
         return accepted
-            ? new(
-                PropertiesKey: propertiesKey,
-                Accepted: true,
-                IsGuaranteedImprovement: frontierAssessment == FrontierCandidateAssessment.GuaranteedImprovement
-            )
-            : CandidatePreFilterResult.Rejected;
+            ? new(Accepted: true, IsRetained: true)
+            : new(Accepted: false, IsRetained: terminalRetained);
     }
 
     public CandidatePreFilterResult TryAdd(ref CandidateDraft candidate)
@@ -123,8 +115,7 @@ internal sealed class CandidatePreFilter
             candidate.IVs,
             candidate.EffectivePassives
         ) && candidate.AttackProfile.Contains(attackTargets.FullTargetMask);
-        if (isTerminal)
-            RetainTerminal(candidate.Materialize());
+        var terminalRetained = isTerminal && RetainTerminal(candidate.Materialize());
 
         var propertiesKey = defaultPolicy.KeyOf(candidate);
         var frontierAssessment = searchFrontier.AssessCandidate(
@@ -141,14 +132,9 @@ internal sealed class CandidatePreFilter
         var earlyCandidates = earlyCandidatesByPalId[candidate.Pal.Id];
         var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new());
         if (!group.TryAdd(ref candidate))
-            return CandidatePreFilterResult.Rejected;
+            return new(Accepted: false, IsRetained: terminalRetained);
 
-        return new(
-            PropertiesKey: propertiesKey,
-            Accepted: true,
-            IsGuaranteedImprovement:
-                frontierAssessment == FrontierCandidateAssessment.GuaranteedImprovement
-        );
+        return new(Accepted: true, IsRetained: true);
     }
 
     public IReadOnlyList<IPalReference> TerminalCandidates => terminalCandidates.Values.ToArray();
@@ -162,12 +148,12 @@ internal sealed class CandidatePreFilter
         return retained;
     }
 
-    private void RetainTerminal(IPalReference candidate)
+    private bool RetainTerminal(IPalReference candidate)
     {
         if (target.RequiredGender != PalGender.WILDCARD && candidate.Gender != target.RequiredGender)
         {
             if (candidate.Gender != PalGender.WILDCARD && !settings.UseGenderReversers)
-                return;
+                return false;
             candidate = candidate.WithGuaranteedGender(
                 settings.DB,
                 target.RequiredGender,
@@ -176,13 +162,14 @@ internal sealed class CandidatePreFilter
         }
 
         var key = selectionPolicy.KeyOf(candidate);
-        terminalCandidates.AddOrUpdate(
+        var retained = terminalCandidates.AddOrUpdate(
             key,
             candidate,
             (_, incumbent) => CompareTerminal(candidate, incumbent) < 0
                 ? candidate
                 : incumbent
         );
+        return ReferenceEquals(retained, candidate);
     }
 
     private int CompareTerminal(IPalReference left, IPalReference right)
@@ -213,14 +200,6 @@ internal sealed class CandidatePreFilter
             }
         }
         return best;
-    }
-
-    public void Propagate(CandidatePreFilterResult result)
-    {
-        if (result.Accepted && result.IsGuaranteedImprovement)
-        {
-            frontier.MarkCandidatesOutdated(result.PropertiesKey);
-        }
     }
 
     private sealed class EarlyCandidateGroup
