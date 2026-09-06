@@ -62,6 +62,14 @@ namespace PalCalc.UI.ViewModel.PalDerived
             Passive3 = passiveVms.Skip(2).FirstOrDefault();
             Passive4 = passiveVms.Skip(3).FirstOrDefault();
 
+            var attackVms = instance.ActiveSkills.Select(ActiveSkillViewModel.Make).ToList();
+            Attack1 = attackVms.Skip(0).FirstOrDefault();
+            Attack2 = attackVms.Skip(1).FirstOrDefault();
+            Attack3 = attackVms.Skip(2).FirstOrDefault();
+            Attack4 = attackVms.Skip(3).FirstOrDefault();
+            Attack5 = attackVms.Skip(4).FirstOrDefault();
+            Attack6 = attackVms.Skip(5).FirstOrDefault();
+
             IvHp = instance.IV_HP;
             IvAttack = instance.IV_Attack;
             IvDefense = instance.IV_Defense;
@@ -94,6 +102,24 @@ namespace PalCalc.UI.ViewModel.PalDerived
         private PassiveSkillViewModel passive4;
 
         [ObservableProperty]
+        private ActiveSkillViewModel attack1;
+
+        [ObservableProperty]
+        private ActiveSkillViewModel attack2;
+
+        [ObservableProperty]
+        private ActiveSkillViewModel attack3;
+
+        [ObservableProperty]
+        private ActiveSkillViewModel attack4;
+
+        [ObservableProperty]
+        private ActiveSkillViewModel attack5;
+
+        [ObservableProperty]
+        private ActiveSkillViewModel attack6;
+
+        [ObservableProperty]
         private int ivHp = 0;
 
         [ObservableProperty]
@@ -103,6 +129,9 @@ namespace PalCalc.UI.ViewModel.PalDerived
         private int ivDefense = 0;
 
         public bool IsValid => Pal != null;
+
+        private List<ActiveSkill> AttackSkills =>
+            new() { Attack1?.ModelObject, Attack2?.ModelObject, Attack3?.ModelObject, Attack4?.ModelObject, Attack5?.ModelObject, Attack6?.ModelObject };
 
         public PalInstance ModelObject => !IsValid ? null : new PalInstance()
         {
@@ -124,8 +153,8 @@ namespace PalCalc.UI.ViewModel.PalDerived
             IV_HP = IvHp,
             IV_Shot = IvAttack,
             IV_Defense = IvDefense,
-            ActiveSkills = [],
-            EquippedActiveSkills = []
+            ActiveSkills = AttackSkills.Distinct().ToList(),
+            EquippedActiveSkills = AttackSkills.Distinct().ToList()
         };
     }
 }

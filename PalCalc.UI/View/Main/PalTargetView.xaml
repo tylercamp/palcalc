@@ -124,7 +124,7 @@
                         <RowDefinition Height="1*" />
                     </Grid.RowDefinitions>
 
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack1, Mode=TwoWay}" IsDropDownOpen="True" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack1, Mode=TwoWay}" />
                     <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack2, Mode=TwoWay}" Grid.Column="2" />
                     <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack3, Mode=TwoWay}" Grid.Row="2" />
                     <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack4, Mode=TwoWay}" Grid.Row="2" Grid.Column="2" />
