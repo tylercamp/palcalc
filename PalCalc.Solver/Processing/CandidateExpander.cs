@@ -440,8 +440,8 @@ namespace PalCalc.Solver.Processing
                                 }
                             }
 
-                            // Build the structural effort for this combination of passives and IVs.
-                            // Attack-inheritance probability is deliberately excluded; exact attack
+                            // Build the base ("structural") effort for this combination of passives and IVs.
+                            // Attack-inheritance probability is ignored on purpose; the full attack
                             // details are reconstructed after the search.
                             var structuralProbability = probabilityForUpToNumPassives * ivsProbability;
                             if (structuralProbability <= 0)

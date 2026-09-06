@@ -12,7 +12,8 @@ take.
 
 The shortest tree is not always the fastest one. A two-step path with poor
 inheritance odds may take longer than a three-step path whose children are much
-more likely to have the right traits.
+more likely to have the right traits. The solver compares paths by their
+estimated effort and keeps a small selection of useful alternatives.
 
 ## Concepts at a Glance
 
