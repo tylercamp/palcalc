@@ -399,9 +399,7 @@ namespace PalCalc.UI.Tests
             var target = JObject.Parse(File.ReadAllText(targetPath));
             var reference = (JObject)target["CurrentResults"]!["Results"]![0]!["PalReference"]!;
 
-            Assert.AreEqual(0, settings["SolverSettings"]!["MaxSpecialCakes"]!.Value<int>());
             Assert.IsInstanceOfType<JArray>(target["RequiredAttackInternalNames"]);
-            Assert.AreEqual(0, target["CurrentResults"]!["SolverSettings"]!["MaxSpecialCakes"]!.Value<int>());
             Assert.AreEqual(JTokenType.Null, reference["AvgRequiredBreedings"]!.Type);
             Assert.AreEqual(JTokenType.Null, reference["MaterializedAttackInheritance"]!.Type);
             Assert.AreEqual(JTokenType.Null, reference["Parent1"]!["MaterializedAttackInheritance"]!.Type);
@@ -413,10 +411,6 @@ namespace PalCalc.UI.Tests
     {
         WithTemporaryDirectory(path =>
         {
-            File.WriteAllText(
-                Path.Combine(path, "settings.json"),
-                """{"SolverSettings":{"MaxSpecialCakes":7}}"""
-            );
             var savePath = Directory.CreateDirectory(Path.Combine(path, "save-1"));
             File.WriteAllText(
                 Path.Combine(savePath.FullName, "pal-targets.json"),
@@ -436,12 +430,10 @@ namespace PalCalc.UI.Tests
 
             StorageMigrationRunner.EnsureCurrent(path);
 
-            var settings = JObject.Parse(File.ReadAllText(Path.Combine(path, "settings.json")));
             var target = JObject.Parse(File.ReadAllText(
                 Path.Combine(savePath.FullName, "targets", "attack-target.json")
             ));
 
-            Assert.AreEqual(7, settings["SolverSettings"]!["MaxSpecialCakes"]!.Value<int>());
             CollectionAssert.AreEqual(
                 new[] { "Attack_A", "Attack_B" },
                 target["RequiredAttackInternalNames"]!.Values<string>().ToArray()
