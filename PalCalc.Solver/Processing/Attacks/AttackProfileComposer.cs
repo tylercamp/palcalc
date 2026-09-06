@@ -96,7 +96,6 @@ internal sealed class AttackProfileComposer(
     private const int TargetMaskBitCount = PalSpecifier.MaxRequiredAttacks;
     private const int TargetMaskCount = AttackProfile.TargetMaskCount;
     private const int MaxEquippedAttacksPerParent = 3;
-    private const int PackedParentLoadoutShift = 8;
 
     private readonly AttackProfileAccumulator accumulator = new();
     private readonly Dictionary<int, AttackProfile> cachedProfiles = [];
@@ -271,7 +270,7 @@ internal sealed class AttackProfileComposer(
                 for (var i = 0; i < cakeLoadouts.Length; i++)
                 {
                     var loadouts = cakeLoadouts[i];
-                    var parent1Loadout = (byte)(loadouts >> PackedParentLoadoutShift);
+                    var parent1Loadout = (byte)(loadouts >> 8);
                     var parent2Loadout = (byte)loadouts;
                     Emit(
                         totalCakes,
@@ -397,7 +396,7 @@ internal sealed class AttackProfileComposer(
         var parent2Loadout = (byte)(childMask & parent2Mask);
         TrimDuplicateAttacks(ref parent1Loadout, parent2Loadout);
         TrimDuplicateAttacks(ref parent2Loadout, parent1Loadout);
-        return (ushort)((parent1Loadout << PackedParentLoadoutShift) | parent2Loadout);
+        return (ushort)((parent1Loadout << 8) | parent2Loadout);
     }
 
     private static void TrimDuplicateAttacks(ref byte loadout, byte otherLoadout)

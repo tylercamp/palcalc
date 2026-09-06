@@ -4,9 +4,9 @@ namespace PalCalc.Solver.PalReference.Properties;
 
 public enum AttackInheritanceMode
 {
-    Baseline,
-    Normal,
-    InheritAll,
+    Baseline, // No target attacks are inherited; only the child's innate level-1 target attacks apply
+    Normal, // Attack inheritance is relevant, use normal 1-attack
+    InheritAll, // Attack inheritance will inherit all equipped from each parent (Special Cakes)
 }
 
 /// <summary>

@@ -121,7 +121,7 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
     internal ulong EntryTargetMasks { get; }
 
     /// <summary>
-    /// WARNING: Provided for convenience, actual solver code should use `EntriesSpan`
+    /// WARNING: Provided for convenience, hot paths should use `EntriesSpan`
     /// </summary>
     public IReadOnlyList<AttackProfileEntry> Entries => entries ?? [];
 
