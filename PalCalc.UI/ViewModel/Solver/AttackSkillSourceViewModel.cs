@@ -16,13 +16,14 @@ namespace PalCalc.UI.ViewModel.Solver
         {
             PropertyChangedEventManager.AddHandler(palSource, PalSourcePalsChanged, nameof(palSource.AvailablePals));
             Attacks = CollectAttacks(palSource).ToList();
-            AvailableAttacks = Attacks.Where(a => a.IsAvailable).Select(a => a.Attack).ToList();
         }
 
         private void PalSourcePalsChanged(object sender, PropertyChangedEventArgs args)
         {
             Attacks = CollectAttacks(sender as PalSourceViewModel).ToList();
-            AvailableAttacks = Attacks.Where(a => a.IsAvailable).Select(a => a.Attack).ToList();
+
+            OnPropertyChanged(nameof(AvailableAttacks));
+            OnPropertyChanged(nameof(InheritableAttacks));
         }
 
         private static IEnumerable<AvailableAttackSkillViewModel> CollectAttacks(PalSourceViewModel palSource)
@@ -45,7 +46,10 @@ namespace PalCalc.UI.ViewModel.Solver
         [ObservableProperty]
         private List<AvailableAttackSkillViewModel> attacks;
 
-        [ObservableProperty]
-        private List<ActiveSkillViewModel> availableAttacks;
+        public IEnumerable<AvailableAttackSkillViewModel> InheritableAttacks =>
+            Attacks.Where(a => a.Availability != AttackSkillAvailability.NotInheritable);
+
+        public IEnumerable<ActiveSkillViewModel> AvailableAttacks =>
+            Attacks.Where(a => a.IsAvailable).Select(a => a.Attack);
     }
 }

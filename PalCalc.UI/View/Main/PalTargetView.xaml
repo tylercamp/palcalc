@@ -21,11 +21,37 @@
     <StackPanel.Resources>
         <c:ValueVisibilityConverter x:Key="VVC_Negate" Negate="True" />
 
+        <Style TargetType="materialIcons:MaterialIcon" x:Key="AttackUnavailableWarningTooltipTemplate">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Availability}" Value="NotInheritable">
+                    <Setter Property="ToolTipService.ToolTip" Value="Cannot be inherited" />
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding Availability}" Value="NotKnownByPals">
+                    <Setter Property="ToolTipService.ToolTip" Value="No Pals know this attack" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
             <TextBlock Text="{Binding Name.Value}" />
         </DataTemplate>
-        <DataTemplate x:Key="AttackTemplate" DataType="{x:Type mvm:ActiveSkillViewModel}">
-            <TextBlock Text="{Binding Name.Value}" />
+        <DataTemplate x:Key="AttackTemplate" DataType="{x:Type svm:AvailableAttackSkillViewModel}">
+            <StackPanel Orientation="Horizontal">
+                <Grid Visibility="{Binding IsAvailable, Converter={StaticResource VVC_Negate}}" Margin="0,0,4,0">
+                    <vu:ForceEnabled>
+                        <materialIcons:MaterialIcon Cursor="Hand"
+                                                    Width="16" Height="16"
+                                                    Kind="WarningCircleOutline"
+                                                    Foreground="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
+                                                    Background="Transparent"
+                                                    Style="{StaticResource AttackUnavailableWarningTooltipTemplate}"
+                                                    />
+                    </vu:ForceEnabled>
+                </Grid>
+                
+                <TextBlock Text="{Binding Attack.Name.Value}" />
+            </StackPanel>
         </DataTemplate>
     </StackPanel.Resources>
     <Grid>
@@ -58,9 +84,18 @@
     <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" adonisExtensions:LayerExtension.IncreaseLayer="False" Background="{x:Null}" Margin="0,5,0,0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer2BorderBrush}}" BorderThickness="1">
         <GroupBox.Resources>
             <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
-                <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Content.AvailableAttackSkills.AvailableAttacks}" />
+                <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Content.AvailableAttackSkills.InheritableAttacks}" />
                 <Setter Property="ItemTemplate" Value="{StaticResource AttackTemplate}" />
-                <Setter Property="TextSearch.TextPath" Value="Name.Value" />
+                <Setter Property="TextSearch.TextPath" Value="Attack.Name.Value" />
+                <Setter Property="SelectedValuePath" Value="Attack" />
+
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+                            <Setter Property="IsEnabled" Value="{Binding IsAvailable}" />
+                        </Style>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
             <DataTemplate x:Key="ThinAttacksList" DataType="vm:PalTargetViewModel">
