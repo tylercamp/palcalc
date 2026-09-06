@@ -52,7 +52,7 @@
             </ComboBox>
         </StackPanel>
     </Grid>
-    <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" adonisExtensions:LayerExtension.IncreaseLayer="False" Padding="0" Background="{x:Null}" Margin="0,5,0,0">
+    <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" adonisExtensions:LayerExtension.IncreaseLayer="False" Background="{x:Null}" Margin="0,5,0,0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer2BorderBrush}}" BorderThickness="1">
         <GroupBox.Resources>
             <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
                 <Setter Property="ItemsSource" Value="{x:Static mvm:ActiveSkillViewModel.Inheritable}" />
