@@ -4,6 +4,7 @@ using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.Utils;
+using Serilog;
 using System.Diagnostics;
 
 namespace PalCalc.Solver.Processing;
@@ -19,6 +20,8 @@ internal sealed class ResultPostProcessor(
     AttackTargetContext attackTargets
 )
 {
+    private static ILogger logger = Log.ForContext<ResultPostProcessor>();
+
     /// <summary>
     /// Updates the `frontier` by applying surgery operations to its contents. Pals
     /// in `extraResults` can be provided to maintain compatibility with `ResultAccumulator`:
@@ -81,6 +84,7 @@ internal sealed class ResultPostProcessor(
 
     public List<IPalReference> Finalize(ResultAccumulator terminalResults)
     {
+        logger.Debug("Finalizing results");
         var candidates = terminalResults
             .Results
             // Bred candidates are constrained in the expansion kernel. Apply
@@ -99,25 +103,71 @@ internal sealed class ResultPostProcessor(
         if (attackTargets?.IsActive != true)
             return terminalResults.SelectFinalResults(candidates).ToList();
 
+        logger.Debug("Finding attack-compatible candidates");
         var finalists = candidates
             .Select(reference => (Reference: reference, Entry: SelectRootEntry(reference)))
             .Where(result => result.Entry is not null)
             .ToList();
+        finalists.Sort((left, right) =>
+            left.Entry!.Value.TotalSpecialCakes.CompareTo(
+                right.Entry!.Value.TotalSpecialCakes
+            )
+        );
+
+        logger.Debug("Materializing attack candidates from {FinalistsCount} finalists", finalists.Count);
         var materializer = new AttackResultMaterializer(attackTargets, settings);
-        var materialized = new List<IPalReference>(finalists.Count);
-        foreach (var finalist in finalists)
+        var materialized = new List<IPalReference>();
+        var bestExactCakes = int.MaxValue;
+        var examined = 0;
+        var rejected = 0;
+        var adjustedCakeTotals = 0;
+        for (var i = 0; i < finalists.Count; i++)
         {
+            var finalist = finalists[i];
+            var estimatedCakes = finalist.Entry!.Value.TotalSpecialCakes;
+            // Search cake totals are lower bounds: materialization can add
+            // exact attack/gender attempts, but cannot remove cake use already
+            // present in the selected profile entry.
+            if (estimatedCakes > bestExactCakes)
+                break;
+
+            examined++;
             var result = materializer.Materialize(
                 finalist.Reference,
-                finalist.Entry!.Value
+                finalist.Entry.Value
             );
             if (!SatisfiesMaterializedConstraints(result))
+            {
+                rejected++;
                 continue;
+            }
 
-            materialized.Add(result);
+            var exactCakes = result.AttackProfile.EntriesSpan[0].TotalSpecialCakes;
+            if (exactCakes != estimatedCakes)
+                adjustedCakeTotals++;
+
+            if (exactCakes < bestExactCakes)
+            {
+                bestExactCakes = exactCakes;
+                materialized.Clear();
+            }
+
+            if (exactCakes == bestExactCakes)
+                materialized.Add(result);
         }
 
-        return terminalResults.SelectFinalResults(materialized).ToList();
+        logger.Debug(
+            "Attack materialization examined {ExaminedCount} finalists, skipped {SkippedCount} above the exact minimum of {MinimumCakes} cakes, rejected {RejectedCount}, and adjusted {AdjustedCount} cake totals",
+            examined,
+            finalists.Count - examined,
+            bestExactCakes == int.MaxValue ? null : bestExactCakes,
+            rejected,
+            adjustedCakeTotals
+        );
+        logger.Debug("Re-applying result pruning to {MaterializedCount} minimum-cake materialized results", materialized.Count);
+        var res = terminalResults.SelectFinalResults(materialized).ToList();
+        logger.Debug("Result finalization complete with {FinalCount} results", res.Count);
+        return res;
     }
 
     private bool SatisfiesTerminalTarget(IPalReference reference) =>

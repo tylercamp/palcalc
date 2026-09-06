@@ -61,7 +61,7 @@ public class ResultPostProcessorTests
             attackTargets: null
         );
 
-        processor.ApplySurgery(frontier);
+        processor.ApplySurgery(frontier, extraResults: null);
         var results = processor.Finalize(
             frontier.TerminalResults
         );
@@ -185,7 +185,7 @@ public class ResultPostProcessorTests
             attackTargets
         );
 
-        processor.ApplySurgery(frontier);
+        processor.ApplySurgery(frontier, extraResults: null);
         var surgery = processor
             .Finalize(frontier.TerminalResults)
             .OfType<SurgeryTablePalReference>()
@@ -270,7 +270,7 @@ public class ResultPostProcessorTests
             attackTargets
         );
 
-        processor.ApplySurgery(frontier);
+        processor.ApplySurgery(frontier, extraResults: null);
         var surgeries = processor
             .Finalize(frontier.TerminalResults)
             .OfType<SurgeryTablePalReference>()
@@ -430,6 +430,46 @@ public class ResultPostProcessorTests
             new AttackProfile(new AttackProfileEntry(1, 1))
         );
         accumulator.Observe([validMinimum, higherTier]);
+
+        var results = new ResultPostProcessor(
+            target,
+            configuredSolver.Settings,
+            controller,
+            attackTargets
+        ).Finalize(accumulator);
+
+        Assert.AreEqual(1, results.Count);
+        Assert.AreEqual(0, results[0].AttackProfile.Entries.Single().TotalSpecialCakes);
+    }
+
+    [TestMethod]
+    public void Finalize_DoesNotMaterializeFinalistsAboveTheProvenMinimumCakeTier()
+    {
+        var target = ActiveTarget(TargetPal, TargetAttack);
+        var configuredSolver = SolverTestScenario.Solver(
+            [],
+            maxSpecialCakes: null
+        );
+        var controller = Controller();
+        var attackTargets = new AttackTargetContext(target, SolverTestScenario.DB);
+        var accumulator = new ResultAccumulator(
+            target,
+            new KeepAllSelectionPolicy(),
+            attackTargets
+        );
+        var validMinimum = Bred(
+            Leaf(TargetAttack, mask: 1),
+            Leaf(TargetAttack, mask: 1),
+            TargetPal,
+            new AttackProfile(new AttackProfileEntry(1, 0))
+        );
+        var unreconstructableHigherTier = Bred(
+            Leaf(),
+            Leaf(),
+            TargetPal,
+            new AttackProfile(new AttackProfileEntry(1, 1))
+        );
+        accumulator.Observe([unreconstructableHigherTier, validMinimum]);
 
         var results = new ResultPostProcessor(
             target,
