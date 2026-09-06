@@ -26,11 +26,9 @@ namespace PalCalc.UI.ViewModel.GraphSharp
             Value = node;
             Pal = PalViewModel.Make(node.PalRef.Pal);
             var inheritance = (node.PalRef as BredPalReference)?.MaterializedAttackInheritance;
-            LearnedAttacks = new AttackSkillCollectionViewModel(MasteredAttacksFor(node.PalRef, inheritance).Select(ActiveSkillViewModel.Make));
-            InheritedAttacks = new AttackSkillCollectionViewModel((inheritance?.InheritedAttacks ?? []).Select(ActiveSkillViewModel.Make));
             EquippedAttacks = inheritance is null
-                ? LearnedAttacks
-                : InheritedAttacks;
+                ? new AttackSkillCollectionViewModel(DefaultEquippedAttacksFor(node.PalRef).Select(ActiveSkillViewModel.Make))
+                : new AttackSkillCollectionViewModel(inheritance.InheritedAttacks.Select(ActiveSkillViewModel.Make));
             SpecialCakes = inheritance?.SpecialCakes ?? 0;
             UsesSpecialCake = inheritance?.Mode == AttackInheritanceMode.InheritAll;
             PassiveSkills = node.PalRef.ActualPassives.Select(PassiveSkillViewModel.Make).ToList();
@@ -87,10 +85,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
         public PalViewModel Pal { get; }
 
-        public AttackSkillCollectionViewModel LearnedAttacks { get; }
         public AttackSkillCollectionViewModel EquippedAttacks { get; private set; }
-        public AttackSkillCollectionViewModel InheritedAttacks { get; }
-        public bool LearnedAttacksDifferFromEquipped => !LearnedAttacks.AsModelEnumerable().SequenceEqual(EquippedAttacks.AsModelEnumerable());
         public int SpecialCakes { get; }
         public bool UsesSpecialCake { get; }
 
@@ -98,18 +93,14 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         {
             EquippedAttacks = new AttackSkillCollectionViewModel(attacks.Select(ActiveSkillViewModel.Make));
             OnPropertyChanged(nameof(EquippedAttacks));
-            OnPropertyChanged(nameof(LearnedAttacksDifferFromEquipped));
         }
 
-        private static IEnumerable<ActiveSkill> MasteredAttacksFor(
-            IPalReference reference,
-            MaterializedAttackInheritance inheritance
-        ) => inheritance?.ChildLearnedAttacks ?? reference switch
+        private static IEnumerable<ActiveSkill> DefaultEquippedAttacksFor(IPalReference reference) => reference switch
         {
             OwnedPalReference owned => owned.UnderlyingInstance.ActiveSkills ?? [],
             CompositeOwnedPalReference composite => composite.Male.UnderlyingInstance.ActiveSkills ?? [],
             WildPalReference wild => wild.Pal.Level1ActiveSkills(PalDB.LoadEmbedded()),
-            SurgeryTablePalReference surgery => MasteredAttacksFor(surgery.Input, null),
+            SurgeryTablePalReference surgery => DefaultEquippedAttacksFor(surgery.Input),
             _ => [],
         };
 
