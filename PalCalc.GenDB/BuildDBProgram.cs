@@ -724,6 +724,8 @@ namespace PalCalc.GenDB
             ExportImage(icons.FoodIconOn, "../PalCalc.UI/Resources/FoodOn.png", SKEncodedImageFormat.Png);
             ExportImage(icons.TimerIcon, "../PalCalc.UI/Resources/Timer.png", SKEncodedImageFormat.Png);
 
+            ExportImage(icons.SpecialCakeIcon, "../PalCalc.UI/Resources/Cake_Special.png", 64, 64, SKEncodedImageFormat.Png);
+
             ExportImage(icons.DungeonIconSmall, "../PalCalc.UI/Resources/DungeonSmall.png", SKEncodedImageFormat.Png);
 
             ExportImage(icons.SurgeryTableIcon, "../PalCalc.UI/Resources/SurgeryTable.png", 256, 256, SKEncodedImageFormat.Png);

@@ -30,6 +30,7 @@ namespace PalCalc.GenDB.GameDataReaders
         public const string DAY_ICON_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_timezone_daytime";
         public const string NIGHT_ICON_PATH = "Pal/Content/Pal/Texture/UI/Main_Menu/T_icon_timezone_night";
         public const string DUNGEON_ICON_SMALL_PATH = "Pal/Content/Pal/Texture/UI/IngameMenu/T_icon_dungeon_S";
+        public const string SPECIAL_CAKE_ICON_PATH = "Pal/Content/Others/InventoryItemIcon/Texture/T_itemicon_food_Cake05";
 
         public const string SURGERY_TABLE_ICON_PATH = "Pal/Content/Pal/Texture/BuildObject/PNG/T_icon_buildObject_OperatingTable";
 
