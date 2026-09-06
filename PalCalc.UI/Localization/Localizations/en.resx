@@ -1144,4 +1144,7 @@ Would you like to download the installer now?
   <data name="LC_REQUIRED_ATTACKS_SUMMARY" xml:space="preserve">
     <value>Attacks: {AttacksList}</value>
   </data>
+  <data name="LC_SPECIAL_CAKES_REQUIRED_DESC" xml:space="preserve">
+    <value>Special Cakes must be used for this breeding step.</value>
+  </data>
 </root>

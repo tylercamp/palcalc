@@ -1072,4 +1072,7 @@
   <data name="LC_REQUIRED_ATTACKS_SUMMARY" xml:space="preserve">
     <value>AttacksList</value>
   </data>
+  <data name="LC_SPECIAL_CAKES_REQUIRED_DESC" xml:space="preserve">
+    <value />
+  </data>
 </root>

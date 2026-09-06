@@ -97,9 +97,8 @@
                                     VerticalAlignment="Top"
                                     HorizontalAlignment="Left"
                                     Cursor="Hand"
-                                    ToolTipService.ToolTip="Special Cakes must be used for this breeding step."
+                                    ToolTipService.ToolTip="{itl:LocalizedText LC_SPECIAL_CAKES_REQUIRED_DESC}"
                                     >
-                                <!-- TODO ITL -->
                                 <Border.Background>
                                     <ImageBrush>
                                         <ImageBrush.ImageSource>

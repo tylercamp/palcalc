@@ -1191,6 +1191,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SPECIAL_CAKES_REQUIRED_DESC,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_STARTUP_LOADING,
         /// <summary>
         ///   Looks up a localized string similar to AddedPassive.
