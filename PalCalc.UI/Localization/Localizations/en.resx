@@ -1147,4 +1147,10 @@ Would you like to download the installer now?
   <data name="LC_SPECIAL_CAKES_REQUIRED_DESC" xml:space="preserve">
     <value>Special Cakes must be used for this breeding step.</value>
   </data>
+  <data name="LC_ATTACK_SKILL_NOT_INHERITABLE" xml:space="preserve">
+    <value>Cannot be inherited</value>
+  </data>
+  <data name="LC_ATTACK_SKILL_NOT_KNOWN" xml:space="preserve">
+    <value>No Pals know this attack</value>
+  </data>
 </root>

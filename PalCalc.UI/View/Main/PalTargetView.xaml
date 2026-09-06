@@ -24,11 +24,11 @@
         <Style TargetType="materialIcons:MaterialIcon" x:Key="AttackUnavailableWarningTooltipTemplate">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Availability}" Value="NotInheritable">
-                    <Setter Property="ToolTipService.ToolTip" Value="Cannot be inherited" />
+                    <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText LC_ATTACK_SKILL_NOT_INHERITABLE}" />
                 </DataTrigger>
 
                 <DataTrigger Binding="{Binding Availability}" Value="NotKnownByPals">
-                    <Setter Property="ToolTipService.ToolTip" Value="No Pals know this attack" />
+                    <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText LC_ATTACK_SKILL_NOT_KNOWN}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>

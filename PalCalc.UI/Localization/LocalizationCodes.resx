@@ -1075,4 +1075,10 @@
   <data name="LC_SPECIAL_CAKES_REQUIRED_DESC" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_ATTACK_SKILL_NOT_INHERITABLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_ATTACK_SKILL_NOT_KNOWN" xml:space="preserve">
+    <value />
+  </data>
 </root>

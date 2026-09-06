@@ -84,6 +84,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_ATTACK_SKILL_NOT_INHERITABLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_ATTACK_SKILL_NOT_KNOWN,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_BASE_ASSIGNED_LABEL,
         /// <summary>
         ///   Looks up a localized string similar to BaseName.
