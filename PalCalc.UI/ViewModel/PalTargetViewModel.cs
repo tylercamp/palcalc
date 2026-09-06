@@ -33,6 +33,8 @@ namespace PalCalc.UI.ViewModel
         public PalTargetViewModel(SaveGameViewModel sourceSave, PalSourceViewModel sourcePals, PalSpecifierViewModel initial, PassiveSkillsPresetCollectionViewModel presets)
         {
             this.sourcePals = sourcePals;
+            
+            AvailableAttackSkills = new AttackSkillSourceViewModel(sourcePals);
 
             if (initial.IsReadOnly)
             {
@@ -144,6 +146,8 @@ namespace PalCalc.UI.ViewModel
         }
 
         public bool IsValid => CurrentPalSpecifier.IsValid;
+
+        public AttackSkillSourceViewModel AvailableAttackSkills { get; }
 
         public PassiveSkillsPresetCollectionViewModel Presets { get; }
 

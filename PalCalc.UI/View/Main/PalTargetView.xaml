@@ -6,6 +6,7 @@
             xmlns:local="clr-namespace:PalCalc.UI.View.Main"
             xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
             xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
+            xmlns:svm="clr-namespace:PalCalc.UI.ViewModel.Solver"
             xmlns:dnkc="clr-namespace:DotNetKit.Windows.Controls;assembly=DotNetKit.Wpf.AutoCompleteComboBox"
             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
@@ -18,6 +19,8 @@
             d:DataContext="{d:DesignInstance vm:PalTargetViewModel, IsDesignTimeCreatable=True}"
             d:DesignHeight="401.428" d:DesignWidth="842.441">
     <StackPanel.Resources>
+        <c:ValueVisibilityConverter x:Key="VVC_Negate" Negate="True" />
+
         <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
             <TextBlock Text="{Binding Name.Value}" />
         </DataTemplate>
@@ -55,23 +58,23 @@
     <GroupBox Header="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" adonisExtensions:LayerExtension.IncreaseLayer="False" Background="{x:Null}" Margin="0,5,0,0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer2BorderBrush}}" BorderThickness="1">
         <GroupBox.Resources>
             <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
-                <Setter Property="ItemsSource" Value="{x:Static mvm:ActiveSkillViewModel.Inheritable}" />
+                <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Content.AvailableAttackSkills.AvailableAttacks}" />
                 <Setter Property="ItemTemplate" Value="{StaticResource AttackTemplate}" />
                 <Setter Property="TextSearch.TextPath" Value="Name.Value" />
             </Style>
 
-            <DataTemplate x:Key="ThinAttacksList" DataType="mvm:PalSpecifierAttackSkillCollectionViewModel">
+            <DataTemplate x:Key="ThinAttacksList" DataType="vm:PalTargetViewModel">
                 <StackPanel vu:StackPanelExtensions.Spacing="5">
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack1, Mode=TwoWay}" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack2, Mode=TwoWay}" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack3, Mode=TwoWay}" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack4, Mode=TwoWay}" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack5, Mode=TwoWay}" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack6, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack1, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack2, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack3, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack4, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack5, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack6, Mode=TwoWay}" />
                 </StackPanel>
             </DataTemplate>
 
-            <DataTemplate x:Key="WideAttacksList" DataType="mvm:PalSpecifierAttackSkillCollectionViewModel">
+            <DataTemplate x:Key="WideAttacksList" DataType="vm:PalTargetViewModel">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
@@ -86,16 +89,16 @@
                         <RowDefinition Height="1*" />
                     </Grid.RowDefinitions>
 
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack1, Mode=TwoWay}" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack2, Mode=TwoWay}" Grid.Column="2" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack3, Mode=TwoWay}" Grid.Row="2" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack4, Mode=TwoWay}" Grid.Row="2" Grid.Column="2" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack5, Mode=TwoWay}" Grid.Row="4" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack6, Mode=TwoWay}" Grid.Row="4" Grid.Column="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack1, Mode=TwoWay}" IsDropDownOpen="True" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack2, Mode=TwoWay}" Grid.Column="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack3, Mode=TwoWay}" Grid.Row="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack4, Mode=TwoWay}" Grid.Row="2" Grid.Column="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack5, Mode=TwoWay}" Grid.Row="4" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack6, Mode=TwoWay}" Grid.Row="4" Grid.Column="2" />
                 </Grid>
             </DataTemplate>
 
-            <DataTemplate x:Key="ExtraWideAttacksList" DataType="mvm:PalSpecifierAttackSkillCollectionViewModel">
+            <DataTemplate x:Key="ExtraWideAttacksList" DataType="vm:PalTargetViewModel">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
@@ -110,19 +113,19 @@
                         <RowDefinition Height="1*" />
                     </Grid.RowDefinitions>
 
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack1, Mode=TwoWay}" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack2, Mode=TwoWay}" Grid.Column="2" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack3, Mode=TwoWay}" Grid.Column="4" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack4, Mode=TwoWay}" Grid.Row="2" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack5, Mode=TwoWay}" Grid.Row="2" Grid.Column="2" />
-                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding Attack6, Mode=TwoWay}" Grid.Row="2" Grid.Column="4" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack1, Mode=TwoWay}" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack2, Mode=TwoWay}" Grid.Column="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack3, Mode=TwoWay}" Grid.Column="4" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack4, Mode=TwoWay}" Grid.Row="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack5, Mode=TwoWay}" Grid.Row="2" Grid.Column="2" />
+                    <dnkc:AutoCompleteComboBox SelectedValue="{Binding CurrentPalSpecifier.RequiredAttacks.Attack6, Mode=TwoWay}" Grid.Row="2" Grid.Column="4" />
                 </Grid>
             </DataTemplate>
 
             <c:GreaterThanConverter x:Key="AttacksWideMode" MinValue="400" />
             <c:GreaterThanConverter x:Key="AttacksExtraWideMode" MinValue="800" />
         </GroupBox.Resources>
-        <ContentControl Content="{Binding CurrentPalSpecifier.RequiredAttacks}">
+        <ContentControl Content="{Binding}">
             <ContentControl.Style>
                 <Style TargetType="ContentControl">
                     <Setter Property="ContentTemplate" Value="{StaticResource ThinAttacksList}" />
