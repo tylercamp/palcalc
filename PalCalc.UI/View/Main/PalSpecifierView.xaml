@@ -165,7 +165,7 @@
                     >
                     <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" FontWeight="Bold" />
                     <TextBlock Text=": " />
-                    <TextBlock Text="{Binding RequiredAttacks.Description.Value}" />
+                    <TextBlock Text="{Binding RequiredAttacks.FixedViewModel.Description.Value}" />
                 </StackPanel>
 
                 <Grid

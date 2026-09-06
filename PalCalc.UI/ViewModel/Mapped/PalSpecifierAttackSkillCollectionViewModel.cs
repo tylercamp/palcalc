@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.UI.Localization;
+using PalCalc.UI.ViewModel.PalDerived;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -53,6 +55,8 @@ public partial class PalSpecifierAttackSkillCollectionViewModel : ObservableObje
         new[] { Attack1, Attack2, Attack3, Attack4, Attack5, Attack6 }.OfType<ActiveSkillViewModel>();
 
     public IEnumerable<ActiveSkill> AsModelEnumerable() => AsEnumerable().Select(attack => attack.ModelObject).Distinct();
+
+    public AttackSkillCollectionViewModel FixedViewModel => new AttackSkillCollectionViewModel(AsEnumerable());
 
     public void CopyFrom(PalSpecifierAttackSkillCollectionViewModel other)
     {
