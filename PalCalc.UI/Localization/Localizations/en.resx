@@ -146,10 +146,10 @@
 This value is doubled internally to account for pal inactivity at night.</value>
   </data>
   <data name="LC_COMMON_ALL_ATTACK_SKILLS" xml:space="preserve">
-    <value>All Active Skills</value>
+    <value>All Attack Skills</value>
   </data>
   <data name="LC_COMMON_ATTACK_SKILLS" xml:space="preserve">
-    <value>Active Skills</value>
+    <value>Attack Skills</value>
   </data>
   <data name="LC_COMMON_CANCEL" xml:space="preserve">
     <value>Cancel</value>
@@ -161,7 +161,7 @@ This value is doubled internally to account for pal inactivity at night.</value>
     <value>Enabled</value>
   </data>
   <data name="LC_COMMON_EQUIPPED_ATTACK_SKILLS" xml:space="preserve">
-    <value>Equipped Active Skills</value>
+    <value>Equipped Attack Skills</value>
   </data>
   <data name="LC_COMMON_GENDER" xml:space="preserve">
     <value>Gender</value>
@@ -438,7 +438,7 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
     <value>Open in Explorer</value>
   </data>
   <data name="LC_OPTIONAL_TRAITS_SUMMARY" xml:space="preserve">
-    <value>Optionally with {TraitsList}</value>
+    <value>Optional Passives: {TraitsList}</value>
   </data>
   <data name="LC_PAL_CHECKLIST_SEARCH" xml:space="preserve">
     <value>Search</value>
@@ -559,7 +559,7 @@ This will not delete the save files from your computer.</value>
     <value>Remove Manual Save?</value>
   </data>
   <data name="LC_REQUIRED_TRAITS_SUMMARY" xml:space="preserve">
-    <value>With {TraitsList}</value>
+    <value>Passives: {TraitsList}</value>
   </data>
   <data name="LC_RESULT_BREEDING_ATTEMPTS" xml:space="preserve">
     <value>{AvgAttempts} attempts</value>
@@ -909,7 +909,7 @@ Higher values linearly affect time required, depending on how many types of pals
     <value>Target Pals</value>
   </data>
   <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">
-    <value>no passives</value>
+    <value>None</value>
   </data>
   <data name="LC_TRAITS_COUNT_RANDOM" xml:space="preserve">
     <value>{NumRandom} random</value>
@@ -1160,5 +1160,8 @@ Would you like to download the installer now?
   </data>
   <data name="LC_LIBOOZ_VC_REDIST_BTN_MORE_INFO" xml:space="preserve">
     <value>More Information</value>
+  </data>
+  <data name="LC_REQUIRED_ATTACKS_SUMMARY" xml:space="preserve">
+    <value>Attacks: {AttacksList}</value>
   </data>
 </root>

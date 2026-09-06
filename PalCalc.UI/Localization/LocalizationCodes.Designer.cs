@@ -721,6 +721,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_REMOVE_SAVE_TITLE,
         /// <summary>
+        ///   Looks up a localized string similar to AttacksList.
+        /// </summary>
+        LC_REQUIRED_ATTACKS_SUMMARY,
+        /// <summary>
         ///   Looks up a localized string similar to TraitsList.
         /// </summary>
         LC_REQUIRED_TRAITS_SUMMARY,

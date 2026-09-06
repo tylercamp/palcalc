@@ -11,7 +11,7 @@ namespace PalCalc.UI.ViewModel.PalDerived
         public AttackSkillCollectionViewModel(IEnumerable<ActiveSkillViewModel> attacks)
         {
             Attacks = attacks.ToList();
-            Description = Translator.Join.Bind(Attacks.Select(t => t.Name));
+            Description = LocalizationCodes.LC_REQUIRED_ATTACKS_SUMMARY.Bind(Translator.Join.Bind(Attacks.Select(t => t.Name)));
         }
 
         public List<ActiveSkillViewModel> Attacks { get; }

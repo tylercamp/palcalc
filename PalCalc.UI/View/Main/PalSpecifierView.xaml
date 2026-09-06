@@ -91,10 +91,10 @@
             
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
@@ -144,10 +144,18 @@
                 </Grid>
 
                 <TextBlock
+                    Text="{Binding RequiredAttacks.FixedViewModel.Description.Value}"
+                    TextWrapping="Wrap"
+                    FontWeight="Bold"
+                    Visibility="{Binding RequiredAttacks.HasItems, Converter={StaticResource BVC}}"
+                    Grid.Row="1"
+                    />
+
+                <TextBlock
                     Text="{Binding RequiredPassives.FixedViewModel.RequiredDescription.Value}"
                     TextWrapping="Wrap"
                     FontWeight="Bold"
-                    Grid.Row="1"
+                    Grid.Row="2"
                     />
 
                 <TextBlock
@@ -155,18 +163,8 @@
                     TextWrapping="Wrap"
                     FontStyle="Italic"
                     Visibility="{Binding OptionalPassives.HasItems, Converter={StaticResource BVC}}"
-                    Grid.Row="2"
-                    />
-
-                <StackPanel
                     Grid.Row="3"
-                    Orientation="Horizontal"
-                    Visibility="{Binding RequiredAttacks.HasItems, Converter={StaticResource BVC}}"
-                    >
-                    <TextBlock Text="{itl:LocalizedText Code=LC_COMMON_ATTACK_SKILLS}" FontWeight="Bold" />
-                    <TextBlock Text=": " />
-                    <TextBlock Text="{Binding RequiredAttacks.FixedViewModel.Description.Value}" />
-                </StackPanel>
+                    />
 
                 <Grid
                     Grid.Row="4"
