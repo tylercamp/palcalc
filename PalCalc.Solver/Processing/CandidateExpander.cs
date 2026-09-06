@@ -511,16 +511,16 @@ namespace PalCalc.Solver.Processing
                                     res = new BredPalReference(
                                         settings.GameSettings,
                                         childPalType,
+                                        gender: PalGender.WILDCARD,
                                         parent1,
                                         parent2,
+                                        avgRequiredBreedings: null,
                                         newPassives,
                                         probabilityForUpToNumPassives,
                                         finalIVs,
                                         ivsProbability,
                                         attackProfile: AttackProfile.Inactive,
-                                        materializedAttackInheritance: null,
-                                        avgRequiredBreedings: null,
-                                        gender: PalGender.WILDCARD
+                                        materializedAttackInheritance: null
                                     );
                                     filterResult = context.PreFilter.TryAdd(res);
                                 }

@@ -86,9 +86,9 @@ public class AttackResultMaterializerTests
         var result = (BredPalReference)new AttackResultMaterializer(context, settings)
             .Materialize(root, selectedEntry);
         var expectedBreedings = BredPalReferenceEffort.WithGuaranteedGender(
-            1,
-            child,
             SolverTestScenario.DB,
+            child,
+            1,
             PalGender.MALE,
             useReverser: false
         );
@@ -399,18 +399,18 @@ public class AttackResultMaterializerTests
     {
         settings ??= Settings();
         return new(
-        settings.GameSettings,
-        child ?? Child,
-        parent1,
-        parent2,
-        [],
-        passivesProbability: 1,
-        new IV_Set(),
-        ivsProbability: 1,
-        attackProfile,
-        materializedAttackInheritance: null,
-        avgRequiredBreedings: null,
-        gender
+            settings.GameSettings,
+            child ?? Child,
+            gender,
+            parent1,
+            parent2,
+            avgRequiredBreedings: null,
+            [],
+            passivesProbability: 1,
+            new IV_Set(),
+            ivsProbability: 1,
+            attackProfile,
+            materializedAttackInheritance: null
         );
     }
 

@@ -19,9 +19,21 @@ internal sealed class ResultPostProcessor(
     AttackTargetContext attackTargets
 )
 {
+    /// <summary>
+    /// Updates the `frontier` by applying surgery operations to its contents. Pals
+    /// in `extraResults` can be provided to maintain compatibility with `ResultAccumulator`:
+    /// 
+    /// The `ResultAccumulator` is used to preserve alternate, potentially less-optimal
+    /// results and present more choices in the final list. This check only applies to
+    /// Pals which fully satisfy the `PalSpecifier` target, and would skip Pals which only
+    /// satisfy the target after surgery.
+    /// 
+    /// The `SurgeryFinalistAccumulator` can be used to collect these potential results,
+    /// and those results can be used as `extraResults`.
+    /// </summary>
     public void ApplySurgery(
         SearchFrontier frontier,
-        IEnumerable<IPalReference> retainedSurgeryFinalists = null
+        IEnumerable<IPalReference> extraResults
     )
     {
         var surgeryCompatiblePassives = target
@@ -35,10 +47,10 @@ internal sealed class ResultPostProcessor(
         )
             return;
 
-        // Surgery runs once after breeding. Applying it during every iteration
-        // would model more combinations, but would materially expand the
-        // frontier and increase search cost.
-        var retained = retainedSurgeryFinalists?.ToArray() ?? [];
+        // Surgery should run once after breeding. It's more accurate to apply at
+        // every solver step, but it drastically increases the search space for
+        // little gain.
+        var retained = extraResults?.ToArray() ?? [];
         frontier.ExpandSingles(palReferences =>
             palReferences
                 .Concat(retained)

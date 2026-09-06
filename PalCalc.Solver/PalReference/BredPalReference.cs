@@ -69,16 +69,16 @@ namespace PalCalc.Solver.PalReference
         public BredPalReference(
             GameSettings gameSettings,
             Pal pal,
+            PalGender gender,
             IPalReference parent1,
             IPalReference parent2,
+            int? avgRequiredBreedings,
             List<PassiveSkill> passives,
             float passivesProbability,
             IV_Set ivs,
             float ivsProbability,
             AttackProfile attackProfile,
-            MaterializedAttackInheritance materializedAttackInheritance,
-            int? avgRequiredBreedings,
-            PalGender gender
+            MaterializedAttackInheritance materializedAttackInheritance
         ) : this(gameSettings, pal, parent1, parent2, passives, ivs, attackProfile, materializedAttackInheritance)
         {
             Gender = gender;
@@ -184,7 +184,7 @@ namespace PalCalc.Solver.PalReference
                     AttackProfile,
                     MaterializedAttackInheritance)
                 {
-                    AvgRequiredBreedings = BredPalReferenceEffort.WithGuaranteedGender(AvgRequiredBreedings, Pal, db, gender, useReverser),
+                    AvgRequiredBreedings = BredPalReferenceEffort.WithGuaranteedGender(db, Pal, AvgRequiredBreedings, gender, useReverser),
                     Gender = gender,
                     PassivesProbability = PassivesProbability,
                     IVsProbability = IVsProbability,

@@ -33,6 +33,10 @@ namespace PalCalc.Solver.Processing.Search
         {
             this.listA = listA;
             this.listB = listB;
+
+            // The cartesian product of two different lists is just all pairs of AxB.
+            // The product of a list with _itself_ can end up with pairs like (X,Y) and (Y,X).
+            // We can adjust the work size by dropping swapped, duplicate pairs.
             this.unorderedSameList = unorderedSameList;
             Count = unorderedSameList
                 ? ((long)listA.Count * (listA.Count + 1)) / 2

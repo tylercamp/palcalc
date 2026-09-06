@@ -154,16 +154,16 @@ public class PalSpecifierAttackTests
         var bred = new BredPalReference(
             new GameSettings(),
             pals[0],
+            gender: PalGender.WILDCARD,
             firstParent,
             secondParent,
+            avgRequiredBreedings: 1,
             [],
             passivesProbability: 1,
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
             ivsProbability: 1,
             attackProfile: AttackProfile.Inactive,
-            materializedAttackInheritance: inheritance,
-            avgRequiredBreedings: 1,
-            gender: PalGender.WILDCARD
+            materializedAttackInheritance: inheritance
         );
 
         Assert.AreSame(secondParent, bred.Parent1);
@@ -180,16 +180,16 @@ public class PalSpecifierAttackTests
         var result = new BredPalReference(
             new GameSettings(),
             db.Pals.First(),
+            gender: PalGender.WILDCARD,
             Owned(db.Pals.First(), "parent-1", attack, 1),
             Owned(db.Pals.First(), "parent-2", attack, 2),
+            avgRequiredBreedings: null,
             [],
             passivesProbability: 1,
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
             ivsProbability: 1,
             attackProfile: AttackProfile.Inactive,
-            materializedAttackInheritance: null,
-            avgRequiredBreedings: null,
-            gender: PalGender.WILDCARD
+            materializedAttackInheritance: null
         );
 
         var display = new BreedingResultViewModel(null, new GameSettings(), result, []);

@@ -231,16 +231,16 @@ internal sealed class AttackResultMaterializer
         var reference = new BredPalReference(
             settings.GameSettings,
             bred.Pal,
+            gender: bred.Gender,
             parent1.Reference,
             parent2.Reference,
+            avgRequiredBreedings: requiredBreedings,
             [.. bred.EffectivePassives],
             bred.PassivesProbability,
             bred.IVs,
             bred.IVsProbability,
             attackProfile: new AttackProfile(bred.AttackProfile.HasNoopAttack, actualEntry),
-            materializedAttackInheritance: inheritance,
-            avgRequiredBreedings: requiredBreedings,
-            gender: bred.Gender
+            materializedAttackInheritance: inheritance
         );
 
         return new(
@@ -267,9 +267,9 @@ internal sealed class AttackResultMaterializer
         return bred.Gender == PalGender.WILDCARD
             ? requiredBreedings
             : BredPalReferenceEffort.WithGuaranteedGender(
-                requiredBreedings,
-                bred.Pal,
                 settings.DB,
+                bred.Pal,
+                requiredBreedings,
                 bred.Gender,
                 settings.UseGenderReversers
             );

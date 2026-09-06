@@ -115,16 +115,16 @@ public class BredReferenceConverterTests
     ) => new(
         new GameSettings(),
         pal,
+        gender: gender,
         parent1,
         parent2,
+        avgRequiredBreedings: avgRequiredBreedings,
         [],
         passivesProbability: 0.5f,
         new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
         ivsProbability: 0.5f,
         attackProfile: AttackProfile.Inactive,
-        materializedAttackInheritance: inheritance,
-        avgRequiredBreedings: avgRequiredBreedings,
-        gender: gender
+        materializedAttackInheritance: inheritance
     );
 
     private static OwnedPalReference Owned(Pal pal, string id, ActiveSkill attack, int index) => new(

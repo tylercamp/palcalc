@@ -64,16 +64,16 @@ internal struct CandidateDraft
     public BredPalReference Materialize() => materialized ??= new BredPalReference(
         gameSettings,
         Pal,
+        Gender,
         parent1,
         parent2,
+        avgRequiredBreedings: null,
         EffectivePassives,
         passivesProbability,
         IVs,
         ivsProbability,
         AttackProfile.Materialize(),
-        materializedAttackInheritance: null,
-        avgRequiredBreedings: null,
-        Gender
+        materializedAttackInheritance: null
     );
 
     public override int GetHashCode() => HashCode.Combine(

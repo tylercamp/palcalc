@@ -38,22 +38,35 @@ internal static class BredPalReferenceEffort
             : allBreedingWithIncubation;
     }
 
+    /// <summary>
+    /// Given a Pal which takes `baseRequiredBreedings` to acquire, returns an adjusted "num. required breedings"
+    /// depending on the target gender and the Pal's gender probabilities.
+    /// </summary>
     public static int WithGuaranteedGender(
-        int requiredBreedings,
-        Pal pal,
         PalDB db,
+        Pal pal,
+        int baseRequiredBreedings,
         PalGender gender,
         bool useReverser
     )
     {
         if (gender == PalGender.WILDCARD || useReverser)
-            return requiredBreedings;
+            return baseRequiredBreedings;
 
         if (gender == PalGender.OPPOSITE_WILDCARD)
-            return db.BreedingMostLikelyGender[pal] != PalGender.WILDCARD
-                ? (int)Math.Ceiling(requiredBreedings / db.BreedingGenderProbability[pal][db.BreedingLeastLikelyGender[pal]])
-                : requiredBreedings * 2;
+        {
+            if (db.BreedingMostLikelyGender[pal] != PalGender.WILDCARD)
+            {
+                // assume the other parent has the more likely gender
+                return (int)Math.Ceiling(baseRequiredBreedings / db.BreedingGenderProbability[pal][db.BreedingLeastLikelyGender[pal]]);
+            }
+            else
+            {
+                // no preferred bred gender, i.e. 50/50 bred chance, so have half the probability / twice the effort to get desired instance
+                return baseRequiredBreedings * 2;
+            }
+        }
 
-        return (int)Math.Ceiling(requiredBreedings / db.BreedingGenderProbability[pal][gender]);
+        return (int)Math.Ceiling(baseRequiredBreedings / db.BreedingGenderProbability[pal][gender]);
     }
 }

@@ -650,16 +650,16 @@ public class ResultPostProcessorTests
     ) => new(
         new GameSettings(),
         child,
+        gender,
         parent1,
         parent2,
+        avgRequiredBreedings: null,
         [],
         passivesProbability: 1,
         new IV_Set(),
         ivsProbability: 1,
         attackProfile,
-        materializedAttackInheritance: null,
-        avgRequiredBreedings: null,
-        gender
+        materializedAttackInheritance: null
     );
 
     private static OwnedPalReference Leaf(

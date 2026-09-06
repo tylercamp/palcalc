@@ -245,16 +245,16 @@ namespace PalCalc.UI.Persistence.Serialization
             var result = new BredPalReference(
                 settings,
                 value.PalInternalName.InternalToPal(db),
+                value.AvgRequiredBreedings is null ? PalGender.WILDCARD : value.Gender.Value,
                 FromDto(value.Parent1, db, settings, solverSettings),
                 FromDto(value.Parent2, db, settings, solverSettings),
+                value.AvgRequiredBreedings,
                 value.EffectivePassiveInternalNames.Select(name => name.InternalToStandardPassive(db)).ToList(),
                 value.PassivesProbability.Value,
                 FromDto(value.IVs),
                 value.IVsProbability.Value,
                 AttackProfile.Inactive,
-                materializedAttackInheritance,
-                value.AvgRequiredBreedings,
-                value.AvgRequiredBreedings is null ? PalGender.WILDCARD : value.Gender.Value
+                materializedAttackInheritance
             );
             return value.AvgRequiredBreedings is null
                 ? result.WithGuaranteedGender(db, value.Gender.Value, solverSettings.UseGenderReversers)

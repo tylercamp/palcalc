@@ -238,16 +238,16 @@ public class CandidateSelectionPolicyTests
         BredPalReference BredWith(AttackProfile profile) => new(
             settings,
             "Wixen Noct".ToPal(SolverTestScenario.DB),
+            gender: PalGender.WILDCARD,
             parent1,
             parent2,
+            avgRequiredBreedings: null,
             passives: [],
             passivesProbability: 1,
             ivs: new IV_Set(),
             ivsProbability: 1,
             attackProfile: profile,
-            materializedAttackInheritance: null,
-            avgRequiredBreedings: null,
-            gender: PalGender.WILDCARD
+            materializedAttackInheritance: null
         );
 
         var first = BredWith(Profile(1));
