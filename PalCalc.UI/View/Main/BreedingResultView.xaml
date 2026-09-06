@@ -61,7 +61,7 @@
 
             <DataTemplate DataType="{x:Type gsvm:SurgeryBreedingTreeNodeViewModel}">
                 <StackPanel Margin="5" Orientation="Horizontal">
-                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Margin="0,0,5,0">
+                    <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}" Margin="0,0,5,0">
                         <Border.Background>
                             <ImageBrush>
                                 <ImageBrush.ImageSource>
@@ -88,7 +88,35 @@
             <DataTemplate DataType="{x:Type gsvm:StandardBreedingTreeNodeViewModel}">
                 <StackPanel Orientation="Vertical" Margin="5" MinWidth="180" UseLayoutRounding="True">
                     <DockPanel HorizontalAlignment="Stretch">
-                        <Border Width="50" Height="50" CornerRadius="25" BorderThickness="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}" Margin="0,0,5,0" Background="{Binding Pal.IconBrush}" />
+                        <Grid VerticalAlignment="Stretch">
+                            <Border Width="24" Height="24"
+                                    CornerRadius="25"
+                                    BorderThickness="1"
+                                    BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
+                                    Visibility="{Binding UsesSpecialCake, Converter={StaticResource VVC}}"
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Left"
+                                    Cursor="Hand"
+                                    ToolTipService.ToolTip="Special Cakes must be used for this breeding step."
+                                    >
+                                <!-- TODO ITL -->
+                                <Border.Background>
+                                    <ImageBrush>
+                                        <ImageBrush.ImageSource>
+                                            <BitmapImage UriSource="pack://application:,,,/PalCalc.UI;component/Resources/Cake_Special.png" />
+                                        </ImageBrush.ImageSource>
+                                    </ImageBrush>
+                                </Border.Background>
+                            </Border>
+
+                            <Border Width="50" Height="50"
+                                    CornerRadius="25"
+                                    BorderThickness="1"
+                                    BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
+                                    Margin="0,0,5,0"
+                                    Background="{Binding Pal.IconBrush}"
+                                    />
+                        </Grid>
                         <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Stretch">
                             <StackPanel.Resources>
                                 <DataTemplate DataType="mvm:SpecificPalRefLocationViewModel" x:Key="LocationPopupContent">
@@ -123,7 +151,6 @@
                                 <Border Visibility="{Binding IsCheckable, Converter={StaticResource VVC}}" Width="16" Margin="0,0,8,0" Height="0" />
                             </StackPanel>
                             <StackPanel Margin="0,2,0,0" Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult.EffectiveAttacks.Attacks, Converter={StaticResource CVC}}">
-                                <TextBlock Text="{itl:LocalizedText LC_RESULT_EQUIPPED_ATTACKS}" FontSize="9" />
                                 <ItemsControl ItemsSource="{Binding EquippedAttacks.Attacks}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -131,12 +158,6 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <!-- TODO - Use icon -->
-                                <vu:LocalizedEmbeddedText Code="LC_RESULT_USE_SPECIAL_CAKE" Visibility="{Binding UsesSpecialCake, Converter={StaticResource VVC}}">
-                                    <vu:EmbeddedParam Key="NumCakes">
-                                        <TextBlock Text="{Binding SpecialCakes}" FontSize="9" />
-                                    </vu:EmbeddedParam>
-                                </vu:LocalizedEmbeddedText>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="10" Visibility="{Binding AvgRequiredAttemptsVisibility}">
