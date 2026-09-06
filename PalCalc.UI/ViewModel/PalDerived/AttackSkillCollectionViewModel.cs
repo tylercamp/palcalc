@@ -23,6 +23,6 @@ namespace PalCalc.UI.ViewModel.PalDerived
         public IEnumerable<ActiveSkillViewModel> AsEnumerable() => Attacks;
 
         public IEnumerable<ActiveSkill> AsModelEnumerable() =>
-            AsEnumerable().Select(attack => attack.ModelObject).Distinct();
+            AsEnumerable().SkipNull().Select(attack => attack.ModelObject).Distinct();
     }
 }

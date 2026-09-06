@@ -122,6 +122,8 @@ internal sealed class ParallelBatchExecutor(
                     {
                         // The shared pre-filter owns the current per-mask champions.
                         // Do not keep replaced candidates alive in batch result lists.
+                        //
+                        // TODO - Avoid contaminating result responsibilities like this
                         foreach (var _ in expanded) { }
                     }
                     else

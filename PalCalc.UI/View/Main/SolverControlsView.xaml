@@ -42,8 +42,6 @@
                 <RowDefinition />
                 <RowDefinition Height="{StaticResource SepHeight}" />
                 <RowDefinition />
-                <RowDefinition Height="{StaticResource SepHeight}" />
-                <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -71,7 +69,7 @@
                 MinWidth="60"
             />
 
-            <Button Grid.Row="6"
+            <Button Grid.Row="4"
                     Grid.ColumnSpan="99"
                     Command="{Binding ChangeSurgeryPassives}"
                     IsEnabled="{Binding CanEditSettings}"

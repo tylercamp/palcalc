@@ -21,7 +21,7 @@
         <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
             <TextBlock Text="{Binding Name.Value}" />
         </DataTemplate>
-        <DataTemplate x:Key="ActiveTemplate" DataType="{x:Type mvm:ActiveSkillViewModel}">
+        <DataTemplate x:Key="AttackTemplate" DataType="{x:Type mvm:ActiveSkillViewModel}">
             <TextBlock Text="{Binding Name.Value}" />
         </DataTemplate>
     </StackPanel.Resources>
@@ -56,7 +56,7 @@
         <GroupBox.Resources>
             <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
                 <Setter Property="ItemsSource" Value="{x:Static mvm:ActiveSkillViewModel.Inheritable}" />
-                <Setter Property="ItemTemplate" Value="{StaticResource ActiveTemplate}" />
+                <Setter Property="ItemTemplate" Value="{StaticResource AttackTemplate}" />
                 <Setter Property="TextSearch.TextPath" Value="Name.Value" />
             </Style>
 
