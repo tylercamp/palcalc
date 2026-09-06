@@ -2,6 +2,7 @@ using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Utils;
+using System.Runtime.CompilerServices;
 
 namespace PalCalc.Solver.Processing.Attacks;
 
@@ -17,6 +18,11 @@ internal readonly record struct AttackCompositionChoice(
     byte Parent1TargetMask,
     byte Parent2TargetMask,
     AttackProfileEntry ChildEntry
+);
+
+internal readonly record struct AttackMaterializationMetrics(
+    TimeSpan BreedingEffort,
+    int TotalSpecialCakes
 );
 
 /// <summary>
@@ -50,8 +56,8 @@ internal sealed class AttackResultMaterializer
     private readonly ActiveSkill[][] attacksByMask;
     private readonly Dictionary<(Pal Pal, byte InheritedMask), ActiveSkill[]> childLearnedAttacks =
         [];
-    private readonly Dictionary<IPalReference, Dictionary<AttackProfileEntry, MaterializedResult>> materialized =
-        new(ReferenceEqualityComparer.Instance);
+    private readonly Dictionary<ResultKey, EvaluatedResult> evaluated = [];
+    private readonly Dictionary<ResultKey, MaterializedResult> materialized = [];
 
     public AttackResultMaterializer(AttackTargetContext targets, BreedingSolverSettings settings)
     {
@@ -91,6 +97,36 @@ internal sealed class AttackResultMaterializer
     public IPalReference Materialize(IPalReference reference, AttackProfileEntry selectedEntry) =>
         MaterializeResult(reference, selectedEntry).Reference;
 
+    public AttackMaterializationMetrics Evaluate(
+        IPalReference reference,
+        AttackProfileEntry selectedEntry
+    )
+    {
+        var result = EvaluateResult(reference, selectedEntry);
+        return new(result.BreedingEffort, result.TotalSpecialCakes);
+    }
+
+    private EvaluatedResult EvaluateResult(
+        IPalReference reference,
+        AttackProfileEntry selectedEntry
+    )
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+
+        var key = new ResultKey(reference, selectedEntry);
+        if (evaluated.TryGetValue(key, out var result))
+            return result;
+
+        result = reference switch
+        {
+            SurgeryTablePalReference surgery => EvaluateResult(surgery.Input, selectedEntry),
+            BredPalReference bred => EvaluateBred(bred, selectedEntry),
+            _ => EvaluateLeaf(reference, selectedEntry),
+        };
+        evaluated.Add(key, result);
+        return result;
+    }
+
     private MaterializedResult MaterializeResult(
         IPalReference reference,
         AttackProfileEntry selectedEntry
@@ -98,22 +134,18 @@ internal sealed class AttackResultMaterializer
     {
         ArgumentNullException.ThrowIfNull(reference);
 
-        if (!materialized.TryGetValue(reference, out var entries))
-        {
-            entries = [];
-            materialized.Add(reference, entries);
-        }
-
-        if (entries.TryGetValue(selectedEntry, out var result))
+        var key = new ResultKey(reference, selectedEntry);
+        if (materialized.TryGetValue(key, out var result))
             return result;
 
+        var evaluation = EvaluateResult(reference, selectedEntry);
         result = reference switch
         {
             SurgeryTablePalReference surgery => MaterializeSurgery(surgery, selectedEntry),
-            BredPalReference bred => MaterializeBred(bred, selectedEntry),
+            BredPalReference bred => MaterializeChoice(bred, evaluation),
             _ => new(MaterializeLeaf(reference, selectedEntry), selectedEntry.TotalSpecialCakes),
         };
-        entries.Add(selectedEntry, result);
+        materialized.Add(key, result);
         return result;
     }
 
@@ -142,7 +174,7 @@ internal sealed class AttackResultMaterializer
     /// then deterministic tie-breaks on the witness fields. Only that winner
     /// is materialized.
     /// </summary>
-    private MaterializedResult MaterializeBred(
+    private EvaluatedResult EvaluateBred(
         BredPalReference bred,
         AttackProfileEntry selectedEntry
     )
@@ -169,7 +201,13 @@ internal sealed class AttackResultMaterializer
         }
 
         return found
-            ? MaterializeChoice(bred, best)
+            ? new(
+                best.BreedingEffort,
+                best.TotalSpecialCakes,
+                best.Choice,
+                best.AttackProbability,
+                best.RequiredBreedings
+            )
             : throw new InvalidOperationException(
                 "The selected attack profile entry cannot be reconstructed."
             );
@@ -180,10 +218,8 @@ internal sealed class AttackResultMaterializer
         AttackCompositionChoice choice
     )
     {
-        // Parent effort and cake totals are only authoritative after their
-        // selected entries have been recursively materialized.
-        var parent1 = MaterializeResult(bred.Parent1, choice.Parent1Entry);
-        var parent2 = MaterializeResult(bred.Parent2, choice.Parent2Entry);
+        var parent1 = EvaluateResult(bred.Parent1, choice.Parent1Entry);
+        var parent2 = EvaluateResult(bred.Parent2, choice.Parent2Entry);
         var parentCakes = parent1.TotalSpecialCakes + parent2.TotalSpecialCakes;
         var attackProbability = AttackProbabilityFor(choice, bred.Parent1, bred.Parent2);
         var requiredBreedings = RequiredBreedings(bred, attackProbability);
@@ -191,22 +227,18 @@ internal sealed class AttackResultMaterializer
         var totalCakes = parentCakes + (usesSpecialCake ? requiredBreedings : 0);
         var parentEffort = BredPalReferenceEffort.CombineParentEffort(
             settings.GameSettings,
-            parent1.Reference,
-            parent2.Reference,
-            parent1.Reference.BreedingEffort,
-            parent2.Reference.BreedingEffort
+            bred.Parent1,
+            bred.Parent2
         );
         var selfEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
             settings.GameSettings,
             bred.Pal,
-            parent1.Reference.TimeFactor,
-            parent2.Reference.TimeFactor,
+            bred.Parent1.TimeFactor,
+            bred.Parent2.TimeFactor,
             requiredBreedings
         );
 
         return new(
-            parent1,
-            parent2,
             choice,
             attackProbability,
             requiredBreedings,
@@ -217,10 +249,14 @@ internal sealed class AttackResultMaterializer
 
     private MaterializedResult MaterializeChoice(
         BredPalReference bred,
-        in EvaluatedChoice evaluated
+        in EvaluatedResult evaluated
     )
     {
-        var choice = evaluated.Choice;
+        var choice = evaluated.Choice ?? throw new InvalidOperationException(
+            "A bred result has no selected attack-inheritance witness."
+        );
+        var parent1 = MaterializeResult(bred.Parent1, choice.Parent1Entry);
+        var parent2 = MaterializeResult(bred.Parent2, choice.Parent2Entry);
         var inheritedMask = (byte)(choice.Parent1TargetMask | choice.Parent2TargetMask);
         var inheritedAttacks = AttacksForMask(inheritedMask);
         var actualEntry = new AttackProfileEntry(
@@ -243,8 +279,8 @@ internal sealed class AttackResultMaterializer
             bred.Parent2.AttackProfile.HasNoopAttack;
         var inheritance = new MaterializedAttackInheritance(
             choice.Mode,
-            LoadoutFor(evaluated.Parent1.Reference, choice.Parent1TargetMask, parent1RequiresNoop),
-            LoadoutFor(evaluated.Parent2.Reference, choice.Parent2TargetMask, parent2RequiresNoop),
+            LoadoutFor(parent1.Reference, choice.Parent1TargetMask, parent1RequiresNoop),
+            LoadoutFor(parent2.Reference, choice.Parent2TargetMask, parent2RequiresNoop),
             inheritedAttacks,
             ChildLearnedAttacksFor(bred.Pal, inheritedMask),
             choice.Mode == AttackInheritanceMode.InheritAll ? evaluated.RequiredBreedings : 0,
@@ -254,8 +290,8 @@ internal sealed class AttackResultMaterializer
             settings.GameSettings,
             bred.Pal,
             gender: bred.Gender,
-            evaluated.Parent1.Reference,
-            evaluated.Parent2.Reference,
+            parent1.Reference,
+            parent2.Reference,
             avgRequiredBreedings: evaluated.RequiredBreedings,
             [.. bred.EffectivePassives],
             bred.PassivesProbability,
@@ -333,9 +369,22 @@ internal sealed class AttackResultMaterializer
         );
     }
 
+    private static EvaluatedResult EvaluateLeaf(
+        IPalReference reference,
+        in AttackProfileEntry selectedEntry
+    )
+    {
+        MaterializeLeaf(reference, selectedEntry);
+        return new(
+            reference.BreedingEffort,
+            selectedEntry.TotalSpecialCakes,
+            Choice: null,
+            AttackProbability: 1,
+            RequiredBreedings: 0
+        );
+    }
+
     private readonly record struct EvaluatedChoice(
-        MaterializedResult Parent1,
-        MaterializedResult Parent2,
         AttackCompositionChoice Choice,
         float AttackProbability,
         int RequiredBreedings,
@@ -343,10 +392,39 @@ internal sealed class AttackResultMaterializer
         TimeSpan BreedingEffort
     );
 
+    private readonly record struct EvaluatedResult(
+        TimeSpan BreedingEffort,
+        int TotalSpecialCakes,
+        AttackCompositionChoice? Choice,
+        float AttackProbability,
+        int RequiredBreedings
+    );
+
     private readonly record struct MaterializedResult(
         IPalReference Reference,
         int TotalSpecialCakes
     );
+
+    private readonly struct ResultKey(
+        IPalReference reference,
+        AttackProfileEntry entry
+    ) : IEquatable<ResultKey>
+    {
+        private readonly IPalReference reference = reference;
+        private readonly AttackProfileEntry entry = entry;
+
+        // Distinct search nodes can be structurally equal but require separate
+        // reconstruction cache entries. Keep the hash consistent with
+        // ReferenceEquals by bypassing IPalReference.GetHashCode overrides.
+        public bool Equals(ResultKey other) =>
+            ReferenceEquals(reference, other.reference) && entry.Equals(other.entry);
+
+        public override bool Equals(object obj) =>
+            obj is ResultKey other && Equals(other);
+
+        public override int GetHashCode() =>
+            HashCode.Combine(RuntimeHelpers.GetHashCode(reference), entry);
+    }
 
     /// <summary>
     /// Exhaustively enumerates every concrete witness for the given parents and
@@ -375,8 +453,6 @@ internal sealed class AttackResultMaterializer
         var parent1Profile = parent1.AttackProfile;
         var parent2Profile = parent2.AttackProfile;
         var cakeBreedings = (int)Math.Ceiling(1f / baseProbability);
-        var cakeLoadouts = new ushort[AttackProfile.TargetMaskCount];
-
         foreach (var parent1Entry in parent1Profile.Entries)
             foreach (var parent2Entry in parent2Profile.Entries)
             {
@@ -419,12 +495,11 @@ internal sealed class AttackResultMaterializer
                 if (settings.MaxSpecialCakes == 0)
                     continue;
 
-                var count = AttackProfileComposer.EnumerateCakeMasks(
+                var cakeLoadouts = AttackProfileComposer.CakeMasksFor(
                     parent1Mask,
-                    parent2Mask,
-                    cakeLoadouts
+                    parent2Mask
                 );
-                for (var i = 0; i < count; i++)
+                for (var i = 0; i < cakeLoadouts.Count; i++)
                 {
                     var loadouts = cakeLoadouts[i];
                     var parent1Loadout = (byte)(loadouts >> 8);

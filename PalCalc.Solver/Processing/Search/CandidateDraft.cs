@@ -76,6 +76,8 @@ internal struct CandidateDraft
         materializedAttackInheritance: null
     );
 
+    // Note: This should exactly mirror the hash calc for `BredPalReference`, since some
+    // tie-breaker calcs use hash at the end
     public override int GetHashCode() => HashCode.Combine(
         nameof(BredPalReference),
         Pal,

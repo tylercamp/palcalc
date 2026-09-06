@@ -32,6 +32,23 @@ public class AttackResultMaterializerTests
         Assert.IsFalse(result.MaterializedAttackInheritance.Mode == AttackInheritanceMode.InheritAll);
     }
 
+    [TestMethod]
+    public void Evaluate_MatchesTheSubsequentlyMaterializedResult()
+    {
+        var selectedEntry = Entry(mask: 1, cakes: 0);
+        var root = Bred(Leaf(1), Leaf(0), new AttackProfile(selectedEntry));
+        var materializer = new AttackResultMaterializer(Context(), Settings());
+
+        var evaluation = materializer.Evaluate(root, selectedEntry);
+        var result = (BredPalReference)materializer.Materialize(root, selectedEntry);
+
+        Assert.AreEqual(result.BreedingEffort, evaluation.BreedingEffort);
+        Assert.AreEqual(
+            result.AttackProfile.Entries.Single().TotalSpecialCakes,
+            evaluation.TotalSpecialCakes
+        );
+    }
+
     [DataTestMethod]
     [DataRow(false, false, 0.5f)]
     [DataRow(true, false, 1f)]
@@ -122,9 +139,7 @@ public class AttackResultMaterializerTests
             BredPalReferenceEffort.CombineParentEffort(
                 Settings().GameSettings,
                 result.Parent1,
-                result.Parent2,
-                result.Parent1.BreedingEffort,
-                result.Parent2.BreedingEffort
+                result.Parent2
             ) + BredPalReferenceEffort.CalculateSelfBreedingEffort(
                 Settings().GameSettings,
                 result.Pal,

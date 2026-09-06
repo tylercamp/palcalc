@@ -114,9 +114,9 @@ internal sealed class ResultPostProcessor(
             )
         );
 
-        logger.Debug("Materializing attack candidates from {FinalistsCount} finalists", finalists.Count);
+        logger.Debug("Evaluating attack candidates from {FinalistsCount} finalists", finalists.Count);
         var materializer = new AttackResultMaterializer(attackTargets, settings);
-        var materialized = new List<IPalReference>();
+        var minimumCakeFinalists = new List<(IPalReference Reference, AttackProfileEntry Entry)>();
         var bestExactCakes = int.MaxValue;
         var examined = 0;
         var rejected = 0;
@@ -132,38 +132,50 @@ internal sealed class ResultPostProcessor(
                 break;
 
             examined++;
-            var result = materializer.Materialize(
+            var evaluation = materializer.Evaluate(
                 finalist.Reference,
                 finalist.Entry.Value
             );
-            if (!SatisfiesMaterializedConstraints(result))
+            if (!SatisfiesEvaluatedConstraints(evaluation))
             {
                 rejected++;
                 continue;
             }
 
-            var exactCakes = result.AttackProfile.EntriesSpan[0].TotalSpecialCakes;
+            var exactCakes = evaluation.TotalSpecialCakes;
             if (exactCakes != estimatedCakes)
                 adjustedCakeTotals++;
 
             if (exactCakes < bestExactCakes)
             {
                 bestExactCakes = exactCakes;
-                materialized.Clear();
+                minimumCakeFinalists.Clear();
             }
 
             if (exactCakes == bestExactCakes)
-                materialized.Add(result);
+                minimumCakeFinalists.Add((finalist.Reference, finalist.Entry.Value));
         }
 
         logger.Debug(
-            "Attack materialization examined {ExaminedCount} finalists, skipped {SkippedCount} above the exact minimum of {MinimumCakes} cakes, rejected {RejectedCount}, and adjusted {AdjustedCount} cake totals",
+            "Attack evaluation examined {ExaminedCount} finalists, skipped {SkippedCount} above the exact minimum of {MinimumCakes} cakes, rejected {RejectedCount}, and adjusted {AdjustedCount} cake totals",
             examined,
             finalists.Count - examined,
             bestExactCakes == int.MaxValue ? null : bestExactCakes,
             rejected,
             adjustedCakeTotals
         );
+        logger.Debug(
+            "Materializing {FinalistsCount} minimum-cake attack candidates",
+            minimumCakeFinalists.Count
+        );
+        var materialized = new List<IPalReference>(minimumCakeFinalists.Count);
+        foreach (var finalist in minimumCakeFinalists)
+        {
+            var result = materializer.Materialize(finalist.Reference, finalist.Entry);
+            if (SatisfiesMaterializedConstraints(result))
+                materialized.Add(result);
+        }
+
         logger.Debug("Re-applying result pruning to {MaterializedCount} minimum-cake materialized results", materialized.Count);
         var res = terminalResults.SelectFinalResults(materialized).ToList();
         logger.Debug("Result finalization complete with {FinalCount} results", res.Count);
@@ -206,6 +218,11 @@ internal sealed class ResultPostProcessor(
         return settings.MaxSpecialCakes is not int maxCakes ||
             entries[0].TotalSpecialCakes <= maxCakes;
     }
+
+    private bool SatisfiesEvaluatedConstraints(AttackMaterializationMetrics result) =>
+        result.BreedingEffort <= settings.MaxEffort &&
+        (settings.MaxSpecialCakes is not int maxCakes ||
+            result.TotalSpecialCakes <= maxCakes);
 
     private IEnumerable<IPalReference> ExpandSurgeryCandidates(
         IPalReference reference,

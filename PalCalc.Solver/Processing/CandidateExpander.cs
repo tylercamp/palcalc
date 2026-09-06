@@ -96,11 +96,6 @@ namespace PalCalc.Solver.Processing
             }
         }
 
-        TimeSpan CombinedEffort(TimeSpan p1Effort, TimeSpan p2Effort) =>
-            settings.GameSettings.MultipleBreedingFarms
-                ? p1Effort > p2Effort ? p1Effort : p2Effort
-                : p1Effort + p2Effort;
-
         // we have two parents but don't necessarily have definite genders for them, figure out which parent should have which
         // gender (if they're wild/bred pals) for the least overall effort (different pals have different gender probabilities)
         (IPalReference, IPalReference) PreferredParentsGenders((IPalReference, IPalReference) p)
@@ -148,7 +143,7 @@ namespace PalCalc.Solver.Processing
             bool hasNoPreference = true;
             foreach (var (p1, p2) in parentPairOptions)
             {
-                var effort = CombinedEffort(p1.BreedingEffort, p2.BreedingEffort);
+                var effort = BredPalReferenceEffort.CombineParentEffort(settings.GameSettings, p1, p2);
                 if (optimalTime == TimeSpan.Zero) optimalTime = effort;
                 else if (optimalTime != effort)
                 {
@@ -196,7 +191,7 @@ namespace PalCalc.Solver.Processing
             {
                 foreach (var opt in parentPairOptions)
                 {
-                    if (optimalTime == CombinedEffort(opt.Item1.BreedingEffort, opt.Item2.BreedingEffort))
+                    if (optimalTime == BredPalReferenceEffort.CombineParentEffort(settings.GameSettings, opt.Item1, opt.Item2))
                     {
                         return opt;
                     }
@@ -215,6 +210,7 @@ namespace PalCalc.Solver.Processing
             CandidateExpansionContext context
         )
         {
+            // reusable list to avoid GC, no need for a pool + "return" logic
             var passivePerms = new List<List<PassiveSkill>>();
 
             foreach (var p in workBatch)
@@ -454,14 +450,11 @@ namespace PalCalc.Solver.Processing
                                 continue;
                             }
 
-                            // TODO - Is this pre-calc actually valuable? Most of the time, `MaxEffort` is infinite
                             var structuralBreedings = (int)Math.Ceiling(1.0f / structuralProbability);
                             var parentBreedingEffort = BredPalReferenceEffort.CombineParentEffort(
                                 settings.GameSettings,
                                 parent1,
-                                parent2,
-                                parent1.BreedingEffort,
-                                parent2.BreedingEffort
+                                parent2
                             );
                             var selfBreedingEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
                                 settings.GameSettings,

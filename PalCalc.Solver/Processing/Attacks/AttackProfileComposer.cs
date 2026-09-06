@@ -382,6 +382,9 @@ internal sealed class AttackProfileComposer(
         return count;
     }
 
+    internal static IReadOnlyList<ushort> CakeMasksFor(byte parent1Mask, byte parent2Mask) =>
+        CakeMaskCache.Values[(parent1Mask << TargetMaskBitCount) | parent2Mask];
+
     // Attacks available from only one parent must fit that parent's three equipped
     // slots. Shared attacks may be assigned to either parent; the six-total check
     // guarantees the remaining shared attacks can be split between them.

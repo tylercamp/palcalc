@@ -58,9 +58,7 @@ namespace PalCalc.Solver.PalReference
             parentBreedingEffort = BredPalReferenceEffort.CombineParentEffort(
                 gameSettings,
                 Parent1,
-                Parent2,
-                Parent1.BreedingEffort,
-                Parent2.BreedingEffort
+                Parent2
             );
 
             TimeFactor = EffectivePassives.ToTimeFactor();

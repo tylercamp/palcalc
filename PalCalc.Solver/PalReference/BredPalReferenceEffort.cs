@@ -7,13 +7,18 @@ internal static class BredPalReferenceEffort
     public static TimeSpan CombineParentEffort(
         GameSettings gameSettings,
         IPalReference parent1,
-        IPalReference parent2,
-        TimeSpan parent1Effort,
-        TimeSpan parent2Effort
-    ) => gameSettings.MultipleBreedingFarms &&
-        parent1 is BredPalReference && parent2 is BredPalReference
-            ? parent1Effort > parent2Effort ? parent1Effort : parent2Effort
-            : parent1Effort + parent2Effort;
+        IPalReference parent2
+    )
+    {
+        var parent1Effort = parent1.BreedingEffort;
+        var parent2Effort = parent2.BreedingEffort;
+
+        return
+            gameSettings.MultipleBreedingFarms &&
+            parent1 is BredPalReference && parent2 is BredPalReference
+                ? parent1Effort > parent2Effort ? parent1Effort : parent2Effort
+                : parent1Effort + parent2Effort;
+    }
 
     public static TimeSpan CalculateSelfBreedingEffort(
         GameSettings gameSettings,

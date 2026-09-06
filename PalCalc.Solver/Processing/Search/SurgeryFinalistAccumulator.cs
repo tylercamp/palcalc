@@ -7,8 +7,16 @@ using PalCalc.Solver.Processing.Attacks;
 namespace PalCalc.Solver.Processing.Search;
 
 /// <summary>
-/// Retains candidates which can become terminal after the single post-search
-/// surgery pass, before ordinary frontier pruning discards alternative paths.
+/// <para>
+/// The `ResultAccumulator` will preserve any results that satisfy the final target,
+/// even if it's not the best result. This doesn't work well with results which satisfy
+/// after surgery since surgery happens at the very end, after the typical pruning
+/// processes have already run.
+/// </para>
+/// 
+/// <para>
+/// This tracks result candidates which satisfy the final target after surgery.
+/// </para>
 /// </summary>
 internal sealed class SurgeryFinalistAccumulator
 {
