@@ -29,6 +29,8 @@ namespace PalCalc.Solver.PalReference
 
         List<PassiveSkill> ActualPassives { get; }
 
+        AttackProfile AttackProfile { get; }
+
         PalGender Gender { get; }
 
         /// <summary>

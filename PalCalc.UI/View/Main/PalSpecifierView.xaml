@@ -15,6 +15,7 @@
     <UserControl.Resources>
         <c:CollectionVisibilityConverter x:Key="CVC" />
         <c:IntToIVConverter x:Key="IIVC" />
+        <c:ValueVisibilityConverter x:Key="VVC" />
         <BooleanToVisibilityConverter x:Key="BVC" />
 
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
@@ -89,10 +90,10 @@
             
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
@@ -142,10 +143,18 @@
                 </Grid>
 
                 <TextBlock
+                    Text="{Binding RequiredAttacks.FixedViewModel.Description.Value}"
+                    TextWrapping="Wrap"
+                    FontWeight="Bold"
+                    Visibility="{Binding RequiredAttacks.HasItems, Converter={StaticResource BVC}}"
+                    Grid.Row="1"
+                    />
+
+                <TextBlock
                     Text="{Binding RequiredPassives.FixedViewModel.RequiredDescription.Value}"
                     TextWrapping="Wrap"
                     FontWeight="Bold"
-                    Grid.Row="1"
+                    Grid.Row="2"
                     />
 
                 <TextBlock
@@ -153,11 +162,11 @@
                     TextWrapping="Wrap"
                     FontStyle="Italic"
                     Visibility="{Binding OptionalPassives.HasItems, Converter={StaticResource BVC}}"
-                    Grid.Row="2"
+                    Grid.Row="3"
                     />
 
                 <Grid
-                    Grid.Row="3"
+                    Grid.Row="4"
                     Visibility="{Binding HasIVs, Converter={StaticResource BVC}}"
                     >
                     <Grid.Resources>

@@ -56,7 +56,8 @@ internal static class SolverTestScenario
         int maxSurgeryCost = 0,
         IEnumerable<PassiveSkill>? allowedSurgeryPassives = null,
         IEnumerable<Pal>? allowedWildPals = null,
-        IEnumerable<Pal>? bannedBredPals = null
+        IEnumerable<Pal>? bannedBredPals = null,
+        int? maxSpecialCakes = 0
     ) =>
         new(
             solver: new BreedingSolver(),
@@ -77,9 +78,16 @@ internal static class SolverTestScenario
                 maxThreads: maxThreads,
                 maxSurgeryCost: maxSurgeryCost,
                 allowedSurgeryPassives: allowedSurgeryPassives?.ToList() ?? [],
-                useGenderReversers: false
+                useGenderReversers: false,
+                maxSpecialCakes: maxSpecialCakes
             )
         );
+
+    public static List<IPalReference> Solve(
+        ConfiguredSolver solver,
+        string targetPal,
+        IEnumerable<ActiveSkill> requiredAttacks
+    ) => Solve(solver, targetPal, requiredAttacks, null, null, PalGender.WILDCARD, 0, 0, 0);
 
     public static List<IPalReference> Solve(
         ConfiguredSolver solver,
@@ -89,7 +97,21 @@ internal static class SolverTestScenario
         PalGender requiredGender = PalGender.WILDCARD,
         int ivHp = 0,
         int ivAttack = 0,
-        int ivDefense = 0
+        int ivDefense = 0,
+        ActiveSkill? requiredAttack = null
+    ) => Solve(solver, targetPal, requiredAttack is null ? [] : [requiredAttack], requiredPassives,
+        optionalPassives, requiredGender, ivHp, ivAttack, ivDefense);
+
+    private static List<IPalReference> Solve(
+        ConfiguredSolver solver,
+        string targetPal,
+        IEnumerable<ActiveSkill> requiredAttacks,
+        IEnumerable<PassiveSkill>? requiredPassives,
+        IEnumerable<PassiveSkill>? optionalPassives,
+        PalGender requiredGender,
+        int ivHp,
+        int ivAttack,
+        int ivDefense
     ) =>
         solver.Solver.Solve(
             new BreedingSolverRequest(
@@ -102,6 +124,7 @@ internal static class SolverTestScenario
                     IV_HP = ivHp,
                     IV_Attack = ivAttack,
                     IV_Defense = ivDefense,
+                    RequiredAttacks = requiredAttacks?.ToList() ?? [],
                 },
                 solver.Settings
             ),
@@ -130,6 +153,7 @@ internal static class SolverTestScenario
             .OrderBy(r => r.PalInternalName, StringComparer.Ordinal)
             .ThenBy(r => r.Gender)
             .ThenBy(r => r.Passives, StringComparer.Ordinal)
+            .ThenBy(r => r.AttackProfile, StringComparer.Ordinal)
             .ThenBy(r => r.IVs.HP.Min)
             .ThenBy(r => r.IVs.Attack.Min)
             .ThenBy(r => r.IVs.Defense.Min)
@@ -143,6 +167,7 @@ internal static class SolverTestScenario
         string PalInternalName,
         PalGender Gender,
         string Passives,
+        string AttackProfile,
         IV_Set IVs,
         long EffortTicks,
         int GoldCost,
@@ -160,6 +185,12 @@ internal static class SolverTestScenario
                         .GroupBy(p => p.InternalName)
                         .OrderBy(g => g.Key, StringComparer.Ordinal)
                         .Select(g => $"{g.Key}:{g.Count()}")
+                ),
+                AttackProfile: string.Join(
+                    "|",
+                    result.AttackProfile.Entries.Select(entry =>
+                        $"{entry.LearnedTargetMask}:{entry.TotalSpecialCakes}"
+                    )
                 ),
                 IVs: result.IVs,
                 EffortTicks: result.BreedingEffort.Ticks,

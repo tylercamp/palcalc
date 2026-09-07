@@ -1,6 +1,7 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.Processing;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Utils;
 using Serilog;
 
@@ -22,6 +23,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
 
     private readonly int maxThreads;
     private readonly PalSpecifier target;
+    private readonly AttackTargetContext attackTargets;
 
     public ResultAccumulator TerminalResults => resultAccumulator;
 
@@ -32,12 +34,14 @@ internal sealed class SearchFrontier : ICandidateFrontierView
         IEnumerable<IPalReference> initialContent,
         int maxThreads,
         SolverStateController controller,
-        ICandidateSelectionPolicy selectionPolicy
+        ICandidateSelectionPolicy selectionPolicy,
+        AttackTargetContext attackTargets
     )
     {
         ArgumentNullException.ThrowIfNull(selectionPolicy);
 
         this.target = target;
+        this.attackTargets = attackTargets;
         this.controller = controller;
         this.selectionPolicy = selectionPolicy;
 
@@ -45,7 +49,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
         index = new FrontierIndex(selectionPolicy);
         index.AddRange(initialList);
 
-        resultAccumulator = new ResultAccumulator(target, selectionPolicy);
+        resultAccumulator = new ResultAccumulator(target, selectionPolicy, attackTargets);
         resultAccumulator.Observe(index.All);
         pairSchedule = ParentPairSchedule.Initial(initialList);
 
@@ -56,28 +60,54 @@ internal sealed class SearchFrontier : ICandidateFrontierView
 
     public FrontierCandidateAssessment AssessCandidate(IPalReference reference, EffectivePropertiesKey propertiesKey)
     {
-        var incumbent = index[propertiesKey]?.FirstOrDefault();
-        return incumbent == null
-            ? FrontierCandidateAssessment.PotentialImprovement
-            : selectionPolicy.AssessAgainstFrontier(reference, incumbent);
+        var incumbents = index[propertiesKey];
+        if (incumbents is null || incumbents.Count == 0)
+            return FrontierCandidateAssessment.PotentialImprovement;
+
+        var guaranteedImprovement = true;
+        for (int i = 0; i < incumbents.Count; i++)
+        {
+            // Direct `for` loop since `List+Enumerator` was still being allocated for some reason
+            var incumbent = incumbents[i];
+            var assessment = selectionPolicy.AssessAgainstFrontier(reference, incumbent);
+            if (assessment == FrontierCandidateAssessment.Inferior)
+                return FrontierCandidateAssessment.Inferior;
+            if (assessment != FrontierCandidateAssessment.GuaranteedImprovement)
+                guaranteedImprovement = false;
+        }
+
+        return guaranteedImprovement
+            ? FrontierCandidateAssessment.GuaranteedImprovement
+            : FrontierCandidateAssessment.PotentialImprovement;
     }
 
-    /// <summary>
-    /// Marks candidates with the same effective properties as ineligible for
-    /// further breeding. This allows us to skip older, less efficient candidates
-    /// when a better one is found in the middle of a search.
-    /// 
-    /// The full simplification pass still decides whether the candidate that
-    /// prompted this change is retained.
-    /// </summary>
-    public void MarkCandidatesOutdated(EffectivePropertiesKey propertiesKey)
+    internal FrontierCandidateAssessment AssessCandidate(
+        in CandidateDraft candidate,
+        EffectivePropertiesKey propertiesKey,
+        DefaultCandidateSelectionPolicy policy
+    )
     {
-        var alternatives = index[propertiesKey];
-        if (alternatives == null) return;
+        var incumbents = index[propertiesKey];
+        if (incumbents is null || incumbents.Count == 0)
+            return FrontierCandidateAssessment.PotentialImprovement;
 
-        foreach (var alternative in alternatives)
-            alternative.IsOutdated = true;
+        var guaranteedImprovement = true;
+        for (int i = 0; i < incumbents.Count; i++)
+        {
+            var assessment = policy.AssessAgainstFrontier(candidate, incumbents[i]);
+            if (assessment == FrontierCandidateAssessment.Inferior)
+                return FrontierCandidateAssessment.Inferior;
+            if (assessment != FrontierCandidateAssessment.GuaranteedImprovement)
+                guaranteedImprovement = false;
+        }
+
+        return guaranteedImprovement
+            ? FrontierCandidateAssessment.GuaranteedImprovement
+            : FrontierCandidateAssessment.PotentialImprovement;
     }
+
+    public void ObserveTerminal(IEnumerable<IPalReference> candidates) =>
+        resultAccumulator.Observe(candidates);
 
     /// <summary>
     /// Expands every pending parent pair and atomically advances the frontier
@@ -174,6 +204,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
                 return !controller.CancellationToken.IsCancellationRequested;
             })
         );
+        newCandidates.RemoveAll(candidate => candidate.IsOutdated);
         if (controller.CancellationToken.IsCancellationRequested)
             return FrontierDelta.None;
 
@@ -249,8 +280,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
             }
         }
 
-        // Efficient additions are expanded first so they can invalidate less
-        // efficient parents while the following batch is still running.
+        // Expand efficient additions first in the next scheduled pass.
         allAdded = selectionPolicy.OrderForExpansion(allAdded);
 
         return new FrontierDelta(
@@ -267,7 +297,7 @@ internal sealed class SearchFrontier : ICandidateFrontierView
             reference is not SurgeryTablePalReference
         )
             return false;
-        if (!target.IsSatisfiedBy(reference))
+        if (!(attackTargets?.Satisfies(reference) ?? target.IsSatisfiedBy(reference)))
             return false;
 
         return

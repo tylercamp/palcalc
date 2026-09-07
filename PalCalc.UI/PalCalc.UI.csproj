@@ -24,6 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Cake_Special.png" />
     <None Remove="Resources\DungeonSmall.png" />
     <None Remove="Resources\Elements\Dark.png" />
     <None Remove="Resources\Elements\Dragon.png" />
@@ -358,6 +359,10 @@
     <None Remove="Resources\TraitRank\Passive_Positive_5_icon.png" />
     <None Remove="Resources\T_icon_compass_camp.png" />
     <None Remove="Resources\Xbox_app_logo.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Cake_Special.png" />
   </ItemGroup>
 
   <ItemGroup>

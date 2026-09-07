@@ -251,7 +251,7 @@
                                                                          Margin="0, 0, 4, 0"/>
 
                                 <Grid Background="{x:Null}">
-                                    <ContentPresenter x:Name="ContentSite" 
+                                    <ContentPresenter x:Name="ContentSite"
                                                       IsHitTestVisible="False"
                                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -259,6 +259,15 @@
                                                       ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}"
                                                       ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
 
+                                    <ContentPresenter x:Name="EditableContentSite"
+                                                      Panel.ZIndex="1"
+                                                      Visibility="Hidden"
+                                                      IsHitTestVisible="False"
+                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                      Content="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                      ContentTemplate="{Binding ItemTemplate, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                      ContentTemplateSelector="{Binding ItemTemplateSelector, RelativeSource={RelativeSource AncestorType=ComboBox}}"/>
 
                                     <TextBox x:Name="PART_EditableTextBox"
                                              IsReadOnly="{TemplateBinding IsReadOnly}"
@@ -346,10 +355,26 @@
                         <Trigger Property="IsEditable" Value="True">
                             <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
                             <Setter Property="UIElement.Visibility" TargetName="PART_EditableTextBox" Value="Visible"/>
+                            <Setter Property="Opacity" TargetName="PART_EditableTextBox" Value="0"/>
                             <Setter Property="UIElement.Visibility" TargetName="ContentSite" Value="Hidden"/>
+                            <Setter Property="UIElement.Visibility" TargetName="EditableContentSite" Value="Visible"/>
                             <Setter Property="HorizontalAlignment" TargetName="ToggleButton" Value="Right"/>
                             <Setter Property="HorizontalAlignment" TargetName="ToggleButton" Value="Right"/>
                         </Trigger>
+
+                        <Trigger Property="SelectedItem" Value="{x:Null}">
+                            <Setter Property="Visibility" TargetName="EditableContentSite" Value="Hidden"/>
+                            <Setter Property="Opacity" TargetName="PART_EditableTextBox" Value="1"/>
+                        </Trigger>
+
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="ItemTemplate" Value="{x:Null}"/>
+                                <Condition Property="ItemTemplateSelector" Value="{x:Null}"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Visibility" TargetName="EditableContentSite" Value="Hidden"/>
+                            <Setter Property="Opacity" TargetName="PART_EditableTextBox" Value="1"/>
+                        </MultiTrigger>
 
                         <Trigger Property="Validation.HasError" Value="True">
                             <Setter Property="Visibility" TargetName="ErrorAlertHost" Value="Visible"/>
@@ -358,6 +383,8 @@
                         </Trigger>
 
                         <Trigger Property="IsFocused" SourceName="PART_EditableTextBox" Value="True">
+                            <Setter Property="Visibility" TargetName="EditableContentSite" Value="Hidden"/>
+                            <Setter Property="Opacity" TargetName="PART_EditableTextBox" Value="1"/>
                             <Setter Property="IsValidatedElementFocused" TargetName="ErrorAlertHost" Value="True"/>
                         </Trigger>
 

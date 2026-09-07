@@ -194,6 +194,7 @@ namespace PalCalc.UI.Persistence.Migrations
             {
                 ["Id"] = id,
                 ["TargetPalInternalName"] = ReadIdentity(root["TargetPal"] ?? root["TargetPalInternalName"]),
+                ["RequiredAttackInternalNames"] = NamesArray(ReadNames(root["RequiredAttackInternalNames"] ?? root["RequiredAttacks"])),
                 ["RequiredPassiveInternalNames"] = new JArray(required.Select(name => name == null ? JValue.CreateNull() : new JValue(name))),
                 ["OptionalPassiveInternalNames"] = new JArray(optional.Select(name => name == null ? JValue.CreateNull() : new JValue(name))),
                 ["MinimumIV_HP"] = ReadInt(root["MinimumIV_HP"] ?? root["MinIV_HP"], 0),
@@ -580,7 +581,28 @@ namespace PalCalc.UI.Persistence.Migrations
                 ["Defense"] = value["IV_Defense"] ?? "any",
             });
             result["IVsProbability"] = ReadFloat(value["IVsProbability"], 1);
+            result["AvgRequiredBreedings"] = value["AvgRequiredBreedings"]?.Type == JTokenType.Integer
+                ? value["AvgRequiredBreedings"].DeepClone()
+                : JValue.CreateNull();
+            result["MaterializedAttackInheritance"] = NormalizeMaterializedAttackInheritance(value["MaterializedAttackInheritance"] as JObject);
             return result;
+        }
+
+        private static JToken NormalizeMaterializedAttackInheritance(JObject value)
+        {
+            if (value == null)
+                return JValue.CreateNull();
+
+            return new JObject
+            {
+                ["Mode"] = value["Mode"]?.DeepClone() ?? new JValue(0),
+                ["Parent1LoadoutInternalNames"] = NamesArray(ReadNames(value["Parent1LoadoutInternalNames"] ?? value["Parent1Loadout"])),
+                ["Parent2LoadoutInternalNames"] = NamesArray(ReadNames(value["Parent2LoadoutInternalNames"] ?? value["Parent2Loadout"])),
+                ["InheritedAttackInternalNames"] = NamesArray(ReadNames(value["InheritedAttackInternalNames"] ?? value["InheritedAttacks"])),
+                ["ChildLearnedAttackInternalNames"] = NamesArray(ReadNames(value["ChildLearnedAttackInternalNames"] ?? value["ChildLearnedAttacks"])),
+                ["SpecialCakes"] = ReadInt(value["SpecialCakes"], 0),
+                ["AttackProbability"] = ReadFloat(value["AttackProbability"], 1),
+            };
         }
 
         private static JObject NormalizeComposite(JObject value, IReadOnlyCollection<string> desiredPassives)
@@ -699,6 +721,8 @@ namespace PalCalc.UI.Persistence.Migrations
             ["Parent2"] = null,
             ["PassivesProbability"] = null,
             ["IVsProbability"] = null,
+            ["AvgRequiredBreedings"] = null,
+            ["MaterializedAttackInheritance"] = null,
             ["Male"] = null,
             ["Female"] = null,
             ["Input"] = null,

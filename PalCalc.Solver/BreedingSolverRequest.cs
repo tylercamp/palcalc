@@ -1,4 +1,5 @@
 using PalCalc.Model;
+using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 
 namespace PalCalc.Solver;
@@ -38,7 +39,8 @@ internal sealed class SolverRunContext
         BreedingMechanics mechanics,
         PalBreedingDB breedingDB,
         SolverStateController controller,
-        ICandidateSelectionPolicy selectionPolicy
+        ICandidateSelectionPolicy selectionPolicy,
+        AttackTargetContext attackTargets
     )
     {
         Target = target;
@@ -47,6 +49,7 @@ internal sealed class SolverRunContext
         BreedingDB = breedingDB;
         Controller = controller;
         SelectionPolicy = selectionPolicy;
+        AttackTargets = attackTargets;
     }
 
     public PalSpecifier Target { get; }
@@ -55,6 +58,7 @@ internal sealed class SolverRunContext
     public PalBreedingDB BreedingDB { get; }
     public SolverStateController Controller { get; }
     public ICandidateSelectionPolicy SelectionPolicy { get; }
+    public AttackTargetContext AttackTargets { get; }
 
     public static SolverRunContext Create(
         BreedingSolverRequest request,
@@ -65,9 +69,11 @@ internal sealed class SolverRunContext
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(controller);
 
+        var attackTargets = new AttackTargetContext(request.CapturedTarget, request.Settings.DB);
         selectionPolicy ??= new DefaultCandidateSelectionPolicy(
             request.Settings.ResultPruning,
-            controller.CancellationToken
+            controller.CancellationToken,
+            attackTargets: attackTargets
         );
 
         return new(
@@ -78,7 +84,8 @@ internal sealed class SolverRunContext
             mechanics: request.Settings.DB.BreedingMechanics,
             breedingDB: request.Settings.BreedingDB,
             controller: controller,
-            selectionPolicy: selectionPolicy
+            selectionPolicy: selectionPolicy,
+            attackTargets: attackTargets
         );
     }
 }

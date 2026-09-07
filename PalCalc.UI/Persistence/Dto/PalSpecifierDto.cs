@@ -10,6 +10,7 @@ namespace PalCalc.UI.Persistence.Dto
     {
         public string Id { get; init; }
         public string TargetPalInternalName { get; init; }
+        public List<string> RequiredAttackInternalNames { get; init; }
         public List<string> RequiredPassiveInternalNames { get; init; }
         public List<string> OptionalPassiveInternalNames { get; init; }
         public int MinimumIV_HP { get; init; }

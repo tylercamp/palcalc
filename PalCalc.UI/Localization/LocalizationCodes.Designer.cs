@@ -84,6 +84,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_ATTACK_SKILL_NOT_INHERITABLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_ATTACK_SKILL_NOT_KNOWN,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_BASE_ASSIGNED_LABEL,
         /// <summary>
         ///   Looks up a localized string similar to BaseName.
@@ -721,6 +729,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_REMOVE_SAVE_TITLE,
         /// <summary>
+        ///   Looks up a localized string similar to AttacksList.
+        /// </summary>
+        LC_REQUIRED_ATTACKS_SUMMARY,
+        /// <summary>
         ///   Looks up a localized string similar to TraitsList.
         /// </summary>
         LC_REQUIRED_TRAITS_SUMMARY,
@@ -772,6 +784,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_RESULT_NUM_CAKES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_RESULT_NUM_SPECIAL_CAKES,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -1180,6 +1196,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_SOURCE_PALS_PLAYERS_AND_GUILDS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SPECIAL_CAKES_REQUIRED_DESC,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

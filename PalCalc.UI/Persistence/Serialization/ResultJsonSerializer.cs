@@ -73,7 +73,7 @@ namespace PalCalc.UI.Persistence.Serialization
                 Results = value.Results.Select(item =>
                 {
                     var displayedResult = FromDto(item.PalReference, db, gameSettings, solverSettings);
-                    var vm = new BreedingResultViewModel(cachedSave, gameSettings, displayedResult);
+                    var vm = new BreedingResultViewModel(cachedSave, gameSettings, displayedResult, target.RequiredAttacks);
 
                     if (item.CheckedNodes != null && vm.Graph != null)
                     {
@@ -175,6 +175,8 @@ namespace PalCalc.UI.Persistence.Serialization
                 PassivesProbability = bred.PassivesProbability,
                 IVs = ToDto(bred.IVs),
                 IVsProbability = bred.IVsProbability,
+                AvgRequiredBreedings = bred.AvgRequiredBreedings,
+                MaterializedAttackInheritance = ToDto(bred.MaterializedAttackInheritance),
             },
             CompositeOwnedPalReference composite => new()
             {
@@ -217,7 +219,7 @@ namespace PalCalc.UI.Persistence.Serialization
             var effectivePassives = value.EffectivePassiveInternalNames
                 .Select(name => name.InternalToStandardPassive(db))
                 .ToList();
-            var result = new OwnedPalReference(instance, effectivePassives, FromDto(value.IVs));
+            var result = new OwnedPalReference(instance, effectivePassives, FromDto(value.IVs), AttackProfile.Inactive);
             return value.ActualGender.Value == instance.Gender
                 ? result
                 : (OwnedPalReference)result.WithGuaranteedGender(db, value.ActualGender.Value, solverSettings.UseGenderReversers);
@@ -229,25 +231,58 @@ namespace PalCalc.UI.Persistence.Serialization
                 value.PalInternalName.InternalToPal(db),
                 value.GuaranteedPassiveInternalNames.Select(name => name.InternalToStandardPassive(db)),
                 value.RandomPassiveCount.Value,
-                db.BreedingMechanics
+                db.BreedingMechanics,
+                AttackProfile.Inactive
             );
             return result.WithGuaranteedGender(db, value.Gender.Value, solverSettings.UseGenderReversers);
         }
 
         private static IPalReference FromBred(PalReferenceDto value, PalDB db, GameSettingsModel settings, SerializableSolverSettings solverSettings)
         {
+            var materializedAttackInheritance = FromDto(value.MaterializedAttackInheritance, db);
             var result = new BredPalReference(
                 settings,
                 value.PalInternalName.InternalToPal(db),
+                value.AvgRequiredBreedings is null ? PalGender.WILDCARD : value.Gender.Value,
                 FromDto(value.Parent1, db, settings, solverSettings),
                 FromDto(value.Parent2, db, settings, solverSettings),
+                value.AvgRequiredBreedings,
                 value.EffectivePassiveInternalNames.Select(name => name.InternalToStandardPassive(db)).ToList(),
                 value.PassivesProbability.Value,
                 FromDto(value.IVs),
-                value.IVsProbability.Value
+                value.IVsProbability.Value,
+                AttackProfile.Inactive,
+                materializedAttackInheritance
             );
-            return result.WithGuaranteedGender(db, value.Gender.Value, solverSettings.UseGenderReversers);
+            return value.AvgRequiredBreedings is null
+                ? result.WithGuaranteedGender(db, value.Gender.Value, solverSettings.UseGenderReversers)
+                : result;
         }
+
+        private static MaterializedAttackInheritanceDto ToDto(MaterializedAttackInheritance value) => value == null
+            ? null
+            : new MaterializedAttackInheritanceDto
+            {
+                Mode = value.Mode,
+                Parent1LoadoutInternalNames = value.Parent1Loadout.Select(attack => attack.InternalName).ToList(),
+                Parent2LoadoutInternalNames = value.Parent2Loadout.Select(attack => attack.InternalName).ToList(),
+                InheritedAttackInternalNames = value.InheritedAttacks.Select(attack => attack.InternalName).ToList(),
+                ChildLearnedAttackInternalNames = value.ChildLearnedAttacks.Select(attack => attack.InternalName).ToList(),
+                SpecialCakes = value.SpecialCakes,
+                AttackProbability = value.AttackProbability,
+            };
+
+        private static MaterializedAttackInheritance FromDto(MaterializedAttackInheritanceDto value, PalDB db) => value == null
+            ? null
+            : new MaterializedAttackInheritance(
+                value.Mode,
+                value.Parent1LoadoutInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                value.Parent2LoadoutInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                value.InheritedAttackInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                value.ChildLearnedAttackInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                value.SpecialCakes,
+                value.AttackProbability
+            );
 
         private static SurgeryOperationDto ToDto(ISurgeryOperation value) => value switch
         {

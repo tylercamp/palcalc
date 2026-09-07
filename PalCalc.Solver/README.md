@@ -1,8 +1,8 @@
 # Solver Overview
 
 Pal Calc finds practical breeding paths from the Pals a player already has, or
-is willing to capture, to a target Pal with the requested passives, IVs, and
-gender.
+is willing to capture, to a target Pal with the requested passives, IVs,
+attack skills, and gender.
 
 For example, you might ask for an Anubis with Legend, Earth Emperor, and at
 least 90 attack IV. Pal Calc will work through all the possibilities and
@@ -18,7 +18,8 @@ estimated effort and keeps a small selection of useful alternatives.
 ## Concepts at a Glance
 
 - **Target** - The Pal being requested, including its required and optional
-  passives, IV thresholds, gender, and any limits placed on the search.
+  passives, required attacks, IV thresholds, gender, and any limits placed on
+  the search.
 - **Candidate** - A Pal the solver might use in a breeding tree. It can be one
   you own, one you can catch, or a child from an earlier step. Sometimes one
   candidate stands for several actual Pals.
@@ -98,7 +99,7 @@ target. Required passives must appear on the breeding result. Optional passives
 are preferred when there is room for them, but are not needed for a valid
 result.
 
-It does not matter how the desired passives are divided between the parents.
+The distribution of passives between the parents has no effect on probabilities.
 Palworld combines and deduplicates both parents' passives before rolling
 inheritance, so a 2/2 split is no better than a 1/3 or 0/4 split.
 
@@ -112,6 +113,26 @@ Some candidates stand for more than one individual Pal, so the solver records
 their IVs as ranges. During the search, the important question is usually
 whether that range can meet the requested threshold. Exact values can still
 help choose between otherwise similar paths.
+
+#### Attacks
+
+Attack inheritance in Palworld is only based on the attacks _equipped_
+by each parent, making it easy to manipulate inheritance probabilities.
+
+There's an extra bonus of "ignore-inherit" attacks, which are exclusive
+to certain pals and ignored entirely in the inheritance process. If you
+have one parent with an "ignore-inherit" attack, and the other parent has
+just 1 normal attack equipped, the child has a 100% chance to inherit the
+"1 attack" from that other parent.
+
+As Pal Calc considers each possible child, it builds up a list of desired
+attacks that can be achieved somewhere in the parents' breeding tree
+(or on the parents themselves.)
+
+While IVs and passives are tracked closely through the breeding process,
+Pal Calc just holds a loose collection of details for attacks as they
+pass through each step. The final choice of "who equips which attack" is
+saved for the very end.
 
 #### Gender
 
@@ -137,11 +158,10 @@ breed to estimate the time spent making that child.
 Depending on the solver settings, effort can include:
 
 - the effort already spent obtaining both parents
-- passive and IV inheritance probabilities
+- passive, IV, and attack inheritance probabilities
 - the chance of obtaining the required gender
 - breeding and incubation time
 - the effort needed to capture a wild Pal
-- the number of breeding facilities available
 
 This is why the fewest breeding steps do not always produce the fastest path.
 It is also why an extra irrelevant passive can matter: even when two children
@@ -185,6 +205,23 @@ Completed results are handled separately. A Pal can be a good final answer
 even when another equivalent Pal would make a better parent, so the solver
 saves results before simplifying the frontier.
 
+### Comparing Attack Paths
+
+Pal Calc doesn't track each unique way to manage attack skills. For
+each Pal it only records the attacks available up the chain, and some extra
+information:
+
+- The available pairings of desired attacks between the parents
+- The number of Special Cakes required for each pairing
+- Whether a "ignore-inherit" attack is available
+
+Breeding effort is excluded here on purpose because it adds a lot of
+tracking overhead. Instead, attack options are compared by the number of
+Special Cakes required. A path which needs fewer Special Cakes
+will _often_ require less breeding attempts than other approaches, making
+it a semi-accurate stand-in for direct breeding effort. These cakes are
+also high-level and expensive, making them even more important for comparisons.
+
 ## Search Coverage and Limits
 
 The solver tries every new parent combination among the candidates it retains.
@@ -213,11 +250,20 @@ after the main breeding search. Considering every possible surgery during
 every breeding round could uncover more intermediate combinations, but it
 would also multiply the number of paths the solver has to search.
 
-After applying surgery options, the solver checks that each path has the
-requested passives and gender, then returns the paths that remain. The UI may
-group or reduce those alternatives further so the player is not shown hundreds
-of similarly efficient trees. `PalResultGrouping` and `PalResultProperty` are
-used for that presentation step, but aren't used in the breeding search itself.
+After applying surgery options, the solver filters for paths which have the
+requested passives, attacks, and gender. The PalCalc.UI app will further
+group or reduce those alternatives so the player isn't shown hundreds of
+similar trees. `PalResultGrouping` and `PalResultProperty` are used for that
+presentation step, but aren't used in the breeding search itself.
+
+The solver ends by resolving the real attack skills needed on parent
+and child Pals. The earlier search process just tracks the presence and
+general distribution of attack skills. This simple approach gives great
+performance improvements.
+
+We can save this detail for the end because attacks are _very_ easy to
+manipulate. Results with attack data are resolved by a simple rule:
+"Attack inheritance should appear as late in the tree as possible."
 
 ## Detailed Solver Walkthrough
 
@@ -227,8 +273,6 @@ The following is a complete walkthrough of the steps, in order.
 
 1. `BreedingSolver` receives a `BreedingSolverRequest` containing the target
    and settings.
-2. The request keeps a normalized copy of the target so later changes by the
-   caller cannot affect a running solve.
 3. `SolverRunContext` stores the target, settings, breeding mechanics,
    breeding database, run controller, and candidate-selection policy used for
    this run.
@@ -247,7 +291,8 @@ to the target.
 4. Create wildcard gender representations where gender can be resolved later.
 5. When the player owns matching male and female Pals, create a composite
    candidate that can supply either gender.
-6. Add the resulting candidates to the initial frontier.
+6. Build initial attack profiles from owned mastered attacks and wild level-1 attacks.
+7. Add the resulting candidates to the initial frontier.
 
 ### 3. Create the frontier and first parent schedule
 
@@ -277,7 +322,7 @@ For each pair, `CandidateExpander`:
    parent is male or female.
 4. Finds the child species the pair can produce.
 5. Determines the useful passive and IV outcomes for that child.
-6. Calculates the probability and effort of producing each relevant outcome.
+6. Combines the parent attack profiles and adjusts probabilities.
 7. Produces candidates that may add a new or better path.
 
 Workers use a quick assessment from the selection policy to avoid returning
@@ -285,9 +330,6 @@ children that are already known to be unhelpful. This is only a pre-filter;
 the frontier performs the complete simplification after collecting the batch.
 
 ### 5. Save completed results
-
-`ResultAccumulator` checks each produced candidate before the frontier is
-simplified.
 
 Any candidate that satisfies the target is saved as a completed result. This
 happens separately because a valid result may not be one of the candidates
@@ -301,7 +343,9 @@ rules without changing which effort levels have been discovered.
 
 The frontier merges the children from the batch with the candidates already
 retained. `DefaultCandidateSelectionPolicy` runs the simplification using the
-rules configured by `ResultPruningPolicy`.
+rules configured by `ResultPruningPolicy`. Some special handling is needed
+to preserve and compare `AttackProfiles` since they're not part of the
+effective properties.
 
 1. Group candidates by their effective properties.
 2. Treat lower breeding effort as a guaranteed improvement over matching
@@ -312,7 +356,10 @@ rules configured by `ResultPruningPolicy`.
    IV quality, cost, location, reuse, wild Pals, referenced players, variety,
    and the configured result limit.
 5. Keep the selected paths for each effective-property group.
-6. Produce a `FrontierDelta` containing the candidates added to and removed
+6. In each effective-property group, check for any `AttackProfiles` which were
+   entirely removed by pruning. Restore the lowest-cost candidates for each
+   missing `AttackProfile`.
+7. Produce a `FrontierDelta` containing the candidates added to and removed
    from the frontier.
 
 `FrontierIndex` is updated from that delta. `ParentPairSchedule` then adds the
@@ -338,7 +385,12 @@ The loop stops when:
 1. Apply the allowed surgery operations and their costs.
 2. Check the final required and optional passive rules.
 3. Check that the result has the requested gender.
-4. Return the remaining paths as a `BreedingSolverResult`.
+4. Check the result for an `AttackProfile` which meets the attack requirements
+   maximum Special Cake limit.
+5. Reconstruct the necessary attack inheritance modes and parent loadouts.
+6. Recompute exact probability, effort, and cake totals, and re-verify
+   that the result still meets the final requirements.
+7. Return the remaining paths as a `BreedingSolverResult`.
 
 The UI may use `PalResultGrouping` and `PalResultProperty` to reduce or group
 the returned paths for display. This does not change which candidates were
@@ -349,16 +401,22 @@ explored during the solve.
 ```text
 BreedingSolver
   -> SolverRunContext
+       -> AttackTargetContext
   -> SolverRun
        -> InitialPalBuilder
        -> SearchFrontier
             -> FrontierIndex
             -> ParentPairSchedule
             -> ResultAccumulator
+            -> DefaultCandidateSelectionPolicy
        -> ParallelBatchExecutor
             -> CandidateExpander per worker
                  -> worker-local object pools
+                 -> AttackProfileComposer
+                      -> AttackProfile / AttackProfileEntry
+                      -> AttackProfileReducer
        -> ResultPostProcessor
+            -> AttackResultMaterializer
   -> BreedingSolverResult
 ```
 

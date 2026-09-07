@@ -69,6 +69,8 @@ namespace PalCalc.Solver.PalReference
 
         public List<PassiveSkill> ActualPassives { get; }
 
+        public AttackProfile AttackProfile => Male.AttackProfile;
+
         public IV_Set IVs { get; }
 
         public PalGender Gender { get; private set; } = PalGender.WILDCARD;

@@ -23,7 +23,7 @@ internal sealed class ParentPairSchedule
 
     // (new content, all pairs must be evaluated)
     public static ParentPairSchedule Initial(List<IPalReference> initialContent) =>
-        new(new LazyCartesianProduct<IPalReference>(initialContent, initialContent));
+        new(AntiDiagonalLazyCartesianProduct<IPalReference>.Unordered(initialContent));
 
     public static ParentPairSchedule AfterPairMerge(
         List<IPalReference> orderedRetainedExisting,
@@ -33,9 +33,14 @@ internal sealed class ParentPairSchedule
         new(
             new ConcatenatedLazyCartesianProduct<IPalReference>([
                 // pair the remaining frontier items with the newly-added items
-                (orderedRetainedExisting, delta.AddedForScheduling),
+                new AntiDiagonalLazyCartesianProduct<IPalReference>(
+                    orderedRetainedExisting,
+                    delta.AddedForScheduling
+                ),
                 // pair the newly-added items with each other
-                (delta.AddedForScheduling, delta.AddedForScheduling),
+                AntiDiagonalLazyCartesianProduct<IPalReference>.Unordered(
+                    delta.AddedForScheduling
+                ),
             ])
         );
 
@@ -57,8 +62,7 @@ internal sealed class ParentPairSchedule
                     retainedExisting
                 ),
                 // pair the newly-added items with each other
-                new AntiDiagonalLazyCartesianProduct<IPalReference>(
-                    delta.AddedForScheduling,
+                AntiDiagonalLazyCartesianProduct<IPalReference>.Unordered(
                     delta.AddedForScheduling
                 ),
             ])

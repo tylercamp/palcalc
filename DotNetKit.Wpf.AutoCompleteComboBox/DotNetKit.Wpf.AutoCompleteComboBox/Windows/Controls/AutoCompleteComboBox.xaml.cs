@@ -79,36 +79,53 @@ namespace DotNetKit.Windows.Controls
 
         private static void ItemsSourcePropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dpcea)
         {
-            var comboBox = (ComboBox)dependencyObject;
+            var comboBox = (AutoCompleteComboBox)dependencyObject;
             var previousSelectedItem = comboBox.SelectedItem;
+            var previousSelectedValue = comboBox.SelectedValue;
 
             if (dpcea.NewValue is ICollectionView cv)
             {
-                ((AutoCompleteComboBox)dependencyObject).defaultItemsFilter = cv.Filter;
-                comboBox.ItemsSource = cv;
+                comboBox.defaultItemsFilter = cv.Filter;
+                ((ComboBox)comboBox).ItemsSource = cv;
             }
             else
             {
-                ((AutoCompleteComboBox)dependencyObject).defaultItemsFilter = null;
+                comboBox.defaultItemsFilter = null;
                 IEnumerable newValue = dpcea.NewValue as IEnumerable;
                 CollectionViewSource newCollectionViewSource = new CollectionViewSource
                 {
                     Source = newValue
                 };
-                comboBox.ItemsSource = newCollectionViewSource.View;
+                ((ComboBox)comboBox).ItemsSource = newCollectionViewSource.View;
             }
 
-            // avoid unnecessary event re-raise
-            if (comboBox.SelectedItem != previousSelectedItem)
-                comboBox.SelectedItem = previousSelectedItem;
-
-            // if ItemsSource doesn't contain previousSelectedItem
-            if (comboBox.SelectedItem != previousSelectedItem)
+            if (!string.IsNullOrEmpty(comboBox.SelectedValuePath))
             {
-                comboBox.SelectedItem = null;
+                // Items may be recreated while their selected values remain the same.
+                // Select the replacement item without replacing the SelectedValue binding.
+                comboBox.SelectedItem = previousSelectedValue == null
+                    ? null
+                    : comboBox.Items.Cast<object>().FirstOrDefault(item =>
+                    {
+                        var selectedValue = new DependencyVariable<object>();
+                        selectedValue.SetBinding(item, comboBox.SelectedValuePath);
+                        return Equals(selectedValue.Value, previousSelectedValue);
+                    });
+            }
+            else
+            {
+                // avoid unnecessary event re-raise
+                if (comboBox.SelectedItem != previousSelectedItem)
+                    comboBox.SelectedItem = previousSelectedItem;
+
+                // if ItemsSource doesn't contain previousSelectedItem
+                if (comboBox.SelectedItem != previousSelectedItem)
+                {
+                    comboBox.SelectedItem = null;
+                }
             }
 
-            ((AutoCompleteComboBox)dependencyObject).lastValidSelectedItem = comboBox.SelectedItem;
+            comboBox.lastValidSelectedItem = comboBox.SelectedItem;
         }
         #endregion ItemsSource
 

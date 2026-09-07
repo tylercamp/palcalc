@@ -33,6 +33,8 @@ namespace PalCalc.UI.ViewModel
         public PalTargetViewModel(SaveGameViewModel sourceSave, PalSourceViewModel sourcePals, PalSpecifierViewModel initial, PassiveSkillsPresetCollectionViewModel presets)
         {
             this.sourcePals = sourcePals;
+            
+            AvailableAttackSkills = new AttackSkillSourceViewModel(sourcePals);
 
             if (initial.IsReadOnly)
             {
@@ -52,14 +54,13 @@ namespace PalCalc.UI.ViewModel
                 }
             }
 
-            CurrentPalSpecifier.RefreshWith(sourcePals.AvailablePals);
+            CurrentPalSpecifier.RefreshWith(sourcePals.AvailablePals.ToList());
 
             void RefreshOnChange(object sender, PropertyChangedEventArgs ev)
             {
-                CurrentPalSpecifier?.RefreshWith(sourcePals.AvailablePals);
+                CurrentPalSpecifier?.RefreshWith(sourcePals.AvailablePals.ToList());
             }
 
-            PropertyChangedEventManager.AddHandler(sourceSave.Customizations, RefreshOnChange, nameof(sourceSave.Customizations.CustomContainers));
             PropertyChangedEventManager.AddHandler(sourcePals, RefreshOnChange, nameof(sourcePals.AvailablePals));
             
             Presets = presets;
@@ -123,7 +124,7 @@ namespace PalCalc.UI.ViewModel
 
                     if (value != null)
                     {
-                        value?.RefreshWith(sourcePals.AvailablePals);
+                        value?.RefreshWith(sourcePals.AvailablePals.ToList());
                     }
                 }
             }
@@ -144,6 +145,8 @@ namespace PalCalc.UI.ViewModel
         }
 
         public bool IsValid => CurrentPalSpecifier.IsValid;
+
+        public AttackSkillSourceViewModel AvailableAttackSkills { get; }
 
         public PassiveSkillsPresetCollectionViewModel Presets { get; }
 

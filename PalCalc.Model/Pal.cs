@@ -73,6 +73,10 @@ namespace PalCalc.Model
         public List<string> GuaranteedPassivesInternalIds { get; set; } = new List<string>();
         public IEnumerable<PassiveSkill> GuaranteedPassiveSkills(PalDB db) => GuaranteedPassivesInternalIds.Select(id => id.InternalToStandardPassive(db));
 
+        public List<string> Level1AttackInternalIds { get; set; } = new List<string>();
+
+        public IEnumerable<ActiveSkill> Level1ActiveSkills(PalDB db) => Level1AttackInternalIds.Select(id => id.InternalToActive(db));
+
         public PartnerSkill PartnerSkill { get; set; } = null;
 
         public int Rarity { get; set; } = 0;

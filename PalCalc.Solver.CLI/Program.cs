@@ -18,10 +18,21 @@ internal class Program
         var db = PalDB.LoadEmbedded();
         Console.WriteLine("Loaded Pal DB");
 
-        var saveGame = DirectSavesLocation.AllLocal.SelectMany(l => l.ValidSaveGames).MaxBy(g => g.LevelMeta.ReadGameOptions().PlayerLevel);
+        var saveLocation = DirectSavesLocation.AllLocal.MaxBy(l => l.ValidSaveGames.Max(s => s.LastModified));
+        var saveGame = saveLocation.ValidSaveGames.MaxBy(g => g.LastModified);
         Console.WriteLine("Using {0}", saveGame);
 
         var savedInstances = saveGame.Level.ReadCharacterData(db, GameSettings.Defaults, [], null).Pals;
+        Console.WriteLine("{0} native pals", savedInstances.Count);
+
+        var fromGps = saveLocation.GlobalPalStorage.ReadPals("GPS").Pals;
+        savedInstances.AddRange(fromGps);
+        Console.WriteLine("{0} GPS pals", fromGps.Count);
+
+        var fromDps = saveGame.Players.SelectMany(p => p.DimensionalPalStorageSaveFile?.ReadPals("DPS")?.Pals ?? []).ToList();
+        savedInstances.AddRange(fromDps);
+        Console.WriteLine("{0} DPS pals", fromDps.Count);
+
         Console.WriteLine("Loaded save game");
 
         var solverSettings = new BreedingSolverSettings(
@@ -30,29 +41,70 @@ internal class Program
                 breedingDB: PalBreedingDB.LoadEmbedded(db),
                 resultPruning: ResultPruningPolicy.Default,
                 ownedPals: savedInstances,
-                maxBreedingSteps: 99,
+                maxBreedingSteps: 8,
                 maxSolverIterations: 99,
-                maxWildPals: 99,
+                maxWildPals: 15,
                 allowedWildPals: db.Pals.ToList(),
                 bannedBredPals: new List<Pal>(),
-                maxBredIrrelevantPassives: 2,
-                maxInputIrrelevantPassives: 4,
+                maxBredIrrelevantPassives: 0,
+                maxInputIrrelevantPassives: 3,
                 maxEffort: TimeSpan.FromDays(7),
                 maxThreads: 0,
                 maxSurgeryCost: 1_000_000,
                 allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
-                useGenderReversers: true
+                useGenderReversers: false,
+                maxSpecialCakes: 1000000
         );
         var solver = new BreedingSolver();
 
+        long lastCount = 0;
+        DateTime lastTime = DateTime.Now;
         solver.StatusUpdateInterval = TimeSpan.FromSeconds(1);
-        solver.StatusUpdated += ev => Console.WriteLine($"{ev.CurrentPhase} ({ev.CurrentStepIndex}) - {ev.WorkProcessedCount} / {ev.CurrentWorkSize}");
+        solver.StatusUpdated += ev =>
+        {
+            var diff = ev.WorkProcessedCount - lastCount;
+            if (diff < 0)
+            {
+                lastCount = ev.WorkProcessedCount;
+                diff = 0;
+            }
+
+            var now = DateTime.Now;
+            var throughput = diff / (now - lastTime).TotalSeconds;
+            Console.WriteLine($"{ev.CurrentPhase} ({ev.CurrentStepIndex:N0}) - {ev.WorkProcessedCount:N0} / {ev.CurrentWorkSize:N0} ({(int)throughput:N0}/s)");
+
+            lastTime = now;
+            lastCount = ev.WorkProcessedCount;
+        };
+
+        var requiredAttack = "PowerShot".InternalToActive(db);
 
         var targetInstance = new PalSpecifier
         {
             Pal = "Beakon".ToPal(db),
-            RequiredPassives = new List<PassiveSkill> { "Lord of the Sea".ToStandardPassive(db), "Lord of the Underworld".ToStandardPassive(db), "Nimble".ToStandardPassive(db), "Legend".ToStandardPassive(db) },
-            IV_Attack = 90,
+            RequiredPassives = new List<PassiveSkill> { "Nimble".ToStandardPassive(db) },
+            RequiredAttacks = [requiredAttack],
+            //IV_Attack = 90,
+            //IV_Defense = 90,
+            //IV_HP = 90
+        };
+
+        var targetInstance2 = new PalSpecifier
+        {
+            Pal = "Broncherry".ToPal(db),
+            RequiredPassives = [
+                "Runner".ToStandardPassive(db),
+                "Nimble".ToStandardPassive(db),
+            ],
+            RequiredAttacks = [
+                "Bog Blast".ToActive(db),
+                "Bubble Blast".ToActive(db),
+                "Aqua Gun".ToActive(db),
+                "Dark Ball".ToActive(db),
+                "Dragon Cannon".ToActive(db),
+                //"Flare Storm".ToActive(db),
+            ],
+            //IV_Attack = 90,
             //IV_Defense = 90,
             //IV_HP = 90
         };
@@ -61,7 +113,7 @@ internal class Program
             CancellationToken.None
         );
         var solveResult = solver.Solve(
-            new BreedingSolverRequest(targetInstance, solverSettings),
+            new BreedingSolverRequest(targetInstance2, solverSettings),
             controller
         );
         var matches = solveResult.Results;
@@ -73,12 +125,33 @@ internal class Program
         }
 
         Console.WriteLine("Took {0}", TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds));
+        Console.WriteLine("Required attack: {0} ({1})", requiredAttack.Name, requiredAttack.InternalName);
 
         Console.WriteLine("\n\nRESULTS:");
         foreach (var match in matches.OrderBy(m => m.BreedingEffort))
         {
             var tree = new BreedingTree(match);
             tree.Print();
+            foreach (var bred in tree.AllNodes.Select(node => node.Item1.PalRef).OfType<BredPalReference>())
+            {
+                Console.WriteLine(
+                    "{0} attacks: {1}; chance: {2:P2}; expected attempts: {3}; step effort: {4}",
+                    bred.Pal.Name,
+                    string.Join(", ", bred.MaterializedAttackInheritance?.ChildLearnedAttacks.Select(attack => attack.Name) ?? []),
+                    bred.MaterializedAttackInheritance?.AttackProbability ?? 1,
+                    bred.AvgRequiredBreedings,
+                    bred.SelfBreedingEffort
+                );
+            }
+            Console.WriteLine(
+                "Selected result attacks: {0}",
+                string.Join(", ", match switch
+                {
+                    BredPalReference bred => bred.MaterializedAttackInheritance?.ChildLearnedAttacks.Select(attack => attack.Name) ?? [],
+                    OwnedPalReference owned => (owned.UnderlyingInstance.ActiveSkills ?? []).Select(attack => attack.Name),
+                    _ => [],
+                })
+            );
             Console.WriteLine("Should take: {0}\n", match.BreedingEffort);
         }
     }

@@ -289,7 +289,8 @@ namespace PalCalc.UI.ViewModel.Solver
 
                 maxSurgeryCost: MaxGoldCost,
                 allowedSurgeryPassives: PalDB.LoadEmbedded().SurgeryPassiveSkills.Except(BannedSurgeryPassives).ToList(),
-                useGenderReversers: UseGenderReversers
+                useGenderReversers: UseGenderReversers,
+                maxSpecialCakes: int.MaxValue
             );
 
         public SerializableSolverSettings AsModel => new SerializableSolverSettings()
