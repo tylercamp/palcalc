@@ -21,18 +21,6 @@
     <StackPanel.Resources>
         <c:ValueVisibilityConverter x:Key="VVC_Negate" Negate="True" />
 
-        <Style TargetType="materialIcons:MaterialIcon" x:Key="AttackUnavailableWarningTooltipTemplate">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Availability}" Value="NotInheritable">
-                    <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText LC_ATTACK_SKILL_NOT_INHERITABLE}" />
-                </DataTrigger>
-
-                <DataTrigger Binding="{Binding Availability}" Value="NotKnownByPals">
-                    <Setter Property="ToolTipService.ToolTip" Value="{itl:LocalizedText LC_ATTACK_SKILL_NOT_KNOWN}" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
         <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
             <TextBlock Text="{Binding Name.Value}" />
         </DataTemplate>
@@ -45,7 +33,7 @@
                                                     Kind="WarningCircleOutline"
                                                     Foreground="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
                                                     Background="Transparent"
-                                                    Style="{StaticResource AttackUnavailableWarningTooltipTemplate}"
+                                                    ToolTipService.ToolTip="{Binding WarningText.Value}"
                                                     />
                     </vu:ForceEnabled>
                 </Grid>
@@ -96,6 +84,13 @@
                         </Style>
                     </Setter.Value>
                 </Setter>
+
+                <Style.Triggers>
+                    <Trigger Property="IsDropDownOpen" Value="False">
+                        <Setter Property="ToolTipService.ToolTip"
+                                Value="{Binding SelectedItem.WarningText.Value, RelativeSource={RelativeSource Self}}" />
+                    </Trigger>
+                </Style.Triggers>
             </Style>
 
             <DataTemplate x:Key="ThinAttacksList" DataType="vm:PalTargetViewModel">
