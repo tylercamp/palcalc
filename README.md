@@ -12,7 +12,7 @@ _v1.12.1 recording_
 
 ---
 
-Pal Calc is a breeding solver for Palworld which uses the data from your save file to automatically find the optimal breeding tree for any desired pal, passive skills, and IVs. It will find _the_ optimal path using your own pals, tell you where to find those pals, and estimate how long each step will take.
+Pal Calc is a breeding solver for Palworld which uses the data from your save file to automatically find the optimal breeding tree for any desired pal, passive skills, attack skills, and IVs. Breeding and inheritance probabilities are accurately modeled and used to compare paths. It will find optimal paths using your own pals, tell you where to find those pals, and estimate how long each step will take.
 
 No more spreadsheets!
 
@@ -38,6 +38,7 @@ Full list of features
   - Probability of directly- and randomly-inserted passives
   - For directly-inherited passives, probability of getting the desired passives
   - Probability of IV inheritance (if enabled)
+  - Probability of attack inheritance (if enabled)
 - Offers the optimal path
   - Determines "path efficiency" based on calculated probabilities, not just the total number of steps
   - Handles single-root paths, where you successively breed children with another pal you own (one "starting point")
@@ -58,7 +59,7 @@ Full list of features
   - Search for specific pals and/or pals with specific IVs, passives, and attack skills
   - Manually add pals in custom containers for use in breeding calculations (does _not_ affect Palworld save data)
 - Multiple languages
-  - Supports all languages in Palworld, pal and passives names imported from game files
+  - Supports all languages in Palworld, pal and skill names imported from game files
   - Translations for in-app text [can be added](./PalCalc.UI/Localization/README.md)
 
 # Community Help
@@ -113,5 +114,4 @@ The Community Toolkit library is used for the viewmodels, which provides the `Ob
 ## Maybe TODOs
 - Option to auto-recalc all target pals when changes are detected
 - Allow specifying custom db.json
-- Attack skill inheritance + solving
 - Implement proper graph diffing for the built in GraphSharp animations
