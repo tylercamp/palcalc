@@ -23,6 +23,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 PlayerSources.Selections = initialTreeSelections;
 
             PropertyChangedEventManager.AddHandler(PlayerSources, OnTreeSelectionChanged, nameof(PlayerSources.Selections));
+            PropertyChangedEventManager.AddHandler(sourceSave.Customizations, OnCustomPalsChanged, nameof(sourceSave.Customizations.CustomContainers));
         }
 
         private void OnTreeSelectionChanged(object sender, PropertyChangedEventArgs e)
@@ -30,6 +31,9 @@ namespace PalCalc.UI.ViewModel.Solver
             PersistedSelectionIds = null;
             OnPropertyChanged(nameof(AvailablePals));
         }
+
+        private void OnCustomPalsChanged(object sender, PropertyChangedEventArgs e) =>
+            OnPropertyChanged(nameof(AvailablePals));
 
         public PalSourceTreeViewModel PlayerSources { get; }
 

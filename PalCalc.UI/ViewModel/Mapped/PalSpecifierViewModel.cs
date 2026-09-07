@@ -160,7 +160,7 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public bool IsValid => TargetPal != null;
 
-        public void RefreshWith(IEnumerable<PalInstance> availablePals)
+        public void RefreshWith(List<PalInstance> availablePals)
         {
             if (availablePals.Any())
             {
