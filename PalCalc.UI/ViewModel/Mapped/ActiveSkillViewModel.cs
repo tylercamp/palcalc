@@ -39,9 +39,6 @@ namespace PalCalc.UI.ViewModel.Mapped
 
         public static IReadOnlyList<ActiveSkillViewModel> All { get; } = PalDB.LoadEmbedded().ActiveSkills.Select(Make).OrderBy(s => s.Name.Value).ToList();
 
-        public static IReadOnlyList<ActiveSkillViewModel> Inheritable { get; } =
-            PalDB.LoadEmbedded().ActiveSkills.Where(s => s.CanInherit).Select(Make).OrderBy(s => s.Name.Value).ToList();
-
         private static ActiveSkillViewModel designerInstance;
         public static ActiveSkillViewModel DesignerInstance =>
             designerInstance ??= new ActiveSkillViewModel(
