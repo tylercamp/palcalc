@@ -131,7 +131,9 @@ namespace PalCalc.UI.ViewModel.PalDerived
         public bool IsValid => Pal != null;
 
         private List<ActiveSkill> AttackSkills =>
-            new() { Attack1?.ModelObject, Attack2?.ModelObject, Attack3?.ModelObject, Attack4?.ModelObject, Attack5?.ModelObject, Attack6?.ModelObject };
+            new List<ActiveSkill> { Attack1?.ModelObject, Attack2?.ModelObject, Attack3?.ModelObject, Attack4?.ModelObject, Attack5?.ModelObject, Attack6?.ModelObject }
+                .SkipNull()
+                .ToList();
 
         public PalInstance ModelObject => !IsValid ? null : new PalInstance()
         {
