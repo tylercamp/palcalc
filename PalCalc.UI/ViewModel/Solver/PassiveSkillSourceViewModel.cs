@@ -45,7 +45,7 @@ namespace PalCalc.UI.ViewModel.Solver
             CollectionChangedEventManager.AddHandler(PassiveSkillViewModel.All, PassiveSkills_CollectionChanged);
 
             if (specifier != null)
-                specifier.PropertyChanged += Specifier_PropertyChanged;
+                PropertyChangedEventManager.AddHandler(specifier, Specifier_PropertyChanged, nameof(specifier.TargetPal));
 
             Recompute();
         }
@@ -57,11 +57,7 @@ namespace PalCalc.UI.ViewModel.Solver
 
         private void PassiveSkills_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => Recompute();
 
-        private void Specifier_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(PalSpecifierViewModel.TargetPal))
-                Recompute();
-        }
+        private void Specifier_PropertyChanged(object sender, PropertyChangedEventArgs e) => Recompute();
 
         private void SolverControls_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -125,7 +121,11 @@ namespace PalCalc.UI.ViewModel.Solver
                         : PalBreedingDB.NotReachableBreedingSteps;
             }
 
-            var wildPassives = db.Pals
+            var targetRequiresSameType = target != null && db.Pals
+                .Where(pal => pal != target)
+                .All(pal => BreedingSteps(pal) == PalBreedingDB.NotReachableBreedingSteps);
+
+            var reachableWildPassives = db.Pals
                 .Where(pal => pal != target
                     && !solverControls.BannedWildPals.Contains(pal)
                     && BreedingSteps(pal) <= solverControls.MaxBreedingSteps)
@@ -133,50 +133,61 @@ namespace PalCalc.UI.ViewModel.Solver
                 .Where(passive => passive is not (null or IUnknownPassive))
                 .ToHashSet();
 
+            ILocalizedText OwnedRouteWarning(PassiveSkill passive)
+            {
+                if (!ownedPalsByPassive.TryGetValue(passive, out var carriers))
+                    return targetRequiresSameType
+                        ? WarningTexts.RequiresSameType
+                        : WarningTexts.NoneOwned;
+
+                var minSteps = carriers.Min(BreedingSteps);
+                if (minSteps == PalBreedingDB.NotReachableBreedingSteps)
+                    return WarningTexts.RequiresSameType;
+                if (minSteps > solverControls.MaxBreedingSteps)
+                    return WarningTexts.OwnedOutOfReach;
+
+                return null;
+            }
+
+            ILocalizedText WildRouteWarning(PassiveSkill passive)
+            {
+                if (!reachableWildPassives.Contains(passive))
+                    return WarningTexts.NoWildCarrier;
+                if (solverControls.MaxWildPals == 0)
+                    return WarningTexts.WildDisabled;
+
+                return null;
+            }
+
+            ILocalizedText SurgeryRouteWarning(PassiveSkill passive)
+            {
+                if (solverControls.BannedSurgeryPassives.Contains(passive))
+                    return WarningTexts.SurgeryBanned;
+                if (passive.SurgeryCost > solverControls.MaxGoldCost)
+                    return WarningTexts.SurgeryTooExpensive;
+
+                return null;
+            }
+
             return PassiveSkillViewModel.All.Select(passive =>
             {
                 var model = passive.ModelObject;
-                var reasons = new List<ILocalizedText>();
-                var available = false;
-
-                if (!ownedPalsByPassive.TryGetValue(model, out var ownedCarriers))
+                var routeWarnings = new List<ILocalizedText>
                 {
-                    reasons.Add(WarningTexts.NoneOwned);
-                }
-                else
-                {
-                    var ownedMinSteps = ownedCarriers.Min(BreedingSteps);
-                    if (ownedMinSteps == PalBreedingDB.NotReachableBreedingSteps)
-                        reasons.Add(WarningTexts.RequiresSameType);
-                    else if (ownedMinSteps > solverControls.MaxBreedingSteps)
-                        reasons.Add(WarningTexts.OwnedOutOfReach);
-                    else
-                        available = true;
-                }
+                    OwnedRouteWarning(model),
+                };
 
                 if (model is not UnrecognizedPassiveSkill)
                 {
-                    if (!wildPassives.Contains(model))
-                        reasons.Add(WarningTexts.NoWildCarrier);
-                    else if (solverControls.MaxWildPals == 0)
-                        reasons.Add(WarningTexts.WildDisabled);
-                    else
-                        available = true;
+                    routeWarnings.Add(WildRouteWarning(model));
 
                     if (model.SupportsSurgery)
-                    {
-                        if (solverControls.BannedSurgeryPassives.Contains(model))
-                            reasons.Add(WarningTexts.SurgeryBanned);
-                        else if (model.SurgeryCost > solverControls.MaxGoldCost)
-                            reasons.Add(WarningTexts.SurgeryTooExpensive);
-                        else
-                            available = true;
-                    }
+                        routeWarnings.Add(SurgeryRouteWarning(model));
                 }
 
                 return new AvailablePassiveSkillViewModel(
                     passive,
-                    available ? [] : reasons
+                    routeWarnings.SkipNull().ToList()
                 );
             }).ToList();
         }

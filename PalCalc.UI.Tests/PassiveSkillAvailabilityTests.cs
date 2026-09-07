@@ -65,6 +65,27 @@ public class PassiveSkillAvailabilityTests
     }
 
     [TestMethod]
+    public void SameTypeTargetUsesSameTypeWarningWithoutOwnedCarrier()
+    {
+        var target = Db.Pals.First(candidate => Db.Pals
+            .Where(source => source != candidate)
+            .All(source => BreedingDb.MinBreedingSteps[source][candidate]
+                == PalBreedingDB.NotReachableBreedingSteps));
+        var guaranteedPassives = Db.Pals.SelectMany(pal => pal.GuaranteedPassiveSkills(Db)).ToHashSet();
+        var passive = Db.StandardPassiveSkills.First(candidate =>
+            !candidate.SupportsSurgery && !guaranteedPassives.Contains(candidate)
+        );
+
+        var entry = EntryFor(
+            PassiveSkillSourceViewModel.CollectPassives([], MakeControls(), Targeting(target)),
+            passive
+        );
+
+        Assert.IsFalse(entry.IsAvailable);
+        StringAssert.Contains(entry.WarningText.Value, "only use other Pals of the same type");
+    }
+
+    [TestMethod]
     public void WildPassiveHonorsWildLimitAndAllowedSpecies()
     {
         var route = Db.Pals
