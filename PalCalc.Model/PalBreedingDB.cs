@@ -16,6 +16,11 @@ namespace PalCalc.Model
     {
         private static ILogger logger = Log.ForContext<PalBreedingDB>();
 
+        /// <summary>
+        /// If it's impossible to reach one Pal from another Pal, their distance ("min breeding steps") will be set to this value.
+        /// </summary>
+        public const int NotReachableBreedingSteps = 10000;
+
         public List<BreedingResult> Breeding { get; set; }
 
         // Map[ParentPal, Map[ChildPal, NumSteps]]

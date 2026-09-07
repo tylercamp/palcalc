@@ -304,7 +304,7 @@ namespace PalCalc.UI.ViewModel
         {
             if (PalTargetList?.SelectedTarget != null)
             {
-                PalTarget = new PalTargetViewModel(OpenedSave, PalTargetList.SourcePals, PalTargetList.SelectedTarget, passivePresets);
+                PalTarget = new PalTargetViewModel(OpenedSave, PalTargetList.SourcePals, PalTargetList.SelectedTarget, passivePresets, SolverControls);
                 passivePresets.ActivePalTarget = PalTarget;
             }
             else

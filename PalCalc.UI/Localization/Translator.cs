@@ -80,5 +80,10 @@ namespace PalCalc.UI.Localization
             new DerivedLocalizableText<IEnumerable<ILocalizedText>>(
                 (locale, parts) => string.Join(ListSeparator.Value, parts.Select(p => p.Value))
             );
+
+        public static DerivedLocalizableText<IEnumerable<ILocalizedText>> JoinNewline { get; } =
+            new DerivedLocalizableText<IEnumerable<ILocalizedText>>(
+                (locale, parts) => string.Join("\n", parts.Select(p => p.Value))
+            );
     }
 }

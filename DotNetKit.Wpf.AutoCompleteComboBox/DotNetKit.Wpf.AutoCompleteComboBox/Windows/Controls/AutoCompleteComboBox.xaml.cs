@@ -292,6 +292,9 @@ namespace DotNetKit.Windows.Controls
                 return;
             }
 
+            if (ItemsSource == null)
+                return;
+
             var matchingItem = ItemsSource.Cast<object>().Where(i => TextFromItem(i) == Text).FirstOrDefault();
             if (matchingItem != SelectedItem)
             {

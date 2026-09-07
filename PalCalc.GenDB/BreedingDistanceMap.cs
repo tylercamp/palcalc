@@ -76,7 +76,7 @@ namespace PalCalc.GenDB
                     // the remaining (src,target) pairs are impossible
                     foreach (var p in unresolved)
                     {
-                        palDistances[p.Item1].Add(p.Item2, 10000);
+                        palDistances[p.Item1].Add(p.Item2, PalBreedingDB.NotReachableBreedingSteps);
                     }
                 }
             }

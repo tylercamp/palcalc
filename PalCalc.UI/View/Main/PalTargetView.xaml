@@ -21,8 +21,22 @@
     <StackPanel.Resources>
         <c:ValueVisibilityConverter x:Key="VVC_Negate" Negate="True" />
 
-        <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type mvm:PassiveSkillViewModel}">
-            <TextBlock Text="{Binding Name.Value}" />
+        <DataTemplate x:Key="PassiveTemplate" DataType="{x:Type svm:AvailablePassiveSkillViewModel}">
+            <StackPanel Orientation="Horizontal">
+                <Grid Visibility="{Binding IsAvailable, Converter={StaticResource VVC_Negate}}" Margin="0,0,4,0">
+                    <vu:ForceEnabled>
+                        <materialIcons:MaterialIcon Cursor="Hand"
+                                                    Width="16" Height="16"
+                                                    Kind="WarningCircleOutline"
+                                                    Foreground="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
+                                                    Background="Transparent"
+                                                    ToolTipService.ToolTip="{Binding WarningText.Value}"
+                                                    />
+                    </vu:ForceEnabled>
+                </Grid>
+
+                <TextBlock Text="{Binding Passive.Name.Value}" />
+            </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="AttackTemplate" DataType="{x:Type svm:AvailableAttackSkillViewModel}">
             <StackPanel Orientation="Horizontal">
@@ -190,9 +204,25 @@
             <TabControl Margin="0" Padding="0" Background="{x:Null}">
                 <TabControl.Resources>
                     <Style TargetType="dnkc:AutoCompleteComboBox" BasedOn="{StaticResource {x:Type dnkc:AutoCompleteComboBox}}">
-                        <Setter Property="ItemsSource" Value="{x:Static mvm:PassiveSkillViewModel.All}" />
+                        <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}, Path=DataContext.AvailablePassiveSkills.Passives}" />
                         <Setter Property="ItemTemplate" Value="{StaticResource PassiveTemplate}" />
-                        <Setter Property="TextSearch.TextPath" Value="Name.Value" />
+                        <Setter Property="TextSearch.TextPath" Value="Passive.Name.Value" />
+                        <Setter Property="SelectedValuePath" Value="Passive" />
+
+                        <Setter Property="ItemContainerStyle">
+                            <Setter.Value>
+                                <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+                                    <Setter Property="IsEnabled" Value="{Binding IsAvailable}" />
+                                </Style>
+                            </Setter.Value>
+                        </Setter>
+
+                        <Style.Triggers>
+                            <Trigger Property="IsDropDownOpen" Value="False">
+                                <Setter Property="ToolTipService.ToolTip"
+                                        Value="{Binding SelectedItem.WarningText.Value, RelativeSource={RelativeSource Self}}" />
+                            </Trigger>
+                        </Style.Triggers>
                     </Style>
 
                     <DataTemplate x:Key="ThinPassivesList" DataType="mvm:PalSpecifierPassiveSkillCollectionViewModel">
