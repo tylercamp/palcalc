@@ -403,8 +403,6 @@ namespace PalCalc.UI.ViewModel
                 {
                     PalTargetList.SelectedTarget = currentSpec;
                     ShowNoResultsNotice = (job.Results.Count == 0);
-
-                    UpdatePalTarget();
                 }
 
                 WeakEventManager<PalSpecifierViewModel, EventArgs>.AddHandler(currentSpec, nameof(currentSpec.ResultsCheckedStateChanged), PalSpecifierCheckedStateChanged);

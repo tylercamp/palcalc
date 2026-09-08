@@ -80,8 +80,24 @@ namespace DotNetKit.Windows.Controls
         private static void ItemsSourcePropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dpcea)
         {
             var comboBox = (AutoCompleteComboBox)dependencyObject;
-            var previousSelectedItem = comboBox.SelectedItem;
+            var previousSelectedItem = comboBox.SelectedItem ?? comboBox.lastValidSelectedItem;
             var previousSelectedValue = comboBox.SelectedValue;
+
+            if (dpcea.NewValue != null
+                && comboBox.GetBindingExpression(SelectedValueProperty) is BindingExpression selectedValueBinding)
+            {
+                // A new data context is authoritative: retain its selection, including null.
+                selectedValueBinding.UpdateTarget();
+                previousSelectedValue = comboBox.SelectedValue;
+            }
+            else if (previousSelectedValue == null
+                && previousSelectedItem != null
+                && !string.IsNullOrEmpty(comboBox.SelectedValuePath))
+            {
+                var selectedValue = new DependencyVariable<object>();
+                selectedValue.SetBinding(previousSelectedItem, comboBox.SelectedValuePath);
+                previousSelectedValue = selectedValue.Value;
+            }
 
             if (dpcea.NewValue is ICollectionView cv)
             {
@@ -101,16 +117,24 @@ namespace DotNetKit.Windows.Controls
 
             if (!string.IsNullOrEmpty(comboBox.SelectedValuePath))
             {
-                // Items may be recreated while their selected values remain the same.
-                // Select the replacement item without replacing the SelectedValue binding.
-                comboBox.SelectedItem = previousSelectedValue == null
-                    ? null
-                    : comboBox.Items.Cast<object>().FirstOrDefault(item =>
-                    {
-                        var selectedValue = new DependencyVariable<object>();
-                        selectedValue.SetBinding(item, comboBox.SelectedValuePath);
-                        return Equals(selectedValue.Value, previousSelectedValue);
-                    });
+                if (dpcea.NewValue == null)
+                {
+                    // Losing the available choices must not clear the bound model value.
+                    comboBox.SetCurrentValue(SelectedValueProperty, previousSelectedValue);
+                }
+                else
+                {
+                    // Items may be recreated while their selected values remain the same.
+                    // Select the replacement item without replacing the SelectedValue binding.
+                    comboBox.SelectedItem = previousSelectedValue == null
+                        ? null
+                        : comboBox.Items.Cast<object>().FirstOrDefault(item =>
+                        {
+                            var selectedValue = new DependencyVariable<object>();
+                            selectedValue.SetBinding(item, comboBox.SelectedValuePath);
+                            return Equals(selectedValue.Value, previousSelectedValue);
+                        });
+                }
             }
             else
             {
@@ -125,7 +149,10 @@ namespace DotNetKit.Windows.Controls
                 }
             }
 
-            comboBox.lastValidSelectedItem = comboBox.SelectedItem;
+            // An ancestor binding can briefly resolve to null while its data context is
+            // replaced. Keep the last selection so the following item source can restore it.
+            if (dpcea.NewValue != null || comboBox.SelectedItem != null)
+                comboBox.lastValidSelectedItem = comboBox.SelectedItem;
         }
         #endregion ItemsSource
 
