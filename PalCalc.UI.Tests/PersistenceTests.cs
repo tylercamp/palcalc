@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
+using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.UI.Model;
@@ -576,7 +577,7 @@ namespace PalCalc.UI.Tests
             db,
             null,
             GameSettings.Defaults,
-            null,
+            new PalSpecifier { Pal = pal },
             null,
             null);
         Assert.AreSame(restored.Results[1], restored.SelectedResult);
