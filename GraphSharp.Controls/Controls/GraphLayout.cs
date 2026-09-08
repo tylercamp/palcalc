@@ -196,7 +196,6 @@ namespace GraphSharp.Controls
             if (Graph == null || Graph.VertexCount == 0 || !LayoutAlgorithmFactory.IsValidAlgorithm(LayoutAlgorithmType) || !CanLayout)
                 return; //no graph to layout, or wrong layout algorithm
 
-            UpdateLayout();
             if (!IsLoaded)
             {
                 RoutedEventHandler handler = null;
@@ -209,6 +208,8 @@ namespace GraphSharp.Controls
                 Loaded += handler;
                 return;
             }
+
+            UpdateLayout();
 
             //get the actual positions if we want to continue the layout
             IDictionary<TVertex, Point> oldPositions = GetOldVertexPositions(continueLayout);
