@@ -15,6 +15,9 @@ inheritance odds may take longer than a three-step path whose children are much
 more likely to have the right traits. The solver compares paths by their
 estimated effort and keeps a small selection of useful alternatives.
 
+A detailed explanation of Palworld breeding mechanics and calculations are
+described [here](./README-PALWORLD-MECHANICS.md).
+
 ## Concepts at a Glance
 
 - **Target** - The Pal being requested, including its required and optional
@@ -176,7 +179,7 @@ The estimate is an average, not a promise. You might get the desired child on
 the first egg, or you might need many more attempts than expected. The estimate
 gives the solver a consistent way to compare whole breeding trees.
 
-See [Passive inheritance estimation](./README-BREED-ESTIMATE.md) for the
+See ["Estimating Breeding Time for Inheriting Passives"](./README-BREED-ESTIMATE.md) for the
 probability calculations used by the solver.
 
 ## Keeping the Search Manageable
