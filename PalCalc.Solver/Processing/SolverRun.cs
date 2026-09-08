@@ -39,11 +39,31 @@ namespace PalCalc.Solver.Processing
             };
             stateUpdated?.Invoke(statusMsg);
 
-            var surgeryFinalists = SurgeryFinalistAccumulator.Create(
-                spec,
-                settings,
-                context.AttackTargets
-            );
+            var surgeryFinalists = SurgeryFinalistAccumulator.Create(spec, settings, context.AttackTargets);
+
+            var selectedSurgeryPassives = spec.RequiredPassives
+                .Where(passive => passive.SupportsSurgery && settings.SurgeryPassives.Contains(passive))
+                .ToList();
+
+            // If some passives are available through surgery, and the max-cost can cover all selected
+            // passives, then all the most-optimal paths will have surgery of those passives at the
+            // very end. This means we can drop these passives from the main search process and let
+            // the surgery post-pass add them instead.
+            var breedingTarget = spec;
+            if (
+                selectedSurgeryPassives.Count > 0 &&
+                selectedSurgeryPassives.Sum(passive => passive.SurgeryCost) <= settings.MaxSurgeryCost
+            )
+            {
+                // (don't ignore passives with breeding effects)
+                var surgeryPassives = selectedSurgeryPassives
+                    .Where(passive => passive.TrackedEffects.Count == 0);
+                breedingTarget = spec.NormalizedCopy();
+                breedingTarget.RequiredPassives = breedingTarget.RequiredPassives
+                    .Except(surgeryPassives)
+                    .ToList();
+            }
+
             var frontier = new SearchFrontier(
                 spec,
                 new InitialPalBuilder(
@@ -69,7 +89,7 @@ namespace PalCalc.Solver.Processing
 
                 var expansionContext = new CandidateExpansionContext(
                     StepIndex: s,
-                    Target: spec,
+                    Target: breedingTarget,
                     PreFilter: new CandidatePreFilter(
                         target: spec,
                         maxEffort: settings.MaxEffort,

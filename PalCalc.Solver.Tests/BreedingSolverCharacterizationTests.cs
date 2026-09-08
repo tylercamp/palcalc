@@ -259,6 +259,89 @@ public class BreedingSolverCharacterizationTests
     }
 
     [TestMethod]
+    public void Solve_DoesNotBreedForAffordableSurgeryPassive()
+    {
+        var surgeryPassive = SolverTestScenario.DB.SurgeryPassiveSkills
+            .First(passive => passive.TrackedEffects.Count == 0);
+        var ownedPals = new[]
+        {
+            SolverTestScenario.Owned(
+                "Katress",
+                PalGender.MALE,
+                passives: [surgeryPassive]
+            ),
+            SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
+        };
+        var baseline = SolverTestScenario.Solver(
+            ownedPals,
+            maxSpecialCakes: 0,
+            maxBreedingSteps: 1,
+            maxSolverIterations: 1,
+            maxBredIrrelevantPassives: 1
+        );
+        var withSurgery = SolverTestScenario.Solver(
+            ownedPals,
+            maxSpecialCakes: 0,
+            maxBreedingSteps: 1,
+            maxSolverIterations: 1,
+            maxBredIrrelevantPassives: 1,
+            maxSurgeryCost: surgeryPassive.SurgeryCost,
+            allowedSurgeryPassives: [surgeryPassive]
+        );
+
+        var baselineEffort = SolverTestScenario.Solve(baseline, "Wixen Noct")
+            .Min(result => result.BreedingEffort);
+        var results = SolverTestScenario.Solve(
+            withSurgery,
+            "Wixen Noct",
+            requiredPassives: [surgeryPassive]
+        );
+
+        Assert.IsTrue(results.Count > 0);
+        Assert.AreEqual(baselineEffort, results.Min(result => result.BreedingEffort));
+        Assert.IsTrue(results.Any(result => result is SurgeryTablePalReference));
+    }
+
+    [TestMethod]
+    public void Solve_BreedsForSurgeryPassivesWhenCombinedCostExceedsBudget()
+    {
+        var surgeryPassives = SolverTestScenario.DB.SurgeryPassiveSkills
+            .Where(passive => passive.TrackedEffects.Count == 0)
+            .Take(2)
+            .ToList();
+        var solver = SolverTestScenario.Solver(
+            [
+                SolverTestScenario.Owned(
+                    "Katress",
+                    PalGender.MALE,
+                    passives: surgeryPassives
+                ),
+                SolverTestScenario.Owned(
+                    "Wixen",
+                    PalGender.FEMALE,
+                    passives: surgeryPassives
+                ),
+            ],
+            maxSpecialCakes: 0,
+            maxBreedingSteps: 1,
+            maxSolverIterations: 1,
+            maxSurgeryCost: surgeryPassives.Sum(passive => passive.SurgeryCost) - 1,
+            allowedSurgeryPassives: surgeryPassives
+        );
+
+        var results = SolverTestScenario.Solve(
+            solver,
+            "Wixen Noct",
+            requiredPassives: surgeryPassives
+        );
+
+        Assert.IsTrue(results.Count > 0);
+        Assert.IsTrue(results.All(result =>
+            surgeryPassives.All(result.EffectivePassives.Contains)
+        ));
+    }
+
+    [TestMethod]
     public void Solve_DoesNotExceedConfiguredSurgeryCost()
     {
         var surgeryPassive = SolverTestScenario.DB.SurgeryPassiveSkills.First();
