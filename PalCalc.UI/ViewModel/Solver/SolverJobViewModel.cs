@@ -311,6 +311,13 @@ namespace PalCalc.UI.ViewModel.Solver
                         }
                         break;
 
+                    case SolverPhase.Finalizing:
+                        SolverStatusMessage = LocalizationCodes.LC_SOLVER_STATUS_FINALIZING.Bind();
+                        overallStep = (int)numTotalSteps;
+                        StepProgress = 100;
+                        StepStatusMessage = null;
+                        break;
+
                     case SolverPhase.Finished:
                         if (obj.IsCanceled)
                         {

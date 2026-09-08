@@ -1213,6 +1213,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_SOLVER_STATUS_BREEDING,
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_STATUS_FINALIZING,
+        /// <summary>
         ///   Looks up a localized string similar to Duration.
         /// </summary>
         LC_SOLVER_STATUS_FINISHED,

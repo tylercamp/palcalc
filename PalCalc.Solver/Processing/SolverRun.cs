@@ -155,17 +155,21 @@ namespace PalCalc.Solver.Processing
                 }
             }
 
-            var resultPostProcessor = new ResultPostProcessor(
-                spec,
-                settings,
-                controller,
-                context.AttackTargets
-            );
-            resultPostProcessor.ApplySurgery(
-                frontier,
-                surgeryFinalists?.Candidates
-            );
-            var results = resultPostProcessor.Finalize(frontier.TerminalResults);
+            statusMsg = statusMsg with { CurrentPhase = SolverPhase.Finalizing };
+            stateUpdated?.Invoke(statusMsg);
+
+            List<IPalReference> results;
+
+            if (!controller.CancellationToken.IsCancellationRequested)
+            {
+                var resultPostProcessor = new ResultPostProcessor(spec, settings, controller, context.AttackTargets);
+                resultPostProcessor.ApplySurgery(frontier, surgeryFinalists?.Candidates);
+                results = resultPostProcessor.Finalize(frontier.TerminalResults);
+            }
+            else
+            {
+                results = [];
+            }
 
             statusMsg = statusMsg with
             {

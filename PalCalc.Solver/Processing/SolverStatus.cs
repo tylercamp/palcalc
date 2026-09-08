@@ -4,6 +4,7 @@ public enum SolverPhase
 {
     Initializing,
     Breeding,
+    Finalizing,
     Finished,
 }
 

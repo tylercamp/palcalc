@@ -1186,4 +1186,7 @@ Would you like to download the installer now?
   <data name="LC_PASSIVE_SKILL_SURGERY_UNAFFORDABLE" xml:space="preserve">
     <value>Surgery for this passive exceeds the max gold cost</value>
   </data>
+  <data name="LC_SOLVER_STATUS_FINALIZING" xml:space="preserve">
+    <value>Finalizing results with surgery and attack selections</value>
+  </data>
 </root>

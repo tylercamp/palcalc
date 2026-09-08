@@ -1114,4 +1114,7 @@
   <data name="LC_PASSIVE_SKILL_SURGERY_UNAFFORDABLE" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SOLVER_STATUS_FINALIZING" xml:space="preserve">
+    <value />
+  </data>
 </root>
