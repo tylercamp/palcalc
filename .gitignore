@@ -8,3 +8,6 @@ Level.sav.json
 
 character*.json
 *.user
+
+.claude/
+.vscode/

@@ -1,53 +1,120 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PalCalc.Model;
 using PalCalc.UI.ViewModel.Mapped;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
     public partial class AttackSkillSourceViewModel : ObservableObject
     {
-        public AttackSkillSourceViewModel(PalSourceViewModel palSource)
+        private readonly PalSourceViewModel sourcePals;
+        private readonly SolverControlsViewModel solverControls;
+        private readonly PalSpecifierViewModel specifier;
+
+        public AttackSkillSourceViewModel(
+            PalSourceViewModel sourcePals,
+            SolverControlsViewModel solverControls,
+            PalSpecifierViewModel specifier
+        )
         {
-            PropertyChangedEventManager.AddHandler(palSource, PalSourcePalsChanged, nameof(palSource.AvailablePals));
-            Attacks = CollectAttacks(palSource).ToList();
+            this.sourcePals = sourcePals;
+            this.solverControls = solverControls;
+            this.specifier = specifier;
+
+            PropertyChangedEventManager.AddHandler(sourcePals, SourcePals_PropertyChanged, nameof(sourcePals.AvailablePals));
+            PropertyChangedEventManager.AddHandler(solverControls, SolverControls_PropertyChanged, string.Empty);
+            PropertyChangedEventManager.AddHandler(specifier, Specifier_PropertyChanged, nameof(specifier.TargetPal));
+
+            Recompute();
         }
 
-        private void PalSourcePalsChanged(object sender, PropertyChangedEventArgs args)
-        {
-            Attacks = CollectAttacks(sender as PalSourceViewModel).ToList();
+        private void SourcePals_PropertyChanged(object sender, PropertyChangedEventArgs args) => Recompute();
+        private void Specifier_PropertyChanged(object sender, PropertyChangedEventArgs args) => Recompute();
 
-            OnPropertyChanged(nameof(AvailableAttacks));
-            OnPropertyChanged(nameof(InheritableAttacks));
+        private void SolverControls_PropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName is nameof(SolverControlsViewModel.MaxBreedingSteps)
+                or nameof(SolverControlsViewModel.MaxWildPals)
+                or nameof(SolverControlsViewModel.BannedWildPals))
+                Recompute();
         }
 
-        private static IEnumerable<AvailableAttackSkillViewModel> CollectAttacks(PalSourceViewModel palSource)
-        {
-            var knownAttacks = new HashSet<ActiveSkill>(palSource.AvailablePals.SelectMany(p => p.ActiveSkills));
+        private void Recompute() => Attacks = CollectAttacks(
+            sourcePals.AvailablePals,
+            solverControls,
+            specifier
+        );
 
-            foreach (var attack in ActiveSkillViewModel.All)
+        internal static List<AvailableAttackSkillViewModel> CollectAttacks(
+            IEnumerable<PalInstance> availablePals,
+            SolverControlsViewModel solverControls,
+            PalSpecifierViewModel specifier
+        )
+        {
+            var target = specifier?.TargetPal?.ModelObject;
+            var db = PalDB.LoadEmbedded();
+            var breedingDB = PalBreedingDB.LoadEmbedded(db);
+            var ownedPals = availablePals.Where(pal => pal?.Pal != null).ToList();
+            var ownedSpecies = ownedPals.Select(pal => pal.Pal).ToHashSet();
+            var carriersByAttack = ownedPals
+                .SelectMany(pal => (pal.ActiveSkills ?? []).Select(attack => (Attack: attack, pal.Pal)))
+                .GroupBy(pair => pair.Attack)
+                .ToDictionary(group => group.Key, group => group.Select(pair => pair.Pal).ToHashSet());
+
+            int BreedingSteps(Pal pal)
             {
-                if (!attack.ModelObject.CanInherit)
-                    yield return new AvailableAttackSkillViewModel(attack, AttackSkillAvailability.NotInheritable);
+                if (target == null)
+                    return 0;
 
-                else if (!knownAttacks.Contains(attack.ModelObject))
-                    yield return new AvailableAttackSkillViewModel(attack, AttackSkillAvailability.NotKnownByPals);
-
-                else
-                    yield return new AvailableAttackSkillViewModel(attack, AttackSkillAvailability.Available);
+                return breedingDB.MinBreedingSteps.TryGetValue(pal, out var toTarget)
+                    && toTarget.TryGetValue(target, out var steps)
+                        ? steps
+                        : PalBreedingDB.NotReachableBreedingSteps;
             }
+
+            var targetRequiresSameType = target != null && db.Pals
+                .Where(pal => pal != target)
+                .All(pal => BreedingSteps(pal) == PalBreedingDB.NotReachableBreedingSteps);
+
+            var reachableWildAttacks = db.Pals
+                .Where(pal => pal != target
+                    && !ownedSpecies.Contains(pal)
+                    && !solverControls.BannedWildPals.Contains(pal)
+                    && BreedingSteps(pal) <= solverControls.MaxBreedingSteps)
+                .SelectMany(pal => pal.Level1ActiveSkills(db))
+                .ToHashSet();
+
+            return ActiveSkillViewModel.All.Select(attack =>
+            {
+                carriersByAttack.TryGetValue(attack.ModelObject, out var carriers);
+                return new AvailableAttackSkillViewModel(
+                    attack,
+                    new AttackSkillAvailabilityInfo(
+                        attack.ModelObject.CanInherit,
+                        OwnedSkillAvailabilityInfo.FromCarriers(
+                            carriers,
+                            BreedingSteps,
+                            solverControls.MaxBreedingSteps,
+                            targetRequiresSameType
+                        ),
+                        new WildSkillAvailabilityInfo(
+                            reachableWildAttacks.Contains(attack.ModelObject),
+                            solverControls.MaxWildPals > 0
+                        )
+                    )
+                );
+            }).ToList();
         }
 
+        [NotifyPropertyChangedFor(nameof(InheritableAttacks))]
+        [NotifyPropertyChangedFor(nameof(AvailableAttacks))]
         [ObservableProperty]
         private List<AvailableAttackSkillViewModel> attacks;
 
         public IEnumerable<AvailableAttackSkillViewModel> InheritableAttacks =>
-            Attacks.Where(a => a.Availability != AttackSkillAvailability.NotInheritable);
+            Attacks.Where(attack => attack.CanInherit);
 
         public IEnumerable<ActiveSkillViewModel> AvailableAttacks =>
             Attacks.Where(a => a.IsAvailable).Select(a => a.Attack);

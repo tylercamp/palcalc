@@ -92,6 +92,22 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_ATTACK_SKILL_NOT_REACHABLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_ATTACK_SKILL_REQUIRES_SAME_TYPE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_ATTACK_SKILL_WILD_DISABLED,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_ATTACK_SKILL_WILD_NOT_KNOWN,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_BASE_ASSIGNED_LABEL,
         /// <summary>
         ///   Looks up a localized string similar to BaseName.
@@ -676,6 +692,34 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_PALWORLD_SAVE_FILES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVE_SKILL_NOT_KNOWN,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVE_SKILL_NOT_REACHABLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVE_SKILL_REQUIRES_SAME_TYPE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVE_SKILL_SURGERY_DISABLED,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVE_SKILL_SURGERY_UNAFFORDABLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVE_SKILL_WILD_DISABLED,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_PASSIVE_SKILL_WILD_NOT_KNOWN,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

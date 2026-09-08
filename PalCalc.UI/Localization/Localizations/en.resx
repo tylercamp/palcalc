@@ -1153,4 +1153,37 @@ Would you like to download the installer now?
   <data name="LC_ATTACK_SKILL_NOT_KNOWN" xml:space="preserve">
     <value>No Pals know this attack</value>
   </data>
+  <data name="LC_ATTACK_SKILL_NOT_REACHABLE" xml:space="preserve">
+    <value>Your Pals that know this attack can't reach this target within the max breeding steps</value>
+  </data>
+  <data name="LC_ATTACK_SKILL_REQUIRES_SAME_TYPE" xml:space="preserve">
+    <value>The target Pal can only use other Pals of the same type; none of those Pals know this attack</value>
+  </data>
+  <data name="LC_ATTACK_SKILL_WILD_DISABLED" xml:space="preserve">
+    <value>This attack is available from Wild Pals, but Wild Pals are disabled</value>
+  </data>
+  <data name="LC_ATTACK_SKILL_WILD_NOT_KNOWN" xml:space="preserve">
+    <value>No available wild Pal has this attack</value>
+  </data>
+  <data name="LC_PASSIVE_SKILL_NOT_KNOWN" xml:space="preserve">
+    <value>None of your Pals have this passive</value>
+  </data>
+  <data name="LC_PASSIVE_SKILL_NOT_REACHABLE" xml:space="preserve">
+    <value>Your Pals with this passive can't reach this target within the max breeding steps</value>
+  </data>
+  <data name="LC_PASSIVE_SKILL_REQUIRES_SAME_TYPE" xml:space="preserve">
+    <value>The target Pal can only use other Pals of the same type; none of those Pals have this passive</value>
+  </data>
+  <data name="LC_PASSIVE_SKILL_WILD_DISABLED" xml:space="preserve">
+    <value>This passive is available from Wild Pals, but Wild Pals are disabled</value>
+  </data>
+  <data name="LC_PASSIVE_SKILL_WILD_NOT_KNOWN" xml:space="preserve">
+    <value>No available wild Pal has this passive</value>
+  </data>
+  <data name="LC_PASSIVE_SKILL_SURGERY_DISABLED" xml:space="preserve">
+    <value>Surgery is not allowed for this passive</value>
+  </data>
+  <data name="LC_PASSIVE_SKILL_SURGERY_UNAFFORDABLE" xml:space="preserve">
+    <value>Surgery for this passive exceeds the max gold cost</value>
+  </data>
 </root>

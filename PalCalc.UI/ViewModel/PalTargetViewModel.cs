@@ -53,7 +53,7 @@ namespace PalCalc.UI.ViewModel
             }
 
             CurrentPalSpecifier.RefreshWith(sourcePals.AvailablePals.ToList());
-            AvailableAttackSkills = new AttackSkillSourceViewModel(sourcePals);
+            AvailableAttackSkills = new AttackSkillSourceViewModel(sourcePals, solverControls, CurrentPalSpecifier);
             AvailablePassiveSkills = new PassiveSkillSourceViewModel(sourcePals, solverControls, CurrentPalSpecifier);
 
             void RefreshOnChange(object sender, PropertyChangedEventArgs ev)

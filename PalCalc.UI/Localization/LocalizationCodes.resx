@@ -1081,4 +1081,37 @@
   <data name="LC_ATTACK_SKILL_NOT_KNOWN" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_ATTACK_SKILL_NOT_REACHABLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_ATTACK_SKILL_REQUIRES_SAME_TYPE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_ATTACK_SKILL_WILD_DISABLED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_ATTACK_SKILL_WILD_NOT_KNOWN" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PASSIVE_SKILL_NOT_KNOWN" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PASSIVE_SKILL_NOT_REACHABLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PASSIVE_SKILL_REQUIRES_SAME_TYPE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PASSIVE_SKILL_WILD_DISABLED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PASSIVE_SKILL_WILD_NOT_KNOWN" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PASSIVE_SKILL_SURGERY_DISABLED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_PASSIVE_SKILL_SURGERY_UNAFFORDABLE" xml:space="preserve">
+    <value />
+  </data>
 </root>
