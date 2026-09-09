@@ -127,6 +127,11 @@ public readonly struct AttackProfile : IEquatable<AttackProfile>
 
     public ReadOnlySpan<AttackProfileEntry> EntriesSpan => entries ?? [];
 
+    /// <summary>
+    /// Returns whether any of the contained profiles can fully cover the requirements of
+    /// the given mask. (This is <em>not</em> the same as whether the exact mask is
+    /// contained - this allows for supersets.)
+    /// </summary>
     public bool Contains(byte requiredMask)
     {
         if (entries == null)

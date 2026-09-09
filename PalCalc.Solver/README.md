@@ -27,47 +27,49 @@ described [here](./README-PALWORLD-MECHANICS.md).
   you own, one you can catch, or a child from an earlier step. Sometimes one
   candidate stands for several actual Pals.
 - **Frontier** - The useful candidates found so far. Any Pal in the frontier
-  may become a parent in a later breeding step.
+  may become a parent in a later breeding step. This is important - it gives
+  us the breeding pairs to check, and acts as a record of the fastest way
+  to reach any given Pal.
 - **Effective properties** - The parts of a Pal that matter for the current
-  target: species, gender representation, useful passives, and whether each
-  requested IV threshold can be met. If two Pals have the same effective
+  target: species, gender, useful passives, and whether each requested IV
+  threshold can be met. If two Pals have the same effective
   properties, either one will work in the same future breeding steps.
-- **Breeding effort** - An estimate of the work needed to obtain a Pal.
+  (Not seen here: attack skills, and for good reason. This will be mentioned later.)
+- **Breeding effort** - The estimated time to obtain a Pal.
   `BreedingEffort` covers its complete breeding tree, while
   `SelfBreedingEffort` covers only the work introduced by that candidate.
-- **Simplification** - Dropping paths that are slower or do not add anything
+- **Simplification** - Dropping paths that are slower or don't add anything
   new, while keeping the best paths and a few useful alternatives. This is also
   called *pruning*.
 - **Completed result** - A Pal that matches the target. It is saved even when
-  the solver does not need it as a parent.
+  the solver does not need it as a parent. This is also called a *terminal result*.
 
 After each round, the solver records what changed in the frontier. This change
 is called a **frontier delta**. It lets the solver try the new parent pairs
 without repeating work it has already done.
 
-## Building a Breeding Tree
+## Building a Breeding Tree - "The Algorithm"
 
-Imagine trying to find a breeding tree by hand. You would begin with the Pals
+Imagine trying to find a breeding tree by hand. You'd start with the Pals
 available to you, choose two that could make a useful child, and add that child
-to the list of possible parents. You would keep doing this until one of the
+to the list of possible parents. You keep doing this until one of the
 children matched your target.
 
-The solver follows the same general process, but it can consider many possible
-trees at once.
+The solver follows the same general process:
 
 It first builds a frontier from the owned and wild Pals allowed by the solver
 settings. It skips Pals that cannot help with the target. When several owned
 Pals would work the same way, it picks one to represent them. It can also
 combine matching male and female Pals so either gender is available later.
 
-The solver then breeds the Pals in the frontier. Useful children are added back
+The solver then breeds the Pals in the frontier. **"Useful"** children are added back
 to the frontier, so they can become parents in the next round. Children that
 already satisfy the target are also saved as completed results.
 
 This repeats until a round produces no useful new Pals, or until the configured
 iteration limit is reached.
 
-### What makes a child useful?
+### What makes a child "useful"?
 
 A child is useful when it adds a new or better way to reach the target. It may
 introduce the right Pal for a later breeding combination, collect useful
@@ -75,9 +77,9 @@ passives in one place, carry an IV that can meet a requested threshold, or
 provide the gender needed for another pair.
 
 The meaning of "useful" depends on the target. If the request only requires an
-attack IV, exact health and defense IVs are ignored when comparing two
-candidates. Likewise, a passive that is valuable in general may still be
-irrelevant for the final target pal.
+attack IV, then exact health and defense IVs are ignored when comparing two
+candidates. Likewise, a high-tier, valuable passive may still be irrelevant
+if it's not one of the passives we wanted in the final target pal.
 
 The solver calls this smaller, target-specific view of a Pal its **effective
 properties**. Grouping candidates this way lets it compare paths that will have
@@ -106,6 +108,11 @@ The distribution of passives between the parents has no effect on probabilities.
 Palworld combines and deduplicates both parents' passives before rolling
 inheritance, so a 2/2 split is no better than a 1/3 or 0/4 split.
 
+**What gets tracked:**
+
+1. The list of actual passives, for inheritance probabilities.
+2. The list of effective passives, for comparing similar Pals.
+
 #### IVs
 
 An IV is relevant when it can satisfy a threshold in the current request.
@@ -116,6 +123,11 @@ Some candidates stand for more than one individual Pal, so the solver records
 their IVs as ranges. During the search, the important question is usually
 whether that range can meet the requested threshold. Exact values can still
 help choose between otherwise similar paths.
+
+**What gets tracked:** Each IV is stored as...
+
+1. A range of values based on the parent IVs.
+2. A flag which says whether the IV is "relevant".
 
 #### Attacks
 
@@ -137,9 +149,19 @@ Pal Calc just holds a loose collection of details for attacks as they
 pass through each step. The final choice of "who equips which attack" is
 saved for the very end.
 
+**What gets tracked:**
+
+1. A rough list of possible attacks for the child
+2. Some info on how those attacks are distributed up the tree.
+
+_Note: The other properties in this list are used as "Effective Properties", but_
+_attack skills are treated differently. Attack combinations can become so large_
+_that it's hard to compare paths efficiently. Instead, the other properties here_
+_are used for grouping, and attack skills are preserved separately._
+
 #### Gender
 
-The solver does not always need to choose a candidate's gender right away. A
+The solver doesn't always need to choose a candidate's gender right away. A
 wildcard gender means it can choose the required gender later and include the
 chance of obtaining that gender in the effort estimate. An opposite-wildcard
 simply takes whichever gender is opposite the other parent.
@@ -147,6 +169,10 @@ simply takes whichever gender is opposite the other parent.
 If the player owns equivalent male and female Pals, the solver can combine them
 into a composite owned candidate. A later step can use whichever owned Pal has
 the required gender instead of breeding another copy just for its gender.
+
+**What gets tracked:**
+
+1. The "guaranteed gender" of a given Pal. If the gender can't be guaranteed (namely for "owned pals"), then a "wildcard" gender value is used.
 
 ## Estimating the Effort of a Path
 
@@ -198,8 +224,8 @@ Lower breeding effort is the clearest improvement. If the solver finds the
 same effective Pal through a faster path, the slower path can be ignored
 entirely.
 
-Effort is not the only useful difference, however. Two paths may take the same
-estimated effort while differing in the number of steps, IV quality, cost, Pal
+Effort is not the only useful difference, however. Two paths can have the same
+effort while differing in the number of steps, IV quality, cost, Pal
 locations, and other practical details. The solver uses those differences to
 decide which alternatives are worth keeping instead of simply taking whichever
 path it found first.
@@ -216,7 +242,7 @@ information:
 
 - The available pairings of desired attacks between the parents
 - The number of Special Cakes required for each pairing
-- Whether a "ignore-inherit" attack is available
+- Whether an "ignore-inherit" attack is available
 
 Breeding effort is excluded here on purpose because it adds a lot of
 tracking overhead. Instead, attack options are compared by the number of
@@ -224,6 +250,13 @@ Special Cakes required. A path which needs fewer Special Cakes
 will _often_ require less breeding attempts than other approaches, making
 it a semi-accurate stand-in for direct breeding effort. These cakes are
 also high-level and expensive, making them even more important for comparisons.
+
+_Technical note: the "available pairings" data is stored in a 64-bit `ulong`_
+_bitfield for general comparisons, and an array of 8-bit `byte` bitfields for_
+_associating arrangements with cake costs. With 6 order-independent attack slots,_
+_there are only 6 bits needed to represent available attacks. There are 64 (`2^6`)_
+_possible arrangements, conveniently letting us represent combined state in_
+_a single `ulong` via `1 << IndividualMask`._
 
 ## Search Coverage and Limits
 
@@ -276,10 +309,10 @@ The following is a complete walkthrough of the steps, in order.
 
 1. `BreedingSolver` receives a `BreedingSolverRequest` containing the target
    and settings.
-3. `SolverRunContext` stores the target, settings, breeding mechanics,
+2. `SolverRunContext` stores the target, settings, breeding mechanics,
    breeding database, run controller, and candidate-selection policy used for
    this run.
-4. `SolverRun` runs the search and finishes the results.
+3. `SolverRun` runs the search and finishes the results.
 
 ### 2. Build the starting candidates
 
@@ -388,8 +421,8 @@ The loop stops when:
 1. Apply the allowed surgery operations and their costs.
 2. Check the final required and optional passive rules.
 3. Check that the result has the requested gender.
-4. Check the result for an `AttackProfile` which meets the attack requirements
-   maximum Special Cake limit.
+4. Check the result for an `AttackProfile` which meets the attack requirements and
+   Special Cake limit.
 5. Reconstruct the necessary attack inheritance modes and parent loadouts.
 6. Recompute exact probability, effort, and cake totals, and re-verify
    that the result still meets the final requirements.
