@@ -345,7 +345,7 @@ namespace PalCalc.Solver.Processing
                         continue;
                     }
 
-                    if (settings.BannedBredPals.Contains(childPalType))
+                    if (childPalType != context.Target.Pal && settings.BannedBredPals.Contains(childPalType))
                         continue;
 
 #if DEBUG && DEBUG_CHECKS
