@@ -493,7 +493,7 @@ namespace PalCalc.UI.Tests
         var male = Owned(PalGender.MALE, "male");
         var female = Owned(PalGender.FEMALE, "female");
         var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics, AttackProfile.Inactive);
-        var bred = new BredPalReference(GameSettings.Defaults, pal, PalGender.WILDCARD, male, wild, null, [swift], 1, ivs, 1, AttackProfile.Inactive, null);
+        var bred = new BredPalReference(GameSettings.Defaults, pal, PalGender.WILDCARD, male, wild, null, [swift], 1, 1, ivs, 1, AttackProfile.Inactive, null);
         var composite = new CompositeOwnedPalReference(male, female);
         var surgery = new SurgeryTablePalReference(wild, [new AddPassiveSurgeryOperation(swift)]);
         var settings = new SerializableSolverSettings();

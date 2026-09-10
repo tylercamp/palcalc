@@ -92,6 +92,23 @@ internal static class SolverTestScenario
     public static List<IPalReference> Solve(
         ConfiguredSolver solver,
         string targetPal,
+        IEnumerable<ActiveSkill> requiredAttacks,
+        IEnumerable<PassiveSkill> requiredPassives
+    ) => Solve(
+        solver,
+        targetPal,
+        requiredAttacks,
+        requiredPassives,
+        null,
+        PalGender.WILDCARD,
+        0,
+        0,
+        0
+    );
+
+    public static List<IPalReference> Solve(
+        ConfiguredSolver solver,
+        string targetPal,
         IEnumerable<PassiveSkill>? requiredPassives = null,
         IEnumerable<PassiveSkill>? optionalPassives = null,
         PalGender requiredGender = PalGender.WILDCARD,

@@ -486,6 +486,7 @@ public class SearchFrontierCharacterizationTests
             parent2: parent2,
             passives: [],
             passivesProbability: 1,
+            specialCakePassivesProbability: 1,
             ivs: new IV_Set(),
             ivsProbability: 1,
             attackProfile: AttackProfile.Inactive,

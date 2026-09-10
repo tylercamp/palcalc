@@ -244,6 +244,7 @@ public class CandidateSelectionPolicyTests
             avgRequiredBreedings: null,
             passives: [],
             passivesProbability: 1,
+            specialCakePassivesProbability: 1,
             ivs: new IV_Set(),
             ivsProbability: 1,
             attackProfile: profile,

@@ -117,6 +117,26 @@ public class AttackResultMaterializerTests
     }
 
     [TestMethod]
+    public void Materialize_CakeUsesTheFixedInheritancePassiveProbability()
+    {
+        var selectedEntry = Entry(mask: 1, cakes: 2);
+        var root = Bred(
+            Leaf(1),
+            Leaf(0),
+            new AttackProfile(selectedEntry),
+            passivesProbability: 0.25f,
+            specialCakePassivesProbability: 0.5f
+        );
+
+        var result = Materialize(root, selectedEntry);
+
+        Assert.AreEqual(AttackInheritanceMode.InheritAll, result.MaterializedAttackInheritance.Mode);
+        Assert.AreEqual(0.5f, result.PassivesProbability);
+        Assert.AreEqual(2, result.AvgRequiredBreedings);
+        Assert.AreEqual(2, result.MaterializedAttackInheritance.SpecialCakes);
+    }
+
+    [TestMethod]
     public void Materialize_RecursivelyCalculatesParentAndChildEffort()
     {
         var intermediateEntry = Entry(mask: 1, cakes: 0);
@@ -409,7 +429,9 @@ public class AttackResultMaterializerTests
         AttackProfile attackProfile,
         Pal? child = null,
         PalGender gender = PalGender.WILDCARD,
-        BreedingSolverSettings? settings = null
+        BreedingSolverSettings? settings = null,
+        float passivesProbability = 1,
+        float specialCakePassivesProbability = 1
     )
     {
         settings ??= Settings();
@@ -421,7 +443,8 @@ public class AttackResultMaterializerTests
             parent2,
             avgRequiredBreedings: null,
             [],
-            passivesProbability: 1,
+            passivesProbability,
+            specialCakePassivesProbability,
             new IV_Set(),
             ivsProbability: 1,
             attackProfile,

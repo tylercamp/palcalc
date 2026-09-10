@@ -186,7 +186,8 @@ internal sealed class AttackResultMaterializer
             bred.Parent1,
             bred.Parent2,
             bred.PassivesProbability,
-            bred.IVsProbability
+            bred.IVsProbability,
+            bred.SpecialCakePassivesProbability
         ))
         {
             if (!MatchesSearchEntry(choice, selectedEntry))
@@ -205,6 +206,7 @@ internal sealed class AttackResultMaterializer
                 best.BreedingEffort,
                 best.TotalSpecialCakes,
                 best.Choice,
+                best.PassivesProbability,
                 best.AttackProbability,
                 best.RequiredBreedings
             )
@@ -222,7 +224,16 @@ internal sealed class AttackResultMaterializer
         var parent2 = EvaluateResult(bred.Parent2, choice.Parent2Entry);
         var parentCakes = parent1.TotalSpecialCakes + parent2.TotalSpecialCakes;
         var attackProbability = AttackProbabilityFor(choice, bred.Parent1, bred.Parent2);
-        var requiredBreedings = RequiredBreedings(bred, attackProbability);
+        var passivesProbability = choice.Mode == AttackInheritanceMode.InheritAll
+            ? bred.SpecialCakePassivesProbability
+            : bred.PassivesProbability;
+        if (passivesProbability <= 0)
+            throw new InvalidOperationException("A materialized attack choice has an impossible passive outcome.");
+        var requiredBreedings = RequiredBreedings(
+            bred,
+            passivesProbability,
+            attackProbability
+        );
         var usesSpecialCake = choice.Mode == AttackInheritanceMode.InheritAll;
         var totalCakes = parentCakes + (usesSpecialCake ? requiredBreedings : 0);
         var parentEffort = BredPalReferenceEffort.CombineParentEffort(
@@ -240,6 +251,7 @@ internal sealed class AttackResultMaterializer
 
         return new(
             choice,
+            passivesProbability,
             attackProbability,
             requiredBreedings,
             totalCakes,
@@ -294,7 +306,8 @@ internal sealed class AttackResultMaterializer
             parent2.Reference,
             avgRequiredBreedings: evaluated.RequiredBreedings,
             [.. bred.EffectivePassives],
-            bred.PassivesProbability,
+            evaluated.PassivesProbability,
+            bred.SpecialCakePassivesProbability,
             bred.IVs,
             bred.IVsProbability,
             attackProfile: new AttackProfile(bred.AttackProfile.HasNoopAttack, actualEntry),
@@ -314,10 +327,14 @@ internal sealed class AttackResultMaterializer
     // Exact expected attempts for the realized outcome; unlike the search-time
     // estimate, they include the attack probability and any guaranteed-gender
     // adjustment.
-    private int RequiredBreedings(BredPalReference bred, float attackProbability)
+    private int RequiredBreedings(
+        BredPalReference bred,
+        float passivesProbability,
+        float attackProbability
+    )
     {
         var requiredBreedings = (int)Math.Ceiling(
-            1f / (bred.PassivesProbability * bred.IVsProbability * attackProbability)
+            1f / (passivesProbability * bred.IVsProbability * attackProbability)
         );
         return bred.Gender == PalGender.WILDCARD
             ? requiredBreedings
@@ -379,6 +396,7 @@ internal sealed class AttackResultMaterializer
             reference.BreedingEffort,
             selectedEntry.TotalSpecialCakes,
             Choice: null,
+            PassivesProbability: 1,
             AttackProbability: 1,
             RequiredBreedings: 0
         );
@@ -386,6 +404,7 @@ internal sealed class AttackResultMaterializer
 
     private readonly record struct EvaluatedChoice(
         AttackCompositionChoice Choice,
+        float PassivesProbability,
         float AttackProbability,
         int RequiredBreedings,
         int TotalSpecialCakes,
@@ -396,6 +415,7 @@ internal sealed class AttackResultMaterializer
         TimeSpan BreedingEffort,
         int TotalSpecialCakes,
         AttackCompositionChoice? Choice,
+        float PassivesProbability,
         float AttackProbability,
         int RequiredBreedings
     );
@@ -438,7 +458,8 @@ internal sealed class AttackResultMaterializer
         IPalReference parent1,
         IPalReference parent2,
         float passivesProbability,
-        float ivsProbability
+        float ivsProbability,
+        float specialCakePassivesProbability
     )
     {
         if (!targets.IsActive)
@@ -452,7 +473,10 @@ internal sealed class AttackResultMaterializer
         var inheritableTargetMask = targets.InheritableTargetMask;
         var parent1Profile = parent1.AttackProfile;
         var parent2Profile = parent2.AttackProfile;
-        var cakeBreedings = (int)Math.Ceiling(1f / baseProbability);
+        var cakeBaseProbability = specialCakePassivesProbability * ivsProbability;
+        var cakeBreedings = cakeBaseProbability > 0
+            ? (int)Math.Ceiling(1f / cakeBaseProbability)
+            : int.MaxValue;
         foreach (var parent1Entry in parent1Profile.Entries)
             foreach (var parent2Entry in parent2Profile.Entries)
             {
@@ -492,7 +516,7 @@ internal sealed class AttackResultMaterializer
                         yield return normalChoice;
                 }
 
-                if (settings.MaxSpecialCakes == 0)
+                if (settings.MaxSpecialCakes == 0 || cakeBaseProbability <= 0)
                     continue;
 
                 var cakeLoadouts = AttackProfileComposer.CakeMasksFor(

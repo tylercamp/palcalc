@@ -395,6 +395,12 @@ namespace PalCalc.Solver.Processing
                         // option represents the likelyhood of getting all desired passives + up to some number of irrelevant passives
                         var probabilityForUpToNumPassives = 0.0f;
 
+                        // (special cakes can be used for attack solving; the cake has affects on passive probabilities too. track this
+                        // separately for use later in AttackProfileComposer and AttackResultMaterializer)
+                        var specialCakeProbabilityForUpToNumPassives = 0.0f;
+                        var calculateSpecialCakeProbability =
+                            context.AttackTargets.IsActive && settings.MaxSpecialCakes != 0;
+
                         for (int numFinalPassives = targetPassives.Count; numFinalPassives <= Math.Min(GameConstants.MaxTotalPassives, targetPassives.Count + settings.MaxBredIrrelevantPassives); numFinalPassives++)
                         {
 #if DEBUG && DEBUG_CHECKS
@@ -409,6 +415,19 @@ namespace PalCalc.Solver.Processing
                                         targetPassives,
                                         numFinalPassives
                                     );
+
+                            if (calculateSpecialCakeProbability)
+                            {
+                                specialCakeProbabilityForUpToNumPassives +=
+                                    Probabilities.Passives
+                                        .ProbabilityInheritedTargetPassivesForFixedInheritRoll(
+                                            mechanics,
+                                            parentPassives,
+                                            targetPassives,
+                                            numFinalPassives,
+                                            inheritedCountRoll: GameConstants.MaxTotalPassives
+                                        );
+                            }
 
                             if (probabilityForUpToNumPassives <= 0)
                                 continue;
@@ -477,6 +496,7 @@ namespace PalCalc.Solver.Processing
                                         parent1,
                                         parent2,
                                         probabilityForUpToNumPassives,
+                                        specialCakeProbabilityForUpToNumPassives,
                                         ivsProbability
                                     );
                                     if (preparedProfile.EntryTargetMasks != 0)
@@ -488,6 +508,7 @@ namespace PalCalc.Solver.Processing
                                             parent2,
                                             newPassives,
                                             probabilityForUpToNumPassives,
+                                            specialCakeProbabilityForUpToNumPassives,
                                             finalIVs,
                                             ivsProbability,
                                             selfBreedingEffort,
@@ -510,6 +531,7 @@ namespace PalCalc.Solver.Processing
                                         avgRequiredBreedings: null,
                                         newPassives,
                                         probabilityForUpToNumPassives,
+                                        specialCakeProbabilityForUpToNumPassives,
                                         finalIVs,
                                         ivsProbability,
                                         attackProfile: AttackProfile.Inactive,

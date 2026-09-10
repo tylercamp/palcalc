@@ -74,6 +74,8 @@ public class BredReferenceConverterTests
         Assert.AreEqual(17, reloaded.AvgRequiredBreedings);
         Assert.AreEqual(17, reloaded.MaterializedAttackInheritance!.SpecialCakes);
         Assert.AreEqual(AttackInheritanceMode.InheritAll, reloaded.MaterializedAttackInheritance.Mode);
+        Assert.AreEqual(original.PassivesProbability, reloaded.PassivesProbability);
+        Assert.AreEqual(original.BreedingEffort, reloaded.BreedingEffort);
     }
 
     [TestMethod]
@@ -121,6 +123,7 @@ public class BredReferenceConverterTests
         avgRequiredBreedings: avgRequiredBreedings,
         [],
         passivesProbability: 0.5f,
+        specialCakePassivesProbability: 0.5f,
         new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
         ivsProbability: 0.5f,
         attackProfile: AttackProfile.Inactive,

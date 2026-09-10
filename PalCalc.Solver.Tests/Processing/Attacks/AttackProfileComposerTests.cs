@@ -49,11 +49,11 @@ public class AttackProfileComposerTests
 
         var normal = Materialize(
             new AttackProfileComposer(context, settings),
-            Child, Reference(parent1), Reference(parent2), 1, 1
+            Child, Reference(parent1), Reference(parent2), 1, 1, 1
         );
         var lowProbability = Materialize(
             new AttackProfileComposer(context, settings),
-            Child, Reference(parent1, neutral: true), Reference(parent2), 0.01f, 1
+            Child, Reference(parent1, neutral: true), Reference(parent2), 0.01f, 0.1f, 1
         );
 
         Assert.AreEqual(normal, lowProbability);
@@ -69,8 +69,8 @@ public class AttackProfileComposerTests
         var parent2 = Reference(new AttackProfile(Entry(0)));
         var composer = new AttackProfileComposer(context, settings);
 
-        var first = Materialize(composer, Child, parent1, parent2, 0.5f, 0.5f);
-        var second = Materialize(composer, Child, parent1, parent2, 0.51f, 0.5f);
+        var first = Materialize(composer, Child, parent1, parent2, 0.5f, 0.5f, 0.5f);
+        var second = Materialize(composer, Child, parent1, parent2, 0.51f, 0.51f, 0.5f);
 
         Assert.AreSame(first.Entries, second.Entries);
     }
@@ -119,6 +119,31 @@ public class AttackProfileComposerTests
     }
 
     [TestMethod]
+    public void Compose_CakeUsesItsPassiveProbabilityAndSkipsImpossibleOutcomes()
+    {
+        var attacks = Attacks(2);
+        var context = Context(attacks);
+        var settings = Settings(cakes: 100);
+        var parent1 = Reference(new AttackProfile(Entry(0b01)));
+        var parent2 = Reference(new AttackProfile(Entry(0b10)));
+
+        var impossible = Materialize(
+            new AttackProfileComposer(context, settings),
+            Child, parent1, parent2, 0.5f, 1, specialCakePassivesProbability: 0
+        );
+        var possible = Materialize(
+            new AttackProfileComposer(context, settings),
+            Child, parent1, parent2, 0.5f, 1, specialCakePassivesProbability: 0.25f
+        );
+
+        Assert.IsFalse(impossible.Contains(0b11));
+        Assert.AreEqual(
+            4,
+            possible.Entries.Single(entry => entry.LearnedTargetMask == 0b11).TotalSpecialCakes
+        );
+    }
+
+    [TestMethod]
     public void Compose_CategoryChampionsMatchBruteForceNormalAvailability()
     {
         var attacks = Attacks(2);
@@ -129,7 +154,7 @@ public class AttackProfileComposerTests
 
         var optimized = Materialize(
             new AttackProfileComposer(context, settings),
-            Child, Reference(parent1), Reference(parent2), 1, 1
+            Child, Reference(parent1), Reference(parent2), 1, 1, 1
         );
         var expected = BruteForceNormalProfile(context, parent1, parent2);
 
@@ -178,7 +203,7 @@ public class AttackProfileComposerTests
         var settings = Settings(cakes: cakes);
         return Materialize(
             new AttackProfileComposer(Context(attacks), settings),
-            Child, Reference(new(parent1)), Reference(new(parent2)), passivesProbability, ivsProbability
+            Child, Reference(new(parent1)), Reference(new(parent2)), passivesProbability, passivesProbability, ivsProbability
         );
     }
 
@@ -188,8 +213,16 @@ public class AttackProfileComposerTests
         IPalReference parent1,
         IPalReference parent2,
         float passivesProbability,
-        float ivsProbability
-    ) => composer.Prepare(child, parent1, parent2, passivesProbability, ivsProbability).Materialize();
+        float ivsProbability,
+        float specialCakePassivesProbability
+    ) => composer.Prepare(
+        child,
+        parent1,
+        parent2,
+        passivesProbability,
+        specialCakePassivesProbability,
+        ivsProbability
+    ).Materialize();
 
     private static AttackTargetContext Context(IEnumerable<ActiveSkill> attacks) =>
         new(new PalSpecifier { RequiredAttacks = attacks.ToList() }, SolverTestScenario.DB);

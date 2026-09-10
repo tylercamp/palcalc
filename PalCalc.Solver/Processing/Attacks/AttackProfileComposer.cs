@@ -108,6 +108,7 @@ internal sealed class AttackProfileComposer(
         IPalReference parent1,
         IPalReference parent2,
         float passivesProbability,
+        float specialCakePassivesProbability,
         float ivsProbability
     )
     {
@@ -115,6 +116,8 @@ internal sealed class AttackProfileComposer(
             return new(AttackProfile.Inactive);
 
         var baseProbability = passivesProbability * ivsProbability;
+        // (the actual passive probabilities can change when special cakes are involved, need to handle these accordingly)
+        var cakeBaseProbability = specialCakePassivesProbability * ivsProbability;
         if (
             !ReferenceEquals(child, cachedChild) ||
             !ReferenceEquals(parent1, cachedParent1) ||
@@ -134,7 +137,9 @@ internal sealed class AttackProfileComposer(
             // not depend on probability at all.
             var cacheKey = settings.MaxSpecialCakes == 0
                 ? 0
-                : (int)Math.Ceiling(1f / baseProbability);
+                : cakeBaseProbability > 0
+                    ? (int)Math.Ceiling(1f / cakeBaseProbability)
+                    : int.MaxValue;
             if (cachedProfiles.TryGetValue(cacheKey, out var cached))
                 return new(cached);
 
@@ -144,6 +149,7 @@ internal sealed class AttackProfileComposer(
                 parent1,
                 parent2,
                 passivesProbability,
+                specialCakePassivesProbability,
                 ivsProbability,
                 accumulator
             );
@@ -156,6 +162,7 @@ internal sealed class AttackProfileComposer(
             parent1,
             parent2,
             passivesProbability,
+            specialCakePassivesProbability,
             ivsProbability,
             accumulator
         );
@@ -180,6 +187,7 @@ internal sealed class AttackProfileComposer(
         IPalReference parent1,
         IPalReference parent2,
         float passivesProbability,
+        float specialCakePassivesProbability,
         float ivsProbability,
         AttackProfileAccumulator entries
     )
@@ -252,7 +260,16 @@ internal sealed class AttackProfileComposer(
         if (maxSpecialCakes == 0)
             return;
 
-        var edgeSpecialCakes = (int)Math.Ceiling(1f / baseProbability);
+        // It's possible to have `special...Probability = 0` here, but have
+        // normal probabilities non-zero. e.g. if the pal is expected to have exactly 3
+        // passives, and the parents have a total of 4 passives, then special cakes
+        // would cause the child to always have 4. This would mean a 0% chance of
+        // 3 passives.
+        var cakeBaseProbability = specialCakePassivesProbability * ivsProbability;
+        if (cakeBaseProbability <= 0)
+            return;
+
+        var edgeSpecialCakes = (int)Math.Ceiling(1f / cakeBaseProbability);
 
         foreach (var parent1Entry in parent1Entries)
             foreach (var parent2Entry in parent2Entries)

@@ -284,6 +284,64 @@ public class AttackInheritanceSolverTests
     }
 
     [TestMethod]
+    public void Solve_CakeRejectsFinalPassiveCountsBelowTheCombinedParentPool()
+    {
+        var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
+        var attacks = InheritableAttacksNotInnateTo(2, child);
+        var passives = SolverTestScenario.DB.PassiveSkills.Take(4).ToArray();
+
+        SolverTestScenario.ConfiguredSolver Configure(bool includeIrrelevantPassives) =>
+            SolverTestScenario.Solver(
+                [
+                    WithAttacks(
+                        SolverTestScenario.Owned(
+                            "Katress",
+                            PalGender.MALE,
+                            includeIrrelevantPassives ? passives[..3] : passives[..1]
+                        ),
+                        attacks[0]
+                    ),
+                    WithAttacks(
+                        SolverTestScenario.Owned(
+                            "Wixen",
+                            PalGender.FEMALE,
+                            includeIrrelevantPassives ? passives[3..] : passives[1..2]
+                        ),
+                        attacks[1]
+                    ),
+                ],
+                maxBreedingSteps: 1,
+                maxSolverIterations: 1,
+                maxBredIrrelevantPassives: 1,
+                maxSpecialCakes: 100
+            );
+
+        var dirty = SolverTestScenario.Solve(
+            Configure(includeIrrelevantPassives: true),
+            child.Name,
+            attacks,
+            requiredPassives: passives[..2]
+        );
+        var clean = SolverTestScenario.Solve(
+                Configure(includeIrrelevantPassives: false),
+                child.Name,
+                attacks,
+                requiredPassives: passives[..2]
+            )
+            .OfType<BredPalReference>()
+            .Single();
+
+        Assert.AreEqual(0, dirty.Count);
+        Assert.AreEqual(AttackInheritanceMode.InheritAll, clean.MaterializedAttackInheritance.Mode);
+        Assert.AreEqual(
+            SolverTestScenario.DB.BreedingMechanics.PassiveRandomAddedProbability[0] +
+                SolverTestScenario.DB.BreedingMechanics.PassiveRandomAddedProbability[1],
+            clean.PassivesProbability,
+            0.0001f
+        );
+    }
+
+    [TestMethod]
     public void Solve_CakeTransfersAtMostThreeTargetAttacksPerParent()
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);

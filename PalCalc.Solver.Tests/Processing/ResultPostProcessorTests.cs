@@ -696,6 +696,7 @@ public class ResultPostProcessorTests
         avgRequiredBreedings: null,
         [],
         passivesProbability: 1,
+        specialCakePassivesProbability: 1,
         new IV_Set(),
         ivsProbability: 1,
         attackProfile,

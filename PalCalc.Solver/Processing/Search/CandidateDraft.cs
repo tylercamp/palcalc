@@ -16,6 +16,7 @@ internal struct CandidateDraft
     private readonly IPalReference parent1;
     private readonly IPalReference parent2;
     private readonly float passivesProbability;
+    private readonly float specialCakePassivesProbability;
     private readonly float ivsProbability;
     private BredPalReference materialized;
 
@@ -26,6 +27,7 @@ internal struct CandidateDraft
         IPalReference parent2,
         List<PassiveSkill> passives,
         float passivesProbability,
+        float specialCakePassivesProbability,
         IV_Set ivs,
         float ivsProbability,
         TimeSpan selfBreedingEffort,
@@ -37,6 +39,7 @@ internal struct CandidateDraft
         this.parent1 = parent1;
         this.parent2 = parent2;
         this.passivesProbability = passivesProbability;
+        this.specialCakePassivesProbability = specialCakePassivesProbability;
         this.ivsProbability = ivsProbability;
         materialized = null;
 
@@ -70,6 +73,7 @@ internal struct CandidateDraft
         avgRequiredBreedings: null,
         EffectivePassives,
         passivesProbability,
+        specialCakePassivesProbability,
         IVs,
         ivsProbability,
         AttackProfile.Materialize(),

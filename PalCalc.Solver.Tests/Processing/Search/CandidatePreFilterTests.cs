@@ -63,6 +63,7 @@ public class CandidatePreFilterTests
             parent1,
             parent2,
             passivesProbability: 1,
+            specialCakePassivesProbability: 1,
             ivsProbability: 1
         );
         var draft = new CandidateDraft(
@@ -72,6 +73,7 @@ public class CandidatePreFilterTests
             parent2,
             [],
             passivesProbability: 1,
+            specialCakePassivesProbability: 1,
             new IV_Set(),
             ivsProbability: 1,
             selfBreedingEffort: TimeSpan.FromMinutes(1),
@@ -269,6 +271,7 @@ public class CandidatePreFilterTests
             parent2,
             [],
             passivesProbability: 1,
+            specialCakePassivesProbability: 1,
             new IV_Set(),
             ivsProbability: 1,
             selfBreedingEffort: TimeSpan.FromMinutes(1),
@@ -278,6 +281,7 @@ public class CandidatePreFilterTests
                 parent1,
                 parent2,
                 passivesProbability: 1,
+                specialCakePassivesProbability: 1,
                 ivsProbability: 1
             )
         );

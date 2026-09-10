@@ -73,6 +73,7 @@ namespace PalCalc.Solver.PalReference
             int? avgRequiredBreedings,
             List<PassiveSkill> passives,
             float passivesProbability,
+            float specialCakePassivesProbability,
             IV_Set ivs,
             float ivsProbability,
             AttackProfile attackProfile,
@@ -95,10 +96,19 @@ namespace PalCalc.Solver.PalReference
             else AvgRequiredBreedings = (int)Math.Ceiling(1.0f / (passivesProbability * ivsProbability));
 
             PassivesProbability = passivesProbability;
+            SpecialCakePassivesProbability = specialCakePassivesProbability;
             IVsProbability = ivsProbability;
         }
 
         public float PassivesProbability { get; private set; }
+
+        // Special cakes affect passive probability calculations, and we know special cakes will
+        // only affect the solver if attack solving is enabled... but there's no way to know whether
+        // special cakes will be involved with a pal until the very end.
+        //
+        // Probabilities are built up as part of the main breeding loop, so track the special-cake
+        // version of these probabilities at the same time
+        internal float SpecialCakePassivesProbability { get; private set; }
 
         public Pal Pal { get; private set; }
         public IPalReference Parent1 { get; private set; }
@@ -185,6 +195,7 @@ namespace PalCalc.Solver.PalReference
                     AvgRequiredBreedings = BredPalReferenceEffort.WithGuaranteedGender(db, Pal, AvgRequiredBreedings, gender, useReverser),
                     Gender = gender,
                     PassivesProbability = PassivesProbability,
+                    SpecialCakePassivesProbability = SpecialCakePassivesProbability,
                     IVsProbability = IVsProbability,
                 };
             }
