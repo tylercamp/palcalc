@@ -1189,4 +1189,14 @@ Would you like to download the installer now?
   <data name="LC_SOLVER_STATUS_FINALIZING" xml:space="preserve">
     <value>Finalizing results with surgery and attack selections</value>
   </data>
+  <data name="LC_SOLVER_SETTINGS_SKIP_SURGERY_SEARCH" xml:space="preserve">
+    <value>Simplify Surgery Search</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_SKIP_SURGERY_SEARCH_DESC" xml:space="preserve">
+    <value>If enabled, passive skills from surgery will be skipped during normal searches and only apply at the end.
+
+This improves performance by ignoring surgery passives until the solver is done.
+
+This may give less efficient breeding paths if a surgery passive was already available on a nearby Pal.</value>
+  </data>
 </root>

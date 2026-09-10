@@ -42,6 +42,8 @@
                 <RowDefinition />
                 <RowDefinition Height="{StaticResource SepHeight}" />
                 <RowDefinition />
+                <RowDefinition Height="{StaticResource SepHeight}" />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -69,7 +71,16 @@
                 MinWidth="60"
             />
 
-            <Button Grid.Row="4"
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_SKIP_SURGERY_SEARCH}"/>
+            <CheckBox
+                Grid.Row="4" Grid.Column="2"
+                IsChecked="{Binding SkipSurgerySearch, Mode=TwoWay}"
+                IsEnabled="{Binding CanEditSettings}"
+                ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_SKIP_SURGERY_SEARCH_DESC}"
+                ToolTipService.ShowOnDisabled="True"
+                />
+
+            <Button Grid.Row="6"
                     Grid.ColumnSpan="99"
                     Command="{Binding ChangeSurgeryPassives}"
                     IsEnabled="{Binding CanEditSettings}"

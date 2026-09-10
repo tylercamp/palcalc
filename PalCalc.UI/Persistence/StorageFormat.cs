@@ -11,7 +11,7 @@ namespace PalCalc.UI.Persistence
 
     internal static class StorageFormat
     {
-        public const int CurrentVersion = 4;
+        public const int CurrentVersion = 5;
         public const int LegacyVersion = 0;
         public const string ManifestFileName = "storage-format.json";
 

@@ -130,6 +130,7 @@ public class BreedingSolverRequestTests
             maxThreads: 1,
             maxSurgeryCost: 100,
             allowedSurgeryPassives: surgeryPassives,
+            skipSurgeryPassivesDuringSearch: false,
             useGenderReversers: false,
             maxSpecialCakes: 0
         );

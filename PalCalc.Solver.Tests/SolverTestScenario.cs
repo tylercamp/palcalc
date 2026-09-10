@@ -55,6 +55,7 @@ internal static class SolverTestScenario
         GameSettings? gameSettings = null,
         int maxSurgeryCost = 0,
         IEnumerable<PassiveSkill>? allowedSurgeryPassives = null,
+        bool skipSurgeryPassivesDuringSearch = false,
         IEnumerable<Pal>? allowedWildPals = null,
         IEnumerable<Pal>? bannedBredPals = null,
         int? maxSpecialCakes = 0
@@ -78,6 +79,7 @@ internal static class SolverTestScenario
                 maxThreads: maxThreads,
                 maxSurgeryCost: maxSurgeryCost,
                 allowedSurgeryPassives: allowedSurgeryPassives?.ToList() ?? [],
+                skipSurgeryPassivesDuringSearch: skipSurgeryPassivesDuringSearch,
                 useGenderReversers: false,
                 maxSpecialCakes: maxSpecialCakes
             )

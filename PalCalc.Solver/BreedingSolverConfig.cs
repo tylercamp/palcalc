@@ -39,6 +39,7 @@ public sealed class BreedingSolverSettings
         int maxThreads,
         int maxSurgeryCost,
         IEnumerable<PassiveSkill> allowedSurgeryPassives,
+        bool skipSurgeryPassivesDuringSearch,
         bool useGenderReversers,
         int? maxSpecialCakes
     )
@@ -72,6 +73,7 @@ public sealed class BreedingSolverSettings
             : Math.Clamp(maxThreads, 1, Environment.ProcessorCount);
         MaxSurgeryCost = maxSurgeryCost;
         SurgeryPassives = allowedSurgeryPassives.ToList();
+        SkipSurgeryPassivesDuringSearch = skipSurgeryPassivesDuringSearch;
         UseGenderReversers = useGenderReversers;
         MaxSpecialCakes = maxSpecialCakes;
     }
@@ -92,6 +94,7 @@ public sealed class BreedingSolverSettings
     public int MaxThreads { get; }
     public int MaxSurgeryCost { get; }
     public IReadOnlyList<PassiveSkill> SurgeryPassives { get; }
+    public bool SkipSurgeryPassivesDuringSearch { get; }
     public bool UseGenderReversers { get; }
     public int? MaxSpecialCakes { get; }
 }

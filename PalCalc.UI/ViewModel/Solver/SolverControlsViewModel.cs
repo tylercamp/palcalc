@@ -52,6 +52,7 @@ namespace PalCalc.UI.ViewModel.Solver
             MaxInputIrrelevantPassives = 2;
             MaxBredIrrelevantPassives = 1;
             MaxGoldCost = 0;
+            SkipSurgerySearch = false;
 
             ChangeBredPals = new RelayCommand(() =>
             {
@@ -175,6 +176,13 @@ namespace PalCalc.UI.ViewModel.Solver
             set => SetProperty(ref useGenderReversers, value);
         }
 
+        private bool skipSurgerySearch;
+        public bool SkipSurgerySearch
+        {
+            get => skipSurgerySearch;
+            set => SetProperty(ref skipSurgerySearch, value);
+        }
+
         private void OnStatePropertiesChanged()
         {
             OnPropertyChanged(nameof(CanRunSolver));
@@ -289,6 +297,7 @@ namespace PalCalc.UI.ViewModel.Solver
 
                 maxSurgeryCost: MaxGoldCost,
                 allowedSurgeryPassives: PalDB.LoadEmbedded().SurgeryPassiveSkills.Except(BannedSurgeryPassives).ToList(),
+                skipSurgeryPassivesDuringSearch: SkipSurgerySearch,
                 useGenderReversers: UseGenderReversers,
                 maxSpecialCakes: int.MaxValue
             );
@@ -304,6 +313,7 @@ namespace PalCalc.UI.ViewModel.Solver
             BannedBredPalInternalNames = BannedBredPals.Select(p => p.InternalName).ToList(),
             BannedWildPalInternalNames = BannedWildPals.Select(p => p.InternalName).ToList(),
             BannedSurgeryPassiveInternalNames = BannedSurgeryPassives.Select(p => p.InternalName).ToList(),
+            SkipSurgerySearch = SkipSurgerySearch,
             MaxGoldCost = MaxGoldCost,
             UseGenderReversers = UseGenderReversers,
         };
@@ -318,6 +328,7 @@ namespace PalCalc.UI.ViewModel.Solver
             MaxThreads = model.MaxThreads;
             MaxGoldCost = model.MaxGoldCost;
             UseGenderReversers = model.UseGenderReversers;
+            SkipSurgerySearch = model.SkipSurgerySearch;
 
             BannedBredPals = model.BannedBredPals(PalDB.LoadEmbedded());
             BannedWildPals = model.BannedWildPals(PalDB.LoadEmbedded());

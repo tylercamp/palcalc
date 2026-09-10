@@ -12,6 +12,8 @@ namespace PalCalc.UI.Persistence.Migrations
 {
     internal sealed class V0001_FormalizePersistence : StorageMigration
     {
+        // This migration is a frozen historical contract. Add new persisted fields in a new
+        // migration instead of updating this normalization to match the current schema.
         private const string LegacyResultsDirectoryName = "results";
         private const string LegacyTargetFileName = "pal-targets.json";
         private const string TargetIndexFileName = "pal-target-ids.json";

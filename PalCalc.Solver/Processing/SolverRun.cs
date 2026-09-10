@@ -51,6 +51,7 @@ namespace PalCalc.Solver.Processing
             // the surgery post-pass add them instead.
             var breedingTarget = spec;
             if (
+                settings.SkipSurgeryPassivesDuringSearch &&
                 selectedSurgeryPassives.Count > 0 &&
                 selectedSurgeryPassives.Sum(passive => passive.SurgeryCost) <= settings.MaxSurgeryCost
             )

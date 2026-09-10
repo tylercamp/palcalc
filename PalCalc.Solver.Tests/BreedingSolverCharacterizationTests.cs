@@ -286,7 +286,8 @@ public class BreedingSolverCharacterizationTests
             maxSolverIterations: 1,
             maxBredIrrelevantPassives: 1,
             maxSurgeryCost: surgeryPassive.SurgeryCost,
-            allowedSurgeryPassives: [surgeryPassive]
+            allowedSurgeryPassives: [surgeryPassive],
+            skipSurgeryPassivesDuringSearch: true
         );
 
         var baselineEffort = SolverTestScenario.Solve(baseline, "Wixen Noct")
@@ -300,6 +301,36 @@ public class BreedingSolverCharacterizationTests
         Assert.IsTrue(results.Count > 0);
         Assert.AreEqual(baselineEffort, results.Min(result => result.BreedingEffort));
         Assert.IsTrue(results.Any(result => result is SurgeryTablePalReference));
+    }
+
+    [TestMethod]
+    public void Solve_ConsidersAffordableSurgeryPassiveDuringSearchByDefault()
+    {
+        var surgeryPassive = SolverTestScenario.DB.SurgeryPassiveSkills
+            .First(passive => passive.TrackedEffects.Count == 0);
+        var solver = SolverTestScenario.Solver(
+            [
+                SolverTestScenario.Owned("Katress", PalGender.MALE, passives: [surgeryPassive]),
+                SolverTestScenario.Owned("Wixen", PalGender.FEMALE, passives: [surgeryPassive]),
+            ],
+            maxSpecialCakes: 0,
+            maxBreedingSteps: 1,
+            maxSolverIterations: 1,
+            maxBredIrrelevantPassives: 1,
+            maxSurgeryCost: surgeryPassive.SurgeryCost,
+            allowedSurgeryPassives: [surgeryPassive]
+        );
+
+        var results = SolverTestScenario.Solve(
+            solver,
+            "Wixen Noct",
+            requiredPassives: [surgeryPassive]
+        );
+
+        Assert.IsTrue(results.Any(result =>
+            result is not SurgeryTablePalReference &&
+            result.ActualPassives.Contains(surgeryPassive)
+        ));
     }
 
     [TestMethod]

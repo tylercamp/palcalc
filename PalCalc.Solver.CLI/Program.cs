@@ -36,24 +36,25 @@ internal class Program
         Console.WriteLine("Loaded save game");
 
         var solverSettings = new BreedingSolverSettings(
-                gameSettings: new GameSettings(),
-                db: db,
-                breedingDB: PalBreedingDB.LoadEmbedded(db),
-                resultPruning: ResultPruningPolicy.Default,
-                ownedPals: savedInstances,
-                maxBreedingSteps: 8,
-                maxSolverIterations: 99,
-                maxWildPals: 15,
-                allowedWildPals: db.Pals.ToList(),
-                bannedBredPals: new List<Pal>(),
-                maxBredIrrelevantPassives: 0,
-                maxInputIrrelevantPassives: 3,
-                maxEffort: TimeSpan.FromDays(7),
-                maxThreads: 0,
-                maxSurgeryCost: 1_000_000,
-                allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
-                useGenderReversers: false,
-                maxSpecialCakes: 1000000
+            gameSettings: new GameSettings(),
+            db: db,
+            breedingDB: PalBreedingDB.LoadEmbedded(db),
+            resultPruning: ResultPruningPolicy.Default,
+            ownedPals: savedInstances,
+            maxBreedingSteps: 8,
+            maxSolverIterations: 99,
+            maxWildPals: 15,
+            allowedWildPals: db.Pals.ToList(),
+            bannedBredPals: new List<Pal>(),
+            maxBredIrrelevantPassives: 0,
+            maxInputIrrelevantPassives: 3,
+            maxEffort: TimeSpan.FromDays(7),
+            maxThreads: 0,
+            maxSurgeryCost: 1_000_000,
+            allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
+            skipSurgeryPassivesDuringSearch: false,
+            useGenderReversers: false,
+            maxSpecialCakes: 1000000
         );
         var solver = new BreedingSolver();
 

@@ -306,6 +306,7 @@ namespace PalCalc.UI.Tests
             Assert.IsTrue(unknownPropertyWasPreserved.Value);
 
             var settings = AppSettingsJsonSerializer.FromCurrentJson(raw.ToString(Formatting.None));
+            Assert.IsFalse(settings.SolverSettings.SkipSurgerySearch);
             CollectionAssert.Contains(settings.SolverSettings.BannedSurgeryPassiveInternalNames, "user-choice");
             CollectionAssert.Contains(settings.SolverSettings.BannedSurgeryPassiveInternalNames, "SwimSpeed_up_3");
             CollectionAssert.Contains(settings.SolverSettings.BannedSurgeryPassiveInternalNames, "PAL_ALLAttack_up3");

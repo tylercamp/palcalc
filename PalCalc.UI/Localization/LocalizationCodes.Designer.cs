@@ -1199,6 +1199,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SOLVER_SETTINGS_SKIP_SURGERY_SEARCH,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_SETTINGS_SKIP_SURGERY_SEARCH_DESC,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SOLVER_SETTINGS_SURGERY_ALLOWED_PASSIVES,
         /// <summary>
         ///   Looks up a localized string similar to .
