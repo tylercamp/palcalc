@@ -48,38 +48,31 @@
         <DataTemplate x:Key="FixedItemDataTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="15" />
                     <ColumnDefinition Width="Auto" SharedSizeGroup="RenameButton" />
                     <ColumnDefinition Width="2" />
                     <ColumnDefinition Width="Auto" SharedSizeGroup="OverwriteButton" />
-                    <ColumnDefinition Width="15" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="15" />
+                    <ColumnDefinition Width="2" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="4" Text="{Binding Name}" HorizontalAlignment="Left" />
+                <TextBlock Grid.Column="0" Text="{Binding Name}" HorizontalAlignment="Left" Margin="15,0,15,0" />
             </Grid>
         </DataTemplate>
 
         <DataTemplate x:Key="ItemDataTemplate">
-            <Grid>
+            <Grid IsHitTestVisible="True">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="15" />
                     <ColumnDefinition Width="Auto" SharedSizeGroup="RenameButton" />
                     <ColumnDefinition Width="2" />
                     <ColumnDefinition Width="Auto" SharedSizeGroup="OverwriteButton" />
-                    <ColumnDefinition Width="15" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="15" />
+                    <ColumnDefinition Width="2" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Click="RenameButton_Click" ToolTip="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=RenameButtonTooltip}">
-                    <materialIcons:MaterialIcon Kind="Rename" Foreground="Goldenrod" />
-                </Button>
-                <Button Grid.Column="2" Click="OverwriteButton_Click" ToolTip="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=OverwriteButtonTooltip}">
-                    <materialIcons:MaterialIcon Kind="FileReplace" Foreground="SteelBlue" />
-                </Button>
-
-                <ContentControl Grid.Column="4" Content="{Binding}">
+                <ContentControl Grid.Column="0" Content="{Binding}" Margin="15,0,15,0" IsHitTestVisible="False">
                     <ContentControl.ContentTemplate>
                         <Binding RelativeSource="{RelativeSource AncestorType=local:EditableListMenu}" Path="ItemContentTemplate">
                             <Binding.TargetNullValue>
@@ -90,6 +83,13 @@
                         </Binding>
                     </ContentControl.ContentTemplate>
                 </ContentControl>
+
+                <Button Grid.Column="2" Click="RenameButton_Click" ToolTip="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=RenameButtonTooltip}">
+                    <materialIcons:MaterialIcon Kind="Rename" Foreground="Goldenrod" />
+                </Button>
+                <Button Grid.Column="4" Click="OverwriteButton_Click" ToolTip="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=OverwriteButtonTooltip}">
+                    <materialIcons:MaterialIcon Kind="FileReplace" Foreground="SteelBlue" />
+                </Button>
 
                 <Button Grid.Column="6" Click="DeleteButton_Click" ToolTip="{Binding RelativeSource={RelativeSource AncestorType=local:EditableListMenu}, Path=DeleteButtonTooltip}">
                     <materialIcons:MaterialIcon Kind="Delete" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}" />
@@ -106,7 +106,7 @@
                 </Style>
                 <Style TargetType="materialIcons:MaterialIcon">
                     <Setter Property="VerticalAlignment" Value="Stretch" />
-                    <Setter Property="Height" Value="18" />
+                    <Setter Property="Height" Value="16" />
                 </Style>
                 <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="VerticalAlignment" Value="Center" />

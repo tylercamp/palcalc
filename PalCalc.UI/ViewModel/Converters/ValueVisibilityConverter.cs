@@ -12,6 +12,7 @@ namespace PalCalc.UI.ViewModel.Converters
     internal class ValueVisibilityConverter : IValueConverter
     {
         public bool Negate { get; set; } = false;
+        public Visibility FalseyVisibility { get; set; } = Visibility.Collapsed;
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -24,7 +25,7 @@ namespace PalCalc.UI.ViewModel.Converters
 
             if (Negate) shouldShow = !shouldShow;
 
-            return shouldShow ? Visibility.Visible : Visibility.Collapsed;
+            return shouldShow ? Visibility.Visible : FalseyVisibility;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
