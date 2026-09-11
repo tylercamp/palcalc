@@ -134,7 +134,7 @@ internal sealed class InitialPalBuilder(
                 .SelectMany(p =>
                 {
                     var guaranteedPassives = p.GuaranteedPassiveSkills(settings.DB);
-                    var attackState = attackTargets.StateOf(p);
+                    var wildAttacks = p.WildActiveSkills(settings.DB).ToArray();
                     var numIrrelevantGuaranteed = guaranteedPassives.Except(target.DesiredPassives).Count();
                     var numAllowedRandomPassives = Math.Clamp(
                         value: settings.MaxInputIrrelevantPassives - numIrrelevantGuaranteed,
@@ -150,12 +150,10 @@ internal sealed class InitialPalBuilder(
                                 guaranteedPassives,
                                 numRandomPassives,
                                 mechanics,
-                                // Assume wild pals only have their Lv1 attack(s)
-                                // TODO: Eventually reference wild pal level ranges
                                 attackProfile: attackTargets.IsActive
                                     ? new(
-                                        attackState.HasNooplLevel1Attack,
-                                        new AttackProfileEntry(attackState.Level1TargetMask, 0)
+                                        wildAttacks.Any(attack => !attack.CanInherit),
+                                        new AttackProfileEntry(attackTargets.MaskOf(wildAttacks), 0)
                                     )
                                     : AttackProfile.Inactive
                             )

@@ -53,5 +53,21 @@ namespace PalCalc.Model.Tests
                 roundTrippedPal.InternalAttackLeveling.Single().AttackInternalId
             );
         }
+
+        [TestMethod]
+        public void WildAttacksFallBackToLevelOneWithoutWildLevelData()
+        {
+            var source = paldb.Pals.First(pal => pal.InternalAttackLeveling.Any(entry => entry.Level > 1));
+            var pal = new Pal
+            {
+                MinWildLevel = null,
+                InternalAttackLeveling = source.InternalAttackLeveling,
+            };
+
+            CollectionAssert.AreEquivalent(
+                pal.Level1ActiveSkills(paldb).ToArray(),
+                pal.WildActiveSkills(paldb).ToArray()
+            );
+        }
     }
 }

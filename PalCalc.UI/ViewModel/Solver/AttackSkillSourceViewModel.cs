@@ -83,7 +83,7 @@ namespace PalCalc.UI.ViewModel.Solver
                     && !ownedSpecies.Contains(pal)
                     && !solverControls.BannedWildPals.Contains(pal)
                     && BreedingSteps(pal) <= solverControls.MaxBreedingSteps)
-                .SelectMany(pal => pal.Level1ActiveSkills(db))
+                .SelectMany(pal => pal.WildActiveSkills(db))
                 .ToHashSet();
 
             return ActiveSkillViewModel.All.Select(attack =>

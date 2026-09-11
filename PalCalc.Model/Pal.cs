@@ -89,6 +89,10 @@ namespace PalCalc.Model
         public IEnumerable<(ActiveSkill Attack, int Level)> AttackLeveling(PalDB db) =>
             InternalAttackLeveling.Select(entry => (entry.AttackInternalId.InternalToActive(db), entry.Level));
 
+        public IEnumerable<ActiveSkill> WildActiveSkills(PalDB db) => MinWildLevel.HasValue
+            ? AttackLeveling(db).Where(entry => entry.Level <= MinWildLevel.Value).Select(entry => entry.Attack)
+            : Level1ActiveSkills(db);
+
         public PartnerSkill PartnerSkill { get; set; } = null;
 
         public int Rarity { get; set; } = 0;

@@ -146,14 +146,14 @@ public class InitialPalBuilderTests
     }
 
     [TestMethod]
-    public void Build_WildProfileUsesOnlyLevelOneAttacks()
+    public void Build_WildProfileUsesAttacksAvailableAtMinimumWildLevel()
     {
-        var pal = "Katress".ToPal(SolverTestScenario.DB);
-        var level1 = pal.Level1ActiveSkills(SolverTestScenario.DB).First();
-        var later = SolverTestScenario.DB.ActiveSkills.First(attack =>
-            attack != level1 && !pal.Level1AttackInternalIds.Contains(attack.InternalName)
+        var pal = SolverTestScenario.DB.Pals.First(candidate =>
+            candidate.MinWildLevel.HasValue && candidate.AttackLeveling(SolverTestScenario.DB)
+                .Any(entry => entry.Level > 1 && entry.Level <= candidate.MinWildLevel.Value)
         );
-        var target = Target(level1, later);
+        var wildAttacks = pal.WildActiveSkills(SolverTestScenario.DB).ToArray();
+        var target = Target(wildAttacks);
         var configuredSolver = SolverTestScenario.Solver(
             ownedPals: [], maxSpecialCakes: 0, maxBreedingSteps: 1, maxWildPals: 1, allowedWildPals: [pal]
         );
@@ -162,7 +162,7 @@ public class InitialPalBuilderTests
         var context = new AttackTargetContext(target, SolverTestScenario.DB);
 
         Assert.AreEqual(
-            context.MaskOf(pal.Level1ActiveSkills(SolverTestScenario.DB)),
+            context.MaskOf(wildAttacks),
             wild.AttackProfile.Entries.Single().LearnedTargetMask
         );
     }

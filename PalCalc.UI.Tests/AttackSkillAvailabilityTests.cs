@@ -59,10 +59,13 @@ public class AttackSkillAvailabilityTests
     }
 
     [TestMethod]
-    public void WildLevelOneAttackHonorsWildLimitAndAllowedSpecies()
+    public void WildMinimumLevelAttackHonorsWildLimitAndAllowedSpecies()
     {
         var route = Db.Pals
-            .SelectMany(carrier => carrier.Level1ActiveSkills(Db)
+            .Where(carrier => carrier.MinWildLevel.HasValue)
+            .SelectMany(carrier => carrier.AttackLeveling(Db)
+                .Where(entry => entry.Level > 1 && entry.Level <= carrier.MinWildLevel.GetValueOrDefault())
+                .Select(entry => entry.Attack)
                 .Where(attack => attack.CanInherit)
                 .SelectMany(attack => BreedingDb.MinBreedingSteps[carrier]
                     .Where(pair => pair.Key != carrier
@@ -88,7 +91,7 @@ public class AttackSkillAvailabilityTests
 
         controls.MaxWildPals = 1;
         controls.BannedWildPals = Db.Pals
-            .Where(pal => pal.Level1ActiveSkills(Db).Contains(route.Attack))
+            .Where(pal => pal.WildActiveSkills(Db).Contains(route.Attack))
             .ToList();
         var bannedEntry = EntryFor(
             AttackSkillSourceViewModel.CollectAttacks([], controls, Targeting(route.Target)),
