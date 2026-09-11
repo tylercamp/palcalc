@@ -49,6 +49,12 @@ namespace PalCalc.Model
         Farming,
     }
 
+    public class PalInternalAttackLevel
+    {
+        public string AttackInternalId { get; set; }
+        public int Level { get; set; }
+    }
+
     public class Pal
     {
         public PalId Id { get; set; }
@@ -73,9 +79,15 @@ namespace PalCalc.Model
         public List<string> GuaranteedPassivesInternalIds { get; set; } = new List<string>();
         public IEnumerable<PassiveSkill> GuaranteedPassiveSkills(PalDB db) => GuaranteedPassivesInternalIds.Select(id => id.InternalToStandardPassive(db));
 
-        public List<string> Level1AttackInternalIds { get; set; } = new List<string>();
+        [JsonIgnore]
+        public IEnumerable<string> Level1AttackInternalIds => InternalAttackLeveling.Where(al => al.Level == 1).Select(al => al.AttackInternalId);
 
         public IEnumerable<ActiveSkill> Level1ActiveSkills(PalDB db) => Level1AttackInternalIds.Select(id => id.InternalToActive(db));
+
+        public List<PalInternalAttackLevel> InternalAttackLeveling { get; set; } = new List<PalInternalAttackLevel>();
+
+        public IEnumerable<(ActiveSkill Attack, int Level)> AttackLeveling(PalDB db) =>
+            InternalAttackLeveling.Select(entry => (entry.AttackInternalId.InternalToActive(db), entry.Level));
 
         public PartnerSkill PartnerSkill { get; set; } = null;
 

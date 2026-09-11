@@ -181,10 +181,11 @@ public class BreedingSolverCharacterizationTests
     [TestMethod]
     public void Solve_RespectsBannedBredPals()
     {
-        var wixenNoct = "Wixen Noct".ToPal(SolverTestScenario.DB);
+        var wixenNoct = "Katress".ToPal(SolverTestScenario.DB);
         var solver = SolverTestScenario.Solver(
             [
-                SolverTestScenario.Owned("Katress", PalGender.MALE),
+                SolverTestScenario.Owned("Mossanda", PalGender.MALE),  // Should be able to breed for Katress...
+                SolverTestScenario.Owned("Elgrove", PalGender.FEMALE), // but it's been banned
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
             maxSpecialCakes: 0,

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace PalCalc.Model.Tests
 {
@@ -30,6 +31,27 @@ namespace PalCalc.Model.Tests
                 .ToList();
 
             Assert.IsEmpty(groups, $"Expected no duplicate pals by english name, found duplicates of {string.Join(", ", groups.Select(g => g.Key))}");
+        }
+
+        [TestMethod]
+        public void AttackLevelingRoundTripsThroughJson()
+        {
+            var json = JObject.Parse(paldb.ToJson());
+            var firstPal = (JObject)json["Pals"]!.First!;
+            firstPal["InternalAttackLeveling"] = JArray.FromObject(new[]
+            {
+                new PalInternalAttackLevel { AttackInternalId = paldb.ActiveSkills.First().InternalName, Level = 7 },
+            });
+
+            var roundTrippedPal = PalDB.FromJson(json.ToString()).Pals.First(p =>
+                p.InternalName == firstPal["InternalName"]!.ToObject<string>()
+            );
+
+            Assert.AreEqual(7, roundTrippedPal.InternalAttackLeveling.Single().Level);
+            Assert.AreEqual(
+                paldb.ActiveSkills.First().InternalName,
+                roundTrippedPal.InternalAttackLeveling.Single().AttackInternalId
+            );
         }
     }
 }

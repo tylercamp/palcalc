@@ -79,7 +79,7 @@ public class BreedingGraphAttackInstructionTests
     public void WildPalEquipsItsLevelOneLearnedAttacks()
     {
         var db = PalDB.LoadEmbedded();
-        var pal = db.Pals.First(candidate => candidate.Level1AttackInternalIds.Count > 0);
+        var pal = db.Pals.First(candidate => candidate.Level1AttackInternalIds.Count() > 0);
         var wild = new WildPalReference(
             pal,
             [],

@@ -383,39 +383,39 @@ namespace PalCalc.GenDB
             }).SkipNull().ToList();
         }
 
-        private static void AssignLevel1ActiveSkills(
+        private static void AssignActiveSkillLevels(
             List<Pal> pals,
             List<ActiveSkill> attacks,
             List<UActiveSkill> rawAttacks,
             IEnumerable<UActiveSkillLevel> levels
         )
         {
-            var attacksByInternalName = attacks.ToDictionary(
-                attack => attack.InternalName,
-                StringComparer.Ordinal
-            );
+            var attackInternalNames = attacks.Select(attack => attack.InternalName).ToHashSet(StringComparer.Ordinal);
             var rawWazaIds = rawAttacks
                 .Select(attack => attack.WazaType)
                 .ToHashSet();
-            var level1ByPalId = levels
-                .Where(level => level.Level == 1)
+            var levelsByPalId = levels
                 .GroupBy(level => level.PalId, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(group => group.Key, StringComparer.OrdinalIgnoreCase);
 
             foreach (var pal in pals)
             {
-                if (!level1ByPalId.TryGetValue(pal.InternalName, out var palLevels))
+                if (!levelsByPalId.TryGetValue(pal.InternalName, out var palLevels))
                 {
-                    pal.Level1AttackInternalIds = [];
+                    logger.Warning("No attacks found for Pal {InternalName}", pal.InternalName);
+                    pal.InternalAttackLeveling = [];
                     continue;
                 }
 
-                if (palLevels.Count() == 0)
-                {
-                    logger.Warning("Pal {Pal} has no level 1 active skills", pal.InternalName);
-                }
-
-                pal.Level1AttackInternalIds = palLevels.Select(pl => ActiveSkillInternalName(pl.WazaID, rawWazaIds)).ToList();
+                pal.InternalAttackLeveling = palLevels
+                    .Select(level => new PalInternalAttackLevel
+                    {
+                        AttackInternalId = ActiveSkillInternalName(level.WazaID, rawWazaIds),
+                        Level = level.Level,
+                    })
+                    .Where(entry => attackInternalNames.Contains(entry.AttackInternalId))
+                    .OrderBy(entry => entry.Level)
+                    .ToList();
             }
         }
 
@@ -827,7 +827,7 @@ namespace PalCalc.GenDB
                 rawItems,
                 localizations.ToDictionary(l => l.LanguageCode, l => l.ReadAttackNames(provider))
             );
-            AssignLevel1ActiveSkills(
+            AssignActiveSkillLevels(
                 pals,
                 attacks,
                 rawAttackData.Skills,
