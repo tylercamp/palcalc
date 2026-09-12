@@ -133,6 +133,15 @@ namespace PalCalc.UI.ViewModel.Mapped
         public bool Iv_Attack_IsValid => MinIv_Attack <= MaxIv_Attack;
         public bool Iv_Defense_IsValid => MinIv_Defense <= MaxIv_Defense;
 
+        [RelayCommand]
+        private void SetHpIvToMax() => MinIv_HP = MaxIv_HP;
+
+        [RelayCommand]
+        private void SetAttackIvToMax() => MinIv_Attack = MaxIv_Attack;
+
+        [RelayCommand]
+        private void SetDefenseIvToMax() => MinIv_Defense = MaxIv_Defense;
+
         private BreedingResultListViewModel currentResults;
         public BreedingResultListViewModel CurrentResults
         {

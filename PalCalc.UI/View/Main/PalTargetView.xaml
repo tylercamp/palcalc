@@ -347,11 +347,31 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
 
-            <Style TargetType="Label" x:Key="MaxIvLabel" BasedOn="{StaticResource {x:Type Label}}">
+            <Style TargetType="Button" x:Key="MaxIvButton">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}" />
                 <Setter Property="HorizontalContentAlignment" Value="Center" />
-                <Setter Property="ContentStringFormat" Value="({0})" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Cursor" Value="Hand" />
                 <Setter Property="Grid.Column" Value="2" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="Transparent">
+                                <TextBlock x:Name="Text"
+                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}, StringFormat='({0})'}" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+                                    <Setter TargetName="Text" Property="TextDecorations" Value="Underline" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
             <DataTemplate x:Key="IVThinTemplate" DataType="vm:PalTargetViewModel">
@@ -371,9 +391,10 @@
 
                     <Label Grid.Row="0" Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_HP}" />
                     <vu:IntegerTextBox Grid.Row="0" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_HP, Mode=TwoWay}" MinValue="0" MaxValue="100" />
-                    <Label Grid.Row="0" Content="{Binding CurrentPalSpecifier.MaxIv_HP, FallbackValue=0}">
-                        <Label.Style>
-                            <Style TargetType="Label" BasedOn="{StaticResource MaxIvLabel}">
+                    <Button Grid.Row="0" Content="{Binding CurrentPalSpecifier.MaxIv_HP, FallbackValue=0}"
+                            Command="{Binding CurrentPalSpecifier.SetHpIvToMaxCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource MaxIvButton}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding CurrentPalSpecifier.Iv_HP_IsValid, FallbackValue=True}" Value="False">
                                         <Setter Property="Foreground" Value="IndianRed" />
@@ -381,14 +402,15 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </Label.Style>
-                    </Label>
+                        </Button.Style>
+                    </Button>
 
                     <Label Grid.Row="2" Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK}" />
                     <vu:IntegerTextBox Grid.Row="2" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_Attack, Mode=TwoWay}" MinValue="0" MaxValue="100" />
-                    <Label Grid.Row="2" Content="{Binding CurrentPalSpecifier.MaxIv_Attack, FallbackValue=0}">
-                        <Label.Style>
-                            <Style TargetType="Label" BasedOn="{StaticResource MaxIvLabel}">
+                    <Button Grid.Row="2" Content="{Binding CurrentPalSpecifier.MaxIv_Attack, FallbackValue=0}"
+                            Command="{Binding CurrentPalSpecifier.SetAttackIvToMaxCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource MaxIvButton}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding CurrentPalSpecifier.Iv_Attack_IsValid, FallbackValue=True}" Value="False">
                                         <Setter Property="Foreground" Value="IndianRed" />
@@ -396,14 +418,15 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </Label.Style>
-                    </Label>
+                        </Button.Style>
+                    </Button>
 
                     <Label Grid.Row="4" Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE}" />
                     <vu:IntegerTextBox Grid.Row="4" Grid.Column="1" Value="{Binding CurrentPalSpecifier.MinIv_Defense, Mode=TwoWay}" MinValue="0" MaxValue="100" />
-                    <Label Grid.Row="4" Content="{Binding CurrentPalSpecifier.MaxIv_Defense, FallbackValue=0}">
-                        <Label.Style>
-                            <Style TargetType="Label" BasedOn="{StaticResource MaxIvLabel}">
+                    <Button Grid.Row="4" Content="{Binding CurrentPalSpecifier.MaxIv_Defense, FallbackValue=0}"
+                            Command="{Binding CurrentPalSpecifier.SetDefenseIvToMaxCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource MaxIvButton}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding CurrentPalSpecifier.Iv_Defense_IsValid, FallbackValue=True}" Value="False">
                                         <Setter Property="Foreground" Value="IndianRed" />
@@ -411,8 +434,8 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </Label.Style>
-                    </Label>
+                        </Button.Style>
+                    </Button>
                 </Grid>
             </DataTemplate>
 
@@ -443,9 +466,10 @@
 
                         <Label Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_HP_SHORT}" />
                         <vu:IntegerTextBox Grid.Column="2" Value="{Binding CurrentPalSpecifier.MinIv_HP, Mode=TwoWay}" MinValue="0" MaxValue="100" />
-                        <Label Grid.Column="4" Content="{Binding CurrentPalSpecifier.MaxIv_HP, FallbackValue=0}">
-                            <Label.Style>
-                                <Style TargetType="Label" BasedOn="{StaticResource MaxIvLabel}">
+                        <Button Grid.Column="4" Content="{Binding CurrentPalSpecifier.MaxIv_HP, FallbackValue=0}"
+                                Command="{Binding CurrentPalSpecifier.SetHpIvToMaxCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource MaxIvButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding CurrentPalSpecifier.Iv_HP_IsValid, FallbackValue=True}" Value="False">
                                             <Setter Property="Foreground" Value="IndianRed" />
@@ -453,8 +477,8 @@
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Label.Style>
-                        </Label>
+                            </Button.Style>
+                        </Button>
                     </Grid>
 
                     <Grid Grid.Column="2">
@@ -468,9 +492,10 @@
 
                         <Label Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_ATTACK_SHORT}" />
                         <vu:IntegerTextBox Grid.Column="2" Value="{Binding CurrentPalSpecifier.MinIv_Attack, Mode=TwoWay}" MinValue="0" MaxValue="100" />
-                        <Label Grid.Column="4" Content="{Binding CurrentPalSpecifier.MaxIv_Attack, FallbackValue=0}">
-                            <Label.Style>
-                                <Style TargetType="Label" BasedOn="{StaticResource MaxIvLabel}">
+                        <Button Grid.Column="4" Content="{Binding CurrentPalSpecifier.MaxIv_Attack, FallbackValue=0}"
+                                Command="{Binding CurrentPalSpecifier.SetAttackIvToMaxCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource MaxIvButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding CurrentPalSpecifier.Iv_Attack_IsValid, FallbackValue=True}" Value="False">
                                             <Setter Property="Foreground" Value="IndianRed" />
@@ -478,8 +503,8 @@
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Label.Style>
-                        </Label>
+                            </Button.Style>
+                        </Button>
                     </Grid>
 
                     <Grid Grid.Column="4">
@@ -493,9 +518,10 @@
 
                         <Label Grid.Column="0" Content="{itl:LocalizedText Code=LC_COMMON_IV_DEFENSE_SHORT}" />
                         <vu:IntegerTextBox Grid.Column="2" Value="{Binding CurrentPalSpecifier.MinIv_Defense, Mode=TwoWay}" MinValue="0" MaxValue="100" />
-                        <Label Grid.Column="4" Content="{Binding CurrentPalSpecifier.MaxIv_Defense, FallbackValue=0}">
-                            <Label.Style>
-                                <Style TargetType="Label" BasedOn="{StaticResource MaxIvLabel}">
+                        <Button Grid.Column="4" Content="{Binding CurrentPalSpecifier.MaxIv_Defense, FallbackValue=0}"
+                                Command="{Binding CurrentPalSpecifier.SetDefenseIvToMaxCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource MaxIvButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding CurrentPalSpecifier.Iv_Defense_IsValid, FallbackValue=True}" Value="False">
                                             <Setter Property="Foreground" Value="IndianRed" />
@@ -503,8 +529,8 @@
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Label.Style>
-                        </Label>
+                            </Button.Style>
+                        </Button>
                     </Grid>
                 </Grid>
             </DataTemplate>
