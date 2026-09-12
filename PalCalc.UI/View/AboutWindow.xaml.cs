@@ -20,7 +20,7 @@ namespace PalCalc.UI.View
 {
     public partial class AboutViewModel : ObservableObject
     {
-        public string Title => $"Pal Calc {App.Version}";
+        public string Title => $"PalCalc {App.Version}";
     }
 
     /// <summary>

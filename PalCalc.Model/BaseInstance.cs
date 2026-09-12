@@ -29,7 +29,7 @@ namespace PalCalc.Model
 
 
         /// <summary>
-        /// Returns the world coords in normalized map coordinates (X and Y in range [0 1], used for UI position calcs in Pal Calc)
+        /// Returns the world coords in normalized map coordinates (X and Y in range [0 1], used for UI position calcs in PalCalc)
         /// </summary>
         public static MapCoord NormalizedFromWorldCoord(WorldCoord coord)
         {

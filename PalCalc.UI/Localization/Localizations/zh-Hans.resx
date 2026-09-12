@@ -233,7 +233,7 @@
     <value>自定义帕鲁盒</value>
   </data>
   <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve">
-    <value>内容修改自动保存在Pal Calc。自定义帕鲁盒不会影响Palworld存档。</value>
+    <value>内容修改自动保存在PalCalc。自定义帕鲁盒不会影响Palworld存档。</value>
   </data>
   <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve">
     <value>新建...</value>
@@ -272,9 +272,9 @@
   <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve">
     <value>加载存档时发生错误。
 
-如果是新版游戏的存档，请尝试升级Pal Calc。
+如果是新版游戏的存档，请尝试升级PalCalc。
 
-旧版的存档可能不再支持，请使用之前版本的Pal Calc。
+旧版的存档可能不再支持，请使用之前版本的PalCalc。
 
 可以找到生成的zip文件用于发送求助报告:
 
@@ -326,7 +326,7 @@
     <value>语言</value>
   </data>
   <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
-    <value>需要重启Pal Calc使语言设置生效。</value>
+    <value>需要重启PalCalc使语言设置生效。</value>
   </data>
   <data name="LC_LIST_SEPARATOR" xml:space="preserve">
     <value>，</value>
@@ -453,7 +453,7 @@
     <value>将删除自定义帕鲁盒'{Label}'</value>
   </data>
   <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve">
-    <value>确认从Pal Calc移除此存档吗？
+    <value>确认从PalCalc移除此存档吗？
 
 {SaveLabel}
 
@@ -574,7 +574,7 @@
     <value>移除</value>
   </data>
   <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
-    <value>Xbox保存文件不完整，功能仍可运行。关闭Palworld数分钟并重启Pal Calc软件，可以解决此问题。</value>
+    <value>Xbox保存文件不完整，功能仍可运行。关闭Palworld数分钟并重启PalCalc软件，可以解决此问题。</value>
   </data>
   <data name="LC_SAVE_INSPECTOR_LOADING" xml:space="preserve">
     <value>读取原始保存文件...</value>
@@ -642,7 +642,7 @@
 
 （此值通常应小于“最多求解次数”。）
 
-增大数值，Pal Calc遍历的方案越多，并且会相应增加所需时间。</value>
+增大数值，PalCalc遍历的方案越多，并且会相应增加所需时间。</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve">
     <value>CPU核心数</value>
@@ -664,9 +664,9 @@
     <value>最多求解次数</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION" xml:space="preserve">
-    <value>求解过程允许执行的最大次数。较大的值可能让Pal Calc找到更优化的配种路径。
+    <value>求解过程允许执行的最大次数。较大的值可能让PalCalc找到更优化的配种路径。
 
-（Pal Calc会判断是否有必要额外搜索，可能在到达设定次数之前结束。）
+（PalCalc会判断是否有必要额外搜索，可能在到达设定次数之前结束。）
 
 （此值通常等于或大于“繁殖代数限制”。）
 
@@ -764,6 +764,6 @@
     <value>观赏笼({CageId})</value>
   </data>
   <data name="LC_WINDOW_TITLE" xml:space="preserve">
-    <value>Pal Calc</value>
+    <value>PalCalc</value>
   </data>
 </root>

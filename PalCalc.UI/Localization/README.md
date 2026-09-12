@@ -1,8 +1,8 @@
-# Pal Calc Translations
+# PalCalc Translations
 
-Pal Calc supports translations for languages used in the game. Pal and Passive Skill names are taken directly from the game files. Other text is for Pal Calc itself.
+PalCalc supports translations for languages used in the game. Pal and Passive Skill names are taken directly from the game files. Other text is for PalCalc itself.
 
-Each text in Pal Calc has an entry in the `LocalizationCodes.resx` file. Each entry has a name (called the "Localization Code" or `LC`) and sometimes a list of parameters (for dynamic text). Translations for each `LC` are stored in `.resx` files in the [Localizations](./Localizations/) folder.
+Each text in PalCalc has an entry in the `LocalizationCodes.resx` file. Each entry has a name (called the "Localization Code" or `LC`) and sometimes a list of parameters (for dynamic text). Translations for each `LC` are stored in `.resx` files in the [Localizations](./Localizations/) folder.
 
 ## For Translators
 
@@ -13,9 +13,9 @@ You will need Visual Studio to edit the files and run the program.
 1. Download and install [Visual Studio](https://visualstudio.microsoft.com/vs/community/).
 2. During installation, enable the ".NET desktop development" option.
 
-### 2. Open Pal Calc Project
+### 2. Open PalCalc Project
 
-1. [Download the Pal Calc code.](https://github.com/tylercamp/palcalc/archive/refs/heads/main.zip)
+1. [Download the PalCalc code.](https://github.com/tylercamp/palcalc/archive/refs/heads/main.zip)
 2. Extract the ZIP file.
 3. Double-click on the "PalCalc.sln" file.
 4. Expand the "PalCalc.UI" entry. (Don't double-click on it, click the arrow next to it.)
@@ -23,13 +23,13 @@ You will need Visual Studio to edit the files and run the program.
 
 All changes will be made in this "Localization" folder.
 
-### 3. Running Pal Calc
+### 3. Running PalCalc
 
 1. Right-click the "PalCalc.UI" entry
 2. Click "Set as Startup Project"
 3. Click the green button at the top of the window, which says "PalCalc.UI"
 
-This will create and run the Pal Calc program.
+This will create and run the PalCalc program.
 
 In Debug mode, a "Debug" menu appears in the toolbar. To open the Translation Debug window:
 
@@ -53,7 +53,7 @@ Some LCs include "format parameters" to modify the final text. For example:
 - `LC_LOC_COORD_PALBOX` in `LocalizationCodes.resx` contains: "Tab | X | Y".
 - The English translation is `Palbox, tab {Tab} at ({X},{Y})`.
 
-`{Tab}`, `{X}`, and `{Y}` in the translation will be replaced with appropriate text when Pal Calc is running. If any parameters are missing or incorrect, the English text will be used instead. Errors will appear in the Translation Debug window.
+`{Tab}`, `{X}`, and `{Y}` in the translation will be replaced with appropriate text when PalCalc is running. If any parameters are missing or incorrect, the English text will be used instead. Errors will appear in the Translation Debug window.
 
 ### 6. Tips
 
@@ -67,7 +67,7 @@ Some LCs include "format parameters" to modify the final text. For example:
 
 Create a new [Issue](https://github.com/tylercamp/palcalc/issues) on GitHub and upload your `.resx` file. Please include a list of changes.
 
-If you want credit, include your name for Pal Calc's "About" window.
+If you want credit, include your name for PalCalc's "About" window.
 
 ## For Developers
 

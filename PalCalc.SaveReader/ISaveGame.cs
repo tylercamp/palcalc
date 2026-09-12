@@ -302,7 +302,7 @@ namespace PalCalc.SaveReader
     }
 
     /// <summary>
-    /// A fake save-game whose ISaveFiles don't return any data. Meant to be a placeholder for "fake" saves added in Pal Calc.
+    /// A fake save-game whose ISaveFiles don't return any data. Meant to be a placeholder for "fake" saves added in PalCalc.
     /// </summary>
     public class VirtualSaveGame : ISaveGame
     {

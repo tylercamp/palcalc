@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LC_ABOUT_APP" xml:space="preserve">
-    <value>About Pal Calc</value>
+    <value>About PalCalc</value>
   </data>
   <data name="LC_ADD_FAKE_SAVE" xml:space="preserve">
     <value>Add a fake save...</value>
@@ -248,7 +248,7 @@ This value is doubled internally to account for pal inactivity at night.</value>
     <value>Custom Containers</value>
   </data>
   <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve">
-    <value>Changes will be saved in Pal Calc automatically. Custom containers do not affect Palworld save files.</value>
+    <value>Changes will be saved in PalCalc automatically. Custom containers do not affect Palworld save files.</value>
   </data>
   <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve">
     <value>Add new...</value>
@@ -287,9 +287,9 @@ Please find the generated ZIP file to send with any support questions:
   <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve">
     <value>An error occurred when loading the save file.
 
-Save files from newer versions of Palworld may require updates to Pal Calc.
+Save files from newer versions of Palworld may require updates to PalCalc.
 
-Files from older versions may be unsupported, and an older version of Pal Calc might be needed.
+Files from older versions may be unsupported, and an older version of PalCalc might be needed.
 
 Please find the generated ZIP file to send with any support questions:
 
@@ -350,7 +350,7 @@ Please find the generated ZIP file to send with any support questions:
     <value>English</value>
   </data>
   <data name="LC_JOB_QUEUE_CLOSING_MSG" xml:space="preserve">
-    <value>Closing Pal Calc will cancel any remaining jobs. Are you sure you want to quit?</value>
+    <value>Closing PalCalc will cancel any remaining jobs. Are you sure you want to quit?</value>
   </data>
   <data name="LC_JOB_QUEUE_CLOSING_TITLE" xml:space="preserve">
     <value>Pending Jobs</value>
@@ -362,7 +362,7 @@ Please find the generated ZIP file to send with any support questions:
     <value>Language</value>
   </data>
   <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
-    <value>Pal Calc must be restarted for the new language to fully apply.</value>
+    <value>PalCalc must be restarted for the new language to fully apply.</value>
   </data>
   <data name="LC_LIST_SEPARATOR" xml:space="preserve">
     <value>, </value>
@@ -549,7 +549,7 @@ If disabled, the time to breed a pal is always based on the sum of the time requ
     <value>The custom container '{Label}' will be removed.</value>
   </data>
   <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve">
-    <value>Are you sure you want to remove this save from from Pal Calc?
+    <value>Are you sure you want to remove this save from from PalCalc?
 
 {SaveLabel}
 
@@ -730,7 +730,7 @@ This will not delete the save files from your computer.</value>
     <value>Remove</value>
   </data>
   <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
-    <value>The Xbox save file is incomplete, but features will still work. This resolves automatically when Palworld is closed for a few minutes and Pal Calc is restarted.</value>
+    <value>The Xbox save file is incomplete, but features will still work. This resolves automatically when Palworld is closed for a few minutes and PalCalc is restarted.</value>
   </data>
   <data name="LC_SAVE_INSPECTOR_LOADING" xml:space="preserve">
     <value>Reading raw save data...</value>
@@ -817,7 +817,7 @@ Higher values *exponentially* affect time required.</value>
 
 (This value should typically be smaller than "Max Solver Steps".)
 
-Higher values cause Pal Calc to consider more options, and linearly affects computation time.</value>
+Higher values cause PalCalc to consider more options, and linearly affects computation time.</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve">
     <value>Max CPUs</value>
@@ -839,9 +839,9 @@ Higher values linearly affect computation time.</value>
     <value>Max Solver Steps</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION" xml:space="preserve">
-    <value>The maximum number of times the breeding solver will run. Larger values may allow Pal Calc to find more options when searching for the optimal breeding path.
+    <value>The maximum number of times the breeding solver will run. Larger values may allow PalCalc to find more options when searching for the optimal breeding path.
 
-(Pal Calc will detect if additional breeding attempts are needed and may stop before reaching this limit.)
+(PalCalc will detect if additional breeding attempts are needed and may stop before reaching this limit.)
 
 (This value should typically be the same as, or bigger than, "Max Breeding Steps".)
 
@@ -969,7 +969,7 @@ Higher values linearly affect time required, depending on how many types of pals
     <value>Viewing Cage ({CageId})</value>
   </data>
   <data name="LC_WINDOW_TITLE" xml:space="preserve">
-    <value>Pal Calc</value>
+    <value>PalCalc</value>
   </data>
   <data name="LC_SURGERY_STEP_TITLE" xml:space="preserve">
     <value>Surgery</value>
@@ -978,7 +978,7 @@ Higher values linearly affect time required, depending on how many types of pals
     <value>Use Gender Reversers</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION" xml:space="preserve">
-    <value>Whether to assume the use of Gender Reversers for breeding effort calculations. This prevents Pal Calc from including gender probabilities, and allows Pal Calc to force-breed pals with incompatible genders.
+    <value>Whether to assume the use of Gender Reversers for breeding effort calculations. This prevents PalCalc from including gender probabilities, and allows PalCalc to force-breed pals with incompatible genders.
 
 Gender Reversers are not shown in the breeding graph. If enabled, Owned Pals in the graph may be shown with a different gender.</value>
   </data>
@@ -1053,7 +1053,7 @@ This is only visual and will have no effect on the solver or any estimates.</val
     <value>Unable to fetch the latest version - try again later.</value>
   </data>
   <data name="LC_UPDATES_CHECK_RESULT_ON_LATEST" xml:space="preserve">
-    <value>Pal Calc is up to date!</value>
+    <value>PalCalc is up to date!</value>
   </data>
   <data name="LC_UPDATES_CHECK_OPTION_SKIP" xml:space="preserve">
     <value>Skip this version</value>
@@ -1074,24 +1074,24 @@ This is only visual and will have no effect on the solver or any estimates.</val
 2. A LevelMeta.sav file - This contains info like the host's player name and in-game day.
 3. A Player folder containing one or more .sav files - This identifies each player and the Pal Containers they own.
 
-Level.sav is required. Pal Calc benefits from the other files but can operate without them.
+Level.sav is required. PalCalc benefits from the other files but can operate without them.
 
-When playing a P2P multiplayer session ("Multiplayer" set to "On"), the host can use Pal Calc to export the save files to a ZIP and share with others.
+When playing a P2P multiplayer session ("Multiplayer" set to "On"), the host can use PalCalc to export the save files to a ZIP and share with others.
 
 When playing on a dedicated server, these files must be gathered manually. You may need to ask the server host for a copy. Save files are typically included in any "backups" of server data.</value>
   </data>
   <data name="LC_LOCATION_FAKE_SAVES_INSTRUCTIONS" xml:space="preserve">
-    <value>A "Virtual Save" is a placeholder for players who are otherwise unable to load their save file into Pal Calc. (e.g. PlayStation saves, or Server saves where the server host does not provide a copy of the save files.)
+    <value>A "Virtual Save" is a placeholder for players who are otherwise unable to load their save file into PalCalc. (e.g. PlayStation saves, or Server saves where the server host does not provide a copy of the save files.)
 
 Like all other save types, you can use the Save Inspector window ("Selected Save" menu → "Inspect") to manually add pals for the solver to use. The "Pal Containers" section on the left has a "Custom Containers" option where you can add and edit pals.</value>
   </data>
   <data name="LC_LOCATION_STEAM_INSTRUCTIONS" xml:space="preserve">
-    <value>Pal Calc automatically detects standard save files managed by Steam. A Steam location appears in Pal Calc for each user with Palworld save data.
+    <value>PalCalc automatically detects standard save files managed by Steam. A Steam location appears in PalCalc for each user with Palworld save data.
 
 When connecting to another person's multiplayer world, Palworld does not download the full save file. The data must be manually collected and added to "Local Files". See that section for more details.</value>
   </data>
   <data name="LC_LOCATION_XBOX_INSTRUCTIONS" xml:space="preserve">
-    <value>Pal Calc automatically detects standard save files managed by Xbox Game Pass. An Xbox location appears in Pal Calc for each user with Palworld save data.
+    <value>PalCalc automatically detects standard save files managed by Xbox Game Pass. An Xbox location appears in PalCalc for each user with Palworld save data.
 
 When connecting to another person's multiplayer world, Palworld does not download the full save file. The data must be manually collected and added to "Local Files". See that section for more details.</value>
   </data>
@@ -1123,7 +1123,7 @@ When connecting to another person's multiplayer world, Palworld does not downloa
     <value>Reset Window Layout</value>
   </data>
   <data name="LC_UI_LAYOUT_RESET_NOTICE" xml:space="preserve">
-    <value>Saved window and panel layouts were reset. The defaults will be used the next time Pal Calc starts.</value>
+    <value>Saved window and panel layouts were reset. The defaults will be used the next time PalCalc starts.</value>
   </data>
   <data name="LC_DEBUG_LOGGING" xml:space="preserve">
     <value>Debug Logging</value>
@@ -1133,7 +1133,7 @@ When connecting to another person's multiplayer world, Palworld does not downloa
 
 Would you like to download the installer now?
 
-(Pal Calc must be restarted after installation.)</value>
+(PalCalc must be restarted after installation.)</value>
   </data>
   <data name="LC_LIBOOZ_VC_REDIST_BTN_DOWNLOAD" xml:space="preserve">
     <value>Download Now</value>

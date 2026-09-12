@@ -1,4 +1,4 @@
-# Pal Calc
+# PalCalc
 
 https://github.com/user-attachments/assets/2ededad9-4f0a-47b1-a460-b553be46bdd4
 
@@ -8,11 +8,11 @@ _v1.12.1 recording_
 
 **[Click here to get the latest version.](https://github.com/tylercamp/palcalc/releases/latest)** (Expand "Assets" at the bottom, download `PalCalc.UI.exe`, place in its own folder and run.)
 
-<<< **The Pal Calc wiki can be found [here.](https://github.com/tylercamp/palcalc/wiki)** >>>
+<<< **The PalCalc wiki can be found [here.](https://github.com/tylercamp/palcalc/wiki)** >>>
 
 ---
 
-Pal Calc is a breeding solver for Palworld which uses the data from your save file to automatically find the optimal breeding tree for any desired pal, passive skills, attack skills, and IVs. Breeding and inheritance probabilities are accurately modeled and used to compare paths. It will find optimal paths using your own pals, tell you where to find those pals, and estimate how long each step will take.
+PalCalc is a breeding solver for Palworld which uses the data from your save file to automatically find the optimal breeding tree for any desired pal, passive skills, attack skills, and IVs. Breeding and inheritance probabilities are accurately modeled and used to compare paths. It will find optimal paths using your own pals, tell you where to find those pals, and estimate how long each step will take.
 
 No more spreadsheets!
 
@@ -64,17 +64,17 @@ Full list of features
 
 # Community Help
 
-Pal Calc currently has some outstanding pieces that need more information to resolve. Some of these need some level of reverse engineering, but some can be figured out through experimentation and statistics. An [issue](https://github.com/tylercamp/palcalc/issues) has been created for each item, where more information can be found.
+PalCalc currently has some outstanding pieces that need more information to resolve. Some of these need some level of reverse engineering, but some can be figured out through experimentation and statistics. An [issue](https://github.com/tylercamp/palcalc/issues) has been created for each item, where more information can be found.
 
 1. Is there a formula for how long breeding takes? Or is it a constant five minutes? [Issue](https://github.com/tylercamp/palcalc/issues/2)
 2. What's the probability of wild pals having exactly N passives? [Issue](https://github.com/tylercamp/palcalc/issues/4)
 3. Has the passive skill inheritance calculation changed since /u/mgxts reverse engineered it? Was their reverse engineering accurate? [Issue](https://github.com/tylercamp/palcalc/issues/7)
-4. Assuming the passive skill inheritance calculation is correct, is Pal Calc's implementation of those probabilities correct? [Issue](https://github.com/tylercamp/palcalc/issues/8)
+4. Assuming the passive skill inheritance calculation is correct, is PalCalc's implementation of those probabilities correct? [Issue](https://github.com/tylercamp/palcalc/issues/8)
 5. What's a good way to estimate time needed to capture a wild pal of a certain type? e.g. Chikipi would be much faster to find + catch than Paladius. [Issue](https://github.com/tylercamp/palcalc/issues/10)
 
 # Development
 
-Visual Studio Community 2022 is required. The `.CLI` projects act as test programs which can be ran without involving the whole Pal Calc UI.
+Visual Studio Community 2022 is required. The `.CLI` projects act as test programs which can be ran without involving the whole PalCalc UI.
 
 ## Palworld Database
 
@@ -96,7 +96,7 @@ The solver logic in `PalCalc.Solver` wraps this type with `IPalReference` types,
 
 The overall solver process is described in the project's [README](./PalCalc.Solver/).
 
-## Pal Calc UI
+## PalCalc UI
 
 The general structure of the `PalCalc.UI` project is somewhat messy. The application uses WPF and (weak) MVVM, mainly for convenience. MVVM principals and WPF best-practices were not strictly adhered to. There are various hackfixes since many features were unplanned and added through the path of least resistance. Refactoring is planned and gladly accepted.
 

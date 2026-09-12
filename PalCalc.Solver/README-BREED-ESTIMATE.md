@@ -13,7 +13,7 @@ Nonetheless, the work by /u/mgxts is the best information we have at the moment.
 
 The main Reddit post includes a table of probabilities for inheriting different numbers of traits from the list of parents. The default values are represented by [`BreedingMechanics`](../PalCalc.Model/BreedingMechanics.cs). Each `PalDB` owns a mechanics instance, so customized databases can supply different probabilities.
 
-Pal Calc uses these probabilities:
+PalCalc uses these probabilities:
 
 - Chance of inheriting exactly `N` passives from the parents (`Probability` column in the table from the Reddit post) (`BreedingMechanics.PassiveProbabilityDirect`)
 - Chance of inheriting `N` random passives (not represented in any table; pulled from the "RANDOM PASSIVE SKILLS" section of their pseudocode) (`BreedingMechanics.PassiveRandomAddedProbability`)
@@ -88,7 +88,7 @@ From the above, we have:
 1. A 2% chance of getting exactly the two desired passives
 2. A 5.5% chance of getting the two desired passives and one undesired passive
 
-Pal Calc will produce a child representing [1]. A 2% chance is roughly 1 in 50 odds, and will require (on average) 50 attempts to accomplish. At 10 minutes per breeding attempt, that gives ~8 hours.
+PalCalc will produce a child representing [1]. A 2% chance is roughly 1 in 50 odds, and will require (on average) 50 attempts to accomplish. At 10 minutes per breeding attempt, that gives ~8 hours.
 
 For the child representing [2], keep in mind that case #1 is optimal, and #2 is the fallback. Getting case #1 would be at least as good as getting case #2, though the opposite is not true. Since getting case #1 is at least as good, we can rephrase the question from "probability of getting exactly X" to "probability of getting something _at least as good_ as X".
 

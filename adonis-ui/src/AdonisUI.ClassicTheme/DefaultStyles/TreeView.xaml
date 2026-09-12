@@ -145,7 +145,7 @@
 
         <Style.Triggers>
 
-            <!-- This seems to cause noisy binding warnings when the component mounts, commenting this out has no apparent effect on Pal Calc -->
+            <!-- This seems to cause noisy binding warnings when the component mounts, commenting this out has no apparent effect on PalCalc -->
             <!--
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>

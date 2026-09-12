@@ -247,7 +247,7 @@ Bu değer, geceleri palin hareketsizliğini hesaba katmak için dahili olarak ik
     <value>Özel Konteynerler</value>
   </data>
   <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve">
-    <value>Değişiklikler Pal Calc'ta otomatik olarak kaydedilecektir. Özel konteynerler Palworld kayıt dosyalarını etkilemez.</value>
+    <value>Değişiklikler PalCalc'ta otomatik olarak kaydedilecektir. Özel konteynerler Palworld kayıt dosyalarını etkilemez.</value>
   </data>
   <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve">
     <value>Yeni Ekle...</value>
@@ -286,9 +286,9 @@ Destek sorularınızla birlikte göndereceğiniz oluşturulan ZIP dosyasını l�
   <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve">
     <value>Kaydedilen dosyayı yüklerken bir hata oluştu.
 
-Palworld'ün yeni sürümlerinden dosyaları kaydetmek için Pal Calc'ın güncellenmesi gerekebilir.
+Palworld'ün yeni sürümlerinden dosyaları kaydetmek için PalCalc'ın güncellenmesi gerekebilir.
 
-Eski sürümlerden gelen dosyalar desteklenmeyebilir ve Pal Calc'ın eski bir sürümü gerekebilir. 
+Eski sürümlerden gelen dosyalar desteklenmeyebilir ve PalCalc'ın eski bir sürümü gerekebilir. 
 
 Destek sorularınızla birlikte göndereceğiniz oluşturulan ZIP dosyasını lütfen burada bulabilirsiniz:
 
@@ -352,7 +352,7 @@ Destek sorularınızla birlikte göndereceğiniz oluşturulan ZIP dosyasını l�
     <value>Dil</value>
   </data>
   <data name="LC_JOB_QUEUE_CLOSING_MSG" xml:space="preserve">
-    <value>Pal Calc'ı kapatmak kalan tüm işleri iptal edecektir. Gerçekten çıkmak istiyor musunuz?</value>
+    <value>PalCalc'ı kapatmak kalan tüm işleri iptal edecektir. Gerçekten çıkmak istiyor musunuz?</value>
   </data>
   <data name="LC_JOB_QUEUE_CLOSING_TITLE" xml:space="preserve">
     <value>Bekleyen İşler</value>
@@ -361,7 +361,7 @@ Destek sorularınızla birlikte göndereceğiniz oluşturulan ZIP dosyasını l�
     <value>İşler ({Count})</value>
   </data>
   <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
-    <value>Yeni dilin tam olarak uygulanabilmesi için Pal Calc'ın yeniden başlatılması gerekir.</value>
+    <value>Yeni dilin tam olarak uygulanabilmesi için PalCalc'ın yeniden başlatılması gerekir.</value>
   </data>
   <data name="LC_LIST_SEPARATOR" xml:space="preserve">
     <value>, </value>
@@ -548,7 +548,7 @@ Devre dışı bırakıldığında, bir pal yetiştirme süresi her zaman ebeveyn
     <value>Özel konteyner '{Label}' kaldırılacak.</value>
   </data>
   <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve">
-    <value>Bu kaydı Pal Calc'ten kaldırmak istediğinizden emin misiniz?
+    <value>Bu kaydı PalCalc'ten kaldırmak istediğinizden emin misiniz?
 
 {SaveLabel}
 
@@ -678,7 +678,7 @@ Bu, bilgisayarınızdaki kayıtlı dosyaları silmez..</value>
     <value>Kaldır</value>
   </data>
   <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve">
-    <value>TXbox kayıt dosyası eksik, ancak özellikler yine de çalışacaktır. Palworld birkaç dakika kapatılıp Pal Calc yeniden başlatıldığında bu sorun otomatik olarak çözülür.</value>
+    <value>TXbox kayıt dosyası eksik, ancak özellikler yine de çalışacaktır. Palworld birkaç dakika kapatılıp PalCalc yeniden başlatıldığında bu sorun otomatik olarak çözülür.</value>
   </data>
   <data name="LC_SAVE_INSPECTOR_LOADING" xml:space="preserve">
     <value>Ham kayıt verilerini okunuyor...</value>
@@ -765,7 +765,7 @@ Daha yüksek değerler, gereken süreyi *katlanarak* etkiler.</value>
 
 (Bu değer genellikle "Maksimum Çözücü Adımları"ndan daha küçük olmalıdır.".)
 
-Daha yüksek değerler, Pal Calc'ın daha fazla seçeneği değerlendirmesine neden olur ve hesaplama süresini doğrusal olarak etkiler..</value>
+Daha yüksek değerler, PalCalc'ın daha fazla seçeneği değerlendirmesine neden olur ve hesaplama süresini doğrusal olarak etkiler..</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve">
     <value>Maksimum CPU sayısı</value>
@@ -787,9 +787,9 @@ Daha yüksek değerler hesaplama süresini doğrusal olarak etkiler..</value>
     <value>Maksimum Çözücü Adımları</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION" xml:space="preserve">
-    <value>Üreme çözücünün çalışacağı maksimum sayı. Daha büyük değerler, Pal Calc'ın optimal üreme yolunu ararken daha fazla seçenek bulmasını sağlayabilir.
+    <value>Üreme çözücünün çalışacağı maksimum sayı. Daha büyük değerler, PalCalc'ın optimal üreme yolunu ararken daha fazla seçenek bulmasını sağlayabilir.
 
-(Pal Calc, ek üreme girişimlerinin gerekli olup olmadığını algılar ve bu sınıra ulaşmadan önce durdurulabilir.)
+(PalCalc, ek üreme girişimlerinin gerekli olup olmadığını algılar ve bu sınıra ulaşmadan önce durdurulabilir.)
 
 (Bu değer genellikle "Maksimum Üreme Adımı" ile aynı veya daha büyük olmalıdır.)
 
@@ -917,7 +917,7 @@ Daha yüksek değerler, sahip olunan pal türlerinin sayısına bağlı olarak g
     <value>Gözetleme Kafesi ({CageId})</value>
   </data>
   <data name="LC_WINDOW_TITLE" xml:space="preserve">
-    <value>Pal Calc</value>
+    <value>PalCalc</value>
   </data>
   <data name="LC_SURGERY_STEP_TITLE" xml:space="preserve">
     <value>Cerrahi</value>
@@ -926,7 +926,7 @@ Daha yüksek değerler, sahip olunan pal türlerinin sayısına bağlı olarak g
     <value>Cinsiyet Dönüştürücüleri Kullan</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION" xml:space="preserve">
-    <value>Üreme çabası hesaplamaları için Cinsiyet Değiştiricilerin kullanımını varsaymak. Bu, Pal Calc'ın cinsiyet olasılıklarını dahil etmesini engeller ve Pal Calc'ın uyumsuz cinsiyetlere sahip arkadaşları zorla üremesini sağlar.
+    <value>Üreme çabası hesaplamaları için Cinsiyet Değiştiricilerin kullanımını varsaymak. Bu, PalCalc'ın cinsiyet olasılıklarını dahil etmesini engeller ve PalCalc'ın uyumsuz cinsiyetlere sahip arkadaşları zorla üremesini sağlar.
 
 Cinsiyet Değiştiriciler üreme grafiğinde gösterilmez. Etkinleştirilirse, grafikteki Sahip Olunan Arkadaşlar farklı bir cinsiyetle gösterilebilir..</value>
   </data>

@@ -1,6 +1,6 @@
 # Palworld Breeding Mechanics
 
-This document covers all Palworld breeding mechanics as used by Pal Calc. It's based
+This document covers all Palworld breeding mechanics as used by PalCalc. It's based
 on game asset files, manual breeding results, and raw game disassembly.
 
 We try to restrict ourselves to _definitive_ discoveries and not just a "likely" process.
@@ -18,7 +18,7 @@ _only_ way to breed the child.
 
 _Note: Some special recipes may have gender requirements. In particular, the child of Katress + Wixen may change depending on parent genders._
 
-Pal Calc uses this process when generating its breeding database:
+PalCalc uses this process when generating its breeding database:
 
 > - Visit each possible pairing of Pal species
 > - If both parents are the same species, the child is that species
@@ -36,9 +36,9 @@ The child pal species is always consistent, so it's trivial to check for accurac
 with manual testing. (Mutated eggs ignored here.)
 
 Breeding powers, priorities, and special recipes are read directly from the game
-data. Pal Calc uses them to generate `breeding.json` and `breedingdb.json`, which
+data. PalCalc uses them to generate `breeding.json` and `breedingdb.json`, which
 the solver reads when finding possible paths. This file is embedded in
-the Pal Calc EXE files.
+the PalCalc EXE files.
 
 ## Passive Skills
 
@@ -141,7 +141,7 @@ There is little verifiable information available on the IV inheritance mechanics
 of sources collected data and posed their own opinions, but without access to the data
 itself, we can't tell if those opinions are correct.
 
-For Pal Calc, the original discussion and sample data are collected in
+For PalCalc, the original discussion and sample data are collected in
 [issue #22](https://github.com/tylercamp/palcalc/issues/22). (Specific comment
 with sample data + processing script [here](https://github.com/tylercamp/palcalc/issues/22#issuecomment-2509009708).)
 
@@ -154,7 +154,7 @@ Empirically, we know that a child Pal will always inherit at least 1 IV from its
 Therefore, since `Combi_TalentInheritNum` covers 3 outcomes, it must be a set of weights
 for inheriting 1-3 IVs.
 
-Pal Calc interprets these via sum-and-divide like the other `Combi_*` data mentioned in
+PalCalc interprets these via sum-and-divide like the other `Combi_*` data mentioned in
 the Passive Skills section:
 
 | Inherited IVs | Chance |
@@ -167,7 +167,7 @@ The samples have not shown a clear preference for a particular stat, parent,
 gender, level, or higher IV. Children may inherit all selected values from one
 parent or a mixture from both.
 
-Pal Calc assumes the following process:
+PalCalc assumes the following process:
 
 > 1. Roll the number of IVs to inherit using `Combi_TalentInheritNum`.
 > 2. Select that many stats from HP, attack, and defense.

@@ -741,7 +741,7 @@ namespace PalCalc.GenDB
                 string palName;
 
                 var internalName = icon.Key;
-                // ("Human" icon is used as a placeholder for unknown pals in pal calc)
+                // ("Human" icon is used as a placeholder for unknown pals in palcalc)
                 if (internalName == "Human")
                 {
                     palName = internalName;

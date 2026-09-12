@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PalCalc.GenDB
 {
-    // some manually use Pal Calc's data as a reference, provide it in CSV form for those folks
+    // some manually use PalCalc's data as a reference, provide it in CSV form for those folks
 
     class CSVWriter : IDisposable
     {

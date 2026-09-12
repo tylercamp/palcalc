@@ -1,11 +1,11 @@
 # Solver Overview
 
-Pal Calc finds practical breeding paths from the Pals a player already has, or
+PalCalc finds practical breeding paths from the Pals a player already has, or
 is willing to capture, to a target Pal with the requested passives, IVs,
 attack skills, and gender.
 
 For example, you might ask for an Anubis with Legend, Earth Emperor, and at
-least 90 attack IV. Pal Calc will work through all the possibilities and
+least 90 attack IV. PalCalc will work through all the possibilities and
 return complete breeding trees: which owned or wild Pals to start with, which
 parents to breed at each step, and roughly how much effort each path should
 take.
@@ -140,12 +140,12 @@ have one parent with an "ignore-inherit" attack, and the other parent has
 just 1 normal attack equipped, the child has a 100% chance to inherit the
 "1 attack" from that other parent.
 
-As Pal Calc considers each possible child, it builds up a list of desired
+As PalCalc considers each possible child, it builds up a list of desired
 attacks that can be achieved somewhere in the parents' breeding tree
 (or on the parents themselves.)
 
 While IVs and passives are tracked closely through the breeding process,
-Pal Calc just holds a loose collection of details for attacks as they
+PalCalc just holds a loose collection of details for attacks as they
 pass through each step. The final choice of "who equips which attack" is
 saved for the very end.
 
@@ -215,7 +215,7 @@ useful child becomes another possible parent, and every new parent can be
 paired with the Pals already found. Keeping every possible way of reaching
 every child would massively expand the pool of paths the solver has to search.
 
-Pal Calc simplifies the frontier after each round. If two candidates have the
+PalCalc simplifies the frontier after each round. If two candidates have the
 same effective properties, they are equally useful in future breeding. The
 solver compares the paths that produced them and can drop one that clearly
 takes longer.
@@ -236,7 +236,7 @@ saves results before simplifying the frontier.
 
 ### Comparing Attack Paths
 
-Pal Calc doesn't track each unique way to manage attack skills. For
+PalCalc doesn't track each unique way to manage attack skills. For
 each Pal it only records the attacks available up the chain, and some extra
 information:
 
@@ -273,7 +273,7 @@ produce is equivalent to or worse than something it has already kept, so the
 frontier stops changing and there are no new parent pairs to try.
 
 "Optimal" therefore means optimal according to the solver's effort model and
-candidate-selection rules. Pal Calc does not preserve every possible ancestry
+candidate-selection rules. PalCalc does not preserve every possible ancestry
 for every Pal. It preserves the fastest useful candidates it finds, along with
 a limited selection of alternatives that differ in practical ways.
 

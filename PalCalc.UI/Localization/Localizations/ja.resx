@@ -123,7 +123,7 @@
   <data name="LC_LANGUAGE" xml:space="preserve">
     <value>言語</value>
   </data>
-  <data name="LC_ABOUT_APP" xml:space="preserve"><value>Pal Calc について</value></data>
+  <data name="LC_ABOUT_APP" xml:space="preserve"><value>PalCalc について</value></data>
   <data name="LC_ADD_FAKE_SAVE" xml:space="preserve"><value>仮想セーブを追加...</value></data>
   <data name="LC_ADD_NEW_SAVE" xml:space="preserve"><value>セーブデータを追加...</value></data>
   <data name="LC_ANY_GUILD" xml:space="preserve"><value>すべてのギルド</value></data>
@@ -167,7 +167,7 @@
   <data name="LC_CRASHLOG_FAILED" xml:space="preserve"><value>クラッシュログを作成できませんでした。</value></data>
   <data name="LC_CUSTOM_CONTAINER" xml:space="preserve"><value>{Label}（カスタム）</value></data>
   <data name="LC_CUSTOM_CONTAINERS" xml:space="preserve"><value>カスタムコンテナ</value></data>
-  <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve"><value>変更内容はPal Calcに自動保存されます。カスタムコンテナはPalworldのセーブデータに影響しません。</value></data>
+  <data name="LC_CUSTOM_CONTAINERS_DESCRIPTION" xml:space="preserve"><value>変更内容はPalCalcに自動保存されます。カスタムコンテナはPalworldのセーブデータに影響しません。</value></data>
   <data name="LC_CUSTOM_CONTAINER_ADD_NEW" xml:space="preserve"><value>新規追加...</value></data>
   <data name="LC_CUSTOM_CONTAINER_NEW_FIELD" xml:space="preserve"><value>名前</value></data>
   <data name="LC_CUSTOM_CONTAINER_NEW_TITLE" xml:space="preserve"><value>新しいカスタムコンテナ</value></data>
@@ -184,9 +184,9 @@
 {CrashlogPath}</value></data>
   <data name="LC_ERROR_SAVE_LOAD_FAILED" xml:space="preserve"><value>セーブデータの読み込み中にエラーが発生しました。
 
-新しいバージョンのPalworldのセーブデータには、Pal Calcの更新が必要な場合があります。
+新しいバージョンのPalworldのセーブデータには、PalCalcの更新が必要な場合があります。
 
-古いバージョンのセーブデータはサポート対象外の場合があり、古いPal Calcが必要になることがあります。
+古いバージョンのセーブデータはサポート対象外の場合があり、古いPalCalcが必要になることがあります。
 
 サポートへ問い合わせる場合は、作成された次のZIPファイルを添付してください。
 
@@ -208,10 +208,10 @@
   <data name="LC_INCLUDE_PALS_IN_CAGES" xml:space="preserve"><value>鑑賞用ケージのパルを含める</value></data>
   <data name="LC_INCLUDE_PALS_ON_EXPEDITIONS" xml:space="preserve"><value>遠征中のパルを含める</value></data>
   <data name="LC_INSPECT_SAVE" xml:space="preserve"><value>確認</value></data>
-  <data name="LC_JOB_QUEUE_CLOSING_MSG" xml:space="preserve"><value>Pal Calcを閉じると、残っているジョブはすべてキャンセルされます。終了しますか？</value></data>
+  <data name="LC_JOB_QUEUE_CLOSING_MSG" xml:space="preserve"><value>PalCalcを閉じると、残っているジョブはすべてキャンセルされます。終了しますか？</value></data>
   <data name="LC_JOB_QUEUE_CLOSING_TITLE" xml:space="preserve"><value>未完了のジョブ</value></data>
   <data name="LC_JOB_QUEUE_HEADER" xml:space="preserve"><value>ジョブ（{Count}）</value></data>
-  <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve"><value>新しい言語を完全に適用するには、Pal Calcを再起動してください。</value></data>
+  <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve"><value>新しい言語を完全に適用するには、PalCalcを再起動してください。</value></data>
   <data name="LC_LIST_SEPARATOR" xml:space="preserve"><value>、</value></data>
   <data name="LC_LOC_COORD_BASE" xml:space="preserve"><value>拠点、スロット（{X}, {Y}）</value></data>
   <data name="LC_LOC_COORD_DPS" xml:space="preserve"><value>パル次元ストレージ、タブ {Tab}（{X}, {Y}）</value></data>
@@ -276,7 +276,7 @@
   <data name="LC_POPUP_TITLE_LOADING_SAVE_FILE" xml:space="preserve"><value>セーブデータを読み込み中</value></data>
   <data name="LC_RANDOM_TRAIT" xml:space="preserve"><value>（ランダム）</value></data>
   <data name="LC_REMOVE_CUSTOM_CONTAINER_DESCRIPTION" xml:space="preserve"><value>カスタムコンテナ「{Label}」を削除します。</value></data>
-  <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve"><value>Pal Calcからこのセーブデータを削除しますか？
+  <data name="LC_REMOVE_SAVE_DESCRIPTION" xml:space="preserve"><value>PalCalcからこのセーブデータを削除しますか？
 
 {SaveLabel}
 
@@ -338,7 +338,7 @@ PC上のセーブファイルは削除されません。</value></data>
   <data name="LC_SAVE_GAME_LBL_NO_METADATA" xml:space="preserve"><value>{GameId}（メタデータを読み取れません）</value></data>
   <data name="LC_SAVE_GAME_LBL_SERVER" xml:space="preserve"><value>{WorldName}、{DayNumber}日目</value></data>
   <data name="LC_SAVE_GAME_REMOVE_BTN_LABEL" xml:space="preserve"><value>削除</value></data>
-  <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve"><value>Xboxのセーブファイルは不完全ですが、機能は引き続き利用できます。Palworldを数分間終了してからPal Calcを再起動すると、自動的に解消されます。</value></data>
+  <data name="LC_SAVE_GAME_XBOX_INCOMPLETE" xml:space="preserve"><value>Xboxのセーブファイルは不完全ですが、機能は引き続き利用できます。Palworldを数分間終了してからPalCalcを再起動すると、自動的に解消されます。</value></data>
   <data name="LC_SAVE_INSPECTOR_LOADING" xml:space="preserve"><value>生のセーブデータを読み込み中...</value></data>
   <data name="LC_SAVE_LOCATION" xml:space="preserve"><value>場所</value></data>
   <data name="LC_SAVE_LOCATION_LBL_STEAM" xml:space="preserve"><value>Steam ユーザー {UserId} - 有効なセーブデータ {NumValidSaves}件</value></data>
@@ -375,7 +375,7 @@ PC上のセーブファイルは削除されません。</value></data>
 
 （通常は「最大探索回数」より小さく設定してください。）
 
-値を大きくすると、Pal Calcがより多くの選択肢を検討し、計算時間に比例して影響します。</value></data>
+値を大きくすると、PalCalcがより多くの選択肢を検討し、計算時間に比例して影響します。</value></data>
   <data name="LC_SOLVER_SETTINGS_MAX_CPU" xml:space="preserve"><value>最大CPUスレッド数</value></data>
   <data name="LC_SOLVER_SETTINGS_MAX_CPU_DESCRIPTION" xml:space="preserve"><value>配合ルート検索が使用できるCPUスレッド数です。0の場合はすべてのCPUスレッドを使用します。</value></data>
   <data name="LC_SOLVER_SETTINGS_MAX_INPUT_IRRELEVANT_TRAITS" xml:space="preserve"><value>親パルの不要パッシブ上限</value></data>
@@ -387,7 +387,7 @@ PC上のセーブファイルは削除されません。</value></data>
   <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS" xml:space="preserve"><value>最大探索回数</value></data>
   <data name="LC_SOLVER_SETTINGS_MAX_SOLVER_STEPS_DESCRIPTION" xml:space="preserve"><value>配合ルート検索を実行する最大回数です。値を大きくすると、最適な配合経路の検索でより多くの選択肢を見つけられる場合があります。
 
-（追加の配合試行が必要かどうかはPal Calcが検出するため、この上限に達する前に停止することがあります。）
+（追加の配合試行が必要かどうかはPalCalcが検出するため、この上限に達する前に停止することがあります。）
 
 （通常は「配合手順数の上限」と同じか、それ以上に設定してください。）
 
@@ -433,10 +433,10 @@ PC上のセーブファイルは削除されません。</value></data>
   <data name="LC_UNKNOWN_PLAYER" xml:space="preserve"><value>不明なプレイヤー</value></data>
   <data name="LC_UPDATE_AVAILABLE" xml:space="preserve"><value>アップデートがあります！</value></data>
   <data name="LC_VIEWING_CAGE_LABEL" xml:space="preserve"><value>鑑賞用ケージ（{CageId}）</value></data>
-  <data name="LC_WINDOW_TITLE" xml:space="preserve"><value>Pal Calc</value></data>
+  <data name="LC_WINDOW_TITLE" xml:space="preserve"><value>PalCalc</value></data>
   <data name="LC_SURGERY_STEP_TITLE" xml:space="preserve"><value>手術</value></data>
   <data name="LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS" xml:space="preserve"><value>パルリバーサーを使用する</value></data>
-  <data name="LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION" xml:space="preserve"><value>配合の予想所要時間を計算するとき、パルリバーサーを使用する前提にします。有効にするとPal Calcは性別確率を計算に含めず、通常は性別が合わないパル同士も配合できるものとして扱います。
+  <data name="LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION" xml:space="preserve"><value>配合の予想所要時間を計算するとき、パルリバーサーを使用する前提にします。有効にするとPalCalcは性別確率を計算に含めず、通常は性別が合わないパル同士も配合できるものとして扱います。
 
 性別変更薬は配合グラフには表示されません。有効にすると、グラフ内の所有パルが実際と異なる性別で表示されることがあります。</value></data>
   <data name="LC_SOLVER_SETTINGS_SURGERY_ALLOWED_PASSIVES" xml:space="preserve"><value>手術で追加・変更を許可するパッシブスキル</value></data>
@@ -467,9 +467,9 @@ PC上のセーブファイルは削除されません。</value></data>
   <data name="LC_SAVE_KIND_TITLE_XBOX" xml:space="preserve"><value>Xbox</value></data>
   <data name="LC_SAVE_KIND_TITLE_VIRTUAL" xml:space="preserve"><value>仮想セーブ</value></data>
   <data name="LC_UPDATES_CHECK_RESULT_FAILED" xml:space="preserve"><value>最新バージョンを取得できませんでした。時間をおいて再試行してください。</value></data>
-  <data name="LC_UPDATES_CHECK_RESULT_ON_LATEST" xml:space="preserve"><value>Pal Calcは最新です！</value></data>
+  <data name="LC_UPDATES_CHECK_RESULT_ON_LATEST" xml:space="preserve"><value>PalCalcは最新です！</value></data>
   <data name="LC_UPDATES_CHECK_OPTION_SKIP" xml:space="preserve"><value>このバージョンをスキップ</value></data>
-  <data name="LC_UPDATES_CHECK_BODY" xml:space="preserve"><value>Pal Calc {Version} が利用可能です。ダウンロードページを開きますか？</value></data>
+  <data name="LC_UPDATES_CHECK_BODY" xml:space="preserve"><value>PalCalc {Version} が利用可能です。ダウンロードページを開きますか？</value></data>
   <data name="LC_HELP" xml:space="preserve"><value>ヘルプ</value></data>
   <data name="LC_SAVE_LOCATION_STEAM_INSTALL" xml:space="preserve"><value>Steamのセーブファイルが見つかりません。Palworldをインストールして一度起動すると、Steamがセーブファイルを自動的にダウンロードします。</value></data>
   <data name="LC_LOCATION_MANUAL_SAVES_INSTRUCTIONS" xml:space="preserve"><value>手動で共有されたセーブファイルはここから追加できます。Palworldのセーブデータは、次を含むフォルダです。
@@ -478,18 +478,18 @@ PC上のセーブファイルは削除されません。</value></data>
 2. LevelMeta.sav - ホストのプレイヤー名やゲーム内の日数などの情報です。
 3. 1つ以上の.savファイルを含むPlayerフォルダ - 各プレイヤーと、そのプレイヤーが所有する保管場所を識別します。
 
-Level.savは必須です。Pal Calcはその他のファイルがあると便利ですが、なくても動作します。
+Level.savは必須です。PalCalcはその他のファイルがあると便利ですが、なくても動作します。
 
-P2Pマルチプレイ（「マルチプレイ」が「オン」）では、ホストがPal CalcでセーブファイルをZIPにエクスポートして他のプレイヤーと共有できます。
+P2Pマルチプレイ（「マルチプレイ」が「オン」）では、ホストがPalCalcでセーブファイルをZIPにエクスポートして他のプレイヤーと共有できます。
 
 専用サーバーでは、これらのファイルを手動で集める必要があります。サーバーホストにコピーを依頼してください。セーブファイルは通常、サーバーデータのバックアップに含まれています。</value></data>
-  <data name="LC_LOCATION_FAKE_SAVES_INSTRUCTIONS" xml:space="preserve"><value>「仮想セーブ」は、セーブデータをPal Calcへ読み込めないプレイヤー用の代替データです（例: PlayStationのセーブデータ、またはサーバーホストがセーブデータを提供しないサーバーのセーブデータ）。
+  <data name="LC_LOCATION_FAKE_SAVES_INSTRUCTIONS" xml:space="preserve"><value>「仮想セーブ」は、セーブデータをPalCalcへ読み込めないプレイヤー用の代替データです（例: PlayStationのセーブデータ、またはサーバーホストがセーブデータを提供しないサーバーのセーブデータ）。
 
 他のセーブデータ形式と同様に、セーブデータ確認（「選択中のセーブ」メニュー → 「確認」）を使って、配合ルート検索で使用するパルを手動追加できます。左側の「保管場所」にある「カスタムコンテナ」からパルを追加・編集してください。</value></data>
-  <data name="LC_LOCATION_STEAM_INSTRUCTIONS" xml:space="preserve"><value>Pal CalcはSteamが管理する標準的なセーブファイルを自動検出します。Palworldのセーブデータを持つユーザーごとに、Steamの場所がPal Calcに表示されます。
+  <data name="LC_LOCATION_STEAM_INSTRUCTIONS" xml:space="preserve"><value>PalCalcはSteamが管理する標準的なセーブファイルを自動検出します。Palworldのセーブデータを持つユーザーごとに、Steamの場所がPalCalcに表示されます。
 
 他人のマルチプレイワールドに接続した場合、Palworldは完全なセーブファイルをダウンロードしません。データを手動で収集し、「ローカルファイル」に追加する必要があります。詳しくはそちらの説明をご覧ください。</value></data>
-  <data name="LC_LOCATION_XBOX_INSTRUCTIONS" xml:space="preserve"><value>Pal CalcはXbox Game Passが管理する標準的なセーブファイルを自動検出します。Palworldのセーブデータを持つユーザーごとに、Xboxの場所がPal Calcに表示されます。
+  <data name="LC_LOCATION_XBOX_INSTRUCTIONS" xml:space="preserve"><value>PalCalcはXbox Game Passが管理する標準的なセーブファイルを自動検出します。Palworldのセーブデータを持つユーザーごとに、Xboxの場所がPalCalcに表示されます。
 
 他人のマルチプレイワールドに接続した場合、Palworldは完全なセーブファイルをダウンロードしません。データを手動で収集し、「ローカルファイル」に追加する必要があります。詳しくはそちらの説明をご覧ください。</value></data>
   <data name="LC_SELECTED_SAVE" xml:space="preserve"><value>選択中のセーブデータ</value></data>
@@ -501,5 +501,5 @@ P2Pマルチプレイ（「マルチプレイ」が「オン」）では、ホ�
   <data name="LC_SAVE_PROPERTY_SAVE_ID" xml:space="preserve"><value>ゲームID</value></data>
   <data name="LC_PALWORLD_SAVE_FILES" xml:space="preserve"><value>Palworld セーブファイル</value></data>
   <data name="LC_RESET_UI_LAYOUT" xml:space="preserve"><value>画面レイアウトをリセット</value></data>
-  <data name="LC_UI_LAYOUT_RESET_NOTICE" xml:space="preserve"><value>保存されたウィンドウとパネルの配置をリセットしました。次回Pal Calcの起動時に初期配置が使用されます。</value></data>
+  <data name="LC_UI_LAYOUT_RESET_NOTICE" xml:space="preserve"><value>保存されたウィンドウとパネルの配置をリセットしました。次回PalCalcの起動時に初期配置が使用されます。</value></data>
 </root>

@@ -58,7 +58,7 @@ namespace PalCalc.UI
                 .CreateLogger();
 
             logger = Log.ForContext<App>();
-            logger.Information($"Pal Calc version {Version}");
+            logger.Information($"PalCalc version {Version}");
             logger.Information(
                 "Using {AppDirectory} as application directory (launched from {LaunchDirectory})",
                 AppContext.BaseDirectory,
