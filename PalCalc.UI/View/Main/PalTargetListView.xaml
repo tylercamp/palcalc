@@ -8,6 +8,7 @@
          xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
          xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
          ItemsSource="{Binding Targets}" SelectedValue="{Binding SelectedTarget, Mode=TwoWay}"
+         AlternationCount="2"
          mc:Ignorable="d" 
          d:DataContext="{d:DesignInstance vm:PalTargetListViewModel, IsDesignTimeCreatable=True}"
          d:DesignHeight="450" d:DesignWidth="800"
@@ -25,6 +26,14 @@
     <ListBox.ItemContainerStyle>
         <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
             <Style.Triggers>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="ItemsControl.AlternationIndex" Value="0" />
+                        <Condition Property="IsSelected" Value="False" />
+                        <Condition Property="IsMouseOver" Value="False" />
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="{DynamicResource SolverAlternatingRowBackgroundBrush}" />
+                </MultiTrigger>
                 <DataTrigger Binding="{Binding IsReadOnly}" Value="True">
                     <Setter Property="dd:DragDrop.DragSourceIgnore" Value="True" />
                 </DataTrigger>

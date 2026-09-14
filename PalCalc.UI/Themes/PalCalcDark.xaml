@@ -7,4 +7,6 @@
         <ResourceDictionary Source="pack://application:,,,/PalCalc.UI;component/View/Pal/PassiveSkillView.Dark.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PalCalc.UI;component/View/SaveSelectionPage.Dark.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+    <SolidColorBrush x:Key="SolverAlternatingRowBackgroundBrush" Color="#373743" />
 </ResourceDictionary>
