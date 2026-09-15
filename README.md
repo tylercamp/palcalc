@@ -1,117 +1,92 @@
 # PalCalc
 
+## Automatic Palworld Breeding Tree Calculator
+
+**The definitive breeding solver for Palworld.** Spend less time planning and more time playing!
+
+Load your save, choose exactly what you want, and PalCalc automatically builds complete breeding trees from the Pals you already own. It compares paths using breeding and inheritance probabilities - not just the number of steps - while accurately accounting for passive skills, attack skills, and IVs.
+
+PalCalc is free and open source for Windows. It runs locally and reads your save files directly.
+
+- **[Download the standalone EXE (recommended)](https://github.com/tylercamp/palcalc/releases/latest/download/PalCalc.UI.exe)**
+- **[Download the ZIP package](https://github.com/tylercamp/palcalc/releases/latest/download/PalCalc-NoBundle.zip)** - try this if antivirus software interferes with the standalone EXE
+
+[Latest release notes and all downloads](https://github.com/tylercamp/palcalc/releases/latest) · [Wiki](https://github.com/tylercamp/palcalc/wiki)
+
+## How it works
+
+1. Load an auto-detected Steam or Xbox save, add a downloaded server save, or enter your Pals manually
+2. Choose a target Pal, passive skills, attack skills, and IVs
+3. Let PalCalc calculate and compare complete multi-generation breeding trees
+
+Every breeding step shows where to find the required Pals and estimates how long the step will take.
+
+Xbox saves must first sync to your PC by installing Palworld through the [Xbox app](https://apps.microsoft.com/detail/9mv0b5hzvk9z) and running the game at least once.
+
 https://github.com/user-attachments/assets/2ededad9-4f0a-47b1-a460-b553be46bdd4
 
 _v1.12.1 recording_
 
----
+## Download and run
 
-**[Click here to get the latest version.](https://github.com/tylercamp/palcalc/releases/latest)** (Expand "Assets" at the bottom, download `PalCalc.UI.exe`, place in its own folder and run.)
+### Standalone EXE - recommended
 
-<<< **The PalCalc wiki can be found [here.](https://github.com/tylercamp/palcalc/wiki)** >>>
+Download `PalCalc.UI.exe`, place it in its own folder, and run it. When run for the first time, Windows may ask you to install [.NET 9 from Microsoft](https://dotnet.microsoft.com/download/dotnet/9.0).
 
----
+### ZIP package - antivirus fallback
 
-PalCalc is a breeding solver for Palworld which uses the data from your save file to automatically find the optimal breeding tree for any desired pal, passive skills, attack skills, and IVs. Breeding and inheritance probabilities are accurately modeled and used to compare paths. It will find optimal paths using your own pals, tell you where to find those pals, and estimate how long each step will take.
+If antivirus software interferes with the standalone EXE, download `PalCalc-NoBundle.zip` instead. Extract the full contents into their own folder and run the included `PalCalc.UI.exe`. When updating, replace all files in that folder.
 
-No more spreadsheets!
+PalCalc does not require administrator access. If it unexpectedly asks for elevated permissions, do not continue and [report the problem](https://github.com/tylercamp/palcalc/issues).
 
-No more fumbling between bases and sorting pals!
+## Features
 
-Stop manually building breeding trees!
+- **Start with the Pals you actually have**
+  - Load a local Steam or Xbox save, add a downloaded server save, or build a virtual collection by hand
+  - Find routes from your owned Pals, with wild Pals included only when you allow them
+  - Focus the search on a specific guild or player
+- **Ask for exactly the Pal you want**
+  - Choose the species, passive skills, attack skills, and IVs you care about
+  - Combine those requirements in a single search instead of solving each one separately
+  - Save presets for passive combinations you use often
+- **Get a complete plan with realistic estimates**
+  - PalCalc compares multi-generation trees by their chances of success, not just their number of steps
+  - Time estimates account for gender odds and the chances of inheriting desired passives, attacks, and IVs
+  - Gender Reversers, Surgery Table options, and Special Cakes are included when enabled
+  - You control the limits for breeding steps, wild Pals, and unwanted passives
+- **Easily find your Pals**
+  - Pals used in the breeding tree are linked back to their Palbox, base, viewing cage, or other source
+  - Use the minimap and coordinates to find Pals at bases and viewing cages
+  - Search your collection by Pal, skill, or IV with the Save Inspector
+- **Available in multiple languages**
+  - Pal and skill names come directly from Palworld's localized game data
+  - Community translations cover the rest of the interface, and the [translation guide](./PalCalc.UI/Localization/README.md) walks through adding or improving one
 
-**Spend less time planning your game and more time playing it!**
+Curious how PalCalc reaches its answers? Read about the [full solver process](./PalCalc.Solver/README.md), the underlying [Palworld breeding mechanics and probabilities](./PalCalc.Solver/README-PALWORLD-MECHANICS.md), or check out the example [step-by-step passive inheritance calculation](./PalCalc.Solver/README-BREED-ESTIMATE.md).
 
----
+PalCalc's save support is based on [palworld-save-tools by cheahjs](https://github.com/cheahjs/palworld-save-tools). Its breeding-effort calculations were first built on community research into [passive inheritance mechanics](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/).
 
-Full list of features
+## For contributors
 
-- Can detect and read from your local game save files, based on [palworld-save-tools by cheahjs](https://github.com/cheahjs/palworld-save-tools)
-- Supports local Steam saves and Xbox saves
-  - Xbox saves are synced to your PC by downloading the game through the ['Xbox' app on Windows](https://apps.microsoft.com/detail/9mv0b5hzvk9z) and running the game at least once. Save files are synced when the game is run.
-- Built for convenience
-  - All breeding steps will tell you where you can find an involved Pal
-  - For pals in viewing cages or bases, hover over the Pal's location for a minimap which highlights the base and shows its coordinates
-  - Create presets to auto-fill commonly used passives in the solver settings
-- Provides time estimates on each step, based on probabilities and mechanics [derived by /u/mgxts in this Reddit post](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/)
-  - Gender probabilities
-  - Probability of directly- and randomly-inserted passives
-  - For directly-inherited passives, probability of getting the desired passives
-  - Probability of IV inheritance (if enabled)
-  - Probability of attack inheritance (if enabled)
-- Offers the optimal path
-  - Determines "path efficiency" based on calculated probabilities, not just the total number of steps
-  - Handles single-root paths, where you successively breed children with another pal you own (one "starting point")
-  - Handles multi-root paths, where two children are bred (multiple "starting points")
-  - _See [here](./PalCalc.Solver/README.md) for an overview of the full solver process._
-- Flexible search process
-  - Allows wild pals
-  - Set a max number of undesired passives if you're ok with imperfect pals
-  - Set limits on the number of breeding steps
-  - Choose which pals you want to include by filtering by guilds and players
-- Efficient
-  - Low memory usage and fast load times
-  - Relatively fast path-solving process, searches take under a minute
-  - Distributes path-solving work across all available CPU cores
-- Save Inspector
-  - Lists all pal containers (palbox, viewing cages, etc.)
-  - Inspect pals to see IVs, passives, and attack skills
-  - Search for specific pals and/or pals with specific IVs, passives, and attack skills
-  - Manually add pals in custom containers for use in breeding calculations (does _not_ affect Palworld save data)
-- Multiple languages
-  - Supports all languages in Palworld, pal and skill names imported from game files
-  - Translations for in-app text [can be added](./PalCalc.UI/Localization/README.md)
+PalCalc targets .NET 9 and Windows x64. Visual Studio Community 2022 or a compatible .NET SDK can build the solution.
 
-# Community Help
+```powershell
+dotnet build PalCalc.sln
+dotnet test PalCalc.Solver.Tests
+dotnet run --project PalCalc.UI
+```
 
-PalCalc currently has some outstanding pieces that need more information to resolve. Some of these need some level of reverse engineering, but some can be figured out through experimentation and statistics. An [issue](https://github.com/tylercamp/palcalc/issues) has been created for each item, where more information can be found.
+The solution is divided into four main projects:
 
-1. Is there a formula for how long breeding takes? Or is it a constant five minutes? [Issue](https://github.com/tylercamp/palcalc/issues/2)
-2. What's the probability of wild pals having exactly N passives? [Issue](https://github.com/tylercamp/palcalc/issues/4)
-3. Has the passive skill inheritance calculation changed since /u/mgxts reverse engineered it? Was their reverse engineering accurate? [Issue](https://github.com/tylercamp/palcalc/issues/7)
-4. Assuming the passive skill inheritance calculation is correct, is PalCalc's implementation of those probabilities correct? [Issue](https://github.com/tylercamp/palcalc/issues/8)
-5. What's a good way to estimate time needed to capture a wild pal of a certain type? e.g. Chikipi would be much faster to find + catch than Paladius. [Issue](https://github.com/tylercamp/palcalc/issues/10)
+- [`PalCalc.Model`](./PalCalc.Model/) contains game data and shared domain models
+- [`PalCalc.SaveReader`](./PalCalc.SaveReader/) reads Palworld save files
+- [`PalCalc.Solver`](./PalCalc.Solver/) calculates and compares breeding paths
+- [`PalCalc.UI`](./PalCalc.UI/) is the Windows WPF application
 
-# Development
+To update Palworld game data, use [`PalCalc.GenDB`](./PalCalc.GenDB/). It rebuilds `PalCalc.Model/db.json` from locally installed game files; do not edit that file manually. See the [database-generation guide](./PalCalc.GenDB/README.md) for setup instructions.
 
-Visual Studio Community 2022 is required. The `.CLI` projects act as test programs which can be ran without involving the whole PalCalc UI.
+Bug reports, research contributions, and pull requests are welcome in [GitHub Issues](https://github.com/tylercamp/palcalc/issues).
 
-## Palworld Database
+## License
 
-The list of pals, passives, and stats are stored in a `db.json` file embedded in `PalCalc.Model`. This file is generated by the [`PalCalc.GenDB`](./PalCalc.GenDB/) project. Running this project will update the `db.json` file in `PalCalc.Model` which will be used by the rest of the projects. It also updates the Pal icons and in-game map used by `PalCalc.UI`.
-
-`PalCalc.GenDB` will attempt to read and export data from your local Palworld game files. See the [README](./PalCalc.GenDB/README.md) for more info. It uses [CUE4Parse](https://github.com/FabianFG/CUE4Parse), made and maintained by the same developers of the popular modding tool [FModel](https://fmodel.app/), to perform that export.
-
-The `db.json` file should _not_ be modified manually. It should be modified by re-running the `PalCalc.GenDB` project.
-
-## Save File Support
-
-Save file parsing is in `PalCalc.SaveReader`, which is a partial C# port of [palworld-save-tools](https://github.com/cheahjs/palworld-save-tools). See the project's [README](./PalCalc.SaveReader/) for more information.
-
-## Data and Solver Model
-
-Data collected from Palworld or a save file are represented by types in `PalCalc.Model`. Instances of an owned pal within the game are represented by `PalInstance`.
-
-The solver logic in `PalCalc.Solver` wraps this type with `IPalReference` types, which can represent owned, wild, and bred pals. `PalCalc.Solver.BreedingSolver` returns a `BreedingSolverResult` containing these references; `OwnedPalReference` values provide access to their underlying owned instances.
-
-The overall solver process is described in the project's [README](./PalCalc.Solver/).
-
-## PalCalc UI
-
-The general structure of the `PalCalc.UI` project is somewhat messy. The application uses WPF and (weak) MVVM, mainly for convenience. MVVM principals and WPF best-practices were not strictly adhered to. There are various hackfixes since many features were unplanned and added through the path of least resistance. Refactoring is planned and gladly accepted.
-
-Entries in the `Resource` folder are set to the `Resource` build action and embedded in the final program.
-
-The Community Toolkit library is used for the viewmodels, which provides the `ObservableObject`, `ObservableProperty`, and other utilities. These use code generation to automatically implement `private` fields annotated with `[ObservableProperty]` as `public` properties with the appropriate `INotifyPropertyChanged` logic.
-
-`GraphSharp`, a defunct library [preserved after the Codeplex shutdown](https://github.com/NinetailLabs/GraphSharp), does not have any documentation. It was added here by referencing [hollowdrutt's implementation](https://github.com/hollowdrutt/GraphSharpDemo) of a useful overview/walkthrough of its usage [by Sacha Barber](https://sachabarbs.wordpress.com/2010/08/31/pretty-cool-graphs-in-wpf/).
-
-## TODOs
-- Notify when a pal involved in a breeding path is no longer available in the source save or has been moved
-- Optimize app startup time
-  - Seems to largely be due to JSON deserialization overhead
-
-## Maybe TODOs
-- Option to auto-recalc all target pals when changes are detected
-- Allow specifying custom db.json
-- Implement proper graph diffing for the built in GraphSharp animations
+PalCalc is available under the [MIT License](./LICENSE.txt).
