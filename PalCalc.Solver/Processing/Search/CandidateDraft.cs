@@ -50,6 +50,7 @@ internal struct CandidateDraft
         SelfBreedingEffort = selfBreedingEffort;
         BreedingEffort = breedingEffort;
         TotalCost = parent1.TotalCost + parent2.TotalCost;
+        TotalRequiredLevels = parent1.TotalRequiredLevels + parent2.TotalRequiredLevels;
         AttackProfile = attackProfile;
     }
 
@@ -61,6 +62,8 @@ internal struct CandidateDraft
     public TimeSpan SelfBreedingEffort { get; }
     public TimeSpan BreedingEffort { get; }
     public int TotalCost { get; }
+
+    public int TotalRequiredLevels { get; }
     public PreparedAttackProfile AttackProfile { get; }
     public bool IsMaterialized => materialized is not null;
 

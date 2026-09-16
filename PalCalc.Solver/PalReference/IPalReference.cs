@@ -31,6 +31,11 @@ namespace PalCalc.Solver.PalReference
 
         AttackProfile AttackProfile { get; }
 
+        LevelRequirements LevelRequirements => null;
+
+        /// <summary>Cheap search estimate; repeated references are counted per occurrence.</summary>
+        int TotalRequiredLevels => LevelRequirements is { } levels ? levels.FinalLevel - levels.InitialLevel : 0;
+
         PalGender Gender { get; }
 
         /// <summary>

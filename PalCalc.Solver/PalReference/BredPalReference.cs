@@ -42,6 +42,8 @@ namespace PalCalc.Solver.PalReference
                 Parent2 = parent1;
             }
 
+            TotalRequiredLevels = Parent1.TotalRequiredLevels + Parent2.TotalRequiredLevels;
+
             IVs = ivs;
             AttackProfile = attackProfile;
             MaterializedAttackInheritance = parentOrderReversed || materializedAttackInheritance is null
@@ -112,6 +114,8 @@ namespace PalCalc.Solver.PalReference
 
         public Pal Pal { get; private set; }
         public IPalReference Parent1 { get; private set; }
+
+        public int TotalRequiredLevels { get; }
         public IPalReference Parent2 { get; private set; }
 
         public PalGender Gender { get; private set; } = PalGender.WILDCARD;
@@ -175,6 +179,7 @@ namespace PalCalc.Solver.PalReference
         public List<PassiveSkill> ActualPassives => EffectivePassives;
 
         public AttackProfile AttackProfile { get; }
+
 
         public MaterializedAttackInheritance MaterializedAttackInheritance { get; }
 

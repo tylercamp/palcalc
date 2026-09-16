@@ -184,7 +184,9 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
                     ? FrontierCandidateAssessment.Inferior
                     : FrontierCandidateAssessment.PotentialImprovement;
 
-        return TotalMinIV(candidate) > TotalMinIV(incumbent)
+        return TotalMinIV(candidate) > TotalMinIV(incumbent) ||
+            attackProfilesActive && TotalMinIV(candidate) == TotalMinIV(incumbent) &&
+            candidate.TotalRequiredLevels < incumbent.TotalRequiredLevels
             ? FrontierCandidateAssessment.PotentialImprovement
             : CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
                 ? FrontierCandidateAssessment.Inferior
@@ -222,7 +224,9 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
                     ? FrontierCandidateAssessment.Inferior
                     : FrontierCandidateAssessment.PotentialImprovement;
 
-        return TotalMinIV(candidate.IVs) > TotalMinIV(incumbent)
+        return TotalMinIV(candidate.IVs) > TotalMinIV(incumbent) ||
+            attackProfilesActive && TotalMinIV(candidate.IVs) == TotalMinIV(incumbent) &&
+            candidate.TotalRequiredLevels < incumbent.TotalRequiredLevels
             ? FrontierCandidateAssessment.PotentialImprovement
             : CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
                 ? FrontierCandidateAssessment.Inferior
@@ -395,6 +399,8 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         comparison = left.Candidate.BreedingEffort.CompareTo(right.Candidate.BreedingEffort);
         if (comparison != 0) return comparison;
         comparison = left.Candidate.TotalCost.CompareTo(right.Candidate.TotalCost);
+        if (comparison != 0) return comparison;
+        comparison = left.Candidate.TotalRequiredLevels.CompareTo(right.Candidate.TotalRequiredLevels);
         if (comparison != 0) return comparison;
         return left.Candidate.GetHashCode().CompareTo(right.Candidate.GetHashCode());
     }

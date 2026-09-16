@@ -32,7 +32,8 @@ internal sealed class InitialPalBuilder(
                         .ToList()
                 ),
                 new RelevantIVKey(reference.IVs),
-                reference.AttackProfile
+                reference.AttackProfile,
+                reference.LevelRequirements is not null
             );
 
         bool WithinBreedingSteps(Pal pal) =>
@@ -70,6 +71,7 @@ internal sealed class InitialPalBuilder(
                         : AttackProfile.Inactive
                 );
             })
+            .SelectMany(reference => TrainingVariants(reference).Cast<OwnedPalReference>())
             .GroupBy(pal => (
                 State: StateWithoutGender(pal),
                 pal.Gender
@@ -85,6 +87,7 @@ internal sealed class InitialPalBuilder(
                         p.UnderlyingInstance.IV_Attack +
                         p.UnderlyingInstance.IV_Defense
                     )
+                    .ThenBy(p => p.LevelRequirements is { } levels ? levels.FinalLevel - levels.InitialLevel : 0)
                     .First()
             )
             .GroupBy(StateWithoutGender)
@@ -102,7 +105,7 @@ internal sealed class InitialPalBuilder(
         List<OwnedPalReference> group
     )
     {
-        if (group.Count == 1)
+        if (group.Count == 1 || group.Any(p => p.LevelRequirements is not null))
             return group;
         if (group.Count != 2)
             throw new NotImplementedException();
@@ -159,14 +162,54 @@ internal sealed class InitialPalBuilder(
                             )
                         );
                 })
+                .SelectMany(TrainingVariants)
                 .Where(candidate => candidate.BreedingEffort <= settings.MaxEffort)
         );
+    }
+
+    private IEnumerable<IPalReference> TrainingVariants(IPalReference reference)
+    {
+        yield return reference;
+        if (!attackTargets.IsActive)
+            yield break;
+
+        var initialLevel = reference is OwnedPalReference owned
+            ? owned.UnderlyingInstance.Level
+            : reference.Pal.MinWildLevel ?? 1;
+        var schedule = reference.Pal.AttackLeveling(settings.DB).ToArray();
+        var initialMask = reference.AttackProfile.Entries.Single().LearnedTargetMask;
+        var levels = schedule
+            .Where(entry => entry.Level > initialLevel &&
+                (attackTargets.MaskOf([entry.Attack]) & ~initialMask) != 0)
+            .Select(entry => entry.Level).Distinct().Order();
+        var previousMask = initialMask;
+        foreach (var finalLevel in levels)
+        {
+            var gained = schedule.Where(entry => entry.Level > initialLevel && entry.Level <= finalLevel)
+                .Select(entry => entry.Attack).ToArray();
+            var mask = (byte)(initialMask | attackTargets.MaskOf(gained));
+            if (mask == previousMask)
+                continue;
+            previousMask = mask;
+            var profile = new AttackProfile(
+                reference.AttackProfile.HasNoopAttack || gained.Any(attack => !attack.CanInherit),
+                new AttackProfileEntry(mask, 0)
+            );
+            var requirements = new LevelRequirements(initialLevel, finalLevel);
+            yield return reference switch
+            {
+                OwnedPalReference own => own.WithLevelRequirements(requirements, profile),
+                WildPalReference wild => wild.WithLevelRequirements(requirements, profile),
+                _ => throw new InvalidOperationException("Only owned and wild pals can be trained.")
+            };
+        }
     }
 
     private readonly record struct InitialOwnedState(
         Pal Pal,
         PassiveSetKey Passives,
         RelevantIVKey IVs,
-        AttackProfile AttackProfile
+        AttackProfile AttackProfile,
+        bool RequiresTraining
     );
 }

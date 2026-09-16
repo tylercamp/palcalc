@@ -674,14 +674,21 @@ internal sealed class AttackResultMaterializer
         reference switch
         {
             SurgeryTablePalReference surgery => LearnedAttacks(surgery.Input),
-            OwnedPalReference owned => owned.UnderlyingInstance.ActiveSkills ?? [],
+            OwnedPalReference owned => (owned.UnderlyingInstance.ActiveSkills ?? []).Concat(TrainingAttacks(owned)),
+            WildPalReference wild => wild.Pal.WildActiveSkills(settings.DB).Concat(TrainingAttacks(wild)),
             // A composite only exists when both copies share the same attack
             // profile (see InitialPalBuilder), so the male's attacks stand in
             // for the pair.
             CompositeOwnedPalReference composite => composite.Male.UnderlyingInstance.ActiveSkills ?? [],
             BredPalReference { MaterializedAttackInheritance: not null } bred => bred.MaterializedAttackInheritance.ChildLearnedAttacks,
-            WildPalReference wild => wild.Pal.WildActiveSkills(settings.DB),
             _ => reference.Pal.Level1ActiveSkills(settings.DB),
         };
+
+    private IEnumerable<ActiveSkill> TrainingAttacks(IPalReference reference) =>
+        reference.LevelRequirements is { } levels
+            ? reference.Pal.AttackLeveling(settings.DB)
+                .Where(entry => entry.Level > levels.InitialLevel && entry.Level <= levels.FinalLevel)
+                .Select(entry => entry.Attack)
+            : [];
 
 }

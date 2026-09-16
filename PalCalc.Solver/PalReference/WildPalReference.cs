@@ -54,6 +54,21 @@ namespace PalCalc.Solver.PalReference
 
         public AttackProfile AttackProfile { get; private set; }
 
+        public LevelRequirements LevelRequirements { get; private set; }
+
+        internal WildPalReference WithLevelRequirements(LevelRequirements requirements, AttackProfile profile) =>
+            new(Pal)
+            {
+                SelfBreedingEffort = SelfBreedingEffort,
+                Gender = Gender,
+                EffectivePassives = EffectivePassives,
+                EffectivePassivesHash = EffectivePassivesHash,
+                IVs = IVs,
+                AttackProfile = profile,
+                LevelRequirements = requirements,
+                CapturesRequiredForGender = CapturesRequiredForGender
+            };
+
         public float TimeFactor => 1.0f;
 
         public IPalRefLocation Location { get; } = new CapturedRefLocation();
@@ -104,6 +119,7 @@ namespace PalCalc.Solver.PalReference
                 EffectivePassivesHash = this.EffectivePassivesHash,
                 IVs = IVs,
                 AttackProfile = AttackProfile,
+                LevelRequirements = LevelRequirements,
                 CapturesRequiredForGender = capturesRequiredForGender
             };
         }
@@ -136,6 +152,6 @@ namespace PalCalc.Solver.PalReference
 
         public override string ToString() => $"Captured {Gender} {Pal} w/ up to {EffectivePassives.Count} random passive skills";
 
-        public override int GetHashCode() => HashCode.Combine(nameof(WildPalReference), Pal, Gender, EffectivePassivesHash);
+        public override int GetHashCode() => HashCode.Combine(nameof(WildPalReference), Pal, Gender, EffectivePassivesHash, AttackProfile, LevelRequirements);
     }
 }

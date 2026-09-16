@@ -19,7 +19,9 @@ namespace PalCalc.Solver.PalReference
             PalInstance instance,
             List<PassiveSkill> effectivePassives,
             IV_Set effectiveIVs,
-            AttackProfile attackProfile
+            AttackProfile attackProfile,
+            // TODO - Remove default value
+            LevelRequirements levelRequirements = null
         )
         {
             this.instance = instance;
@@ -30,6 +32,7 @@ namespace PalCalc.Solver.PalReference
 
             ActualPassives = instance.PassiveSkills;
             AttackProfile = attackProfile;
+            LevelRequirements = levelRequirements;
 
             IVs = effectiveIVs;
 
@@ -47,6 +50,11 @@ namespace PalCalc.Solver.PalReference
         public List<PassiveSkill> ActualPassives { get; }
 
         public AttackProfile AttackProfile { get; }
+
+        public LevelRequirements LevelRequirements { get; }
+
+        internal OwnedPalReference WithLevelRequirements(LevelRequirements requirements, AttackProfile profile) =>
+            new(instance, EffectivePassives, IVs, profile, requirements) { Gender = Gender };
 
         public float TimeFactor { get; }
 
@@ -74,7 +82,7 @@ namespace PalCalc.Solver.PalReference
 
         private OwnedPalReference MakeGuaranteedGenderImpl(PalGender gender)
         {
-            var res = new OwnedPalReference(instance, EffectivePassives, IVs, AttackProfile);
+            var res = new OwnedPalReference(instance, EffectivePassives, IVs, AttackProfile, LevelRequirements);
             res.Gender = gender;
             return res;
         }
@@ -103,11 +111,12 @@ namespace PalCalc.Solver.PalReference
             var asOwned = obj as OwnedPalReference;
             if (ReferenceEquals(asOwned, null)) return false;
 
-            return GetHashCode() == obj.GetHashCode();
+            return Equals(instance, asOwned.instance) && Gender == asOwned.Gender &&
+                Equals(AttackProfile, asOwned.AttackProfile) && Equals(LevelRequirements, asOwned.LevelRequirements);
         }
 
         public override string ToString() => $"Owned {Gender} {Pal.Name} w/ ({EffectivePassives.PassiveSkillListToString()}) in {Location}";
 
-        public override int GetHashCode() => HashCode.Combine(nameof(OwnedPalReference), UnderlyingInstance.GetHashCode());
+        public override int GetHashCode() => HashCode.Combine(nameof(OwnedPalReference), UnderlyingInstance, Gender, AttackProfile, LevelRequirements);
     }
 }

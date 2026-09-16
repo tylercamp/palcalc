@@ -64,6 +64,8 @@ namespace PalCalc.Solver.PalReference
 
         public int TotalCost { get; }
 
+        public int TotalRequiredLevels { get; }
+
         public SurgeryTablePalReference(IPalReference input, List<ISurgeryOperation> rawOperations)
         {
             if (input is SurgeryTablePalReference stpr)
@@ -94,6 +96,7 @@ namespace PalCalc.Solver.PalReference
 
             Gender = input.Gender;
             TotalCost = input.TotalCost;
+            TotalRequiredLevels = input.TotalRequiredLevels;
 
             // replace-passive operations are only valid when the pal's passive slots are all occupied
 #if DEBUG && DEBUG_CHECKS
@@ -167,6 +170,7 @@ namespace PalCalc.Solver.PalReference
         public int EffectivePassivesHash { get; }
         public IV_Set IVs => Input.IVs;
         public AttackProfile AttackProfile => Input.AttackProfile;
+
 
         public int NumTotalBreedingSteps => Input.NumTotalBreedingSteps;
         public int NumTotalEggs => Input.NumTotalEggs;
