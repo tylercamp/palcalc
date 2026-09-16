@@ -679,8 +679,8 @@ internal sealed class AttackResultMaterializer
             // profile (see InitialPalBuilder), so the male's attacks stand in
             // for the pair.
             CompositeOwnedPalReference composite => composite.Male.UnderlyingInstance.ActiveSkills ?? [],
-            BredPalReference { MaterializedAttackInheritance: not null } bred =>
-                bred.MaterializedAttackInheritance.ChildLearnedAttacks,
+            BredPalReference { MaterializedAttackInheritance: not null } bred => bred.MaterializedAttackInheritance.ChildLearnedAttacks,
+            WildPalReference wild => wild.Pal.WildActiveSkills(settings.DB),
             _ => reference.Pal.Level1ActiveSkills(settings.DB),
         };
 

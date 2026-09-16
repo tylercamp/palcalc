@@ -148,23 +148,26 @@ public class InitialPalBuilderTests
     [TestMethod]
     public void Build_WildProfileUsesAttacksAvailableAtMinimumWildLevel()
     {
-        var pal = SolverTestScenario.DB.Pals.First(candidate =>
-            candidate.MinWildLevel.HasValue && candidate.AttackLeveling(SolverTestScenario.DB)
-                .Any(entry => entry.Level > 1 && entry.Level <= candidate.MinWildLevel.Value)
-        );
+        var pal = "Eidrolon".ToPal(SolverTestScenario.DB);
         var wildAttacks = pal.WildActiveSkills(SolverTestScenario.DB).ToArray();
-        var target = Target(wildAttacks);
+        var target = Target(
+            "DragonWave".InternalToActive(SolverTestScenario.DB),
+            "Unique_GhostDragon_TailSlash".InternalToActive(SolverTestScenario.DB),
+            "CommetRain".InternalToActive(SolverTestScenario.DB)
+        );
         var configuredSolver = SolverTestScenario.Solver(
-            ownedPals: [], maxSpecialCakes: 0, maxBreedingSteps: 1, maxWildPals: 1, allowedWildPals: [pal]
+            ownedPals: [], maxSpecialCakes: 0, maxBreedingSteps: 8, maxWildPals: 1, allowedWildPals: [pal]
         );
 
         var wild = NewBuilder(configuredSolver, target).Build(target).OfType<WildPalReference>().First();
         var context = new AttackTargetContext(target, SolverTestScenario.DB);
 
         Assert.AreEqual(
-            context.MaskOf(wildAttacks),
+            (byte)3,
             wild.AttackProfile.Entries.Single().LearnedTargetMask
         );
+        Assert.AreEqual((byte)3, context.MaskOf(wildAttacks));
+        Assert.IsTrue(wild.AttackProfile.HasNoopAttack);
     }
 
     [TestMethod]
