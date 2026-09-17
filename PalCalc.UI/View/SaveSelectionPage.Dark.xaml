@@ -2,5 +2,4 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <SolidColorBrush x:Key="SaveVirtualIconBrush" Color="#AFC8FF" />
     <SolidColorBrush x:Key="SaveFolderIconBrush" Color="#FFD166" />
-    <SolidColorBrush x:Key="SaveCountForegroundBrush" Color="#A9A9C0" />
 </ResourceDictionary>

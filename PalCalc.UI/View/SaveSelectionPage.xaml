@@ -148,7 +148,7 @@
                             <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" vu:StackPanelExtensions.Spacing="8">
                                     <TextBlock Text="{Binding TypeLabel.Value}" FontWeight="SemiBold" FontSize="20" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding AvailableSaves.Count, StringFormat='({0})'}" VerticalAlignment="Center"  Foreground="{DynamicResource SaveCountForegroundBrush}" FontSize="20" />
+                                    <TextBlock Text="{Binding AvailableSaves.Count, StringFormat='({0})'}" VerticalAlignment="Center" Opacity="0.8" FontSize="20" />
                                 </StackPanel>
                                 <Grid MaxWidth="200">
                                     <TextBlock Text="{Binding Title.Value}" Visibility="{Binding Title, Converter={StaticResource VVC}}" TextWrapping="Wrap" />

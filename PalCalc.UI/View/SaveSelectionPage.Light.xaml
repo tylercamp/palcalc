@@ -5,6 +5,4 @@
                      Color="{DynamicResource {x:Static adonisUi:Colors.AccentColor}}" />
     <SolidColorBrush x:Key="SaveFolderIconBrush"
                      Color="{DynamicResource {x:Static adonisUi:Colors.AlertColor}}" />
-    <SolidColorBrush x:Key="SaveCountForegroundBrush"
-                     Color="{DynamicResource {x:Static adonisUi:Colors.DisabledForegroundColor}}" />
 </ResourceDictionary>
