@@ -193,7 +193,8 @@ public class EffectivePropertiesKeyTests
             guaranteedPassives: [],
             numRandomPassives: 2,
             mechanics: SolverTestScenario.DB.BreedingMechanics,
-            attackProfile: AttackProfile.Inactive
+            attackProfile: AttackProfile.Inactive,
+            levelRequirements: null
         );
 
         var gendered = wild.WithGuaranteedGender(

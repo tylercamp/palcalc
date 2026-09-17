@@ -21,6 +21,8 @@ namespace PalCalc.UI.Persistence.Dto
         [JsonProperty(Required = Required.Always)]
         public string RefType { get; init; }
 
+        public LevelRequirements LevelRequirements { get; init; }
+
         public PalInstanceSnapshotDto Instance { get; init; }
         public PalGender? ActualGender { get; init; }
         public IvSetDto IVs { get; init; }

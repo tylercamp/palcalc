@@ -205,6 +205,12 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_COMMON_LEVEL" xml:space="preserve">
     <value>Level</value>
   </data>
+  <data name="LC_GRAPH_LEVEL_REQUIREMENT" xml:space="preserve">
+    <value>Lv. {Level}</value>
+  </data>
+  <data name="LC_GRAPH_LEVEL_TRAINING" xml:space="preserve">
+    <value>Lv. {InitialLevel} → Lv. {FinalLevel}</value>
+  </data>
   <data name="LC_COMMON_RANK" xml:space="preserve">
     <value>Tier</value>
   </data>

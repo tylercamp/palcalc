@@ -215,7 +215,8 @@ public class InitialPalBuilderTests
         );
         var wild = new WildPalReference(
             pal, [], 0, SolverTestScenario.DB.BreedingMechanics,
-            attackProfile: profile
+            attackProfile: profile,
+            levelRequirements: null
         );
         var bred = new BredPalReference(
             new GameSettings(), pal, PalGender.WILDCARD, owned, owned, null, [], 1, 1, new(), 1,

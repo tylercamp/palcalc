@@ -124,6 +124,27 @@ public class LevelingTests
         new(Owned(Species(), initial), [], new(), new AttackProfile(new AttackProfileEntry(7, 0)),
             new LevelRequirements(initial, final));
 
+    [TestMethod]
+    public void DisablingTrainingKeepsOnlyBaselineOwnedAndWildAttacks()
+    {
+        var species = Species(10);
+        var target = Target(species);
+        var context = new AttackTargetContext(target, DB);
+        foreach (var wild in new[] { false, true })
+        {
+            var settings = SolverTestScenario.Solver(wild ? [] : [Owned(species, 5)],
+                maxBreedingSteps: int.MaxValue, maxWildPals: 1, allowedWildPals: [species], trainPals: false).Settings;
+            var seeds = new InitialPalBuilder(settings, DB.BreedingMechanics, settings.BreedingDB, context).Build(target);
+            Assert.IsTrue(seeds.All(p => p.LevelRequirements is null));
+            Assert.IsTrue(seeds.All(p => p.AttackProfile.Entries.Single().LearnedTargetMask == (wild ? 3 : 1)));
+            Assert.IsTrue(seeds.Count > 0);
+        }
+        var instance = Owned(species, 5);
+        var results = SolverTestScenario.Solve(SolverTestScenario.Solver([instance], maxBreedingSteps: 0,
+            trainPals: false), species.Name, species.AttackLeveling(DB).Select(e => e.Attack));
+        Assert.AreEqual(0, results.Count);
+    }
+
     private static BredPalReference Bred(IPalReference first, IPalReference second) =>
         new(new GameSettings(), "Wixen Noct".ToPal(DB), PalGender.WILDCARD, first, second,
             null, [], 1, 1, new(), 1, AttackProfile.Inactive, null);

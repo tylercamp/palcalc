@@ -31,7 +31,7 @@
             <c:ValueBoolConverter x:Key="VBC_Negated" Negate="True" />
             <c:ValueVisibilityConverter x:Key="VVC" />
             <c:CollectionVisibilityConverter x:Key="CVC" />
-            <graphSharpConverters:EdgeRouteToPathConverter x:Key="BreedingEdgeRouteToPathConverter" />
+            <c:BreedingEdgeRouteToPathConverter x:Key="BreedingEdgeRouteToPathConverter" />
 
             <Style TargetType="Label">
                 <Setter Property="UseLayoutRounding" Value="True" />
@@ -265,7 +265,13 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type graphSharp:VertexControl}">
+                            <Grid DataContext="{Binding Vertex, RelativeSource={RelativeSource TemplatedParent}}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
                             <Border x:Name="NodeBorder"
+                                    SizeChanged="NodeBorder_SizeChanged"
                                     DataContext="{Binding Vertex, RelativeSource={RelativeSource TemplatedParent}}"
                                     BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
                                     Background="{DynamicResource BreedingNodeBackgroundBrush}"
@@ -307,10 +313,22 @@
                                     </Button>
                                 </Grid>
                             </Border>
+                                <Grid Grid.Row="1" Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:BreedingResultView}, Path=DisplayedResult.EffectiveAttacks.Attacks, Converter={StaticResource CVC}}">
+                                    <Border x:Name="LevelBorder" HorizontalAlignment="Right" Margin="0,3,0,0"
+                                            CornerRadius="5" BorderThickness="1" Padding="6,2"
+                                            BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
+                                            Background="{DynamicResource BreedingNodeBackgroundBrush}"
+                                            Visibility="{Binding HasLevelDescription, Converter={StaticResource VVC}, FallbackValue=Collapsed}">
+                                        <TextBlock x:Name="LevelText" Text="{Binding LevelDescription.Value}" FontSize="10" />
+                                    </Border>
+                                </Grid>
+                            </Grid>
                             <ControlTemplate.Triggers>
                                 <DataTrigger Binding="{Binding IsComplete}" Value="True">
                                     <Setter TargetName="NodeContent" Property="Opacity" Value="0.4" />
                                     <Setter TargetName="NodeBorder" Property="BorderBrush" Value="{DynamicResource BreedingCompleteBrush}" />
+                                    <Setter TargetName="LevelBorder" Property="BorderBrush" Value="{DynamicResource BreedingCompleteBrush}" />
+                                    <Setter TargetName="LevelText" Property="Opacity" Value="0.4" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsChecked}" Value="True">
                                     <Setter TargetName="ToggleButton" Property="Opacity" Value="1.0" />
@@ -349,6 +367,8 @@
                                                     <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Target.ActualWidth" />
                                                     <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Target.ActualHeight" />
                                                     <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="RoutePoints" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Source.(local:BreedingResultView.NodeBodyHeight)" />
+                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Target.(local:BreedingResultView.NodeBodyHeight)" />
                                                 </MultiBinding>
                                             </PathGeometry.Figures>
                                         </PathGeometry>

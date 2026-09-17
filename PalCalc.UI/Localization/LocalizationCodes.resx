@@ -177,6 +177,12 @@
   <data name="LC_COMMON_LEVEL" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_GRAPH_LEVEL_REQUIREMENT" xml:space="preserve">
+    <value>Level</value>
+  </data>
+  <data name="LC_GRAPH_LEVEL_TRAINING" xml:space="preserve">
+    <value>InitialLevel | FinalLevel</value>
+  </data>
   <data name="LC_COMMON_RANK" xml:space="preserve">
     <value />
   </data>

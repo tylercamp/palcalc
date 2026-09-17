@@ -299,7 +299,8 @@ namespace PalCalc.UI.ViewModel.Solver
                 allowedSurgeryPassives: PalDB.LoadEmbedded().SurgeryPassiveSkills.Except(BannedSurgeryPassives).ToList(),
                 skipSurgeryPassivesDuringSearch: SkipSurgerySearch,
                 useGenderReversers: UseGenderReversers,
-                maxSpecialCakes: int.MaxValue
+                maxSpecialCakes: int.MaxValue,
+                trainPals: true
             );
 
         public SerializableSolverSettings AsModel => new SerializableSolverSettings()

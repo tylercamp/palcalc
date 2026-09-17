@@ -48,7 +48,8 @@ namespace PalCalc.UI.ViewModel.Solver
                     allowedSurgeryPassives: [],
                     skipSurgeryPassivesDuringSearch: false,
                     useGenderReversers: false,
-                    maxSpecialCakes: 0
+                    maxSpecialCakes: 0,
+                    trainPals: true
             );
             var solver = new BreedingSolver();
 

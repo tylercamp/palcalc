@@ -16,7 +16,8 @@ namespace PalCalc.Solver.PalReference
             IEnumerable<PassiveSkill> guaranteedPassives,
             int numRandomPassives,
             BreedingMechanics mechanics,
-            AttackProfile attackProfile
+            AttackProfile attackProfile,
+            LevelRequirements levelRequirements
         )
         {
             ArgumentNullException.ThrowIfNull(mechanics);
@@ -28,6 +29,7 @@ namespace PalCalc.Solver.PalReference
             EffectivePassives = guaranteedPassives.Concat(Enumerable.Range(0, numRandomPassives).Select(i => new RandomPassiveSkill())).ToList();
             Gender = PalGender.WILDCARD;
             AttackProfile = attackProfile;
+            LevelRequirements = levelRequirements;
             CapturesRequiredForGender = 1;
 
             if (guaranteedPassives.Any(t => !pal.GuaranteedPassivesInternalIds.Contains(t.InternalName))) throw new InvalidOperationException();

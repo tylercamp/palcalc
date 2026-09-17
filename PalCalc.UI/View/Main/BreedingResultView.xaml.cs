@@ -29,6 +29,18 @@ namespace PalCalc.UI.View.Main
     {
         private const double CacheRefreshZoomRatio = 1.25;
 
+        public static readonly DependencyProperty NodeBodyHeightProperty = DependencyProperty.RegisterAttached(
+            "NodeBodyHeight", typeof(double), typeof(BreedingResultView), new PropertyMetadata(0d));
+
+        public static double GetNodeBodyHeight(DependencyObject value) => (double)value.GetValue(NodeBodyHeightProperty);
+        public static void SetNodeBodyHeight(DependencyObject value, double height) => value.SetValue(NodeBodyHeightProperty, height);
+
+        private void NodeBorder_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (((FrameworkElement)sender).TemplatedParent is VertexControl vertex)
+                SetNodeBodyHeight(vertex, e.NewSize.Height);
+        }
+
         private readonly Queue<VertexControl> pendingCacheRefresh = new();
         private bool isCacheRefreshActive;
         private double pendingZoom;

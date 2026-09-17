@@ -56,6 +56,7 @@ namespace PalCalc.UI.ViewModel.GraphSharp
 
             IsCheckable = node.PalRef is BredPalReference or WildPalReference or SurgeryTablePalReference;
             ToggleCheckedCommand = new RelayCommand(() => IsChecked = !IsChecked);
+            UpdateLevelDescription();
         }
 
         [NotifyPropertyChangedFor(nameof(IsComplete))]
@@ -89,10 +90,38 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         public int SpecialCakes { get; }
         public bool UsesSpecialCake { get; }
 
+        public ILocalizedText LevelDescription { get; private set; }
+        public bool HasLevelDescription => LevelDescription is not null;
+
+        private void UpdateLevelDescription()
+        {
+            LevelDescription = null;
+            if (Value.PalRef.LevelRequirements is { } levels)
+            {
+                LevelDescription = LocalizationCodes.LC_GRAPH_LEVEL_TRAINING.Bind(new
+                {
+                    InitialLevel = levels.InitialLevel,
+                    FinalLevel = levels.FinalLevel
+                });
+            }
+            else if (Value.PalRef is WildPalReference wild)
+            {
+                var equipped = EquippedAttacks.AsModelEnumerable().ToHashSet();
+                var requiredLevel = wild.Pal.AttackLeveling(PalDB.LoadEmbedded())
+                    .Where(entry => equipped.Contains(entry.Attack))
+                    .Select(entry => entry.Level).DefaultIfEmpty(0).Max();
+                if (requiredLevel > 0)
+                    LevelDescription = LocalizationCodes.LC_GRAPH_LEVEL_REQUIREMENT.Bind(new { Level = requiredLevel });
+            }
+            OnPropertyChanged(nameof(LevelDescription));
+            OnPropertyChanged(nameof(HasLevelDescription));
+        }
+
         public void SetEquippedAttacks(IEnumerable<ActiveSkill> attacks)
         {
             EquippedAttacks = new AttackSkillCollectionViewModel(attacks.Select(ActiveSkillViewModel.Make));
             OnPropertyChanged(nameof(EquippedAttacks));
+            UpdateLevelDescription();
         }
 
         private static IEnumerable<ActiveSkill> DefaultEquippedAttacksFor(IPalReference reference) => reference switch

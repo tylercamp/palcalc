@@ -350,6 +350,14 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_GRAPH_CHECK_STEP_DESCRIPTION,
         /// <summary>
+        ///   Looks up a localized string similar to Level.
+        /// </summary>
+        LC_GRAPH_LEVEL_REQUIREMENT,
+        /// <summary>
+        ///   Looks up a localized string similar to InitialLevel | FinalLevel.
+        /// </summary>
+        LC_GRAPH_LEVEL_TRAINING,
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_GRAPH_UNCHECK_STEP_DESCRIPTION,

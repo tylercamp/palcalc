@@ -85,7 +85,8 @@ public class BreedingGraphAttackInstructionTests
             [],
             0,
             db.BreedingMechanics,
-            AttackProfile.Inactive
+            AttackProfile.Inactive,
+            null
         );
         var graph = BreedingGraph.FromPalReference(null, new GameSettings(), wild, []);
         var node = (StandardBreedingTreeNodeViewModel)graph.NodeFor(graph.Tree.Root);

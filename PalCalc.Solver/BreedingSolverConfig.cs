@@ -41,7 +41,8 @@ public sealed class BreedingSolverSettings
         IEnumerable<PassiveSkill> allowedSurgeryPassives,
         bool skipSurgeryPassivesDuringSearch,
         bool useGenderReversers,
-        int? maxSpecialCakes
+        int? maxSpecialCakes,
+        bool trainPals
     )
     {
         ArgumentNullException.ThrowIfNull(db);
@@ -76,6 +77,7 @@ public sealed class BreedingSolverSettings
         SkipSurgeryPassivesDuringSearch = skipSurgeryPassivesDuringSearch;
         UseGenderReversers = useGenderReversers;
         MaxSpecialCakes = maxSpecialCakes;
+        TrainPals = trainPals;
     }
 
     public PalDB DB { get; }
@@ -97,4 +99,5 @@ public sealed class BreedingSolverSettings
     public bool SkipSurgeryPassivesDuringSearch { get; }
     public bool UseGenderReversers { get; }
     public int? MaxSpecialCakes { get; }
+    public bool TrainPals { get; }
 }

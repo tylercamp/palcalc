@@ -59,7 +59,9 @@ namespace PalCalc.UI.ViewModel.Solver
             var ownedPals = availablePals.Where(pal => pal?.Pal != null).ToList();
             var ownedSpecies = ownedPals.Select(pal => pal.Pal).ToHashSet();
             var carriersByAttack = ownedPals
-                .SelectMany(pal => (pal.ActiveSkills ?? []).Select(attack => (Attack: attack, pal.Pal)))
+                .SelectMany(pal => (pal.ActiveSkills ?? []).Concat(
+                        pal.Pal.AttackLeveling(db).Where(entry => entry.Level > pal.Level).Select(entry => entry.Attack))
+                    .Select(attack => (Attack: attack, pal.Pal)))
                 .GroupBy(pair => pair.Attack)
                 .ToDictionary(group => group.Key, group => group.Select(pair => pair.Pal).ToHashSet());
 
@@ -83,7 +85,8 @@ namespace PalCalc.UI.ViewModel.Solver
                     && !ownedSpecies.Contains(pal)
                     && !solverControls.BannedWildPals.Contains(pal)
                     && BreedingSteps(pal) <= solverControls.MaxBreedingSteps)
-                .SelectMany(pal => pal.WildActiveSkills(db))
+                .SelectMany(pal => pal.WildActiveSkills(db).Concat(
+                    pal.AttackLeveling(db).Where(entry => entry.Level > (pal.MinWildLevel ?? 1)).Select(entry => entry.Attack)))
                 .ToHashSet();
 
             return ActiveSkillViewModel.All.Select(attack =>

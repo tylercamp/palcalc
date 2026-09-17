@@ -493,7 +493,7 @@ namespace PalCalc.UI.Tests
 
         var male = Owned(PalGender.MALE, "male");
         var female = Owned(PalGender.FEMALE, "female");
-        var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics, AttackProfile.Inactive);
+        var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics, AttackProfile.Inactive, null);
         var bred = new BredPalReference(GameSettings.Defaults, pal, PalGender.WILDCARD, male, wild, null, [swift], 1, 1, ivs, 1, AttackProfile.Inactive, null);
         var composite = new CompositeOwnedPalReference(male, female);
         var surgery = new SurgeryTablePalReference(wild, [new AddPassiveSurgeryOperation(swift)]);
@@ -556,7 +556,7 @@ namespace PalCalc.UI.Tests
     {
         var db = PalDB.LoadEmbedded();
         var pal = "Beakon".ToPal(db);
-        var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics, AttackProfile.Inactive);
+        var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics, AttackProfile.Inactive, null);
         var dto = new BreedingResultListDto
         {
             GameSettings = ResultJsonSerializer.ToDto(GameSettings.Defaults),
@@ -621,6 +621,85 @@ namespace PalCalc.UI.Tests
 
         Assert.AreEqual(LocationType.Custom, restored.Location.Type);
         Assert.AreEqual("favorites", restored.Location.ContainerId);
+    }
+
+    [TestMethod]
+    public void VersionFiveMigratesLevelRequirementsOnEveryNestedReference()
+    {
+        WithTemporaryDirectory(path =>
+        {
+            File.WriteAllText(StorageFormat.ManifestPath(path), JsonConvert.SerializeObject(new StorageManifest { Version = 5 }));
+            var settings = JObject.FromObject(AppSettingsJsonSerializer.ToDto(new AppSettings()));
+            File.WriteAllText(Path.Combine(path, "settings.json"), settings.ToString());
+
+            var db = PalDB.LoadEmbedded();
+            var pal = "Beakon".ToPal(db);
+            OwnedPalReference Owned(PalGender gender) => new(new PalInstance
+            {
+                Pal = pal, Gender = gender, InstanceId = gender.ToString(), PassiveSkills = [],
+                ActiveSkills = [], EquippedActiveSkills = [],
+                Location = new PalLocation { Type = LocationType.Palbox, ContainerId = "box", Index = 1 }
+            }, [], new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random), AttackProfile.Inactive);
+            var composite = new CompositeOwnedPalReference(Owned(PalGender.MALE), Owned(PalGender.FEMALE));
+            var wild = new WildPalReference(pal, [], 0, db.BreedingMechanics, AttackProfile.Inactive, null);
+            var surgery = new SurgeryTablePalReference(wild, []);
+            var root = new BredPalReference(new GameSettings(), pal, PalGender.WILDCARD, composite, surgery,
+                null, [], 1, 1, new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random), 1, AttackProfile.Inactive, null);
+            var reference = JObject.FromObject(ResultJsonSerializer.ToDto(root));
+            var references = reference.DescendantsAndSelf().OfType<JObject>().Where(o => o["RefType"] != null).ToArray();
+            foreach (var item in references) item.Remove("LevelRequirements");
+            var results = JObject.FromObject(new BreedingResultListDto
+            {
+                GameSettings = ResultJsonSerializer.ToDto(new GameSettings()),
+                SolverSettings = ResultJsonSerializer.ToDto(new SerializableSolverSettings()),
+                Results = [new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(root) }],
+                SelectedResultIndex = 0
+            });
+            results["Results"]![0]!["PalReference"] = reference;
+            var targets = Directory.CreateDirectory(Path.Combine(path, "save", "targets"));
+            var targetPath = Path.Combine(targets.FullName, "target.json");
+            var targetDocument = JObject.FromObject(TargetJsonSerializer.ToDto(
+                new PalSpecifierViewModel("target", new PalSpecifier { Pal = pal }), db, new GameSettings()));
+            targetDocument["CurrentResults"] = results;
+            File.WriteAllText(targetPath, targetDocument.ToString());
+            var preservedPath = Path.Combine(targets.FullName, "preserved.json");
+            var preserved = new JObject
+            {
+                ["CurrentResults"] = new JObject
+                {
+                    ["SolverSettings"] = new JObject(),
+                    ["Results"] = new JArray(new JObject
+                    {
+                        ["PalReference"] = new JObject { ["LevelRequirements"] = new JObject { ["InitialLevel"] = 5, ["FinalLevel"] = 20 } }
+                    })
+                }
+            };
+            File.WriteAllText(preservedPath, preserved.ToString());
+
+            StorageMigrationRunner.EnsureCurrent(path);
+            Assert.IsNotNull(AppSettingsJsonSerializer.FromCurrentJson(File.ReadAllText(Path.Combine(path, "settings.json"))));
+            var migratedSettings = JObject.Parse(File.ReadAllText(Path.Combine(path, "settings.json")));
+            Assert.HasCount(0, migratedSettings.SelectTokens("$..TrainPals").ToArray());
+            var migratedTarget = JObject.Parse(File.ReadAllText(targetPath));
+            Assert.IsNotNull(TargetJsonSerializer.FromCurrentTargetJson(migratedTarget.ToString()));
+            Assert.HasCount(0, migratedTarget.SelectTokens("$..TrainPals").ToArray());
+            Assert.IsNull(migratedTarget["LevelRequirements"]);
+            var migrated = migratedTarget["CurrentResults"]!;
+            Assert.IsNull(migrated["LevelRequirements"]);
+            var dto = migrated.ToObject<BreedingResultListDto>()!;
+            var migratedReferences = ((JObject)migrated["Results"]![0]!["PalReference"]!).DescendantsAndSelf()
+                .OfType<JObject>().Where(o => o["RefType"] != null).ToArray();
+            Assert.HasCount(6, migratedReferences);
+            Assert.HasCount(6, migratedTarget.SelectTokens("$..LevelRequirements").ToArray());
+            Assert.IsTrue(migratedReferences.All(o => o["LevelRequirements"]?.Type == JTokenType.Null));
+            Assert.IsNotNull(ResultJsonSerializer.FromDto(dto.Results[0].PalReference, db, new GameSettings(), new SerializableSolverSettings()));
+            Assert.IsTrue(JToken.DeepEquals(preserved, JObject.Parse(File.ReadAllText(preservedPath))));
+            Assert.IsTrue(File.Exists(targetPath + ".bak"));
+            Assert.AreEqual(6, JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
+            var migratedText = File.ReadAllText(targetPath);
+            StorageMigrationRunner.EnsureCurrent(path);
+            Assert.AreEqual(migratedText, File.ReadAllText(targetPath));
+        });
     }
 
     private static void WithTemporaryDirectory(Action<string> action)

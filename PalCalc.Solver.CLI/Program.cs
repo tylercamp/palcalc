@@ -54,7 +54,8 @@ internal class Program
             allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
             skipSurgeryPassivesDuringSearch: false,
             useGenderReversers: false,
-            maxSpecialCakes: 1000000
+            maxSpecialCakes: 1000000,
+            trainPals: true
         );
         var solver = new BreedingSolver();
 
@@ -101,8 +102,8 @@ internal class Program
                 "Bog Blast".ToActive(db),
                 "Bubble Blast".ToActive(db),
                 "Aqua Gun".ToActive(db),
-                "Dark Ball".ToActive(db),
-                "Dragon Cannon".ToActive(db),
+                //"Dark Ball".ToActive(db),
+                //"Dragon Cannon".ToActive(db),
                 //"Flare Storm".ToActive(db),
             ],
             //IV_Attack = 90,

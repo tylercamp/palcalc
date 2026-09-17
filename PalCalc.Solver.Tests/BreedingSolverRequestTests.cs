@@ -132,7 +132,8 @@ public class BreedingSolverRequestTests
             allowedSurgeryPassives: surgeryPassives,
             skipSurgeryPassivesDuringSearch: false,
             useGenderReversers: false,
-            maxSpecialCakes: 0
+            maxSpecialCakes: 0,
+            trainPals: true
         );
 
         gameSettings.BreedingTime = TimeSpan.FromHours(1);

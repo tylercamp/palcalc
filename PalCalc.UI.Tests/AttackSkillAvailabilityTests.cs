@@ -91,7 +91,7 @@ public class AttackSkillAvailabilityTests
 
         controls.MaxWildPals = 1;
         controls.BannedWildPals = Db.Pals
-            .Where(pal => pal.WildActiveSkills(Db).Contains(route.Attack))
+            .Where(pal => pal.AttackLeveling(Db).Any(entry => entry.Attack == route.Attack))
             .ToList();
         var bannedEntry = EntryFor(
             AttackSkillSourceViewModel.CollectAttacks([], controls, Targeting(route.Target)),
@@ -123,6 +123,26 @@ public class AttackSkillAvailabilityTests
         MaxWildPals = 0,
         BannedWildPals = [],
     };
+
+    [TestMethod]
+    public void TrainingMakesFutureOwnedAndWildAttacksAvailable()
+    {
+        var pal = Db.Pals.First(p => p.AttackLeveling(Db).Any(e => e.Level > (p.MinWildLevel ?? 1) && e.Attack.CanInherit));
+        var future = pal.AttackLeveling(Db).First(e => e.Level > (pal.MinWildLevel ?? 1) && e.Attack.CanInherit);
+        var owned = new PalInstance { Pal = pal, Level = 1, Gender = PalGender.MALE, ActiveSkills = [] };
+        var controls = MakeControls(10);
+        var target = Targeting(pal);
+        Assert.IsTrue(EntryFor(AttackSkillSourceViewModel.CollectAttacks([owned], controls, target), future.Attack).IsAvailable);
+        Assert.IsTrue(controls.ConfiguredSolverSettings(new GameSettings(), [owned]).TrainPals);
+
+        controls.MaxWildPals = 1;
+        controls.BannedWildPals = Db.Pals.Where(p => p != pal).ToList();
+        var differentTarget = BreedingDb.MinBreedingSteps[pal].First(p => p.Key != pal && p.Value <= 10).Key;
+        target = Targeting(differentTarget);
+        Assert.IsTrue(EntryFor(AttackSkillSourceViewModel.CollectAttacks([], controls, target), future.Attack).IsAvailable);
+        var baseline = pal.WildActiveSkills(Db).First(a => a.CanInherit);
+        Assert.IsTrue(EntryFor(AttackSkillSourceViewModel.CollectAttacks([], controls, target), baseline).IsAvailable);
+    }
 
     private static PalSpecifierViewModel Targeting(Pal pal) => new(
         "test-target",

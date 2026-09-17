@@ -153,6 +153,7 @@ namespace PalCalc.UI.Persistence.Serialization
             OwnedPalReference owned => new()
             {
                 RefType = "OWNED_PAL",
+                LevelRequirements = owned.LevelRequirements,
                 Instance = CustomizationsJsonSerializer.ToDto(owned.UnderlyingInstance),
                 ActualGender = owned.Gender,
                 IVs = ToDto(owned.IVs),
@@ -161,6 +162,7 @@ namespace PalCalc.UI.Persistence.Serialization
             WildPalReference wild => new()
             {
                 RefType = "WILD_PAL",
+                LevelRequirements = wild.LevelRequirements,
                 PalInternalName = wild.Pal.InternalName,
                 GuaranteedPassiveInternalNames = wild.EffectivePassives.Where(passive => passive is not RandomPassiveSkill).Select(passive => passive.InternalName).ToList(),
                 RandomPassiveCount = wild.EffectivePassives.Count(passive => passive is RandomPassiveSkill),
@@ -221,7 +223,7 @@ namespace PalCalc.UI.Persistence.Serialization
             var effectivePassives = value.EffectivePassiveInternalNames
                 .Select(name => name.InternalToStandardPassive(db))
                 .ToList();
-            var result = new OwnedPalReference(instance, effectivePassives, FromDto(value.IVs), AttackProfile.Inactive);
+            var result = new OwnedPalReference(instance, effectivePassives, FromDto(value.IVs), AttackProfile.Inactive, value.LevelRequirements);
             return value.ActualGender.Value == instance.Gender
                 ? result
                 : (OwnedPalReference)result.WithGuaranteedGender(db, value.ActualGender.Value, solverSettings.UseGenderReversers);
@@ -234,7 +236,8 @@ namespace PalCalc.UI.Persistence.Serialization
                 value.GuaranteedPassiveInternalNames.Select(name => name.InternalToStandardPassive(db)),
                 value.RandomPassiveCount.Value,
                 db.BreedingMechanics,
-                AttackProfile.Inactive
+                AttackProfile.Inactive,
+                value.LevelRequirements
             );
             return result.WithGuaranteedGender(db, value.Gender.Value, solverSettings.UseGenderReversers);
         }

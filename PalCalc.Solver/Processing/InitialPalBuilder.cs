@@ -158,7 +158,8 @@ internal sealed class InitialPalBuilder(
                                         wildAttacks.Any(attack => !attack.CanInherit),
                                         new AttackProfileEntry(attackTargets.MaskOf(wildAttacks), 0)
                                     )
-                                    : AttackProfile.Inactive
+                                    : AttackProfile.Inactive,
+                                levelRequirements: null
                             )
                         );
                 })
@@ -170,7 +171,7 @@ internal sealed class InitialPalBuilder(
     private IEnumerable<IPalReference> TrainingVariants(IPalReference reference)
     {
         yield return reference;
-        if (!attackTargets.IsActive)
+        if (!attackTargets.IsActive || !settings.TrainPals)
             yield break;
 
         var initialLevel = reference is OwnedPalReference owned
