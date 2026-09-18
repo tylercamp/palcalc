@@ -44,6 +44,10 @@ namespace PalCalc.SaveReader.FArchive.Custom
 
         protected override IProperty Decode(FArchiveReader subReader, string path, IEnumerable<IVisitor> visitors)
         {
+            var pathVisitors = visitors.Where(v => v.Matches(path)).ToArray();
+            // The containing byte array has already been consumed, so uninterested
+            // callers don't need to decode its custom contents.
+            if (!subReader.PreserveValues && pathVisitors.Length == 0) return null;
             logger.Verbose("decoding");
 
             var meta = new MapModelDataPropertyMeta()
@@ -74,7 +78,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
             result.StageInstanceIdBelongToValid = subReader.ReadUInt32() > 0;
             result.CreatedAt = subReader.ReadInt64();
 
-            foreach (var v in visitors.Where(v => v.Matches(path)))
+            foreach (var v in pathVisitors)
                 v.VisitMapModelProperty(path, result);
 
             logger.Verbose("done");

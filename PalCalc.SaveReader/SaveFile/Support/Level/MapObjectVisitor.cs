@@ -103,19 +103,70 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
         }
     }
 
+    // Collect until the ID is known, then suppress irrelevant entry callbacks.
+    // This also works when model/container fields precede MapObjectId.
+    class MapObjectEntryVisitor : MapContainerCollectingVisitor
+    {
+        private const string EntryPath = ".worldSaveData.MapObjectSaveData.MapObjectSaveData";
+        private const string ObjectIdPath = EntryPath + ".MapObjectId";
+        private readonly string[] objectIds;
+        private bool rejected;
+
+        public GvasMapObject Result { get; } = new() { WorldLocation = new VectorLiteral() };
+
+        public MapObjectEntryVisitor(string[] objectIds)
+        {
+            this.objectIds = objectIds;
+            OnExit += id => Result.PalContainerId = id;
+        }
+
+        public override bool Matches(string path) =>
+            (!rejected && path.StartsWith(EntryPath, StringComparison.OrdinalIgnoreCase))
+            || string.Equals(path, ObjectIdPath, StringComparison.OrdinalIgnoreCase);
+
+        public override void VisitString(string path, string value)
+        {
+            if (string.Equals(path, ObjectIdPath, StringComparison.OrdinalIgnoreCase))
+            {
+                Result.ObjectId = value;
+                rejected = objectIds.Length > 0 && !objectIds.Contains(value);
+            }
+            else base.VisitString(path, value);
+        }
+
+        public override void VisitVector(string path, VectorLiteral value)
+        {
+            if (string.Equals(path, EntryPath + ".WorldLocation", StringComparison.OrdinalIgnoreCase))
+                Result.WorldLocation = value;
+        }
+
+        public override void VisitGuid(string path, Guid value)
+        {
+            if (string.Equals(path, EntryPath + ".MapObjectInstanceId", StringComparison.OrdinalIgnoreCase))
+                Result.InstanceId = value;
+            else if (string.Equals(path, EntryPath + ".MapObjectConcreteModelInstanceId", StringComparison.OrdinalIgnoreCase))
+                Result.ConcreteModelInstanceId = value;
+        }
+
+        public override void VisitMapModelProperty(string path, MapModelDataProperty prop)
+        {
+            if (path != EntryPath + ".Model.RawData") return;
+            Result.OwnerBaseId = prop.BaseCampIdBelongTo;
+            Result.OwnerGroupId = prop.GroupIdBelongTo;
+            Result.BuilderPlayerId = prop.BuildPlayerUid;
+            Result.CurrentHP = prop.CurrentHp;
+            Result.MaxHP = prop.MaxHp;
+        }
+    }
+
     public class MapObjectVisitor : IVisitor
     {
         private static ILogger logger = Log.ForContext<MapObjectVisitor>();
 
         public List<GvasMapObject> Result { get; } = new List<GvasMapObject>();
 
-        GvasMapObject pendingEntry;
+        MapObjectEntryVisitor pendingEntry;
         string[] objectIds;
-
-        private const string K_MAP_OBJECT_ID = ".MapObjectSaveData.MapObjectId";
-        private const string K_WORLD_LOCATION = ".MapObjectSaveData.WorldLocation";
-        private const string K_MAP_OBJECT_INSTANCE_ID = ".MapObjectSaveData.MapObjectInstanceId";
-        private const string K_MAP_OBJECT_CONCRETE_INSTANCE_ID = ".MapObjectSaveData.MapObjectConcreteModelInstanceId";
 
         public MapObjectVisitor(params string[] collectedObjectIds) : base(".worldSaveData.MapObjectSaveData")
         {
@@ -132,29 +183,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                 logger.Warning("Starting new map object entry but the previous entry wasn't finished");
             }
 
-            pendingEntry = new GvasMapObject();
-
-            yield return new ValueCollectingVisitor(this, isCaseSensitive: false, K_MAP_OBJECT_ID, K_WORLD_LOCATION, K_MAP_OBJECT_INSTANCE_ID, K_MAP_OBJECT_CONCRETE_INSTANCE_ID)
-                .WithOnExit(values =>
-                {
-                    pendingEntry.ObjectId = values.GetValueOrDefault(K_MAP_OBJECT_ID) as string;
-                    pendingEntry.WorldLocation = (VectorLiteral)values.GetValueOrElse(K_WORLD_LOCATION, new VectorLiteral());
-                    pendingEntry.InstanceId = (Guid)values.GetValueOrElse(K_MAP_OBJECT_INSTANCE_ID, Guid.Empty);
-                    pendingEntry.ConcreteModelInstanceId = (Guid)values.GetValueOrElse(K_MAP_OBJECT_CONCRETE_INSTANCE_ID, Guid.Empty);
-                });
-
-            yield return new PropertyEmittingVisitor<MapModelDataProperty>(this, isCaseSensitive: true, ".MapObjectSaveData.Model.RawData")
-                .WithOnValue((path, prop) =>
-                {
-                    pendingEntry.OwnerBaseId = prop.BaseCampIdBelongTo;
-                    pendingEntry.OwnerGroupId = prop.GroupIdBelongTo;
-                    pendingEntry.BuilderPlayerId = prop.BuildPlayerUid;
-                    pendingEntry.CurrentHP = prop.CurrentHp;
-                    pendingEntry.MaxHP = prop.MaxHp;
-                });
-              
-            yield return new MapContainerCollectingVisitor()
-                .WithOnExit(containerId => pendingEntry.PalContainerId = containerId);
+            pendingEntry = new MapObjectEntryVisitor(objectIds);
+            yield return pendingEntry;
         }
 
         public override void VisitArrayEntryEnd(string path, int index, ArrayPropertyMeta meta)
@@ -168,8 +198,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                 return;
             }
 
-            if (objectIds.Length == 0 || objectIds.Contains(pendingEntry.ObjectId))
-                Result.Add(pendingEntry);
+            if (objectIds.Length == 0 || objectIds.Contains(pendingEntry.Result.ObjectId))
+                Result.Add(pendingEntry.Result);
 
             pendingEntry = null;
         }

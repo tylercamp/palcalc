@@ -20,6 +20,7 @@ namespace PalCalc.SaveReader.FArchive
         Dictionary<string, string> typeHints;
         readonly FrozenDictionary<string, ICustomReader> customReaders;
         bool archivePreserve;
+        internal bool PreserveValues => archivePreserve;
 
         // Keep scopes flat, and don't allocate matching/child lists for empty scopes.
         private static IReadOnlyList<IVisitor> MatchingVisitors(IEnumerable<IVisitor> visitors, string path)
