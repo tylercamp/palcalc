@@ -1,6 +1,7 @@
 using PalCalc.SaveReader.FArchive.Custom;
 using Serilog;
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -17,6 +18,7 @@ namespace PalCalc.SaveReader.FArchive
 
         BinaryReader reader;
         Dictionary<string, string> typeHints;
+        readonly FrozenDictionary<string, ICustomReader> customReaders;
         bool archivePreserve;
 
         // Keep scopes flat, and don't allocate matching/child lists for empty scopes.
@@ -55,10 +57,17 @@ namespace PalCalc.SaveReader.FArchive
         }
 
         public FArchiveReader(Stream stream, Dictionary<string, string> typeHints, bool archivePreserve = false)
+            : this(stream, typeHints, archivePreserve, ICustomReader.All.ToFrozenDictionary(r => r.MatchedPath, StringComparer.Ordinal))
+        {
+        }
+
+        private FArchiveReader(Stream stream, Dictionary<string, string> typeHints, bool archivePreserve, FrozenDictionary<string, ICustomReader> customReaders)
         {
             reader = new BinaryReader(stream);
             this.typeHints = typeHints;
             this.archivePreserve = archivePreserve;
+            // Snapshot once per parse; custom byte-array subreaders reuse the same lookup.
+            this.customReaders = customReaders;
         }
 
         // should generally try to avoid preserving parsed data (outside of debugging), but in some cases
@@ -150,7 +159,7 @@ namespace PalCalc.SaveReader.FArchive
 
         public FArchiveReader Derived(Stream data)
         {
-            return new FArchiveReader(data, typeHints, archivePreserve);
+            return new FArchiveReader(data, typeHints, archivePreserve, customReaders);
         }
 
         public Dictionary<string, object> ReadPropertiesUntilEnd(string path, IEnumerable<IVisitor> visitors)
@@ -254,8 +263,7 @@ namespace PalCalc.SaveReader.FArchive
                     }
 
                 default:
-                    var customReader = ICustomReader.All.SingleOrDefault(r => r.MatchedPath == path);
-                    if (customReader != null)
+                    if (customReaders.TryGetValue(path, out var customReader))
                         return customReader.Decode(this, structType, 0, path, visitors);
                     else
                         // treat as property list?
@@ -325,8 +333,7 @@ namespace PalCalc.SaveReader.FArchive
 
         public IProperty ReadProperty(string typeName, ulong size, string path, string nestedCallerPath, IEnumerable<IVisitor> visitors)
         {
-            var customReader = ICustomReader.All.SingleOrDefault(r => r.MatchedPath == path);
-            if (customReader != null && (path != nestedCallerPath || nestedCallerPath == ""))
+            if ((path != nestedCallerPath || nestedCallerPath == "") && customReaders.TryGetValue(path, out var customReader))
                 return customReader.Decode(this, typeName, size, path, visitors);
 
             var pathVisitors = MatchingVisitors(visitors, path);
