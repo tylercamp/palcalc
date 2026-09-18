@@ -152,9 +152,12 @@ namespace PalCalc.SaveReader
 
                         fs.CopyTo(combinedStream);
                     }
+                    break;
                 }
-                catch (Exception e) when (i != MaxRetryAttempts)
+                catch (Exception e)
                 {
+                    combinedStream.Dispose();
+                    if (i == MaxRetryAttempts) throw;
                     logger.Warning(e, "Error while reading {File}, retrying", lastFile);
                 }
             }
