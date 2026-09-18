@@ -13,6 +13,35 @@ Logging.InitCommonFull();
 
 var db = PalDB.LoadEmbedded();
 
+
+
+
+void ReadAll(bool full)
+{
+    foreach (var sl in DirectSavesLocation.AllLocal)
+    {
+        foreach (var save in sl.ValidSaveGames)
+        {
+            if (full) save.Level.ReadRawCharacterData();
+            else save.Level.ParseGvas();
+        }
+    }
+}
+
+var sw2 = Stopwatch.StartNew();
+ReadAll(false);
+Console.WriteLine($"Slim read took {sw2.ElapsedMilliseconds}");
+
+sw2.Restart();
+ReadAll(true);
+Console.WriteLine($"Full read took {sw2.ElapsedMilliseconds}");
+
+
+Environment.Exit(0);
+
+
+
+
 //var locs = XboxSavesLocation.FindAll();
 
 //CompressedSAV.WithDecompressedSave(@"C:\Users\algor\AppData\Local\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData\wgs\0009000009374154_0000000000000000000000006B210A9C\9E4FC968024C4FF8989588B179E6E82F\DF1AB54D4A0B442C99F0D3790F50811A", s =>

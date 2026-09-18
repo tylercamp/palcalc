@@ -19,6 +19,34 @@ namespace PalCalc.SaveReader.FArchive
         Dictionary<string, string> typeHints;
         bool archivePreserve;
 
+        // Keep scopes flat, and don't allocate matching/child lists for empty scopes.
+        private static IReadOnlyList<IVisitor> MatchingVisitors(IEnumerable<IVisitor> visitors, string path)
+        {
+            if (visitors is IReadOnlyCollection<IVisitor> { Count: 0 }) return Array.Empty<IVisitor>();
+            List<IVisitor> matches = null;
+            foreach (var visitor in visitors)
+                if (visitor.Matches(path))
+                    (matches ??= new List<IVisitor>()).Add(visitor);
+            return matches is null ? Array.Empty<IVisitor>() : matches;
+        }
+
+        private static IReadOnlyList<IVisitor> ChildVisitors(IReadOnlyList<IVisitor> visitors, Func<IVisitor, IEnumerable<IVisitor>> begin)
+        {
+            List<IVisitor> children = null;
+            foreach (var visitor in visitors)
+                foreach (var child in begin(visitor))
+                    (children ??= new List<IVisitor>()).Add(child);
+            return children is null ? Array.Empty<IVisitor>() : children;
+        }
+
+        private static IEnumerable<IVisitor> AppendVisitors(IEnumerable<IVisitor> visitors, IReadOnlyList<IVisitor> children)
+        {
+            if (children.Count == 0) return visitors;
+            var result = new List<IVisitor>(visitors);
+            result.AddRange(children);
+            return result;
+        }
+
         private static bool ShouldExit(IEnumerable<IVisitor> visitors)
         {
             //if (!visitors.Any()) return false;
@@ -156,9 +184,9 @@ namespace PalCalc.SaveReader.FArchive
                 StructType = structType,
             };
 
-            var pathVisitors = visitors.Where(v => v.Matches(path)).ToList();
-            var extraVisitors = pathVisitors.SelectMany(v => v.VisitStructPropertyBegin(path, meta)).ToList();
-            var newVisitors = visitors.Concat(extraVisitors);
+            var pathVisitors = MatchingVisitors(visitors, path);
+            var extraVisitors = ChildVisitors(pathVisitors, v => v.VisitStructPropertyBegin(path, meta));
+            var newVisitors = AppendVisitors(visitors, extraVisitors);
 
             var value = ReadStructValue(structType, path, newVisitors);
 
@@ -186,42 +214,42 @@ namespace PalCalc.SaveReader.FArchive
                 case "DateTime":
                     {
                         var r = ReadUInt64();
-                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitDateTime(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitDateTime(path, r);
                         return r;
                     }
 
                 case "Vector":
                     {
                         var r = ReadVector();
-                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitVector(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitVector(path, r);
                         return r;
                     }
 
                 case "Quat":
                     {
                         var r = ReadQuaternion();
-                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitQuaternion(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitQuaternion(path, r);
                         return r;
                     }
 
                 case "LinearColor":
                     {
                         var r = ReadLinearColor();
-                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitLinearColor(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitLinearColor(path, r);
                         return r;
                     }
 
                 case "Color":
                     {
                         var r = new ColorLiteral() { b = ReadByte(), g = ReadByte(), r = ReadByte(), a = ReadByte() };
-                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitColor(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitColor(path, r);
                         return r;
                     }
 
                 case "Guid":
                     {
                         var r = ReadGuid();
-                        foreach (var v in visitors.Where(v => v.Matches(path))) v.VisitGuid(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitGuid(path, r);
                         return r;
                     }
 
@@ -237,7 +265,6 @@ namespace PalCalc.SaveReader.FArchive
 
         object ReadPropValue(string typeName, string structTypeName, string path, IEnumerable<IVisitor> visitors)
         {
-            var pathVisitors = visitors.Where(v => v.Matches(path));
             switch (typeName)
             {
                 case "StructProperty": return ReadStructValue(structTypeName, path, visitors);
@@ -246,49 +273,49 @@ namespace PalCalc.SaveReader.FArchive
                 case "EnumProperty":
                     {
                         var r = ReadString();
-                        foreach (var v in pathVisitors) v.VisitString(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitString(path, r);
                         return r;
                     }
 
                 case "IntProperty":
                     {
                         var r = ReadInt32();
-                        foreach (var v in pathVisitors) v.VisitInt(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitInt(path, r);
                         return r;
                     }
 
                 case "BoolProperty":
                     {
                         var r = ReadBool();
-                        foreach (var v in pathVisitors) v.VisitBool(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitBool(path, r);
                         return r;
                     }
 
                 case "FloatProperty":
                     {
                         var r = ReadFloat();
-                        foreach (var v in pathVisitors) v.VisitFloat(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitFloat(path, r);
                         return r;
                     }
 
                 case "UInt16Property":
                     {
                         var r = ReadUInt16();
-                        foreach (var v in pathVisitors) v.VisitUInt16(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitUInt16(path, r);
                         return r;
                     }
 
                 case "UInt32Property":
                     {
                         var r = ReadUInt32();
-                        foreach (var v in pathVisitors) v.VisitUInt32(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitUInt32(path, r);
                         return r;
                     }
 
                 case "Int64Property":
                     {
                         var r = ReadInt64();
-                        foreach (var v in pathVisitors) v.VisitInt64(path, r);
+                        foreach (var v in visitors) if (v.Matches(path)) v.VisitInt64(path, r);
                         return r;
                     }
 
@@ -302,7 +329,7 @@ namespace PalCalc.SaveReader.FArchive
             if (customReader != null && (path != nestedCallerPath || nestedCallerPath == ""))
                 return customReader.Decode(this, typeName, size, path, visitors);
 
-            var pathVisitors = visitors.Where(v => v.Matches(path)).ToList();
+            var pathVisitors = MatchingVisitors(visitors, path);
 
             switch (typeName)
             {
@@ -420,14 +447,14 @@ namespace PalCalc.SaveReader.FArchive
                 case "EnumProperty":
                     {
                         var meta = new EnumPropertyMeta { Path = path, EnumType = ReadString(), Id = ReadOptionalGuid() };
-                        var extraVisitors = pathVisitors.SelectMany(v => v.VisitEnumPropertyBegin(path, meta)).ToList();
-                        var newVisitors = visitors.Concat(extraVisitors);
+                        var extraVisitors = ChildVisitors(pathVisitors, v => v.VisitEnumPropertyBegin(path, meta));
+                        var newVisitors = AppendVisitors(visitors, extraVisitors);
 
                         var enumValue = ReadString();
 
-                        foreach (var v in newVisitors.Where(v => v.Matches(path)))
+                        foreach (var v in newVisitors)
                         {
-                            v.VisitString(path, enumValue);
+                            if (v.Matches(path)) v.VisitString(path, enumValue);
                         }
 
                         foreach (var v in pathVisitors)
@@ -481,7 +508,7 @@ namespace PalCalc.SaveReader.FArchive
                         var arrayType = ReadString();
                         var id = ReadOptionalGuid();
 
-                        var count = ReadUInt32();
+                        var count = checked((int)ReadUInt32());
                         if (arrayType == "StructProperty")
                         {
                             var propertyName = ReadString();
@@ -505,21 +532,23 @@ namespace PalCalc.SaveReader.FArchive
                                 ContentId = valueId,
                             };
 
-                            var extraVisitors = pathVisitors.SelectMany(v => v.VisitArrayPropertyBegin(path, meta)).ToArray();
-                            var newVisitors = visitors.Concat(extraVisitors);
+                            var extraVisitors = ChildVisitors(pathVisitors, v => v.VisitArrayPropertyBegin(path, meta));
+                            var newVisitors = AppendVisitors(visitors, extraVisitors);
 
-                            var values = Enumerable.Range(0, (int)count).Select(i =>
+                            var entryPath = $"{path}.{propertyName}";
+                            var values = archivePreserve ? new List<object>() : null;
+                            for (int i = 0; i < count; i++)
                             {
-                                var extraEntryVisitors = newVisitors.Where(v => v.Matches(path)).SelectMany(v => v.VisitArrayEntryBegin(path, i, meta)).ToList();
-                                var newEntryVisitors = newVisitors.Concat(extraEntryVisitors);
+                                var extraEntryVisitors = ChildVisitors(MatchingVisitors(newVisitors, path), v => v.VisitArrayEntryBegin(path, i, meta));
+                                var newEntryVisitors = AppendVisitors(newVisitors, extraEntryVisitors);
 
-                                var r = ReadStructValue(arrayTypeName, $"{path}.{propertyName}", newEntryVisitors);
+                                var r = ReadStructValue(arrayTypeName, entryPath, newEntryVisitors);
 
                                 foreach (var v in extraEntryVisitors) v.Exit();
-                                foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitArrayEntryEnd(path, i, meta);
+                                foreach (var v in newVisitors) if (v.Matches(path)) v.VisitArrayEntryEnd(path, i, meta);
 
-                                return r;
-                            }).ToArray();
+                                values?.Add(r);
+                            }
 
                             foreach (var v in extraVisitors) v.Exit();
                             foreach (var v in pathVisitors) v.VisitArrayPropertyEnd(path, meta);
@@ -529,7 +558,7 @@ namespace PalCalc.SaveReader.FArchive
                                 return new ArrayProperty
                                 {
                                     TypedMeta = meta,
-                                    Value = values
+                                    Value = values.ToArray()
                                 };
                             }
                             else
@@ -541,8 +570,8 @@ namespace PalCalc.SaveReader.FArchive
                         {
                             var meta = new ArrayPropertyMeta { Path = path, ArrayType = arrayType, Id = id };
 
-                            var extraVisitors = pathVisitors.SelectMany(v => v.VisitArrayPropertyBegin(path, meta));
-                            var newVisitors = pathVisitors.Concat(extraVisitors); // no new path subparts
+                            var extraVisitors = ChildVisitors(pathVisitors, v => v.VisitArrayPropertyBegin(path, meta));
+                            var newVisitors = AppendVisitors(pathVisitors, extraVisitors); // no new path subparts
 
                             object content;
                             var iteration = Enumerable.Range(0, (int)count);
@@ -579,7 +608,7 @@ namespace PalCalc.SaveReader.FArchive
                                     break;
 
                                 case "ByteProperty":
-                                    if (count != size - 4) throw new Exception("Labelled ByteProperty not implemented"); // sic
+                                    if ((ulong)count != size - 4) throw new Exception("Labelled ByteProperty not implemented"); // sic
 
                                     content = ReadBytes((int)count);
                                     foreach (var v in newVisitors)
@@ -631,21 +660,21 @@ namespace PalCalc.SaveReader.FArchive
                             ValueStructType = valueStructType,
                         };
 
-                        var extraVisitors = pathVisitors.SelectMany(v => v.VisitMapPropertyBegin(path, meta)).ToList();
-                        var newVisitors = visitors.Concat(extraVisitors);
+                        var extraVisitors = ChildVisitors(pathVisitors, v => v.VisitMapPropertyBegin(path, meta));
+                        var newVisitors = AppendVisitors(visitors, extraVisitors);
 
                         var values = archivePreserve ? new Dictionary<object, object>() : null;
 
                         for (int i = 0; i < count && !ShouldExit(newVisitors); i++)
                         {
-                            var extraEntryVisitors = newVisitors.Where(v => v.Matches(path)).SelectMany(v => v.VisitMapEntryBegin(path, i, meta)).ToList();
-                            var newEntryVisitors = newVisitors.Concat(extraEntryVisitors);
+                            var extraEntryVisitors = ChildVisitors(MatchingVisitors(newVisitors, path), v => v.VisitMapEntryBegin(path, i, meta));
+                            var newEntryVisitors = AppendVisitors(newVisitors, extraEntryVisitors);
 
                             var key = ReadPropValue(keyType, keyStructType, keyPath, newEntryVisitors);
                             var value = ReadPropValue(valueType, valueStructType, valuePath, newEntryVisitors);
 
                             foreach (var v in extraEntryVisitors) v.Exit();
-                            foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitMapEntryEnd(path, i, meta);
+                            foreach (var v in newVisitors) if (v.Matches(path)) v.VisitMapEntryEnd(path, i, meta);
 
                             if (values != null)
                             {
@@ -678,11 +707,12 @@ namespace PalCalc.SaveReader.FArchive
                         var id = ReadOptionalGuid();
 
                         ReadUInt32(); // ?
-                        var count = ReadUInt32();
+                        var count = checked((int)ReadUInt32());
 
                         if (setType == "StructProperty")
                         {
-                            var structType = GetTypeOr($"{path}.StructProperty", "StructProperty");
+                            var entryPath = $"{path}.StructProperty";
+                            var structType = GetTypeOr(entryPath, "StructProperty");
                             var meta = new SetPropertyMeta
                             {
                                 Path = path,
@@ -691,23 +721,24 @@ namespace PalCalc.SaveReader.FArchive
                                 StructType = structType,
                             };
 
-                            var extraVisitors = pathVisitors.SelectMany(v => v.VisitSetPropertyBegin(path, meta)).ToArray();
-                            var newVisitors = visitors.Concat(extraVisitors);
+                            var extraVisitors = ChildVisitors(pathVisitors, v => v.VisitSetPropertyBegin(path, meta));
+                            var newVisitors = AppendVisitors(visitors, extraVisitors);
 
-                            var values = Enumerable.Range(0, (int)count).Select(i =>
+                            var values = archivePreserve ? new List<object>() : null;
+                            for (int i = 0; i < count; i++)
                             {
-                                var extraEntryVisitors = newVisitors.Where(v => v.Matches(path)).SelectMany(v => v.VisitSetEntryBegin(path, i, meta)).ToList();
-                                var newEntryVisitors = newVisitors.Concat(extraEntryVisitors);
+                                var extraEntryVisitors = ChildVisitors(MatchingVisitors(newVisitors, path), v => v.VisitSetEntryBegin(path, i, meta));
+                                var newEntryVisitors = AppendVisitors(newVisitors, extraEntryVisitors);
 
                                 // note: typically `StructProperty` wouldn't be passed as the `structType`, but it's all we've got
                                 // note: no sub-path to append here
-                                var r = ReadStructValue(structType, $"{path}.StructProperty", newEntryVisitors);
+                                var r = ReadStructValue(structType, entryPath, newEntryVisitors);
 
                                 foreach (var v in extraEntryVisitors) v.Exit();
-                                foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitSetEntryEnd(path, i, meta);
+                                foreach (var v in newVisitors) if (v.Matches(path)) v.VisitSetEntryEnd(path, i, meta);
 
-                                return r;
-                            }).ToArray();
+                                values?.Add(r);
+                            }
 
                             foreach (var v in extraVisitors) v.Exit();
                             foreach (var v in pathVisitors) v.VisitSetPropertyEnd(path, meta);
@@ -717,7 +748,7 @@ namespace PalCalc.SaveReader.FArchive
                                 return new SetProperty
                                 {
                                     TypedMeta = meta,
-                                    Value = values
+                                    Value = values.ToArray()
                                 };
                             }
                             else
@@ -734,21 +765,22 @@ namespace PalCalc.SaveReader.FArchive
                                 SetType = setType,
                             };
 
-                            var extraVisitors = pathVisitors.SelectMany(v => v.VisitSetPropertyBegin(path, meta)).ToArray();
-                            var newVisitors = visitors.Concat(extraVisitors);
+                            var extraVisitors = ChildVisitors(pathVisitors, v => v.VisitSetPropertyBegin(path, meta));
+                            var newVisitors = AppendVisitors(visitors, extraVisitors);
 
-                            var values = Enumerable.Range(0, (int)count).Select(i =>
+                            var values = archivePreserve ? new List<Dictionary<string, object>>() : null;
+                            for (int i = 0; i < count; i++)
                             {
-                                var extraEntryVisitors = newVisitors.Where(v => v.Matches(path)).SelectMany(v => v.VisitSetEntryBegin(path, i, meta)).ToList();
-                                var newEntryVisitors = newVisitors.Concat(extraEntryVisitors);
+                                var extraEntryVisitors = ChildVisitors(MatchingVisitors(newVisitors, path), v => v.VisitSetEntryBegin(path, i, meta));
+                                var newEntryVisitors = AppendVisitors(newVisitors, extraEntryVisitors);
 
                                 var r = ReadPropertiesUntilEnd(path, newEntryVisitors);
 
                                 foreach (var v in extraEntryVisitors) v.Exit();
-                                foreach (var v in newVisitors.Where(v => v.Matches(path))) v.VisitSetEntryEnd(path, i, meta);
+                                foreach (var v in newVisitors) if (v.Matches(path)) v.VisitSetEntryEnd(path, i, meta);
 
-                                return r;
-                            }).ToArray();
+                                values?.Add(r);
+                            }
 
                             foreach (var v in extraVisitors) v.Exit();
                             foreach (var v in pathVisitors) v.VisitSetPropertyEnd(path, meta);
@@ -758,7 +790,7 @@ namespace PalCalc.SaveReader.FArchive
                                 return new SetProperty
                                 {
                                     TypedMeta = meta,
-                                    Value = values
+                                    Value = values.ToArray()
                                 };
                             }
                             else
