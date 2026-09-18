@@ -6,6 +6,7 @@ using Serilog.Exceptions;
 using Serilog.Templates;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,11 +30,19 @@ namespace PalCalc.Model
 
     public static class LoggingExtensions
     {
-        public static LoggerConfiguration PalCommon(this LoggerConfiguration config) =>
-            config
-                .WriteTo.Async(a => a.Debug(Logging.MessageFormat, LogEventLevel.Debug))
+        public static LoggerConfiguration PalCommon(this LoggerConfiguration config)
+        {
+            if (Debugger.IsAttached)
+            {
+                config.WriteTo.Async(a => a.Debug(Logging.MessageFormat, LogEventLevel.Debug));
+            }
+            
+            config            
                 .WriteTo.Console(Logging.MessageFormat, LogEventLevel.Information)
-                .MinimumLevel.Verbose()
+                .MinimumLevel.Debug()
                 .Enrich.WithExceptionDetails();
+
+            return config;
+        }
     }
 }
