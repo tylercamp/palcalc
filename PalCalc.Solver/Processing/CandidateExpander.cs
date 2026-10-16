@@ -395,7 +395,7 @@ namespace PalCalc.Solver.Processing
                         // option represents the likelyhood of getting all desired passives + up to some number of irrelevant passives
                         var probabilityForUpToNumPassives = 0.0f;
 
-                        // (special cakes can be used for attack solving; the cake has affects on passive probabilities too. track this
+                        // (special cakes can be used for attack solving; the cake has effects on passive probabilities too. track this
                         // separately for use later in AttackProfileComposer and AttackResultMaterializer)
                         var specialCakeProbabilityForUpToNumPassives = 0.0f;
                         var calculateSpecialCakeProbability =

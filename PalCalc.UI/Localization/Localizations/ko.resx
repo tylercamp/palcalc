@@ -346,9 +346,6 @@
   <data name="LC_INSPECT_SAVE" xml:space="preserve">
     <value>검사</value>
   </data>
-  <data name="LC_ITL_LABEL" xml:space="preserve">
-    <value>한국어</value>
-  </data>
   <data name="LC_JOB_QUEUE_CLOSING_MSG" xml:space="preserve">
     <value>PalCalc를 닫으면 남은 모든 작업이 취소됩니다. 종료하시겠습니까?</value>
   </data>
@@ -357,9 +354,6 @@
   </data>
   <data name="LC_JOB_QUEUE_HEADER" xml:space="preserve">
     <value>작업 ({Count})</value>
-  </data>
-  <data name="LC_LANGUAGE" xml:space="preserve">
-    <value>언어</value>
   </data>
   <data name="LC_LANG_CHANGED_RESTART" xml:space="preserve">
     <value>새 언어가 완전히 적용되려면 PalCalc를 다시 시작해야 합니다.</value>
