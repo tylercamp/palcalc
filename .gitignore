@@ -2,6 +2,7 @@
 obj/
 bin/
 cache/
+/_REA-ANALYSIS/
 data/
 publish/
 Level.sav.json
