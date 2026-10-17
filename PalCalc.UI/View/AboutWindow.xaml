@@ -3,7 +3,7 @@
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                             xmlns:local="clr-namespace:PalCalc.UI.View"
+                             xmlns:v="clr-namespace:PalCalc.UI.View"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
                              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                              mc:Ignorable="d"
@@ -14,9 +14,9 @@
                              WindowStartupLocation="CenterOwner"
                              PlaceTitleBarOverContent="True"
                              IconVisibility="Collapsed"
-                             >
+                            >
     <Window.DataContext>
-        <local:AboutViewModel />
+        <v:AboutViewModel />
     </Window.DataContext>
     <StackPanel Orientation="Vertical" Margin="10,10,10,10">
         <StackPanel.Resources>
@@ -35,12 +35,12 @@
 
         <TextBlock Text="by Tyler Camp" />
         <TextBlock>
-            <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/" RequestNavigate="Hyperlink_RequestNavigate">https://github.com/tylercamp/palcalc/</Hyperlink>
+            <v:Weblink Uri="https://github.com/tylercamp/palcalc/">https://github.com/tylercamp/palcalc/</v:Weblink>
         </TextBlock>
         <TextBlock>
-            <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/issues" RequestNavigate="Hyperlink_RequestNavigate">Bug Reports</Hyperlink>
+            <v:Weblink Uri="https://github.com/tylercamp/palcalc/issues">Bug Reports</v:Weblink>
             |
-            <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/releases" RequestNavigate="Hyperlink_RequestNavigate">Releases</Hyperlink>
+            <v:Weblink Uri="https://github.com/tylercamp/palcalc/releases">Releases</v:Weblink>
         </TextBlock>
 
         <TextBlock FontStyle="Italic" FontSize="11">
@@ -51,51 +51,62 @@
         </TextBlock>
 
         <Separator />
-        
+
         <Label FontWeight="Bold" FontSize="12">References</Label>
         <TextBlock>
-            <Hyperlink NavigateUri="https://paldb.cc/en/Pals" RequestNavigate="Hyperlink_RequestNavigate">Pal icons from Paldb.cc</Hyperlink>
+            Latest
+            <v:Weblink Uri="https://github.com/tylercamp/palcalc/tree/main/PalCalc.GenDB">data</v:Weblink>
+            and
+            <v:Weblink Uri="https://github.com/tylercamp/palcalc/tree/main/PalCalc.UI/Resources">Pal icons</v:Weblink>
+            scraped using
+            <v:Weblink Uri="https://github.com/FabianFG/CUE4Parse">CUE4Parse</v:Weblink>
+            (<v:Weblink Uri="https://github.com/FabianFG/CUE4Parse/blob/master/LICENSE">Apache 2 License</v:Weblink>)
         </TextBlock>
         <TextBlock>
-            <Hyperlink NavigateUri="https://paldb.cc" RequestNavigate="Hyperlink_RequestNavigate">Latest data scraped from paldb.cc</Hyperlink>
+            Palworld
+            <v:Weblink Uri="https://github.com/tylercamp/palcalc/blob/main/docres/research/palworld-breeding/README.md">mechanics</v:Weblink>
+            were
+            <v:Weblink Uri="https://github.com/tylercamp/palcalc/blob/main/docres/research/palworld-breeding/REA-GUIDE.md">reverse-engineered</v:Weblink>
+            using
+            <v:Weblink Uri="https://github.com/morluto/rea">REA</v:Weblink>
+            (<v:Weblink Uri="https://github.com/morluto/rea/blob/main/LICENSE">MIT License</v:Weblink>)
         </TextBlock>
         <TextBlock>
-            <Hyperlink NavigateUri="https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/" RequestNavigate="Hyperlink_RequestNavigate">Passive skill breeding calc. reverse engineered by /u/mgxts</Hyperlink>
+            Palworld save support based on
+            <v:Weblink Uri="https://github.com/cheahjs/palworld-save-tools">palworld-save-tools</v:Weblink>
+            (<v:Weblink Uri="https://github.com/cheahjs/palworld-save-tools/blob/main/LICENSE">MIT License</v:Weblink>)
         </TextBlock>
         <TextBlock>
-            <Hyperlink NavigateUri="https://github.com/cheahjs/palworld-save-tools" RequestNavigate="Hyperlink_RequestNavigate">Palworld save support based on palworld-save-tools</Hyperlink>
-            (<Hyperlink NavigateUri="https://github.com/cheahjs/palworld-save-tools/blob/main/LICENSE" RequestNavigate="Hyperlink_RequestNavigate">MIT License</Hyperlink>)
-        </TextBlock>
-        <TextBlock>
-            <Hyperlink NavigateUri="https://github.com/Tom60chat/Xbox-Live-Save-Exporter" RequestNavigate="Hyperlink_RequestNavigate">Xbox save support based on Xbox-Live-Save-Exporter</Hyperlink>
+            Xbox save support based on
+            <v:Weblink Uri="https://github.com/Tom60chat/Xbox-Live-Save-Exporter">Xbox-Live-Save-Exporter</v:Weblink>
         </TextBlock>
 
         <Separator />
 
         <Label FontWeight="Bold" FontSize="12">Libraries</Label>
         <TextBlock>
-            <Hyperlink NavigateUri="https://github.com/benruehl/adonis-ui" RequestNavigate="Hyperlink_RequestNavigate">Adonis UI - Dark Theme by benruehl</Hyperlink>
-            (<Hyperlink NavigateUri="https://github.com/benruehl/adonis-ui/blob/master/LICENSE">MIT License</Hyperlink>)
+            <v:Weblink Uri="https://github.com/benruehl/adonis-ui">Adonis UI - Dark Theme by benruehl</v:Weblink>
+            (<v:Weblink Uri="https://github.com/benruehl/adonis-ui/blob/master/LICENSE">MIT License</v:Weblink>)
         </TextBlock>
         <TextBlock>
-            <Hyperlink NavigateUri="https://github.com/serilog/serilog" RequestNavigate="Hyperlink_RequestNavigate">Serilog</Hyperlink>
-            (<Hyperlink NavigateUri="https://github.com/serilog/serilog/blob/dev/LICENSE" RequestNavigate="Hyperlink_RequestNavigate">Apache 2 License</Hyperlink>)
+            <v:Weblink Uri="https://github.com/serilog/serilog">Serilog</v:Weblink>
+            (<v:Weblink Uri="https://github.com/serilog/serilog/blob/dev/LICENSE">Apache 2 License</v:Weblink>)
         </TextBlock>
         <TextBlock>
-            <Hyperlink NavigateUri="https://github.com/vain0x/DotNetKit.Wpf.AutoCompleteComboBox" RequestNavigate="Hyperlink_RequestNavigate">AutoCompleteComboBox by vain0x</Hyperlink>
-            (<Hyperlink NavigateUri="https://github.com/vain0x/DotNetKit.Wpf.AutoCompleteComboBox/blob/main/LICENSE.md" RequestNavigate="Hyperlink_RequestNavigate">MIT License</Hyperlink>)
+            <v:Weblink Uri="https://github.com/vain0x/DotNetKit.Wpf.AutoCompleteComboBox">AutoCompleteComboBox by vain0x</v:Weblink>
+            (<v:Weblink Uri="https://github.com/vain0x/DotNetKit.Wpf.AutoCompleteComboBox/blob/main/LICENSE.md">MIT License</v:Weblink>)
         </TextBlock>
         <TextBlock>
-            <Hyperlink NavigateUri="https://github.com/NinetailLabs/GraphSharp" RequestNavigate="Hyperlink_RequestNavigate">GraphSharp by Various Authors (Defunct, Modified)</Hyperlink>
-            (<Hyperlink NavigateUri="https://github.com/NinetailLabs/GraphSharp/blob/master/LICENSE" RequestNavigate="Hyperlink_RequestNavigate">Apache 2 License</Hyperlink>)
+            <v:Weblink Uri="https://github.com/NinetailLabs/GraphSharp">GraphSharp by Various Authors (Defunct, Modified)</v:Weblink>
+            (<v:Weblink Uri="https://github.com/NinetailLabs/GraphSharp/blob/master/LICENSE">Apache 2 License</v:Weblink>)
         </TextBlock>
         <TextBlock>
-            <Hyperlink NavigateUri="https://github.com/YaccConstructor/QuickGraph" RequestNavigate="Hyperlink_RequestNavigate">QuickGraph by YaccConstructor</Hyperlink>
-            (<Hyperlink NavigateUri="https://github.com/YaccConstructor/QuickGraph/blob/master/LICENSE.txt" RequestNavigate="Hyperlink_RequestNavigate">Ms-PL License</Hyperlink>)
-            (<Hyperlink NavigateUri="https://github.com/deepakkumar1984/QuickGraph.NETStandard" RequestNavigate="Hyperlink_RequestNavigate">.NET Standard Port</Hyperlink>)
+            <v:Weblink Uri="https://github.com/YaccConstructor/QuickGraph">QuickGraph by YaccConstructor</v:Weblink>
+            (<v:Weblink Uri="https://github.com/YaccConstructor/QuickGraph/blob/master/LICENSE.txt">Ms-PL License</v:Weblink>)
+            (<v:Weblink Uri="https://github.com/deepakkumar1984/QuickGraph.NETStandard">.NET Standard Port</v:Weblink>)
         </TextBlock>
         <TextBlock>
-            <Hyperlink NavigateUri="https://github.com/zao/ooz" RequestNavigate="Hyperlink_RequestNavigate">ooz/libooz by zao/rarten</Hyperlink>
+            <v:Weblink Uri="https://github.com/zao/ooz">ooz/libooz by zao/rarten</v:Weblink>
             (No license stated)
         </TextBlock>
 
@@ -127,11 +138,11 @@
             <StackPanel Grid.Row="0" Grid.Column="2">
                 <TextBlock>
                     在这251秒赌上我的一起
-                    <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/70" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
+                    <v:Weblink Uri="https://github.com/tylercamp/palcalc/pull/70">(1)</v:Weblink>
                 </TextBlock>
                 <TextBlock>
                     Narugakuruga
-                    <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/87" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
+                    <v:Weblink Uri="https://github.com/tylercamp/palcalc/pull/87">(1)</v:Weblink>
                 </TextBlock>
             </StackPanel>
 
@@ -142,7 +153,7 @@
             <StackPanel Grid.Row="2" Grid.Column="2">
                 <TextBlock>
                     moroa2017
-                    <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/158" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
+                    <v:Weblink Uri="https://github.com/tylercamp/palcalc/pull/158">(1)</v:Weblink>
                 </TextBlock>
             </StackPanel>
 
@@ -153,7 +164,7 @@
             <StackPanel Grid.Row="4" Grid.Column="2">
                 <TextBlock>
                     Elderly-Emre
-                    <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/180" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
+                    <v:Weblink Uri="https://github.com/tylercamp/palcalc/pull/180">(1)</v:Weblink>
                 </TextBlock>
             </StackPanel>
 
@@ -164,7 +175,7 @@
             <StackPanel Grid.Row="6" Grid.Column="2">
                 <TextBlock>
                     yknn-888
-                    <Hyperlink NavigateUri="https://github.com/tylercamp/palcalc/pull/240" RequestNavigate="Hyperlink_RequestNavigate">(1)</Hyperlink>
+                    <v:Weblink Uri="https://github.com/tylercamp/palcalc/pull/240">(1)</v:Weblink>
                 </TextBlock>
             </StackPanel>
         </Grid>
