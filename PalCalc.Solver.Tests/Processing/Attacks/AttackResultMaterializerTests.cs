@@ -50,6 +50,30 @@ public class AttackResultMaterializerTests
     }
 
     [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void Evaluate_UsesRealizedParentEffortWhenSearchUsesAnOptimisticCakeBound(bool parallelFarms)
+    {
+        var settings = Settings();
+        settings.GameSettings.MultipleBreedingFarms = parallelFarms;
+        var firstEntry = Entry(1);
+        var secondEntry = Entry(0);
+        var first = Bred(Leaf(1), Leaf(0), new AttackProfile(firstEntry), settings: settings,
+            passivesProbability: 0.25f, specialCakePassivesProbability: 1f);
+        var second = Bred(Leaf(0), Leaf(0), new AttackProfile(secondEntry), settings: settings,
+            passivesProbability: 0.5f, specialCakePassivesProbability: 1f);
+        var root = Bred(first, second, new AttackProfile(firstEntry), settings: settings);
+        var materializer = new AttackResultMaterializer(Context(), settings);
+
+        var evaluation = materializer.Evaluate(root, firstEntry);
+        var result = (BredPalReference)materializer.Materialize(root, firstEntry);
+
+        Assert.AreEqual(result.BreedingEffort, evaluation.BreedingEffort);
+        Assert.IsTrue(result.BreedingEffort > root.BreedingEffort);
+        Assert.AreEqual(0, evaluation.TotalSpecialCakes);
+    }
+
+    [DataTestMethod]
     [DataRow(false, false, 0.5f)]
     [DataRow(true, false, 1f)]
     [DataRow(false, true, 1f)]

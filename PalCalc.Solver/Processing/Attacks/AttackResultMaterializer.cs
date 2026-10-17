@@ -239,7 +239,9 @@ internal sealed class AttackResultMaterializer
         var parentEffort = BredPalReferenceEffort.CombineParentEffort(
             settings.GameSettings,
             bred.Parent1,
-            bred.Parent2
+            parent1.BreedingEffort,
+            bred.Parent2,
+            parent2.BreedingEffort
         );
         var selfEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
             settings.GameSettings,
