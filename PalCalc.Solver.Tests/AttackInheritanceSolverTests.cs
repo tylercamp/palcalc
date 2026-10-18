@@ -250,33 +250,37 @@ public class AttackInheritanceSolverTests
 
         SolverTestScenario.ConfiguredSolver Configure(int? maxSpecialCakes) => SolverTestScenario.Solver(
             [
-                WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE), attacks[0]),
+                WithAttacks(SolverTestScenario.Owned("Katress", PalGender.MALE, ivHp: 100), attacks[0]),
                 WithAttacks(SolverTestScenario.Owned("Wixen", PalGender.FEMALE), attacks[1]),
             ],
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
+            maxBredIrrelevantPassives: 4,
             maxSpecialCakes: maxSpecialCakes
         );
 
-        Assert.AreEqual(0, SolverTestScenario.Solve(Configure(0), child.Name, attacks).Count);
-        Assert.AreEqual(0, SolverTestScenario.Solve(Configure(0), child.Name, [attacks[0], attacks[0], attacks[1]]).Count);
-        Assert.AreEqual(0, SolverTestScenario.Solve(Configure(1), child.Name, attacks).Count);
+        Assert.AreEqual(0, SolverTestScenario.Solve(Configure(0), child.Name, attacks, ivHp: 90).Count);
+        Assert.AreEqual(0, SolverTestScenario.Solve(Configure(0), child.Name, [attacks[0], attacks[0], attacks[1]], ivHp: 90).Count);
+        Assert.AreEqual(0, SolverTestScenario.Solve(Configure(1), child.Name, attacks, ivHp: 90).Count);
 
-        var limited = SolverTestScenario.Solve(Configure(100), child.Name, attacks)
+        var limited = SolverTestScenario.Solve(Configure(100), child.Name, attacks, ivHp: 90)
             .OfType<BredPalReference>()
             .Single();
         var duplicateTargets = SolverTestScenario.Solve(
                 Configure(100),
                 child.Name,
-                [attacks[0], attacks[0], attacks[1]]
+                [attacks[0], attacks[0], attacks[1]], ivHp: 90
             )
             .OfType<BredPalReference>()
             .Single();
-        var unlimited = SolverTestScenario.Solve(Configure(null), child.Name, attacks)
+        var unlimited = SolverTestScenario.Solve(Configure(null), child.Name, attacks, ivHp: 90)
             .OfType<BredPalReference>()
             .Single();
 
         Assert.AreEqual(0b11, limited.AttackProfile.Entries.Single().LearnedTargetMask);
+        Assert.AreEqual(1f / 3f, limited.IVsProbability, 0.000001f);
+        Assert.AreEqual(4, limited.EffectivePassives.Count);
+        Assert.AreEqual(1f, limited.PassivesProbability);
         Assert.IsTrue(limited.MaterializedAttackInheritance.SpecialCakes > 1);
         Assert.AreEqual(AttackInheritanceMode.InheritAll, limited.MaterializedAttackInheritance.Mode);
         Assert.AreEqual(0b11, duplicateTargets.AttackProfile.Entries.Single().LearnedTargetMask);
@@ -284,13 +288,13 @@ public class AttackInheritanceSolverTests
     }
 
     [TestMethod]
-    public void Solve_CakeRejectsFinalPassiveCountsBelowTheCombinedParentPool()
+    public void Solve_CakeTargetsFourEvenWithAnUndersizedParentPool()
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var attacks = InheritableAttacksNotInnateTo(2, child);
         var passives = SolverTestScenario.DB.PassiveSkills.Take(4).ToArray();
 
-        SolverTestScenario.ConfiguredSolver Configure(bool includeIrrelevantPassives) =>
+        SolverTestScenario.ConfiguredSolver Configure(bool includeIrrelevantPassives, int maxIrrelevant = 1) =>
             SolverTestScenario.Solver(
                 [
                     WithAttacks(
@@ -312,7 +316,7 @@ public class AttackInheritanceSolverTests
                 ],
                 maxBreedingSteps: 1,
                 maxSolverIterations: 1,
-                maxBredIrrelevantPassives: 1,
+                maxBredIrrelevantPassives: maxIrrelevant,
                 maxSpecialCakes: 100
             );
 
@@ -323,7 +327,7 @@ public class AttackInheritanceSolverTests
             requiredPassives: passives[..2]
         );
         var clean = SolverTestScenario.Solve(
-                Configure(includeIrrelevantPassives: false),
+                Configure(includeIrrelevantPassives: false, maxIrrelevant: 2),
                 child.Name,
                 attacks,
                 requiredPassives: passives[..2]
@@ -334,8 +338,7 @@ public class AttackInheritanceSolverTests
         Assert.AreEqual(0, dirty.Count);
         Assert.AreEqual(AttackInheritanceMode.InheritAll, clean.MaterializedAttackInheritance.Mode);
         Assert.AreEqual(
-            SolverTestScenario.DB.BreedingMechanics.PassiveRandomAddedProbability[0] +
-                SolverTestScenario.DB.BreedingMechanics.PassiveRandomAddedProbability[1],
+            1f,
             clean.PassivesProbability,
             0.0001f
         );
@@ -356,6 +359,7 @@ public class AttackInheritanceSolverTests
                 ],
                 maxBreedingSteps: 1,
                 maxSolverIterations: 1,
+                maxBredIrrelevantPassives: 4,
                 maxSpecialCakes: 100
             );
 
@@ -382,6 +386,7 @@ public class AttackInheritanceSolverTests
             ],
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
+            maxBredIrrelevantPassives: 4,
             maxSpecialCakes: 100
         );
 

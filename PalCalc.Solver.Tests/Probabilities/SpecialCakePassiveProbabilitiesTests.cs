@@ -20,15 +20,16 @@ public class SpecialCakePassiveProbabilitiesTests
     }
 
     [TestMethod]
-    public void FixedFourInheritsAllAvailableBeforeRollingRandomPassives()
+    public void OverrideFourFillsTheShortfallWithoutAnOrdinaryRandomCountRoll()
     {
         var parentPassives = Passives(3);
         var desired = parentPassives.Take(2).ToList();
 
         Assert.AreEqual(
-            db.BreedingMechanics.PassiveRandomAddedProbability[0],
+            0,
             Probability(parentPassives, desired, finalCount: 3)
         );
+        Assert.AreEqual(1, Probability(parentPassives, desired, finalCount: 4));
     }
 
     [TestMethod]
@@ -41,9 +42,9 @@ public class SpecialCakePassiveProbabilitiesTests
     }
 
     [TestMethod]
-    public void FixedFourCannotFillAllSlotsFromRandomPassivesAlone()
+    public void OverrideFourCanFillAllSlotsFromRandomPassivesAlone()
     {
-        Assert.AreEqual(0, Probability([], [], finalCount: 4));
+        Assert.AreEqual(1, Probability([], [], finalCount: 4));
     }
 
     [TestMethod]
@@ -53,12 +54,12 @@ public class SpecialCakePassiveProbabilitiesTests
 
         Assert.AreEqual(
             0,
-            PassiveProbabilities.ProbabilityInheritedTargetPassivesForFixedInheritRoll(
+            PassiveProbabilities.ProbabilityInheritedTargetPassivesForOverride(
                 db.BreedingMechanics,
                 desired,
                 desired,
                 numFinalPassives: 2,
-                inheritedCountRoll: 1
+                overrideCount: 1
             )
         );
     }
@@ -67,14 +68,40 @@ public class SpecialCakePassiveProbabilitiesTests
         List<PassiveSkill> parentPassives,
         List<PassiveSkill> desired,
         int finalCount
-    ) => PassiveProbabilities.ProbabilityInheritedTargetPassivesForFixedInheritRoll(
+    ) => PassiveProbabilities.ProbabilityInheritedTargetPassivesForOverride(
         db.BreedingMechanics,
         parentPassives,
         desired,
         finalCount,
-        inheritedCountRoll: GameConstants.MaxTotalPassives
+        overrideCount: GameConstants.MaxTotalPassives
     );
 
     private List<PassiveSkill> Passives(int count) =>
         db.PassiveSkills.Take(count).ToList();
+
+    [DataTestMethod]
+    [DataRow(1, 1, 1f / 5)]
+    [DataRow(2, 2, 2f / 5)]
+    [DataRow(4, 4, 4f / 5)]
+    public void OverrideIgnoresRandomContributions(int count, int finalCount, float expected)
+    {
+        var parents = Passives(5);
+        Assert.AreEqual(
+            expected: expected,
+            actual: PassiveProbabilities.ProbabilityInheritedTargetPassivesForOverride(
+                db.BreedingMechanics, parents, parents.Take(1).ToList(), finalCount, count
+            ),
+            delta: 0.000001f
+        );
+    }
+
+    [TestMethod]
+    public void OverrideIgnoresOrdinaryWeightTablesAndRejectsNonpositiveOverrides()
+    {
+        var mechanics = new BreedingMechanics([1, 0, 0], new() { [1] = 1 }, new() { [0] = 1 });
+        Assert.AreEqual(1f, PassiveProbabilities.ProbabilityInheritedTargetPassivesForOverride(mechanics, [], [], 4, 4));
+        foreach (var count in new[] { 0, -1 })
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+                PassiveProbabilities.ProbabilityInheritedTargetPassivesForOverride(mechanics, [], [], 4, count));
+    }
 }
