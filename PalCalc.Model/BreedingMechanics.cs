@@ -90,7 +90,7 @@ public sealed class BreedingMechanics
 
     /// <summary>
     /// Raw IV weights used by the inheritance algorithm;
-    /// see `../PalCalc.Solver/README-PALWORLD-MECHANICS.md#iv-source-selection`
+    /// see `../PALWORLD-BREEDING-MECHANICS.md#iv-source-selection`
     /// and impl. comments below
     /// </summary>
     [JsonProperty]
@@ -122,10 +122,13 @@ public sealed class BreedingMechanics
     /// <summary>
     /// Inheritance probabilities depend on the specific IVs requested (HP, ATK, and/or DEF)
     /// and are asymmetric (e.g., HP is more likely to be inherited than any other stat).
-    /// (See `../PalCalc.Solver/README-PALWORLD-MECHANICS.md#iv-source-selection`)
+    /// (See `../PALWORLD-BREEDING-MECHANICS.md#iv-source-selection`)
     ///
-    /// This array covers the final probabilities of individual inheritance outcomes
-    /// (e.g., HP, HP+ATK, DEF, DEF+HP, etc.) where index Bit0 = HP, Bit1 = ATK, Bit2 = DEF
+    /// This array covers the final probabilities of desired inheritance outcomes
+    /// (e.g., HP, HP+ATK, DEF, DEF+HP, etc.) where index Bit0 = HP, Bit1 = ATK, Bit2 = DEF.
+    /// 
+    /// Note this is not e.g. the chance of getting exactly `HP+ATK`, but the combined
+    /// chance of all ways to inherit `HP+ATK` (which would be `HP+ATK` *or* `HP+ATK+DEF`.)
     /// </summary>
     private readonly float[] ivDesiredProbabilities;
 
@@ -151,7 +154,7 @@ public sealed class BreedingMechanics
     {
         const int hp = 1, attack = 2, defense = 4;
 
-        // see `../PalCalc.Solver/README-PALWORLD-MECHANICS.md#iv-source-selection`
+        // see `../PALWORLD-BREEDING-MECHANICS.md#iv-source-selection`
         /*
         Palworld's IV inheritance logic is essentially:
 

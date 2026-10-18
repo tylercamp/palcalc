@@ -64,9 +64,9 @@
         </TextBlock>
         <TextBlock>
             Palworld
-            <v:Weblink Uri="https://github.com/tylercamp/palcalc/blob/main/docres/research/palworld-breeding/README.md">mechanics</v:Weblink>
+            <v:Weblink Uri="https://github.com/tylercamp/palcalc/blob/main/PALWORLD-BREEDING-MECHANICS.md">mechanics</v:Weblink>
             were
-            <v:Weblink Uri="https://github.com/tylercamp/palcalc/blob/main/docres/research/palworld-breeding/REA-GUIDE.md">reverse-engineered</v:Weblink>
+            <v:Weblink Uri="https://github.com/tylercamp/palcalc/blob/main/docres/research/palworld-breeding/README.md">reverse-engineered</v:Weblink>
             using
             <v:Weblink Uri="https://github.com/morluto/rea">REA</v:Weblink>
             (<v:Weblink Uri="https://github.com/morluto/rea/blob/main/LICENSE">MIT License</v:Weblink>)

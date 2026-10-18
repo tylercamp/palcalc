@@ -22,7 +22,7 @@ public class IVProbabilitiesTests
     ];
 
     // Hand-derived expectations; source sets and the general formula are documented in:
-    // ../../PalCalc.Solver/README-PALWORLD-MECHANICS.md#iv-source-selection
+    // ../../PALWORLD-BREEDING-MECHANICS.md#iv-source-selection
     //
     // P(required subset) = sum(selector weight / total weight * fraction of its branches containing the subset)
     //
@@ -139,7 +139,7 @@ public class IVProbabilitiesTests
     }
 
     // Reference impl. which matches the Palworld IV calculation (almost) exactly; namely, see:
-    // README-PALWORLD-MECHANICS.md#iv-source-selection
+    // ../../PALWORLD-BREEDING-MECHANICS.md#iv-source-selection
     //
     // `true` inputs/output indicates whether the value meets the target.
     private static (bool HP, bool Attack, bool Defense) ReferenceChildIVs(

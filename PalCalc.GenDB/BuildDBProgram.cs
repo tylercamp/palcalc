@@ -861,7 +861,7 @@ namespace PalCalc.GenDB
 
             var rawGameSettings = GameSettingReader.ReadGameSettings(provider);
             db.BreedingMechanics = new BreedingMechanics(
-                // this array has special logic associated with it, see `README-PALWORLD-MECHANICS.md` - store as-is
+                // this array has special logic associated with it, see `../PALWORLD-BREEDING-MECHANICS.md` - store as-is
                 ivInheritanceWeights: rawGameSettings.TalentInheritNum.ToArray(),
                 // this array has 4 entries, and we empirically know it's possible to inherit 4 passives, so starting index must be 1
                 passiveInheritanceWeights: Enumerable.Range(1, 4).ToDictionary(n => n, n => rawGameSettings.PassiveInheritNum[n - 1]),

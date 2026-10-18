@@ -16,7 +16,7 @@ more likely to have the right traits. The solver compares paths by their
 estimated effort and keeps a small selection of useful alternatives.
 
 A detailed explanation of Palworld breeding mechanics and calculations are
-described [here](./README-PALWORLD-MECHANICS.md).
+described [here](../PALWORLD-BREEDING-MECHANICS.md).
 
 ## Concepts at a Glance
 

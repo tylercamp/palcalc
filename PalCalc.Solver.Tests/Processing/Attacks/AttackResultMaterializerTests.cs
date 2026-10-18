@@ -52,7 +52,7 @@ public class AttackResultMaterializerTests
     [DataTestMethod]
     [DataRow(false)]
     [DataRow(true)]
-    public void Evaluate_UsesRealizedParentEffortWhenSearchUsesAnOptimisticCakeBound(bool parallelFarms)
+    public void Evaluate_UsesRealizedParentEffortDuringFinalization(bool parallelFarms)
     {
         var settings = Settings();
         settings.GameSettings.MultipleBreedingFarms = parallelFarms;

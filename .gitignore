@@ -3,6 +3,15 @@ obj/
 bin/
 cache/
 /_REA-ANALYSIS/
+# Publish only the report and selected evidence from each investigation.
+/docres/research/palworld-breeding/assessments/*/*
+!/docres/research/palworld-breeding/assessments/*/assessment.md
+!/docres/research/palworld-breeding/assessments/*/evidence.md
+/docres/research/palworld-misc/assessments/*/*
+!/docres/research/palworld-misc/assessments/*/assessment.md
+!/docres/research/palworld-misc/assessments/*/evidence.md
+/output/
+__pycache__/
 data/
 publish/
 Level.sav.json

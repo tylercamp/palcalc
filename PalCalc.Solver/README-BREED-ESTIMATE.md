@@ -1,13 +1,12 @@
 # Estimating Breeding Time for Inheriting Passives
 
-Thanks to [the work by /u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/), we have detailed information on the _likely_ breeding process for inheriting passive skills. Note that:
-
-1. The author mentions that this calculation has not been 100% verified.
-2. At the time of writing, this reverse-engineering is ~8 months old, and has not been updated since it was first posted. (There is an [open issue](https://github.com/tylercamp/palcalc/issues/7) in this repo for any potential updates.)
-3. This is [based on a disassembly of the Palworld code](https://www.reddit.com/r/Palworld/comments/1af9in7/comment/koexa09/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button), and while the author emphasizes it's not 100% confirmed, any work based on disassembly is likely to be more accurate than efforts based purely on statistics.
-4. Assuming that the disassembly by /u/mgxts was accurate in the first place, and that there haven't been any updates in recent versions, there's still room for error in my own implementation of this calculation. There is an [open issue](https://github.com/tylercamp/palcalc/issues/8) for confirming this.
-
-Nonetheless, the work by /u/mgxts is the best information we have at the moment. We welcome any additional information on any of the above points in the [Issues](https://github.com/tylercamp/palcalc/issues) section of this repo.
+The ordinary passive model originated with
+[/u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/).
+The [2026-10-16 assessment](../docres/research/palworld-breeding/README.md) recovered
+the current reference algorithm for Steam build 25246127. The worked examples below
+use PalCalc's ordinary-mode approximation and repository weight data; they are not
+new game-frequency measurements. See the [mechanics README](../PALWORLD-BREEDING-MECHANICS.md)
+for provenance, the random-filler limitation, and IV/attack interactions.
 
 ## Probability References
 
@@ -79,7 +78,10 @@ The probability of choosing 3 passives from the list of 4, where those three wil
 
 Finally, we have a 1.5% chance for case [1], and a 4% chance for case [2]. Since _either_ of these would give us the desired outcome (the two desired passives and one undesired), we just add them for **a total 5.5% chance.**
 
-_Note: It's possible for the randomly passive to be one of the desired passives, or one of the passives held by the parents. This is ignored since it only slightly affects the final probabilities._
+_PalCalc ignores the chance that random additions supply desired passives. It also
+models successful filling, omitting the recovered weight-array bug and pool
+exhaustion. Their frequency with actual game data was not established; the size of
+that approximation is not quantified here._
 
 ### Example - Estimates for Children, Compensating for "At Best"
 
@@ -97,3 +99,25 @@ In that case we can combine the probabilities for [1] and [2], giving us a 7.5% 
 **This gives us our final result - from these two parents we create two children, one with an ~8 hour estimate, and the other with a ~2 hour estimate.**
 
 (The logic involving `P(Direct)` and `P(Random)` is implemented in `Probabilities.Passives.ProbabilityInheritedTargetPassives`. `CandidateExpander` accumulates these probabilities and assigns them to candidate children.)
+
+## Special Cake override
+
+A positive passive override replaces both ordinary count rolls. Special Cakes use
+the existing override-four model: select up to four distinct parental passives,
+then fill any shortfall. Do not multiply by `PassiveRandomAddedProbability` in this
+branch. PalCalc assumes successful filling and therefore models four final passives.
+Native filling can fall short for the reasons documented in the mechanics README.
+
+For the earlier parents `[Lucky, Brave]` and `[Runner, Brave, Workaholic]`, the
+deduplicated pool has four passives. Override four selects all four: the two available
+desired passives Lucky and Runner are included with probability one. If the request
+allows at most one irrelevant passive, a four-passive child is rejected; allowing
+two admits it. With only Lucky and Runner in the parental pool, the override still
+models four final passives by filling the two remaining slots.
+
+The override is implemented by
+`Probabilities.Passives.ProbabilityInheritedTargetPassivesForOverride`.
+Search compares candidates using ordinary-mode passive probability and omits
+attack-inheritance odds. During finalization, attack result materialization selects
+the concrete mode and recomputes expected attempts, effort, and cake use with that
+mode's passive probability and the required IV/attack odds.
