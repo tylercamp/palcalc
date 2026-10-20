@@ -335,7 +335,7 @@ public class AttackInheritanceSolverTests
             .OfType<BredPalReference>()
             .Single();
 
-        Assert.AreEqual(0, dirty.Count);
+        Assert.AreEqual(4, dirty.OfType<BredPalReference>().Single().EffectivePassives.Count);
         Assert.AreEqual(AttackInheritanceMode.InheritAll, clean.MaterializedAttackInheritance.Mode);
         Assert.AreEqual(
             1f,

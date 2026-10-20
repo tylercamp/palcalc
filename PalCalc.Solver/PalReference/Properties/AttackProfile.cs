@@ -32,22 +32,27 @@ public readonly record struct AttackProfileEntry(
 ///     this Pal's parents.
 /// </para>
 /// <para>
-///     Profiles are deliberately bounded. For each requested-attack mask the
-///     solver keeps the outcome using the fewest estimated Special Cakes.
+///     During search, each exact requested-attack mask retains only its
+///     minimum estimated Special Cake cost. Finalization may reconstruct
+///     alternatives with higher cake costs and lower effort.
 /// </para>
 /// <para>
 ///     During search, the profile records only exact requested-attack availability
 ///     and the minimum estimated Special Cake cost for each mask. Attack
 ///     probability, attack-specific effort, exact loadouts, and gender-adjusted
-///     cake use are reconstructed after search. This deliberately lossy boundary
-///     keeps the fixed attack search state small and portable: a structurally
-///     slower path can be discarded even when its exact attack odds would have
-///     been better, and a coarse finalist can fail an exact constraint after
-///     reconstruction.
+///     cake use are reconstructed after search. Each bred candidate has one
+///     breeding method and its own passive probability; every profile entry
+///     respects that method.
 /// </para>
 /// <para>
-///     Search profile = availability + estimated cakes. Materialized inheritance
-///     = exact probability + effort + cakes + loadouts.
+///     This deliberately lossy boundary keeps the fixed attack search state small
+///     and portable: a structurally slower path can be discarded even when its
+///     exact attack odds would have been better, and a coarse finalist can fail
+///     an exact constraint after reconstruction.
+/// </para>
+/// <para>
+///     Search profile = availability + estimated cakes.
+///     Materialized inheritance = exact probability + effort + cakes + loadouts.
 /// </para>
 /// <para>
 ///     The final, exact choice of attacks is decided in the final solver steps, using

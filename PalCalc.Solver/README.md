@@ -292,14 +292,31 @@ group or reduce those alternatives so the player isn't shown hundreds of
 similar trees. `PalResultGrouping` and `PalResultProperty` are used for that
 presentation step, but aren't used in the breeding search itself.
 
+Each bred candidate represents either ordinary breeding or breeding with a
+Special Cake, with the passive probability for that method.
+
+`MaxBredIrrelevantPassives` limits the ordinary passive options we explore.
+Special Cakes need separate handling: they produce four passive slots in our
+model, even when that exceeds the configured limit.
+
+We could also search for ways to use cakes just to improve passive inheritance,
+but that would add more options to the search. We skip those for performance,
+accepting that we may miss some valid or better paths.
+
+Neither breeding method nor cake count is used to group candidates during the
+search. Cake totals are used later when comparing completed results and
+simplifying them for display.
+
 The solver ends by resolving the real attack skills needed on parent
 and child Pals. The earlier search process just tracks the presence and
 general distribution of attack skills. This simple approach gives great
 performance improvements.
 
 We can save this detail for the end because attacks are _very_ easy to
-manipulate. Results with attack data are resolved by a simple rule:
-"Attack inheritance should appear as late in the tree as possible."
+manipulate. The rough idea is to assign attacks as late in the tree as possible,
+but this isn't a rule that every reconstructed path must follow. Finalization
+compares the actual effort and cake costs of the attack arrangements still
+available in each tree.
 
 ## Detailed Solver Walkthrough
 
@@ -423,14 +440,41 @@ The loop stops when:
 3. Check that the result has the requested gender.
 4. Check the result for an `AttackProfile` which meets the attack requirements and
    Special Cake limit.
-5. Reconstruct the necessary attack inheritance modes and parent loadouts.
-6. Recompute exact probability, effort, and cake totals, and re-verify
-   that the result still meets the final requirements.
-7. Return the remaining paths as a `BreedingSolverResult`.
+5. Work out the attack-inheritance options and their actual effort and Special
+   Cake costs. Save the parent choices for each option.
+6. Remove options that exceed the configured limits or are clearly worse than a
+   comparable option.
+7. Build the retained breeding trees, check their final requirements again, and
+   simplify similar results.
+8. Return the remaining paths as a `BreedingSolverResult`.
 
-The UI may use `PalResultGrouping` and `PalResultProperty` to reduce or group
-the returned paths for display. This does not change which candidates were
-explored during the solve.
+When working out attack options, the breeding method is already fixed on each
+candidate. Finalization chooses the parent loadouts and calculates their costs
+within that method.
+
+A faster path may need more Special Cakes than a slower one, so we keep both
+when neither is clearly better. We can drop an option if another takes no more
+effort and uses no more cakes, with an improvement in at least one. To make that
+comparison, the paths must match on final passives, gender, IV ranges, concrete
+input choices, breeding-step count, gold cost, wild-Pal count, and training
+requirements.
+
+Sometimes we can skip calculating the attack options altogether. If another
+comparable result is already better than even the candidate's lower effort and
+cake bounds, there is no need to evaluate it further.
+
+Different candidate trees with equal effort and cake costs can survive this
+comparison. Within one candidate and requested attack combination, however, we
+keep one consistently chosen attack plan when both costs match. Later result
+simplification can reduce similar paths further, within groups that have the
+same effort, cake total, and output properties.
+
+A slow path that saves Special Cakes can still be useful, so the UI compares
+paths with different cake totals separately. Both UI simplification passes
+preserve those distinctions. The cutoff at twice the fastest nonzero effort
+applies within each cake tier. The UI uses `PalResultGrouping` and
+`PalResultProperty` for this further simplification; these final-list groups
+do not change how candidates are grouped during the search.
 
 ## Implementation Map
 
@@ -450,9 +494,10 @@ BreedingSolver
                  -> worker-local object pools
                  -> AttackProfileComposer
                       -> AttackProfile / AttackProfileEntry
-                      -> AttackProfileReducer
+                      -> AttackProfileAccumulator
        -> ResultPostProcessor
             -> AttackResultMaterializer
+            -> FinalizationAlternatives / FinalizationComparison
   -> BreedingSolverResult
 ```
 

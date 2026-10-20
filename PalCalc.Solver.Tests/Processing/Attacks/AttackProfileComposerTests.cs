@@ -49,11 +49,11 @@ public class AttackProfileComposerTests
 
         var normal = Materialize(
             new AttackProfileComposer(context, settings),
-            Child, Reference(parent1), Reference(parent2), 1, 1, 1
+            Child, Reference(parent1), Reference(parent2), new(BreedingMethod.Ordinary, 1), 1
         );
         var lowProbability = Materialize(
             new AttackProfileComposer(context, settings),
-            Child, Reference(parent1, neutral: true), Reference(parent2), 0.01f, 0.1f, 1
+            Child, Reference(parent1, neutral: true), Reference(parent2), new(BreedingMethod.Ordinary, 0.01f), 0.1f
         );
 
         Assert.AreEqual(normal, lowProbability);
@@ -63,14 +63,14 @@ public class AttackProfileComposerTests
     [TestMethod]
     public void Compose_ReusesProfileForTheSameRoundedCakeCost()
     {
-        var context = Context(Attacks(1));
+        var context = Context(Attacks(2));
         var settings = Settings(cakes: 100);
         var parent1 = Reference(new AttackProfile(Entry(1)));
-        var parent2 = Reference(new AttackProfile(Entry(0)));
+        var parent2 = Reference(new AttackProfile(Entry(2)));
         var composer = new AttackProfileComposer(context, settings);
 
-        var first = Materialize(composer, Child, parent1, parent2, 0.5f, 0.5f, 0.5f);
-        var second = Materialize(composer, Child, parent1, parent2, 0.51f, 0.51f, 0.5f);
+        var first = Materialize(composer, Child, parent1, parent2, new(BreedingMethod.SpecialCake, 0.5f), 0.5f);
+        var second = Materialize(composer, Child, parent1, parent2, new(BreedingMethod.SpecialCake, 0.51f), 0.5f);
 
         Assert.AreSame(first.Entries, second.Entries);
     }
@@ -119,7 +119,7 @@ public class AttackProfileComposerTests
     }
 
     [TestMethod]
-    public void Compose_CakeUsesItsPassiveProbabilityAndSkipsImpossibleOutcomes()
+    public void Compose_MethodsKeepTheirOwnProbabilityAndAttackOutcomes()
     {
         var attacks = Attacks(2);
         var context = Context(attacks);
@@ -129,11 +129,11 @@ public class AttackProfileComposerTests
 
         var impossible = Materialize(
             new AttackProfileComposer(context, settings),
-            Child, parent1, parent2, 0.5f, 1, specialCakePassivesProbability: 0
+            Child, parent1, parent2, new(BreedingMethod.Ordinary, 0.5f), 1
         );
         var possible = Materialize(
             new AttackProfileComposer(context, settings),
-            Child, parent1, parent2, 0.5f, 1, specialCakePassivesProbability: 0.25f
+            Child, parent1, parent2, new(BreedingMethod.SpecialCake, 0.25f), 1
         );
 
         Assert.IsFalse(impossible.Contains(0b11));
@@ -141,6 +141,27 @@ public class AttackProfileComposerTests
             4,
             possible.Entries.Single(entry => entry.LearnedTargetMask == 0b11).TotalSpecialCakes
         );
+    }
+
+    [DataTestMethod]
+    [DataRow(0, false)]
+    [DataRow(3, false)]
+    [DataRow(4, true)]
+    public void Compose_CakeOnlyOutcomeRequiresEnoughCakes(int cakeLimit, bool expected)
+    {
+        var context = Context(Attacks(2));
+        var composer = new AttackProfileComposer(context, Settings(cakeLimit));
+        var profile = Materialize(
+            composer, Child,
+            Reference(new AttackProfile(Entry(1))),
+            Reference(new AttackProfile(Entry(2))),
+            new(BreedingMethod.SpecialCake, 0.25f), ivsProbability: 1
+        );
+
+        Assert.AreEqual(expected, profile.Contains(3));
+        Assert.AreEqual(expected ? 1 : 0, profile.Entries.Count);
+        if (expected)
+            Assert.AreEqual(new AttackProfileEntry(3, 4), profile.Entries.Single());
     }
 
     [TestMethod]
@@ -154,11 +175,24 @@ public class AttackProfileComposerTests
 
         var optimized = Materialize(
             new AttackProfileComposer(context, settings),
-            Child, Reference(parent1), Reference(parent2), 1, 1, 1
+            Child, Reference(parent1), Reference(parent2), new(BreedingMethod.Ordinary, 1), 1
         );
         var expected = BruteForceNormalProfile(context, parent1, parent2);
 
         Assert.AreEqual(expected, optimized);
+    }
+
+    [TestMethod]
+    public void Compose_CakesCannotBeIntroducedForPassivesOrOneNonInnateAttack()
+    {
+        var innate = Child.Level1ActiveSkills(SolverTestScenario.DB).First();
+        var context = Context([innate, Attacks(1).Single()]);
+        var profile = Materialize(
+            new AttackProfileComposer(context, Settings(100)), Child,
+            Reference(new AttackProfile(Entry(3))), Reference(new AttackProfile(Entry(0))),
+            new(BreedingMethod.SpecialCake, 1), 1
+        );
+        Assert.AreEqual(0, profile.Entries.Count);
     }
 
     [TestMethod]
@@ -203,7 +237,8 @@ public class AttackProfileComposerTests
         var settings = Settings(cakes: cakes);
         return Materialize(
             new AttackProfileComposer(Context(attacks), settings),
-            Child, Reference(new(parent1)), Reference(new(parent2)), passivesProbability, passivesProbability, ivsProbability
+            Child, Reference(new(parent1)), Reference(new(parent2)),
+            new(cakes == 0 ? BreedingMethod.Ordinary : BreedingMethod.SpecialCake, passivesProbability), ivsProbability
         );
     }
 
@@ -212,15 +247,13 @@ public class AttackProfileComposerTests
         Pal child,
         IPalReference parent1,
         IPalReference parent2,
-        float passivesProbability,
-        float ivsProbability,
-        float specialCakePassivesProbability
+        BreedingOutcome outcome,
+        float ivsProbability
     ) => composer.Prepare(
         child,
         parent1,
         parent2,
-        passivesProbability,
-        specialCakePassivesProbability,
+        outcome,
         ivsProbability
     ).Materialize();
 
