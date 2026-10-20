@@ -26,15 +26,20 @@ namespace PalCalc.Solver.ResultPruning
 
         public static ResultPruningPolicy Default { get; } = new(
             token => [
+                // effort-optimizing policies
                 new MinimumEffortPruning(token),
                 new MinimumBreedingStepsPruning(token),
                 new OptimalIVsPruning(token, maxIvDifference: 10),
                 new MinimumCostPruning(token),
+                new MinimumLevelingPruning(token),
+                new MinimumWildPalsPruning(token),
+
+                // preference policies
                 new PreferredLocationPruning(token),
                 new MinimumReusePruning(token),
-                new MinimumWildPalsPruning(token),
                 new MinimumReferencedPlayersPruning(token),
-                new MinimumLevelingPruning(token),
+
+                // cut-off
                 new VariedResultsPruning(token, maxSimilarityPercent: 0.1f),
                 new ResultLimitPruning(token, maxResults: 3),
             ]
