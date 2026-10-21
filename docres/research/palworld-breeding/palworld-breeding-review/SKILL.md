@@ -7,14 +7,22 @@ description: "Assess PalCalc breeding paths, inheritance estimates, and scoped s
 
 Compare the process assumed by PalCalc with the recovered game behavior. Focus on
 differences that affect possible breeding paths, desired contents, probabilities,
-expected attempts, or the requested supporting calculation. Use the user's scope;
-omit mutation unless requested.
+expected attempts, or the requested supporting calculation. Honor the user's
+scope. A standard game-update review follows the workflow's full checklist,
+including mode boundaries; omitted mutation or other
+alternate modes must remain visible as gaps.
 
 Read [review-notes.md](references/review-notes.md) before assessing findings. It records distinctions established in prior reviews and worked examples, not permanent claims about future game builds.
 
 ## Start from completed evidence
 
 Resolve the repository root and the supplied assessment or REA run. Start with its report and cited evidence; confirm the build/executable identity and scope. Read detailed models or input contracts only where needed to settle a claim. Older runs may keep these under `_REA-ANALYSIS/runs/<run>/`; do not assume the newest directory is the intended one. Manifests, startup logs, and full query histories are not prerequisites for review.
+
+Use the [mechanics status table](../README.md#current-verification-status) to locate
+the game-version report and relevant mechanic sections. Confirm game version and
+its source first, then supporting platform/build/hash and asset identities. A
+targeted comparison doesn't establish complete version coverage. Review notes
+and older maintained summaries are leads, not substitutes for missing evidence.
 
 Use `PALWORLD-BREEDING-MECHANICS.md` as the default documented algorithm, or the document the user supplies. The README describes PalCalc's assumed process; a discrepancy with it does not prove the implementation currently has the same discrepancy. Inspect implementation only when requested or needed to resolve that distinction, using the repository's CodeGraph instructions.
 
@@ -57,3 +65,9 @@ Then give **notes for future reviews**: terminology, equivalences, scope exclusi
 For each material conclusion, link the decisive evidence and give the procedure/address, field name, diagnostic, or short call path another agent can use for comparison. Include key unresolved checks without implying that current data tables or runtime behavior were tested. Keep setup and operational provenance out of the report. If no material difference is established, say so.
 
 Return the assessment in chat by default; save or modify repository documents only when requested. For a published assessment, use the compact [assessment template](../ASSESSMENT-TEMPLATE.md): `evidence.md` contains the full scoped game model and selected excerpts; `assessment.md` contains the reduced PalCalc model and functional comparison, naming its document/code baseline. Cover agreements and remaining differences as well as corrected older assumptions. Keep implementation separate. Update the maintained reference only when requested, following the [workflow](../ASSESSMENT-WORKFLOW.md); preserve saved plans and progress.
+
+When publication is requested, update the relevant mechanic sections in the
+game-version report, preserving other coverage and dates. Separate a supported
+game change from newly verified behavior or a correction to our understanding;
+record the distinction in the hub and changelog. Verified unchanged behavior needs
+the workflow's code/data dependency comparison, not just an old conclusion.

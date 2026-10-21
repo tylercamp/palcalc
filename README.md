@@ -90,7 +90,7 @@ to choose a starting point:
 
 - [Review existing findings](docres/research/palworld-breeding/README.md#review-existing-findings)
 - [Investigate another mechanic](docres/research/palworld-breeding/README.md#run-an-assessment-yourself)
-- [Check a newer game build](docres/research/palworld-breeding/README.md#check-a-game-update)
+- [Check a new game version](docres/research/palworld-breeding/README.md#check-a-game-update)
 
 Bug reports, research contributions, and pull requests are welcome in [GitHub Issues](https://github.com/tylercamp/palcalc/issues).
 

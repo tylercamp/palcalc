@@ -11,7 +11,7 @@ Choose a topic:
 - [Attack inheritance](#activeattack-skills)
 - [IV inheritance](#ivs)
 - [Gender](#gender) and [wild Pals](#wild-pals)
-- [Which builds and mechanics have been checked](#assessment-coverage)
+- [Which versions and mechanics have been checked](#assessment-coverage)
 - [PalCalc's limitations and search tradeoffs](LIMITATIONS.md)
 
 Each topic covers the high-level details of a breeding mechanic, with links to more
@@ -30,30 +30,23 @@ by Pocket Pair, Inc. themselves.
 
 ## Assessment coverage
 
-These findings were checked against **Steam build 25246127**. Some parts of
-breeding, including child gender and wild-Pal generation, still need separate
-investigation. The table below shows what has been checked and where PalCalc uses
-an approximation. See [build and research details](#build-and-research-details)
-for the executable identity, review dates, and version-label limitations.
-Coverage of a named build doesn't establish compatibility with a later update,
-and checking executable logic doesn't by itself verify the current asset values.
+The [research checklist](docres/research/palworld-breeding/README.md#current-verification-status)
+records the last checked game version and date for each mechanic, with links to
+its conclusions and evidence. The [research changelog](docres/research/palworld-breeding/CHANGELOG.md)
+records which rules changed or were confirmed unchanged.
 
-| Question | Published coverage | What was checked |
-| --- | --- | --- |
-| Child species | [2026-10-18 assessment](docres/research/palworld-breeding/assessments/2026-10-18-build-25246127/assessment.md) | Ordinary recipe and breeding-power selection; current recipe and species lists weren't fully checked |
-| Child gender | Not fully investigated | Recipe gender requirements don't explain how the child's own gender is chosen |
-| Child passives | [2026-10-16 assessment](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/assessment.md) | Selection from parents, random additions, and item overrides; random filling can fall short |
-| Child attacks | [2026-10-16 assessment](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/assessment.md) | Selection from equipped parental attacks and the all-attack item effect; later initialization wasn't fully traced |
-| Child IVs | [2026-10-16 assessment](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/assessment.md) | Which stats come from parents or fresh random values; mutation and talent bonuses aren't covered by the explanation below |
-| Wild-Pal passives | Not fully investigated | Initial spawning and capture-time changes need separate checks |
-| Wild-Pal attacks | Not fully investigated | Initial spawning, level-based learning, and capture-time changes need separate checks |
-| Wild-Pal gender | Not fully investigated | The spawn-time selection process remains to be documented |
+**A comprehensive baseline review is pending.** We've cleared the earlier
+incremental reports to make room for a complete, version-based record. The rules
+below retain our existing understanding; they haven't yet been revalidated under
+the new checklist. This documentation update doesn't establish support for a newer
+game version. Older research remains available in Git history.
 
-Other relevant topics include [egg-production time](#egg-production-time) and
-[world-map coordinates](docres/research/palworld-misc/README.md#world-map-coordinates).
-The current timing and map calculations haven't been independently verified
-against the game's code. See [PalCalc's limitations](LIMITATIONS.md) for the
-approximations used in estimates.
+Some details, including child gender and wild-Pal generation, still need further
+investigation. The explanation below doesn't cover mutation or talent-bonus
+branches. [Egg-production time](#egg-production-time) and
+[world-map coordinates](docres/research/palworld-misc/README.md#world-map-coordinates)
+are supporting topics, reviewed when needed rather than on every game update.
+See [PalCalc's limitations](LIMITATIONS.md) for the approximations used in estimates.
 
 ## Pal Species
 
@@ -66,9 +59,8 @@ normal breeding powers, this works out to averaging the parents' powers and roun
 up, then adding any item rank adjustment. It selects an eligible child with the
 nearest power, breaking distance ties by priority and exact ties by table order.
 
-The [species evidence](docres/research/palworld-breeding/assessments/2026-10-18-build-25246127/evidence.md#reconstructed-ordinary-selector)
-explains the exact arithmetic and where that simplification stops being valid.
-Mutation and later replacement pools were outside this assessment's scope.
+The exact arithmetic and later replacement rules still need to be included in
+our [comprehensive research baseline](docres/research/palworld-breeding/README.md#current-verification-status).
 
 Pals that appear as special-recipe children are excluded from the ordinary
 breeding-power selection. Bosses and other species flagged as ineligible are
@@ -85,9 +77,10 @@ For how PalCalc builds its list of breeding pairs, see the
 The original passive inheritance model is credited to
 [/u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/).
 
-The completed REA assessment independently checked ordinary inheritance and item
-effects, including an apparent bug in random passive selection. See the
-[passive reference and evidence](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/evidence.md#passive-selection-and-override).
+Our existing explanation also draws on earlier reverse engineering of ordinary
+inheritance and item effects, including an apparent bug in random passive
+selection. Its current verification status is recorded in the
+[research checklist](docres/research/palworld-breeding/README.md#current-verification-status).
 
 The first roll asks for one to four passives from the parents. If the parents
 have fewer unique passives than requested, the child inherits the available ones.
@@ -190,9 +183,8 @@ are lost; learned attacks and currently equipped attacks are different things.
 
 **a.** If the two parents each have one attack equipped, and only one of them is a desired attack, there's a 50/50 chance of inheriting that attack. (Two attacks to pick from.) But if the other parent equips a non-inheritable attack, the desired attack chance is 100%. (One attack to pick from.)
 
-The recovered [attack model](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/evidence.md#attack-inheritance)
-records the detailed selection and saved attack lists. Later initialization wasn't
-fully traced; the report explains that boundary and the item-data assumptions.
+Later initialization and the complete path to the saved attack lists still need
+verification in the [comprehensive research baseline](docres/research/palworld-breeding/README.md#current-verification-status).
 
 ## IVs
 
@@ -221,7 +213,8 @@ Each inherited stat can come from either parent. Stats not taken from parents ge
 fresh random values. A random value can happen to match a parent's IV, but that
 doesn't mean it was inherited.
 
-For the exact selection process, see the [recovered IV pseudocode and evidence](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/evidence.md#iv-source-selection).
+Current verification of the exact selection process is tracked in the
+[research checklist](docres/research/palworld-breeding/README.md#current-verification-status).
 The [solver's IV calculations](PalCalc.Solver/README.md#iv-probabilities) explain
 how those rules become probability and effort estimates.
 
@@ -233,7 +226,7 @@ parent genders are separate from the child's own gender: a gender-specific recip
 doesn't by itself explain how the child's gender is drawn.
 
 A complete investigation of child and wild-spawn gender selection hasn't yet
-been published in these assessments. For how PalCalc uses the species
+been published here. For how PalCalc uses the species
 probabilities in estimates, see [gender handling](PalCalc.Solver/README.md#gender).
 
 ## Wild Pals
@@ -244,7 +237,8 @@ doesn't tell us which of those steps supplied it.
 
 These processes haven't received a complete assessment here. The breeding
 findings above don't establish the rules for wild Pals. See the
-[coverage table](#assessment-coverage) for what has been investigated, and the
+[research checklist](docres/research/palworld-breeding/README.md#current-verification-status)
+for verification status, and the
 [solver overview](PalCalc.Solver/README.md#2-build-the-starting-candidates) for
 how PalCalc represents available wild Pals.
 
@@ -257,22 +251,6 @@ The exact farm timing formula, including activity, sleep, and breeding-speed
 modifiers, hasn't received a completed game-code assessment here. PalCalc uses a
 configurable estimate; its [timing calculation](PalCalc.Solver/README.md#egg-production-time)
 and assumptions are documented in the solver README.
-
-## Build and research details
-
-<details>
-<summary>Executable identity and research dates</summary>
-
-The published game-code findings concern Steam build 25246127, Windows x86-64,
-executable SHA-256 `e590b5e7bfaa3fea40fab1a02cc72c8fc5fd6f8631ef2308e95ac56c25195837`.
-The release label recorded in the previous reference was **v1.0.5.102999**;
-the retained assessments did not independently establish that label.
-
-Inheritance evidence was recovered on 2026-10-16 and its implementation comparison
-reviewed on 2026-10-18. Species selection was assessed on 2026-10-18 for the same
-executable. These dates do not establish coverage of later game builds.
-
-</details>
 
 ## Further reading
 

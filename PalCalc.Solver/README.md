@@ -486,8 +486,10 @@ do not change how candidates are grouped during the search.
 
 The [player-facing mechanics reference](../PALWORLD-BREEDING-MECHANICS.md) explains
 the game rules. This section records the implementation and calculation details
-behind PalCalc's estimates. The linked build-specific evidence remains the source
-for the recovered game pseudocode and its scope.
+behind PalCalc's estimates. The [research checklist](../docres/research/palworld-breeding/README.md#current-verification-status)
+tracks game-version verification and links to published pseudocode and evidence
+when available. A comprehensive baseline is pending; the explanations here retain
+the existing model rather than claiming new verification.
 
 ### Species database
 
@@ -504,8 +506,8 @@ GenDB visits each species pair and:
    highest value preferred. Special-recipe children are excluded from this scan.
 
 This generated graph needs more than matching rank arithmetic to agree with the
-game. The [species comparison](../docres/research/palworld-breeding/assessments/2026-10-18-build-25246127/assessment.md#functional-comparison)
-records conditions still needing data checks:
+game. Earlier research identified conditions still needing data checks, retained
+here for the [baseline review](../docres/research/palworld-breeding/README.md#current-verification-status):
 
 - GenDB doesn't read `IgnoreCombi` when building its eligible roster.
 - Its same-species shortcut runs before recipe matching.
@@ -515,16 +517,15 @@ records conditions still needing data checks:
 - The generated graph has no input for the game's item rank adjustment.
 
 These are algorithm differences or conditional consequences, not proof of a wrong
-live pairing without the relevant current data. See the
-[reconstructed selector](../docres/research/palworld-breeding/assessments/2026-10-18-build-25246127/evidence.md#reconstructed-ordinary-selector)
-for recipe order, eligibility, exact rounding limits, item clamps, fallback, and
-later child-ID replacements.
+live pairing without the relevant current data. The comprehensive baseline still
+needs to establish recipe order, eligibility, exact rounding limits, item clamps,
+fallback, and later child-ID replacements for its named game version.
 
 ### IV probabilities
 
-The source patterns below come from the
-[build-specific IV evidence](../docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/evidence.md#iv-source-selection).
-They describe the ordinary source-selection model, not mutation or talent bonuses.
+The source patterns below retain the ordinary source-selection model derived
+from earlier research, not mutation or talent bonuses. Their game-version
+verification is pending in the [research checklist](../docres/research/palworld-breeding/README.md#current-verification-status).
 
 | Original selector / weight array index | Possible parent-sourced sets |
 | --- | --- |
@@ -533,15 +534,15 @@ They describe the ordinary source-selection model, not mutation or talent bonuse
 | 2 | HP+Attack+Defense |
 
 The game makes a weighted selection from `Combi_TalentInheritNum`. Its result is
-the **zero-based index of the selected array entry**. “Category 1” in the native
-reference means index 1, the **second entry**, rather than one inherited stat.
+the **zero-based index of the selected array entry**. “Category 1” in the earlier
+research meant index 1, the **second entry**, rather than one inherited stat.
 For the repository's `[3,2,1]` weights, that entry has weight 2. PalCalc stores
 the same ordered array and uses the game's zero-based selector indices directly.
 
 This excerpt shows ordinary source selection. Tuples are ordered
 `(HP, Attack, Defense)`; each field in `H` chooses either parent's corresponding
-value. The native reference specifies exact RNG operations and subsequent item
-bonuses separately.
+value. This excerpt models source selection; it doesn't specify exact RNG
+operations or subsequent item bonuses.
 
 ```text
 R = (fresh random HP, fresh random Attack, fresh random Defense)
@@ -574,9 +575,9 @@ middle category HP always comes from a parent and one branch inherits all three
 stats. Unselected stats use fresh values. An isolated Attack+Defense source set is
 impossible; an Attack+Defense **target** can still succeed through an all-three branch.
 
-The native selector returns the original index; sentinel and unexpected categories
-use the one-stat fallback in this build. PalCalc supports its existing valid
-three-category data: weight array indices 0/1/2 label the original selector entries,
+In the earlier recovered model, the native selector returned the original index;
+sentinel and unexpected categories used the one-stat fallback. PalCalc supports
+its existing valid three-category data: weight array indices 0/1/2 label the original selector entries,
 not achieved stat counts.
 
 [`BuildDesiredIVProbabilities`](../PalCalc.Model/BreedingMechanics.cs) represents
@@ -615,27 +616,26 @@ that contributes another factor of 1/2. If both qualify, either parent's value
 succeeds. No required IVs gives probability one. These probabilities are computed per database, so
 custom category weights still use the same asymmetric pattern table.
 
-The game reference also records talent-bonus and mutation branches. Those are
-outside this solver correction.
+Talent-bonus and mutation branches are outside this solver model.
 
 ### Attack inheritance details
 
-The [recovered attack helper](../docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/evidence.md#attack-inheritance)
-combines and deduplicates eligible equipped-parent attacks. The row flag
+The attack model derived from earlier research combines and deduplicates eligible
+equipped-parent attacks. The row flag
 `IgnoreRandomInherit` excludes attacks; missing database rows are excluded too.
 The all-attack item branch retains all eligible inherited IDs, while initial
 equipment is capped separately.
 
-The evidence records separate mastered/equipped writes and initial equipment
-order. Those details alone don't establish a difference in final inherited
-availability or success probability. Later initialization wasn't fully traced,
-so the assessment doesn't settle all downstream writes.
+Earlier research identified separate mastered/equipped writes and initial
+equipment order. Those details alone don't establish a difference in final
+inherited availability or success probability. Later initialization wasn't fully
+traced; settling those downstream writes remains part of the baseline review.
 
 PalCalc's Cake05 model uses `bInheritAllActiveSkills=true` and
-`PassiveInheritCountOverride=4`. The recovered consumer branches establish what
-those fields do, but the inheritance assessment didn't re-extract the item's
-current asset values. Keep that data-provenance boundary separate from the
-algorithm and search restrictions described above.
+`PassiveInheritCountOverride=4`. Earlier research traced the consumer branches,
+but didn't re-extract the item's current asset values. The baseline review still
+needs to verify both the branches and their inputs for its game version. Keep that
+data-provenance boundary separate from the search restrictions described above.
 
 ### Egg-production time
 

@@ -5,9 +5,10 @@ game or keeping every possible breeding tree. This page collects the current
 modeling omissions and search tradeoffs, and explains what they mean for results.
 
 For the game rules and detailed calculations, start with
-[Palworld Breeding Mechanics](PALWORLD-BREEDING-MECHANICS.md). Its
-[coverage table](PALWORLD-BREEDING-MECHANICS.md#assessment-coverage) is the main
-record of which mechanics and builds have been checked. The
+[Palworld Breeding Mechanics](PALWORLD-BREEDING-MECHANICS.md). The
+[research checklist](docres/research/palworld-breeding/README.md#current-verification-status)
+is the main record of which mechanics and game versions have been checked. A
+comprehensive baseline is pending after the research documentation reset. The
 [solver overview](PalCalc.Solver/README.md) explains how the current implementation
 uses those rules.
 
@@ -112,8 +113,8 @@ An unverified mechanic isn't necessarily implemented incorrectly. It means the
 published evidence hasn't established the full process. Conversely, some recovered
 behavior is intentionally omitted from the estimate.
 
-The [mechanics coverage table](PALWORLD-BREEDING-MECHANICS.md#assessment-coverage)
-records the build-specific findings and gaps, including child gender and wild-Pal
+The [research checklist](docres/research/palworld-breeding/README.md#current-verification-status)
+records game-version verification and gaps, including child gender and wild-Pal
 generation. The inheritance estimates described there omit mutation and talent-bonus
 branches. The [species comparison](PalCalc.Solver/README.md#species-database)
 also records data conditions still needing checks before claiming that PalCalc's

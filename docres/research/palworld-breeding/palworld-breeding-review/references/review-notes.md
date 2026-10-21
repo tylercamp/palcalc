@@ -10,7 +10,10 @@ These distinctions came from a completed Palworld inheritance review. Apply the 
 - Separate equipped/mastered writes in a generation helper do not alone establish a final player-visible difference. Later initialization may reconcile collections. If that boundary was not traced, keep it as an unresolved implementation observation.
 - Distinct-parent deduplication agrees with the documented pool model; it is not a discrepancy. Native index order matters only when it changes the requested outcome or its probability, rather than exact RNG replay alone.
 - A random IV can equal a parental IV. Observed numerical matches do not prove a parent source. Track source labels when evaluating inherited-count claims.
-- Unless requested, leave mutation out. Do not use excluded mutation branches to weaken or contradict ordinary-mode guarantees.
+- In a targeted ordinary-mode review, don't use excluded mutation branches to
+  weaken or contradict ordinary-mode guarantees. A comprehensive version review
+  still needs to account for alternate modes explicitly; these notes don't
+  authorize omitting them from the checklist.
 
 ## Findings that can affect estimates
 
@@ -57,8 +60,9 @@ An item-specific claim such as Cake05 having override 4 or all-attack inheritanc
 
 ## Species, gender, and wild-Pal boundaries
 
-- The 2026-10-18 species evidence covers ordinary recipe/rank selection, not live
-  table equivalence or mutation/replacement pools. Compare eligibility, self-pairs,
+- Earlier species work covered ordinary recipe/rank selection, not live table
+  equivalence or mutation/replacement pools. Those reports were cleared for the
+  comprehensive baseline; this note isn't published proof. Compare eligibility, self-pairs,
   first-match recipe order, gender coverage, ties, and item inputs separately.
 - A missing native shortcut is not a demonstrated wrong live result without the
   data conditions that distinguish it. Likewise, source/parser heuristics do not

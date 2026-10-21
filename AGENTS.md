@@ -13,11 +13,20 @@ and examples.
 
 # Mechanics research
 
-For new REA analysis or comparisons after a game update, read the
-[assessment workflow](docres/research/palworld-breeding/ASSESSMENT-WORKFLOW.md)
-before starting, then the relevant sections of the
-[REA guide](docres/research/palworld-breeding/REA-GUIDE.md). Follow the user's
-requested scope; a targeted investigation doesn't require reviewing every mechanic.
+For new REA analysis or comparisons after a game update, start with the
+[mechanics checklist and status](docres/research/palworld-breeding/README.md#current-verification-status),
+then read the [assessment workflow](docres/research/palworld-breeding/ASSESSMENT-WORKFLOW.md)
+and relevant sections of the [REA guide](docres/research/palworld-breeding/REA-GUIDE.md).
+A standard game-update review accounts for every required mechanic; partial or
+unresolved coverage keeps the review incomplete. A targeted investigation can
+cover less, but mustn't imply complete version verification. Map conversion and
+breeding time are supporting topics, not required update checks.
+
+Record game version as the primary identity, with build IDs/hashes as supporting
+metadata. Publish conclusions and evidence by game version and mechanic, update
+the checklist and changelog, and distinguish game changes from corrections to our
+understanding. Don't assume a skill will be discovered automatically: the workflow
+and guide above are the required starting points for investigation.
 
 For reviewing completed findings, explicitly read the repository's
 [review skill](docres/research/palworld-breeding/palworld-breeding-review/SKILL.md)

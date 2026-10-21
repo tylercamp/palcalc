@@ -1,8 +1,9 @@
 # Recovering Palworld calculations with REA
 
-For current rules and coverage, read the
+For a player-facing explanation, read the
 [mechanics reference](../../../PALWORLD-BREEDING-MECHANICS.md).
-The [research introduction](README.md) is the entry point for contributors.
+The [research hub](README.md#current-verification-status) owns the mechanic
+checklist, game-version status, and links to conclusions and evidence.
 This technical guide supports extraction stages 1–2 of the
 [assessment workflow](ASSESSMENT-WORKFLOW.md); that workflow defines scope selection,
 publication rules, comparison, reference updates, and optional implementation.
@@ -11,7 +12,9 @@ Use the installed REA skill and current tool schemas. This guide provides discov
 methods for offspring species, gender, passives, IVs/talents, attacks, and wild-Pal
 initialization/capture. It also supports targeted
 [additional-logic reviews](../palworld-misc/README.md). A scoped investigation need
-not examine every topic; record omitted questions and modes explicitly.
+not examine every topic; record omitted questions and modes explicitly. A standard
+game-update review must account for every required mechanic, as defined by the
+workflow, even when dependency comparisons avoid repeating native recovery.
 
 ## Extraction output and boundary
 
@@ -19,6 +22,8 @@ Recover the scoped inputs, selection, weighting, ordering, filtering, duplicates
 retries, caps, overrides, arithmetic, and final writes. Reconstruct readable full
 pseudocode and retain selected evidence for `evidence.md`; use the
 [report outlines](ASSESSMENT-TEMPLATE.md#companion-evidencemd-outline).
+Keep sections organized by mechanic in the game-version report, rather than
+publishing a separate report for each analysis run.
 The PalCalc model and its comparison with the reviewed baseline belong in
 `assessment.md`. Use the [review skill](palworld-breeding-review/SKILL.md) for that
 stage, rather than starting another native discovery pass.
@@ -44,7 +49,7 @@ You own the investigation, live native session, progress, and report. Follow the
 
 | Phase | Read | Capture for the game model and evidence |
 | --- | --- | --- |
-| 1. Identify inputs | [Inputs](#inputs-and-evidence-boundary), [Operations](#long-running-analysis) | Build, platform, executable hash, scope |
+| 1. Identify inputs | [Inputs](#inputs-and-evidence-boundary), [Operations](#long-running-analysis) | Game version and source, platform, supporting build/hash, scope |
 | 2. Find anchors | [Names](#discovery-anchors-from-palcalc), [Native discovery](#native-discovery-with-rea) | Names/call paths that locate the relevant code |
 | 3. Resolve inputs | [Fields](#recovering-fields-and-defaults), [Assets if needed](#conditional-asset-work) | Input semantics needed to understand the findings |
 | 4. Recover calculations | [Mechanics](#mechanics-to-trace), [Helpers](#helpers-worth-creating-when-needed) | Conclusions, concise pseudocode, decisive evidence |
@@ -60,9 +65,12 @@ Keep **one owner of the live REA session** unless isolation is established. Have
 
 ## Inputs and evidence boundary
 
-Locate `Pal/Binaries/Win64/Palworld-Win64-Shipping.exe` and record its SHA-256.
-Add architecture, image base, Steam build ID, and tool versions where available.
-Leave unavailable metadata unknown without blocking discovery.
+Establish the Palworld game version and record its source. This is the primary
+report identity. Locate `Pal/Binaries/Win64/Palworld-Win64-Shipping.exe` and record
+its SHA-256. Add architecture, image base, Steam build ID, and tool versions where
+available. If the game version remains unknown, use the workflow's provisional
+report naming and keep version verification pending; don't invent a release label
+or block useful discovery on missing metadata.
 
 The Steam build ID is `buildid` in the installation's Steam appmanifest, not an
 ELF build ID. Confirm the manifest's game identity rather than guessing its app ID.
@@ -102,6 +110,11 @@ recovered, and compare only if requested. The investigation should establish
 what the game does, rather than work toward an assumed match with PalCalc.
 
 ## Discovery anchors from PalCalc
+
+The [historical discovery references](HISTORICAL-DISCOVERY-REFERENCES.md) retain
+old call paths, offsets, and constants that may help locate these routines.
+They're exploration tips for a named executable, not current mechanics or
+verification evidence.
 
 Start with these source files when the repository is available. In an indexed checkout, use CodeGraph to locate/read their current definitions. Otherwise search the source normally.
 

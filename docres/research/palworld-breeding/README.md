@@ -1,202 +1,185 @@
-# Researching Palworld breeding mechanics
+# Palworld mechanics research
 
-PalCalc needs a reliable understanding of the game rules behind breeding paths and
-their success probabilities. An AI agent can use
-[Reverse Engineer Anything (REA)](https://github.com/morluto/rea) to investigate a
-specific Palworld executable and compare its behavior with PalCalc.
+This is the record of which mechanics we've checked, against which game versions,
+and where to find the conclusions and evidence. For a player-facing explanation
+of the rules, start with [Palworld Breeding Mechanics](../../../PALWORLD-BREEDING-MECHANICS.md).
 
-For the current rules, approximations, and assessment coverage, read
-[PALWORLD-BREEDING-MECHANICS.md](../../../PALWORLD-BREEDING-MECHANICS.md).
-This folder explains how to investigate, review, and maintain that understanding.
+We use [Reverse Engineer Anything (REA)](https://github.com/morluto/rea) to recover
+the game's logic. [GenDB](../../../PalCalc.GenDB/README.md) supplies game-data
+values such as species ranks, recipes, and skill weights. We need both: finding
+the expected values doesn't prove how the game uses them, and recovering the
+selection code doesn't establish the values in the current assets.
+
+## Current verification status
+
+**Last complete game-version review: none published.**
+
+**Last mechanics verification update: none under this checklist.**
+
+We're starting a comprehensive baseline review rather than carrying forward the
+old, separate investigations as completed coverage. The existing mechanics
+explanation and solver calculations remain available, but haven't yet been
+revalidated through this checklist. The earlier reports were removed during this
+documentation reset; they're available in Git history.
+
+The table below is the main coverage record. Once reports are published, each row
+links directly to that mechanic's conclusions and supporting evidence. A partial
+review can update individual rows without making the whole version complete.
+
+| Required mechanic | What needs to be established | Last checked game version / date | Status | Conclusions / evidence |
+| --- | --- | --- | --- | --- |
+| Child species | Recipes and parent genders, rank selection, eligibility, ties, item effects, and later replacements | — | Awaiting baseline review | — |
+| Child gender | Ratios, fixed genders, overrides, and final assignment | — | Awaiting baseline review | — |
+| Child passives | Parental selection, random additions, duplicates, failed additions, and item effects | — | Awaiting baseline review | — |
+| Child attacks | Equipped-parent inheritance, natural and mastered attacks, item effects, and final learned/equipped contents | — | Awaiting baseline review | — |
+| Child IVs | Parent and random sources, asymmetric branches, ranges, and item effects | — | Awaiting baseline review | — |
+| Wild-Pal passives | Spawn-time contents, guaranteed passives, and capture-time changes | — | Awaiting baseline review | — |
+| Wild-Pal attacks | Spawn-time contents, level-based learning, and capture-time changes | — | Awaiting baseline review | — |
+| Wild-Pal gender | Spawn-time selection, ratios, fixed genders, and overrides | — | Awaiting baseline review | — |
+
+A standard game-update review checks **all eight mechanics**, including their
+relevant ordinary and item modes. Record alternate modes such as mutation
+explicitly: trace their effects or explain which conclusions don't cover them.
+An excluded mode stays visible as a gap; it doesn't become verified just because
+PalCalc currently ignores it. See the [workflow's completion rules](ASSESSMENT-WORKFLOW.md#reviewing-a-game-update).
+
+Use **verified**, **verified unchanged**, **partial**, or **unresolved** for
+published findings. The last-checked version/date advances only for the scope
+actually supported by evidence; a later unsuccessful check is recorded separately
+in that version's report. An unresolved new version doesn't erase an older
+verified finding or make it applicable to the new version.
+
+[The changelog](CHANGELOG.md) records completed and partial version reviews, what
+changed, and corrections to our understanding. Game version is the primary
+identifier; platform, Steam build ID, executable hash, and asset identities
+distinguish the installation actually checked. If the version is unknown, say so
+and keep the review provisional rather than guessing a release label.
+
+### Supporting mechanics
+
+| Mechanic | Current explanation | Last checked game version / date | Status |
+| --- | --- | --- | --- |
+| World-map coordinates | [Coordinate transforms and calibration](../palworld-misc/README.md#world-map-coordinates) | — | No published native verification |
+| Egg-production time | [PalCalc's timing model](../../../PalCalc.Solver/README.md#egg-production-time) | — | No published native verification |
+
+These get targeted reviews when a change, reported problem, or explicit request
+calls for one. They aren't required for a standard game-update review, and their
+older check dates don't make that review incomplete.
 
 ## Choose a starting point
 
 | Task | Start here |
 | --- | --- |
-| Check the reasoning or reproduce checks behind a committed finding | [Review existing findings](#review-existing-findings) |
-| Investigate a new or not-yet-covered mechanic | [Run an assessment](#run-an-assessment-yourself), using the requested scope |
-| Check for changes after a game update | [Check a game update](#check-a-game-update) |
-| Read detailed game pseudocode | Open **Evidence / pseudocode** in the [published assessments](#published-assessments) |
-| Understand which document to update | [Where information lives](#where-information-lives) and [when to update it](#when-updating-these-docs) |
-
-## Data and logic
-
-[GenDB](../../../PalCalc.GenDB/README.md) tells us what values are stored in the
-game files, such as species stats, breeding ranks, recipes, skill weights, and
-icons. Reverse engineering tells us how the game uses those values: what it
-selects, filters, calculates, and saves.
-
-We need both. Finding the expected weights doesn't prove how they're selected,
-and understanding the selection code doesn't prove which values the current
-assets contain. We also need to check that PalCalc considers the same eligible
-Pals and recipes as the game.
-
-## Questions PalCalc needs answered
-
-| Area | Questions |
-| --- | --- |
-| Child species | Which recipe or rank rule chooses the child, including genders, eligibility, ties, and later replacements? |
-| Child gender | How is the child's gender selected, and which data or overrides influence it? |
-| Child passives | How are parental and random passives selected, including item overrides and failed additions? |
-| Child attacks | How are equipped, inherited, natural, and mastered attacks assembled? |
-| Child IVs | How are parental and fresh values selected, including asymmetric branches and relevant overrides? |
-| Wild-Pal passives | What is assigned at spawn, what is guaranteed, and what can change on capture? |
-| Wild-Pal attacks | What is assigned at spawn, learned with level, or changed on capture? |
-| Wild-Pal gender | How is gender selected when a wild Pal is spawned? |
-
-These are the questions a complete review needs to cover; they haven't all been
-answered yet. The [coverage table](../../../PALWORLD-BREEDING-MECHANICS.md#assessment-coverage)
-shows the published findings and remaining gaps. A smaller review can focus on
-selected questions, but should say which modes it covers: ordinary breeding,
-items, mutation, spawning, or capture.
-
-## From game behavior to PalCalc
-
-```mermaid
-flowchart LR
-    A[Recover game behavior] --> B[Reconstruct full scoped pseudocode]
-    B --> C[Derive the PalCalc model]
-    C --> D[Compare with docs and relevant code]
-    D --> E[Update the maintained reference]
-    E --> F[Implement and test when requested]
-```
-
-The full model describes the part of the game being investigated, including
-details PalCalc doesn't model. The reduced model describes the rules we use for
-PalCalc and explains what we leave out. For example, we might ignore which random
-passive is selected while still accounting for how many are added. If selections
-can fail, ignoring those failures is an approximation that needs to be stated.
-
-The [workflow](ASSESSMENT-WORKFLOW.md) explains what to produce at each stage.
-The [REA guide](REA-GUIDE.md) explains how to investigate the executable.
-The [review skill](palworld-breeding-review/SKILL.md) compares findings from a
-completed investigation. It doesn't start another investigation or authorize
-implementation changes.
+| Understand the game rules or see whether they're current | [Mechanics explanation](../../../PALWORLD-BREEDING-MECHANICS.md), then the [status table](#current-verification-status) |
+| Verify a committed finding | [Review existing findings](#review-existing-findings) |
+| Investigate a new mechanic or fill a gap | [Run an assessment yourself](#run-an-assessment-yourself) |
+| Check a new game version | [Check a game update](#check-a-game-update) |
+| Read detailed game pseudocode | Follow a mechanic's evidence link in the status table; [report layout](#published-reports) |
+| Maintain these docs | [Where information lives](#where-information-lives) and [update dependencies](#when-updating-these-docs) |
+| Perform an analysis as an agent | Read the [workflow](ASSESSMENT-WORKFLOW.md), then the relevant [REA guide](REA-GUIDE.md) sections; the [review skill](palworld-breeding-review/SKILL.md) applies after evidence recovery |
 
 ## Review existing findings
 
-Start with the relevant [published assessment](#published-assessments). Its
-`assessment.md` states the conclusions, reviewed code/document baseline, and checks
-performed. Follow its links into `evidence.md` for the game pseudocode and the
-observations supporting each claim.
+Open the mechanic's conclusions in `assessment.md`, then its full game pseudocode
+and selected observations in `evidence.md`. Both belong to one game-version report.
 
-1. Check the report's build, executable identity, input-data sources, and scope.
-   A conclusion about ordinary breeding doesn't automatically cover mutation,
-   spawning, or capture.
-2. Check the reasoning against the cited evidence. Use the repository's
+1. Check the game version, platform, executable and asset identities, review date,
+   covered modes, and compared PalCalc revision. A conclusion about ordinary
+   breeding doesn't automatically cover mutation, spawning, or capture.
+2. Check the reasoning against the cited evidence. The repository's
    [review skill](palworld-breeding-review/SKILL.md) and its
-   [notes](palworld-breeding-review/references/review-notes.md) for a structured
-   comparison. An older installed copy may cover fewer mechanics.
-3. If reproducing a check, use the report's recorded inputs and assumptions and
-   identify what the check establishes. Synthetic checks test the reconstructed
-   calculation; PalCalc tests check the implementation. Neither runs the game or
-   independently verifies the recovered instructions. The report's conclusions
-   apply to its named baseline; newer code needs its own comparison.
+   [notes](palworld-breeding-review/references/review-notes.md) explain the comparison
+   and distinctions worth preserving. Those notes aren't current-version proof.
+3. Reproduce calculations using the recorded inputs and assumptions. Synthetic
+   checks test the reconstructed calculation; PalCalc tests check its implementation.
+   Neither independently verifies the recovered instructions or runs the game.
 
-Reviewing the published evidence doesn't require a new Ghidra session or access
-to the original chat and ignored working files. If independent executable
-inspection is needed, treat it as an explicitly scoped investigation using the
-[workflow](ASSESSMENT-WORKFLOW.md), and distinguish its new observations from the
-retained evidence. Don't silently turn an evidence review into another REA run.
+The published report must stand without the original chat or ignored working
+files. An independent executable inspection follows the investigation workflow;
+reviewing completed evidence doesn't itself authorize a new native session.
 
 ## Run an assessment yourself
 
-Use the [assessment workflow](ASSESSMENT-WORKFLOW.md) for a new mechanic or a gap
-in an earlier investigation. Select the relevant questions from the table above;
-a targeted task doesn't require examining every breeding system.
+Use the [workflow](ASSESSMENT-WORKFLOW.md) and [report template](ASSESSMENT-TEMPLATE.md).
+You'll need the game files, a writable checkout, REA's native-analysis tools, and
+a compatible Ghidra/Java installation. See the [setup instructions](REA-GUIDE.md#ghidra-prerequisite-gate).
+Asset-extraction prerequisites are needed only for the relevant data checks.
 
-You'll need the game files, a writable checkout, and an AI environment with REA's
-native-analysis tools and a compatible Ghidra/Java installation. The
-[setup instructions](REA-GUIDE.md#ghidra-prerequisite-gate) explain how to check
-those tools and reuse an existing installation with the required authorization.
-GenDB and mapping prerequisites are only needed if the investigation requires
-asset extraction.
+A targeted investigation can cover one mechanic. Add its conclusions and evidence
+to the report for that game version, preserving other mechanics' coverage and
+review dates. If it introduces a new mechanic, add it to the checklist and say
+whether future update reviews must cover it or it belongs with supporting topics.
 
-1. Make the game files and checkout available, then check the required tools
-   using the setup instructions above.
-2. Give the agent the executable or installed-game path, desired scope, and the
-   mechanics document/code revision to compare. Follow the
-   [assessment workflow](ASSESSMENT-WORKFLOW.md). Unknown version metadata should
-   be recorded as unknown, not inferred from an older report.
-3. Review `evidence.md` and `assessment.md`. They should be understandable without
-   the original chat, native session, or ignored working directory.
-
-For example, from a checkout with the required tools available:
+For example:
 
 ```text
-Follow docres/research/palworld-breeding/ASSESSMENT-WORKFLOW.md to assess the
-installed Palworld build. Examine how a bred child's gender is selected,
-including any relevant item overrides. Compare with
-PALWORLD-BREEDING-MECHANICS.md at the current revision. Report any scope gaps.
-Publish the evidence and assessment; do not implement changes in this run.
+Follow docres/research/palworld-breeding/ASSESSMENT-WORKFLOW.md to investigate
+child gender in the installed Palworld version. Record the game version and
+supporting executable/data identities. Update that mechanic in the version's
+assessment and evidence, marking the other checklist entries as not checked by
+this investigation. Compare with the current mechanics document and report gaps.
+Do not implement solver changes.
 ```
 
 ## Check a game update
 
-Follow [Reviewing a later game build](ASSESSMENT-WORKFLOW.md#reviewing-a-later-game-build).
-Use the relevant earlier assessment as a baseline, recheck the executable identity
-and asset dependencies, and record which behaviors changed, remained equivalent,
-were carried forward, or weren't assessed. An unchanged executable doesn't prove
-unchanged game data, and different code addresses don't prove a behavior change.
+Follow [Reviewing a game update](ASSESSMENT-WORKFLOW.md#reviewing-a-game-update).
+Use the previous version's report as a baseline and account for every required
+mechanic. An unchanged dependency can justify **verified unchanged** without
+reconstructing it from scratch, provided the report records what was compared and
+why that covers the mechanic. An unchanged executable alone doesn't prove unchanged
+assets; relocated code alone doesn't prove a behavior change.
 
-The workflow defines the comparison and publication procedure. Publish new
-build-specific findings separately, then update the maintained reference and
-coverage when those updates are part of the task. Don't rewrite an older report
-as though it investigated the new build.
+Publish a report for the new game version and update the status table and changelog.
+Keep the previous version's conclusions intact. A partial review is useful, but
+mustn't be presented as complete verification of the update.
+
+## Published reports
+
+No comprehensive baseline report has been published yet. See the
+[changelog](CHANGELOG.md) for review history from this reset onward.
+
+```text
+assessments/<game-version>/
+  assessment.md   conclusions per mechanic, changes, PalCalc comparison, checks
+  evidence.md     full game pseudocode, inputs, selected native/data evidence
+```
+
+Use stable headings for the eight mechanics in both files, as shown in the
+[template](ASSESSMENT-TEMPLATE.md). Dates belong in the report, rather than naming
+a separate report for each investigation. Platform/build variants of the same
+release must have distinct, explicitly scoped sections or folders; one platform's
+findings don't verify another. See the workflow for provisional unknown versions.
 
 ## Where information lives
 
 | Location | Main responsibility |
 | --- | --- |
-| [Current mechanics](../../../PALWORLD-BREEDING-MECHANICS.md) | Maintained explanation of game rules and current verification coverage, derived from the linked findings |
-| [Limitations](../../../LIMITATIONS.md) | Current modeling omissions, search tradeoffs, and their practical effects; detailed mechanics and build coverage stay in the mechanics reference |
-| [Solver overview](../../../PalCalc.Solver/README.md) | How the current implementation searches, estimates effort, and finalizes results |
-| [Workflow](ASSESSMENT-WORKFLOW.md) | Investigation, reconstruction, comparison, publication, and update process |
-| [REA guide](REA-GUIDE.md) | Setup, tracing checklists, technical methods and troubleshooting |
-| [Report template](ASSESSMENT-TEMPLATE.md) | Outlines for the two published assessment files |
-| `assessments/<date>-build-<id>/evidence.md` | Build-specific game model and pseudocode, selected supporting observations, and evidence boundaries |
-| `assessments/<date>-build-<id>/assessment.md` | Interpretation of that evidence and comparison with an explicitly recorded PalCalc baseline, including consequences and checks |
-| `tools/` | Reusable helpers and their tests; see the [PE helper instructions](REA-GUIDE.md#bundled-offline-pe-helper) |
-| `_REA-ANALYSIS/runs/<timestamp>-<id>/` at the repo root | Ignored raw responses, experiments, exports, logs and working notes |
-
-The evidence files support the game-behavior claims. The assessment files explain
-their consequences for the reviewed PalCalc baseline. The maintained mechanics
-reference summarizes accepted findings for readers; the solver overview describes
-the implementation. Check current implementation claims against the code rather
-than assuming a historical assessment still describes it.
+| This README | Current mechanic checklist, verification status, and routes into conclusions/evidence |
+| [Changelog](CHANGELOG.md) | Review dates, versions, affected mechanics, and the kind of change |
+| `assessments/<game-version>/assessment.md` | Authoritative conclusions for that version and comparison with a named PalCalc baseline |
+| `assessments/<game-version>/evidence.md` | Full game model and pseudocode, input provenance, decisive observations, and proof boundaries |
+| [Mechanics explanation](../../../PALWORLD-BREEDING-MECHANICS.md) | Player-facing game rules, derived from the research, with links back to status and detail |
+| [Limitations](../../../LIMITATIONS.md) | Current modeling omissions, search tradeoffs, and their practical effects |
+| [Solver overview](../../../PalCalc.Solver/README.md) and [worked calculations](../../../PalCalc.Solver/README-BREED-ESTIMATE.md) | Current implementation and its estimates |
+| [Workflow](ASSESSMENT-WORKFLOW.md), [template](ASSESSMENT-TEMPLATE.md), [REA guide](REA-GUIDE.md) | Review procedure, report structure, and technical investigation methods |
+| [Historical discovery references](HISTORICAL-DISCOVERY-REFERENCES.md) | Build-specific search anchors, layout clues, and constants for exploration; not mechanics conclusions or verification coverage |
+| [Review skill](palworld-breeding-review/SKILL.md) | Comparing completed findings with PalCalc |
+| `tools/` | Reusable helpers and tests; see the [PE helper instructions](REA-GUIDE.md#bundled-offline-pe-helper) |
+| `_REA-ANALYSIS/runs/<timestamp>-<id>/` at the repo root | Ignored raw responses, experiments, exports, logs, and working notes |
 
 ## When updating these docs
 
-- Accepted research findings prompt a review of the mechanics explanation,
-  coverage table, and relevant limitations. Link each summary to the detailed
-  finding it is based on; keep unknowns and data assumptions visible.
-- Implementation changes prompt a review of the solver explanation, worked
-  calculations, and current limitations. Record the change without making older
-  assessments appear to describe the new implementation.
-- A new build assessment updates the [assessment index](#published-assessments)
-  and, when reference updates are included, the mechanics coverage. Preserve
-  older reports' build identities, baselines, and scope.
-- Short explanations may repeat information for their audience, but should link
-  to the document responsible for the detailed rule or procedure. Review those
-  summaries when the underlying explanation changes; don't maintain competing
-  coverage tables or copies of the full workflow.
-
-## Additional game logic
-
-REA can investigate a scoped game calculation outside inheritance using the same
-process. [Additional game logic](../palworld-misc/README.md) documents world-map
-coordinate conversion and links the supporting
-[egg-production-time model](../../../PalCalc.Solver/README.md#egg-production-time).
-These topics receive targeted reviews when relevant. A standard breeding review
-records whether each needs work, is carried forward, or was not assessed; it does
-not require both investigations on every run.
-
-## Published assessments
-
-| Date | Build | Scope | Assessment / comparison | Evidence / pseudocode |
-| --- | --- | --- | --- | --- |
-| 2026-10-18 | 25246127 | Offspring species selection | [Assessment](assessments/2026-10-18-build-25246127/assessment.md) | [Evidence](assessments/2026-10-18-build-25246127/evidence.md#reconstructed-ordinary-selector) |
-| 2026-10-16 | 25246127 | IVs, passives, and attack inheritance | [Assessment](assessments/2026-10-16-build-25246127/assessment.md) | [Evidence](assessments/2026-10-16-build-25246127/evidence.md) |
-
-For another build, start from the workflow and semantic discovery anchors. Earlier
-addresses and findings are leads, not proof of unchanged behavior.
+- Accepted findings update the version report, status table, and changelog. Review
+  the player explanation and relevant limitations as derived summaries; link each
+  summary to the detailed finding rather than copying the full report.
+- Solver changes prompt a review of the solver explanation, worked calculations,
+  and limitations. They don't establish new game verification or rewrite an older
+  report's comparison as though it reviewed today's code.
+- A correction to our understanding updates the affected report with a dated
+  correction note and changelog entry. Preserve what was previously concluded and
+  why it changed; don't describe the correction as a game update without evidence.
+- Short explanations may repeat information for their audience. Keep one owner
+  for the detailed rule or procedure and review its linked summaries when it changes.
+  The player page and limitations page link here rather than maintaining separate
+  coverage tables.

@@ -3,7 +3,7 @@ obj/
 bin/
 cache/
 /_REA-ANALYSIS/
-# Publish only the report and selected evidence from each investigation.
+# Publish only the version report and selected evidence; raw runs stay local.
 /docres/research/palworld-breeding/assessments/*/*
 !/docres/research/palworld-breeding/assessments/*/assessment.md
 !/docres/research/palworld-breeding/assessments/*/evidence.md

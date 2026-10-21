@@ -2,8 +2,9 @@
 
 Our ordinary passive model started with
 [the work by /u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/).
-The [2026-10-16 assessment](../docres/research/palworld-breeding/README.md) later
-recovered the breeding algorithm for Steam build 25246127.
+Earlier reverse engineering informed the item-override model below. A new
+comprehensive baseline is pending; the [research checklist](../docres/research/palworld-breeding/README.md#current-verification-status)
+tracks game-version verification and links to conclusions and evidence when published.
 
 The examples below explain how PalCalc estimates ordinary passive inheritance,
 using the probability weights stored in this repository. These are worked
@@ -122,9 +123,9 @@ attempt random filling for target - selected_count
 stop; do not perform the ordinary random-add count roll
 ```
 
-See the [recovered override branch](../docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/evidence.md#passive-selection-and-override)
-for the underlying game evidence. PalCalc's Special Cake calculation uses a target
-of four.
+See the [research checklist](../docres/research/palworld-breeding/README.md#current-verification-status)
+for verification status and links to game evidence when published. PalCalc's
+Special Cake calculation uses a target of four.
 
 PalCalc assumes those filling attempts succeed, so it models a four-passive
 child. The game can sometimes finish with fewer; see the
