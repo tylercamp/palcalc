@@ -4,6 +4,24 @@ This is the maintained reference for the game mechanics PalCalc relies on and th
 approximations it uses. Read the [solver overview](PalCalc.Solver/README.md) for
 how those mechanics are used to search for breeding paths.
 
+Choose a topic:
+
+- [Child species](#pal-species)
+- [Passive inheritance](#passive-skills), including [Special Cakes](#passive-override-items--special-cakes)
+- [Attack inheritance](#activeattack-skills)
+- [IV inheritance](#ivs)
+- [Gender](#gender) and [wild Pals](#wild-pals)
+- [Which builds and mechanics have been checked](#assessment-coverage)
+- [PalCalc's limitations and search tradeoffs](LIMITATIONS.md)
+
+Each topic summarizes the build-specific findings linked in that section. Follow
+the evidence links for the detailed game pseudocode, supporting observations, and
+the limits of what was established. The assessment reports compare those findings
+with a named PalCalc revision; this page is the maintained explanation rather than
+a historical snapshot. [LIMITATIONS.md](LIMITATIONS.md) collects the current
+modeling omissions and search tradeoffs, while the topic sections below explain
+their mechanics in detail.
+
 We investigate the game's behavior for specific builds using AI and
 [Reverse Engineer Anything (REA)](https://github.com/morluto/rea). The
 [research introduction](docres/research/palworld-breeding/README.md) explains the
@@ -18,6 +36,8 @@ breeding, including child gender and wild-Pal generation, still need separate
 investigation. The table below shows what has been checked and where PalCalc uses
 an approximation. See [build and research details](#build-and-research-details)
 for the executable identity, review dates, and version-label limitations.
+Coverage of a named build doesn't establish compatibility with a later update,
+and checking executable logic doesn't by itself verify the current asset values.
 
 | Question | Published coverage | PalCalc treatment and limits |
 | --- | --- | --- |

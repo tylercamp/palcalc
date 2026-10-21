@@ -62,7 +62,7 @@ PalCalc does not require administrator access. If it unexpectedly asks for eleva
   - Pal and skill names come directly from Palworld's localized game data
   - Community translations cover the rest of the interface, and the [translation guide](./PalCalc.UI/Localization/README.md) walks through adding or improving one
 
-Curious how PalCalc reaches its answers? Read about the [full solver process](./PalCalc.Solver/README.md), the underlying [Palworld breeding mechanics and probabilities](./PALWORLD-BREEDING-MECHANICS.md), or check out the example [step-by-step passive inheritance calculation](./PalCalc.Solver/README-BREED-ESTIMATE.md).
+Curious how PalCalc reaches its answers? Start with the [Palworld breeding mechanics and probabilities](./PALWORLD-BREEDING-MECHANICS.md). For more detail, read about the [full solver process](./PalCalc.Solver/README.md) or follow the example [step-by-step passive inheritance calculation](./PalCalc.Solver/README-BREED-ESTIMATE.md).
 
 PalCalc's save support is based on [palworld-save-tools by cheahjs](https://github.com/cheahjs/palworld-save-tools). Its breeding-effort calculations were first built on community research into [passive inheritance mechanics](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/).
 
@@ -85,10 +85,12 @@ The solution is divided into four main projects:
 
 To update Palworld game data, use [`PalCalc.GenDB`](./PalCalc.GenDB/). It rebuilds `PalCalc.Model/db.json` from locally installed game files; do not edit that file manually. See the [database-generation guide](./PalCalc.GenDB/README.md) for setup instructions.
 
-To verify or update game logic, start with the
-[mechanics research introduction](docres/research/palworld-breeding/README.md).
-It links the reproducible workflow, technical extraction guide, published
-assessments, and [supporting game calculations](docres/research/palworld-misc/README.md).
+For mechanics research, use the [research introduction](docres/research/palworld-breeding/README.md)
+to choose a starting point:
+
+- [Review existing findings](docres/research/palworld-breeding/README.md#review-existing-findings)
+- [Investigate another mechanic](docres/research/palworld-breeding/README.md#run-an-assessment-yourself)
+- [Check a newer game build](docres/research/palworld-breeding/README.md#check-a-game-update)
 
 Bug reports, research contributions, and pull requests are welcome in [GitHub Issues](https://github.com/tylercamp/palcalc/issues).
 

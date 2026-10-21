@@ -90,6 +90,10 @@ the [maintained mechanics document](../../../PALWORLD-BREEDING-MECHANICS.md).
 Keep recovered behavior, PalCalc's model, and remaining implementation differences
 explicit. Do not label a difference fixed merely because the documentation changed.
 Update its per-mechanic coverage and the [assessment index](README.md#published-assessments).
+Review relevant [limitations](../../../LIMITATIONS.md) and linked summaries when
+the findings change an omission, approximation, or scope boundary. The
+[document responsibilities and update rules](README.md#where-information-lives)
+identify which page owns each explanation.
 
 ### Deliverables and Git
 
@@ -120,6 +124,8 @@ and settings. Explain older estimates that may need a fresh solve; do not clear
 player data to force recalculation. Keep implementation explanations in the
 [solver overview](../../../PalCalc.Solver/README.md) and worked calculations in
 [the probability example](../../../PalCalc.Solver/README-BREED-ESTIMATE.md).
+Review the [current limitations](../../../LIMITATIONS.md) when implementation
+changes remove or introduce an approximation or search tradeoff.
 
 ## Reviewing a later game build
 

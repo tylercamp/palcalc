@@ -17,6 +17,8 @@ estimated effort and keeps a small selection of useful alternatives.
 
 A detailed explanation of Palworld breeding mechanics and calculations are
 described [here](../PALWORLD-BREEDING-MECHANICS.md).
+The [limitations page](../LIMITATIONS.md) collects the modeling omissions and
+search tradeoffs described throughout this overview.
 
 ## Concepts at a Glance
 
