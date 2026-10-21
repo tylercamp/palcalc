@@ -112,7 +112,9 @@ public class BreedingGraphAttackInstructionTests
 
     private static BredPalReference Bred(Pal pal, IPalReference parent1, IPalReference parent2, MaterializedAttackInheritance? inheritance) => new(
         new GameSettings(), pal, PalGender.WILDCARD, parent1, parent2,
-        avgRequiredBreedings: null, [], 1, 1,
+        avgRequiredBreedings: null, [],
+        new BreedingOutcome(inheritance?.Mode == AttackInheritanceMode.InheritAll
+            ? BreedingMethod.SpecialCake : BreedingMethod.Ordinary, 1),
         new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random }, 1,
         attackProfile: AttackProfile.Inactive,
         materializedAttackInheritance: inheritance

@@ -253,8 +253,11 @@ namespace PalCalc.UI.Persistence.Serialization
                 FromDto(value.Parent2, db, settings, solverSettings),
                 value.AvgRequiredBreedings,
                 value.EffectivePassiveInternalNames.Select(name => name.InternalToStandardPassive(db)).ToList(),
-                value.PassivesProbability.Value, // These values only differ during solving
-                value.PassivesProbability.Value, // 
+                new BreedingOutcome(
+                    materializedAttackInheritance?.Mode == AttackInheritanceMode.InheritAll
+                        ? BreedingMethod.SpecialCake : BreedingMethod.Ordinary,
+                    value.PassivesProbability.Value
+                ),
                 FromDto(value.IVs),
                 value.IVsProbability.Value,
                 AttackProfile.Inactive,

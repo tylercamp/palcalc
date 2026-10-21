@@ -1,6 +1,7 @@
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
+using PalCalc.Solver.Utils;
 
 namespace PalCalc.Solver.Processing;
 
@@ -21,19 +22,18 @@ internal sealed class ResultAccumulator(
     public IEnumerable<IPalReference> SelectFinalResults(IEnumerable<IPalReference> candidates)
     {
         var distinct = candidates.Distinct().ToList();
-        IEnumerable<IPalReference> preferredCakeTier = distinct;
-        if (attackTargets?.IsActive == true && distinct.Count != 0)
-        {
-            var minimumCakes = distinct.Min(reference =>
-                reference.AttackProfile.EntriesSpan[0].TotalSpecialCakes
-            );
-            preferredCakeTier = distinct.Where(reference =>
-                reference.AttackProfile.EntriesSpan[0].TotalSpecialCakes == minimumCakes
-            );
-        }
+        if (attackTargets?.IsActive != true)
+            return distinct
+                .GroupBy(selectionPolicy.BreedingEffortGroupOf)
+                .SelectMany(selectionPolicy.SelectRetainedAlternatives);
 
-        return preferredCakeTier
-            .GroupBy(selectionPolicy.BreedingEffortGroupOf)
+        var comparison = new FinalizationComparison();
+        return distinct
+            .GroupBy(reference => (
+                Outcome: comparison.KeyOf(reference),
+                Effort: reference.BreedingEffort,
+                Cakes: PalResultProperty.SpecialCakes(reference)
+            ))
             .SelectMany(selectionPolicy.SelectRetainedAlternatives);
     }
 

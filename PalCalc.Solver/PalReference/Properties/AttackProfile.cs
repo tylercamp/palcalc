@@ -1,9 +1,7 @@
 namespace PalCalc.Solver.PalReference.Properties;
 
 /// <summary>
-///     One possible attack outcome: the mask of desired attacks it achieves, and
-///     the minimum estimated Special Cake cost of the complete breeding tree
-///     that reaches it.
+///     One possible attack outcome.
 /// </summary>
 ///
 /// <param name="LearnedTargetMask">
@@ -21,7 +19,7 @@ public readonly record struct AttackProfileEntry(
 
 /// <summary>
 /// <para>
-///     Manages a distinct list of possible attack outcomes for a given Pal. As children
+///     Tracks a distinct list of possible attack outcomes for a given Pal. As children
 ///     are bred, the profiles of the parents are accumulated to track available paths.
 /// </para>
 /// <para>
@@ -32,26 +30,18 @@ public readonly record struct AttackProfileEntry(
 ///     this Pal's parents.
 /// </para>
 /// <para>
-///     Profiles are deliberately bounded. For each requested-attack mask the
-///     solver keeps the outcome using the fewest estimated Special Cakes.
+///     During search, each exact requested-attack mask retains only its minimum
+///     estimated Special Cake cost. Each bred candidate has one breeding method
+///     and its own passive probability; every profile entry respects that method.
+///     This keeps the search state small, but can discard paths whose attack odds
+///     would have made them better.
 /// </para>
 /// <para>
-///     During search, the profile records only exact requested-attack availability
-///     and the minimum estimated Special Cake cost for each mask. Attack
-///     probability, attack-specific effort, exact loadouts, and gender-adjusted
-///     cake use are reconstructed after search. This deliberately lossy boundary
-///     keeps the fixed attack search state small and portable: a structurally
-///     slower path can be discarded even when its exact attack odds would have
-///     been better, and a coarse finalist can fail an exact constraint after
-///     reconstruction.
-/// </para>
-/// <para>
-///     Search profile = availability + estimated cakes. Materialized inheritance
-///     = exact probability + effort + cakes + loadouts.
-/// </para>
-/// <para>
-///     The final, exact choice of attacks is decided in the final solver steps, using
-///     `AttackResultMaterializer` and `MaterializedAttackInheritance`.
+///     `AttackResultMaterializer` chooses the exact loadouts and records them in
+///     `MaterializedAttackInheritance`, recalculating attack probability, effort,
+///     and gender-adjusted cake use. It may reconstruct alternatives with higher
+///     cake costs and lower effort, or reject a surviving path once its actual
+///     costs are known.
 /// </para>
 /// </summary>
 public readonly struct AttackProfile : IEquatable<AttackProfile>

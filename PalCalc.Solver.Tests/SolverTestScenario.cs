@@ -90,8 +90,9 @@ internal static class SolverTestScenario
     public static List<IPalReference> Solve(
         ConfiguredSolver solver,
         string targetPal,
-        IEnumerable<ActiveSkill> requiredAttacks
-    ) => Solve(solver, targetPal, requiredAttacks, null, null, PalGender.WILDCARD, 0, 0, 0);
+        IEnumerable<ActiveSkill> requiredAttacks,
+        int ivHp = 0
+    ) => Solve(solver, targetPal, requiredAttacks, null, null, PalGender.WILDCARD, ivHp, 0, 0);
 
     public static List<IPalReference> Solve(
         ConfiguredSolver solver,

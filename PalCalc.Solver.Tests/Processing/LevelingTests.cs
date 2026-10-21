@@ -147,7 +147,7 @@ public class LevelingTests
 
     private static BredPalReference Bred(IPalReference first, IPalReference second) =>
         new(new GameSettings(), "Wixen Noct".ToPal(DB), PalGender.WILDCARD, first, second,
-            null, [], 1, 1, new(), 1, AttackProfile.Inactive, null);
+            null, [], new(BreedingMethod.Ordinary, 1), new(), 1, AttackProfile.Inactive, null);
 
     private static BredPalReference ReusedAcrossBranches(IPalReference first, IPalReference second)
     {
@@ -222,8 +222,8 @@ public class LevelingTests
                 new AttackProfile(new AttackProfileEntry(1, 0)));
             var entry = new AttackProfileEntry(1, 0);
             var bred = new BredPalReference(settings.GameSettings, child, PalGender.WILDCARD,
-                carrier, trained, null, [], 1, 1, new(), 1, new AttackProfile(entry), null);
-            var result = (BredPalReference)new AttackResultMaterializer(context, settings).Materialize(bred, entry);
+                carrier, trained, null, [], new(BreedingMethod.Ordinary, 1), new(), 1, new AttackProfile(entry), null);
+            var result = (BredPalReference)MaterializeSingle(new AttackResultMaterializer(context, settings), bred, entry);
             var instructions = result.MaterializedAttackInheritance;
             Assert.IsNotNull(instructions);
             Assert.AreEqual(1f, instructions.AttackProbability);
@@ -231,4 +231,8 @@ public class LevelingTests
             Assert.AreEqual((1, 15), MinimumLevelingPruning.TrainingOf(result));
         }
     }
+    private static IPalReference MaterializeSingle(
+        AttackResultMaterializer materializer, IPalReference reference, AttackProfileEntry entry) =>
+        materializer.Materialize(materializer.Evaluate(reference, entry.LearnedTargetMask).Single());
+
 }

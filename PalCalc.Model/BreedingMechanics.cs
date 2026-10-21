@@ -19,7 +19,7 @@ public sealed class BreedingMechanics
 
     [JsonConstructor]
     public BreedingMechanics(
-        Dictionary<int, int> ivInheritanceWeights,
+        int[] ivInheritanceWeights,
         Dictionary<int, int> passiveInheritanceWeights,
         Dictionary<int, int> passiveRandomWeights
     )
@@ -40,7 +40,6 @@ public sealed class BreedingMechanics
                 );
         }
 
-        IVProbabilityDirect = NormFromWeights(0, 3, ivInheritanceWeights);
         PassiveProbabilityDirect = NormFromWeights(0, 4, passiveInheritanceWeights);
         PassiveRandomAddedProbability = NormFromWeights(0, 4, passiveRandomWeights);
 
@@ -89,8 +88,13 @@ public sealed class BreedingMechanics
         ivDesiredProbabilities = BuildDesiredIVProbabilities();
     }
 
+    /// <summary>
+    /// Raw IV weights used by the inheritance algorithm;
+    /// see `../PALWORLD-BREEDING-MECHANICS.md#iv-source-selection`
+    /// and impl. comments below
+    /// </summary>
     [JsonProperty]
-    public Dictionary<int, int> IVInheritanceWeights { get; set; }
+    public int[] IVInheritanceWeights { get; set; }
 
     [JsonProperty]
     public Dictionary<int, int> PassiveInheritanceWeights { get; set; }
@@ -99,8 +103,6 @@ public sealed class BreedingMechanics
     public Dictionary<int, int> PassiveRandomWeights { get; set; }
 
     // direct probability helpers
-    [JsonIgnore]
-    public IReadOnlyDictionary<int, float> IVProbabilityDirect { get; }
 
     [JsonIgnore]
     public IReadOnlyDictionary<int, float> PassiveProbabilityDirect { get; }
@@ -117,19 +119,25 @@ public sealed class BreedingMechanics
     [JsonIgnore]
     public IReadOnlyDictionary<int, float> PassiveRandomAddedAtLeastN { get; }
 
+    /// <summary>
+    /// Inheritance probabilities depend on the specific IVs requested (HP, ATK, and/or DEF)
+    /// and are asymmetric (e.g., HP is more likely to be inherited than any other stat).
+    /// (See `../PALWORLD-BREEDING-MECHANICS.md#iv-source-selection`)
+    ///
+    /// This array covers the final probabilities of desired inheritance outcomes
+    /// (e.g., HP, HP+ATK, DEF, DEF+HP, etc.) where index Bit0 = HP, Bit1 = ATK, Bit2 = DEF.
+    /// 
+    /// Note this is not e.g. the chance of getting exactly `HP+ATK`, but the combined
+    /// chance of all ways to inherit `HP+ATK` (which would be `HP+ATK` *or* `HP+ATK+DEF`.)
+    /// </summary>
     private readonly float[] ivDesiredProbabilities;
 
     /// <summary>
-    /// Gets the chance that the inherited IV categories include all desired
-    /// categories, before selecting between the two parents' values.
+    /// Gets the chance that the parent-sourced stat set includes all requested
+    /// stats. (Not including each roll for choosing the "correct" parent for a stat.)
     /// </summary>
-    public float ProbabilityOfInheritingDesiredIVs(int desiredIVCount)
-    {
-        if (desiredIVCount < 1 || desiredIVCount > MaxInheritedIVs)
-            throw new ArgumentOutOfRangeException(nameof(desiredIVCount));
-
-        return ivDesiredProbabilities[desiredIVCount - 1];
-    }
+    public float ProbabilityOfInheritingDesiredIVs(bool hp, bool attack, bool defense) =>
+        ivDesiredProbabilities[(hp ? 1 : 0) | (attack ? 2 : 0) | (defense ? 4 : 0)];
 
     public TimeSpan TimeToCatch(Pal pal)
     {
@@ -144,26 +152,46 @@ public sealed class BreedingMechanics
 
     private float[] BuildDesiredIVProbabilities()
     {
-        // IV desired-count probabilities: chance of getting `numDesired` specific IVs given the
-        // inherited-count distribution. combinations table is fixed (there are 3 IV stats).
-        var combinationsProbabilityTable =
-            new Dictionary<int, Dictionary<int, float>>
-            {
-                { 1, new() { { 1, 1f / 3f }, { 2, 0f },      { 3, 0f } } },
-                { 2, new() { { 1, 2f / 3f }, { 2, 1f / 3f }, { 3, 0f } } },
-                { 3, new() { { 1, 1f },      { 2, 1f },      { 3, 1f } } },
-            };
+        const int hp = 1, attack = 2, defense = 4;
 
-        var result = new float[MaxInheritedIVs];
-        for (var inherited = 1; inherited <= MaxInheritedIVs; inherited++)
+        // see `../PALWORLD-BREEDING-MECHANICS.md#iv-source-selection`
+        /*
+        Palworld's IV inheritance logic is essentially:
+
+        switch (weighted_random(Combi_TalentInheritNum))
         {
-            for (var desired = 1; desired <= MaxInheritedIVs; desired++)
-            {
-                result[desired - 1] +=
-                    IVProbabilityDirect[inherited] *
-                    combinationsProbabilityTable[inherited][desired];
-            }
+            case 0 => random_choice(HP, ATK, DEF)
+            case 1 => random_choice(HP+ATK+DEF, HP+DEF, HP+ATK)
+            case 2 => HP+ATK+DEF
         }
+
+        (... indicating which stats get pulled from parents; unselected stats are set to random())
+        */
+
+        int[][] parentSourceSetsBySelectorIndex =
+        [
+            [hp, attack, defense],
+            [hp | attack | defense, hp | defense, hp | attack],
+            [hp | attack | defense],
+        ];
+        var totalWeight = IVInheritanceWeights.Sum();
+        var result = new float[8]; // 7 unordered combinations, +1 for "no relevant IVs"
+
+        // `0` means no HP, ATK, or DEF IVs to inherit:
+        // we don't care about inheritance, 100% "success" regardless of outcome
+        result[0] = 1f;
+
+        // go through each desired outcome
+        for (var outcomeBits = 1; outcomeBits < result.Length; outcomeBits++)
+            // each different way of achieving that outcome increases the odds of success
+            // (go through each selectable branch (`selectorIndex`), then each sub-outcome in the branches (`.Count(..) / .Length`))
+            for (var selectorIndex = 0; selectorIndex < parentSourceSetsBySelectorIndex.Length; selectorIndex++)
+            {
+                var selectorProbability = IVInheritanceWeights[selectorIndex] / (float)totalWeight;
+                result[outcomeBits] += selectorProbability *
+                    parentSourceSetsBySelectorIndex[selectorIndex].Count(selected => (selected & outcomeBits) == outcomeBits) /
+                    parentSourceSetsBySelectorIndex[selectorIndex].Length;
+            }
 
         return result;
     }

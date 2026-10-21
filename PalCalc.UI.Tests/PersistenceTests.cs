@@ -494,7 +494,7 @@ namespace PalCalc.UI.Tests
         var male = Owned(PalGender.MALE, "male");
         var female = Owned(PalGender.FEMALE, "female");
         var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics, AttackProfile.Inactive, null);
-        var bred = new BredPalReference(GameSettings.Defaults, pal, PalGender.WILDCARD, male, wild, null, [swift], 1, 1, ivs, 1, AttackProfile.Inactive, null);
+        var bred = new BredPalReference(GameSettings.Defaults, pal, PalGender.WILDCARD, male, wild, null, [swift], new(BreedingMethod.Ordinary, 1), ivs, 1, AttackProfile.Inactive, null);
         var composite = new CompositeOwnedPalReference(male, female);
         var surgery = new SurgeryTablePalReference(wild, [new AddPassiveSurgeryOperation(swift)]);
         var settings = new SerializableSolverSettings();
@@ -644,7 +644,7 @@ namespace PalCalc.UI.Tests
             var wild = new WildPalReference(pal, [], 0, db.BreedingMechanics, AttackProfile.Inactive, null);
             var surgery = new SurgeryTablePalReference(wild, []);
             var root = new BredPalReference(new GameSettings(), pal, PalGender.WILDCARD, composite, surgery,
-                null, [], 1, 1, new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random), 1, AttackProfile.Inactive, null);
+                null, [], new(BreedingMethod.Ordinary, 1), new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random), 1, AttackProfile.Inactive, null);
             var reference = JObject.FromObject(ResultJsonSerializer.ToDto(root));
             var references = reference.DescendantsAndSelf().OfType<JObject>().Where(o => o["RefType"] != null).ToArray();
             foreach (var item in references) item.Remove("LevelRequirements");

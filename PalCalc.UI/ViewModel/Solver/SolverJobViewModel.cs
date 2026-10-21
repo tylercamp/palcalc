@@ -203,36 +203,7 @@ namespace PalCalc.UI.ViewModel.Solver
 
                 if (dispatcher.HasShutdownStarted) return;
 
-                // general simplification pass, get the best result for each potentially
-                // interesting combination of result properties
-                var resultsTable = new PalResultGrouping(PalResultProperty.Combine(
-                    PalResultProperty.EffectivePassives,
-                    PalResultProperty.NumBreedingSteps,
-                    p => p.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
-                ));
-                resultsTable.AddRange(results);
-                resultsTable.FilterAll(ResultPruningPolicy.Default, tokenSource.Token);
-
-                // final simplification pass, ignore any results which are over 2x the effort of the fastest option
-                resultsTable = resultsTable.BuildNew(PalResultProperty.Combine(
-                    PalResultProperty.EffectivePassives
-                ));
-                resultsTable.FilterAll(g =>
-                {
-                    // (though if "the fastest option" is just a pal we already own with 0 effort, don't count that)
-                    var nonZero = g.Where(r => r.BreedingEffort > TimeSpan.Zero).ToList();
-                    if (nonZero.Count != 0)
-                    {
-                        var fastest = g.Where(r => r.BreedingEffort > TimeSpan.Zero).Min(r => r.BreedingEffort);
-                        return g.Where(r => r.BreedingEffort <= fastest * 2);
-                    }
-                    else
-                    {
-                        return g.Take(1);
-                    }
-                });
-
-                results = resultsTable.All.ToList();
+                results = SimplifyResults(results, tokenSource.Token);
 
                 dispatcher.Invoke(() =>
                 {
@@ -259,6 +230,43 @@ namespace PalCalc.UI.ViewModel.Solver
                     throw new Exception("Unhandled error during solver operation", e);
                 });
             }
+        }
+
+        internal static List<IPalReference> SimplifyResults(IEnumerable<IPalReference> results, CancellationToken token)
+        {
+            // general simplification pass, get the best result for each potentially
+            // interesting combination of result properties
+            var resultsTable = new PalResultGrouping(PalResultProperty.Combine(
+                PalResultProperty.EffectivePassives,
+                PalResultProperty.NumBreedingSteps,
+                PalResultProperty.SpecialCakes,
+                p => p.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
+            ));
+
+            resultsTable.AddRange(results);
+            resultsTable.FilterAll(ResultPruningPolicy.Default, token);
+
+            // final simplification pass, within each cake tier, ignore results over 2x its fastest option
+            resultsTable = resultsTable.BuildNew(PalResultProperty.Combine(
+                PalResultProperty.EffectivePassives,
+                PalResultProperty.SpecialCakes
+            ));
+            resultsTable.FilterAll(g =>
+            {
+                // (though if "the fastest option" is just a pal we already own with 0 effort, don't count that)
+                var nonZero = g.Where(r => r.BreedingEffort > TimeSpan.Zero).ToList();
+                if (nonZero.Count != 0)
+                {
+                    var fastest = g.Where(r => r.BreedingEffort > TimeSpan.Zero).Min(r => r.BreedingEffort);
+                    return g.Where(r => r.BreedingEffort <= fastest * 2);
+                }
+                else
+                {
+                    return g.Take(1);
+                }
+            });
+
+            return resultsTable.All.ToList();
         }
 
         private void Solver_StatusUpdated(SolverStatus obj)
