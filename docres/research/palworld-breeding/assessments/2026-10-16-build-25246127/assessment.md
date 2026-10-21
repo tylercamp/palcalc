@@ -5,10 +5,11 @@ Executable SHA-256:
 `e590b5e7bfaa3fea40fab1a02cc72c8fc5fd6f8631ef2308e95ac56c25195837`.
 Release version/date were not recorded.
 
-Comparison: the [current mechanics README](../../../../../PALWORLD-BREEDING-MECHANICS.md)
+Comparison: the [mechanics reference](../../../../../PALWORLD-BREEDING-MECHANICS.md)
 and PalCalc's `rea-mechanics` working tree at `7691b05` plus local changes,
 reviewed on 2026-10-18. The discovered game behavior comes from the completed
-2026-10-16 investigation.
+2026-10-16 investigation. Implementation statements below describe that reviewed
+baseline, not later changes to the branch or the linked files.
 
 ## Discovered mechanics
 
@@ -51,24 +52,24 @@ Native talent bonuses, mutation, wild initialization/capture, and child gender
 are not established by this reduced inheritance model. Numeric examples retain
 the data provenance and assumptions in [the evidence](evidence.md#example-inputs-and-limits).
 
-## Functional comparison with current PalCalc
+## Functional comparison with the reviewed PalCalc baseline
 
-| Mechanic | Current model versus discovered behavior | Effect on estimates |
+| Mechanic | Reviewed model versus discovered behavior | Effect on estimates |
 | --- | --- | --- |
-| IV source sets | Current subset table matches the recovered branches under ideal uniform draws; the older symmetric-count assumption was corrected | Requested stat identities affect success odds; accidental fresh-random matches remain excluded |
+| IV source sets | Reviewed subset table matches the recovered branches under ideal uniform draws; the older symmetric-count assumption was corrected | Requested stat identities affect success odds; accidental fresh-random matches remain excluded |
 | Ordinary parental passives | Merge/deduplication and parental selection agree | Random additions supplying desired passives do not contribute to modeled success |
-| Passive override | Current override replaces both count rolls correctly; filling is assumed successful | Modeled final counts can be optimistic when native filling falls short |
+| Passive override | Reviewed override replaces both count rolls correctly; filling is assumed successful | Modeled final counts can be optimistic when native filling falls short |
 | Random passive filler | Native weight mismatch and pool exhaustion are deliberately omitted | Bias and failed additions are not estimated; practical frequency remains unknown |
-| Attacks | Current final-inherited-content model agrees with the recovered pool/item behavior | No new inheritance-probability discrepancy was established; equipment ordering alone is not one |
+| Attacks | Reviewed final-inherited-content model agrees with the recovered pool/item behavior | No new inheritance-probability discrepancy was established; equipment ordering alone is not one |
 
 Relevant implementation: [IV source sets](../../../../../PalCalc.Model/BreedingMechanics.cs),
 [parental IV choices](../../../../../PalCalc.Solver/Probabilities/IVs.cs),
 [passive probabilities](../../../../../PalCalc.Solver/Probabilities/Passives.cs), and
 [attack probabilities](../../../../../PalCalc.Solver/Probabilities/Attacks.cs).
-Search comparisons retain ordinary-mode passive effort;
+At the reviewed baseline, search comparisons retained ordinary-mode passive effort;
 [final materialization](../../../../../PalCalc.Solver/Processing/Attacks/AttackResultMaterializer.cs)
-recomputes mode-specific attempts, effort, and cake use. Saved plans and player
-progress are preserved; older saved estimates may require a fresh solve.
+recomputed mode-specific attempts, effort, and cake use. Saved plans and player
+progress were preserved; older saved estimates could require a fresh solve.
 
 ## Breadcrumbs and limits
 

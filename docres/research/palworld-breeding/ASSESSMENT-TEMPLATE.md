@@ -4,7 +4,7 @@ Scope: <questions and modes; platform, executable SHA-256, build/version if know
 Compared with: <mechanics document and code revision or working tree>.
 Data inputs: <verified source or explicit assumptions behind numeric examples>.
 Coverage: <reviewed, carried forward, or not assessed for each requested mechanic>.
-Supporting logic: <egg-production time and map conversion disposition, if relevant>.
+Supporting logic: <review status for egg-production time and map conversion, if relevant>.
 
 ## Recovered game behavior
 
@@ -15,10 +15,10 @@ excluded modes, and any missing proof.
 
 ## PalCalc-relevant model
 
-Give understandable reduced pseudocode. Explain which game details are retained,
-omitted, approximated, or unresolved and why. Identify conditions needed for a
-simplification to preserve possible paths, desired outcomes, probabilities, and
-expected attempts. Do not treat unknowns as proven equivalences.
+Give understandable pseudocode for the model proposed for PalCalc. Explain which game
+details are retained, omitted, approximated, or unresolved and why. State when a
+simplification preserves the possible paths, desired outcomes, probabilities, and
+expected attempts. Don't assume that an unresolved detail has no effect.
 
 ## Functional comparison
 

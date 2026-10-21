@@ -4,57 +4,52 @@ This is the maintained reference for the game mechanics PalCalc relies on and th
 approximations it uses. Read the [solver overview](PalCalc.Solver/README.md) for
 how those mechanics are used to search for breeding paths.
 
-Native behavior is recovered for specific game builds using AI and
+We investigate the game's behavior for specific builds using AI and
 [Reverse Engineer Anything (REA)](https://github.com/morluto/rea). The
 [research introduction](docres/research/palworld-breeding/README.md) explains the
 process, how to run it yourself, and where published evidence is kept. GenDB
-extracts the data consumed by these algorithms; see the
+extracts the game data used by these rules; see the
 [data-generation guide](PalCalc.GenDB/README.md).
 
 ## Assessment coverage
 
-The published native findings concern **Steam build 25246127**, Windows x86-64,
-executable SHA-256 `e590b5e7bfaa3fea40fab1a02cc72c8fc5fd6f8631ef2308e95ac56c25195837`.
-The release label recorded in the previous reference was **v1.0.5.102999**;
-the retained native assessments did not independently establish that label.
-Inheritance evidence was recovered on 2026-10-16 and its implementation comparison
-reviewed on 2026-10-18. Species selection was assessed on 2026-10-18 for the same
-executable. These dates do not establish coverage of later game builds.
+These findings were checked against **Steam build 25246127**. Some parts of
+breeding, including child gender and wild-Pal generation, still need separate
+investigation. The table below shows what has been checked and where PalCalc uses
+an approximation. See [build and research details](#build-and-research-details)
+for the executable identity, review dates, and version-label limitations.
 
 | Question | Published coverage | PalCalc treatment and limits |
 | --- | --- | --- |
-| Child species | [2026-10-18 assessment](docres/research/palworld-breeding/assessments/2026-10-18-build-25246127/assessment.md) | Core rank rules agree; roster, recipe overlap, self-pairs, and exact ties need data-equivalence checks |
+| Child species | [2026-10-18 assessment](docres/research/palworld-breeding/assessments/2026-10-18-build-25246127/assessment.md) | Main rank rules agree; eligible species, overlapping recipes, same-species parents, and ties still need checks against current game data |
 | Child gender | No complete native assessment published | Uses species gender probabilities from game data; recipe gender constraints are a separate question |
-| Child passives | [2026-10-16 assessment](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/assessment.md) | Ordinary selection and override recovered; filler failures and exhaustion omitted |
-| Child attacks | [2026-10-16 assessment](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/assessment.md) | Final inherited contents modeled; later initialization remains an evidence boundary |
-| Child IVs | [2026-10-16 assessment](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/assessment.md) | Asymmetric source sets modeled; accidental random matches, mutation, and talent bonuses omitted |
-| Wild-Pal passives | No complete spawn/capture assessment published | Guaranteed-passive data and random-count assumptions are distinct from a verified generation algorithm |
+| Child passives | [2026-10-16 assessment](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/assessment.md) | Ordinary selection and item overrides checked; PalCalc assumes random filling succeeds |
+| Child attacks | [2026-10-16 assessment](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/assessment.md) | Inherited attacks modeled; later initialization wasn't fully traced |
+| Child IVs | [2026-10-16 assessment](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/assessment.md) | Different inheritance patterns for different stats modeled; accidental random matches, mutation, and talent bonuses omitted |
+| Wild-Pal passives | No complete spawn/capture assessment published | Uses guaranteed-passive data and assumptions about random counts; the full generation process hasn't been verified |
 | Wild-Pal attacks | No complete spawn/capture assessment published | Starting candidates use the current solver model; spawn, learning, and capture effects need separate proof |
 | Wild-Pal gender | No complete native assessment published | Uses species gender data; the spawn-time selection process remains to be documented |
 
 Supporting calculations are reviewed when relevant, rather than in every
 inheritance assessment: see [egg-production time](#egg-production-time) and
 [world-map coordinates](docres/research/palworld-misc/README.md#world-map-coordinates).
-Their current source-derived descriptions are not new native assessments.
+Those sections describe PalCalc's code, rather than newly verified game formulas.
 
 ## Pal Species
 
 ### Recovered game behavior
 
+The game first checks for a special recipe matching the parents, including their
+genders where required. It uses the first matching recipe in table order.
+
+If no recipe applies, it uses the parents' breeding ranks to choose a child. For
+ordinary rank values, this works out to averaging the parents' ranks and rounding
+up, then adding any item rank adjustment. It selects an eligible child with the
+nearest rank, breaking distance ties by priority and exact ties by table order.
+
 The [species evidence](docres/research/palworld-breeding/assessments/2026-10-18-build-25246127/evidence.md#reconstructed-ordinary-selector)
-reconstructs ordinary selection as:
-
-```text
-try matching special recipes in table order, including parent genders
-if none applies, use the parent's rounded-up mean rank plus the clamped item adjustment
-exclude boss/IgnoreCombi rows and characters appearing as special-recipe children
-choose the nearest rank, then highest priority; retain table order on an exact tie
-use the documented fallback if no candidate remains
-```
-
-The simplified rounding formula has an input-domain boundary; see the evidence
-for exact arithmetic, recipe fallback, item inputs, and final child-ID replacements.
-Mutation/replacement pools were outside the species assessment's scope.
+explains the exact arithmetic and where that simplification stops being valid.
+Mutation and later replacement pools were outside this assessment's scope.
 
 ### PalCalc's generated breeding graph
 
@@ -87,12 +82,30 @@ data. PalCalc uses them to generate `breeding.json` and `breedingdb.json`, which
 the solver reads when finding possible paths. This file is embedded in
 the PalCalc EXE files.
 
-The [functional comparison](docres/research/palworld-breeding/assessments/2026-10-18-build-25246127/assessment.md#functional-comparison)
-records remaining conditions: GenDB's roster does not read `IgnoreCombi`, its
-same-species shortcut precedes recipe matching, recipe resolution assumes a unique
-match, and exact ties add a non-variant preference. The native item rank adjustment
-also has no input in the generated graph. These distinctions do not prove an
-incorrect live pairing without checking the relevant current data.
+### Technical details and remaining differences
+
+The recovered ordinary selector can be summarized as:
+
+```text
+try matching special recipes in table order, including parent genders
+if none applies, use the parents' rounded-up mean rank plus the clamped item adjustment
+exclude boss/IgnoreCombi rows and characters appearing as special-recipe children
+choose the nearest rank, then highest priority; retain table order on an exact tie
+use the documented fallback if no candidate remains
+```
+
+The evidence records the arithmetic limits, recipe fallback, item inputs, and
+later child-ID replacements. The [functional comparison](docres/research/palworld-breeding/assessments/2026-10-18-build-25246127/assessment.md#functional-comparison)
+also identifies differences that still need checking against current data:
+
+- GenDB doesn't read `IgnoreCombi` when building its list of eligible species.
+- It returns the parent species for same-species pairs before checking recipes.
+- Recipe resolution assumes exactly one match.
+- Exact ties prefer a non-variant Pal, rather than simply keeping table order.
+- The generated breeding graph has no input for the game's item rank adjustment.
+
+These differences could matter, but we need the relevant game data before we can
+say that a particular live breeding pair produces the wrong result in PalCalc.
 
 ## Passive Skills
 
@@ -107,10 +120,11 @@ The existing PalCalc data contains these `BP_PalGameSetting` weights:
 - `Combi_PassiveInheritNum`: `[4, 3, 2, 1]`
 - `Combi_PassiveRandomAddNum`: `[4, 3, 2, 1]`
 
-The native parental-count selector returns its original index **plus one**; the
-random-add selector returns its original index. These are requested counts, capped
-by available parental candidates and remaining child slots. For ideal weighted
-selection, normalizing the repository's weights gives:
+The first roll asks for one to four passives from the parents. If the parents
+have fewer unique passives than requested, the child inherits the available ones.
+The second roll asks for zero to three random additions, limited by the remaining
+slots on the child. Dividing each weight by the sum of its list gives these
+probabilities under ideal weighted selection:
 
 | Requested parental count | Chance | Random-add attempts | Chance |
 | --- | ---: | --- | ---: |
@@ -130,12 +144,10 @@ PalCalc's ordinary-mode model is:
 Passive inheritance happens in two stages: the child first inherits passives
 from its parents (steps 1-3), then the game may add random passives (steps 4-5).
 
-PalCalc assumes successful filling with sufficient eligible candidates and ignores
-the chance that random additions supply desired passives. The recovered filler
-compares compacted weights but subtracts original weights after removals. This
-apparent bug can bias choices or consume attempts without a selection. PalCalc
-intentionally omits it and pool exhaustion; their frequency with actual game data
-was not established. Requested counts are not unconditional game guarantees.
+PalCalc assumes random filling succeeds and ignores the chance that a random
+addition supplies one of the desired passives. The game can sometimes finish with
+fewer passives than requested because of a selection bug or because no eligible
+passives remain. We don't yet know how often that happens with actual game data.
 
 ### Passive override items / Special Cakes
 
@@ -149,11 +161,11 @@ attempt random filling for target - selected_count
 stop; do not perform the ordinary random-add count roll
 ```
 
-PalCalc's existing Special Cake model uses override four. With at least four
-parental candidates the child selects four directly. With fewer, PalCalc models
-successful filling to four; the native bug or pool exhaustion can leave the real
-child short. The native run verified the override consumer, not Cake05's current
-asset value.
+PalCalc models Special Cakes with an override of four. With at least four unique
+parental passives, the child selects four directly. With fewer, PalCalc assumes
+the remaining slots are filled successfully. The game's selection bug or a lack
+of eligible passives can leave the real child short. The investigation checked
+how the game handles the override, but didn't re-extract Cake05's current item data.
 
 For five parental candidates containing two desired passives, override four
 selects both with probability `Choose(3,2)/Choose(5,4) = 3/5`. For a pool containing
@@ -161,12 +173,29 @@ only the two desired passives, the modeled result contains both plus two random
 passives with probability one. A result allowing fewer than four total passives has
 probability zero in this override model, even with empty parents.
 
-Search carries normal and Special Cake probabilities separately. Candidate effort
-comparisons use ordinary-mode passive probability and omit attack-inheritance odds.
-During finalization, attack materialization selects the concrete mode and recalculates
-attempts, effort, and cake use with that mode's passive probability and IV/attack odds.
-Special Cakes remain part of existing attack solving, rather than a new standalone
-passive-only item search.
+Ordinary and Special Cake candidates each carry their own passive probability.
+During search, PalCalc uses that probability and the IV odds to estimate effort.
+Finalization then chooses the equipped attacks within the candidate's breeding
+method and recalculates attempts, effort, and cake use, including attack odds and
+required-gender adjustments.
+
+We only consider cakes when needed to inherit multiple requested attacks that
+the child doesn't already learn at level one. We could also search for cakes just
+to improve passive inheritance, but skip those options for performance, accepting
+that we may miss some valid or better paths.
+
+### Selection details and approximation limits
+
+The parental-count selector returns the selected weight's original index plus
+one; the random-add selector returns its original index without adjustment.
+These are requested counts, not guarantees that every addition succeeds.
+
+The random filler removes excluded passives from a copied weight array. When
+choosing a passive, it compares against those remaining weights but subtracts
+weights from the original, unchanged array. This apparent bug can bias the choice
+or use up an attempt without selecting anything. PalCalc omits this behavior and
+the possibility of exhausting the eligible pool. Their practical frequency hasn't
+been measured; see the [filler evidence and example](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/evidence.md#random-passive-filler).
 
 ### Important Details
 
@@ -224,11 +253,15 @@ not revalidate the item's current asset values._
 
 **b.** Special Cakes cause children to inherit all possible equipped attacks from each parent. More specifically, they cause children to inherit three attacks from each parent. There is no way for a child to inherit more than three attacks from any one parent.
 
+### Technical details and limits
+
 The recovered [attack model](docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/evidence.md#attack-inheritance)
-supports this final-inherited-content model. Initial equipment order and the separate
-mastered/equipped writes are retained in that reference; they do not establish a new
-inheritance-probability discrepancy. Missing database rows are also excluded from the
-native eligible pool. Later initialization remains a documented evidence boundary.
+supports the inherited-attack behavior above. It also records initial equipment
+order and separate writes to mastered and equipped attack lists. Those details
+alone don't show that the final available attacks or their inheritance odds differ
+from PalCalc's model. Attacks missing from the game's database are excluded too.
+Later initialization wasn't fully traced, so these findings don't establish
+whether another step changes the saved attack collections.
 
 ## IVs
 
@@ -239,17 +272,32 @@ establish the source-selection process below.
 
 ### IV source selection
 
+The game doesn't simply roll how many IVs to inherit and then choose that many
+stats. It chooses between three groups of inheritance patterns. In the middle
+group, HP always comes from a parent, and one pattern inherits all three stats.
+That means asking for HP can give different odds from asking for Attack or Defense.
+
+The table below shows those patterns. The group numbers are zero-based indices
+from the game's weighted selector, rather than counts of inherited stats.
+
+| Selected group (weight array index) | Possible stats taken from parents |
+| --- | --- |
+| 0 | HP **or** Attack **or** Defense |
+| 1 | HP+Attack+Defense **or** HP+Defense **or** HP+Attack |
+| 2 | HP+Attack+Defense |
+
+For each stat taken from a parent, PalCalc assumes either parent is chosen
+independently with equal chance. Stats not taken from parents get fresh random
+values. A random value can happen to match a parent's IV, but that doesn't mean
+it was inherited; PalCalc doesn't count those accidental matches as successes.
+
+### Selector indices and calculation details
+
 The game makes a weighted selection from `Combi_TalentInheritNum`. Its result is
 the **zero-based index of the selected array entry**. “Category 1” in the native
 reference means index 1, the **second entry**, rather than one inherited stat.
 For the repository's `[3,2,1]` weights, that entry has weight 2. PalCalc stores
 the same ordered array and uses the game's zero-based selector indices directly.
-
-| Original selector index | PalCalc weight array index | Parental source sets |
-| --- | --- | --- |
-| 0 | 0 | HP **or** Attack **or** Defense |
-| 1 | 1 | HP+Attack+Defense **or** HP+Defense **or** HP+Attack |
-| 2 | 2 | HP+Attack+Defense |
 
 This excerpt shows ordinary source selection. Tuples are ordered
 `(HP, Attack, Defense)`; each field in `H` chooses either parent's corresponding
@@ -310,25 +358,25 @@ Using the repository's `[3,2,1]` weights and ideal uniform branches, the conditi
 stats. These are derived examples, not measured frequencies. The previous
 50% / 33.33% / 16.67% interpretation incorrectly treated categories as final counts.
 
-For required subsets, before choosing a qualifying parent's value:
+The following probabilities describe the chance of taking all the requested
+stats from parents, before checking which parent's values meet the requested IV
+thresholds. For example, HP+Attack counts both the HP+Attack pattern and the
+all-three pattern:
 
-| Desired subset | Conditional selection probability |
+| Desired stats | Chance all are taken from parents |
 | --- | ---: |
 | HP | 2/3 |
 | Attack, or Defense | 5/9 |
 | HP+Attack, or HP+Defense | 7/18 |
 | Attack+Defense, or all three | 5/18 |
 
-For each selected stat, PalCalc assumes either parent is chosen independently with
-equal chance. One qualifying parent contributes another factor of 1/2; either parent
-is sufficient when both qualify. No required IVs gives probability one. The subset
-probabilities are computed per database, so custom category weights retain the
-asymmetric branch table.
+If only one parent meets the threshold for a selected stat, that contributes
+another factor of 1/2. If both qualify, either parent's value succeeds. No required
+IVs gives probability one. These probabilities are computed per database, so
+custom category weights still use the same asymmetric pattern table.
 
-A fresh random value can equal a parent's number; a numerical match does not prove
-inheritance. PalCalc estimates parent-sourced target IVs and omits accidental random
-matches. Native talent-bonus and mutation branches are retained in the game reference
-but are outside this solver correction.
+The game reference also records talent-bonus and mutation branches. Those are
+outside this solver correction.
 
 
 ## Gender
@@ -381,6 +429,17 @@ A targeted timing assessment should trace the farm progress threshold, update ra
 parent and world modifiers, pauses, and the final egg-production event. Record units,
 covered modes, build identity, and evidence before replacing these assumptions.
 See the [additional-logic review policy](docres/research/palworld-misc/README.md).
+
+## Build and research details
+
+The published game-code findings concern Steam build 25246127, Windows x86-64,
+executable SHA-256 `e590b5e7bfaa3fea40fab1a02cc72c8fc5fd6f8631ef2308e95ac56c25195837`.
+The release label recorded in the previous reference was **v1.0.5.102999**;
+the retained assessments did not independently establish that label.
+
+Inheritance evidence was recovered on 2026-10-16 and its implementation comparison
+reviewed on 2026-10-18. Species selection was assessed on 2026-10-18 for the same
+executable. These dates do not establish coverage of later game builds.
 
 ## Implementation References
 

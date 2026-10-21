@@ -9,7 +9,8 @@ Compared with the working-tree [species description](../../../../../PALWORLD-BRE
 [GenDB calculator](../../../../../PalCalc.GenDB/PalBreedingCalculator.cs),
 [character reader](../../../../../PalCalc.GenDB/GameDataReaders/PalReader.cs), and
 [recipe reader](../../../../../PalCalc.GenDB/GameDataReaders/UniqueBreedComboReader.cs)
-based on commit `7691b05ab05a69f400b76d993ddd31cea790099b`.
+based on commit `7691b05ab05a69f400b76d993ddd31cea790099b`. Implementation statements
+below describe that reviewed baseline, not later changes to the linked files.
 No solver, database-generation, or saved-plan behavior was changed by this assessment.
 
 ## Conclusions
@@ -68,7 +69,7 @@ established. The implementation comparison below records the remaining distincti
 | `CombiRankBonus` | Item effect in `DA_BreedingItemEffectData.ItemEffectMap`; int32 addition to target rank, clamped to 0..10 | [Named field and retained cake entries](evidence.md#inputs-and-identity), [consumer](evidence.md#rank-arithmetic) |
 
 These references identify the inputs and their roles. Current table contents and
-item availability were not freshly extracted; the retained Cake02Ã¢â‚¬â€œCake05 entries
+item availability were not freshly extracted; the retained Cake02 through Cake05 entries
 all set `CombiRankBonus` to zero.
 
 ### Agreements
@@ -86,7 +87,7 @@ These are algorithm agreements, not an exhaustive verification of `breeding.json
 | Same-species shortcut | PalCalc returns the parent species before checking recipes. The traced native path instead performs recipe/rank selection. Equivalence depends on recipe contents, eligibility, ranks and priorities for self-pairs. |
 | Recipe resolution | Native returns the first matching row and falls through to rank selection when no applicable row remains. PalCalc requires exactly one matching recipe once a species pair has any recipe. Overlap or incomplete gender coverage can therefore change behavior or make generation fail; current rows were not enumerated here. |
 | Equal priority | Native retains table encounter order. PalCalc adds a non-variant preference after distance and priority. A difference requires tied candidates and a conflicting row order. |
-| Item rank adjustment | Native reads `CombiRankBonus` at item-effect offset `+0xc`, clamps it to 0..10 and adds it to the target rank. PalCalc's species graph has no such input. The field name/offset are verified against the current executable. Retained Cake02Ã¢â‚¬â€œCake05 entries all have zero; no positive-bonus item or specific item-induced mismatch is established. Current item values/availability were not re-extracted. |
+| Item rank adjustment | Native reads `CombiRankBonus` at item-effect offset `+0xc`, clamps it to 0..10 and adds it to the target rank. PalCalc's species graph has no such input. The field name/offset are verified against the reviewed executable. Retained Cake02 through Cake05 entries all have zero; no positive-bonus item or specific item-induced mismatch is established. Item values/availability for the reviewed build were not re-extracted. |
 
 These are demonstrated algorithm distinctions or conditional consequences, not a
 claim that current ordinary breeding results are incorrect. Establish relevant

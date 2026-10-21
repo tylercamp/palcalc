@@ -5,7 +5,10 @@ description: "Assess PalCalc breeding paths, inheritance estimates, and scoped s
 
 # Palworld Breeding Review
 
-Compare the assumed process with recovered behavior at the level that changes possible breeding paths, desired contents, probabilities, expected attempts, or the requested supporting calculation. Use the user's scope; omit mutation unless requested.
+Compare the process assumed by PalCalc with the recovered game behavior. Focus on
+differences that affect possible breeding paths, desired contents, probabilities,
+expected attempts, or the requested supporting calculation. Use the user's scope;
+omit mutation unless requested.
 
 Read [review-notes.md](references/review-notes.md) before assessing findings. It records distinctions established in prior reviews and worked examples, not permanent claims about future game builds.
 
@@ -19,11 +22,11 @@ REA is already complete. Do not open a binary, launch/import Ghidra, install too
 
 ## Derive the scoped PalCalc model
 
-Start from the full scoped game pseudocode in `evidence.md`. Write the reduced
-PalCalc-relevant pseudocode in `assessment.md`, explaining each omission,
-approximation, and equivalence condition. Preserve dependencies that affect
-possible paths, final contents, probability, or expected effort; a simpler model
-must not silently turn unknowns into guarantees.
+Start from the full game pseudocode for the reviewed scope in `evidence.md`.
+Write pseudocode for the proposed PalCalc model in `assessment.md`. Explain what
+it leaves out, where it approximates the game, and when a simplification gives
+the same result. Keep dependencies that affect possible paths, final contents,
+probability, or expected effort; don't turn unresolved details into guarantees.
 
 Cover the requested child species/gender/passive/attack/IV and wild initialization
 or capture questions. For species, test recipe and gender precedence, roster,

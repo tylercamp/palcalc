@@ -1,22 +1,20 @@
 # Additional Palworld game logic
 
-The [breeding research introduction](../palworld-breeding/README.md) and
-[assessment workflow](../palworld-breeding/ASSESSMENT-WORKFLOW.md) also support
-other scoped calculations. Use the same full game reconstruction, reduced
-PalCalc model, baseline comparison, and selected-evidence format. Store a new
-supporting-logic assessment as `assessments/<date>-build-<id>-<topic>/assessment.md`
-and `evidence.md`; keep raw investigation files under the ignored root run directory.
+Some game calculations matter to PalCalc even though they aren't inheritance
+rules. This folder covers topics such as converting world positions into map
+coordinates and estimating how long parents take to produce an egg.
 
-These topics receive targeted reviews when reported behavior, relevant code/data
-changes, or an explicit request warrants one. Standard breeding reviews record
-reviewed, carried forward, or not assessed; they do not rerun every topic.
+We review these when reported behavior, code or data changes, or an explicit
+request calls for it. A standard breeding review records whether each topic was
+reviewed, carried forward, or not assessed; it doesn't rerun every investigation.
 
 ## World-map coordinates
 
 PalCalc uses positions from saves to show the in-game map coordinate numbers and
 to place markers on its map image. These are two different 2D outputs from a 3D
 world position. [MapCoord](../../../PalCalc.Model/BaseInstance.cs) currently ignores
-Z and applies an affine transform to X and Y:
+Z and applies an affine transform to X and Y: a calculation that can scale,
+rotate, and shift the coordinates.
 
 ```text
 output_x = matrix[0,0] * world_x + matrix[0,1] * world_y + matrix[0,2]
@@ -37,10 +35,10 @@ matrices. [MapReader](../../../PalCalc.GenDB/GameDataReaders/MapReader.cs) reads
 map bounds and a region texture, but this alone does not establish the native UI
 coordinate formula. Its current scope recognizes `MainMap` and `FirstRegion`.
 
-Status: described from repository source on 2026-10-18. The retained breeding
-assessments do not contain a native map-conversion assessment or a game-build
-validation of these calibration constants. They must not be labeled REA-verified
-solely because they exist in code.
+This description comes from the repository source, reviewed on 2026-10-18. The
+published breeding assessments haven't verified the game's map-conversion
+formula or checked these calibration constants against a particular build.
+Their presence in PalCalc's code doesn't mean they have been verified with REA.
 
 A targeted reassessment should record the executable and map-asset identities,
 input/output units, axis swaps/signs/offsets, Z handling, region/texture selection,
@@ -61,6 +59,13 @@ progress from idle/sleep time. Carry forward an estimate only with its assumptio
 and provenance; an implementation formula is not proof of the game's formula.
 
 ## Adding another topic
+
+Use the [breeding research introduction](../palworld-breeding/README.md) and
+[assessment workflow](../palworld-breeding/ASSESSMENT-WORKFLOW.md). Keep the same
+separation between the full game model, the model used by PalCalc, and the
+comparison with the reviewed baseline. Store a new assessment as
+`assessments/<date>-build-<id>-<topic>/assessment.md` and `evidence.md`; keep raw
+investigation files under the ignored root run directory.
 
 State what PalCalc needs, choose the smallest useful scope, and follow the shared
 workflow. Start with a section here linking its current explanation and evidence;

@@ -1,6 +1,6 @@
 # Assessing and updating Palworld mechanics
 
-Start with the [research introduction](README.md). This workflow owns the stages,
+Start with the [research introduction](README.md). This workflow defines the stages,
 outputs, and publication rules. Use the [REA guide](REA-GUIDE.md) for extraction
 methods and the [review skill](palworld-breeding-review/SKILL.md) for comparison of
 completed evidence. The [template](ASSESSMENT-TEMPLATE.md) provides report outlines.
@@ -9,8 +9,9 @@ completed evidence. The [template](ASSESSMENT-TEMPLATE.md) provides report outli
 
 Record the requested questions and modes, platform, executable SHA-256, assessment
 date, and game build/version where known. Name the documented algorithm and code
-revision or working tree being compared. Record data provenance separately for
-numeric examples; static code recovery does not prove current asset values.
+revision or working tree being compared. For numeric examples, separately record
+where the input values came from; reading the executable's logic doesn't establish
+the current asset values.
 
 A standard breeding review considers all questions in the
 [requirements table](README.md#questions-palcalc-needs-answered): child species,
@@ -57,8 +58,9 @@ probability, or expected attempts. An ignored selection identity does not imply
 that failed selections or achieved counts are irrelevant.
 
 Keep this proposed model separate from both the recovered game model and the
-current implementation. A simplification needs a stated equivalence condition or
-an explicit approximation, not an assumption that native details are harmless.
+current implementation. For each simplification, explain the conditions under
+which it gives the same result, or label it as an approximation. Don't assume
+that a game detail is harmless just because PalCalc doesn't currently model it.
 
 ## 4. Compare with the reviewed baseline
 

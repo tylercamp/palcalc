@@ -1,8 +1,9 @@
 # Researching Palworld breeding mechanics
 
 PalCalc needs a reliable understanding of the game rules behind breeding paths and
-their success probabilities. AI agents use [Reverse Engineer Anything (REA)](https://github.com/morluto/rea)
-to recover behavior from a specific Palworld executable and compare it with PalCalc.
+their success probabilities. An AI agent can use
+[Reverse Engineer Anything (REA)](https://github.com/morluto/rea) to investigate a
+specific Palworld executable and compare its behavior with PalCalc.
 
 For the current rules, approximations, and assessment coverage, read
 [PALWORLD-BREEDING-MECHANICS.md](../../../PALWORLD-BREEDING-MECHANICS.md).
@@ -10,11 +11,15 @@ This folder explains how to investigate, review, and maintain that understanding
 
 ## Data and logic
 
-[GenDB](../../../PalCalc.GenDB/README.md) extracts data such as species stats,
-breeding ranks, recipes, skill weights, and icons. Reverse engineering establishes
-how game code uses those inputs: selection, ordering, filtering, arithmetic, and
-final saved values. Matching executable logic alone does not verify current asset
-values or that PalCalc's generated breeding graph uses an equivalent roster.
+[GenDB](../../../PalCalc.GenDB/README.md) tells us what values are stored in the
+game files, such as species stats, breeding ranks, recipes, skill weights, and
+icons. Reverse engineering tells us how the game uses those values: what it
+selects, filters, calculates, and saves.
+
+We need both. Finding the expected weights doesn't prove how they're selected,
+and understanding the selection code doesn't prove which values the current
+assets contain. We also need to check that PalCalc considers the same eligible
+Pals and recipes as the game.
 
 ## Questions PalCalc needs answered
 
@@ -29,10 +34,11 @@ values or that PalCalc's generated breeding graph uses an equivalent roster.
 | Wild-Pal attacks | What is assigned at spawn, learned with level, or changed on capture? |
 | Wild-Pal gender | How is gender selected when a wild Pal is spawned? |
 
-These are the coverage requirements, not a claim that every question is already
-answered. The [coverage table](../../../PALWORLD-BREEDING-MECHANICS.md#assessment-coverage)
-identifies published findings and gaps. Ordinary, item, mutation, spawn, and capture
-modes must be distinguished; a scoped review can leave other modes unassessed.
+These are the questions a complete review needs to cover; they haven't all been
+answered yet. The [coverage table](../../../PALWORLD-BREEDING-MECHANICS.md#assessment-coverage)
+shows the published findings and remaining gaps. A smaller review can focus on
+selected questions, but should say which modes it covers: ordinary breeding,
+items, mutation, spawning, or capture.
 
 ## From game behavior to PalCalc
 
@@ -45,24 +51,29 @@ flowchart LR
     E --> F[Implement and test when requested]
 ```
 
-The full model describes the scoped game process, including details PalCalc does
-not model. The reduced model explains what PalCalc needs and why other details
-are omitted. For example, it can ignore which random passive is selected while
-still accounting for the number of random additions. Failed filling attempts may
-affect that count and must be identified as an approximation if omitted.
+The full model describes the part of the game being investigated, including
+details PalCalc doesn't model. The reduced model describes the rules we use for
+PalCalc and explains what we leave out. For example, we might ignore which random
+passive is selected while still accounting for how many are added. If selections
+can fail, ignoring those failures is an approximation that needs to be stated.
 
-The [workflow](ASSESSMENT-WORKFLOW.md) owns stage boundaries and output rules.
-The [REA guide](REA-GUIDE.md) supplies the technical extraction instructions.
-The [review skill](palworld-breeding-review/SKILL.md) compares completed evidence;
-it does not start another native investigation or authorize implementation.
+The [workflow](ASSESSMENT-WORKFLOW.md) explains what to produce at each stage.
+The [REA guide](REA-GUIDE.md) explains how to investigate the executable.
+The [review skill](palworld-breeding-review/SKILL.md) compares findings from a
+completed investigation. It doesn't start another investigation or authorize
+implementation changes.
 
 ## Run an assessment yourself
 
-1. Have the game files and a writable checkout available. Use an AI environment
-   with REA native-analysis tools and a compatible Ghidra/Java installation.
-   Follow the [prerequisite gate](REA-GUIDE.md#ghidra-prerequisite-gate) rather than
-   installing another copy of working tools. GenDB and mapping prerequisites are
-   needed only when the scoped investigation requires asset extraction.
+You'll need the game files, a writable checkout, and an AI environment with REA's
+native-analysis tools and a compatible Ghidra/Java installation. The
+[setup instructions](REA-GUIDE.md#ghidra-prerequisite-gate) explain how to check
+those tools and reuse an existing installation with the required authorization.
+GenDB and mapping prerequisites are only needed if the investigation requires
+asset extraction.
+
+1. Make the game files and checkout available, then check the required tools
+   using the setup instructions above.
 2. Give the agent the executable or installed-game path, desired scope, and the
    mechanics document/code revision to compare. Follow the
    [assessment workflow](ASSESSMENT-WORKFLOW.md). Unknown version metadata should
@@ -94,7 +105,7 @@ narrower scope.
 | [REA guide](REA-GUIDE.md) | Setup, tracing checklists, technical methods and troubleshooting |
 | [Report template](ASSESSMENT-TEMPLATE.md) | Outlines for the two published assessment files |
 | `assessments/<date>-build-<id>/evidence.md` | Recovered scoped game model and selected supporting evidence |
-| `assessments/<date>-build-<id>/assessment.md` | PalCalc projection, baseline comparison, consequences, and checks |
+| `assessments/<date>-build-<id>/assessment.md` | Model used for the PalCalc comparison, reviewed baseline, consequences, and checks |
 | `tools/` | Reusable helpers and their tests; see the [PE helper instructions](REA-GUIDE.md#bundled-offline-pe-helper) |
 | `_REA-ANALYSIS/runs/<timestamp>-<id>/` at the repo root | Ignored raw responses, experiments, exports, logs and working notes |
 
