@@ -111,6 +111,21 @@ four distinct passives from the parents, and the game tries to fill any remainin
 slots with random passives. This means we don't multiply by
 `PassiveRandomAddedProbability` when calculating the cake probability.
 
+More generally, a positive `PassiveInheritCountOverride=N` replaces both count
+rolls with the following process:
+
+```text
+target = min(N, 4)
+pool = distinct(parent A passives + parent B passives)
+select up to target parental passives without replacement
+attempt random filling for target - selected_count
+stop; do not perform the ordinary random-add count roll
+```
+
+See the [recovered override branch](../docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/evidence.md#passive-selection-and-override)
+for the underlying game evidence. PalCalc's Special Cake calculation uses a target
+of four.
+
 PalCalc assumes those filling attempts succeed, so it models a four-passive
 child. The game can sometimes finish with fewer; see the
 [mechanics README](../PALWORLD-BREEDING-MECHANICS.md) for the known limitations.
@@ -121,6 +136,17 @@ Runner are guaranteed to be included. If the parents only had Lucky and Runner,
 we'd instead model a child with those two passives and two random fillers. Those
 extra slots stay on the candidate, since they affect inheritance in later
 generations.
+
+For a larger pool, suppose the parents have five unique passives between them,
+including two desired passives. The cake selects four parental passives. The
+chance of including both desired passives is `Choose(3,2) / Choose(5,4) = 3/5`:
+choose the other two inherited passives from the three irrelevant ones, out of
+all ways to select four from five.
+
+Because PalCalc assumes successful filling, the override probability is zero for
+requested final counts below four, even when the parents have fewer passives or
+none at all. This is a property of the estimate, not proof that every real cake
+child finishes with four passives.
 
 `MaxBredIrrelevantPassives` limits the ordinary passive options we explore during
 search. It doesn't exclude the extra slots required by cakes, and it isn't a

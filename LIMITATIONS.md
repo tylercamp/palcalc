@@ -35,7 +35,7 @@ data hasn't been established.
 
 This matters especially for Special Cakes: the game targets four passives, but
 with fewer than four parental candidates it relies on random filling. PalCalc
-models a four-passive result. See [passive selection and its limits](PALWORLD-BREEDING-MECHANICS.md#selection-details-and-approximation-limits)
+models a four-passive result. See [passive selection and its limits](PALWORLD-BREEDING-MECHANICS.md#passive-skills)
 for the detailed explanation and evidence.
 
 ### Desired traits supplied by fresh random values
@@ -46,7 +46,7 @@ qualifying parent-sourced values, ignoring fresh random values that happen to me
 the target. These omissions can miss successful outcomes and overestimate effort.
 
 See the [passive calculation](PalCalc.Solver/README-BREED-ESTIMATE.md) and
-[IV calculation](PALWORLD-BREEDING-MECHANICS.md#selector-indices-and-calculation-details).
+[IV calculation](PalCalc.Solver/README.md#iv-probabilities).
 
 ### Unknown or irrelevant passive identities
 
@@ -66,7 +66,7 @@ the player's routine. In particular, egg-production time includes an assumed
 allowance for parent availability. Incubation and capture effort also depend on
 the configured model and settings.
 
-See [egg-production time](PALWORLD-BREEDING-MECHANICS.md#egg-production-time)
+See [egg-production time](PalCalc.Solver/README.md#egg-production-time)
 and [effort estimation](PalCalc.Solver/README.md#estimating-the-effort-of-a-path).
 
 ## Search tradeoffs
@@ -115,7 +115,7 @@ behavior is intentionally omitted from the estimate.
 The [mechanics coverage table](PALWORLD-BREEDING-MECHANICS.md#assessment-coverage)
 records the build-specific findings and gaps, including child gender and wild-Pal
 generation. The inheritance estimates described there omit mutation and talent-bonus
-branches. The [species comparison](PALWORLD-BREEDING-MECHANICS.md#technical-details-and-remaining-differences)
+branches. The [species comparison](PalCalc.Solver/README.md#species-database)
 also records data conditions still needing checks before claiming that PalCalc's
 generated graph matches every live pairing.
 

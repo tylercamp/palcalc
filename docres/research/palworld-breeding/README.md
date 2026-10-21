@@ -186,7 +186,7 @@ than assuming a historical assessment still describes it.
 REA can investigate a scoped game calculation outside inheritance using the same
 process. [Additional game logic](../palworld-misc/README.md) documents world-map
 coordinate conversion and links the supporting
-[egg-production-time model](../../../PALWORLD-BREEDING-MECHANICS.md#egg-production-time).
+[egg-production-time model](../../../PalCalc.Solver/README.md#egg-production-time).
 These topics receive targeted reviews when relevant. A standard breeding review
 records whether each needs work, is carried forward, or was not assessed; it does
 not require both investigations on every run.

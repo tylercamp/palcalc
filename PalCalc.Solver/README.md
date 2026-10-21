@@ -296,11 +296,15 @@ presentation step, but aren't used in the breeding search itself.
 
 Each bred candidate represents either ordinary breeding or breeding with a
 Special Cake, with the passive probability for that method.
+During search, we use that probability and the IV odds to estimate effort.
+Attack-inheritance odds are included when finalization chooses the equipped attacks.
 
 `MaxBredIrrelevantPassives` limits the ordinary passive options we explore.
 Special Cakes need separate handling: they produce four passive slots in our
 model, even when that exceeds the configured limit.
 
+We only introduce cake candidates when the parents can equip and pass on multiple
+requested attacks that the child doesn't already learn at level one.
 We could also search for ways to use cakes just to improve passive inheritance,
 but that would add more options to the search. We skip those for performance,
 accepting that we may miss some valid or better paths.
@@ -478,6 +482,189 @@ applies within each cake tier. The UI uses `PalResultGrouping` and
 `PalResultProperty` for this further simplification; these final-list groups
 do not change how candidates are grouped during the search.
 
+## Mechanics used by the solver
+
+The [player-facing mechanics reference](../PALWORLD-BREEDING-MECHANICS.md) explains
+the game rules. This section records the implementation and calculation details
+behind PalCalc's estimates. The linked build-specific evidence remains the source
+for the recovered game pseudocode and its scope.
+
+### Species database
+
+Each species has a breeding power, named `CombiRank` in game data. GenDB reads
+those powers, priorities, and special recipes to generate `breeding.json` and
+`breedingdb.json`, which are embedded in PalCalc and used to find possible pairs.
+
+GenDB visits each species pair and:
+
+1. Returns the same species for a same-species pair.
+2. Otherwise uses a matching special recipe, where one applies.
+3. Otherwise averages the parent powers and rounds up, then chooses the nearest
+   eligible child power. `CombiDuplicatePriority` breaks distance ties, with the
+   highest value preferred. Special-recipe children are excluded from this scan.
+
+This generated graph needs more than matching rank arithmetic to agree with the
+game. The [species comparison](../docres/research/palworld-breeding/assessments/2026-10-18-build-25246127/assessment.md#functional-comparison)
+records conditions still needing data checks:
+
+- GenDB doesn't read `IgnoreCombi` when building its eligible roster.
+- Its same-species shortcut runs before recipe matching.
+- Recipe resolution assumes exactly one matching row.
+- Exact distance/priority ties add a non-variant preference instead of retaining
+  native table order.
+- The generated graph has no input for the game's item rank adjustment.
+
+These are algorithm differences or conditional consequences, not proof of a wrong
+live pairing without the relevant current data. See the
+[reconstructed selector](../docres/research/palworld-breeding/assessments/2026-10-18-build-25246127/evidence.md#reconstructed-ordinary-selector)
+for recipe order, eligibility, exact rounding limits, item clamps, fallback, and
+later child-ID replacements.
+
+### IV probabilities
+
+The source patterns below come from the
+[build-specific IV evidence](../docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/evidence.md#iv-source-selection).
+They describe the ordinary source-selection model, not mutation or talent bonuses.
+
+| Original selector / weight array index | Possible parent-sourced sets |
+| --- | --- |
+| 0 | HP; Attack; Defense |
+| 1 | HP+Attack+Defense; HP+Defense; HP+Attack |
+| 2 | HP+Attack+Defense |
+
+The game makes a weighted selection from `Combi_TalentInheritNum`. Its result is
+the **zero-based index of the selected array entry**. “Category 1” in the native
+reference means index 1, the **second entry**, rather than one inherited stat.
+For the repository's `[3,2,1]` weights, that entry has weight 2. PalCalc stores
+the same ordered array and uses the game's zero-based selector indices directly.
+
+This excerpt shows ordinary source selection. Tuples are ordered
+`(HP, Attack, Defense)`; each field in `H` chooses either parent's corresponding
+value. The native reference specifies exact RNG operations and subsequent item
+bonuses separately.
+
+```text
+R = (fresh random HP, fresh random Attack, fresh random Defense)
+H = (choose either parent's HP,
+     choose either parent's Attack,
+     choose either parent's Defense)
+selectorIndex = weighted_original_index(Combi_TalentInheritNum)
+
+if selectorIndex == 2:
+    result = H
+else:
+    branch = choose_index(3)
+    if selectorIndex == 1:
+        result = [
+            (H.HP, H.Attack, H.Defense),
+            (H.HP, R.Attack, H.Defense),
+            (H.HP, H.Attack, R.Defense)
+        ][branch]
+    else:
+        result = [
+            (H.HP, R.Attack, R.Defense),
+            (R.HP, H.Attack, R.Defense),
+            (R.HP, R.Attack, H.Defense)
+        ][branch]
+```
+
+For each logical stat, the game prepares a fresh random value and a value selected
+from either parent. The branch determines which source reaches the child. In the
+middle category HP always comes from a parent and one branch inherits all three
+stats. Unselected stats use fresh values. An isolated Attack+Defense source set is
+impossible; an Attack+Defense **target** can still succeed through an all-three branch.
+
+The native selector returns the original index; sentinel and unexpected categories
+use the one-stat fallback in this build. PalCalc supports its existing valid
+three-category data: weight array indices 0/1/2 label the original selector entries,
+not achieved stat counts.
+
+[`BuildDesiredIVProbabilities`](../PalCalc.Model/BreedingMechanics.cs) represents
+the parent-sourced sets above as bit masks: HP = 1, Attack = 2, Defense = 4. For
+each requested subset it sums, over the three selector indices:
+
+```text
+normalized_weight[selectorIndex]
+    * number_of_source_sets_containing_the_entire_requested_subset
+    / number_of_source_sets_for_that_selector_index
+```
+
+This averages branches uniformly for the estimate. It precomputes probabilities
+for all eight requested subsets, including the empty subset with probability one.
+
+Using the repository's `[3,2,1]` weights and ideal uniform branches, the conditional
+**exact parent-sourced count** probabilities are 50% / 22.22% / 27.78% for one/two/three
+stats. These are derived examples, not measured frequencies. The previous
+50% / 33.33% / 16.67% interpretation incorrectly treated categories as final counts.
+
+The following probabilities describe the chance of taking all the requested
+stats from parents, before checking which parent's values meet the requested IV
+thresholds. For example, HP+Attack counts both the HP+Attack pattern and the
+all-three pattern:
+
+| Desired stats | Chance all are taken from parents |
+| --- | ---: |
+| HP | 2/3 |
+| Attack, or Defense | 5/9 |
+| HP+Attack, or HP+Defense | 7/18 |
+| Attack+Defense, or all three | 5/18 |
+
+For each selected stat, PalCalc assumes either parent is chosen independently
+with equal chance. If only one parent meets the threshold for a selected stat,
+that contributes another factor of 1/2. If both qualify, either parent's value
+succeeds. No required IVs gives probability one. These probabilities are computed per database, so
+custom category weights still use the same asymmetric pattern table.
+
+The game reference also records talent-bonus and mutation branches. Those are
+outside this solver correction.
+
+### Attack inheritance details
+
+The [recovered attack helper](../docres/research/palworld-breeding/assessments/2026-10-16-build-25246127/evidence.md#attack-inheritance)
+combines and deduplicates eligible equipped-parent attacks. The row flag
+`IgnoreRandomInherit` excludes attacks; missing database rows are excluded too.
+The all-attack item branch retains all eligible inherited IDs, while initial
+equipment is capped separately.
+
+The evidence records separate mastered/equipped writes and initial equipment
+order. Those details alone don't establish a difference in final inherited
+availability or success probability. Later initialization wasn't fully traced,
+so the assessment doesn't settle all downstream writes.
+
+PalCalc's Cake05 model uses `bInheritAllActiveSkills=true` and
+`PassiveInheritCountOverride=4`. The recovered consumer branches establish what
+those fields do, but the inheritance assessment didn't re-extract the item's
+current asset values. Keep that data-provenance boundary separate from the
+algorithm and search restrictions described above.
+
+### Egg-production time
+
+PalCalc estimates production time per attempt as follows. This is the current
+solver model, not a newly verified native timing formula.
+
+```text
+time_per_attempt = BreedingTime * 2 * parent_A_time_factor * parent_B_time_factor
+```
+
+[GameSettings](../PalCalc.Model/GameSettings.cs) defaults `BreedingTime` to five
+minutes and doubles it to approximate parents being available only half the time.
+That availability allowance is a solver assumption, not a game-code constant.
+[ToTimeFactor](../PalCalc.Solver/Utils/SolverExtensions.cs) currently uses a factor of
+0.5 for a parent with the tracked breeding-speed passive effect, otherwise 1.
+With default settings this gives ten minutes per attempt without those effects.
+
+Producing the egg is separate from incubating it. The
+[effort calculation](../PalCalc.Solver/PalReference/BredPalReferenceEffort.cs) multiplies
+production time by expected attempts, then combines it with incubation according
+to the configured incubator model. None of this establishes the native treatment
+of work, idling, sleep, or multiple speed modifiers.
+
+
+For a targeted timing investigation, follow the
+[additional-logic review policy](../docres/research/palworld-misc/README.md#egg-production-time)
+and the technical guide rather than treating this formula as proof of game behavior.
+
+
 ## Implementation Map
 
 ```text
@@ -507,5 +694,13 @@ Further references:
 
 - [Passive inheritance estimation](./README-BREED-ESTIMATE.md)
 - [Miscellaneous optimization notes](./README-MISC.md)
+- Child species: [`PalBreedingCalculator.cs`](../PalCalc.GenDB/PalBreedingCalculator.cs)
+  and [`UniqueBreedComboReader.cs`](../PalCalc.GenDB/GameDataReaders/UniqueBreedComboReader.cs)
+- Game settings: [`GameSettingReader.cs`](../PalCalc.GenDB/GameDataReaders/GameSettingReader.cs)
+  and [`BreedingMechanics.cs`](../PalCalc.Model/BreedingMechanics.cs)
+- Passive estimates: [`Probabilities/Passives.cs`](./Probabilities/Passives.cs)
+- IV estimates: [`Probabilities/IVs.cs`](./Probabilities/IVs.cs)
+- Attack estimates: [`Probabilities/Attacks.cs`](./Probabilities/Attacks.cs)
+- Attack inheritance flags: [`ActiveSkillReader.cs`](../PalCalc.GenDB/GameDataReaders/ActiveSkillReader.cs)
 - [`PalCalc.Solver.CLI/Program.cs`](../PalCalc.Solver.CLI/Program.cs) contains
   an end-to-end usage example.

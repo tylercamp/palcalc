@@ -268,7 +268,7 @@ numbers from normalized texture positions and pixels; test several landmarks and
 state whether Z is used. GenDB's map reader and sample calibration are leads, not
 proof of a native projection formula.
 
-For [egg production](../../../PALWORLD-BREEDING-MECHANICS.md#egg-production-time),
+For [egg production](../../../PalCalc.Solver/README.md#egg-production-time),
 trace breeding-farm progress, threshold and update rate, parent/world modifiers,
 pauses, and the egg-created event. Separate production from incubation, wall-clock
 waiting, and PalCalc's availability assumptions. Record time units and distinguish

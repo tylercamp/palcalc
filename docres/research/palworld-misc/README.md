@@ -48,8 +48,8 @@ selected native evidence and distinguish fitted approximation from exact formula
 ## Egg-production time
 
 The maintained explanation is in
-[Palworld Breeding Mechanics](../../../PALWORLD-BREEDING-MECHANICS.md#egg-production-time),
-because production time affects breeding effort. It distinguishes the configurable
+[solver README](../../../PalCalc.Solver/README.md#egg-production-time),
+because this is PalCalc's effort model. It distinguishes the configurable
 base time, parent speed factors, PalCalc's availability allowance, and incubation.
 No native timing assessment is published in the retained breeding reports.
 
