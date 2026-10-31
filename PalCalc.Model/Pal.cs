@@ -106,7 +106,7 @@ namespace PalCalc.Model
 
         private EggSize? eggSize;
         [JsonIgnore]
-        public EggSize EggSize => eggSize ??= GameConstants.EggSizeMinRarity.OrderBy(kvp => kvp.Value).First(kvp => kvp.Value <= Rarity).Key;
+        public EggSize EggSize => eggSize ??= GameConstants.EggSizeMinRarity.OrderByDescending(kvp => kvp.Value).First(kvp => kvp.Value <= Rarity).Key;
 
         public PalSize Size { get; set; } = PalSize.None;
 
