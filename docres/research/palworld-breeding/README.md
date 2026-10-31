@@ -24,7 +24,7 @@ contains the scoped game model, current inputs and decisive observations.
 Runtime source membership/order, world state and options retain their explicit
 input contracts; static verification does not establish measured gameplay
 frequencies or a universal capture-addition guarantee. The assessment records
-findings and completion corrections; the [changelog](CHANGELOG.md) tracks checked
+current findings and limits; the [changelog](CHANGELOG.md) tracks checked
 versions, observed game changes and assessment scope.
 
 The table below is the main coverage record, linking each mechanic to its
@@ -101,8 +101,10 @@ and selected observations in `evidence.md`. Both belong to one game-version repo
    checks test the reconstructed calculation; PalCalc tests check its implementation.
    Neither independently verifies the recovered instructions or runs the game.
 
-The published report must stand without the original chat or ignored working
-files. An independent executable inspection follows the investigation workflow;
+The published report must stand without the original chat, ignored working files,
+or other investigation passes. References to prior reports may use only accepted
+reviews, identified by version and scope. Omit rejected or intermediate review
+history and local repository state such as staged, unstaged or unrelated changes. An independent executable inspection follows the investigation workflow;
 reviewing completed evidence doesn't itself authorize a new native session.
 
 ## Run an assessment yourself
@@ -131,7 +133,7 @@ Do not implement solver changes.
 ## Check a game update
 
 Follow [Reviewing a game update](ASSESSMENT-WORKFLOW.md#reviewing-a-game-update).
-Use the previous version's report as a baseline and account for every required
+Use the previous accepted version report as a baseline and account for every required
 mechanic. An unchanged dependency can justify **verified unchanged** without
 reconstructing it from scratch, provided the report records what was compared and
 why that covers the mechanic. An unchanged executable alone doesn't prove unchanged
@@ -147,7 +149,7 @@ to the remaining gaps using retained evidence first.
 
 - [1.0.5.102999 assessment](assessments/1.0.5.102999/assessment.md) and
   [evidence](assessments/1.0.5.102999/evidence.md), Windows Steam build 25246127,
-  reviewed 2026-10-21–29; editorially simplified October 30. See the
+  reviewed 2026-10-21–29. See the
   [current coverage table](#current-verification-status) and mechanic sections
   for scope and conditions.
 
@@ -193,10 +195,11 @@ findings don't verify another. See the workflow for provisional unknown versions
 - Solver changes prompt a review of the solver explanation, worked calculations,
   and limitations. They don't establish new game verification or rewrite an older
   report's comparison as though it reviewed today's code.
-- A correction to our understanding updates the affected report with a dated
-  correction note. Preserve what was previously concluded and why it changed;
-  correct the changelog too if its version, game-change or scope record is affected.
-  Don't describe the correction as a game update without evidence.
+- A correction to an accepted finding states the supported result and its evidence
+  in the affected report. Link the accepted baseline when explaining a changed
+  conclusion; keep intermediate or rejected reviews in private notes. Correct the
+  changelog if its version, game-change or scope record is affected. Don't describe
+  a changed interpretation as a game update without evidence.
 - Short explanations may repeat information for their audience. Keep one owner
   for the detailed rule or procedure and review its linked summaries when it changes.
   The player page and limitations page link here rather than maintaining separate

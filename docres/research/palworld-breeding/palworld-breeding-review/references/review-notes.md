@@ -1,6 +1,8 @@
 # Breeding mechanics review notes
 
-These distinctions came from a completed Palworld inheritance review. Apply the reasoning to the selected build's evidence; do not assume an old finding is still present. The examples below are useful hypotheses and counterexamples, not substitutes for native proof.
+Apply these distinctions and worked examples to the selected build's evidence.
+They are hypotheses and counterexamples, not substitutes for proof of that build's
+behavior.
 
 ## Terms and the functional boundary
 
@@ -60,10 +62,9 @@ An item-specific claim such as Cake05 having override 4 or all-attack inheritanc
 
 ## Species, gender, and wild-Pal boundaries
 
-- Earlier species work covered ordinary recipe/rank selection, not live table
-  equivalence or mutation/replacement pools. Those reports were cleared for the
-  comprehensive baseline; this note isn't published proof. Compare eligibility, self-pairs,
-  first-match recipe order, gender coverage, ties, and item inputs separately.
+- Ordinary recipe/rank selection alone does not establish live table equivalence
+  or mutation/replacement pools. Compare eligibility, self-pairs, first-match recipe
+  order, gender coverage, ties and item inputs separately.
 - A missing native shortcut is not a demonstrated wrong live result without the
   data conditions that distinguish it. Likewise, source/parser heuristics do not
   establish the native eligible roster.

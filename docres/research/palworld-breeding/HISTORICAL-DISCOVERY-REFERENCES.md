@@ -1,12 +1,11 @@
 # Historical discovery references
 
-These are shortcuts for finding code and data during a new investigation. They
-were collected during the 2026-10-16 and 2026-10-18 investigations of the Windows
-x86-64 executable identified below:
+These are exploration leads for the Windows x86-64 executable identified below:
+search anchors, addresses and layout clues requiring corroboration before use.
 
 - Steam build ID: `25246127`
 - Executable SHA-256: `e590b5e7bfaa3fea40fab1a02cc72c8fc5fd6f8631ef2308e95ac56c25195837`
-- Game version: not independently established in those reports
+- Game version: not independently established for these leads
 
 Use the [REA guide](REA-GUIDE.md) for the investigation procedure. These notes
 contain exploration leads only: they don't establish current mechanics, supply
@@ -19,8 +18,7 @@ even when a familiar string or function shape appears in another build.
 
 Start with named diagnostics, then follow references and callers. Use the old
 addresses to orient yourself only after checking the target identity and mapping.
-Routine roles below are labels from the earlier investigation, not recovered
-source signatures.
+Routine roles below are analyst labels, not recovered source signatures.
 
 | Search anchor or investigation label | Old address | Exploration tip |
 | --- | --- | --- |
@@ -37,7 +35,7 @@ source signatures.
 | Common child initialization | `0x142e73be0` | Inspect this and later callers when checking for subsequent field overwrites |
 | Other species-generation paths | `0x142e71f20`, `0x142e72ea0` | Leads for following replacement and alternate branches beyond the main selector |
 
-Useful neighboring calls from the earlier traces:
+Useful neighboring calls:
 
 - Parent character-row lookups: `0x142f79ad0`, `0x142e721f0`.
 - Parent identifier and gender accessors: `0x142f7fc70`, `0x142f7b1d0`.
@@ -69,7 +67,7 @@ consumers before applying any of these old layouts.
 | `ParentTribeA/B` / recipe row | uint16 at `+0x8`, `+0xc` |
 | `ParentGenderA/B`, `ChildCharacterID` / recipe row | Gender bytes at `+0xa`, `+0xe`; 8-byte name at `+0x10` |
 
-For reflection-layout discovery, the earlier trace used descriptors
+Reflection-layout discovery leads include descriptors
 `0x1473ef470` (`CombiRank`), `0x1473ef4b0` (`CombiDuplicatePriority`),
 `0x1473eec80` (`IsBoss`), and `0x1473ef4f0` (`IgnoreCombi`). Descriptor member
 `+0x38` was a field-offset lead. The bool setter routines were `0x140f197d0` and

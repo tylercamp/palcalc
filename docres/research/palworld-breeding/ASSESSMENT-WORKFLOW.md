@@ -29,9 +29,9 @@ If the game version can't be established, record it as unknown and use
 useful investigation, but leave the game-version checklist pending. Once the
 version is confirmed, move the report to its version folder and repair links.
 
-Name the previous version report, mechanics-document revision, and code revision
-or working tree being compared. Separately record the source of numeric inputs;
-understanding executable logic doesn't establish current asset values.
+Name the previous accepted version report, mechanics-document revision, and code
+revision or identified source snapshot being compared. Separately record the source of
+numeric inputs; understanding executable logic doesn't establish current asset values.
 
 For every mechanic, record ordinary, item, mutation, spawn, capture, or other
 relevant modes and the final observable boundary reached. An excluded mode is a
@@ -189,10 +189,9 @@ approximation. Don't assume a detail is harmless because PalCalc currently omits
 
 ## 4. Compare with the recorded baselines
 
-Compare game behavior with the previous version's report, where one exists, and
-the reduced PalCalc model with the named document/code baseline. These are
-different comparisons: a newly discovered error in our model isn't proof that
-the game changed.
+Compare game behavior with the previous accepted version report, where one exists, and
+the reduced PalCalc model with the named document/code baseline. These are different
+comparisons: a newly discovered error in our model isn't proof that the game changed.
 
 Use the [review skill](palworld-breeding-review/SKILL.md) and its
 [notes](palworld-breeding-review/references/review-notes.md). Assess agreements,
@@ -224,12 +223,16 @@ one release, use explicitly scoped sections or a folder suffix when conclusions
 would otherwise be ambiguous. Don't silently combine different executable or
 asset identities into one verified target.
 
-Only `assessment.md` and `evidence.md` are published from each assessment folder;
-other generated files are ignored. Both files must stand without the original
-chat, native session, or ignored run directory. Embed small necessary numeric
-snapshots and retain semantic discovery anchors alongside decisive excerpts.
-Reusable helpers belong in `tools/` with a meaningful check; run-specific scripts
-stay in the ignored directory. Don't publish game binaries or toolchains.
+Only `assessment.md` and `evidence.md` are published from each assessment folder; other
+generated files are ignored. Both files must stand without the original chat, native
+session, ignored run directory or another investigation pass. Prior review references
+are limited to accepted reports, identified by version and scope. State current
+conclusions, evidence and limits directly; omit intermediate or rejected reviews,
+acceptance/recheck narratives, editorial history and local repository state (including
+staged, unstaged and unrelated changes). Embed small necessary numeric snapshots and
+retain semantic discovery anchors alongside decisive excerpts. Reusable helpers belong
+in `tools/` with a meaningful check; run-specific scripts stay in the ignored directory.
+Don't publish game binaries or toolchains.
 
 After each continuation, consolidate the report around the current understanding:
 
@@ -238,22 +241,23 @@ After each continuation, consolidate the report around the current understanding
   support the assessment's conclusions and limitations. Preserve useful excerpts
   when merging earlier sections; it isn't a transcript of the investigation.
 - The changelog records changes to checked versions, observed game mechanics and
-  assessment scope. Detailed findings and dated evidence corrections stay in the
-  version report; research and publication checkpoints do not need changelog entries.
+  assessment scope. Detailed findings stay in the version report; research and
+  publication checkpoints do not need changelog entries.
 - Temporary topic notes and the private checkpoint under `txt/` hold exploratory
   reasoning, operational history, session state, and next steps, with references
   to generated artifacts under `runs/`.
 
 Replace superseded explanations instead of appending another account of the same
-path. Keep corrections traceable through dated notes and Git history; don't erase
-decisive evidence or leave contradictory old conclusions mixed with current ones.
-Before a substantial cleanup of an uncommitted report, save a local copy under
+path. Keep investigation and correction history in private notes and Git history;
+don't erase decisive evidence or leave superseded conclusions mixed with current
+ones. Before a substantial report cleanup, save a local copy under
 `txt/` so useful material and correction context aren't lost. Move exploration
 notes there and promote the consolidated argument into the published files.
 Keep citation anchors where useful or update their incoming links; preserving
 every historical heading or evidence ID isn't a publication requirement. Retain
-the IDs and excerpts supporting published claims, along with necessary correction
-notes. Published reasoning and citations must stand without either ignored folder.
+the IDs and excerpts supporting published claims. When correcting an accepted
+conclusion, identify that accepted baseline and explain the supported difference.
+Published reasoning and citations must stand without either ignored folder.
 
 Update the hub's mechanic rows. Add a short [changelog](CHANGELOG.md) entry when
 the latest checked version, an observed game mechanic or assessment scope changes.
@@ -329,7 +333,7 @@ changed. A grade change needs an evidence-based explanation of the supported cla
 
 ## Reviewing a game update
 
-Create the new version report from the checklist, using the previous report as
+Create the new version report from the checklist, using the previous accepted report as
 the comparison baseline. Compare the same questions, inputs, modes, and output
 boundaries; explain any change in scope. Use the coverage dispositions above.
 
@@ -353,7 +357,8 @@ The first comprehensive baseline has no previous complete report to inherit:
 establish its rules and evidence directly. Old hypotheses and maintained summaries
 can guide discovery, but aren't substitutes for the missing proof.
 
-Preserve previous version reports. Amend a published conclusion only with a dated
-correction in that report explaining what changed in our understanding. Correct
-the changelog if its checked-version, game-change or scope record is affected;
-don't invent a historical game change.
+Preserve prior accepted version reports. When correcting an accepted conclusion,
+state the current result and supporting evidence, and identify the accepted
+baseline when explaining the difference. Keep intermediate review history in
+private notes. Correct the changelog if its checked-version, game-change or scope
+record is affected; don't invent a historical game change.

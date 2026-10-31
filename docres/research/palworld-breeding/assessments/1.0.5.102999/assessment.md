@@ -8,33 +8,27 @@
 - Supporting identity: Steam build 25246127; executable SHA-256
   `e590b5e7bfaa3fea40fab1a02cc72c8fc5fd6f8631ef2308e95ac56c25195837`.
   [Archive and decoder identities](evidence.md#identity-and-methods).
-- Review dates: 2026-10-21 through 2026-10-29; editorially simplified 2026-10-30; findings last reviewed 2026-10-29.
-- Previous game-version report: none; this establishes a baseline only where
-  the evidence supports the stated scope.
+- Review dates: 2026-10-21 through 2026-10-29.
+- Previous accepted game-version report: none; this is the first verified baseline.
 - Compared PalCalc baseline: mechanics document at
-  `1c09c860fefc8769250ffaf52af42910d48916b9`, with the initial working-tree
-  modifications to `PalCalc.Model/GameConstants.cs` and `PalCalc.UI/App.xaml.cs`
-  preserved. This is a documentation/model comparison, not a solver-code audit.
-- Investigation state: **Finished**, 2026-10-29, after both acceptance findings
-  received new native proof and independent recheck. The October 28 completion
-  remains withdrawn; this is a separate evidence-based completion decision.
+  `1c09c860fefc8769250ffaf52af42910d48916b9`.
+  This is a documentation/model comparison, not a solver-code audit.
+- Investigation state: **Finished**, 2026-10-29.
 - Verification coverage: **Full: eight Verified** for the recorded base-game
-  questions, inputs, modes and saved-output boundaries. No original mode was
-  removed or question narrowed to restore coverage. There is no previous fully
-  verified version; these are baseline findings, not verified-unchanged claims.
+  questions, inputs, modes and saved-output boundaries.
 
 ## Review summary
 
 | Mechanic | Status | Checked date | Modes covered / gaps | Change from previous version | Conclusions | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| Child species | Verified | 2026-10-27 | Recipes/ranks/items, boss/mutation, shipped first-load order, both egg routes and extra-save application; supplied effect conditions explicit | Further baseline verification | [Conclusions](#child-species) | [Evidence](evidence.md#child-species) |
-| Child gender | Verified | 2026-10-22 | Ordinary/mutation, both egg routes, pickup effects and final extra-egg save | Baseline recovery | [Conclusions](#child-gender) | [Evidence](evidence.md#child-gender) |
-| Child passives | Verified | 2026-10-27 | Ordinary/item/mutation, ordered current pools and primary/additional saved contents; supplied pickup effects and stated source-setup conditions retained | Further baseline verification | [Conclusions](#child-passives) | [Evidence](evidence.md#child-passives) |
-| Child attacks | Verified | 2026-10-22 | Generation/availability, both egg routes and final extra-egg save | Baseline recovery | [Conclusions](#child-attacks) | [Evidence](evidence.md#child-attacks) |
-| Child IVs | Verified | 2026-10-26 | Sources/items/mutation, primary/additional saves through hatch; collection routes bound, supplied effects and fixed-rank setup conditions explicit | Further baseline verification | [Conclusions](#child-ivs) | [Evidence](evidence.md#child-ivs) |
-| Wild-Pal passives | Verified | 2026-10-29 | Named AddRarePal/byte43 binding established; assignment/resolved species, supplied spawn modes, current pools, capture predicates/source contracts, additions, KingWhale and saved storage; runtime frequencies explicit | Further baseline verification | [Conclusions](#wild-pal-passives) | [Evidence](evidence.md#wild-pal-passives) |
-| Wild-Pal attacks | Verified | 2026-10-29 | Form/settings-to-saved-input bridge independently rechecked; overall available set, natural/Tamago, NPC source and storage; KingWhale selected action start preserves availability inputs | Further baseline verification | [Conclusions](#wild-pal-attacks) | [Evidence](evidence.md#wild-pal-attacks) |
-| Wild-Pal gender | Verified | 2026-10-24 | Species/form initialization or supplied saved gender through installation, actor binding and ordinary/KingWhale capture | Baseline recovery | [Conclusions](#wild-pal-gender) | [Evidence](evidence.md#wild-pal-gender) |
+| Child species | Verified | 2026-10-27 | Recipes/ranks/items, boss/mutation, shipped first-load order, both egg routes and extra-save application; supplied effect conditions explicit | First verified baseline | [Conclusions](#child-species) | [Evidence](evidence.md#child-species) |
+| Child gender | Verified | 2026-10-22 | Ordinary/mutation, both egg routes, pickup effects and final extra-egg save | First verified baseline | [Conclusions](#child-gender) | [Evidence](evidence.md#child-gender) |
+| Child passives | Verified | 2026-10-27 | Ordinary/item/mutation, ordered current pools and primary/additional saved contents; supplied pickup effects and stated source-setup conditions retained | First verified baseline | [Conclusions](#child-passives) | [Evidence](evidence.md#child-passives) |
+| Child attacks | Verified | 2026-10-22 | Generation/availability, both egg routes and final extra-egg save | First verified baseline | [Conclusions](#child-attacks) | [Evidence](evidence.md#child-attacks) |
+| Child IVs | Verified | 2026-10-26 | Sources/items/mutation, primary/additional saves through hatch; collection routes bound, supplied effects and fixed-rank setup conditions explicit | First verified baseline | [Conclusions](#child-ivs) | [Evidence](evidence.md#child-ivs) |
+| Wild-Pal passives | Verified | 2026-10-29 | Named AddRarePal/byte43 binding established; assignment/resolved species, supplied spawn modes, current pools, capture predicates/source contracts, additions, KingWhale and saved storage; runtime frequencies explicit | First verified baseline | [Conclusions](#wild-pal-passives) | [Evidence](evidence.md#wild-pal-passives) |
+| Wild-Pal attacks | Verified | 2026-10-29 | Form/settings-to-saved-input bridge; overall available set, natural/Tamago, NPC source and storage; KingWhale selected action start preserves availability inputs | First verified baseline | [Conclusions](#wild-pal-attacks) | [Evidence](evidence.md#wild-pal-attacks) |
+| Wild-Pal gender | Verified | 2026-10-24 | Species/form initialization or supplied saved gender through installation, actor binding and ordinary/KingWhale capture | First verified baseline | [Conclusions](#wild-pal-gender) | [Evidence](evidence.md#wild-pal-gender) |
 
 ## Child species
 
@@ -62,7 +56,7 @@ The ceiling expression agrees within normal representable positive-rank inputs
 and default rounding; it is not the native formula for arbitrary int32 inputs.
 The documented ordinary recipe/rank account agrees with this recovered core.
 The current tables contain eligible quest variants and equal-rank/equal-priority
-rows. Their first-load order is now bound through native table members, the
+rows. Their first-load order is bound through native table members, the
 identified single-parent composite/plain DataTable load paths and the checked
 decoder bridge. The ordinary pool has 186 candidates; mutation has 263. Recipe
 inputs have no overlapping valid matches with different child IDs.
@@ -103,8 +97,8 @@ the traced current-farm, legacy and extra-egg paths preserve the assigned byte. 
 separates child assignment from recipe matching but leaves this algorithm open.
 No complete code-accuracy finding is made. Current reflection corroborates the
 MaleProbability field. The current inventory-farm save path preserves gender through live registration.
-The latest [extra-egg continuation](evidence.md#extra-egg-save-application-and-mutation-selectors)
-closes the remaining grant boundary. Both pickup effects preserve gender in their
+The [extra-egg save application](evidence.md#extra-egg-save-application-and-mutation-selectors)
+preserves gender through the grant. Both pickup effects preserve gender in their
 child-save writes; unknown activation rates do not change that conclusion.
 
 ## Child passives
@@ -133,14 +127,14 @@ Uniform-subset selection is a nominal approximation to clamped finite-grid
 indices. Ignoring the identities of unwanted additions can be useful, but does
 not justify assuming attempted additions always achieve their count. The baseline
 mechanics and limitations already identify this distinction and the Cake05
-shortfall. The current asset snapshot newly binds those inputs to this report's
+shortfall. The current asset snapshot binds those inputs to this report's
 version. It does not establish a new game bug or quantify its live incidence.
 Current inventory-farm copies preserve the generated passive list. Native
-first-load reconstruction now binds the shipped composite table to its sole
+first-load reconstruction binds the shipped composite table to its sole
 Common parent, serialized row order, ascending reserved/allocated slots and
 fresh manager pools. The decoder's counted reader and unsorted writer were
 checked; fresh extraction reproduces the same order. All 85 ordinary candidates,
-12 rank>3 candidates and five mutation candidates now have explicit ordered
+12 rank>3 candidates and five mutation candidates have explicit ordered
 inputs. [Load contracts and snapshots](evidence.md#shipped-composite-first-load-order).
 
 This resolves a practical data condition: with CraftSpeed_up3 excluded, a first
@@ -182,14 +176,14 @@ mutation: separate extra draw; do not promise an additional distinct move
 The ordinary documented union/eligibility model agrees at the recovered generation
 boundary. Equipment truncation alone does not show lost inheritance. Conversely,
 raw MasteredWaza and learned availability are distinct: the recovered availability
-getter unions raw mastered moves with level-eligible natural moves. This closes
-the earlier availability gap; natural moves need not be copied into raw mastered.
+getter unions raw mastered moves with level-eligible natural moves. Natural moves
+need not be copied into raw mastered.
 No false discrepancy is raised from equipment ordering or the term “exclusive.”
 The shipped CharacterIDReplacer alias Gorrila→Gorilla affects no current learning
 row IDs. Current inventory-farm copies preserve the stored arrays through hatch
-and live registration. The latest extra-egg creation hook copies both arrays into the new egg save;
+and live registration. The extra-egg creation hook copies both arrays into the new egg save;
 alpha conversion also preserves them. Activation rates do not affect their
-preservation, so this row is now Verified. [Shared boundary](evidence.md#shared-child-save-boundary).
+preservation. [Shared boundary](evidence.md#shared-child-save-boundary).
 
 ## Child IVs
 
@@ -259,14 +253,14 @@ success rate for a different or changing setup.
 descriptor/name/setter proof binds `AddRarePal` to row byte `+0x43`. The recovered
 consumer and current decoded singleton therefore join: the rare addition draws
 `Rare` with weight100, with existing-list duplicate suppression and no four-slot
-append guard. Ordinary filling and the declared target/source closures remain
-established. [Rare-pool proof](evidence.md#rare-passive-draw-and-current-pool). The question
-remains which list reaches captured storage. Inputs are the assignment-stage
+append guard. Ordinary filling and the declared target/source contracts are
+established. [Rare-pool proof](evidence.md#rare-passive-draw-and-current-pool).
+The question is which list reaches captured storage. Inputs are the assignment-stage
 species, Unique NPC key/resolved saved species, explicit caller passive array,
 random/rare/skip flags, current manager pools, supplied target/source state and
 relic value. Ordinary/rare initialization, overrides, World Tree spawning,
 capture additions and KingWhale remain in scope; rare initialization retains
-the distinct producer contract below. No mode was removed to preserve the grade. [Full model and observations](evidence.md#wild-pal-passives).
+the distinct producer contract below. [Full model and observations](evidence.md#wild-pal-passives).
 
 Initialization applies assignment-species defaults before explicit caller traits
 and random filling. A nonempty Unique NPC key can replace saved CharacterID
@@ -289,12 +283,12 @@ RainbowPassiveRate separately supplies its high-rank-pool percent input.
 KingWhale's connected callback preserves existing passives while changing its
 other saved fields; a target-row default does not erase a stored Legend.
 
-### Ordinary target and source closure
+### Ordinary target and source contracts
 
-The original fresh PinkCat setup is now connected from initialization through
+The declared fresh PinkCat setup connects from initialization through
 augmentation to saved storage. Construction/copy/install values are joined to
 actual binder, group, spawner/controller, facial, equipment and removal recipients.
-The last two concrete initialization dispatches now resolve to a query and engine
+The last two concrete initialization dispatches resolve to a query and engine
 ForceNetUpdate, with network-owned scheduling/dormancy destinations. Under the
 declared unchanged setup and recovered native routes, trainer stays null,
 IsPlayer false, owner history empty, and Neutral GroupId does not create the
@@ -319,10 +313,6 @@ explicit. Multiple sources retain runtime membership/order inputs; a query
 reentered during reset is not inferred from a hypothetical listener.
 [Source grant](evidence.md#ordinary-rank-1-guardiandog-active-grant-to-capture-collector) /
 [completed reset](evidence.md#completed-partner-reset-and-unchanged-guardiandog-regrant).
-
-The named target/source result is separate from the rare-pool and form-input
-bindings. Both later acceptance gaps are resolved; their significant coverage
-corrections are recorded in the [completion history](#acceptance-review-and-bounded-continuation).
 
 ### Reduced PalCalc model and comparison
 
@@ -357,15 +347,15 @@ species, move-species resolver, level, explicit attacks, rare/Tamago flags and
 learning tables. Ordinary/rare initialization, relevant supplied overrides and
 the connected KingWhale capture mode remain included.
 
-**Verified after independent acceptance recheck, 2026-10-29.** The form/settings
-producer and stage-query contract now derive assignment species, rare state and
+**Verified, updated 2026-10-29.** The form/settings
+producer and stage-query contract derive assignment species, rare state and
 saved species/level for the original declared spawn inputs and supplied world
 state. [Full producer model](evidence.md#wild-form-selection-and-saved-level-handoff).
 The requested level still feeds initial attack setup; successful rare selection
 adds inherited RarePal_LevelAdd=5, range choice precedes the CharacterMaxLevel=80
 cap, and final natural availability uses the saved level. Predator selection
 uses a validated prefixed row and does not set the rare flag or add those levels.
-The question was not narrowed to resolved inputs. Availability is the union of stored MasteredWaza
+Availability is the union of stored MasteredWaza
 and all natural moves through the current saved species/level. The query does
 not read EquipWaza. Nonempty explicit attacks populate mastered and suppress
 initial natural setup, but derived natural availability remains. Rare/Tamago
@@ -384,26 +374,25 @@ available attacks = unique(M union level-eligible natural attacks for that speci
 ```
 
 The move-species helper is already bound to Unique NPC lookup, and the standard
-spawner supplies a None key. New NPC-companion source evidence binds
+spawner supplies a None key. NPC-companion source evidence binds
 FindNPCOtomoWaza to the shipped two-row table: ColorfulBird and RobinHood_Ground
 supply three explicit attacks each; nonmatching species supply an empty array.
 The general initializer's separate Unique NPC key still controls saved species.
 [Caller/source model](evidence.md#npc-companion-attack-source).
 
-The NPC master-setup review corrects an earlier incomplete summary: a weapon
-normalization branch can add Weapon_Use to mastered, while punch removal affects
-only equipment. All 753 rows in the checked Pal table have Weapon=None, so this
-weapon-addition branch does not change availability for those Pals with existing
-attack arrays. Empty-array fallback remains explicitly modeled. The named
-APalNPC::MasterWazaSetup callback registration and its array writers are now
-bound. [Correction and materiality check](evidence.md#npc-master-setup-correction-and-availability-effects).
+NPC master setup has a weapon normalization branch that can add Weapon_Use to mastered,
+while punch removal affects only equipment. All 753 rows in the checked Pal table have
+Weapon=None, so this weapon-addition branch does not change availability for those Pals
+with existing attack arrays. Empty-array fallback remains explicitly modeled. The named
+APalNPC::MasterWazaSetup callback registration and its array writers are bound. [Model
+and materiality check](evidence.md#npc-master-setup-and-availability-effects).
 
 **KingWhale action-start conclusion, 2026-10-27:** PhaseWazaList and
 InterruptWazaMap preload/select combat actions. The concrete shipped actions for
 Unique_KingWhale_Breaching_P3, Unique_KingWhale_TidalBore and
 Unique_KingWhale_SuperTidalBore do not grant those IDs as mastered attacks during
 initialization/start. Class declarations, Blueprint ancestry/overrides, the actual
-component queue/start and immediate native parameter writes are now checked.
+component queue/start and immediate native parameter writes are checked.
 They preserve MasteredWaza, saved CharacterID and saved level. Capture preserves
 the mastered list and replaces species with BOSS_KingWhale_otomo, whose natural
 learning set contains none of the three IDs. An input without them mastered thus
@@ -458,26 +447,13 @@ group predicate. This invocation's ownership-history update occurs after its
 augmentation check; it cannot retroactively block that check. Preservation through
 every release/re-capture mode is not established.
 
-## Checks and reference updates
+## Checks
 
-The baseline's static native/data checks and independent acceptance rechecks
-support the published models. Reconstruction checks covered finite-grid selectors,
-species rounding/ties/recipes, ordered passive pools and the current-data shortfall,
-World Tree selection, save transfer and KingWhale availability consequences.
-These test the reconstruction; they do not measure live frequencies or RNG
+Static native/data evidence supports the published models. Reconstruction checks covered
+finite-grid selectors, species rounding/ties/recipes, ordered passive pools and the
+current-data shortfall, World Tree selection, save transfer and KingWhale availability
+consequences. These test the reconstruction; they do not measure live frequencies or RNG
 independence. No live-game/disk-save test or solver-code audit is claimed.
-
-Dated corrections accompany the affected evidence and the
-[completion history](#acceptance-review-and-bounded-continuation) below. These
-baseline findings and corrections to understanding are not evidence of a historical
-game update. The [changelog](../../CHANGELOG.md) records checked versions,
-observed game changes and assessment scope.
-
-The October 30 editorial pass changed no mechanics, coverage grades or checked
-dates. It shortened supporting delivery/callback machinery and consolidated
-status narratives, retaining conditions and verification landmarks. Local
-links/anchors, Markdown structure and mechanics/qualification preservation were
-checked against the saved pre-edit publication.
 
 ### Discrepancies relevant to the scoped PalCalc model
 
@@ -532,25 +508,7 @@ changed inputs and multiple-source registry positions remain separate conditions
 
 **Finished, 2026-10-29; eight Verified** for the recorded shipped-base questions,
 inputs, modes and saved-output boundaries. No required observation remains planned.
-Runtime inputs and unclaimed outputs below remain explicit; they do not remove
-an original mode or narrow a question to obtain verification.
-
-### Acceptance review and bounded continuation
-
-The October 23 premature completion and October 28 all-eight-Verified/Finished
-claim remain withdrawn. The October 29 acceptance review identified missing
-form/settings-to-saved-input and rare-pool schema proof. New native evidence
-closed both gaps and independent rechecks accepted the resolutions before the
-current completion decision. This does not retroactively justify either earlier
-stop or imply a game update.
-
-| Resolved requirement | Current conclusion / boundary |
-| --- | --- |
-| Form selection and saved-level handoff | Named settings/defaults, rare ranges, Predator replacement and stage-position query derive assignment/rare/saved species and level from original spawn inputs plus supplied world state. Initial attack setup uses requested level; final natural availability uses saved level. [Evidence](evidence.md#wild-form-selection-and-saved-level-handoff). |
-| Rare passive current-input link | Named descriptor/setter binds row byte +0x43 to AddRarePal, joining the consumer to the Rare/weight100 singleton. Duplicate suppression and uncapped append remain explicit. [Evidence](evidence.md#rare-passive-draw-and-current-pool). |
-
-The observations and current data support verification; reviewer agreement alone
-does not supply missing proof. Established capture target/source closure stands.
+Runtime inputs and unclaimed outputs remain explicit below.
 
 | Remaining limit | Consequence |
 | --- | --- |

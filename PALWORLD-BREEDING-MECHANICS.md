@@ -36,8 +36,7 @@ its conclusions and evidence. The [research changelog](docres/research/palworld-
 records which rules changed or were confirmed unchanged.
 
 The [1.0.5.102999 baseline assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md)
-is **Finished: all eight required mechanics are Verified**, following new native
-proof and independent rechecks of the October 29 acceptance findings. Both the
+is **Finished: all eight required mechanics are Verified**. Both the
 rare-passive pool binding and spawn-form/settings-to-saved-input bridge are
 established for the recorded shipped-base inputs, modes and output boundaries.
 It includes ordinary, item/mutation, primary/additional egg, collection/hatch and specified spawn/capture

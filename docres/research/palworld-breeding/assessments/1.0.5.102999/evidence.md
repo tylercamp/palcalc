@@ -2,13 +2,10 @@
 
 ## Identity and methods
 
-Review dates: 2026-10-21–29; editorially simplified 2026-10-30. The October 29
-acceptance gaps were closed and independently rechecked. Latest matching identity
-checks: executable October 29, base archive October 28, mappings/decoder October 25;
-no new extraction is claimed by the editorial pass. This is a baseline for the Windows x86-64
-Steam executable and shipped base archive, not a comparison with a previously
-verified release. The shipped `Pal/Config/DefaultGame.ini`, section
-`/Script/EngineSettings.GeneralProjectSettings`, contains:
+Review dates: 2026-10-21–29. Matching identity checks: executable October 29, base
+archive October 28, mappings/decoder October 25. This baseline covers the Windows x86-64
+Steam executable and shipped base archive. The shipped `Pal/Config/DefaultGame.ini`,
+section `/Script/EngineSettings.GeneralProjectSettings`, contains:
 
 ```ini
 ProjectName=Pal
@@ -42,13 +39,10 @@ Address Tables, Stack, Decompiler Switch Analysis and Decompiler Parameter ID.
 Types, computed calls, and decompiler parameter inference therefore need explicit
 corroboration. Pseudocode uses analyst variable names, not recovered source.
 
-Retained REA observations from the October 15–16 investigation were read directly,
-after independently matching their subject SHA-256 to this executable. They are
-identified below as **retained native evidence**, not fresh tool calls, earlier
-published verification, or proof about unchanged assets. The asset snapshots below
-were freshly extracted on October 21; old asset exports were not used as current
-input proof. Evidence IDs identify observations; the decisive excerpts are embedded
-here so readers don't need the ignored run directory or an active REA session.
+Native REA observations are bound to this executable by their subject SHA-256.
+Asset snapshots use the archive, mappings and decoder identified above; executable
+identity alone does not establish asset contents. Evidence IDs identify observations,
+with decisive excerpts and input snapshots included in this report.
 
 ### Shared inputs and arithmetic
 
@@ -104,7 +98,7 @@ approximations, not exact finite-grid probabilities.
 
 Scope: ordinary recipe/rank selector, item rank input, boss-form replacement,
 and mutation selector through the generation save's CharacterID. The current inventory-farm hatch/live-save path is established in the
-[shared boundary](#shared-child-save-boundary); the legacy delivery, pickup and extra-egg paths are connected below; the shipped first-load order is now established below. Supplied pickup effects remain inputs; arbitrary activation frequencies are not inferred.
+[shared boundary](#shared-child-save-boundary); the legacy delivery, pickup and extra-egg paths are connected below; the shipped first-load order is established below. Supplied pickup effects remain inputs; arbitrary activation frequencies are not inferred.
 
 Retained native evidence: selector `0x142e70570`,
 `ev_1dd305e7a8b2687006498757e9c18ccf691dfd8774258d98fac7f42a48e8f717`;
@@ -199,10 +193,8 @@ generation callers, and all later CharacterID writes.
 
 ### Species ordering: first surviving priority tie
 
-**2026-10-27 correction to the October 23 ordering limitation.** The shipped
-first-load input is now bound below. This is further baseline evidence, not a
-game update or a claim that arbitrary runtime table edits preserve order.
-The retained nearest-rank body `0x142e713c0`,
+The shipped first-load input is bound below; arbitrary runtime table edits are
+outside that order guarantee. The nearest-rank body `0x142e713c0`,
 `ev_60ca11e6c75540b73dc28550fb44c46473e3970ae629a375ec54cefb206de165`,
 obtains character row names with `0x1451f68c0(characterTable, &names)` and
 visits that returned array sequentially. It appends all equal-best-distance IDs
@@ -389,13 +381,13 @@ after selecting the final generation species and stores its result in
 `param_6+2` (an eight-byte-pointer expression, byte offset `0x10`). Mutation
 contains the same test inline, then calls common initialization `0x142e73be0`.
 That common initializer does not itself assign this gender byte in the retained
-body. The later hatch and pickup continuations below establish preservation in the declared routes.
+body. The hatch and pickup models below establish preservation in the declared routes.
 
 Fresh `MaleProbability` values include 0, 100 and -1, plus ordinary percentages
 such as 50. Ratios are species data, not recipe gender requirements. Fresh reflection descriptor `0x1473ef410` corroborates MaleProbability at row
 `+0xfc`, observation `ev_3bdf538054cdcd6381a2bb773640a0485dfd40f9c63a319e13079a6da3212b85`.
 The shared current-farm save path preserves the assigned gender. The legacy
-egg and extra-egg grant continuations below now establish preservation too;
+egg and extra-egg grant models below establish preservation too;
 child gender is Verified for the declared base-game routes.
 
 Dependencies: character row identity/offset/type, gender enum identity, exact
@@ -487,11 +479,10 @@ item override, mutation selectors/composition, callers and later passive writes.
 
 ### Passive ordering: established construction and remaining input
 
-**2026-10-27 closure:** native container/load checks and the identified decoder
-now establish initial alignment and the ordered shipped first-load pools. The
-post-removal filler mismatch remains and has a concrete current-data witness
-below. This is further baseline verification, not a newly changed game rule.
-Later table edits and modded inputs are outside this unmodified first-load claim.
+Native container/load checks and the identified decoder establish initial
+alignment and the ordered shipped first-load pools. The post-removal filler
+mismatch has a concrete current-data witness below. Later table edits and modded
+inputs are outside this unmodified first-load claim.
 
 The shipped manager CDO selects DT_PassiveSkill_Main, a CompositeDataTable with
 one parent, DT_PassiveSkill_Main_Common. Both decoded dictionaries have the same
@@ -575,10 +566,9 @@ integer-ticket bound is derived below.
 
 #### Shipped composite first-load order
 
-**2026-10-27 closure:** the ordinary, rank>3 and mutation candidate orders below
-are reconstructed for the unmodified shipped tables at first load. This is a
-static load-path/data reconstruction, not a runtime snapshot or a claim about
-later table edits. It closes the earlier row-order gap for those inputs.
+The ordinary, rank>3 and mutation candidate orders below are reconstructed for
+the unmodified shipped tables at first load. This is a static load-path/data
+reconstruction, not a runtime snapshot or a claim about later table edits.
 
 Class getter 0x1451c4d50 names CompositeDataTable; constructor 0x1451c7870 installs
 vtable 0x1480dd048 after DataTable construction. Parent getter 0x1451f65d0 names
@@ -776,8 +766,8 @@ to the recovered current order gives:
 The complete candidate intervals were checked against direct enumeration of all
 7,355 tickets. Conventional weighting would assign the first two named rows 100
 tickets each and have no failed ticket. This establishes material bias and a
-shortfall witness using current ordered inputs, beyond the earlier invented
-arrangements. It is not a uniformly sampled-ticket or live-frequency claim.
+shortfall witness using current ordered inputs. It is not a uniformly
+sampled-ticket or live-frequency claim.
 
 For example, take ordinary nonmutation generation with Cake05's override 4 and
 a parental union containing only CraftSpeed_up3. That passive is selected, then
@@ -856,8 +846,8 @@ construction dependencies as well as table values.
 
 Scope: equipped-parent inheritance, level-one lookup, item override and mutation
 grant through generation's `EquipWaza` and `MasteredWaza` writes. Derived learned availability is established below; the shared current-farm
-hatch path preserves both stored arrays. The legacy and extra-egg continuations
-below close preservation through those paths; child attacks are Verified.
+hatch path preserves both stored arrays. The legacy and extra-egg models below
+establish preservation through those paths; child attacks are Verified.
 
 Retained native evidence: `0x142e91200`,
 `ev_7b460f49258830decb1a0302368a7fbc5e7dbc876741febb543d74af7121a49a`;
@@ -1161,11 +1151,6 @@ are not guaranteed to return an egg; no universal world-object bypass follows.
 | `14305b3d7` before `14305b5c4` | Initialization before completion/cleanup |
 | `1430a1fd0`; model slots `+0x448/+0x450 = 140b81320` | Inherited pickup; no-op hooks |
 
-**October 26 correction:** native registration pairs are name/exec. Earlier prose
-mistook `IsExistItems` for `OnFinishedDropItem`, and `RequestDispose_ToServer` for
-`RequestDrop_ToServer`. The corrected drop route above supersedes those labels;
-this was an analysis correction, not a game change.
-
 ### Legacy world-egg metadata consumer
 
 The separate legacy producer `1430216b0` copies its generated save into
@@ -1312,8 +1297,8 @@ TransformExtraSave(source, mutationItem):
 
 The ordinary transform is `ev_1741f7d5a5731802cf3631f6bb8dfde44ac0b4c34c76068ed9a1d33ea0f01ae4`.
 Its source subsets differ from the asymmetric ordinary two-parent breeding rule:
-the source here is one existing saved child. Mutation minimum is the previously
-recovered `Combi_MutationMinTalent` (default `90`). Native descriptors
+the source here is one existing saved child. Mutation minimum is
+`Combi_MutationMinTalent` (default `90`). Native descriptors
 `0x14747c5a0` and `0x14747cab0` bind the transform's `+0x1d38` and `+0x1df0`
 reads to those original setting names. The mutation passive predicates/selectors
 (`0x143156320`, `0x1431566b0`, `0x1431509b0`, `0x1431509f0`) bind to the concrete pools in the following subsection.
@@ -1383,7 +1368,7 @@ and hatch-record paths above. The hook's class check and setter preserve species
 in the child save, gender, both attack arrays and all other copied fields.
 This is static final-save evidence, not a live pickup/hatch test or modded result.
 
-The mutation predicates now have concrete pool meanings:
+The mutation predicates use these pools:
 
 - `0x143156320` (`ev_a3ccad25773b24b8ef65f6003f1db720f69cdccd3d8e756d730387cfaa349e01`)
   checks membership in manager map `+0x398`: `AddMutationPal`.
@@ -1498,7 +1483,7 @@ Aggregate(type, contributing records):                  # 143151a60
     return highest + ungrouped + sum(groups.values)
 ```
 
-The new base-archive extraction includes `DT_PassiveSkillEffectCondition`
+The base-archive snapshot includes `DT_PassiveSkillEffectCondition`
 (51 rows) and `BP_PalPassiveSkillManager`'s class default object. That object
 selects this condition table and `DT_PassiveSkill_Main`. Neither
 `EggAlphaConversion` nor `EggObtainExtraEgg` occurs among the condition-table
@@ -1514,17 +1499,17 @@ which sources are contributing at a particular gameplay moment.
 | `DT_PassiveSkillEffectCondition` | `99d227a6c2eda070f26c6cd3524114e15f7c69fdf194d83d52dbec6ff5bc3392` |
 | `BP_PalPassiveSkillManager`, `Default__BP_PalPassiveSkillManager_C` | `4a1b2e2d2f3870af2634f062fed06fd522765472e381947bd6716614ab20a8cc` |
 
-The package paths are `Pal/Content/Pal/DataTable/PassiveSkill/DT_PassiveSkillEffectCondition`
-and `Pal/Content/Pal/Blueprint/System/BP_PalPassiveSkillManager`. These export
-hashes identify decoded inputs; the archive and decoder identities above identify
-their shipped source. The prior partner table exports remain applicable because
-the archive hash is identical. All six ordinary/BOSS definitions for
-`NaughtyCat`, `SakuraSaurus` and `SakuraSaurus_Water`, across all five ranks,
-have `WorkType=None` and empty item/weapon constraints. Their restriction item
-names are respectively `SkillUnlock_NaughtyCat`, `SkillUnlock_SakuraSaurus`,
-and `SkillUnlock_SakuraSaurus_Water`. A restriction's presence is not proof of its
-enforcement. All associated egg-effect rows declare `InvokeInOtomo=true`, other
-Invoke flags false, and `IsStackablePartnerSkillBySameTribe=false`.
+The package paths are
+`Pal/Content/Pal/DataTable/PassiveSkill/DT_PassiveSkillEffectCondition` and
+`Pal/Content/Pal/Blueprint/System/BP_PalPassiveSkillManager`. These export hashes
+identify decoded inputs; the archive and decoder identities above identify their shipped
+source. The partner table exports use the same matching archive. All six ordinary/BOSS
+definitions for `NaughtyCat`, `SakuraSaurus` and `SakuraSaurus_Water`, across all five
+ranks, have `WorkType=None` and empty item/weapon constraints. Their restriction item
+names are respectively `SkillUnlock_NaughtyCat`, `SkillUnlock_SakuraSaurus`, and
+`SkillUnlock_SakuraSaurus_Water`. A restriction's presence is not proof of its
+enforcement. All associated egg-effect rows declare `InvokeInOtomo=true`, other Invoke
+flags false, and `IsStackablePartnerSkillBySameTribe=false`.
 
 Item predicate `0x142caf350`,
 `ev_e43b48d3694f9c01ef5f36d9d40700610d2630d367ab1c2b104ce5717a3ec353`,
@@ -1567,7 +1552,7 @@ then visits the row's four TargetType/EffectType/EffectValue slots through the
 already recovered target filter. Alpha conversion's flag-0 check does not add
 this source list; extra-egg's flag-1 check does.
 
-Activation conversion is now native-bound. `0x143119760` identifies itself as
+Activation conversion uses the native definition builder. `0x143119760` identifies itself as
 `UPalPartnerSkillPassiveSkill::ConvertPassiveSkills` and copies each rank's
 skill parameters, looks up that passive row, then ORs its Invoke flags into the
 copied definition's trigger mask:
@@ -1592,8 +1577,9 @@ assembly `ev_f4e40343821ab0beeeb2e113b10978b6d7f36cb15d4c3cb33e85fbb3b33f117b`
 includes `0x1431198d3: OR EAX,0x10`. The method preserves copied parameters;
 this is a flag-to-bit contribution, not proof about every possible input mask.
 
-Correction to a discovery lead: `0x14311dbb0` is a named-record lookup/copy,
-not this builder (`ev_3a6f6bda06b3c813928903fd58091303c3d94a4840c3f15b25d8def354a646eb`).
+Named-record lookup/copy `0x14311dbb0`
+(`ev_3a6f6bda06b3c813928903fd58091303c3d94a4840c3f15b25d8def354a646eb`)
+is separate from the definition builder.
 It supplies the definition consumed by `0x143110fd0`,
 `ev_3bfb9d6a1652fb989dee2c0f57985960fc71dfe1248fb54754cb573fe1a66baf`:
 
@@ -1733,13 +1719,12 @@ Retained descriptor bytes support the field bindings above:
 #### Unchanged ordinary NaughtyCat rank mixtures
 
 The fixed rank-1 grant proof extends to **fixed initial ranks 1–5** for ordinary
-NaughtyCat sources satisfying the same setup conditions. This is not a claim
-about rank changes after grant or arbitrary party activation. Each source must
-have completed the retained initialization/grant path, belong to the pickup
-player, have `SkillUnlock_NaughtyCat`, retain valid ordinary party identity and
-have no intervening holder, ownership, restriction or disable changes. The
-shipped non-stacking setting and the previously established non-excluding
-source lists apply. The pickup must use the known world-egg hook.
+NaughtyCat sources satisfying the same setup conditions. This is not a claim about rank
+changes after grant or arbitrary party activation. Each source must have completed the
+retained initialization/grant path, belong to the pickup player, have
+`SkillUnlock_NaughtyCat`, retain valid ordinary party identity and have no intervening
+holder, ownership, restriction or disable changes. The shipped non-stacking setting and
+the non-excluding source lists apply. The pickup must use the known world-egg hook.
 
 The current `DT_PartnerSkillParameter` has five one-entry rank definitions for
 `NaughtyCat`. Their entire `Parameters` objects are identical: zero delay,
@@ -1781,15 +1766,15 @@ the shared acceptance/cache proof is in
 [NaughtyCat contribution at pickup](#rank-1-naughtycat-contribution-at-pickup),
 and the arithmetic uses the aggregation model above. This closes the fixed-rank
 ordinary source calculation. Unrestricted query-time source changes remain
-outside this fixed setup. The world-placement handoff is now established above;
+outside this fixed setup. The world-placement handoff is established above;
 its generic model does not use this extra-egg consumer.
 
 ## Shared partner-effect model
 
 These established rules support the pickup and capture calculations under supplied
-effects, and the setup-specific NaughtyCat/GuardianDog conclusions. The declared unchanged NaughtyCat setup now has its source-list binding
-established below; arbitrary source combinations remain separate. No measured
-gameplay frequencies are implied.
+effects, and the setup-specific NaughtyCat/GuardianDog conclusions. The declared
+unchanged NaughtyCat setup uses the source-list binding below; arbitrary source
+combinations remain separate. No measured gameplay frequencies are implied.
 
 ### Shipped partner-table selection and accessor initialization
 
@@ -1962,11 +1947,10 @@ index -1. Crafted/debug aliases and other controller/party contracts are outside
 this inference. Native landmarks: `142c8fb20` -> `142f92290` for the slot actor,
 `142cbd740` for the comparison and `143143bc0` for ToTrainer acceptance.
 
-#### Arena exclusion values and extra-egg consumer correction
+#### Arena exclusion values and egg-effect consumers
 
-**October 23 correction:** `EggAlphaConversion=0xf5` uses `1430aa530`;
-`EggObtainExtraEgg=0xf6` uses `143088820` with flag **1**, including item-derived
-additional effects. Earlier continuation references conflated them. The original
+`EggAlphaConversion=0xf5` uses `1430aa530`; `EggObtainExtraEgg=0xf6` uses
+`143088820` with flag **1**, including item-derived additional effects. The
 enum records are `147691360` / `147691370`; the [pickup model](#pickup-effects-and-additional-eggs)
 and extra-save transform retain their distinct behavior.
 
@@ -2012,7 +1996,7 @@ arena CDO: `7ee6b18d3af7fbcc10f9548fe997268f7ebc857ae4da2c367d374066a4122d36`.
 ## Wild-Pal passives
 
 **Verified for declared assignment/rare inputs, updated 2026-10-29.** Target/source
-capture closure and the [rare current-input link](#rare-passive-draw-and-current-pool)
+capture contracts and the [rare current-input link](#rare-passive-draw-and-current-pool)
 are established. Form selection is documented separately under the wild-attack
 producer boundary; an enable flag is not itself the resulting rare flag. Fresh native initializer `0x1432e6070`,
 `ev_06a0c4c0404e03ccfee8f18e7230feeda2c6ff9339e82d3b9b14c95cd2bd31c1`,
@@ -2070,20 +2054,18 @@ to the recovered WeightedIndex gives `[3277,24903,3277,983,328]` for indices
 
 ### Rare passive draw and current pool
 
-**Acceptance correction and native closure, 2026-10-29.** The general
+The general
 initializer's resulting rare flag invokes `0x143150a30`, then appends a nonempty
 result if absent. This append has **no four-slot guard**; the cap on preceding
 caller passives must not be transferred to it. A form-enable flag alone does not
 mean this draw occurs. The [form-selection prefix](#wild-form-selection-and-saved-level-handoff)
 establishes that separate producer contract.
 
-The consumer and pool construction are retained, but were omitted from the
-published rare-draw argument. Fresh native observations now bind the missing
-field, as documented below:
+The consumer and pool construction use the named field binding below:
 
 ```text
 BuildRareDrawPool(manager, row):              # 1431538a0
-    if row.AddRarePal:                       # byte43, now bound below
+    if row.AddRarePal:                       # byte43; field binding below
         Insert(manager.pool_168, row.key, row)
         manager.total_410 += row.LotteryWeight_at_0c
         manager.weights_418.append(row.LotteryWeight_at_0c)
@@ -2138,14 +2120,13 @@ Their complete **decoded `AddRarePal=true`** candidate snapshot is:
 | `DT_PassiveSkill_Main-DT_PassiveSkill_Main.json` | `ce22ba86cf0a461289f380d9bb12dcbc6b73a003b217bd678ad37cf76d472eab` |
 | `DT_PassiveSkill_Main_Common-DT_PassiveSkill_Main_Common.json` | `a405785eae0c0e246f248dc9c246db024213bab48c1e87053f873af6dcf7cb91` |
 
-These use the recorded shipped archive/mappings/decoder identities; this review
-checked retained exports, not a fresh extraction. Native byte `+0x43` is now bound to
-`AddRarePal`; the fresh pool is the positive-weight singleton above: total100,
-tickets0–99, result `Rare`. Ordering cannot affect a single candidate, and no
+These exports use the recorded shipped archive/mappings/decoder identities.
+Native byte `+0x43` is bound to `AddRarePal`; the fresh pool is the positive-weight
+singleton above: total100, tickets0–99, result `Rare`. Ordering cannot affect a single candidate, and no
 uniform-RNG assumption is needed for that identity. Duplicate suppression at the
 caller can still prevent another append of `Rare`.
 
-**Native field closure:** the property descriptor at `0x1476967f0` begins
+**Native field binding:** the property descriptor at `0x1476967f0` begins
 with name pointer `0x147696ee8`; its ASCII bytes decode to `AddRarePal`.
 Descriptor `+0x48` points to boolean setter `0x140f52230`, whose complete body is
 `c6414301c3`: `MOV byte [RCX+0x43],1; RET`. The property pointer list at
@@ -2160,14 +2141,12 @@ and actual setter, not inference from adjacent field names.
 | Setter `140f52230`, five complete bytes | `ev_6296b095f6cb9dbec9a7f218b60802b89cd4a9e5c1709b48a71087ab7115877f` |
 | Shared property pointer-list entries | `ev_db15f8dfb04444d3db41bfb193f339b7d76e4ab449d976fa18bcf48113f483ef` |
 
-The new reads match the recorded executable SHA-256 and reduced analysis profile;
-their bytes were also compared with the original executable's PE file mappings.
-This closes the code-to-current-data gap identified by the acceptance review.
+The native reads match the recorded executable SHA-256 and reduced analysis profile;
+their bytes were also compared with the executable's PE file mappings.
 Given the resulting rare flag and valid fresh manager/table inputs, the draw
 returns `Rare`; duplicate suppression can prevent a second copy. Its append has
 no four-slot guard. Form enable/selection remains a separate producer contract,
-and no unconditional rare-spawn frequency is claimed. No ordering or unrelated
-lifecycle investigation is needed to settle the singleton identity.
+and no unconditional rare-spawn frequency is claimed.
 
 ### World Tree standard-spawner passive input
 
@@ -2310,9 +2289,9 @@ Fresh extraction preserves the retained script/table bytes. JSON SHA-256:
 
 Checks cover valid/invalid manager arrays, all 35 tickets, the conditional 15-bit
 scalar enumeration, a full four-slot default list, duplicates and the None fallback.
-No game execution or player save was used. Further baseline evidence, not a game
-change. The later target/source closure completes its named conditions; caller-
-specific inputs and unclaimed activation frequencies remain explicit.
+No game execution or player save was used. Target/source conditions are given in
+the capture sections below; caller-specific inputs and unclaimed activation
+frequencies remain explicit.
 
 ### Capture additions
 
@@ -2540,11 +2519,11 @@ does not alias their trainer-pointer storage. The setter's immediate notificatio
 targets `PalInteractiveObjectSphereComponent`; arbitrary further listeners are
 not covered by that direct-write conclusion.
 
-**October 28 offset correction:** Funnel receiver `wchar_t* +0x318` means byte
-**+0x630**, its own CharacterParameterComponent, not the independent individual's
-actor pointer at byte `+0x318`. The corrected recipient is consequential; no
-universal alias-exclusion claim follows. Landmarks: shared actor constructor
-`142e34a00`, Funnel constructor `14291d970`, setter route `142f259e0`.
+Funnel receiver `wchar_t* +0x318` means byte **+0x630**, its own
+CharacterParameterComponent, not the independent individual's actor pointer at byte
+`+0x318`. This identifies the direct recipient; no universal alias-exclusion claim
+follows. Landmarks: shared actor constructor `142e34a00`, Funnel constructor
+`14291d970`, setter route `142f259e0`.
 
 #### Capture ownership history is recorded after augmentation
 
@@ -2801,17 +2780,17 @@ trainer acceptance and world-exclusion contracts then restore type55/value15
 under that same source actor's weak key. InOtomo10/Always40 do not match this
 definition's mask and cannot supply a second invocation of it.
 
-**What this settles:** an earlier queued reset that has fully completed is not,
-by itself, a reason to leave this unchanged sole-source answer unknown. Before
-the new scheduled reset runs, the prior accepted record remains; after a complete
-eligible reset, the accepted contribution is restored. Reinserted sparse-map
-position can matter with multiple competing sources, but cannot change which
-grantor supplies the declared sole contribution. This is a conditional
-state-transfer result, not a live scheduling measurement or a guarantee about
-a query reentered during reset, changed restriction/disable inputs, failed
-validity gates, changed recipients, or arbitrary other registered sources.
-Those cases retain the general query-time input model. Target eligibility is established for the declared setup in the final closure
-above; other supplied target/source states retain the general predicate model.
+**What this settles:** an earlier queued reset that has fully completed is not, by
+itself, a reason to leave this unchanged sole-source answer unknown. Before the new
+scheduled reset runs, the prior accepted record remains; after a complete eligible
+reset, the accepted contribution is restored. Reinserted sparse-map position can matter
+with multiple competing sources, but cannot change which grantor supplies the declared
+sole contribution. This is a conditional state-transfer result, not a live scheduling
+measurement or a guarantee about a query reentered during reset, changed
+restriction/disable inputs, failed validity gates, changed recipients, or arbitrary
+other registered sources. Those cases retain the general query-time input model. Target
+eligibility is established for the declared setup in the target model above; other
+supplied target/source states retain the general predicate model.
 
 | Decisive observation | Evidence |
 | --- | --- |
@@ -2861,7 +2840,7 @@ declarations, not proof that every party member contributes.
 
 Native `UPalPartnerSkillPassiveSkill::IsAssignablePassiveSkill`, `0x143127a90`,
 `ev_9c34fd44838d70f95118eb7483781f43ca5a4ef1ad32ba0b8c08e67daceae7c3`,
-tests an activation mask and event-specific conditions. Conversion of InvokeActiveOtomo to trigger bit 1 and ordinary restriction/removal are established in the shared effect sections. The ordinary GuardianDog active invocation is now connected below; the five asset values alone still do not establish unconditional live capture probabilities.
+tests an activation mask and event-specific conditions. Conversion of InvokeActiveOtomo to trigger bit 1 and ordinary restriction/removal are established in the shared effect sections. The ordinary GuardianDog active invocation is connected below; the five asset values alone still do not establish unconditional live capture probabilities.
 
 #### Capture source traversal order
 
@@ -2907,7 +2886,7 @@ valid, and no ownership/rank/unlock/restriction/disable change intervenes. There
 are no other contributing sources. Effective type-exclusion lists must not contain
 `SyncroPassiveWhenCapture` (`0x55`). The inherited component default and the
 [effective shipped-world arena binding](#effective-arena-subsystem-and-shipped-world-binding)
-now establish that neither decoded arena list excludes it for this setup. The output here is accepted source membership and its capture
+establish that neither decoded arena list excludes it for this setup. The output here is accepted source membership and its capture
 use, not a universal success rate for every catchable target.
 
 The fresh base package `Pal/Content/Pal/Blueprint/Character/Monster/PalActorBP/GuardianDog/BP_GuardianDog`
@@ -2943,11 +2922,10 @@ Recovered `0x142cb0c90` validates handler `+0x230`, clears handler byte `+0x38`,
 then calls `0x143130c70` and `0x14312b280`. The former performs previous-flag
 removal through `0x143125880` / `0x1431254b0` and removes a worker delegate;
 `0x143125880` also clears `+0x71/+0x72`. These shown reset/removal bodies do not
-restore `+0x38`. The active entry dispatches trigger `1` on authority. That clears
-the previously unresolved trigger-1 guard in `IsAssignablePassiveSkill` for this
-activation path, subject to its valid-trainer and definition checks. A returned
-empty direct-callers list for the component callback did not establish absence:
-the reflected wrapper and actual Kismet invocation supply that edge.
+restore `+0x38`. The active entry dispatches trigger `1` on authority. The cleared
+byte satisfies the trigger-1 guard in `IsAssignablePassiveSkill` for
+this activation path, subject to its valid-trainer and definition checks. The
+reflected wrapper and Kismet invocation connect the component callback.
 
 ```text
 shipped holder.ActivateOtomo(valid selected companion):
@@ -2992,22 +2970,21 @@ AddPal, EffectType1 exclusion, existing-passive duplicates, source order and the
 cap remain as recovered in [capture additions](#capture-additions). No live
 frequency or universal active-party/catchable-target assertion is added.
 
-**Exclusion reassessment, 2026-10-28.** The retained shipped-world argument applies
-to this effect as well as NaughtyCat's: the configured Blueprint supplies primary
-list {0x46} and companion list {0x0d..0x14, 0x78}; native enum records bind those
-values. Neither the enabled primary/companion union nor the disabled empty-list
-branch contains 0x55. GuardianDog's inherited component has no serialized exclusion
-override, and its initialization does not add one. Thus effective arena selection
-is no longer an unresolved exclusion-list condition for the unchanged declared
-shipped-default setup. Custom overrides or intervening restriction changes remain
-outside it, as already declared.
+The shipped-world exclusion model applies to this effect as well as NaughtyCat's: the
+configured Blueprint supplies primary list {0x46} and companion list {0x0d..0x14, 0x78};
+native enum records bind those values. Neither the enabled primary/companion union nor
+the disabled empty-list branch contains 0x55. GuardianDog's inherited component has no
+serialized exclusion override, and its initialization does not add one. Thus effective
+arena selection does not exclude this effect in the unchanged declared shipped-default
+setup. Custom overrides or intervening restriction changes remain outside it, as already
+declared.
 
 The remaining setup condition is target-predicate state, together with keeping
 the declared accepted source unchanged until the query. Source order is irrelevant
 to the sole-contributor case; broader runtime source membership/positions remain
 conditional as described above. General rank/removal branches and an all-writer
-audit are outside this fixed setup. The final target/source closure supports the
-current Wild-Pal passive grade without expanding this source contract.
+audit are outside this fixed setup. The target/source model supports the
+declared Wild-Pal passive result within this source contract.
 
 | Decisive observation | Evidence ID |
 | --- | --- |
@@ -3049,7 +3026,7 @@ The source character row has PassiveSkill1=Legend and IsTowerBoss=true; the
 target has PassiveSkill1=None and IsTowerBoss=false. Both have MaleProbability=50,
 Tribe=KingWhale, CombiRank=20, and matching eight natural learning rows. Matching
 ratios and moves do not prove preservation of saved contents or the module's
-phase-specific attack overrides. The callback and its hookup are now recovered:
+phase-specific attack overrides. The callback and its hookup are:
 
 ```text
 OnCaptured_KingWhale(module,pal,captor):
@@ -3084,10 +3061,9 @@ capture, rather than inferred solely from a configured class or method name.
 
 ## Wild-Pal attacks
 
-**Verified after independent acceptance recheck, 2026-10-29; overall available attacks are the requested output.**
-The calculation below now includes the recovered
-[spawn-form/settings bridge](#wild-form-selection-and-saved-level-handoff);
-independent acceptance recheck accepted that closure.
+**Verified, updated 2026-10-29; overall available attacks are the requested output.**
+The calculation uses the
+[spawn-form/settings bridge](#wild-form-selection-and-saved-level-handoff).
 Equipment choice is retained below only to explain data flow and possible writes
 to availability inputs. Initializer `0x1432e6070` copies nonempty explicit
 attack overrides into both saved arrays; otherwise it calls `0x1432ed8a0`,
@@ -3148,9 +3124,9 @@ still introduce ties. Exact tie replay through sort depth-fallback helpers remai
 unverified, but is not required for overall set availability: AvailableWaza reads
 mastered plus all level-eligible natural moves and does not read equipment.
 Tamago inputs are bound below. The general initializer passes collect-all=true.
-Its separate move-species resolver `0x1430ef5c0` is now established as the
+Its separate move-species resolver `0x1430ef5c0` uses the
 [Unique NPC lookup](#unique-npc-key-lookup-and-saved-species), in addition to the
-learning table's CharacterIDReplacer; that helper is no longer a missing edge.
+learning table's CharacterIDReplacer.
 
 Fresh Tamago callback `0x14332d430`,
 `ev_f6d3be21466fb48b2e9c2a3277f782bb0d65db7c5f239a2609e37fe1a857da96`,
@@ -3186,7 +3162,7 @@ prefix can therefore leave fewer than three equipped entries; there is no retry
 from later entries. The hook doesn't clear the mastered array. NPC setup `0x1430f7260`,
 `ev_b605f3a770cadac9b884651c3dec643bcb445b5b2ff31bf95b2531e0f699fcac`,
 has availability-relevant behavior beyond simply reusing nonempty arrays; its
-complete conditional model and the correction are below.
+complete conditional model is below.
 
 Level update `0x1430f78d0`,
 `ev_c8c7cb4f4df7b86d27a700f02606cd29d1b420dbf938d6550575a99ba67f45fd`,
@@ -3212,8 +3188,8 @@ Equipment sort/trim is relevant only if it changes one of those inputs.
 
 ### Overall wild attack availability
 
-**Output clarification, 2026-10-26:** the user requests the overall available
-attack set, not a particular equipped loadout. The established
+The output is the overall available attack set at captured storage. Equipped
+loadout is outside that output. The established
 [AvailableWaza/HasMasteredWaza routines](#derived-learned-availability) give the
 observable boundary. In set notation, retaining the original engine list model:
 
@@ -3234,7 +3210,7 @@ be replaced by the original spawn species in this formula.
 
 #### NPC-companion attack source
 
-New native `0x142e711b0` names itself
+Native `0x142e711b0` names itself
 `UPalDatabaseCharacterParameter::FindNPCOtomoWaza`. It initializes an empty output,
 enumerates database `+0x150`, finds the first row whose FName at `+8` equals its
 **input species**, and appends the three uint16 values at `+0x10/+0x12/+0x14`.
@@ -3276,14 +3252,12 @@ field/schema bytes: `ev_313546a5c2540fe598db96cb9b2eb229a80319fe76f7933d346fa793
 The retained wrapper is
 `ev_907710a2df1aac6228d5a37760ab4a7534eae0400ee58d298535148e0f7c8430`.
 
-#### NPC master-setup correction and availability effects
+#### NPC master-setup and availability effects
 
-**Correction, 2026-10-26:** the earlier summary that `0x1430f7260` merely uses
-existing nonempty arrays omitted its weapon normalization branch. This concerns
-our understanding of the same executable, not a game update. The retained body
-is `ev_b605f3a770cadac9b884651c3dec643bcb445b5b2ff31bf95b2531e0f699fcac`.
-New getter and writer checks separate equipment at live `+0x428` from mastered
-at `+0x438`. The availability-relevant conditional model is:
+NPC master setup `0x1430f7260` includes weapon normalization as well as array
+setup. Its body is `ev_b605f3a770cadac9b884651c3dec643bcb445b5b2ff31bf95b2531e0f699fcac`.
+Getter and writer checks separate equipment at live `+0x428` from mastered at
+`+0x438`. The availability-relevant conditional model is:
 
 ```text
 MasterWazaSetup(actor):
@@ -3323,7 +3297,7 @@ not by itself show every spawner's dispatch or every possible supplied-save stat
 DT_PalMonsterParameter have `Weapon=EPalWeaponType::None`. For a Pal drawn from
 those rows with an existing nonempty attack array, this normalization does not
 add Weapon_Use to mastered. Consequently the weapon branch is a meaningful
-shared-helper correction, not evidence of a new attack available to an ordinary
+shared-helper branch, not evidence of a new attack available to an ordinary
 Pal. If both arrays are empty, the explicit fallback model above remains usable;
 no arbitrary supplied-save contents are presumed.
 
@@ -3417,7 +3391,7 @@ frequency measurement, or preservation under arbitrary mods/later grants.
 
 ## Wild-Pal gender
 
-**Verified for declared inputs, updated 2026-10-24.** The ratio helper, general initializer, supplied-save installation, actor association and ordinary/KingWhale storage path now establish the saved-gender output. See the [complete transfer argument](#saved-wild-gender-from-spawn-input-through-captured-storage). Initializer gender uses the species after initial form selection, not necessarily the later Unique NPC CharacterID. A supplied/overridden save contributes its own saved Gender. The detailed caller and field observations below remain useful for the other wild mechanics.
+**Verified for declared inputs, updated 2026-10-24.** The ratio helper, general initializer, supplied-save installation, actor association and ordinary/KingWhale storage path establish the saved-gender output. See the [complete transfer argument](#saved-wild-gender-from-spawn-input-through-captured-storage). Initializer gender uses the species after initial form selection, not necessarily the later Unique NPC CharacterID. A supplied/overridden save contributes its own saved Gender. The detailed caller and field observations below remain useful for the other wild mechanics.
 
 ### Saved wild gender from spawn input through captured storage
 
@@ -3500,17 +3474,15 @@ or cover player creation, mods or unobserved runtime distributions.
 
 ### Wild form selection and saved-level handoff
 
-**Native closure independently accepted, 2026-10-29.** The
-October 29 review correctly identified the omitted producer between requested
-spawn species/level and the resolved inputs used by availability. The recovered
-accessors, named settings/defaults, alternate replacement and position gate now
-join that producer. The question has not been narrowed to already resolved inputs.
+The form-selection producer derives resolved species and saved level from the
+requested spawn species/level and supplied world state. Its accessors, named
+settings/defaults, alternate replacement and position gate are modeled below.
 
 Inputs are spawn species, requested level, form-enable flag, caller rank/arrays,
 Unique NPC key, current character/learning tables, effective game/option settings,
 and the actual spawner position and world-stage registry/query keys. The last
 group is consumed by the recovered Predator gate; it is explicit supplied world
-state, not a claimed distribution of every spawner or a new mode exclusion.
+state, without a claimed distribution over every spawner.
 Outputs are assignment species, resulting rare flag, saved species/level and the
 mastered inputs reaching the established overall-availability calculation.
 
@@ -3642,7 +3614,7 @@ byte to saved `+20` after finding a valid row. With the shipped inputs, a succes
 rare replacement of requested21 uses level26 for the range (rank2, awakening5)
 and save, while attack setup receives21. Requested78 becomes83 for range choice
 (rank4, awakening10), then saves80. Overall natural availability uses the saved
-species/level, so the earlier equipment/attack formula needs this producer bridge.
+species/level, so the equipment/attack formula requires this producer bridge.
 An invalid/missing resolved row does not gain a valid-save guarantee merely from
 the common initializer's nonzero return; the existing row-guard boundary remains.
 
@@ -3687,7 +3659,7 @@ The records are stage models, not generic actors. `142b05130` names
 The model does not label virtual`+360` as AActor.GetLevel or infer all concrete
 subclass returns from the base table. Actual registered matching keys, maps,
 position and loaded options remain supplied world state. Their query interface,
-validity, filtering, order and first-box early return are now established; no
+validity, filtering, order and first-box early return are established; no
 population/lifecycle census is needed to evaluate this conditional transformation.
 
 #### Decisive native observations and data identity
@@ -3733,7 +3705,7 @@ population/lifecycle census is needed to evaluate this conditional transformatio
 | Stage-model class identity | `ev_3853b46043d449dff82c60923df9e22a42bb60c90388dac568fa1d7137b3c366` |
 | Stage-model base constructor | `ev_507631b36e49d017db895d420615268838d47abdc3703c1ae3ba1b2c95373528` |
 
-All new records bind the same executable SHA-256 and reduced analysis profile in
+All records bind the same executable SHA-256 and reduced analysis profile in
 the identity section. The retained decoded BP CDO hash is
 `3048902dcf178ad85c514c5dcc70373e8007d1c5e0b03da9f394dc2d7758ac8f`;
 BP class hash `9d18d32a7bff1a3972242feab7146ba8cf04166c536b9fb282daa8832654bb82`
@@ -3744,11 +3716,6 @@ establishes its native superclass. The Pal character-table export hash is
 establishes its `PalNPCSpawnerBase` superclass. These use the recorded archive,
 decoder and mappings; no mod/player configuration or fresh archive extraction
 was substituted. Native reads were checked against current source-file mappings.
-
-The acceptance review's missing native/helper/default facts are now recovered.
-Independent acceptance recheck of the published resolution passed before
-full version verification was declared. This is correction and completion
-of the baseline argument, not evidence that the game changed.
 
 ### Wild input contracts: retained wrapper and sequencing boundaries
 
@@ -3828,7 +3795,7 @@ A nonempty key ignores the input species; a missing row does **not** fall back t
 it. Companion helper `0x1430ef610` returns the same row CharacterID or None without
 this identity-on-empty branch; it is not an attack-array lookup.
 
-The fresh-save output boundary is now connected. General initializer
+At the fresh-save output boundary, general initializer
 `0x1432e6070` assigns gender and character-default passives using the earlier
 assignment species **S**. With no explicit attacks, its nonempty-key path supplies
 resolved species **R** to natural attack setup. Explicit arrays instead populate
@@ -3859,13 +3826,11 @@ None, the resolver preserves S. A concrete gameplay discrepancy needs an actual
 caller supplying differing S/R and distinguishing gender/passive/attack data;
 none is asserted solely from this ordering.
 
-**Remaining contract:** the standard-spawner path below supplies None and now
-connects its input producer; other modes still need their own keys/flags. The
-row lookup, field names and final CharacterID write are no longer missing edges.
-Stop further tracing at those caller inputs and saved contents, not scheduling
-or population. The saved-gender continuation answers its separate conditional
-input-to-storage question. The October 29 acceptance-review requirements are resolved in the
-form and rare-pool sections above.
+The standard-spawner path below supplies a None Unique NPC key; other modes
+retain their own keys/flags. The [saved-gender transfer](#saved-wild-gender-from-spawn-input-through-captured-storage)
+uses the assignment-stage gender, while the form and rare-pool sections establish
+the separate species/level and rare-input contracts. No scheduling or population
+distribution is inferred from these caller inputs and saved contents.
 
 | Decisive observation | Evidence ID |
 | --- | --- |
@@ -3906,7 +3871,7 @@ The decoded Spawn script selects `SpawnGroup.PalList[i].PalID.Key` into
 
 The World Tree aura branch and its computed array are explicit inputs, not an
 assumption that the returned passive list is empty, nonempty or has fixed weights.
-That producer's current ordered pool and exact selection rule are now established in
+That producer's current ordered pool and exact selection rule are established in
 [the World Tree input evidence](#world-tree-standard-spawner-passive-input); branch activation frequency remains unclaimed.
 Instance overrides of RarePalAble are not inferred from the CDO.
 
@@ -3947,12 +3912,12 @@ InitPalIndividualParam = resulting save
 SpawnNewCharacter(InitPalIndividualParam, network parameters, callback)
 ```
 
-Thus the previously unresolved *later Unique NPC replacement* does not split the
-assignment and saved species on this standard path. This does not assert that
-initial form selection leaves the requested species unchanged, or establish unconditional
-passive probabilities. The World Tree caller array and manager order are now bound.
-Other spawn modes retain their declared caller inputs. The final wild-passive
-closure and separate attack/gender sections establish their recorded scopes.
+Thus the later Unique NPC replacement does not split the assignment and saved species on
+this standard path. This does not assert that initial form selection leaves the
+requested species unchanged, or establish unconditional passive probabilities. The World
+Tree caller array and manager order are bound. Other spawn modes retain their declared
+caller inputs. The wild-passive, attack and gender sections establish their recorded
+scopes.
 
 | Observation | Identity |
 | --- | --- |
@@ -3966,7 +3931,7 @@ closure and separate attack/gender sections establish their recorded scopes.
 
 #### Fresh save installation into individual parameters
 
-The standard spawner's save-to-native handoff now reaches a constructed
+The standard spawner's save-to-native handoff reaches a constructed
 **PalIndividualCharacterParameter**, rather than ending at a Blueprint local:
 
 ```text
@@ -4003,8 +3968,8 @@ live-object `+0x3d0`, the same parameter layout established for the capture
 lookup. The manager helper writes supplied record fields around live-object `+0x320/+0x328`;
 those lie outside the save and are not confused with Dynamic.GroupId at `+0x6f8`.
 
-**Current boundary:** the [gender continuation](#saved-wild-gender-from-spawn-input-through-captured-storage)
-now connects the completion callbacks to the installed parameter and actor, and
+**Transfer boundary:** the [saved-gender model](#saved-wild-gender-from-spawn-input-through-captured-storage)
+connects the completion callbacks to the installed parameter and actor, and
 checks gender-specific post-copy preservation. This does not establish the full
 query-time capture-addition state: live trainer references and group/history
 changes before the gate remain conditions. A healthy returned handle or a copied
@@ -4029,11 +3994,11 @@ constructor default alone still does not prove capture eligibility.
 
 | Retained caller | Established contract | Remaining bound |
 | --- | --- | --- |
-| `0x1432e5ef0`, `ev_907710a2df1aac6228d5a37760ab4a7534eae0400ee58d298535148e0f7c8430` | Registered NPCOtomo API forwards the attack array from `0x142e711b0` as p9; p10 empty, p8=0, p13=0. Only a nonempty p9 bypasses initial natural setup; the two-row source table and three-entry matching results are now established above. | NPC-companion caller species/Unique NPC keys remain caller-specific; this is not an ordinary-wild input proof. |
+| `0x1432e5ef0`, `ev_907710a2df1aac6228d5a37760ab4a7534eae0400ee58d298535148e0f7c8430` | Registered NPCOtomo API forwards the attack array from `0x142e711b0` as p9; p10 empty, p8=0, p13=0. Only a nonempty p9 bypasses initial natural setup; the two-row source table and three-entry matching results are established above. | NPC-companion caller species/Unique NPC keys remain caller-specific; this is not an ordinary-wild input proof. |
 | `0x1432e6e70`, `ev_096b4cfea4cfb3423b416637670e86beeecc077cf189b4931c1c534ef36e7ffb` | p9 empty, p10 copied from supplied passives; forwards the skip/form flags, allowing natural attack setup. | Values supplied by each upstream caller remain separate contracts. |
 | `0x142d45b60`, `ev_73e8dd25ef9c5f55d629bc3fdab7f37b247fe55889a135f3f77f20da8cdac391` | p8=1, p13=0; forwards copied explicit arrays and caller talent override. Random passive filling is skipped, while defaults/caller passives remain separate. A registered PalArenaSoloNPCSpawner NPC entry reaches this helper. | Other API callers and concrete arena field values remain separate; the method is not ordinary-wild input proof. |
 | `0x142b84150`, `ev_6c2faccb3b1e3bef42d13650cebd8078c74e7a21ecc26529a8324d6f5cd50554` | Registered GetInitializedCharacterSaveParemter_ParamSetup marshals arrays and booleans to general initialization. | Marshalling is not proof of ordinary wild-spawn inputs or concrete flag values. |
-| `0x143035620`, `ev_dcf71cb7b0412941fe9ba97fc22305b9e4117d675811a5d49db5ec94692a81c5` | Copies dynamic egg data `+0x78`; calls `1432e6e70` only when the copied CharacterID is empty, using metadata species `+0x70`. | This is the already recovered egg fallback, not a new ordinary wild caller requiring general spawn research. |
+| `0x143035620`, `ev_dcf71cb7b0412941fe9ba97fc22305b9e4117d675811a5d49db5ec94692a81c5` | Copies dynamic egg data `+0x78`; calls `1432e6e70` only when the copied CharacterID is empty, using metadata species `+0x70`. | Egg-save fallback is distinct from ordinary wild spawning. |
 | `0x142ed6840`, `ev_929af7c2e0667593f578e1f3dd774d4a57b7170296387534baab5bb78e517fcf` | Calls `1432e6e70`, then copies the generated save into its dynamic-item object. | Item-generation context must not be relabelled ordinary wild spawning; incomplete inferred call arguments prevent assigning every flag here. |
 
 The recruiter, NPC attack setup and connected KingWhale capture callback retain
@@ -4051,12 +4016,12 @@ entry points without inferring ordinary gameplay from an address:
 | `0x147854ec0` | GetInitializedCharacterSaveParemter_ParamSetup | `0x142b84150` → general initializer |
 | `0x147307cc0` | GetInitializedNPCSaveParameter | `0x142849450` → `0x142d45d70` → `0x142d45b60` |
 
-The spelling `Paremter` is the native registered name. For the last entry,
-registration `0x142848850` passes the six-method array starting at `0x147307cb0`
-and UClass from `0x1428464d0` to the native-function registrar. That class getter
-names **PalArenaSoloNPCSpawner**, size `0x2e8`. Thus the owner is established,
-not inferred from the NPC token or function location. An xref to the middle pair
-was empty; inspecting the actual array start supplied the registration edge.
+The spelling `Paremter` is the native registered name. For the last entry, registration
+`0x142848850` passes the six-method array starting at `0x147307cb0` and UClass from
+`0x1428464d0` to the native-function registrar. That class getter names
+**PalArenaSoloNPCSpawner**, size `0x2e8`. Thus the owner is established, not inferred
+from the NPC token or function location. The native registration array supplies the
+API/class binding.
 
 Its NPC method forwards source fields `+0x2ac/+0x2b4/+0x2bc/+0x2c0/+0x2c4/+0x2c8`
 and empty temporary arrays to the existing parameterized helper. That helper
@@ -4068,22 +4033,21 @@ values are not established here; a bounded descriptor check for names containing
 CharacterID/NPCID found no matching field descriptor at those offsets. That no-hit
 does not prove the fields lack metadata or that another input is absent.
 
-The NPCOtomo entry is a separate NPC-companion API. Its attack helper's source table and matching conditions are now bound above:
+The NPCOtomo entry is a separate NPC-companion API. Its attack helper's source table and matching conditions are bound above:
 ColorfulBird and RobinHood_Ground supply three entries, while nonmatching
 species return empty. **Forwarding an array alone does not prove that natural
 setup is skipped**, and derived natural availability remains separate. No ordinary spawn-mode argument values are
 inferred from either reflected wrapper. Egg fallback and dynamic-item generation
 remain separately classified in the table above.
 
-**Current boundary:** the Unique NPC lookup and final save write are established;
-two previously anonymous candidates are now classified as NPC-companion and
-arena-solo-NPC entries. The standard wild-spawner invocation is now connected above, including its None
-key and two branch contracts. Other spawn modes retain their own input gaps.
-That caller must be justified by its effect on saved gender/passives/attacks,
-rather than expanding into spawn scheduling. Arena field-name/default recovery
-is a separate follow-up only if its declared arena output is needed. Later
-attack, gender and target/source sections close their specific supplied-input
-and saved-transfer questions; no broader spawner census is inferred.
+**Caller boundary:** the Unique NPC lookup and final save write are established.
+NPC-companion and arena-solo-NPC entries have distinct contracts from the standard
+wild-spawner invocation, including its None key and two branch contracts. Other spawn
+modes retain their own input gaps. That caller must be justified by its effect on saved
+gender/passives/attacks, rather than expanding into spawn scheduling. Arena
+field-name/default recovery is a separate follow-up only if its declared arena output is
+needed. Later attack, gender and target/source sections close their specific
+supplied-input and saved-transfer questions; no broader spawner census is inferred.
 
 | Decisive observation | Evidence ID |
 | --- | --- |

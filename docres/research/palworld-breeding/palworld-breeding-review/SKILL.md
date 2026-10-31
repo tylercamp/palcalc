@@ -13,7 +13,7 @@ completion decisions. A standard game-update review accounts for the full
 checklist, with declared inputs, modes, questions, and output boundaries. Missing
 answers stay visible even when the investigation finishes with gaps.
 
-Read [review-notes.md](references/review-notes.md) before assessing findings. It records distinctions established in prior reviews and worked examples, not permanent claims about future game builds.
+Read [review-notes.md](references/review-notes.md) before assessing findings. It explains review distinctions and worked examples, not permanent claims about future game builds.
 
 ## Start from completed evidence
 
@@ -95,7 +95,9 @@ the workflow's code/data dependency comparison, not just an old conclusion.
 
 Consolidate the current answers and decisive evidence when updating a report,
 following the workflow's [publication boundary](../ASSESSMENT-WORKFLOW.md#what-belongs-in-published-evidence).
-Keep investigation state separate from coverage and retain meaningful dated
-corrections. Move exploratory models, rejected leads, and continuation history to
-`txt/`; keep the evidence needed for published conclusions and material limitations
-self-contained. A partial mechanic can still have established parts worth publishing.
+Keep investigation state separate from coverage. Reports must state current
+conclusions and their evidence without pass/review history, editorial notes or
+local repository state. Reference only prior accepted reviews, identified by
+version and scope. Move other review history, exploratory models, rejected leads
+and continuation notes to `txt/`; keep published conclusions and material
+limitations self-contained. A partial mechanic can still have established parts worth publishing.

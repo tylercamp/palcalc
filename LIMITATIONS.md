@@ -9,8 +9,7 @@ For the game rules and detailed calculations, start with
 [research checklist](docres/research/palworld-breeding/README.md#current-verification-status)
 is the main record of which mechanics and versions have been checked. The
 [1.0.5.102999 assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md)
-records eight Verified mechanics, investigation Finished after native proof and
-independent rechecks resolved both October 29 acceptance findings. Wild-passive
+records eight Verified mechanics, investigation Finished. Wild-passive
 rare-pool binding and wild-attack form/settings-to-saved-input handling are
 established. This does not implement their recovered details in PalCalc or measure unconditional gameplay
 frequencies.

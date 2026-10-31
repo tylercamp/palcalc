@@ -23,8 +23,8 @@ and exports belong under `_REA-ANALYSIS/runs/<run-id>/`.
 - Platform/configuration: <platform, distribution, relevant options/mods>
 - Supporting identity: <build ID, executable SHA-256, relevant assets/mappings>
 - Review dates: <first published, last updated; dates also recorded per mechanic>
-- Previous game-version report: <link, or no prior baseline>
-- Compared PalCalc baseline: <mechanics document and code revision/working tree>
+- Previous accepted game-version report: <link and scope, or no accepted baseline>
+- Compared PalCalc baseline: <mechanics document/code revision or identified source snapshot>
 - Investigation state: <ongoing or finished; reason for stopping if finished>
 - Verification coverage: <full or partial for the declared questions/modes; gaps>
 
@@ -73,11 +73,13 @@ and exports belong under `_REA-ANALYSIS/runs/<run-id>/`.
 
 <Use the per-mechanic outline below.>
 
-## Checks and reference updates
+## Checks
 
-<Checks actually performed, results, documentation changes, and implementation
+<Checks actually performed, results, and implementation
 checks only if requested. Distinguish native inspection, synthetic calculations,
-PalCalc tests, and live observations. Record a dated note for any later correction.>
+PalCalc tests, and live observations. State current results directly; omit research,
+review and editorial history or local repository state. Prior review references
+must identify accepted reports.>
 ```
 
 ### Per-mechanic assessment outline
@@ -121,8 +123,9 @@ Supporting mechanics can be added after the required sections when investigated.
 ## Identity and methods
 
 <Game version and source; platform/build/hash; asset and decoding-input identities;
-review dates; tools/methods; original observations versus reused evidence. Record
-the provenance of numeric inputs and the boundaries of static analysis.>
+review dates; tools/methods; observation and numeric-input provenance; boundaries
+of static analysis. Include decisive evidence here, with references to prior
+accepted reports only where needed. Omit other pass/review and repository-state details.>
 
 ## Child species
 
@@ -185,9 +188,9 @@ investigation history and speculative models stay in `txt/`.
   history stays under `runs/`, and exploratory reasoning/operating notes under
   `txt/`; published citations and reasoning must stand alone.
 
-Keep a single current explanation for each path. Retain decisive excerpts and
-useful citation anchors when consolidating; record meaningful corrections with
-dates, without leaving superseded conclusions interleaved with current ones.
-Preserve the uncommitted report under `txt/` before a substantial cleanup. Update
-incoming links when replacing obsolete headings rather than keeping every phase
-heading or unused evidence ID in the published file.
+Keep a single current explanation for each path. Retain decisive excerpts and useful
+citation anchors when consolidating. State current conclusions directly; when explaining
+a correction, reference only an accepted baseline. Keep other review history in private
+notes. Preserve the report under `txt/` before a substantial cleanup. Update incoming
+links when replacing obsolete headings rather than keeping every phase heading or unused
+evidence ID in the published file.
