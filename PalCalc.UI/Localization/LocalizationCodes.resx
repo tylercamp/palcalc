@@ -132,6 +132,21 @@
   <data name="LC_BASE_LABEL" xml:space="preserve">
     <value>BaseName</value>
   </data>
+  <data name="LC_BREEDABLE_CALCULATING" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_BREEDABLE_GROUP_NOT_REACHABLE" xml:space="preserve">
+    <value>NumPals</value>
+  </data>
+  <data name="LC_BREEDABLE_GROUP_OWNED" xml:space="preserve">
+    <value>NumPals</value>
+  </data>
+  <data name="LC_BREEDABLE_GROUP_TIER" xml:space="preserve">
+    <value>Tier|NumPals</value>
+  </data>
+  <data name="LC_BREEDABLE_PARENT_BRED" xml:space="preserve">
+    <value />
+  </data>
   <data name="LC_BREEDING_TIME" xml:space="preserve">
     <value />
   </data>
@@ -602,6 +617,12 @@
     <value />
   </data>
   <data name="LC_TARGET_PALS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TOOL_FIND_BREEDABLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TOOLS" xml:space="preserve">
     <value />
   </data>
   <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">

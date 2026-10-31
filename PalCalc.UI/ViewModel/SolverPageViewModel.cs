@@ -98,6 +98,8 @@ namespace PalCalc.UI.ViewModel
 
         public SolverQueueViewModel SolverQueue { get; } = new SolverQueueViewModel();
 
+        public ToolListViewModel Tools { get; }
+
         public CommonSaveOperationsViewModel SaveOperations { get; }
 
         // main app model
@@ -159,6 +161,9 @@ namespace PalCalc.UI.ViewModel
             SolverControls.CopyFrom(settings.SolverSettings);
             solverControlsPropertyChangedHandler = SolverControls_PropertyChanged;
             SolverControls.PropertyChanged += solverControlsPropertyChangedHandler;
+
+            Tools = new ToolListViewModel([new BreedableToolViewModel(SolverControls)]);
+            Tools.PropertyChanged += Tools_PropertyChanged;
             
             // TODO - would prefer to have the delete command managed by the target list, rather than having
             //        to manually assign the command for each specifier VM
@@ -208,6 +213,8 @@ namespace PalCalc.UI.ViewModel
             if (SolverControls != null && solverControlsPropertyChangedHandler != null)
                 SolverControls.PropertyChanged -= solverControlsPropertyChangedHandler;
 
+            Tools.PropertyChanged -= Tools_PropertyChanged;
+
             if (passivePresets != null && presetSelectedHandler != null)
                 passivePresets.PresetSelected -= presetSelectedHandler;
 
@@ -247,6 +254,7 @@ namespace PalCalc.UI.ViewModel
             if (OpenedSave?.Value == save)
             {
                 UpdateFromSaveProperties();
+                RunSelectedTool();
             }
         }
 
@@ -321,8 +329,33 @@ namespace PalCalc.UI.ViewModel
         {
             if (e.PropertyName == nameof(PalTargetList.SelectedTarget))
             {
+                if (PalTargetList.SelectedTarget != null) Tools.SelectedTool = null;
+
                 UpdatePalTarget();
             }
+        }
+
+        private void Tools_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Tools.SelectedTool) && Tools.SelectedTool != null)
+            {
+                PalTargetList.SelectedTarget = null;
+                RunSelectedTool();
+            }
+        }
+
+        private void RunSelectedTool()
+        {
+            var cachedData = OpenedSave.CachedValue;
+            if (Tools.SelectedTool == null || cachedData == null) return;
+
+            Tools.SelectedTool.Run(
+                SolverControls.ConfiguredSolverSettings(
+                    SelectedGameSettings.ModelObject,
+                    PalTargetList.SourcePals.AvailablePals.ToList()
+                ),
+                cachedData
+            );
         }
 
         private void SaveTargetList(PalTargetListViewModel list)
@@ -340,6 +373,12 @@ namespace PalCalc.UI.ViewModel
 
         private void RunSolver()
         {
+            if (Tools.SelectedTool != null)
+            {
+                RunSelectedTool();
+                return;
+            }
+
             var currentSpec = PalTarget?.CurrentPalSpecifier;
             if (currentSpec?.ModelObject == null) return;
 

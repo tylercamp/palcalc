@@ -138,6 +138,21 @@
   <data name="LC_BASE_LABEL" xml:space="preserve">
     <value>Base ({BaseName})</value>
   </data>
+  <data name="LC_BREEDABLE_CALCULATING" xml:space="preserve">
+    <value>Calculating...</value>
+  </data>
+  <data name="LC_BREEDABLE_GROUP_NOT_REACHABLE" xml:space="preserve">
+    <value>Not Reachable ({NumPals})</value>
+  </data>
+  <data name="LC_BREEDABLE_GROUP_OWNED" xml:space="preserve">
+    <value>Already Owned ({NumPals})</value>
+  </data>
+  <data name="LC_BREEDABLE_GROUP_TIER" xml:space="preserve">
+    <value>Tier {Tier} ({NumPals})</value>
+  </data>
+  <data name="LC_BREEDABLE_PARENT_BRED" xml:space="preserve">
+    <value>Needs to be bred first</value>
+  </data>
   <data name="LC_BREEDING_TIME" xml:space="preserve">
     <value>Breeding Time (Seconds)</value>
   </data>
@@ -901,6 +916,12 @@ Higher values linearly affect time required, depending on how many types of pals
   </data>
   <data name="LC_TARGET_PALS" xml:space="preserve">
     <value>Target Pals</value>
+  </data>
+  <data name="LC_TOOL_FIND_BREEDABLE" xml:space="preserve">
+    <value>Find All Breedable</value>
+  </data>
+  <data name="LC_TOOLS" xml:space="preserve">
+    <value>Tools</value>
   </data>
   <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">
     <value>None</value>

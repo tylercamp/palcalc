@@ -7,6 +7,7 @@
              xmlns:v="clr-namespace:PalCalc.UI.View.Main"
              xmlns:uiv="clr-namespace:PalCalc.UI.View"
              xmlns:vm="clr-namespace:PalCalc.UI.ViewModel"
+             xmlns:vms="clr-namespace:PalCalc.UI.ViewModel.Solver"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
              xmlns:b="clr-namespace:PalCalc.UI.ViewModel.Behaviors"
@@ -24,7 +25,12 @@
              >
     <UserControl.Resources>
         <c:ValueVisibilityConverter x:Key="VVC" />
+        <c:ValueVisibilityConverter x:Key="NegatedVVC" Negate="True" />
         <c:ValueBoolConverter x:Key="NegatedVBC" Negate="True" />
+
+        <DataTemplate DataType="{x:Type vms:BreedableToolViewModel}">
+            <v:BreedableToolView />
+        </DataTemplate>
     </UserControl.Resources>
     <Border Padding="5">
         <DockPanel>
@@ -81,6 +87,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition MinHeight="100" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
                         <!-- "Target Pals" section -->
@@ -88,8 +95,13 @@
                             <v:PalTargetListView BorderThickness="0" DataContext="{Binding PalTargetList}" />
                         </GroupBox>
 
+                        <!-- "Tools" section -->
+                        <Expander Header="{itl:LocalizedText LC_TOOLS}" Grid.Row="1" Margin="0,5,0,0" IsExpanded="True" adonisExtensions:LayerExtension.IncreaseLayer="True">
+                            <v:ToolListView BorderThickness="0" DataContext="{Binding Tools}" />
+                        </Expander>
+
                         <Grid Visibility="{Binding SolverQueue.QueuedItems.Count, Converter={StaticResource VVC}}"
-                              Grid.Row="1"
+                              Grid.Row="2"
                               layout:GridLayoutBehavior.Key="Solver.JobQueue"
                               layout:GridLayoutBehavior.PrimaryRow="0"
                               layout:GridLayoutBehavior.PrimaryMinimum="100">
@@ -122,8 +134,11 @@
 
                 <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
+                <!-- Selected tool, replaces the center pane -->
+                <ContentControl Grid.Column="2" Content="{Binding Tools.SelectedTool}" Visibility="{Binding Tools.SelectedTool, Converter={StaticResource VVC}}" />
+
                 <!-- Center Pane -->
-                <DockPanel Grid.Column="2">
+                <DockPanel Grid.Column="2" Visibility="{Binding Tools.SelectedTool, Converter={StaticResource NegatedVVC}}">
                     <!-- Solver controls at the top -->
                     <v:SolverControlsView DockPanel.Dock="Top" DataContext="{Binding SolverControls}" Margin="0,0,0,5" Padding="5" HorizontalContentAlignment="Right" Background="{DynamicResource ResourceKey={x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" adonisExtensions:LayerExtension.IncreaseLayer="True" />
 
@@ -173,6 +188,7 @@
                     <!-- "Target Pal" section -->
                     <Expander Header="{itl:LocalizedText LC_TARGET_PAL}"
                               Grid.Row="0"
+                              Visibility="{Binding Tools.SelectedTool, Converter={StaticResource NegatedVVC}}"
                               IsExpanded="True"
                               adonisExtensions:LayerExtension.IncreaseLayer="True"
                               >
@@ -193,6 +209,17 @@
 
                         <!-- "Source Pals" section -->
                         <Expander Header="{itl:LocalizedText LC_SOURCE_PALS}" Grid.Row="0" Margin="0,5,0,0" Padding="0" IsExpanded="True" Name="SourcePalsExpander" VerticalContentAlignment="Stretch" adonisExtensions:LayerExtension.IncreaseLayer="True">
+                            <!-- Fill the pane while the results are hidden for a tool -->
+                            <Expander.Style>
+                                <Style TargetType="Expander" BasedOn="{StaticResource {x:Type Expander}}">
+                                    <Setter Property="Grid.RowSpan" Value="3" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Tools.SelectedTool}" Value="{x:Null}">
+                                            <Setter Property="Grid.RowSpan" Value="1" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Expander.Style>
                             <i:Interaction.Behaviors>
                                 <b:ExpanderGridRowResetBehavior TargetGridRowIndex="0" ExpandedMinHeight="120" />
                             </i:Interaction.Behaviors>
@@ -258,9 +285,9 @@
                             </ScrollViewer>
                         </Expander>
 
-                        <GridSplitter IsEnabled="{Binding ElementName=SourcePalsExpander, Path=IsExpanded}" Grid.Row="1" Background="{x:Null}" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                        <GridSplitter Visibility="{Binding Tools.SelectedTool, Converter={StaticResource NegatedVVC}}" IsEnabled="{Binding ElementName=SourcePalsExpander, Path=IsExpanded}" Grid.Row="1" Background="{x:Null}" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
 
-                        <Grid Grid.Row="2">
+                        <Grid Grid.Row="2" Visibility="{Binding Tools.SelectedTool, Converter={StaticResource NegatedVVC}}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
