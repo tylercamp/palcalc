@@ -86,10 +86,10 @@ For how PalCalc builds its list of breeding pairs, see the
 The original passive inheritance model is credited to
 [/u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/).
 
-Our existing explanation also draws on earlier reverse engineering of ordinary
-inheritance and item effects, including an apparent bug in random passive
-selection. Its current verification status is recorded in the
-[research checklist](docres/research/palworld-breeding/README.md#current-verification-status).
+The [1.0.5.102999 passive assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-passives)
+establishes ordinary inheritance, item overrides and mutation, including an apparent
+bug in random passive selection. The [research checklist](docres/research/palworld-breeding/README.md#current-verification-status)
+records the inputs and modes covered for each version.
 
 The first roll asks for one to four passives from the parents. If the parents
 have fewer unique passives than requested, the child inherits the available ones.
@@ -250,8 +250,12 @@ add a separate 1–5 talent bonus to each ordinary offspring stat, clamped at 10
 Mutation instead generates fresh talents in the shipped default range 90–100;
 it doesn't run the ordinary parental-talent or item-bonus branch.
 
-Mutation also uses different species and passive selection and attempts an extra
-Strong attack of the child's primary element. That attack can already be present,
+Mutation uses a separate rank formula for species selection. Its nearest-rank pool
+can include special-recipe children, which ordinary rank selection excludes;
+that pool still excludes bosses and rows flagged `IgnoreCombi`.
+[Species model](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#child-species).
+It also uses different passive selection and attempts an extra Strong attack of
+the child's primary element. That attack can already be present,
 so the draw doesn't guarantee another distinct attack. Mutation's passive inserts
 can displace parental entries, including with a Special Cake. The report's
 [full game model](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md)

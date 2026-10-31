@@ -33,8 +33,6 @@ holds current coverage; version reports hold findings, evidence and corrections.
   are supporting topics, reviewed when requested or implicated by a change.
   [Checklist](README.md#current-verification-status) /
   [scope rules](ASSESSMENT-WORKFLOW.md#define-the-questions-and-boundaries).
-- Earlier incremental reports were cleared for this baseline and remain in Git
-  history. No fully verified version was carried forward at the reset.
 
 ## Recording changes
 

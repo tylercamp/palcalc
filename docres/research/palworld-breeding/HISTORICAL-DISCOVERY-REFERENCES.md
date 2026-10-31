@@ -5,7 +5,9 @@ search anchors, addresses and layout clues requiring corroboration before use.
 
 - Steam build ID: `25246127`
 - Executable SHA-256: `e590b5e7bfaa3fea40fab1a02cc72c8fc5fd6f8631ef2308e95ac56c25195837`
-- Game version: not independently established for these leads
+- Game version: `1.0.5.102999` for the assessed installation, from packaged
+  `ProjectVersion` in `Pal/Config/DefaultGame.ini`.
+  [Version and installation identities](assessments/1.0.5.102999/evidence.md#identity-and-methods).
 
 Use the [REA guide](REA-GUIDE.md) for the investigation procedure. These notes
 contain exploration leads only: they don't establish current mechanics, supply
@@ -16,11 +18,11 @@ even when a familiar string or function shape appears in another build.
 
 ## Entry points and nearby routines
 
-Start with named diagnostics, then follow references and callers. Use the old
+Start with named diagnostics, then follow references and callers. Use the build-specific
 addresses to orient yourself only after checking the target identity and mapping.
 Routine roles below are analyst labels, not recovered source signatures.
 
-| Search anchor or investigation label | Old address | Exploration tip |
+| Search anchor or investigation label | Build-specific address | Exploration tip |
 | --- | --- | --- |
 | `UPalBreedingUtility::GenerateChildSaveParameter`, `PalBreedingUtility.cpp` | `0x142de98f0` | Follow the diagnostic-led entry toward the orchestration code |
 | Child-generation orchestrator | `0x142e73970` | Follow calls toward species, talent, attack, and passive routines, and inspect the final child writes |
@@ -48,9 +50,9 @@ Useful neighboring calls:
 
 The owner matters: a parent object offset isn't interchangeable with a child-save
 offset. Establish the current owner, type, and accesses through reflection and
-consumers before applying any of these old layouts.
+consumers before applying any of these build-specific layouts.
 
-| Field / owner from the old trace | Old offset or layout |
+| Field / owner | Offset or layout |
 | --- | --- |
 | `Combi_TalentInheritNum` / settings | `+0x1d38`, ordered float32 weights |
 | `Combi_PassiveInheritNum`, `Combi_PassiveRandomAddNum` / settings | `+0x1d48`, `+0x1d58` |
@@ -73,7 +75,7 @@ Reflection-layout discovery leads include descriptors
 `+0x38` was a field-offset lead. The bool setter routines were `0x140f197d0` and
 `0x140e68230`; short setter bodies can help corroborate a suspected layout.
 
-The old `CombiRankBonus` descriptor was at `0x1473512b0`, with its ASCII name at
+The `CombiRankBonus` descriptor is at `0x1473512b0`, with its ASCII name at
 `0x147351628`. Descriptor members `+0x18` and `+0x38` were useful type/offset
 leads. Don't confuse those descriptor-relative members with the item-effect
 field's offset.
@@ -85,14 +87,14 @@ follow their consumers; matching a literal alone doesn't identify a mechanic.
 
 | Lead | Where to look and what to inspect |
 | --- | --- |
-| `-0.5f`, bytes `00 00 00 bf` | Old address `0x14676d208`, referenced by the species selector near `0x142e70a22`; inspect surrounding conversions, rounding state, signed shifts, and operation order |
+| `-0.5f`, bytes `00 00 00 bf` | Build-specific address `0x14676d208`, referenced by the species selector near `0x142e70a22`; inspect surrounding conversions, rounding state, signed shifts, and operation order |
 | Integer literals `0` and `10` near `CombiRankBonus` | Species selector around `0x142e70a43..0x142e70a58`; follow sign tests, comparisons, and conditional moves |
 | `999999`, `-999`, and string `SheepBall` | Search the nearest-rank routine and its string references for initialization and fallback paths |
-| Talent conditional moves | Old helper around `0x142e90c99..0x142e90ccc`; track register sources independently through each exit |
-| Talent stores | Old addresses `0x142e90e03`, `0x142e90e0a`, `0x142e90e10`, `0x142e90e16`; useful endpoints for tracing source values |
-| Passive weight reads | Old filler around `0x143150d26..0x143150d37`; distinguish the copied array in `R12` from the manager array accessed through `R13+0x400` |
-| Passive removal and loop progress | Old filler around `0x143150f53` and `0x143150fd4..0x143150fe3`; follow total updates, append paths, and attempt-counter changes |
-| Attack array reads/writes | Old addresses `0x142e912b0`, `0x142e9131c`, `0x142e9142b`; inspect element widths and source/destination collections |
+| Talent conditional moves | Helper around `0x142e90c99..0x142e90ccc`; track register sources independently through each exit |
+| Talent stores | Build-specific addresses `0x142e90e03`, `0x142e90e0a`, `0x142e90e10`, `0x142e90e16`; useful endpoints for tracing source values |
+| Passive weight reads | Filler around `0x143150d26..0x143150d37`; distinguish the copied array in `R12` from the manager array accessed through `R13+0x400` |
+| Passive removal and loop progress | Filler around `0x143150f53` and `0x143150fd4..0x143150fe3`; follow total updates, append paths, and attempt-counter changes |
+| Attack array reads/writes | Build-specific addresses `0x142e912b0`, `0x142e9131c`, `0x142e9142b`; inspect element widths and source/destination collections |
 
 The existing guide's [asset-path and field-name seeds](REA-GUIDE.md#discovery-anchors-from-palcalc)
 remain the preferred starting point for another executable. In particular,
@@ -108,7 +110,7 @@ Give each set of addresses/offsets its executable identity. Put recovered rules,
 pseudocode, evidence supporting conclusions, and verification status in the
 version reports defined by the [workflow](ASSESSMENT-WORKFLOW.md).
 
-These leads were extracted from the reports retained in Git commit `6e45912`, under
-`assessments/2026-10-16-build-25246127/` and
-`assessments/2026-10-18-build-25246127/`. That provenance identifies where the tips
-came from; it doesn't reinstate those reports as a verified baseline.
+The native address leads are tied to the executable hash above. They do not
+establish asset contents; use the archive and decoding-input identities in the
+[version evidence](assessments/1.0.5.102999/evidence.md#identity-and-methods) when
+checking asset-dependent conclusions.

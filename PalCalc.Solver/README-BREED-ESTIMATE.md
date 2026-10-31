@@ -2,9 +2,10 @@
 
 Our ordinary passive model started with
 [the work by /u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/).
-Earlier reverse engineering informed the item-override model below. A new
-comprehensive baseline is pending; the [research checklist](../docres/research/palworld-breeding/README.md#current-verification-status)
-tracks game-version verification and links to conclusions and evidence when published.
+The [1.0.5.102999 assessment](../docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-passives)
+verifies ordinary, item-override and mutation passive rules for its declared inputs
+and saved-output boundaries. The [research checklist](../docres/research/palworld-breeding/README.md#current-verification-status)
+tracks version coverage. That mechanics assessment does not audit the current solver code.
 
 The examples below explain how PalCalc estimates ordinary passive inheritance,
 using the probability weights stored in this repository. These are worked

@@ -350,10 +350,9 @@ conditional consequence for the specified saved parents, not a live breeding tes
 or proof of how a player obtains those parents. The two Quest_Farmer03 self-pairs
 likewise select their base IDs under those ordinary no-bonus conditions.
 
-This resolves the October 23 exact-ID/order limitation for the declared shipped
-tables. Arbitrary table edits, modified rounding modes, unconditional effect-source
-frequencies and exact joint RNG replay remain unclaimed. No solver implementation
-was inspected or changed to turn this finding into a claimed code fix.
+The exact-ID/order conclusion applies to the declared shipped tables. Arbitrary
+table edits, modified rounding modes, unconditional effect-source frequencies and
+exact joint RNG replay remain unclaimed.
 
 
 ## Child gender

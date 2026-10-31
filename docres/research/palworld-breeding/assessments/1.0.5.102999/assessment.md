@@ -75,7 +75,7 @@ For PalCalc, preserve recipe/gender precedence, native candidate eligibility,
 priority and material table order; evaluate a self-pair shortcut only where it
 agrees with those rules. Ordinary boss replacement and mutation remain omissions
 from the simpler documented rank account. A missing implementation mode is not
-proof of a recent game change, and this documentation update implements no fix.
+proof of a recent game change.
 
 The first-load order argument is specific to the shipped tables. Arbitrary runtime
 table edits, altered floating-point rounding and effect-source activation
@@ -215,7 +215,7 @@ evaluate mutation's fresh range separately
 The baseline document's asymmetric source sets agree with the recovered helper.
 Its ordinary inheritance discussion omits talent bonuses and mutation; the
 limitations identify those omissions. Source labels must remain separate from
-numerical matches. No solver change or probability fix is claimed here.
+numerical matches.
 
 **Collection determines whether a transform applies.** Current-farm direct hatch
 preserves the generated save through its shared container and pending hatch record.
@@ -329,9 +329,8 @@ Condition them on eligible target state and the supplied ordered source records;
 retain filters, slot competition and fill failures when estimating desired
 contents/attempts. Existing guaranteed-wild examples require their specified
 initialization/capture conditions. Treating capture as a universal no-op is not
-supported. This is further baseline recovery, not a game-version change or a
-solver fix. The current code was not audited or changed; the named documentation/model
-comparison remains the recorded baseline.
+supported. The comparison applies to the named documentation/model baseline;
+it does not establish a game-version change or the current solver's accuracy.
 
 Unconditional live activation/spawn frequencies, arbitrary changing parties,
 modified world/network implementations and external player state are not inferred.
@@ -508,7 +507,16 @@ changed inputs and multiple-source registry positions remain separate conditions
 
 **Finished, 2026-10-29; eight Verified** for the recorded shipped-base questions,
 inputs, modes and saved-output boundaries. No required observation remains planned.
-Runtime inputs and unclaimed outputs remain explicit below.
+
+The declared saved-output calculations and named unchanged setups have supported
+answers. The remaining limits concern supplied runtime inputs, excluded
+configurations and unclaimed outputs, so no required mechanic question is deferred.
+The scheduled reset does not run inline; the completed-reset result is separately
+conditioned. A query reentered partway through reset has no established concrete
+route in this evidence. Further lifecycle tracing would require such a binding
+affecting the declared output, rather than the existence of a possible listener.
+[Reset scheduling](evidence.md#battle-mode-source-reset-is-scheduled-not-invoked-during-registration) /
+[completed-reset conditions](evidence.md#completed-partner-reset-and-unchanged-guardiandog-regrant).
 
 | Remaining limit | Consequence |
 | --- | --- |
