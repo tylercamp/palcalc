@@ -119,6 +119,7 @@ namespace PalCalc.GenDB
                         FoodAmount = rawPal.FoodAmount,
 
                         Nocturnal = rawPal.Nocturnal,
+                        CraftSpeed = rawPal.CraftSpeed,
 
                         WorkSuitability = new()
                         {
