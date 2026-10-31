@@ -238,11 +238,6 @@
             </Grid>
         </Border>
 
-        <TextBlock DockPanel.Dock="Top"
-                   Text="{itl:LocalizedText LC_BREEDABLE_CALCULATING}"
-                   Visibility="{Binding IsCalculating, Converter={StaticResource VVC}}"
-                   Margin="5" />
-
         <ScrollViewer x:Name="GroupsScrollViewer"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled"

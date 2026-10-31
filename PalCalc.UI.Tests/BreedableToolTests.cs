@@ -12,24 +12,24 @@ namespace PalCalc.UI.Tests;
 public class BreedableToolTests
 {
     [TestMethod]
-    public async Task Run_GroupsCardsByTier()
+    public void Run_GroupsCardsByTier()
     {
         var tool = new BreedableToolViewModel(null!);
 
-        await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
+        tool.Run(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
 
-        Assert.AreEqual("Already Owned (2)", tool.Groups.First().Title.Value);
+        Assert.AreEqual("Already Owned (2) - Best IVs Shown", tool.Groups.First().Title.Value);
         Assert.AreEqual("Tier 1 (1)", tool.Groups[1].Title.Value);
         StringAssert.StartsWith(tool.Groups.Last().Title.Value, "Not Reachable");
         Assert.AreEqual(DB.Pals.Count(), tool.Groups.Sum(g => g.Cards.Count));
     }
 
     [TestMethod]
-    public async Task Run_CollapsesOwnedAndNotReachableGroups()
+    public void Run_CollapsesOwnedAndNotReachableGroups()
     {
         var tool = new BreedableToolViewModel(null!);
 
-        await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
+        tool.Run(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
 
         Assert.IsFalse(tool.Groups.First().IsExpanded);
         Assert.IsFalse(tool.Groups.Last().IsExpanded);
@@ -37,23 +37,23 @@ public class BreedableToolTests
     }
 
     [TestMethod]
-    public async Task Run_SkipsEmptyGroups()
+    public void Run_SkipsEmptyGroups()
     {
         var tool = new BreedableToolViewModel(null!);
 
-        await tool.RunAsync(Settings(), null!);
+        tool.Run(Settings(), null!);
 
         StringAssert.StartsWith(tool.Groups.Single().Title.Value, "Not Reachable");
     }
 
     [TestMethod]
-    public async Task Run_OwnedParentHasGenderAndIVs()
+    public void Run_OwnedParentHasGenderAndIVs()
     {
         var penking = Owned("Penking", PalGender.MALE);
         penking.IV_HP = 80;
         var tool = new BreedableToolViewModel(null!);
 
-        await tool.RunAsync(Settings(penking, Owned("Bushi", PalGender.FEMALE)), null!);
+        tool.Run(Settings(penking, Owned("Bushi", PalGender.FEMALE)), null!);
 
         var card = tool.Groups[1].Cards.Single();
         var parent = card.Parent1.Pal.ModelObject == penking.Pal ? card.Parent1 : card.Parent2;
@@ -64,7 +64,7 @@ public class BreedableToolTests
     }
 
     [TestMethod]
-    public async Task Run_CardShowsIVRange()
+    public void Run_CardShowsIVRange()
     {
         var penking = Owned("Penking", PalGender.MALE);
         var bushi = Owned("Bushi", PalGender.FEMALE);
@@ -72,21 +72,21 @@ public class BreedableToolTests
         bushi.IV_HP = 70;
         var tool = new BreedableToolViewModel(null!);
 
-        await tool.RunAsync(Settings(penking, bushi), null!);
+        tool.Run(Settings(penking, bushi), null!);
 
         var range = (IVRangeValueViewModel)tool.Groups[1].Cards.Single().IVs.HP;
         Assert.AreEqual((20, 70), (range.Min, range.Max));
     }
 
     [TestMethod]
-    public async Task Run_OwnedCardHasBestOwnedPal()
+    public void Run_OwnedCardHasBestOwnedPal()
     {
         var weak = Owned("Penking", PalGender.MALE);
         var strong = Owned("Penking", PalGender.FEMALE);
         strong.IV_HP = 90;
         var tool = new BreedableToolViewModel(null!);
 
-        await tool.RunAsync(Settings(weak, strong), null!);
+        tool.Run(Settings(weak, strong), null!);
 
         var owned = tool.Groups.First().Cards.Single().Owned;
         Assert.AreEqual(PalGender.FEMALE, owned.Gender.Value);
@@ -94,29 +94,29 @@ public class BreedableToolTests
     }
 
     [TestMethod]
-    public async Task Run_BredCardHasNoOwnedPal()
+    public void Run_BredCardHasNoOwnedPal()
     {
-        var tool = await RunWithPenkingAndBushi();
+        var tool = RunWithPenkingAndBushi();
 
         Assert.IsNull(tool.Groups[1].Cards.Single().Owned);
     }
 
     [TestMethod]
-    public async Task Run_NotReachableCardHasNoIVs()
+    public void Run_NotReachableCardHasNoIVs()
     {
         var tool = new BreedableToolViewModel(null!);
 
-        await tool.RunAsync(Settings(), null!);
+        tool.Run(Settings(), null!);
 
         Assert.IsTrue(tool.Groups.Single().Cards.All(c => c.IVs == null && c.Owned == null));
     }
 
     [TestMethod]
-    public async Task Run_BredParentHasNoInstance()
+    public void Run_BredParentHasNoInstance()
     {
         var tool = new BreedableToolViewModel(null!);
 
-        await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
+        tool.Run(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
 
         var parents = tool.Groups[2].Cards.SelectMany(c => new[] { c.Parent1, c.Parent2 }).ToList();
         var bred = parents.First(p => !p.IsOwned);
@@ -126,25 +126,13 @@ public class BreedableToolTests
         Assert.IsNull(bred.Location);
     }
 
-    [TestMethod]
-    public async Task Run_NewerRunReplacesOlderRun()
-    {
-        var tool = new BreedableToolViewModel(null!);
-        var older = tool.RunAsync(Settings(Owned("Penking", PalGender.MALE)), null!);
-        var newer = tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.MALE)), null!);
-
-        await Task.WhenAll(older, newer);
-
-        Assert.AreEqual("Already Owned (2)", tool.Groups.First().Title.Value);
-    }
-
     [DataTestMethod]
     [DataRow("sibel")]
     [DataRow("SIBELYX")]
     [DataRow("  belyx ")]
-    public async Task Search_HighlightsNameMatches(string search)
+    public void Search_HighlightsNameMatches(string search)
     {
-        var tool = await RunWithPenkingAndBushi();
+        var tool = RunWithPenkingAndBushi();
 
         tool.SearchText = search;
 
@@ -156,9 +144,9 @@ public class BreedableToolTests
     }
 
     [TestMethod]
-    public async Task Search_ClearingRemovesHighlights()
+    public void Search_ClearingRemovesHighlights()
     {
-        var tool = await RunWithPenkingAndBushi();
+        var tool = RunWithPenkingAndBushi();
 
         tool.SearchText = "sibel";
         tool.SearchText = "  ";
@@ -169,20 +157,20 @@ public class BreedableToolTests
     }
 
     [TestMethod]
-    public async Task Search_AppliesToNewRuns()
+    public void Search_AppliesToNewRuns()
     {
-        var tool = await RunWithPenkingAndBushi();
+        var tool = RunWithPenkingAndBushi();
         tool.SearchText = "sibel";
 
-        await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
+        tool.Run(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
 
         Assert.IsTrue(tool.Groups[1].Cards.Single().IsHighlighted);
     }
 
     [TestMethod]
-    public async Task ToggleExpanded_ExpandsThenCollapsesEveryGroup()
+    public void ToggleExpanded_ExpandsThenCollapsesEveryGroup()
     {
-        var tool = await RunWithPenkingAndBushi();
+        var tool = RunWithPenkingAndBushi();
         Assert.AreEqual("Expand All", tool.ExpandToggleLabel.Value);
 
         tool.ToggleExpandedCommand.Execute(null);
@@ -197,9 +185,9 @@ public class BreedableToolTests
     }
 
     [TestMethod]
-    public async Task ToggleExpanded_FollowsManualChanges()
+    public void ToggleExpanded_FollowsManualChanges()
     {
-        var tool = await RunWithPenkingAndBushi();
+        var tool = RunWithPenkingAndBushi();
         tool.ToggleExpandedCommand.Execute(null);
 
         tool.Groups[0].IsExpanded = false;
@@ -213,11 +201,11 @@ public class BreedableToolTests
 
     // accessibility tools call `ToString` on list items, and `ILocalizedText.ToString` throws
     [TestMethod]
-    public async Task Run_ItemsAreSafeToConvertToString()
+    public void Run_ItemsAreSafeToConvertToString()
     {
         var tool = new BreedableToolViewModel(null!);
 
-        await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
+        tool.Run(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
 
         foreach (var group in tool.Groups)
         {
@@ -226,20 +214,10 @@ public class BreedableToolTests
         }
     }
 
-    [TestMethod]
-    public async Task Run_ClearsCalculatingNote()
+    private static BreedableToolViewModel RunWithPenkingAndBushi()
     {
         var tool = new BreedableToolViewModel(null!);
-
-        await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE)), null!);
-
-        Assert.IsFalse(tool.IsCalculating);
-    }
-
-    private static async Task<BreedableToolViewModel> RunWithPenkingAndBushi()
-    {
-        var tool = new BreedableToolViewModel(null!);
-        await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
+        tool.Run(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
         return tool;
     }
 

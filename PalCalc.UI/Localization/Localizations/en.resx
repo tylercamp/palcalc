@@ -138,9 +138,6 @@
   <data name="LC_BASE_LABEL" xml:space="preserve">
     <value>Base ({BaseName})</value>
   </data>
-  <data name="LC_BREEDABLE_CALCULATING" xml:space="preserve">
-    <value>Calculating...</value>
-  </data>
   <data name="LC_BREEDABLE_COLLAPSE_ALL" xml:space="preserve">
     <value>Collapse All</value>
   </data>
@@ -151,7 +148,7 @@
     <value>Not Reachable ({NumPals})</value>
   </data>
   <data name="LC_BREEDABLE_GROUP_OWNED" xml:space="preserve">
-    <value>Already Owned ({NumPals})</value>
+    <value>Already Owned ({NumPals}) - Best IVs Shown</value>
   </data>
   <data name="LC_BREEDABLE_GROUP_TIER" xml:space="preserve">
     <value>Tier {Tier} ({NumPals})</value>

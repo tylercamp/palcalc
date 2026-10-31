@@ -116,10 +116,6 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        LC_BREEDABLE_CALCULATING,
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
         LC_BREEDABLE_COLLAPSE_ALL,
         /// <summary>
         ///   Looks up a localized string similar to .

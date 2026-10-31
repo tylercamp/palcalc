@@ -132,9 +132,6 @@
   <data name="LC_BASE_LABEL" xml:space="preserve">
     <value>BaseName</value>
   </data>
-  <data name="LC_BREEDABLE_CALCULATING" xml:space="preserve">
-    <value />
-  </data>
   <data name="LC_BREEDABLE_COLLAPSE_ALL" xml:space="preserve">
     <value />
   </data>

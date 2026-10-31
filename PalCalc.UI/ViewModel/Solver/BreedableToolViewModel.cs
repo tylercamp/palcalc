@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
@@ -74,17 +73,9 @@ namespace PalCalc.UI.ViewModel.Solver
 
     public partial class BreedableToolViewModel(SolverControlsViewModel solverControls) : ObservableObject, ISolverTool
     {
-        // the "calculating" note only appears if a run takes long enough to notice
-        private static readonly TimeSpan CalculatingNoteDelay = TimeSpan.FromMilliseconds(100);
-
-        private int latestRunId = 0;
-
         public ILocalizedText Name { get; } = LocalizationCodes.LC_TOOL_FIND_BREEDABLE.Bind();
 
         public SolverControlsViewModel SolverControls { get; } = solverControls;
-
-        [ObservableProperty]
-        private bool isCalculating = false;
 
         [NotifyPropertyChangedFor(nameof(ExpandToggleLabel))]
         [ObservableProperty]
@@ -117,29 +108,13 @@ namespace PalCalc.UI.ViewModel.Solver
                 OnPropertyChanged(nameof(ExpandToggleLabel));
         }
 
-        public async void Run(BreedingSolverSettings settings, CachedSaveGame save) =>
-            await RunAsync(settings, save);
-
-        internal async Task RunAsync(BreedingSolverSettings settings, CachedSaveGame save)
+        public void Run(BreedingSolverSettings settings, CachedSaveGame save)
         {
-            var runId = ++latestRunId;
-            var calculation = Task.Run(new BreedableCalculator(settings).Calculate);
-
-            var noteDelay = Task.Delay(CalculatingNoteDelay);
-            if (await Task.WhenAny(calculation, noteDelay) == noteDelay && runId == latestRunId)
-                IsCalculating = true;
-
-            var result = await calculation;
-
-            // (a newer run has replaced this one)
-            if (runId != latestRunId) return;
-
-            Groups = BuildGroups(result, save, settings.GameSettings);
+            Groups = BuildGroups(new BreedableCalculator(settings).Calculate(), save, settings.GameSettings);
             foreach (var group in Groups)
                 group.PropertyChanged += Group_PropertyChanged;
 
             UpdateHighlights();
-            IsCalculating = false;
         }
 
         private void UpdateHighlights()
