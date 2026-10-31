@@ -1,7 +1,7 @@
 namespace PalCalc.Solver.PalReference.Properties;
 
 /// <summary>
-///     One possible attack outcome.
+///     One possible requested-attack outcome and its search-time Special Cake estimate.
 /// </summary>
 ///
 /// <param name="LearnedTargetMask">
@@ -9,7 +9,7 @@ namespace PalCalc.Solver.PalReference.Properties;
 ///     this mask is decided by the `AttackTargetContext` for the current solver run.
 /// </param>
 /// <param name="TotalSpecialCakes">
-///     The minimum estimated number of Special Cakes needed throughout the
+///     The minimum search-time estimate of Special Cakes needed throughout the
 ///     complete breeding tree for this exact outcome.
 /// </param>
 public readonly record struct AttackProfileEntry(

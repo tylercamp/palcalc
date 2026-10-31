@@ -13,7 +13,7 @@ completion decisions. A standard game-update review accounts for the full
 checklist, with declared inputs, modes, questions, and output boundaries. Missing
 answers stay visible even when the investigation finishes with gaps.
 
-Read [review-notes.md](references/review-notes.md) before assessing findings. It explains review distinctions and worked examples, not permanent claims about future game builds.
+Read [review-notes.md](references/review-notes.md) before assessing findings. It explains general review distinctions; concrete models and worked examples belong in the version report.
 
 ## Start from completed evidence
 

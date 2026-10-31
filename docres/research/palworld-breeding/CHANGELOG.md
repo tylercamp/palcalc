@@ -50,5 +50,6 @@ Add a short dated entry when one of these changes:
 
 Keep detailed findings, evidence corrections and verification-grade explanations
 in the version report. Research checkpoints, session activity, publication edits
-and solver changes do not need entries here. If a correction changes a recorded
-version, game-change claim or scope, correct that entry explicitly.
+and solver changes do not need entries here. If a published entry misstates a
+checked version, mechanics change or assessment scope, add a dated correction
+referencing that entry.

@@ -1,8 +1,8 @@
 # Breeding mechanics review notes
 
-Apply these distinctions and worked examples to the selected build's evidence.
-They are hypotheses and counterexamples, not substitutes for proof of that build's
-behavior.
+Use these distinctions to assess the selected build's evidence. Concrete
+algorithms, inputs and worked examples belong in the version report; these notes
+do not establish a build's behavior.
 
 ## Terms and the functional boundary
 
@@ -17,44 +17,24 @@ behavior.
   still needs to account for alternate modes explicitly; these notes don't
   authorize omitting them from the checklist.
 
-## Findings that can affect estimates
+## Selection and outcome checks
 
-### Asymmetric IV selection
-
-Do not read a weighted selector's index as the achieved count without following its branches. In the reviewed native model, category 1 (the nominal two-stat category) had these possible parent-source sets:
-
-```text
-{HP, Attack, Defense}
-{HP, Defense}
-{HP, Attack}
-```
-
-This differs from uniformly choosing two of three stats: HP is always parent-sourced in that category, and one branch takes all three. Verify the table against the selected run's decisive instructions. When this behavior is present, simply normalizing category weights as probabilities of exactly one/two/three inherited stats gives the wrong model. Selection of either parent's value remains a separate step.
-
-### Passive weight mismatch and failed attempts
-
-The reviewed filler compared the ticket against a compacted weight vector but subtracted entries from the original vector after candidates were removed. Preserve the distinction between the arrays; do not silently rewrite it into conventional weighted selection.
-
-To assess failure reachability, first consider the corrected/invariant case: nonnegative remaining weights, a positive total equal to their sum, aligned keys and weights, and no arithmetic overflow. A ticket in `[0,total-1]`, compared and reduced using that same vector, must select a positive-weight entry. Thus counting attempts is not independently a random-failure mechanic under those conditions.
-
-The mismatch can break that guarantee. For example, original weights `[1,3,5]` become `[3,5]` after excluding the first entry. With ticket 7, comparing against 3 then subtracting original weight 1 leaves 6, which also fails the comparison against 5. Correct subtraction would leave 4 and select the second remaining entry. This demonstrates possible behavior, not its frequency with actual game data.
-
-Distinguish this regular-loop behavior from exhausted candidates (which stop filling), malformed caches, missing rows, zero totals and overflow. Call the mismatch an apparent bug or implementation quirk, without claiming developer intent. Its biased outcomes and possible shortfalls belong under one cause; avoid double-counting failed attempts as a separate discrepancy. Check actual live weights/order before claiming practical frequency or magnitude.
-
-### Passive override semantics
-
-Compare the entire item branch with the ordinary process. In the reviewed model, a positive `PassiveInheritCountOverride=N` replaced both ordinary count rolls. It selected up to `min(N,4)` distinct parental passives, then attempted random filling for any shortfall.
-
-- Override 4 with at least four distinct parental passives directly produces four in the ordinary override path.
-- With fewer parental candidates, the branch targets four but relies on filling; an unqualified always-four guarantee requires proof of successful filling and sufficient candidates.
-- An override other than four does not automatically target four.
-- Without the weight mismatch and with valid, sufficient pools, do not invent an independent chance for a weighted fill attempt to fail.
-
-An item-specific claim such as Cake05 having override 4 or all-attack inheritance enabled requires that item's data provenance. Recovering the consumer branch alone does not verify current item values.
+- Follow a selector's branches before interpreting its category as an achieved
+  count. Keep source selection separate from incidental numerical matches.
+- Compare the entire override branch with the ordinary process, including which
+  steps it replaces. Distinguish requested counts, attempts and successful
+  additions; guarantees require sufficient candidates and successful filling.
+- Assess the recovered behavior even when it appears buggy. Do not silently
+  substitute an intended algorithm or claim developer intent. Demonstrate the
+  conditions for a failed selection, distinguishing them from exhausted pools
+  or invalid inputs; do not invent a separate failure chance without evidence.
+- Separate possible failures from measured gameplay frequency or magnitude.
+  Avoid counting multiple symptoms of one cause as independent discrepancies.
 
 ## Evidence and reporting scope
 
 - A completed REA model is build-specific. Preserve target identity, evidence locations and the final-write boundary; do not promote static analysis to observed execution.
+- Item-specific claims require the item's data provenance. Recovering the consumer branch alone does not verify current item values.
 - Keep numeric tables/defaults symbolic unless the task calls for them. Conditional calculations using README weights must be labelled hypothetical, including RNG assumptions.
 - Distinguish an algorithm discrepancy from its practical impact. A demonstrated branch can matter structurally even when its frequency has not been evaluated.
 - Do not claim the current solver is wrong solely from the mechanics README. A code-accuracy question needs the actual implementation and relevant callers; a documentation comparison does not require a general code audit.
@@ -71,6 +51,3 @@ An item-specific claim such as Cake05 having override 4 or all-attack inheritanc
 - Required parent genders in recipes are separate from the child's random gender.
   Spawn-time contents and capture-time changes are separate from inheritance.
   A parsed save proves persisted contents, not their generation history.
-- Map conversion and egg-production time are optional scoped reviews. Distinguish
-  calibrated/assumed PalCalc formulas from recovered native behavior, and
-  production from incubation or availability allowances.
