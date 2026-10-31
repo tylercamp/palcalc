@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace PalCalc.Model.Tests
@@ -32,6 +33,34 @@ namespace PalCalc.Model.Tests
 
             Assert.IsEmpty(groups, $"Expected no duplicate pals by english name, found duplicates of {string.Join(", ", groups.Select(g => g.Key))}");
         }
+
+        [TestMethod]
+        public void PalInstanceRankRoundTripsThroughJson()
+        {
+            var converter = new PalInstanceJsonConverter(paldb);
+            var json = JsonConvert.SerializeObject(MakeInstanceWithRank(4), converter);
+
+            Assert.AreEqual(4, JsonConvert.DeserializeObject<PalInstance>(json, converter).Rank);
+        }
+
+        [TestMethod]
+        public void PalInstanceRankDefaultsToOneWhenMissingFromJson()
+        {
+            var converter = new PalInstanceJsonConverter(paldb);
+            var json = JObject.Parse(JsonConvert.SerializeObject(MakeInstanceWithRank(4), converter));
+            json.Remove("Rank");
+
+            Assert.AreEqual(1, JsonConvert.DeserializeObject<PalInstance>(json.ToString(), converter).Rank);
+        }
+
+        private PalInstance MakeInstanceWithRank(int rank) => new()
+        {
+            Pal = paldb.Pals.First(),
+            Location = new PalLocation { Type = LocationType.Palbox, ContainerId = "box", Index = 1 },
+            Gender = PalGender.MALE,
+            PassiveSkills = [],
+            Rank = rank,
+        };
 
         [TestMethod]
         public void AttackLevelingRoundTripsThroughJson()

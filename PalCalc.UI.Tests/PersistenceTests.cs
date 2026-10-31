@@ -552,6 +552,44 @@ namespace PalCalc.UI.Tests
     }
 
     [TestMethod]
+    public void PalInstanceSnapshotRoundTripPreservesRank()
+    {
+        var db = PalDB.LoadEmbedded();
+        var dto = CustomizationsJsonSerializer.ToDto(MakeInstanceWithRank(db, 4));
+
+        var restored = CustomizationsJsonSerializer.FromDto(
+            JsonConvert.DeserializeObject<PalInstanceSnapshotDto>(JsonConvert.SerializeObject(dto)),
+            db);
+
+        Assert.AreEqual(4, restored.Rank);
+    }
+
+    [TestMethod]
+    public void PalInstanceSnapshotWithoutRankLoadsAsRankOne()
+    {
+        var db = PalDB.LoadEmbedded();
+        var json = JObject.FromObject(CustomizationsJsonSerializer.ToDto(MakeInstanceWithRank(db, 4)));
+        json.Remove("Rank");
+
+        var restored = CustomizationsJsonSerializer.FromDto(
+            JsonConvert.DeserializeObject<PalInstanceSnapshotDto>(json.ToString()),
+            db);
+
+        Assert.AreEqual(1, restored.Rank);
+    }
+
+    private static PalInstance MakeInstanceWithRank(PalDB db, int rank) => new()
+    {
+        Pal = "Beakon".ToPal(db),
+        Location = new PalLocation { Type = LocationType.Palbox, ContainerId = "box", Index = 1 },
+        Gender = PalGender.MALE,
+        PassiveSkills = [],
+        ActiveSkills = [],
+        EquippedActiveSkills = [],
+        Rank = rank,
+    };
+
+    [TestMethod]
     public void SelectedResultRoundTrips()
     {
         var db = PalDB.LoadEmbedded();
