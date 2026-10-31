@@ -17,10 +17,12 @@ For new REA analysis or comparisons after a game update, start with the
 [mechanics checklist and status](docres/research/palworld-breeding/README.md#current-verification-status),
 then read the [assessment workflow](docres/research/palworld-breeding/ASSESSMENT-WORKFLOW.md)
 and relevant sections of the [REA guide](docres/research/palworld-breeding/REA-GUIDE.md).
-A standard game-update review accounts for every required mechanic; partial or
-unresolved coverage keeps the review incomplete. A targeted investigation can
-cover less, but mustn't imply complete version verification. Map conversion and
-breeding time are supporting topics, not required update checks.
+A standard game-update review accounts for every required mechanic. Follow the
+workflow's scope, further-tracing, and completion rules: define questions and
+output boundaries, justify new dependencies, and distinguish investigation state
+from verification coverage. A finished investigation can have documented gaps;
+it mustn't imply full version verification. Map conversion and breeding time are
+supporting topics, not required update checks.
 
 Record game version as the primary identity, with build IDs/hashes as supporting
 metadata. Publish conclusions and evidence by game version and mechanic, update

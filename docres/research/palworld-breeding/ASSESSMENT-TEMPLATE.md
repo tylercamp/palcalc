@@ -8,6 +8,11 @@ not checked, preserving any findings already published for that version.
 
 Use the [workflow](ASSESSMENT-WORKFLOW.md) for completion and publication rules.
 The outlines below organize the report; they aren't evidence that a review happened.
+Define the questions before discovery, then keep these sections current on
+continuation. Consolidate answers and evidence rather than appending a history
+of research passes. Temporary topic notes, draft models, and continuation
+checkpoints belong under `_REA-ANALYSIS/txt/<investigation-id>/`; generated output
+and exports belong under `_REA-ANALYSIS/runs/<run-id>/`.
 
 ## assessment.md outline
 
@@ -20,7 +25,8 @@ The outlines below organize the report; they aren't evidence that a review happe
 - Review dates: <first published, last updated; dates also recorded per mechanic>
 - Previous game-version report: <link, or no prior baseline>
 - Compared PalCalc baseline: <mechanics document and code revision/working tree>
-- Overall review: <complete or partial; required mechanics/modes still missing>
+- Investigation state: <ongoing or finished; reason for stopping if finished>
+- Verification coverage: <full or partial for the declared questions/modes; gaps>
 
 ## Review summary
 
@@ -78,8 +84,13 @@ PalCalc tests, and live observations. Record a dated note for any later correcti
 
 For each heading, give:
 
+- **Questions and boundaries:** inputs, modes, output being explained, evidence
+  needed to connect the calculation to that output, and external conditions left
+  as inputs. Follow the workflow's scope rules when new material branches appear.
 - **Status, date, and scope:** verified, verified unchanged, partial, unresolved,
-  or not checked. Name covered modes and remaining questions.
+  or not checked. Within partial coverage, say which answers are established and
+  which remain conditional; don't add a grade for every function or treat a
+  finished investigation as fully verified.
 - **Game rule:** a definitive answer where evidence permits, with links to the
   full pseudocode and decisive observations. Keep uncertainty explicit.
 - **Version comparison:** changed game behavior, verified unchanged, newly
@@ -87,10 +98,15 @@ For each heading, give:
   link the prior conclusion and the dependency comparison proving it still applies.
 - **PalCalc model:** reduced pseudocode, retained dependencies, omissions and
   approximations, and when simplifications preserve outcomes and probabilities.
+  State the precision of probability claims, verified versus symbolic inputs,
+  and any assumptions about draws, pool order, or activation.
 - **Baseline comparison:** agreement or discrepancy with the named document/code
   revision, consequences for paths or estimates, and unresolved data conditions.
-- **Limits and next check:** gaps that could change the conclusion. Don't describe
-  a documentation correction as an implemented solver fix.
+- **Remaining gaps:** which question each gap affects and its consequence for the
+  answer. If further tracing is warranted, state the missing fact and stopping
+  boundary under the workflow's dependency rule; otherwise explain why it remains
+  a conditional input or follow-up. Don't describe a documentation correction as
+  an implemented solver fix.
 
 For species, include recipes/genders, eligibility, rounding/item inputs, self-pairs,
 ties/table order, and final replacements. For wild Pals, distinguish spawn, learning,
@@ -143,17 +159,35 @@ the provenance of numeric inputs and the boundaries of static analysis.>
 
 ### Per-mechanic evidence outline
 
+Promote established material from temporary notes using the workflow's
+[publication boundary](ASSESSMENT-WORKFLOW.md#what-belongs-in-published-evidence).
+Each section should support a current assessment conclusion or material
+limitation. Partial coverage can still have publishable established parts;
+investigation history and speculative models stay in `txt/`.
+
 - **Inputs and scope:** names, types, units, provenance, covered modes and final
-  observable boundary. State not checked where applicable.
+  observable boundary, matching the assessment's declared questions. State not
+  checked where applicable.
 - **Full game pseudocode:** branches, ordering/filtering, overrides, failures,
   caps, and final writes, including behavior omitted from PalCalc's model.
 - **Selected evidence:** decisive native/data excerpts, procedure/address or
   semantic anchors, and enough context to check each material conclusion.
 - **Dependencies and version comparison:** relevant callers, helpers, defaults,
-  input tables, item settings, and later writes. For verified unchanged behavior,
-  link the earlier model and retain the comparison supporting reuse; don't paste
+  input tables, item settings, and later writes that can change the scoped answer.
+  Record the justified boundary, not every transitive dependency. For verified
+  unchanged behavior, link the earlier model and retain the comparison supporting reuse; don't paste
   the same pseudocode into every version without explaining what was checked.
 - **Examples and checks:** distinguishing inputs and actual results; separate
   symbolic or assumed values from verified current data and live observations.
+  Label nominal probabilities and exact executable details separately; neither
+  establishes measured gameplay frequencies.
 - **Limits:** unresolved branches/assets/modes or untraced final writes. Raw query
-  history and operating notes stay local; published citations must stand alone.
+  history stays under `runs/`, and exploratory reasoning/operating notes under
+  `txt/`; published citations and reasoning must stand alone.
+
+Keep a single current explanation for each path. Retain decisive excerpts and
+useful citation anchors when consolidating; record meaningful corrections with
+dates, without leaving superseded conclusions interleaved with current ones.
+Preserve the uncommitted report under `txt/` before a substantial cleanup. Update
+incoming links when replacing obsolete headings rather than keeping every phase
+heading or unused evidence ID in the published file.

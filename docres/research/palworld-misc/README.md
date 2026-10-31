@@ -68,7 +68,8 @@ comparison with the reviewed baseline. Use a section in the relevant game-versio
 report under `../palworld-breeding/assessments/<game-version>/`, with conclusions
 in `assessment.md` and pseudocode/evidence in `evidence.md`. Link it from the
 supporting-mechanics table and record the review in the changelog. Keep raw
-investigation files under the ignored root run directory.
+generated artifacts under `_REA-ANALYSIS/runs/` and temporary topic documentation
+under `_REA-ANALYSIS/txt/`, following the shared workflow's publication boundary.
 
 State what PalCalc needs, choose the smallest useful scope, and follow the shared
 workflow. Start with a section here linking its current explanation and evidence;

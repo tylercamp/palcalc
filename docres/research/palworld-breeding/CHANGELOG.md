@@ -1,29 +1,56 @@
-# Mechanics verification history
+# Mechanics changelog
 
-This records game-version reviews and changes in our understanding of the
-mechanics. The [research hub](README.md#current-verification-status) is the current
-status record; each version's assessment and evidence hold the detailed findings.
+This records changes to the latest checked game version for a set of mechanics,
+observed changes in game mechanics, and changes to the questions or mechanics
+assessments target. The [research hub](README.md#current-verification-status)
+holds current coverage; version reports hold findings, evidence and corrections.
 
-## 2026-10-21: documentation reset, baseline pending
+## 1.0.5.102999 — 2026-10-29: first verified baseline
 
-The earlier incremental reports have been cleared for a comprehensive baseline.
-They remain in Git history. No game version has been fully verified under the new
-checklist, and this documentation reset isn't a mechanics verification.
+- **Latest checked version:** 1.0.5.102999 for all eight required mechanics:
+  child species, gender, passives, attacks and IVs, plus wild-Pal passives,
+  attacks and gender. This baseline covers the shipped Windows Steam
+  configuration. Per-mechanic dates, modes and conditions are in the
+  [assessment](assessments/1.0.5.102999/assessment.md#review-summary).
+- **Observed game changes:** none established against an earlier verified
+  version; there is no earlier complete baseline. Newly recovered rules and
+  corrections to our understanding do not establish a game update.
 
-## Recording a review
+## 2026-10-26: wild-attack assessment output clarified
 
-Add entries newest first, headed by **game version and review date**. Link the
-version report and list the affected mechanics under the applicable categories:
+- **Assessment scope:** assess attacks available overall at captured storage.
+  Equipped loadout is not a separate required output; equipment handling matters
+  where it changes availability. Ordinary/rare initialization, supplied overrides
+  and the connected KingWhale capture mode remain included.
+  [Question and boundaries](assessments/1.0.5.102999/assessment.md#wild-pal-attacks).
 
-- **Game behavior changed:** a supported difference between two checked versions.
-- **Verified unchanged:** checked code/data dependencies support the earlier rule.
-- **Newly verified:** behavior established for the first time; this doesn't imply
-  it was introduced by this game version.
-- **Understanding corrected:** our earlier conclusion or model was wrong or
-  incomplete; explain the correction without claiming the game changed.
-- **Still unresolved:** missing proof or partial coverage, with its practical limits.
+## 2026-10-21: comprehensive baseline scope established
 
-State whether the overall version review is complete or partial. Record platform
-and supporting build/hash identities in the linked report. A later correction or
-targeted review gets its own dated entry and updates that version's sections;
-don't rewrite the history as though it was known at the original review date.
+- **Assessment scope:** standard baseline and game-update reviews account for
+  eight mechanics: child species, gender, passives, attacks and IVs, plus
+  wild-Pal passives, attacks and gender. Relevant item, mutation, spawn and capture
+  modes belong in each declared question. Map conversion and egg-production time
+  are supporting topics, reviewed when requested or implicated by a change.
+  [Checklist](README.md#current-verification-status) /
+  [scope rules](ASSESSMENT-WORKFLOW.md#define-the-questions-and-boundaries).
+- Earlier incremental reports were cleared for this baseline and remain in Git
+  history. No fully verified version was carried forward at the reset.
+
+## Recording changes
+
+Add a short dated entry when one of these changes:
+
+1. **Latest checked version:** name the affected mechanics and the previous/new
+   game versions, with a link to their assessment. Keep partial coverage explicit;
+   checking a newer release does not automatically advance its last-verified version.
+2. **Observed game mechanics:** state the supported difference between checked
+   versions and link the evidence. Label newly recovered behavior or a corrected
+   interpretation accurately when it explains a changed summary; neither alone
+   proves the game changed.
+3. **Assessment scope:** state which questions, mechanics, modes or output
+   boundaries were added, removed or clarified, and why.
+
+Keep detailed findings, evidence corrections and verification-grade explanations
+in the version report. Research checkpoints, session activity, publication edits
+and solver changes do not need entries here. If a correction changes a recorded
+version, game-change claim or scope, correct that entry explicitly.

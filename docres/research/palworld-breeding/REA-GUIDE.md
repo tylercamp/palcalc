@@ -15,12 +15,17 @@ initialization/capture. It also supports targeted
 not examine every topic; record omitted questions and modes explicitly. A standard
 game-update review must account for every required mechanic, as defined by the
 workflow, even when dependency comparisons avoid repeating native recovery.
+Use its [scope boundaries](ASSESSMENT-WORKFLOW.md#define-the-questions-and-boundaries)
+and [further-tracing rule](ASSESSMENT-WORKFLOW.md#deciding-what-to-investigate-next)
+to decide which paths need recovery. The tracing lists below are prompts for the
+declared questions, not a requirement to explore every reachable subsystem.
 
 ## Extraction output and boundary
 
 Recover the scoped inputs, selection, weighting, ordering, filtering, duplicates,
 retries, caps, overrides, arithmetic, and final writes. Reconstruct readable full
-pseudocode and retain selected evidence for `evidence.md`; use the
+pseudocode in temporary notes, then promote established material and selected
+evidence under the workflow's [publication boundary](ASSESSMENT-WORKFLOW.md#what-belongs-in-published-evidence); use the
 [report outlines](ASSESSMENT-TEMPLATE.md#companion-evidencemd-outline).
 Keep sections organized by mechanic in the game-version report, rather than
 publishing a separate report for each analysis run.
@@ -28,12 +33,16 @@ The PalCalc model and its comparison with the reviewed baseline belong in
 `assessment.md`. Use the [review skill](palworld-breeding-review/SKILL.md) for that
 stage, rather than starting another native discovery pass.
 
-Keep external weights, item effects, ranges, and tables symbolic unless the scoped
-question requires extraction. Record input names, types, meaning, and units.
+Follow the workflow's [probability guidance](ASSESSMENT-WORKFLOW.md#probability-claims).
+Keep external weights, item effects, ranges, and tables symbolic when that answers
+the question; verify the values needed for concrete claims. Record input names,
+types, meaning, and units.
 Recover code-embedded operations and literals needed for exact semantics, including
 index adjustments, normalization, comparisons, clamps, and RNG arithmetic.
-Current numeric probabilities and changes to PalCalc are outside extraction scope
-unless separately requested.
+The assessment stage derives probability claims from the recovered rules and
+inputs. Exact RNG replay and measured gameplay frequencies aren't default
+extraction requirements; implementation changes remain outside research scope
+unless requested.
 
 ## Working in bounded phases
 
@@ -47,6 +56,18 @@ confident semantic label. Verified names do not establish current asset values.
 
 You own the investigation, live native session, progress, and report. Follow these phases directly; sub-agents are optional. Read the linked sections as needed and keep large evidence on disk.
 
+Before another discovery phase, check retained evidence against the remaining
+questions and identify the specific missing observation. A phase boundary is a
+checkpoint; it doesn't by itself finish the investigation. Follow the workflow's
+[investigation-state rules](ASSESSMENT-WORKFLOW.md#investigation-state-and-verification-coverage)
+for a separate completion decision. It isn't a requirement to close and reimport
+the binary. Keep a healthy,
+authorized session available across phases when supported and within the permitted
+lifetime. Export and close when ending native work, when requested, or when the
+environment requires it. Don't keep a session alive beyond its authorization or
+assume a resumable snapshot is a live database. Existing ownership, identity, and
+process rules still apply.
+
 | Phase | Read | Capture for the game model and evidence |
 | --- | --- | --- |
 | 1. Identify inputs | [Inputs](#inputs-and-evidence-boundary), [Operations](#long-running-analysis) | Game version and source, platform, supporting build/hash, scope |
@@ -55,7 +76,11 @@ You own the investigation, live native session, progress, and report. Follow the
 | 4. Recover calculations | [Mechanics](#mechanics-to-trace), [Helpers](#helpers-worth-creating-when-needed) | Conclusions, concise pseudocode, decisive evidence |
 | 5. Verify | [Handoff](#verification-and-handoff) | Checks, limits, next useful comparison |
 
-Keep brief local notes when needed to resume after a context reset: current question, relevant evidence, provider state, authorization/process ownership, and next action. These working notes are not published deliverables. Phases 2–3 can inform each other; record missing proofs instead of guessing.
+Keep temporary topic notes and a continuation checkpoint under `txt/`: current
+question, relevant run artifacts, provider state, authorization/process ownership,
+and next action. Use those notes for hypotheses and intermediate models rather
+than appending each discovery to `evidence.md`. Phases 2–3 can inform each other;
+record missing proofs instead of guessing.
 
 ### Optional delegation
 
@@ -84,7 +109,8 @@ Use `<repo-root>/_REA-ANALYSIS` for agent-created analysis files. Create it on d
 ```text
 _REA-ANALYSIS/
   tools/                       checkout-local prerequisites/downloads, if needed
-  runs/<timestamp>-<unique-id>/ scripts, evidence, logs, exports, checks, notes
+  runs/<timestamp>-<unique-id>/ scripts, raw output, logs, exports, checks, snapshots
+  txt/<investigation-id>/      temporary Markdown, draft models, continuation notes
 ```
 
 Create a fresh run subdirectory for a new investigation. Resume that same
@@ -92,8 +118,9 @@ directory after a context reset, worker change, or retry, keeping attempts
 separate inside it.
 
 - Set analysis subprocesses' working directory there. All phase-output filenames
-  are relative to that run.
-- Give sub-agents the same absolute run path and distinct outputs.
+  for generated artifacts are relative to that run. Write temporary documentation
+  under `txt/`, referencing the run's artifacts as needed.
+- Give sub-agents the absolute run and notes paths, with distinct outputs.
 - Keep investigation outputs out of OS temp folders, application directories,
   and this guide's directory; provider-managed temporary files are exempt.
 - Put reviewed reusable helpers in `tools/`, as specified by the workflow.
@@ -208,7 +235,10 @@ Previous compatible setup: CUE4Parse `1.2.2.202607`, Newtonsoft.Json `13.0.4`, .
 
 ## Mechanics to trace
 
-For each mechanic, trace inputs through every relevant branch/helper to final stores. Establish answers neutrally from the current build.
+For each mechanic, trace inputs through the branches and writes needed to explain
+the declared output. Establish answers neutrally from the current build. Follow
+later transformations that can change that output, applying the workflow's
+dependency rule rather than expanding automatically into every caller lifecycle.
 
 ### Offspring species
 
@@ -464,6 +494,11 @@ Retain the decisive excerpts or responses supporting each material conclusion, i
 
 Check empty/short/full pools, duplicates, missing rows, invalid counts, selector boundaries, item/mutation branches, and final overwrites. Inspect apparently symmetric branches independently and follow initialization through saved outputs.
 
+Apply those checks to the declared questions and output boundaries. Report which
+answers are established and which remain conditional; follow the workflow's
+[completion rules](ASSESSMENT-WORKFLOW.md#investigation-state-and-verification-coverage)
+rather than treating every unknown as another mandatory native pass.
+
 After updates, revalidate identity, names/layouts, and native calculations; inspect assets only as needed for input contracts. Reuse semantic anchors, not unverified addresses. Executable/data changes are independent; distinguish calculation changes from scraped-value changes.
 
 A completed report contains:
@@ -472,7 +507,10 @@ A completed report contains:
 - Relevant field/diagnostic names, call paths, or branch locations for a later comparison.
 - Checks and unresolved questions that could change the conclusions.
 
-Keep operational setup, process histories, uncited working notes, and raw dumps
-local. Publish the full scoped pseudocode and selected supporting evidence in
-`evidence.md`, and the PalCalc model and comparison in `assessment.md`. Citations
-must resolve without ignored files.
+Keep exploratory documentation and operational history in `txt/`, and raw dumps
+and generated artifacts in `runs/`. Consolidate established findings into the
+current mechanic sections, retaining the decisive evidence for conclusions and
+material limitations and repairing links instead of appending phase narratives.
+Publish the scoped game pseudocode and supporting evidence in `evidence.md`, and
+the PalCalc model and comparison in `assessment.md`. Citations and reasoning must
+stand without either ignored folder.

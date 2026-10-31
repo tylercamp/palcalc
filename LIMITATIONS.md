@@ -7,8 +7,38 @@ modeling omissions and search tradeoffs, and explains what they mean for results
 For the game rules and detailed calculations, start with
 [Palworld Breeding Mechanics](PALWORLD-BREEDING-MECHANICS.md). The
 [research checklist](docres/research/palworld-breeding/README.md#current-verification-status)
-is the main record of which mechanics and game versions have been checked. A
-comprehensive baseline is pending after the research documentation reset. The
+is the main record of which mechanics and versions have been checked. The
+[1.0.5.102999 assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md)
+records eight Verified mechanics, investigation Finished after native proof and
+independent rechecks resolved both October 29 acceptance findings. Wild-passive
+rare-pool binding and wild-attack form/settings-to-saved-input handling are
+established. This does not implement their recovered details in PalCalc or measure unconditional gameplay
+frequencies.
+
+The declared unchanged NaughtyCat setup supplies a nominal 50-percent extra-egg
+roll input; the [shipped item audit](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#shipped-item-sources-do-not-add-extra-egg-records)
+finds no extra-egg contribution from the additional static item list. The
+[drop/re-pickup proof](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#world-placement-proof-boundary)
+preserves an existing farm egg's save, distinct from legacy pickup's extra-egg
+transforms. Child IV and mutation passive transforms include their final save
+application. Arbitrary changing source sets remain runtime inputs; general
+rank-change replacement is outside the unchanged setup.
+
+Capture additions require eligible target state, not just room below four traits.
+The [fresh-target argument](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#fresh-pinkcat-capture-target-argument)
+connects construction, actual callbacks and saved fields for the declared ordinary
+setup. The [GuardianDog source contract](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#ordinary-rank-1-guardiandog-active-grant-to-capture-collector)
+and completed eligible reset establish its conditional contribution. Alternate
+target/group states and multiple-source registry order retain explicit inputs;
+these results are not a universal capture-addition rate.
+
+The [species-order findings](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#concrete-species-ties-recipes-and-self-pairs)
+establish material tied winners and Flower-parent self-pairs. Wild attack coverage
+concerns overall availability, including the [KingWhale action boundary](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#kingwhale-battle-actions-and-captured-availability):
+using a combat action does not itself grant that attack as mastered. These
+research conclusions do not claim independent sources impossible or fix solver
+estimates automatically.
+The
 [solver overview](PalCalc.Solver/README.md) explains how the current implementation
 uses those rules.
 
@@ -32,7 +62,12 @@ PalCalc assumes the requested random additions can be filled successfully. The
 recovered game code has an apparent weight-array bug that can bias selection or
 use an attempt without adding a passive. Filling also stops if eligible candidates
 run out. PalCalc doesn't model those failures; their frequency with actual game
-data hasn't been established.
+data hasn't been established. Fresh first-population keys and weights are now shown to align;
+the mismatch arises after removals. Shipped first-load row order is now
+reconstructed. A concrete current-data input (CraftSpeed_up3 already selected)
+has 95 tickets that add nothing in its next fill attempt, so a Cake05 target
+can fall short when it relies on filling. This does not establish an overall
+live failure rate. [Ordering evidence](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#passive-ordering-established-construction-and-remaining-input).
 
 This matters especially for Special Cakes: the game targets four passives, but
 with fewer than four parental candidates it relies on random filling. PalCalc
@@ -114,9 +149,12 @@ published evidence hasn't established the full process. Conversely, some recover
 behavior is intentionally omitted from the estimate.
 
 The [research checklist](docres/research/palworld-breeding/README.md#current-verification-status)
-records game-version verification and gaps, including child gender and wild-Pal
-generation. The inheritance estimates described there omit mutation and talent-bonus
-branches. The [species comparison](PalCalc.Solver/README.md#species-database)
+records game-version coverage: child gender is Verified for its conditional
+assignment/save boundary; wild-passive rare-pool binding and wild-attack form selection are now established
+with the report's explicit supplied-state conditions. The inheritance estimates omit mutation and talent-bonus branches;
+the [version report](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-ivs)
+separately records their generation behavior. The
+[species comparison](PalCalc.Solver/README.md#species-database)
 also records data conditions still needing checks before claiming that PalCalc's
 generated graph matches every live pairing.
 

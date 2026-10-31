@@ -24,9 +24,9 @@ process, how to run it yourself, and where published evidence is kept. GenDB
 extracts the game data used by these rules; see the
 [data-generation guide](PalCalc.GenDB/README.md).
 
-By **reverse engineering** the Palworld game code we can understand _exactly_ how
-things work in-game. This is as accurate as it gets, second only to direct explanations
-by Pocket Pair, Inc. themselves.
+Reverse engineering connects these explanations to the shipped game code and its
+inputs. Each finding states the version and paths checked; incomplete paths and
+runtime configuration remain explicit in the research reports.
 
 ## Assessment coverage
 
@@ -35,15 +35,19 @@ records the last checked game version and date for each mechanic, with links to
 its conclusions and evidence. The [research changelog](docres/research/palworld-breeding/CHANGELOG.md)
 records which rules changed or were confirmed unchanged.
 
-**A comprehensive baseline review is pending.** We've cleared the earlier
-incremental reports to make room for a complete, version-based record. The rules
-below retain our existing understanding; they haven't yet been revalidated under
-the new checklist. This documentation update doesn't establish support for a newer
-game version. Older research remains available in Git history.
+The [1.0.5.102999 baseline assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md)
+is **Finished: all eight required mechanics are Verified**, following new native
+proof and independent rechecks of the October 29 acceptance findings. Both the
+rare-passive pool binding and spawn-form/settings-to-saved-input bridge are
+established for the recorded shipped-base inputs, modes and output boundaries.
+It includes ordinary, item/mutation, primary/additional egg, collection/hatch and specified spawn/capture
+paths. This is a static baseline, not measured gameplay frequencies or a solver
+implementation update. Runtime source/target state and modified world inputs
+retain the report's explicit conditions.
 
-Some details, including child gender and wild-Pal generation, still need further
-investigation. The explanation below doesn't cover mutation or talent-bonus
-branches. [Egg-production time](#egg-production-time) and
+The ordinary rules below remain separate from the
+[mutation and talent-bonus branches](#mutation-and-talent-bonus-items).
+[Egg-production time](#egg-production-time) and
 [world-map coordinates](docres/research/palworld-misc/README.md#world-map-coordinates)
 are supporting topics, reviewed when needed rather than on every game update.
 See [PalCalc's limitations](LIMITATIONS.md) for the approximations used in estimates.
@@ -59,8 +63,14 @@ normal breeding powers, this works out to averaging the parents' powers and roun
 up, then adding any item rank adjustment. It selects an eligible child with the
 nearest power, breaking distance ties by priority and exact ties by table order.
 
-The exact arithmetic and later replacement rules still need to be included in
-our [comprehensive research baseline](docres/research/palworld-breeding/README.md#current-verification-status).
+The [version evidence](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#child-species)
+records the exact arithmetic and recovered replacements. The shipped first-load
+table order is established: PinkCat, PlantSlime and SheepBall win their respective
+equal-priority ties. In particular, specified PlantSlime_Flower parents with zero
+rank bonus in ordinary nonmutation generation select PlantSlime, or BOSS_PlantSlime
+if boss conversion succeeds. Identical saved parent IDs do not universally bypass
+selection. This is static model evidence, not a live breeding test or solver fix.
+[Conditions and evidence](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#concrete-species-ties-recipes-and-self-pairs).
 
 Pals that appear as special-recipe children are excluded from the ordinary
 breeding-power selection. Bosses and other species flagged as ineligible are
@@ -112,9 +122,19 @@ selection bug or because no eligible passives remain. We don't yet know how ofte
 that happens with actual game data. The [limitations page](LIMITATIONS.md#random-passive-filling)
 explains how this affects PalCalc's estimates.
 
+The [pool-construction check](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#passive-ordering-established-construction-and-remaining-input)
+establishes initial alignment and reconstructs the shipped first-load candidate
+order. With CraftSpeed_up3 already selected, 95 of the 7,355 integer tickets in
+the next fill attempt add nothing. Cake05 can therefore miss its four-passive
+target when it needs random filling; these ticket counts are not live frequencies.
+
 ### Special Cakes
 
-Special Cakes skip both ordinary count rolls and target four passives:
+Here, “Special Cake” means Cake05, whose recovered item effect skips both ordinary
+count rolls and targets four passives. Other cake items have different effects;
+see the [version's item inputs](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#shared-inputs-and-arithmetic).
+
+For Cake05 in ordinary breeding:
 
 - If the parents have at least four unique passives between them, the child
   inherits four of those passives.
@@ -139,8 +159,10 @@ selection. This means:
 - Have duplicates of a passive between the parents doesn't make it more likely to inherit that passive
 - Additional unwanted passives reduce the chance of selecting the desired passives
 
-**b.** Wild Pals can have certain guaranteed passives (e.g. a wild `Gorirat` will always have `Conceited`.) These are not
-automatically added to bred children; they only affect inheritance when they are actually present on a parent.
+**b.** The general wild-Pal initializer adds species passives, such as Gorirat's
+Conceited, before random additions. These aren't automatically added to bred
+children; they affect inheritance when actually present on a parent. Special spawn
+and capture paths have their own inputs; see [wild Pals](#wild-pals).
 
 **c.** The "inherited from parents" count is an _upper limit_ on what to inherit. 
 If the game rolls three but the parents only have two, the child inherits those two. 
@@ -183,8 +205,11 @@ are lost; learned attacks and currently equipped attacks are different things.
 
 **a.** If the two parents each have one attack equipped, and only one of them is a desired attack, there's a 50/50 chance of inheriting that attack. (Two attacks to pick from.) But if the other parent equips a non-inheritable attack, the desired attack chance is 100%. (One attack to pick from.)
 
-Later initialization and the complete path to the saved attack lists still need
-verification in the [comprehensive research baseline](docres/research/palworld-breeding/README.md#current-verification-status).
+Learned availability combines stored mastered attacks with natural moves allowed
+by the current level. A natural move therefore need not appear in the raw mastered
+list, and equipment trimming alone does not remove its availability. The current
+inventory-farm and recorded alternate hatch routes preserve their scoped saved
+contents, as detailed in the [version report](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-attacks).
 
 ## IVs
 
@@ -218,6 +243,55 @@ Current verification of the exact selection process is tracked in the
 The [solver's IV calculations](PalCalc.Solver/README.md#iv-probabilities) explain
 how those rules become probability and effort estimates.
 
+### Mutation and talent-bonus items
+
+The [version report](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-ivs)
+distinguishes these generation paths from ordinary inheritance. Cake02 and Cake04
+add a separate 1–5 talent bonus to each ordinary offspring stat, clamped at 100.
+Mutation instead generates fresh talents in the shipped default range 90–100;
+it doesn't run the ordinary parental-talent or item-bonus branch.
+
+Mutation also uses different species and passive selection and attempts an extra
+Strong attack of the child's primary element. That attack can already be present,
+so the draw doesn't guarantee another distinct attack. Mutation's passive inserts
+can displace parental entries, including with a Special Cake. The report's
+[full game model](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md)
+keeps these branches and their evidence separate. These findings don't mean the
+solver estimates include those modes.
+
+
+## World-egg pickup effects
+
+The 1.0.5.102999 findings identify two effects on the legacy world-egg model's pickup path.
+`EggAlphaConversion` can replace the egg item while copying its existing child
+save. `EggObtainExtraEgg` prepares an additional egg: its ordinary transform
+rerolls some IVs, while its mutation transform generates fresh IVs and can replace
+the first eligible `AddMutationPal` and `AddPal`/`Rank > 3` entries, with mutation
+membership taking priority during the scan. Each draw excludes the other current
+entries; an empty draw preserves the slot, and a draw need not change its ID.
+These transforms concern the additional egg, not an unconditional reroll of the
+original child. The prepared save is now traced into the granted egg. Gender and attack arrays
+remain copied. With the shipped global `bIsStackablePartnerSkillBySameTribe=false`,
+contributing non-stackable partner values use the greatest value per `TribeId`,
+then combine groups. These rows declare `InvokeInOtomo`, which native conversion
+maps to the separate `InOtomo` trigger. Their shipped item constraints are empty.
+Item-presence restriction checks and ordinary holder removal are traced. The
+declared unchanged NaughtyCat setup reaches the pickup consumer under its stated
+conditions; arbitrary changing-party source sets remain supplied inputs. No
+unconditional pickup frequency is established.
+The [shipped static item audit](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#shipped-item-sources-do-not-add-extra-egg-records)
+establishes that the additional item-derived list contributes no extra-egg effect
+under the assessed shipped inputs; partner contributions remain a separate question.
+See the [scoped evidence](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#pickup-effect-conditions-tribe-grouping-and-activation-masks)
+before interpreting asset values as live probabilities.
+
+Collection route matters. The current breeding farm's direct hatch and container
+pickup preserve the generated child save. Dropping an existing egg through the
+shipped `CommonDropItem3D` route selects a generic dropped-item model: re-picking
+it preserves its saved IVs without the legacy egg model's extra-egg roll. The
+[route and save-transfer proof](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#world-placement-proof-boundary)
+closes Child IV verification for the declared inputs and modes; it does not
+establish a universal pickup rule or an unconditional rate for arbitrary parties.
 
 ## Gender
 
@@ -225,19 +299,66 @@ Each species has gender probabilities in the game data. A recipe's required
 parent genders are separate from the child's own gender: a gender-specific recipe
 doesn't by itself explain how the child's gender is drawn.
 
-A complete investigation of child and wild-spawn gender selection hasn't yet
-been published here. For how PalCalc uses the species
+The [verified child-gender finding](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-gender)
+recovers ordinary and mutation generation assignments from the selected child's
+`MaleProbability`. Zero and 100 give fixed genders; negative values give None.
+Other values are percent thresholds for the random draw. Current inventory-hatch,
+legacy world-egg and additional pickup-egg paths preserve that saved value.
+Wild-Pal supplied-spawn and captured-storage contracts are established for the
+recorded modes. For how PalCalc uses the species
 probabilities in estimates, see [gender handling](PalCalc.Solver/README.md#gender).
 
 ## Wild Pals
+
+For overall attack availability, use stored mastered attacks plus the current
+species' natural moves through the Pal's level. Equipped slots alone do not
+define this set. The [wild-attack assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#wild-pal-attacks)
+keeps NPC overrides and KingWhale's special capture handling separate. The
+three non-natural attacks in KingWhale's battle lists are combat actions; their
+shipped initialization/start implementations do not grant them as mastered
+attacks. Capture preserves an existing mastered entry but does not supply these
+IDs through that action route. Seeing an attack used in combat therefore does
+not establish its availability after capture.
 
 A wild Pal's skills can depend on what it receives when spawned, what it learns
 with levels, and any changes made during capture. A skill recorded in a save
 doesn't tell us which of those steps supplied it.
 
-These processes haven't received a complete assessment here. The breeding
-findings above don't establish the rules for wild Pals. See the
-[research checklist](docres/research/palworld-breeding/README.md#current-verification-status)
+The [verified wild-Pal findings](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#wild-pal-passives)
+recover species-passive ordering, ratio-based initialization and level-based
+attack setup. Capture can add passives through synchronization and RainbowPassiveRate,
+and rebuilds overfilled equipment from its first three entries. Its ordinary
+storage writer preserves the resulting traits. KingWhale has a separate species,
+talent and equipment rewrite. The species used at gender/default-passive assignment and later learning/common
+initialization must be distinguished when a Unique NPC key selects a different
+CharacterID from DT_UniqueNPC. A valid resolved ID reaches the saved species,
+while earlier gender/defaults retain their assignment species. An absent key
+preserves species. The report records concrete ordinary caller inputs and
+keeps effective spawn modes explicit.
+The standard World Tree aura spawn branch draws one trait from seven World Tree
+passives and appends it after species defaults if a passive slot remains. This
+rolled trait is separate from the spawner's temporary WorldTreeAura effect.
+[Selection rules and limits](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#world-tree-standard-spawner-passive-input).
+
+The [ordinary rank-1 GuardianDog activation path](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#ordinary-rank-1-guardiandog-active-grant-to-capture-collector)
+is connected to the trainer's synchronization collector. Its value 15 is a roll
+input per eligible source passive under the stated effect-list and capture-target
+conditions, not a guaranteed addition rate for all captures.
+The [capture target gate](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#capture-target-fields-player-owner-history-and-group)
+checks whether a trainer reference is live, IsPlayer, old-owner history count and group
+membership through Dynamic.GroupId. The standard spawner now has a bound None-key input path, native save
+installation and actor association. Saved gender is preserved: shared initialization
+uses the species after initial form selection, while a supplied/overridden saved
+gender reaches captured storage unchanged. See the [wild-gender conclusion](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#wild-pal-gender).
+Capture additions still depend on the supplied target/source state. The
+[fresh-target argument](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#fresh-pinkcat-capture-target-argument)
+now connects construction through actual initialization/capture recipients for
+the declared ordinary setup; constructor defaults alone were insufficient.
+The capture's own owner-history update occurs after augmentation and cannot
+block additions earlier in that same invocation. The unchanged eligible
+GuardianDog source also has a completed-reset regrant argument. These results
+do not make every captured target eligible or establish a universal addition rate.
+See the [research checklist](docres/research/palworld-breeding/README.md#current-verification-status)
 for verification status, and the
 [solver overview](PalCalc.Solver/README.md#2-build-the-starting-candidates) for
 how PalCalc represents available wild Pals.

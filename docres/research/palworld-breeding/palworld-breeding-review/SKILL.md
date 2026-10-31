@@ -8,15 +8,21 @@ description: "Assess PalCalc breeding paths, inheritance estimates, and scoped s
 Compare the process assumed by PalCalc with the recovered game behavior. Focus on
 differences that affect possible breeding paths, desired contents, probabilities,
 expected attempts, or the requested supporting calculation. Honor the user's
-scope. A standard game-update review follows the workflow's full checklist,
-including mode boundaries; omitted mutation or other
-alternate modes must remain visible as gaps.
+scope. Use the [workflow](../ASSESSMENT-WORKFLOW.md) for scope, further-tracing, and
+completion decisions. A standard game-update review accounts for the full
+checklist, with declared inputs, modes, questions, and output boundaries. Missing
+answers stay visible even when the investigation finishes with gaps.
 
 Read [review-notes.md](references/review-notes.md) before assessing findings. It records distinctions established in prior reviews and worked examples, not permanent claims about future game builds.
 
 ## Start from completed evidence
 
 Resolve the repository root and the supplied assessment or REA run. Start with its report and cited evidence; confirm the build/executable identity and scope. Read detailed models or input contracts only where needed to settle a claim. Older runs may keep these under `_REA-ANALYSIS/runs/<run>/`; do not assume the newest directory is the intended one. Manifests, startup logs, and full query histories are not prerequisites for review.
+
+Temporary topic investigations and continuation notes now belong under
+`_REA-ANALYSIS/txt/<investigation-id>/`; generated artifacts stay under `runs/`.
+When reviewing supplied working notes, distinguish their tentative reasoning from
+established observations. Published conclusions must stand without either folder.
 
 Use the [mechanics status table](../README.md#current-verification-status) to locate
 the game-version report and relevant mechanic sections. Confirm game version and
@@ -26,7 +32,17 @@ and older maintained summaries are leads, not substitutes for missing evidence.
 
 Use `PALWORLD-BREEDING-MECHANICS.md` as the default documented algorithm, or the document the user supplies. The README describes PalCalc's assumed process; a discrepancy with it does not prove the implementation currently has the same discrepancy. Inspect implementation only when requested or needed to resolve that distinction, using the repository's CodeGraph instructions.
 
-REA is already complete. Do not open a binary, launch/import Ghidra, install tooling, or rerun discovery. Resolve a decisive question from retained evidence when available. Otherwise state the missing proof and its consequence; do not turn an incomplete finding into a confirmed difference. Use [REA-GUIDE.md](../REA-GUIDE.md) only to understand an existing investigation's scope and methods, not to restart its workflow.
+Work from completed observations; the wider investigation needn't be finished.
+Do not open a binary, launch/import Ghidra, install tooling, or rerun discovery.
+Resolve a decisive question from retained evidence when available. Otherwise state
+the missing proof and its consequence; don't turn an incomplete finding into a
+confirmed difference. Use [REA-GUIDE.md](../REA-GUIDE.md) only to understand an
+existing investigation's scope and methods, not to restart its workflow.
+
+Separate an established calculation under supplied inputs from proof of the
+gameplay conditions supplying them. Review activation and probability coverage
+explicitly where they differ; don't let a conditional answer imply an unconditional
+rate. A process change alone doesn't justify upgrading verification grades.
 
 ## Derive the scoped PalCalc model
 
@@ -56,6 +72,10 @@ For each candidate difference:
 
 Do not infer a probability change merely because two routines execute in different orders. For shared RNG or native quantization effects, explain their relevance and required assumptions before including them as an estimate discrepancy. Do not claim exact frequencies or independence from static evidence.
 
+Use the workflow's probability guidance to choose the precision needed for the
+question. Preserve material ordering or selector defects; don't demand exact RNG
+replay or a full activation lifecycle when the declared answer doesn't require it.
+
 ## Deliver two separate lists
 
 First give concise bullets of **discrepancies relevant to the scoped PalCalc behavior**. Each should identify the assumption, recovered difference and consequence. Lead with the material differences, not a function-by-function trace. Do not call the list action items or propose implementation changes unless asked.
@@ -68,6 +88,14 @@ Return the assessment in chat by default; save or modify repository documents on
 
 When publication is requested, update the relevant mechanic sections in the
 game-version report, preserving other coverage and dates. Separate a supported
-game change from newly verified behavior or a correction to our understanding;
-record the distinction in the hub and changelog. Verified unchanged behavior needs
+game change from newly verified behavior or a correction to our understanding
+in that report. Update the hub's coverage; use the changelog for changes to checked
+versions, observed game mechanics or assessment scope. Verified unchanged behavior needs
 the workflow's code/data dependency comparison, not just an old conclusion.
+
+Consolidate the current answers and decisive evidence when updating a report,
+following the workflow's [publication boundary](../ASSESSMENT-WORKFLOW.md#what-belongs-in-published-evidence).
+Keep investigation state separate from coverage and retain meaningful dated
+corrections. Move exploratory models, rejected leads, and continuation history to
+`txt/`; keep the evidence needed for published conclusions and material limitations
+self-contained. A partial mechanic can still have established parts worth publishing.

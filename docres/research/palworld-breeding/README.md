@@ -12,45 +12,52 @@ selection code doesn't establish the values in the current assets.
 
 ## Current verification status
 
-**Last complete game-version review: none published.**
+**Last fully verified game version: 1.0.5.102999, 2026-10-29.**
 
-**Last mechanics verification update: none under this checklist.**
+**Latest assessment: eight Verified. Investigation state: Finished.** This is the
+first verified baseline for the shipped Windows Steam configuration, not a
+comparison with an earlier verified release or a solver update.
 
-We're starting a comprehensive baseline review rather than carrying forward the
-old, separate investigations as completed coverage. The existing mechanics
-explanation and solver calculations remain available, but haven't yet been
-revalidated through this checklist. The earlier reports were removed during this
-documentation reset; they're available in Git history.
+The [assessment](assessments/1.0.5.102999/assessment.md) gives current rules,
+conditions and the PalCalc model comparison; [evidence](assessments/1.0.5.102999/evidence.md)
+contains the scoped game model, current inputs and decisive observations.
+Runtime source membership/order, world state and options retain their explicit
+input contracts; static verification does not establish measured gameplay
+frequencies or a universal capture-addition guarantee. The assessment records
+findings and completion corrections; the [changelog](CHANGELOG.md) tracks checked
+versions, observed game changes and assessment scope.
 
-The table below is the main coverage record. Once reports are published, each row
-links directly to that mechanic's conclusions and supporting evidence. A partial
-review can update individual rows without making the whole version complete.
+The table below is the main coverage record, linking each mechanic to its
+conclusions and supporting evidence. A targeted review can update individual
+rows without establishing full version verification.
 
-| Required mechanic | What needs to be established | Last checked game version / date | Status | Conclusions / evidence |
+| Required mechanic | Questions to answer for declared inputs and modes | Last checked game version / date | Status | Conclusions / evidence |
 | --- | --- | --- | --- | --- |
-| Child species | Recipes and parent genders, rank selection, eligibility, ties, item effects, and later replacements | — | Awaiting baseline review | — |
-| Child gender | Ratios, fixed genders, overrides, and final assignment | — | Awaiting baseline review | — |
-| Child passives | Parental selection, random additions, duplicates, failed additions, and item effects | — | Awaiting baseline review | — |
-| Child attacks | Equipped-parent inheritance, natural and mastered attacks, item effects, and final learned/equipped contents | — | Awaiting baseline review | — |
-| Child IVs | Parent and random sources, asymmetric branches, ranges, and item effects | — | Awaiting baseline review | — |
-| Wild-Pal passives | Spawn-time contents, guaranteed passives, and capture-time changes | — | Awaiting baseline review | — |
-| Wild-Pal attacks | Spawn-time contents, level-based learning, and capture-time changes | — | Awaiting baseline review | — |
-| Wild-Pal gender | Spawn-time selection, ratios, fixed genders, and overrides | — | Awaiting baseline review | — |
+| Child species | Which child ID results from the given parents, recipe/rank inputs and mode, including item effects and later replacements? | 1.0.5.102999 / 2026-10-27 | Verified | [Conclusions](assessments/1.0.5.102999/assessment.md#child-species) / [Evidence](assessments/1.0.5.102999/evidence.md#child-species) |
+| Child gender | How is the selected child's saved gender assigned, including ratios, fixed genders and overrides? | 1.0.5.102999 / 2026-10-22 | Verified | [Conclusions](assessments/1.0.5.102999/assessment.md#child-gender) / [Evidence](assessments/1.0.5.102999/evidence.md#child-gender) |
+| Child passives | Which passives can reach the child and with what selection/count rules, including items, mutation, failures and later changes? | 1.0.5.102999 / 2026-10-27 | Verified | [Conclusions](assessments/1.0.5.102999/assessment.md#child-passives) / [Evidence](assessments/1.0.5.102999/evidence.md#child-passives) |
+| Child attacks | Which parental and natural attacks are available to the child, and how do item/mutation effects and equipment limits affect them? | 1.0.5.102999 / 2026-10-22 | Verified | [Conclusions](assessments/1.0.5.102999/assessment.md#child-attacks) / [Evidence](assessments/1.0.5.102999/evidence.md#child-attacks) |
+| Child IVs | Which values supply each saved IV, including source selection, random ranges, items, mutation and later changes? | 1.0.5.102999 / 2026-10-26 | Verified | [Conclusions](assessments/1.0.5.102999/assessment.md#child-ivs) / [Evidence](assessments/1.0.5.102999/evidence.md#child-ivs); [item-derived extra-egg exclusion established](assessments/1.0.5.102999/evidence.md#shipped-item-sources-do-not-add-extra-egg-records) |
+| Wild-Pal passives | Which passives result from the specified spawn inputs, and how can capture effects change the saved list? | 1.0.5.102999 / 2026-10-29 | Verified | [Conclusions](assessments/1.0.5.102999/assessment.md#wild-pal-passives) / [Evidence](assessments/1.0.5.102999/evidence.md#wild-pal-passives) |
+| Wild-Pal attacks | Which attacks are available overall for the specified spawn/level inputs, and how can capture change that set? | 1.0.5.102999 / 2026-10-29 | Verified | [Conclusions](assessments/1.0.5.102999/assessment.md#wild-pal-attacks) / [Evidence](assessments/1.0.5.102999/evidence.md#wild-pal-attacks) |
+| Wild-Pal gender | How do the resolved species and spawn overrides determine saved gender, and does capture change it? | 1.0.5.102999 / 2026-10-24 | Verified | [Conclusions](assessments/1.0.5.102999/assessment.md#wild-pal-gender) / [Evidence](assessments/1.0.5.102999/evidence.md#wild-pal-gender) |
 
-A standard game-update review checks **all eight mechanics**, including their
-relevant ordinary and item modes. Record alternate modes such as mutation
-explicitly: trace their effects or explain which conclusions don't cover them.
-An excluded mode stays visible as a gap; it doesn't become verified just because
-PalCalc currently ignores it. See the [workflow's completion rules](ASSESSMENT-WORKFLOW.md#reviewing-a-game-update).
+A standard game-update review accounts for **all eight mechanics**. Turn these
+questions into explicit inputs, modes, and output boundaries using the
+[workflow's scope rules](ASSESSMENT-WORKFLOW.md#define-the-questions-and-boundaries).
+Keep alternate-mode exclusions visible; PalCalc omitting a behavior isn't proof
+that it doesn't matter.
 
-Use **verified**, **verified unchanged**, **partial**, or **unresolved** for
-published findings. The last-checked version/date advances only for the scope
-actually supported by evidence; a later unsuccessful check is recorded separately
-in that version's report. An unresolved new version doesn't erase an older
-verified finding or make it applicable to the new version.
+The workflow defines [coverage grades and investigation state](ASSESSMENT-WORKFLOW.md#investigation-state-and-verification-coverage).
+A finished investigation can have partial coverage. Within a partial mechanic,
+the report explains which calculations, activation conditions, and probability
+claims are established. Finishing doesn't upgrade those claims. The
+last-checked version/date advances only for the scope supported by evidence;
+record a later unsuccessful check separately rather than implying the older
+finding applies to the new version.
 
-[The changelog](CHANGELOG.md) records completed and partial version reviews, what
-changed, and corrections to our understanding. Game version is the primary
+[The changelog](CHANGELOG.md) records changes to checked versions, observed game
+mechanics and assessment scope. Game version is the primary
 identifier; platform, Steam build ID, executable hash, and asset identities
 distinguish the installation actually checked. If the version is unknown, say so
 and keep the review provisional rather than guessing a release label.
@@ -64,7 +71,7 @@ and keep the review provisional rather than guessing a release label.
 
 These get targeted reviews when a change, reported problem, or explicit request
 calls for one. They aren't required for a standard game-update review, and their
-older check dates don't make that review incomplete.
+older check dates don't prevent full verification of the required mechanics.
 
 ## Choose a starting point
 
@@ -132,12 +139,19 @@ assets; relocated code alone doesn't prove a behavior change.
 
 Publish a report for the new game version and update the status table and changelog.
 Keep the previous version's conclusions intact. A partial review is useful, but
-mustn't be presented as complete verification of the update.
+mustn't be presented as full verification of the update. Before another native
+pass, apply the workflow's [further-tracing rule](ASSESSMENT-WORKFLOW.md#deciding-what-to-investigate-next)
+to the remaining gaps using retained evidence first.
 
 ## Published reports
 
-No comprehensive baseline report has been published yet. See the
-[changelog](CHANGELOG.md) for review history from this reset onward.
+- [1.0.5.102999 assessment](assessments/1.0.5.102999/assessment.md) and
+  [evidence](assessments/1.0.5.102999/evidence.md), Windows Steam build 25246127,
+  reviewed 2026-10-21–29; editorially simplified October 30. See the
+  [current coverage table](#current-verification-status) and mechanic sections
+  for scope and conditions.
+
+See the [changelog](CHANGELOG.md) for review history.
 
 ```text
 assessments/<game-version>/
@@ -156,30 +170,41 @@ findings don't verify another. See the workflow for provisional unknown versions
 | Location | Main responsibility |
 | --- | --- |
 | This README | Current mechanic checklist, verification status, and routes into conclusions/evidence |
-| [Changelog](CHANGELOG.md) | Review dates, versions, affected mechanics, and the kind of change |
+| [Changelog](CHANGELOG.md) | Changes to checked versions, observed game mechanics and assessment scope |
 | `assessments/<game-version>/assessment.md` | Authoritative conclusions for that version and comparison with a named PalCalc baseline |
-| `assessments/<game-version>/evidence.md` | Full game model and pseudocode, input provenance, decisive observations, and proof boundaries |
+| `assessments/<game-version>/evidence.md` | Consolidated scoped game model, input provenance, and decisive support for assessment conclusions and material limitations |
 | [Mechanics explanation](../../../PALWORLD-BREEDING-MECHANICS.md) | Player-facing game rules, derived from the research, with links back to status and detail |
 | [Limitations](../../../LIMITATIONS.md) | Current modeling omissions, search tradeoffs, and their practical effects |
 | [Solver overview](../../../PalCalc.Solver/README.md) and [worked calculations](../../../PalCalc.Solver/README-BREED-ESTIMATE.md) | Current implementation and its estimates |
-| [Workflow](ASSESSMENT-WORKFLOW.md), [template](ASSESSMENT-TEMPLATE.md), [REA guide](REA-GUIDE.md) | Review procedure, report structure, and technical investigation methods |
+| [Workflow](ASSESSMENT-WORKFLOW.md) | Scope, further-tracing decisions, probability claims, completion, and publication rules |
+| [Template](ASSESSMENT-TEMPLATE.md), [REA guide](REA-GUIDE.md) | Report structure and technical investigation methods, following the workflow's boundaries |
 | [Historical discovery references](HISTORICAL-DISCOVERY-REFERENCES.md) | Build-specific search anchors, layout clues, and constants for exploration; not mechanics conclusions or verification coverage |
 | [Review skill](palworld-breeding-review/SKILL.md) | Comparing completed findings with PalCalc |
 | `tools/` | Reusable helpers and tests; see the [PE helper instructions](REA-GUIDE.md#bundled-offline-pe-helper) |
-| `_REA-ANALYSIS/runs/<timestamp>-<id>/` at the repo root | Ignored raw responses, experiments, exports, logs, and working notes |
+| `_REA-ANALYSIS/runs/<timestamp>-<id>/` at the repo root | Ignored scripts, raw responses, generated output, exports, logs, and snapshots |
+| `_REA-ANALYSIS/txt/<investigation-id>/` at the repo root | Ignored temporary documentation: topic investigations, hypotheses, draft models, and continuation notes |
 
 ## When updating these docs
 
-- Accepted findings update the version report, status table, and changelog. Review
-  the player explanation and relevant limitations as derived summaries; link each
-  summary to the detailed finding rather than copying the full report.
+- Accepted findings update the version report and status table. Update the
+  changelog when checked versions, observed game mechanics or assessment scope
+  change. Review the player explanation and relevant limitations as derived
+  summaries; link each summary to the detailed finding.
 - Solver changes prompt a review of the solver explanation, worked calculations,
   and limitations. They don't establish new game verification or rewrite an older
   report's comparison as though it reviewed today's code.
 - A correction to our understanding updates the affected report with a dated
-  correction note and changelog entry. Preserve what was previously concluded and
-  why it changed; don't describe the correction as a game update without evidence.
+  correction note. Preserve what was previously concluded and why it changed;
+  correct the changelog too if its version, game-change or scope record is affected.
+  Don't describe the correction as a game update without evidence.
 - Short explanations may repeat information for their audience. Keep one owner
   for the detailed rule or procedure and review its linked summaries when it changes.
   The player page and limitations page link here rather than maintaining separate
   coverage tables.
+- Consolidate continued work into current mechanic sections under the workflow's
+  publication rules. Keep the hub's narrative short and link to the coverage table
+  and report rather than repeating status counts or each research pass.
+- Develop investigations in temporary `txt/` notes and promote established
+  material under the [publication boundary](ASSESSMENT-WORKFLOW.md#what-belongs-in-published-evidence).
+  Keep supporting evidence for material uncertainties public, without copying the
+  entire search history into `evidence.md`.
