@@ -35,34 +35,6 @@ namespace PalCalc.Model.Tests
         }
 
         [TestMethod]
-        public void PalInstanceRankRoundTripsThroughJson()
-        {
-            var converter = new PalInstanceJsonConverter(paldb);
-            var json = JsonConvert.SerializeObject(MakeInstanceWithRank(4), converter);
-
-            Assert.AreEqual(4, JsonConvert.DeserializeObject<PalInstance>(json, converter).Rank);
-        }
-
-        [TestMethod]
-        public void PalInstanceRankDefaultsToOneWhenMissingFromJson()
-        {
-            var converter = new PalInstanceJsonConverter(paldb);
-            var json = JObject.Parse(JsonConvert.SerializeObject(MakeInstanceWithRank(4), converter));
-            json.Remove("Rank");
-
-            Assert.AreEqual(1, JsonConvert.DeserializeObject<PalInstance>(json.ToString(), converter).Rank);
-        }
-
-        private PalInstance MakeInstanceWithRank(int rank) => new()
-        {
-            Pal = paldb.Pals.First(),
-            Location = new PalLocation { Type = LocationType.Palbox, ContainerId = "box", Index = 1 },
-            Gender = PalGender.MALE,
-            PassiveSkills = [],
-            Rank = rank,
-        };
-
-        [TestMethod]
         public void AttackLevelingRoundTripsThroughJson()
         {
             var json = JObject.Parse(paldb.ToJson());
@@ -98,5 +70,33 @@ namespace PalCalc.Model.Tests
                 pal.WildActiveSkills(paldb).ToArray()
             );
         }
+
+        [TestMethod]
+        public void PalInstanceRankRoundTripsThroughJson()
+        {
+            var converter = new PalInstanceJsonConverter(paldb);
+            var json = JsonConvert.SerializeObject(MakeInstanceWithRank(4), converter);
+
+            Assert.AreEqual(4, JsonConvert.DeserializeObject<PalInstance>(json, converter).Rank);
+        }
+
+        [TestMethod]
+        public void PalInstanceRankDefaultsToOneWhenMissingFromJson()
+        {
+            var converter = new PalInstanceJsonConverter(paldb);
+            var json = JObject.Parse(JsonConvert.SerializeObject(MakeInstanceWithRank(4), converter));
+            json.Remove("Rank");
+
+            Assert.AreEqual(1, JsonConvert.DeserializeObject<PalInstance>(json.ToString(), converter).Rank);
+        }
+
+        private PalInstance MakeInstanceWithRank(int rank) => new()
+        {
+            Pal = paldb.Pals.First(),
+            Location = new PalLocation { Type = LocationType.Palbox, ContainerId = "box", Index = 1 },
+            Gender = PalGender.MALE,
+            PassiveSkills = [],
+            Rank = rank,
+        };
     }
 }
