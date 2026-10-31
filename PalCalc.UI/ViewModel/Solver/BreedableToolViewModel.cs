@@ -41,12 +41,14 @@ namespace PalCalc.UI.ViewModel.Solver
     public partial class BreedableCardViewModel(
         PalViewModel pal,
         IVSetViewModel ivs,
+        BreedableParentViewModel owned,
         BreedableParentViewModel parent1,
         BreedableParentViewModel parent2
     ) : ObservableObject
     {
         public PalViewModel Pal { get; } = pal;
         public IVSetViewModel IVs { get; } = ivs;
+        public BreedableParentViewModel Owned { get; } = owned;
         public BreedableParentViewModel Parent1 { get; } = parent1;
         public BreedableParentViewModel Parent2 { get; } = parent2;
 
@@ -165,6 +167,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 new(
                     PalViewModel.Make(entry.Pal),
                     IVSetViewModel.FromIVs(entry.IVs),
+                    entry.OwnedInstance == null ? null : new(save, gameSettings, entry.Pal, entry.OwnedInstance),
                     entry.Source == null ? null : new(save, gameSettings, entry.Source.Parent1.Pal, entry.Parent1Instance),
                     entry.Source == null ? null : new(save, gameSettings, entry.Source.Parent2.Pal, entry.Parent2Instance)
                 );
@@ -175,7 +178,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 .ToList();
 
             var notReachableCards = result.NotReachable
-                .Select(p => new BreedableCardViewModel(PalViewModel.Make(p), null, null, null))
+                .Select(p => new BreedableCardViewModel(PalViewModel.Make(p), null, null, null, null))
                 .ToList();
 
             // (tiers which only added a gender have no entries, so they don't get a group)

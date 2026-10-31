@@ -13,8 +13,8 @@ namespace PalCalc.Solver;
 /// preferring the required gender and then the highest IVs. Either can be `null` if
 /// the parent needs to be bred instead.
 ///
-/// `IVs` are the range of IVs available through `Source`, or the IVs of the best
-/// owned pal for tier 0.
+/// `OwnedInstance` is the owned pal with the highest IVs, for tier 0. `IVs` are that
+/// pal's IVs, or otherwise the range of IVs available through `Source`.
 /// </summary>
 public sealed record BreedableEntry(
     Pal Pal,
@@ -22,6 +22,7 @@ public sealed record BreedableEntry(
     BreedingResult Source,
     PalInstance Parent1Instance,
     PalInstance Parent2Instance,
+    PalInstance OwnedInstance,
     IV_Set IVs
 );
 

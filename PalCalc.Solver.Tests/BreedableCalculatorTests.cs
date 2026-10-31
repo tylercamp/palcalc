@@ -311,6 +311,14 @@ public class BreedableCalculatorTests
     }
 
     [TestMethod]
+    public void Calculate_BredSpeciesHasNoOwnedInstance()
+    {
+        var entry = Entry(Calculate(false, Male("Penking"), Female("Bushi")), "Sibelyx");
+
+        Assert.IsNull(entry.OwnedInstance);
+    }
+
+    [TestMethod]
     public void Calculate_BredParentCarriesIVRangeForward()
     {
         var sibelyx = "Sibelyx".ToPal(DB);
@@ -330,8 +338,10 @@ public class BreedableCalculatorTests
         var low = WithIVs("Penking", PalGender.MALE, 10, 10, 10);
         var high = WithIVs("Penking", PalGender.FEMALE, 50, 60, 70);
 
-        var ivs = Entry(Calculate(false, low, high), "Penking").IVs;
+        var entry = Entry(Calculate(false, low, high), "Penking");
+        var ivs = entry.IVs;
 
+        Assert.AreSame(high, entry.OwnedInstance);
         Assert.AreEqual((50, 50), (ivs.HP.Min, ivs.HP.Max));
         Assert.AreEqual((60, 60), (ivs.Attack.Min, ivs.Attack.Max));
         Assert.AreEqual((70, 70), (ivs.Defense.Min, ivs.Defense.Max));

@@ -40,6 +40,23 @@
             </vu:PopupToolTipContent>
         </DataTemplate>
 
+        <DataTemplate x:Key="LocationTemplate">
+            <StackPanel>
+                <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" TextTrimming="CharacterEllipsis" Visibility="{Binding OwnerVisibility}" />
+                <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="OwnedTemplate">
+            <vu:PopupToolTipTrigger HorizontalAlignment="Left"
+                                    Cursor="Hand"
+                                    InitialShowDelay="200"
+                                    PopupAnimation="None"
+                                    ToolTipContentTemplate="{StaticResource ParentPopupContent}">
+                <ContentControl Content="{Binding Location}" ContentTemplate="{StaticResource LocationTemplate}" />
+            </vu:PopupToolTipTrigger>
+        </DataTemplate>
+
         <!-- A parent which needs to be bred has no specific pal to show, so it has no popup -->
         <DataTemplate x:Key="ParentTemplate">
             <vu:PopupToolTipTrigger HorizontalAlignment="Left"
@@ -59,10 +76,9 @@
                                TextTrimming="CharacterEllipsis"
                                Visibility="{Binding IsOwned, Converter={StaticResource NegatedVVC}}" />
 
-                    <StackPanel DataContext="{Binding Location}" Visibility="{Binding Converter={StaticResource VVC}}">
-                        <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" TextTrimming="CharacterEllipsis" Visibility="{Binding OwnerVisibility}" />
-                        <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
+                    <ContentControl Content="{Binding Location}"
+                                    ContentTemplate="{StaticResource LocationTemplate}"
+                                    Visibility="{Binding Location, Converter={StaticResource VVC}}" />
                 </StackPanel>
             </vu:PopupToolTipTrigger>
         </DataTemplate>
@@ -99,6 +115,10 @@
                         BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
                         Background="{DynamicResource BreedingNodeBackgroundBrush}">
                     <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="2*" MinWidth="60" />
@@ -141,6 +161,14 @@
                             <ContentControl Content="{Binding Parent1}" ContentTemplate="{StaticResource ParentTemplate}" Visibility="{Binding Parent1, Converter={StaticResource VVC}}" />
                             <ContentControl Content="{Binding Parent2}" ContentTemplate="{StaticResource ParentTemplate}" Visibility="{Binding Parent2, Converter={StaticResource VVC}}" Margin="0,4,0,0" />
                         </StackPanel>
+
+                        <!-- On its own row since half-width cards don't have room beside the IVs -->
+                        <ContentControl Grid.Row="1"
+                                        Grid.ColumnSpan="3"
+                                        Margin="0,4,0,0"
+                                        Content="{Binding Owned}"
+                                        ContentTemplate="{StaticResource OwnedTemplate}"
+                                        Visibility="{Binding Owned, Converter={StaticResource VVC}}" />
                     </Grid>
                 </Border>
 

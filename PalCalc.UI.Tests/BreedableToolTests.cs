@@ -6,7 +6,9 @@ using PalCalc.UI.ViewModel.Solver;
 
 namespace PalCalc.UI.Tests;
 
+// the view models and localization used here expect to run on the UI thread, so these tests can't run in parallel
 [TestClass]
+[DoNotParallelize]
 public class BreedableToolTests
 {
     [TestMethod]
@@ -77,13 +79,36 @@ public class BreedableToolTests
     }
 
     [TestMethod]
+    public async Task Run_OwnedCardHasBestOwnedPal()
+    {
+        var weak = Owned("Penking", PalGender.MALE);
+        var strong = Owned("Penking", PalGender.FEMALE);
+        strong.IV_HP = 90;
+        var tool = new BreedableToolViewModel(null!);
+
+        await tool.RunAsync(Settings(weak, strong), null!);
+
+        var owned = tool.Groups.First().Cards.Single().Owned;
+        Assert.AreEqual(PalGender.FEMALE, owned.Gender.Value);
+        Assert.AreEqual(90, ((IVDirectValueViewModel)owned.IVs.HP).Value);
+    }
+
+    [TestMethod]
+    public async Task Run_BredCardHasNoOwnedPal()
+    {
+        var tool = await RunWithPenkingAndBushi();
+
+        Assert.IsNull(tool.Groups[1].Cards.Single().Owned);
+    }
+
+    [TestMethod]
     public async Task Run_NotReachableCardHasNoIVs()
     {
         var tool = new BreedableToolViewModel(null!);
 
         await tool.RunAsync(Settings(), null!);
 
-        Assert.IsTrue(tool.Groups.Single().Cards.All(c => c.IVs == null));
+        Assert.IsTrue(tool.Groups.Single().Cards.All(c => c.IVs == null && c.Owned == null));
     }
 
     [TestMethod]

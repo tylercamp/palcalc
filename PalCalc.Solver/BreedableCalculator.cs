@@ -25,6 +25,7 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
         Dictionary<Pal, PalGender> genders = [];
         Dictionary<Pal, BreedingResult> sources = [];
         Dictionary<Pal, (PalInstance, PalInstance)> parents = [];
+        Dictionary<Pal, PalInstance> bestOwned = [];
         Dictionary<Pal, IV_Set> ivs = [];
 
         foreach (var pal in settings.OwnedPals)
@@ -34,7 +35,14 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
         }
 
         foreach (var group in ownedByPal)
-            ivs[group.Key] = ExactIVs(group.OrderByDescending(TotalIVs).ThenBy(p => p.InstanceId, StringComparer.Ordinal).First());
+        {
+            bestOwned[group.Key] = group
+                .OrderByDescending(TotalIVs)
+                .ThenBy(p => p.InstanceId, StringComparer.Ordinal)
+                .First();
+
+            ivs[group.Key] = ExactIVs(bestOwned[group.Key]);
+        }
 
         // each generation only uses what was available at the end of the previous generation. a
         // generation can also add nothing but a new gender for an owned species, so tiers can be empty
@@ -87,6 +95,7 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
                     sources.GetValueOrDefault(kvp.Key),
                     parents.GetValueOrDefault(kvp.Key).Item1,
                     parents.GetValueOrDefault(kvp.Key).Item2,
+                    bestOwned.GetValueOrDefault(kvp.Key),
                     ivs.GetValueOrDefault(kvp.Key)
                 ))
                 .OrderBy(e => e.Tier)
