@@ -22,11 +22,34 @@ internal static class BredPalReferenceEffort
         TimeSpan parent1Effort,
         IPalReference parent2,
         TimeSpan parent2Effort
-    ) =>
-            gameSettings.MultipleBreedingFarms &&
-            parent1 is BredPalReference && parent2 is BredPalReference
-                ? parent1Effort > parent2Effort ? parent1Effort : parent2Effort
-                : parent1Effort + parent2Effort;
+    )
+    {
+        if (parent1 is not BredPalReference bred1 || parent2 is not BredPalReference bred2)
+            return parent1Effort + parent2Effort;
+
+        if (gameSettings.MultipleBreedingFarms)
+            return parent1Effort > parent2Effort ? parent1Effort : parent2Effort;
+
+        if (!gameSettings.MultipleIncubators)
+            return parent1Effort + parent2Effort;
+
+        // one farm lays the eggs in turn, but they incubate side by side, so the farm is free
+        // for the other parent as soon as an egg is laid
+        var parent1First = SingleFarmEffort(gameSettings, bred1, parent1Effort, parent2Effort);
+        var parent2First = SingleFarmEffort(gameSettings, bred2, parent2Effort, parent1Effort);
+        return parent1First < parent2First ? parent1First : parent2First;
+    }
+
+    private static TimeSpan SingleFarmEffort(
+        GameSettings gameSettings,
+        BredPalReference first,
+        TimeSpan firstEffort,
+        TimeSpan secondEffort
+    )
+    {
+        var secondDone = firstEffort - first.Pal.EggSize.IncubationTime(gameSettings) + secondEffort;
+        return secondDone > firstEffort ? secondDone : firstEffort;
+    }
 
     public static TimeSpan CalculateSelfBreedingEffort(
         GameSettings gameSettings,
