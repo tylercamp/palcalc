@@ -297,6 +297,46 @@ public class BreedableCalculatorTests
         Assert.AreSame(penking, InstanceFor(entry, "Penking"));
     }
 
+    [TestMethod]
+    public void Calculate_ChildIVsSpanBothParents()
+    {
+        var penking = WithIVs("Penking", PalGender.MALE, 10, 60, 30);
+        var bushi = WithIVs("Bushi", PalGender.FEMALE, 40, 20, 30);
+
+        var ivs = Entry(Calculate(false, penking, bushi), "Sibelyx").IVs;
+
+        Assert.AreEqual((10, 40), (ivs.HP.Min, ivs.HP.Max));
+        Assert.AreEqual((20, 60), (ivs.Attack.Min, ivs.Attack.Max));
+        Assert.AreEqual((30, 30), (ivs.Defense.Min, ivs.Defense.Max));
+    }
+
+    [TestMethod]
+    public void Calculate_BredParentCarriesIVRangeForward()
+    {
+        var sibelyx = "Sibelyx".ToPal(DB);
+        var partner = "Penking".ToPal(DB);
+        var child = BreedingDB.BreedingByParent[sibelyx][partner].Single().Child;
+        var penking = WithIVs("Penking", PalGender.MALE, 10, 10, 10);
+        var bushi = WithIVs("Bushi", PalGender.FEMALE, 90, 90, 90);
+
+        var ivs = Entry(Calculate(false, penking, bushi), child.Name).IVs;
+
+        Assert.AreEqual((10, 90), (ivs.HP.Min, ivs.HP.Max));
+    }
+
+    [TestMethod]
+    public void Calculate_OwnedSpeciesUsesHighestIVs()
+    {
+        var low = WithIVs("Penking", PalGender.MALE, 10, 10, 10);
+        var high = WithIVs("Penking", PalGender.FEMALE, 50, 60, 70);
+
+        var ivs = Entry(Calculate(false, low, high), "Penking").IVs;
+
+        Assert.AreEqual((50, 50), (ivs.HP.Min, ivs.HP.Max));
+        Assert.AreEqual((60, 60), (ivs.Attack.Min, ivs.Attack.Max));
+        Assert.AreEqual((70, 70), (ivs.Defense.Min, ivs.Defense.Max));
+    }
+
     [DataTestMethod]
     [DataRow(true)]
     [DataRow(false)]

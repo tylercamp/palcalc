@@ -29,7 +29,7 @@
             <TextBlock Text="{Binding Value, Mode=OneWay}" />
         </DataTemplate>
     </UserControl.Resources>
-    <UniformGrid Columns="3">
+    <UniformGrid Columns="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Columns}">
         <StackPanel
             Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=Orientation}"
             Opacity="{Binding RelativeSource={RelativeSource AncestorType=local:PalIVsView}, Path=IV_HP, Converter={StaticResource RTOC}}"

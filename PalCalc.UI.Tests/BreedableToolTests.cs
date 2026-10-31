@@ -62,6 +62,31 @@ public class BreedableToolTests
     }
 
     [TestMethod]
+    public async Task Run_CardShowsIVRange()
+    {
+        var penking = Owned("Penking", PalGender.MALE);
+        var bushi = Owned("Bushi", PalGender.FEMALE);
+        penking.IV_HP = 20;
+        bushi.IV_HP = 70;
+        var tool = new BreedableToolViewModel(null!);
+
+        await tool.RunAsync(Settings(penking, bushi), null!);
+
+        var range = (IVRangeValueViewModel)tool.Groups[1].Cards.Single().IVs.HP;
+        Assert.AreEqual((20, 70), (range.Min, range.Max));
+    }
+
+    [TestMethod]
+    public async Task Run_NotReachableCardHasNoIVs()
+    {
+        var tool = new BreedableToolViewModel(null!);
+
+        await tool.RunAsync(Settings(), null!);
+
+        Assert.IsTrue(tool.Groups.Single().Cards.All(c => c.IVs == null));
+    }
+
+    [TestMethod]
     public async Task Run_BredParentHasNoInstance()
     {
         var tool = new BreedableToolViewModel(null!);
@@ -88,6 +113,79 @@ public class BreedableToolTests
         Assert.AreEqual("Already Owned (2)", tool.Groups.First().Title.Value);
     }
 
+    [DataTestMethod]
+    [DataRow("sibel")]
+    [DataRow("SIBELYX")]
+    [DataRow("  belyx ")]
+    public async Task Search_HighlightsNameMatches(string search)
+    {
+        var tool = await RunWithPenkingAndBushi();
+
+        tool.SearchText = search;
+
+        var card = tool.Groups[1].Cards.Single();
+        Assert.IsTrue(card.IsHighlighted);
+        Assert.IsTrue(tool.Groups[1].HasHighlightedCards);
+        Assert.IsFalse(tool.Groups[0].HasHighlightedCards);
+        Assert.IsTrue(tool.HasHighlightedCards);
+    }
+
+    [TestMethod]
+    public async Task Search_ClearingRemovesHighlights()
+    {
+        var tool = await RunWithPenkingAndBushi();
+
+        tool.SearchText = "sibel";
+        tool.SearchText = "  ";
+
+        Assert.IsFalse(tool.HasHighlightedCards);
+        Assert.IsFalse(tool.Groups.Any(g => g.HasHighlightedCards));
+        Assert.IsFalse(tool.Groups.SelectMany(g => g.Cards).Any(c => c.IsHighlighted));
+    }
+
+    [TestMethod]
+    public async Task Search_AppliesToNewRuns()
+    {
+        var tool = await RunWithPenkingAndBushi();
+        tool.SearchText = "sibel";
+
+        await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
+
+        Assert.IsTrue(tool.Groups[1].Cards.Single().IsHighlighted);
+    }
+
+    [TestMethod]
+    public async Task ToggleExpanded_ExpandsThenCollapsesEveryGroup()
+    {
+        var tool = await RunWithPenkingAndBushi();
+        Assert.AreEqual("Expand All", tool.ExpandToggleLabel.Value);
+
+        tool.ToggleExpandedCommand.Execute(null);
+
+        Assert.IsTrue(tool.Groups.All(g => g.IsExpanded));
+        Assert.AreEqual("Collapse All", tool.ExpandToggleLabel.Value);
+
+        tool.ToggleExpandedCommand.Execute(null);
+
+        Assert.IsFalse(tool.Groups.Any(g => g.IsExpanded));
+        Assert.AreEqual("Expand All", tool.ExpandToggleLabel.Value);
+    }
+
+    [TestMethod]
+    public async Task ToggleExpanded_FollowsManualChanges()
+    {
+        var tool = await RunWithPenkingAndBushi();
+        tool.ToggleExpandedCommand.Execute(null);
+
+        tool.Groups[0].IsExpanded = false;
+
+        Assert.AreEqual("Expand All", tool.ExpandToggleLabel.Value);
+
+        tool.ToggleExpandedCommand.Execute(null);
+
+        Assert.IsTrue(tool.Groups.All(g => g.IsExpanded));
+    }
+
     // accessibility tools call `ToString` on list items, and `ILocalizedText.ToString` throws
     [TestMethod]
     public async Task Run_ItemsAreSafeToConvertToString()
@@ -111,6 +209,13 @@ public class BreedableToolTests
         await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE)), null!);
 
         Assert.IsFalse(tool.IsCalculating);
+    }
+
+    private static async Task<BreedableToolViewModel> RunWithPenkingAndBushi()
+    {
+        var tool = new BreedableToolViewModel(null!);
+        await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
+        return tool;
     }
 
     private static readonly PalDB DB = PalDB.LoadEmbedded();

@@ -118,6 +118,14 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_BREEDABLE_CALCULATING,
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_BREEDABLE_COLLAPSE_ALL,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_BREEDABLE_EXPAND_ALL,
+        /// <summary>
         ///   Looks up a localized string similar to NumPals.
         /// </summary>
         LC_BREEDABLE_GROUP_NOT_REACHABLE,

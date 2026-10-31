@@ -35,6 +35,14 @@ namespace PalCalc.UI.View.Pal
             set => SetValue(OrientationProperty, value);
         }
 
+        public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(nameof(Columns), typeof(int), typeof(PalIVsView), new PropertyMetadata(3));
+
+        public int Columns
+        {
+            get => (int)GetValue(ColumnsProperty);
+            set => SetValue(ColumnsProperty, value);
+        }
+
         public static readonly DependencyProperty IV_HPProperty = DependencyProperty.Register(nameof(IV_HP), typeof(IVValueViewModel), typeof(PalIVsView));
 
         public IVValueViewModel IV_HP

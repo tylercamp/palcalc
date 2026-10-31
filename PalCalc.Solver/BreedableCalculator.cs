@@ -1,4 +1,5 @@
 using PalCalc.Model;
+using PalCalc.Solver.PalReference.Properties;
 
 namespace PalCalc.Solver;
 
@@ -24,12 +25,16 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
         Dictionary<Pal, PalGender> genders = [];
         Dictionary<Pal, BreedingResult> sources = [];
         Dictionary<Pal, (PalInstance, PalInstance)> parents = [];
+        Dictionary<Pal, IV_Set> ivs = [];
 
         foreach (var pal in settings.OwnedPals)
         {
             tiers[pal.Pal] = 0;
             genders[pal.Pal] = genders.GetValueOrDefault(pal.Pal) | pal.Gender;
         }
+
+        foreach (var group in ownedByPal)
+            ivs[group.Key] = ExactIVs(group.OrderByDescending(TotalIVs).ThenBy(p => p.InstanceId, StringComparer.Ordinal).First());
 
         // each generation only uses what was available at the end of the previous generation. a
         // generation can also add nothing but a new gender for an owned species, so tiers can be empty
@@ -58,7 +63,10 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
 
             // (must use the genders from this generation, not the genders which become available later)
             foreach (var (pal, source) in newSources)
+            {
                 parents[pal] = BestOwnedParents(source, genders);
+                ivs[pal] = InheritedIVs(source, parents[pal], ivs);
+            }
 
             foreach (var (pal, source) in newSources)
             {
@@ -78,7 +86,8 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
                     kvp.Value,
                     sources.GetValueOrDefault(kvp.Key),
                     parents.GetValueOrDefault(kvp.Key).Item1,
-                    parents.GetValueOrDefault(kvp.Key).Item2
+                    parents.GetValueOrDefault(kvp.Key).Item2,
+                    ivs.GetValueOrDefault(kvp.Key)
                 ))
                 .OrderBy(e => e.Tier)
                 .ThenBy(e => e.Pal.InternalIndex),
@@ -131,6 +140,31 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
             .Select(p => (p.Parent1, p.Parent2))
             .FirstOrDefault();
     }
+
+    // an owned pal's IVs are all known, so these only ever need `IV_Value.Merge` rather than the
+    // handling of random and irrelevant IVs in `CandidateExpander`
+    private static IV_Set InheritedIVs(
+        BreedingResult breeding,
+        (PalInstance, PalInstance) parents,
+        Dictionary<Pal, IV_Set> ivs
+    )
+    {
+        var parent1 = parents.Item1 == null ? ivs[breeding.Parent1.Pal] : ExactIVs(parents.Item1);
+        var parent2 = parents.Item2 == null ? ivs[breeding.Parent2.Pal] : ExactIVs(parents.Item2);
+
+        return new(
+            HP: IV_Value.Merge(parent1.HP, parent2.HP),
+            Attack: IV_Value.Merge(parent1.Attack, parent2.Attack),
+            Defense: IV_Value.Merge(parent1.Defense, parent2.Defense)
+        );
+    }
+
+    private static IV_Set ExactIVs(PalInstance pal) =>
+        new(
+            HP: new(IsRelevant: true, Min: pal.IV_HP, Max: pal.IV_HP),
+            Attack: new(IsRelevant: true, Min: pal.IV_Attack, Max: pal.IV_Attack),
+            Defense: new(IsRelevant: true, Min: pal.IV_Defense, Max: pal.IV_Defense)
+        );
 
     private static int TotalIVs(PalInstance pal) =>
         pal == null ? 0 : pal.IV_HP + pal.IV_Attack + pal.IV_Defense;

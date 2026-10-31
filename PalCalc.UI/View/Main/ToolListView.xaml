@@ -11,7 +11,7 @@
          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
     <ListBox.ItemTemplate>
         <DataTemplate DataType="vms:ISolverTool">
-            <TextBlock Text="{Binding Name.Value}" FontWeight="Bold" Margin="5" />
+            <TextBlock Text="{Binding Name.Value}" FontWeight="Bold" HorizontalAlignment="Center" Margin="5" />
         </DataTemplate>
     </ListBox.ItemTemplate>
     <ListBox.ItemContainerStyle>

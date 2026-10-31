@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference.Properties;
@@ -7,6 +8,7 @@ using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,7 +31,6 @@ namespace PalCalc.UI.ViewModel.Solver
             Defense: new IVDirectValueViewModel(true, instance.IV_Defense)
         );
 
-        // (only used by the hover popup, so these aren't created for every card up front)
         public SpecificPalRefLocationViewModel Location => instance == null ? null : location ??= new(
             source,
             settings,
@@ -37,18 +38,36 @@ namespace PalCalc.UI.ViewModel.Solver
         );
     }
 
-    public class BreedableCardViewModel(PalViewModel pal, BreedableParentViewModel parent1, BreedableParentViewModel parent2)
+    public partial class BreedableCardViewModel(
+        PalViewModel pal,
+        IVSetViewModel ivs,
+        BreedableParentViewModel parent1,
+        BreedableParentViewModel parent2
+    ) : ObservableObject
     {
         public PalViewModel Pal { get; } = pal;
+        public IVSetViewModel IVs { get; } = ivs;
         public BreedableParentViewModel Parent1 { get; } = parent1;
         public BreedableParentViewModel Parent2 { get; } = parent2;
+
+        [ObservableProperty]
+        private bool isHighlighted = false;
     }
 
-    public class BreedableGroupViewModel(ILocalizedText title, bool isExpanded, List<BreedableCardViewModel> cards)
+    public partial class BreedableGroupViewModel(
+        ILocalizedText title,
+        bool isExpanded,
+        List<BreedableCardViewModel> cards
+    ) : ObservableObject
     {
         public ILocalizedText Title { get; } = title;
-        public bool IsExpanded { get; } = isExpanded;
         public List<BreedableCardViewModel> Cards { get; } = cards;
+
+        [ObservableProperty]
+        private bool isExpanded = isExpanded;
+
+        [ObservableProperty]
+        private bool hasHighlightedCards = false;
     }
 
     public partial class BreedableToolViewModel(SolverControlsViewModel solverControls) : ObservableObject, ISolverTool
@@ -65,8 +84,36 @@ namespace PalCalc.UI.ViewModel.Solver
         [ObservableProperty]
         private bool isCalculating = false;
 
+        [NotifyPropertyChangedFor(nameof(ExpandToggleLabel))]
         [ObservableProperty]
         private List<BreedableGroupViewModel> groups = [];
+
+        [ObservableProperty]
+        private string searchText = "";
+
+        [ObservableProperty]
+        private bool hasHighlightedCards = false;
+
+        partial void OnSearchTextChanged(string value) => UpdateHighlights();
+
+        private bool AreAllExpanded => Groups.All(g => g.IsExpanded);
+
+        public ILocalizedText ExpandToggleLabel =>
+            (AreAllExpanded ? LocalizationCodes.LC_BREEDABLE_COLLAPSE_ALL : LocalizationCodes.LC_BREEDABLE_EXPAND_ALL).Bind();
+
+        [RelayCommand]
+        private void ToggleExpanded()
+        {
+            var isExpanded = !AreAllExpanded;
+            foreach (var group in Groups)
+                group.IsExpanded = isExpanded;
+        }
+
+        private void Group_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(BreedableGroupViewModel.IsExpanded))
+                OnPropertyChanged(nameof(ExpandToggleLabel));
+        }
 
         public async void Run(BreedingSolverSettings settings, CachedSaveGame save) =>
             await RunAsync(settings, save);
@@ -86,7 +133,26 @@ namespace PalCalc.UI.ViewModel.Solver
             if (runId != latestRunId) return;
 
             Groups = BuildGroups(result, save, settings.GameSettings);
+            foreach (var group in Groups)
+                group.PropertyChanged += Group_PropertyChanged;
+
+            UpdateHighlights();
             IsCalculating = false;
+        }
+
+        private void UpdateHighlights()
+        {
+            var search = SearchText.Trim();
+
+            foreach (var group in Groups)
+            {
+                foreach (var card in group.Cards)
+                    card.IsHighlighted = search.Length > 0 && card.Pal.Name.Value.Contains(search, StringComparison.CurrentCultureIgnoreCase);
+
+                group.HasHighlightedCards = group.Cards.Any(c => c.IsHighlighted);
+            }
+
+            HasHighlightedCards = Groups.Any(g => g.HasHighlightedCards);
         }
 
         private static List<BreedableGroupViewModel> BuildGroups(
@@ -98,6 +164,7 @@ namespace PalCalc.UI.ViewModel.Solver
             BreedableCardViewModel ToCard(BreedableEntry entry) =>
                 new(
                     PalViewModel.Make(entry.Pal),
+                    IVSetViewModel.FromIVs(entry.IVs),
                     entry.Source == null ? null : new(save, gameSettings, entry.Source.Parent1.Pal, entry.Parent1Instance),
                     entry.Source == null ? null : new(save, gameSettings, entry.Source.Parent2.Pal, entry.Parent2Instance)
                 );
@@ -108,7 +175,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 .ToList();
 
             var notReachableCards = result.NotReachable
-                .Select(p => new BreedableCardViewModel(PalViewModel.Make(p), null, null))
+                .Select(p => new BreedableCardViewModel(PalViewModel.Make(p), null, null, null))
                 .ToList();
 
             // (tiers which only added a gender have no entries, so they don't get a group)

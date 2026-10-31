@@ -1,4 +1,5 @@
 using PalCalc.Model;
+using PalCalc.Solver.PalReference.Properties;
 using System.Collections.ObjectModel;
 
 namespace PalCalc.Solver;
@@ -11,13 +12,17 @@ namespace PalCalc.Solver;
 /// `Parent1Instance` and `Parent2Instance` are the owned pals to use for that pair,
 /// preferring the required gender and then the highest IVs. Either can be `null` if
 /// the parent needs to be bred instead.
+///
+/// `IVs` are the range of IVs available through `Source`, or the IVs of the best
+/// owned pal for tier 0.
 /// </summary>
 public sealed record BreedableEntry(
     Pal Pal,
     int Tier,
     BreedingResult Source,
     PalInstance Parent1Instance,
-    PalInstance Parent2Instance
+    PalInstance Parent2Instance,
+    IV_Set IVs
 );
 
 /// <summary>
