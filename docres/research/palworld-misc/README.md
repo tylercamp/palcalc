@@ -4,10 +4,9 @@ Some game calculations matter to PalCalc even though they aren't inheritance
 rules. This folder covers topics such as converting world positions into map
 coordinates and estimating how long parents take to produce an egg.
 
-We review these when reported behavior, code or data changes, or an explicit
-request calls for it. These are supporting mechanics in the
-[research checklist](../palworld-breeding/README.md#supporting-mechanics), not
-required checks on every standard game update.
+We review these supporting topics in response to reported problems, code or data
+changes, or specific requests. Their status is recorded in the
+[research checklist](../palworld-breeding/README.md#supporting-mechanics).
 
 ## World-map coordinates
 

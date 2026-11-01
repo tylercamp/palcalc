@@ -24,6 +24,9 @@ from verification coverage. A finished investigation can have documented gaps;
 it mustn't imply full version verification. Map conversion and breeding time are
 supporting topics, not required update checks.
 
+Agents must also read the assessment workflow before updating the research
+checklist or verification coverage.
+
 Record game version as the primary identity, with build IDs/hashes as supporting
 metadata. Publish conclusions and evidence by game version and mechanic, update
 the checklist and changelog, and distinguish game changes from corrections to our

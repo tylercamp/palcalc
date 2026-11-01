@@ -1,17 +1,13 @@
 # Estimating Breeding Time for Inheriting Passives
 
-Our ordinary passive model started with
-[the work by /u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/).
-The [1.0.5.102999 assessment](../docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-passives)
-verifies ordinary, item-override and mutation passive rules for its declared inputs
-and saved-output boundaries. The [research checklist](../docres/research/palworld-breeding/README.md#current-verification-status)
-tracks version coverage. That mechanics assessment does not audit the current solver code.
+This page explains how PalCalc calculates passive-inheritance probabilities for
+one child and converts them into estimated breeding time. The examples use the
+repository's default probability weights.
 
-The examples below explain how PalCalc estimates ordinary passive inheritance,
-using the probability weights stored in this repository. These are worked
-calculations, not new measurements from breeding in the game. See the
-[mechanics README](../PALWORLD-BREEDING-MECHANICS.md) for the supporting sources,
-known limits of random passive filling, and how IV and attack inheritance fit in.
+Our ordinary model is based on
+[the work by /u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/).
+See [Palworld Breeding Mechanics](../PALWORLD-BREEDING-MECHANICS.md) for the game
+rules, version coverage and PalCalc's approximations.
 
 ## Probability References
 
@@ -83,11 +79,11 @@ The probability of choosing 3 passives from the list of 4, where those three wil
 
 Finally, we have a 1.5% chance for case [1], and a 4% chance for case [2]. Since _either_ of these would give us the desired outcome (the two desired passives and one undesired), we just add them for **a total 5.5% chance.**
 
-_Note: A random addition could give us one of the desired passives, but PalCalc
-ignores that possibility. We also assume random filling succeeds. The game can
-fail to add a passive because of a bug in its selection weights or because no
-eligible passives remain. We don't yet know how often those failures happen
-with actual game data, so we can't say how much they affect the estimates._
+_These examples count desired passives inherited from the parents and assume
+random additions succeed. Random additions can also supply desired passives, or
+fail because of the game's selection bug or exhausted candidates. Their overall
+effect on gameplay probabilities hasn't been measured. See
+[PalCalc's limitations](../LIMITATIONS.md#random-passive-filling)._
 
 ### Example - Estimates for Children, Compensating for "At Best"
 
@@ -108,77 +104,21 @@ In that case we can combine the probabilities for [1] and [2], giving us a 7.5% 
 
 ## Special Cake override
 
-Special Cakes skip both ordinary count rolls. Instead, the child inherits up to
-four distinct passives from the parents, and the game tries to fill any remaining
-slots with random passives. This means we don't multiply by
-`PassiveRandomAddedProbability` when calculating the cake probability.
+Special Cakes replace both ordinary passive-count rolls. The game selects up to
+four distinct parental passives, then attempts random additions for any remaining
+slots. PalCalc assumes these additions succeed, so the estimate always has four
+passives. The calculation skips the ordinary count-roll probabilities.
 
-More generally, a positive `PassiveInheritCountOverride=N` replaces both count
-rolls with the following process:
+For example, suppose the parents have five distinct passives between them,
+including two desired passives. The cake selects four. The chance of including
+both desired passives is `Choose(3,2) / Choose(5,4) = 3/5`: choose the other two
+inherited passives from the three unwanted ones, out of all ways to select four
+from five.
 
-```text
-target = min(N, 4)
-pool = distinct(parent A passives + parent B passives)
-select up to target parental passives without replacement
-attempt random filling for target - selected_count
-stop; do not perform the ordinary random-add count roll
-```
+When the parents have fewer than four distinct passives, PalCalc still models
+four slots, including random fillers. Those unwanted fillers affect inheritance
+in later generations. Actual filling can fall short; see
+[random passive filling](../LIMITATIONS.md#random-passive-filling).
 
-See the [research checklist](../docres/research/palworld-breeding/README.md#current-verification-status)
-for verification status and links to game evidence when published. PalCalc's
-Special Cake calculation uses a target of four.
-
-PalCalc assumes those filling attempts succeed, so it models a four-passive
-child. The game can sometimes finish with fewer; see the
-[mechanics README](../PALWORLD-BREEDING-MECHANICS.md) for the known limitations.
-
-For the earlier parents `[Lucky, Brave]` and `[Runner, Brave, Workaholic]`, the
-combined list has four unique passives. The cake selects all four, so Lucky and
-Runner are guaranteed to be included. If the parents only had Lucky and Runner,
-we'd instead model a child with those two passives and two random fillers. Those
-extra slots stay on the candidate, since they affect inheritance in later
-generations.
-
-For a larger pool, suppose the parents have five unique passives between them,
-including two desired passives. The cake selects four parental passives. The
-chance of including both desired passives is `Choose(3,2) / Choose(5,4) = 3/5`:
-choose the other two inherited passives from the three irrelevant ones, out of
-all ways to select four from five.
-
-Because PalCalc assumes successful filling, the override probability is zero for
-requested final counts below four, even when the parents have fewer passives or
-none at all. This is a property of the estimate, not proof that every real cake
-child finishes with four passives.
-
-`MaxBredIrrelevantPassives` limits the ordinary passive options we explore during
-search. It doesn't exclude the extra slots required by cakes, and it isn't a
-restriction on the final result's passive count. Owned inputs still have their
-separate limit on irrelevant passives.
-
-The override is implemented by
-`Probabilities.Passives.ProbabilityInheritedTargetPassivesForOverride`.
-Ordinary and cake candidates each carry a `BreedingOutcome` with their breeding
-method and passive probability. During search, we use that probability and the
-IV odds to estimate effort. Ordinary attack-inheritance odds are saved for later.
-
-At finalization, we choose the equipped attacks within the candidate's breeding
-method and recalculate attempts, effort, and cake use, including any adjustment
-for the required gender. We calculate and cache the costs and exact parent
-choices before building the result trees, so we don't have to construct trees
-we'll immediately discard.
-
-A slower path that saves cakes can still be useful alongside a faster path that
-uses more. We keep those tradeoffs, comparing costs only when the paths have
-matching output, inputs, and other resource properties. The configured effort
-and cake limits still apply. See the [solver walkthrough](./README.md#8-apply-surgery-and-return-the-results)
-for the full comparison rules.
-
-We only consider cakes when the parents can equip and pass on multiple requested
-attacks that the child doesn't already learn at level one. We could also use
-cakes just to improve passive inheritance, but that would add more options to
-the search. We skip those for performance, accepting that we may miss some valid
-or better paths.
-
-During search, the compact attack profiles still compare available attacks and
-estimated cake costs. Neither breeding method nor cake count is used as an
-effective property for grouping candidates.
+See the [solver walkthrough](./README.md) for how cake outcomes are searched and
+compared.

@@ -6,17 +6,15 @@ of the rules, start with [Palworld Breeding Mechanics](../../../PALWORLD-BREEDIN
 
 We use [Reverse Engineer Anything (REA)](https://github.com/morluto/rea) to recover
 the game's logic. [GenDB](../../../PalCalc.GenDB/README.md) supplies game-data
-values such as species ranks, recipes, and skill weights. We need both: finding
-the expected values doesn't prove how the game uses them, and recovering the
-selection code doesn't establish the values in the current assets.
+values such as species ranks, recipes, and skill weights. Both are needed for a
+sufficient view of in-game behavior.
 
 ## Current verification status
 
 **Last fully verified game version: 1.0.5.102999, 2026-10-29.**
 
-**Latest assessment: eight Verified. Investigation state: Finished.** This is the
-first verified baseline for the shipped Windows Steam configuration, not a
-comparison with an earlier verified release or a solver update.
+**Latest assessment: eight Verified. Investigation state: Finished.** This
+establishes the first verified baseline for the shipped Windows Steam configuration.
 
 The [assessment](assessments/1.0.5.102999/assessment.md) gives current rules,
 conditions and the PalCalc model comparison; [evidence](assessments/1.0.5.102999/evidence.md)
@@ -42,19 +40,17 @@ rows without establishing full version verification.
 | Wild-Pal attacks | Which attacks are available overall for the specified spawn/level inputs, and how can capture change that set? | 1.0.5.102999 / 2026-10-29 | Verified | [Conclusions](assessments/1.0.5.102999/assessment.md#wild-pal-attacks) / [Evidence](assessments/1.0.5.102999/evidence.md#wild-pal-attacks) |
 | Wild-Pal gender | How do the resolved species and spawn overrides determine saved gender, and does capture change it? | 1.0.5.102999 / 2026-10-24 | Verified | [Conclusions](assessments/1.0.5.102999/assessment.md#wild-pal-gender) / [Evidence](assessments/1.0.5.102999/evidence.md#wild-pal-gender) |
 
-A standard game-update review accounts for **all eight mechanics**. Turn these
-questions into explicit inputs, modes, and output boundaries using the
+A standard game-update review accounts for **all of the above**. These questions
+are used to identify explicit inputs, modes and output boundaries under the
 [workflow's scope rules](ASSESSMENT-WORKFLOW.md#define-the-questions-and-boundaries).
-Keep alternate-mode exclusions visible; PalCalc omitting a behavior isn't proof
-that it doesn't matter.
+Reports also record excluded modes and their effect on coverage.
 
 The workflow defines [coverage grades and investigation state](ASSESSMENT-WORKFLOW.md#investigation-state-and-verification-coverage).
 A finished investigation can have partial coverage. Within a partial mechanic,
 the report explains which calculations, activation conditions, and probability
-claims are established. Finishing doesn't upgrade those claims. The
-last-checked version/date advances only for the scope supported by evidence;
-record a later unsuccessful check separately rather than implying the older
-finding applies to the new version.
+claims are established. The last-checked version/date advances only for the scope
+supported by evidence; record a later unsuccessful check separately rather than
+implying the older finding applies to the new version.
 
 [The changelog](CHANGELOG.md) records changes to checked versions, observed game
 mechanics and assessment scope. Game version is the primary
