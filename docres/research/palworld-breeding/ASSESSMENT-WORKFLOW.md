@@ -182,6 +182,11 @@ assumed. Each material claim needs its target, procedure/address or semantic
 anchor, relevant branch, and enough surrounding context to check the reasoning.
 Raw decompiler output alone isn't an effective model.
 
+Session-local REA Evidence IDs (`ev_*`) may be retained as supplementary provenance,
+but must not substitute for supporting material available in the published report
+or committed references. Cite the published section or excerpt supporting the
+claim, and identify private Evidence IDs as optional provenance.
+
 Record the code and data dependencies needed to check this mechanic next time.
 Include the shared helpers, caller branches, relevant defaults/overrides, input
 tables, and later writes that could change the scoped conclusion. Apply the
@@ -297,8 +302,9 @@ ones. Before a substantial report cleanup, save a local copy under
 notes there and promote the consolidated argument into the published files.
 Keep citation anchors where useful or update their incoming links; preserving
 every historical heading or evidence ID isn't a publication requirement. Retain
-the IDs and excerpts supporting published claims. When correcting an accepted
-conclusion, identify that accepted baseline and explain the supported difference.
+the decisive excerpts and useful provenance IDs supporting published claims.
+When correcting an accepted conclusion, identify that accepted baseline and explain
+the supported difference.
 Published reasoning and citations must stand without either ignored folder.
 
 Update the hub's mechanic rows. Add a short [changelog](CHANGELOG.md) entry when

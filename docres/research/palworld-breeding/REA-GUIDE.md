@@ -499,6 +499,8 @@ Report a background job's identity, log, and completion file. Use hidden Windows
 ## Verification and handoff
 
 Retain the decisive excerpts or responses supporting each material conclusion, including the target identity, procedure/address, relevant branch, and interpretation limits. Preserve enough surrounding context to check the claim. Verify that report citations resolve; a full export or query ledger is not required for publication.
+Treat session-local Evidence IDs as optional provenance under the workflow's
+[publication rules](ASSESSMENT-WORKFLOW.md#what-belongs-in-published-evidence).
 
 Check empty/short/full pools, duplicates, missing rows, invalid counts, selector boundaries, item/mutation branches, and final overwrites. Inspect apparently symmetric branches independently and follow initialization through saved outputs.
 
