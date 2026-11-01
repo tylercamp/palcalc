@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.PalReference
 {
+    // Sync: when output/resource properties or reference types change, review
+    // FinalizationComparison.KeyOf and InputsOf in Processing/FinalizationAlternatives.cs.
+    // They decide which plans can safely be compared on effort and cake use alone.
     public interface IPalReference
     {
         Pal Pal { get; }
