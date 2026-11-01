@@ -1,18 +1,17 @@
 # PalCalc limitations
 
 PalCalc skips some breeding options to keep searches manageable. That means a
-valid plan—or a faster one—can be missed. Its estimates also simplify some game
+valid plan — or a faster one — can be missed. Its estimates also simplify some game
 rules. The sections below explain when the results may differ from the game.
 
 For game rules, see [Palworld Breeding Mechanics](PALWORLD-BREEDING-MECHANICS.md).
 The [solver overview](PalCalc.Solver/README.md) explains how PalCalc uses them.
 The [research checklist](docres/research/palworld-breeding/README.md#current-verification-status)
-records which mechanics and game versions have been checked; confirming a game
-rule doesn't automatically add it to PalCalc's estimates.
+records which mechanics and game versions have been reviewed.
 
 ## What PalCalc models
 
-A solve looks for a target species with the requested passives, HP/Attack/Defense
+The solver looks for a target species with the requested passives, HP/Attack/Defense
 IV thresholds, attacks, and gender, using the allowed owned and wild Pals. It
 estimates inheritance attempts and effort, with supported items, training, and
 surgery options included according to the settings.
@@ -22,19 +21,46 @@ cover every way to obtain the requested Pal.
 
 ## Deliberate approximations in estimates
 
-### Random passive filling
+### Random passive selection bug
 
-The game can add fewer random passives than PalCalc predicts. An apparent game
-bug can bias which passive is chosen or use an attempt without adding one.
-Filling also stops when eligible candidates run out. PalCalc assumes these
-additions succeed. The overall frequency of failed additions in gameplay hasn't
-been measured.
+When Palworld adds random passives to pals, it includes a check for whether the rolled
+passive is "valid".
 
-This matters especially for Special Cakes. PalCalc models a four-passive result,
-but when the parents have fewer than four distinct passives, the game relies on
-random filling to reach four. That filling can fall short. See
-[passive selection and its limits](PALWORLD-BREEDING-MECHANICS.md#passive-skills)
+If the rolled passive is invalid, that passive is skipped and may leave the pal with
+fewer final passives than expected. Under normal operation there is _no known way_ for
+this to occur.
+
+Palworld uses two lists to pick the available random passives - the full, reference-list
+of passives, and a temporary copy with certain passives removed (e.g. already-selected passives,
+uninheritable passives like `Lucky`.)
+
+This code is all reasonable.
+
+However, the final selection has unexpected logic - the game appears
+to mix these lists in a way which can cause an invalid passive to be selected. The intent of each
+list is obvious to an experienced reader, and _we consider this mismatch a bug in Palworld's
+inheritance code._ (Namely, Palworld rolls for an index from a full list, but uses that index in
+the filtered list. **An array-index mixup is a very common class of bug in programs using arrays.**)
+
+Given these two pieces:
+
+1. A check which skips invalid passives, which never happens except for...
+2. ... an apparent bug which can produce invalid passives
+
+The game can add fewer random passives than PalCalc predicts. The overall frequency of
+failed additions in gameplay hasn't been measured, but we estimate it to range from
+approx. `1 in 80` to `1 in 100` chance per random passive added. (It becomes less likely
+as more passives are added, and is influenced by the number of available parent passives.)
+
+This affects random passives added normally and added forcibly due to Special Cakes.
+See [passive selection and its limits](PALWORLD-BREEDING-MECHANICS.md#passive-skills)
 for the game rules and supporting evidence.
+
+In practice, since this has the effect of reducing random passives, this means passive
+inheritance results can be slightly "better" than PalCalc's predictions.
+
+**Since the effect is uncommon, and apparently unintended, PalCalc specifically
+_does not_ model this behavior in its own probabilities.**
 
 ### Desired traits supplied by fresh random values
 
@@ -68,12 +94,12 @@ and [effort estimation](PalCalc.Solver/README.md#estimating-the-effort-of-a-path
 
 ## Search tradeoffs
 
-### Cakes are considered for attack inheritance
+### Cakes are only considered for attack inheritance
 
-PalCalc can miss a useful Special Cake plan when the benefit is only passive
-inheritance. To keep searches faster, it considers Special Cakes only when needed
+To speed up solving, PalCalc only considers Special Cakes when they are needed
 to inherit multiple requested attacks that the child doesn't already learn at
-level one.
+level one. PalCalc can miss a useful Special Cake plan when the benefit is only passive
+inheritance.
 
 The setting that limits unwanted passives also reduces the options explored.
 Special Cakes can add extra passives beyond that limit, and those passives still
@@ -120,10 +146,6 @@ They don't establish a bonus on every capture or egg pickup, or an overall
 gameplay rate. Having an empty passive slot alone doesn't guarantee a capture
 bonus. Changing companion ranks or the set of active bonus sources also falls
 outside the unchanged setups used for those findings.
-
-A Pal using an attack in combat doesn't by itself mean that the attack will be
-available after capture. See the [wild-attack evidence](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#kingwhale-battle-actions-and-captured-availability)
-for that distinction; it doesn't rule out other ways to obtain an attack.
 
 PalCalc's species database hasn't been shown to match every live pairing. Ties,
 special recipes and variant parents can affect the result. See the
