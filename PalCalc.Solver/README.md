@@ -17,8 +17,8 @@ estimated effort and keeps a small selection of useful alternatives.
 
 A detailed explanation of Palworld breeding mechanics and calculations are
 described [here](../PALWORLD-BREEDING-MECHANICS.md).
-The [limitations page](../LIMITATIONS.md) collects the modeling omissions and
-search tradeoffs described throughout this overview.
+These are used as a reference, but for performance and simplicity, PalCalc intentionally ignores or simplifies certain mechanics. The [limitations page](../LIMITATIONS.md) describes some of these
+search tradeoffs, which are also occasionally mentioned in this overview.
 
 ## Concepts at a Glance
 
@@ -294,24 +294,21 @@ group or reduce those alternatives so the player isn't shown hundreds of
 similar trees. `PalResultGrouping` and `PalResultProperty` are used for that
 presentation step, but aren't used in the breeding search itself.
 
-Each bred candidate represents either ordinary breeding or breeding with a
+A bred candidate can represent either ordinary breeding or breeding with a
 Special Cake, with the passive probability for that method.
 During search, we use that probability and the IV odds to estimate effort.
 Attack-inheritance odds are included when finalization chooses the equipped attacks.
 
-`MaxBredIrrelevantPassives` limits the ordinary passive options we explore.
-Special Cakes need separate handling: they produce four passive slots in our
-model, even when that exceeds the configured limit.
+This is necessary since `MaxBredIrrelevantPassives` limits the ordinary passive
+options we explore. Special Cakes need separate handling: they _guarantee_ four passive
+skills in Palworld, which can forcibly exceed PalCalc's limit.
 
+(TODO - Tweak once we add the setting from the other TODO in `CandidateExpander`.)
 We only introduce cake candidates when the parents can equip and pass on multiple
 requested attacks that the child doesn't already learn at level one.
 We could also search for ways to use cakes just to improve passive inheritance,
 but that would add more options to the search. We skip those for performance,
 accepting that we may miss some valid or better paths.
-
-Neither breeding method nor cake count is used to group candidates during the
-search. Cake totals are used later when comparing completed results and
-simplifying them for display.
 
 The solver ends by resolving the real attack skills needed on parent
 and child Pals. The earlier search process just tracks the presence and
@@ -460,29 +457,18 @@ within that method.
 
 A faster path may need more Special Cakes than a slower one, so we keep both
 when neither is clearly better. We can drop an option if another takes no more
-effort and uses no more cakes, with an improvement in at least one. To make that
-comparison, the paths must match on final passives, gender, IV ranges, concrete
-input choices, breeding-step count, gold cost, wild-Pal count, and training
-requirements.
-
-Sometimes we can skip calculating the attack options altogether. If another
-comparable result is already better than even the candidate's lower effort and
-cake bounds, there is no need to evaluate it further.
-
-Different candidate trees with equal effort and cake costs can survive this
-comparison. Within one candidate and requested attack combination, however, we
-keep one consistently chosen attack plan when both costs match. Later result
-simplification can reduce similar paths further, within groups that have the
-same effort, cake total, and output properties.
+effort and uses no more cakes, with an improvement in at least one.
 
 A slow path that saves Special Cakes can still be useful, so the UI compares
-paths with different cake totals separately. Both UI simplification passes
-preserve those distinctions. The cutoff at twice the fastest nonzero effort
-applies within each cake tier. The UI uses `PalResultGrouping` and
+paths with different cake totals separately. The UI uses `PalResultGrouping` and
 `PalResultProperty` for this further simplification; these final-list groups
 do not change how candidates are grouped during the search.
 
 ## Mechanics used by the solver
+
+TODO:
+   Is it strictly necessary to have this section in the solver README? It's already fairly large. Maybe better for a different file?
+   The info on the most recently-reviewed game is definitely appropriate, but I'm not sure about the rest. How does this differ from the content in `PALWORLD-BREEDING-MECHANICS.md`?
 
 The [player-facing mechanics reference](../PALWORLD-BREEDING-MECHANICS.md) explains
 the game rules. This section records the implementation and calculation details

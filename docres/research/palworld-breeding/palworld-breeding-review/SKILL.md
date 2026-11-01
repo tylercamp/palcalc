@@ -19,7 +19,7 @@ Read [review-notes.md](references/review-notes.md) before assessing findings. It
 
 Resolve the repository root and the supplied assessment or REA run. Start with its report and cited evidence; confirm the build/executable identity and scope. Read detailed models or input contracts only where needed to settle a claim. Older runs may keep these under `_REA-ANALYSIS/runs/<run>/`; do not assume the newest directory is the intended one. Manifests, startup logs, and full query histories are not prerequisites for review.
 
-Temporary topic investigations and continuation notes now belong under
+Temporary topic investigations and continuation notes belong under
 `_REA-ANALYSIS/txt/<investigation-id>/`; generated artifacts stay under `runs/`.
 When reviewing supplied working notes, distinguish their tentative reasoning from
 established observations. Published conclusions must stand without either folder.
@@ -30,7 +30,7 @@ its source first, then supporting platform/build/hash and asset identities. A
 targeted comparison doesn't establish complete version coverage. Review notes
 and older maintained summaries are leads, not substitutes for missing evidence.
 
-Use `PALWORLD-BREEDING-MECHANICS.md` as the default documented algorithm, or the document the user supplies. The README describes PalCalc's assumed process; a discrepancy with it does not prove the implementation currently has the same discrepancy. Inspect implementation only when requested or needed to resolve that distinction, using the repository's CodeGraph instructions.
+Use `PALWORLD-BREEDING-MECHANICS.md` as the default documented algorithm, or the document the user supplies. The README describes PalCalc's assumed process; a discrepancy with it does not prove the implementation currently has the same discrepancy. Inspect implementation only when requested or needed to resolve that distinction, using the repository's CodeGraph instructions if available.
 
 Work from completed observations; the wider investigation needn't be finished.
 Do not open a binary, launch/import Ghidra, install tooling, or rerun discovery.
