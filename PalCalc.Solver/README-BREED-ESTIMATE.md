@@ -76,7 +76,7 @@ The probability of choosing 3 passives from the list of 4, where those three wil
 
 Finally, we have a 1.5% chance for case [1], and a 4% chance for case [2]. Since _either_ of these would give us the desired outcome (the two desired passives and one undesired), we just add them for **a total 5.5% chance.**
 
-_These examples count desired passives inherited from the parents and assume random additions succeed. Random additions can also supply desired passives, or fail because of the game's selection bug or exhausted candidates. PalCalc treats these effects as negligible and are ignored. See [PalCalc's limitations](../LIMITATIONS.md#random-passive-filling)._
+_These examples count desired passives inherited from the parents and assume random additions succeed. Random additions can also supply desired passives, or fail because of the game's selection bug or exhausted candidates. PalCalc treats these effects as negligible and are ignored. See [PalCalc's limitations](../LIMITATIONS.md#random-passive-selection-bug)._
 
 ### Example - Estimates for Children, Compensating for "At Best"
 
@@ -103,6 +103,6 @@ Special Cakes replace both ordinary passive-count rolls. The game selects up to 
 
 For example, suppose the parents have five distinct passives between them, including two desired passives. The cake selects four. The chance of including both desired passives is `Choose(3,2) / Choose(5,4) = 3/5`: choose the other two inherited passives from the three unwanted ones, out of all ways to select four from five.
 
-When the parents have fewer than four distinct passives, PalCalc still models four slots, including random fillers. Those unwanted fillers affect inheritance in later generations. Actual filling can fall short due to an apparent in-game bug; see [random passive filling](../LIMITATIONS.md#random-passive-filling).
+When the parents have fewer than four distinct passives, PalCalc still models four slots, including random fillers. Those unwanted fillers affect inheritance in later generations. Actual filling can fall short due to an apparent in-game bug; see [random passive filling](../LIMITATIONS.md#random-passive-selection-bug).
 
 See the [solver walkthrough](./README.md) for how cake outcomes are searched and compared.

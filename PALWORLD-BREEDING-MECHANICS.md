@@ -118,7 +118,7 @@ from its parents (steps 1-3), then the game may add random passives (steps 4-5).
 
 The game can sometimes finish with fewer passives than requested because of a
 selection bug or because no eligible passives remain. We don't yet know how often
-that happens with actual game data. The [limitations page](LIMITATIONS.md#random-passive-filling)
+that happens with actual game data. The [limitations page](LIMITATIONS.md#random-passive-selection-bug)
 explains how this affects PalCalc's estimates.
 
 The [pool-construction check](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#passive-ordering-established-construction-and-remaining-input)

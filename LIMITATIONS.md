@@ -23,44 +23,28 @@ cover every way to obtain the requested Pal.
 
 ### Random passive selection bug
 
-When Palworld adds random passives to pals, it includes a check for whether the rolled
-passive is "valid".
+When Palworld adds random passives during breeding, it uses a pool of eligible
+passives and their selection weights. It removes already-selected passives from
+a temporary copy of that pool.
 
-If the rolled passive is invalid, that passive is skipped and may leave the pal with
-fewer final passives than expected. Under normal operation there is _no known way_ for
-this to occur.
+After removing candidates, the game mixes the remaining weights with weights
+from the original list. This can bias selection or consume an attempt without
+adding a passive. We consider this mismatch an apparent bug in Palworld's
+inheritance code.
 
-Palworld uses two lists to pick the available random passives - the full, reference-list
-of passives, and a temporary copy with certain passives removed (e.g. already-selected passives,
-uninheritable passives like `Lucky`.)
+The game can therefore add fewer random passives than PalCalc predicts. The
+overall frequency of failed additions in gameplay and their impact on estimates
+haven't been measured.
 
-This code is all reasonable.
-
-However, the final selection has unexpected logic - the game appears
-to mix these lists in a way which can cause an invalid passive to be selected. The intent of each
-list is obvious to an experienced reader, and _we consider this mismatch a bug in Palworld's
-inheritance code._ (Namely, Palworld rolls for an index from a full list, but uses that index in
-the filtered list. **An array-index mixup is a very common class of bug in programs using arrays.**)
-
-Given these two pieces:
-
-1. A check which skips invalid passives, which never happens except for...
-2. ... an apparent bug which can produce invalid passives
-
-The game can add fewer random passives than PalCalc predicts. The overall frequency of
-failed additions in gameplay hasn't been measured, but we estimate it to range from
-approx. `1 in 80` to `1 in 100` chance per random passive added. (It becomes less likely
-as more passives are added, and is influenced by the number of available parent passives.)
-
-This affects random passives added normally and added forcibly due to Special Cakes.
+This affects ordinary random additions and Special Cakes that rely on random
+filling because the parents have fewer than four distinct passives.
 See [passive selection and its limits](PALWORLD-BREEDING-MECHANICS.md#passive-skills)
 for the game rules and supporting evidence.
 
-In practice, since this has the effect of reducing random passives, this means passive
-inheritance results can be slightly "better" than PalCalc's predictions.
+Fewer unwanted passives can improve inheritance odds in later generations.
 
-**Since the effect is uncommon, and apparently unintended, PalCalc specifically
-_does not_ model this behavior in its own probabilities.**
+**PalCalc assumes random filling succeeds and does not model this behavior in
+its probabilities.**
 
 ### Desired traits supplied by fresh random values
 
