@@ -45,10 +45,7 @@ namespace PalCalc.UI.Persistence.Dto
         public int IV_Shot { get; init; }
         public int IV_Defense { get; init; }
         public bool IsOnExpedition { get; init; }
-
-        // (optional, data saved before this was added has no rank)
-        [JsonProperty(Required = Required.Default)]
-        public int Rank { get; init; } = 1;
+        public int Rank { get; init; }
 
         [JsonProperty(Required = Required.AllowNull)]
         public string OwnerPlayerId { get; init; }

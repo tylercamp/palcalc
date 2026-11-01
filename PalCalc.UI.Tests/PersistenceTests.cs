@@ -10,6 +10,7 @@ using PalCalc.UI.Persistence.Dto;
 using PalCalc.UI.Persistence.Serialization;
 using PalCalc.UI.ViewModel;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.PalDerived;
 using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
@@ -565,24 +566,79 @@ namespace PalCalc.UI.Tests
     }
 
     [TestMethod]
-    public void PalInstanceSnapshotWithoutRankLoadsAsRankOne()
+    public void CustomPalsDefaultToRankOne()
     {
         var db = PalDB.LoadEmbedded();
-        var json = JObject.FromObject(CustomizationsJsonSerializer.ToDto(MakeInstanceWithRank(db, 4)));
-        json.Remove("Rank");
+        var instance = MakeInstanceWithRank(db, 4);
+        instance.Location.Type = LocationType.Custom;
 
-        var restored = CustomizationsJsonSerializer.FromDto(
-            JsonConvert.DeserializeObject<PalInstanceSnapshotDto>(json.ToString()),
-            db);
-
-        Assert.AreEqual(1, restored.Rank);
+        Assert.AreEqual(1, new CustomPalInstanceViewModel(instance).ModelObject.Rank);
     }
 
-    private static PalInstance MakeInstanceWithRank(PalDB db, int rank) => new()
+    [TestMethod]
+    public void VersionSixMigratesRankOnCustomPalsAndNestedResults()
+    {
+        WithTemporaryDirectory(path =>
+        {
+            File.WriteAllText(StorageFormat.ManifestPath(path), JsonConvert.SerializeObject(new StorageManifest { Version = 6 }));
+            var db = PalDB.LoadEmbedded();
+            var pal = "Beakon".ToPal(db);
+            var ivs = new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random);
+            OwnedPalReference Owned(PalGender gender, int rank) => new(MakeInstanceWithRank(db, rank, gender), [], ivs, AttackProfile.Inactive);
+
+            var saveDirectory = Directory.CreateDirectory(Path.Combine(path, "save"));
+            var customizations = JObject.FromObject(CustomizationsJsonSerializer.ToDto(new SaveCustomizations
+            {
+                CustomContainers = [new CustomContainer { Label = "favorites", Contents = [MakeInstanceWithRank(db, 1)] }],
+            }));
+            ((JObject)customizations.SelectToken("$.CustomContainers[0].Contents[0]")!).Remove("Rank");
+            var customizationsPath = Path.Combine(saveDirectory.FullName, "custom-containers.json");
+            File.WriteAllText(customizationsPath, customizations.ToString());
+
+            var composite = new CompositeOwnedPalReference(Owned(PalGender.MALE, 1), Owned(PalGender.FEMALE, 1));
+            var root = new BredPalReference(new GameSettings(), pal, PalGender.WILDCARD, composite, Owned(PalGender.MALE, 4),
+                null, [], 1, 1, ivs, 1, AttackProfile.Inactive, null);
+            var reference = JObject.FromObject(ResultJsonSerializer.ToDto(root));
+            foreach (var instance in reference.SelectTokens("$..Instance").OfType<JObject>().Where(i => i["Rank"]!.ToObject<int>() != 4).ToList())
+                instance.Remove("Rank");
+            var results = JObject.FromObject(new BreedingResultListDto
+            {
+                GameSettings = ResultJsonSerializer.ToDto(new GameSettings()),
+                SolverSettings = ResultJsonSerializer.ToDto(new SerializableSolverSettings()),
+                Results = [new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(root) }],
+                SelectedResultIndex = 0
+            });
+            results["Results"]![0]!["PalReference"] = reference;
+            var targets = Directory.CreateDirectory(Path.Combine(saveDirectory.FullName, "targets"));
+            var targetPath = Path.Combine(targets.FullName, "target.json");
+            var targetDocument = JObject.FromObject(TargetJsonSerializer.ToDto(
+                new PalSpecifierViewModel("target", new PalSpecifier { Pal = pal }), db, new GameSettings()));
+            targetDocument["CurrentResults"] = results;
+            File.WriteAllText(targetPath, targetDocument.ToString());
+
+            StorageMigrationRunner.EnsureCurrent(path);
+
+            var restored = CustomizationsJsonSerializer.ToRuntime(
+                CustomizationsJsonSerializer.FromCurrentJson(File.ReadAllText(customizationsPath)), db);
+            Assert.AreEqual(1, restored.CustomContainers.Single().Contents.Single().Rank);
+
+            var migratedTarget = JObject.Parse(File.ReadAllText(targetPath));
+            Assert.IsNotNull(TargetJsonSerializer.FromCurrentTargetJson(migratedTarget.ToString()));
+            CollectionAssert.AreEquivalent(
+                new[] { 1, 1, 4 },
+                migratedTarget.SelectTokens("$..Instance").OfType<JObject>().Select(i => i["Rank"]!.ToObject<int>()).ToArray());
+
+            Assert.IsTrue(File.Exists(customizationsPath + ".bak"));
+            Assert.IsTrue(File.Exists(targetPath + ".bak"));
+            Assert.AreEqual(7, JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
+        });
+    }
+
+    private static PalInstance MakeInstanceWithRank(PalDB db, int rank, PalGender gender = PalGender.MALE) => new()
     {
         Pal = "Beakon".ToPal(db),
         Location = new PalLocation { Type = LocationType.Palbox, ContainerId = "box", Index = 1 },
-        Gender = PalGender.MALE,
+        Gender = gender,
         PassiveSkills = [],
         ActiveSkills = [],
         EquippedActiveSkills = [],
@@ -733,7 +789,7 @@ namespace PalCalc.UI.Tests
             Assert.IsNotNull(ResultJsonSerializer.FromDto(dto.Results[0].PalReference, db, new GameSettings(), new SerializableSolverSettings()));
             Assert.IsTrue(JToken.DeepEquals(preserved, JObject.Parse(File.ReadAllText(preservedPath))));
             Assert.IsTrue(File.Exists(targetPath + ".bak"));
-            Assert.AreEqual(6, JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
+            Assert.AreEqual(StorageFormat.CurrentVersion, JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
             var migratedText = File.ReadAllText(targetPath);
             StorageMigrationRunner.EnsureCurrent(path);
             Assert.AreEqual(migratedText, File.ReadAllText(targetPath));
