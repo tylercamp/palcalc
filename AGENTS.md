@@ -25,7 +25,9 @@ it mustn't imply full version verification. Map conversion and breeding time are
 supporting topics, not required update checks.
 
 Agents must also read the assessment workflow before updating the research
-checklist or verification coverage.
+checklist or verification coverage. Follow its
+[review close-out and PR-readiness guidance](docres/research/palworld-breeding/ASSESSMENT-WORKFLOW.md#review-close-out-and-pr-readiness)
+before final delivery or preparing research changes for merge.
 
 Record game version as the primary identity, with build IDs/hashes as supporting
 metadata. Publish conclusions and evidence by game version and mechanic, update

@@ -62,18 +62,22 @@ and provenance; an implementation formula is not proof of the game's formula.
 
 Use the [breeding research introduction](../palworld-breeding/README.md) and
 [assessment workflow](../palworld-breeding/ASSESSMENT-WORKFLOW.md). Keep the same
-separation between the full game model, the model used by PalCalc, and the
-comparison with the reviewed baseline. Use a section in the relevant game-version
-report under `../palworld-breeding/assessments/<game-version>/`, with conclusions
-in `assessment.md` and pseudocode/evidence in `evidence.md`. Link it from the
-supporting-mechanics table and record the review in the changelog. Keep raw
-generated artifacts under `_REA-ANALYSIS/runs/` and temporary topic documentation
-under `_REA-ANALYSIS/txt/`, following the shared workflow's publication boundary.
+separation between the full game model, any proposed PalCalc model, and current
+implementation. State whether model derivation or comparison is applicable,
+outside the request, or has no existing implementation to compare. Use a section
+in the relevant game-version report under
+`../palworld-breeding/assessments/<game-version>/`, with conclusions in
+`assessment.md` and the scoped model/evidence in `evidence.md`. Link it from the
+supporting-mechanics table and record relevant checked-version, game-mechanics or
+assessment-scope changes in the changelog. Keep raw generated artifacts under
+`_REA-ANALYSIS/runs/` and temporary topic documentation under `_REA-ANALYSIS/txt/`,
+following the shared workflow's publication boundary.
 
 State what PalCalc needs, choose the smallest useful scope, and follow the shared
 workflow. Start with a section here linking its current explanation and evidence;
 add a separate reference page only when that explanation becomes too large.
-A completed assessment records the game version/date, supporting build identity, full scoped pseudocode, data
-contracts, reduced model, comparison, checks, and unresolved limits. Do not mark
-uninvestigated topics as verified or launch new REA work as part of documentation
-maintenance alone.
+A completed assessment records the game version/date, supporting build identity,
+full scoped model, data contracts, applicable PalCalc model/comparison, checks and
+unresolved limits. Use pseudocode, a schema, decision table or state transitions
+to fit the question. Do not mark uninvestigated topics as verified or launch new
+REA work as part of documentation maintenance alone.

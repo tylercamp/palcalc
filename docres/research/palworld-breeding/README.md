@@ -77,13 +77,13 @@ older check dates don't prevent full verification of the required mechanics.
 | Verify a committed finding | [Review existing findings](#review-existing-findings) |
 | Investigate a new mechanic or fill a gap | [Run an assessment yourself](#run-an-assessment-yourself) |
 | Check a new game version | [Check a game update](#check-a-game-update) |
-| Read detailed game pseudocode | Follow a mechanic's evidence link in the status table; [report layout](#published-reports) |
+| Read detailed game models | Follow a mechanic's evidence link in the status table; [report layout](#published-reports) |
 | Maintain these docs | [Where information lives](#where-information-lives) and [update dependencies](#when-updating-these-docs) |
 | Perform an analysis as an agent | Read the [workflow](ASSESSMENT-WORKFLOW.md), then the relevant [REA guide](REA-GUIDE.md) sections; the [review skill](palworld-breeding-review/SKILL.md) applies after evidence recovery |
 
 ## Review existing findings
 
-Open the mechanic's conclusions in `assessment.md`, then its full game pseudocode
+Open the mechanic's conclusions in `assessment.md`, then its full scoped game model
 and selected observations in `evidence.md`. Both belong to one game-version report.
 
 1. Check the game version, platform, executable and asset identities, review date,
@@ -106,8 +106,9 @@ reviewing completed evidence doesn't itself authorize a new native session.
 ## Run an assessment yourself
 
 Use the [workflow](ASSESSMENT-WORKFLOW.md) and [report template](ASSESSMENT-TEMPLATE.md).
-You'll need the game files, a writable checkout, REA's native-analysis tools, and
-a compatible Ghidra/Java installation. See the [setup instructions](REA-GUIDE.md#ghidra-prerequisite-gate).
+You'll need the relevant game files and a writable checkout. Native analysis also
+requires REA's native-analysis tools and a compatible Ghidra/Java installation;
+see the [setup instructions](REA-GUIDE.md#ghidra-prerequisite-gate).
 Asset-extraction prerequisites are needed only for the relevant data checks.
 
 A targeted investigation can cover one mechanic. Add its conclusions and evidence
@@ -121,8 +122,9 @@ For example:
 Follow docres/research/palworld-breeding/ASSESSMENT-WORKFLOW.md to investigate
 child gender in the installed Palworld version. Record the game version and
 supporting executable/data identities. Update that mechanic in the version's
-assessment and evidence, marking the other checklist entries as not checked by
-this investigation. Compare with the current mechanics document and report gaps.
+assessment and evidence. Preserve other mechanics' established coverage and dates;
+in a new report, mark uninvestigated entries as not checked. State this
+investigation's scope separately. Compare with the mechanics reference and report gaps.
 Do not implement solver changes.
 ```
 
@@ -149,15 +151,16 @@ to the remaining gaps using retained evidence first.
   [current coverage table](#current-verification-status) and mechanic sections
   for scope and conditions.
 
-See the [changelog](CHANGELOG.md) for review history.
+See the [changelog](CHANGELOG.md) for changes to checked versions, game mechanics
+and assessment scope.
 
 ```text
 assessments/<game-version>/
   assessment.md   conclusions per mechanic, changes, PalCalc comparison, checks
-  evidence.md     full game pseudocode, inputs, selected native/data evidence
+  evidence.md     full scoped game model, inputs, selected native/data evidence
 ```
 
-Use stable headings for the eight mechanics in both files, as shown in the
+Use stable headings for the required mechanics in both files, as shown in the
 [template](ASSESSMENT-TEMPLATE.md). Dates belong in the report, rather than naming
 a separate report for each investigation. Platform/build variants of the same
 release must have distinct, explicitly scoped sections or folders; one platform's
@@ -207,3 +210,7 @@ findings don't verify another. See the workflow for provisional unknown versions
   material under the [publication boundary](ASSESSMENT-WORKFLOW.md#what-belongs-in-published-evidence).
   Keep supporting evidence for material uncertainties public, without copying the
   entire search history into `evidence.md`.
+
+The workflow defines [review close-out and PR readiness](ASSESSMENT-WORKFLOW.md#review-close-out-and-pr-readiness),
+including the best-practice expectation that research and related updates are
+complete for their agreed scope before merging to `main`.

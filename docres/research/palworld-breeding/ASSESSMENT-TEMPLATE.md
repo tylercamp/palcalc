@@ -2,9 +2,17 @@
 
 Copy the assessment outline into `assessments/<game-version>/assessment.md` and
 its companion outline into `evidence.md`. Replace placeholders and instructional
-text with findings. Keep all eight mechanic headings in both files, using the
-same names so links remain stable. A targeted review leaves other rows explicitly
-not checked, preserving any findings already published for that version.
+text with findings. Keep the required mechanic headings in both files, using the
+same names so links remain stable. In a new version report, topics outside the
+investigation start as not checked. In an existing report, preserve other topics'
+established coverage and dates unless new evidence affects them. State the current
+investigation's scope separately from accumulated version coverage.
+
+Use pseudocode, a schema, decision table or state transitions to express the full
+scoped model as appropriate. State whether a PalCalc model or implementation
+comparison applies, is outside the requested scope, or has no existing
+implementation to compare. Supporting topics use the same per-topic outlines;
+they need no invented inheritance estimate or proposed implementation.
 
 Use the [workflow](ASSESSMENT-WORKFLOW.md) for completion and publication rules.
 The outlines below organize the report; they aren't evidence that a review happened.
@@ -13,6 +21,8 @@ continuation. Consolidate answers and evidence rather than appending a history
 of research passes. Temporary topic notes, draft models, and continuation
 checkpoints belong under `_REA-ANALYSIS/txt/<investigation-id>/`; generated output
 and exports belong under `_REA-ANALYSIS/runs/<run-id>/`.
+Use the workflow's [close-out and PR-readiness guidance](ASSESSMENT-WORKFLOW.md#review-close-out-and-pr-readiness)
+before final delivery.
 
 ## assessment.md outline
 
@@ -21,10 +31,11 @@ and exports belong under `_REA-ANALYSIS/runs/<run-id>/`.
 
 - Game version and source: <release label, how it was established>
 - Platform/configuration: <platform, distribution, relevant options/mods>
-- Supporting identity: <build ID, executable SHA-256, relevant assets/mappings>
+- Supporting identity: <build ID, executable SHA-256, relevant assets/mappings; format and producer/reader identities when relevant>
+- Required coverage: <required topic/question set or checklist revision>
 - Review dates: <first published, last updated; dates also recorded per mechanic>
-- Previous accepted game-version report: <link and scope, or no accepted baseline>
-- Compared PalCalc baseline: <mechanics document/code revision or identified source snapshot>
+- Previous accepted game-version report: <link, scope and immutable revision, or no accepted baseline>
+- Compared PalCalc baseline: <proposed model, solver document/code revision or source snapshot; applicability>
 - Investigation state: <ongoing or finished; reason for stopping if finished>
 - Verification coverage: <full or partial for the declared questions/modes; gaps>
 
@@ -94,16 +105,18 @@ For each heading, give:
   which remain conditional; don't add a grade for every function or treat a
   finished investigation as fully verified.
 - **Game rule:** a definitive answer where evidence permits, with links to the
-  full pseudocode and decisive observations. Keep uncertainty explicit.
+  full scoped model and decisive observations. Keep uncertainty explicit.
 - **Version comparison:** changed game behavior, verified unchanged, newly
   verified behavior, correction to our understanding, or unresolved. If unchanged,
   link the prior conclusion and the dependency comparison proving it still applies.
-- **PalCalc model:** reduced pseudocode, retained dependencies, omissions and
+- **PalCalc model, when in scope:** reduced model, retained dependencies, omissions and
   approximations, and when simplifications preserve outcomes and probabilities.
   State the precision of probability claims, verified versus symbolic inputs,
-  and any assumptions about draws, pool order, or activation.
-- **Baseline comparison:** agreement or discrepancy with the named document/code
-  revision, consequences for paths or estimates, and unresolved data conditions.
+  and any assumptions about draws, pool order, or activation. Otherwise state its
+  applicability without inventing a model.
+- **Baseline comparison, when in scope:** name both subjects and the document/code
+  revisions being compared, their agreement or discrepancy, consequences for the
+  requested behavior, and unresolved data conditions.
 - **Remaining gaps:** which question each gap affects and its consequence for the
   answer. If further tracing is warranted, state the missing fact and stopping
   boundary under the workflow's dependency rule; otherwise explain why it remains
@@ -123,6 +136,7 @@ Supporting mechanics can be added after the required sections when investigated.
 ## Identity and methods
 
 <Game version and source; platform/build/hash; asset and decoding-input identities;
+relevant format/producer/reader identities and effective overrides;
 review dates; tools/methods; observation and numeric-input provenance; boundaries
 of static analysis. Include decisive evidence here, with references to prior
 accepted reports only where needed. Omit other pass/review and repository-state details.>
@@ -171,8 +185,9 @@ investigation history and speculative models stay in `txt/`.
 - **Inputs and scope:** names, types, units, provenance, covered modes and final
   observable boundary, matching the assessment's declared questions. State not
   checked where applicable.
-- **Full game pseudocode:** branches, ordering/filtering, overrides, failures,
-  caps, and final writes, including behavior omitted from PalCalc's model.
+- **Full scoped game model:** pseudocode, schema, decision table or state transitions
+  fitting the question. Preserve relevant branches, ordering/filtering, overrides,
+  failures, caps and final writes, including behavior omitted from PalCalc's model.
 - **Selected evidence:** decisive native/data excerpts, procedure/address or
   semantic anchors, and enough context to check each material conclusion.
 - **Dependencies and version comparison:** relevant callers, helpers, defaults,

@@ -30,7 +30,22 @@ its source first, then supporting platform/build/hash and asset identities. A
 targeted comparison doesn't establish complete version coverage. Review notes
 and older maintained summaries are leads, not substitutes for missing evidence.
 
-Use `PALWORLD-BREEDING-MECHANICS.md` as the default documented algorithm, or the document the user supplies. The README describes PalCalc's assumed process; a discrepancy with it does not prove the implementation currently has the same discrepancy. Inspect implementation only when requested or needed to resolve that distinction, using the repository's CodeGraph instructions if available.
+Identify both subjects of the requested comparison:
+
+- **Game behavior:** the version report and supporting evidence establish the
+  scoped findings; `PALWORLD-BREEDING-MECHANICS.md` summarizes them and PalCalc's
+  approximations.
+- **Current PalCalc behavior:** use solver documentation and the identified
+  implementation revision. Inspect code when requested or needed to establish an
+  implementation claim, following the repository's CodeGraph instructions if available.
+- **Proposed PalCalc model:** identify the recommended simplifications, omissions
+  and accuracy limits separately from current implementation behavior.
+
+Use the baseline supplied by the user where specified, identifying what it
+describes. Agreement with the mechanics reference alone doesn't establish
+implementation accuracy. Identify accepted baselines by immutable revision and
+follow the workflow's [conflict procedure](../ASSESSMENT-WORKFLOW.md#conflicting-evidence-and-corrections)
+when evidence disagrees.
 
 Work from completed observations; the wider investigation needn't be finished.
 Do not open a binary, launch/import Ghidra, install tooling, or rerun discovery.
@@ -46,9 +61,12 @@ rate. A process change alone doesn't justify upgrading verification grades.
 
 ## Derive the scoped PalCalc model
 
-Start from the full game pseudocode for the reviewed scope in `evidence.md`.
-Write pseudocode for the proposed PalCalc model in `assessment.md`. Explain what
-it leaves out, where it approximates the game, and when a simplification gives
+Start from the full scoped game model in `evidence.md`, using pseudocode, a schema,
+decision table or state transitions as appropriate. When model derivation is in
+scope, describe the proposed PalCalc model in `assessment.md`. Otherwise state
+whether it is outside the request or has no existing implementation to compare.
+For a proposed model, explain what it leaves out, where it approximates the game,
+and when a simplification gives
 the same result. Keep dependencies that affect possible paths, final contents,
 probability, or expected effort; don't turn unresolved details into guarantees.
 
@@ -84,7 +102,7 @@ Then give **notes for future reviews**: terminology, equivalences, scope exclusi
 
 For each material conclusion, link the decisive evidence and give the procedure/address, field name, diagnostic, or short call path another agent can use for comparison. Include key unresolved checks without implying that current data tables or runtime behavior were tested. Keep setup and operational provenance out of the report. If no material difference is established, say so.
 
-Return the assessment in chat by default; save or modify repository documents only when requested. For a published assessment, use the compact [assessment template](../ASSESSMENT-TEMPLATE.md): `evidence.md` contains the full scoped game model and selected excerpts; `assessment.md` contains the reduced PalCalc model and functional comparison, naming its document/code baseline. Cover agreements and remaining differences as well as corrected older assumptions. Keep implementation separate. Update the maintained reference only when requested, following the [workflow](../ASSESSMENT-WORKFLOW.md); preserve saved plans and progress.
+Return the assessment in chat by default; save or modify repository documents only when requested. For a published assessment, use the compact [assessment template](../ASSESSMENT-TEMPLATE.md): `evidence.md` contains the full scoped game model and selected excerpts; `assessment.md` contains the conclusions and, when in scope, the PalCalc model and functional comparison with identified baselines. Cover agreements and remaining differences as well as corrected older assumptions. Keep implementation separate. Update the maintained reference only when requested, following the [workflow](../ASSESSMENT-WORKFLOW.md); preserve saved plans and progress.
 
 When publication is requested, update the relevant mechanic sections in the
 game-version report, preserving other coverage and dates. Separate a supported
