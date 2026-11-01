@@ -246,6 +246,19 @@ namespace PalCalc.UI.ViewModel.Solver
             resultsTable.AddRange(results);
             resultsTable.FilterAll(ResultPruningPolicy.Default, token);
 
+            // Limit cakes relative to the fastest path with the same final passives
+            resultsTable = resultsTable.BuildNew(PalResultProperty.Combine(
+                PalResultProperty.EffectivePassives
+            ));
+            resultsTable.FilterAll(g =>
+            {
+                var fastest = g.Min(r => r.BreedingEffort);
+                // Use the cheapest tied fastest path so input order doesn't change the cutoff.
+                var maxCakes = 2L * g.Where(r => r.BreedingEffort == fastest)
+                    .Min(r => r.NumTotalEggs);
+                return g.Where(r => r.NumTotalEggs <= maxCakes);
+            });
+
             // final simplification pass, within each cake tier, ignore results over 2x its fastest option
             resultsTable = resultsTable.BuildNew(PalResultProperty.Combine(
                 PalResultProperty.EffectivePassives,
