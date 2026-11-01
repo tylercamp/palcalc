@@ -45,6 +45,7 @@ namespace PalCalc.UI.Persistence.Dto
         public int IV_Shot { get; init; }
         public int IV_Defense { get; init; }
         public bool IsOnExpedition { get; init; }
+        public int Rank { get; init; }
 
         [JsonProperty(Required = Required.AllowNull)]
         public string OwnerPlayerId { get; init; }
