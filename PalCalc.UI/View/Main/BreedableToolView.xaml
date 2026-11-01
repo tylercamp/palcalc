@@ -1,0 +1,298 @@
+<UserControl x:Class="PalCalc.UI.View.Main.BreedableToolView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vms="clr-namespace:PalCalc.UI.ViewModel.Solver"
+             xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
+             xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
+             xmlns:itl="clr-namespace:PalCalc.UI.Localization"
+             xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <c:ValueVisibilityConverter x:Key="VVC" />
+        <c:ValueVisibilityConverter x:Key="NegatedVVC" Negate="True" />
+
+        <!-- Mirrors the location popup for pal nodes in BreedingResultView -->
+        <DataTemplate x:Key="ParentPopupContent">
+            <vu:PopupToolTipContent Background="{DynamicResource BreedingPopupBackgroundBrush}">
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="FontSize" Value="13" />
+                        </Style>
+                    </StackPanel.Resources>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Pal.Name.Value}" />
+                        <vp:PalGenderView DataContext="{Binding Gender}" Height="14" Margin="2,0,0,0" />
+                    </StackPanel>
+                    <vp:PalIVsView Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" FontSize="9" IV_HP="{Binding IVs.HP}" IV_Attack="{Binding IVs.Attack}" IV_Defense="{Binding IVs.Defense}" />
+
+                    <StackPanel DataContext="{Binding Location}">
+                        <vp:PalLocationView DataContext="{Binding MapLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" Width="300" Height="300" />
+                        <vp:PalLocationView DataContext="{Binding ContainerLocationPreview}" Visibility="{Binding Converter={StaticResource VVC}}" />
+                    </StackPanel>
+                </StackPanel>
+            </vu:PopupToolTipContent>
+        </DataTemplate>
+
+        <DataTemplate x:Key="LocationTemplate">
+            <StackPanel>
+                <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" TextTrimming="CharacterEllipsis" Visibility="{Binding OwnerVisibility}" />
+                <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="OwnedTemplate">
+            <vu:PopupToolTipTrigger HorizontalAlignment="Left"
+                                    Cursor="Hand"
+                                    InitialShowDelay="200"
+                                    PopupAnimation="None"
+                                    ToolTipContentTemplate="{StaticResource ParentPopupContent}">
+                <ContentControl Content="{Binding Location}" ContentTemplate="{StaticResource LocationTemplate}" />
+            </vu:PopupToolTipTrigger>
+        </DataTemplate>
+
+        <!-- A parent which needs to be bred has no specific pal to show, so it has no popup -->
+        <DataTemplate x:Key="ParentTemplate">
+            <vu:PopupToolTipTrigger HorizontalAlignment="Left"
+                                    IsEnabled="{Binding IsOwned}"
+                                    Cursor="Hand"
+                                    InitialShowDelay="200"
+                                    PopupAnimation="None"
+                                    ToolTipContentTemplate="{StaticResource ParentPopupContent}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Pal.Name.Value}" FontSize="11" TextTrimming="CharacterEllipsis" />
+                        <vp:PalGenderView DataContext="{Binding Gender}" Visibility="{Binding Converter={StaticResource VVC}}" Height="11" Margin="2,0,0,0" />
+                    </StackPanel>
+
+                    <TextBlock Text="{itl:LocalizedText LC_BREEDABLE_PARENT_BRED}"
+                               FontSize="10"
+                               TextTrimming="CharacterEllipsis"
+                               Visibility="{Binding IsOwned, Converter={StaticResource NegatedVVC}}" />
+
+                    <ContentControl Content="{Binding Location}"
+                                    ContentTemplate="{StaticResource LocationTemplate}"
+                                    Visibility="{Binding Location, Converter={StaticResource VVC}}" />
+                </StackPanel>
+            </vu:PopupToolTipTrigger>
+        </DataTemplate>
+
+        <!-- Cards keep a fixed width so they line up, and only shrink if the pane is narrower than one card -->
+        <DataTemplate x:Key="CardTemplate">
+            <Grid MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}" UseLayoutRounding="True">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Width" Value="420" />
+                        <Style.Triggers>
+                            <!-- Two of these line up with one card with parents, given the panel's spacing -->
+                            <DataTrigger Binding="{Binding Parent1}" Value="{x:Null}">
+                                <Setter Property="Width" Value="205" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+
+                <!-- Behind the card so that only the glow around it shows -->
+                <Border IsHitTestVisible="False"
+                        CornerRadius="10"
+                        Background="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
+                        Opacity="{Binding Opacity, ElementName=SearchPulse}"
+                        Visibility="{Binding IsHighlighted, Converter={StaticResource VVC}}">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="0" BlurRadius="20" Opacity="1" Color="{DynamicResource {x:Static adonisUi:Colors.AlertColor}}" />
+                    </Border.Effect>
+                </Border>
+
+                <Border Padding="7"
+                        BorderThickness="2"
+                        CornerRadius="10"
+                        BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
+                        Background="{DynamicResource BreedingNodeBackgroundBrush}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="2*" MinWidth="60" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Width="50" Height="50"
+                                CornerRadius="25"
+                                BorderThickness="1"
+                                BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
+                                Margin="0,0,8,0"
+                                VerticalAlignment="Top"
+                                Background="{Binding Pal.IconBrush}" />
+
+                        <StackPanel Grid.Column="1" Margin="0,0,8,0">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Parent1}" Value="{x:Null}">
+                                            <Setter Property="Grid.ColumnSpan" Value="2" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+                            <vp:PalIVsView Columns="1"
+                                           Orientation="Horizontal"
+                                           Margin="0,2,0,0"
+                                           Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                                           FontSize="10"
+                                           IV_HP="{Binding IVs.HP}"
+                                           IV_Attack="{Binding IVs.Attack}"
+                                           IV_Defense="{Binding IVs.Defense}"
+                                           Visibility="{Binding IVs, Converter={StaticResource VVC}}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                            <ContentControl Content="{Binding Parent1}" ContentTemplate="{StaticResource ParentTemplate}" Visibility="{Binding Parent1, Converter={StaticResource VVC}}" />
+                            <ContentControl Content="{Binding Parent2}" ContentTemplate="{StaticResource ParentTemplate}" Visibility="{Binding Parent2, Converter={StaticResource VVC}}" Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <!-- On its own row since half-width cards don't have room beside the IVs -->
+                        <ContentControl Grid.Row="1"
+                                        Grid.ColumnSpan="3"
+                                        Margin="0,4,0,0"
+                                        Content="{Binding Owned}"
+                                        ContentTemplate="{StaticResource OwnedTemplate}"
+                                        Visibility="{Binding Owned, Converter={StaticResource VVC}}" />
+                    </Grid>
+                </Border>
+
+                <!-- Morphs the card's border, in step with the glow and collapsed group headers -->
+                <Border IsHitTestVisible="False"
+                        BorderThickness="2"
+                        CornerRadius="10"
+                        BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
+                        Opacity="{Binding Opacity, ElementName=SearchPulse}"
+                        Visibility="{Binding IsHighlighted, Converter={StaticResource VVC}}" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <DockPanel>
+        <!-- Never drawn, its opacity drives every search highlight so that they all stay in step -->
+        <Border x:Name="SearchPulse" DockPanel.Dock="Top" Visibility="Collapsed">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasHighlightedCards}" Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard x:Name="SearchPulseStoryboard">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                         From="0.1"
+                                                         To="1"
+                                                         Duration="00:00:00.8"
+                                                         AutoReverse="True"
+                                                         RepeatBehavior="Forever" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="SearchPulseStoryboard" />
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+        </Border>
+
+        <Border DockPanel.Dock="Top"
+                Margin="0,0,0,5"
+                Padding="5"
+                Background="{DynamicResource ResourceKey={x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"
+                adonisExtensions:LayerExtension.IncreaseLayer="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" MaxWidth="250" />
+                    <ColumnDefinition Width="*" MinWidth="10" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" Content="{itl:LocalizedText LC_PAL_CHECKLIST_SEARCH}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <TextBox Grid.Column="1" VerticalAlignment="Center" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+
+                <StackPanel Grid.Column="3" Orientation="Horizontal">
+                    <TextBlock Text="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <CheckBox IsChecked="{Binding SolverControls.UseGenderReversers, Mode=TwoWay}"
+                              VerticalAlignment="Center"
+                              Margin="0,0,25,0"
+                              ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION}" />
+                    <Button Content="{Binding ExpandToggleLabel.Value}" Command="{Binding ToggleExpandedCommand}" Margin="0,0,10,0" />
+                    <Button Content="{itl:LocalizedText LC_SOLVER_RUN}" Command="{Binding SolverControls.RunSolverCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <ScrollViewer x:Name="GroupsScrollViewer"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      PreviewMouseWheel="Groups_PreviewMouseWheel"
+                      SizeChanged="Groups_LayoutChanged"
+                      Expander.Expanded="Groups_LayoutChanged"
+                      Expander.Collapsed="Groups_LayoutChanged">
+            <ItemsControl x:Name="GroupsList" ItemsSource="{Binding Groups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vms:BreedableGroupViewModel">
+                        <Grid Margin="0,0,0,5">
+                            <Expander x:Name="GroupExpander" Header="{Binding Title.Value}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Loaded="Groups_LayoutChanged">
+                                <ItemsControl ItemsSource="{Binding Cards}" ItemTemplate="{StaticResource CardTemplate}" Margin="7">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <vu:SpacedWrapPanel Orientation="Horizontal" HorizontalSpacing="10" VerticalSpacing="10" HorizontalContentAlignment="Left" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Expander>
+
+                            <!-- Pulses over the header of a collapsed group, since its highlighted cards are hidden.
+                                 Waits for the 0.2s collapse animation of Expander, while the cards are still visible. -->
+                            <Grid IsHitTestVisible="False" Opacity="{Binding Opacity, ElementName=SearchPulse}">
+                                <Border Background="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}" Opacity="0.5" />
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding HasHighlightedCards}" Value="True" />
+                                                    <Condition Binding="{Binding IsExpanded, ElementName=GroupExpander}" Value="False" />
+                                                </MultiDataTrigger.Conditions>
+                                                <MultiDataTrigger.EnterActions>
+                                                    <BeginStoryboard x:Name="ShowHeaderPulse">
+                                                        <Storyboard>
+                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.25" Value="{x:Static Visibility.Visible}" />
+                                                            </ObjectAnimationUsingKeyFrames>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </MultiDataTrigger.EnterActions>
+                                                <MultiDataTrigger.ExitActions>
+                                                    <StopStoryboard BeginStoryboardName="ShowHeaderPulse" />
+                                                </MultiDataTrigger.ExitActions>
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>
