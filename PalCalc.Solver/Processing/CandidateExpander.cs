@@ -246,27 +246,6 @@ namespace PalCalc.Solver.Processing
                     if (!canReach) continue;
                 }
 
-                // if we disallow any irrelevant passives, neither parents have a useful passive, and at least 1 parent
-                // has an irrelevant passive, then it's impossible to breed a child with zero total passives
-                //
-                // (child would need to have zero since there's nothing useful to inherit and we disallow irrelevant passives,
-                //  impossible to have zero since a child always inherits at least 1 direct passive if possible)
-                if (settings.MaxBredIrrelevantPassives == 0)
-                {
-                    bool HasValidPassives(IPalReference parent)
-                    {
-                        foreach (var passive in parent.EffectivePassives)
-                        {
-                            if (context.Target.RequiredPassives.Contains(passive)) return true;
-                        }
-
-                        return parent.EffectivePassives.Count == 0;
-                    }
-
-                    if (!HasValidPassives(p.Item1) && !HasValidPassives(p.Item2))
-                        continue;
-                }
-
                 var ivsProbability = Probabilities.IVs.ProbabilityInheritedTargetIVs(mechanics, p.Item1.IVs, p.Item2.IVs);
 
                 using var parentPassivesRef = passiveListPool.BorrowWith(p.Item1.ActualPassives);
@@ -389,176 +368,122 @@ namespace PalCalc.Solver.Processing
                     foreach (var targetPassives in passivePerms)
                     {
                         // go through each potential final number of passives, accumulate the probability of any of these exact options
-                        // leading to the desired passives within MAX_IRRELEVANT_PASSIVES.
+                        // leading to the desired passives within MaxBredIrrelevantPassives.
                         //
                         // we'll generate an option for each possible outcome of up to the max possible number of passives, where each
-                        // option represents the likelyhood of getting all desired passives + up to some number of irrelevant passives
-                        var probabilityForUpToNumPassives = 0.0f;
-
-                        // (special cakes can be used for attack solving; the cake has effects on passive probabilities too. track this
-                        // separately for use later in AttackProfileComposer and AttackResultMaterializer)
-                        var specialCakeProbabilityForUpToNumPassives = 0.0f;
-                        var calculateSpecialCakeProbability =
-                            context.AttackTargets.IsActive && settings.MaxSpecialCakes != 0;
-
-                        for (int numFinalPassives = targetPassives.Count; numFinalPassives <= Math.Min(GameConstants.MaxTotalPassives, targetPassives.Count + settings.MaxBredIrrelevantPassives); numFinalPassives++)
+                        // option represents the likelihood of getting all desired passives + up to some number of irrelevant passives
+                        var ordinaryProbability = 0f;
+                        var ordinaryLimit = Math.Min(
+                            GameConstants.MaxTotalPassives,
+                            targetPassives.Count + settings.MaxBredIrrelevantPassives
+                        );
+                        for (int count = targetPassives.Count; count <= ordinaryLimit; count++)
                         {
-#if DEBUG && DEBUG_CHECKS
-                            float initialProbability = probabilityForUpToNumPassives;
-#endif
-
-                            probabilityForUpToNumPassives +=
-                                Probabilities.Passives
-                                    .ProbabilityInheritedTargetPassives(
-                                        mechanics,
-                                        parentPassives,
-                                        targetPassives,
-                                        numFinalPassives
-                                    );
-
-                            if (calculateSpecialCakeProbability)
-                            {
-                                specialCakeProbabilityForUpToNumPassives +=
-                                    Probabilities.Passives
-                                        .ProbabilityInheritedTargetPassivesForFixedInheritRoll(
-                                            mechanics,
-                                            parentPassives,
-                                            targetPassives,
-                                            numFinalPassives,
-                                            inheritedCountRoll: GameConstants.MaxTotalPassives
-                                        );
-                            }
-
-                            if (probabilityForUpToNumPassives <= 0)
-                                continue;
-
-#if DEBUG && DEBUG_CHECKS
-                            if (initialProbability == probabilityForUpToNumPassives) Debugger.Break();
-#endif
-
-                            // (not entirely correct, since some irrelevant passives may be specific and inherited by parents. if we know a child
-                            //  may have some specific passive, it may be efficient to breed that child with another parent which also has that
-                            //  irrelevant passive, which would increase the overall likelyhood of a desired passive being inherited)
-                            using var newPassivesRef = passiveListPool.BorrowWith(targetPassives);
-                            var newPassives = newPassivesRef.Value;
-
-                            var numRandomPassivesNeeded = numFinalPassives - newPassives.Count;
-                            var randomPassivesStart = newPassives.Count;
-
-                            for (int i = 0; i < numRandomPassivesNeeded; i++)
-                                newPassives.Add(randomPassivePool.BorrowRaw());
-
-                            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                            void ReturnRandomPassives()
-                            {
-                                // Return borrowed RandomPassiveSkill instances to the pool
-                                for (int i = randomPassivesStart; i < newPassives.Count; i++)
-                                {
-                                    if (newPassives[i] is RandomPassiveSkill rps)
-                                        randomPassivePool.Return(rps);
-                                }
-                            }
-
-                            // Build the base ("structural") effort for this combination of passives and IVs.
-                            // Attack-inheritance probability is ignored on purpose; the full attack
-                            // details are reconstructed after the search.
-                            var structuralProbability = probabilityForUpToNumPassives * ivsProbability;
-                            if (structuralProbability <= 0)
-                            {
-                                ReturnRandomPassives();
-                                continue;
-                            }
-
-                            var structuralBreedings = (int)Math.Ceiling(1.0f / structuralProbability);
-                            var parentBreedingEffort = BredPalReferenceEffort.CombineParentEffort(
-                                settings.GameSettings,
-                                parent1,
-                                parent2
+                            ordinaryProbability += Probabilities.Passives.ProbabilityInheritedTargetPassives(
+                                mechanics, parentPassives, targetPassives, count
                             );
-                            var selfBreedingEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
-                                settings.GameSettings,
-                                childPalType,
-                                parent1.TimeFactor,
-                                parent2.TimeFactor,
-                                structuralBreedings
+                            if (ordinaryProbability <= 0)
+                                continue;
+                            var result = BuildChildPal(count, new(BreedingMethod.Ordinary, ordinaryProbability));
+                            if (result is not null)
+                                yield return result;
+                        }
+
+                        // TODO - Make special cake use customizable
+
+                        // we could also use special cakes to get better passive inheritance, but that would add more
+                        // options to the search. we skip those for performance, accepting that we may miss some valid
+                        // or better breeding paths.
+                        //
+                        // instead, we only consider cakes when we need to inherit multiple target attacks that the
+                        // child doesn't already get at level 1 (checked by AttackProfileComposer). when we do use
+                        // a cake, we still account for its effects on passive inheritance.
+                        if (context.AttackTargets.IsActive && settings.MaxSpecialCakes != 0)
+                        {
+                            var count = GameConstants.MaxTotalPassives;
+                            var probability = Probabilities.Passives.ProbabilityInheritedTargetPassivesForOverride(
+                                mechanics, parentPassives, targetPassives, count, overrideCount: count
                             );
-                            var structuralEffort = parentBreedingEffort + selfBreedingEffort;
-
-                            var retained = false;
-                            if (structuralEffort <= settings.MaxEffort)
+                            if (probability > 0)
                             {
-                                BredPalReference res = null;
-                                var filterResult = CandidatePreFilterResult.Rejected;
-                                if (context.AttackTargets.IsActive)
-                                {
-                                    var preparedProfile = attackProfileComposer.Prepare(
-                                        childPalType,
-                                        parent1,
-                                        parent2,
-                                        probabilityForUpToNumPassives,
-                                        specialCakeProbabilityForUpToNumPassives,
-                                        ivsProbability
-                                    );
-                                    if (preparedProfile.EntryTargetMasks != 0)
-                                    {
-                                        var draft = new CandidateDraft(
-                                            settings.GameSettings,
-                                            childPalType,
-                                            parent1,
-                                            parent2,
-                                            newPassives,
-                                            probabilityForUpToNumPassives,
-                                            specialCakeProbabilityForUpToNumPassives,
-                                            finalIVs,
-                                            ivsProbability,
-                                            selfBreedingEffort,
-                                            structuralEffort,
-                                            preparedProfile
-                                        );
-                                        filterResult = context.PreFilter.TryAdd(ref draft);
-                                        if (filterResult.Accepted)
-                                            res = draft.Materialize();
-                                    }
-                                }
-                                else
-                                {
-                                    res = new BredPalReference(
-                                        settings.GameSettings,
-                                        childPalType,
-                                        gender: PalGender.WILDCARD,
-                                        parent1,
-                                        parent2,
-                                        avgRequiredBreedings: null,
-                                        newPassives,
-                                        probabilityForUpToNumPassives,
-                                        specialCakeProbabilityForUpToNumPassives,
-                                        finalIVs,
-                                        ivsProbability,
-                                        attackProfile: AttackProfile.Inactive,
-                                        materializedAttackInheritance: null
-                                    );
-                                    filterResult = context.PreFilter.TryAdd(res);
-                                }
-
-                                if (filterResult.IsRetained)
-                                {
-                                    newPassivesRef.Retain();
-                                    retained = true;
-                                }
-
-                                if (res is not null && filterResult.Accepted)
-                                {
-                                    yield return res;
-                                }
-                            }
-
-                            if (!retained)
-                            {
-                                ReturnRandomPassives();
+                                var result = BuildChildPal(count, new(BreedingMethod.SpecialCake, probability));
+                                if (result is not null)
+                                    yield return result;
                             }
                         }
 
                         passiveListPool.Return(targetPassives);
+
+                        BredPalReference BuildChildPal(int numFinalPassives, BreedingOutcome outcome)
+                        {
+                            var structuralProbability = outcome.PassivesProbability * ivsProbability;
+                            if (structuralProbability <= 0)
+                                return null;
+
+                            // Ordinary attack odds are reconstructed after search.
+                            var structuralBreedings = (int)Math.Ceiling(1f / structuralProbability);
+                            var parentBreedingEffort = BredPalReferenceEffort.CombineParentEffort(
+                                settings.GameSettings, parent1, parent2
+                            );
+                            var selfBreedingEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
+                                settings.GameSettings, childPalType,
+                                parent1.TimeFactor, parent2.TimeFactor, structuralBreedings
+                            );
+                            var structuralEffort = parentBreedingEffort + selfBreedingEffort;
+                            if (structuralEffort > settings.MaxEffort)
+                                return null;
+
+                            var profile = context.AttackTargets.IsActive
+                                ? attackProfileComposer.Prepare(childPalType, parent1, parent2, outcome, ivsProbability)
+                                : default;
+                            if (context.AttackTargets.IsActive && profile.EntryTargetMasks == 0)
+                                return null;
+
+                            // (not entirely correct, since some irrelevant passives may be specific and inherited from parents. if we know a child
+                            //  may have some specific passive, it may be efficient to breed that child with another parent which also has that
+                            //  irrelevant passive, which would increase the overall likelihood of a desired passive being inherited)
+                            using var newPassivesRef = passiveListPool.BorrowWith(targetPassives);
+                            var newPassives = newPassivesRef.Value;
+                            var randomPassivesStart = newPassives.Count;
+                            while (newPassives.Count < numFinalPassives)
+                                newPassives.Add(randomPassivePool.BorrowRaw());
+
+                            BredPalReference result = null;
+                            var filterResult = CandidatePreFilterResult.Rejected;
+                            if (context.AttackTargets.IsActive)
+                            {
+                                // (`CandidateDraft` exists SPECIFICALLY for this check - we want to avoid creating
+                                // a new object and causing GC churn, so we copy it into a `struct` repr)
+                                var draft = new CandidateDraft(
+                                    settings.GameSettings, childPalType, parent1, parent2,
+                                    newPassives, outcome, finalIVs, ivsProbability,
+                                    selfBreedingEffort, structuralEffort, profile
+                                );
+                                filterResult = context.PreFilter.TryAdd(ref draft);
+                                if (filterResult.Accepted)
+                                    result = draft.Materialize();
+                            }
+                            else
+                            {
+                                result = new BredPalReference(
+                                    settings.GameSettings, childPalType, PalGender.WILDCARD,
+                                    parent1, parent2, avgRequiredBreedings: null,
+                                    newPassives, outcome, finalIVs, ivsProbability,
+                                    AttackProfile.Inactive, materializedAttackInheritance: null
+                                );
+                                filterResult = context.PreFilter.TryAdd(result);
+                            }
+
+                            // Rejected expansion candidates may still be retained as terminal/surgery finalists.
+                            // Keep their pooled passives alive whenever any consumer retained the candidate.
+                            if (filterResult.IsRetained)
+                                newPassivesRef.Retain();
+                            else
+                                for (int i = randomPassivesStart; i < newPassives.Count; i++)
+                                    randomPassivePool.Return((RandomPassiveSkill)newPassives[i]);
+
+                            return filterResult.Accepted ? result : null;
+                        }
                     }
                 }
             }

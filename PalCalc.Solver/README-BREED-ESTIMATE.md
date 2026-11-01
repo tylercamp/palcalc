@@ -1,19 +1,16 @@
 # Estimating Breeding Time for Inheriting Passives
 
-Thanks to [the work by /u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/), we have detailed information on the _likely_ breeding process for inheriting passive skills. Note that:
+Thanks to [the work by /u/mgxts](https://www.reddit.com/r/Palworld/comments/1af9in7/passive_skill_inheritance_mechanics_in_breeding/), we have detailed information on the _likely_ breeding process for inheriting passive skills. This served as the basis for PalCalc's main feature: accurately estimating the efficiency of different breeding trees.
 
-1. The author mentions that this calculation has not been 100% verified.
-2. At the time of writing, this reverse-engineering is ~8 months old, and has not been updated since it was first posted. (There is an [open issue](https://github.com/tylercamp/palcalc/issues/7) in this repo for any potential updates.)
-3. This is [based on a disassembly of the Palworld code](https://www.reddit.com/r/Palworld/comments/1af9in7/comment/koexa09/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button), and while the author emphasizes it's not 100% confirmed, any work based on disassembly is likely to be more accurate than efforts based purely on statistics.
-4. Assuming that the disassembly by /u/mgxts was accurate in the first place, and that there haven't been any updates in recent versions, there's still room for error in my own implementation of this calculation. There is an [open issue](https://github.com/tylercamp/palcalc/issues/8) for confirming this.
+Previously, we had to assume their work was correct and still accurate today. Now, years after their original post, PalCalc regularly re-verifies these mechanics against the latest Palworld binaries by using AI to reverse-engineer the relevant game code.
 
-Nonetheless, the work by /u/mgxts is the best information we have at the moment. We welcome any additional information on any of the above points in the [Issues](https://github.com/tylercamp/palcalc/issues) section of this repo.
+See [Palworld Breeding Mechanics](../PALWORLD-BREEDING-MECHANICS.md) for more details on game rules, version coverage and PalCalc's approximations.
+
+This page explains how PalCalc calculates passive-inheritance probabilities for one child and converts them into estimated breeding time. The examples use the repository's default probability weights.
 
 ## Probability References
 
-The main Reddit post includes a table of probabilities for inheriting different numbers of traits from the list of parents. The default values are represented by [`BreedingMechanics`](../PalCalc.Model/BreedingMechanics.cs). Each `PalDB` owns a mechanics instance, so customized databases can supply different probabilities.
-
-PalCalc uses these probabilities:
+PalCalc uses several specific probabilities, best described in the above Reddit post, for inheriting different numbers of traits from the parents:
 
 - Chance of inheriting exactly `N` passives from the parents (`Probability` column in the table from the Reddit post) (`BreedingMechanics.PassiveProbabilityDirect`)
 - Chance of inheriting `N` random passives (not represented in any table; pulled from the "RANDOM PASSIVE SKILLS" section of their pseudocode) (`BreedingMechanics.PassiveRandomAddedProbability`)
@@ -79,7 +76,7 @@ The probability of choosing 3 passives from the list of 4, where those three wil
 
 Finally, we have a 1.5% chance for case [1], and a 4% chance for case [2]. Since _either_ of these would give us the desired outcome (the two desired passives and one undesired), we just add them for **a total 5.5% chance.**
 
-_Note: It's possible for the randomly passive to be one of the desired passives, or one of the passives held by the parents. This is ignored since it only slightly affects the final probabilities._
+_These examples count desired passives inherited from the parents and assume random additions succeed. Random additions can also supply desired passives, or fail because of the game's selection bug or exhausted candidates. PalCalc treats these effects as negligible and are ignored. See [PalCalc's limitations](../LIMITATIONS.md#random-passive-selection-bug)._
 
 ### Example - Estimates for Children, Compensating for "At Best"
 
@@ -97,3 +94,15 @@ In that case we can combine the probabilities for [1] and [2], giving us a 7.5% 
 **This gives us our final result - from these two parents we create two children, one with an ~8 hour estimate, and the other with a ~2 hour estimate.**
 
 (The logic involving `P(Direct)` and `P(Random)` is implemented in `Probabilities.Passives.ProbabilityInheritedTargetPassives`. `CandidateExpander` accumulates these probabilities and assigns them to candidate children.)
+
+## Special Cake override
+
+TODO - This section should briefly mention _when_ special cakes are considered.
+
+Special Cakes replace both ordinary passive-count rolls. The game selects up to four distinct parental passives, then attempts random additions for any remaining slots. PalCalc assumes these additions succeed, so the estimate always has four passives. The calculation skips the ordinary count-roll probabilities.
+
+For example, suppose the parents have five distinct passives between them, including two desired passives. The cake selects four. The chance of including both desired passives is `Choose(3,2) / Choose(5,4) = 3/5`: choose the other two inherited passives from the three unwanted ones, out of all ways to select four from five.
+
+When the parents have fewer than four distinct passives, PalCalc still models four slots, including random fillers. Those unwanted fillers affect inheritance in later generations. Actual filling can fall short due to an apparent in-game bug; see [random passive filling](../LIMITATIONS.md#random-passive-selection-bug).
+
+See the [solver walkthrough](./README.md) for how cake outcomes are searched and compared.

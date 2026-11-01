@@ -20,6 +20,38 @@ Leave the reader with the smallest accurate mental model of the code:
 
 Prefer concepts and relationships over a narration of the implementation.
 
+## Writing style
+
+Write inline comments like a helpful note to another developer: casual, direct,
+and technically precise. Explain why we chose an approach, what assumption makes
+it valid, or what tradeoff we accept. Use "we," contractions, and concrete
+language where natural. Match the surrounding capitalization and formatting;
+lowercase openings are appropriate where that is the local style.
+
+Preserve useful existing explanations and phrasing. Avoid replacing them with
+abstract terminology or merely describing what the code does. Casual wording
+should retain the constraints and accuracy caveats.
+
+Keep XML documentation somewhat more formal: explain the abstraction's purpose,
+its place in the workflow, and any caller-visible limitations. Put local
+implementation reasoning beside the relevant code.
+
+For example, explain a deliberate tradeoff:
+
+```csharp
+// we could also use special cakes to get better passive inheritance, but that would add more
+// options to the search. we skip those for performance, accepting that we may miss some valid
+// or better breeding paths.
+```
+
+Or explain a technical constraint:
+
+```csharp
+// two search nodes can compare equal but still need their own reconstruction.
+// use reference identity for both equality and hashing here, rather than the
+// equality/hash overrides on IPalReference.
+```
+
 ## Establish the model first
 
 Before editing:

@@ -37,4 +37,33 @@ The following options were considered (but ignored) for improving accuracy and/o
 - We compromise with two observations:
   - (1) Attack inheritance is relatively low-cost: at most it adds a 50% probability, compared to IV (e.g. 20%) and passive probability (e.g. 5%). 100% inheritance chance is possible, which isn't true for IVs and passives. The player can manually change the skill pool of the parents, which isn't true for IVs and passives
   - (2) One special cake is used for each breeding attempt; i.e., special cakes, if used, directly correlate with the number of breeding attempts needed
-- If we consider attack inheritance probability as _relatively_ trivial, and we note that special cakes directly relate to breeding effort, we can drop other comparison details and use special cakes as the _sole metric_ for comparing attack profile paths. This can give slightly-less-optimal paths, but the performance improvement is substantial enough that it's worth the slight loss in accuracy (perf. comes from less overall data to compute, and fewer allocations to trigger GC)
+- If we consider attack inheritance probability as _relatively_ trivial, and we note that special cakes directly relate to breeding effort, we can drop other comparison details and use special cakes as the _sole metric_ for comparing search-time attack profile paths. This can give slightly-less-optimal paths, but the performance improvement is substantial enough that it's worth the slight loss in accuracy (perf. comes from less overall data to compute, and fewer allocations to trigger GC)
+
+### Preserving final effort/cake trade-offs
+
+During search, cake count is a useful shortcut for comparing attack options.
+But if we keep optimizing only for cakes at the end, we can end up preferring
+an extremely slow breeding path just because it saves one cake.
+
+Instead, finalization keeps useful tradeoffs: a faster path can survive alongside
+a slower path that uses fewer cakes. If one option takes no more effort and uses
+no more cakes, with an improvement in at least one, we can drop the worse option.
+
+We calculate the costs first and only build the trees we keep. Each option saves
+its exact parent choices, so building the tree later gives us the same plan we
+evaluated. We can also skip evaluating a candidate if another comparable result
+is already better than its lower bounds. For effort, we calculate those bounds
+without attack rolls, but still include gender adjustments, passive and IV odds,
+and the usual sum/max combination of parent effort. The estimated cake counts
+give us the lower bound for cakes.
+
+We only compare different candidate trees this way when they match on output
+passives, IV ranges, gender, concrete input choices, step count, gold cost,
+wild-Pal count, and training requirements. Final result simplification and the
+UI also keep different cake totals separate, so a slow option that saves cakes
+isn't removed just because a faster option uses more.
+
+This lets us reduce work without adding another slowdown threshold or result
+cap. It still takes more work when there are many useful tradeoffs to keep.
+And it doesn't change search pruning: a faster path that uses more cakes may
+already have been discarded during search, before finalization gets to compare it.
