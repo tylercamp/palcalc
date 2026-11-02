@@ -21,7 +21,7 @@ public class BreedableToolTests
         Assert.AreEqual("Already Owned (2) - Best IVs Shown", tool.Groups.First().Title.Value);
         Assert.AreEqual("Tier 1 (1)", tool.Groups[1].Title.Value);
         StringAssert.StartsWith(tool.Groups.Last().Title.Value, "Not Reachable");
-        Assert.AreEqual(DB.Pals.Count(), tool.Groups.Sum(g => g.Cards.Count));
+        Assert.AreEqual(DB.Pals.Count() - 1, tool.Groups.Sum(g => g.Cards.Count));
     }
 
     [TestMethod]
@@ -240,7 +240,7 @@ public class BreedableToolTests
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxWildPals: 0,
-            allowedWildPals: DB.Pals,
+            allowedWildPals: [],
             bannedBredPals: [],
             maxInputIrrelevantPassives: 0,
             maxBredIrrelevantPassives: 0,

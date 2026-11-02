@@ -11,7 +11,7 @@ public class BreedableCalculatorTests
         var result = Calculate(useGenderReversers: true);
 
         Assert.AreEqual(0, result.Entries.Count);
-        Assert.AreEqual(DB.Pals.Count(), result.NotReachable.Count);
+        Assert.AreEqual(DB.Pals.Count() - 1, result.NotReachable.Count);
     }
 
     [TestMethod]
@@ -152,28 +152,34 @@ public class BreedableCalculatorTests
     }
 
     [TestMethod]
-    public void Calculate_NotReachableSkipsBannedWildPals()
+    public void Calculate_FlowerGumossIsHiddenWhenNotOwned()
     {
-        var banned = "PlantSlime_Flower".InternalToPal(DB);
-        var allowed = "PlantSlime".InternalToPal(DB);
+        var result = Calculate(true);
 
-        var result = CalculateWithBanned(banned);
-
-        CollectionAssert.DoesNotContain(result.NotReachable.ToList(), banned);
-        CollectionAssert.Contains(result.NotReachable.ToList(), allowed);
+        CollectionAssert.DoesNotContain(result.NotReachable.ToList(), FlowerGumoss);
+        CollectionAssert.Contains(result.NotReachable.ToList(), "PlantSlime".InternalToPal(DB));
     }
 
     [TestMethod]
-    public void Calculate_BannedWildPalsAreStillListedWhenOwnedOrBred()
+    public void Calculate_FlowerGumossIsHiddenWhenOwned()
     {
-        var sibelyx = "Sibelyx".ToPal(DB);
-        var penking = "Penking".ToPal(DB);
+        var result = Calculate(true, OwnedFlowerGumoss(), Male("Penking"));
 
-        var result = CalculateWithBanned(penking, Male("Penking"), Female("Bushi"));
-        Assert.AreEqual(0, Entry(result, "Penking").Tier);
+        Assert.IsFalse(result.Entries.Any(e => e.Pal == FlowerGumoss));
+        CollectionAssert.DoesNotContain(result.NotReachable.ToList(), FlowerGumoss);
+    }
 
-        var bred = CalculateWithBanned(sibelyx, Male("Penking"), Female("Bushi"));
-        Assert.AreEqual(1, Entry(bred, "Sibelyx").Tier);
+    [TestMethod]
+    public void Calculate_OwnedFlowerGumossIsStillUsedAsParent()
+    {
+        var flower = OwnedFlowerGumoss();
+        var child = BreedingDB.BreedingByParent[FlowerGumoss]["Penking".ToPal(DB)].Single().Child;
+
+        var result = Calculate(false, flower, Male("Penking"));
+
+        var entry = Entry(result, child.Name);
+        Assert.AreEqual(1, entry.Tier);
+        CollectionAssert.Contains(new[] { entry.Parent1Instance, entry.Parent2Instance }, flower);
     }
 
     [TestMethod]
@@ -380,7 +386,7 @@ public class BreedableCalculatorTests
         var result = Calculate(useGenderReversers, Male("Penking"), Female("Bushi"), Female("Lamball"));
 
         CollectionAssert.AreEquivalent(
-            DB.Pals.ToList(),
+            DB.Pals.Where(p => p != FlowerGumoss).ToList(),
             result.Entries.Select(e => e.Pal).Concat(result.NotReachable).ToList()
         );
     }
@@ -413,21 +419,20 @@ public class BreedableCalculatorTests
 
     private static readonly PalDB DB = SolverTestScenario.DB;
     private static readonly PalBreedingDB BreedingDB = PalBreedingDB.LoadEmbedded(DB);
+    private static readonly Pal FlowerGumoss = "PlantSlime_Flower".InternalToPal(DB);
 
     private static PalInstance Male(string name) => SolverTestScenario.Owned(name, PalGender.MALE);
     private static PalInstance Female(string name) => SolverTestScenario.Owned(name, PalGender.FEMALE);
+
+    // (shares its name with the normal gumoss, so it can't be looked up by name)
+    private static PalInstance OwnedFlowerGumoss() => new() { Pal = FlowerGumoss, Gender = PalGender.FEMALE };
 
     private static PalInstance WithIVs(string name, PalGender gender, int hp, int attack, int defense) =>
         SolverTestScenario.Owned(name, gender, ivHp: hp, ivAttack: attack, ivDefense: defense);
 
     private static BreedableResult Calculate(bool useGenderReversers, params PalInstance[] ownedPals) =>
         new BreedableCalculator(
-            SolverTestScenario.Solver(ownedPals, useGenderReversers: useGenderReversers, allowedWildPals: DB.Pals).Settings
-        ).Calculate();
-
-    private static BreedableResult CalculateWithBanned(Pal banned, params PalInstance[] ownedPals) =>
-        new BreedableCalculator(
-            SolverTestScenario.Solver(ownedPals, allowedWildPals: DB.Pals.Where(p => p != banned)).Settings
+            SolverTestScenario.Solver(ownedPals, useGenderReversers: useGenderReversers).Settings
         ).Calculate();
 
     private static BreedableEntry Entry(BreedableResult result, string name) =>

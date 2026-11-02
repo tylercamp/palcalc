@@ -162,7 +162,7 @@ public class BreedableCalculatorEdgeCaseTests
         var result = Calculate(BreedingDB, [Owned(unknown, PalGender.MALE)], true);
 
         Assert.AreEqual(unknown, result.Entries.Single().Pal);
-        Assert.AreEqual(DB.Pals.Count(), result.NotReachable.Count);
+        Assert.AreEqual(DB.Pals.Count() - 1, result.NotReachable.Count);
     }
 
     [TestMethod]
@@ -218,6 +218,8 @@ public class BreedableCalculatorEdgeCaseTests
         foreach (var pal in DB.Pals)
         {
             var result = Calculate(BreedingDB, [Owned(pal, PalGender.WILDCARD)], useGenderReversers);
+            if (pal.InternalName == "PlantSlime_Flower") continue; // (finishes, but has no entry)
+
             Assert.AreEqual(pal, result.Entries.Single().Pal);
         }
     }
@@ -232,7 +234,12 @@ public class BreedableCalculatorEdgeCaseTests
         for (var run = 0; run < 40; run++)
         {
             var owned = RandomPals(random, random.Next(palCount + 1));
-            var ownedPals = owned.Where(p => p.Gender != PalGender.NONE).Select(p => p.Pal).ToHashSet();
+            var flowerGumoss = "PlantSlime_Flower".InternalToPal(DB);
+            var ownedPals = owned
+                .Where(p => p.Gender != PalGender.NONE)
+                .Select(p => p.Pal)
+                .Where(p => p != flowerGumoss)
+                .ToHashSet();
 
             var withReversers = Calculate(BreedingDB, owned, true);
             var withoutReversers = Calculate(BreedingDB, owned, false);
@@ -241,7 +248,7 @@ public class BreedableCalculatorEdgeCaseTests
             {
                 var tiers = result.Entries.ToDictionary(e => e.Pal, e => e.Tier);
 
-                Assert.AreEqual(palCount, tiers.Count + result.NotReachable.Count);
+                Assert.AreEqual(palCount - 1, tiers.Count + result.NotReachable.Count);
                 Assert.IsFalse(result.NotReachable.Any(tiers.ContainsKey));
                 CollectionAssert.AreEquivalent(
                     ownedPals.ToList(),
@@ -251,7 +258,8 @@ public class BreedableCalculatorEdgeCaseTests
                 foreach (var entry in result.Entries.Where(e => e.Tier > 0))
                 {
                     Assert.AreEqual(entry.Pal, entry.Source.Child);
-                    Assert.IsTrue(entry.Source.Parents.All(p => tiers[p.Pal] < entry.Tier));
+                    // (an owned flower gumoss is a tier 0 parent with no entry of its own)
+                    Assert.IsTrue(entry.Source.Parents.All(p => tiers.GetValueOrDefault(p.Pal) < entry.Tier));
 
                     if (entry.Parent1Instance != null) Assert.AreEqual(entry.Source.Parent1.Pal, entry.Parent1Instance.Pal);
                     if (entry.Parent2Instance != null) Assert.AreEqual(entry.Source.Parent2.Pal, entry.Parent2Instance.Pal);
@@ -327,12 +335,7 @@ public class BreedableCalculatorEdgeCaseTests
 
     private static BreedableResult Calculate(PalBreedingDB db, IEnumerable<PalInstance> ownedPals, bool useGenderReversers) =>
         new BreedableCalculator(
-            SolverTestScenario.Solver(
-                ownedPals,
-                breedingDB: db,
-                useGenderReversers: useGenderReversers,
-                allowedWildPals: db.Breeding.Select(b => b.Child).Distinct()
-            ).Settings
+            SolverTestScenario.Solver(ownedPals, breedingDB: db, useGenderReversers: useGenderReversers).Settings
         ).Calculate();
 
     private static int TierOf(BreedableResult result, Pal pal) => result.Entries.Single(e => e.Pal == pal).Tier;

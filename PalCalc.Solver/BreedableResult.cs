@@ -46,8 +46,7 @@ public sealed class BreedableResult
     public IReadOnlyList<BreedableEntry> Entries { get; }
 
     /// <summary>
-    /// Every species which can't be reached, ordered by species. Species which aren't
-    /// in the allowed wild pals are left out.
+    /// Every species which can't be reached, ordered by species.
     /// </summary>
     public IReadOnlyList<Pal> NotReachable { get; }
 }

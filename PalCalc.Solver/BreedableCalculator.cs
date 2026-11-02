@@ -12,6 +12,10 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
 {
     private static readonly PalGender[] ParentGenders = [PalGender.MALE, PalGender.FEMALE];
 
+    // the flower gumoss has the same name and icon as the normal gumoss, so it would look like a
+    // duplicate. it doesn't get an entry of its own, but can still be used as a parent if owned
+    private const string HiddenPalInternalName = "PlantSlime_Flower";
+
     private readonly ILookup<Pal, PalInstance> ownedByPal = settings.OwnedPals.ToLookup(p => p.Pal);
 
     public BreedableResult Calculate()
@@ -89,6 +93,7 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
 
         return new(
             tiers
+                .Where(kvp => kvp.Key.InternalName != HiddenPalInternalName)
                 .Select(kvp => new BreedableEntry(
                     kvp.Key,
                     kvp.Value,
@@ -103,9 +108,7 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
             settings.BreedingDB.Breeding
                 .Select(b => b.Child)
                 .Distinct()
-                .Where(p => !tiers.ContainsKey(p))
-                // (same as the solver: a banned wild pal isn't suggested, but is still used if owned or bred)
-                .Where(settings.AllowedWildPals.Contains)
+                .Where(p => !tiers.ContainsKey(p) && p.InternalName != HiddenPalInternalName)
                 .OrderBy(p => p.InternalIndex)
         );
     }

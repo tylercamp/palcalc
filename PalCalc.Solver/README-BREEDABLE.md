@@ -8,9 +8,9 @@ A **Tools** section sits under Target Pals. Selecting **Find All Breedable** rep
 
 - **Already Owned:** tier 0, showing the Pal with the highest IVs and where it is
 - **Tier 1 to N:** the IV range available, and one parent pair with each parent's location
-- **Not Reachable:** species which the selected Pals can't lead to, leaving out anything banned in Allowed Wild Pals
+- **Not Reachable:** species which the selected Pals can't lead to
 
-Passives, attacks, and effort are ignored. The calculation only looks at species, genders, and known IVs.
+Passives, attacks, and effort are ignored. The calculation only looks at species, genders, and known IVs. The flower Gumoss never gets a card, since it would look like a duplicate of the normal Gumoss.
 
 It's built on what already exists. It uses the existing Run command, Source Pals, `BreedingSolverSettings`, the Use Gender Reversers setting, and the gender rules in `BreedingResult.Matches`. Selecting a tool only changes what's visible, so target mode isn't affected, and nothing is saved to disk.
 
@@ -71,7 +71,7 @@ This means a generation can add a gender without adding a species, so a tier can
 - Every species can hatch as either gender, which is true for all 299 today. A single-gender species would need the bred-Pal logic to change.
 - Same-species pairs only produce themselves, which is also true for all 299. If that changes, remove the filter on `candidates`.
 - Gender rules come from `BreedingResult.Matches`, and the solver's filtering comes from `BreedingSolverSettings`, so changes to either carry over.
-- Not Reachable follows `AllowedWildPals`, which is how the flower Gumoss (`PlantSlime_Flower`) stays out of it, since it's banned by default and shares its name and icon with the normal Gumoss. It works like the solver's ban: a banned species is still listed if it's owned or can be bred. Banning every wild Pal empties Not Reachable.
+- The flower Gumoss (`PlantSlime_Flower`) is left out of `Entries` and `NotReachable` by `HiddenPalInternalName`, because it shares its name and icon with the normal Gumoss. It's only hidden from the results: an owned one still counts as a tier 0 parent, so a card's parent can be a flower Gumoss, shown as Gumoss. It breeds the same child as the normal Gumoss with all 297 other species today. If it gets its own name or icon, remove the constant.
 
 **Stopping:** each generation has to add a species or a gender, and each of those can only happen once per species, so the loop has a hard limit. Anything added to the loop has to keep that true.
 
