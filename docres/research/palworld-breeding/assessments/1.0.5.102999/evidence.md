@@ -841,6 +841,113 @@ construction dependencies as well as table values.
 | Constructor thunk bytes / body | `ev_3940899b09b3908a1f21e3d9335ca42f5eef25c380f4ff02404deefab345292f`, `ev_207ace8aad1044a3658319f6adf027eba048edbedecb7aa126411b9066740744` |
 
 
+#### Nominal per-egg fill-failure probabilities
+
+This calculation uses the recovered ordinary filler and the complete ordered
+85-entry snapshot above: 73 weight-100 and 12 weight-5 candidates, total 7,360.
+It covers ordinary nonmutation generation and Cake05, excluding pickup transforms.
+The event is **at least one attempted random addition selecting nothing in an
+egg's fill batch**. It does not measure passive-identity bias, desired-child
+success, or error in a solver estimate.
+
+Assume independent uniform integer tickets on `[0,T)` for each filler draw,
+ordinary count probabilities from `[4,3,2,1]`, and uniform parental-subset selection.
+These are nominal probability assumptions. The native `rand()%T` operation does
+not establish uniform tickets or independence, and no live frequencies are inferred.
+The extrema below apply to this model and the recorded order; they are not bounds
+on arbitrary modified tables or correlated RNG sequences. Percentages are rounded.
+
+| Distinct parental passives | Ordinary: per-egg failure probability | Cake05 |
+| --- | ---: | ---: |
+| 0 | 0.00531701% | 0.03234036% |
+| 4 | 0.00130153%–1.35838480% | 0% |
+
+Ordinary results average both count rolls, including zero filling attempts and
+the four-slot cap. Cake05 uses the same faulty filler but replaces both count
+rolls: zero parental passives require four attempts; four parental passives fill
+the child directly and require none.
+
+The four-passive ordinary minimum uses Artisan (`CraftSpeed_up2`), Serious
+(`CraftSpeed_up1`), Clumsy (`CraftSpeed_down1`) and Slacker (`CraftSpeed_down2`),
+pool indices 1–4. Its maximum uses Swift (`MoveSpeed_up_3`), Eternal Engine
+(`Stamina_Up_3`), King of the Waves (`SwimSpeed_up_3`) and Lavish Hospitality
+(`SelfDeathAddItemDrop_up_3`), indices 57, 66, 74 and 78.
+
+**Broader parental-union bounds:** ordinary breeding ranges from 0.00130153% to
+1.62896418%; Cake05 ranges from zero to 3.87018931%. The ordinary maximum uses
+King of the Waves and Lavish Hospitality. The Cake05 maximum uses Remarkable
+Craftsmanship (`CraftSpeed_up3`, index 0) and King of the Waves, followed by two
+fill attempts. Thus checking only one, three and four attempts misses the upper
+bound. The exact ordinary maximum is `680422661468027/41770265456521875`; the
+exact Cake05 maximum is `20197057/521862250` (probabilities before multiplying by 100).
+
+All named witnesses have positive first-fill intervals in the aligned empty
+pool. The recovered model can generate their singletons, retain pairs and combine
+two disjoint pairs, without a mutual-exclusion rule for these passive identities.
+They are constructively reachable under this model, rather than assumed typical
+player choices or live-tested acquisitions.
+
+Conditioning on an already determined attempt count gives a different table.
+Each range includes all initial inherited sets fitting the four-slot cap; it
+does not include the probability of rolling that attempt count.
+
+| Filling attempts | Probability of at least one failed addition |
+| --- | ---: |
+| 1 | 0%–2.58679374% |
+| 2 | 0%–3.87018931% |
+| 3 | 0.01089460%–2.61350072% |
+| 4 | 0.03234036%: necessarily starts empty |
+
+For an empty starting list alone, the one/two/three/four-attempt probabilities
+are 0%, 0.01052966%, 0.03211076% and 0.03234036%. Zero attempts always gives zero.
+More attempts can therefore have a lower failure probability when the initial
+contents differ.
+
+To reproduce the calculation, let `E` contain excluded ordinary-pool indices,
+`n_i(E)` be candidate i's successful ticket count from the preceding interval
+formula, `D(E)` its failed ticket count, and `T(E)` its surviving weight sum:
+
+```text
+F(E,0) = 0
+F(E,a) = D(E)/T(E) + sum_i n_i(E)/T(E) * F(E union {i},a-1)
+```
+
+A first failure satisfies the event immediately; successful branches remove
+the selected candidate and continue. For parental-union size N, ordinary
+inheritance takes `h=min(j,N)`, with j=1..4 weighted 4:3:2:1. Average over uniform
+h-subsets S and k=0..3 weighted 4:3:2:1, evaluating
+`F(S intersect AddPal, min(k,4-h))`. Cake05 instead uses `h=min(4,N)` and
+`F(S intersect AddPal,4-h)`. Inherited passives outside AddPal occupy slots without
+removing filler candidates; their identities can be folded into an outside-pool
+count. No distribution over player parent sets is assumed.
+
+Enumerating N=0..4 covers 2,233,380 such equivalence classes, including all
+2,024,785 four-member subsets of the 85-entry pool. For N>=4, the ordinary
+probability is the average of the probabilities for its four-member subsets:
+choosing a uniform four-subset and then a uniform h-subset gives the same
+h-subset distribution for h<=3, while h=4 needs no filling. Larger unions cannot
+exceed the four-union extrema. Cake05 needs no filling for any N>=4.
+
+For a **single attempt**, the recorded order has the tighter upper bound
+`190/7345 = 2.58679374%`, attained by excluding indices 0, 5 and 11. The earlier
+285-ticket bound permits other orders. In this order the final three weights
+are 100 and the preceding weight is 5. If m<=3 pool entries are excluded and r
+have weight 5, failed tickets are zero for m=0, `95*r` for m=1 or 2, and
+`max(0,95*(r-1))` for m=3. For m=3 with a surviving final weight-100 entry, the
+last acceptance threshold is 7,155 and T=7,060+95r; when all final weight-100
+entries are removed, T=7,060 and the final threshold still covers it.
+
+Checks compared interval masses with every ticket in 260 five-entry
+order/exclusion cases and 37 full-pool witness states. The single-attempt count
+formula was checked for every excluded set of size 0..3. Exact rational
+recurrences agreed with the floating-point calculation for the featured
+extrema and both global maxima; an empty two-attempt batch independently gives
+`(60/7360)*(95/7355) = 57/541328`. Three larger-union cases checked the
+four-subset averaging identity. Independent literal-loop simulations of the
+assumed model corroborated both global witnesses, including 1,000,000 ordinary
+eggs with 16,369 failures versus 16,289.64 expected. These checks validate the
+arithmetic under the declared assumptions, not the native RNG or gameplay rates.
+
 ## Child attacks
 
 Scope: equipped-parent inheritance, level-one lookup, item override and mutation

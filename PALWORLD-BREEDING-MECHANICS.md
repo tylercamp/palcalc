@@ -114,13 +114,36 @@ The ordinary process is:
 Passive inheritance happens in two stages: the child first inherits passives
 from its parents (steps 1-3), then the game may add random passives (steps 4-5).
 
-An apparent bug in random selection can bias which passives are added or leave
-the child with fewer passives than requested. Its frequency in gameplay hasn't
-been measured. The [limitations page](LIMITATIONS.md#random-passive-selection-bug)
-explains how this affects PalCalc's estimates.
+### Random-passive selection bug
 
-The [passive assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-passives)
-links the recovered rules and a worked example of this bug using current game data.
+An apparent bug can cause the game to skip a random passive it tried to add,
+leaving the child with fewer passives. It can also change which random passives
+are more likely to be chosen. The
+[passive assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-passives)
+explains the bug and gives an example using the current game data.
+
+For nonmutated eggs, the table below shows the **calculated chance per egg that
+at least one random addition fails**. Count each passive shared by the parents
+only once:
+
+| Unique passives between the parents | Ordinary breeding | Special Cake |
+| --- | ---: | ---: |
+| Zero | About 0.0053% | About 0.0323% |
+| Four | About 0.0013%–1.36%, depending on the passives | 0%: no random filling |
+
+Allowing other combinations of parental passives raises the highest calculated
+chances to about **1.6% for ordinary breeding** (roughly 1 in 60 eggs) and
+**3.9% with Special Cakes** (roughly 1 in 26). Both cases use parents with two
+unique passives between them. Which passives the parents have matters as well
+as how many random additions the game tries.
+
+These calculations use the default game data, treat the random rolls as
+independent, and assume each possible lottery number is equally likely. They
+haven't been measured through gameplay. The
+[full calculation](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#nominal-per-egg-fill-failure-probabilities)
+records the assumptions and examples. These rates also don't tell us how far
+PalCalc's breeding-time estimates might differ; see the
+[limitations page](LIMITATIONS.md#random-passive-selection-bug).
 
 ### Special Cakes
 
@@ -218,23 +241,23 @@ group, HP always comes from a parent, and one pattern inherits all three stats.
 That means asking for HP can give different odds from asking for Attack or Defense.
 
 The default weights `[3, 2, 1]` (`Combi_TalentInheritNum` in `BP_PalGameSetting`)
-choose between these groups, giving the nominal calculated chances below.
+choose between these groups, giving the calculated chances below.
 They select a group of patterns, rather than simply how many stats to inherit.
 See the
 [recorded game inputs](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#shared-inputs-and-arithmetic).
 
-| Selection group | Nominal chance | Possible stats taken from parents |
+| Selection group | Calculated chance | Possible stats taken from parents |
 | --- | ---: | --- |
 | First | 50% | HP **or** Attack **or** Defense |
 | Second | 33⅓% | HP+Attack+Defense **or** HP+Defense **or** HP+Attack |
 | Third | 16⅔% | HP+Attack+Defense |
 
-Within either of the first two groups, the game chooses one of its three patterns
-with equal nominal chances. Each parent-sourced stat has its own nominal
-50/50 choice between the two parents' values. Stats not taken from parents get
-fresh random values from 0–100, inclusive. A random value can happen to match a
-parent's IV, but that doesn't mean it was inherited. These are calculated
-probabilities, not measured gameplay frequencies.
+For these calculations, the three patterns in either of the first two groups
+are equally likely. Each inherited stat has a separate 50/50 choice between
+the parents' values. Stats not taken from parents get fresh random values from 0–100,
+inclusive. A random value can happen to match a parent's IV, but that doesn't
+mean it was inherited. These chances assume independent, evenly distributed
+random rolls; they haven't been measured through gameplay.
 
 Current verification of the exact selection process is tracked in the
 [research checklist](docres/research/palworld-breeding/README.md#current-verification-status).
@@ -295,8 +318,8 @@ PalCalc's estimates.
 A wild Pal's skills can depend on what it receives when spawned, what it learns
 with levels, and any changes made during capture.
 
-- **Passives:** Ordinary generation adds species-specific passives before random
-  filling. Special spawns can supply other traits; World Tree aura spawns, for
+- **Passives:** Wild Pals normally receive species-specific passives before random
+  additions. Special spawns can supply other traits; World Tree aura spawns, for
   example, can add one World Tree passive if a slot remains.
 - **Capture bonuses:** Effects such as Yakumo's passive sharing (`GuardianDog` in
   `DT_PartnerSkillParameter`) can add passives during capture. An empty slot alone

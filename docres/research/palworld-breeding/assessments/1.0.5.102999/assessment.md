@@ -146,6 +146,16 @@ fill leaves at most three final passives. [Current-data witness](evidence.md#con
 These are integer-ticket consequences, not measured frequencies or a current
 solver-code audit. Treating filling as guaranteed remains a model approximation.
 
+Under independent uniform-ticket draws and nominal count/subset selection, the
+[per-egg calculation](evidence.md#nominal-per-egg-fill-failure-probabilities) bounds
+the chance of at least one failed random addition. Zero-passive parents give
+0.00531701% in ordinary breeding or 0.03234036% with Cake05. A four-passive parental
+union gives 0.00130153%–1.35838480% in ordinary breeding and zero with Cake05.
+Across parental unions, the maxima are 1.62896418% and 3.87018931%, respectively;
+both use two distinct parental passives. These are nominal model probabilities,
+not live incidence or downstream estimate-error measurements. The calculation
+does not change PalCalc's existing successful-fill approximation.
+
 The saved-content calculation remains conditional on the declared per-egg inputs
 and supplied pickup effects. It does not establish an unconditional per-pickup
 mixture for arbitrary changing parties. The separate unchanged-rank NaughtyCat

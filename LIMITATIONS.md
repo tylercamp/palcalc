@@ -32,9 +32,11 @@ from the original list. This can bias selection or consume an attempt without
 adding a passive. We consider this mismatch an apparent bug in Palworld's
 inheritance code.
 
-The game can therefore add fewer random passives than PalCalc predicts. The
-overall frequency of failed additions in gameplay and their impact on estimates
-haven't been measured.
+The game can therefore add fewer random passives than PalCalc predicts. We have
+[calculated chances for different parent setups](PALWORLD-BREEDING-MECHANICS.md#random-passive-selection-bug),
+using the default game data and assumptions about the random rolls. Those
+figures haven't been confirmed through gameplay measurements, and how much this
+changes PalCalc's breeding-time estimates is still unknown.
 
 This affects ordinary random additions and Special Cakes that rely on random
 filling because the parents have fewer than four distinct passives.
@@ -124,12 +126,12 @@ describes their effects on generated children. A confirmed game mechanic can
 therefore still be missing from PalCalc's model.
 
 Capture bonuses and extra-egg effects depend on the target Pal, collection method
-and active companions. The published findings cover the supplied states and ranks
-described in the [assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md).
-They don't establish a bonus on every capture or egg pickup, or an overall
-gameplay rate. Having an empty passive slot alone doesn't guarantee a capture
-bonus. Changing companion ranks or the set of active bonus sources also falls
-outside the unchanged setups used for those findings.
+and active companions. The [assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md)
+covers specific target conditions and companion setups. An empty passive slot
+alone doesn't guarantee a capture bonus, and the findings don't give an overall
+bonus rate across different capture or pickup situations. Rates for setups where
+companion ranks or active bonus sources change during the process haven't been
+established.
 
 PalCalc's species database hasn't been shown to match every live pairing. Ties,
 special recipes and variant parents can affect the result. See the
