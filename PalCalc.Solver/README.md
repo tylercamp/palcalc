@@ -460,5 +460,6 @@ Further references:
 
 - [Passive inheritance estimation](./README-BREED-ESTIMATE.md)
 - [Miscellaneous optimization notes](./README-MISC.md)
+- [Find All Breedable tool](./README-BREEDABLE.md)
 - [`PalCalc.Solver.CLI/Program.cs`](../PalCalc.Solver.CLI/Program.cs) contains
   an end-to-end usage example.
