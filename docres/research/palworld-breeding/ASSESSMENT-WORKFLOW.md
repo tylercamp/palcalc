@@ -328,7 +328,7 @@ them to the writing; audience announcements don't need to appear in the document
 
 | Document | Intended readers and appropriate detail |
 | --- | --- |
-| [Mechanics explanation](../../../PALWORLD-BREEDING-MECHANICS.md) | Players planning breeding. Explain rules and practical exceptions using in-game names, examples, probability tables and short algorithms. Brief technical notes can support the explanation. |
+| [Mechanics explanation](../../../PALWORLD-BREEDING-MECHANICS.md) | Primarily players planning breeding, also technical readers needing a very high-level reference. Start with written explanations, followed by more specific algorithm overviews where useful. Use in-game names, examples, probability tables and brief technical notes to explain rules and practical exceptions. |
 | [Limitations](../../../LIMITATIONS.md) | Players interpreting results and choosing settings. Explain practical effects and their causes in plain language; link detailed implementation or research reasoning. |
 | [Solver overview](../../../PalCalc.Solver/README.md) | Developers and technically interested contributors. Explain architecture, code concepts, calculations and implementation tradeoffs. |
 | [Worked calculations](../../../PalCalc.Solver/README-BREED-ESTIMATE.md) | Players comfortable with probability math and developers checking estimates. Show step-by-step calculations; use code references where they help connect the math to the implementation. |
@@ -347,8 +347,14 @@ as a reference for tone and depth. Its probability tables, ordered algorithms,
 brief data-field explanations and implementation links are acceptable. Use current
 accepted assessments for mechanics claims; that older text isn't a findings baseline.
 
-Lead with the player-visible concept. A technical identifier can follow its
-explanation when useful, but mustn't be the primary name of an item or effect.
+Lead with the player-visible concept. For constants and in-game items, include
+brief parenthetical source breadcrumbs at their introduction: the code name and
+the relevant asset/table or property, where established by evidence. For example,
+Special Cakes (`Cake05`, with `PassiveInheritCountOverride=4` in
+`DA_BreedingItemEffectData`). Keep in-game names primary and explain what a value
+means before relying on its identifier. Distinguish serialized asset values from
+native defaults; don't guess a source table. A breadcrumb should orient a reader
+without explaining the resource layout or repeating the reference at every mention.
 Keep extended native traces, layout details and worked proof examples in the
 version report, linked from the summary. This doesn't exclude a short breeding
 example or a calculation that helps players understand the rule.
