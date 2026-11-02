@@ -152,6 +152,31 @@ public class BreedableCalculatorTests
     }
 
     [TestMethod]
+    public void Calculate_NotReachableSkipsBannedWildPals()
+    {
+        var banned = "PlantSlime_Flower".InternalToPal(DB);
+        var allowed = "PlantSlime".InternalToPal(DB);
+
+        var result = CalculateWithBanned(banned);
+
+        CollectionAssert.DoesNotContain(result.NotReachable.ToList(), banned);
+        CollectionAssert.Contains(result.NotReachable.ToList(), allowed);
+    }
+
+    [TestMethod]
+    public void Calculate_BannedWildPalsAreStillListedWhenOwnedOrBred()
+    {
+        var sibelyx = "Sibelyx".ToPal(DB);
+        var penking = "Penking".ToPal(DB);
+
+        var result = CalculateWithBanned(penking, Male("Penking"), Female("Bushi"));
+        Assert.AreEqual(0, Entry(result, "Penking").Tier);
+
+        var bred = CalculateWithBanned(sibelyx, Male("Penking"), Female("Bushi"));
+        Assert.AreEqual(1, Entry(bred, "Sibelyx").Tier);
+    }
+
+    [TestMethod]
     public void Calculate_ParentUsesHighestIVsOfRequiredGender()
     {
         var low = WithIVs("Penking", PalGender.MALE, 10, 10, 10);
@@ -397,7 +422,12 @@ public class BreedableCalculatorTests
 
     private static BreedableResult Calculate(bool useGenderReversers, params PalInstance[] ownedPals) =>
         new BreedableCalculator(
-            SolverTestScenario.Solver(ownedPals, useGenderReversers: useGenderReversers).Settings
+            SolverTestScenario.Solver(ownedPals, useGenderReversers: useGenderReversers, allowedWildPals: DB.Pals).Settings
+        ).Calculate();
+
+    private static BreedableResult CalculateWithBanned(Pal banned, params PalInstance[] ownedPals) =>
+        new BreedableCalculator(
+            SolverTestScenario.Solver(ownedPals, allowedWildPals: DB.Pals.Where(p => p != banned)).Settings
         ).Calculate();
 
     private static BreedableEntry Entry(BreedableResult result, string name) =>

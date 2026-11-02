@@ -327,7 +327,12 @@ public class BreedableCalculatorEdgeCaseTests
 
     private static BreedableResult Calculate(PalBreedingDB db, IEnumerable<PalInstance> ownedPals, bool useGenderReversers) =>
         new BreedableCalculator(
-            SolverTestScenario.Solver(ownedPals, breedingDB: db, useGenderReversers: useGenderReversers).Settings
+            SolverTestScenario.Solver(
+                ownedPals,
+                breedingDB: db,
+                useGenderReversers: useGenderReversers,
+                allowedWildPals: db.Breeding.Select(b => b.Child).Distinct()
+            ).Settings
         ).Calculate();
 
     private static int TierOf(BreedableResult result, Pal pal) => result.Entries.Single(e => e.Pal == pal).Tier;

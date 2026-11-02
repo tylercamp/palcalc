@@ -240,7 +240,7 @@ public class BreedableToolTests
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxWildPals: 0,
-            allowedWildPals: [],
+            allowedWildPals: DB.Pals,
             bannedBredPals: [],
             maxInputIrrelevantPassives: 0,
             maxBredIrrelevantPassives: 0,

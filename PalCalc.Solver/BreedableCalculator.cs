@@ -104,6 +104,8 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
                 .Select(b => b.Child)
                 .Distinct()
                 .Where(p => !tiers.ContainsKey(p))
+                // (same as the solver: a banned wild pal isn't suggested, but is still used if owned or bred)
+                .Where(settings.AllowedWildPals.Contains)
                 .OrderBy(p => p.InternalIndex)
         );
     }
