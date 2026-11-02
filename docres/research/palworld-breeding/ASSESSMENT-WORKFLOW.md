@@ -318,7 +318,44 @@ When reference updates are included in the task, review the
 [limitations](../../../LIMITATIONS.md) against accepted findings. Keep solver
 details in the solver docs, link summaries back to conclusions/evidence, and
 don't label an implementation difference fixed merely because docs changed.
-See [document responsibilities](README.md#where-information-lives).
+See [document responsibilities](README.md#where-information-lives) and the authoring
+guidance below when choosing vocabulary and depth for each output.
+
+### Writing for each audience
+
+These are authoring instructions, primarily for agents editing the docs. Apply
+them to the writing; audience announcements don't need to appear in the documents.
+
+| Document | Intended readers and appropriate detail |
+| --- | --- |
+| [Mechanics explanation](../../../PALWORLD-BREEDING-MECHANICS.md) | Players planning breeding. Explain rules and practical exceptions using in-game names, examples, probability tables and short algorithms. Brief technical notes can support the explanation. |
+| [Limitations](../../../LIMITATIONS.md) | Players interpreting results and choosing settings. Explain practical effects and their causes in plain language; link detailed implementation or research reasoning. |
+| [Solver overview](../../../PalCalc.Solver/README.md) | Developers and technically interested contributors. Explain architecture, code concepts, calculations and implementation tradeoffs. |
+| [Worked calculations](../../../PalCalc.Solver/README-BREED-ESTIMATE.md) | Players comfortable with probability math and developers checking estimates. Show step-by-step calculations; use code references where they help connect the math to the implementation. |
+| [Research hub](README.md) | Players checking coverage, contributors, researchers and agents. Keep orientation and status concise; link detailed findings and procedures. |
+| [Changelog](CHANGELOG.md) | Readers tracking checked versions, observed game changes and assessment scope. Use brief entries linking to detail. |
+| `assessment.md` | Researchers, reviewers, developers and agents deciding what the findings establish. State technical conclusions, conditions and PalCalc comparisons directly, with evidence links. |
+| `evidence.md` | Technical readers verifying or revisiting findings. Retain scoped models, identifiers, inputs, decisive excerpts and useful verification landmarks. |
+| This workflow and the [template](ASSESSMENT-TEMPLATE.md) | Research authors, reviewers and agents. Give procedural and authoring instructions. |
+| [REA guide](REA-GUIDE.md) and [historical references](HISTORICAL-DISCOVERY-REFERENCES.md) | Researchers and agents operating REA or locating native logic. Technical setup, procedures and build-specific discovery leads are appropriate. |
+| [Review skill](palworld-breeding-review/SKILL.md) and its [notes](palworld-breeding-review/references/review-notes.md) | Reviewers and agents comparing retained findings. Explain comparison procedures and distinctions to check. |
+| [Supporting mechanics](../palworld-misc/README.md) and [data-generation guide](../../../PalCalc.GenDB/README.md) | Developers, researchers and agents maintaining those calculations or data. Technical models, calibration assumptions and extraction procedures are appropriate. |
+
+For the mechanics explanation, use the
+[earlier breeding guide](https://github.com/tylercamp/palcalc/blob/66f18a000e2107640b219562437357ced5aff7eb/PalCalc.Solver/README-PALWORLD-MECHANICS.md)
+as a reference for tone and depth. Its probability tables, ordered algorithms,
+brief data-field explanations and implementation links are acceptable. Use current
+accepted assessments for mechanics claims; that older text isn't a findings baseline.
+
+Lead with the player-visible concept. A technical identifier can follow its
+explanation when useful, but mustn't be the primary name of an item or effect.
+Keep extended native traces, layout details and worked proof examples in the
+version report, linked from the summary. This doesn't exclude a short breeding
+example or a calculation that helps players understand the rule.
+
+Retain material conditions and uncertainty in terms each audience can understand;
+readers shouldn't need to reconstruct a caveat from evidence. Shortening a summary
+doesn't remove the version report's responsibility to retain its supporting detail.
 
 ## 6. Implement only when requested
 

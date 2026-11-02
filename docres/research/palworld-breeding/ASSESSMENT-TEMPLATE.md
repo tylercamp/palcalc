@@ -24,6 +24,13 @@ and exports belong under `_REA-ANALYSIS/runs/<run-id>/`.
 Use the workflow's [close-out and PR-readiness guidance](ASSESSMENT-WORKFLOW.md#review-close-out-and-pr-readiness)
 before final delivery.
 
+Write `assessment.md` for researchers, reviewers and developers deciding what the
+findings establish and how they affect PalCalc. State conclusions and conditions
+directly, linking to the proof. Write `evidence.md` for technical readers verifying
+or revisiting those findings: retain the models, identifiers, inputs and excerpts
+needed for that work. Use the workflow's [audience guidance](ASSESSMENT-WORKFLOW.md#writing-for-each-audience)
+when updating linked summaries for other readers.
+
 ## assessment.md outline
 
 ```markdown

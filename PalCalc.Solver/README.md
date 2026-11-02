@@ -15,10 +15,11 @@ inheritance odds may take longer than a three-step path whose children are much
 more likely to have the right traits. The solver compares paths by their
 estimated effort and keeps a small selection of useful alternatives.
 
-A detailed explanation of Palworld breeding mechanics and calculations are
-described [here](../PALWORLD-BREEDING-MECHANICS.md).
-These are used as a reference, but for performance and simplicity, PalCalc intentionally ignores or simplifies certain mechanics. The [limitations page](../LIMITATIONS.md) describes some of these
-search tradeoffs, which are also occasionally mentioned in this overview.
+For the game rules, see [Palworld Breeding Mechanics](../PALWORLD-BREEDING-MECHANICS.md).
+For performance and simplicity, PalCalc intentionally ignores or simplifies
+certain mechanics. The [limitations page](../LIMITATIONS.md) describes the practical
+effects of these choices; this overview explains the relevant implementation
+tradeoffs.
 
 ## Concepts at a Glance
 

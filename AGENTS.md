@@ -13,6 +13,9 @@ and examples.
 
 # Mechanics research
 
+Before editing mechanics documentation, agents must read the workflow's
+[audience and detail guidance](docres/research/palworld-breeding/ASSESSMENT-WORKFLOW.md#writing-for-each-audience).
+
 For new REA analysis or comparisons after a game update, start with the
 [mechanics checklist and status](docres/research/palworld-breeding/README.md#current-verification-status),
 then read the [assessment workflow](docres/research/palworld-breeding/ASSESSMENT-WORKFLOW.md)

@@ -168,6 +168,9 @@ findings don't verify another. See the workflow for provisional unknown versions
 
 ## Where information lives
 
+Agents editing these docs must follow the workflow's
+[audience and detail guidance](ASSESSMENT-WORKFLOW.md#writing-for-each-audience).
+
 | Location | Main responsibility |
 | --- | --- |
 | This README | Current mechanic checklist, verification status, and routes into conclusions/evidence |
@@ -176,11 +179,15 @@ findings don't verify another. See the workflow for provisional unknown versions
 | `assessments/<game-version>/evidence.md` | Consolidated scoped game model, input provenance, and decisive support for assessment conclusions and material limitations |
 | [Mechanics explanation](../../../PALWORLD-BREEDING-MECHANICS.md) | Player-facing game rules, derived from the research, with links back to status and detail |
 | [Limitations](../../../LIMITATIONS.md) | Current modeling omissions, search tradeoffs, and their practical effects |
-| [Solver overview](../../../PalCalc.Solver/README.md) and [worked calculations](../../../PalCalc.Solver/README-BREED-ESTIMATE.md) | Current implementation and its estimates |
+| [Solver overview](../../../PalCalc.Solver/README.md) | Current implementation and its estimates |
+| [Worked calculations](../../../PalCalc.Solver/README-BREED-ESTIMATE.md) | Passive-inheritance probabilities and effort estimates for one child |
 | [Workflow](ASSESSMENT-WORKFLOW.md) | Scope, further-tracing decisions, probability claims, completion, and publication rules |
-| [Template](ASSESSMENT-TEMPLATE.md), [REA guide](REA-GUIDE.md) | Report structure and technical investigation methods, following the workflow's boundaries |
-| [Historical discovery references](HISTORICAL-DISCOVERY-REFERENCES.md) | Build-specific search anchors, layout clues, and constants for exploration; not mechanics conclusions or verification coverage |
-| [Review skill](palworld-breeding-review/SKILL.md) | Comparing completed findings with PalCalc |
+| [Template](ASSESSMENT-TEMPLATE.md) | Report structure, following the workflow's boundaries |
+| [REA guide](REA-GUIDE.md) | Technical investigation methods, following the workflow's boundaries |
+| [Historical discovery references](HISTORICAL-DISCOVERY-REFERENCES.md) | Search anchors, layout clues, and constants for exploration; not mechanics conclusions or verification coverage |
+| [Review skill](palworld-breeding-review/SKILL.md) and its [notes](palworld-breeding-review/references/review-notes.md) | Comparing completed findings with PalCalc |
+| [Supporting mechanics](../palworld-misc/README.md) | Explanations of supporting calculations and links to their verification status |
+| [Data-generation guide](../../../PalCalc.GenDB/README.md) | How game data becomes PalCalc's database |
 | `tools/` | Reusable helpers and tests; see the [PE helper instructions](REA-GUIDE.md#bundled-offline-pe-helper) |
 | `_REA-ANALYSIS/runs/<timestamp>-<id>/` at the repo root | Ignored scripts, raw responses, generated output, exports, logs, and snapshots |
 | `_REA-ANALYSIS/txt/<investigation-id>/` at the repo root | Ignored temporary documentation: topic investigations, hypotheses, draft models, and continuation notes |
