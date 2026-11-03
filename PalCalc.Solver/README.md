@@ -120,10 +120,6 @@ inheritance, so a 2/2 split is no better than a 1/3 or 0/4 split.
 1. The list of actual passives, for inheritance probabilities.
 2. The list of effective passives, for comparing similar Pals.
 
-_Note: Bred and composite candidates can still have unknown passive names,
-represented by placeholders. Those placeholders can affect duplicate counting;
-see [unknown passive identities](../LIMITATIONS.md#unknown-or-irrelevant-passive-identities)._
-
 #### IVs
 
 An IV is relevant when it can satisfy a threshold in the current request.
@@ -151,8 +147,8 @@ have one parent with an "ignore-inherit" attack, and the other parent has
 just 1 normal attack equipped, the child has a 100% chance to inherit the
 "1 attack" from that other parent.
 
-As PalCalc considers each possible child, it records which combinations of
-requested attacks can be made available on that child, using the parents or
+As PalCalc considers each possible child, it records the combinations of
+attacks which can be made available on that child, based on the parents or
 their breeding paths. These records are called **attack profiles**.
 
 For example, a path might be able to supply either of two requested attacks
@@ -268,10 +264,6 @@ will _often_ require less breeding attempts than other approaches, making
 it a semi-accurate stand-in for direct breeding effort. These cakes are
 also high-level and expensive, making them even more important for comparisons.
 
-This shortcut can discard a faster path that uses more Special Cakes. The final
-effort calculation compares the options that survived; it can't recover paths
-already removed during the search.
-
 _Technical note: the "available pairings" data is stored in a 64-bit `ulong`_
 _bitfield for general comparisons, and an array of 8-bit `byte` bitfields for_
 _associating arrangements with cake costs. With 6 order-independent attack slots,_
@@ -350,9 +342,7 @@ available in each tree.
 
 ## Detailed Solver Walkthrough
 
-The following maps the search steps to their implementation, in order. The
-[earlier overview](#building-a-breeding-tree---the-algorithm) explains the same
-process without the class-level detail.
+The following maps the search steps to their implementation, in order.
 
 ### 1. Prepare the solve
 
@@ -480,7 +470,7 @@ The loop stops when:
    simplify similar results.
 8. Return the remaining paths as a `BreedingSolverResult`.
 
-When working out attack options, the breeding method is already fixed on each
+When working out attack options, the breeding method (use of Special Cakes) is already fixed on each
 candidate. Finalization chooses the parent loadouts and calculates their costs
 within that method.
 
@@ -505,12 +495,11 @@ groups. They don't change how candidates are grouped during the search.
 
 ## Mechanics used by the solver
 
-The [player-facing mechanics reference](../PALWORLD-BREEDING-MECHANICS.md) explains
+The [mechanics reference](../PALWORLD-BREEDING-MECHANICS.md) explains
 the game rules and probabilities. This section explains how PalCalc uses them
 in its estimates. The [research checklist](../docres/research/palworld-breeding/README.md#current-verification-status)
-records the latest fully verified game version, currently 1.0.5.102999, and links
-to the findings and evidence. That game verification is separate from checking
-which rules the solver implements; its approximations are collected in
+records the latest fully verified game version - currently 1.0.5.102999 - and links
+to the findings and evidence. Various comments on PalCalc's approximations are collected in
 [LIMITATIONS.md](../LIMITATIONS.md).
 
 ### Species database
@@ -531,12 +520,6 @@ The generated database uses some shortcuts and different tie handling:
   native table order.
 - The generated graph has no input for the game's item rank adjustment.
 
-Matching the average-power calculation alone therefore doesn't establish that
-every database entry agrees with the game. The
-[species assessment](../docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-species)
-gives the recovered rules and concrete variant cases; the full generated database
-hasn't been verified against every live pairing.
-
 ### IV probabilities
 
 The [IV source-selection explanation](../PALWORLD-BREEDING-MECHANICS.md#iv-source-selection)
@@ -547,9 +530,8 @@ gives the game's patterns and default weights (`Combi_TalentInheritNum` in
 2. For each of those stats, which parents meet the requested threshold?
 
 For the default `[3, 2, 1]` weights, the first question gives the following
-nominal probabilities. They assume equally likely choices within each group,
-as described in the linked rules; they aren't measured gameplay frequencies.
-An HP+Attack target counts both the HP+Attack and all-three inheritance patterns.
+overall probabilities.
+(An HP+Attack target counts both the HP+Attack and all-three inheritance patterns.)
 
 | Desired stats | Chance all are taken from parents |
 | --- | ---: |
@@ -558,18 +540,14 @@ An HP+Attack target counts both the HP+Attack and all-three inheritance patterns
 | HP+Attack, or HP+Defense | 7/18 |
 | Attack+Defense, or all three | 5/18 |
 
-For example, suppose only Attack IV is requested, with a threshold of 90. One
+For example, say we only want the Attack IV with a threshold of 90. One
 parent has 95 and the other has 60. Attack comes from a parent with probability
 5/9, and only one of the two parents qualifies, so PalCalc gives this IV
 requirement a success chance of `5/9 × 1/2 = 5/18`, or about 27.8%. If both
 parents meet the threshold, the chance is 5/9 instead.
 
 For multiple requested stats, each stat with only one qualifying parent adds
-another factor of 1/2; PalCalc assumes the parent choices are independent.
-No requested IVs gives probability one. The
-[`BuildDesiredIVProbabilities` calculation](../PalCalc.Model/BreedingMechanics.cs)
-precomputes the requested-stat probabilities for the database's weights, so
-custom weights use the same asymmetric pattern table.
+another factor of 1/2.
 
 This model omits talent bonuses, mutation, and fresh random IVs that happen to
 meet the target. See [desired traits supplied by fresh random values](../LIMITATIONS.md#desired-traits-supplied-by-fresh-random-values).
@@ -581,33 +559,25 @@ explain ordinary and Special Cake selection. PalCalc combines and deduplicates
 eligible equipped-parent attacks, excluding non-inheritable attacks
 (`IgnoreRandomInherit` in `DT_WazaDataTable`) and attacks missing from its database.
 
-The three equipped slots don't limit how many attacks the child can know.
-Special Cakes (`Cake05` in `DA_BreedingItemEffectData`) can pass on all eligible
-equipped attacks from both parents. PalCalc tracks the achievable combinations
+PalCalc tracks the achievable combinations
 during search and chooses parent loadouts during [finalization](#finishing-the-results).
 Its restrictions on when to consider Special Cakes are described there too.
 
 ### Egg-production time
 
-PalCalc estimates production time per attempt as follows. This is the current
-solver model, not a newly verified native timing formula.
+PalCalc _estimates_ production time per attempt as follows:
 
 ```text
 time_per_attempt = BreedingTime * 2 * parent_A_time_factor * parent_B_time_factor
 ```
 
 [GameSettings](../PalCalc.Model/GameSettings.cs) defaults `BreedingTime` to five
-minutes and doubles it to approximate parents being available only half the time.
-That availability allowance is a solver assumption, not a game-code constant.
-[ToTimeFactor](../PalCalc.Solver/Utils/SolverExtensions.cs) currently uses a factor of
-0.5 for a parent with the tracked breeding-speed passive effect, otherwise 1.
-With default settings this gives ten minutes per attempt without those effects.
+minutes and doubles it to approximate parents being available only half the time (due to day/night cycle).
 
 Producing the egg is separate from incubating it. The
 [effort calculation](../PalCalc.Solver/PalReference/BredPalReferenceEffort.cs) multiplies
 production time by expected attempts, then combines it with incubation according
-to the configured incubator model. None of this establishes the native treatment
-of work, idling, sleep, or multiple speed modifiers.
+to the configured incubator model.
 
 
 See the [timing research status](../docres/research/palworld-breeding/README.md#supporting-mechanics)
