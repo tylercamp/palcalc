@@ -393,6 +393,47 @@ Dependencies: character row identity/offset/type, gender enum identity, exact
 threshold constant/instructions, ordinary and mutation assignment, spawn/hatch
 callers, overrides and later saved gender writes.
 
+### Special-encounter gender rows
+
+The 753-row `DT_PalMonsterParameter` composite export identified under
+[shipped table binding](#shipped-species-table-binding-and-order), SHA-256
+`b8fce52f84af279b5494a6de87ea6966aa412a5b00e555e0730a3b3ae5ad8599`,
+contains the following complete set of rows with `MaleProbability` equal to
+0, 100 or a negative value: ten female-only, eight male-only and three None.
+All have negative `ZukanIndex` values and identify special encounter forms,
+rather than ordinary Paldeck entries.
+
+| Character row | MaleProbability | Assigned gender |
+| --- | ---: | --- |
+| `RAID_NightLady` | 0 | Female |
+| `RAID_NightLady_Dark` | 0 | Female |
+| `RAID_NightLady_Dark_2` | 0 | Female |
+| `GYM_BlackGriffon` | 100 | Male |
+| `GYM_ElecPanda` | 0 | Female |
+| `GYM_Horus` | 100 | Male |
+| `GYM_LilyQueen` | 0 | Female |
+| `GYM_ThunderDragonMan` | 100 | Male |
+| `GYM_MoonQueen` | 0 | Female |
+| `GYM_ElecPanda_2` | 0 | Female |
+| `GYM_LilyQueen_2` | 0 | Female |
+| `GYM_ThunderDragonMan_2` | 100 | Male |
+| `GYM_Horus_2` | 100 | Male |
+| `GYM_BlackGriffon_2` | 100 | Male |
+| `GYM_BlackGriffon_2_Avatar` | 100 | Male |
+| `GYM_MoonQueen_2` | 0 | Female |
+| `GYM_MoonQueen_2_Servant` | 0 | Female |
+| `GYM_ElecPanda_Otomo` | -1 | None |
+| `PREDATOR_FlowerRabbit_Quest` | 100 | Male |
+| `POLICE_ThunderDog` | -1 | None |
+| `POLICE_HawkBird` | -1 | None |
+
+These settings apply to the named forms, not the corresponding ordinary species.
+For example, `RAID_NightLady` is the raid Bellanoir form, and
+`GYM_BlackGriffon` is a tower Shadowbeak form. The None cases are a special tower
+Grizzbolt companion and police Rayhound/Nitewing forms. These are table defaults;
+[supplied spawn saves and overrides](#saved-wild-gender-from-spawn-input-through-captured-storage)
+retain their separate gender contracts.
+
 ## Child passives
 
 Scope: ordinary and positive-override generation, random filling, mutation

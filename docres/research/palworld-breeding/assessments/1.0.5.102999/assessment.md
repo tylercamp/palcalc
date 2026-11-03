@@ -101,6 +101,11 @@ The [extra-egg save application](evidence.md#extra-egg-save-application-and-muta
 preserves gender through the grant. Both pickup effects preserve gender in their
 child-save writes; unknown activation rates do not change that conclusion.
 
+The retained character-table snapshot locates fixed or absent genders on special
+raid, tower, quest and police rows. These are form-specific settings, not gender
+restrictions on the corresponding ordinary species. The
+[named-row snapshot](evidence.md#special-encounter-gender-rows) retains all 21 cases.
+
 ## Child passives
 
 Question: which identities and achieved count reach the child save, and with what selection rules? Inputs are ordered parental lists, `Combi_PassiveInheritNum`, `Combi_PassiveRandomAddNum`, `PassiveInheritCountOverride`, manager pools/weights, mutation mode and supplied pickup effects. Output is the final saved passive list for primary/additional eggs. Ordered current pools, selection and final transfer are established for these per-egg inputs. Supplied effects remain conditional inputs; no unconditional per-pickup mixture for arbitrary changing source setups is claimed.

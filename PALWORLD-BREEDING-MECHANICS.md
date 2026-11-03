@@ -263,13 +263,47 @@ to each ordinary offspring IV, capped at 100. Mutation instead gives fresh IVs
 in the default range 90–100 (`Combi_MutationMinTalent=90` in the native game
 settings), skipping both parental IV inheritance and the item bonus.
 
-Mutation also changes species and passive selection. Its species pool can include
-special-recipe children, but still excludes bosses and other ineligible species.
-Mutation passives can displace parental passives, even with a Special Cake. It
-also attempts an extra attack of the child's primary element, which may duplicate
-one the child already has.
+Mutation also attempts an extra attack of the child's primary element, which may
+duplicate one the child already has. Species and passives use separate selection
+rules from ordinary breeding.
 
-TODO - Should mention the game's algorithm for choosing passives and pal species for mutation eggs
+#### Mutation species
+
+Mutation skips special recipes and uses a randomized breeding-power calculation:
+
+1. Calculate a target power using the lower parental breeding power, the
+   difference between the parents' powers, and a random adjustment.
+2. Select the nearest eligible species, using the same priority and table-order
+   tie breakers as ordinary selection. Special-recipe children are allowed in
+   this pool; bosses and other ineligible species are still excluded.
+3. Use the selected species' Alpha form if one is available. This replaces the
+   ordinary Alpha-conversion roll.
+
+The [mutation species model](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#child-species)
+gives the exact arithmetic and settings behind the target power.
+
+#### Mutation passives
+
+Without a passive-count override, the game:
+
+1. Draws one mutation passive and one high-rank random passive, removing duplicates.
+2. Randomly selects distinct parental passives not already present until the
+   child has four passives or the parental pool is exhausted.
+3. Attempts ordinary random filling for any remaining slots. The usual
+   [selection bug](#random-passive-selection-bug) can leave a shortfall.
+
+The mutation pool uses `AddMutationPal`; the high-rank random pool uses
+`AddPal=true` and `Rank>3` (both in `DT_PassiveSkill_Main`). These draws use the
+pool's selection weights (`LotteryWeight`).
+
+With a Special Cake, the game first builds the ordinary cake outcome. It then
+draws a high-rank passive absent from that outcome, followed by a mutation passive
+absent from both the outcome and the new high-rank choice. Any successful mutation
+draw goes first, followed by any successful high-rank draw and then the cake
+outcome; the list is trimmed to four. A draw with no eligible candidate adds
+nothing. These new entries can therefore displace parental passives.
+See the [full passive model](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#child-passives)
+for the selection and exclusion rules.
 
 PalCalc's estimates omit mutation and IV bonuses. The
 [version report](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-ivs)
@@ -296,20 +330,21 @@ the [effect conditions and combination rules](docres/research/palworld-breeding/
 Each species has gender probabilities in the game data (`MaleProbability` in
 `DT_PalMonsterParameter`).
 
-Ordinary and mutated children use the selected species' gender ratio; some species
-have a fixed gender or no gender. The checked hatch and extra-egg routes preserve
-the assigned gender. See the [gender assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-gender)
+Ordinary and mutated children use the selected species' gender ratio. Fixed or
+absent genders occur on special encounter forms: for example, raid Bellanoir
+variants are configured female-only, tower Shadowbeak forms male-only, and police
+Rayhound/Nitewing forms genderless. These settings belong to those special forms,
+not their ordinary species. The [special-encounter snapshot](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#special-encounter-gender-rows)
+lists the relevant game-data rows.
+
+See the [gender assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-gender)
 for the game rules, and [gender handling](PalCalc.Solver/README.md#gender) for
 PalCalc's estimates.
-
-TODO - Which species are being referred to? And "The checked ... routes preserve the assigned gender" - is this a meaningful statement? Sounds like fluff at a glance
 
 ## Wild Pals
 
 A wild Pal's skills can depend on what it receives when spawned, what it learns
 with levels, and any changes made during capture.
-
-TODO - How are random passive skills added? Does it use the same random passive roll as normal breeding?
 
 - **Passives:** Wild Pals normally receive species-specific passives before random
   additions. Special spawns can supply other traits; World Tree aura spawns, for
@@ -325,6 +360,38 @@ TODO - How are random passive skills added? Does it use the same random passive 
 - **Gender:** Wild Pals normally use their species' ratio, though special spawns
   can supply a different gender. The checked capture routes preserve the assigned
   gender.
+
+### Random passives on wild Pals
+
+When ordinary wild random filling is enabled, the game starts with species and
+spawn-supplied passives, then rolls how many random additions to attempt. This
+uses different count weights from breeding (`PassiveSkillAppendNumWeights` in
+the native game settings):
+
+| Random-add attempts | Calculated chance |
+| --- | ---: |
+| 0 | 10% |
+| 1 | 76% |
+| 2 | 10% |
+| 3 | 3% |
+| 4 | 1% |
+
+These chances normalize the default weights `[10, 76, 10, 3, 1]`, assuming evenly
+distributed weighted rolls; they aren't measured spawn frequencies. Attempts are
+capped by the remaining slots, so this isn't a table of final passive counts.
+Special spawns and rare additions have their own rules.
+
+The count roll differs, but wild generation uses the same ordinary random-passive
+pool and selection helper as breeding (`AddPal` in `DT_PassiveSkill_Main`). The
+[selection bug](#random-passive-selection-bug) therefore applies here too: an
+attempt can fail to add a passive.
+
+These weights come from the executable's native defaults, rather than a serialized
+override in the game-data asset. See the [initialization evidence](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#wild-pal-passives)
+for their source and the conditions controlling random filling. PalCalc's current
+estimate still uses a [simplified wild-passive distribution](LIMITATIONS.md#wild-random-passive-counts).
+
+### Yakumo passive order
 
 **Yakumo's passive order can matter when slots are limited.** The game checks
 eligible passives in stored order, using the same per-check rate for each, and

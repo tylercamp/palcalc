@@ -40,6 +40,7 @@ changes PalCalc's breeding-time estimates is still unknown.
 
 This affects ordinary random additions and Special Cakes that rely on random
 filling because the parents have fewer than four distinct passives.
+It also affects ordinary wild random filling, which uses the same selector.
 See [passive selection and its limits](PALWORLD-BREEDING-MECHANICS.md#passive-skills)
 for the game rules and supporting evidence.
 
@@ -119,6 +120,19 @@ See [search coverage](PalCalc.Solver/README.md#search-coverage-and-limits)
 and [finishing results](PalCalc.Solver/README.md#finishing-the-results).
 
 ## Unverified and unmodeled behavior
+
+### Wild random passive counts
+
+PalCalc currently assumes that wild Pals are equally likely to receive zero,
+one, two, three or four random passives. The game's ordinary wild-generation
+weights instead strongly favor one attempted addition. Existing passives, special
+spawns and failed selections can also change the final count.
+
+This mismatch can affect the estimated capture effort for wild starting Pals
+with a limited number of unwanted passives. The solver's probability logic
+hasn't yet been updated to the [recovered wild-passive rules](PALWORLD-BREEDING-MECHANICS.md#random-passives-on-wild-pals).
+
+### Other omitted behavior and verification limits
 
 Inheritance estimates omit mutation and talent bonuses, even though the
 [version report](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-ivs)
