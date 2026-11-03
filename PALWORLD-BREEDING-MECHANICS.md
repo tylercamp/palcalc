@@ -6,7 +6,7 @@ how those mechanics are used to search for breeding paths.
 
 For farm-bred eggs, the child's species, gender, IVs, passives and inherited
 attacks are determined when the egg is produced. The checked hatch routes use
-that stored child rather than rerolling inheritance. See the
+that child rather than rerolling inheritance. See the
 [generation-to-hatch evidence](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#shared-child-save-boundary)
 and the separate [world-egg pickup effects](#world-egg-pickup-effects) for the
 collection-time exceptions.
@@ -38,9 +38,7 @@ records the last checked game version and date for each mechanic, with links to
 its conclusions and evidence. The [research changelog](docres/research/palworld-breeding/CHANGELOG.md)
 records changes to checked versions, game mechanics and assessment scope.
 
-The linked version reports contain the detailed findings, evidence and conditions.
-Their game-code analysis doesn't measure how often every outcome occurs in play,
-or establish that PalCalc models every rule.
+These reports contain the detailed findings, evidence and conditions.
 See [PalCalc's limitations](LIMITATIONS.md) for the approximations used in estimates.
 
 ## Pal Species
@@ -51,10 +49,11 @@ parents, including their genders where required. It uses the first matching
 recipe in table order.
 
 If no recipe applies, it uses the parents' breeding powers to choose a child. For
-normal breeding powers, this works out to averaging the parents' powers and rounding
+normal breeding powers, this means: take the average of the parents' powers, round
 up, then adding any item rank adjustment. It selects an eligible child with the
 nearest power, breaking distance ties by breeding priority (`CombiDuplicatePriority`
-in `DT_PalMonsterParameter`) and exact ties by table order.
+in `DT_PalMonsterParameter`), and if there is still a tie, Palworld picks the option
+which appears first in the game files.
 
 For ordinary breeding, the steps are:
 
@@ -75,7 +74,7 @@ ordinary Gumoss, which can then become an Alpha.
 _Note: Some special recipes have gender requirements. In particular, the child of
 Katress + Wixen may change depending on parent genders._
 
-For how PalCalc builds its list of breeding pairs, see the
+To see how PalCalc builds its list of breeding pairs, see the
 [solver's species database explanation](PalCalc.Solver/README.md#species-database).
 
 ## Passive Skills
@@ -91,10 +90,9 @@ described below.
 The first roll asks for one to four passives from the parents. If the parents
 have fewer unique passives than requested, the child inherits the available ones.
 The second roll asks for zero to three random additions, limited by the remaining
-slots on the child. The default count weights (`Combi_PassiveInheritNum` and
+slots on the child. The default weights (`Combi_PassiveInheritNum` and
 `Combi_PassiveRandomAddNum` in `BP_PalGameSetting`, both `[4, 3, 2, 1]`) give the
-following chances for those rolls. These are calculated probabilities, not
-measured breeding frequencies:
+following chances for those rolls:
 
 | Requested parental count | Chance | Random-add attempts | Chance |
 | --- | ---: | --- | ---: |
@@ -116,20 +114,19 @@ from its parents (steps 1-3), then the game may add random passives (steps 4-5).
 
 ### Random-passive selection bug
 
-An apparent bug can cause the game to skip a random passive it tried to add,
+An apparent bug in the game can cause it to skip a random passive it tried to add,
 leaving the child with fewer passives. It can also change which random passives
 are more likely to be chosen. The
 [passive assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-passives)
 explains the bug and gives an example using the current game data.
 
 For nonmutated eggs, the table below shows the **calculated chance per egg that
-at least one random addition fails**. Count each passive shared by the parents
-only once:
+at least one random addition fails**:
 
 | Unique passives between the parents | Ordinary breeding | Special Cake |
 | --- | ---: | ---: |
-| Zero | About 0.0053% | About 0.0323% |
-| Four | About 0.0013%–1.36%, depending on the passives | 0%: no random filling |
+| Zero | ~0.0053% | ~0.0323% |
+| Four | ~0.0013% - ~1.36%, depending on the passives | 0%: no random filling |
 
 Allowing other combinations of parental passives raises the highest calculated
 chances to about **1.6% for ordinary breeding** (roughly 1 in 60 eggs) and
@@ -138,22 +135,21 @@ unique passives between them. Which passives the parents have matters as well
 as how many random additions the game tries.
 
 These calculations use the default game data, treat the random rolls as
-independent, and assume each possible lottery number is equally likely. They
-haven't been measured through gameplay. The
-[full calculation](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#nominal-per-egg-fill-failure-probabilities)
+independent, and assume each possible lottery number is equally likely.
+The [full calculation](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#nominal-per-egg-fill-failure-probabilities)
 records the assumptions and examples. These rates also don't tell us how far
 PalCalc's breeding-time estimates might differ; see the
 [limitations page](LIMITATIONS.md#random-passive-selection-bug).
 
 ### Special Cakes
 
-Special Cakes (`Cake05`, with `PassiveInheritCountOverride=4` in
-`DA_BreedingItemEffectData`) replace both ordinary count rolls with a target of
+Special Cakes (in-game name `Cake05`, with `PassiveInheritCountOverride=4` in
+`DA_BreedingItemEffectData`) will replace both passive-count rolls with a target of
 four passives.
 Other breeding items have different effects; see the
 [item-effect table](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#shared-inputs-and-arithmetic).
 
-In ordinary breeding:
+When using Special Cakes:
 
 - If the parents have at least four unique passives between them, the child
   inherits four of those passives.
@@ -209,22 +205,21 @@ For ordinary breeding, the game uses this process:
 
 Having the same attack equipped on both parents doesn't make it more likely to
 be inherited. The selected attack can also be one the child naturally learns at
-level one, in which case inheritance adds no new attack to its available moves.
+level one, in which case inheritance is still possible but adds no new attack to
+its final available moves.
 
 With a Special Cake (`bInheritAllActiveSkills=true` in `DA_BreedingItemEffectData`),
 the child inherits all eligible equipped attacks from both parents, rather than
-just one. Each parent can contribute at most three equipped attacks. The child's
-three equipment slots don't mean additional inherited attacks are lost; learned
-attacks and currently equipped attacks are different things.
+just one. Since only three attacks can be equipped by any pal, each parent can
+contribute at most three equipped attacks.
 
 ### Important Details
 
 **a.** If the two parents each have one attack equipped, and only one of them is a desired attack, there's a 50/50 chance of inheriting that attack. (Two attacks to pick from.) But if the other parent equips a non-inheritable attack, the desired attack chance is 100%. (One attack to pick from.)
 
 Available attacks include inherited moves and the species' natural moves
-(`DT_WazaMasterLevel`) through the Pal's current level. Only three can be equipped
-at once. See the
-[attack assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-attacks)
+(`DT_WazaMasterLevel`) through the Pal's current level.
+See the [attack assessment](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-attacks)
 for the inheritance rules and checked hatch routes.
 
 ## IVs
@@ -237,27 +232,23 @@ establishes the inheritance process below.
 
 The game doesn't simply roll how many IVs to inherit and then choose that many
 stats. It chooses between three groups of inheritance patterns. In the middle
-group, HP always comes from a parent, and one pattern inherits all three stats.
+group, HP always comes from a parent, and in another group, all three stats are inherited.
 That means asking for HP can give different odds from asking for Attack or Defense.
 
 The default weights `[3, 2, 1]` (`Combi_TalentInheritNum` in `BP_PalGameSetting`)
 choose between these groups, giving the calculated chances below.
-They select a group of patterns, rather than simply how many stats to inherit.
 See the
 [recorded game inputs](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#shared-inputs-and-arithmetic).
 
 | Selection group | Calculated chance | Possible stats taken from parents |
 | --- | ---: | --- |
 | First | 50% | HP **or** Attack **or** Defense |
-| Second | 33⅓% | HP+Attack+Defense **or** HP+Defense **or** HP+Attack |
-| Third | 16⅔% | HP+Attack+Defense |
+| Second | 33% | HP+Attack+Defense **or** HP+Defense **or** HP+Attack |
+| Third | 16% | HP+Attack+Defense |
 
-For these calculations, the three patterns in either of the first two groups
-are equally likely. Each inherited stat has a separate 50/50 choice between
-the parents' values. Stats not taken from parents get fresh random values from 0–100,
-inclusive. A random value can happen to match a parent's IV, but that doesn't
-mean it was inherited. These chances assume independent, evenly distributed
-random rolls; they haven't been measured through gameplay.
+The first two groups have multiple sub-options, which Palworld chooses at random.
+Each inherited stat has a separate 50/50 choice between
+the parents' values. Stats not taken from parents get fresh random values from 0–100.
 
 Current verification of the exact selection process is tracked in the
 [research checklist](docres/research/palworld-breeding/README.md#current-verification-status).
@@ -267,7 +258,7 @@ how those rules become probability and effort estimates.
 ### Mutation and talent-bonus items
 
 Some [breeding items](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#shared-inputs-and-arithmetic)
-(`Cake02` and `Cake04` in `DA_BreedingItemEffectData`) add a separate 1–5 bonus
+(Mushroom Cake - `Cake02`, and `Cake04` - Extravagant Vegetable Cake, in `DA_BreedingItemEffectData`) add a separate 1–5 bonus
 to each ordinary offspring IV, capped at 100. Mutation instead gives fresh IVs
 in the default range 90–100 (`Combi_MutationMinTalent=90` in the native game
 settings), skipping both parental IV inheritance and the item bonus.
@@ -277,6 +268,8 @@ special-recipe children, but still excludes bosses and other ineligible species.
 Mutation passives can displace parental passives, even with a Special Cake. It
 also attempts an extra attack of the child's primary element, which may duplicate
 one the child already has.
+
+TODO - Should mention the game's algorithm for choosing passives and pal species for mutation eggs
 
 PalCalc's estimates omit mutation and IV bonuses. The
 [version report](docres/research/palworld-breeding/assessments/1.0.5.102999/assessment.md#child-ivs)
@@ -294,18 +287,14 @@ remain copied. These changes to the additional egg don't reroll the original chi
 Collection method matters. The breeding farm's direct hatch and container pickup
 keep the generated child's traits. In the checked drop-and-pickup route, an
 existing egg also keeps its saved IVs and doesn't receive the extra-egg roll above.
-These findings don't establish that every egg pickup behaves the same way.
 
 Bonuses depend on the active companions and their eligibility. The report gives
-the [effect conditions and combination rules](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#pickup-effect-conditions-tribe-grouping-and-activation-masks);
-it doesn't establish an overall bonus rate for arbitrary or changing parties.
+the [effect conditions and combination rules](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#pickup-effect-conditions-tribe-grouping-and-activation-masks).
 
 ## Gender
 
 Each species has gender probabilities in the game data (`MaleProbability` in
-`DT_PalMonsterParameter`). A recipe's required parent genders are separate from
-the child's own gender: a gender-specific recipe doesn't by itself explain how
-the child's gender is drawn.
+`DT_PalMonsterParameter`).
 
 Ordinary and mutated children use the selected species' gender ratio; some species
 have a fixed gender or no gender. The checked hatch and extra-egg routes preserve
@@ -313,10 +302,14 @@ the assigned gender. See the [gender assessment](docres/research/palworld-breedi
 for the game rules, and [gender handling](PalCalc.Solver/README.md#gender) for
 PalCalc's estimates.
 
+TODO - Which species are being referred to? And "The checked ... routes preserve the assigned gender" - is this a meaningful statement? Sounds like fluff at a glance
+
 ## Wild Pals
 
 A wild Pal's skills can depend on what it receives when spawned, what it learns
 with levels, and any changes made during capture.
+
+TODO - How are random passive skills added? Does it use the same random passive roll as normal breeding?
 
 - **Passives:** Wild Pals normally receive species-specific passives before random
   additions. Special spawns can supply other traits; World Tree aura spawns, for
@@ -324,9 +317,9 @@ with levels, and any changes made during capture.
 - **Capture bonuses:** Effects such as Yakumo's passive sharing (`GuardianDog` in
   `DT_PartnerSkillParameter`) can add passives during capture. An empty slot alone
   doesn't guarantee a bonus: the target and active companion must meet the
-  effect's conditions. The findings don't establish a bonus rate for every capture.
+  effect's conditions.
 - **Attacks:** Available moves include learned attacks and natural moves through
-  the Pal's current level. They aren't limited to the three equipped moves.
+  the Pal's current level.
   Seeing a boss use an attack in combat doesn't guarantee it will be available
   after capture; Panthalus has special handling covered in the report.
 - **Gender:** Wild Pals normally use their species' ratio, though special spawns
