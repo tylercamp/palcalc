@@ -298,25 +298,14 @@ They don't guarantee the fastest possible real-world plan; the
 
 A completed breeding path still needs a final pass before it is returned.
 
-Surgery can add, remove, or change passives at a cost. The solver applies it
-after the main breeding search. Considering every possible surgery during
-every breeding round could uncover more intermediate combinations, but it
-would also multiply the number of paths the solver has to search.
+By this point, each bred candidate already represents either ordinary breeding
+or breeding with a Special Cake. During search, we use that method's passive
+probability and the IV odds to estimate effort, saving the attack assignments
+and their inheritance odds for finalization.
 
-After applying surgery options, the solver filters for paths which have the
-requested passives, attacks, and gender. The PalCalc.UI app will further
-group or reduce those alternatives so the player isn't shown hundreds of
-similar trees. `PalResultGrouping` and `PalResultProperty` are used for that
-presentation step, but aren't used in the breeding search itself.
-
-A bred candidate can represent either ordinary breeding or breeding with a
-Special Cake, with the passive probability for that method.
-During search, we use that probability and the IV odds to estimate effort.
-Attack-inheritance odds are included when finalization chooses the equipped attacks.
-
-This is necessary since `MaxBredIrrelevantPassives` limits the ordinary passive
-options we explore. Special Cakes need separate handling: they _guarantee_ four passive
-skills in Palworld, which can forcibly exceed PalCalc's limit.
+Special Cakes need separate candidates because `MaxBredIrrelevantPassives`
+limits the ordinary passive options we explore. Special Cakes _guarantee_ four
+passive skills in Palworld, which can forcibly exceed PalCalc's limit.
 
 _Note: The game's [random passive-selection bug](../LIMITATIONS.md#random-passive-selection-bug)
 can leave a child short of four passives. PalCalc assumes the random filling
@@ -329,16 +318,22 @@ We could also search for ways to use cakes just to improve passive inheritance,
 but that would add more options to the search. We skip those for performance,
 accepting that we may miss some valid or better paths.
 
-The solver ends by resolving the real attack skills needed on parent
-and child Pals. The earlier search process just tracks the presence and
-general distribution of attack skills. This simple approach gives great
-performance improvements.
+Once the main search finishes, the solver applies surgery options, which can
+add, remove, or change passives at a cost. Considering every possible surgery
+during every breeding round could uncover more intermediate combinations, but
+it would also multiply the number of paths the solver has to search.
+
+Finalization then resolves the real attack skills needed on parent and child
+Pals and includes their inheritance odds in the effort estimate. The earlier
+search process just tracks the presence and general distribution of attack
+skills. This simple approach gives great performance improvements.
 
 We can save this detail for the end because attacks are _very_ easy to
-manipulate. The rough idea is to assign attacks as late in the tree as possible,
-but this isn't a rule that every reconstructed path must follow. Finalization
-compares the actual effort and cake costs of the attack arrangements still
-available in each tree.
+manipulate. The general guideline is to assign attacks as late in the tree as
+possible.
+
+The solver checks that the completed trees have the requested passives,
+attacks, and gender before returning the results.
 
 ## Detailed Solver Walkthrough
 
@@ -478,20 +473,8 @@ A faster path may need more Special Cakes than a slower one, so we keep both
 when neither is clearly better. We can drop an option if another takes no more
 effort and uses no more cakes, with an improvement in at least one.
 
-A slow path that saves Special Cakes can still be useful, but the UI applies
-two further filters to keep the displayed list manageable:
-
-- **Ordinary cakes:** Within each group with the same final passives, find the
-  fastest path and discard paths using more than twice its ordinary cake count.
-  If several paths tie for fastest, use the lowest cake count among them. This
-  comparison spans different step counts and Special Cake totals.
-- **Time:** Within each group with the same final passives and Special Cake
-  total, discard paths taking more than twice the fastest option's effort.
-  Zero-effort options, such as an already-owned Pal, are excluded when choosing
-  this time baseline. If the group has only zero-effort options, keep one.
-
-The UI uses `PalResultGrouping` and `PalResultProperty` for these final-list
-groups. They don't change how candidates are grouped during the search.
+The UI may apply additional grouping and filtering to avoid massive lists of
+results, using `PalResultGrouping` and `PalResultProperty` for presentation.
 
 ## Mechanics used by the solver
 

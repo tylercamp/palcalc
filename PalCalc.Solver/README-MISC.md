@@ -60,9 +60,8 @@ give us the lower bound for cakes.
 We only compare different candidate trees this way when they match on output
 passives, IV ranges, gender, concrete input choices, step count, gold cost,
 wild-Pal count, and training requirements. Final result simplification keeps
-different Special Cake totals separate. The UI then applies the
-[ordinary-cake and time cutoffs](README.md#8-apply-surgery-and-return-the-results);
-separate Special Cake groups don't exempt a path from the ordinary-cake cutoff.
+different Special Cake totals separate. The UI may apply additional grouping
+and filtering to keep the displayed result list manageable.
 
 The finalization comparison reduces work without imposing its own slowdown
 threshold or result cap. It still takes more work when there are many useful
