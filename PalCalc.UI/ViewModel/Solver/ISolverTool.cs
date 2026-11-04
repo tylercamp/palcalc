@@ -15,6 +15,9 @@ namespace PalCalc.UI.ViewModel.Solver
     {
         ILocalizedText Name { get; }
 
+        // called each time the tool is selected, before `Run`
+        void OnSelected() { }
+
         void Run(BreedingSolverSettings settings, CachedSaveGame save);
     }
 }

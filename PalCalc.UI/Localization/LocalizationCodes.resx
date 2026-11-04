@@ -156,6 +156,51 @@
   <data name="LC_BREEDING_TIME_DESC" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_COMBOS_CHILD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMBOS_CHOOSE_CHILD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMBOS_GROUP_NEITHER" xml:space="preserve">
+    <value>NumPals</value>
+  </data>
+  <data name="LC_COMBOS_GROUP_ONE_FIRST" xml:space="preserve">
+    <value>NumPals</value>
+  </data>
+  <data name="LC_COMBOS_GROUP_READY" xml:space="preserve">
+    <value>NumPals</value>
+  </data>
+  <data name="LC_COMBOS_PARENT_CAN_BE_BRED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMBOS_PARENT_CATCH_ONLY" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMBOS_PARENT_NOT_BREEDABLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMBOS_SORT" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMBOS_SORT_A_TO_Z" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMBOS_SORT_ATTACK" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMBOS_SORT_DEFENSE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMBOS_SORT_HIGHEST_IVS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMBOS_SORT_HP" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_COMBOS_SORT_Z_TO_A" xml:space="preserve">
+    <value />
+  </data>
   <data name="LC_COMMON_CANCEL" xml:space="preserve">
     <value />
   </data>
@@ -620,6 +665,9 @@
     <value />
   </data>
   <data name="LC_TARGET_PALS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_TOOL_COMBOS_BY_CHILD" xml:space="preserve">
     <value />
   </data>
   <data name="LC_TOOL_FIND_BREEDABLE" xml:space="preserve">

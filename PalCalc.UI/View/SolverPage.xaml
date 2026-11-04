@@ -31,6 +31,10 @@
         <DataTemplate DataType="{x:Type vms:BreedableToolViewModel}">
             <v:BreedableToolView />
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vms:ParentCombosToolViewModel}">
+            <v:ParentCombosToolView />
+        </DataTemplate>
     </UserControl.Resources>
     <Border Padding="5">
         <DockPanel>

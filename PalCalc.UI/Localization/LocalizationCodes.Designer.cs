@@ -148,6 +148,66 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMBOS_CHILD,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMBOS_CHOOSE_CHILD,
+        /// <summary>
+        ///   Looks up a localized string similar to NumPals.
+        /// </summary>
+        LC_COMBOS_GROUP_NEITHER,
+        /// <summary>
+        ///   Looks up a localized string similar to NumPals.
+        /// </summary>
+        LC_COMBOS_GROUP_ONE_FIRST,
+        /// <summary>
+        ///   Looks up a localized string similar to NumPals.
+        /// </summary>
+        LC_COMBOS_GROUP_READY,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMBOS_PARENT_CAN_BE_BRED,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMBOS_PARENT_CATCH_ONLY,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMBOS_PARENT_NOT_BREEDABLE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMBOS_SORT,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMBOS_SORT_A_TO_Z,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMBOS_SORT_ATTACK,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMBOS_SORT_DEFENSE,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMBOS_SORT_HIGHEST_IVS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMBOS_SORT_HP,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_COMBOS_SORT_Z_TO_A,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMMON_ALL_ATTACK_SKILLS,
         /// <summary>
         ///   Looks up a localized string similar to .
@@ -1316,6 +1376,10 @@ namespace PalCalc.UI.Localization {
         ///   Looks up a localized string similar to .
         /// </summary>
         LC_TARGET_PALS,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TOOL_COMBOS_BY_CHILD,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>

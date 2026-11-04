@@ -13,7 +13,16 @@ using System.Linq;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
-    public class BreedableParentViewModel(CachedSaveGame source, GameSettings settings, Pal pal, PalInstance instance)
+    // `requiredGender` is the gender the pair needs, if known, to show when the owned pal needs a gender reverser.
+    // `hint` says how to get a parent which isn't owned, if known.
+    public class BreedableParentViewModel(
+        CachedSaveGame source,
+        GameSettings settings,
+        Pal pal,
+        PalInstance instance,
+        PalGender? requiredGender = null,
+        ILocalizedText hint = null
+    )
     {
         private SpecificPalRefLocationViewModel location;
 
@@ -22,7 +31,11 @@ namespace PalCalc.UI.ViewModel.Solver
         // a parent which needs to be bred has no specific pal
         public bool IsOwned => instance != null;
 
+        public bool NeedsReverser { get; } = instance != null && requiredGender is PalGender gender && !instance.Gender.HasFlag(gender);
+
         public PalGenderViewModel Gender { get; } = instance == null ? null : PalGenderViewModel.Make(instance.Gender);
+
+        public ILocalizedText Hint { get; } = hint;
 
         public IVSetViewModel IVs { get; } = instance == null ? null : new(
             HP: new IVDirectValueViewModel(true, instance.IV_HP),

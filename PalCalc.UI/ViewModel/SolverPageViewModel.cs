@@ -162,7 +162,7 @@ namespace PalCalc.UI.ViewModel
             solverControlsPropertyChangedHandler = SolverControls_PropertyChanged;
             SolverControls.PropertyChanged += solverControlsPropertyChangedHandler;
 
-            Tools = new ToolListViewModel([new BreedableToolViewModel(SolverControls)]);
+            Tools = new ToolListViewModel([new BreedableToolViewModel(SolverControls), new ParentCombosToolViewModel(SolverControls)]);
             Tools.PropertyChanged += Tools_PropertyChanged;
             
             // TODO - would prefer to have the delete command managed by the target list, rather than having
@@ -340,6 +340,7 @@ namespace PalCalc.UI.ViewModel
             if (e.PropertyName == nameof(Tools.SelectedTool) && Tools.SelectedTool != null)
             {
                 PalTargetList.SelectedTarget = null;
+                Tools.SelectedTool.OnSelected();
                 RunSelectedTool();
             }
         }
