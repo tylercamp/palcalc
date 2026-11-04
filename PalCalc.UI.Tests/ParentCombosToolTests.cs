@@ -130,6 +130,28 @@ public class ParentCombosToolTests
     }
 
     [TestMethod]
+    public void SelectedSort_PhilanthropistPicksPhilanthropistPals()
+    {
+        var best = Owned("Penking", PalGender.MALE);
+        best.IV_HP = 90;
+        var philanthropist = Owned("Penking", PalGender.MALE);
+        philanthropist.PassiveSkills = [Philanthropist];
+        var tool = Run(best, philanthropist, Owned("Bushi", PalGender.FEMALE));
+        tool.Child = Pal("Sibelyx");
+
+        PassiveSkillViewModel PenkingPassive() =>
+            tool.Groups.First().Cards.Single().Parent2.BreedSpeedPassive;
+
+        Assert.IsNull(PenkingPassive());
+
+        tool.SelectedSort = tool.SortOptions.Single(o => o.Sort == ParentComboSort.MostPhilanthropist);
+        Assert.AreEqual(Philanthropist, PenkingPassive().ModelObject);
+
+        tool.SelectedSort = tool.SortOptions.Single(o => o.Sort == ParentComboSort.HighestIVs);
+        Assert.IsNull(PenkingPassive());
+    }
+
+    [TestMethod]
     public void ChildOptions_LeaveOutFlowerGumoss()
     {
         var tool = new ParentCombosToolViewModel(null!);
@@ -179,6 +201,20 @@ public class ParentCombosToolTests
         AssertOrder(ParentComboSort.HighestAttack, cards, "Chikipi", "Penking", "Lamball");
     }
 
+    [TestMethod]
+    public void Sorted_MostPhilanthropistThenAverage()
+    {
+        var cards = new[]
+        {
+            Card("Lamball", "Cattiva", IVs(90, 90, 90)),
+            Card("Penking", "Bushi", IVs(10, 10, 10), numPhilanthropists: 2),
+            Card("Chikipi", "Foxparks", IVs(50, 50, 50), numPhilanthropists: 1),
+            Card("Anubis", "Bushi", IVs(10, 10, 10), numPhilanthropists: 1),
+        };
+
+        AssertOrder(ParentComboSort.MostPhilanthropist, cards, "Penking", "Chikipi", "Anubis", "Lamball");
+    }
+
     private static readonly PalDB DB = PalDB.LoadEmbedded();
     private static readonly PalBreedingDB BreedingDB = PalBreedingDB.LoadEmbedded(DB);
 
@@ -204,12 +240,17 @@ public class ParentCombosToolTests
             Defense: new(IsRelevant: true, Min: defense, Max: defense)
         );
 
-    // (only the names and IVs matter for sorting, so the breeding pair doesn't need to be real)
-    private static ParentComboCardViewModel Card(string parent1, string parent2, IV_Set? ivs)
+    private static readonly PassiveSkill Philanthropist = "Philanthropist".ToStandardPassive(DB);
+
+    // (only the names, IVs and passives matter for sorting, so the breeding pair doesn't need to be real)
+    private static ParentComboCardViewModel Card(string parent1, string parent2, IV_Set? ivs, int numPhilanthropists = 0)
     {
         var source = BreedingDB.Breeding.First();
+        PalInstance WithPhilanthropist(int index) =>
+            numPhilanthropists > index ? new() { Pal = source.Parent1.Pal, PassiveSkills = [Philanthropist] } : null;
+
         return new(
-            new ParentCombo(source, PalGender.MALE, null, null, ParentAvailability.Owned, ParentAvailability.Owned, ivs),
+            new ParentCombo(source, PalGender.MALE, WithPhilanthropist(0), WithPhilanthropist(1), ParentAvailability.Owned, ParentAvailability.Owned, ivs),
             new BreedableParentViewModel(null!, null!, parent1.ToPal(DB), null),
             new BreedableParentViewModel(null!, null!, parent2.ToPal(DB), null)
         );

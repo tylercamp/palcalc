@@ -40,6 +40,11 @@ public sealed record ParentCombo(
     public int NumOwnedParents =>
         (Parent1Availability == ParentAvailability.Owned ? 1 : 0) +
         (Parent2Availability == ParentAvailability.Owned ? 1 : 0);
+
+    // owned parents with Philanthropist, each of which halves the breeding time
+    public int NumBreedSpeedParents =>
+        (ParentCombosCalculator.HasBreedSpeed(Parent1Instance) ? 1 : 0) +
+        (ParentCombosCalculator.HasBreedSpeed(Parent2Instance) ? 1 : 0);
 }
 
 /// <summary>

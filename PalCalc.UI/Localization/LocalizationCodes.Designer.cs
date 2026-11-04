@@ -204,6 +204,10 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_COMBOS_SORT_PHILANTHROPIST,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_COMBOS_SORT_Z_TO_A,
         /// <summary>
         ///   Looks up a localized string similar to .

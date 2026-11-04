@@ -205,6 +205,9 @@ This value is doubled internally to account for pal inactivity at night.</value>
   <data name="LC_COMBOS_SORT_HP" xml:space="preserve">
     <value>Highest HP</value>
   </data>
+  <data name="LC_COMBOS_SORT_PHILANTHROPIST" xml:space="preserve">
+    <value>Most Philanthropist</value>
+  </data>
   <data name="LC_COMBOS_SORT_Z_TO_A" xml:space="preserve">
     <value>Z to A</value>
   </data>

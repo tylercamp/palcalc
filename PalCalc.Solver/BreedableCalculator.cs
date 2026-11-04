@@ -136,10 +136,12 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
     }
 
     // the owned pal to use as a parent with the given gender, or `null` if it needs to be bred instead
-    internal static PalInstance BestOwned(IEnumerable<PalInstance> owned, PalGender gender, bool useGenderReversers) =>
+    // `preferred` picks those pals ahead of higher IVs, after the gender needed
+    internal static PalInstance BestOwned(IEnumerable<PalInstance> owned, PalGender gender, bool useGenderReversers, Func<PalInstance, bool> preferred = null) =>
         owned
             .Where(p => useGenderReversers || p.Gender.HasFlag(gender))
             .OrderByDescending(p => p.Gender.HasFlag(gender))
+            .ThenByDescending(p => preferred?.Invoke(p) == true)
             .ThenByDescending(TotalIVs)
             .ThenBy(p => p.InstanceId, StringComparer.Ordinal)
             .FirstOrDefault();

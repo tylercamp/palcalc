@@ -1,13 +1,15 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference.Properties;
+using PalCalc.Solver.Utils;
 
 namespace PalCalc.Solver;
 
 /// <summary>
 /// Finds every pair of parent species which breeds one child, and which of the two
 /// parents are owned. A parent which isn't owned says whether it can be bred from the
-/// owned pals, using `BreedableCalculator`, or has to be caught. Passives and attacks
-/// are ignored.
+/// owned pals, using `BreedableCalculator`, or has to be caught. Attacks are ignored,
+/// and so are passives, except that Philanthropist can be preferred when picking the
+/// owned pals.
 /// </summary>
 public sealed class ParentCombosCalculator(BreedingSolverSettings settings)
 {
@@ -26,11 +28,19 @@ public sealed class ParentCombosCalculator(BreedingSolverSettings settings)
         .Select(g => g.Key)
         .ToHashSet();
 
-    public ParentCombosResult Calculate(Pal child) =>
-        Calculate(child, new BreedableCalculator(settings).Calculate());
+    /// <summary>
+    /// Whether the pal has a passive which speeds up breeding, i.e. Philanthropist. Uses the
+    /// same check as the solver's breeding time (`ToTimeFactor`).
+    /// </summary>
+    public static bool HasBreedSpeed(PalInstance instance) => instance?.PassiveSkills?.ToTimeFactor() < 1;
+
+    public ParentCombosResult Calculate(Pal child, bool preferBreedSpeed = false) =>
+        Calculate(child, new BreedableCalculator(settings).Calculate(), preferBreedSpeed);
 
     // (takes the breedable result so it doesn't need recalculating for each child)
-    public ParentCombosResult Calculate(Pal child, BreedableResult breedable)
+    //
+    // `preferBreedSpeed` picks owned pals with Philanthropist ahead of higher IVs, after the gender needed
+    public ParentCombosResult Calculate(Pal child, BreedableResult breedable, bool preferBreedSpeed = false)
     {
         var entries = breedable.Entries.ToDictionary(e => e.Pal);
 
@@ -39,16 +49,16 @@ public sealed class ParentCombosCalculator(BreedingSolverSettings settings)
             settings.BreedingDB.Breeding
                 .Where(b => b.Child == child)
                 .Where(b => showsHiddenPal || b.Parents.All(p => p.Pal.InternalName != BreedableCalculator.HiddenPalInternalName))
-                .Select(b => ToCombo(b, entries))
+                .Select(b => ToCombo(b, entries, preferBreedSpeed))
                 .OrderByDescending(c => c.NumOwnedParents)
                 .ThenBy(c => Math.Min(c.Source.Parent1.Pal.InternalIndex, c.Source.Parent2.Pal.InternalIndex))
                 .ThenBy(c => Math.Max(c.Source.Parent1.Pal.InternalIndex, c.Source.Parent2.Pal.InternalIndex))
         );
     }
 
-    // uses the gender order with the most owned parents, then the fewest gender reversers, then the most which
-    // can be bred, then the best IVs
-    private ParentCombo ToCombo(BreedingResult breeding, Dictionary<Pal, BreedableEntry> entries)
+    // uses the gender order with the most owned parents, then the fewest gender reversers, then (when preferred)
+    // the most with Philanthropist, then the most which can be bred, then the best IVs
+    private ParentCombo ToCombo(BreedingResult breeding, Dictionary<Pal, BreedableEntry> entries, bool preferBreedSpeed)
     {
         var parent1 = breeding.Parent1.Pal;
         var parent2 = breeding.Parent2.Pal;
@@ -57,9 +67,9 @@ public sealed class ParentCombosCalculator(BreedingSolverSettings settings)
             .Where(g => breeding.Matches(parent1, g, parent2, g.OppositeGender()))
             .Select(g =>
             {
-                var instance1 = BestOwned(parent1, g, null);
+                var instance1 = BestOwned(parent1, g, null, preferBreedSpeed);
                 // (a pal can't be bred with itself, so a pair of the same species needs two of them)
-                var instance2 = BestOwned(parent2, g.OppositeGender(), parent1 == parent2 ? instance1 : null);
+                var instance2 = BestOwned(parent2, g.OppositeGender(), parent1 == parent2 ? instance1 : null, preferBreedSpeed);
 
                 return new ParentCombo(
                     breeding,
@@ -76,6 +86,7 @@ public sealed class ParentCombosCalculator(BreedingSolverSettings settings)
                 (c.Parent1Instance?.Gender.HasFlag(c.Parent1Gender) == false ? 1 : 0) +
                 (c.Parent2Instance?.Gender.HasFlag(c.Parent1Gender.OppositeGender()) == false ? 1 : 0)
             )
+            .ThenByDescending(c => preferBreedSpeed ? c.NumBreedSpeedParents : 0)
             .ThenByDescending(c =>
                 (c.Parent1Availability == ParentAvailability.Breedable ? 1 : 0) +
                 (c.Parent2Availability == ParentAvailability.Breedable ? 1 : 0)
@@ -84,8 +95,13 @@ public sealed class ParentCombosCalculator(BreedingSolverSettings settings)
             .First();
     }
 
-    private PalInstance BestOwned(Pal pal, PalGender gender, PalInstance exclude) =>
-        BreedableCalculator.BestOwned(ownedByPal[pal].Where(p => p != exclude), gender, settings.UseGenderReversers);
+    private PalInstance BestOwned(Pal pal, PalGender gender, PalInstance exclude, bool preferBreedSpeed) =>
+        BreedableCalculator.BestOwned(
+            ownedByPal[pal].Where(p => p != exclude),
+            gender,
+            settings.UseGenderReversers,
+            preferBreedSpeed ? HasBreedSpeed : null
+        );
 
     // a parent which isn't owned can be bred once it's available in either gender, which also covers the
     // gender that isn't owned, and a second pal of a species where only one is owned

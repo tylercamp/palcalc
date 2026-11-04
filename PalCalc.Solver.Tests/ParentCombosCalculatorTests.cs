@@ -155,6 +155,55 @@ public class ParentCombosCalculatorTests
     }
 
     [TestMethod]
+    public void Calculate_PrefersPhilanthropistOnlyWhenAsked()
+    {
+        var best = WithIVs("Penking", PalGender.MALE, 90, 90, 90);
+        var philanthropist = SolverTestScenario.Owned("Penking", PalGender.MALE, [Philanthropist], 10, 10, 10);
+        var settings = Settings(false, best, philanthropist, Female("Bushi"));
+
+        var byIVs = Combo(new ParentCombosCalculator(settings).Calculate("Sibelyx".ToPal(DB)), "Penking", "Bushi");
+        var byPassive = Combo(new ParentCombosCalculator(settings).Calculate("Sibelyx".ToPal(DB), preferBreedSpeed: true), "Penking", "Bushi");
+
+        Assert.AreEqual(best, InstanceFor(byIVs, "Penking"));
+        Assert.AreEqual(0, byIVs.NumBreedSpeedParents);
+        Assert.AreEqual(philanthropist, InstanceFor(byPassive, "Penking"));
+        Assert.AreEqual(1, byPassive.NumBreedSpeedParents);
+    }
+
+    [TestMethod]
+    public void Calculate_PhilanthropistComesAfterTheGenderNeeded()
+    {
+        // only a female bushi is owned, so the penking needs to be male to skip a reverser
+        var male = Male("Penking");
+        var female = SolverTestScenario.Owned("Penking", PalGender.FEMALE, [Philanthropist]);
+
+        var combo = Combo(
+            new ParentCombosCalculator(Settings(true, male, female, Female("Bushi"))).Calculate("Sibelyx".ToPal(DB), preferBreedSpeed: true),
+            "Penking",
+            "Bushi"
+        );
+
+        Assert.AreEqual(male, InstanceFor(combo, "Penking"));
+    }
+
+    [TestMethod]
+    public void Calculate_CountsBothPhilanthropistParents()
+    {
+        var combo = Combo(
+            Calculate(
+                false,
+                "Sibelyx",
+                SolverTestScenario.Owned("Penking", PalGender.MALE, [Philanthropist]),
+                SolverTestScenario.Owned("Bushi", PalGender.FEMALE, [Philanthropist, "Swift".ToStandardPassive(DB)])
+            ),
+            "Penking",
+            "Bushi"
+        );
+
+        Assert.AreEqual(2, combo.NumBreedSpeedParents);
+    }
+
+    [TestMethod]
     public void Calculate_MostOwnedParentsComeFirst()
     {
         var result = Calculate(false, "Sibelyx", Male("Penking"), Female("Bushi"), Female("Lamball"));
@@ -197,6 +246,7 @@ public class ParentCombosCalculatorTests
     private static readonly PalDB DB = SolverTestScenario.DB;
     private static readonly PalBreedingDB BreedingDB = PalBreedingDB.LoadEmbedded(DB);
     private static readonly Pal FlowerGumoss = "PlantSlime_Flower".InternalToPal(DB);
+    private static readonly PassiveSkill Philanthropist = "Philanthropist".ToStandardPassive(DB);
 
     private static PalInstance Male(string name) => SolverTestScenario.Owned(name, PalGender.MALE);
     private static PalInstance Female(string name) => SolverTestScenario.Owned(name, PalGender.FEMALE);

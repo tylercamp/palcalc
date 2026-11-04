@@ -37,6 +37,11 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public ILocalizedText Hint { get; } = hint;
 
+        // Philanthropist, which halves the breeding time (an icon on Combos By Child's cards)
+        public PassiveSkillViewModel BreedSpeedPassive { get; } = PassiveSkillViewModel.Make(
+            instance?.PassiveSkills?.FirstOrDefault(p => p.TrackedEffects.Any(e => e.InternalName == PassiveSkillEffect.BreedSpeed))
+        );
+
         public IVSetViewModel IVs { get; } = instance == null ? null : new(
             HP: new IVDirectValueViewModel(true, instance.IV_HP),
             Attack: new IVDirectValueViewModel(true, instance.IV_Attack),

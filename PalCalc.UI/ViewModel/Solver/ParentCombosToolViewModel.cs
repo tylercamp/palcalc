@@ -21,6 +21,8 @@ namespace PalCalc.UI.ViewModel.Solver
         HighestHP,
         HighestAttack,
         HighestDefense,
+        // the most parents with Philanthropist, which also prefers owned pals with it
+        MostPhilanthropist,
     }
 
     public class ParentComboSortOption(ParentComboSort sort, ILocalizedText label)
@@ -82,6 +84,7 @@ namespace PalCalc.UI.ViewModel.Solver
             new(ParentComboSort.HighestHP, LocalizationCodes.LC_COMBOS_SORT_HP.Bind()),
             new(ParentComboSort.HighestAttack, LocalizationCodes.LC_COMBOS_SORT_ATTACK.Bind()),
             new(ParentComboSort.HighestDefense, LocalizationCodes.LC_COMBOS_SORT_DEFENSE.Bind()),
+            new(ParentComboSort.MostPhilanthropist, LocalizationCodes.LC_COMBOS_SORT_PHILANTHROPIST.Bind()),
         ];
 
         private BreedingSolverSettings settings;
@@ -101,9 +104,10 @@ namespace PalCalc.UI.ViewModel.Solver
         [ObservableProperty]
         private List<ParentComboGroupViewModel> groups = [];
 
-        partial void OnChildChanged(PalViewModel value) => Update();
+        partial void OnChildChanged(PalViewModel value) => Update(keepExpanded: false);
 
-        partial void OnSelectedSortChanged(ParentComboSortOption value) => SetGroups(keepExpanded: true);
+        // (recalculates, since the Philanthropist sort changes which owned pals are picked)
+        partial void OnSelectedSortChanged(ParentComboSortOption value) => Update(keepExpanded: true);
 
         // (shows "Expand All" while no child is chosen)
         private bool AreAllExpanded => Groups.Count > 0 && Groups.All(g => g.IsExpanded);
@@ -138,16 +142,16 @@ namespace PalCalc.UI.ViewModel.Solver
             calculator = new ParentCombosCalculator(settings);
             breedable = new BreedableCalculator(settings).Calculate();
 
-            Update();
+            Update(keepExpanded: false);
         }
 
-        private void Update()
+        private void Update(bool keepExpanded)
         {
             combos = Child == null || calculator == null
                 ? null
-                : calculator.Calculate(Child.ModelObject, breedable);
+                : calculator.Calculate(Child.ModelObject, breedable, SelectedSort?.Sort == ParentComboSort.MostPhilanthropist);
 
-            SetGroups(keepExpanded: false);
+            SetGroups(keepExpanded);
         }
 
         private void SetGroups(bool keepExpanded)
@@ -238,6 +242,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 ParentComboSort.HighestHP => cards.OrderByDescending(c => Stat(c.SortIVs, s => s.HP)).ThenByDescending(c => Average(c.SortIVs)),
                 ParentComboSort.HighestAttack => cards.OrderByDescending(c => Stat(c.SortIVs, s => s.Attack)).ThenByDescending(c => Average(c.SortIVs)),
                 ParentComboSort.HighestDefense => cards.OrderByDescending(c => Stat(c.SortIVs, s => s.Defense)).ThenByDescending(c => Average(c.SortIVs)),
+                ParentComboSort.MostPhilanthropist => cards.OrderByDescending(c => c.Combo.NumBreedSpeedParents).ThenByDescending(c => Average(c.SortIVs)),
                 _ => cards.OrderByDescending(c => Average(c.SortIVs)),
             };
 
