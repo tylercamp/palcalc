@@ -13,26 +13,7 @@ holds current coverage; version reports hold findings, evidence and corrections.
   configuration. Per-mechanic dates, modes and conditions are in the
   [assessment](assessments/1.0.5.102999/assessment.md#review-summary).
 - **Observed game changes:** none established against an earlier verified
-  version; there is no earlier complete baseline. Newly recovered rules and
-  corrections to our understanding do not establish a game update.
-
-## 2026-10-26: wild-attack assessment output clarified
-
-- **Assessment scope:** assess attacks available overall at captured storage.
-  Equipped loadout is not a separate required output; equipment handling matters
-  where it changes availability. Ordinary/rare initialization, supplied overrides
-  and the connected KingWhale capture mode remain included.
-  [Question and boundaries](assessments/1.0.5.102999/assessment.md#wild-pal-attacks).
-
-## 2026-10-21: comprehensive baseline scope established
-
-- **Assessment scope:** standard baseline and game-update reviews account for
-  eight mechanics: child species, gender, passives, attacks and IVs, plus
-  wild-Pal passives, attacks and gender. Relevant item, mutation, spawn and capture
-  modes belong in each declared question. Map conversion and egg-production time
-  are supporting topics, reviewed when requested or implicated by a change.
-  [Checklist](README.md#current-verification-status) /
-  [scope rules](ASSESSMENT-WORKFLOW.md#define-the-questions-and-boundaries).
+  version; there is no earlier complete baseline.
 
 ## Recording changes
 
