@@ -59,13 +59,15 @@ internal static class SolverTestScenario
         IEnumerable<Pal>? allowedWildPals = null,
         IEnumerable<Pal>? bannedBredPals = null,
         int? maxSpecialCakes = 0,
-        bool trainPals = true
+        bool trainPals = true,
+        bool useGenderReversers = false,
+        PalBreedingDB? breedingDB = null
     ) =>
         new(
             solver: new BreedingSolver(),
             settings: new BreedingSolverSettings(
                 db: DB,
-                breedingDB: PalBreedingDB.LoadEmbedded(DB),
+                breedingDB: breedingDB ?? PalBreedingDB.LoadEmbedded(DB),
                 gameSettings: gameSettings ?? new GameSettings(),
                 ownedPals: ownedPals.ToList(),
                 resultPruning: ResultPruningPolicy.Default,
@@ -81,7 +83,7 @@ internal static class SolverTestScenario
                 maxSurgeryCost: maxSurgeryCost,
                 allowedSurgeryPassives: allowedSurgeryPassives?.ToList() ?? [],
                 skipSurgeryPassivesDuringSearch: skipSurgeryPassivesDuringSearch,
-                useGenderReversers: false,
+                useGenderReversers: useGenderReversers,
                 maxSpecialCakes: maxSpecialCakes,
                 trainPals: trainPals
             )
