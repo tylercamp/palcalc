@@ -1,12 +1,11 @@
 # Palworld Breeding Mechanics
 
 This page explains the breeding rules that matter when planning a Pal, along with
-PalCalc's approximations. Read the [solver overview](PalCalc.Solver/README.md) for
+PalCalc's approximations. Read the [solver overview](PalCalc.Solver/README.md) to see
 how those mechanics are used to search for breeding paths.
 
 For farm-bred eggs, the child's species, gender, IVs, passives and inherited
-attacks are determined when the egg is produced. The checked hatch routes use
-that child rather than rerolling inheritance. See the
+attacks are determined when the egg is produced. See the
 [generation-to-hatch evidence](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#shared-child-save-boundary)
 and the separate [world-egg pickup effects](#world-egg-pickup-effects) for the
 collection-time exceptions.
@@ -37,9 +36,6 @@ The [research checklist](docres/research/palworld-breeding/README.md#current-ver
 records the last checked game version and date for each mechanic, with links to
 its conclusions and evidence. The [research changelog](docres/research/palworld-breeding/CHANGELOG.md)
 records changes to checked versions, game mechanics and assessment scope.
-
-These reports contain the detailed findings, evidence and conditions.
-See [PalCalc's limitations](LIMITATIONS.md) for the approximations used in estimates.
 
 ## Pal Species
 
@@ -259,9 +255,9 @@ how those rules become probability and effort estimates.
 
 Some [breeding items](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#shared-inputs-and-arithmetic)
 (Mushroom Cake - `Cake02`, and `Cake04` - Extravagant Vegetable Cake, in `DA_BreedingItemEffectData`) add a separate 1–5 bonus
-to each ordinary offspring IV, capped at 100. Mutation instead gives fresh IVs
-in the default range 90–100 (`Combi_MutationMinTalent=90` in the native game
-settings), skipping both parental IV inheritance and the item bonus.
+to each ordinary offspring IV, capped at 100, _after_ the child IV is selected.
+Mutation instead gives fresh IVs in the default range 90–100 (`Combi_MutationMinTalent=90` in the native game
+settings), _skipping_ both parental IV inheritance and the item bonus.
 
 Mutation also attempts an extra attack of the child's primary element, which may
 duplicate one the child already has. Species and passives use separate selection
@@ -376,8 +372,7 @@ the native game settings):
 | 3 | 3% |
 | 4 | 1% |
 
-These chances normalize the default weights `[10, 76, 10, 3, 1]`, assuming evenly
-distributed weighted rolls; they aren't measured spawn frequencies. Attempts are
+These chances normalize the default weights `[10, 76, 10, 3, 1]`. Attempts are
 capped by the remaining slots, so this isn't a table of final passive counts.
 Special spawns and rare additions have their own rules.
 
@@ -386,9 +381,9 @@ pool and selection helper as breeding (`AddPal` in `DT_PassiveSkill_Main`). The
 [selection bug](#random-passive-selection-bug) therefore applies here too: an
 attempt can fail to add a passive.
 
-These weights come from the executable's native defaults, rather than a serialized
-override in the game-data asset. See the [initialization evidence](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#wild-pal-passives)
-for their source and the conditions controlling random filling. PalCalc's current
+These weights come from the game code and are not visible in the game's assets.
+See the [initialization evidence](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#wild-pal-passives)
+for their source and the conditions which control random filling. PalCalc's current
 estimate still uses a [simplified wild-passive distribution](LIMITATIONS.md#wild-random-passive-counts).
 
 ### Yakumo passive order
