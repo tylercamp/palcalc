@@ -16,7 +16,7 @@ IV thresholds, attacks, and gender, using the allowed owned and wild Pals. It
 estimates inheritance attempts and effort, with supported items, training, and
 surgery options included according to the settings.
 
-These estimates cover the selected settings and supported mechanics. They don't
+PalCalc's estimates cover the selected settings and supported mechanics. They don't
 cover every way to obtain the requested Pal.
 
 ## Deliberate approximations in estimates
@@ -82,6 +82,8 @@ and [effort estimation](PalCalc.Solver/README.md#estimating-the-effort-of-a-path
 ## Search tradeoffs
 
 ### Cakes are only considered for attack inheritance
+
+TODO - This may need revision once the other settings TODO is addressed
 
 To speed up solving, PalCalc only considers Special Cakes when they are needed
 to inherit multiple requested attacks that the child doesn't already learn at
