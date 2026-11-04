@@ -31,15 +31,12 @@ namespace PalCalc.Solver.Probabilities
             if (a.Defense.IsRelevant) numRelevantDefense++;
             if (b.Defense.IsRelevant) numRelevantDefense++;
 
-            int numRequiredIVs = 0;
-            if (numRelevantHP > 0) numRequiredIVs++;
-            if (numRelevantAttack > 0) numRequiredIVs++;
-            if (numRelevantDefense > 0) numRequiredIVs++;
-
-            if (numRequiredIVs == 0) return 1.0f;
-
             // base probability is the chance of getting the IV categories we want
-            float result = mechanics.ProbabilityOfInheritingDesiredIVs(numRequiredIVs);
+            float result = mechanics.ProbabilityOfInheritingDesiredIVs(
+                hp: numRelevantHP > 0,
+                attack: numRelevantAttack > 0,
+                defense: numRelevantDefense > 0
+            );
 
             // even if we got the right IV categories, we might not get the right parents/values
             //

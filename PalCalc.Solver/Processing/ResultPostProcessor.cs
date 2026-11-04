@@ -87,15 +87,6 @@ internal sealed class ResultPostProcessor(
         logger.Debug("Finalizing results");
         var candidates = terminalResults
             .Results
-            // Bred candidates are constrained in the expansion kernel. Apply
-            // the same output constraint to owned candidates which already
-            // satisfy the target.
-            .Where(reference =>
-                reference.ActualPassives
-                    .Except(target.DesiredPassives)
-                    .Count() <=
-                settings.MaxBredIrrelevantPassives
-            )
             .SelectMany(EnforceRequiredGender)
             .Where(SatisfiesTerminalTarget)
             .ToList();
@@ -108,6 +99,7 @@ internal sealed class ResultPostProcessor(
             .Select(reference => (Reference: reference, Entry: SelectRootEntry(reference)))
             .Where(result => result.Entry is not null)
             .ToList();
+
         finalists.Sort((left, right) =>
             left.Entry!.Value.TotalSpecialCakes.CompareTo(
                 right.Entry!.Value.TotalSpecialCakes
@@ -115,68 +107,36 @@ internal sealed class ResultPostProcessor(
         );
 
         logger.Debug("Evaluating attack candidates from {FinalistsCount} finalists", finalists.Count);
-        var materializer = new AttackResultMaterializer(attackTargets, settings);
-        var minimumCakeFinalists = new List<(IPalReference Reference, AttackProfileEntry Entry)>();
-        var bestExactCakes = int.MaxValue;
-        var examined = 0;
-        var rejected = 0;
-        var adjustedCakeTotals = 0;
-        for (var i = 0; i < finalists.Count; i++)
+        var materializer = new AttackResultMaterializer(attackTargets, settings, controller.CancellationToken);
+        var alternatives = new FinalizationAlternatives();
+        foreach (var finalist in finalists)
         {
-            var finalist = finalists[i];
-            var estimatedCakes = finalist.Entry!.Value.TotalSpecialCakes;
-            // Search cake totals are lower bounds: materialization can add
-            // exact attack/gender attempts, but cannot remove cake use already
-            // present in the selected profile entry.
-            if (estimatedCakes > bestExactCakes)
+            controller.PauseIfRequested();
+            if (controller.CancellationToken.IsCancellationRequested)
                 break;
 
-            examined++;
-            var evaluation = materializer.Evaluate(
-                finalist.Reference,
-                finalist.Entry.Value
-            );
-            if (!SatisfiesEvaluatedConstraints(evaluation))
+            var bounds = materializer.LowerBounds(finalist.Reference, finalist.Entry.Value);
+            if (alternatives.DominatesLowerBounds(finalist.Reference, bounds))
             {
-                rejected++;
                 continue;
             }
-
-            var exactCakes = evaluation.TotalSpecialCakes;
-            if (exactCakes != estimatedCakes)
-                adjustedCakeTotals++;
-
-            if (exactCakes < bestExactCakes)
+            foreach (var evaluation in materializer.Evaluate(
+                finalist.Reference, finalist.Entry.Value.LearnedTargetMask))
             {
-                bestExactCakes = exactCakes;
-                minimumCakeFinalists.Clear();
+                if (!SatisfiesEvaluatedConstraints(evaluation.Metrics))
+                {
+                    continue;
+                }
+                alternatives.Add(evaluation);
             }
-
-            if (exactCakes == bestExactCakes)
-                minimumCakeFinalists.Add((finalist.Reference, finalist.Entry.Value));
         }
 
-        logger.Debug(
-            "Attack evaluation examined {ExaminedCount} finalists, skipped {SkippedCount} above the exact minimum of {MinimumCakes} cakes, rejected {RejectedCount}, and adjusted {AdjustedCount} cake totals",
-            examined,
-            finalists.Count - examined,
-            bestExactCakes == int.MaxValue ? null : bestExactCakes,
-            rejected,
-            adjustedCakeTotals
-        );
-        logger.Debug(
-            "Materializing {FinalistsCount} minimum-cake attack candidates",
-            minimumCakeFinalists.Count
-        );
-        var materialized = new List<IPalReference>(minimumCakeFinalists.Count);
-        foreach (var finalist in minimumCakeFinalists)
-        {
-            var result = materializer.Materialize(finalist.Reference, finalist.Entry);
-            if (SatisfiesMaterializedConstraints(result))
-                materialized.Add(result);
-        }
+        var materialized = alternatives.Results
+            .Select(materializer.Materialize)
+            .Where(SatisfiesMaterializedConstraints)
+            .ToList();
+        logger.Debug("Attack materialization: {Finalists} alternatives, {Nodes} cached nodes", materialized.Count, materializer.MaterializedCount);
 
-        logger.Debug("Re-applying result pruning to {MaterializedCount} minimum-cake materialized results", materialized.Count);
         var res = terminalResults.SelectFinalResults(materialized).ToList();
         logger.Debug("Result finalization complete with {FinalCount} results", res.Count);
         return res;

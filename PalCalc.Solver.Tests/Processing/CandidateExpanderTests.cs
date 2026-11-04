@@ -179,6 +179,72 @@ public class CandidateExpanderTests
         );
     }
 
+    [DataTestMethod]
+    [DataRow(0, false)]
+    [DataRow(1, true)]
+    public void ExpandBatch_RetainsCakeOnlyCandidatesWithinBudget(int cakeLimit, bool expected)
+    {
+        var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
+        var targetAttack = InheritableAttackNotInnateTo(child);
+        var otherAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
+            attack.CanInherit && attack != targetAttack && !child.Level1AttackInternalIds.Contains(attack.InternalName));
+        var swift = "Swift".ToStandardPassive(SolverTestScenario.DB);
+        var runner = "Runner".ToStandardPassive(SolverTestScenario.DB);
+        var first = WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE, [swift]), targetAttack);
+        var second = WithAttack(SolverTestScenario.Owned("Wixen", PalGender.FEMALE, [runner]), otherAttack);
+        var target = new PalSpecifier
+        {
+            Pal = child,
+            RequiredPassives = [swift, runner],
+            RequiredAttacks = [targetAttack, otherAttack],
+        };
+        var settings = SolverTestScenario.Solver(
+            [first, second], maxSpecialCakes: cakeLimit, maxBredIrrelevantPassives: 0
+        ).Settings;
+        var attackTargets = new AttackTargetContext(target, settings.DB);
+        // Ordinary breeding can inherit only one passive; the override can retain both.
+        var mechanics = new BreedingMechanics(
+            SolverTestScenario.DB.BreedingMechanics.IVInheritanceWeights,
+            new() { [1] = 1 },
+            new() { [0] = 1 }
+        );
+
+        var candidates = Expand(
+            ReferenceFor(first, target, attackTargets),
+            ReferenceFor(second, target, attackTargets),
+            target, settings, mechanics
+        ).Candidates;
+
+        Assert.AreEqual(expected ? 1 : 0, candidates.Count);
+        if (!expected) return;
+
+        var candidate = (BredPalReference)candidates.Single();
+        var entry = candidate.AttackProfile.Entries.Single();
+        Assert.AreEqual(1f, candidate.PassivesProbability);
+        Assert.AreEqual(BreedingMethod.SpecialCake, candidate.Outcome.Method);
+        Assert.AreEqual(4, candidate.EffectivePassives.Count);
+        Assert.AreEqual(1, candidate.AvgRequiredBreedings);
+        Assert.AreEqual(new AttackProfileEntry(3, 1), entry);
+        var result = (BredPalReference)MaterializeSingle(new AttackResultMaterializer(attackTargets, settings), candidate, entry);
+        Assert.AreEqual(AttackInheritanceMode.InheritAll, result.MaterializedAttackInheritance.Mode);
+        Assert.AreEqual(1, result.MaterializedAttackInheritance.SpecialCakes);
+        Assert.AreEqual(candidate.Outcome,
+            ((BredPalReference)candidate.WithGuaranteedGender(settings.DB, PalGender.MALE, false)).Outcome);
+
+        var mate = SolverTestScenario.Owned(child.Name, PalGender.FEMALE);
+        var next = Expand(candidate, ReferenceFor(mate, target, attackTargets), target, settings)
+            .Candidates.OfType<BredPalReference>()
+            .Single(reference => reference.Outcome.Method == BreedingMethod.Ordinary);
+        var expectedProbability = PalCalc.Solver.Probabilities.Passives.ProbabilityInheritedTargetPassives(
+            settings.DB.BreedingMechanics, candidate.ActualPassives, [swift, runner], 2
+        );
+        var cleanProbability = PalCalc.Solver.Probabilities.Passives.ProbabilityInheritedTargetPassives(
+            settings.DB.BreedingMechanics, [swift, runner], [swift, runner], 2
+        );
+        Assert.AreEqual(expectedProbability, next.PassivesProbability);
+        Assert.IsTrue(next.PassivesProbability < cleanProbability);
+    }
+
     private static ExpansionResult Expand(
         PalInstance first,
         PalInstance second,
@@ -205,7 +271,8 @@ public class CandidateExpanderTests
         IPalReference firstReference,
         IPalReference secondReference,
         PalSpecifier target,
-        BreedingSolverSettings settings
+        BreedingSolverSettings settings,
+        BreedingMechanics? mechanics = null
     )
     {
         var controller = new SolverStateController(
@@ -244,7 +311,7 @@ public class CandidateExpanderTests
             controller,
             settings,
             new ObjectPoolFactory(),
-            settings.DB.BreedingMechanics,
+            mechanics ?? settings.DB.BreedingMechanics,
             settings.BreedingDB,
             attackTargets
         );
@@ -317,4 +384,8 @@ public class CandidateExpanderTests
         List<IPalReference> Candidates,
         WorkBatchProgress Progress
     );
+    private static IPalReference MaterializeSingle(
+        AttackResultMaterializer materializer, IPalReference reference, AttackProfileEntry entry) =>
+        materializer.Materialize(materializer.Evaluate(reference, entry.LearnedTargetMask).Single());
+
 }

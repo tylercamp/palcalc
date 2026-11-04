@@ -18,19 +18,16 @@ internal readonly struct PreparedAttackProfile
 {
     private readonly AttackProfileComposer composer;
     private readonly AttackProfile cached;
-    private readonly int cacheKey;
+    private readonly (BreedingMethod Method, int EdgeCakes) cacheKey;
     private readonly bool isCached;
-    private readonly bool isCacheable;
 
     internal PreparedAttackProfile(
         AttackProfileComposer composer,
-        int cacheKey,
-        bool isCacheable
+        (BreedingMethod Method, int EdgeCakes) cacheKey
     )
     {
         this.composer = composer;
         this.cacheKey = cacheKey;
-        this.isCacheable = isCacheable;
         cached = default;
         isCached = false;
     }
@@ -39,9 +36,8 @@ internal readonly struct PreparedAttackProfile
     {
         this.cached = cached;
         composer = null;
-        cacheKey = 0;
+        cacheKey = default;
         isCached = true;
-        isCacheable = false;
     }
 
     public ulong EntryTargetMasks => isCached
@@ -74,7 +70,7 @@ internal readonly struct PreparedAttackProfile
 
     public AttackProfile Materialize() => isCached
         ? cached
-        : composer.MaterializePrepared(cacheKey, isCacheable);
+        : composer.MaterializePrepared(cacheKey);
 
     public override int GetHashCode() => isCached
         ? cached.GetHashCode()
@@ -98,7 +94,7 @@ internal sealed class AttackProfileComposer(
     private const int MaxEquippedAttacksPerParent = 3;
 
     private readonly AttackProfileAccumulator accumulator = new();
-    private readonly Dictionary<int, AttackProfile> cachedProfiles = [];
+    private readonly Dictionary<(BreedingMethod Method, int EdgeCakes), AttackProfile> cachedProfiles = [];
     private Pal cachedChild;
     private IPalReference cachedParent1;
     private IPalReference cachedParent2;
@@ -107,17 +103,16 @@ internal sealed class AttackProfileComposer(
         Pal child,
         IPalReference parent1,
         IPalReference parent2,
-        float passivesProbability,
-        float specialCakePassivesProbability,
+        BreedingOutcome outcome,
         float ivsProbability
     )
     {
         if (!targets.IsActive)
             return new(AttackProfile.Inactive);
 
-        var baseProbability = passivesProbability * ivsProbability;
-        // (the actual passive probabilities can change when special cakes are involved, need to handle these accordingly)
-        var cakeBaseProbability = specialCakePassivesProbability * ivsProbability;
+        var baseProbability = outcome.PassivesProbability * ivsProbability;
+        if (baseProbability <= 0)
+            throw new ArgumentOutOfRangeException(nameof(outcome));
         if (
             !ReferenceEquals(child, cachedChild) ||
             !ReferenceEquals(parent1, cachedParent1) ||
@@ -130,43 +125,14 @@ internal sealed class AttackProfileComposer(
             cachedParent2 = parent2;
         }
 
-        if (baseProbability > 0)
-        {
-            // For fixed parents and child, composition depends on probability only
-            // through this rounded Special Cake cost. With cakes disabled it does
-            // not depend on probability at all.
-            var cacheKey = settings.MaxSpecialCakes == 0
-                ? 0
-                : cakeBaseProbability > 0
-                    ? (int)Math.Ceiling(1f / cakeBaseProbability)
-                    : int.MaxValue;
-            if (cachedProfiles.TryGetValue(cacheKey, out var cached))
-                return new(cached);
-
-            accumulator.Reset(targets.StateOf(child).HasNooplLevel1Attack);
-            Enumerate(
-                child,
-                parent1,
-                parent2,
-                passivesProbability,
-                specialCakePassivesProbability,
-                ivsProbability,
-                accumulator
-            );
-            return new(this, cacheKey, isCacheable: true);
-        }
+        var edgeCakes = outcome.SpecialCakesFor((int)Math.Ceiling(1f / baseProbability));
+        var cacheKey = (outcome.Method, edgeCakes);
+        if (cachedProfiles.TryGetValue(cacheKey, out var cached))
+            return new(cached);
 
         accumulator.Reset(targets.StateOf(child).HasNooplLevel1Attack);
-        Enumerate(
-            child,
-            parent1,
-            parent2,
-            passivesProbability,
-            specialCakePassivesProbability,
-            ivsProbability,
-            accumulator
-        );
-        return new(this, cacheKey: 0, isCacheable: false);
+        Enumerate(child, parent1, parent2, outcome, edgeCakes, accumulator);
+        return new(this, cacheKey);
     }
 
     internal ulong PreparedEntryTargetMasks => accumulator.OccupiedMasks;
@@ -174,11 +140,10 @@ internal sealed class AttackProfileComposer(
     internal AttackProfileEntry PreparedEntryForMask(int mask) =>
         accumulator.EntryForMask(mask);
 
-    internal AttackProfile MaterializePrepared(int cacheKey, bool isCacheable)
+    internal AttackProfile MaterializePrepared((BreedingMethod Method, int EdgeCakes) cacheKey)
     {
         var profile = accumulator.Build();
-        if (isCacheable)
-            cachedProfiles.Add(cacheKey, profile);
+        cachedProfiles.Add(cacheKey, profile);
         return profile;
     }
 
@@ -186,9 +151,8 @@ internal sealed class AttackProfileComposer(
         Pal child,
         IPalReference parent1,
         IPalReference parent2,
-        float passivesProbability,
-        float specialCakePassivesProbability,
-        float ivsProbability,
+        BreedingOutcome outcome,
+        int edgeSpecialCakes,
         AttackProfileAccumulator entries
     )
     {
@@ -200,9 +164,6 @@ internal sealed class AttackProfileComposer(
         var parent2Profile = parent2.AttackProfile;
         var inheritableTargetMask = targets.InheritableTargetMask;
         var maxSpecialCakes = settings.MaxSpecialCakes;
-        var baseProbability = passivesProbability * ivsProbability;
-        if (baseProbability <= 0)
-            return;
 
         var innateMask = targets.StateOf(child).Level1TargetMask;
 
@@ -216,60 +177,55 @@ internal sealed class AttackProfileComposer(
         // the full Cartesian product of the two parent profiles.
         const int normalCategoryCount = TargetMaskBitCount * 2;
         const int anyCategory = normalCategoryCount;
-        Span<int> parent1CategoryCakes = stackalloc int[normalCategoryCount + 1];
-        Span<int> parent2CategoryCakes = stackalloc int[normalCategoryCount + 1];
-        parent1CategoryCakes.Fill(int.MaxValue);
-        parent2CategoryCakes.Fill(int.MaxValue);
-
-        BuildCategoryCakes(parent1Entries, parent1CategoryCakes);
-        BuildCategoryCakes(parent2Entries, parent2CategoryCakes);
-
-        EmitBestNormal(
-            parent1CategoryCakes,
-            parent2CategoryCakes,
-            anyCategory,
-            anyCategory,
-            innateMask
-        );
-
-        var normalTargetBits = (byte)(inheritableTargetMask & ~innateMask);
-        while (normalTargetBits != 0)
+        if (outcome.Allows(AttackInheritanceMode.Normal))
         {
-            var bit = (byte)(normalTargetBits & -normalTargetBits);
-            normalTargetBits &= (byte)~bit;
-            var bitIndex = BitOperations.TrailingZeroCount((uint)bit);
-            var withoutAttack = bitIndex << 1;
-            var withAttack = withoutAttack + 1;
+            Span<int> parent1CategoryCakes = stackalloc int[normalCategoryCount + 1];
+            Span<int> parent2CategoryCakes = stackalloc int[normalCategoryCount + 1];
+            parent1CategoryCakes.Fill(int.MaxValue);
+            parent2CategoryCakes.Fill(int.MaxValue);
 
-            // At least one parent must carry the target. These are the only
-            // three presence combinations which can produce it.
+            BuildCategoryCakes(parent1Entries, parent1CategoryCakes);
+            BuildCategoryCakes(parent2Entries, parent2CategoryCakes);
+
             EmitBestNormal(
-                parent1CategoryCakes, parent2CategoryCakes,
-                withAttack, withoutAttack, (byte)(innateMask | bit)
+                parent1CategoryCakes,
+                parent2CategoryCakes,
+                anyCategory,
+                anyCategory,
+                innateMask
             );
-            EmitBestNormal(
-                parent1CategoryCakes, parent2CategoryCakes,
-                withoutAttack, withAttack, (byte)(innateMask | bit)
-            );
-            EmitBestNormal(
-                parent1CategoryCakes, parent2CategoryCakes,
-                withAttack, withAttack, (byte)(innateMask | bit)
-            );
+
+            var normalTargetBits = (byte)(inheritableTargetMask & ~innateMask);
+            while (normalTargetBits != 0)
+            {
+                var bit = (byte)(normalTargetBits & -normalTargetBits);
+                normalTargetBits &= (byte)~bit;
+                var bitIndex = BitOperations.TrailingZeroCount((uint)bit);
+                var withoutAttack = bitIndex << 1;
+                var withAttack = withoutAttack + 1;
+
+                // At least one parent must carry the target. These are the only
+                // three presence combinations which can produce it.
+                EmitBestNormal(
+                    parent1CategoryCakes, parent2CategoryCakes,
+                    withAttack, withoutAttack, (byte)(innateMask | bit)
+                );
+                EmitBestNormal(
+                    parent1CategoryCakes, parent2CategoryCakes,
+                    withoutAttack, withAttack, (byte)(innateMask | bit)
+                );
+                EmitBestNormal(
+                    parent1CategoryCakes, parent2CategoryCakes,
+                    withAttack, withAttack, (byte)(innateMask | bit)
+                );
+            }
         }
 
         if (maxSpecialCakes == 0)
             return;
 
-        // It's possible to have `special...Probability = 0` here, but have
-        // normal probabilities non-zero. e.g. if the pal is expected to have exactly 3
-        // passives, and the parents have a total of 4 passives, then special cakes
-        // would cause the child to always have 4. This would mean a 0% chance of
-        // 3 passives.
-        var cakeBaseProbability = specialCakePassivesProbability * ivsProbability;
-        if (cakeBaseProbability <= 0)
+        if (!outcome.Allows(AttackInheritanceMode.InheritAll))
             return;
-
-        var edgeSpecialCakes = (int)Math.Ceiling(1f / cakeBaseProbability);
 
         foreach (var parent1Entry in parent1Entries)
             foreach (var parent2Entry in parent2Entries)
@@ -289,6 +245,8 @@ internal sealed class AttackProfileComposer(
                     var loadouts = cakeLoadouts[i];
                     var parent1Loadout = (byte)(loadouts >> 8);
                     var parent2Loadout = (byte)loadouts;
+                    if (!RequiresSpecialCake(innateMask, (byte)(parent1Loadout | parent2Loadout)))
+                        continue;
                     Emit(
                         totalCakes,
                         (byte)(innateMask | parent1Loadout | parent2Loadout)
@@ -353,6 +311,11 @@ internal sealed class AttackProfileComposer(
             entries.Add(new AttackProfileEntry(childMask, totalCakes));
         }
     }
+
+    // Only consider cakes when at least two distinct requested attacks need
+    // inheritance; the child's level-one attacks already come for free.
+    internal static bool RequiresSpecialCake(byte innateMask, byte inheritedMask) =>
+        BitOperations.PopCount((uint)(inheritedMask & ~innateMask)) > 1;
 
     /// <summary>
     /// For special-cake inheritance, writes the inclusion-maximal unions of target

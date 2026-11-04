@@ -809,7 +809,7 @@ This setting requires a restart to fully apply.</value>
     <value>Max Bred Irrelevant Passives</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION" xml:space="preserve">
-    <value>The maximum number of irrelevant passive skills allowed for any bred pal, including the final breeding result.
+    <value>Limits the extra irrelevant-passive variants explored for ordinary breeding. Passives required by Special Cakes are included regardless of this limit.
 
 Values higher than '1' will typically add shorter breeding paths if there are unused passive skill slots in the final pal.
 

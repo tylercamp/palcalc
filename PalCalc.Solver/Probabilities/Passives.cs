@@ -85,20 +85,24 @@ namespace PalCalc.Solver.Probabilities
         }
 
         /// <summary>
-        /// Calculates the probability for one fixed inherited-count roll, as used by Special Cakes.
-        /// The number actually inherited is capped by the number of distinct parent passives.
+        /// Calculates the probability for an item override, replacing both ordinary count rolls.
+        /// Selects parental passives first, then fills the shortfall up to the override's capped target.
         /// </summary>
-        public static float ProbabilityInheritedTargetPassivesForFixedInheritRoll(
+        /// <remarks>Used to handle Special Cakes.</remarks>
+        public static float ProbabilityInheritedTargetPassivesForOverride(
             BreedingMechanics mechanics,
             List<PassiveSkill> parentPassives,
             List<PassiveSkill> desiredParentPassives,
             int numFinalPassives,
-            int inheritedCountRoll
+            int overrideCount
         )
         {
             ArgumentNullException.ThrowIfNull(mechanics);
-            if (inheritedCountRoll < 0 || inheritedCountRoll > GameConstants.MaxTotalPassives)
-                throw new ArgumentOutOfRangeException(nameof(inheritedCountRoll));
+            if (overrideCount <= 0 || overrideCount > GameConstants.MaxTotalPassives)
+                throw new ArgumentOutOfRangeException(nameof(overrideCount));
+
+            // e.g. if override forces 4 passives, any other "final" count has 0% chance
+            if (numFinalPassives != overrideCount) return 0f;
 
 #if DEBUG && DEBUG_CHECKS
             if (parentPassives.Count != parentPassives.Distinct().Count()) Debugger.Break();
@@ -110,8 +114,9 @@ namespace PalCalc.Solver.Probabilities
                 parentPassives,
                 desiredParentPassives,
                 numFinalPassives,
-                inheritedCountRoll,
-                1f
+                overrideCount,
+                1f,
+                fillToTarget: true
             );
         }
 
@@ -120,13 +125,15 @@ namespace PalCalc.Solver.Probabilities
         /// of rolling for that many direct passives from the parents, returns the effective chance of
         /// getting `numFinalPassives` where those passives contain all the desired ones.
         /// </summary>
+        /// <param name="fillToTarget">Whether the relevant inheritance logic is forcing `numFinalPassives` as the final count, e.g. Special Cakes forces 4</param>
         private static float ProbabilityForInheritedCountRoll(
             BreedingMechanics mechanics,
             List<PassiveSkill> parentPassives,
             List<PassiveSkill> desiredParentPassives,
             int numFinalPassives,
             int numInheritedFromParent,
-            float inheritedCountProbability
+            float inheritedCountProbability,
+            bool fillToTarget = false
         )
         {
             // we may inherit more passives from the parents than the parents actually have (e.g. inherit 4 passives from parents with
@@ -199,6 +206,9 @@ namespace PalCalc.Solver.Probabilities
 
             // we've inherited as many passives as we can get from the parents, now we need to fill in the remaining with
             // random passives until we get `numFinalPassives`
+
+            // (though if there's an effect that guarantees we'll reach the target num. passives, we can skip that step)
+            if (fillToTarget) return probabilityGotRequiredFromParent;
 
             // if we inherit 4 passives and "need exactly 0 random", then the random probability doesn't matter
             // at all - no additional random passives would be added. in that case we don't need exactly `N`

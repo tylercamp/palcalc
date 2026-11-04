@@ -27,6 +27,10 @@ namespace PalCalc.Solver.Utils
         public static GroupIdFn IvExact { get; } = reference => HashCode.Combine(reference.IVs.HP, reference.IVs.Attack, reference.IVs.Defense);
         public static GroupIdFn GoldCost { get; } = reference => reference.TotalCost;
 
+        // Root-results in the solver's final list of results will have a single realized profile entry; inactive profiles use no cakes
+        // (ResultPostProcessor.SatisfiesMaterializedConstraints)
+        public static GroupIdFn SpecialCakes { get; } = reference => reference.AttackProfile.EntriesSpan.Length == 1 ? reference.AttackProfile.EntriesSpan[0].TotalSpecialCakes : 0;
+
         /// <summary>
         /// Makes a grouping function based on the result of applying `mainFn` to all
         /// elements (i.e. children and self) of a provided pal reference.

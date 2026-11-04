@@ -219,7 +219,7 @@ public class InitialPalBuilderTests
             levelRequirements: null
         );
         var bred = new BredPalReference(
-            new GameSettings(), pal, PalGender.WILDCARD, owned, owned, null, [], 1, 1, new(), 1,
+            new GameSettings(), pal, PalGender.WILDCARD, owned, owned, null, [], new(BreedingMethod.Ordinary, 1), new(), 1,
             attackProfile: profile,
             materializedAttackInheritance: null
         );
