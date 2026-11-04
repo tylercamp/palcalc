@@ -19,9 +19,7 @@ establishes the first verified baseline for the shipped Windows Steam configurat
 The [assessment](assessments/1.0.5.102999/assessment.md) gives current rules,
 conditions and the PalCalc model comparison; [evidence](assessments/1.0.5.102999/evidence.md)
 contains the scoped game model, current inputs and decisive observations.
-Runtime source membership/order, world state and options retain their explicit
-input contracts; static verification does not establish measured gameplay
-frequencies or a universal capture-addition guarantee. The assessment records
+The assessment records
 current findings and limits; the [changelog](CHANGELOG.md) tracks checked
 versions, observed game changes and assessment scope.
 
