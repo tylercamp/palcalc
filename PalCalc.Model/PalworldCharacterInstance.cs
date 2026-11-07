@@ -54,7 +54,7 @@ namespace PalCalc.Model
         public PalLocation Location { get; set; }
         public PalGender Gender { get; set; }
         public List<PassiveSkill> PassiveSkills { get; set; }
-        public int Rank { get; set; } // (1 - 5)
+        public int Rank { get; set; } = 1; // (1 - 5)
 
         public List<ActiveSkill> ActiveSkills { get; set; }
         public List<ActiveSkill> EquippedActiveSkills { get; set; }

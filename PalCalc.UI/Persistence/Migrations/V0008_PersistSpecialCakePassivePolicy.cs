@@ -4,9 +4,9 @@ using System.IO;
 
 namespace PalCalc.UI.Persistence.Migrations
 {
-    internal sealed class V0007_PersistSpecialCakePassivePolicy : StorageMigration
+    internal sealed class V0008_PersistSpecialCakePassivePolicy : StorageMigration
     {
-        public V0007_PersistSpecialCakePassivePolicy() : base(6, 7) { }
+        public V0008_PersistSpecialCakePassivePolicy() : base(7, 8) { }
 
         public override void Apply(StorageMigrationContext context)
         {
