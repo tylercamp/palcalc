@@ -388,8 +388,7 @@ public class SearchFrontierCharacterizationTests
             [slower],
             maxThreads: 1,
             new SolverStateController(CancellationToken.None),
-            policy,
-            attackTargets
+            policy
         );
         var filter = new CandidatePreFilter(
             target,
@@ -439,8 +438,7 @@ public class SearchFrontierCharacterizationTests
             [],
             maxThreads: 1,
             new SolverStateController(CancellationToken.None),
-            policy,
-            attackTargets
+            policy
         );
 
         frontier.ExpandSingles(_ => [surgery]);
@@ -518,14 +516,11 @@ public class SearchFrontierCharacterizationTests
                 MinimumEffortOnly,
                 controller.CancellationToken,
                 attackTargets: null
-            ),
-            attackTargets: null
+            )
         );
     }
 
-    private static AttackProfile Profile(params byte[] masks) => new(masks.Select(mask =>
-        new AttackProfileEntry(mask, 0)
-    ).ToArray());
+    private static AttackProfile Profile(params byte[] masks) => new(masks);
 
     /*
      * Deliberately minimal reference used to characterize frontier mechanics without

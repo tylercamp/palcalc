@@ -858,6 +858,7 @@ Higher values linearly affect computation time.</value>
   </data>
   <data name="LC_SOLVER_SETTINGS_MAX_WILD_PALS_DESCRIPTION" xml:space="preserve">
     <value>The maximum number of wild pals to allow in a breeding path.
+
 Higher values linearly affect time required, depending on how many types of pals are owned.</value>
   </data>
   <data name="LC_SOLVER_STATUS_BREEDING" xml:space="preserve">
@@ -1204,5 +1205,13 @@ Would you like to download the installer now?
 This improves performance by ignoring surgery passives until the solver is done.
 
 This may give less efficient breeding paths if a surgery passive was already available on a nearby Pal.</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOW_SPECIAL_CAKES_FOR_PASSIVES" xml:space="preserve">
+    <value>Allow Special Cakes for Passives</value>
+  </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOW_SPECIAL_CAKES_FOR_PASSIVES_DESCRIPTION" xml:space="preserve">
+    <value>When disabled, Special Cakes are only used as needed for attack inheritance steps.
+
+If enabled, Special Cakes will also be considered for passive inheritance, and ensures 4 passives will be added to the child. This can more-than-double the amount of breeding pairs checked by the solver.</value>
   </data>
 </root>

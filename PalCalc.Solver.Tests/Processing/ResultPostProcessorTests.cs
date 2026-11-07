@@ -28,7 +28,7 @@ public class ResultPostProcessorTests
         );
         var configuredSolver = SolverTestScenario.Solver(
             [owned],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxBreedingSteps: 0,
             maxSurgeryCost: surgeryPassive.SurgeryCost,
             allowedSurgeryPassives: [surgeryPassive]
@@ -51,14 +51,14 @@ public class ResultPostProcessorTests
             [ownedReference],
             maxThreads: 1,
             controller,
-            policy,
-            attackTargets: null
+            policy
         );
         var processor = new ResultPostProcessor(
             target,
             configuredSolver.Settings,
             controller,
-            attackTargets: null
+            attackTargets: null,
+            selectionPolicy: policy
         );
 
         processor.ApplySurgery(frontier, extraResults: null);
@@ -93,14 +93,14 @@ public class ResultPostProcessorTests
         };
         var settings = SolverTestScenario.Solver(
             [],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxSurgeryCost: surgeryPassive.SurgeryCost,
             allowedSurgeryPassives: [surgeryPassive]
         ).Settings;
         var controller = Controller();
         var attackTargets = new AttackTargetContext(target, settings.DB);
         var policy = Policy(controller, attackTargets);
-        var profile = new AttackProfile(new AttackProfileEntry(0, 0));
+        var profile = new AttackProfile((byte)0);
         var faster = Bred(Leaf(), Leaf(), TargetPal, profile);
         var slower = Bred(faster, Leaf(), TargetPal, profile);
         var frontier = new SearchFrontier(
@@ -108,8 +108,7 @@ public class ResultPostProcessorTests
             [faster],
             maxThreads: 1,
             controller,
-            policy,
-            attackTargets
+            policy
         );
         var surgeryFinalists = SurgeryFinalistAccumulator.Create(
             target,
@@ -121,7 +120,8 @@ public class ResultPostProcessorTests
             target,
             settings,
             controller,
-            attackTargets
+            attackTargets,
+            policy
         );
 
         processor.ApplySurgery(frontier, surgeryFinalists.Candidates);
@@ -175,14 +175,14 @@ public class ResultPostProcessorTests
             [ownedReference],
             maxThreads: 1,
             controller,
-            policy,
-            attackTargets
+            policy
         );
         var processor = new ResultPostProcessor(
             target,
             configuredSolver.Settings,
             controller,
-            attackTargets
+            attackTargets,
+            policy
         );
 
         processor.ApplySurgery(frontier, extraResults: null);
@@ -260,14 +260,14 @@ public class ResultPostProcessorTests
             [new CompositeOwnedPalReference(maleReference, femaleReference)],
             maxThreads: 1,
             controller,
-            policy,
-            attackTargets
+            policy
         );
         var processor = new ResultPostProcessor(
             target,
             configuredSolver.Settings,
             controller,
-            attackTargets
+            attackTargets,
+            policy
         );
 
         processor.ApplySurgery(frontier, extraResults: null);
@@ -296,14 +296,11 @@ public class ResultPostProcessorTests
         };
         var configuredSolver = SolverTestScenario.Solver(
             ownedPals: [],
-            maxSpecialCakes: 0
+            specialCakePolicy: SpecialCakePolicy.Never
         );
         var controller = Controller();
-        var accumulator = new ResultAccumulator(
-            target,
-            Policy(controller),
-            attackTargets: null
-        );
+        var policy = Policy(controller);
+        var accumulator = new ResultAccumulator(target);
         accumulator.Observe([
             new WildPalReference(
                 target.Pal,
@@ -318,7 +315,8 @@ public class ResultPostProcessorTests
             target,
             configuredSolver.Settings,
             controller,
-            attackTargets: null
+            attackTargets: null,
+            selectionPolicy: policy
         );
 
         var results = processor.Finalize(accumulator);
@@ -341,13 +339,10 @@ public class ResultPostProcessorTests
         {
             Pal = owned.Pal,
         };
-        var configuredSolver = SolverTestScenario.Solver([owned], maxSpecialCakes: 0);
+        var configuredSolver = SolverTestScenario.Solver([owned], specialCakePolicy: SpecialCakePolicy.Never);
         var controller = Controller();
-        var accumulator = new ResultAccumulator(
-            target,
-            Policy(controller),
-            attackTargets: null
-        );
+        var policy = Policy(controller);
+        var accumulator = new ResultAccumulator(target);
         accumulator.Observe([
             new OwnedPalReference(
                 owned,
@@ -362,7 +357,8 @@ public class ResultPostProcessorTests
             target,
             configuredSolver.Settings,
             controller,
-            attackTargets: null
+            attackTargets: null,
+            selectionPolicy: policy
         );
 
         var results = processor.Finalize(accumulator);
@@ -371,64 +367,28 @@ public class ResultPostProcessorTests
     }
 
     [TestMethod]
-    public void Finalize_ShortlistsEstimatedCakeLimitBeforeMaterialization()
-    {
-        var target = ActiveTarget(TargetPal, TargetAttack);
-        var configuredSolver = SolverTestScenario.Solver(
-            [],
-            maxSpecialCakes: 0
-        );
-        var controller = Controller();
-        var attackTargets = new AttackTargetContext(target, SolverTestScenario.DB);
-        var accumulator = new ResultAccumulator(
-            target,
-            Policy(controller, attackTargets),
-            attackTargets
-        );
-        var advertisedButUnreconstructable = Bred(
-            Leaf(),
-            Leaf(),
-            TargetPal,
-            new AttackProfile(new AttackProfileEntry(1, 1))
-        );
-        accumulator.Observe([advertisedButUnreconstructable]);
-
-        var results = new ResultPostProcessor(
-            target,
-            configuredSolver.Settings,
-            controller,
-            attackTargets
-        ).Finalize(accumulator);
-
-        Assert.AreEqual(0, results.Count);
-    }
-
-    [TestMethod]
     public void Finalize_PreservesDifferentInputChoicesAfterMaterialization()
     {
         var target = ActiveTarget(TargetPal, TargetAttack);
         var configuredSolver = SolverTestScenario.Solver(
             [],
-            maxSpecialCakes: null
+            specialCakePolicy: SpecialCakePolicy.AttackInheritanceOnly
         );
         var controller = Controller();
         var attackTargets = new AttackTargetContext(target, SolverTestScenario.DB);
-        var accumulator = new ResultAccumulator(
-            target,
-            new KeepAllSelectionPolicy(),
-            attackTargets
-        );
+        var policy = new KeepAllSelectionPolicy();
+        var accumulator = new ResultAccumulator(target);
         var validMinimum = Bred(
             Leaf(TargetAttack, mask: 1),
             Leaf(TargetAttack, mask: 1),
             TargetPal,
-            new AttackProfile(new AttackProfileEntry(1, 0))
+            new AttackProfile((byte)1)
         );
         var higherTier = Bred(
             Leaf(TargetAttack, mask: 1, totalSpecialCakes: 1),
             Leaf(TargetAttack, mask: 1),
             TargetPal,
-            new AttackProfile(new AttackProfileEntry(1, 1))
+            new AttackProfile((byte)1)
         );
         accumulator.Observe([validMinimum, higherTier]);
 
@@ -436,7 +396,8 @@ public class ResultPostProcessorTests
             target,
             configuredSolver.Settings,
             controller,
-            attackTargets
+            attackTargets,
+            policy
         ).Finalize(accumulator);
 
         Assert.AreEqual(2, results.Count);
@@ -447,21 +408,22 @@ public class ResultPostProcessorTests
     public void Finalize_EvaluatesFasterResultsAboveTheMinimumCakeTier()
     {
         var target = ActiveTarget(TargetPal, TargetAttack);
-        var settings = SolverTestScenario.Solver([], maxSpecialCakes: null).Settings;
+        var settings = SolverTestScenario.Solver([], specialCakePolicy: SpecialCakePolicy.AttackInheritanceOnly).Settings;
         var controller = Controller();
         var attackTargets = new AttackTargetContext(target, settings.DB);
-        var accumulator = new ResultAccumulator(target, new KeepAllSelectionPolicy(), attackTargets);
+        var policy = new KeepAllSelectionPolicy();
+        var accumulator = new ResultAccumulator(target);
         var first = Leaf(TargetAttack, mask: 1);
         var second = Leaf(TargetAttack, mask: 1);
-        var slow = Bred(first, second, TargetPal, new AttackProfile(new AttackProfileEntry(1, 0)),
+        var slow = Bred(first, second, TargetPal, new AttackProfile((byte)1),
             passivesProbability: 0.01f);
-        // Alternate profile costs model different attack histories for the same input.
-        var costlier = new OwnedPalReference(first.UnderlyingInstance, [], new IV_Set(),
-            new AttackProfile(new AttackProfileEntry(1, 1)));
-        var fast = Bred(costlier, second, TargetPal, new AttackProfile(new AttackProfileEntry(1, 1)));
+        // Use the same input identity to exercise finalization within one comparison group.
+        var costlier = new SolverTestScenario.PricedOwnedReference(first.UnderlyingInstance, [], new IV_Set(),
+            new AttackProfile(1), 1);
+        var fast = Bred(costlier, second, TargetPal, new AttackProfile((byte)1));
         accumulator.Observe([slow, fast]);
 
-        var results = new ResultPostProcessor(target, settings, controller, attackTargets).Finalize(accumulator);
+        var results = new ResultPostProcessor(target, settings, controller, attackTargets, policy).Finalize(accumulator);
 
         Assert.AreEqual(2, results.Count);
         var cheapest = results.Single(r => PalResultProperty.SpecialCakes(r) == 0);
@@ -469,21 +431,28 @@ public class ResultPostProcessorTests
         Assert.IsTrue(cheapest.BreedingEffort > fastest.BreedingEffort * 2);
     }
 
-    [TestMethod]
-    public void SelectFinalResults_PreservesMaterializedCakeTiers()
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void SelectFinalResults_PreservesMaterializedCakeTiers(bool forPassives)
     {
         var target = ActiveTarget(TargetPal, TargetAttack);
         var controller = Controller();
         var attackTargets = new AttackTargetContext(target, SolverTestScenario.DB);
-        var accumulator = new ResultAccumulator(
-            target,
-            new KeepAllSelectionPolicy(),
-            attackTargets
+        var policy = new DefaultCandidateSelectionPolicy(
+            new(token => [new ResultLimitPruning(token, maxResults: 1)]),
+            controller.CancellationToken,
+            attackTargets: forPassives ? null : attackTargets,
+            considerPassiveCakes: forPassives
         );
+        var parent1 = Leaf(TargetAttack, mask: 1);
+        var parent2 = Leaf();
 
-        var results = accumulator.SelectFinalResults([
-            Leaf(TargetAttack, mask: 1, totalSpecialCakes: 2),
-            Leaf(TargetAttack, mask: 1, totalSpecialCakes: 1),
+        var results = policy.SelectFinalResults([
+            Bred(parent1, parent2, TargetPal, new AttackProfile((byte)1),
+                method: BreedingMethod.SpecialCake, recordedSpecialCakes: 1),
+            Bred(parent1, parent2, TargetPal, new AttackProfile((byte)1),
+                method: BreedingMethod.SpecialCake, recordedSpecialCakes: 2),
         ]).ToList();
 
         Assert.AreEqual(2, results.Count);
@@ -496,16 +465,13 @@ public class ResultPostProcessorTests
         var target = ActiveTarget(TargetPal, TargetAttack);
         var configuredSolver = SolverTestScenario.Solver(
             [],
-            maxSpecialCakes: 0
+            specialCakePolicy: SpecialCakePolicy.Never
         );
         var controller = Controller();
         var attackTargets = new AttackTargetContext(target, SolverTestScenario.DB);
-        var accumulator = new ResultAccumulator(
-            target,
-            Policy(controller, attackTargets),
-            attackTargets
-        );
-        var profile = new AttackProfile(new AttackProfileEntry(1, 0));
+        var policy = Policy(controller, attackTargets);
+        var accumulator = new ResultAccumulator(target);
+        var profile = new AttackProfile((byte)1);
         var faster = Bred(
             Leaf(TargetAttack, mask: 1),
             Leaf(TargetAttack, mask: 1),
@@ -524,7 +490,8 @@ public class ResultPostProcessorTests
             target,
             configuredSolver.Settings,
             controller,
-            attackTargets
+            attackTargets,
+            policy
         ).Finalize(accumulator);
 
         Assert.AreEqual(2, results.Count);
@@ -537,21 +504,18 @@ public class ResultPostProcessorTests
         var target = ActiveTarget(TargetPal, TargetAttack);
         var configuredSolver = SolverTestScenario.Solver(
             [],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxEffort: TimeSpan.Zero
         );
         var controller = Controller();
         var attackTargets = new AttackTargetContext(target, SolverTestScenario.DB);
-        var accumulator = new ResultAccumulator(
-            target,
-            Policy(controller, attackTargets),
-            attackTargets
-        );
+        var policy = Policy(controller, attackTargets);
+        var accumulator = new ResultAccumulator(target);
         var advertised = Bred(
             Leaf(mask: 1),
             Leaf(mask: 1),
             TargetPal,
-            new AttackProfile(new AttackProfileEntry(1, 0))
+            new AttackProfile((byte)1)
         );
         accumulator.Observe([advertised]);
 
@@ -559,14 +523,15 @@ public class ResultPostProcessorTests
             target,
             configuredSolver.Settings,
             controller,
-            attackTargets
+            attackTargets,
+            policy
         ).Finalize(accumulator);
 
         Assert.AreEqual(0, results.Count);
     }
 
     [TestMethod]
-    public void Finalize_ChecksGenderAdjustedCakeUseAfterMaterialization()
+    public void Finalize_RecordsGenderAdjustedCakeUseAfterMaterialization()
     {
         var child = SolverTestScenario.DB.Pals.First(p =>
             SolverTestScenario.DB.BreedingGenderProbability[p][PalGender.MALE] < 0.5f &&
@@ -583,20 +548,17 @@ public class ResultPostProcessorTests
         target.RequiredAttacks.Add(secondAttack);
         var configuredSolver = SolverTestScenario.Solver(
             [],
-            maxSpecialCakes: 1
+            specialCakePolicy: SpecialCakePolicy.AttackInheritanceOnly
         );
         var controller = Controller();
         var attackTargets = new AttackTargetContext(target, SolverTestScenario.DB);
-        var accumulator = new ResultAccumulator(
-            target,
-            Policy(controller, attackTargets),
-            attackTargets
-        );
+        var policy = Policy(controller, attackTargets);
+        var accumulator = new ResultAccumulator(target);
         var advertised = Bred(
             Leaf(targetAttack, mask: 1),
             Leaf(secondAttack, mask: 2),
             child,
-            new AttackProfile(new AttackProfileEntry(3, 1)),
+            new AttackProfile((byte)3),
             method: BreedingMethod.SpecialCake
         );
         accumulator.Observe([advertised]);
@@ -605,10 +567,14 @@ public class ResultPostProcessorTests
             target,
             configuredSolver.Settings,
             controller,
-            attackTargets
+            attackTargets,
+            policy
         ).Finalize(accumulator);
 
-        Assert.AreEqual(0, results.Count);
+        var result = (BredPalReference)results.Single();
+        Assert.IsTrue(result.SelfSpecialCakes > 1);
+        Assert.AreEqual(result.AvgRequiredBreedings, result.SelfSpecialCakes);
+        Assert.AreEqual(result.AvgRequiredBreedings, PalResultProperty.SpecialCakes(result));
     }
 
     [TestMethod]
@@ -626,29 +592,26 @@ public class ResultPostProcessorTests
         var target = ActiveTarget(child, targetAttack);
         var configuredSolver = SolverTestScenario.Solver(
             [],
-            maxSpecialCakes: 1,
+            specialCakePolicy: SpecialCakePolicy.AttackInheritanceOnly,
             maxEffort: BredPalReferenceEffort.CalculateSelfBreedingEffort(
                 new GameSettings(), child, 1, 1, requiredBreedings: 1)
         );
         var controller = Controller();
         var attackTargets = new AttackTargetContext(target, SolverTestScenario.DB);
-        var accumulator = new ResultAccumulator(
-            target,
-            new KeepAllSelectionPolicy(),
-            attackTargets
-        );
+        var policy = new KeepAllSelectionPolicy();
+        var accumulator = new ResultAccumulator(target);
         var rejected = Bred(
             Leaf(targetAttack, mask: 1),
             Leaf(targetAttack),
             child,
-            new AttackProfile(new AttackProfileEntry(1, 1)),
+            new AttackProfile((byte)1),
             gender: PalGender.MALE
         );
         var valid = Bred(
             Leaf(targetAttack, mask: 1),
             Leaf(targetAttack, mask: 1),
             child,
-            new AttackProfile(new AttackProfileEntry(1, 0))
+            new AttackProfile((byte)1)
         );
         accumulator.Observe([rejected, valid]);
 
@@ -656,82 +619,78 @@ public class ResultPostProcessorTests
             target,
             configuredSolver.Settings,
             controller,
-            attackTargets
+            attackTargets,
+            policy
         ).Finalize(accumulator);
 
         Assert.AreEqual(1, results.Count);
-        Assert.AreEqual(0, results[0].AttackProfile.Entries.Single().TotalSpecialCakes);
+        Assert.AreEqual(0, results[0].ExpectedSpecialCakes);
     }
 
     [TestMethod]
     public void Finalize_SkipsProvenDominatedCandidateBeforeReconstruction()
     {
         var target = ActiveTarget(TargetPal, TargetAttack);
-        var settings = SolverTestScenario.Solver([], maxSpecialCakes: null).Settings;
+        var settings = SolverTestScenario.Solver([], specialCakePolicy: SpecialCakePolicy.AttackInheritanceOnly).Settings;
         var controller = Controller();
         var context = new AttackTargetContext(target, settings.DB);
-        var accumulator = new ResultAccumulator(target, new KeepAllSelectionPolicy(), context);
+        var policy = new KeepAllSelectionPolicy();
+        var accumulator = new ResultAccumulator(target);
         var first = Leaf(TargetAttack, mask: 1);
         var second = Leaf(TargetAttack, mask: 1);
-        var valid = Bred(first, second, TargetPal, new AttackProfile(new AttackProfileEntry(1, 0)));
+        var valid = Bred(first, second, TargetPal, new AttackProfile((byte)1));
         var hiddenFirst = new OwnedPalReference(first.UnderlyingInstance, [], first.IVs,
-            new AttackProfile(new AttackProfileEntry(0, 0)));
+            new AttackProfile((byte)0));
         var hiddenSecond = new OwnedPalReference(second.UnderlyingInstance, [], second.IVs,
-            new AttackProfile(new AttackProfileEntry(0, 0)));
+            new AttackProfile((byte)0));
         // Deliberately unreconstructable: evaluating it would throw. Both its
         // effort and cake lower bounds are worse, with identical input choices.
         var dominated = Bred(hiddenFirst, hiddenSecond, TargetPal,
-            new AttackProfile(new AttackProfileEntry(1, 1)), passivesProbability: .5f);
+            new AttackProfile(1), passivesProbability: .5f, recordedSpecialCakes: 1);
         accumulator.Observe([dominated, valid]);
 
-        var results = new ResultPostProcessor(target, settings, controller, context).Finalize(accumulator);
+        var results = new ResultPostProcessor(target, settings, controller, context, policy).Finalize(accumulator);
 
         Assert.AreEqual(1, results.Count);
         Assert.AreEqual(0, PalResultProperty.SpecialCakes(results[0]));
     }
 
-    [DataTestMethod]
-    [DataRow(-1, 3)]
-    [DataRow(6, 2)]
-    [DataRow(4, 1)]
-    public void Finalize_PreservesAttackDrivenCakeTradeoffsWithinBudget(int budget, int expectedCount)
+    [TestMethod]
+    public void Finalize_PreservesAttackDrivenCakeTradeoffs()
     {
         var attacks = SolverTestScenario.DB.ActiveSkills.Where(attack => attack.CanInherit &&
             !TargetPal.Level1ActiveSkills(SolverTestScenario.DB).Contains(attack)).Take(2).ToArray();
         var target = new PalSpecifier { Pal = TargetPal, RequiredAttacks = attacks.ToList() };
-        var settings = SolverTestScenario.Solver([], maxSpecialCakes: budget < 0 ? null : budget).Settings;
+        var settings = SolverTestScenario.Solver([], specialCakePolicy: SpecialCakePolicy.AttackInheritanceOnly).Settings;
         var first = Leaf(attacks[0], mask: 1);
         var second = Leaf(attacks[1], mask: 2);
-        var slowPrep = Breed(first, first, 1, 0, .01f, 1, BreedingMethod.Ordinary);
-        var middlePrep = Breed(first, first, 1, 0, .1f, 1, BreedingMethod.Ordinary);
+        var slowPrep = Breed(first, first, 1, .01f, 1, BreedingMethod.Ordinary);
+        var middlePrep = Breed(first, first, 1, .1f, 1, BreedingMethod.Ordinary);
         var roots = new[]
         {
-            Breed(first, second, 3, 10, 1, .1f, BreedingMethod.SpecialCake),
-            Breed(middlePrep, second, 3, 5, 1, .2f, BreedingMethod.SpecialCake),
-            Breed(slowPrep, second, 3, 1, 1, 1, BreedingMethod.SpecialCake),
+            Breed(first, second, 3, 1, .1f, BreedingMethod.SpecialCake),
+            Breed(middlePrep, second, 3, 1, .2f, BreedingMethod.SpecialCake),
+            Breed(slowPrep, second, 3, 1, 1, BreedingMethod.SpecialCake),
         };
         var context = new AttackTargetContext(target, settings.DB);
-        var accumulator = new ResultAccumulator(target, new KeepAllSelectionPolicy(), context);
+        var policy = new KeepAllSelectionPolicy();
+        var accumulator = new ResultAccumulator(target);
         accumulator.Observe(roots);
 
-        var results = new ResultPostProcessor(target, settings, Controller(), context).Finalize(accumulator);
+        var results = new ResultPostProcessor(target, settings, Controller(), context, policy).Finalize(accumulator);
 
-        Assert.AreEqual(expectedCount, results.Count);
-        Assert.IsTrue(results.All(result => budget < 0 || PalResultProperty.SpecialCakes(result) <= budget));
+        Assert.AreEqual(3, results.Count);
         Assert.IsTrue(results.OfType<BredPalReference>().All(result =>
             result.MaterializedAttackInheritance.Mode == AttackInheritanceMode.InheritAll));
-        if (budget < 0)
-        {
-            var cheapest = results.Single(result => PalResultProperty.SpecialCakes(result) == 1);
-            var fastest = results.Single(result => PalResultProperty.SpecialCakes(result) == 10);
-            Assert.IsTrue(cheapest.BreedingEffort > fastest.BreedingEffort * 2);
-        }
+        var cheapest = results.Single(result => PalResultProperty.SpecialCakes(result) == 1);
+        var fastest = results.Single(result => PalResultProperty.SpecialCakes(result) == 10);
+        Assert.IsTrue(cheapest.BreedingEffort > fastest.BreedingEffort * 2);
 
-        BredPalReference Breed(IPalReference parent1, IPalReference parent2, byte mask, int cakes,
+        BredPalReference Breed(IPalReference parent1, IPalReference parent2, byte mask,
             float passives, float ivs, BreedingMethod method) => new(
                 settings.GameSettings, TargetPal, PalGender.WILDCARD, parent1, parent2, null, [],
                 new(method, passives), new IV_Set(), ivs,
-                new AttackProfile(new AttackProfileEntry(mask, cakes)), null);
+                new AttackProfile((byte)mask), null);
     }
 
     private static PalSpecifier ActiveTarget(
@@ -752,7 +711,8 @@ public class ResultPostProcessorTests
         AttackProfile attackProfile,
         PalGender gender = PalGender.WILDCARD,
         BreedingMethod method = BreedingMethod.Ordinary,
-        float passivesProbability = 1
+        float passivesProbability = 1,
+        int? recordedSpecialCakes = null
     ) => new(
         new GameSettings(),
         child,
@@ -765,7 +725,8 @@ public class ResultPostProcessorTests
         new IV_Set(),
         ivsProbability: 1,
         attackProfile,
-        materializedAttackInheritance: null
+        materializedAttackInheritance: null,
+        recordedSpecialCakes: recordedSpecialCakes
     );
 
     private static OwnedPalReference Leaf(
@@ -781,12 +742,7 @@ public class ResultPostProcessorTests
         instance.ActiveSkills = [learnedAttack];
         instance.EquippedActiveSkills = [learnedAttack];
 
-        return new(
-            instance,
-            [],
-            new IV_Set(),
-            new AttackProfile(new AttackProfileEntry(mask, totalSpecialCakes))
-        );
+        return new SolverTestScenario.PricedOwnedReference(instance, [], new IV_Set(), new AttackProfile(mask), totalSpecialCakes);
     }
 
     private static SolverStateController Controller() =>
@@ -824,6 +780,9 @@ public class ResultPostProcessorTests
         public IReadOnlyList<IPalReference> SelectRetainedAlternatives(
             IEnumerable<IPalReference> candidates
         ) => candidates.ToList();
+
+        public IEnumerable<IPalReference> SelectFinalResults(IEnumerable<IPalReference> candidates) =>
+            candidates.Distinct().ToList();
 
         public BreedingEffortGroupKey BreedingEffortGroupOf(IPalReference candidate) =>
             new(candidate.BreedingEffort.Ticks);

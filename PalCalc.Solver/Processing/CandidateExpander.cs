@@ -389,16 +389,14 @@ namespace PalCalc.Solver.Processing
                                 yield return result;
                         }
 
-                        // TODO - Make special cake use customizable
-
-                        // we could also use special cakes to get better passive inheritance, but that would add more
-                        // options to the search. we skip those for performance, accepting that we may miss some valid
-                        // or better breeding paths.
-                        //
-                        // instead, we only consider cakes when we need to inherit multiple target attacks that the
-                        // child doesn't already get at level 1 (checked by AttackProfileComposer). when we do use
-                        // a cake, we still account for its effects on passive inheritance.
-                        if (context.AttackTargets.IsActive && settings.MaxSpecialCakes != 0)
+                        // when we allow cakes for passives, we try an extra breeding option even without
+                        // target attacks. cakes force four inherited passives, so this option uses its own
+                        // passive odds. with the attack-only policy, AttackProfileComposer checks that we
+                        // actually need to inherit multiple target attacks.
+                        if (
+                            settings.SpecialCakePolicy == SpecialCakePolicy.AttacksAndPassives ||
+                            (context.AttackTargets.HasRequiredAttacks && settings.SpecialCakePolicy == SpecialCakePolicy.AttackInheritanceOnly)
+                        )
                         {
                             var count = GameConstants.MaxTotalPassives;
                             var probability = Probabilities.Passives.ProbabilityInheritedTargetPassivesForOverride(
@@ -433,10 +431,8 @@ namespace PalCalc.Solver.Processing
                             if (structuralEffort > settings.MaxEffort)
                                 return null;
 
-                            var profile = context.AttackTargets.IsActive
-                                ? attackProfileComposer.Prepare(childPalType, parent1, parent2, outcome, ivsProbability)
-                                : default;
-                            if (context.AttackTargets.IsActive && profile.EntryTargetMasks == 0)
+                            var profile = attackProfileComposer.Compose(childPalType, parent1, parent2, outcome.Method);
+                            if (context.AttackTargets.HasRequiredAttacks && !profile.HasOutcomes)
                                 return null;
 
                             // (not entirely correct, since some irrelevant passives may be specific and inherited from parents. if we know a child
@@ -450,13 +446,13 @@ namespace PalCalc.Solver.Processing
 
                             BredPalReference result = null;
                             var filterResult = CandidatePreFilterResult.Rejected;
-                            if (context.AttackTargets.IsActive)
+                            if (context.PreFilter.RetainsCostAlternatives)
                             {
                                 // (`CandidateDraft` exists SPECIFICALLY for this check - we want to avoid creating
                                 // a new object and causing GC churn, so we copy it into a `struct` repr)
                                 var draft = new CandidateDraft(
                                     settings.GameSettings, childPalType, parent1, parent2,
-                                    newPassives, outcome, finalIVs, ivsProbability,
+                                    newPassives, outcome, finalIVs, ivsProbability, structuralBreedings,
                                     selfBreedingEffort, structuralEffort, profile
                                 );
                                 filterResult = context.PreFilter.TryAdd(ref draft);

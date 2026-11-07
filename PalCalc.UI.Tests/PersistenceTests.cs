@@ -693,9 +693,61 @@ namespace PalCalc.UI.Tests
             Assert.HasCount(6, migratedTarget.SelectTokens("$..LevelRequirements").ToArray());
             Assert.IsTrue(migratedReferences.All(o => o["LevelRequirements"]?.Type == JTokenType.Null));
             Assert.IsNotNull(ResultJsonSerializer.FromDto(dto.Results[0].PalReference, db, new GameSettings(), new SerializableSolverSettings()));
+            preserved["CurrentResults"]!["SolverSettings"]!["AllowSpecialCakesForPassives"] = false;
             Assert.IsTrue(JToken.DeepEquals(preserved, JObject.Parse(File.ReadAllText(preservedPath))));
             Assert.IsTrue(File.Exists(targetPath + ".bak"));
-            Assert.AreEqual(6, JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
+            Assert.AreEqual(StorageFormat.CurrentVersion, JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
+            var migratedText = File.ReadAllText(targetPath);
+            StorageMigrationRunner.EnsureCurrent(path);
+            Assert.AreEqual(migratedText, File.ReadAllText(targetPath));
+        });
+    }
+
+    [TestMethod]
+    [DataRow(null)]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void VersionSixBackfillsPassiveCakePolicyWithoutReplacingExistingChoices(bool? existingChoice)
+    {
+        WithTemporaryDirectory(path =>
+        {
+            File.WriteAllText(StorageFormat.ManifestPath(path),
+                JsonConvert.SerializeObject(new StorageManifest { Version = 6 }));
+            var settingsPath = Path.Combine(path, "settings.json");
+            var settings = JObject.FromObject(AppSettingsJsonSerializer.ToDto(new AppSettings()));
+            var results = JObject.FromObject(new BreedingResultListDto
+            {
+                GameSettings = ResultJsonSerializer.ToDto(new GameSettings()),
+                SolverSettings = ResultJsonSerializer.ToDto(new SerializableSolverSettings()),
+                Results = [],
+                SelectedResultIndex = -1,
+            });
+            foreach (var solverSettings in new[] { (JObject)settings["SolverSettings"]!, (JObject)results["SolverSettings"]! })
+                if (existingChoice is bool choice)
+                    solverSettings["AllowSpecialCakesForPassives"] = choice;
+                else
+                    solverSettings.Remove("AllowSpecialCakesForPassives");
+            var originalSettings = settings.ToString();
+            File.WriteAllText(settingsPath, originalSettings);
+            var targets = Directory.CreateDirectory(Path.Combine(path, "save", "targets"));
+            var targetPath = Path.Combine(targets.FullName, "target.json");
+            var originalTarget = new JObject { ["CurrentResults"] = results }.ToString();
+            File.WriteAllText(targetPath, originalTarget);
+            var emptyTargetPath = Path.Combine(targets.FullName, "empty.json");
+            File.WriteAllText(emptyTargetPath, """{"CurrentResults":null}""");
+
+            StorageMigrationRunner.EnsureCurrent(path);
+
+            var migratedSettings = AppSettingsJsonSerializer.FromCurrentJson(File.ReadAllText(settingsPath));
+            Assert.AreEqual(existingChoice ?? false, migratedSettings.SolverSettings.AllowSpecialCakesForPassives);
+            var migrated = JObject.Parse(File.ReadAllText(targetPath));
+            var migratedResults = ResultJsonSerializer.FromCurrentJson(migrated["CurrentResults"]!.ToString());
+            Assert.AreEqual(existingChoice ?? false, migratedResults.SolverSettings.AllowSpecialCakesForPassives);
+            Assert.AreEqual(JTokenType.Null, JObject.Parse(File.ReadAllText(emptyTargetPath))["CurrentResults"]!.Type);
+            Assert.AreEqual(originalSettings, File.ReadAllText(settingsPath + ".bak"));
+            Assert.AreEqual(originalTarget, File.ReadAllText(targetPath + ".bak"));
+            Assert.AreEqual(StorageFormat.CurrentVersion,
+                JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
             var migratedText = File.ReadAllText(targetPath);
             StorageMigrationRunner.EnsureCurrent(path);
             Assert.AreEqual(migratedText, File.ReadAllText(targetPath));

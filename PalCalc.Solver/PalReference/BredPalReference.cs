@@ -14,6 +14,7 @@ namespace PalCalc.Solver.PalReference
     public class BredPalReference : IPalReference
     {
         private GameSettings gameSettings;
+        private readonly int? recordedSpecialCakes;
 
         private BredPalReference(
             GameSettings gameSettings,
@@ -24,10 +25,13 @@ namespace PalCalc.Solver.PalReference
             IV_Set ivs,
             AttackProfile attackProfile,
             MaterializedAttackInheritance materializedAttackInheritance,
-            BreedingOutcome outcome
+            BreedingOutcome outcome,
+            int? recordedSpecialCakes
         )
         {
             this.gameSettings = gameSettings;
+            this.recordedSpecialCakes = recordedSpecialCakes;
+
             Outcome = outcome;
 
             Pal = pal;
@@ -80,8 +84,9 @@ namespace PalCalc.Solver.PalReference
             IV_Set ivs,
             float ivsProbability,
             AttackProfile attackProfile,
-            MaterializedAttackInheritance materializedAttackInheritance
-        ) : this(gameSettings, pal, parent1, parent2, passives, ivs, attackProfile, materializedAttackInheritance, outcome)
+            MaterializedAttackInheritance materializedAttackInheritance,
+            int? recordedSpecialCakes = null
+        ) : this(gameSettings, pal, parent1, parent2, passives, ivs, attackProfile, materializedAttackInheritance, outcome, recordedSpecialCakes)
         {
             Gender = gender;
             if (avgRequiredBreedings is int materializedBreedings)
@@ -126,6 +131,8 @@ namespace PalCalc.Solver.PalReference
             set
             {
                 _avgRequiredBreedings = value;
+                ExpectedSpecialCakes = Parent1.ExpectedSpecialCakes + Parent2.ExpectedSpecialCakes + SelfSpecialCakes;
+                BaseSpecialCakes = Parent1.BaseSpecialCakes + Parent2.BaseSpecialCakes + SelfSpecialCakes;
                 SelfBreedingEffort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
                     gameSettings, Pal, Parent1.TimeFactor, Parent2.TimeFactor, _avgRequiredBreedings
                 );
@@ -144,6 +151,9 @@ namespace PalCalc.Solver.PalReference
         }
 
         public int TotalCost => Parent1.TotalCost + Parent2.TotalCost;
+        public int SelfSpecialCakes => recordedSpecialCakes ?? Outcome.SpecialCakesFor(AvgRequiredBreedings);
+        public int ExpectedSpecialCakes { get; private set; }
+        public int BaseSpecialCakes { get; private set; }
 
         private TimeSpan parentBreedingEffort;
         public TimeSpan BreedingEffort { get; private set; }
@@ -185,11 +195,16 @@ namespace PalCalc.Solver.PalReference
             }
             else
             {
-                return new BredPalReference(gameSettings, Pal, Parent1, Parent2, EffectivePassives, IVs,
-                    AttackProfile,
-                    MaterializedAttackInheritance, Outcome)
+                return new BredPalReference(
+                    gameSettings,
+                    Pal,
+                    Parent1, Parent2,
+                    EffectivePassives, IVs, AttackProfile, MaterializedAttackInheritance,
+                    Outcome, recordedSpecialCakes
+                )
                 {
                     AvgRequiredBreedings = BredPalReferenceEffort.WithGuaranteedGender(db, Pal, AvgRequiredBreedings, gender, useReverser),
+                    BaseSpecialCakes = BaseSpecialCakes,
                     Gender = gender,
                     IVsProbability = IVsProbability,
                 };
@@ -237,7 +252,7 @@ namespace PalCalc.Solver.PalReference
                     Pal,
                     Parent1.GetHashCode() ^ Parent2.GetHashCode(),
                     EffectivePassivesHash,
-                    HashCode.Combine(BreedingEffort, SelfBreedingEffort, Outcome),
+                    HashCode.Combine(BreedingEffort, SelfBreedingEffort, Outcome, BaseSpecialCakes, SelfSpecialCakes),
                     Gender,
                     IVs,
                     AttackProfile

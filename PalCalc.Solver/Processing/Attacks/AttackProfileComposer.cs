@@ -6,83 +6,10 @@ using PalCalc.Solver.PalReference.Properties;
 namespace PalCalc.Solver.Processing.Attacks;
 
 /// <summary>
-/// The result of <see cref="AttackProfileComposer.Prepare"/>: either a materialized
-/// <see cref="AttackProfile"/>, or a lazy, allocation-free view over the composer's
-/// current accumulator. This lets `CandidateExpander` compare candidate profiles
-/// before materializing them (see `CandidateDraft`).
-///
-/// A value backed by the composer is only valid until the next call to
-/// <see cref="AttackProfileComposer.Prepare"/>; consume or materialize it before then.
-/// </summary>
-internal readonly struct PreparedAttackProfile
-{
-    private readonly AttackProfileComposer composer;
-    private readonly AttackProfile cached;
-    private readonly (BreedingMethod Method, int EdgeCakes) cacheKey;
-    private readonly bool isCached;
-
-    internal PreparedAttackProfile(
-        AttackProfileComposer composer,
-        (BreedingMethod Method, int EdgeCakes) cacheKey
-    )
-    {
-        this.composer = composer;
-        this.cacheKey = cacheKey;
-        cached = default;
-        isCached = false;
-    }
-
-    internal PreparedAttackProfile(AttackProfile cached)
-    {
-        this.cached = cached;
-        composer = null;
-        cacheKey = default;
-        isCached = true;
-    }
-
-    public ulong EntryTargetMasks => isCached
-        ? cached.EntryTargetMasks
-        : composer.PreparedEntryTargetMasks;
-
-    public bool Contains(byte requiredMask)
-    {
-        var masks = EntryTargetMasks;
-        while (masks != 0)
-        {
-            var mask = BitOperations.TrailingZeroCount(masks);
-            masks &= masks - 1;
-            if ((mask & requiredMask) == requiredMask)
-                return true;
-        }
-        return false;
-    }
-
-    public AttackProfileEntry EntryForMask(int mask)
-    {
-        if (!isCached)
-            return composer.PreparedEntryForMask(mask);
-
-        foreach (ref readonly var entry in cached.EntriesSpan)
-            if (entry.LearnedTargetMask == mask)
-                return entry;
-        throw new ArgumentOutOfRangeException(nameof(mask));
-    }
-
-    public AttackProfile Materialize() => isCached
-        ? cached
-        : composer.MaterializePrepared(cacheKey);
-
-    public override int GetHashCode() => isCached
-        ? cached.GetHashCode()
-        : composer.PreparedHashCode;
-}
-
-/// <summary>
 /// Computes the child's search-time <see cref="AttackProfile"/> from the two parents'
-/// profiles: which requested attacks can end up on the child, at the minimum
-/// estimated Special Cake cost per mask. The result is exposed lazily as a
-/// <see cref="PreparedAttackProfile"/>; concrete inheritance choices are
-/// reconstructed later by <see cref="AttackResultMaterializer"/>.
+/// profiles: which requested attacks can end up on the child, using the chosen
+/// breeding method. Concrete inheritance choices are reconstructed later by
+/// <see cref="AttackResultMaterializer"/>.
 /// </summary>
 internal sealed class AttackProfileComposer(
     AttackTargetContext targets,
@@ -93,229 +20,96 @@ internal sealed class AttackProfileComposer(
     private const int TargetMaskCount = AttackProfile.TargetMaskCount;
     private const int MaxEquippedAttacksPerParent = 3;
 
-    private readonly AttackProfileAccumulator accumulator = new();
-    private readonly Dictionary<(BreedingMethod Method, int EdgeCakes), AttackProfile> cachedProfiles = [];
     private Pal cachedChild;
     private IPalReference cachedParent1;
     private IPalReference cachedParent2;
+    private AttackProfile? ordinaryProfile;
+    private AttackProfile? cakeProfile;
 
-    internal PreparedAttackProfile Prepare(
-        Pal child,
-        IPalReference parent1,
-        IPalReference parent2,
-        BreedingOutcome outcome,
-        float ivsProbability
-    )
+    internal AttackProfile Compose(Pal child, IPalReference parent1, IPalReference parent2, BreedingMethod method)
     {
-        if (!targets.IsActive)
-            return new(AttackProfile.Inactive);
+        if (!targets.HasRequiredAttacks)
+            return AttackProfile.Inactive;
 
-        var baseProbability = outcome.PassivesProbability * ivsProbability;
-        if (baseProbability <= 0)
-            throw new ArgumentOutOfRangeException(nameof(outcome));
-        if (
-            !ReferenceEquals(child, cachedChild) ||
+        if (!ReferenceEquals(child, cachedChild) ||
             !ReferenceEquals(parent1, cachedParent1) ||
-            !ReferenceEquals(parent2, cachedParent2)
-        )
+            !ReferenceEquals(parent2, cachedParent2))
         {
-            cachedProfiles.Clear();
             cachedChild = child;
             cachedParent1 = parent1;
             cachedParent2 = parent2;
+            ordinaryProfile = cakeProfile = null;
         }
 
-        var edgeCakes = outcome.SpecialCakesFor((int)Math.Ceiling(1f / baseProbability));
-        var cacheKey = (outcome.Method, edgeCakes);
-        if (cachedProfiles.TryGetValue(cacheKey, out var cached))
-            return new(cached);
-
-        accumulator.Reset(targets.StateOf(child).HasNooplLevel1Attack);
-        Enumerate(child, parent1, parent2, outcome, edgeCakes, accumulator);
-        return new(this, cacheKey);
+        return method switch
+        {
+            BreedingMethod.Ordinary => ordinaryProfile ??= ComposeUncached(child, parent1.AttackProfile, parent2.AttackProfile, method),
+            BreedingMethod.SpecialCake => cakeProfile ??= ComposeUncached(child, parent1.AttackProfile, parent2.AttackProfile, method),
+            _ => throw new ArgumentOutOfRangeException(nameof(method)),
+        };
     }
 
-    internal ulong PreparedEntryTargetMasks => accumulator.OccupiedMasks;
-    internal int PreparedHashCode => accumulator.CalculateHashCode();
-    internal AttackProfileEntry PreparedEntryForMask(int mask) =>
-        accumulator.EntryForMask(mask);
-
-    internal AttackProfile MaterializePrepared((BreedingMethod Method, int EdgeCakes) cacheKey)
+    private AttackProfile ComposeUncached(Pal child, AttackProfile first, AttackProfile second, BreedingMethod method)
     {
-        var profile = accumulator.Build();
-        cachedProfiles.Add(cacheKey, profile);
-        return profile;
+        var state = targets.StateOf(child);
+        var innateMask = state.Level1TargetMask;
+        var inheritableMask = targets.InheritableTargetMask;
+        ulong masks = 0;
+        if (first.EntryTargetMasks == 0 || second.EntryTargetMasks == 0)
+            return new(masks, state.HasNooplLevel1Attack);
+
+        if (method == BreedingMethod.Ordinary)
+        {
+            masks = 1UL << innateMask;
+            // Normal inheritance transfers at most one target attack. We only need
+            // to know which attacks are available from either parent, so we can skip
+            // the full Cartesian product of the two parent profiles.
+            var available = (AvailableAttacks(first) | AvailableAttacks(second)) & inheritableMask & ~innateMask;
+            while (available != 0)
+            {
+                var bit = available & -available;
+                available &= available - 1;
+                masks |= 1UL << (innateMask | bit);
+            }
+        }
+        else if (settings.SpecialCakePolicy != SpecialCakePolicy.Never)
+        {
+            for (var firstMasks = first.EntryTargetMasks; firstMasks != 0; firstMasks &= firstMasks - 1)
+                for (var secondMasks = second.EntryTargetMasks; secondMasks != 0; secondMasks &= secondMasks - 1)
+                {
+                    var firstMask = BitOperations.TrailingZeroCount(firstMasks) & inheritableMask;
+                    var secondMask = BitOperations.TrailingZeroCount(secondMasks) & inheritableMask;
+                    foreach (var loadouts in CakeMaskCache.Values[(firstMask << TargetMaskBitCount) | secondMask])
+                    {
+                        var inherited = (byte)((loadouts >> 8) | (byte)loadouts);
+                        if (AllowsSpecialCake(settings.SpecialCakePolicy, innateMask, inherited))
+                            masks |= 1UL << (innateMask | inherited);
+                    }
+                }
+        }
+
+        return new(masks, state.HasNooplLevel1Attack);
     }
 
-    private void Enumerate(
-        Pal child,
-        IPalReference parent1,
-        IPalReference parent2,
-        BreedingOutcome outcome,
-        int edgeSpecialCakes,
-        AttackProfileAccumulator entries
-    )
+    private static int AvailableAttacks(AttackProfile profile)
     {
-        ArgumentNullException.ThrowIfNull(child);
-        ArgumentNullException.ThrowIfNull(parent1);
-        ArgumentNullException.ThrowIfNull(parent2);
-
-        var parent1Profile = parent1.AttackProfile;
-        var parent2Profile = parent2.AttackProfile;
-        var inheritableTargetMask = targets.InheritableTargetMask;
-        var maxSpecialCakes = settings.MaxSpecialCakes;
-
-        var innateMask = targets.StateOf(child).Level1TargetMask;
-
-        var parent1Entries = parent1Profile.EntriesSpan;
-        var parent2Entries = parent2Profile.EntriesSpan;
-        // Normal inheritance transfers at most one target attack. For each parent,
-        // the categories below keep its cheapest entry overall and its cheapest
-        // entry with and without each of the six target bits. Those 13 champions
-        // per parent are enough to price the baseline and the three
-        // parent-presence combinations that can transfer each target, without
-        // the full Cartesian product of the two parent profiles.
-        const int normalCategoryCount = TargetMaskBitCount * 2;
-        const int anyCategory = normalCategoryCount;
-        if (outcome.Allows(AttackInheritanceMode.Normal))
-        {
-            Span<int> parent1CategoryCakes = stackalloc int[normalCategoryCount + 1];
-            Span<int> parent2CategoryCakes = stackalloc int[normalCategoryCount + 1];
-            parent1CategoryCakes.Fill(int.MaxValue);
-            parent2CategoryCakes.Fill(int.MaxValue);
-
-            BuildCategoryCakes(parent1Entries, parent1CategoryCakes);
-            BuildCategoryCakes(parent2Entries, parent2CategoryCakes);
-
-            EmitBestNormal(
-                parent1CategoryCakes,
-                parent2CategoryCakes,
-                anyCategory,
-                anyCategory,
-                innateMask
-            );
-
-            var normalTargetBits = (byte)(inheritableTargetMask & ~innateMask);
-            while (normalTargetBits != 0)
-            {
-                var bit = (byte)(normalTargetBits & -normalTargetBits);
-                normalTargetBits &= (byte)~bit;
-                var bitIndex = BitOperations.TrailingZeroCount((uint)bit);
-                var withoutAttack = bitIndex << 1;
-                var withAttack = withoutAttack + 1;
-
-                // At least one parent must carry the target. These are the only
-                // three presence combinations which can produce it.
-                EmitBestNormal(
-                    parent1CategoryCakes, parent2CategoryCakes,
-                    withAttack, withoutAttack, (byte)(innateMask | bit)
-                );
-                EmitBestNormal(
-                    parent1CategoryCakes, parent2CategoryCakes,
-                    withoutAttack, withAttack, (byte)(innateMask | bit)
-                );
-                EmitBestNormal(
-                    parent1CategoryCakes, parent2CategoryCakes,
-                    withAttack, withAttack, (byte)(innateMask | bit)
-                );
-            }
-        }
-
-        if (maxSpecialCakes == 0)
-            return;
-
-        if (!outcome.Allows(AttackInheritanceMode.InheritAll))
-            return;
-
-        foreach (var parent1Entry in parent1Entries)
-            foreach (var parent2Entry in parent2Entries)
-            {
-                var parentCakes = parent1Entry.TotalSpecialCakes + parent2Entry.TotalSpecialCakes;
-                var totalCakes = parentCakes + edgeSpecialCakes;
-                if (maxSpecialCakes is int maximumSpecialCakes && totalCakes > maximumSpecialCakes)
-                    continue;
-
-                var parent1Mask = (byte)(parent1Entry.LearnedTargetMask & inheritableTargetMask);
-                var parent2Mask = (byte)(parent2Entry.LearnedTargetMask & inheritableTargetMask);
-                var cakeLoadouts = CakeMaskCache.Values[
-                    (parent1Mask << TargetMaskBitCount) | parent2Mask
-                ];
-                for (var i = 0; i < cakeLoadouts.Length; i++)
-                {
-                    var loadouts = cakeLoadouts[i];
-                    var parent1Loadout = (byte)(loadouts >> 8);
-                    var parent2Loadout = (byte)loadouts;
-                    if (!RequiresSpecialCake(innateMask, (byte)(parent1Loadout | parent2Loadout)))
-                        continue;
-                    Emit(
-                        totalCakes,
-                        (byte)(innateMask | parent1Loadout | parent2Loadout)
-                    );
-                }
-            }
-
-        void BuildCategoryCakes(
-            ReadOnlySpan<AttackProfileEntry> profileEntries,
-            Span<int> minimumCakes
-        )
-        {
-            foreach (ref readonly var entry in profileEntries)
-            {
-                minimumCakes[anyCategory] = Math.Min(
-                    minimumCakes[anyCategory],
-                    entry.TotalSpecialCakes
-                );
-
-                var entryMask = (byte)(entry.LearnedTargetMask & inheritableTargetMask);
-                for (var bitIndex = 0; bitIndex < TargetMaskBitCount; bitIndex++)
-                {
-                    var category = (bitIndex << 1) + ((entryMask >> bitIndex) & 1);
-                    minimumCakes[category] = Math.Min(
-                        minimumCakes[category],
-                        entry.TotalSpecialCakes
-                    );
-                }
-            }
-        }
-
-        void EmitBestNormal(
-            ReadOnlySpan<int> firstMinimumCakes,
-            ReadOnlySpan<int> secondMinimumCakes,
-            int parent1Category,
-            int parent2Category,
-            byte childMask
-        )
-        {
-            var parent1Cakes = firstMinimumCakes[parent1Category];
-            var parent2Cakes = secondMinimumCakes[parent2Category];
-            if (parent1Cakes == int.MaxValue || parent2Cakes == int.MaxValue)
-                return;
-
-            Emit(
-                parent1Cakes + parent2Cakes,
-                childMask
-            );
-        }
-
-        void Emit(
-            int totalCakes,
-            byte childMask
-        )
-        {
-            if (maxSpecialCakes is int maximumSpecialCakes && totalCakes > maximumSpecialCakes)
-                return;
-
-            if (!entries.CouldImprove(childMask, totalCakes))
-                return;
-
-            entries.Add(new AttackProfileEntry(childMask, totalCakes));
-        }
+        var available = 0;
+        for (var masks = profile.EntryTargetMasks; masks != 0; masks &= masks - 1)
+            available |= BitOperations.TrailingZeroCount(masks);
+        return available;
     }
 
-    // Only consider cakes when at least two distinct requested attacks need
-    // inheritance; the child's level-one attacks already come for free.
-    internal static bool RequiresSpecialCake(byte innateMask, byte inheritedMask) =>
-        BitOperations.PopCount((uint)(inheritedMask & ~innateMask)) > 1;
+    // With the attack-only policy, only consider cakes when at least two distinct
+    // requested attacks need inheritance; the child's level-one attacks already come for free.
+    internal static bool AllowsSpecialCake(SpecialCakePolicy policy, byte innateMask, byte inheritedMask) =>
+        policy switch
+        {
+            SpecialCakePolicy.Never => false,
+            SpecialCakePolicy.AttackInheritanceOnly =>
+                BitOperations.PopCount((uint)(inheritedMask & ~innateMask)) > 1,
+            SpecialCakePolicy.AttacksAndPassives => true,
+            _ => throw new ArgumentOutOfRangeException(nameof(policy)),
+        };
 
     /// <summary>
     /// For special-cake inheritance, writes the inclusion-maximal unions of target

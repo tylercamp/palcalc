@@ -148,7 +148,6 @@ public class PalSpecifierAttackTests
             [attacks[1]],
             [],
             [],
-            SpecialCakes: 0,
             AttackProbability: 1
         );
         var bred = new BredPalReference(

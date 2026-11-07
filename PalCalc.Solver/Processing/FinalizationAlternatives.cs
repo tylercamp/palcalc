@@ -1,33 +1,44 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
-using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 
 namespace PalCalc.Solver.Processing;
 
+internal readonly record struct BreedingPathMetrics(
+    TimeSpan BreedingEffort,
+    int TotalSpecialCakes
+)
+{
+    public bool Covers(BreedingPathMetrics other) =>
+        BreedingEffort <= other.BreedingEffort && TotalSpecialCakes <= other.TotalSpecialCakes;
+
+    public bool Dominates(BreedingPathMetrics other) =>
+        Covers(other) && this != other;
+}
+
 /// <summary>Finalization-only comparisons; these never partition the search frontier.</summary>
-internal sealed class FinalizationAlternatives
+internal sealed class FinalizationAlternatives<T>
 {
     private readonly FinalizationComparison comparison = new();
-    private readonly Dictionary<FinalizationComparison.Key, List<EvaluatedAttackResult>> groups = [];
+    private readonly Dictionary<FinalizationComparison.Key, List<(T Result, BreedingPathMetrics Metrics)>> groups = [];
 
-    public IEnumerable<EvaluatedAttackResult> Results => groups.Values.SelectMany(group => group);
+    public IEnumerable<T> Results => groups.Values.SelectMany(group => group.Select(entry => entry.Result));
 
-    public bool DominatesLowerBounds(IPalReference source, AttackMaterializationMetrics bounds) =>
+    public bool DominatesLowerBounds(IPalReference source, BreedingPathMetrics bounds) =>
         groups.TryGetValue(comparison.KeyOf(source), out var group) &&
         group.Any(existing => existing.Metrics.Dominates(bounds));
 
-    public void Add(EvaluatedAttackResult candidate)
+    public void Add(IPalReference source, BreedingPathMetrics metrics, T result)
     {
-        var key = comparison.KeyOf(candidate.Source);
+        var key = comparison.KeyOf(source);
         if (!groups.TryGetValue(key, out var group))
             groups.Add(key, group = []);
-        if (group.Any(existing => existing.Metrics.Dominates(candidate.Metrics)))
+        if (group.Any(existing => existing.Metrics.Dominates(metrics)))
             return;
-        group.RemoveAll(existing => candidate.Metrics.Dominates(existing.Metrics));
+        group.RemoveAll(existing => metrics.Dominates(existing.Metrics));
         // Equal metrics can still describe meaningfully different breeding paths.
-        group.Add(candidate);
+        group.Add((result, metrics));
     }
 }
 

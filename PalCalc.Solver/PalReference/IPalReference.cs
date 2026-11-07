@@ -56,6 +56,10 @@ namespace PalCalc.Solver.PalReference
         TimeSpan SelfBreedingEffort { get; }
         int TotalCost { get; }
 
+        // Special cake costs before gender and attack adjustments, used as a lower bound when pruning
+        int BaseSpecialCakes => ExpectedSpecialCakes;
+        int ExpectedSpecialCakes => 0;
+
         /// <summary>
         /// Returns a version of this pal with the given gender. The new pal may have its effort updated
         /// to reflect gender probabilities, depending on `useReverser` (which makes gender-change free).

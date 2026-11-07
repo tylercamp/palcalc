@@ -1,14 +1,13 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
-using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Utils;
 
 namespace PalCalc.Solver.Processing.Search;
 
 /// <summary>
 /// Stack-local candidate state used to run the early filters before creating
-/// the retained profile array and breeding-tree node.
+/// a breeding-tree node.
 /// </summary>
 internal struct CandidateDraft
 {
@@ -17,6 +16,7 @@ internal struct CandidateDraft
     private readonly IPalReference parent2;
     private readonly BreedingOutcome outcome;
     private readonly float ivsProbability;
+    private readonly int requiredBreedings;
     private BredPalReference materialized;
 
     public CandidateDraft(
@@ -28,9 +28,10 @@ internal struct CandidateDraft
         BreedingOutcome outcome,
         IV_Set ivs,
         float ivsProbability,
+        int requiredBreedings,
         TimeSpan selfBreedingEffort,
         TimeSpan breedingEffort,
-        PreparedAttackProfile attackProfile
+        AttackProfile attackProfile
     )
     {
         this.gameSettings = gameSettings;
@@ -38,6 +39,7 @@ internal struct CandidateDraft
         this.parent2 = parent2;
         this.outcome = outcome;
         this.ivsProbability = ivsProbability;
+        this.requiredBreedings = requiredBreedings;
         materialized = null;
 
         Pal = pal;
@@ -49,6 +51,8 @@ internal struct CandidateDraft
         TotalCost = parent1.TotalCost + parent2.TotalCost;
         TotalRequiredLevels = parent1.TotalRequiredLevels + parent2.TotalRequiredLevels;
         AttackProfile = attackProfile;
+        SelfSpecialCakes = outcome.SpecialCakesFor(requiredBreedings);
+        BaseSpecialCakes = parent1.BaseSpecialCakes + parent2.BaseSpecialCakes + SelfSpecialCakes;
     }
 
     public Pal Pal { get; }
@@ -59,9 +63,11 @@ internal struct CandidateDraft
     public TimeSpan SelfBreedingEffort { get; }
     public TimeSpan BreedingEffort { get; }
     public int TotalCost { get; }
+    public int BaseSpecialCakes { get; }
+    private int SelfSpecialCakes { get; }
 
     public int TotalRequiredLevels { get; }
-    public PreparedAttackProfile AttackProfile { get; }
+    public AttackProfile AttackProfile { get; }
     public bool IsMaterialized => materialized is not null;
 
     public BredPalReference Materialize() => materialized ??= new BredPalReference(
@@ -70,12 +76,12 @@ internal struct CandidateDraft
         Gender,
         parent1,
         parent2,
-        avgRequiredBreedings: null,
+        avgRequiredBreedings: requiredBreedings,
         EffectivePassives,
         outcome,
         IVs,
         ivsProbability,
-        AttackProfile.Materialize(),
+        AttackProfile,
         materializedAttackInheritance: null
     );
 
@@ -86,7 +92,7 @@ internal struct CandidateDraft
         Pal,
         parent1.GetHashCode() ^ parent2.GetHashCode(),
         EffectivePassivesHash,
-        HashCode.Combine(BreedingEffort, SelfBreedingEffort, outcome),
+        HashCode.Combine(BreedingEffort, SelfBreedingEffort, outcome, BaseSpecialCakes, SelfSpecialCakes),
         Gender,
         IVs,
         AttackProfile

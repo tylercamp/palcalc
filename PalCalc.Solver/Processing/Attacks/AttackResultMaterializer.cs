@@ -12,32 +12,20 @@ namespace PalCalc.Solver.Processing.Attacks;
 /// and the resulting child entry.
 /// </summary>
 internal readonly record struct AttackCompositionChoice(
-    AttackProfileEntry Parent1Entry,
-    AttackProfileEntry Parent2Entry,
+    byte Parent1Mask,
+    byte Parent2Mask,
     AttackInheritanceMode Mode,
     byte Parent1TargetMask,
     byte Parent2TargetMask,
-    AttackProfileEntry ChildEntry
+    byte ChildMask
 );
-
-internal readonly record struct AttackMaterializationMetrics(
-    TimeSpan BreedingEffort,
-    int TotalSpecialCakes
-)
-{
-    public bool Covers(AttackMaterializationMetrics other) =>
-        BreedingEffort <= other.BreedingEffort && TotalSpecialCakes <= other.TotalSpecialCakes;
-
-    public bool Dominates(AttackMaterializationMetrics other) =>
-        Covers(other) && this != other;
-}
 
 // these only live during finalization. keep the chosen parents with each result
 // so materializing it later uses the same breeding path we evaluated.
 internal sealed record EvaluatedAttackResult(
     IPalReference Source,
     byte TargetMask,
-    AttackMaterializationMetrics Metrics,
+    BreedingPathMetrics Metrics,
     AttackCompositionChoice? Choice = null,
     int RequiredBreedings = 0,
     float AttackProbability = 1,
@@ -54,15 +42,11 @@ internal sealed record EvaluatedAttackResult(
 /// attack-inheritance alternatives for a search-time <see cref="IPalReference"/>,
 /// then reconstruct the selected alternatives as materialized references.
 ///
-/// Search-time references carry a summary of possible attack outcomes and
-/// their estimated Special Cake costs. Materialized references additionally
-/// carry an exact <see cref="MaterializedAttackInheritance"/> (probabilities,
-/// effort, cake totals, parent loadouts). Reconstruction is recursive: a bred
-/// pal retains effort/cake tradeoffs for the requested attacks, including the
-/// exact parent choices for each. Reconstruction does not require matching the
-/// selected search entry's estimated cake count. Retained parent profiles,
-/// breeding method, loadout feasibility, and cake-budget checks still constrain
-/// choices. Only selected alternatives are materialized.
+/// Search records feasible attack masks and estimates effort and cake costs
+/// for each breeding path. Reconstruction selects concrete parent loadouts,
+/// then computes effort and cake use from the required attempts. Retained
+/// parent profiles, breeding methods, and cake policy constrain the choices.
+/// Only selected alternatives are materialized.
 ///
 /// Each reconstructed bred reference has one selected attack outcome in its profile. Owned
 /// leaves retain their learned-attack availability; their final equipped attacks
@@ -91,8 +75,8 @@ internal sealed class AttackResultMaterializer
     internal int EvaluationCacheHits { get; private set; }
     internal int EvaluatedChoiceCount { get; private set; }
 
-    public AttackMaterializationMetrics LowerBounds(IPalReference source, AttackProfileEntry entry) =>
-        new(EffortLowerBound(source), entry.TotalSpecialCakes);
+    public BreedingPathMetrics LowerBounds(IPalReference source) =>
+        new(EffortLowerBound(source), source.BaseSpecialCakes);
 
     private TimeSpan EffortLowerBound(IPalReference source)
     {
@@ -133,8 +117,7 @@ internal sealed class AttackResultMaterializer
     /// <para>
     /// During the solver process, an <see cref="IPalReference"/> only tracks its
     /// potential attack outcomes. Exact parent effort and cake totals come from
-    /// the recursively evaluated results, not from the search-time profile,
-    /// which only estimates them.
+    /// the recursively evaluated results, rather than the estimates used during search.
     /// </para>
     /// </summary>
     public IReadOnlyList<EvaluatedAttackResult> Evaluate(IPalReference reference, byte targetMask)
@@ -163,9 +146,10 @@ internal sealed class AttackResultMaterializer
         }
         else
         {
-            var entry = reference.AttackProfile.Entries.Single(e => e.LearnedTargetMask == targetMask);
+            if ((reference.AttackProfile.EntryTargetMasks & (1UL << targetMask)) == 0)
+                throw new InvalidOperationException("The selected attack mask cannot be reconstructed.");
             result = [
-                new(reference, targetMask, new(reference.BreedingEffort, entry.TotalSpecialCakes))
+                new(reference, targetMask, new(reference.BreedingEffort, reference.ExpectedSpecialCakes))
             ];
         }
         evaluated.Add(key, result);
@@ -183,7 +167,7 @@ internal sealed class AttackResultMaterializer
         {
             SurgeryTablePalReference surgery => new SurgeryTablePalReference(Materialize(selected.Input), surgery.Operations),
             BredPalReference bred => MaterializeChoice(bred, selected),
-            _ => MaterializeLeaf(selected.Source, new AttackProfileEntry(selected.TargetMask, selected.TotalSpecialCakes)),
+            _ => selected.Source,
         };
         materialized.Add(selected, result);
         return result;
@@ -200,12 +184,12 @@ internal sealed class AttackResultMaterializer
             bred.Pal, bred.Parent1, bred.Parent2, bred.Outcome, bred.IVsProbability))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (choice.ChildEntry.LearnedTargetMask != targetMask)
+            if (choice.ChildMask != targetMask)
                 continue;
 
             foundWitness = true;
-            var first = Evaluate(bred.Parent1, choice.Parent1Entry.LearnedTargetMask);
-            var second = Evaluate(bred.Parent2, choice.Parent2Entry.LearnedTargetMask);
+            var first = Evaluate(bred.Parent1, choice.Parent1Mask);
+            var second = Evaluate(bred.Parent2, choice.Parent2Mask);
             foreach (var parent1 in first)
                 foreach (var parent2 in second)
                 {
@@ -238,8 +222,8 @@ internal sealed class AttackResultMaterializer
         var first = left.Choice.Value;
         var second = right.Choice.Value;
 
-        var firstAttrs  = (first.Mode, first.Parent1TargetMask, first.Parent2TargetMask, first.Parent1Entry.LearnedTargetMask, first.Parent2Entry.LearnedTargetMask, first.Parent1Entry.TotalSpecialCakes, first.Parent2Entry.TotalSpecialCakes);
-        var secondAttrs = (second.Mode, second.Parent1TargetMask, second.Parent2TargetMask, second.Parent1Entry.LearnedTargetMask, second.Parent2Entry.LearnedTargetMask, second.Parent1Entry.TotalSpecialCakes, second.Parent2Entry.TotalSpecialCakes);
+        var firstAttrs  = (first.Mode, first.Parent1TargetMask, first.Parent2TargetMask, first.Parent1Mask, first.Parent2Mask);
+        var secondAttrs = (second.Mode, second.Parent1TargetMask, second.Parent2TargetMask, second.Parent1Mask, second.Parent2Mask);
 
         return firstAttrs.CompareTo(secondAttrs);
     }
@@ -272,8 +256,8 @@ internal sealed class AttackResultMaterializer
 
         return new EvaluatedAttackResult(
             bred,
-            choice.ChildEntry.LearnedTargetMask,
-            new AttackMaterializationMetrics(parentEffort + selfEffort, totalCakes),
+            choice.ChildMask,
+            new BreedingPathMetrics(parentEffort + selfEffort, totalCakes),
             choice,
             requiredBreedings,
             attackProbability,
@@ -293,11 +277,6 @@ internal sealed class AttackResultMaterializer
         var parent2 = Materialize(evaluated.Parent2);
         var inheritedMask = (byte)(choice.Parent1TargetMask | choice.Parent2TargetMask);
         var inheritedAttacks = AttacksForMask(inheritedMask);
-        var actualEntry = new AttackProfileEntry(
-            choice.ChildEntry.LearnedTargetMask,
-            evaluated.TotalSpecialCakes
-        );
-
         // if only one parent contributes the target attack, we can guarantee inheritance
         // by having the other parent equip a non-inheritable attack. Palworld excludes
         // that attack from the roll, leaving only the one we want.
@@ -322,7 +301,6 @@ internal sealed class AttackResultMaterializer
             LoadoutFor(parent2, choice.Parent2TargetMask, parent2RequiresNoop),
             inheritedAttacks,
             ChildLearnedAttacksFor(bred.Pal, inheritedMask),
-            bred.Outcome.SpecialCakesFor(evaluated.RequiredBreedings),
             evaluated.AttackProbability
         );
 
@@ -337,7 +315,7 @@ internal sealed class AttackResultMaterializer
             bred.Outcome,
             bred.IVs,
             bred.IVsProbability,
-            attackProfile: new AttackProfile(bred.AttackProfile.HasNoopAttack, actualEntry),
+            attackProfile: new AttackProfile(bred.AttackProfile.HasNoopAttack, choice.ChildMask),
             materializedAttackInheritance: inheritance
         );
 
@@ -391,23 +369,6 @@ internal sealed class AttackResultMaterializer
         _ => throw new ArgumentOutOfRangeException(nameof(choice))
     };
 
-    private static IPalReference MaterializeLeaf(
-        IPalReference reference,
-        in AttackProfileEntry selectedEntry
-    )
-    {
-        foreach (ref readonly var entry in reference.AttackProfile.EntriesSpan)
-        {
-            if (entry.LearnedTargetMask == selectedEntry.LearnedTargetMask &&
-                entry.TotalSpecialCakes == selectedEntry.TotalSpecialCakes)
-                return reference;
-        }
-
-        throw new InvalidOperationException(
-            "The selected attack profile entry cannot be reconstructed."
-        );
-    }
-
     private readonly struct ResultKey(IPalReference reference, byte targetMask) : IEquatable<ResultKey>
     {
         private readonly IPalReference reference = reference;
@@ -426,7 +387,7 @@ internal sealed class AttackResultMaterializer
     /// Enumerates choices from the retained parent profiles, respecting the
     /// breeding method and inheritance feasibility. Cake choices use cached
     /// loadouts that cover the largest possible sets of target attacks.
-    /// Estimated cake costs are checked against the configured MaxSpecialCakes limit.
+    /// Cake eligibility follows the same usage policy as search-time composition.
     /// </summary>
     internal IEnumerable<AttackCompositionChoice> EnumerateChoices(
         Pal child,
@@ -436,7 +397,7 @@ internal sealed class AttackResultMaterializer
         float ivsProbability
     )
     {
-        if (!targets.IsActive)
+        if (!targets.HasRequiredAttacks)
             yield break;
 
         var baseProbability = outcome.PassivesProbability * ivsProbability;
@@ -447,16 +408,12 @@ internal sealed class AttackResultMaterializer
         var inheritableTargetMask = targets.InheritableTargetMask;
         var parent1Profile = parent1.AttackProfile;
         var parent2Profile = parent2.AttackProfile;
-        var edgeCakes = outcome.SpecialCakesFor((int)Math.Ceiling(1f / baseProbability));
-        foreach (var parent1Entry in parent1Profile.Entries)
-            foreach (var parent2Entry in parent2Profile.Entries)
+        foreach (var firstMask in parent1Profile.Masks)
+            foreach (var secondMask in parent2Profile.Masks)
             {
-                var parentCakes = parent1Entry.TotalSpecialCakes + parent2Entry.TotalSpecialCakes;
-
                 var baseline = CreateChoice(
-                    parent1Entry,
-                    parent2Entry,
-                    parentCakes,
+                    firstMask,
+                    secondMask,
                     AttackInheritanceMode.Baseline,
                     0,
                     0,
@@ -465,8 +422,8 @@ internal sealed class AttackResultMaterializer
                 if (baseline is AttackCompositionChoice baselineChoice)
                     yield return baselineChoice;
 
-                var parent1Mask = (byte)(parent1Entry.LearnedTargetMask & inheritableTargetMask);
-                var parent2Mask = (byte)(parent2Entry.LearnedTargetMask & inheritableTargetMask);
+                var parent1Mask = (byte)(firstMask & inheritableTargetMask);
+                var parent2Mask = (byte)(secondMask & inheritableTargetMask);
                 var normalTargets = (byte)((parent1Mask | parent2Mask) & ~innateMask);
                 while (normalTargets != 0)
                 {
@@ -475,9 +432,8 @@ internal sealed class AttackResultMaterializer
                     var parent1HasAttack = (parent1Mask & bit) != 0;
                     var parent2HasAttack = (parent2Mask & bit) != 0;
                     var normal = CreateChoice(
-                        parent1Entry,
-                        parent2Entry,
-                        parentCakes,
+                        firstMask,
+                        secondMask,
                         AttackInheritanceMode.Normal,
                         parent1HasAttack ? bit : (byte)0,
                         parent2HasAttack ? bit : (byte)0,
@@ -487,7 +443,7 @@ internal sealed class AttackResultMaterializer
                         yield return normalChoice;
                 }
 
-                if (settings.MaxSpecialCakes == 0 || !outcome.Allows(AttackInheritanceMode.InheritAll))
+                if (settings.SpecialCakePolicy == SpecialCakePolicy.Never || !outcome.Allows(AttackInheritanceMode.InheritAll))
                     continue;
 
                 var cakeLoadouts = AttackProfileComposer.CakeMasksFor(
@@ -500,9 +456,8 @@ internal sealed class AttackResultMaterializer
                     var parent1Loadout = (byte)(loadouts >> 8);
                     var parent2Loadout = (byte)loadouts;
                     var cake = CreateChoice(
-                        parent1Entry,
-                        parent2Entry,
-                        parentCakes,
+                        firstMask,
+                        secondMask,
                         AttackInheritanceMode.InheritAll,
                         parent1Loadout,
                         parent2Loadout,
@@ -514,9 +469,8 @@ internal sealed class AttackResultMaterializer
             }
 
         AttackCompositionChoice? CreateChoice(
-            in AttackProfileEntry parent1Entry,
-            in AttackProfileEntry parent2Entry,
-            int parentCakes,
+            byte firstMask,
+            byte secondMask,
             AttackInheritanceMode mode,
             byte parent1TargetMask,
             byte parent2TargetMask,
@@ -526,25 +480,10 @@ internal sealed class AttackResultMaterializer
             if (!outcome.Allows(mode))
                 return null;
             if (mode == AttackInheritanceMode.InheritAll &&
-                !AttackProfileComposer.RequiresSpecialCake(innateMask, (byte)(parent1TargetMask | parent2TargetMask)))
+                !AttackProfileComposer.AllowsSpecialCake(settings.SpecialCakePolicy, innateMask, (byte)(parent1TargetMask | parent2TargetMask)))
                 return null;
 
-            var totalCakes = parentCakes + edgeCakes;
-            if (settings.MaxSpecialCakes is int maxCakes && totalCakes > maxCakes)
-                return null;
-
-            var childEntry = new AttackProfileEntry(
-                childMask,
-                totalCakes
-            );
-            return new(
-                parent1Entry,
-                parent2Entry,
-                mode,
-                parent1TargetMask,
-                parent2TargetMask,
-                childEntry
-            );
+            return new(firstMask, secondMask, mode, parent1TargetMask, parent2TargetMask, childMask);
         }
     }
 

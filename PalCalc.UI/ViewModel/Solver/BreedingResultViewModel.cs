@@ -48,7 +48,7 @@ namespace PalCalc.UI.ViewModel.Solver
                     allowedSurgeryPassives: [],
                     skipSurgeryPassivesDuringSearch: false,
                     useGenderReversers: false,
-                    maxSpecialCakes: 0,
+                    specialCakePolicy: SpecialCakePolicy.Never,
                     trainPals: true
             );
             var solver = new BreedingSolver();
@@ -96,9 +96,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 DisplayedResult = displayedResult;
                 Graph = BreedingGraph.FromPalReference(source, settings, displayedResult, normalizedRequiredAttacks);
                 EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
-                NumSpecialCakes = DisplayedResult.AllReferences()
-                    .OfType<BredPalReference>()
-                    .Sum(reference => reference.MaterializedAttackInheritance?.SpecialCakes ?? 0);
+                NumSpecialCakes = DisplayedResult.ExpectedSpecialCakes;
 
                 EffectiveAttacks = new AttackSkillCollectionViewModel(normalizedRequiredAttacks.Select(ActiveSkillViewModel.Make));
 

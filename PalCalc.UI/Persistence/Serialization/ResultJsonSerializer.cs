@@ -127,6 +127,7 @@ namespace PalCalc.UI.Persistence.Serialization
             MaxGoldCost = value.MaxGoldCost,
             SkipSurgerySearch = value.SkipSurgerySearch,
             UseGenderReversers = value.UseGenderReversers,
+            AllowSpecialCakesForPassives = value.AllowSpecialCakesForPassives,
             BannedBredPalInternalNames = value.BannedBredPalInternalNames.ToList(),
             BannedWildPalInternalNames = value.BannedWildPalInternalNames.ToList(),
             BannedSurgeryPassiveInternalNames = value.BannedSurgeryPassiveInternalNames.ToList(),
@@ -143,6 +144,7 @@ namespace PalCalc.UI.Persistence.Serialization
             MaxGoldCost = value.MaxGoldCost,
             SkipSurgerySearch = value.SkipSurgerySearch,
             UseGenderReversers = value.UseGenderReversers,
+            AllowSpecialCakesForPassives = value.AllowSpecialCakesForPassives,
             BannedBredPalInternalNames = value.BannedBredPalInternalNames.ToList(),
             BannedWildPalInternalNames = value.BannedWildPalInternalNames.ToList(),
             BannedSurgeryPassiveInternalNames = value.BannedSurgeryPassiveInternalNames.ToList(),
@@ -180,7 +182,7 @@ namespace PalCalc.UI.Persistence.Serialization
                 IVs = ToDto(bred.IVs),
                 IVsProbability = bred.IVsProbability,
                 AvgRequiredBreedings = bred.AvgRequiredBreedings,
-                MaterializedAttackInheritance = ToDto(bred.MaterializedAttackInheritance),
+                MaterializedAttackInheritance = ToDtoInheritance(bred),
             },
             CompositeOwnedPalReference composite => new()
             {
@@ -254,44 +256,56 @@ namespace PalCalc.UI.Persistence.Serialization
                 value.AvgRequiredBreedings,
                 value.EffectivePassiveInternalNames.Select(name => name.InternalToStandardPassive(db)).ToList(),
                 new BreedingOutcome(
-                    materializedAttackInheritance?.Mode == AttackInheritanceMode.InheritAll
+                    value.MaterializedAttackInheritance?.Mode == AttackInheritanceMode.InheritAll
                         ? BreedingMethod.SpecialCake : BreedingMethod.Ordinary,
                     value.PassivesProbability.Value
                 ),
                 FromDto(value.IVs),
                 value.IVsProbability.Value,
                 AttackProfile.Inactive,
-                materializedAttackInheritance
+                materializedAttackInheritance,
+                recordedSpecialCakes: value.MaterializedAttackInheritance?.SpecialCakes
             );
             return value.AvgRequiredBreedings is null
                 ? result.WithGuaranteedGender(db, value.Gender.Value, solverSettings.UseGenderReversers)
                 : result;
         }
 
-        private static MaterializedAttackInheritanceDto ToDto(MaterializedAttackInheritance value) => value == null
-            ? null
-            : new MaterializedAttackInheritanceDto
-            {
-                Mode = value.Mode,
-                Parent1LoadoutInternalNames = value.Parent1Loadout.Select(attack => attack.InternalName).ToList(),
-                Parent2LoadoutInternalNames = value.Parent2Loadout.Select(attack => attack.InternalName).ToList(),
-                InheritedAttackInternalNames = value.InheritedAttacks.Select(attack => attack.InternalName).ToList(),
-                ChildLearnedAttackInternalNames = value.ChildLearnedAttacks.Select(attack => attack.InternalName).ToList(),
-                SpecialCakes = value.SpecialCakes,
-                AttackProbability = value.AttackProbability,
-            };
+        private static MaterializedAttackInheritanceDto ToDtoInheritance(BredPalReference bred)
+        {
+            var attacks = bred.MaterializedAttackInheritance;
+            if (attacks is null && bred.Outcome.Method == BreedingMethod.Ordinary && bred.SelfSpecialCakes == 0)
+                return null;
 
-        private static MaterializedAttackInheritance FromDto(MaterializedAttackInheritanceDto value, PalDB db) => value == null
-            ? null
-            : new MaterializedAttackInheritance(
-                value.Mode,
-                value.Parent1LoadoutInternalNames.Select(name => name.InternalToActive(db)).ToList(),
-                value.Parent2LoadoutInternalNames.Select(name => name.InternalToActive(db)).ToList(),
-                value.InheritedAttackInternalNames.Select(name => name.InternalToActive(db)).ToList(),
-                value.ChildLearnedAttackInternalNames.Select(name => name.InternalToActive(db)).ToList(),
-                value.SpecialCakes,
-                value.AttackProbability
-            );
+            // The existing format stores cake use with attack instructions.
+            // Empty loadouts carry a passive-only cake step without instructions.
+            return new MaterializedAttackInheritanceDto
+            {
+                Mode = bred.Outcome.Method == BreedingMethod.SpecialCake
+                    ? AttackInheritanceMode.InheritAll
+                    : attacks?.Mode ?? AttackInheritanceMode.Baseline,
+                Parent1LoadoutInternalNames = attacks?.Parent1Loadout.Select(attack => attack.InternalName).ToList() ?? [],
+                Parent2LoadoutInternalNames = attacks?.Parent2Loadout.Select(attack => attack.InternalName).ToList() ?? [],
+                InheritedAttackInternalNames = attacks?.InheritedAttacks.Select(attack => attack.InternalName).ToList() ?? [],
+                ChildLearnedAttackInternalNames = attacks?.ChildLearnedAttacks.Select(attack => attack.InternalName).ToList() ?? [],
+                SpecialCakes = bred.SelfSpecialCakes,
+                AttackProbability = attacks?.AttackProbability ?? 1,
+            };
+        }
+
+        private static MaterializedAttackInheritance FromDto(MaterializedAttackInheritanceDto value, PalDB db) =>
+            value == null || (value.Mode == AttackInheritanceMode.InheritAll &&
+                value.Parent1LoadoutInternalNames.Count == 0 && value.Parent2LoadoutInternalNames.Count == 0 &&
+                value.InheritedAttackInternalNames.Count == 0 && value.ChildLearnedAttackInternalNames.Count == 0)
+                ? null
+                : new MaterializedAttackInheritance(
+                    value.Mode,
+                    value.Parent1LoadoutInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                    value.Parent2LoadoutInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                    value.InheritedAttackInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                    value.ChildLearnedAttackInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                    value.AttackProbability
+                );
 
         private static SurgeryOperationDto ToDto(ISurgeryOperation value) => value switch
         {

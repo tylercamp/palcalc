@@ -16,63 +16,47 @@ public class AttackProfileComposerTests
     {
         var innate = Child.Level1ActiveSkills(SolverTestScenario.DB).First();
 
-        var profile = Materialize([innate], Entry(0), Entry(0), cakes: 0);
+        var profile = Compose([innate], (byte)0, (byte)0, policy: SpecialCakePolicy.Never);
 
-        Assert.AreEqual(new AttackProfileEntry(1, 0), profile.Entries.Single());
+        Assert.AreEqual((byte)1, profile.Masks.Single());
     }
 
     [TestMethod]
     public void Compose_NormalInheritanceAddsExactlyOneNonInnateAttack()
     {
-        var profile = Materialize(
+        var profile = Compose(
             Attacks(2),
-            Entry(0b11),
-            Entry(0),
-            cakes: 0
+            (byte)0b11,
+            (byte)0,
+            policy: SpecialCakePolicy.Never
         );
 
         CollectionAssert.AreEquivalent(
             new byte[] { 0, 0b01, 0b10 },
-            profile.Entries.Select(entry => entry.LearnedTargetMask).ToArray()
+            profile.Masks.ToArray()
         );
-        Assert.IsTrue(profile.Entries.All(entry => entry.TotalSpecialCakes == 0));
     }
 
     [TestMethod]
-    public void Compose_NormalAvailabilityIgnoresAttackProbabilityAndNoopState()
+    public void Compose_NormalAvailabilityIgnoresParentNoopState()
     {
         var attack = Attacks(1);
         var context = Context(attack);
-        var settings = Settings(cakes: 0);
-        var parent1 = new AttackProfile(Entry(1));
-        var parent2 = new AttackProfile(Entry(0));
+        var settings = Settings(policy: SpecialCakePolicy.Never);
+        var parent1 = new AttackProfile((byte)1);
+        var parent2 = new AttackProfile((byte)0);
 
-        var normal = Materialize(
+        var normal = Compose(
             new AttackProfileComposer(context, settings),
-            Child, Reference(parent1), Reference(parent2), new(BreedingMethod.Ordinary, 1), 1
+            Child, Reference(parent1), Reference(parent2), BreedingMethod.Ordinary
         );
-        var lowProbability = Materialize(
+        var withNoopParent = Compose(
             new AttackProfileComposer(context, settings),
-            Child, Reference(parent1, neutral: true), Reference(parent2), new(BreedingMethod.Ordinary, 0.01f), 0.1f
+            Child, Reference(parent1, neutral: true), Reference(parent2), BreedingMethod.Ordinary
         );
 
-        Assert.AreEqual(normal, lowProbability);
+        Assert.AreEqual(normal, withNoopParent);
         Assert.IsTrue(normal.Contains(1));
-    }
-
-    [TestMethod]
-    public void Compose_ReusesProfileForTheSameRoundedCakeCost()
-    {
-        var context = Context(Attacks(2));
-        var settings = Settings(cakes: 100);
-        var parent1 = Reference(new AttackProfile(Entry(1)));
-        var parent2 = Reference(new AttackProfile(Entry(2)));
-        var composer = new AttackProfileComposer(context, settings);
-
-        var first = Materialize(composer, Child, parent1, parent2, new(BreedingMethod.SpecialCake, 0.5f), 0.5f);
-        var second = Materialize(composer, Child, parent1, parent2, new(BreedingMethod.SpecialCake, 0.51f), 0.5f);
-
-        Assert.AreSame(first.Entries, second.Entries);
     }
 
     [TestMethod]
@@ -82,100 +66,69 @@ public class AttackProfileComposerTests
             !attack.CanInherit && !Child.Level1AttackInternalIds.Contains(attack.InternalName));
         var inheritable = Attacks(1).Single();
 
-        var profile = Materialize(
+        var profile = Compose(
             [nonInheritable, inheritable],
-            Entry(0b11),
-            Entry(0),
-            cakes: 0
+            (byte)0b11,
+            (byte)0,
+            policy: SpecialCakePolicy.Never
         );
 
         CollectionAssert.AreEquivalent(
             new byte[] { 0, 0b10 },
-            profile.Entries.Select(entry => entry.LearnedTargetMask).ToArray()
+            profile.Masks.ToArray()
         );
-    }
-
-    [DataTestMethod]
-    [DataRow(9, true)]
-    [DataRow(8, false)]
-    public void Compose_CakeCostIncludesParentsAndHonorsLimit(
-        int cakeLimit,
-        bool expected
-    )
-    {
-        var profile = Materialize(
-            Attacks(6),
-            Entry(0b000111, cakes: 2),
-            Entry(0b111000, cakes: 3),
-            cakes: cakeLimit,
-            passivesProbability: 0.5f,
-            ivsProbability: 0.5f
-        );
-
-        Assert.AreEqual(expected, profile.Contains(0b111111));
-        if (expected)
-            Assert.AreEqual(9, profile.Entries.Single(entry => entry.LearnedTargetMask == 0b111111)
-                .TotalSpecialCakes);
     }
 
     [TestMethod]
-    public void Compose_MethodsKeepTheirOwnProbabilityAndAttackOutcomes()
+    public void Compose_CachesFeasibilitySeparatelyByMethod()
     {
         var attacks = Attacks(2);
         var context = Context(attacks);
-        var settings = Settings(cakes: 100);
-        var parent1 = Reference(new AttackProfile(Entry(0b01)));
-        var parent2 = Reference(new AttackProfile(Entry(0b10)));
+        var settings = Settings(SpecialCakePolicy.AttackInheritanceOnly);
+        var parent1 = Reference(new AttackProfile((byte)0b01));
+        var parent2 = Reference(new AttackProfile((byte)0b10));
 
-        var impossible = Materialize(
-            new AttackProfileComposer(context, settings),
-            Child, parent1, parent2, new(BreedingMethod.Ordinary, 0.5f), 1
-        );
-        var possible = Materialize(
-            new AttackProfileComposer(context, settings),
-            Child, parent1, parent2, new(BreedingMethod.SpecialCake, 0.25f), 1
-        );
+        var composer = new AttackProfileComposer(context, settings);
+        var impossible = composer.Compose(Child, parent1, parent2, BreedingMethod.Ordinary);
+        var possible = composer.Compose(Child, parent1, parent2, BreedingMethod.SpecialCake);
 
         Assert.IsFalse(impossible.Contains(0b11));
-        Assert.AreEqual(
-            4,
-            possible.Entries.Single(entry => entry.LearnedTargetMask == 0b11).TotalSpecialCakes
-        );
+        Assert.IsTrue(possible.Contains(0b11));
     }
 
-    [DataTestMethod]
-    [DataRow(0, false)]
-    [DataRow(3, false)]
-    [DataRow(4, true)]
-    public void Compose_CakeOnlyOutcomeRequiresEnoughCakes(int cakeLimit, bool expected)
+    [TestMethod]
+    [DataRow(SpecialCakePolicy.Never, false)]
+    [DataRow(SpecialCakePolicy.AttackInheritanceOnly, true)]
+    [DataRow(SpecialCakePolicy.AttacksAndPassives, true)]
+    public void Compose_CakeOnlyOutcomeFollowsPolicy(SpecialCakePolicy policy, bool expected)
     {
         var context = Context(Attacks(2));
-        var composer = new AttackProfileComposer(context, Settings(cakeLimit));
-        var profile = Materialize(
+        var composer = new AttackProfileComposer(context, Settings(policy));
+        var profile = Compose(
             composer, Child,
-            Reference(new AttackProfile(Entry(1))),
-            Reference(new AttackProfile(Entry(2))),
-            new(BreedingMethod.SpecialCake, 0.25f), ivsProbability: 1
+            Reference(new AttackProfile((byte)1)),
+            Reference(new AttackProfile((byte)2)),
+            BreedingMethod.SpecialCake
         );
 
         Assert.AreEqual(expected, profile.Contains(3));
-        Assert.AreEqual(expected ? 1 : 0, profile.Entries.Count);
+        Assert.AreEqual(expected ? 1 : 0, profile.Masks.Count());
         if (expected)
-            Assert.AreEqual(new AttackProfileEntry(3, 4), profile.Entries.Single());
+            Assert.AreEqual((byte)3, profile.Masks.Single());
     }
 
     [TestMethod]
-    public void Compose_CategoryChampionsMatchBruteForceNormalAvailability()
+    public void Compose_NormalMasksMatchBruteForceAvailability()
     {
         var attacks = Attacks(2);
-        var settings = Settings(cakes: 0);
+        var settings = Settings(policy: SpecialCakePolicy.Never);
         var context = Context(attacks);
-        var parent1 = new AttackProfile(Entry(0b00), Entry(0b01), Entry(0b10), Entry(0b11));
-        var parent2 = new AttackProfile(Entry(0b00), Entry(0b01), Entry(0b10));
+        var parent1 = new AttackProfile((byte)0b00, (byte)0b01, (byte)0b10, (byte)0b11);
+        var parent2 = new AttackProfile((byte)0b00, (byte)0b01, (byte)0b10);
 
-        var optimized = Materialize(
+        var optimized = Compose(
             new AttackProfileComposer(context, settings),
-            Child, Reference(parent1), Reference(parent2), new(BreedingMethod.Ordinary, 1), 1
+            Child, Reference(parent1), Reference(parent2), BreedingMethod.Ordinary
         );
         var expected = BruteForceNormalProfile(context, parent1, parent2);
 
@@ -187,12 +140,12 @@ public class AttackProfileComposerTests
     {
         var innate = Child.Level1ActiveSkills(SolverTestScenario.DB).First();
         var context = Context([innate, Attacks(1).Single()]);
-        var profile = Materialize(
-            new AttackProfileComposer(context, Settings(100)), Child,
-            Reference(new AttackProfile(Entry(3))), Reference(new AttackProfile(Entry(0))),
-            new(BreedingMethod.SpecialCake, 1), 1
+        var profile = Compose(
+            new AttackProfileComposer(context, Settings(SpecialCakePolicy.AttackInheritanceOnly)), Child,
+            Reference(new AttackProfile((byte)3)), Reference(new AttackProfile((byte)0)),
+            BreedingMethod.SpecialCake
         );
-        Assert.AreEqual(0, profile.Entries.Count);
+        Assert.AreEqual(0, profile.Masks.Count());
     }
 
     [TestMethod]
@@ -225,43 +178,34 @@ public class AttackProfileComposerTests
             }
     }
 
-    private static AttackProfile Materialize(
+    private static AttackProfile Compose(
         IEnumerable<ActiveSkill> attacks,
-        AttackProfileEntry parent1,
-        AttackProfileEntry parent2,
-        int? cakes,
-        float passivesProbability = 1,
-        float ivsProbability = 1
+        byte parent1,
+        byte parent2,
+        SpecialCakePolicy policy
     )
     {
-        var settings = Settings(cakes: cakes);
-        return Materialize(
+        var settings = Settings(policy);
+        return Compose(
             new AttackProfileComposer(Context(attacks), settings),
             Child, Reference(new(parent1)), Reference(new(parent2)),
-            new(cakes == 0 ? BreedingMethod.Ordinary : BreedingMethod.SpecialCake, passivesProbability), ivsProbability
+            policy == SpecialCakePolicy.Never ? BreedingMethod.Ordinary : BreedingMethod.SpecialCake
         );
     }
 
-    private static AttackProfile Materialize(
+    private static AttackProfile Compose(
         AttackProfileComposer composer,
         Pal child,
         IPalReference parent1,
         IPalReference parent2,
-        BreedingOutcome outcome,
-        float ivsProbability
-    ) => composer.Prepare(
-        child,
-        parent1,
-        parent2,
-        outcome,
-        ivsProbability
-    ).Materialize();
+        BreedingMethod method
+    ) => composer.Compose(child, parent1, parent2, method);
 
     private static AttackTargetContext Context(IEnumerable<ActiveSkill> attacks) =>
         new(new PalSpecifier { RequiredAttacks = attacks.ToList() }, SolverTestScenario.DB);
 
-    private static BreedingSolverSettings Settings(int? cakes) =>
-        SolverTestScenario.Solver([], maxSpecialCakes: cakes).Settings;
+    private static BreedingSolverSettings Settings(SpecialCakePolicy policy) =>
+        SolverTestScenario.Solver([], specialCakePolicy: policy).Settings;
 
     private static OwnedPalReference Reference(AttackProfile profile, bool neutral = false) =>
         new(
@@ -269,11 +213,9 @@ public class AttackProfileComposerTests
             [],
             new IV_Set(),
             attackProfile: neutral
-                ? new AttackProfile(true, profile.Entries.ToArray())
+                ? new AttackProfile(true, profile.Masks.ToArray())
                 : profile
         );
-
-    private static AttackProfileEntry Entry(byte mask, int cakes = 0) => new(mask, cakes);
 
     private static ActiveSkill[] Attacks(int count) => SolverTestScenario.DB.ActiveSkills
         .Where(attack => attack.CanInherit && !Child.Level1AttackInternalIds.Contains(attack.InternalName))
@@ -286,32 +228,20 @@ public class AttackProfileComposerTests
         AttackProfile parent2
     )
     {
-        var minimumCakesByMask = new Dictionary<byte, int>();
-        var innateMask = context.StateOf(Child).Level1TargetMask;
-        var inheritableMask = context.InheritableTargetMask;
-        foreach (var first in parent1.Entries)
-            foreach (var second in parent2.Entries)
+        var masks = new HashSet<byte>();
+        var innate = context.StateOf(Child).Level1TargetMask;
+        foreach (var first in parent1.Masks)
+            foreach (var second in parent2.Masks)
             {
-                var totalCakes = first.TotalSpecialCakes + second.TotalSpecialCakes;
-                Add(innateMask, totalCakes);
-                var available = (byte)((first.LearnedTargetMask | second.LearnedTargetMask) & inheritableMask);
+                masks.Add(innate);
+                var available = (first | second) & context.InheritableTargetMask;
                 for (var bit = 1; bit <= context.FullTargetMask; bit <<= 1)
-                    if ((available & bit) != 0 && (innateMask & bit) == 0)
-                        Add((byte)(innateMask | bit), totalCakes);
+                    if ((available & bit) != 0)
+                        masks.Add((byte)(innate | bit));
             }
 
-        return new AttackProfile(minimumCakesByMask
-            .OrderBy(pair => pair.Key)
-            .Select(pair => new AttackProfileEntry(pair.Key, pair.Value))
-            .ToArray());
-
-        void Add(byte mask, int cakes)
-        {
-            if (!minimumCakesByMask.TryGetValue(mask, out var existing) || cakes < existing)
-                minimumCakesByMask[mask] = cakes;
-        }
+        return new AttackProfile(context.StateOf(Child).HasNooplLevel1Attack, masks.ToArray());
     }
-
     private static int BitCount(byte mask)
     {
         var count = 0;

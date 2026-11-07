@@ -111,9 +111,9 @@ public class CandidateExpanderTests
             target
         ).Candidates.Single();
 
-        var inherited = candidate.AttackProfile.Entries.Single(entry => entry.LearnedTargetMask == 1);
-        Assert.IsTrue(candidate.AttackProfile.Entries.Count > 1);
-        Assert.AreEqual(0, inherited.TotalSpecialCakes);
+        Assert.IsTrue(candidate.AttackProfile.Masks.Contains((byte)1));
+        Assert.IsTrue(candidate.AttackProfile.Masks.Count() > 1);
+        Assert.AreEqual(0, candidate.ExpectedSpecialCakes);
         Assert.AreEqual(
             (int)Math.Ceiling(1f / (candidate.PassivesProbability * candidate.IVsProbability)),
             candidate.AvgRequiredBreedings
@@ -139,7 +139,7 @@ public class CandidateExpanderTests
         );
         var candidate = (BredPalReference)expansion.Candidates.Single();
 
-        Assert.AreEqual(0, candidate.AttackProfile.Entries.Single().LearnedTargetMask);
+        Assert.AreEqual(0, candidate.AttackProfile.Masks.Single());
     }
 
     [TestMethod]
@@ -155,7 +155,7 @@ public class CandidateExpanderTests
         var male = WithAttack(SolverTestScenario.Owned("Katress", PalGender.MALE), otherAttack);
         var female = WithAttack(SolverTestScenario.Owned("Katress", PalGender.FEMALE), targetAttack);
         var wixen = WithAttack(SolverTestScenario.Owned("Wixen", PalGender.MALE), neutral);
-        var configuredSolver = SolverTestScenario.Solver([male, female, wixen], maxSpecialCakes: 0, maxBreedingSteps: 1, maxSolverIterations: 1);
+        var configuredSolver = SolverTestScenario.Solver([male, female, wixen], specialCakePolicy: SpecialCakePolicy.Never, maxBreedingSteps: 1, maxSolverIterations: 1);
         var attackTargets = new AttackTargetContext(target, configuredSolver.Settings.DB);
         var composite = new CompositeOwnedPalReference(
             ReferenceFor(male, target, attackTargets),
@@ -180,9 +180,9 @@ public class CandidateExpanderTests
     }
 
     [DataTestMethod]
-    [DataRow(0, false)]
-    [DataRow(1, true)]
-    public void ExpandBatch_RetainsCakeOnlyCandidatesWithinBudget(int cakeLimit, bool expected)
+    [DataRow(SpecialCakePolicy.Never, false)]
+    [DataRow(SpecialCakePolicy.AttackInheritanceOnly, true)]
+    public void ExpandBatch_RetainsCakeOnlyCandidatesWhenAllowed(SpecialCakePolicy policy, bool expected)
     {
         var child = "Wixen Noct".ToPal(SolverTestScenario.DB);
         var targetAttack = InheritableAttackNotInnateTo(child);
@@ -199,7 +199,7 @@ public class CandidateExpanderTests
             RequiredAttacks = [targetAttack, otherAttack],
         };
         var settings = SolverTestScenario.Solver(
-            [first, second], maxSpecialCakes: cakeLimit, maxBredIrrelevantPassives: 0
+            [first, second], specialCakePolicy: policy, maxBredIrrelevantPassives: 0
         ).Settings;
         var attackTargets = new AttackTargetContext(target, settings.DB);
         // Ordinary breeding can inherit only one passive; the override can retain both.
@@ -219,17 +219,20 @@ public class CandidateExpanderTests
         if (!expected) return;
 
         var candidate = (BredPalReference)candidates.Single();
-        var entry = candidate.AttackProfile.Entries.Single();
+        var entry = candidate.AttackProfile.Masks.Single();
         Assert.AreEqual(1f, candidate.PassivesProbability);
         Assert.AreEqual(BreedingMethod.SpecialCake, candidate.Outcome.Method);
         Assert.AreEqual(4, candidate.EffectivePassives.Count);
         Assert.AreEqual(1, candidate.AvgRequiredBreedings);
-        Assert.AreEqual(new AttackProfileEntry(3, 1), entry);
+        Assert.AreEqual((byte)3, entry);
+        Assert.AreEqual(1, candidate.BaseSpecialCakes);
         var result = (BredPalReference)MaterializeSingle(new AttackResultMaterializer(attackTargets, settings), candidate, entry);
         Assert.AreEqual(AttackInheritanceMode.InheritAll, result.MaterializedAttackInheritance.Mode);
-        Assert.AreEqual(1, result.MaterializedAttackInheritance.SpecialCakes);
-        Assert.AreEqual(candidate.Outcome,
-            ((BredPalReference)candidate.WithGuaranteedGender(settings.DB, PalGender.MALE, false)).Outcome);
+        Assert.AreEqual(1, result.SelfSpecialCakes);
+        var gendered = (BredPalReference)candidate.WithGuaranteedGender(settings.DB, PalGender.MALE, false);
+        Assert.AreEqual(candidate.Outcome, gendered.Outcome);
+        Assert.AreEqual(candidate.BaseSpecialCakes, gendered.BaseSpecialCakes);
+        Assert.AreEqual(gendered.AvgRequiredBreedings, gendered.ExpectedSpecialCakes);
 
         var mate = SolverTestScenario.Owned(child.Name, PalGender.FEMALE);
         var next = Expand(candidate, ReferenceFor(mate, target, attackTargets), target, settings)
@@ -243,6 +246,17 @@ public class CandidateExpanderTests
         );
         Assert.AreEqual(expectedProbability, next.PassivesProbability);
         Assert.IsTrue(next.PassivesProbability < cleanProbability);
+
+        Assert.AreEqual(candidate.BaseSpecialCakes, next.BaseSpecialCakes);
+        Assert.IsFalse(next.AttackProfile.Contains(3));
+        var materializer = new AttackResultMaterializer(attackTargets, settings);
+        foreach (var mask in next.AttackProfile.Masks)
+        {
+            var ordinary = (BredPalReference)MaterializeSingle(materializer, next, mask);
+            Assert.AreEqual(0, ordinary.SelfSpecialCakes);
+            Assert.IsTrue(ordinary.ExpectedSpecialCakes > 0);
+            Assert.AreNotEqual(AttackInheritanceMode.InheritAll, ordinary.MaterializedAttackInheritance.Mode);
+        }
     }
 
     private static ExpansionResult Expand(
@@ -253,7 +267,7 @@ public class CandidateExpanderTests
     {
         var configuredSolver = SolverTestScenario.Solver(
             [first, second],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxBreedingSteps: 1,
             maxSolverIterations: 1
         );
@@ -289,8 +303,7 @@ public class CandidateExpanderTests
             [firstReference, secondReference],
             maxThreads: 1,
             controller,
-            selectionPolicy,
-            attackTargets
+            selectionPolicy
         );
         var context = new CandidateExpansionContext(
             StepIndex: 0,
@@ -349,13 +362,10 @@ public class CandidateExpanderTests
                     instance.IV_Defense
                 )
             ),
-            attackProfile: attackTargets?.IsActive == true
+            attackProfile: attackTargets?.HasRequiredAttacks == true
                 ? new(
-                    attackTargets.IsActive && (instance.ActiveSkills ?? []).Any(attack => !attack.CanInherit),
-                    new AttackProfileEntry(
-                    attackTargets.MaskOf(instance.ActiveSkills ?? []),
-                    0
-                    )
+                    attackTargets.HasRequiredAttacks && (instance.ActiveSkills ?? []).Any(attack => !attack.CanInherit),
+                    attackTargets.MaskOf(instance.ActiveSkills ?? [])
                 )
                 : AttackProfile.Inactive
         );
@@ -385,7 +395,7 @@ public class CandidateExpanderTests
         WorkBatchProgress Progress
     );
     private static IPalReference MaterializeSingle(
-        AttackResultMaterializer materializer, IPalReference reference, AttackProfileEntry entry) =>
-        materializer.Materialize(materializer.Evaluate(reference, entry.LearnedTargetMask).Single());
+        AttackResultMaterializer materializer, IPalReference reference, byte entry) =>
+        materializer.Materialize(materializer.Evaluate(reference, entry).Single());
 
 }

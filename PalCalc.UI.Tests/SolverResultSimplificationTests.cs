@@ -12,9 +12,9 @@ public class SolverResultSimplificationTests
     [TestMethod]
     public void SimplificationPreservesSlowSpecialCakeSavingOptionsWithinTheCakeLimit()
     {
-        var slow = new TestPalReference(100, 1) { AttackProfile = new(new AttackProfileEntry(1, 1)) };
-        var middle = new TestPalReference(10, 1) { AttackProfile = new(new AttackProfileEntry(1, 5)) };
-        var fast = new TestPalReference(1, 1) { AttackProfile = new(new AttackProfileEntry(1, 10)) };
+        var slow = new TestPalReference(100, 1) { ExpectedSpecialCakes = 1 };
+        var middle = new TestPalReference(10, 1) { ExpectedSpecialCakes = 5 };
+        var fast = new TestPalReference(1, 1) { ExpectedSpecialCakes = 10 };
 
         var results = SolverJobViewModel.SimplifyResults([fast, middle, slow], CancellationToken.None);
 
@@ -140,6 +140,7 @@ public class SolverResultSimplificationTests
         public int EffectivePassivesHash => EffectivePassives.SetHash(passive => passive.InternalName);
         public List<PassiveSkill> ActualPassives => EffectivePassives;
         public IV_Set IVs => new();
+        public int ExpectedSpecialCakes { get; init; }
         public AttackProfile AttackProfile { get; init; } = AttackProfile.Inactive;
         public float TimeFactor => 1;
         public IPalRefLocation Location { get; init; } = BredRefLocation.Instance;

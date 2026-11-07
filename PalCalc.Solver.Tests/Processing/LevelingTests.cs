@@ -59,7 +59,7 @@ public class LevelingTests
         var instance = Owned(species, 5);
         var seeds = Build(species, instance).OfType<OwnedPalReference>().ToArray();
         CollectionAssert.AreEqual(new byte[] { 1, 3, 7 },
-            seeds.Select(p => p.AttackProfile.Entries.Single().LearnedTargetMask).ToArray());
+            seeds.Select(p => p.AttackProfile.Masks.Single()).ToArray());
         Assert.AreEqual(3, seeds.Distinct().Count());
         Assert.IsNull(seeds[0].LevelRequirements);
         Assert.AreEqual(new LevelRequirements(5, 10), seeds[1].LevelRequirements);
@@ -121,7 +121,7 @@ public class LevelingTests
     }
 
     private static OwnedPalReference Trained(int initial, int final) =>
-        new(Owned(Species(), initial), [], new(), new AttackProfile(new AttackProfileEntry(7, 0)),
+        new(Owned(Species(), initial), [], new(), new AttackProfile((byte)7),
             new LevelRequirements(initial, final));
 
     [TestMethod]
@@ -136,7 +136,7 @@ public class LevelingTests
                 maxBreedingSteps: int.MaxValue, maxWildPals: 1, allowedWildPals: [species], trainPals: false).Settings;
             var seeds = new InitialPalBuilder(settings, DB.BreedingMechanics, settings.BreedingDB, context).Build(target);
             Assert.IsTrue(seeds.All(p => p.LevelRequirements is null));
-            Assert.IsTrue(seeds.All(p => p.AttackProfile.Entries.Single().LearnedTargetMask == (wild ? 3 : 1)));
+            Assert.IsTrue(seeds.All(p => p.AttackProfile.Masks.Single() == (wild ? 3 : 1)));
             Assert.IsTrue(seeds.Count > 0);
         }
         var instance = Owned(species, 5);
@@ -219,8 +219,8 @@ public class LevelingTests
             var carrierInstance = SolverTestScenario.Owned("Katress", PalGender.MALE);
             carrierInstance.ActiveSkills = [attacks[0]];
             var carrier = new OwnedPalReference(carrierInstance, [], new(),
-                new AttackProfile(new AttackProfileEntry(1, 0)));
-            var entry = new AttackProfileEntry(1, 0);
+                new AttackProfile((byte)1));
+            var entry = (byte)1;
             var bred = new BredPalReference(settings.GameSettings, child, PalGender.WILDCARD,
                 carrier, trained, null, [], new(BreedingMethod.Ordinary, 1), new(), 1, new AttackProfile(entry), null);
             var result = (BredPalReference)MaterializeSingle(new AttackResultMaterializer(context, settings), bred, entry);
@@ -232,7 +232,7 @@ public class LevelingTests
         }
     }
     private static IPalReference MaterializeSingle(
-        AttackResultMaterializer materializer, IPalReference reference, AttackProfileEntry entry) =>
-        materializer.Materialize(materializer.Evaluate(reference, entry.LearnedTargetMask).Single());
+        AttackResultMaterializer materializer, IPalReference reference, byte entry) =>
+        materializer.Materialize(materializer.Evaluate(reference, entry).Single());
 
 }
