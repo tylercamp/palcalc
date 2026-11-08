@@ -79,35 +79,7 @@ namespace PalCalc.SaveReader
             LocalData = new LocalDataSaveFile(new FilteredFileSource(basePath, f => MatchesPath(f, "LocalData.sav")));
             WorldOption = new WorldOptionSaveFile(new FilteredFileSource(basePath, f => MatchesPath(f, "WorldOption.sav")));
 
-            var playersPath = Path.Join(basePath, "Players");
-            if (Directory.Exists(playersPath))
-            {
-                Players = Directory
-                    .EnumerateFiles(playersPath, "*.sav")
-                    .Where(f => !Path.GetFileNameWithoutExtension(f).EndsWith("_dps"))
-                    .Select(f =>
-                    {
-                        var baseName = Path.GetFileNameWithoutExtension(f);
-                        var dpsPath = $"{playersPath}/{baseName}_dps.sav";
-                        var dpsFile = File.Exists(dpsPath) ? new PlayersDpsSaveFile(new SingleFileSource(dpsPath)) : null;
-                        return new PlayersSaveFile(new SingleFileSource(f), dpsFile);
-                    })
-                    .Where(psf =>
-                    {
-                        if (!psf.IsValid)
-                        {
-                            // some software, namely the "SaveSync" app on Steam, will store extra data in the Players
-                            // folder which is not valid GVAS. skip these
-                            logger.Warning("Player save file is invalid, skipping: {savePath}", string.Join("; ", psf.FilePaths));
-                        }
-                        return psf.IsValid;
-                    })
-                    .ToList();
-            }
-            else
-            {
-                Players = new List<PlayersSaveFile>();
-            }
+            playersPath = Path.Join(basePath, "Players");
 
             if (Directory.Exists(basePath))
             {
@@ -187,7 +159,56 @@ namespace PalCalc.SaveReader
         public LevelMetaSaveFile LevelMeta { get; }
         public LocalDataSaveFile LocalData { get; }
         public WorldOptionSaveFile WorldOption { get; }
-        public List<PlayersSaveFile> Players { get; }
+
+        private string playersPath;
+        private object playersLock = new object();
+        private List<string> playersFileNames;
+        private List<PlayersSaveFile> players;
+
+        // player files can appear after the save is first found (a new player joins, or a player's first use of
+        // DPS creates their `_dps.sav`), so rebuild the list whenever the set of files in `Players/` changes
+        public List<PlayersSaveFile> Players
+        {
+            get
+            {
+                lock (playersLock)
+                {
+                    List<string> fileNames = Directory.Exists(playersPath)
+                        ? Directory.EnumerateFiles(playersPath, "*.sav").Order().ToList()
+                        : [];
+
+                    if (players == null || !fileNames.SequenceEqual(playersFileNames))
+                    {
+                        playersFileNames = fileNames;
+                        players = ReadPlayers(fileNames);
+                    }
+
+                    return players;
+                }
+            }
+        }
+
+        private List<PlayersSaveFile> ReadPlayers(List<string> fileNames) =>
+            fileNames
+                .Where(f => !Path.GetFileNameWithoutExtension(f).EndsWith("_dps"))
+                .Select(f =>
+                {
+                    var baseName = Path.GetFileNameWithoutExtension(f);
+                    var dpsPath = $"{playersPath}/{baseName}_dps.sav";
+                    var dpsFile = File.Exists(dpsPath) ? new PlayersDpsSaveFile(new SingleFileSource(dpsPath)) : null;
+                    return new PlayersSaveFile(new SingleFileSource(f), dpsFile);
+                })
+                .Where(psf =>
+                {
+                    if (!psf.IsValid)
+                    {
+                        // some software, namely the "SaveSync" app on Steam, will store extra data in the Players
+                        // folder which is not valid GVAS. skip these
+                        logger.Warning("Player save file is invalid, skipping: {savePath}", string.Join("; ", psf.FilePaths));
+                    }
+                    return psf.IsValid;
+                })
+                .ToList();
 
         public IEnumerable<SaveFileLocation> RawFiles => !Path.Exists(BasePath) ? [] : (
             Directory
