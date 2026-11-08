@@ -26,15 +26,23 @@ internal sealed record EvaluatedAttackResult(
     IPalReference Source,
     byte TargetMask,
     BreedingPathMetrics Metrics,
-    AttackCompositionChoice? Choice = null,
-    int RequiredBreedings = 0,
-    float AttackProbability = 1,
-    EvaluatedAttackResult Parent1 = null,
-    EvaluatedAttackResult Parent2 = null,
-    EvaluatedAttackResult Input = null)
+    AttackCompositionChoice? Choice,
+    int RequiredBreedings,
+    float AttackProbability,
+    EvaluatedAttackResult Parent1,
+    EvaluatedAttackResult Parent2,
+    EvaluatedAttackResult OriginalResult // for surgery
+)
 {
     public TimeSpan BreedingEffort => Metrics.BreedingEffort;
     public int TotalSpecialCakes => Metrics.TotalSpecialCakes;
+
+    public static EvaluatedAttackResult Noop(IPalReference source, byte targetMask, BreedingPathMetrics metrics, EvaluatedAttackResult originalResult) =>
+        new(
+            Source: source, TargetMask: targetMask, Metrics: metrics,
+            Choice: null, RequiredBreedings: 0, AttackProbability: 1f,
+            Parent1: null, Parent2: null, OriginalResult: originalResult
+        );
 }
 
 /// <summary>
@@ -102,7 +110,8 @@ internal sealed class AttackResultMaterializer
     public AttackResultMaterializer(
         AttackTargetContext targets,
         BreedingSolverSettings settings,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         this.targets = targets;
         this.settings = settings;
@@ -137,7 +146,7 @@ internal sealed class AttackResultMaterializer
             // surgery only changes passives, so we can pass the same attack requirements
             // through to the input. its AttackProfile delegates to the input too.
             result = Evaluate(surgery.Input, targetMask)
-                .Select(input => new EvaluatedAttackResult(reference, targetMask, input.Metrics, Input: input))
+                .Select(input => EvaluatedAttackResult.Noop(reference, targetMask, input.Metrics, input))
                 .ToArray();
         }
         else if (reference is BredPalReference bred)
@@ -149,7 +158,7 @@ internal sealed class AttackResultMaterializer
             if ((reference.AttackProfile.EntryTargetMasks & (1UL << targetMask)) == 0)
                 throw new InvalidOperationException("The selected attack mask cannot be reconstructed.");
             result = [
-                new(reference, targetMask, new(reference.BreedingEffort, reference.ExpectedSpecialCakes))
+                EvaluatedAttackResult.Noop(reference, targetMask, new(reference.BreedingEffort, reference.ExpectedSpecialCakes), originalResult: null)
             ];
         }
         evaluated.Add(key, result);
@@ -165,7 +174,7 @@ internal sealed class AttackResultMaterializer
 
         var result = selected.Source switch
         {
-            SurgeryTablePalReference surgery => new SurgeryTablePalReference(Materialize(selected.Input), surgery.Operations),
+            SurgeryTablePalReference surgery => new SurgeryTablePalReference(Materialize(selected.OriginalResult), surgery.Operations),
             BredPalReference bred => MaterializeChoice(bred, selected),
             _ => selected.Source,
         };
@@ -232,7 +241,8 @@ internal sealed class AttackResultMaterializer
         BredPalReference bred,
         AttackCompositionChoice choice,
         EvaluatedAttackResult parent1,
-        EvaluatedAttackResult parent2)
+        EvaluatedAttackResult parent2
+    )
     {
         var attackProbability = AttackProbabilityFor(choice, bred.Parent1, bred.Parent2);
         if (bred.PassivesProbability <= 0)
@@ -261,7 +271,8 @@ internal sealed class AttackResultMaterializer
             choice,
             requiredBreedings,
             attackProbability,
-            parent1, parent2
+            parent1, parent2,
+            OriginalResult: null
         );
     }
 
@@ -316,7 +327,8 @@ internal sealed class AttackResultMaterializer
             bred.IVs,
             bred.IVsProbability,
             attackProfile: new AttackProfile(bred.AttackProfile.HasNoopAttack, choice.ChildMask),
-            materializedAttackInheritance: inheritance
+            materializedAttackInheritance: inheritance,
+            recordedSpecialCakes: null
         );
 
         return reference;
@@ -376,11 +388,9 @@ internal sealed class AttackResultMaterializer
         // two search nodes can compare equal but still need their own reconstruction.
         // use reference identity for both equality and hashing here, rather than the
         // equality/hash overrides on IPalReference.
-        public bool Equals(ResultKey other) =>
-            ReferenceEquals(reference, other.reference) && targetMask == other.targetMask;
+        public bool Equals(ResultKey other) => ReferenceEquals(reference, other.reference) && targetMask == other.targetMask;
         public override bool Equals(object obj) => obj is ResultKey other && Equals(other);
-        public override int GetHashCode() =>
-            HashCode.Combine(RuntimeHelpers.GetHashCode(reference), targetMask);
+        public override int GetHashCode() => HashCode.Combine(RuntimeHelpers.GetHashCode(reference), targetMask);
     }
 
     /// <summary>
@@ -479,8 +489,10 @@ internal sealed class AttackResultMaterializer
         {
             if (!outcome.Allows(mode))
                 return null;
-            if (mode == AttackInheritanceMode.InheritAll &&
-                !AttackProfileComposer.AllowsSpecialCake(settings.SpecialCakePolicy, innateMask, (byte)(parent1TargetMask | parent2TargetMask)))
+            if (
+                mode == AttackInheritanceMode.InheritAll &&
+                !AttackProfileComposer.AllowsSpecialCake(settings.SpecialCakePolicy, innateMask, (byte)(parent1TargetMask | parent2TargetMask))
+            )
                 return null;
 
             return new(firstMask, secondMask, mode, parent1TargetMask, parent2TargetMask, childMask);

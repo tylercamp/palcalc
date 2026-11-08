@@ -85,7 +85,7 @@ namespace PalCalc.Solver.PalReference
             float ivsProbability,
             AttackProfile attackProfile,
             MaterializedAttackInheritance materializedAttackInheritance,
-            int? recordedSpecialCakes = null
+            int? recordedSpecialCakes // (only meant for serialization + testing)
         ) : this(gameSettings, pal, parent1, parent2, passives, ivs, attackProfile, materializedAttackInheritance, outcome, recordedSpecialCakes)
         {
             Gender = gender;

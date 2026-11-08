@@ -39,7 +39,7 @@ public class CandidateCostFrontierTests
     public void DraftPathRetainsTradeoffsWithoutAllocatingRejectedTrees()
     {
         var settings = SolverTestScenario.Solver([]).Settings;
-        var frontier = new CandidateCostFrontier(hasRequiredAttacks: false);
+        var frontier = new CandidateCostFrontier(hasRequiredAttacks: false, markReplacedOutdated: false);
         var slow = Candidate(0, cakes: 0, attempts: 100);
         Assert.IsTrue(frontier.TryAdd(slow));
         var fast = Draft(cakes: 1, effort: slow.BreedingEffort / 10);

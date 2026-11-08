@@ -147,7 +147,7 @@ public class LevelingTests
 
     private static BredPalReference Bred(IPalReference first, IPalReference second) =>
         new(new GameSettings(), "Wixen Noct".ToPal(DB), PalGender.WILDCARD, first, second,
-            null, [], new(BreedingMethod.Ordinary, 1), new(), 1, AttackProfile.Inactive, null);
+            null, [], new(BreedingMethod.Ordinary, 1), new(), 1, AttackProfile.Inactive, null, null);
 
     private static BredPalReference ReusedAcrossBranches(IPalReference first, IPalReference second)
     {
@@ -222,7 +222,7 @@ public class LevelingTests
                 new AttackProfile((byte)1));
             var entry = (byte)1;
             var bred = new BredPalReference(settings.GameSettings, child, PalGender.WILDCARD,
-                carrier, trained, null, [], new(BreedingMethod.Ordinary, 1), new(), 1, new AttackProfile(entry), null);
+                carrier, trained, null, [], new(BreedingMethod.Ordinary, 1), new(), 1, new AttackProfile(entry), null, null);
             var result = (BredPalReference)MaterializeSingle(new AttackResultMaterializer(context, settings), bred, entry);
             var instructions = result.MaterializedAttackInheritance;
             Assert.IsNotNull(instructions);

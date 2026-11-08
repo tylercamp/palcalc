@@ -690,7 +690,7 @@ public class ResultPostProcessorTests
             float passives, float ivs, BreedingMethod method) => new(
                 settings.GameSettings, TargetPal, PalGender.WILDCARD, parent1, parent2, null, [],
                 new(method, passives), new IV_Set(), ivs,
-                new AttackProfile((byte)mask), null);
+                new AttackProfile((byte)mask), null, null);
     }
 
     private static PalSpecifier ActiveTarget(
@@ -755,7 +755,8 @@ public class ResultPostProcessorTests
         new(
             ResultPruningPolicy.Default,
             controller.CancellationToken,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
 
     private sealed class KeepAllSelectionPolicy : ICandidateSelectionPolicy

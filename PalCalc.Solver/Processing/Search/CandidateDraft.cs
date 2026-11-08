@@ -82,7 +82,8 @@ internal struct CandidateDraft
         IVs,
         ivsProbability,
         AttackProfile,
-        materializedAttackInheritance: null
+        materializedAttackInheritance: null,
+        recordedSpecialCakes: null
     );
 
     // Note: This should exactly mirror the hash calc for `BredPalReference`, since some

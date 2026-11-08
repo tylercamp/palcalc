@@ -101,7 +101,8 @@ public class SearchFrontierCharacterizationTests
             attackTargets: new AttackTargetContext(
                 new PalSpecifier { RequiredAttacks = [requiredAttack] },
                 SolverTestScenario.DB
-            )
+            ),
+            considerPassiveCakes: false
         );
         var first = new TestPalReference(
             "first",
@@ -150,7 +151,8 @@ public class SearchFrontierCharacterizationTests
             attackTargets: new AttackTargetContext(
                 new PalSpecifier { RequiredAttacks = [requiredAttack] },
                 SolverTestScenario.DB
-            )
+            ),
+            considerPassiveCakes: false
         );
         var statePal = "Katress".ToPal(SolverTestScenario.DB);
         var dominating = new TestPalReference(
@@ -198,7 +200,8 @@ public class SearchFrontierCharacterizationTests
         var policy = new DefaultCandidateSelectionPolicy(
             new(token => [new ResultLimitPruning(token, maxResults: 3)]),
             CancellationToken.None,
-            attackTargets: attackTargets
+            attackTargets: attackTargets,
+            considerPassiveCakes: false
         );
         var initial = new TestPalReference(
             "initial",
@@ -381,7 +384,8 @@ public class SearchFrontierCharacterizationTests
         var policy = new DefaultCandidateSelectionPolicy(
             MinimumEffortOnly,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var frontier = new SearchFrontier(
             target,
@@ -421,7 +425,8 @@ public class SearchFrontierCharacterizationTests
         var policy = new DefaultCandidateSelectionPolicy(
             MinimumEffortOnly,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var input = new TestPalReference(
             "input",
@@ -489,7 +494,8 @@ public class SearchFrontierCharacterizationTests
             attackProfile: AttackProfile.Inactive,
             materializedAttackInheritance: null,
             avgRequiredBreedings: null,
-            gender: PalGender.WILDCARD
+            gender: PalGender.WILDCARD,
+            recordedSpecialCakes: null
         );
 
     private static SearchFrontier FrontierFor(
@@ -515,7 +521,8 @@ public class SearchFrontierCharacterizationTests
             selectionPolicy: selectionPolicy ?? new DefaultCandidateSelectionPolicy(
                 MinimumEffortOnly,
                 controller.CancellationToken,
-                attackTargets: null
+                attackTargets: null,
+                considerPassiveCakes: false
             )
         );
     }

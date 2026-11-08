@@ -221,7 +221,8 @@ public class InitialPalBuilderTests
         var bred = new BredPalReference(
             new GameSettings(), pal, PalGender.WILDCARD, owned, owned, null, [], new(BreedingMethod.Ordinary, 1), new(), 1,
             attackProfile: profile,
-            materializedAttackInheritance: null
+            materializedAttackInheritance: null,
+            recordedSpecialCakes: null
         );
 
         foreach (var reference in new IPalReference[]

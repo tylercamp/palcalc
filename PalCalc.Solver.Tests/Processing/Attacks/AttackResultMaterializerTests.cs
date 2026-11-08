@@ -484,7 +484,8 @@ public class AttackResultMaterializerTests
             new IV_Set(),
             ivsProbability: 1,
             attackProfile,
-            materializedAttackInheritance: null
+            materializedAttackInheritance: null,
+            recordedSpecialCakes: null
         );
     }
 

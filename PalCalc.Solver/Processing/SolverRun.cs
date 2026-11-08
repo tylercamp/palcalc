@@ -138,8 +138,7 @@ namespace PalCalc.Solver.Processing
 
             if (!controller.CancellationToken.IsCancellationRequested)
             {
-                var resultPostProcessor = new ResultPostProcessor(
-                    spec, settings, controller, context.AttackTargets, context.SelectionPolicy);
+                var resultPostProcessor = new ResultPostProcessor(spec, settings, controller, context.AttackTargets, context.SelectionPolicy);
                 resultPostProcessor.ApplySurgery(frontier, surgeryFinalists?.Candidates);
                 results = resultPostProcessor.Finalize(frontier.TerminalResults);
             }

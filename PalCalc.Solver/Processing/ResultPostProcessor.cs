@@ -121,11 +121,9 @@ internal sealed class ResultPostProcessor(
 
             var bounds = materializer.LowerBounds(finalist);
             if (alternatives.DominatesLowerBounds(finalist, bounds))
-            {
                 continue;
-            }
-            foreach (var evaluation in materializer.Evaluate(
-                finalist, attackTargets.FullTargetMask))
+
+            foreach (var evaluation in materializer.Evaluate(finalist, attackTargets.FullTargetMask))
             {
                 if (!SatisfiesEvaluatedConstraints(evaluation.Metrics))
                 {
@@ -170,18 +168,12 @@ internal sealed class ResultPostProcessor(
         )
             yield break;
 
-        var requiredReference = AddRequiredPassives(
-            reference,
-            surgeryCompatiblePassives
-        );
-        foreach (var result in AddOptionalPassives(
-            requiredReference,
-            surgeryCompatiblePassives
-        ))
+        var requiredReference = AddRequiredPassives(reference, surgeryCompatiblePassives);
+        foreach (var result in AddOptionalPassives(requiredReference, surgeryCompatiblePassives))
         {
             if (
                 includeUnmodifiedReference ||
-                result is SurgeryTablePalReference surgery && surgery.Operations.Count > 0
+                (result is SurgeryTablePalReference surgery && surgery.Operations.Count > 0)
             )
                 yield return result;
         }
@@ -198,7 +190,7 @@ internal sealed class ResultPostProcessor(
             .ToList();
         if (
             missingRequiredPassives.Count == 0 ||
-            missingRequiredPassives.Sum(passive => passive.SurgeryCost) + reference.TotalCost > settings.MaxSurgeryCost
+            (missingRequiredPassives.Sum(passive => passive.SurgeryCost) + reference.TotalCost > settings.MaxSurgeryCost)
         )
             return reference;
 
@@ -227,10 +219,7 @@ internal sealed class ResultPostProcessor(
         return new SurgeryTablePalReference(reference, operations);
     }
 
-    private IEnumerable<IPalReference> AddOptionalPassives(
-        IPalReference reference,
-        IReadOnlyList<PassiveSkill> surgeryCompatiblePassives
-    )
+    private IEnumerable<IPalReference> AddOptionalPassives(IPalReference reference, IReadOnlyList<PassiveSkill> surgeryCompatiblePassives)
     {
         var missingOptionalPassives = surgeryCompatiblePassives
             .Where(target.OptionalPassives.Contains)
@@ -251,9 +240,7 @@ internal sealed class ResultPostProcessor(
         foreach (
             var passives in missingOptionalPassives
                 .Combinations(numAddablePassives, null)
-                .Where(passives =>
-                    reference.TotalCost + passives.Sum(passive => passive.SurgeryCost) <= settings.MaxSurgeryCost
-                )
+                .Where(passives => reference.TotalCost + passives.Sum(passive => passive.SurgeryCost) <= settings.MaxSurgeryCost)
                 .Where(passives => passives.Any())
                 .Select(passives => passives.ToList())
         )
@@ -266,8 +253,7 @@ internal sealed class ResultPostProcessor(
 
             foreach (var toAdd in passives)
             {
-                if (modifiedPassives.Count < GameConstants.MaxTotalPassives
-                )
+                if (modifiedPassives.Count < GameConstants.MaxTotalPassives)
                 {
                     modifiedPassives.Add(toAdd);
                     operations.Add(new AddPassiveSurgeryOperation(toAdd));
@@ -292,10 +278,7 @@ internal sealed class ResultPostProcessor(
         return results;
     }
 
-    private IEnumerable<PassiveSkill> RemovablePassives(
-        IPalReference reference,
-        bool preserveOptionalPassives
-    )
+    private IEnumerable<PassiveSkill> RemovablePassives(IPalReference reference, bool preserveOptionalPassives)
     {
         return reference.ActualPassives
             .Where(p => !target.RequiredPassives.Contains(p))
@@ -314,10 +297,7 @@ internal sealed class ResultPostProcessor(
             });
     }
 
-    private static void RemovePassiveSlot(
-        List<PassiveSkill> passives,
-        PassiveSkill passive
-    )
+    private static void RemovePassiveSlot(List<PassiveSkill> passives, PassiveSkill passive)
     {
         var index = passives.IndexOf(passive);
         if (index < 0)

@@ -162,7 +162,8 @@ public class PalSpecifierAttackTests
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
             ivsProbability: 1,
             attackProfile: AttackProfile.Inactive,
-            materializedAttackInheritance: inheritance
+            materializedAttackInheritance: inheritance,
+            recordedSpecialCakes: null
         );
 
         Assert.AreSame(secondParent, bred.Parent1);
@@ -188,7 +189,8 @@ public class PalSpecifierAttackTests
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
             ivsProbability: 1,
             attackProfile: AttackProfile.Inactive,
-            materializedAttackInheritance: null
+            materializedAttackInheritance: null,
+            recordedSpecialCakes: null
         );
 
         var display = new BreedingResultViewModel(null, new GameSettings(), result, []);

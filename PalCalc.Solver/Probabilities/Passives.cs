@@ -77,7 +77,8 @@ namespace PalCalc.Solver.Probabilities
                     desiredParentPassives,
                     numFinalPassives,
                     numInheritedFromParent,
-                    mechanics.PassiveProbabilityDirect[numInheritedFromParent]
+                    mechanics.PassiveProbabilityDirect[numInheritedFromParent],
+                    fillToTarget: false
                 );
             }
 
@@ -133,7 +134,7 @@ namespace PalCalc.Solver.Probabilities
             int numFinalPassives,
             int numInheritedFromParent,
             float inheritedCountProbability,
-            bool fillToTarget = false
+            bool fillToTarget
         )
         {
             // we may inherit more passives from the parents than the parents actually have (e.g. inherit 4 passives from parents with

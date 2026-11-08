@@ -77,8 +77,8 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         ResultPruningPolicy resultPruning,
         CancellationToken cancellationToken,
         AttackTargetContext attackTargets,
-        IEffectivePropertiesKeyProvider propertiesKeyProvider = null,
-        bool considerPassiveCakes = false
+        bool considerPassiveCakes,
+        IEffectivePropertiesKeyProvider propertiesKeyProvider = null
     )
     {
         ArgumentNullException.ThrowIfNull(resultPruning);
@@ -238,7 +238,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
 
         // Preserve useful cake/effort tradeoffs even when the ordinary result
         // limit would keep only the fastest tier.
-        var alternatives = new CandidateCostFrontier(hasRequiredAttacks);
+        var alternatives = new CandidateCostFrontier(hasRequiredAttacks, markReplacedOutdated: false);
         foreach (var candidate in distinctCandidates)
             alternatives.TryAdd(candidate);
 

@@ -122,8 +122,7 @@ internal sealed class SolverRunContext
         var selectedSurgeryPassives = target.RequiredPassives
             .Where(passive => passive.SupportsSurgery && settings.SurgeryPassives.Contains(passive))
             .ToList();
-        if (selectedSurgeryPassives.Count == 0 ||
-            selectedSurgeryPassives.Sum(passive => passive.SurgeryCost) > settings.MaxSurgeryCost)
+        if (selectedSurgeryPassives.Count == 0 || selectedSurgeryPassives.Sum(passive => passive.SurgeryCost) > settings.MaxSurgeryCost)
             return target;
 
         var deferred = selectedSurgeryPassives.Where(passive => passive.TrackedEffects.Count == 0);

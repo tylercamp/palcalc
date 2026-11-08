@@ -5,7 +5,9 @@ using PalCalc.Solver.PalReference.Properties;
 namespace PalCalc.Solver.Processing.Search;
 
 /// <summary>Retains effort and cake tradeoffs, partitioned by exact attack mask when needed.</summary>
-internal sealed class CandidateCostFrontier(bool hasRequiredAttacks, bool markReplacedOutdated = false)
+/// <param name="hasRequiredAttacks">Whether specific attacks have been requested, which affects the comparison metrics</param>
+/// <param name="markReplacedOutdated">Whether to modify old candidates and mark them as "outdated" when they get replaced</param>
+internal sealed class CandidateCostFrontier(bool hasRequiredAttacks, bool markReplacedOutdated)
 {
     private readonly List<IPalReference>[] slots = new List<IPalReference>[hasRequiredAttacks ? AttackProfile.TargetMaskCount : 1];
     private readonly Dictionary<IPalReference, int> counts = new(ReferenceEqualityComparer.Instance);

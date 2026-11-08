@@ -28,7 +28,8 @@ public class CandidatePreFilterTests
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var incumbent = new OwnedPalReference(
             SolverTestScenario.Owned("Katress", PalGender.WILDCARD),
@@ -94,7 +95,8 @@ public class CandidatePreFilterTests
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var filter = new CandidatePreFilter(
             target,
@@ -134,7 +136,8 @@ public class CandidatePreFilterTests
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var filter = new CandidatePreFilter(
             target,
@@ -181,7 +184,8 @@ public class CandidatePreFilterTests
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var surgeryFinalists = SurgeryFinalistAccumulator.Create(
             target,
@@ -237,7 +241,8 @@ public class CandidatePreFilterTests
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var surgeryFinalists = SurgeryFinalistAccumulator.Create(
             target,

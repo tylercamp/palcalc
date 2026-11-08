@@ -465,7 +465,8 @@ namespace PalCalc.Solver.Processing
                                     settings.GameSettings, childPalType, PalGender.WILDCARD,
                                     parent1, parent2, avgRequiredBreedings: null,
                                     newPassives, outcome, finalIVs, ivsProbability,
-                                    AttackProfile.Inactive, materializedAttackInheritance: null
+                                    AttackProfile.Inactive, materializedAttackInheritance: null,
+                                    recordedSpecialCakes: null
                                 );
                                 filterResult = context.PreFilter.TryAdd(result);
                             }

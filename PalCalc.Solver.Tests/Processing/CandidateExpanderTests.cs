@@ -296,7 +296,8 @@ public class CandidateExpanderTests
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             controller.CancellationToken,
-            attackTargets: attackTargets
+            attackTargets: attackTargets,
+            considerPassiveCakes: false
         );
         var frontier = new SearchFrontier(
             target,

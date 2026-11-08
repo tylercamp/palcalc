@@ -39,7 +39,8 @@ public class SpecialCakePersistenceTests
             settings, pal, PalGender.WILDCARD, Parent(PalGender.MALE), Parent(PalGender.FEMALE),
             avgRequiredBreedings: 2, [], outcome, new IV_Set(), ivsProbability: 1,
             AttackProfile.Inactive,
-            hasTargetAttacks ? new MaterializedAttackInheritance(mode, [attack], [attack], [attack], [attack], 1) : null
+            hasTargetAttacks ? new MaterializedAttackInheritance(mode, [attack], [attack], [attack], [attack], 1) : null,
+            recordedSpecialCakes: null
         );
 
         var dto = ResultJsonSerializer.ToDto(reference);

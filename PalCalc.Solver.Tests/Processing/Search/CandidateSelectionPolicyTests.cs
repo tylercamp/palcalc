@@ -17,7 +17,8 @@ public class CandidateSelectionPolicyTests
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets: null
+            attackTargets: null,
+            considerPassiveCakes: false
         );
         var incumbent = new TestPalReference(
             "incumbent",
@@ -94,7 +95,8 @@ public class CandidateSelectionPolicyTests
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets: null
+            attackTargets: null,
+            considerPassiveCakes: false
         );
         var incumbent = new TestPalReference(
             "incumbent",
@@ -247,7 +249,8 @@ public class CandidateSelectionPolicyTests
             ivs: new IV_Set(),
             ivsProbability: 1,
             attackProfile: profile,
-            materializedAttackInheritance: null
+            materializedAttackInheritance: null,
+            recordedSpecialCakes: null
         );
 
         var first = BredWith(Profile(1));
@@ -370,7 +373,8 @@ public class CandidateSelectionPolicyTests
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets: null
+            attackTargets: null,
+            considerPassiveCakes: false
         );
         var candidates = Enumerable
             .Range(0, 32)
@@ -580,7 +584,8 @@ public class CandidateSelectionPolicyTests
             new DefaultCandidateSelectionPolicy(
                 ResultPruningPolicy.Default,
                 controller.CancellationToken,
-                attackTargets: null
+                attackTargets: null,
+            considerPassiveCakes: false
             )
         );
         var first = Reference(
@@ -640,7 +645,8 @@ public class CandidateSelectionPolicyTests
         new(
             settings.ResultPruning,
             CancellationToken.None,
-            attackTargets: null
+            attackTargets: null,
+            considerPassiveCakes: false
         );
 
     private static DefaultCandidateSelectionPolicy ActivePolicy(
@@ -656,7 +662,8 @@ public class CandidateSelectionPolicyTests
                     [.. SolverTestScenario.DB.ActiveSkills.Where(attack => attack.CanInherit).Take(6)],
                 },
                 SolverTestScenario.DB
-            )
+            ),
+            considerPassiveCakes: false
         );
 
     private static AttackProfile Profile(params byte[] masks) => new(masks);

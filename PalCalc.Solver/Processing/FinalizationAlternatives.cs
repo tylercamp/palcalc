@@ -45,8 +45,12 @@ internal sealed class FinalizationAlternatives<T>
 internal sealed class FinalizationComparison
 {
     internal readonly record struct Key(
-        Pal Pal, PalGender Gender, PassiveSetKey Passives, PassiveSetKey ActualPassives,
-        IV_Set IVs, int BreedingSteps, int Gold, int WildPals, int RequiredLevels, string Inputs);
+        Pal Pal, PalGender Gender,
+        PassiveSetKey Passives, PassiveSetKey ActualPassives,
+        IV_Set IVs,
+        int BreedingSteps, int Gold, int WildPals, int RequiredLevels,
+        string Inputs
+    );
 
     private readonly record struct InputChoice(object Origin, PalGender Gender, LevelRequirements Levels);
     private readonly Dictionary<InputChoice, int> inputIds = [];
@@ -54,9 +58,10 @@ internal sealed class FinalizationComparison
 
     // TODO - Would rather avoid this massive sort of combined key, if possible
     public Key KeyOf(IPalReference reference) => new(
-        reference.Pal, reference.Gender, new(reference.EffectivePassives),
-        new(reference.ActualPassives), reference.IVs, reference.NumTotalBreedingSteps,
-        reference.TotalCost, reference.NumTotalWildPals, reference.TotalRequiredLevels,
+        reference.Pal, reference.Gender,
+        new(reference.EffectivePassives), new(reference.ActualPassives),
+        reference.IVs,
+        reference.NumTotalBreedingSteps, reference.TotalCost, reference.NumTotalWildPals, reference.TotalRequiredLevels,
         string.Join(",", InputsOf(reference))
     );
 
