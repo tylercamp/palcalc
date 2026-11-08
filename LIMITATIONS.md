@@ -81,31 +81,16 @@ and [effort estimation](PalCalc.Solver/README.md#estimating-the-effort-of-a-path
 
 ## Search tradeoffs
 
-### Cakes are only considered for attack inheritance
-
-TODO - This may need revision once the other settings TODO is addressed
-
-To speed up solving, PalCalc only considers Special Cakes when they are needed
-to inherit multiple requested attacks that the child doesn't already learn at
-level one. PalCalc can miss a useful Special Cake plan when the benefit is only passive
-inheritance.
-
-The setting that limits unwanted passives also reduces the options explored.
-Special Cakes can add extra passives beyond that limit, and those passives still
-affect later inheritance.
-See [Special Cake planning](PalCalc.Solver/README-BREED-ESTIMATE.md#special-cake-override).
-
 ### Search retains a compact set of attack options and breeding paths
 
-PalCalc keeps fewer attack-inheritance options to make searches faster. This can
-discard a faster breeding path that uses more Special Cakes: for each requested
-attack combination, the search keeps only the lowest estimated cake cost. Other
-comparisons also retain a limited set of breeding paths.
+PalCalc uses passive and IV odds to compare paths during search. It works out
+the attack odds for specific parent loadouts at the end. A path dropped early
+could have turned out faster once those attack odds were included.
 
 The final comparison of effort and cake use considers only surviving paths. It
 can't recover discarded candidates, and simplifying the results can remove more
 similar paths.
-See [attack-path comparisons](PalCalc.Solver/README.md#comparing-attack-paths)
+See [path comparisons](PalCalc.Solver/README.md#comparing-paths)
 and [finalization](PalCalc.Solver/README.md#8-apply-surgery-and-return-the-results).
 
 ### Surgery is deferred, and configured limits bound the search

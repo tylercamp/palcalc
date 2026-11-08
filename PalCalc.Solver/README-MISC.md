@@ -1,6 +1,6 @@
 ## Miscellaneous Comments
 
-The following options were considered (but ignored) for improving accuracy and/or breeding effort of the final results.
+The following options were considered for improving accuracy and/or breeding effort of the final results.
 
 ### Including self-breeding effort as a frontier-state discriminator (`EffectivePropertiesKey`) and/or as part of the retained-alternative selection process
 
@@ -22,11 +22,12 @@ The following options were considered (but ignored) for improving accuracy and/o
     - (5) A target of six specific attacks can only be achieved by breeding from two parents with three specific attacks. An intermediate pal with six specific attacks is useless since only three can be inherited from a single parent; i.e., inheriting more than three attacks is only valuable at the very last step
   - Assumption
     - The majority of optimal attack-solving-enabled trees will begin with a focus on passive and IV inheritance
-    - Special cakes, if needed, will always appear towards the end of the tree / near the final result pal
+    - Special cakes, when used only for attack inheritance, will generally appear towards the end of the tree / near the final result pal. Cakes used for passive inheritance can be useful earlier
   - Simplification
     - It will suffice for each solver step to simply track the attacks which are reachable from a given step. The actual distribution of attacks amongst the parents can happen at the end _(since attacks will have relatively little effect on the structure in the end)_
-    - When distributing attacks, a rough rule of thumb is: assign attacks as late as possible; among those assigned attacks, use special cakes as late as possible
+    - When distributing attacks, a rough rule of thumb is: assign attacks as late as possible; among those assigned attacks, use special cakes for attack inheritance as late as possible
 - We approximate with these simplifications by tracking a flattened representation of the available attack types and distribution of attacks ("attack profiles") _on the `BredPalReference`_ rather than retaining and assessing the whole hierarchy when comparing candidates. i.e., we retain just enough information to meaningfully compare at a high level and to make the final assignment decisions at the end of the process
+- Each candidate has a specific breeding method and passive probability during search. The attack profile tracks which requested-attack combinations are possible; finalization chooses concrete parent loadouts within those fixed methods
 
 ### Tracking breeding estimates for each attack profile
 
@@ -37,4 +38,6 @@ The following options were considered (but ignored) for improving accuracy and/o
 - We compromise with two observations:
   - (1) Attack inheritance is relatively low-cost: at most it adds a 50% probability, compared to IV (e.g. 20%) and passive probability (e.g. 5%). 100% inheritance chance is possible, which isn't true for IVs and passives. The player can manually change the skill pool of the parents, which isn't true for IVs and passives
   - (2) One special cake is used for each breeding attempt; i.e., special cakes, if used, directly correlate with the number of breeding attempts needed
-- If we consider attack inheritance probability as _relatively_ trivial, and we note that special cakes directly relate to breeding effort, we can drop other comparison details and use special cakes as the _sole metric_ for comparing search-time attack profile paths. This can give slightly-less-optimal paths, but the performance improvement is substantial enough that it's worth the slight loss in accuracy (perf. comes from less overall data to compute, and fewer allocations to trigger GC)
+- If we consider attack inheritance probability as _relatively_ trivial, we can defer those probabilities and estimate breeding effort from passive and IV inheritance during search
+- We retain tradeoffs between estimated effort and cake use, rather than using cakes as the sole comparison metric. A slower path that uses fewer cakes and a faster path that uses more cakes can both be useful; ordinary descendants still carry the cake costs of their ancestors. Attack profiles tell us which attack outcomes each path can provide
+- This can give slightly-less-optimal paths, but avoids repeatedly computing concrete attack choices during search

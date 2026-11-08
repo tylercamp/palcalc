@@ -97,12 +97,10 @@ In that case we can combine the probabilities for [1] and [2], giving us a 7.5% 
 
 ## Special Cake override
 
-TODO - This section should briefly mention _when_ special cakes are considered.
-
 Special Cakes replace both ordinary passive-count rolls. The game selects up to four distinct parental passives, then attempts random additions for any remaining slots. PalCalc assumes these additions succeed, so the estimate always has four passives. The calculation skips the ordinary count-roll probabilities.
 
 For example, suppose the parents have five distinct passives between them, including two desired passives. The cake selects four. The chance of including both desired passives is `Choose(3,2) / Choose(5,4) = 3/5`: choose the other two inherited passives from the three unwanted ones, out of all ways to select four from five.
 
 When the parents have fewer than four distinct passives, PalCalc still models four slots, including random fillers. Those unwanted fillers affect inheritance in later generations. Actual filling can fall short due to an apparent in-game bug; see [random passive filling](../LIMITATIONS.md#random-passive-selection-bug).
 
-See the [solver walkthrough](./README.md) for how cake outcomes are searched and compared.
+The effect of special cakes on passive inheritance is always modeled when they're used, but PalCalc doesn't always use them. PalCalc may use special cakes for attack inheritance and can optionally use them as part of passive skill inheritance if the "Allow Special Cakes for Passives" option is enabled. See [cake candidate selection](./README.md#choosing-the-breeding-method) for info on the solver's decisions.

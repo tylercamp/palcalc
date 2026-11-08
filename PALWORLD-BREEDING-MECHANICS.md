@@ -160,7 +160,7 @@ passives when random filling is needed. [Mutation](#mutation-and-talent-bonus-it
 can also change which passives the child receives.
 
 For the calculations and how cakes are used in solver search, see the
-[solver overview](PalCalc.Solver/README.md#finishing-the-results) and
+[solver overview](PalCalc.Solver/README.md#choosing-the-breeding-method) and
 [Special Cake probability example](PalCalc.Solver/README-BREED-ESTIMATE.md#special-cake-override).
 
 ### Important Details

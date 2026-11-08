@@ -151,10 +151,10 @@ As PalCalc considers each possible child, it records the combinations of
 attacks which can be made available on that child, based on the parents or
 their breeding paths. These records are called **attack profiles**.
 
-For example, a path might be able to supply either of two requested attacks
-through ordinary breeding, or both together using a Special Cake. The profile
-keeps those possibilities and their estimated Special Cake costs without
-building a separate complete tree for every choice of equipped attacks.
+For example, the same pair might pass on either of two requested attacks
+through ordinary breeding, or both together using a Special Cake. Each breeding
+method gets its own candidate and profile. That profile records which attacks
+are possible without building a separate tree for every parent loadout.
 
 The final choice of "who equips which attack" is saved for the end. At that
 point, the solver selects concrete parent loadouts and includes their attack
@@ -163,8 +163,8 @@ inheritance odds in the effort estimate.
 **What gets tracked:**
 
 1. Which combinations of requested attacks the child can obtain.
-2. The estimated Special Cake cost of each combination and whether a parent
-   can equip a non-inheritable attack to improve the inheritance odds.
+2. Whether a Pal can equip a non-inheritable attack to improve inheritance odds
+   when paired with a parent that carries a requested attack.
 
 _Note: The other properties in this list are used as "Effective Properties", but_
 _attack skills are treated differently. Attack combinations can become so large_
@@ -221,6 +221,36 @@ gives the solver a consistent way to compare whole breeding trees.
 See ["Estimating Breeding Time for Inheriting Passives"](./README-BREED-ESTIMATE.md) for the
 probability calculations used by the solver.
 
+### Choosing the Breeding Method
+
+For each pair, the solver considers ordinary breeding and, when the settings
+allow it, breeding with a Special Cake. Each method gets its own candidate
+because it changes passive inheritance and the attacks the child can obtain.
+During search, the solver estimates effort from that method's passive
+probability and the IV odds. It includes the odds for specific attack loadouts
+when finishing the results.
+
+Ordinary candidates respect the limit on unwanted passives
+(`MaxBredIrrelevantPassives`). Special Cakes aim to fill all four passive slots,
+so their candidates can exceed that limit. Extra unwanted passives still affect
+inheritance in later generations.
+
+_Note: The game's [random passive-selection bug](../LIMITATIONS.md#random-passive-selection-bug)
+can leave a child short of four passives. PalCalc assumes the random filling
+succeeds when estimating Special Cake outcomes._
+
+The solver's cake usage policy controls when these candidates are introduced.
+This is managed by the `SpecialCakePolicy` setting, exposed as the
+`Allow Special Cakes for Passives` checkbox in the app.
+
+- `AttackInheritanceOnly` (checkbox disabled) requires multiple requested attacks that the child
+  doesn't already learn at level one. The UI uses this policy by default.
+- `AttacksAndPassives` (checkbox enabled) also considers cakes without a multiple-attack
+  requirement when required or optional passives remain in the breeding search.
+  If surgery defers all passive targets, the solver uses the attack-only rule.
+  Searching for more cake options may take longer.
+- `Never` (not possible through the app) disables cake candidates.
+
 ## Keeping the Search Manageable
 
 The number of possible breeding trees explodes as the search continues. Every
@@ -247,29 +277,19 @@ Completed results are handled separately. A Pal can be a good final answer
 even when another equivalent Pal would make a better parent, so the solver
 saves results before simplifying the frontier.
 
-### Comparing Attack Paths
+### Comparing Paths
 
-PalCalc doesn't track each unique way to manage attack skills. For
-each Pal it only records the attacks available up the chain, and some extra
-information:
+Special Cakes add another useful difference between paths. A slower path using
+one Special Cake may be worth keeping alongside a faster path using five.
+The solver compares both breeding time and cake use, including in searches
+that only target passives.
 
-- The available pairings of desired attacks between the parents
-- The number of Special Cakes required for each pairing
-- Whether an "ignore-inherit" attack is available
+When attacks are requested, a replacement must also preserve the attack
+combinations the path can provide. The solver postpones choosing parent
+loadouts and including their attack inheritance odds until finalization.
 
-Breeding effort is excluded here on purpose because it adds a lot of
-tracking overhead. Instead, attack options are compared by the number of
-Special Cakes required. A path which needs fewer Special Cakes
-will _often_ require less breeding attempts than other approaches, making
-it a semi-accurate stand-in for direct breeding effort. These cakes are
-also high-level and expensive, making them even more important for comparisons.
-
-_Technical note: the "available pairings" data is stored in a 64-bit `ulong`_
-_bitfield for general comparisons, and an array of 8-bit `byte` bitfields for_
-_associating arrangements with cake costs. With 6 order-independent attack slots,_
-_there are only 6 bits needed to represent available attacks. There are 64 (`2^6`)_
-_possible arrangements, conveniently letting us represent combined state in_
-_a single `ulong` via `1 << IndividualMask`._
+These comparisons use the search estimates. A path that looks better at this
+stage may become more expensive once the solver resolves its attack choices.
 
 ## Search Coverage and Limits
 
@@ -298,39 +318,18 @@ They don't guarantee the fastest possible real-world plan; the
 
 A completed breeding path still needs a final pass before it is returned.
 
-By this point, each bred candidate already represents either ordinary breeding
-or breeding with a Special Cake. During search, we use that method's passive
-probability and the IV odds to estimate effort, saving the attack assignments
-and their inheritance odds for finalization.
-
-Special Cakes need separate candidates because `MaxBredIrrelevantPassives`
-limits the ordinary passive options we explore. Special Cakes _guarantee_ four
-passive skills in Palworld, which can forcibly exceed PalCalc's limit.
-
-_Note: The game's [random passive-selection bug](../LIMITATIONS.md#random-passive-selection-bug)
-can leave a child short of four passives. PalCalc assumes the random filling
-succeeds when estimating Special Cake outcomes._
-
-(TODO - Tweak once we add the setting from the other TODO in `CandidateExpander`.)
-We only introduce cake candidates when the parents can equip and pass on multiple
-requested attacks that the child doesn't already learn at level one.
-We could also search for ways to use cakes just to improve passive inheritance,
-but that would add more options to the search. We skip those for performance,
-accepting that we may miss some valid or better paths.
-
 Once the main search finishes, the solver applies surgery options, which can
 add, remove, or change passives at a cost. Considering every possible surgery
 during every breeding round could uncover more intermediate combinations, but
 it would also multiply the number of paths the solver has to search.
 
-Finalization then resolves the real attack skills needed on parent and child
-Pals and includes their inheritance odds in the effort estimate. The earlier
-search process just tracks the presence and general distribution of attack
-skills. This simple approach gives great performance improvements.
+Each breeding step already has its breeding method (standard or special cake)
+selected by the search process. When attacks
+are requested, finalization chooses specific parent loadouts within that method
+and includes inheritance odds in the effort and cake estimates.
 
-We can save this detail for the end because attacks are _very_ easy to
-manipulate. The general guideline is to assign attacks as late in the tree as
-possible.
+We can save this detail for the end because attacks are _very_ easy to manipulate.
+The general guideline is to assign attacks as late in the tree as possible.
 
 The solver checks that the completed trees have the requested passives,
 attacks, and gender before returning the results.
@@ -343,10 +342,15 @@ The following maps the search steps to their implementation, in order.
 
 1. `BreedingSolver` receives a `BreedingSolverRequest` containing the target
    and settings.
-2. `SolverRunContext` stores the target, settings, breeding mechanics,
-   breeding database, run controller, and candidate-selection policy used for
-   this run.
-3. `SolverRun` runs the search and finishes the results.
+2. `SolverRunContext` keeps the original `Target` for starting-candidate
+   selection and final requirements, and derives a `BreedingTarget` for expansion.
+   With **Simplify Surgery Search**, some required passives can be dropped from the
+   list and deferred for surgery at the end.
+3. When passive cake use is enabled but no desired passives remain in
+   `BreedingTarget`, the context uses the attack-only cake policy. It also stores
+   the mechanics, breeding database, run controller, and shared
+   `ICandidateSelectionPolicy` for the run.
+4. `SolverRun` runs the search and finishes the results.
 
 ### 2. Build the starting candidates
 
@@ -361,7 +365,8 @@ to the target.
 4. Create wildcard gender representations where gender can be resolved later.
 5. When the player owns matching male and female Pals, create a composite
    candidate that can supply either gender.
-6. Build initial attack profiles from owned mastered attacks and wild level-1 attacks.
+6. Build initial attack profiles from owned mastered attacks and attacks
+   available at the minimum wild level. Add training variants when enabled.
 7. Add the resulting candidates to the initial frontier.
 
 ### 3. Create the frontier and first parent schedule
@@ -391,13 +396,37 @@ For each pair, `CandidateExpander`:
 3. Resolves wildcard genders and handles recipes whose child depends on which
    parent is male or female.
 4. Finds the child species the pair can produce.
-5. Determines the useful passive and IV outcomes for that child.
-6. Combines the parent attack profiles and adjusts probabilities.
-7. Produces candidates that may add a new or better path.
+5. Determines the useful passive and IV outcomes for that child, using
+   `BreedingTarget` for the passives needed during breeding.
+6. Creates ordinary and eligible Special Cake candidates with their own
+   `BreedingOutcome`, which records the method and passive probability.
+7. Uses `AttackProfileComposer` to record feasible attack outcomes for each
+   method. Concrete loadouts and their attack probabilities are deferred.
+8. Estimates breeding effort and cake cost, then offers the candidates to
+   `CandidatePreFilter`.
 
-Workers use a quick assessment from the selection policy to avoid returning
-children that are already known to be unhelpful. This is only a pre-filter;
-the frontier performs the complete simplification after collecting the batch.
+`CandidatePreFilter` uses quick policy assessments and a `CandidateCostFrontier`
+per effective-property group to retain useful cake/time alternatives. Without
+attack targets, the cost frontier uses one comparison slot. With attack targets,
+it compares alternatives for each exact attack mask. The frontier performs the
+complete simplification after collecting the batch.
+
+`CandidateDraft` lets these checks reject a candidate before allocating its
+full `BredPalReference`, unless terminal or surgery retention needs that reference.
+
+The cake quantities on a breeding path have distinct roles.
+
+| Property | Role |
+| --- | --- |
+| `SelfSpecialCakes` | Expected special cakes for this step, including repeated attempts. |
+| `ExpectedSpecialCakes` | The current whole-tree count, including parent costs and gender or attack choices as they are resolved. |
+| `BaseSpecialCakes` | The minimum special cakes for the whole-tree count, without e.g. gender requirements. |
+
+_Technical note: six requested attacks give 64 possible masks. `AttackProfile`
+stores the feasible outcomes in one `ulong` using `1UL << IndividualMask`.
+Bit zero represents the valid outcome with none of the requested attacks.
+Clearing every bit represents no feasible outcome, and also serves as the
+inactive profile when attack solving is disabled._
 
 ### 5. Save completed results
 
@@ -405,30 +434,38 @@ Any candidate that satisfies the target is saved as a completed result. This
 happens separately because a valid result may not be one of the candidates
 worth retaining as a future parent.
 
-Completed results are grouped and simplified independently from the frontier.
-Paths with the same breeding effort can be reduced using the result-selection
-rules without changing which effort levels have been discovered.
+`ResultAccumulator` collects candidates that satisfy the original target.
+`CandidatePreFilter` also preserves terminal candidates separately from
+parent-selection decisions when attacks or passive-cake options are active.
+`SurgeryFinalistAccumulator` retains candidates that can meet the target after
+allowed surgery, so early pruning doesn't discard those options.
+
+Final grouping and selection happen after post-processing through
+`ICandidateSelectionPolicy.SelectFinalResults`.
 
 ### 6. Simplify and update the frontier
 
 The frontier merges the children from the batch with the candidates already
 retained. `DefaultCandidateSelectionPolicy` runs the simplification using the
-rules configured by `ResultPruningPolicy`. Some special handling is needed
-to preserve and compare `AttackProfiles` since they're not part of the
-effective properties.
+rules configured by `ResultPruningPolicy`, then uses `CandidateCostFrontier`
+to preserve useful cake/time alternatives and attack coverage.
+
+_Technical note: matching `EffectivePropertiesKey` values put candidates in the
+same comparison group. Replacement also depends on costs and, when attacks are
+requested, coverage of the represented attack outcomes._
 
 1. Group candidates by their effective properties.
-2. Treat lower breeding effort as a guaranteed improvement over matching
-   candidates.
+2. Treat lower breeding effort as a guaranteed improvement when the new path
+   also covers the incumbent's attack outcomes and uses no more estimated cakes.
 3. Treat better cost or IVs as possible improvements that still need the full
    simplification pass.
 4. Apply the ordered rules from `ResultPruningPolicy`, including effort, steps,
    IV quality, cost, location, reuse, wild Pals, referenced players, variety,
    and the configured result limit.
 5. Keep the selected paths for each effective-property group.
-6. In each effective-property group, check for any `AttackProfiles` which were
-   entirely removed by pruning. Restore the lowest-cost candidates for each
-   missing `AttackProfile`.
+6. Supplement those selections with useful cost alternatives from
+   `CandidateCostFrontier`. A slower, cheaper path can survive alongside a faster,
+   more expensive path, even if this exceeds the ordinary result limit.
 7. Produce a `FrontierDelta` containing the candidates added to and removed
    from the frontier.
 
@@ -450,24 +487,24 @@ The loop stops when:
 
 ### 8. Apply surgery and return the results
 
-`ResultPostProcessor` handles the completed paths collected during the search.
+`SolverRun` asks `ResultPostProcessor` to apply surgery through the frontier,
+including the separately retained surgery finalists, then finalize the completed
+candidates.
 
-1. Apply the allowed surgery operations and their costs.
-2. Check the final required and optional passive rules.
-3. Check that the result has the requested gender.
-4. Check the result for an `AttackProfile` which meets the attack requirements and
-   Special Cake limit.
-5. Work out the attack-inheritance options and their actual effort and Special
-   Cake costs. Save the parent choices for each option.
-6. Remove options that exceed the configured limits or are clearly worse than a
-   comparable option.
-7. Build the retained breeding trees, check their final requirements again, and
-   simplify similar results.
-8. Return the remaining paths as a `BreedingSolverResult`.
-
-When working out attack options, the breeding method (use of Special Cakes) is already fixed on each
-candidate. Finalization chooses the parent loadouts and calculates their costs
-within that method.
+1. Apply allowed surgery operations and their costs, retaining useful results.
+2. Resolve the required gender and check the original target's requirements.
+3. For attack targets, `AttackResultMaterializer` evaluates specific parent
+   loadouts for their preselected breeding methods and recalculates probabilities,
+   effort, and cake use.
+4. For attack or passive-cake searches, compare completed alternatives through
+   `FinalizationAlternatives` and `FinalizationComparison`. Passive-only cake
+   searches use the path costs directly. Attack searches use the evaluated
+   costs and reconstruct the selected trees.
+5. Reject reconstructed paths that exceed configured limits or fail the target.
+6. Ask `ICandidateSelectionPolicy.SelectFinalResults` to group and simplify the
+   remaining candidates. The default policy uses its effort groups and, when
+   preserving cake options, also separates outcomes and expected cake counts.
+7. Return the remaining paths as a `BreedingSolverResult`.
 
 A faster path may need more Special Cakes than a slower one, so we keep both
 when neither is clearly better. We can drop an option if another takes no more
@@ -544,7 +581,8 @@ eligible equipped-parent attacks, excluding non-inheritable attacks
 
 PalCalc tracks the achievable combinations
 during search and chooses parent loadouts during [finalization](#finishing-the-results).
-Its restrictions on when to consider Special Cakes are described there too.
+The [breeding-method policy](#choosing-the-breeding-method) controls when Special
+Cake candidates enter the search.
 
 ### Egg-production time
 
@@ -569,26 +607,34 @@ for the scope of completed game-code verification.
 
 ## Implementation Map
 
+The selection policy is shared across search and finalization.
+
 ```text
 BreedingSolver
   -> SolverRunContext
        -> AttackTargetContext
+       -> ICandidateSelectionPolicy (DefaultCandidateSelectionPolicy)
   -> SolverRun
        -> InitialPalBuilder
        -> SearchFrontier
             -> FrontierIndex
             -> ParentPairSchedule
             -> ResultAccumulator
-            -> DefaultCandidateSelectionPolicy
+            -> ICandidateSelectionPolicy
+                 -> CandidateCostFrontier
+       -> CandidatePreFilter per iteration
+            -> CandidateCostFrontier per effective-property group
+            -> SurgeryFinalistAccumulator
        -> ParallelBatchExecutor
             -> CandidateExpander per worker
                  -> worker-local object pools
                  -> AttackProfileComposer
-                      -> AttackProfile / AttackProfileEntry
-                      -> AttackProfileAccumulator
+                      -> AttackProfile
+                 -> CandidatePreFilter
        -> ResultPostProcessor
             -> AttackResultMaterializer
             -> FinalizationAlternatives / FinalizationComparison
+            -> ICandidateSelectionPolicy.SelectFinalResults
   -> BreedingSolverResult
 ```
 
