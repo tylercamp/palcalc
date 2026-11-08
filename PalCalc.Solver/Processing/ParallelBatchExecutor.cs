@@ -35,7 +35,7 @@ internal sealed class ParallelBatchExecutor(
     {
         var controller = context.Controller;
         var settings = context.Settings;
-        var retainCostCandidates = expansionContext.PreFilter.RetainsCostAlternatives;
+        var retainCostCandidates = expansionContext.PreFilter.PreservesAttackAndCakeOptions;
         var progressEntries = new List<WorkBatchProgress>();
         var results = new ConcurrentBag<List<IPalReference>>();
         var chunksEnumerator = work

@@ -446,7 +446,7 @@ namespace PalCalc.Solver.Processing
 
                             BredPalReference result = null;
                             var filterResult = CandidatePreFilterResult.Rejected;
-                            if (context.PreFilter.RetainsCostAlternatives)
+                            if (context.PreFilter.PreservesAttackAndCakeOptions)
                             {
                                 // (`CandidateDraft` exists SPECIFICALLY for this check - we want to avoid creating
                                 // a new object and causing GC churn, so we copy it into a `struct` repr)

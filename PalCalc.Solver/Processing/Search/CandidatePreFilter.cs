@@ -38,7 +38,7 @@ internal sealed class CandidatePreFilter
     > earlyCandidatesByPalId;
     private readonly ConcurrentDictionary<IPalReference, byte> terminalCandidates = new();
 
-    public bool RetainsCostAlternatives { get; }
+    public bool PreservesAttackAndCakeOptions { get; }
 
     public CandidatePreFilter(
         PalSpecifier target,
@@ -59,7 +59,7 @@ internal sealed class CandidatePreFilter
         this.surgeryFinalists = surgeryFinalists;
 
         hasRequiredAttacks = attackTargets?.HasRequiredAttacks == true;
-        RetainsCostAlternatives = hasRequiredAttacks || settings.SpecialCakePolicy == SpecialCakePolicy.AttacksAndPassives;
+        PreservesAttackAndCakeOptions = hasRequiredAttacks || settings.SpecialCakePolicy == SpecialCakePolicy.AttacksAndPassives;
 
         earlyCandidatesByPalId = palIds.ToFrozenDictionary(
             id => id,
@@ -75,7 +75,7 @@ internal sealed class CandidatePreFilter
         var isTerminal = target.IsSatisfiedBy(candidate);
         // A completed result may be a poor future parent and be rejected below.
         // Preserve its best final path before applying frontier-oriented filters.
-        var terminalRetained = isTerminal && RetainsCostAlternatives && RetainTerminal(candidate);
+        var terminalRetained = isTerminal && PreservesAttackAndCakeOptions && RetainTerminal(candidate);
         var surgeryRetained = surgeryFinalists?.TryRetain(candidate) == true;
 
         var propertiesKey = selectionPolicy.KeyOf(candidate);
@@ -87,7 +87,7 @@ internal sealed class CandidatePreFilter
 
         var earlyCandidates = earlyCandidatesByPalId[candidate.Pal.Id];
         var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new(hasRequiredAttacks));
-        var accepted = group.TryAdd(candidate, selectionPolicy, RetainsCostAlternatives);
+        var accepted = group.TryAdd(candidate, selectionPolicy, PreservesAttackAndCakeOptions);
 
         return accepted
             ? new(Accepted: true, IsRetained: true)
