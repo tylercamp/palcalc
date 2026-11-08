@@ -236,8 +236,8 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         if (!preserveSpecialCakeOptions)
             return preferred;
 
-        // Preserve useful cake/effort tradeoffs even when the ordinary result
-        // limit would keep only the fastest tier.
+        // Preserve the cheapest and fastest providers of each attack combination
+        // even when ordinary pruning would keep only the fastest tier.
         var alternatives = new CandidateCostFrontier(hasRequiredAttacks, markReplacedOutdated: false);
         foreach (var candidate in distinctCandidates)
             alternatives.TryAdd(candidate);

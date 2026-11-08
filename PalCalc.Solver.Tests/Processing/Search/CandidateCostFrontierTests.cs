@@ -10,61 +10,99 @@ namespace PalCalc.Solver.Tests.Processing.Search;
 public class CandidateCostFrontierTests
 {
     [TestMethod]
-    [DataRow((byte)0, false)]
-    [DataRow((byte)0, true)]
-    [DataRow((byte)63, false)]
-    [DataRow((byte)63, true)]
-    public void RetainsCakeEffortTradeoffsAndRemovesDominatedPaths(byte mask, bool reverse)
+    [DataRow((byte)0)]
+    [DataRow((byte)63)]
+    public void RetainsOnlyCheapestAndFastestRegardlessOfArrivalOrder(byte mask)
     {
-        var frontier = new CandidateCostFrontier(hasRequiredAttacks: true, markReplacedOutdated: true);
-        var slow = Candidate(mask, cakes: 0, attempts: 100);
-        var middle = Candidate(mask, cakes: 3, attempts: 10);
-        var fast = Candidate(mask, cakes: 10, attempts: 1);
-        var paths = new[] { slow, middle, fast };
-        foreach (var path in reverse ? paths.AsEnumerable().Reverse() : paths)
-            Assert.IsTrue(frontier.TryAdd(path));
-        CollectionAssert.AreEquivalent(paths, frontier.Candidates.ToArray());
+        int[][] orders = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+        foreach (var order in orders)
+        {
+            var frontier = new CandidateCostFrontier(hasRequiredAttacks: true, markReplacedOutdated: true);
+            var slow = Candidate(mask, cakes: 0, attempts: 100);
+            var middle = Candidate(mask, cakes: 3, attempts: 10);
+            var fast = Candidate(mask, cakes: 10, attempts: 1);
+            var paths = new[] { slow, middle, fast };
+            var middleAccepted = false;
+            foreach (var index in order)
+            {
+                var accepted = frontier.TryAdd(paths[index]);
+                if (index == 1) middleAccepted = accepted;
+                Assert.IsTrue(frontier.Candidates.Count() <= 2);
+            }
+            CollectionAssert.AreEquivalent(new[] { slow, fast }, frontier.Candidates.ToArray());
+            Assert.AreEqual(middleAccepted, middle.IsOutdated);
 
-        var dominated = Candidate(mask, cakes: 4, attempts: 20);
-        Assert.IsFalse(frontier.TryAdd(dominated));
-        var improvement = Candidate(mask, cakes: 2, attempts: 1);
-        Assert.IsTrue(frontier.TryAdd(improvement));
-        CollectionAssert.AreEquivalent(new[] { slow, improvement }, frontier.Candidates.ToArray());
-        Assert.IsTrue(middle.IsOutdated);
-        Assert.IsTrue(fast.IsOutdated);
-        Assert.IsFalse(slow.IsOutdated);
+            var improvement = Candidate(mask, cakes: 2, attempts: 1);
+            Assert.IsTrue(frontier.TryAdd(improvement));
+            CollectionAssert.AreEquivalent(new[] { slow, improvement }, frontier.Candidates.ToArray());
+            Assert.IsFalse(frontier.TryAdd(improvement));
+            Assert.IsTrue(fast.IsOutdated);
+            Assert.IsFalse(slow.IsOutdated);
+        }
     }
 
     [TestMethod]
-    public void DraftPathRetainsTradeoffsWithoutAllocatingRejectedTrees()
+    [DataRow(false)]
+    [DataRow(true)]
+    public void DraftPathRejectsMiddleTradeoffWithoutAllocatingTree(bool hasRequiredAttacks)
     {
         var settings = SolverTestScenario.Solver([]).Settings;
-        var frontier = new CandidateCostFrontier(hasRequiredAttacks: false, markReplacedOutdated: false);
-        var slow = Candidate(0, cakes: 0, attempts: 100);
+        var frontier = new CandidateCostFrontier(hasRequiredAttacks, markReplacedOutdated: false);
+        var slow = Candidate(63, cakes: 0, attempts: 100, passiveOnly: !hasRequiredAttacks);
         Assert.IsTrue(frontier.TryAdd(slow));
-        var fast = Draft(cakes: 1, effort: slow.BreedingEffort / 10);
+        var fast = Draft(attempts: 1, parentCakes: 9);
         Assert.IsTrue(frontier.TryAdd(ref fast));
         Assert.IsTrue(fast.IsMaterialized);
-        var dominated = Draft(cakes: 2, effort: slow.BreedingEffort / 5);
-        Assert.IsFalse(frontier.TryAdd(ref dominated));
-        Assert.IsFalse(dominated.IsMaterialized);
+        var middle = Draft(attempts: 3, parentCakes: 0);
+        Assert.IsFalse(frontier.TryAdd(ref middle));
+        Assert.IsFalse(middle.IsMaterialized);
         Assert.AreEqual(2, frontier.Candidates.Count());
 
-        CandidateDraft Draft(int cakes, TimeSpan effort) => new(
-            settings.GameSettings, slow.Pal, slow.Parent1, slow.Parent2, [],
-            new(BreedingMethod.SpecialCake, 1f / cakes), new IV_Set(), 1, cakes, effort, effort,
-            AttackProfile.Inactive);
+        CandidateDraft Draft(int attempts, int parentCakes)
+        {
+            var parent = new SolverTestScenario.PricedOwnedReference(
+                SolverTestScenario.Owned("Katress", PalGender.MALE), [], new IV_Set(), slow.AttackProfile, parentCakes);
+            var effort = BredPalReferenceEffort.CalculateSelfBreedingEffort(
+                settings.GameSettings, slow.Pal, parent.TimeFactor, slow.Parent2.TimeFactor, attempts);
+            return new(settings.GameSettings, slow.Pal, parent, slow.Parent2, [],
+                new(BreedingMethod.SpecialCake, 1f / attempts), new IV_Set(), 1, attempts, effort, effort, slow.AttackProfile);
+        }
     }
 
     [TestMethod]
-    public void FullSelectionPreservesMiddleTradeoffInPassiveOnlySearch()
+    [DataRow(false)]
+    [DataRow(true)]
+    public void FullSelectionRetainsOnlyCheapestAndFastest(bool hasRequiredAttacks)
     {
-        var target = new PalSpecifier { Pal = "Wixen Noct".ToPal(SolverTestScenario.DB) };
+        var target = new PalSpecifier
+        {
+            Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
+            RequiredAttacks = hasRequiredAttacks ? SolverTestScenario.DB.ActiveSkills.Take(1).ToList() : [],
+        };
         var context = new AttackTargetContext(target, SolverTestScenario.DB);
         var settings = SolverTestScenario.Solver([]).Settings;
-        var policy = new DefaultCandidateSelectionPolicy(settings.ResultPruning, CancellationToken.None, context, considerPassiveCakes: true);
-        var paths = new[] { Candidate(0, 0, 100, passiveOnly: true), Candidate(0, 3, 10, passiveOnly: true), Candidate(0, 10, 1, passiveOnly: true) };
-        CollectionAssert.AreEquivalent(paths, policy.SelectRetainedAlternatives(paths).ToArray());
+        var policy = new DefaultCandidateSelectionPolicy(settings.ResultPruning, CancellationToken.None, context, considerPassiveCakes: !hasRequiredAttacks);
+        var paths = Enumerable.Range(0, 100)
+            .Select(cakes => Candidate(0, cakes, 100 - cakes, passiveOnly: !hasRequiredAttacks)).ToArray();
+        CollectionAssert.AreEquivalent(new[] { paths[0], paths[^1] }, policy.SelectRetainedAlternatives(paths).ToArray());
+        Assert.IsTrue(paths.All(path => !path.IsOutdated));
+    }
+
+    [TestMethod]
+    public void ReplacingCheapestDoesNotRetirePathStillProvidingFastest()
+    {
+        var frontier = new CandidateCostFrontier(hasRequiredAttacks: true, markReplacedOutdated: true);
+        var original = Candidate(1, cakes: 5, attempts: 2);
+        var cheapest = Candidate(1, cakes: 0, attempts: 10);
+        var fastest = Candidate(1, cakes: 6, attempts: 1);
+        Assert.IsTrue(frontier.TryAdd(original));
+        Assert.IsTrue(frontier.TryAdd(cheapest));
+        Assert.IsFalse(original.IsOutdated);
+        CollectionAssert.AreEquivalent(new[] { cheapest, original }, frontier.Candidates.ToArray());
+
+        Assert.IsTrue(frontier.TryAdd(fastest));
+        Assert.IsTrue(original.IsOutdated);
+        CollectionAssert.AreEquivalent(new[] { cheapest, fastest }, frontier.Candidates.ToArray());
     }
 
     [TestMethod]

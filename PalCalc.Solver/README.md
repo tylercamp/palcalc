@@ -282,7 +282,9 @@ saves results before simplifying the frontier.
 Special Cakes add another useful difference between paths. A slower path using
 one Special Cake may be worth keeping alongside a faster path using five.
 The solver compares both breeding time and cake use, including in searches
-that only target passives.
+that only target passives. To keep the search manageable, it retains the
+cheapest and fastest alternatives for each attack combination. Intermediate
+compromises may be missed.
 
 When attacks are requested, a replacement must also preserve the attack
 combinations the path can provide. The solver postpones choosing parent
@@ -406,10 +408,9 @@ For each pair, `CandidateExpander`:
    `CandidatePreFilter`.
 
 `CandidatePreFilter` uses quick policy assessments and a `CandidateCostFrontier`
-per effective-property group to retain useful cake/time alternatives. Without
-attack targets, the cost frontier uses one comparison slot. With attack targets,
-it compares alternatives for each exact attack mask. The frontier performs the
-complete simplification after collecting the batch.
+per effective-property group to retain the cheapest and fastest alternatives
+for each exact attack mask, or one comparison group without attack targets.
+The frontier performs the complete simplification after collecting the batch.
 
 `CandidateDraft` lets these checks reject a candidate before allocating its
 full `BredPalReference`, unless terminal or surgery retention needs that reference.
@@ -463,9 +464,10 @@ requested, coverage of the represented attack outcomes._
    IV quality, cost, location, reuse, wild Pals, referenced players, variety,
    and the configured result limit.
 5. Keep the selected paths for each effective-property group.
-6. Supplement those selections with useful cost alternatives from
-   `CandidateCostFrontier`. A slower, cheaper path can survive alongside a faster,
-   more expensive path, even if this exceeds the ordinary result limit.
+6. Supplement those selections with the cheapest and fastest providers per exact
+   attack mask from `CandidateCostFrontier`, or one pair without attack targets.
+   This can exceed the ordinary result limit, but doesn't retain every middle
+   cake/time tradeoff.
 7. Produce a `FrontierDelta` containing the candidates added to and removed
    from the frontier.
 
