@@ -11,6 +11,7 @@ using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.GraphSharp;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.PalDerived;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,6 +24,8 @@ namespace PalCalc.UI.ViewModel.Solver
 {
     public class BreedingResultViewModel : ObservableObject
     {
+        private static readonly ILogger logger = Log.ForContext<BreedingResultViewModel>();
+
         // For XAML designer view
         public BreedingResultViewModel()
         {
@@ -83,6 +86,7 @@ namespace PalCalc.UI.ViewModel.Solver
         private readonly GameSettings graphSettings;
         private readonly ActiveSkill[] graphAttacks;
         private BreedingGraph graph;
+        private bool graphBuildFailed;
         private List<int> checkedNodeIndices;
 
         public BreedingResultViewModel(CachedSaveGame source, GameSettings settings, IPalReference displayedResult, IEnumerable<ActiveSkill> requiredAttacks)
@@ -207,7 +211,24 @@ namespace PalCalc.UI.ViewModel.Solver
         public ILocalizedText Label { get; }
         public ILocalizedText InputLocations { get; }
 
-        public BreedingGraph Graph => HasValue ? graph ??= BuildGraph() : null;
+        public BreedingGraph Graph
+        {
+            get
+            {
+                if (!HasValue || graphBuildFailed) return null;
+
+                try
+                {
+                    return graph ??= BuildGraph();
+                }
+                catch (Exception ex)
+                {
+                    graphBuildFailed = true;
+                    logger.Warning(ex, "Failed to build breeding graph for {Pal}", DisplayedResult.Pal.InternalName);
+                    return null;
+                }
+            }
+        }
 
         internal bool IsGraphBuilt => graph != null;
 
@@ -221,7 +242,7 @@ namespace PalCalc.UI.ViewModel.Solver
         }
 
         public IEnumerable<IBreedingTreeNodeViewModel> CheckedNodes =>
-            Graph.Nodes.Where(n => n.IsChecked);
+            Graph?.Nodes.Where(n => n.IsChecked) ?? [];
 
         public IPalReference DisplayedResult { get; }
 

@@ -699,6 +699,32 @@ namespace PalCalc.UI.Tests
     }
 
     [TestMethod]
+    public void DeferredGraphFailurePreservesSavedCheckmarksUntilRefresh()
+    {
+        var db = PalDB.LoadEmbedded();
+        var settings = new GameSettings();
+        var validWidth = settings.LocationTypeGridWidths[LocationType.Palbox];
+        settings.LocationTypeGridWidths[LocationType.Palbox] = 0;
+        var owned = new OwnedPalReference(MakeInstanceWithRank(db, 1), [], new IV_Set(), AttackProfile.Inactive);
+        var row = new BreedingResultViewModel(null, settings, owned, []) { CheckedNodeIndices = [0] };
+        var results = new BreedingResultListViewModel { Results = [row] };
+
+        Assert.IsNull(row.Graph);
+        settings.LocationTypeGridWidths[LocationType.Palbox] = validWidth;
+        Assert.IsNull(row.Graph);
+        Assert.IsFalse(row.CheckedNodes.Any());
+        Assert.IsTrue(row.HasValue);
+        Assert.AreSame(row, results.SelectedResult);
+
+        var target = new PalSpecifier { Pal = owned.Pal };
+        var saved = ResultJsonSerializer.ToDto(results, db, settings, target);
+        CollectionAssert.AreEqual(new[] { 0 }, saved.Results.Single().CheckedNodes);
+
+        results.UpdateCachedData(null, settings);
+        Assert.IsTrue(results.SelectedResult.Graph.Nodes.Single().IsChecked);
+    }
+
+    [TestMethod]
     public void CustomContentsUseTheirOwningContainerLocation()
     {
         var db = PalDB.LoadEmbedded();
