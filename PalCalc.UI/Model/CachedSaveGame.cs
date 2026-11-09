@@ -125,6 +125,7 @@ namespace PalCalc.UI.Model
             playersByName = null;
             playerGuilds = null;
             basesByGuild = null;
+            containerGuilds = null;
 
             StateId += 1;
         }

@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
+using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
@@ -22,6 +23,34 @@ namespace PalCalc.UI.Tests
     [TestClass]
     public class PersistenceTests
     {
+    [TestMethod]
+    public void RefreshingCachedSaveUpdatesContainerGuild()
+    {
+        var db = PalDB.LoadEmbedded();
+        using var save = new VirtualSaveGame("player", "world", null, null, null, null);
+        var cached = Snapshot("original-guild");
+        Assert.AreEqual("original-guild", cached.GuildsByContainerId["base-container"].Id);
+
+        cached.CopyFrom(Snapshot("new-guild"));
+
+        Assert.AreEqual("new-guild", cached.GuildsByContainerId["base-container"].Id);
+
+        CachedSaveGame Snapshot(string guildId)
+        {
+            var snapshot = CachedSaveGame.FromJson($$"""
+                {
+                    "Players": [],
+                    "Guilds": [{ "Id": "{{guildId}}" }],
+                    "OwnedPals": [],
+                    "Bases": [{ "Id": "base", "OwnerGuildId": "{{guildId}}" }],
+                    "PalContainers": [{ "Type": "Base", "Id": "base-container", "BaseId": "base" }]
+                }
+                """, db);
+            snapshot.UnderlyingSave = save;
+            return snapshot;
+        }
+    }
+
     [TestMethod]
     public void FreshStorageReceivesCurrentManifest()
     {
