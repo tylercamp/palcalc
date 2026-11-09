@@ -32,6 +32,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public BreedingResultListViewModelSettingsSnapshot SettingsSnapshot { get; set; }
 
         public event Action<object, EventArgs> CheckedStateChanged;
+        private bool isRefreshingResults;
 
         private void SubscribeCheckedEvents(List<BreedingResultViewModel> resultList)
         {
@@ -40,10 +41,8 @@ namespace PalCalc.UI.ViewModel.Solver
                 PropertyChangedEventManager.AddHandler(r, OnResultCheckStateChanged, nameof(r.CheckedNodes));
         }
 
-        private void OnResultCheckStateChanged(object sender, PropertyChangedEventArgs args)
-        {
-            CheckedStateChanged?.Invoke(this, EventArgs.Empty);
-        }
+        private void OnResultCheckStateChanged(object sender, PropertyChangedEventArgs args) =>
+            NotifyCheckedStateChanged();
 
         private List<BreedingResultViewModel> results;
         public List<BreedingResultViewModel> Results
@@ -54,7 +53,8 @@ namespace PalCalc.UI.ViewModel.Solver
                 if (SetProperty(ref results, value))
                 {
                     SubscribeCheckedEvents(results);
-                    SelectedResult = results.OrderBy(r => r.TimeEstimate).FirstOrDefault();
+                    if (!isRefreshingResults)
+                        SelectedResult = results.OrderBy(r => r.TimeEstimate).FirstOrDefault();
                     OnPropertyChanged(nameof(EffortWidth));
                     OnPropertyChanged(nameof(NumStepsWidth));
                     OnPropertyChanged(nameof(LocationsWidth));
@@ -70,7 +70,13 @@ namespace PalCalc.UI.ViewModel.Solver
         private BreedingResultViewModel selectedResult;
 
         partial void OnSelectedResultChanged(BreedingResultViewModel value) =>
-            CheckedStateChanged?.Invoke(this, EventArgs.Empty);
+            NotifyCheckedStateChanged();
+
+        private void NotifyCheckedStateChanged()
+        {
+            if (!isRefreshingResults)
+                CheckedStateChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         private readonly double WIDTH_HIDDEN = 0;
         private readonly double FIT_CONTENT = double.NaN;
@@ -115,10 +121,24 @@ namespace PalCalc.UI.ViewModel.Solver
         public void UpdateCachedData(CachedSaveGame csg, GameSettings settings)
         {
             var timer = Stopwatch.StartNew();
-            Results = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult, r.EffectiveAttacks.AsModelEnumerable())
+            var selectedIndex = Results.IndexOf(SelectedResult);
+            var refreshedResults = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult, r.EffectiveAttacks.AsModelEnumerable())
             {
                 CheckedNodeIndices = r.CheckedNodeIndices,
             }).ToList();
+
+            // Rebinding the list can change selection before we restore the matching row.
+            isRefreshingResults = true;
+            try
+            {
+                Results = refreshedResults;
+                SelectedResult = selectedIndex >= 0 ? refreshedResults[selectedIndex] : null;
+            }
+            finally
+            {
+                isRefreshingResults = false;
+            }
+
             Log.ForContext<BreedingResultListViewModel>().Debug(
                 "Load profiling: refresh {Results} results, {Graphs} graphs built during refresh/bind: total {TotalMs:F1} ms",
                 Results.Count, Results.Count(r => r.IsGraphBuilt), timer.Elapsed.TotalMilliseconds

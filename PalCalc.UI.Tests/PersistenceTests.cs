@@ -693,9 +693,14 @@ namespace PalCalc.UI.Tests
         Assert.AreEqual(1, changes);
 
         restored.UpdateCachedData(null, GameSettings.Defaults);
+        Assert.AreSame(restored.Results[1], restored.SelectedResult);
+        Assert.AreEqual(1, changes);
         Assert.IsFalse(restored.Results.Any(result => result.IsGraphBuilt));
         Assert.IsTrue(restored.Results[0].Graph.Nodes.Single().IsChecked);
         Assert.IsFalse(restored.Results[1].Graph.Nodes.Single().IsChecked);
+
+        restored.SelectedResult = restored.Results[0];
+        Assert.AreEqual(2, changes);
     }
 
     [TestMethod]
