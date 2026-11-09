@@ -41,7 +41,7 @@ public sealed class BreedingSolverSettings
         IEnumerable<PassiveSkill> allowedSurgeryPassives,
         bool skipSurgeryPassivesDuringSearch,
         bool useGenderReversers,
-        int? maxSpecialCakes,
+        SpecialCakePolicy specialCakePolicy,
         bool trainPals
     )
     {
@@ -53,8 +53,8 @@ public sealed class BreedingSolverSettings
         ArgumentNullException.ThrowIfNull(allowedWildPals);
         ArgumentNullException.ThrowIfNull(bannedBredPals);
         ArgumentNullException.ThrowIfNull(allowedSurgeryPassives);
-        if (maxSpecialCakes < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxSpecialCakes));
+        if (!Enum.IsDefined(specialCakePolicy))
+            throw new ArgumentOutOfRangeException(nameof(specialCakePolicy));
 
         DB = db;
         BreedingDB = breedingDB;
@@ -76,7 +76,7 @@ public sealed class BreedingSolverSettings
         SurgeryPassives = allowedSurgeryPassives.ToList();
         SkipSurgeryPassivesDuringSearch = skipSurgeryPassivesDuringSearch;
         UseGenderReversers = useGenderReversers;
-        MaxSpecialCakes = maxSpecialCakes;
+        SpecialCakePolicy = specialCakePolicy;
         TrainPals = trainPals;
     }
 
@@ -98,6 +98,13 @@ public sealed class BreedingSolverSettings
     public IReadOnlyList<PassiveSkill> SurgeryPassives { get; }
     public bool SkipSurgeryPassivesDuringSearch { get; }
     public bool UseGenderReversers { get; }
-    public int? MaxSpecialCakes { get; }
+    public SpecialCakePolicy SpecialCakePolicy { get; private set; }
     public bool TrainPals { get; }
+
+    internal BreedingSolverSettings WithAttackOnlyCakes()
+    {
+        var settings = (BreedingSolverSettings)MemberwiseClone();
+        settings.SpecialCakePolicy = SpecialCakePolicy.AttackInheritanceOnly;
+        return settings;
+    }
 }

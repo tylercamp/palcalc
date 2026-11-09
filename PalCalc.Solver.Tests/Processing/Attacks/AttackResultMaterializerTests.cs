@@ -8,14 +8,18 @@ namespace PalCalc.Solver.Tests.Processing.Attacks;
 [TestClass]
 public class AttackResultMaterializerTests
 {
+    public TestContext TestContext { get; set; } = null!;
     private static readonly Pal Child = "Wixen Noct".ToPal(SolverTestScenario.DB);
     private static readonly ActiveSkill TargetAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
         attack.CanInherit && !Child.Level1ActiveSkills(SolverTestScenario.DB).Contains(attack));
 
+    private static readonly ActiveSkill SecondTargetAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
+        attack.CanInherit && attack != TargetAttack && !Child.Level1ActiveSkills(SolverTestScenario.DB).Contains(attack));
+
     [TestMethod]
     public void Materialize_RecomputesEffortAndCakesFromTheConcreteChoice()
     {
-        var selectedEntry = Entry(mask: 1, cakes: 0);
+        var selectedEntry = (byte)(1);
         var root = Bred(
             Leaf(1),
             Leaf(0),
@@ -26,8 +30,8 @@ public class AttackResultMaterializerTests
 
         Assert.AreEqual(0.5f, result.MaterializedAttackInheritance.AttackProbability);
         Assert.AreEqual(2, result.AvgRequiredBreedings);
-        Assert.AreEqual(0, result.MaterializedAttackInheritance.SpecialCakes);
-        Assert.AreEqual(0, result.AttackProfile.Entries.Single().TotalSpecialCakes);
+        Assert.AreEqual(0, result.SelfSpecialCakes);
+        Assert.AreEqual(0, result.ExpectedSpecialCakes);
         Assert.IsTrue(result.BreedingEffort > TimeSpan.Zero);
         Assert.IsFalse(result.MaterializedAttackInheritance.Mode == AttackInheritanceMode.InheritAll);
     }
@@ -35,18 +39,42 @@ public class AttackResultMaterializerTests
     [TestMethod]
     public void Evaluate_MatchesTheSubsequentlyMaterializedResult()
     {
-        var selectedEntry = Entry(mask: 1, cakes: 0);
+        var selectedEntry = (byte)(1);
         var root = Bred(Leaf(1), Leaf(0), new AttackProfile(selectedEntry));
         var materializer = new AttackResultMaterializer(Context(), Settings());
 
-        var evaluation = materializer.Evaluate(root, selectedEntry);
-        var result = (BredPalReference)materializer.Materialize(root, selectedEntry);
+        var evaluation = materializer.Evaluate(root, selectedEntry).Single();
+        var result = (BredPalReference)materializer.Materialize(materializer.Evaluate(root, selectedEntry).Single());
 
         Assert.AreEqual(result.BreedingEffort, evaluation.BreedingEffort);
         Assert.AreEqual(
-            result.AttackProfile.Entries.Single().TotalSpecialCakes,
+            result.ExpectedSpecialCakes,
             evaluation.TotalSpecialCakes
         );
+    }
+
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void Evaluate_UsesRealizedParentEffortDuringFinalization(bool parallelFarms)
+    {
+        var settings = Settings();
+        settings.GameSettings.MultipleBreedingFarms = parallelFarms;
+        var firstEntry = (byte)(1);
+        var secondEntry = (byte)(0);
+        var first = Bred(Leaf(1), Leaf(0), new AttackProfile(firstEntry), settings: settings,
+            passivesProbability: 0.25f);
+        var second = Bred(Leaf(0), Leaf(0), new AttackProfile(secondEntry), settings: settings,
+            passivesProbability: 0.5f);
+        var root = Bred(first, second, new AttackProfile(firstEntry), settings: settings);
+        var materializer = new AttackResultMaterializer(Context(), settings);
+
+        var evaluation = materializer.Evaluate(root, firstEntry).Single();
+        var result = (BredPalReference)materializer.Materialize(materializer.Evaluate(root, firstEntry).Single());
+
+        Assert.AreEqual(result.BreedingEffort, evaluation.BreedingEffort);
+        Assert.IsTrue(result.BreedingEffort > root.BreedingEffort);
+        Assert.AreEqual(0, evaluation.TotalSpecialCakes);
     }
 
     [DataTestMethod]
@@ -60,7 +88,7 @@ public class AttackResultMaterializerTests
     )
     {
         var parent2 = Leaf(parent2HasTarget ? (byte)1 : (byte)0, parent2HasNoop);
-        var entry = Entry(1, cakes: 0);
+        var entry = (byte)(1);
         var result = Materialize(
             Bred(Leaf(1), parent2, new AttackProfile(entry)),
             entry
@@ -85,23 +113,24 @@ public class AttackResultMaterializerTests
         var targetAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
             attack.CanInherit && !child.Level1AttackInternalIds.Contains(attack.InternalName)
         );
+        var secondAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
+            attack.CanInherit && attack != targetAttack && !child.Level1AttackInternalIds.Contains(attack.InternalName));
         var context = new AttackTargetContext(
-            new PalSpecifier { RequiredAttacks = [targetAttack] },
+            new PalSpecifier { RequiredAttacks = [targetAttack, secondAttack] },
             SolverTestScenario.DB
         );
         var settings = Settings();
-        var selectedEntry = Entry(mask: 1, cakes: 1);
+        var selectedEntry = (byte)(3);
         var root = Bred(
             Leaf(targetAttack, 1),
-            Leaf(targetAttack, 0),
+            Leaf(secondAttack, 2),
             new AttackProfile(selectedEntry),
             child,
             PalGender.MALE,
-            settings
+            settings, method: BreedingMethod.SpecialCake
         );
 
-        var result = (BredPalReference)new AttackResultMaterializer(context, settings)
-            .Materialize(root, selectedEntry);
+        var result = (BredPalReference)MaterializeSingle(new AttackResultMaterializer(context, settings), root, selectedEntry);
         var expectedBreedings = BredPalReferenceEffort.WithGuaranteedGender(
             SolverTestScenario.DB,
             child,
@@ -112,20 +141,19 @@ public class AttackResultMaterializerTests
 
         Assert.IsTrue(expectedBreedings > 1);
         Assert.AreEqual(expectedBreedings, result.AvgRequiredBreedings);
-        Assert.AreEqual(expectedBreedings, result.AttackProfile.Entries.Single().TotalSpecialCakes);
-        Assert.AreEqual(expectedBreedings, result.MaterializedAttackInheritance.SpecialCakes);
+        Assert.AreEqual(expectedBreedings, result.ExpectedSpecialCakes);
+        Assert.AreEqual(expectedBreedings, result.SelfSpecialCakes);
     }
 
     [TestMethod]
     public void Materialize_CakeUsesTheFixedInheritancePassiveProbability()
     {
-        var selectedEntry = Entry(mask: 1, cakes: 2);
+        var selectedEntry = (byte)(3);
         var root = Bred(
-            Leaf(1),
+            Leaf(3),
             Leaf(0),
             new AttackProfile(selectedEntry),
-            passivesProbability: 0.25f,
-            specialCakePassivesProbability: 0.5f
+            passivesProbability: 0.5f, method: BreedingMethod.SpecialCake
         );
 
         var result = Materialize(root, selectedEntry);
@@ -133,19 +161,75 @@ public class AttackResultMaterializerTests
         Assert.AreEqual(AttackInheritanceMode.InheritAll, result.MaterializedAttackInheritance.Mode);
         Assert.AreEqual(0.5f, result.PassivesProbability);
         Assert.AreEqual(2, result.AvgRequiredBreedings);
-        Assert.AreEqual(2, result.MaterializedAttackInheritance.SpecialCakes);
+        Assert.AreEqual(2, result.SelfSpecialCakes);
+    }
+
+    [TestMethod]
+    public void Materialize_CakeOnlyOutcomeAssignsCakesOnEveryRequiredEdge()
+    {
+        var intermediateEntry = (byte)(3);
+        var intermediate = Bred(
+            Leaf(3), Leaf(0), new AttackProfile(intermediateEntry),
+            passivesProbability: 0.5f, method: BreedingMethod.SpecialCake
+        );
+        var rootEntry = (byte)(3);
+        var root = Bred(
+            intermediate, Leaf(0), new AttackProfile(rootEntry),
+            passivesProbability: 0.5f, method: BreedingMethod.SpecialCake
+        );
+
+        Assert.AreEqual(2, root.AvgRequiredBreedings);
+        var result = Materialize(root, rootEntry);
+        var parent = new[] { result.Parent1, result.Parent2 }.OfType<BredPalReference>().Single();
+
+        Assert.AreEqual(AttackInheritanceMode.InheritAll, parent.MaterializedAttackInheritance.Mode);
+        Assert.AreEqual(AttackInheritanceMode.InheritAll, result.MaterializedAttackInheritance.Mode);
+        Assert.AreEqual(2, parent.SelfSpecialCakes);
+        Assert.AreEqual(2, result.SelfSpecialCakes);
+        Assert.AreEqual(4, result.ExpectedSpecialCakes);
+        Assert.AreEqual(0.5f, result.PassivesProbability);
+    }
+
+    [TestMethod]
+    public void Materialize_CakeOnlyOutcomeCannotFallBackToNormalInheritance()
+    {
+        var ordinaryEntry = (byte)(1);
+        var root = Bred(
+            Leaf(1), Leaf(0), new AttackProfile(ordinaryEntry),
+            method: BreedingMethod.SpecialCake
+        );
+
+        Assert.ThrowsException<InvalidOperationException>(() => Materialize(root, ordinaryEntry));
+    }
+
+    [TestMethod]
+    public void Materialize_NormalChoiceUsesOnlyOrdinaryPassiveProbability()
+    {
+        var ordinaryEntry = (byte)(1);
+        var root = Bred(
+            Leaf(1), Leaf(0), new AttackProfile(ordinaryEntry),
+            passivesProbability: 0.25f
+        );
+
+        Assert.AreEqual(4, root.AvgRequiredBreedings);
+        var result = Materialize(root, ordinaryEntry);
+
+        Assert.AreEqual(AttackInheritanceMode.Normal, result.MaterializedAttackInheritance.Mode);
+        Assert.AreEqual(0.25f, result.PassivesProbability);
+        Assert.AreEqual(8, result.AvgRequiredBreedings);
+        Assert.AreEqual(0, result.ExpectedSpecialCakes);
     }
 
     [TestMethod]
     public void Materialize_RecursivelyCalculatesParentAndChildEffort()
     {
-        var intermediateEntry = Entry(mask: 1, cakes: 0);
+        var intermediateEntry = (byte)(1);
         var intermediate = Bred(
             Leaf(1),
             Leaf(0),
             new AttackProfile(intermediateEntry)
         );
-        var rootEntry = Entry(mask: 1, cakes: 0);
+        var rootEntry = (byte)(1);
 
         var result = Materialize(
             Bred(intermediate, Leaf(0), new AttackProfile(rootEntry)),
@@ -174,17 +258,17 @@ public class AttackResultMaterializerTests
     [TestMethod]
     public void Materialize_PropagatesRecursiveCakeTotalsExplicitly()
     {
-        var intermediateEntry = Entry(mask: 1, cakes: 2);
+        var intermediateEntry = (byte)(3);
         var intermediate = Bred(
-            Leaf(1, cakes: 1),
+            Leaf(3, cakes: 1),
             Leaf(0),
-            new AttackProfile(intermediateEntry)
+            new AttackProfile(intermediateEntry), method: BreedingMethod.SpecialCake
         );
-        var rootEntry = Entry(mask: 1, cakes: 3);
+        var rootEntry = (byte)(3);
         var root = Bred(
             intermediate,
             Leaf(0),
-            new AttackProfile(rootEntry)
+            new AttackProfile(rootEntry), method: BreedingMethod.SpecialCake
         );
 
         var result = Materialize(root, rootEntry);
@@ -192,15 +276,15 @@ public class AttackResultMaterializerTests
             .OfType<BredPalReference>()
             .Single();
 
-        Assert.AreEqual(2, materializedIntermediate.AttackProfile.Entries.Single().TotalSpecialCakes);
-        Assert.AreEqual(3, result.AttackProfile.Entries.Single().TotalSpecialCakes);
-        Assert.AreEqual(1, result.MaterializedAttackInheritance.SpecialCakes);
+        Assert.AreEqual(2, materializedIntermediate.ExpectedSpecialCakes);
+        Assert.AreEqual(3, result.ExpectedSpecialCakes);
+        Assert.AreEqual(1, result.SelfSpecialCakes);
     }
 
     [TestMethod]
     public void Materialize_ChoosesLowerActualEffortForEqualSearchWitnesses()
     {
-        var selectedEntry = Entry(mask: 1, cakes: 0);
+        var selectedEntry = (byte)(1);
         var parent2 = Leaf(0);
         var parent2WithTarget = Leaf(1);
         var parent2Profile = new OwnedPalReference(
@@ -208,8 +292,8 @@ public class AttackResultMaterializerTests
             [],
             new IV_Set(),
             new AttackProfile(
-                Entry(0),
-                Entry(1)
+                (byte)(0),
+                (byte)(1)
             )
         );
         var root = Bred(
@@ -230,63 +314,18 @@ public class AttackResultMaterializerTests
     }
 
     [TestMethod]
-    public void Materialize_ChoosesLowerActualCakeTotalForEqualSearchWitnesses()
+    public void Materialize_RejectsCakeForSingleNonInnateAttack()
     {
-        var child = SolverTestScenario.DB.Pals.First(p =>
-            SolverTestScenario.DB.BreedingGenderProbability[p][PalGender.MALE] < 0.5f &&
-            SolverTestScenario.DB.ActiveSkills.Any(attack =>
-                attack.CanInherit && !p.Level1AttackInternalIds.Contains(attack.InternalName)
-            )
-        );
-        var targetAttack = SolverTestScenario.DB.ActiveSkills.First(attack =>
-            attack.CanInherit && !child.Level1AttackInternalIds.Contains(attack.InternalName)
-        );
-        var context = new AttackTargetContext(
-            new PalSpecifier { Pal = child, RequiredAttacks = [targetAttack] },
-            SolverTestScenario.DB
-        );
-        var settings = Settings();
-        var searchProfile = new AttackProfile(
-            Entry(0),
-            Entry(1, cakes: 1)
-        );
-        var genderAdjustedParent = Bred(
-            Leaf(targetAttack, 1),
-            Leaf(targetAttack, 0),
-            searchProfile,
-            child,
-            PalGender.MALE,
-            settings
-        );
-        var ordinaryParent = Bred(
-            Leaf(targetAttack, 1),
-            Leaf(targetAttack, 0),
-            searchProfile,
-            child,
-            PalGender.WILDCARD,
-            settings
-        );
-        var selectedEntry = Entry(1, cakes: 2);
-        var root = Bred(
-            genderAdjustedParent,
-            ordinaryParent,
-            new AttackProfile(selectedEntry),
-            child,
-            settings: settings
-        );
-
-        var result = (BredPalReference)new AttackResultMaterializer(context, settings)
-            .Materialize(root, selectedEntry);
-
-        Assert.AreEqual(2, result.AttackProfile.Entries.Single().TotalSpecialCakes);
-        Assert.AreEqual(1, result.MaterializedAttackInheritance.SpecialCakes);
+        var entry = (byte)(1);
+        var root = Bred(Leaf(1), Leaf(0), new AttackProfile(entry), method: BreedingMethod.SpecialCake);
+        Assert.ThrowsException<InvalidOperationException>(() => Materialize(root, entry));
     }
 
     [TestMethod]
     public void Materialize_UsesReferenceIdentityForMemoization()
     {
         var instance = SolverTestScenario.Owned("Katress", PalGender.MALE);
-        var entry = Entry(0);
+        var entry = (byte)(0);
         var first = new OwnedPalReference(
             instance,
             [],
@@ -301,21 +340,21 @@ public class AttackResultMaterializerTests
         );
         var materializer = new AttackResultMaterializer(Context(), Settings());
 
-        Assert.AreSame(first, materializer.Materialize(first, entry));
-        Assert.AreSame(second, materializer.Materialize(second, entry));
+        Assert.AreSame(first, materializer.Materialize(materializer.Evaluate(first, entry).Single()));
+        Assert.AreSame(second, materializer.Materialize(materializer.Evaluate(second, entry).Single()));
     }
 
     [TestMethod]
     public void Materialize_UsesAnyAttackWhenParentHasNoRelevantLearnedAttack()
     {
         var emptyParent = SolverTestScenario.Owned("Katress", PalGender.MALE);
-        var entry = Entry(1);
+        var entry = (byte)(1);
         var root = Bred(
             new OwnedPalReference(
                 emptyParent,
                 [],
                 new IV_Set(),
-                new AttackProfile(Entry(0))
+                new AttackProfile((byte)(0))
             ),
             Leaf(1),
             new AttackProfile(entry)
@@ -340,15 +379,14 @@ public class AttackResultMaterializerTests
         );
         var emptyParent1 = SolverTestScenario.Owned("Katress", PalGender.MALE);
         var emptyParent2 = SolverTestScenario.Owned("Wixen", PalGender.FEMALE);
-        var entry = Entry(1);
+        var entry = (byte)(1);
         var root = Bred(
-            new OwnedPalReference(emptyParent1, [], new IV_Set(), new AttackProfile(Entry(0))),
-            new OwnedPalReference(emptyParent2, [], new IV_Set(), new AttackProfile(Entry(0))),
+            new OwnedPalReference(emptyParent1, [], new IV_Set(), new AttackProfile((byte)(0))),
+            new OwnedPalReference(emptyParent2, [], new IV_Set(), new AttackProfile((byte)(0))),
             new AttackProfile(entry)
         );
 
-        var result = (BredPalReference)new AttackResultMaterializer(context, Settings())
-            .Materialize(root, entry);
+        var result = (BredPalReference)MaterializeSingle(new AttackResultMaterializer(context, Settings()), root, entry);
 
         Assert.IsInstanceOfType<RandomActiveSkill>(
             result.MaterializedAttackInheritance.Parent1Loadout.Single()
@@ -361,7 +399,7 @@ public class AttackResultMaterializerTests
     [TestMethod]
     public void Materialize_PreservesNoopAttackWhenNormalInheritanceDependsOnIt()
     {
-        var entry = Entry(1);
+        var entry = (byte)(1);
         var result = Materialize(
             Bred(Leaf(0, hasNoop: true), Leaf(1), new AttackProfile(entry)),
             entry
@@ -400,7 +438,7 @@ public class AttackResultMaterializerTests
         var result = SolverTestScenario.Solve(
             SolverTestScenario.Solver(
                 [carrier, mate],
-                maxSpecialCakes: 0,
+                specialCakePolicy: SpecialCakePolicy.Never,
                 maxBreedingSteps: 1,
                 maxSolverIterations: 1
             ),
@@ -409,19 +447,18 @@ public class AttackResultMaterializerTests
             requiredAttack: requiredAttack
         ).OfType<BredPalReference>().Single();
 
-        var entry = result.AttackProfile.Entries.Single();
+        var entry = result.AttackProfile.Masks.Single();
 
         Assert.AreEqual(PalGender.MALE, result.Gender);
-        Assert.AreEqual(0, entry.TotalSpecialCakes);
+        Assert.AreEqual(0, result.ExpectedSpecialCakes);
         Assert.IsTrue(result.AvgRequiredBreedings > 0);
         Assert.IsNotNull(result.MaterializedAttackInheritance);
     }
 
     private static BredPalReference Materialize(
         BredPalReference reference,
-        AttackProfileEntry selectedEntry
-    ) => (BredPalReference)new AttackResultMaterializer(Context(), Settings())
-        .Materialize(reference, selectedEntry);
+        byte selectedEntry
+    ) => (BredPalReference)MaterializeSingle(new AttackResultMaterializer(Context(), Settings()), reference, selectedEntry);
 
     private static BredPalReference Bred(
         IPalReference parent1,
@@ -431,7 +468,7 @@ public class AttackResultMaterializerTests
         PalGender gender = PalGender.WILDCARD,
         BreedingSolverSettings? settings = null,
         float passivesProbability = 1,
-        float specialCakePassivesProbability = 1
+        BreedingMethod method = BreedingMethod.Ordinary
     )
     {
         settings ??= Settings();
@@ -443,12 +480,12 @@ public class AttackResultMaterializerTests
             parent2,
             avgRequiredBreedings: null,
             [],
-            passivesProbability,
-            specialCakePassivesProbability,
+            new BreedingOutcome(method, passivesProbability),
             new IV_Set(),
             ivsProbability: 1,
             attackProfile,
-            materializedAttackInheritance: null
+            materializedAttackInheritance: null,
+            recordedSpecialCakes: null
         );
     }
 
@@ -460,15 +497,10 @@ public class AttackResultMaterializerTests
             : SolverTestScenario.DB.ActiveSkills.First(attack =>
                 attack != TargetAttack && attack.CanInherit != hasNoop
             );
-        instance.ActiveSkills = [learnedAttack];
-        instance.EquippedActiveSkills = [learnedAttack];
+        instance.ActiveSkills = (mask & 2) != 0 ? [learnedAttack, SecondTargetAttack] : [learnedAttack];
+        instance.EquippedActiveSkills = instance.ActiveSkills;
 
-        return new(
-            instance,
-            [],
-            new IV_Set(),
-            new AttackProfile(hasNoop, Entry(mask, cakes))
-        );
+        return new SolverTestScenario.PricedOwnedReference(instance, [], new IV_Set(), new AttackProfile(hasNoop, mask), cakes);
     }
 
     private static OwnedPalReference Leaf(ActiveSkill targetAttack, byte mask, int cakes = 0)
@@ -479,25 +511,131 @@ public class AttackResultMaterializerTests
             : SolverTestScenario.DB.ActiveSkills.First(attack =>
                 attack != targetAttack && attack.CanInherit
             );
-        instance.ActiveSkills = [learnedAttack];
-        instance.EquippedActiveSkills = [learnedAttack];
+        instance.ActiveSkills = (mask & 2) != 0 ? [learnedAttack, SecondTargetAttack] : [learnedAttack];
+        instance.EquippedActiveSkills = instance.ActiveSkills;
 
-        return new(
-            instance,
-            [],
-            new IV_Set(),
-            new AttackProfile(Entry(mask, cakes))
-        );
+        return new SolverTestScenario.PricedOwnedReference(instance, [], new IV_Set(), new AttackProfile(mask), cakes);
     }
 
-    private static AttackProfileEntry Entry(byte mask, int cakes = 0) => new(mask, cakes);
+    [DataTestMethod]
+    [DataRow(3)]
+    [DataRow(6)]
+    public void SharedSubtreesAreEvaluatedOnceAndConstructedOnlyAfterSelection(int attackCount)
+    {
+        var settings = Settings();
+        var attacks = SolverTestScenario.DB.ActiveSkills.Where(attack => attack.CanInherit &&
+            !Child.Level1ActiveSkills(SolverTestScenario.DB).Contains(attack)).Take(attackCount).ToList();
+        var context = new AttackTargetContext(new PalSpecifier { RequiredAttacks = attacks }, settings.DB);
+        var mask = (byte)((1 << attackCount) - 1);
+        var instance = SolverTestScenario.Owned("Katress", PalGender.MALE);
+        instance.ActiveSkills = attacks;
+        instance.EquippedActiveSkills = attacks.Take(3).ToList();
+        IPalReference root = new OwnedPalReference(instance, [], new IV_Set(),
+            new AttackProfile(Enumerable.Range(0, mask + 1).Select(i => (byte)i).ToArray()));
+        var cakes = 0;
+        for (var depth = 0; depth < 6; depth++)
+        {
+            cakes = 2 * cakes + 1;
+            root = Bred(root, root, new AttackProfile((byte)(mask)),
+                settings: settings, method: BreedingMethod.SpecialCake);
+        }
+        var materializer = new AttackResultMaterializer(context, settings);
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        var allocated = GC.GetAllocatedBytesForCurrentThread();
+
+        var evaluated = materializer.Evaluate(root, mask);
+        var evaluationMs = watch.Elapsed.TotalMilliseconds;
+        var evaluationBytes = GC.GetAllocatedBytesForCurrentThread() - allocated;
+        Assert.AreEqual(0, materializer.MaterializedCount);
+        Assert.AreEqual(1, evaluated.Count);
+        Assert.IsTrue(materializer.EvaluatedStateCount <= mask + 7);
+        Assert.IsTrue(materializer.EvaluationCacheHits > 0);
+        watch.Restart();
+        allocated = GC.GetAllocatedBytesForCurrentThread();
+        var realized = materializer.Materialize(evaluated.Single());
+        TestContext.WriteLine(
+            $"{attackCount} attacks: evaluation {evaluationMs:F3} ms / {evaluationBytes} bytes; " +
+            $"materialization {watch.Elapsed.TotalMilliseconds:F3} ms / " +
+            $"{GC.GetAllocatedBytesForCurrentThread() - allocated} bytes; " +
+            $"{materializer.EvaluatedStateCount} states, {materializer.EvaluationCacheHits} cache hits, " +
+            $"{materializer.MaterializedCount} materialized nodes.");
+        Assert.AreEqual(cakes, realized.ExpectedSpecialCakes);
+        Assert.AreEqual(evaluated.Single().BreedingEffort, realized.BreedingEffort);
+    }
+
+    [TestMethod]
+    public void Evaluate_PicksTheFasterWitnessForOneFixedPath()
+    {
+        var carrier = Leaf(1);
+        var parent = new OwnedPalReference(carrier.UnderlyingInstance, [], carrier.IVs, new AttackProfile(0, 1));
+        var root = Bred(parent, Leaf(1), new AttackProfile(1));
+        var materializer = new AttackResultMaterializer(Context(), Settings());
+
+        var evaluations = materializer.Evaluate(root, 1);
+        Assert.AreEqual(0, materializer.MaterializedCount);
+        var chosen = evaluations.Single();
+        Assert.AreEqual(1, chosen.RequiredBreedings);
+        var realized = (BredPalReference)materializer.Materialize(chosen);
+        Assert.AreEqual(chosen.BreedingEffort, realized.BreedingEffort);
+        Assert.AreEqual(chosen.TotalSpecialCakes, realized.ExpectedSpecialCakes);
+        Assert.AreSame(evaluations, materializer.Evaluate(root, 1));
+        Assert.IsTrue(materializer.EvaluationCacheHits > 0);
+    }
+
+    [TestMethod]
+    public void EqualMetricWitnessesUseDeterministicProfileTieBreaks()
+    {
+        var innate = Child.Level1ActiveSkills(SolverTestScenario.DB).First();
+        var context = new AttackTargetContext(new PalSpecifier { RequiredAttacks = [innate] },
+            SolverTestScenario.DB);
+        var leaf = Leaf(0);
+        var parent = new OwnedPalReference(leaf.UnderlyingInstance, [], leaf.IVs,
+            new AttackProfile((byte)(1), (byte)(0)));
+        var root = Bred(parent, parent, new AttackProfile((byte)(1)));
+        var materializer = new AttackResultMaterializer(context, Settings());
+
+        var evaluation = materializer.Evaluate(root, 1).Single();
+
+        Assert.AreEqual(AttackInheritanceMode.Baseline, evaluation.Choice!.Value.Mode);
+        Assert.AreEqual((byte)0, evaluation.Parent1.TargetMask);
+        Assert.AreEqual((byte)0, evaluation.Parent2.TargetMask);
+    }
+
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void EffortBoundsRemainLowerThroughGenderSurgeryAndTraining(bool parallelFarms)
+    {
+        var settings = Settings();
+        settings.GameSettings.MultipleBreedingFarms = parallelFarms;
+        var leaf = Leaf(1);
+        var trained = new OwnedPalReference(leaf.UnderlyingInstance, [], leaf.IVs,
+            leaf.AttackProfile, new LevelRequirements(1, 50));
+        var parent = Bred(trained, Leaf(0), new AttackProfile((byte)(1)),
+            gender: PalGender.FEMALE, settings: settings, passivesProbability: .25f);
+        var other = Bred(Leaf(0), Leaf(0), new AttackProfile((byte)(0)), settings: settings);
+        var root = Bred(parent, other, new AttackProfile((byte)(1)), settings: settings);
+        var wrapped = new SurgeryTablePalReference(root, []);
+        var materializer = new AttackResultMaterializer(Context(), settings);
+        var bounds = materializer.LowerBounds(wrapped);
+
+        foreach (var result in materializer.Evaluate(wrapped, 1))
+        {
+            Assert.IsTrue(bounds.Covers(result.Metrics));
+            Assert.AreEqual(result.BreedingEffort, materializer.Materialize(result).BreedingEffort);
+        }
+    }
 
     private static AttackTargetContext Context() =>
         new(
-            new PalSpecifier { RequiredAttacks = [TargetAttack] },
+            new PalSpecifier { RequiredAttacks = [TargetAttack, SecondTargetAttack] },
             SolverTestScenario.DB
         );
 
     private static BreedingSolverSettings Settings() =>
-        SolverTestScenario.Solver([], maxSpecialCakes: null).Settings;
+        SolverTestScenario.Solver([], specialCakePolicy: SpecialCakePolicy.AttackInheritanceOnly).Settings;
+    private static IPalReference MaterializeSingle(
+        AttackResultMaterializer materializer, IPalReference reference, byte entry) =>
+        materializer.Materialize(materializer.Evaluate(reference, entry).Single());
+
 }

@@ -63,10 +63,10 @@ internal sealed class InitialPalBuilder(
                         Attack = MakeIV(target.IV_Attack, p.IV_Attack),
                         Defense = MakeIV(target.IV_Defense, p.IV_Defense),
                     },
-                    attackProfile: attackTargets.IsActive
+                    attackProfile: attackTargets.HasRequiredAttacks
                         ? new(
                             learnedAttacks.Any(attack => !attack.CanInherit),
-                            new AttackProfileEntry(attackTargets.MaskOf(learnedAttacks), 0)
+                            attackTargets.MaskOf(learnedAttacks)
                         )
                         : AttackProfile.Inactive
                 );
@@ -153,10 +153,10 @@ internal sealed class InitialPalBuilder(
                                 guaranteedPassives,
                                 numRandomPassives,
                                 mechanics,
-                                attackProfile: attackTargets.IsActive
+                                attackProfile: attackTargets.HasRequiredAttacks
                                     ? new(
                                         wildAttacks.Any(attack => !attack.CanInherit),
-                                        new AttackProfileEntry(attackTargets.MaskOf(wildAttacks), 0)
+                                        attackTargets.MaskOf(wildAttacks)
                                     )
                                     : AttackProfile.Inactive,
                                 levelRequirements: null
@@ -171,14 +171,14 @@ internal sealed class InitialPalBuilder(
     private IEnumerable<IPalReference> TrainingVariants(IPalReference reference)
     {
         yield return reference;
-        if (!attackTargets.IsActive || !settings.TrainPals)
+        if (!attackTargets.HasRequiredAttacks || !settings.TrainPals)
             yield break;
 
         var initialLevel = reference is OwnedPalReference owned
             ? owned.UnderlyingInstance.Level
             : reference.Pal.MinWildLevel ?? 1;
         var schedule = reference.Pal.AttackLeveling(settings.DB).ToArray();
-        var initialMask = reference.AttackProfile.Entries.Single().LearnedTargetMask;
+        var initialMask = reference.AttackProfile.Masks.Single();
         var levels = schedule
             .Where(entry => entry.Level > initialLevel &&
                 (attackTargets.MaskOf([entry.Attack]) & ~initialMask) != 0)
@@ -194,7 +194,7 @@ internal sealed class InitialPalBuilder(
             previousMask = mask;
             var profile = new AttackProfile(
                 reference.AttackProfile.HasNoopAttack || gained.Any(attack => !attack.CanInherit),
-                new AttackProfileEntry(mask, 0)
+                mask
             );
             var requirements = new LevelRequirements(initialLevel, finalLevel);
             yield return reference switch

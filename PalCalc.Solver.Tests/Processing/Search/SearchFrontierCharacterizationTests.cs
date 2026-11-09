@@ -101,7 +101,8 @@ public class SearchFrontierCharacterizationTests
             attackTargets: new AttackTargetContext(
                 new PalSpecifier { RequiredAttacks = [requiredAttack] },
                 SolverTestScenario.DB
-            )
+            ),
+            considerPassiveCakes: false
         );
         var first = new TestPalReference(
             "first",
@@ -150,7 +151,8 @@ public class SearchFrontierCharacterizationTests
             attackTargets: new AttackTargetContext(
                 new PalSpecifier { RequiredAttacks = [requiredAttack] },
                 SolverTestScenario.DB
-            )
+            ),
+            considerPassiveCakes: false
         );
         var statePal = "Katress".ToPal(SolverTestScenario.DB);
         var dominating = new TestPalReference(
@@ -198,7 +200,8 @@ public class SearchFrontierCharacterizationTests
         var policy = new DefaultCandidateSelectionPolicy(
             new(token => [new ResultLimitPruning(token, maxResults: 3)]),
             CancellationToken.None,
-            attackTargets: attackTargets
+            attackTargets: attackTargets,
+            considerPassiveCakes: false
         );
         var initial = new TestPalReference(
             "initial",
@@ -381,15 +384,15 @@ public class SearchFrontierCharacterizationTests
         var policy = new DefaultCandidateSelectionPolicy(
             MinimumEffortOnly,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var frontier = new SearchFrontier(
             target,
             [slower],
             maxThreads: 1,
             new SolverStateController(CancellationToken.None),
-            policy,
-            attackTargets
+            policy
         );
         var filter = new CandidatePreFilter(
             target,
@@ -422,7 +425,8 @@ public class SearchFrontierCharacterizationTests
         var policy = new DefaultCandidateSelectionPolicy(
             MinimumEffortOnly,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var input = new TestPalReference(
             "input",
@@ -439,8 +443,7 @@ public class SearchFrontierCharacterizationTests
             [],
             maxThreads: 1,
             new SolverStateController(CancellationToken.None),
-            policy,
-            attackTargets
+            policy
         );
 
         frontier.ExpandSingles(_ => [surgery]);
@@ -485,14 +488,14 @@ public class SearchFrontierCharacterizationTests
             parent1: parent1,
             parent2: parent2,
             passives: [],
-            passivesProbability: 1,
-            specialCakePassivesProbability: 1,
+            outcome: new(BreedingMethod.Ordinary, 1),
             ivs: new IV_Set(),
             ivsProbability: 1,
             attackProfile: AttackProfile.Inactive,
             materializedAttackInheritance: null,
             avgRequiredBreedings: null,
-            gender: PalGender.WILDCARD
+            gender: PalGender.WILDCARD,
+            recordedSpecialCakes: null
         );
 
     private static SearchFrontier FrontierFor(
@@ -518,15 +521,13 @@ public class SearchFrontierCharacterizationTests
             selectionPolicy: selectionPolicy ?? new DefaultCandidateSelectionPolicy(
                 MinimumEffortOnly,
                 controller.CancellationToken,
-                attackTargets: null
-            ),
-            attackTargets: null
+                attackTargets: null,
+                considerPassiveCakes: false
+            )
         );
     }
 
-    private static AttackProfile Profile(params byte[] masks) => new(masks.Select(mask =>
-        new AttackProfileEntry(mask, 0)
-    ).ToArray());
+    private static AttackProfile Profile(params byte[] masks) => new(masks);
 
     /*
      * Deliberately minimal reference used to characterize frontier mechanics without

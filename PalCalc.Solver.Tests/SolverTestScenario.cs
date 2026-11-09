@@ -44,6 +44,13 @@ internal static class SolverTestScenario
         };
     }
 
+    internal sealed class PricedOwnedReference(PalInstance instance, List<PassiveSkill> passives,
+        IV_Set ivs, AttackProfile profile, int cakes)
+        : OwnedPalReference(instance, passives, ivs, profile), IPalReference
+    {
+        public int ExpectedSpecialCakes => cakes;
+    }
+
     public static ConfiguredSolver Solver(
         IEnumerable<PalInstance> ownedPals,
         int maxBreedingSteps = 4,
@@ -58,7 +65,7 @@ internal static class SolverTestScenario
         bool skipSurgeryPassivesDuringSearch = false,
         IEnumerable<Pal>? allowedWildPals = null,
         IEnumerable<Pal>? bannedBredPals = null,
-        int? maxSpecialCakes = 0,
+        SpecialCakePolicy specialCakePolicy = SpecialCakePolicy.Never,
         bool trainPals = true
     ) =>
         new(
@@ -82,7 +89,7 @@ internal static class SolverTestScenario
                 allowedSurgeryPassives: allowedSurgeryPassives?.ToList() ?? [],
                 skipSurgeryPassivesDuringSearch: skipSurgeryPassivesDuringSearch,
                 useGenderReversers: false,
-                maxSpecialCakes: maxSpecialCakes,
+                specialCakePolicy: specialCakePolicy,
                 trainPals: trainPals
             )
         );
@@ -90,8 +97,9 @@ internal static class SolverTestScenario
     public static List<IPalReference> Solve(
         ConfiguredSolver solver,
         string targetPal,
-        IEnumerable<ActiveSkill> requiredAttacks
-    ) => Solve(solver, targetPal, requiredAttacks, null, null, PalGender.WILDCARD, 0, 0, 0);
+        IEnumerable<ActiveSkill> requiredAttacks,
+        int ivHp = 0
+    ) => Solve(solver, targetPal, requiredAttacks, null, null, PalGender.WILDCARD, ivHp, 0, 0);
 
     public static List<IPalReference> Solve(
         ConfiguredSolver solver,
@@ -209,9 +217,7 @@ internal static class SolverTestScenario
                 ),
                 AttackProfile: string.Join(
                     "|",
-                    result.AttackProfile.Entries.Select(entry =>
-                        $"{entry.LearnedTargetMask}:{entry.TotalSpecialCakes}"
-                    )
+                    result.AttackProfile.Masks.Select(mask => $"{mask}:{result.ExpectedSpecialCakes}")
                 ),
                 IVs: result.IVs,
                 EffortTicks: result.BreedingEffort.Ticks,

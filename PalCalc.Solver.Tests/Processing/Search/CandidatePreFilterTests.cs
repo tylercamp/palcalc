@@ -22,21 +22,22 @@ public class CandidatePreFilterTests
             Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
             RequiredAttacks = [requiredAttack],
         };
-        var configuredSolver = SolverTestScenario.Solver([], maxSpecialCakes: 0);
+        var configuredSolver = SolverTestScenario.Solver([], specialCakePolicy: SpecialCakePolicy.Never);
         var settings = configuredSolver.Settings;
         var attackTargets = new AttackTargetContext(target, settings.DB);
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var incumbent = new OwnedPalReference(
             SolverTestScenario.Owned("Katress", PalGender.WILDCARD),
             [],
             new IV_Set(),
             new AttackProfile(
-                new AttackProfileEntry(0, 0),
-                new AttackProfileEntry(1, 0)
+                (byte)0,
+                (byte)1
             )
         );
         var frontier = new SearchFrontier(
@@ -44,8 +45,7 @@ public class CandidatePreFilterTests
             [incumbent],
             maxThreads: 1,
             new SolverStateController(CancellationToken.None),
-            selectionPolicy,
-            attackTargets
+            selectionPolicy
         );
         var filter = new CandidatePreFilter(
             target,
@@ -58,24 +58,17 @@ public class CandidatePreFilterTests
         );
         var parent1 = Candidate(cakes: 0);
         var parent2 = Candidate(cakes: 0);
-        var preparedProfile = new AttackProfileComposer(attackTargets, settings).Prepare(
-            child,
-            parent1,
-            parent2,
-            passivesProbability: 1,
-            specialCakePassivesProbability: 1,
-            ivsProbability: 1
-        );
+        var preparedProfile = new AttackProfileComposer(attackTargets, settings).Compose(child, parent1, parent2, BreedingMethod.Ordinary);
         var draft = new CandidateDraft(
             settings.GameSettings,
             child,
             parent1,
             parent2,
             [],
-            passivesProbability: 1,
-            specialCakePassivesProbability: 1,
+            outcome: new(BreedingMethod.Ordinary, 1),
             new IV_Set(),
             ivsProbability: 1,
+            requiredBreedings: 1,
             selfBreedingEffort: TimeSpan.FromMinutes(1),
             breedingEffort: TimeSpan.FromMinutes(1),
             preparedProfile
@@ -88,7 +81,7 @@ public class CandidatePreFilterTests
     }
 
     [TestMethod]
-    public void RetainedAttackCandidates_ExcludesReplacedChampions()
+    public void RetainedCostCandidates_ExcludesDominatedPaths()
     {
         var requiredAttack = SolverTestScenario.DB.ActiveSkills.First(attack => attack.CanInherit);
         var target = new PalSpecifier
@@ -96,13 +89,14 @@ public class CandidatePreFilterTests
             Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
             RequiredAttacks = [requiredAttack],
         };
-        var configuredSolver = SolverTestScenario.Solver([], maxSpecialCakes: 10);
+        var configuredSolver = SolverTestScenario.Solver([], specialCakePolicy: SpecialCakePolicy.AttackInheritanceOnly);
         var settings = configuredSolver.Settings;
         var attackTargets = new AttackTargetContext(target, settings.DB);
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var filter = new CandidatePreFilter(
             target,
@@ -121,7 +115,7 @@ public class CandidatePreFilterTests
 
         CollectionAssert.AreEqual(
             new IPalReference[] { better },
-            filter.RetainedAttackCandidates()
+            filter.RetainedCostCandidates()
         );
         Assert.IsTrue(first.IsOutdated);
     }
@@ -136,13 +130,14 @@ public class CandidatePreFilterTests
             RequiredGender = PalGender.FEMALE,
             RequiredAttacks = [requiredAttack],
         };
-        var configuredSolver = SolverTestScenario.Solver([], maxSpecialCakes: 0);
+        var configuredSolver = SolverTestScenario.Solver([], specialCakePolicy: SpecialCakePolicy.Never);
         var settings = configuredSolver.Settings;
         var attackTargets = new AttackTargetContext(target, settings.DB);
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var filter = new CandidatePreFilter(
             target,
@@ -181,7 +176,7 @@ public class CandidatePreFilterTests
         };
         var settings = SolverTestScenario.Solver(
             [],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxSurgeryCost: surgeryPassive.SurgeryCost,
             allowedSurgeryPassives: [surgeryPassive]
         ).Settings;
@@ -189,7 +184,8 @@ public class CandidatePreFilterTests
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var surgeryFinalists = SurgeryFinalistAccumulator.Create(
             target,
@@ -237,7 +233,7 @@ public class CandidatePreFilterTests
         };
         var settings = SolverTestScenario.Solver(
             [],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxSurgeryCost: surgeryPassive.SurgeryCost,
             allowedSurgeryPassives: [surgeryPassive]
         ).Settings;
@@ -245,7 +241,8 @@ public class CandidatePreFilterTests
         var selectionPolicy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets
+            attackTargets,
+            considerPassiveCakes: false
         );
         var surgeryFinalists = SurgeryFinalistAccumulator.Create(
             target,
@@ -270,20 +267,13 @@ public class CandidatePreFilterTests
             parent1,
             parent2,
             [],
-            passivesProbability: 1,
-            specialCakePassivesProbability: 1,
+            outcome: new(BreedingMethod.Ordinary, 1),
             new IV_Set(),
             ivsProbability: 1,
+            requiredBreedings: 1,
             selfBreedingEffort: TimeSpan.FromMinutes(1),
             breedingEffort: TimeSpan.FromMinutes(1),
-            new AttackProfileComposer(attackTargets, settings).Prepare(
-                child,
-                parent1,
-                parent2,
-                passivesProbability: 1,
-                specialCakePassivesProbability: 1,
-                ivsProbability: 1
-            )
+            new AttackProfileComposer(attackTargets, settings).Compose(child, parent1, parent2, BreedingMethod.Ordinary)
         );
 
         var result = filter.TryAdd(ref draft);
@@ -295,11 +285,12 @@ public class CandidatePreFilterTests
     }
 
     private static OwnedPalReference Candidate(int cakes) =>
-        new(
+        new SolverTestScenario.PricedOwnedReference(
             SolverTestScenario.Owned("Katress", PalGender.MALE),
             [],
             new IV_Set(),
-            new AttackProfile(new AttackProfileEntry(1, cakes))
+            new AttackProfile(1),
+            cakes
         );
 
     private sealed class PotentialImprovementFrontier : ICandidateFrontierView
@@ -331,7 +322,7 @@ public class CandidatePreFilterTests
         public int EffectivePassivesHash => 0;
         public IV_Set IVs { get; } = new();
         public List<PassiveSkill> ActualPassives { get; } = [];
-        public AttackProfile AttackProfile { get; } = new(new AttackProfileEntry(1, 0));
+        public AttackProfile AttackProfile { get; } = new((byte)1);
         public PalGender Gender { get; } = gender;
         public float TimeFactor => 1;
         public IPalRefLocation Location => BredRefLocation.Instance;

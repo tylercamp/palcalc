@@ -176,6 +176,13 @@ namespace PalCalc.UI.ViewModel.Solver
             set => SetProperty(ref useGenderReversers, value);
         }
 
+        private bool allowSpecialCakesForPassives;
+        public bool AllowSpecialCakesForPassives
+        {
+            get => allowSpecialCakesForPassives;
+            set => SetProperty(ref allowSpecialCakesForPassives, value);
+        }
+
         private bool skipSurgerySearch;
         public bool SkipSurgerySearch
         {
@@ -299,7 +306,9 @@ namespace PalCalc.UI.ViewModel.Solver
                 allowedSurgeryPassives: PalDB.LoadEmbedded().SurgeryPassiveSkills.Except(BannedSurgeryPassives).ToList(),
                 skipSurgeryPassivesDuringSearch: SkipSurgerySearch,
                 useGenderReversers: UseGenderReversers,
-                maxSpecialCakes: int.MaxValue,
+                specialCakePolicy: AllowSpecialCakesForPassives
+                    ? SpecialCakePolicy.AttacksAndPassives
+                    : SpecialCakePolicy.AttackInheritanceOnly,
                 trainPals: true
             );
 
@@ -317,6 +326,7 @@ namespace PalCalc.UI.ViewModel.Solver
             SkipSurgerySearch = SkipSurgerySearch,
             MaxGoldCost = MaxGoldCost,
             UseGenderReversers = UseGenderReversers,
+            AllowSpecialCakesForPassives = AllowSpecialCakesForPassives,
         };
 
         public void CopyFrom(SerializableSolverSettings model)
@@ -329,6 +339,7 @@ namespace PalCalc.UI.ViewModel.Solver
             MaxThreads = model.MaxThreads;
             MaxGoldCost = model.MaxGoldCost;
             UseGenderReversers = model.UseGenderReversers;
+            AllowSpecialCakesForPassives = model.AllowSpecialCakesForPassives;
             SkipSurgerySearch = model.SkipSurgerySearch;
 
             BannedBredPals = model.BannedBredPals(PalDB.LoadEmbedded());

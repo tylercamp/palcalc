@@ -67,9 +67,7 @@ internal sealed class FrontierIndex(IEffectivePropertiesKeyProvider keyProvider)
             .CompareTo(BitOperations.PopCount(left.AttackProfile.EntryTargetMasks));
         if (comparison != 0) return comparison;
 
-        comparison = MinimumSpecialCakes(left.AttackProfile).CompareTo(
-            MinimumSpecialCakes(right.AttackProfile)
-        );
+        comparison = left.BaseSpecialCakes.CompareTo(right.BaseSpecialCakes);
         if (comparison != 0) return comparison;
 
         comparison = left.BreedingEffort.CompareTo(right.BreedingEffort);
@@ -82,14 +80,6 @@ internal sealed class FrontierIndex(IEffectivePropertiesKeyProvider keyProvider)
         if (comparison != 0) return comparison;
 
         return TotalMinIV(right).CompareTo(TotalMinIV(left));
-    }
-
-    private static int MinimumSpecialCakes(AttackProfile profile)
-    {
-        var minimum = int.MaxValue;
-        foreach (ref readonly var entry in profile.EntriesSpan)
-            minimum = Math.Min(minimum, entry.TotalSpecialCakes);
-        return minimum;
     }
 
     private static int TotalMaxIV(IPalReference candidate) =>

@@ -6,8 +6,10 @@ using PalCalc.Solver.PalReference.Properties;
 using PalCalc.UI.Model;
 using PalCalc.UI.Persistence.Dto;
 using PalCalc.UI.ViewModel.Solver;
+using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using GameSettingsModel = PalCalc.Model.GameSettings;
 
@@ -15,6 +17,8 @@ namespace PalCalc.UI.Persistence.Serialization
 {
     internal static class ResultJsonSerializer
     {
+        private static readonly ILogger logger = Log.ForContext(typeof(ResultJsonSerializer));
+
         public static BreedingResultListDto FromCurrentJson(string json) =>
             JsonConvert.DeserializeObject<BreedingResultListDto>(json)
             ?? throw new JsonSerializationException("Result document was empty.");
@@ -25,7 +29,8 @@ namespace PalCalc.UI.Persistence.Serialization
             BreedingResultListViewModel value,
             PalDB db,
             GameSettingsModel currentGameSettings,
-            PalSpecifier target)
+            PalSpecifier target
+        )
         {
             var settings = value.SettingsSnapshot ?? new BreedingResultListViewModelSettingsSnapshot
             {
@@ -44,10 +49,7 @@ namespace PalCalc.UI.Persistence.Serialization
             BreedingResultDto ToDto(BreedingResultViewModel result) => new()
             {
                 PalReference = ResultJsonSerializer.ToDto(result.DisplayedResult),
-                CheckedNodes = result.Graph?.Nodes
-                    .Select((node, index) => node.IsChecked ? index : -1)
-                    .Where(index => index >= 0)
-                    .ToList(),
+                CheckedNodes = result.CheckedNodeIndices,
             };
         }
 
@@ -60,6 +62,10 @@ namespace PalCalc.UI.Persistence.Serialization
             GameSettingsSnapshotDto storedGameSettings,
             SolverSettingsSnapshotDto storedSolverSettings)
         {
+            var timer = Stopwatch.StartNew();
+            var stage = new Stopwatch();
+            var referenceTime = TimeSpan.Zero;
+            var viewModelTime = TimeSpan.Zero;
             var gameSettings = FromDto(storedGameSettings ?? value.GameSettings);
             var solverSettings = FromDto(storedSolverSettings ?? value.SolverSettings, db);
 
@@ -72,18 +78,15 @@ namespace PalCalc.UI.Persistence.Serialization
                 },
                 Results = value.Results.Select(item =>
                 {
+                    stage.Restart();
                     var displayedResult = FromDto(item.PalReference, db, gameSettings, solverSettings);
-                    var vm = new BreedingResultViewModel(cachedSave, gameSettings, displayedResult, target.RequiredAttacks);
-
-                    if (item.CheckedNodes != null && vm.Graph != null)
+                    referenceTime += stage.Elapsed;
+                    stage.Restart();
+                    var vm = new BreedingResultViewModel(cachedSave, gameSettings, displayedResult, target.RequiredAttacks)
                     {
-                        foreach (var index in item.CheckedNodes)
-                        {
-                            if (index >= 0 && index < vm.Graph.Nodes.Count)
-                                vm.Graph.Nodes[index].IsChecked = true;
-                        }
-                    }
-
+                        CheckedNodeIndices = item.CheckedNodes,
+                    };
+                    viewModelTime += stage.Elapsed;
                     return vm;
                 }).ToList(),
             };
@@ -91,6 +94,9 @@ namespace PalCalc.UI.Persistence.Serialization
             if (value.SelectedResultIndex >= 0 && value.SelectedResultIndex < result.Results.Count)
                 result.SelectedResult = result.Results[value.SelectedResultIndex];
 
+            logger.Debug("Load profiling: results for {Pal}, {Results} results: references {ReferenceMs:F1} ms, result rows {ViewModelMs:F1} ms, total {TotalMs:F1} ms",
+                target.Pal.InternalName, result.Results.Count,
+                referenceTime.TotalMilliseconds, viewModelTime.TotalMilliseconds, timer.Elapsed.TotalMilliseconds);
             return result;
         }
 
@@ -127,6 +133,7 @@ namespace PalCalc.UI.Persistence.Serialization
             MaxGoldCost = value.MaxGoldCost,
             SkipSurgerySearch = value.SkipSurgerySearch,
             UseGenderReversers = value.UseGenderReversers,
+            AllowSpecialCakesForPassives = value.AllowSpecialCakesForPassives,
             BannedBredPalInternalNames = value.BannedBredPalInternalNames.ToList(),
             BannedWildPalInternalNames = value.BannedWildPalInternalNames.ToList(),
             BannedSurgeryPassiveInternalNames = value.BannedSurgeryPassiveInternalNames.ToList(),
@@ -143,6 +150,7 @@ namespace PalCalc.UI.Persistence.Serialization
             MaxGoldCost = value.MaxGoldCost,
             SkipSurgerySearch = value.SkipSurgerySearch,
             UseGenderReversers = value.UseGenderReversers,
+            AllowSpecialCakesForPassives = value.AllowSpecialCakesForPassives,
             BannedBredPalInternalNames = value.BannedBredPalInternalNames.ToList(),
             BannedWildPalInternalNames = value.BannedWildPalInternalNames.ToList(),
             BannedSurgeryPassiveInternalNames = value.BannedSurgeryPassiveInternalNames.ToList(),
@@ -180,7 +188,7 @@ namespace PalCalc.UI.Persistence.Serialization
                 IVs = ToDto(bred.IVs),
                 IVsProbability = bred.IVsProbability,
                 AvgRequiredBreedings = bred.AvgRequiredBreedings,
-                MaterializedAttackInheritance = ToDto(bred.MaterializedAttackInheritance),
+                MaterializedAttackInheritance = ToDtoInheritance(bred),
             },
             CompositeOwnedPalReference composite => new()
             {
@@ -253,42 +261,57 @@ namespace PalCalc.UI.Persistence.Serialization
                 FromDto(value.Parent2, db, settings, solverSettings),
                 value.AvgRequiredBreedings,
                 value.EffectivePassiveInternalNames.Select(name => name.InternalToStandardPassive(db)).ToList(),
-                value.PassivesProbability.Value, // These values only differ during solving
-                value.PassivesProbability.Value, // 
+                new BreedingOutcome(
+                    value.MaterializedAttackInheritance?.Mode == AttackInheritanceMode.InheritAll
+                        ? BreedingMethod.SpecialCake : BreedingMethod.Ordinary,
+                    value.PassivesProbability.Value
+                ),
                 FromDto(value.IVs),
                 value.IVsProbability.Value,
                 AttackProfile.Inactive,
-                materializedAttackInheritance
+                materializedAttackInheritance,
+                recordedSpecialCakes: value.MaterializedAttackInheritance?.SpecialCakes
             );
             return value.AvgRequiredBreedings is null
                 ? result.WithGuaranteedGender(db, value.Gender.Value, solverSettings.UseGenderReversers)
                 : result;
         }
 
-        private static MaterializedAttackInheritanceDto ToDto(MaterializedAttackInheritance value) => value == null
-            ? null
-            : new MaterializedAttackInheritanceDto
-            {
-                Mode = value.Mode,
-                Parent1LoadoutInternalNames = value.Parent1Loadout.Select(attack => attack.InternalName).ToList(),
-                Parent2LoadoutInternalNames = value.Parent2Loadout.Select(attack => attack.InternalName).ToList(),
-                InheritedAttackInternalNames = value.InheritedAttacks.Select(attack => attack.InternalName).ToList(),
-                ChildLearnedAttackInternalNames = value.ChildLearnedAttacks.Select(attack => attack.InternalName).ToList(),
-                SpecialCakes = value.SpecialCakes,
-                AttackProbability = value.AttackProbability,
-            };
+        private static MaterializedAttackInheritanceDto ToDtoInheritance(BredPalReference bred)
+        {
+            var attacks = bred.MaterializedAttackInheritance;
+            if (attacks is null && bred.Outcome.Method == BreedingMethod.Ordinary && bred.SelfSpecialCakes == 0)
+                return null;
 
-        private static MaterializedAttackInheritance FromDto(MaterializedAttackInheritanceDto value, PalDB db) => value == null
-            ? null
-            : new MaterializedAttackInheritance(
-                value.Mode,
-                value.Parent1LoadoutInternalNames.Select(name => name.InternalToActive(db)).ToList(),
-                value.Parent2LoadoutInternalNames.Select(name => name.InternalToActive(db)).ToList(),
-                value.InheritedAttackInternalNames.Select(name => name.InternalToActive(db)).ToList(),
-                value.ChildLearnedAttackInternalNames.Select(name => name.InternalToActive(db)).ToList(),
-                value.SpecialCakes,
-                value.AttackProbability
-            );
+            // The existing format stores cake use with attack instructions.
+            // Empty loadouts carry a passive-only cake step without instructions.
+            return new MaterializedAttackInheritanceDto
+            {
+                Mode = bred.Outcome.Method == BreedingMethod.SpecialCake
+                    ? AttackInheritanceMode.InheritAll
+                    : attacks?.Mode ?? AttackInheritanceMode.Baseline,
+                Parent1LoadoutInternalNames = attacks?.Parent1Loadout.Select(attack => attack.InternalName).ToList() ?? [],
+                Parent2LoadoutInternalNames = attacks?.Parent2Loadout.Select(attack => attack.InternalName).ToList() ?? [],
+                InheritedAttackInternalNames = attacks?.InheritedAttacks.Select(attack => attack.InternalName).ToList() ?? [],
+                ChildLearnedAttackInternalNames = attacks?.ChildLearnedAttacks.Select(attack => attack.InternalName).ToList() ?? [],
+                SpecialCakes = bred.SelfSpecialCakes,
+                AttackProbability = attacks?.AttackProbability ?? 1,
+            };
+        }
+
+        private static MaterializedAttackInheritance FromDto(MaterializedAttackInheritanceDto value, PalDB db) =>
+            value == null || (value.Mode == AttackInheritanceMode.InheritAll &&
+                value.Parent1LoadoutInternalNames.Count == 0 && value.Parent2LoadoutInternalNames.Count == 0 &&
+                value.InheritedAttackInternalNames.Count == 0 && value.ChildLearnedAttackInternalNames.Count == 0)
+                ? null
+                : new MaterializedAttackInheritance(
+                    value.Mode,
+                    value.Parent1LoadoutInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                    value.Parent2LoadoutInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                    value.InheritedAttackInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                    value.ChildLearnedAttackInternalNames.Select(name => name.InternalToActive(db)).ToList(),
+                    value.AttackProbability
+                );
 
         private static SurgeryOperationDto ToDto(ISurgeryOperation value) => value switch
         {

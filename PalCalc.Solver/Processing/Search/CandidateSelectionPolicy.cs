@@ -2,7 +2,6 @@ using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.ResultPruning;
-using System.Numerics;
 
 namespace PalCalc.Solver.Processing.Search;
 
@@ -33,19 +32,14 @@ internal readonly record struct BreedingEffortGroupKey(long EffortTicks);
 
 internal interface ICandidateSelectionPolicy : IEffectivePropertiesKeyProvider
 {
-    EarlyCandidateSelection SelectEarlyCandidate(
-        IPalReference candidate,
-        IPalReference incumbent
-    );
+    EarlyCandidateSelection SelectEarlyCandidate(IPalReference candidate, IPalReference incumbent);
 
-    FrontierCandidateAssessment AssessAgainstFrontier(
-        IPalReference candidate,
-        IPalReference incumbent
-    );
+    FrontierCandidateAssessment AssessAgainstFrontier(IPalReference candidate, IPalReference incumbent);
 
-    IReadOnlyList<IPalReference> SelectRetainedAlternatives(
-        IEnumerable<IPalReference> candidates
-    );
+    IReadOnlyList<IPalReference> SelectRetainedAlternatives(IEnumerable<IPalReference> candidates);
+
+    /// <summary>Groups completed candidates by the policy's priorities and selects the final alternatives.</summary>
+    IEnumerable<IPalReference> SelectFinalResults(IEnumerable<IPalReference> candidates);
 
     BreedingEffortGroupKey BreedingEffortGroupOf(IPalReference candidate);
 
@@ -63,10 +57,7 @@ internal static class CandidateSelectionPolicyExtensions
         IEnumerable<IPalReference> candidates
     ) =>
         candidates
-            .OrderBy(
-                candidate => candidate,
-                policy.ExpansionPriorityComparer
-            )
+            .OrderBy(candidate => candidate, policy.ExpansionPriorityComparer)
             .ToList();
 }
 
@@ -77,26 +68,26 @@ internal static class CandidateSelectionPolicyExtensions
 /// </summary>
 internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolicy
 {
-    private const int AttackSlotCount = AttackProfile.TargetMaskCount;
-
     private readonly ResultPruningRule retainedAlternativeSelection;
     private readonly IEffectivePropertiesKeyProvider propertiesKeyProvider;
-    private readonly bool attackProfilesActive;
+    private readonly bool hasRequiredAttacks;
+    private readonly bool preserveSpecialCakeOptions;
 
     public DefaultCandidateSelectionPolicy(
         ResultPruningPolicy resultPruning,
         CancellationToken cancellationToken,
         AttackTargetContext attackTargets,
+        bool considerPassiveCakes,
         IEffectivePropertiesKeyProvider propertiesKeyProvider = null
     )
     {
         ArgumentNullException.ThrowIfNull(resultPruning);
 
-        attackProfilesActive = attackTargets?.IsActive == true;
-        this.propertiesKeyProvider =
-            propertiesKeyProvider ?? DefaultEffectivePropertiesKeyProvider.Instance;
-        retainedAlternativeSelection =
-            resultPruning.Create(cancellationToken);
+        this.propertiesKeyProvider = propertiesKeyProvider ?? DefaultEffectivePropertiesKeyProvider.Instance;
+
+        hasRequiredAttacks = attackTargets?.HasRequiredAttacks == true;
+        preserveSpecialCakeOptions = hasRequiredAttacks || considerPassiveCakes;
+        retainedAlternativeSelection = resultPruning.Create(cancellationToken);
     }
 
     public IComparer<IPalReference> ExpansionPriorityComparer { get; } =
@@ -106,15 +97,11 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         propertiesKeyProvider.KeyOf(reference);
 
     internal bool SupportsCandidateDrafts =>
-        ReferenceEquals(
-            propertiesKeyProvider,
-            DefaultEffectivePropertiesKeyProvider.Instance
-        );
+        ReferenceEquals(propertiesKeyProvider, DefaultEffectivePropertiesKeyProvider.Instance);
 
     internal EffectivePropertiesKey KeyOf(in CandidateDraft candidate) =>
         new(
-            palId: candidate.Pal.Id,
-            gender: candidate.Gender,
+            palId: candidate.Pal.Id, gender: candidate.Gender,
             passives: new PassiveSetKey(candidate.EffectivePassives),
             ivs: new RelevantIVKey(candidate.IVs)
         );
@@ -127,18 +114,15 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     /// Candidates tied on both values are both kept because their IVs or breeding
     /// paths may differ; the full simplification pass decides between them.
     /// </summary>
-    public EarlyCandidateSelection SelectEarlyCandidate(
-        IPalReference candidate,
-        IPalReference incumbent
-    )
+    public EarlyCandidateSelection SelectEarlyCandidate(IPalReference candidate, IPalReference incumbent)
     {
         var comparison = CompareScalarPreference(candidate, incumbent);
         if (comparison < 0)
-            return CoversAttackCapability(candidate.AttackProfile, incumbent.AttackProfile)
+            return CoversCandidate(candidate, incumbent)
                 ? EarlyCandidateSelection.ReplaceIncumbent
                 : EarlyCandidateSelection.KeepBoth;
         if (comparison > 0)
-            return CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+            return CoversCandidate(incumbent, candidate)
                 ? EarlyCandidateSelection.RejectCandidate
                 : EarlyCandidateSelection.KeepBoth;
 
@@ -153,18 +137,15 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     /// preferred by this projection only; retirement is deferred to the full
     /// frontier merge.
     /// </summary>
-    public FrontierCandidateAssessment AssessAgainstFrontier(
-        IPalReference candidate,
-        IPalReference incumbent
-    )
+    public FrontierCandidateAssessment AssessAgainstFrontier(IPalReference candidate, IPalReference incumbent)
     {
         var comparison = candidate.BreedingEffort.CompareTo(incumbent.BreedingEffort);
         if (comparison < 0)
-            return CoversAttackCapability(candidate.AttackProfile, incumbent.AttackProfile)
+            return CoversCandidate(candidate, incumbent)
                 ? FrontierCandidateAssessment.GuaranteedImprovement
                 : FrontierCandidateAssessment.PotentialImprovement;
         if (comparison > 0)
-            return CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+            return CoversCandidate(incumbent, candidate)
                 ? FrontierCandidateAssessment.Inferior
                 : FrontierCandidateAssessment.PotentialImprovement;
 
@@ -172,7 +153,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         if (comparison < 0)
             return FrontierCandidateAssessment.PotentialImprovement;
         if (comparison > 0)
-            return CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+            return CoversCandidate(incumbent, candidate)
                 ? FrontierCandidateAssessment.Inferior
                 : FrontierCandidateAssessment.PotentialImprovement;
 
@@ -180,31 +161,33 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         if (comparison != 0)
             return comparison > 0
                 ? FrontierCandidateAssessment.PotentialImprovement
-                : CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+                : CoversCandidate(incumbent, candidate)
                     ? FrontierCandidateAssessment.Inferior
                     : FrontierCandidateAssessment.PotentialImprovement;
 
         return TotalMinIV(candidate) > TotalMinIV(incumbent) ||
-            attackProfilesActive && TotalMinIV(candidate) == TotalMinIV(incumbent) &&
-            candidate.TotalRequiredLevels < incumbent.TotalRequiredLevels
+            (preserveSpecialCakeOptions && TotalMinIV(candidate) == TotalMinIV(incumbent) && candidate.TotalRequiredLevels < incumbent.TotalRequiredLevels)
             ? FrontierCandidateAssessment.PotentialImprovement
-            : CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+            : CoversCandidate(incumbent, candidate)
                 ? FrontierCandidateAssessment.Inferior
                 : FrontierCandidateAssessment.PotentialImprovement;
     }
 
-    internal FrontierCandidateAssessment AssessAgainstFrontier(
-        in CandidateDraft candidate,
-        IPalReference incumbent
-    )
+    internal FrontierCandidateAssessment AssessAgainstFrontier(in CandidateDraft candidate, IPalReference incumbent)
     {
         var comparison = candidate.BreedingEffort.CompareTo(incumbent.BreedingEffort);
         if (comparison < 0)
-            return CoversAttackCapability(candidate.AttackProfile, incumbent.AttackProfile)
+            return CoversCandidate(
+                candidate.AttackProfile, incumbent.AttackProfile,
+                candidate.BaseSpecialCakes, incumbent.BaseSpecialCakes
+            )
                 ? FrontierCandidateAssessment.GuaranteedImprovement
                 : FrontierCandidateAssessment.PotentialImprovement;
         if (comparison > 0)
-            return CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+            return CoversCandidate(
+                incumbent.AttackProfile, candidate.AttackProfile,
+                incumbent.BaseSpecialCakes, candidate.BaseSpecialCakes
+            )
                 ? FrontierCandidateAssessment.Inferior
                 : FrontierCandidateAssessment.PotentialImprovement;
 
@@ -212,7 +195,10 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         if (comparison < 0)
             return FrontierCandidateAssessment.PotentialImprovement;
         if (comparison > 0)
-            return CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+            return CoversCandidate(
+                incumbent.AttackProfile, candidate.AttackProfile,
+                incumbent.BaseSpecialCakes, candidate.BaseSpecialCakes
+            )
                 ? FrontierCandidateAssessment.Inferior
                 : FrontierCandidateAssessment.PotentialImprovement;
 
@@ -220,78 +206,78 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         if (comparison != 0)
             return comparison > 0
                 ? FrontierCandidateAssessment.PotentialImprovement
-                : CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+                : CoversCandidate(
+                    incumbent.AttackProfile, candidate.AttackProfile,
+                    incumbent.BaseSpecialCakes, candidate.BaseSpecialCakes
+                )
                     ? FrontierCandidateAssessment.Inferior
                     : FrontierCandidateAssessment.PotentialImprovement;
 
         return TotalMinIV(candidate.IVs) > TotalMinIV(incumbent) ||
-            attackProfilesActive && TotalMinIV(candidate.IVs) == TotalMinIV(incumbent) &&
-            candidate.TotalRequiredLevels < incumbent.TotalRequiredLevels
+            (preserveSpecialCakeOptions && TotalMinIV(candidate.IVs) == TotalMinIV(incumbent) && candidate.TotalRequiredLevels < incumbent.TotalRequiredLevels)
             ? FrontierCandidateAssessment.PotentialImprovement
-            : CoversAttackCapability(incumbent.AttackProfile, candidate.AttackProfile)
+            : CoversCandidate(
+                incumbent.AttackProfile, candidate.AttackProfile,
+                incumbent.BaseSpecialCakes, candidate.BaseSpecialCakes
+            )
                 ? FrontierCandidateAssessment.Inferior
                 : FrontierCandidateAssessment.PotentialImprovement;
     }
 
-    public IReadOnlyList<IPalReference> SelectRetainedAlternatives(
-        IEnumerable<IPalReference> candidates
-    )
+    public IReadOnlyList<IPalReference> SelectRetainedAlternatives(IEnumerable<IPalReference> candidates)
     {
         var distinctCandidates = candidates.Distinct().ToList();
         if (distinctCandidates.Count == 0)
             return distinctCandidates;
 
         var preferred = retainedAlternativeSelection
-            .Apply(
-                distinctCandidates,
-                new CachedResultData(distinctCandidates)
-            )
+            .Apply(distinctCandidates, new CachedResultData(distinctCandidates))
             .ToList();
-        if (!attackProfilesActive)
+        if (!preserveSpecialCakeOptions)
             return preferred;
 
-        var providers = preferred.ToList();
-        // Ordinary pruning may enforce a hard result limit. Preserve one best
-        // provider for every exact mask capability even when that exceeds it.
-        var exactChampions = new AttackCapability[AttackSlotCount];
-        Span<bool> occupied = stackalloc bool[AttackSlotCount];
+        // Preserve the cheapest and fastest providers of each attack combination
+        // even when ordinary pruning would keep only the fastest tier.
+        var alternatives = new CandidateCostFrontier(hasRequiredAttacks, markReplacedOutdated: false);
         foreach (var candidate in distinctCandidates)
-        {
-            foreach (ref readonly var entry in candidate.AttackProfile.EntriesSpan)
-            {
-                var capability = new AttackCapability(candidate, entry);
-                var slot = entry.LearnedTargetMask;
-                if (!occupied[slot] || CompareCapabilities(capability, exactChampions[slot]) < 0)
-                {
-                    exactChampions[slot] = capability;
-                    occupied[slot] = true;
-                }
-            }
-        }
+            alternatives.TryAdd(candidate);
 
-        for (var slot = 0; slot < AttackSlotCount; slot++)
-        {
-            if (!occupied[slot])
-                continue;
-            var champion = exactChampions[slot].Candidate;
-            if (!providers.Any(provider =>
-                    CoversAttackEntry(
-                        provider.AttackProfile.EntriesSpan,
-                        exactChampions[slot].Entry
-                    )))
-                providers.Add(champion);
-        }
+        var providers = preferred.ToList();
+        foreach (var candidate in alternatives.Candidates)
+            if (!providers.Any(provider => CoversRetainedAlternative(provider, candidate)))
+                providers.Add(candidate);
 
         return providers;
     }
 
+    private bool CoversRetainedAlternative(IPalReference provider, IPalReference candidate) =>
+        CoversCandidate(provider, candidate) &&
+        // Existing pruning chooses within a cake tier. Across tiers, a cheaper
+        // provider also needs to be as fast to replace this path.
+        (provider.BaseSpecialCakes == candidate.BaseSpecialCakes || provider.BreedingEffort <= candidate.BreedingEffort);
+
     public BreedingEffortGroupKey BreedingEffortGroupOf(IPalReference candidate) =>
         new(candidate.BreedingEffort.Ticks);
 
-    private static int CompareScalarPreference(
-        IPalReference candidate,
-        IPalReference incumbent
-    )
+    public IEnumerable<IPalReference> SelectFinalResults(IEnumerable<IPalReference> candidates)
+    {
+        var distinct = candidates.Distinct().ToList();
+        if (!preserveSpecialCakeOptions)
+            return distinct
+                .GroupBy(BreedingEffortGroupOf)
+                .SelectMany(SelectRetainedAlternatives);
+
+        var comparison = new FinalizationComparison();
+        return distinct
+            .GroupBy(reference => (
+                Outcome: comparison.KeyOf(reference),
+                Effort: BreedingEffortGroupOf(reference),
+                Cakes: reference.ExpectedSpecialCakes
+            ))
+            .SelectMany(SelectRetainedAlternatives);
+    }
+
+    private static int CompareScalarPreference(IPalReference candidate, IPalReference incumbent)
     {
         var comparison = candidate.BreedingEffort.CompareTo(incumbent.BreedingEffort);
         return comparison != 0
@@ -299,111 +285,18 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
             : candidate.TotalCost.CompareTo(incumbent.TotalCost);
     }
 
-    private bool CoversAttackCapability(
-        IPalReference provider,
-        IPalReference required
-    )
-    {
-        if (!attackProfilesActive)
-            return true;
-
-        return CoversAttackCapability(
-            provider.AttackProfile,
-            required.AttackProfile
+    private bool CoversCandidate(IPalReference provider, IPalReference required) =>
+        CoversCandidate(
+            provider.AttackProfile, required.AttackProfile,
+            provider.BaseSpecialCakes, required.BaseSpecialCakes
         );
-    }
 
-    private static bool CoversAttackCapability(
-        AttackProfile provider,
-        AttackProfile required
-    )
-    {
-        var requiredEntries = required.EntriesSpan;
-        if (requiredEntries.IsEmpty)
-            return true;
-
-        if ((provider.EntryTargetMasks & required.EntryTargetMasks) !=
-            required.EntryTargetMasks)
-            return false;
-
-        // Unfolded `.All(CoversAttackEntry)`
-        var providerEntries = provider.EntriesSpan;
-        foreach (ref readonly var requiredEntry in requiredEntries)
-        {
-            if (!CoversAttackEntry(providerEntries, requiredEntry))
-                return false;
-        }
-
-        return true;
-    }
-
-    private static bool CoversAttackCapability(
-        in PreparedAttackProfile provider,
-        AttackProfile required
-    )
-    {
-        if ((provider.EntryTargetMasks & required.EntryTargetMasks) !=
-            required.EntryTargetMasks)
-            return false;
-
-        foreach (ref readonly var requiredEntry in required.EntriesSpan)
-            if (provider.EntryForMask(requiredEntry.LearnedTargetMask).TotalSpecialCakes >
-                requiredEntry.TotalSpecialCakes)
-                return false;
-        return true;
-    }
-
-    private static bool CoversAttackCapability(
-        AttackProfile provider,
-        in PreparedAttackProfile required
-    )
-    {
-        if ((provider.EntryTargetMasks & required.EntryTargetMasks) !=
-            required.EntryTargetMasks)
-            return false;
-
-        var masks = required.EntryTargetMasks;
-        var providerEntries = provider.EntriesSpan;
-        while (masks != 0)
-        {
-            var mask = BitOperations.TrailingZeroCount(masks);
-            masks &= masks - 1;
-            if (!CoversAttackEntry(providerEntries, required.EntryForMask(mask)))
-                return false;
-        }
-        return true;
-    }
-
-    private static bool CoversAttackEntry(
-        ReadOnlySpan<AttackProfileEntry> providerEntries,
-        in AttackProfileEntry requiredEntry
-    )
-    {
-        // Profiles contain at most one champion for each exact mask.
-        foreach (ref readonly var providerEntry in providerEntries)
-        {
-            if (providerEntry.LearnedTargetMask == requiredEntry.LearnedTargetMask &&
-                providerEntry.TotalSpecialCakes <= requiredEntry.TotalSpecialCakes)
-                return true;
-        }
-
-        return false;
-    }
-
-    private static int CompareCapabilities(in AttackCapability left, in AttackCapability right)
-    {
-        var comparison = left.Entry.TotalSpecialCakes.CompareTo(right.Entry.TotalSpecialCakes);
-        if (comparison == 0)
-            comparison = left.Entry.LearnedTargetMask.CompareTo(right.Entry.LearnedTargetMask);
-        if (comparison != 0) return comparison;
-        comparison = left.Candidate.BreedingEffort.CompareTo(right.Candidate.BreedingEffort);
-        if (comparison != 0) return comparison;
-        comparison = left.Candidate.TotalCost.CompareTo(right.Candidate.TotalCost);
-        if (comparison != 0) return comparison;
-        comparison = left.Candidate.TotalRequiredLevels.CompareTo(right.Candidate.TotalRequiredLevels);
-        if (comparison != 0) return comparison;
-        return left.Candidate.GetHashCode().CompareTo(right.Candidate.GetHashCode());
-    }
+    private bool CoversCandidate(
+        AttackProfile provider, AttackProfile required,
+        int providerCakes, int requiredCakes
+    ) =>
+        providerCakes <= requiredCakes &&
+        (!hasRequiredAttacks || (provider.EntryTargetMasks & required.EntryTargetMasks) == required.EntryTargetMasks);
 
     // random IVs have no known value and score as zero
     private static int ScoreOf(IV_Value iv, Func<IV_Value, int> select) =>
@@ -424,11 +317,6 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         ScoreOf(ivs.HP, iv => iv.Min) +
         ScoreOf(ivs.Attack, iv => iv.Min) +
         ScoreOf(ivs.Defense, iv => iv.Min);
-
-    private readonly record struct AttackCapability(
-        IPalReference Candidate,
-        AttackProfileEntry Entry
-    );
 
     private sealed class BreedingEffortComparer : IComparer<IPalReference>
     {

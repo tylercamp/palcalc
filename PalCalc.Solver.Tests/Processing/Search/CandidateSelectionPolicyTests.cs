@@ -17,7 +17,8 @@ public class CandidateSelectionPolicyTests
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets: null
+            attackTargets: null,
+            considerPassiveCakes: false
         );
         var incumbent = new TestPalReference(
             "incumbent",
@@ -94,7 +95,8 @@ public class CandidateSelectionPolicyTests
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets: null
+            attackTargets: null,
+            considerPassiveCakes: false
         );
         var incumbent = new TestPalReference(
             "incumbent",
@@ -208,8 +210,8 @@ public class CandidateSelectionPolicyTests
 
         Assert.AreEqual(1, retained.Count);
         CollectionAssert.AreEqual(
-            ordinary.AttackProfile.Entries.ToArray(),
-            retained[0].AttackProfile.Entries.ToArray()
+            ordinary.AttackProfile.Masks.ToArray(),
+            retained[0].AttackProfile.Masks.ToArray()
         );
     }
 
@@ -243,12 +245,12 @@ public class CandidateSelectionPolicyTests
             parent2,
             avgRequiredBreedings: null,
             passives: [],
-            passivesProbability: 1,
-            specialCakePassivesProbability: 1,
+            outcome: new(BreedingMethod.Ordinary, 1),
             ivs: new IV_Set(),
             ivsProbability: 1,
             attackProfile: profile,
-            materializedAttackInheritance: null
+            materializedAttackInheritance: null,
+            recordedSpecialCakes: null
         );
 
         var first = BredWith(Profile(1));
@@ -334,13 +336,13 @@ public class CandidateSelectionPolicyTests
             "first",
             "Katress",
             TimeSpan.FromMinutes(firstMinutes),
-            ProfileWithCakes((byte)firstMask, firstCakes)
+            Profile((byte)firstMask), cakes: firstCakes
         );
         var second = Reference(
             "second",
             "Katress",
             TimeSpan.FromMinutes(secondMinutes),
-            ProfileWithCakes((byte)secondMask, secondCakes)
+            Profile((byte)secondMask), cakes: secondCakes
         );
 
         Assert.AreEqual(
@@ -371,7 +373,8 @@ public class CandidateSelectionPolicyTests
         var policy = new DefaultCandidateSelectionPolicy(
             ResultPruningPolicy.Default,
             CancellationToken.None,
-            attackTargets: null
+            attackTargets: null,
+            considerPassiveCakes: false
         );
         var candidates = Enumerable
             .Range(0, 32)
@@ -477,6 +480,36 @@ public class CandidateSelectionPolicyTests
         );
     }
 
+    [TestMethod]
+    public void FinalSelection_UsesCustomStepPriorityWithSpecialCakeOptions()
+    {
+        var fastest = Reference("fastest", "Katress", TimeSpan.FromMinutes(1), cakes: 5);
+        var cheapest = Reference("cheapest", "Katress", TimeSpan.FromMinutes(10), cakes: 1);
+        var policy = new DelegatingPolicy(
+            new DefaultCandidateSelectionPolicy(
+                ResultPruningPolicy.Default,
+                CancellationToken.None,
+                attackTargets: null,
+                considerPassiveCakes: true
+            ),
+            finalSelection: candidates => candidates
+                .GroupBy(candidate => candidate.NumTotalBreedingSteps)
+                .Select(group => group.OrderBy(candidate => candidate.ExpectedSpecialCakes).First())
+        );
+        var target = new PalSpecifier { Pal = cheapest.Pal };
+        var settings = SolverTestScenario.Solver(
+            [], specialCakePolicy: SpecialCakePolicy.AttacksAndPassives).Settings;
+        var accumulator = new ResultAccumulator(target);
+        accumulator.Observe([fastest, cheapest]);
+        var processor = new ResultPostProcessor(
+            target, settings, new SolverStateController(CancellationToken.None),
+            attackTargets: null, selectionPolicy: policy);
+
+        var results = processor.Finalize(accumulator).ToArray();
+
+        CollectionAssert.AreEqual(new IPalReference[] { cheapest }, results);
+    }
+
     private static SolverTestScenario.ConfiguredSolver SolverWithMultipleCandidateAlternatives()
     {
         var swift = "Swift".ToStandardPassive(SolverTestScenario.DB);
@@ -496,7 +529,7 @@ public class CandidateSelectionPolicyTests
                     passives: [runner]
                 ),
             ],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxThreads: 2
@@ -551,7 +584,8 @@ public class CandidateSelectionPolicyTests
             new DefaultCandidateSelectionPolicy(
                 ResultPruningPolicy.Default,
                 controller.CancellationToken,
-                attackTargets: null
+                attackTargets: null,
+            considerPassiveCakes: false
             )
         );
         var first = Reference(
@@ -577,8 +611,7 @@ public class CandidateSelectionPolicyTests
             initialContent: [first, second],
             maxThreads: 1,
             controller: controller,
-            selectionPolicy: policy,
-            attackTargets: null
+            selectionPolicy: policy
         );
 
         frontier.ExpandPairs(_ => [added]);
@@ -612,7 +645,8 @@ public class CandidateSelectionPolicyTests
         new(
             settings.ResultPruning,
             CancellationToken.None,
-            attackTargets: null
+            attackTargets: null,
+            considerPassiveCakes: false
         );
 
     private static DefaultCandidateSelectionPolicy ActivePolicy(
@@ -628,15 +662,11 @@ public class CandidateSelectionPolicyTests
                     [.. SolverTestScenario.DB.ActiveSkills.Where(attack => attack.CanInherit).Take(6)],
                 },
                 SolverTestScenario.DB
-            )
+            ),
+            considerPassiveCakes: false
         );
 
-    private static AttackProfile Profile(params byte[] masks) => new(masks.Select(mask =>
-        new AttackProfileEntry(mask, 0)
-    ).ToArray());
-
-    private static AttackProfile ProfileWithCakes(byte mask, int cakes) =>
-        new(new AttackProfileEntry(mask, cakes));
+    private static AttackProfile Profile(params byte[] masks) => new(masks);
 
     private static TestPalReference Reference(
         string name,
@@ -644,7 +674,8 @@ public class CandidateSelectionPolicyTests
         TimeSpan effort,
         AttackProfile attackProfile = default,
         int totalCost = 0,
-        bool hasNoopAttack = false
+        bool hasNoopAttack = false,
+        int cakes = 0
     ) =>
         new(
             name,
@@ -652,8 +683,9 @@ public class CandidateSelectionPolicyTests
             effort,
             totalCost,
             hasNoopAttack
-                ? new AttackProfile(true, attackProfile.Entries.ToArray())
-                : attackProfile
+                ? new AttackProfile(true, attackProfile.Masks.ToArray())
+                : attackProfile,
+            cakes
         );
 
     private sealed class DelegatingPolicy(
@@ -663,7 +695,8 @@ public class CandidateSelectionPolicyTests
             IPalReference,
             IPalReference,
             EarlyCandidateSelection
-        >? earlySelection = null
+        >? earlySelection = null,
+        Func<IEnumerable<IPalReference>, IEnumerable<IPalReference>>? finalSelection = null
     ) : ICandidateSelectionPolicy
     {
         public IComparer<IPalReference> ExpansionPriorityComparer { get; } =
@@ -690,6 +723,9 @@ public class CandidateSelectionPolicyTests
             IEnumerable<IPalReference> candidates
         ) =>
             inner.SelectRetainedAlternatives(candidates);
+
+        public IEnumerable<IPalReference> SelectFinalResults(IEnumerable<IPalReference> candidates) =>
+            finalSelection?.Invoke(candidates) ?? inner.SelectFinalResults(candidates);
 
         public BreedingEffortGroupKey BreedingEffortGroupOf(
             IPalReference candidate
@@ -726,7 +762,8 @@ public class CandidateSelectionPolicyTests
         Pal pal,
         TimeSpan breedingEffort,
         int totalCost = 0,
-        AttackProfile attackProfile = default
+        AttackProfile attackProfile = default,
+        int cakes = 0
     ) : IPalReference
     {
         public string Name { get; } = name;
@@ -742,6 +779,7 @@ public class CandidateSelectionPolicyTests
         public TimeSpan BreedingEffort { get; } = breedingEffort;
         public TimeSpan SelfBreedingEffort { get; } = breedingEffort;
         public int TotalCost { get; } = totalCost;
+        public int ExpectedSpecialCakes => cakes;
         public int NumTotalBreedingSteps => 0;
         public int NumTotalEggs => 0;
         public int NumTotalWildPals => 0;

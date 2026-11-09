@@ -25,7 +25,7 @@ namespace PalCalc.UI.View
         {
             InitializeComponent();
 
-#if DEBUG
+#if DEBUG || FORCE_DEBUG_MENU
             DebugMenuItem.Visibility = Visibility.Visible;
 #else
             DebugMenuItem.Visibility = Visibility.Collapsed;
@@ -37,6 +37,11 @@ namespace PalCalc.UI.View
             var debugWindow = new TranslationDebugWindow();
             debugWindow.DataContext = new TranslationDebugViewModel(App.TranslationErrors);
             debugWindow.Show();
+        }
+
+        private void OpenProgramFolder_Click(object sender, RoutedEventArgs e)
+        {
+            WindowsUtils.OpenPathInExplorer(".");
         }
     }
 }

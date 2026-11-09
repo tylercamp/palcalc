@@ -153,6 +153,8 @@
                 <RowDefinition />
                 <RowDefinition Height="{StaticResource SepHeight}" />
                 <RowDefinition />
+                <RowDefinition Height="{StaticResource SepHeight}" />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -177,6 +179,15 @@
                 IsEnabled="{Binding CanEditSettings}"
                 MinValue="0" MaxValue="4"
                 ToolTipService.ToolTip="{itl:LocalizedText LC_SOLVER_SETTINGS_MAX_BRED_IRRELEVANT_TRAITS_DESCRIPTION}"
+                ToolTipService.ShowOnDisabled="True"
+            />
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOW_SPECIAL_CAKES_FOR_PASSIVES}" />
+            <CheckBox
+                Grid.Row="4" Grid.Column="2"
+                IsChecked="{Binding AllowSpecialCakesForPassives, Mode=TwoWay}"
+                IsEnabled="{Binding CanEditSettings}"
+                ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_ALLOW_SPECIAL_CAKES_FOR_PASSIVES_DESCRIPTION}"
                 ToolTipService.ShowOnDisabled="True"
             />
         </Grid>
