@@ -35,7 +35,7 @@ internal sealed class ParallelBatchExecutor(
     {
         var controller = context.Controller;
         var settings = context.Settings;
-        var retainCostCandidates = expansionContext.PreFilter.PreservesAttackAndCakeOptions;
+        var preserveAttackAndCakeOptions = expansionContext.PreFilter.PreservesAttackAndCakeOptions;
         var progressEntries = new List<WorkBatchProgress>();
         var results = new ConcurrentBag<List<IPalReference>>();
         var chunksEnumerator = work
@@ -118,7 +118,7 @@ internal sealed class ParallelBatchExecutor(
                         progress,
                         expansionContext
                     );
-                    if (retainCostCandidates)
+                    if (preserveAttackAndCakeOptions)
                     {
                         // The shared pre-filter owns the current per-mask cake/effort tradeoffs.
                         // Do not keep replaced candidates alive in batch result lists.
@@ -196,7 +196,7 @@ internal sealed class ParallelBatchExecutor(
         workerFailure?.Throw();
 
         return new(
-            Candidates: retainCostCandidates
+            Candidates: preserveAttackAndCakeOptions
                 ? expansionContext.PreFilter.RetainedCostCandidates()
                 : results.SelectMany(batch => batch).ToList(),
             WorkProcessedCount: ProcessedCount()
