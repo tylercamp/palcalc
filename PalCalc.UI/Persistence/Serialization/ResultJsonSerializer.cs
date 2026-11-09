@@ -6,8 +6,10 @@ using PalCalc.Solver.PalReference.Properties;
 using PalCalc.UI.Model;
 using PalCalc.UI.Persistence.Dto;
 using PalCalc.UI.ViewModel.Solver;
+using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using GameSettingsModel = PalCalc.Model.GameSettings;
 
@@ -15,6 +17,8 @@ namespace PalCalc.UI.Persistence.Serialization
 {
     internal static class ResultJsonSerializer
     {
+        private static readonly ILogger logger = Log.ForContext(typeof(ResultJsonSerializer));
+
         public static BreedingResultListDto FromCurrentJson(string json) =>
             JsonConvert.DeserializeObject<BreedingResultListDto>(json)
             ?? throw new JsonSerializationException("Result document was empty.");
@@ -25,7 +29,8 @@ namespace PalCalc.UI.Persistence.Serialization
             BreedingResultListViewModel value,
             PalDB db,
             GameSettingsModel currentGameSettings,
-            PalSpecifier target)
+            PalSpecifier target
+        )
         {
             var settings = value.SettingsSnapshot ?? new BreedingResultListViewModelSettingsSnapshot
             {
@@ -44,10 +49,7 @@ namespace PalCalc.UI.Persistence.Serialization
             BreedingResultDto ToDto(BreedingResultViewModel result) => new()
             {
                 PalReference = ResultJsonSerializer.ToDto(result.DisplayedResult),
-                CheckedNodes = result.Graph?.Nodes
-                    .Select((node, index) => node.IsChecked ? index : -1)
-                    .Where(index => index >= 0)
-                    .ToList(),
+                CheckedNodes = result.CheckedNodeIndices,
             };
         }
 
@@ -60,6 +62,10 @@ namespace PalCalc.UI.Persistence.Serialization
             GameSettingsSnapshotDto storedGameSettings,
             SolverSettingsSnapshotDto storedSolverSettings)
         {
+            var timer = Stopwatch.StartNew();
+            var stage = new Stopwatch();
+            var referenceTime = TimeSpan.Zero;
+            var viewModelTime = TimeSpan.Zero;
             var gameSettings = FromDto(storedGameSettings ?? value.GameSettings);
             var solverSettings = FromDto(storedSolverSettings ?? value.SolverSettings, db);
 
@@ -72,18 +78,15 @@ namespace PalCalc.UI.Persistence.Serialization
                 },
                 Results = value.Results.Select(item =>
                 {
+                    stage.Restart();
                     var displayedResult = FromDto(item.PalReference, db, gameSettings, solverSettings);
-                    var vm = new BreedingResultViewModel(cachedSave, gameSettings, displayedResult, target.RequiredAttacks);
-
-                    if (item.CheckedNodes != null && vm.Graph != null)
+                    referenceTime += stage.Elapsed;
+                    stage.Restart();
+                    var vm = new BreedingResultViewModel(cachedSave, gameSettings, displayedResult, target.RequiredAttacks)
                     {
-                        foreach (var index in item.CheckedNodes)
-                        {
-                            if (index >= 0 && index < vm.Graph.Nodes.Count)
-                                vm.Graph.Nodes[index].IsChecked = true;
-                        }
-                    }
-
+                        CheckedNodeIndices = item.CheckedNodes,
+                    };
+                    viewModelTime += stage.Elapsed;
                     return vm;
                 }).ToList(),
             };
@@ -91,6 +94,9 @@ namespace PalCalc.UI.Persistence.Serialization
             if (value.SelectedResultIndex >= 0 && value.SelectedResultIndex < result.Results.Count)
                 result.SelectedResult = result.Results[value.SelectedResultIndex];
 
+            logger.Debug("Load profiling: results for {Pal}, {Results} results: references {ReferenceMs:F1} ms, result rows {ViewModelMs:F1} ms, total {TotalMs:F1} ms",
+                target.Pal.InternalName, result.Results.Count,
+                referenceTime.TotalMilliseconds, viewModelTime.TotalMilliseconds, timer.Elapsed.TotalMilliseconds);
             return result;
         }
 

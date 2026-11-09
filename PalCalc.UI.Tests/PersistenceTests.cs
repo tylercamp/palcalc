@@ -646,7 +646,7 @@ namespace PalCalc.UI.Tests
     };
 
     [TestMethod]
-    public void SelectedResultRoundTrips()
+    public void SavedResultsDeferGraphsAndPreserveSelectionAndCheckmarks()
     {
         var db = PalDB.LoadEmbedded();
         var pal = "Beakon".ToPal(db);
@@ -657,8 +657,8 @@ namespace PalCalc.UI.Tests
             SolverSettings = ResultJsonSerializer.ToDto(new SerializableSolverSettings()),
             Results =
             [
-                new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(wild) },
-                new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(wild) },
+                new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(wild), CheckedNodes = [0] },
+                new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(wild), CheckedNodes = [0] },
             ],
             SelectedResultIndex = 1,
         };
@@ -667,15 +667,35 @@ namespace PalCalc.UI.Tests
         var restoredDto = JsonConvert.DeserializeObject<BreedingResultListDto>(json);
         Assert.AreEqual(1, restoredDto!.SelectedResultIndex);
 
+        var target = new PalSpecifier { Pal = pal };
         var restored = ResultJsonSerializer.FromDto(
             restoredDto,
             db,
             null,
             GameSettings.Defaults,
-            new PalSpecifier { Pal = pal },
+            target,
             null,
             null);
         Assert.AreSame(restored.Results[1], restored.SelectedResult);
+
+        var saved = ResultJsonSerializer.ToDto(restored, db, GameSettings.Defaults, target);
+        Assert.AreEqual(1, saved.SelectedResultIndex);
+        CollectionAssert.AreEqual(new[] { 0 }, saved.Results[0].CheckedNodes);
+        Assert.IsFalse(restored.Results.Any(result => result.IsGraphBuilt));
+
+        var changes = 0;
+        restored.CheckedStateChanged += (_, _) => changes++;
+        var selectedNode = restored.SelectedResult.Graph.Nodes.Single();
+        Assert.IsTrue(selectedNode.IsChecked);
+        Assert.AreEqual(0, changes);
+        Assert.IsFalse(restored.Results[0].IsGraphBuilt);
+        selectedNode.IsChecked = false;
+        Assert.AreEqual(1, changes);
+
+        restored.UpdateCachedData(null, GameSettings.Defaults);
+        Assert.IsFalse(restored.Results.Any(result => result.IsGraphBuilt));
+        Assert.IsTrue(restored.Results[0].Graph.Nodes.Single().IsChecked);
+        Assert.IsFalse(restored.Results[1].Graph.Nodes.Single().IsChecked);
     }
 
     [TestMethod]

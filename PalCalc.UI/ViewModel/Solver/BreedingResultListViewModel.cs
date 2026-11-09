@@ -6,9 +6,11 @@ using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Solver;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -112,26 +114,15 @@ namespace PalCalc.UI.ViewModel.Solver
         // before display
         public void UpdateCachedData(CachedSaveGame csg, GameSettings settings)
         {
-            // preserve checked state across rebuild
-            var oldCheckedState = Results
-                .Select(r => r.Graph?.Nodes.Select(n => n.IsChecked).ToArray())
-                .ToList();
-
-            var newResults = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult, r.EffectiveAttacks.AsModelEnumerable())).ToList();
-
-            for (int i = 0; i < newResults.Count && i < oldCheckedState.Count; i++)
+            var timer = Stopwatch.StartNew();
+            Results = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult, r.EffectiveAttacks.AsModelEnumerable())
             {
-                var checkedArr = oldCheckedState[i];
-                if (checkedArr == null || newResults[i].Graph == null) continue;
-
-                var nodes = newResults[i].Graph.Nodes;
-                for (int j = 0; j < nodes.Count && j < checkedArr.Length; j++)
-                    nodes[j].IsChecked = checkedArr[j];
-            }
-
-            // Assign only after restoring state: the setter subscribes to checkbox changes,
-            // and replaying saved state must not be treated as a user edit.
-            Results = newResults;
+                CheckedNodeIndices = r.CheckedNodeIndices,
+            }).ToList();
+            Log.ForContext<BreedingResultListViewModel>().Debug(
+                "Load profiling: refresh {Results} results, {Graphs} graphs built during refresh/bind: total {TotalMs:F1} ms",
+                Results.Count, Results.Count(r => r.IsGraphBuilt), timer.Elapsed.TotalMilliseconds
+            );
         }
 
         [JsonIgnore]
