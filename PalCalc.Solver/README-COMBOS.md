@@ -51,8 +51,8 @@ How many breeding steps a missing parent takes isn't shown, to keep the sections
 
 | File | Purpose |
 |---|---|
-| `PalCalc.UI/ViewModel/Solver/ParentCombosToolViewModel.cs` | The child, sort options, sections and cards. `Sorted` holds the sort orders. |
-| `PalCalc.UI/View/Main/ParentCombosToolView.xaml` and `.cs` | The top box and cards. Scrolling reuses `BreedableToolView`'s helpers. |
+| `PalCalc.UI/ViewModel/Solver/ParentCombosToolViewModel.cs` | The child, sort options, sections and cards, loaded a few at a time like Find All Breedable. `Sorted` holds the sort orders. |
+| `PalCalc.UI/View/Main/ParentCombosToolView.xaml` and `.cs` | The top box, cards, and the startup screen's `LoadingPage` while loading. Scrolling reuses `BreedableToolView`'s helpers. |
 | `PalCalc.UI/ViewModel/Solver/BreedableToolViewModel.cs` | `BreedableParentViewModel` gained an optional required gender (for `NeedsReverser`) and hint, and `BreedSpeedPassive` for the Philanthropist icon. Find All Breedable passes neither and doesn't show the icon. |
 | `PalCalc.UI/View/Main/BreedableToolView.xaml.cs` | `UpdateScrollBar` and `ScrollGroups` became `internal static` so both tools share them. |
 | `PalCalc.UI/ViewModel/Solver/ISolverTool.cs` | Gained `OnSelected`, with an empty default, called before `Run` each time a tool is selected. |
@@ -71,4 +71,4 @@ How many breeding steps a missing parent takes isn't shown, to keep the sections
 - `CatchOnly` is worked out from the breeding data, not from spawn data. 26 species only breed from themselves today, including the legendaries. One which can't actually be caught would still say "Catch only", and that hasn't been checked against spawn data.
 - Which species can be bred comes from `BreedableCalculator`, so changes to its rules carry over to the hints.
 
-**UI details:** the parent hover, card styling, and scrolling follow Find All Breedable, so its notes in [README-BREEDABLE.md](./README-BREEDABLE.md) apply here too. The child dropdown only creates items for the visible rows, so UI Automation has to type into it before choosing an item.
+**UI details:** the parent hover, card styling, scrolling, and loading follow Find All Breedable, so its notes in [README-BREEDABLE.md](./README-BREEDABLE.md) apply here too. Here the loading runs on every child or sort change, and a newer change replaces one still loading. The child dropdown only creates items for the visible rows, so UI Automation has to type into it before choosing an item.
