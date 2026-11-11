@@ -413,7 +413,7 @@ public class BreedableCalculatorTests
 
         CollectionAssert.AreEqual(
             Calculate(true, owned).Entries.ToList(),
-            Calculate(true, owned.Reverse().ToArray()).Entries.ToList()
+            Calculate(true, owned.AsEnumerable().Reverse().ToArray()).Entries.ToList()
         );
     }
 
