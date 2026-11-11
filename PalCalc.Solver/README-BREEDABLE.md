@@ -95,7 +95,7 @@ This means a generation can add a gender without adding a species, so a tier can
 - Groups are `GroupBox`es, not `Expander`s, so every group is always laid out and the contents list can scroll to any of them. This also removed two workarounds: the Adonis `Expander` template has an inner `ScrollViewer` which eats wheel events, and its animation re-wrapped the cards.
 - The contents list scrolls on selection, for the keyboard, and on click, for clicking the group that's already selected.
 - `SearchPulse` is the only search animation. The card borders, card glows, and contents entries all follow its opacity so that they stay in step. It only runs while something is highlighted.
-- Show IVs sets the IV `ContentControl`'s content only while it's checked, so unchecked cards don't build the IV views at all.
+- Show IVs sets the IV `ContentControl`'s content only while it's checked, so unchecked cards don't build the IV views at all. The IV template hides itself when there are no IVs, as on a Not Reachable card.
 - The menu's tool items get `OpenToolCommand` from the `ItemsControl` around them, since their own context is the tool.
 - The hover popup copies a few lines from the location popup in `BreedingResultView.xaml`, so changes to that popup won't carry over.
 - **Loading:** building the cards is what's slow (WPF takes a few ms each, over a second for all ~300), not the calculation. So:
