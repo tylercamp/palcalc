@@ -8,8 +8,12 @@ using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
@@ -62,7 +66,10 @@ namespace PalCalc.UI.ViewModel.Solver
     ) : ObservableObject
     {
         public ILocalizedText Title { get; } = title;
-        public List<BreedableCardViewModel> Cards { get; } = cards;
+
+        // (starts empty, `BreedableToolViewModel` moves `AllCards` in here a few at a time while loading)
+        public ObservableCollection<BreedableCardViewModel> Cards { get; } = [];
+        internal List<BreedableCardViewModel> AllCards { get; } = cards;
 
         [ObservableProperty]
         private bool isExpanded = isExpanded;
@@ -108,13 +115,65 @@ namespace PalCalc.UI.ViewModel.Solver
                 OnPropertyChanged(nameof(ExpandToggleLabel));
         }
 
-        public void Run(BreedingSolverSettings settings, CachedSaveGame save)
+        [ObservableProperty]
+        private bool isLoading = false;
+
+        // WPF takes a few ms to build each card, so adding all ~300 at once froze the window for over a second.
+        // adding them a few at a time lets the loading animation keep moving in between.
+        // (this and the two helpers below are also used by `ParentCombosToolViewModel`)
+        internal const int CardsPerBatch = 4;
+
+        // (a newer run replaces one which is still loading)
+        private int latestRun = 0;
+
+        // (async void, so that an error is thrown on the UI thread and handled like any other)
+        public async void Run(BreedingSolverSettings settings, CachedSaveGame save) => await RunAsync(settings, save);
+
+        public async Task RunAsync(BreedingSolverSettings settings, CachedSaveGame save)
         {
-            Groups = BuildGroups(new BreedableCalculator(settings).Calculate(), save, settings.GameSettings);
+            var run = ++latestRun;
+            IsLoading = true;
+
+            // (otherwise reselecting the tool would build all of the previous run's cards at once, before
+            // this run gets to replace them)
+            Groups = [];
+
+            // (safe off the UI thread, the calculator keeps all of its working data local)
+            var result = await OffUIThread(() => new BreedableCalculator(settings).Calculate());
+            if (run != latestRun) return;
+
+            Groups = BuildGroups(result, save, settings.GameSettings);
             foreach (var group in Groups)
                 group.PropertyChanged += Group_PropertyChanged;
 
+            var numShown = 0;
+            foreach (var group in Groups)
+            {
+                foreach (var card in group.AllCards)
+                {
+                    group.Cards.Add(card);
+                    if (++numShown % CardsPerBatch != 0) continue;
+
+                    await NextFrame();
+                    if (run != latestRun) return;
+                }
+            }
+
             UpdateHighlights();
+            IsLoading = false;
+        }
+
+        // (with no dispatcher, as in tests, these both run straight through, so a run finishes before it returns)
+        private static bool OnUIThread => SynchronizationContext.Current is DispatcherSynchronizationContext;
+
+        internal static Task<T> OffUIThread<T>(Func<T> work) =>
+            OnUIThread ? Task.Run(work) : Task.FromResult(work());
+
+        // lets WPF lay out the cards added so far before adding more
+        internal static async Task NextFrame()
+        {
+            if (OnUIThread)
+                await Dispatcher.Yield(DispatcherPriority.Background);
         }
 
         private void UpdateHighlights()
@@ -176,7 +235,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 new(LocalizationCodes.LC_BREEDABLE_GROUP_NOT_REACHABLE.Bind(notReachableCards.Count), isExpanded: false, notReachableCards),
             ];
 
-            return groups.Where(g => g.Cards.Count > 0).ToList();
+            return groups.Where(g => g.AllCards.Count > 0).ToList();
         }
     }
 }

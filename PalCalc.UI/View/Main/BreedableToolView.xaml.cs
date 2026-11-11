@@ -20,6 +20,10 @@ namespace PalCalc.UI.View.Main
         private void Groups_LayoutChanged(object sender, RoutedEventArgs e) =>
             Dispatcher.BeginInvoke(UpdateScrollBar);
 
+        // (the cards are hidden while they load, so decide again once they're shown at their final heights)
+        private void Groups_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) =>
+            Dispatcher.BeginInvoke(UpdateScrollBar);
+
         // if the scrollbar only appeared after a group had grown, it would take up space and re-wrap the
         // cards at the end of the animation. decide on it now, from the height that the groups will end up at.
         private void UpdateScrollBar()
