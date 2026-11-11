@@ -22,6 +22,10 @@ namespace PalCalc.UI.View.Main
 
         private void Groups_PreviewMouseWheel(object sender, MouseWheelEventArgs e) => ScrollGroups(sender, e);
 
+        // (the cards are hidden while they load, so decide again once they're shown at their final heights)
+        private void Groups_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) =>
+            Dispatcher.BeginInvoke(() => UpdateScrollBar(GroupsList, GroupsScrollViewer));
+
         // if the scrollbar only appeared after a group had grown, it would take up space and re-wrap the
         // cards at the end of the animation. decide on it now, from the height that the groups will end up at.
         // (also used by `ParentCombosToolView`, which has the same layout)
