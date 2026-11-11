@@ -37,6 +37,7 @@
         </MenuItem>
         <MenuItem Header="Debug" Padding="5" Name="DebugMenuItem">
             <MenuItem Header="Translation Debugger" Click="TranslationDebugger_Click" />
+            <MenuItem Header="Open Program Folder" Click="OpenProgramFolder_Click" />
         </MenuItem>
         <MenuItem Header="{itl:LocalizedText LC_HELP}" Padding="5">
             <MenuItem IsCheckable="True" IsChecked="{Binding IsDebugLoggingEnabled}" Header="{itl:LocalizedText LC_DEBUG_LOGGING}" />

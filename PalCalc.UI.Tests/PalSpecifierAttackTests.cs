@@ -148,7 +148,6 @@ public class PalSpecifierAttackTests
             [attacks[1]],
             [],
             [],
-            SpecialCakes: 0,
             AttackProbability: 1
         );
         var bred = new BredPalReference(
@@ -159,12 +158,12 @@ public class PalSpecifierAttackTests
             secondParent,
             avgRequiredBreedings: 1,
             [],
-            passivesProbability: 1,
-            specialCakePassivesProbability: 1,
+            outcome: new(BreedingMethod.Ordinary, 1),
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
             ivsProbability: 1,
             attackProfile: AttackProfile.Inactive,
-            materializedAttackInheritance: inheritance
+            materializedAttackInheritance: inheritance,
+            recordedSpecialCakes: null
         );
 
         Assert.AreSame(secondParent, bred.Parent1);
@@ -186,12 +185,12 @@ public class PalSpecifierAttackTests
             Owned(db.Pals.First(), "parent-2", attack, 2),
             avgRequiredBreedings: null,
             [],
-            passivesProbability: 1,
-            specialCakePassivesProbability: 1,
+            outcome: new(BreedingMethod.Ordinary, 1),
             new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
             ivsProbability: 1,
             attackProfile: AttackProfile.Inactive,
-            materializedAttackInheritance: null
+            materializedAttackInheritance: null,
+            recordedSpecialCakes: null
         );
 
         var display = new BreedingResultViewModel(null, new GameSettings(), result, []);

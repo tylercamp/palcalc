@@ -1,5 +1,4 @@
 using PalCalc.Model;
-using PalCalc.Solver.PalReference;
 using System.Collections.Frozen;
 
 namespace PalCalc.Solver.Processing.Attacks;
@@ -19,7 +18,6 @@ internal readonly record struct SpeciesAttackState(
 internal sealed class AttackTargetContext
 {
     private readonly PalDB db;
-    private readonly PalSpecifier target;
     private readonly ActiveSkill[] requiredAttacks;
     private readonly FrozenDictionary<Pal, SpeciesAttackState> speciesStates;
 
@@ -29,18 +27,17 @@ internal sealed class AttackTargetContext
         ArgumentNullException.ThrowIfNull(db);
 
         this.db = db;
-        this.target = target;
         requiredAttacks = target.RequiredAttacks.Distinct().ToArray();
         if (requiredAttacks.Length > PalSpecifier.MaxRequiredAttacks)
             throw new ArgumentOutOfRangeException(nameof(target), $"At most {PalSpecifier.MaxRequiredAttacks} required attacks are supported.");
 
-        IsActive = requiredAttacks.Length != 0;
+        HasRequiredAttacks = requiredAttacks.Length != 0;
         FullTargetMask = (byte)((1 << requiredAttacks.Length) - 1);
         InheritableTargetMask = MaskOf(requiredAttacks.Where(attack => attack.CanInherit));
         speciesStates = db.Pals.ToFrozenDictionary(pal => pal, CreateSpeciesState);
     }
 
-    public bool IsActive { get; }
+    public bool HasRequiredAttacks { get; }
     public byte FullTargetMask { get; }
     public byte InheritableTargetMask { get; }
 
@@ -73,10 +70,6 @@ internal sealed class AttackTargetContext
             : throw new ArgumentOutOfRangeException(nameof(singleBit));
     }
 
-    public bool Satisfies(IPalReference reference) =>
-        target.IsSatisfiedByIgnoringAttacks(reference) &&
-        (!IsActive || reference.AttackProfile.Contains(FullTargetMask));
-
     public SpeciesAttackState StateOf(Pal pal)
     {
         ArgumentNullException.ThrowIfNull(pal);
@@ -90,7 +83,7 @@ internal sealed class AttackTargetContext
         var level1Attacks = pal.Level1ActiveSkills(db).ToArray();
         return new(
             Level1TargetMask: MaskOf(level1Attacks),
-            HasNooplLevel1Attack: level1Attacks.Any(attack => !attack.CanInherit)
+            HasNooplLevel1Attack: HasRequiredAttacks && level1Attacks.Any(attack => !attack.CanInherit)
         );
     }
 }

@@ -102,7 +102,7 @@ public class EffectivePropertiesKeyTests
     {
         var pal = "Katress".ToPal(SolverTestScenario.DB);
         var profile = new AttackProfile(
-            new AttackProfileEntry(1, 0)
+            (byte)1
         );
         var initial = new TestPalReference(
             pal, PalGender.MALE, [], new IV_Set(),
@@ -113,7 +113,7 @@ public class EffectivePropertiesKeyTests
             pal, PalGender.MALE, [], new IV_Set(),
             attackProfile: new AttackProfile(
                 true,
-                new AttackProfileEntry(3, 0)
+                (byte)3
             ),
             breedingEffort: TimeSpan.FromMinutes(2)
         );

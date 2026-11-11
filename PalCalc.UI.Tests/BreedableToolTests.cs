@@ -250,7 +250,7 @@ public class BreedableToolTests
             allowedSurgeryPassives: [],
             skipSurgeryPassivesDuringSearch: false,
             useGenderReversers: false,
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             trainPals: true
         );
 }

@@ -7,19 +7,17 @@ namespace PalCalc.Solver.Tests.Processing.Attacks;
 public class AttackTargetContextTests
 {
     [TestMethod]
-    public void Settings_CapturesZeroFiniteAndUnlimitedCakeLimits()
+    public void Settings_CapturesEachCakePolicy()
     {
-        Assert.AreEqual(0, SolverTestScenario.Solver([], maxSpecialCakes: 0).Settings.MaxSpecialCakes);
-        Assert.AreEqual(12, SolverTestScenario.Solver([], maxSpecialCakes: 12).Settings.MaxSpecialCakes);
-        Assert.IsNull(SolverTestScenario.Solver([], maxSpecialCakes: null).Settings.MaxSpecialCakes);
+        foreach (var policy in Enum.GetValues<SpecialCakePolicy>())
+            Assert.AreEqual(policy, SolverTestScenario.Solver([], specialCakePolicy: policy).Settings.SpecialCakePolicy);
     }
 
     [TestMethod]
-    public void Settings_RejectsNegativeCakeLimit()
+    public void Settings_RejectsUnknownCakePolicy()
     {
         Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
-            SolverTestScenario.Solver([], maxSpecialCakes: -1)
-        );
+            SolverTestScenario.Solver([], specialCakePolicy: (SpecialCakePolicy)(-1)));
     }
 
     [TestMethod]
@@ -51,7 +49,7 @@ public class AttackTargetContextTests
         );
 
         Assert.AreEqual((byte)expectedMask, context.FullTargetMask);
-        Assert.AreEqual(count != 0, context.IsActive);
+        Assert.AreEqual(count != 0, context.HasRequiredAttacks);
     }
 
     [TestMethod]

@@ -22,7 +22,7 @@ public class InitialPalBuilderTests
         );
         var configuredSolver = SolverTestScenario.Solver(
             [male, female],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxBreedingSteps: 1
         );
 
@@ -57,7 +57,7 @@ public class InitialPalBuilderTests
         );
         var configuredSolver = SolverTestScenario.Solver(
             [noisy, clean],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxBreedingSteps: 1
         );
 
@@ -80,7 +80,7 @@ public class InitialPalBuilderTests
         var katress = "Katress".ToPal(SolverTestScenario.DB);
         var configuredSolver = SolverTestScenario.Solver(
             ownedPals: [],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxBreedingSteps: 1,
             maxWildPals: 1,
             allowedWildPals: [katress]
@@ -122,7 +122,7 @@ public class InitialPalBuilderTests
         Assert.AreEqual(2, seeds.Count);
         CollectionAssert.AreEquivalent(
             new byte[] { 0, 1 },
-            seeds.Select(seed => seed.AttackProfile.Entries.Single().LearnedTargetMask).ToArray()
+            seeds.Select(seed => seed.AttackProfile.Masks.Single()).ToArray()
         );
     }
 
@@ -140,7 +140,7 @@ public class InitialPalBuilderTests
         var seed = Build([owned], target).OfType<OwnedPalReference>().Single();
         var context = new AttackTargetContext(target, SolverTestScenario.DB);
 
-        Assert.AreEqual(context.FullTargetMask, seed.AttackProfile.Entries.Single().LearnedTargetMask);
+        Assert.AreEqual(context.FullTargetMask, seed.AttackProfile.Masks.Single());
         Assert.IsTrue(seed.AttackProfile.HasNoopAttack);
         Assert.AreEqual(0, context.MaskOf([nonInheritable]) & context.InheritableTargetMask);
     }
@@ -156,7 +156,7 @@ public class InitialPalBuilderTests
             "CommetRain".InternalToActive(SolverTestScenario.DB)
         );
         var configuredSolver = SolverTestScenario.Solver(
-            ownedPals: [], maxSpecialCakes: 0, maxBreedingSteps: 8, maxWildPals: 1, allowedWildPals: [pal]
+            ownedPals: [], specialCakePolicy: SpecialCakePolicy.Never, maxBreedingSteps: 8, maxWildPals: 1, allowedWildPals: [pal]
         );
 
         var wild = NewBuilder(configuredSolver, target).Build(target).OfType<WildPalReference>().First();
@@ -164,7 +164,7 @@ public class InitialPalBuilderTests
 
         Assert.AreEqual(
             (byte)3,
-            wild.AttackProfile.Entries.Single().LearnedTargetMask
+            wild.AttackProfile.Masks.Single()
         );
         Assert.AreEqual((byte)3, context.MaskOf(wildAttacks));
         Assert.IsTrue(wild.AttackProfile.HasNoopAttack);
@@ -185,7 +185,7 @@ public class InitialPalBuilderTests
 
         Assert.AreEqual(2, seeds.Count);
         Assert.IsFalse(seeds.Any(seed => seed is CompositeOwnedPalReference));
-        Assert.AreEqual(2, seeds.Select(seed => seed.AttackProfile.Entries.Single().LearnedTargetMask).Distinct().Count());
+        Assert.AreEqual(2, seeds.Select(seed => seed.AttackProfile.Masks.Single()).Distinct().Count());
     }
 
     [TestMethod]
@@ -201,14 +201,14 @@ public class InitialPalBuilderTests
         var composite = Build([male, female], target).Single() as CompositeOwnedPalReference;
 
         Assert.IsNotNull(composite);
-        Assert.AreEqual((byte)1, composite.AttackProfile.Entries.Single().LearnedTargetMask);
+        Assert.AreEqual((byte)1, composite.AttackProfile.Masks.Single());
     }
 
     [TestMethod]
     public void WithGuaranteedGender_PreservesAttackProfileCapabilities()
     {
         var pal = "Katress".ToPal(SolverTestScenario.DB);
-        var profile = new AttackProfile(true, new AttackProfileEntry(1, 0));
+        var profile = new AttackProfile(true, (byte)1);
         var owned = new OwnedPalReference(
             SolverTestScenario.Owned(pal.Name, PalGender.MALE), [], new(),
             attackProfile: profile
@@ -219,9 +219,10 @@ public class InitialPalBuilderTests
             levelRequirements: null
         );
         var bred = new BredPalReference(
-            new GameSettings(), pal, PalGender.WILDCARD, owned, owned, null, [], 1, 1, new(), 1,
+            new GameSettings(), pal, PalGender.WILDCARD, owned, owned, null, [], new(BreedingMethod.Ordinary, 1), new(), 1,
             attackProfile: profile,
-            materializedAttackInheritance: null
+            materializedAttackInheritance: null,
+            recordedSpecialCakes: null
         );
 
         foreach (var reference in new IPalReference[]
@@ -231,14 +232,14 @@ public class InitialPalBuilderTests
             bred.WithGuaranteedGender(SolverTestScenario.DB, PalGender.FEMALE, true),
         })
         {
-            Assert.AreEqual((byte)1, reference.AttackProfile.Entries.Single().LearnedTargetMask);
+            Assert.AreEqual((byte)1, reference.AttackProfile.Masks.Single());
             Assert.IsTrue(reference.AttackProfile.HasNoopAttack);
         }
     }
 
     private static List<IPalReference> Build(IEnumerable<PalInstance> owned, PalSpecifier target)
     {
-        var configuredSolver = SolverTestScenario.Solver(owned, maxSpecialCakes: 0, maxBreedingSteps: 4);
+        var configuredSolver = SolverTestScenario.Solver(owned, specialCakePolicy: SpecialCakePolicy.Never, maxBreedingSteps: 4);
         return NewBuilder(configuredSolver, target).Build(target);
     }
 

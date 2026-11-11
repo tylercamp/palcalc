@@ -289,7 +289,7 @@ public class ParentCombosToolTests
             allowedSurgeryPassives: [],
             skipSurgeryPassivesDuringSearch: false,
             useGenderReversers: useGenderReversers,
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             trainPals: true
         );
 }

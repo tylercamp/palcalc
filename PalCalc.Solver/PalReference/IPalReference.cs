@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Solver.PalReference
 {
+    // Sync: when output/resource properties or reference types change, review
+    // FinalizationComparison.KeyOf and InputsOf in Processing/FinalizationAlternatives.cs.
+    // They decide which plans can safely be compared on effort and cake use alone.
     public interface IPalReference
     {
         Pal Pal { get; }
@@ -52,6 +55,10 @@ namespace PalCalc.Solver.PalReference
         TimeSpan BreedingEffort { get; }
         TimeSpan SelfBreedingEffort { get; }
         int TotalCost { get; }
+
+        // Special cake costs before gender and attack adjustments, used as a lower bound when pruning
+        int BaseSpecialCakes => ExpectedSpecialCakes;
+        int ExpectedSpecialCakes => 0;
 
         /// <summary>
         /// Returns a version of this pal with the given gender. The new pal may have its effort updated

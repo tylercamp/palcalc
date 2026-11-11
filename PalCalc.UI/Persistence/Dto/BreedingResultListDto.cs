@@ -40,6 +40,7 @@ namespace PalCalc.UI.Persistence.Dto
         public int MaxGoldCost { get; init; }
         public bool SkipSurgerySearch { get; init; }
         public bool UseGenderReversers { get; init; }
+        public bool AllowSpecialCakesForPassives { get; init; }
         public List<string> BannedBredPalInternalNames { get; init; }
         public List<string> BannedWildPalInternalNames { get; init; }
         public List<string> BannedSurgeryPassiveInternalNames { get; init; }

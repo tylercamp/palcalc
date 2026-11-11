@@ -1231,6 +1231,14 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        LC_SOLVER_SETTINGS_ALLOW_SPECIAL_CAKES_FOR_PASSIVES,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_SOLVER_SETTINGS_ALLOW_SPECIAL_CAKES_FOR_PASSIVES_DESCRIPTION,
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         LC_SOLVER_SETTINGS_ALLOWED_BRED_PALS,
         /// <summary>
         ///   Looks up a localized string similar to .
