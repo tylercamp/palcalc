@@ -72,14 +72,14 @@ public class BredPalReferenceEffortTests
             PalGender.WILDCARD,
             Owned(palName, PalGender.MALE),
             Owned(palName, PalGender.FEMALE),
-            null,
+            avgRequiredBreedings: null,
             [],
-            1,
-            1,
+            new BreedingOutcome(BreedingMethod.Ordinary, 1),
             new IV_Set(),
-            1,
+            ivsProbability: 1,
             AttackProfile.Inactive,
-            null
+            materializedAttackInheritance: null,
+            recordedSpecialCakes: null
         );
 
     private static OwnedPalReference Owned(string palName, PalGender gender) =>

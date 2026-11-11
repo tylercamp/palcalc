@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PalCalc.Model;
+using PalCalc.SaveReader;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference;
 using PalCalc.Solver.PalReference.Properties;
@@ -10,6 +11,7 @@ using PalCalc.UI.Persistence.Dto;
 using PalCalc.UI.Persistence.Serialization;
 using PalCalc.UI.ViewModel;
 using PalCalc.UI.ViewModel.Mapped;
+using PalCalc.UI.ViewModel.PalDerived;
 using PalCalc.UI.ViewModel.Solver;
 using System;
 using System.Collections.Generic;
@@ -21,6 +23,34 @@ namespace PalCalc.UI.Tests
     [TestClass]
     public class PersistenceTests
     {
+    [TestMethod]
+    public void RefreshingCachedSaveUpdatesContainerGuild()
+    {
+        var db = PalDB.LoadEmbedded();
+        using var save = new VirtualSaveGame("player", "world", null, null, null, null);
+        var cached = Snapshot("original-guild");
+        Assert.AreEqual("original-guild", cached.GuildsByContainerId["base-container"].Id);
+
+        cached.CopyFrom(Snapshot("new-guild"));
+
+        Assert.AreEqual("new-guild", cached.GuildsByContainerId["base-container"].Id);
+
+        CachedSaveGame Snapshot(string guildId)
+        {
+            var snapshot = CachedSaveGame.FromJson($$"""
+                {
+                    "Players": [],
+                    "Guilds": [{ "Id": "{{guildId}}" }],
+                    "OwnedPals": [],
+                    "Bases": [{ "Id": "base", "OwnerGuildId": "{{guildId}}" }],
+                    "PalContainers": [{ "Type": "Base", "Id": "base-container", "BaseId": "base" }]
+                }
+                """, db);
+            snapshot.UnderlyingSave = save;
+            return snapshot;
+        }
+    }
+
     [TestMethod]
     public void FreshStorageReceivesCurrentManifest()
     {
@@ -494,7 +524,7 @@ namespace PalCalc.UI.Tests
         var male = Owned(PalGender.MALE, "male");
         var female = Owned(PalGender.FEMALE, "female");
         var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics, AttackProfile.Inactive, null);
-        var bred = new BredPalReference(GameSettings.Defaults, pal, PalGender.WILDCARD, male, wild, null, [swift], 1, 1, ivs, 1, AttackProfile.Inactive, null);
+        var bred = new BredPalReference(GameSettings.Defaults, pal, PalGender.WILDCARD, male, wild, null, [swift], new(BreedingMethod.Ordinary, 1), ivs, 1, AttackProfile.Inactive, null, null);
         var composite = new CompositeOwnedPalReference(male, female);
         var surgery = new SurgeryTablePalReference(wild, [new AddPassiveSurgeryOperation(swift)]);
         var settings = new SerializableSolverSettings();
@@ -552,7 +582,100 @@ namespace PalCalc.UI.Tests
     }
 
     [TestMethod]
-    public void SelectedResultRoundTrips()
+    public void PalInstanceSnapshotRoundTripPreservesRank()
+    {
+        var db = PalDB.LoadEmbedded();
+        var dto = CustomizationsJsonSerializer.ToDto(MakeInstanceWithRank(db, 4));
+
+        var restored = CustomizationsJsonSerializer.FromDto(
+            JsonConvert.DeserializeObject<PalInstanceSnapshotDto>(JsonConvert.SerializeObject(dto)),
+            db);
+
+        Assert.AreEqual(4, restored.Rank);
+    }
+
+    [TestMethod]
+    public void CustomPalsDefaultToRankOne()
+    {
+        var db = PalDB.LoadEmbedded();
+        var instance = MakeInstanceWithRank(db, 4);
+        instance.Location.Type = LocationType.Custom;
+
+        Assert.AreEqual(1, new CustomPalInstanceViewModel(instance).ModelObject.Rank);
+    }
+
+    [TestMethod]
+    public void VersionSixMigratesRankOnCustomPalsAndNestedResults()
+    {
+        WithTemporaryDirectory(path =>
+        {
+            File.WriteAllText(StorageFormat.ManifestPath(path), JsonConvert.SerializeObject(new StorageManifest { Version = 6 }));
+            var db = PalDB.LoadEmbedded();
+            var pal = "Beakon".ToPal(db);
+            var ivs = new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random);
+            OwnedPalReference Owned(PalGender gender, int rank) => new(MakeInstanceWithRank(db, rank, gender), [], ivs, AttackProfile.Inactive);
+
+            var saveDirectory = Directory.CreateDirectory(Path.Combine(path, "save"));
+            var customizations = JObject.FromObject(CustomizationsJsonSerializer.ToDto(new SaveCustomizations
+            {
+                CustomContainers = [new CustomContainer { Label = "favorites", Contents = [MakeInstanceWithRank(db, 1)] }],
+            }));
+            ((JObject)customizations.SelectToken("$.CustomContainers[0].Contents[0]")!).Remove("Rank");
+            var customizationsPath = Path.Combine(saveDirectory.FullName, "custom-containers.json");
+            File.WriteAllText(customizationsPath, customizations.ToString());
+
+            var composite = new CompositeOwnedPalReference(Owned(PalGender.MALE, 1), Owned(PalGender.FEMALE, 1));
+            var root = new BredPalReference(new GameSettings(), pal, PalGender.WILDCARD, composite, Owned(PalGender.MALE, 4),
+                null, [], new(BreedingMethod.Ordinary, 1), ivs, 1, AttackProfile.Inactive, null, null);
+            var reference = JObject.FromObject(ResultJsonSerializer.ToDto(root));
+            foreach (var instance in reference.SelectTokens("$..Instance").OfType<JObject>().Where(i => i["Rank"]!.ToObject<int>() != 4).ToList())
+                instance.Remove("Rank");
+            var results = JObject.FromObject(new BreedingResultListDto
+            {
+                GameSettings = ResultJsonSerializer.ToDto(new GameSettings()),
+                SolverSettings = ResultJsonSerializer.ToDto(new SerializableSolverSettings()),
+                Results = [new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(root) }],
+                SelectedResultIndex = 0
+            });
+            results["Results"]![0]!["PalReference"] = reference;
+            var targets = Directory.CreateDirectory(Path.Combine(saveDirectory.FullName, "targets"));
+            var targetPath = Path.Combine(targets.FullName, "target.json");
+            var targetDocument = JObject.FromObject(TargetJsonSerializer.ToDto(
+                new PalSpecifierViewModel("target", new PalSpecifier { Pal = pal }), db, new GameSettings()));
+            targetDocument["CurrentResults"] = results;
+            File.WriteAllText(targetPath, targetDocument.ToString());
+
+            StorageMigrationRunner.EnsureCurrent(path);
+
+            var restored = CustomizationsJsonSerializer.ToRuntime(
+                CustomizationsJsonSerializer.FromCurrentJson(File.ReadAllText(customizationsPath)), db);
+            Assert.AreEqual(1, restored.CustomContainers.Single().Contents.Single().Rank);
+
+            var migratedTarget = JObject.Parse(File.ReadAllText(targetPath));
+            Assert.IsNotNull(TargetJsonSerializer.FromCurrentTargetJson(migratedTarget.ToString()));
+            CollectionAssert.AreEquivalent(
+                new[] { 1, 1, 4 },
+                migratedTarget.SelectTokens("$..Instance").OfType<JObject>().Select(i => i["Rank"]!.ToObject<int>()).ToArray());
+
+            Assert.IsTrue(File.Exists(customizationsPath + ".bak"));
+            Assert.IsTrue(File.Exists(targetPath + ".bak"));
+            Assert.AreEqual(StorageFormat.CurrentVersion, JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
+        });
+    }
+
+    private static PalInstance MakeInstanceWithRank(PalDB db, int rank, PalGender gender = PalGender.MALE) => new()
+    {
+        Pal = "Beakon".ToPal(db),
+        Location = new PalLocation { Type = LocationType.Palbox, ContainerId = "box", Index = 1 },
+        Gender = gender,
+        PassiveSkills = [],
+        ActiveSkills = [],
+        EquippedActiveSkills = [],
+        Rank = rank,
+    };
+
+    [TestMethod]
+    public void SavedResultsDeferGraphsAndPreserveSelectionAndCheckmarks()
     {
         var db = PalDB.LoadEmbedded();
         var pal = "Beakon".ToPal(db);
@@ -563,8 +686,8 @@ namespace PalCalc.UI.Tests
             SolverSettings = ResultJsonSerializer.ToDto(new SerializableSolverSettings()),
             Results =
             [
-                new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(wild) },
-                new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(wild) },
+                new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(wild), CheckedNodes = [0] },
+                new BreedingResultDto { PalReference = ResultJsonSerializer.ToDto(wild), CheckedNodes = [0] },
             ],
             SelectedResultIndex = 1,
         };
@@ -573,15 +696,66 @@ namespace PalCalc.UI.Tests
         var restoredDto = JsonConvert.DeserializeObject<BreedingResultListDto>(json);
         Assert.AreEqual(1, restoredDto!.SelectedResultIndex);
 
+        var target = new PalSpecifier { Pal = pal };
         var restored = ResultJsonSerializer.FromDto(
             restoredDto,
             db,
             null,
             GameSettings.Defaults,
-            new PalSpecifier { Pal = pal },
+            target,
             null,
             null);
         Assert.AreSame(restored.Results[1], restored.SelectedResult);
+
+        var saved = ResultJsonSerializer.ToDto(restored, db, GameSettings.Defaults, target);
+        Assert.AreEqual(1, saved.SelectedResultIndex);
+        CollectionAssert.AreEqual(new[] { 0 }, saved.Results[0].CheckedNodes);
+        Assert.IsFalse(restored.Results.Any(result => result.IsGraphBuilt));
+
+        var changes = 0;
+        restored.CheckedStateChanged += (_, _) => changes++;
+        var selectedNode = restored.SelectedResult.Graph.Nodes.Single();
+        Assert.IsTrue(selectedNode.IsChecked);
+        Assert.AreEqual(0, changes);
+        Assert.IsFalse(restored.Results[0].IsGraphBuilt);
+        selectedNode.IsChecked = false;
+        Assert.AreEqual(1, changes);
+
+        restored.UpdateCachedData(null, GameSettings.Defaults);
+        Assert.AreSame(restored.Results[1], restored.SelectedResult);
+        Assert.AreEqual(1, changes);
+        Assert.IsFalse(restored.Results.Any(result => result.IsGraphBuilt));
+        Assert.IsTrue(restored.Results[0].Graph.Nodes.Single().IsChecked);
+        Assert.IsFalse(restored.Results[1].Graph.Nodes.Single().IsChecked);
+
+        restored.SelectedResult = restored.Results[0];
+        Assert.AreEqual(2, changes);
+    }
+
+    [TestMethod]
+    public void DeferredGraphFailurePreservesSavedCheckmarksUntilRefresh()
+    {
+        var db = PalDB.LoadEmbedded();
+        var settings = new GameSettings();
+        var validWidth = settings.LocationTypeGridWidths[LocationType.Palbox];
+        settings.LocationTypeGridWidths[LocationType.Palbox] = 0;
+        var owned = new OwnedPalReference(MakeInstanceWithRank(db, 1), [], new IV_Set(), AttackProfile.Inactive);
+        var row = new BreedingResultViewModel(null, settings, owned, []) { CheckedNodeIndices = [0] };
+        var results = new BreedingResultListViewModel { Results = [row] };
+
+        Assert.IsNull(row.Graph);
+        settings.LocationTypeGridWidths[LocationType.Palbox] = validWidth;
+        Assert.IsNull(row.Graph);
+        Assert.IsFalse(row.CheckedNodes.Any());
+        Assert.IsTrue(row.HasValue);
+        Assert.AreSame(row, results.SelectedResult);
+
+        var target = new PalSpecifier { Pal = owned.Pal };
+        var saved = ResultJsonSerializer.ToDto(results, db, settings, target);
+        CollectionAssert.AreEqual(new[] { 0 }, saved.Results.Single().CheckedNodes);
+
+        results.UpdateCachedData(null, settings);
+        Assert.IsTrue(results.SelectedResult.Graph.Nodes.Single().IsChecked);
     }
 
     [TestMethod]
@@ -644,7 +818,7 @@ namespace PalCalc.UI.Tests
             var wild = new WildPalReference(pal, [], 0, db.BreedingMechanics, AttackProfile.Inactive, null);
             var surgery = new SurgeryTablePalReference(wild, []);
             var root = new BredPalReference(new GameSettings(), pal, PalGender.WILDCARD, composite, surgery,
-                null, [], 1, 1, new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random), 1, AttackProfile.Inactive, null);
+                null, [], new(BreedingMethod.Ordinary, 1), new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random), 1, AttackProfile.Inactive, null, null);
             var reference = JObject.FromObject(ResultJsonSerializer.ToDto(root));
             var references = reference.DescendantsAndSelf().OfType<JObject>().Where(o => o["RefType"] != null).ToArray();
             foreach (var item in references) item.Remove("LevelRequirements");
@@ -693,9 +867,64 @@ namespace PalCalc.UI.Tests
             Assert.HasCount(6, migratedTarget.SelectTokens("$..LevelRequirements").ToArray());
             Assert.IsTrue(migratedReferences.All(o => o["LevelRequirements"]?.Type == JTokenType.Null));
             Assert.IsNotNull(ResultJsonSerializer.FromDto(dto.Results[0].PalReference, db, new GameSettings(), new SerializableSolverSettings()));
+            preserved["CurrentResults"]!["SolverSettings"]!["AllowSpecialCakesForPassives"] = false;
             Assert.IsTrue(JToken.DeepEquals(preserved, JObject.Parse(File.ReadAllText(preservedPath))));
             Assert.IsTrue(File.Exists(targetPath + ".bak"));
-            Assert.AreEqual(6, JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
+            Assert.AreEqual(StorageFormat.CurrentVersion, JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
+            var migratedText = File.ReadAllText(targetPath);
+            StorageMigrationRunner.EnsureCurrent(path);
+            Assert.AreEqual(migratedText, File.ReadAllText(targetPath));
+        });
+    }
+
+    [TestMethod]
+    [DataRow(6, null)]
+    [DataRow(6, false)]
+    [DataRow(6, true)]
+    [DataRow(7, null)]
+    [DataRow(7, false)]
+    [DataRow(7, true)]
+    public void PassiveCakePolicyMigrationPreservesExistingChoices(int version, bool? existingChoice)
+    {
+        WithTemporaryDirectory(path =>
+        {
+            File.WriteAllText(StorageFormat.ManifestPath(path),
+                JsonConvert.SerializeObject(new StorageManifest { Version = version }));
+            var settingsPath = Path.Combine(path, "settings.json");
+            var settings = JObject.FromObject(AppSettingsJsonSerializer.ToDto(new AppSettings()));
+            var results = JObject.FromObject(new BreedingResultListDto
+            {
+                GameSettings = ResultJsonSerializer.ToDto(new GameSettings()),
+                SolverSettings = ResultJsonSerializer.ToDto(new SerializableSolverSettings()),
+                Results = [],
+                SelectedResultIndex = -1,
+            });
+            foreach (var solverSettings in new[] { (JObject)settings["SolverSettings"]!, (JObject)results["SolverSettings"]! })
+                if (existingChoice is bool choice)
+                    solverSettings["AllowSpecialCakesForPassives"] = choice;
+                else
+                    solverSettings.Remove("AllowSpecialCakesForPassives");
+            var originalSettings = settings.ToString();
+            File.WriteAllText(settingsPath, originalSettings);
+            var targets = Directory.CreateDirectory(Path.Combine(path, "save", "targets"));
+            var targetPath = Path.Combine(targets.FullName, "target.json");
+            var originalTarget = new JObject { ["CurrentResults"] = results }.ToString();
+            File.WriteAllText(targetPath, originalTarget);
+            var emptyTargetPath = Path.Combine(targets.FullName, "empty.json");
+            File.WriteAllText(emptyTargetPath, """{"CurrentResults":null}""");
+
+            StorageMigrationRunner.EnsureCurrent(path);
+
+            var migratedSettings = AppSettingsJsonSerializer.FromCurrentJson(File.ReadAllText(settingsPath));
+            Assert.AreEqual(existingChoice ?? false, migratedSettings.SolverSettings.AllowSpecialCakesForPassives);
+            var migrated = JObject.Parse(File.ReadAllText(targetPath));
+            var migratedResults = ResultJsonSerializer.FromCurrentJson(migrated["CurrentResults"]!.ToString());
+            Assert.AreEqual(existingChoice ?? false, migratedResults.SolverSettings.AllowSpecialCakesForPassives);
+            Assert.AreEqual(JTokenType.Null, JObject.Parse(File.ReadAllText(emptyTargetPath))["CurrentResults"]!.Type);
+            Assert.AreEqual(originalSettings, File.ReadAllText(settingsPath + ".bak"));
+            Assert.AreEqual(originalTarget, File.ReadAllText(targetPath + ".bak"));
+            Assert.AreEqual(StorageFormat.CurrentVersion,
+                JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
             var migratedText = File.ReadAllText(targetPath);
             StorageMigrationRunner.EnsureCurrent(path);
             Assert.AreEqual(migratedText, File.ReadAllText(targetPath));

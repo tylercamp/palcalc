@@ -54,7 +54,7 @@ internal class Program
             allowedSurgeryPassives: db.PassiveSkills.Where(p => p.SupportsSurgery).ToList(),
             skipSurgeryPassivesDuringSearch: false,
             useGenderReversers: false,
-            maxSpecialCakes: 1000000,
+            specialCakePolicy: SpecialCakePolicy.AttackInheritanceOnly,
             trainPals: true
         );
         var solver = new BreedingSolver();

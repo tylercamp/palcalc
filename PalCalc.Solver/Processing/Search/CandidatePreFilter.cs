@@ -1,10 +1,8 @@
 using PalCalc.Model;
 using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.PalReference;
-using PalCalc.Solver.PalReference.Properties;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
-using System.Numerics;
 
 namespace PalCalc.Solver.Processing.Search;
 
@@ -13,10 +11,7 @@ namespace PalCalc.Solver.Processing.Search;
 /// </summary>
 internal interface ICandidateFrontierView
 {
-    FrontierCandidateAssessment AssessCandidate(
-        IPalReference candidate,
-        EffectivePropertiesKey propertiesKey
-    );
+    FrontierCandidateAssessment AssessCandidate(IPalReference candidate, EffectivePropertiesKey propertiesKey);
 }
 
 internal readonly record struct CandidatePreFilterResult(bool Accepted, bool IsRetained)
@@ -31,7 +26,7 @@ internal readonly record struct CandidatePreFilterResult(bool Accepted, bool IsR
 internal sealed class CandidatePreFilter
 {
     private readonly PalSpecifier target;
-    private readonly AttackTargetContext attackTargets;
+    private readonly bool hasRequiredAttacks;
     private readonly TimeSpan maxEffort;
     private readonly BreedingSolverSettings settings;
     private readonly ICandidateSelectionPolicy selectionPolicy;
@@ -42,6 +37,8 @@ internal sealed class CandidatePreFilter
         ConcurrentDictionary<EffectivePropertiesKey, EarlyCandidateGroup>
     > earlyCandidatesByPalId;
     private readonly ConcurrentDictionary<IPalReference, byte> terminalCandidates = new();
+
+    public bool PreservesAttackAndCakeOptions { get; }
 
     public CandidatePreFilter(
         PalSpecifier target,
@@ -55,12 +52,15 @@ internal sealed class CandidatePreFilter
     )
     {
         this.target = target;
-        this.attackTargets = attackTargets;
         this.maxEffort = maxEffort;
         this.settings = settings;
         this.selectionPolicy = selectionPolicy;
         this.frontier = frontier;
         this.surgeryFinalists = surgeryFinalists;
+
+        hasRequiredAttacks = attackTargets?.HasRequiredAttacks == true;
+        PreservesAttackAndCakeOptions = hasRequiredAttacks || settings.SpecialCakePolicy == SpecialCakePolicy.AttacksAndPassives;
+
         earlyCandidatesByPalId = palIds.ToFrozenDictionary(
             id => id,
             _ => new ConcurrentDictionary<EffectivePropertiesKey, EarlyCandidateGroup>()
@@ -72,31 +72,22 @@ internal sealed class CandidatePreFilter
         if (candidate.BreedingEffort > maxEffort)
             return CandidatePreFilterResult.Rejected;
 
-        var isTerminal = attackTargets?.Satisfies(candidate) ?? target.IsSatisfiedBy(candidate);
+        var isTerminal = target.IsSatisfiedBy(candidate);
         // A completed result may be a poor future parent and be rejected below.
         // Preserve its best final path before applying frontier-oriented filters.
-        var terminalRetained =
-            isTerminal &&
-            attackTargets?.IsActive == true &&
-            RetainTerminal(candidate);
+        var terminalRetained = isTerminal && PreservesAttackAndCakeOptions && RetainTerminal(candidate);
         var surgeryRetained = surgeryFinalists?.TryRetain(candidate) == true;
 
         var propertiesKey = selectionPolicy.KeyOf(candidate);
-        var frontierAssessment = frontier.AssessCandidate(
-            candidate,
-            propertiesKey
-        );
-        if (
-            frontierAssessment == FrontierCandidateAssessment.Inferior &&
-            !isTerminal
-        )
+        var frontierAssessment = frontier.AssessCandidate(candidate, propertiesKey);
+        if (frontierAssessment == FrontierCandidateAssessment.Inferior && !isTerminal)
             return surgeryRetained
                 ? new(Accepted: false, IsRetained: true)
                 : CandidatePreFilterResult.Rejected;
 
         var earlyCandidates = earlyCandidatesByPalId[candidate.Pal.Id];
-        var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new());
-        var accepted = group.TryAdd(candidate, selectionPolicy, attackTargets?.IsActive == true);
+        var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new(hasRequiredAttacks));
+        var accepted = group.TryAdd(candidate, selectionPolicy, PreservesAttackAndCakeOptions);
 
         return accepted
             ? new(Accepted: true, IsRetained: true)
@@ -116,30 +107,21 @@ internal sealed class CandidatePreFilter
             return CandidatePreFilterResult.Rejected;
 
         var isTerminal = target.IsSatisfiedByIgnoringAttacks(
-            candidate.Pal,
-            candidate.Gender,
-            candidate.IVs,
-            candidate.EffectivePassives
-        ) && candidate.AttackProfile.Contains(attackTargets.FullTargetMask);
+            candidate.Pal, candidate.Gender,
+            candidate.IVs, candidate.EffectivePassives
+        ) && target.SatisfiesAttackRequirement(candidate.AttackProfile);
         var terminalRetained = isTerminal && RetainTerminal(candidate.Materialize());
         var surgeryRetained = surgeryFinalists?.TryRetain(ref candidate) == true;
 
         var propertiesKey = defaultPolicy.KeyOf(candidate);
-        var frontierAssessment = searchFrontier.AssessCandidate(
-            candidate,
-            propertiesKey,
-            defaultPolicy
-        );
-        if (
-            frontierAssessment == FrontierCandidateAssessment.Inferior &&
-            !isTerminal
-        )
+        var frontierAssessment = searchFrontier.AssessCandidate(candidate, propertiesKey, defaultPolicy);
+        if (frontierAssessment == FrontierCandidateAssessment.Inferior && !isTerminal)
             return surgeryRetained
                 ? new(Accepted: false, IsRetained: true)
                 : CandidatePreFilterResult.Rejected;
 
         var earlyCandidates = earlyCandidatesByPalId[candidate.Pal.Id];
-        var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new());
+        var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new(hasRequiredAttacks));
         if (!group.TryAdd(ref candidate))
             return new(
                 Accepted: false,
@@ -151,12 +133,12 @@ internal sealed class CandidatePreFilter
 
     public IReadOnlyList<IPalReference> TerminalCandidates => terminalCandidates.Keys.ToArray();
 
-    public List<IPalReference> RetainedAttackCandidates()
+    public List<IPalReference> RetainedCostCandidates()
     {
         var retained = new List<IPalReference>();
         foreach (var candidatesByKey in earlyCandidatesByPalId.Values)
             foreach (var group in candidatesByKey.Values)
-                group.AddRetainedAttackCandidatesTo(retained);
+                group.AddRetainedCostCandidatesTo(retained);
         return retained;
     }
 
@@ -166,133 +148,38 @@ internal sealed class CandidatePreFilter
         {
             if (candidate.Gender != PalGender.WILDCARD && !settings.UseGenderReversers)
                 return false;
-            candidate = candidate.WithGuaranteedGender(
-                settings.DB,
-                target.RequiredGender,
-                settings.UseGenderReversers
-            );
+            candidate = candidate.WithGuaranteedGender(settings.DB, target.RequiredGender, settings.UseGenderReversers);
         }
 
         return terminalCandidates.TryAdd(candidate, 0);
     }
 
-    private sealed class EarlyCandidateGroup
+    private sealed class EarlyCandidateGroup(bool hasRequiredAttacks)
     {
-        private const int AttackSlotCount = AttackProfile.TargetMaskCount;
-
-        private readonly IPalReference[] attackChampions = new IPalReference[AttackSlotCount];
-        private readonly AttackProfileEntry[] attackEntries = new AttackProfileEntry[AttackSlotCount];
-        private readonly Dictionary<IPalReference, int> championCounts =
-            new(ReferenceEqualityComparer.Instance);
+        private readonly CandidateCostFrontier alternatives = new(hasRequiredAttacks, markReplacedOutdated: true);
         private IPalReference ordinaryIncumbent;
 
-        public void AddRetainedAttackCandidatesTo(List<IPalReference> destination)
+        public void AddRetainedCostCandidatesTo(List<IPalReference> destination)
         {
             lock (this)
-                destination.AddRange(championCounts.Keys);
+                destination.AddRange(alternatives.Candidates);
         }
 
-        public bool TryAdd(
-            IPalReference candidate,
-            ICandidateSelectionPolicy selectionPolicy,
-            bool attacksActive
-        )
+        public bool TryAdd(IPalReference candidate, ICandidateSelectionPolicy selectionPolicy, bool retainCostAlternatives)
         {
             lock (this)
-            {
-                if (!attacksActive)
-                    return TryAddOrdinary(candidate, selectionPolicy);
-
-                var attackProfile = candidate.AttackProfile;
-
-                Span<bool> improved = stackalloc bool[AttackSlotCount];
-                var improvesAny = false;
-                foreach (ref readonly var entry in attackProfile.EntriesSpan)
-                {
-                    var slot = entry.LearnedTargetMask;
-                    if (attackChampions[slot] is not null &&
-                        Compare(candidate, entry, attackChampions[slot], attackEntries[slot]) >= 0)
-                        continue;
-
-                    improved[slot] = true;
-                    improvesAny = true;
-                }
-
-                if (!improvesAny)
-                    return false;
-
-                for (var slot = 0; slot < improved.Length; slot++)
-                {
-                    if (!improved[slot])
-                        continue;
-
-                    var previous = attackChampions[slot];
-                    if (previous is not null && --championCounts[previous] == 0)
-                    {
-                        championCounts.Remove(previous);
-                        previous.IsOutdated = true;
-                    }
-
-                    attackChampions[slot] = candidate;
-                    attackEntries[slot] = BestEntryForSlot(candidate, slot);
-                    championCounts.TryGetValue(candidate, out var count);
-                    championCounts[candidate] = count + 1;
-                }
-
-                return true;
-            }
+                return retainCostAlternatives
+                    ? alternatives.TryAdd(candidate)
+                    : TryAddOrdinary(candidate, selectionPolicy);
         }
 
         public bool TryAdd(ref CandidateDraft candidate)
         {
             lock (this)
-            {
-                Span<bool> improved = stackalloc bool[AttackSlotCount];
-                var improvesAny = false;
-                var masks = candidate.AttackProfile.EntryTargetMasks;
-                while (masks != 0)
-                {
-                    var slot = BitOperations.TrailingZeroCount(masks);
-                    masks &= masks - 1;
-                    var entry = candidate.AttackProfile.EntryForMask(slot);
-                    if (attackChampions[slot] is not null &&
-                        Compare(candidate, entry, attackChampions[slot], attackEntries[slot]) >= 0)
-                        continue;
-
-                    improved[slot] = true;
-                    improvesAny = true;
-                }
-
-                if (!improvesAny)
-                    return false;
-
-                var materialized = candidate.Materialize();
-                for (var slot = 0; slot < improved.Length; slot++)
-                {
-                    if (!improved[slot])
-                        continue;
-
-                    var previous = attackChampions[slot];
-                    if (previous is not null && --championCounts[previous] == 0)
-                    {
-                        championCounts.Remove(previous);
-                        previous.IsOutdated = true;
-                    }
-
-                    attackChampions[slot] = materialized;
-                    attackEntries[slot] = candidate.AttackProfile.EntryForMask(slot);
-                    championCounts.TryGetValue(materialized, out var count);
-                    championCounts[materialized] = count + 1;
-                }
-
-                return true;
-            }
+                return alternatives.TryAdd(ref candidate);
         }
 
-        private bool TryAddOrdinary(
-            IPalReference candidate,
-            ICandidateSelectionPolicy selectionPolicy
-        )
+        private bool TryAddOrdinary(IPalReference candidate, ICandidateSelectionPolicy selectionPolicy)
         {
             if (ordinaryIncumbent is null)
             {
@@ -312,67 +199,6 @@ internal sealed class CandidatePreFilter
             }
         }
 
-        private static AttackProfileEntry BestEntryForSlot(IPalReference candidate, int slot)
-        {
-            var mask = (byte)slot;
-            AttackProfileEntry best = default;
-            var found = false;
-            var attackProfile = candidate.AttackProfile;
-            foreach (ref readonly var entry in attackProfile.EntriesSpan)
-            {
-                if (entry.LearnedTargetMask != mask)
-                    continue;
-                if (!found || CompareAttackEntries(entry, best) < 0)
-                {
-                    best = entry;
-                    found = true;
-                }
-            }
-            return best;
-        }
-
-        private static int Compare(
-            IPalReference left,
-            in AttackProfileEntry leftEntry,
-            IPalReference right,
-            in AttackProfileEntry rightEntry
-        )
-        {
-            var comparison = CompareAttackEntries(leftEntry, rightEntry);
-            if (comparison != 0) return comparison;
-            comparison = left.BreedingEffort.CompareTo(right.BreedingEffort);
-            if (comparison != 0) return comparison;
-            comparison = left.TotalCost.CompareTo(right.TotalCost);
-            if (comparison != 0) return comparison;
-            return left.GetHashCode().CompareTo(right.GetHashCode());
-        }
-
-        private static int Compare(
-            in CandidateDraft left,
-            in AttackProfileEntry leftEntry,
-            IPalReference right,
-            in AttackProfileEntry rightEntry
-        )
-        {
-            var comparison = CompareAttackEntries(leftEntry, rightEntry);
-            if (comparison != 0) return comparison;
-            comparison = left.BreedingEffort.CompareTo(right.BreedingEffort);
-            if (comparison != 0) return comparison;
-            comparison = left.TotalCost.CompareTo(right.TotalCost);
-            if (comparison != 0) return comparison;
-            return left.GetHashCode().CompareTo(right.GetHashCode());
-        }
-    }
-
-    private static int CompareAttackEntries(
-        in AttackProfileEntry left,
-        in AttackProfileEntry right
-    )
-    {
-        var comparison = left.TotalSpecialCakes.CompareTo(right.TotalSpecialCakes);
-        return comparison != 0
-            ? comparison
-            : left.LearnedTargetMask.CompareTo(right.LearnedTargetMask);
     }
 }
 

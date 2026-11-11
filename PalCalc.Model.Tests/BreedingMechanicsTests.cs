@@ -1,4 +1,5 @@
 using PalCalc.Model;
+using Newtonsoft.Json.Linq;
 
 namespace PalCalc.Solver.Tests;
 
@@ -10,12 +11,22 @@ public class BreedingMechanicsTests
     // (sanity check that the weights are scraped and probabilities calculated directly for default game settings)
 
     [TestMethod]
-    public void IVProbabilityDirect_MatchesDataminedWeights()
+    public void IVInheritanceWeights_PreserveStoredSelectorWeights()
     {
-        Assert.AreEqual(0f,      mechanics.IVProbabilityDirect[0]);
-        Assert.AreEqual(3f / 6f, mechanics.IVProbabilityDirect[1]);
-        Assert.AreEqual(2f / 6f, mechanics.IVProbabilityDirect[2]);
-        Assert.AreEqual(1f / 6f, mechanics.IVProbabilityDirect[3]);
+        CollectionAssert.AreEqual(new[] { 3, 2, 1 }, mechanics.IVInheritanceWeights);
+    }
+
+    [TestMethod]
+    public void IVInheritanceWeights_RoundTripAsAnOrderedJsonArray()
+    {
+        var original = new BreedingMechanics([1, 4, 7], new() { [1] = 1 }, new() { [0] = 1 });
+        var json = JObject.FromObject(original);
+        Assert.IsInstanceOfType<JArray>(json[nameof(BreedingMechanics.IVInheritanceWeights)]);
+        var restored = json.ToObject<BreedingMechanics>()!;
+
+        CollectionAssert.AreEqual(new[] { 1, 4, 7 }, restored.IVInheritanceWeights);
+        Assert.AreEqual(original.ProbabilityOfInheritingDesiredIVs(true, true, true),
+            restored.ProbabilityOfInheritingDesiredIVs(true, true, true));
     }
 
     [TestMethod]

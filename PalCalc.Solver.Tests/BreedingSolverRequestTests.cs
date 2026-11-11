@@ -11,7 +11,7 @@ public class BreedingSolverRequestTests
     [TestMethod]
     public void BreedingSolver_AcceptsUpToSixRequiredAttacks()
     {
-        var settings = SolverTestScenario.Solver([], maxSpecialCakes: 0).Settings;
+        var settings = SolverTestScenario.Solver([], specialCakePolicy: SpecialCakePolicy.Never).Settings;
         var target = new PalSpecifier
         {
             Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
@@ -27,7 +27,7 @@ public class BreedingSolverRequestTests
     [TestMethod]
     public void BreedingSolver_RejectsSevenDistinctRequiredAttacks()
     {
-        var settings = SolverTestScenario.Solver([], maxSpecialCakes: 0).Settings;
+        var settings = SolverTestScenario.Solver([], specialCakePolicy: SpecialCakePolicy.Never).Settings;
         var target = new PalSpecifier
         {
             Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
@@ -58,7 +58,7 @@ public class BreedingSolverRequestTests
             RequiredGender = PalGender.MALE,
             IV_Attack = 90,
         };
-        var settings = SolverTestScenario.Solver([], maxSpecialCakes: 0).Settings;
+        var settings = SolverTestScenario.Solver([], specialCakePolicy: SpecialCakePolicy.Never).Settings;
 
         var request = new BreedingSolverRequest(target, settings);
         var snapshot = request.Target;
@@ -89,10 +89,10 @@ public class BreedingSolverRequestTests
         var instance = SolverTestScenario.Owned("Wixen Noct", PalGender.MALE);
 
         Assert.IsTrue(target.IsSatisfiedBy(new OwnedPalReference(
-            instance, [], new(), new AttackProfile(new AttackProfileEntry(1, 0))
+            instance, [], new(), new AttackProfile((byte)1)
         )));
         Assert.IsFalse(target.IsSatisfiedBy(new OwnedPalReference(
-            instance, [], new(), new AttackProfile(new AttackProfileEntry(0, 0))
+            instance, [], new(), new AttackProfile((byte)0)
         )));
     }
 
@@ -132,7 +132,7 @@ public class BreedingSolverRequestTests
             allowedSurgeryPassives: surgeryPassives,
             skipSurgeryPassivesDuringSearch: false,
             useGenderReversers: false,
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             trainPals: true
         );
 
@@ -155,7 +155,7 @@ public class BreedingSolverRequestTests
     [TestMethod]
     public void SolverRunContext_UsesFixedRequestDefinition()
     {
-        var settings = SolverTestScenario.Solver([], maxSpecialCakes: 0).Settings;
+        var settings = SolverTestScenario.Solver([], specialCakePolicy: SpecialCakePolicy.Never).Settings;
         var target = new PalSpecifier
         {
             Pal = "Wixen Noct".ToPal(SolverTestScenario.DB),
@@ -184,7 +184,7 @@ public class BreedingSolverRequestTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxBreedingSteps: 1,
             maxSolverIterations: 1
         );
@@ -213,7 +213,7 @@ public class BreedingSolverRequestTests
                     PalGender.MALE
                 ),
             ],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxBreedingSteps: 0,
             maxSolverIterations: 0
         );

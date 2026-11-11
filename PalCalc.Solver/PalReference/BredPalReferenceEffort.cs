@@ -16,7 +16,7 @@ internal static class BredPalReferenceEffort
         parent2.BreedingEffort
     );
 
-    private static TimeSpan CombineParentEffort(
+    public static TimeSpan CombineParentEffort(
         GameSettings gameSettings,
         IPalReference parent1,
         TimeSpan parent1Effort,

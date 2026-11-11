@@ -143,8 +143,7 @@ public class ParallelBatchExecutorTests
             [healthyReference],
             configuredSolver.Settings.MaxThreads,
             controller,
-            context.SelectionPolicy,
-            context.AttackTargets
+            context.SelectionPolicy
         );
         var expansionContext = new CandidateExpansionContext(
             StepIndex: 0,
@@ -183,7 +182,7 @@ public class ParallelBatchExecutorTests
                 SolverTestScenario.Owned("Katress", PalGender.MALE),
                 SolverTestScenario.Owned("Wixen", PalGender.FEMALE),
             ],
-            maxSpecialCakes: 0,
+            specialCakePolicy: SpecialCakePolicy.Never,
             maxBreedingSteps: 1,
             maxSolverIterations: 1,
             maxThreads: maxThreads

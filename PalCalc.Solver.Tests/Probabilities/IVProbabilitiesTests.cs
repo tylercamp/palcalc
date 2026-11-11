@@ -1,1290 +1,187 @@
 using PalCalc.Model;
 using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Probabilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PalCalc.Solver.Tests.Probabilities
+namespace PalCalc.Solver.Tests.Probabilities;
+
+[TestClass]
+public class IVProbabilitiesTests
 {
-    [TestClass]
-    public class IVProbabilitiesTests
+    static readonly int[] CurrentGameWeights = [3, 2, 1];
+
+    private static readonly (bool HP, bool Attack, bool Defense)[] StatSelections =
+    [
+        (false, false, false),
+        (true, false, false),
+        (false, true, false),
+        (false, false, true),
+        (true, true, false),
+        (true, false, true),
+        (false, true, true),
+        (true, true, true),
+    ];
+
+    // Hand-derived expectations; source sets and the general formula are documented in:
+    // ../../PALWORLD-BREEDING-MECHANICS.md#iv-source-selection
+    //
+    // P(required subset) = sum(selector weight / total weight * fraction of its branches containing the subset)
+    //
+    // With CurrentGameWeights = [3, 2, 1], selector probabilities are 3/6, 2/6, and 1/6:
+    //   No requirements:         1
+    //   HP:                      3/6 * 1/3 + 2/6 * 3/3 + 1/6 = 2/3
+    //   Attack or Defense:       3/6 * 1/3 + 2/6 * 2/3 + 1/6 = 5/9
+    //   HP+Attack / HP+Defense:              2/6 * 2/3 + 1/6 = 7/18
+    //   Attack+Defense / all:                2/6 * 1/3 + 1/6 = 5/18
+    // Extra inherited stats are allowed. Both parents meet each required IV, so parent choice adds no penalty.
+    [DataTestMethod]
+    [DataRow(false, false, false, 1, 1)] // No requirements
+    [DataRow(true, false, false, 2, 3)] // HP
+    [DataRow(false, true, false, 5, 9)] // Attack
+    [DataRow(false, false, true, 5, 9)] // Defense
+    [DataRow(true, true, false, 7, 18)] // HP + Attack
+    [DataRow(true, false, true, 7, 18)] // HP + Defense
+    [DataRow(false, true, true, 5, 18)] // Attack + Defense must use the all-three branch
+    [DataRow(true, true, true, 5, 18)] // All three
+    public void ReferenceModelMatchesDocumentedSubsetProbabilities(
+        bool hp, bool attack, bool defense, int numerator, int denominator)
     {
-        private static BreedingMechanics mechanics = PalDB.LoadEmbedded().BreedingMechanics;
+        var required = (hp, attack, defense);
+        Assert.AreEqual(numerator / (float)denominator,
+            ReferenceProbability(CurrentGameWeights, required, required, required), 0.000001f);
+    }
 
-        private static IV_Value RealValue_Relevant = new IV_Value(true, 50, 50);
-        private static IV_Value RealValue_Irrelevant = new IV_Value(false, 50, 50);
-        private static IV_Value RandomValue = IV_Value.Random;
+    [DataTestMethod]
+    [DataRow(false, false, false)]
+    [DataRow(true, false, false)]
+    [DataRow(false, true, false)]
+    [DataRow(false, false, true)]
+    [DataRow(true, true, false)]
+    [DataRow(true, false, true)]
+    [DataRow(false, true, true)]
+    [DataRow(true, true, true)]
+    public void ProbabilityHelpersMatchReferenceGameBranches(bool hp, bool attack, bool defense)
+    {
+        var required = (HP: hp, Attack: attack, Defense: defense);
 
-        private static IV_Value _ANY_ = RandomValue;
+        // Inheritance weights shipped with the game are `[3, 2, 1]` (at time of writing)
+        // Also test with other weights which (1) test each selection separately and (2) use a different
+        //   set of weights, to check for consistency
 
-        private static IV_Set MkIVs(IV_Value? hp = null, IV_Value? attack = null, IV_Value? defense = null) =>
-            new IV_Set { HP = hp ?? _ANY_, Attack = attack ?? _ANY_, Defense = defense ?? _ANY_ };
+        int[][] weightSets = [
+            CurrentGameWeights,
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+            [1, 4, 7]
+        ];
 
-        [TestMethod]
-        public void IVs_HP_0_Atk_0_Def_0()
+        foreach (var weights in weightSets)
         {
-            Assert.AreEqual(
-                1,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    new IV_Set { HP = RealValue_Irrelevant, Attack = RealValue_Irrelevant, Defense = RealValue_Irrelevant },
-                    new IV_Set { HP = RealValue_Irrelevant, Attack = RealValue_Irrelevant, Defense = RealValue_Irrelevant }
-                )
+            var mechanics = new BreedingMechanics(
+                ivInheritanceWeights: weights,
+                passiveInheritanceWeights: new() { [1] = 1 },
+                passiveRandomWeights: new() { [0] = 1 }
             );
 
+            var selectionProbability = ReferenceProbability(weights, required, required, required);
             Assert.AreEqual(
-                1,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    new IV_Set { HP = RandomValue, Attack = RandomValue, Defense = RandomValue },
-                    new IV_Set { HP = RandomValue, Attack = RandomValue, Defense = RandomValue }
-                )
+                expected: selectionProbability,
+                actual: mechanics.ProbabilityOfInheritingDesiredIVs(hp, attack, defense),
+                delta: 0.000001f
             );
+
+            foreach (var parentA in StatSelections)
+                foreach (var parentB in StatSelections)
+                {
+                    // Each required stat must be available from at least one parent.
+                    if ((parentA.HP || parentB.HP) != hp ||
+                        (parentA.Attack || parentB.Attack) != attack ||
+                        (parentA.Defense || parentB.Defense) != defense) continue;
+
+                    var expected = ReferenceProbability(weights, required, parentA, parentB);
+                    foreach (var randomIrrelevant in new[] { false, true })
+                        Assert.AreEqual(
+                            expected: expected,
+                            actual: IVs.ProbabilityInheritedTargetIVs(mechanics, Parent(parentA, randomIrrelevant), Parent(parentB, randomIrrelevant)),
+                            delta: 0.000001f,
+                            message: $"Target {required}; parents {parentA}/{parentB}; weights {string.Join(',', weights)}"
+                        );
+                }
         }
+    }
 
-        #region Single IV Tests
-
-        [TestMethod]
-        public void IVs_HP_1_Atk_0_Def_0()
+    // Uses the reverse-engineered, reference IV inheritance impl. to calculate inheritance probability
+    // for the given weights, required IVs, and presence of IVs on parents
+    private static float ReferenceProbability(
+        int[] weights,
+        (bool HP, bool Attack, bool Defense) required,
+        (bool HP, bool Attack, bool Defense) parentA,
+        (bool HP, bool Attack, bool Defense) parentB)
+    {
+        double probability = 0;
+        for (var selectorIndex = 0; selectorIndex < weights.Length; selectorIndex++)
         {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[1] // inherited 1 IV
-                    *
-                    (1 / 3.0) // it was the HP IV
-                    *
-                    (1 / 2.0) // got from the right parent
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (2 / 3.0) // one of them was the HP IV
-                    *
-                    (1 / 2.0) // got from the right parent
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get the HP IV
-                    *
-                    (1 / 2.0) // got from the right parent
-                )
-            );
+            var branchCount = selectorIndex == 2 ? 1 : 3;
+            var successes = 0;
+            for (var branch = 0; branch < branchCount; branch++)
+                foreach (var fromParentA in StatSelections)
+                {
+                    var child = ReferenceChildIVs(parentA, parentB, fromParentA, selectorIndex, branch);
+                    if ((!required.HP || child.HP) &&
+                        (!required.Attack || child.Attack) &&
+                        (!required.Defense || child.Defense)) successes++;
+                }
 
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant),
-                    MkIVs()
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(),
-                    MkIVs(hp: RealValue_Relevant)
-                ),
-                0.001
-            );
+            probability += weights[selectorIndex] / (double)weights.Sum() *
+                successes / (branchCount * StatSelections.Length);
         }
+        return (float)probability;
+    }
 
-        [TestMethod]
-        public void IVs_HP_2_Atk_0_Def_0()
+    // Reference impl. which matches the Palworld IV calculation (almost) exactly; namely, see:
+    // ../../PALWORLD-BREEDING-MECHANICS.md#iv-source-selection
+    //
+    // `true` inputs/output indicates whether the value meets the target.
+    private static (bool HP, bool Attack, bool Defense) ReferenceChildIVs(
+        (bool HP, bool Attack, bool Defense) parentA,
+        (bool HP, bool Attack, bool Defense) parentB,
+        (bool HP, bool Attack, bool Defense) fromParentA,
+        int selectorIndex,
+        int branch)
+    {
+        // (fresh random matches are excluded from PalCalc's estimate, so R never meets a required IV)
+        var R = (HP: false, Attack: false, Defense: false);
+        var H = (
+            HP: fromParentA.HP ? parentA.HP : parentB.HP,
+            Attack: fromParentA.Attack ? parentA.Attack : parentB.Attack,
+            Defense: fromParentA.Defense ? parentA.Defense : parentB.Defense);
+
+        if (selectorIndex == 2)
+            return H;
+
+        if (selectorIndex == 1)
+            return branch switch
+            {
+                0 => (H.HP, H.Attack, H.Defense),
+                1 => (H.HP, R.Attack, H.Defense),
+                2 => (H.HP, H.Attack, R.Defense),
+                _ => throw new ArgumentOutOfRangeException(nameof(branch)),
+            };
+
+        return branch switch
         {
-            Assert.AreEqual(
-                (
-                    mechanics.IVProbabilityDirect[1] // inherited 1 IV
-                    *
-                    (1 / 3.0) // it was the HP IV
-                    *
-                    (2 / 2.0) // either parent is ok
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (2 / 3.0) // one of them was the HP IV
-                    *
-                    (2 / 2.0) // either parent is ok
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get the HP IV
-                    *
-                    (2 / 2.0) // either parent is ok
-                ),
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_0_Atk_1_Def_0()
-        {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[1] // inherited 1 IV
-                    *
-                    (1 / 3.0) // it was the Attack IV
-                    *
-                    (1 / 2.0) // got from the right parent
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (2 / 3.0) // one of them was the Attack IV
-                    *
-                    (1 / 2.0) // got from the right parent
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get the Attack IV
-                    *
-                    (1 / 2.0) // got from the right parent
-                )
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant),
-                    MkIVs()
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(),
-                    MkIVs(attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_0_Atk_2_Def_0()
-        {
-            Assert.AreEqual(
-                (
-                    mechanics.IVProbabilityDirect[1] // inherited 1 IV
-                    *
-                    (1 / 3.0) // it was the Attack IV
-                    *
-                    (2 / 2.0) // either parent is ok
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (2 / 3.0) // one of them was the Attack IV
-                    *
-                    (2 / 2.0) // either parent is ok
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get the Attack IV
-                    *
-                    (2 / 2.0) // either parent is ok
-                ),
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_0_Atk_0_Def_1()
-        {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[1] // inherited 1 IV
-                    *
-                    (1 / 3.0) // it was the Defense IV
-                    *
-                    (1 / 2.0) // got from the right parent
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (2 / 3.0) // one of them was the Defense IV
-                    *
-                    (1 / 2.0) // got from the right parent
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get the Defense IV
-                    *
-                    (1 / 2.0) // got from the right parent
-                )
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(defense: RealValue_Relevant),
-                    MkIVs()
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(),
-                    MkIVs(defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_0_Atk_0_Def_2()
-        {
-            Assert.AreEqual(
-                (
-                    mechanics.IVProbabilityDirect[1] // inherited 1 IV
-                    *
-                    (1 / 3.0) // it was the Defense IV
-                    *
-                    (2 / 2.0) // either parent is ok
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (2 / 3.0) // one of them was the Defense IV
-                    *
-                    (2 / 2.0) // either parent is ok
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get the Defense IV
-                    *
-                    (2 / 2.0) // either parent is ok
-                ),
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(defense: RealValue_Relevant),
-                    MkIVs(defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        #endregion
-
-        #region Two IV Tests (HP + Attack)
-
-        [TestMethod]
-        public void IVs_HP_1_Atk_1_Def_0()
-        {
-            var probability = (
-                    (
-                        mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                        *
-                        (1 / 3.0) // they're the desired IVs
-                        *
-                        (
-                            (1 / 2.0) // first is from the right parent
-                            *
-                            (1 / 2.0) // next is from the right parent
-                        )
-                    )
-                    + // OR
-                    (
-                        mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                        *
-                        (3 / 3.0) // will always get both IVs
-                        *
-                        (
-                            (1 / 2.0) // first is from the desired parent
-                            *
-                            (1 / 2.0) // second is from the desired parent
-                        )
-                    )
-                );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
-                    MkIVs()
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(),
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_2_Atk_1_Def_0()
-        {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (1 / 3.0) // they're the desired IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the right parent
-                        *
-                        (1 / 2.0) // next is from the right parent
-                    )
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get both IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (1 / 2.0) // second is from the desired parent
-                    )
-                )
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_1_Atk_2_Def_0()
-        {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (1 / 3.0) // they're the desired IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the right parent
-                        *
-                        (1 / 2.0) // next is from the right parent
-                    )
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get both IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (1 / 2.0) // second is from the desired parent
-                    )
-                )
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_2_Atk_2_Def_0()
-        {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (1 / 3.0) // they're the desired IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the right parent
-                        *
-                        (2 / 2.0) // next is from the right parent
-                    )
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get both IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (2 / 2.0) // second is from the desired parent
-                    )
-                )
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        #endregion
-
-        #region Two IV Tests (HP + Defense)
-
-        [TestMethod]
-        public void IVs_HP_1_Atk_0_Def_1()
-        {
-            var probability = (
-                    (
-                        mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                        *
-                        (1 / 3.0) // they're the desired IVs
-                        *
-                        (
-                            (1 / 2.0) // first is from the right parent
-                            *
-                            (1 / 2.0) // next is from the right parent
-                        )
-                    )
-                    + // OR
-                    (
-                        mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                        *
-                        (3 / 3.0) // will always get both IVs
-                        *
-                        (
-                            (1 / 2.0) // first is from the desired parent
-                            *
-                            (1 / 2.0) // second is from the desired parent
-                        )
-                    )
-                );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs()
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(defense: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant),
-                    MkIVs(defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(),
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_2_Atk_0_Def_1()
-        {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (1 / 3.0) // they're the desired IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the right parent
-                        *
-                        (1 / 2.0) // next is from the right parent
-                    )
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get both IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (1 / 2.0) // second is from the desired parent
-                    )
-                )
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_1_Atk_0_Def_2()
-        {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (1 / 3.0) // they're the desired IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the right parent
-                        *
-                        (1 / 2.0) // next is from the right parent
-                    )
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get both IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (1 / 2.0) // second is from the desired parent
-                    )
-                )
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(defense: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_2_Atk_0_Def_2()
-        {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (1 / 3.0) // they're the desired IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the right parent
-                        *
-                        (2 / 2.0) // next is from the right parent
-                    )
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get both IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (2 / 2.0) // second is from the desired parent
-                    )
-                )
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        #endregion
-
-        #region Two IV Tests (Attack + Defense)
-
-        [TestMethod]
-        public void IVs_HP_0_Atk_1_Def_1()
-        {
-            var probability = (
-                    (
-                        mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                        *
-                        (1 / 3.0) // they're the desired IVs
-                        *
-                        (
-                            (1 / 2.0) // first is from the right parent
-                            *
-                            (1 / 2.0) // next is from the right parent
-                        )
-                    )
-                    + // OR
-                    (
-                        mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                        *
-                        (3 / 3.0) // will always get both IVs
-                        *
-                        (
-                            (1 / 2.0) // first is from the desired parent
-                            *
-                            (1 / 2.0) // second is from the desired parent
-                        )
-                    )
-                );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs()
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(defense: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant),
-                    MkIVs(defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(),
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_0_Atk_2_Def_1()
-        {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (1 / 3.0) // they're the desired IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the right parent
-                        *
-                        (1 / 2.0) // next is from the right parent
-                    )
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get both IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (1 / 2.0) // second is from the desired parent
-                    )
-                )
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_0_Atk_1_Def_2()
-        {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (1 / 3.0) // they're the desired IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the right parent
-                        *
-                        (1 / 2.0) // next is from the right parent
-                    )
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get both IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (1 / 2.0) // second is from the desired parent
-                    )
-                )
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(defense: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_0_Atk_2_Def_2()
-        {
-            var probability = (
-                (
-                    mechanics.IVProbabilityDirect[2] // inherited 2 IVs
-                    *
-                    (1 / 3.0) // they're the desired IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the right parent
-                        *
-                        (2 / 2.0) // next is from the right parent
-                    )
-                )
-                + // OR
-                (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (3 / 3.0) // will always get both IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (2 / 2.0) // second is from the desired parent
-                    )
-                )
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        #endregion
-
-        #region Three IV Tests
-
-        [TestMethod]
-        public void IVs_HP_1_Atk_1_Def_1()
-        {
-            var probability = (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (
-                        (1 / 2.0) // first is from the desired parent
-                        *
-                        (1 / 2.0) // second is from the desired parent
-                        *
-                        (1 / 2.0) // third is from the desired parent
-                    )
-                );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs()
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
-                    MkIVs(defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(defense: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(),
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_2_Atk_1_Def_1()
-        {
-            var probability = (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (1 / 2.0) // second is from the desired parent
-                        *
-                        (1 / 2.0) // third is from the desired parent
-                    )
-                );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_1_Atk_2_Def_1()
-        {
-            var probability = (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (
-                        (1 / 2.0) // first is from the desired parent
-                        *
-                        (2 / 2.0) // second is from the desired parent
-                        *
-                        (1 / 2.0) // third is from the desired parent
-                    )
-                );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant, hp: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant, hp: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant, hp: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant, hp: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_1_Atk_1_Def_2()
-        {
-            var probability = (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (
-                        (1 / 2.0) // first is from the desired parent
-                        *
-                        (1 / 2.0) // second is from the desired parent
-                        *
-                        (2 / 2.0) // third is from the desired parent
-                    )
-                );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(defense: RealValue_Relevant, hp: RealValue_Relevant, attack: RealValue_Relevant),
-                    MkIVs(defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(defense: RealValue_Relevant, hp: RealValue_Relevant),
-                    MkIVs(defense: RealValue_Relevant, attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(defense: RealValue_Relevant, attack: RealValue_Relevant),
-                    MkIVs(defense: RealValue_Relevant, hp: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(defense: RealValue_Relevant),
-                    MkIVs(defense: RealValue_Relevant, hp: RealValue_Relevant, attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_2_Atk_2_Def_1()
-        {
-            var probability = (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (2 / 2.0) // second is from the desired parent
-                        *
-                        (1 / 2.0) // third is from the desired parent
-                    )
-                );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_2_Atk_1_Def_2()
-        {
-            var probability = (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (1 / 2.0) // second is from the desired parent
-                        *
-                        (2 / 2.0) // third is from the desired parent
-                    )
-                );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant, attack: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, defense: RealValue_Relevant, attack: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_1_Atk_2_Def_2()
-        {
-            var probability = (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (
-                        (1 / 2.0) // first is from the desired parent
-                        *
-                        (2 / 2.0) // second is from the desired parent
-                        *
-                        (2 / 2.0) // third is from the desired parent
-                    )
-                );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant, hp: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(attack: RealValue_Relevant, defense: RealValue_Relevant, hp: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        [TestMethod]
-        public void IVs_HP_2_Atk_2_Def_2()
-        {
-            var probability = (
-                    mechanics.IVProbabilityDirect[3] // inherited 3 IVs
-                    *
-                    (
-                        (2 / 2.0) // first is from the desired parent
-                        *
-                        (2 / 2.0) // second is from the desired parent
-                        *
-                        (2 / 2.0) // third is from the desired parent
-                    )
-                );
-
-            Assert.AreEqual(
-                probability,
-                IVs.ProbabilityInheritedTargetIVs(mechanics,
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant),
-                    MkIVs(hp: RealValue_Relevant, attack: RealValue_Relevant, defense: RealValue_Relevant)
-                ),
-                0.001
-            );
-        }
-
-        #endregion
+            0 => (H.HP, R.Attack, R.Defense),
+            1 => (R.HP, H.Attack, R.Defense),
+            2 => (R.HP, R.Attack, H.Defense),
+            _ => throw new ArgumentOutOfRangeException(nameof(branch)),
+        };
+    }
+
+    private static IV_Set Parent((bool HP, bool Attack, bool Defense) relevant, bool randomIrrelevant)
+    {
+        IV_Value Value(bool isRelevant) => isRelevant
+            ? new IV_Value(true, 100, 100)
+            : randomIrrelevant ? IV_Value.Random : new IV_Value(false, 50, 50);
+        return new IV_Set(Value(relevant.HP), Value(relevant.Attack), Value(relevant.Defense));
     }
 }
