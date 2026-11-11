@@ -1,7 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace PalCalc.UI.View.Main
 {
@@ -15,46 +14,33 @@ namespace PalCalc.UI.View.Main
             InitializeComponent();
         }
 
-        // (queued so that this only runs once after "Expand All" has changed every group, but still before the
-        // first frame of their animations)
-        private void Groups_LayoutChanged(object sender, RoutedEventArgs e) =>
-            Dispatcher.BeginInvoke(UpdateScrollBar);
-
-        // (the cards are hidden while they load, so decide again once they're shown at their final heights)
+        // a new run hides the cards while it loads, so start it back at the top
         private void Groups_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) =>
-            Dispatcher.BeginInvoke(UpdateScrollBar);
+            ResetScroll(GroupsContents, GroupsScrollViewer);
 
-        // if the scrollbar only appeared after a group had grown, it would take up space and re-wrap the
-        // cards at the end of the animation. decide on it now, from the height that the groups will end up at.
-        private void UpdateScrollBar()
+        // (also used by `ParentCombosToolView`)
+        internal static void ResetScroll(ListBox groupsContents, ScrollViewer groupsScrollViewer)
         {
-            double height = 0;
-            for (var i = 0; i < GroupsList.Items.Count; i++)
-            {
-                if (GroupsList.ItemContainerGenerator.ContainerFromIndex(i) is not ContentPresenter { IsLoaded: true } container) continue;
+            if (groupsScrollViewer.IsVisible) return;
 
-                var root = (FrameworkElement)VisualTreeHelper.GetChild(container, 0);
-                var expander = (Expander)((Panel)root).Children[0];
-
-                height += root.Margin.Bottom + PartHeight(expander, "HeaderSite");
-                if (expander.IsExpanded) height += PartHeight(expander, "ExpandSite");
-            }
-
-            GroupsScrollViewer.VerticalScrollBarVisibility = height > GroupsScrollViewer.ViewportHeight
-                ? ScrollBarVisibility.Visible
-                : ScrollBarVisibility.Auto;
+            groupsContents.SelectedItem = null;
+            groupsScrollViewer.ScrollToTop();
         }
 
-        private static double PartHeight(Expander expander, string name) =>
-            (expander.Template.FindName(name, expander) as FrameworkElement)?.ActualHeight ?? 0;
+        private void GroupsContents_SelectionChanged(object sender, SelectionChangedEventArgs e) =>
+            ScrollToGroup(GroupsList, GroupsScrollViewer, GroupsContents.SelectedItem);
 
-        // the template for `Expander` has its own `ScrollViewer` which never scrolls, but still eats
-        // scroll events, so these need to be caught before they reach it
-        private void Groups_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        private void GroupsContents_ItemClicked(object sender, MouseButtonEventArgs e) =>
+            ScrollToGroup(GroupsList, GroupsScrollViewer, ((FrameworkElement)sender).DataContext);
+
+        // scrolls so that the group's header is at the top, or as close as it gets for the last few groups.
+        // (also used by `ParentCombosToolView`, which has the same layout)
+        internal static void ScrollToGroup(ItemsControl groupsList, ScrollViewer groupsScrollViewer, object group)
         {
-            var scrollViewer = (ScrollViewer)sender;
-            scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
-            e.Handled = true;
+            if (group == null || groupsList.ItemContainerGenerator.ContainerFromItem(group) is not FrameworkElement container) return;
+
+            var top = container.TransformToAncestor(groupsList).Transform(new Point(0, 0)).Y;
+            groupsScrollViewer.ScrollToVerticalOffset(top);
         }
     }
 }

@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference.Properties;
@@ -9,7 +8,6 @@ using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,7 +59,6 @@ namespace PalCalc.UI.ViewModel.Solver
 
     public partial class BreedableGroupViewModel(
         ILocalizedText title,
-        bool isExpanded,
         List<BreedableCardViewModel> cards
     ) : ObservableObject
     {
@@ -70,9 +67,6 @@ namespace PalCalc.UI.ViewModel.Solver
         // (starts empty, `BreedableToolViewModel` moves `AllCards` in here a few at a time while loading)
         public ObservableCollection<BreedableCardViewModel> Cards { get; } = [];
         internal List<BreedableCardViewModel> AllCards { get; } = cards;
-
-        [ObservableProperty]
-        private bool isExpanded = isExpanded;
 
         [ObservableProperty]
         private bool hasHighlightedCards = false;
@@ -84,7 +78,6 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public SolverControlsViewModel SolverControls { get; } = solverControls;
 
-        [NotifyPropertyChangedFor(nameof(ExpandToggleLabel))]
         [ObservableProperty]
         private List<BreedableGroupViewModel> groups = [];
 
@@ -96,24 +89,10 @@ namespace PalCalc.UI.ViewModel.Solver
 
         partial void OnSearchTextChanged(string value) => UpdateHighlights();
 
-        private bool AreAllExpanded => Groups.All(g => g.IsExpanded);
-
-        public ILocalizedText ExpandToggleLabel =>
-            (AreAllExpanded ? LocalizationCodes.LC_BREEDABLE_COLLAPSE_ALL : LocalizationCodes.LC_BREEDABLE_EXPAND_ALL).Bind();
-
-        [RelayCommand]
-        private void ToggleExpanded()
-        {
-            var isExpanded = !AreAllExpanded;
-            foreach (var group in Groups)
-                group.IsExpanded = isExpanded;
-        }
-
-        private void Group_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(BreedableGroupViewModel.IsExpanded))
-                OnPropertyChanged(nameof(ExpandToggleLabel));
-        }
+        // off by default, since the IVs aren't needed to see what's breedable and each card builds faster without them.
+        // (the best-IV parents are still the ones picked, this only changes what's shown)
+        [ObservableProperty]
+        private bool showIVs = false;
 
         [ObservableProperty]
         private bool isLoading = false;
@@ -143,8 +122,6 @@ namespace PalCalc.UI.ViewModel.Solver
             if (run != latestRun) return;
 
             Groups = BuildGroups(result, save, settings.GameSettings);
-            foreach (var group in Groups)
-                group.PropertyChanged += Group_PropertyChanged;
 
             var numShown = 0;
             foreach (var group in Groups)
@@ -215,7 +192,7 @@ namespace PalCalc.UI.ViewModel.Solver
                 .Select(p => new BreedableCardViewModel(PalViewModel.Make(p), null, null, null, null))
                 .ToList();
 
-            // (tiers which only added a gender have no entries, so they don't get a group)
+            // (a tier is the number of breeding steps. tiers which only added a gender have no entries, so they don't get a group)
             var tierGroups = result.Entries
                 .Where(e => e.Tier > 0)
                 .GroupBy(e => e.Tier)
@@ -223,16 +200,15 @@ namespace PalCalc.UI.ViewModel.Solver
                 {
                     var cards = group.Select(ToCard).ToList();
                     return new BreedableGroupViewModel(
-                        LocalizationCodes.LC_BREEDABLE_GROUP_TIER.Bind(new { Tier = group.Key, NumPals = cards.Count }),
-                        isExpanded: true,
+                        LocalizationCodes.LC_BREEDABLE_GROUP_STEPS.Bind(new { StepCount = group.Key, NumPals = cards.Count }),
                         cards
                     );
                 });
 
             List<BreedableGroupViewModel> groups = [
-                new(LocalizationCodes.LC_BREEDABLE_GROUP_OWNED.Bind(ownedCards.Count), isExpanded: false, ownedCards),
+                new(LocalizationCodes.LC_BREEDABLE_GROUP_OWNED.Bind(ownedCards.Count), ownedCards),
                 .. tierGroups,
-                new(LocalizationCodes.LC_BREEDABLE_GROUP_NOT_REACHABLE.Bind(notReachableCards.Count), isExpanded: false, notReachableCards),
+                new(LocalizationCodes.LC_BREEDABLE_GROUP_NOT_REACHABLE.Bind(notReachableCards.Count), notReachableCards),
             ];
 
             return groups.Where(g => g.AllCards.Count > 0).ToList();
