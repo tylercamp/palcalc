@@ -87,7 +87,9 @@
 
         <!-- Only built while "Show IVs" is checked -->
         <DataTemplate x:Key="CardIVsTemplate">
-            <vp:PalIVsView Columns="1"
+            <!-- (hidden for a Not Reachable card, which has no IVs) -->
+            <vp:PalIVsView Visibility="{Binding Converter={StaticResource VVC}}"
+                           Columns="1"
                            Orientation="Horizontal"
                            Margin="0,2,0,0"
                            Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
@@ -273,7 +275,7 @@
                                     Background="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
                                     Opacity="{Binding Opacity, ElementName=SearchPulse}"
                                     Visibility="{Binding HasHighlightedCards, Converter={StaticResource VVC}}" />
-                            <TextBlock Text="{Binding Title.Value}" TextTrimming="CharacterEllipsis" Margin="0,2" />
+                            <TextBlock Text="{Binding Title.Value}" TextWrapping="Wrap" Margin="0,2" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
