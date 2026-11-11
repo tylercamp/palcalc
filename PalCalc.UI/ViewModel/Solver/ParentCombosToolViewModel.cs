@@ -8,8 +8,10 @@ using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
@@ -61,7 +63,9 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public int NumOwnedParents { get; } = numOwnedParents;
 
-        public List<ParentComboCardViewModel> Cards { get; } = cards;
+        // (starts empty, `ParentCombosToolViewModel` moves `AllCards` in here a few at a time while loading)
+        public ObservableCollection<ParentComboCardViewModel> Cards { get; } = [];
+        internal List<ParentComboCardViewModel> AllCards { get; } = cards;
 
         [ObservableProperty]
         private bool isExpanded = isExpanded;
@@ -91,7 +95,13 @@ namespace PalCalc.UI.ViewModel.Solver
         private CachedSaveGame save;
         private ParentCombosCalculator calculator;
         private BreedableResult breedable;
-        private ParentCombosResult combos;
+
+        [ObservableProperty]
+        private bool isLoading = false;
+
+        // (a newer run, child or sort replaces one which is still loading)
+        private int latestRun = 0;
+        private int latestUpdate = 0;
 
         [ObservableProperty]
         private PalViewModel child;
@@ -135,35 +145,75 @@ namespace PalCalc.UI.ViewModel.Solver
             Child = null;
         }
 
-        public void Run(BreedingSolverSettings settings, CachedSaveGame save)
+        // (async void, so that an error is thrown on the UI thread and handled like any other)
+        public async void Run(BreedingSolverSettings settings, CachedSaveGame save) => await RunAsync(settings, save);
+
+        public async Task RunAsync(BreedingSolverSettings settings, CachedSaveGame save)
         {
+            var run = ++latestRun;
+
+            // (safe off the UI thread, both calculators keep all of their working data local)
+            var newBreedable = await BreedableToolViewModel.OffUIThread(() => new BreedableCalculator(settings).Calculate());
+            if (run != latestRun) return;
+
             this.settings = settings;
             this.save = save;
             calculator = new ParentCombosCalculator(settings);
-            breedable = new BreedableCalculator(settings).Calculate();
+            breedable = newBreedable;
 
-            Update(keepExpanded: false);
+            await UpdateAsync(keepExpanded: false);
         }
 
-        private void Update(bool keepExpanded)
-        {
-            combos = Child == null || calculator == null
-                ? null
-                : calculator.Calculate(Child.ModelObject, breedable, SelectedSort?.Sort == ParentComboSort.MostPhilanthropist);
+        // (async void, as with `Run`)
+        private async void Update(bool keepExpanded) => await UpdateAsync(keepExpanded);
 
-            SetGroups(keepExpanded);
-        }
-
-        private void SetGroups(bool keepExpanded)
+        private async Task UpdateAsync(bool keepExpanded)
         {
+            var update = ++latestUpdate;
             var expanded = keepExpanded ? Groups.ToDictionary(g => g.NumOwnedParents, g => g.IsExpanded) : [];
 
+            // (cleared straight away, so the old cards are never rebuilt while the new ones load)
+            SetGroups([]);
+
+            if (Child == null || calculator == null)
+            {
+                IsLoading = false;
+                return;
+            }
+
+            IsLoading = true;
+
+            var child = Child.ModelObject;
+            var preferBreedSpeed = SelectedSort?.Sort == ParentComboSort.MostPhilanthropist;
+            var (currentCalculator, currentBreedable) = (calculator, breedable);
+            var combos = await BreedableToolViewModel.OffUIThread(() => currentCalculator.Calculate(child, currentBreedable, preferBreedSpeed));
+            if (update != latestUpdate) return;
+
+            SetGroups(BuildGroups(combos, save, settings.GameSettings, SelectedSort?.Sort ?? ParentComboSort.HighestIVs, expanded));
+
+            // (a few at a time so the loading animation keeps moving, see `BreedableToolViewModel`)
+            var numShown = 0;
+            foreach (var group in Groups)
+            {
+                foreach (var card in group.AllCards)
+                {
+                    group.Cards.Add(card);
+                    if (++numShown % BreedableToolViewModel.CardsPerBatch != 0) continue;
+
+                    await BreedableToolViewModel.NextFrame();
+                    if (update != latestUpdate) return;
+                }
+            }
+
+            IsLoading = false;
+        }
+
+        private void SetGroups(List<ParentComboGroupViewModel> groups)
+        {
             foreach (var group in Groups)
                 group.PropertyChanged -= Group_PropertyChanged;
 
-            Groups = combos == null
-                ? []
-                : BuildGroups(combos, save, settings.GameSettings, SelectedSort?.Sort ?? ParentComboSort.HighestIVs, expanded);
+            Groups = groups;
 
             foreach (var group in Groups)
                 group.PropertyChanged += Group_PropertyChanged;

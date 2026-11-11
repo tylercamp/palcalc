@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="clr-namespace:PalCalc.UI"
              xmlns:vms="clr-namespace:PalCalc.UI.ViewModel.Solver"
              xmlns:mvm="clr-namespace:PalCalc.UI.ViewModel.Mapped"
              xmlns:vp="clr-namespace:PalCalc.UI.View.Pal"
@@ -19,6 +20,7 @@
         <c:ValueVisibilityConverter x:Key="VVC" />
         <mvm:RankColorConverter x:Key="RCC" />
         <c:ValueVisibilityConverter x:Key="NegatedVVC" Negate="True" />
+        <c:ValueVisibilityConverter x:Key="NegatedHiddenVVC" Negate="True" FalseyVisibility="Hidden" />
 
         <!-- Mirrors the location popup for pal nodes in BreedingResultView, same as BreedableToolView -->
         <DataTemplate x:Key="ParentPopupContent">
@@ -213,30 +215,38 @@
                    Margin="0,40,0,0"
                    Visibility="{Binding Child, Converter={StaticResource NegatedVVC}}" />
 
-        <ScrollViewer x:Name="GroupsScrollViewer"
-                      VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled"
-                      PreviewMouseWheel="Groups_PreviewMouseWheel"
-                      SizeChanged="Groups_LayoutChanged"
-                      Expander.Expanded="Groups_LayoutChanged"
-                      Expander.Collapsed="Groups_LayoutChanged">
-            <ItemsControl x:Name="GroupsList" ItemsSource="{Binding Groups}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="vms:ParentComboGroupViewModel">
-                        <Grid Margin="0,0,0,5">
-                            <Expander Header="{Binding Title.Value}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Loaded="Groups_LayoutChanged">
-                                <ItemsControl ItemsSource="{Binding Cards}" ItemTemplate="{StaticResource CardTemplate}" Margin="7">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <vu:SpacedWrapPanel Orientation="Horizontal" HorizontalSpacing="10" VerticalSpacing="10" HorizontalContentAlignment="Left" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </Expander>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+        <Grid>
+            <!-- Hidden rather than collapsed while loading, so the cards are still laid out as they're added -->
+            <ScrollViewer x:Name="GroupsScrollViewer"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Visibility="{Binding IsLoading, Converter={StaticResource NegatedHiddenVVC}}"
+                          IsVisibleChanged="Groups_IsVisibleChanged"
+                          PreviewMouseWheel="Groups_PreviewMouseWheel"
+                          SizeChanged="Groups_LayoutChanged"
+                          Expander.Expanded="Groups_LayoutChanged"
+                          Expander.Collapsed="Groups_LayoutChanged">
+                <ItemsControl x:Name="GroupsList" ItemsSource="{Binding Groups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vms:ParentComboGroupViewModel">
+                            <Grid Margin="0,0,0,5">
+                                <Expander Header="{Binding Title.Value}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Loaded="Groups_LayoutChanged">
+                                    <ItemsControl ItemsSource="{Binding Cards}" ItemTemplate="{StaticResource CardTemplate}" Margin="7">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <vu:SpacedWrapPanel Orientation="Horizontal" HorizontalSpacing="10" VerticalSpacing="10" HorizontalContentAlignment="Left" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </Expander>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- The same loading animation as the app's startup screen -->
+            <ui:LoadingPage Visibility="{Binding IsLoading, Converter={StaticResource VVC}}" />
+        </Grid>
     </DockPanel>
 </UserControl>

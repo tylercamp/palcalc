@@ -161,6 +161,47 @@ public class ParentCombosToolTests
     }
 
     [TestMethod]
+    public void Child_IsLoadingUntilEveryCardIsShown()
+    {
+        var tool = RunWithPenkingAndBushi();
+        var changes = new List<(bool IsLoading, int NumShown)>();
+        tool.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(ParentCombosToolViewModel.IsLoading))
+                changes.Add((tool.IsLoading, tool.Groups.Sum(g => g.Cards.Count)));
+        };
+
+        tool.Child = Pal("Sibelyx");
+
+        CollectionAssert.AreEqual(new[] { (true, 0), (false, tool.Groups.Sum(g => g.AllCards.Count)) }, changes);
+    }
+
+    [TestMethod]
+    public void Child_NewChildReplacesOneStillLoading()
+    {
+        var tool = RunWithPenkingAndBushi();
+        var hooked = false;
+
+        // (picks another child as soon as the first adds a card, like picking one between batches in the app)
+        tool.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName != nameof(ParentCombosToolViewModel.Groups) || tool.Groups.Count == 0 || hooked) return;
+            hooked = true;
+            tool.Groups[0].Cards.CollectionChanged += (_, _) =>
+            {
+                if (tool.Child.ModelObject == "Sibelyx".ToPal(DB)) tool.Child = Pal("Lamball");
+            };
+        };
+
+        tool.Child = Pal("Sibelyx");
+
+        Assert.AreEqual("Lamball".ToPal(DB), tool.Child.ModelObject);
+        Assert.IsFalse(tool.IsLoading);
+        Assert.IsTrue(tool.Groups.SelectMany(g => g.AllCards).All(c => c.Combo.Source.Child == "Lamball".ToPal(DB)));
+        Assert.IsTrue(tool.Groups.All(g => g.Cards.SequenceEqual(g.AllCards)));
+    }
+
+    [TestMethod]
     public void Sorted_HighestIVsPutsUnreachableLast()
     {
         var cards = new[]
