@@ -114,14 +114,6 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_BASE_LABEL,
         /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        LC_BREEDABLE_COLLAPSE_ALL,
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        LC_BREEDABLE_EXPAND_ALL,
-        /// <summary>
         ///   Looks up a localized string similar to NumPals.
         /// </summary>
         LC_BREEDABLE_GROUP_NOT_REACHABLE,
@@ -130,9 +122,9 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_BREEDABLE_GROUP_OWNED,
         /// <summary>
-        ///   Looks up a localized string similar to Tier|NumPals.
+        ///   Looks up a localized string similar to StepCount|NumPals.
         /// </summary>
-        LC_BREEDABLE_GROUP_TIER,
+        LC_BREEDABLE_GROUP_STEPS,
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
@@ -1399,7 +1391,7 @@ namespace PalCalc.UI.Localization {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        LC_TOOLS,
+        LC_TOOL_SHOW_IVS,
         /// <summary>
         ///   Looks up a localized string similar to InternalName.
         /// </summary>

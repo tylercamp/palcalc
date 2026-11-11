@@ -7,6 +7,7 @@ using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.Persistence;
 using PalCalc.UI.View.Inspector;
+using PalCalc.UI.View.Main;
 using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Presets;
@@ -98,9 +99,12 @@ namespace PalCalc.UI.ViewModel
 
         public SolverQueueViewModel SolverQueue { get; } = new SolverQueueViewModel();
 
-        public ToolListViewModel Tools { get; }
-
         public CommonSaveOperationsViewModel SaveOperations { get; }
+
+        public IReadOnlyList<ISolverTool> Tools { get; }
+
+        // (one window per tool, opening a tool again brings its window back instead)
+        private readonly Dictionary<ISolverTool, SolverToolWindow> toolWindows = [];
 
         // main app model
         public SolverPageViewModel(Dispatcher dispatcher, CommonSaveOperationsViewModel saveOperations, SaveGameViewModel selectedSave, PalTargetListViewModel targets)
@@ -162,9 +166,10 @@ namespace PalCalc.UI.ViewModel
             solverControlsPropertyChangedHandler = SolverControls_PropertyChanged;
             SolverControls.PropertyChanged += solverControlsPropertyChangedHandler;
 
-            Tools = new ToolListViewModel([new BreedableToolViewModel(SolverControls), new ParentCombosToolViewModel(SolverControls)]);
-            Tools.PropertyChanged += Tools_PropertyChanged;
-            
+            // (the tools share these solver controls, so they're added to the save's menu once those exist)
+            Tools = [new BreedableToolViewModel(SolverControls), new ParentCombosToolViewModel(SolverControls)];
+            SaveOperations = SaveOperations.WithTools(Tools, OpenTool);
+
             // TODO - would prefer to have the delete command managed by the target list, rather than having
             //        to manually assign the command for each specifier VM
             deletePalTargetCommand = new RelayCommand<PalSpecifierViewModel>(OnDeletePalSpecifier);
@@ -213,8 +218,6 @@ namespace PalCalc.UI.ViewModel
             if (SolverControls != null && solverControlsPropertyChangedHandler != null)
                 SolverControls.PropertyChanged -= solverControlsPropertyChangedHandler;
 
-            Tools.PropertyChanged -= Tools_PropertyChanged;
-
             if (passivePresets != null && presetSelectedHandler != null)
                 passivePresets.PresetSelected -= presetSelectedHandler;
 
@@ -223,6 +226,50 @@ namespace PalCalc.UI.ViewModel
 
             if (mainWindowClosingHandler != null && App.Current.MainWindow != null)
                 App.Current.MainWindow.Closing -= mainWindowClosingHandler;
+
+            // (the tool windows use this page's Source Pals and solver settings, so they can't outlive it)
+            foreach (var window in toolWindows.Values.ToList())
+                window.Close();
+        }
+
+        private void OpenTool(ISolverTool tool)
+        {
+            if (toolWindows.TryGetValue(tool, out var existing))
+            {
+                if (existing.WindowState == WindowState.Minimized)
+                    existing.WindowState = WindowState.Normal;
+
+                existing.Activate();
+            }
+            else
+            {
+                var window = new SolverToolWindow()
+                {
+                    DataContext = new SolverToolWindowViewModel(tool, PalTargetList.SourcePals, () => RunTool(tool)),
+                    Owner = App.Current.MainWindow,
+                };
+                window.Closed += (_, _) => toolWindows.Remove(tool);
+                toolWindows.Add(tool, window);
+                window.Show();
+            }
+
+            // (rerun each time it's opened, so it always reflects the current save and settings)
+            tool.OnSelected();
+            RunTool(tool);
+        }
+
+        private void RunTool(ISolverTool tool)
+        {
+            var cachedData = OpenedSave.CachedValue;
+            if (cachedData == null) return;
+
+            tool.Run(
+                SolverControls.ConfiguredSolverSettings(
+                    SelectedGameSettings.ModelObject,
+                    PalTargetList.SourcePals.AvailablePals.ToList()
+                ),
+                cachedData
+            );
         }
 
         private void CachedSaveGame_SaveFileLoadEnd(ISaveGame save, CachedSaveGame cachedSave)
@@ -254,7 +301,9 @@ namespace PalCalc.UI.ViewModel
             if (OpenedSave?.Value == save)
             {
                 UpdateFromSaveProperties();
-                RunSelectedTool();
+
+                foreach (var tool in toolWindows.Keys)
+                    RunTool(tool);
             }
         }
 
@@ -329,34 +378,8 @@ namespace PalCalc.UI.ViewModel
         {
             if (e.PropertyName == nameof(PalTargetList.SelectedTarget))
             {
-                if (PalTargetList.SelectedTarget != null) Tools.SelectedTool = null;
-
                 UpdatePalTarget();
             }
-        }
-
-        private void Tools_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(Tools.SelectedTool) && Tools.SelectedTool != null)
-            {
-                PalTargetList.SelectedTarget = null;
-                Tools.SelectedTool.OnSelected();
-                RunSelectedTool();
-            }
-        }
-
-        private void RunSelectedTool()
-        {
-            var cachedData = OpenedSave.CachedValue;
-            if (Tools.SelectedTool == null || cachedData == null) return;
-
-            Tools.SelectedTool.Run(
-                SolverControls.ConfiguredSolverSettings(
-                    SelectedGameSettings.ModelObject,
-                    PalTargetList.SourcePals.AvailablePals.ToList()
-                ),
-                cachedData
-            );
         }
 
         private void SaveTargetList(PalTargetListViewModel list)
@@ -374,12 +397,6 @@ namespace PalCalc.UI.ViewModel
 
         private void RunSolver()
         {
-            if (Tools.SelectedTool != null)
-            {
-                RunSelectedTool();
-                return;
-            }
-
             var currentSpec = PalTarget?.CurrentPalSpecifier;
             if (currentSpec?.ModelObject == null) return;
 

@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using PalCalc.Model;
 using PalCalc.Solver;
 using PalCalc.Solver.PalReference.Properties;
@@ -9,7 +8,6 @@ using PalCalc.UI.ViewModel.Mapped;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -52,12 +50,11 @@ namespace PalCalc.UI.ViewModel.Solver
         );
     }
 
-    public partial class ParentComboGroupViewModel(
+    public class ParentComboGroupViewModel(
         ILocalizedText title,
         int numOwnedParents,
-        bool isExpanded,
         List<ParentComboCardViewModel> cards
-    ) : ObservableObject
+    )
     {
         public ILocalizedText Title { get; } = title;
 
@@ -66,9 +63,6 @@ namespace PalCalc.UI.ViewModel.Solver
         // (starts empty, `ParentCombosToolViewModel` moves `AllCards` in here a few at a time while loading)
         public ObservableCollection<ParentComboCardViewModel> Cards { get; } = [];
         internal List<ParentComboCardViewModel> AllCards { get; } = cards;
-
-        [ObservableProperty]
-        private bool isExpanded = isExpanded;
     }
 
     public partial class ParentCombosToolViewModel(SolverControlsViewModel solverControls) : ObservableObject, ISolverTool
@@ -110,34 +104,17 @@ namespace PalCalc.UI.ViewModel.Solver
         [ObservableProperty]
         private ParentComboSortOption selectedSort;
 
-        [NotifyPropertyChangedFor(nameof(ExpandToggleLabel))]
         [ObservableProperty]
         private List<ParentComboGroupViewModel> groups = [];
 
-        partial void OnChildChanged(PalViewModel value) => Update(keepExpanded: false);
+        // off by default, like `BreedableToolViewModel`. the IV sorts still work while it's off
+        [ObservableProperty]
+        private bool showIVs = false;
+
+        partial void OnChildChanged(PalViewModel value) => Update();
 
         // (recalculates, since the Philanthropist sort changes which owned pals are picked)
-        partial void OnSelectedSortChanged(ParentComboSortOption value) => Update(keepExpanded: true);
-
-        // (shows "Expand All" while no child is chosen)
-        private bool AreAllExpanded => Groups.Count > 0 && Groups.All(g => g.IsExpanded);
-
-        public ILocalizedText ExpandToggleLabel =>
-            (AreAllExpanded ? LocalizationCodes.LC_BREEDABLE_COLLAPSE_ALL : LocalizationCodes.LC_BREEDABLE_EXPAND_ALL).Bind();
-
-        [RelayCommand]
-        private void ToggleExpanded()
-        {
-            var isExpanded = !AreAllExpanded;
-            foreach (var group in Groups)
-                group.IsExpanded = isExpanded;
-        }
-
-        private void Group_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(ParentComboGroupViewModel.IsExpanded))
-                OnPropertyChanged(nameof(ExpandToggleLabel));
-        }
+        partial void OnSelectedSortChanged(ParentComboSortOption value) => Update();
 
         public void OnSelected()
         {
@@ -161,19 +138,18 @@ namespace PalCalc.UI.ViewModel.Solver
             calculator = new ParentCombosCalculator(settings);
             breedable = newBreedable;
 
-            await UpdateAsync(keepExpanded: false);
+            await UpdateAsync();
         }
 
         // (async void, as with `Run`)
-        private async void Update(bool keepExpanded) => await UpdateAsync(keepExpanded);
+        private async void Update() => await UpdateAsync();
 
-        private async Task UpdateAsync(bool keepExpanded)
+        private async Task UpdateAsync()
         {
             var update = ++latestUpdate;
-            var expanded = keepExpanded ? Groups.ToDictionary(g => g.NumOwnedParents, g => g.IsExpanded) : [];
 
             // (cleared straight away, so the old cards are never rebuilt while the new ones load)
-            SetGroups([]);
+            Groups = [];
 
             if (Child == null || calculator == null)
             {
@@ -189,7 +165,7 @@ namespace PalCalc.UI.ViewModel.Solver
             var combos = await BreedableToolViewModel.OffUIThread(() => currentCalculator.Calculate(child, currentBreedable, preferBreedSpeed));
             if (update != latestUpdate) return;
 
-            SetGroups(BuildGroups(combos, save, settings.GameSettings, SelectedSort?.Sort ?? ParentComboSort.HighestIVs, expanded));
+            Groups = BuildGroups(combos, save, settings.GameSettings, SelectedSort?.Sort ?? ParentComboSort.HighestIVs);
 
             // (a few at a time so the loading animation keeps moving, see `BreedableToolViewModel`)
             var numShown = 0;
@@ -208,23 +184,11 @@ namespace PalCalc.UI.ViewModel.Solver
             IsLoading = false;
         }
 
-        private void SetGroups(List<ParentComboGroupViewModel> groups)
-        {
-            foreach (var group in Groups)
-                group.PropertyChanged -= Group_PropertyChanged;
-
-            Groups = groups;
-
-            foreach (var group in Groups)
-                group.PropertyChanged += Group_PropertyChanged;
-        }
-
         private static List<ParentComboGroupViewModel> BuildGroups(
             ParentCombosResult result,
             CachedSaveGame save,
             GameSettings gameSettings,
-            ParentComboSort sort,
-            Dictionary<int, bool> expanded
+            ParentComboSort sort
         )
         {
             ParentComboCardViewModel ToCard(ParentCombo combo)
@@ -254,12 +218,7 @@ namespace PalCalc.UI.ViewModel.Solver
                         _ => LocalizationCodes.LC_COMBOS_GROUP_NEITHER.Bind(cards.Count),
                     };
 
-                    return new ParentComboGroupViewModel(
-                        title,
-                        group.Key,
-                        expanded.GetValueOrDefault(group.Key, group.Key > 0),
-                        cards
-                    );
+                    return new ParentComboGroupViewModel(title, group.Key, cards);
                 })
                 .ToList();
         }

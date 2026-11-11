@@ -85,20 +85,21 @@
             </vu:PopupToolTipTrigger>
         </DataTemplate>
 
-        <!-- Cards keep a fixed width so they line up, and only shrink if the pane is narrower than one card -->
+        <!-- Only built while "Show IVs" is checked -->
+        <DataTemplate x:Key="CardIVsTemplate">
+            <vp:PalIVsView Columns="1"
+                           Orientation="Horizontal"
+                           Margin="0,2,0,0"
+                           Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                           FontSize="10"
+                           IV_HP="{Binding HP}"
+                           IV_Attack="{Binding Attack}"
+                           IV_Defense="{Binding Defense}" />
+        </DataTemplate>
+
+        <!-- Every card has the same width so they line up, the window's minimum width keeps one from being cut off -->
         <DataTemplate x:Key="CardTemplate">
-            <Grid MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}" UseLayoutRounding="True">
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Setter Property="Width" Value="420" />
-                        <Style.Triggers>
-                            <!-- Two of these line up with one card with parents, given the panel's spacing -->
-                            <DataTrigger Binding="{Binding Parent1}" Value="{x:Null}">
-                                <Setter Property="Width" Value="205" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
+            <Grid Width="420" UseLayoutRounding="True">
 
                 <!-- Behind the card so that only the glow around it shows -->
                 <Border IsHitTestVisible="False"
@@ -117,10 +118,6 @@
                         BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
                         Background="{DynamicResource BreedingNodeBackgroundBrush}">
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="2*" MinWidth="60" />
@@ -140,41 +137,45 @@
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Parent1}" Value="{x:Null}">
+                                        <!-- (a Not Reachable card has nothing on the right) -->
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Parent1}" Value="{x:Null}" />
+                                                <Condition Binding="{Binding Owned}" Value="{x:Null}" />
+                                            </MultiDataTrigger.Conditions>
                                             <Setter Property="Grid.ColumnSpan" Value="2" />
-                                        </DataTrigger>
+                                        </MultiDataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
 
                             <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
-                            <vp:PalIVsView Columns="1"
-                                           Orientation="Horizontal"
-                                           Margin="0,2,0,0"
-                                           Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
-                                           FontSize="10"
-                                           IV_HP="{Binding IVs.HP}"
-                                           IV_Attack="{Binding IVs.Attack}"
-                                           IV_Defense="{Binding IVs.Defense}"
-                                           Visibility="{Binding IVs, Converter={StaticResource VVC}}" />
+
+                            <!-- (the content is only set while checked, so the IV views aren't built at all otherwise) -->
+                            <ContentControl Focusable="False">
+                                <ContentControl.Style>
+                                    <Style TargetType="ContentControl">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DataContext.ShowIVs, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                                <Setter Property="Content" Value="{Binding IVs}" />
+                                                <Setter Property="ContentTemplate" Value="{StaticResource CardIVsTemplate}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                            </ContentControl>
                         </StackPanel>
 
+                        <!-- The parents of a bred card, or where the best one is for an owned card -->
                         <StackPanel Grid.Column="2" VerticalAlignment="Center">
                             <ContentControl Content="{Binding Parent1}" ContentTemplate="{StaticResource ParentTemplate}" Visibility="{Binding Parent1, Converter={StaticResource VVC}}" />
                             <ContentControl Content="{Binding Parent2}" ContentTemplate="{StaticResource ParentTemplate}" Visibility="{Binding Parent2, Converter={StaticResource VVC}}" Margin="0,4,0,0" />
+                            <ContentControl Content="{Binding Owned}" ContentTemplate="{StaticResource OwnedTemplate}" Visibility="{Binding Owned, Converter={StaticResource VVC}}" />
                         </StackPanel>
-
-                        <!-- On its own row since half-width cards don't have room beside the IVs -->
-                        <ContentControl Grid.Row="1"
-                                        Grid.ColumnSpan="3"
-                                        Margin="0,4,0,0"
-                                        Content="{Binding Owned}"
-                                        ContentTemplate="{StaticResource OwnedTemplate}"
-                                        Visibility="{Binding Owned, Converter={StaticResource VVC}}" />
                     </Grid>
                 </Border>
 
-                <!-- Morphs the card's border, in step with the glow and collapsed group headers -->
+                <!-- Morphs the card's border, in step with the glow and the contents list -->
                 <Border IsHitTestVisible="False"
                         BorderThickness="2"
                         CornerRadius="10"
@@ -234,75 +235,76 @@
                               VerticalAlignment="Center"
                               Margin="0,0,25,0"
                               ToolTipService.ToolTip="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS_DESCRIPTION}" />
-                    <Button Content="{Binding ExpandToggleLabel.Value}" Command="{Binding ToggleExpandedCommand}" Margin="0,0,10,0" />
-                    <Button Content="{itl:LocalizedText LC_SOLVER_RUN}" Command="{Binding SolverControls.RunSolverCommand}" />
+                    <TextBlock Text="{itl:LocalizedText Code=LC_TOOL_SHOW_IVS}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <CheckBox IsChecked="{Binding ShowIVs}" VerticalAlignment="Center" Margin="0,0,25,0" />
+                    <!-- (the window runs the tool, since it has the Source Pals and settings to run with) -->
+                    <Button Content="{itl:LocalizedText LC_SOLVER_RUN}" Command="{Binding DataContext.RunCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                 </StackPanel>
             </Grid>
         </Border>
 
         <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="170" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Contents, click a group to scroll to it. A group with a search match pulses here too, since its cards might be off-screen -->
+            <ListBox x:Name="GroupsContents"
+                     Grid.Column="0"
+                     Margin="0,0,5,0"
+                     ItemsSource="{Binding Groups}"
+                     SelectionChanged="GroupsContents_SelectionChanged"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     Visibility="{Binding IsLoading, Converter={StaticResource NegatedHiddenVVC}}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <!-- (selecting handles the keyboard, this handles clicking the group that's already selected) -->
+                        <EventSetter Event="PreviewMouseLeftButtonUp" Handler="GroupsContents_ItemClicked" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="vms:BreedableGroupViewModel">
+                        <Grid>
+                            <Border IsHitTestVisible="False"
+                                    Margin="-4,-2"
+                                    CornerRadius="3"
+                                    Background="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}"
+                                    Opacity="{Binding Opacity, ElementName=SearchPulse}"
+                                    Visibility="{Binding HasHighlightedCards, Converter={StaticResource VVC}}" />
+                            <TextBlock Text="{Binding Title.Value}" TextTrimming="CharacterEllipsis" Margin="0,2" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
             <!-- Hidden rather than collapsed while loading, so the cards are still laid out as they're added -->
             <ScrollViewer x:Name="GroupsScrollViewer"
+                          Grid.Column="1"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
                           Visibility="{Binding IsLoading, Converter={StaticResource NegatedHiddenVVC}}"
-                          IsVisibleChanged="Groups_IsVisibleChanged"
-                          PreviewMouseWheel="Groups_PreviewMouseWheel"
-                          SizeChanged="Groups_LayoutChanged"
-                          Expander.Expanded="Groups_LayoutChanged"
-                          Expander.Collapsed="Groups_LayoutChanged">
+                          IsVisibleChanged="Groups_IsVisibleChanged">
                 <ItemsControl x:Name="GroupsList" ItemsSource="{Binding Groups}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="vms:BreedableGroupViewModel">
-                            <Grid Margin="0,0,0,5">
-                                <Expander x:Name="GroupExpander" Header="{Binding Title.Value}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Loaded="Groups_LayoutChanged">
-                                    <ItemsControl ItemsSource="{Binding Cards}" ItemTemplate="{StaticResource CardTemplate}" Margin="7">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <vu:SpacedWrapPanel Orientation="Horizontal" HorizontalSpacing="10" VerticalSpacing="10" HorizontalContentAlignment="Left" />
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                    </ItemsControl>
-                                </Expander>
-
-                                <!-- Pulses over the header of a collapsed group, since its highlighted cards are hidden.
-                                     Waits for the 0.2s collapse animation of Expander, while the cards are still visible. -->
-                                <Grid IsHitTestVisible="False" Opacity="{Binding Opacity, ElementName=SearchPulse}">
-                                    <Border Background="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}" Opacity="0.5" />
-                                    <Grid.Style>
-                                        <Style TargetType="Grid">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                            <Style.Triggers>
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding HasHighlightedCards}" Value="True" />
-                                                        <Condition Binding="{Binding IsExpanded, ElementName=GroupExpander}" Value="False" />
-                                                    </MultiDataTrigger.Conditions>
-                                                    <MultiDataTrigger.EnterActions>
-                                                        <BeginStoryboard x:Name="ShowHeaderPulse">
-                                                            <Storyboard>
-                                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
-                                                                    <DiscreteObjectKeyFrame KeyTime="00:00:00.25" Value="{x:Static Visibility.Visible}" />
-                                                                </ObjectAnimationUsingKeyFrames>
-                                                            </Storyboard>
-                                                        </BeginStoryboard>
-                                                    </MultiDataTrigger.EnterActions>
-                                                    <MultiDataTrigger.ExitActions>
-                                                        <StopStoryboard BeginStoryboardName="ShowHeaderPulse" />
-                                                    </MultiDataTrigger.ExitActions>
-                                                </MultiDataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Grid.Style>
-                                </Grid>
-                            </Grid>
+                            <GroupBox Header="{Binding Title.Value}" Margin="0,0,0,5">
+                                <ItemsControl ItemsSource="{Binding Cards}" ItemTemplate="{StaticResource CardTemplate}" Margin="2">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <vu:SpacedWrapPanel Orientation="Horizontal" HorizontalSpacing="10" VerticalSpacing="10" HorizontalContentAlignment="Left" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </GroupBox>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
 
             <!-- The same loading animation as the app's startup screen -->
-            <ui:LoadingPage Visibility="{Binding IsLoading, Converter={StaticResource VVC}}" />
+            <ui:LoadingPage Grid.ColumnSpan="2" Visibility="{Binding IsLoading, Converter={StaticResource VVC}}" />
         </Grid>
     </DockPanel>
 </UserControl>

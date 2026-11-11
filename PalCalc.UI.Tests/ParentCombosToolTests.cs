@@ -35,14 +35,9 @@ public class ParentCombosToolTests
     }
 
     [TestMethod]
-    public void Child_CollapsesOnlyNeitherOwned()
+    public void ShowIVs_IsOffByDefault()
     {
-        var tool = RunWithPenkingAndBushi();
-
-        tool.Child = Pal("Sibelyx");
-
-        Assert.IsFalse(tool.Groups.Last().IsExpanded);
-        Assert.IsTrue(tool.Groups[..^1].All(g => g.IsExpanded));
+        Assert.IsFalse(new ParentCombosToolViewModel(null!).ShowIVs);
     }
 
     [TestMethod]
@@ -57,18 +52,6 @@ public class ParentCombosToolTests
         Assert.IsNull(tool.Child);
         Assert.AreEqual(0, tool.Groups.Count);
         Assert.AreEqual(ParentComboSort.ZToA, tool.SelectedSort.Sort);
-    }
-
-    [TestMethod]
-    public void SelectedSort_KeepsCollapsedGroups()
-    {
-        var tool = RunWithPenkingAndBushi();
-        tool.Child = Pal("Sibelyx");
-        tool.Groups.First().IsExpanded = false;
-
-        tool.SelectedSort = tool.SortOptions.Single(o => o.Sort == ParentComboSort.AToZ);
-
-        Assert.IsFalse(tool.Groups.First().IsExpanded);
     }
 
     [TestMethod]

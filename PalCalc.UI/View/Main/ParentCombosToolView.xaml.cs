@@ -15,12 +15,13 @@ namespace PalCalc.UI.View.Main
         }
 
         // (same groups layout as `BreedableToolView`, see there for why)
-        private void Groups_LayoutChanged(object sender, RoutedEventArgs e) =>
-            Dispatcher.BeginInvoke(() => BreedableToolView.UpdateScrollBar(GroupsList, GroupsScrollViewer));
-
-        private void Groups_PreviewMouseWheel(object sender, MouseWheelEventArgs e) => BreedableToolView.ScrollGroups(sender, e);
-
         private void Groups_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) =>
-            Dispatcher.BeginInvoke(() => BreedableToolView.UpdateScrollBar(GroupsList, GroupsScrollViewer));
+            BreedableToolView.ResetScroll(GroupsContents, GroupsScrollViewer);
+
+        private void GroupsContents_SelectionChanged(object sender, SelectionChangedEventArgs e) =>
+            BreedableToolView.ScrollToGroup(GroupsList, GroupsScrollViewer, GroupsContents.SelectedItem);
+
+        private void GroupsContents_ItemClicked(object sender, MouseButtonEventArgs e) =>
+            BreedableToolView.ScrollToGroup(GroupsList, GroupsScrollViewer, ((FrameworkElement)sender).DataContext);
     }
 }

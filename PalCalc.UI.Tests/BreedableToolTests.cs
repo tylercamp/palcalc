@@ -18,22 +18,28 @@ public class BreedableToolTests
 
         await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
 
-        Assert.AreEqual("Already Owned (2) - Best IVs Shown", tool.Groups.First().Title.Value);
-        Assert.AreEqual("Tier 1 (1)", tool.Groups[1].Title.Value);
+        Assert.AreEqual("Already Owned (2)", tool.Groups.First().Title.Value);
+        Assert.AreEqual("1 Step(s) (1)", tool.Groups[1].Title.Value);
         StringAssert.StartsWith(tool.Groups.Last().Title.Value, "Not Reachable");
         Assert.AreEqual(DB.Pals.Count() - 1, tool.Groups.Sum(g => g.Cards.Count));
     }
 
     [TestMethod]
-    public async Task Run_CollapsesOwnedAndNotReachableGroups()
+    public void ShowIVs_IsOffByDefault()
     {
-        var tool = new BreedableToolViewModel(null!);
+        Assert.IsFalse(new BreedableToolViewModel(null!).ShowIVs);
+    }
 
-        await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
+    [TestMethod]
+    public async Task ShowIVs_KeepsTheCards()
+    {
+        var tool = await RunWithPenkingAndBushi();
+        var cards = tool.Groups.SelectMany(g => g.Cards).ToList();
 
-        Assert.IsFalse(tool.Groups.First().IsExpanded);
-        Assert.IsFalse(tool.Groups.Last().IsExpanded);
-        Assert.IsTrue(tool.Groups[1..^1].All(g => g.IsExpanded));
+        tool.ShowIVs = true;
+
+        CollectionAssert.AreEqual(cards, tool.Groups.SelectMany(g => g.Cards).ToList());
+        Assert.IsNotNull(tool.Groups[1].Cards.Single().IVs);
     }
 
     [TestMethod]
@@ -165,38 +171,6 @@ public class BreedableToolTests
         await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
 
         Assert.IsTrue(tool.Groups[1].Cards.Single().IsHighlighted);
-    }
-
-    [TestMethod]
-    public async Task ToggleExpanded_ExpandsThenCollapsesEveryGroup()
-    {
-        var tool = await RunWithPenkingAndBushi();
-        Assert.AreEqual("Expand All", tool.ExpandToggleLabel.Value);
-
-        tool.ToggleExpandedCommand.Execute(null);
-
-        Assert.IsTrue(tool.Groups.All(g => g.IsExpanded));
-        Assert.AreEqual("Collapse All", tool.ExpandToggleLabel.Value);
-
-        tool.ToggleExpandedCommand.Execute(null);
-
-        Assert.IsFalse(tool.Groups.Any(g => g.IsExpanded));
-        Assert.AreEqual("Expand All", tool.ExpandToggleLabel.Value);
-    }
-
-    [TestMethod]
-    public async Task ToggleExpanded_FollowsManualChanges()
-    {
-        var tool = await RunWithPenkingAndBushi();
-        tool.ToggleExpandedCommand.Execute(null);
-
-        tool.Groups[0].IsExpanded = false;
-
-        Assert.AreEqual("Expand All", tool.ExpandToggleLabel.Value);
-
-        tool.ToggleExpandedCommand.Execute(null);
-
-        Assert.IsTrue(tool.Groups.All(g => g.IsExpanded));
     }
 
     [TestMethod]

@@ -4,17 +4,17 @@ Find All Breedable answers "what can I reach with the Pals I have?" Combos By Ch
 
 ## Overview
 
-**Combos By Child** is the second entry in the Tools section. Pick a child Pal in the top box, and every pair of parent species which breeds it is shown as a card, split into three sections:
+**Combos By Child** is the second tool in the save's menu, and opens in its own window like Find All Breedable. Pick a child Pal in the top box, and every pair of parent species which breeds it is shown as a card, split into three sections, with the same contents list on the left:
 
 - **Ready Now:** both parents are owned and can be paired right now
 - **Breed or Catch One First:** one parent is owned
-- **Neither Parent Owned:** collapsed to start with
+- **Neither Parent Owned**
 
-An owned parent shows the Pal with the highest IVs in the gender needed, and where it is, with the same hover as Find All Breedable. A parent which isn't owned says **Can be bred** (the owned Pals can lead to it), **Catch only** (it only breeds from itself, like Frostallion), or **Not breedable from your Pals**. When both parents are owned, the card also shows the IV range the child can have.
+An owned parent shows the Pal with the highest IVs in the gender needed, and where it is, with the same hover as Find All Breedable. A parent which isn't owned says **Can be bred** (the owned Pals can lead to it), **Catch only** (it only breeds from itself, like Frostallion), or **Not breedable from your Pals**. With **Show IVs** checked, owned parents show their IVs, and a card with both parents owned shows the IV range the child can have. It's off by default, like Find All Breedable, and the IV sorts work either way.
 
 A **Sort** dropdown orders the cards inside each section by Highest IVs, A to Z, Z to A, the highest HP, ATK or DEF, or Most Philanthropist. With reversers on, a parent of the wrong gender for the pair gets the swap icon from `PalGenderView`.
 
-How many breeding steps a missing parent takes isn't shown, to keep the sections simple. Attacks are ignored, and so are passives except Philanthropist, and nothing is saved to disk. The child is cleared each time the tool is selected, and the sort is kept until another save is opened or the app closes. Pairs with the flower Gumoss are hidden unless one is owned, since it breeds the same children as the normal Gumoss and would look like a duplicate card.
+How many breeding steps a missing parent takes isn't shown, to keep the sections simple. Attacks are ignored, and so are passives except Philanthropist, and nothing is saved to disk. The child is cleared each time the tool is opened from the menu, and the sort is kept until another save is opened or the app closes. Pairs with the flower Gumoss are hidden unless one is owned, since it breeds the same children as the normal Gumoss and would look like a duplicate card.
 
 ## How it works
 
@@ -51,13 +51,11 @@ How many breeding steps a missing parent takes isn't shown, to keep the sections
 
 | File | Purpose |
 |---|---|
-| `PalCalc.UI/ViewModel/Solver/ParentCombosToolViewModel.cs` | The child, sort options, sections and cards, loaded a few at a time like Find All Breedable. `Sorted` holds the sort orders. |
-| `PalCalc.UI/View/Main/ParentCombosToolView.xaml` and `.cs` | The top box, cards, and the startup screen's `LoadingPage` while loading. Scrolling reuses `BreedableToolView`'s helpers. |
+| `PalCalc.UI/ViewModel/Solver/ParentCombosToolViewModel.cs` | The child, sort options, Show IVs, sections and cards, loaded a few at a time like Find All Breedable. `Sorted` holds the sort orders. |
+| `PalCalc.UI/View/Main/ParentCombosToolView.xaml` and `.cs` | The top box, contents list, cards, and the startup screen's `LoadingPage` while loading. Scrolling reuses `BreedableToolView`'s helpers. |
 | `PalCalc.UI/ViewModel/Solver/BreedableToolViewModel.cs` | `BreedableParentViewModel` gained an optional required gender (for `NeedsReverser`) and hint, and `BreedSpeedPassive` for the Philanthropist icon. Find All Breedable passes neither and doesn't show the icon. |
-| `PalCalc.UI/View/Main/BreedableToolView.xaml.cs` | `UpdateScrollBar` and `ScrollGroups` became `internal static` so both tools share them. |
-| `PalCalc.UI/ViewModel/Solver/ISolverTool.cs` | Gained `OnSelected`, with an empty default, called before `Run` each time a tool is selected. |
-| `PalCalc.UI/View/Main/ToolListView.xaml` | Each tool is a bordered entry, now that there's more than one. |
-| `PalCalc.UI/ViewModel/SolverPageViewModel.cs` and `View/SolverPage.xaml` | Add the tool and its `DataTemplate`, and call `OnSelected`. |
+| `PalCalc.UI/ViewModel/Solver/ISolverTool.cs` | Gained `OnSelected`, with an empty default, called before `Run` each time a tool is opened from the menu. |
+| `PalCalc.UI/ViewModel/SolverPageViewModel.cs` and `View/Main/SolverToolWindow.xaml` | Add the tool and its `DataTemplate`, and call `OnSelected`. |
 | `PalCalc.UI/Localization/` | 17 new codes in `LocalizationCodes.resx`, `en.resx`, and `LocalizationCodes.Designer.cs`. |
 | `PalCalc.UI.Tests/ParentCombosToolTests.cs` | Sections, hints, the reverser icon, the Philanthropist pick, the child and sort, and every sort order. |
 
@@ -71,4 +69,4 @@ How many breeding steps a missing parent takes isn't shown, to keep the sections
 - `CatchOnly` is worked out from the breeding data, not from spawn data. 26 species only breed from themselves today, including the legendaries. One which can't actually be caught would still say "Catch only", and that hasn't been checked against spawn data.
 - Which species can be bred comes from `BreedableCalculator`, so changes to its rules carry over to the hints.
 
-**UI details:** the parent hover, card styling, scrolling, and loading follow Find All Breedable, so its notes in [README-BREEDABLE.md](./README-BREEDABLE.md) apply here too. Here the loading runs on every child or sort change, and a newer change replaces one still loading. The child dropdown only creates items for the visible rows, so UI Automation has to type into it before choosing an item.
+**UI details:** the window, contents list, parent hover, card styling, Show IVs, scrolling, and loading follow Find All Breedable, so its notes in [README-BREEDABLE.md](./README-BREEDABLE.md) apply here too. Here the loading runs on every child or sort change, and a newer change replaces one still loading. Each IV template hides itself when there are no IVs, since a parent which isn't owned has none, and the child range needs both parents owned. The child dropdown only creates items for the visible rows, so UI Automation has to type into it before choosing an item.
