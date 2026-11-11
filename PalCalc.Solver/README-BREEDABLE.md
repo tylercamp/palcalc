@@ -52,11 +52,11 @@ This means a generation can add a gender without adding a species, so a tier can
 |---|---|
 | `PalCalc.UI/ViewModel/Solver/ISolverTool.cs` | What a tool provides, and the steps for adding one. |
 | `PalCalc.UI/ViewModel/ToolListViewModel.cs` | The available tools and the selected tool. |
-| `PalCalc.UI/ViewModel/Solver/BreedableToolViewModel.cs` | Runs the calculator, and owns groups, cards, search, and Expand All. |
+| `PalCalc.UI/ViewModel/Solver/BreedableToolViewModel.cs` | Runs the calculator, and owns groups, cards, search, Expand All, and loading the cards a few at a time. |
 | `PalCalc.UI/View/Main/ToolListView.xaml` | The list in the Tools section. |
-| `PalCalc.UI/View/Main/BreedableToolView.xaml` | The top box, cards, hover popup, and search pulse. |
+| `PalCalc.UI/View/Main/BreedableToolView.xaml` | The top box, cards, hover popup, search pulse, and the startup screen's `LoadingPage` while loading. |
 | `PalCalc.UI/View/Main/BreedableToolView.xaml.cs` | Mouse wheel and scrollbar handling. |
-| `PalCalc.UI.Tests/BreedableToolTests.cs` | Groups, parents, search, and Expand All. |
+| `PalCalc.UI.Tests/BreedableToolTests.cs` | Groups, parents, search, Expand All, and loading. |
 | `PalCalc.UI/View/SolverPage.xaml` | Adds the Tools section and tool host. Hides panels while a tool is selected. |
 | `PalCalc.UI/ViewModel/SolverPageViewModel.cs` | Owns the tools, keeps tool and target selection exclusive, and hands off in `RunSolver`. |
 | `PalCalc.UI/View/Pal/PalIVsView.xaml` and `.cs` | Gained an optional `Columns` property, which defaults to the original 3. |
@@ -75,7 +75,7 @@ This means a generation can add a gender without adding a species, so a tier can
 
 **Stopping:** each generation has to add a species or a gender, and each of those can only happen once per species, so the loop has a hard limit. Anything added to the loop has to keep that true.
 
-**Concurrency:** all working data is local to `Calculate`, and it only reads settings and the breeding DB, so it's safe while a solver job is running. It runs directly rather than as a job because it takes a few tens of milliseconds, and `SolverJobViewModel` is tied to solver requests.
+**Concurrency:** all working data is local to `Calculate`, and it only reads settings and the breeding DB, so it's safe while a solver job is running and off the UI thread. The tool runs it with `Task.Run` rather than as a job, because it takes a few tens of milliseconds and `SolverJobViewModel` is tied to solver requests.
 
 **Adding a tool:** implement `ISolverTool`, add a `DataTemplate` for it in `SolverPage.xaml`, and add it to the list in `SolverPageViewModel`.
 
@@ -91,3 +91,9 @@ This means a generation can add a gender without adding a species, so a tier can
 - `SearchPulse` is the only search animation. The card borders, card glows, and group headers all follow its opacity so that they stay in step. It only runs while something is highlighted.
 - Collapsed group headers wait 0.25 seconds to pulse, since the `Expander` collapse takes 0.2 seconds and the cards are still visible until then.
 - The hover popup copies a few lines from the location popup in `BreedingResultView.xaml`, so changes to that popup won't carry over.
+- **Loading:** building the cards is what's slow (WPF takes a few ms each, over a second for all ~300), not the calculation. So:
+  - The cards are added `CardsPerBatch` at a time, with `Dispatcher.Yield(Background)` in between so that WPF lays them out and the loading dots keep moving.
+  - While loading, the cards' `ScrollViewer` is `Hidden`, not `Collapsed`. `Collapsed` skips layout, so all of the cost would land at once when it's shown.
+  - Each run clears `Groups` first. Otherwise reselecting the tool rebuilds the previous run's cards in one go before the new run can hide them.
+  - A newer run replaces one still loading.
+  - With no WPF dispatcher, as in tests, `OffUIThread` and `NextFrame` run straight through, so a run has finished when it returns.
