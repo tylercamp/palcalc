@@ -15,6 +15,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -180,6 +181,7 @@ namespace PalCalc.UI.ViewModel
 
         private void NavigateSolverPage(SaveGameViewModel selectedSave)
         {
+            var timer = Stopwatch.StartNew();
             settings.SelectedGameIdentifier = CachedSaveGame.IdentifierFor(selectedSave.Value);
             Storage.SaveAppSettings(settings);
             CrashSupport.ReferencedSave(selectedSave.Value);
@@ -187,10 +189,21 @@ namespace PalCalc.UI.ViewModel
             var parsedSave = Storage.LoadSave(selectedSave.Parent.SourceLocation, selectedSave.Value, db, GameSettingsViewModel.Load(selectedSave.Value).ModelObject);
             if (parsedSave == null)
                 return;
+            var saveTime = timer.Elapsed;
 
             var saveOperations = new CommonSaveOperationsViewModel(BeginNavigateSaveSelectionPageCommand, selectedSave.Parent, selectedSave);
-            var vm = new SolverPageViewModel(Dispatcher.CurrentDispatcher, saveOperations, selectedSave, LoadPalTargets(selectedSave));
+            var targets = LoadPalTargets(selectedSave);
+            var targetTime = timer.Elapsed - saveTime;
+            var vm = new SolverPageViewModel(Dispatcher.CurrentDispatcher, saveOperations, selectedSave, targets);
+            var viewModelTime = timer.Elapsed - saveTime - targetTime;
             Content = new SolverPage(vm);
+            var pageTime = timer.Elapsed - saveTime - targetTime - viewModelTime;
+            logger.Debug(
+                "Load profiling: open save: save/setup {SaveMs:F1} ms, targets {TargetsMs:F1} ms, solver view model {ViewModelMs:F1} ms, page/bind {PageMs:F1} ms, total {TotalMs:F1} ms",
+                saveTime.TotalMilliseconds, targetTime.TotalMilliseconds, viewModelTime.TotalMilliseconds,
+                pageTime.TotalMilliseconds, timer.Elapsed.TotalMilliseconds
+            );
+            dispatcher.BeginInvoke(() => logger.Debug("Load profiling: UI reached idle {ElapsedMs:F1} ms after opening save", timer.Elapsed.TotalMilliseconds), DispatcherPriority.ContextIdle);
         }
 
         private PalTargetListViewModel LoadPalTargets(SaveGameViewModel sg)

@@ -9,6 +9,7 @@ using PalCalc.UI.ViewModel.Solver;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using GameSettingsModel = PalCalc.Model.GameSettings;
@@ -129,6 +130,7 @@ namespace PalCalc.UI.Persistence
 
         private static PalSpecifierViewModel LoadTarget(string targetsPath, string fileId, TargetRehydrationContext context)
         {
+            var timer = Stopwatch.StartNew();
             try
             {
                 var path = Path.Combine(targetsPath, TargetFileName(fileId));
@@ -138,11 +140,21 @@ namespace PalCalc.UI.Persistence
                     return null;
                 }
 
-                var dto = TargetJsonSerializer.FromCurrentTargetJson(File.ReadAllText(path));
+                var json = File.ReadAllText(path);
+                var readTime = timer.Elapsed;
+                var dto = TargetJsonSerializer.FromCurrentTargetJson(json);
+                var parseTime = timer.Elapsed - readTime;
                 if (!string.Equals(dto.Id, fileId, StringComparison.Ordinal))
                     throw new StorageFormatException($"Target filename '{fileId}' does not match document ID '{dto.Id}'.");
 
-                return TargetJsonSerializer.FromDto(dto, context);
+                var target = TargetJsonSerializer.FromDto(dto, context);
+                logger.Debug(
+                    "Load profiling: target {TargetId}, {Characters} characters, {Results} results: read {ReadMs:F1} ms, parse {ParseMs:F1} ms, rehydrate {RehydrateMs:F1} ms, total {TotalMs:F1} ms",
+                    fileId, json.Length, dto.CurrentResults?.Results.Count ?? 0,
+                    readTime.TotalMilliseconds, parseTime.TotalMilliseconds,
+                    (timer.Elapsed - readTime - parseTime).TotalMilliseconds, timer.Elapsed.TotalMilliseconds
+                );
+                return target;
             }
             catch (Exception ex)
             {

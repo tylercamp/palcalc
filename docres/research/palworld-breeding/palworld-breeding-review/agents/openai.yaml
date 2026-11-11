@@ -1,0 +1,4 @@
+interface:
+  display_name: "Palworld Breeding Review"
+  short_description: "Compare PalCalc mechanics with completed REA evidence"
+  default_prompt: "Use $palworld-breeding-review to derive the scoped PalCalc model from completed REA findings and compare possible breeding paths, inheritance estimates, or supporting logic with the documented baseline. Separate material discrepancies from review notes."

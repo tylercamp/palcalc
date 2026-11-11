@@ -78,15 +78,15 @@ internal sealed class SurgeryFinalistAccumulator
     {
         if (
             candidate.Pal != prerequisiteTarget.Pal ||
-            attackTargets?.IsActive == true &&
-                !candidate.AttackProfile.Contains(attackTargets.FullTargetMask) ||
+            (attackTargets?.HasRequiredAttacks == true && !candidate.AttackProfile.Contains(attackTargets.FullTargetMask)) ||
             !CanRetain(
-            candidate.Pal,
-            candidate.Gender,
-            candidate.IVs,
-            candidate.EffectivePassives,
-            candidate.TotalCost
-        ))
+                candidate.Pal,
+                candidate.Gender,
+                candidate.IVs,
+                candidate.EffectivePassives,
+                candidate.TotalCost
+            )
+        )
             return false;
 
         return candidates.TryAdd(candidate, 0);
@@ -96,15 +96,15 @@ internal sealed class SurgeryFinalistAccumulator
     {
         if (
             candidate.Pal != prerequisiteTarget.Pal ||
-            attackTargets?.IsActive == true &&
-                !candidate.AttackProfile.Contains(attackTargets.FullTargetMask) ||
+            (attackTargets?.HasRequiredAttacks == true && !candidate.AttackProfile.Contains(attackTargets.FullTargetMask)) ||
             !CanRetain(
-            candidate.Pal,
-            candidate.Gender,
-            candidate.IVs,
-            candidate.EffectivePassives,
-            candidate.TotalCost
-        ))
+                candidate.Pal,
+                candidate.Gender,
+                candidate.IVs,
+                candidate.EffectivePassives,
+                candidate.TotalCost
+            )
+        )
             return false;
 
         return candidates.TryAdd(candidate.Materialize(), 0);

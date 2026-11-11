@@ -1153,4 +1153,10 @@
   <data name="LC_SOLVER_SETTINGS_SKIP_SURGERY_SEARCH_DESC" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOW_SPECIAL_CAKES_FOR_PASSIVES" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LC_SOLVER_SETTINGS_ALLOW_SPECIAL_CAKES_FOR_PASSIVES_DESCRIPTION" xml:space="preserve">
+    <value />
+  </data>
 </root>

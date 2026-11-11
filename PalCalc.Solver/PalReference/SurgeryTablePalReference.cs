@@ -170,6 +170,8 @@ namespace PalCalc.Solver.PalReference
         public int EffectivePassivesHash { get; }
         public IV_Set IVs => Input.IVs;
         public AttackProfile AttackProfile => Input.AttackProfile;
+        public int ExpectedSpecialCakes => Input.ExpectedSpecialCakes;
+        public int BaseSpecialCakes => Input.BaseSpecialCakes;
 
 
         public int NumTotalBreedingSteps => Input.NumTotalBreedingSteps;

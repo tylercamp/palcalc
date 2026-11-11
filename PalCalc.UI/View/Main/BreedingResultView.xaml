@@ -89,6 +89,25 @@
                 <StackPanel Orientation="Vertical" Margin="5" MinWidth="180" UseLayoutRounding="True">
                     <DockPanel HorizontalAlignment="Stretch">
                         <Grid VerticalAlignment="Stretch">
+                            <Border Width="50" Height="50"
+                                    CornerRadius="25"
+                                    Margin="0,0,5,0"
+                                    Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}" />
+                            <Border Width="50" Height="50"
+                                    CornerRadius="25"
+                                    BorderThickness="1"
+                                    BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
+                                    Margin="0,0,5,0"
+                                    Background="{Binding Pal.IconBrush}"
+                                    />
+
+                            <Border Width="24" Height="24"
+                                    CornerRadius="25"
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Left"
+                                    Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}"
+                                    Visibility="{Binding UsesSpecialCake, Converter={StaticResource VVC}}"
+                                    />
                             <Border Width="24" Height="24"
                                     CornerRadius="25"
                                     BorderThickness="1"
@@ -107,18 +126,6 @@
                                     </ImageBrush>
                                 </Border.Background>
                             </Border>
-                            
-                            <Border Width="50" Height="50"
-                                    CornerRadius="25"
-                                    Margin="0,0,5,0"
-                                    Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}" />
-                            <Border Width="50" Height="50"
-                                    CornerRadius="25"
-                                    BorderThickness="1"
-                                    BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
-                                    Margin="0,0,5,0"
-                                    Background="{Binding Pal.IconBrush}"
-                                    />
                         </Grid>
                         <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Stretch">
                             <StackPanel.Resources>

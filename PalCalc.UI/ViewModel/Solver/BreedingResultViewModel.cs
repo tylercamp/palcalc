@@ -11,6 +11,7 @@ using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.GraphSharp;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.PalDerived;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,6 +24,8 @@ namespace PalCalc.UI.ViewModel.Solver
 {
     public class BreedingResultViewModel : ObservableObject
     {
+        private static readonly ILogger logger = Log.ForContext<BreedingResultViewModel>();
+
         // For XAML designer view
         public BreedingResultViewModel()
         {
@@ -48,7 +51,7 @@ namespace PalCalc.UI.ViewModel.Solver
                     allowedSurgeryPassives: [],
                     skipSurgeryPassivesDuringSearch: false,
                     useGenderReversers: false,
-                    maxSpecialCakes: 0,
+                    specialCakePolicy: SpecialCakePolicy.Never,
                     trainPals: true
             );
             var solver = new BreedingSolver();
@@ -79,28 +82,31 @@ namespace PalCalc.UI.ViewModel.Solver
             IV_Average = new IVDirectValueViewModel(true, 70);
         }
 
-        private CachedSaveGame source;
+        private readonly CachedSaveGame source;
+        private readonly GameSettings graphSettings;
+        private readonly ActiveSkill[] graphAttacks;
+        private BreedingGraph graph;
+        private bool graphBuildFailed;
+        private List<int> checkedNodeIndices;
+
         public BreedingResultViewModel(CachedSaveGame source, GameSettings settings, IPalReference displayedResult, IEnumerable<ActiveSkill> requiredAttacks)
         {
             this.source = source;
+            graphSettings = settings;
+            DisplayedResult = displayedResult;
+            HasValue = displayedResult != null;
 
-            if (displayedResult == null)
+            if (!HasValue)
             {
-                Graph = null;
-                DisplayedResult = null;
                 Label = LocalizationCodes.LC_COMMON_UNKNOWN.Bind();
             }
             else
             {
-                var normalizedRequiredAttacks = (requiredAttacks ?? []).Where(attack => attack != null).Distinct().ToArray();
-                DisplayedResult = displayedResult;
-                Graph = BreedingGraph.FromPalReference(source, settings, displayedResult, normalizedRequiredAttacks);
+                graphAttacks = (requiredAttacks ?? []).Where(attack => attack != null).Distinct().ToArray();
                 EffectivePassives = new PassiveSkillCollectionViewModel(DisplayedResult.EffectivePassives.Select(PassiveSkillViewModel.Make));
-                NumSpecialCakes = DisplayedResult.AllReferences()
-                    .OfType<BredPalReference>()
-                    .Sum(reference => reference.MaterializedAttackInheritance?.SpecialCakes ?? 0);
+                NumSpecialCakes = DisplayedResult.ExpectedSpecialCakes;
 
-                EffectiveAttacks = new AttackSkillCollectionViewModel(normalizedRequiredAttacks.Select(ActiveSkillViewModel.Make));
+                EffectiveAttacks = new AttackSkillCollectionViewModel(graphAttacks.Select(ActiveSkillViewModel.Make));
 
                 IVs = IVSetViewModel.FromIVs(displayedResult.IVs);
 
@@ -180,10 +186,21 @@ namespace PalCalc.UI.ViewModel.Solver
                     descriptionParts.Add(LocalizationCodes.LC_PAL_WILD_COUNT.Bind(numWildPals));
 
                 InputLocations = Translator.Join.Bind(descriptionParts);
-
-                foreach (var node in Graph.Nodes)
-                    PropertyChangedEventManager.AddHandler(node, OnNodeIsCheckedPropertyChanged, nameof(node.IsChecked));
             }
+        }
+
+        private BreedingGraph BuildGraph()
+        {
+            var built = BreedingGraph.FromPalReference(source, graphSettings, DisplayedResult, graphAttacks);
+            // Restore checkmarks before subscribing so opening a result doesn't trigger a save.
+            foreach (var index in checkedNodeIndices ?? [])
+                if (index >= 0 && index < built.Nodes.Count)
+                    built.Nodes[index].IsChecked = true;
+
+            foreach (var node in built.Nodes)
+                PropertyChangedEventManager.AddHandler(node, OnNodeIsCheckedPropertyChanged, nameof(node.IsChecked));
+            checkedNodeIndices = null;
+            return built;
         }
 
         private void OnNodeIsCheckedPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -194,10 +211,38 @@ namespace PalCalc.UI.ViewModel.Solver
         public ILocalizedText Label { get; }
         public ILocalizedText InputLocations { get; }
 
-        public BreedingGraph Graph { get; }
+        public BreedingGraph Graph
+        {
+            get
+            {
+                if (!HasValue || graphBuildFailed) return null;
+
+                try
+                {
+                    return graph ??= BuildGraph();
+                }
+                catch (Exception ex)
+                {
+                    graphBuildFailed = true;
+                    logger.Warning(ex, "Failed to build breeding graph for {Pal}", DisplayedResult.Pal.InternalName);
+                    return null;
+                }
+            }
+        }
+
+        internal bool IsGraphBuilt => graph != null;
+
+        // Saving an unopened result should preserve its checkmarks without building its graph.
+        internal List<int> CheckedNodeIndices
+        {
+            get => graph == null
+                ? checkedNodeIndices ?? (HasValue ? [] : null)
+                : graph.Nodes.Select((node, index) => node.IsChecked ? index : -1).Where(index => index >= 0).ToList();
+            init => checkedNodeIndices = value;
+        }
 
         public IEnumerable<IBreedingTreeNodeViewModel> CheckedNodes =>
-            Graph.Nodes.Where(n => n.IsChecked);
+            Graph?.Nodes.Where(n => n.IsChecked) ?? [];
 
         public IPalReference DisplayedResult { get; }
 
@@ -207,7 +252,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public TimeSpan TimeEstimate => DisplayedResult?.BreedingEffort ?? TimeSpan.Zero;
         public string TimeEstimateLabel => TimeEstimate.TimeSpanSecondsStr();
 
-        public bool HasValue => Graph != null;
+        public bool HasValue { get; }
         public bool NeedsRefresh => Graph?.NeedsRefresh ?? false;
         public int NumWildPals => DisplayedResult.NumTotalWildPals;
         public int NumBreedingSteps => DisplayedResult.NumTotalBreedingSteps;

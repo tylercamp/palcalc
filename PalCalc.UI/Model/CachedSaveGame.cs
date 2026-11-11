@@ -21,7 +21,7 @@ namespace PalCalc.UI.Model
 {
     public class CachedSaveGame
     {
-        private static readonly string SaveReaderVersion = "v44";
+        private static readonly string SaveReaderVersion = "v45";
 
         public CachedSaveGame(ISaveGame underlyingSave)
         {
@@ -125,6 +125,7 @@ namespace PalCalc.UI.Model
             playersByName = null;
             playerGuilds = null;
             basesByGuild = null;
+            containerGuilds = null;
 
             StateId += 1;
         }

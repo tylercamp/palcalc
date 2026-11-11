@@ -6,9 +6,11 @@ using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Solver;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -30,6 +32,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public BreedingResultListViewModelSettingsSnapshot SettingsSnapshot { get; set; }
 
         public event Action<object, EventArgs> CheckedStateChanged;
+        private bool isRefreshingResults;
 
         private void SubscribeCheckedEvents(List<BreedingResultViewModel> resultList)
         {
@@ -38,10 +41,8 @@ namespace PalCalc.UI.ViewModel.Solver
                 PropertyChangedEventManager.AddHandler(r, OnResultCheckStateChanged, nameof(r.CheckedNodes));
         }
 
-        private void OnResultCheckStateChanged(object sender, PropertyChangedEventArgs args)
-        {
-            CheckedStateChanged?.Invoke(this, EventArgs.Empty);
-        }
+        private void OnResultCheckStateChanged(object sender, PropertyChangedEventArgs args) =>
+            NotifyCheckedStateChanged();
 
         private List<BreedingResultViewModel> results;
         public List<BreedingResultViewModel> Results
@@ -52,7 +53,8 @@ namespace PalCalc.UI.ViewModel.Solver
                 if (SetProperty(ref results, value))
                 {
                     SubscribeCheckedEvents(results);
-                    SelectedResult = results.OrderBy(r => r.TimeEstimate).FirstOrDefault();
+                    if (!isRefreshingResults)
+                        SelectedResult = results.OrderBy(r => r.TimeEstimate).FirstOrDefault();
                     OnPropertyChanged(nameof(EffortWidth));
                     OnPropertyChanged(nameof(NumStepsWidth));
                     OnPropertyChanged(nameof(LocationsWidth));
@@ -68,7 +70,13 @@ namespace PalCalc.UI.ViewModel.Solver
         private BreedingResultViewModel selectedResult;
 
         partial void OnSelectedResultChanged(BreedingResultViewModel value) =>
-            CheckedStateChanged?.Invoke(this, EventArgs.Empty);
+            NotifyCheckedStateChanged();
+
+        private void NotifyCheckedStateChanged()
+        {
+            if (!isRefreshingResults)
+                CheckedStateChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         private readonly double WIDTH_HIDDEN = 0;
         private readonly double FIT_CONTENT = double.NaN;
@@ -112,26 +120,29 @@ namespace PalCalc.UI.ViewModel.Solver
         // before display
         public void UpdateCachedData(CachedSaveGame csg, GameSettings settings)
         {
-            // preserve checked state across rebuild
-            var oldCheckedState = Results
-                .Select(r => r.Graph?.Nodes.Select(n => n.IsChecked).ToArray())
-                .ToList();
-
-            var newResults = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult, r.EffectiveAttacks.AsModelEnumerable())).ToList();
-
-            for (int i = 0; i < newResults.Count && i < oldCheckedState.Count; i++)
+            var timer = Stopwatch.StartNew();
+            var selectedIndex = Results.IndexOf(SelectedResult);
+            var refreshedResults = Results.Select(r => new BreedingResultViewModel(csg, settings, r.DisplayedResult, r.EffectiveAttacks.AsModelEnumerable())
             {
-                var checkedArr = oldCheckedState[i];
-                if (checkedArr == null || newResults[i].Graph == null) continue;
+                CheckedNodeIndices = r.CheckedNodeIndices,
+            }).ToList();
 
-                var nodes = newResults[i].Graph.Nodes;
-                for (int j = 0; j < nodes.Count && j < checkedArr.Length; j++)
-                    nodes[j].IsChecked = checkedArr[j];
+            // Rebinding the list can change selection before we restore the matching row.
+            isRefreshingResults = true;
+            try
+            {
+                Results = refreshedResults;
+                SelectedResult = selectedIndex >= 0 ? refreshedResults[selectedIndex] : null;
+            }
+            finally
+            {
+                isRefreshingResults = false;
             }
 
-            // Assign only after restoring state: the setter subscribes to checkbox changes,
-            // and replaying saved state must not be treated as a user edit.
-            Results = newResults;
+            Log.ForContext<BreedingResultListViewModel>().Debug(
+                "Load profiling: refresh {Results} results, {Graphs} graphs built during refresh/bind: total {TotalMs:F1} ms",
+                Results.Count, Results.Count(r => r.IsGraphBuilt), timer.Elapsed.TotalMilliseconds
+            );
         }
 
         [JsonIgnore]

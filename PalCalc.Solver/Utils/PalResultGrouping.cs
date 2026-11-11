@@ -27,6 +27,8 @@ namespace PalCalc.Solver.Utils
         public static GroupIdFn IvExact { get; } = reference => HashCode.Combine(reference.IVs.HP, reference.IVs.Attack, reference.IVs.Defense);
         public static GroupIdFn GoldCost { get; } = reference => reference.TotalCost;
 
+        public static GroupIdFn SpecialCakes { get; } = reference => reference.ExpectedSpecialCakes;
+
         /// <summary>
         /// Makes a grouping function based on the result of applying `mainFn` to all
         /// elements (i.e. children and self) of a provided pal reference.

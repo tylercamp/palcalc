@@ -25,12 +25,13 @@ namespace PalCalc.UI.ViewModel.GraphSharp
         {
             Value = node;
             Pal = PalViewModel.Make(node.PalRef.Pal);
-            var inheritance = (node.PalRef as BredPalReference)?.MaterializedAttackInheritance;
+            var bred = node.PalRef as BredPalReference;
+            var inheritance = bred?.MaterializedAttackInheritance;
             EquippedAttacks = inheritance is null
                 ? new AttackSkillCollectionViewModel(DefaultEquippedAttacksFor(node.PalRef).Select(ActiveSkillViewModel.Make))
                 : new AttackSkillCollectionViewModel(inheritance.InheritedAttacks.Select(ActiveSkillViewModel.Make));
-            SpecialCakes = inheritance?.SpecialCakes ?? 0;
-            UsesSpecialCake = inheritance?.Mode == AttackInheritanceMode.InheritAll;
+            SpecialCakes = bred?.SelfSpecialCakes ?? 0;
+            UsesSpecialCake = bred?.Outcome.Method == BreedingMethod.SpecialCake;
             PassiveSkills = node.PalRef.ActualPassives.Select(PassiveSkillViewModel.Make).ToList();
             PassiveSkillsCollection = new PassiveSkillCollectionViewModel(PassiveSkills);
 
