@@ -4,7 +4,7 @@ Find All Breedable answers "what can I reach with the Pals I have?" Combos By Ch
 
 ## Overview
 
-**Combos By Child** is the second tool in the save's menu, and opens in its own window like Find All Breedable. Pick a child Pal in the top box, and every pair of parent species which breeds it is shown as a card, split into three sections, with the same contents list on the left:
+**Combos By Child** is the second tool in the Tools menu at the top of the window, and opens in its own window like Find All Breedable. Pick a child Pal in the top box, and every pair of parent species which breeds it is shown as a card, split into three sections, with the same contents list on the left:
 
 - **Ready Now:** both parents are owned and can be paired right now
 - **Breed or Catch One First:** one parent is owned
