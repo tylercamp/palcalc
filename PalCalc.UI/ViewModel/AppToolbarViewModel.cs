@@ -14,6 +14,7 @@ using PalCalc.UI.View.Inspector;
 using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.SaveSelection;
+using PalCalc.UI.ViewModel.Solver;
 using Serilog;
 using Serilog.Core;
 using System;
@@ -62,6 +63,9 @@ namespace PalCalc.UI.ViewModel
             get => PCDebug.FileLogLevel.MinimumLevel == Serilog.Events.LogEventLevel.Debug;
             set => PCDebug.FileLogLevel.MinimumLevel = value ? Serilog.Events.LogEventLevel.Debug : PCDebug.DefaultFileLogLevel;
         }
+
+        // (only filled while a save is open in the solver, since the tools use its Source Pals and settings)
+        public SolverToolsMenuViewModel ToolsMenu { get; } = new SolverToolsMenuViewModel();
 
         public bool IsDarkTheme => settings.IsDarkTheme;
         public bool IsLightTheme => !settings.IsDarkTheme;

@@ -673,6 +673,9 @@
   <data name="LC_TOOL_SHOW_IVS" xml:space="preserve">
     <value />
   </data>
+  <data name="LC_TOOLS" xml:space="preserve">
+    <value />
+  </data>
   <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">
     <value />
   </data>

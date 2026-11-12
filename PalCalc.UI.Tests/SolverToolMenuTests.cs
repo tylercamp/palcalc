@@ -1,10 +1,8 @@
-using CommunityToolkit.Mvvm.Input;
-using PalCalc.UI.ViewModel;
 using PalCalc.UI.ViewModel.Solver;
 
 namespace PalCalc.UI.Tests;
 
-// the tools open from the save's menu, see `CommonSaveOperationsViewModel`
+// the tools open from the app's Tools menu, see `SolverToolsMenuViewModel`
 // (the tool view models use localization, which expects to run on the UI thread)
 [TestClass]
 [DoNotParallelize]
@@ -13,50 +11,47 @@ public class SolverToolMenuTests
     [TestMethod]
     public void Tools_EmptyByDefault()
     {
-        Assert.AreEqual(0, new CommonSaveOperationsViewModel(null, null, null).Tools.Count);
+        Assert.AreEqual(0, new SolverToolsMenuViewModel().Tools.Count);
     }
 
     [TestMethod]
-    public void OpenTool_ClosesMenuAndOpensTool()
+    public void OpenTool_OpensTool()
     {
         ISolverTool opened = null;
         var tool = new BreedableToolViewModel(null!);
-        var operations = new CommonSaveOperationsViewModel(null, null, null).WithTools([tool], t => opened = t);
-        operations.MenuIsOpen = true;
+        var menu = new SolverToolsMenuViewModel();
+        menu.SetTools([tool], t => opened = t);
 
-        operations.OpenToolCommand.Execute(tool);
+        menu.OpenToolCommand.Execute(tool);
 
-        Assert.IsFalse(operations.MenuIsOpen);
+        CollectionAssert.AreEqual(new[] { tool }, menu.Tools.ToList());
         Assert.AreSame(tool, opened);
     }
 
     [TestMethod]
-    public void WithTools_KeepsNavigateCommand()
-    {
-        var navigate = new RelayCommand(() => { });
-        var tool = new BreedableToolViewModel(null!);
-
-        var operations = new CommonSaveOperationsViewModel(navigate, null, null)
-            .WithNavigateCondition(() => true)
-            .WithTools([tool], _ => { });
-
-        Assert.IsNotNull(operations.NavigateSaveSelectionPageCommand);
-        CollectionAssert.AreEqual(new[] { tool }, operations.Tools.ToList());
-    }
-
-    [TestMethod]
-    public void WithNavigateCondition_KeepsTools()
+    public void SetTools_Null_ClearsTools()
     {
         ISolverTool opened = null;
         var tool = new BreedableToolViewModel(null!);
+        var menu = new SolverToolsMenuViewModel();
+        menu.SetTools([tool], t => opened = t);
 
-        var operations = new CommonSaveOperationsViewModel(new RelayCommand(() => { }), null, null)
-            .WithTools([tool], t => opened = t)
-            .WithNavigateCondition(() => true);
+        menu.SetTools(null, null);
+        menu.OpenToolCommand.Execute(tool);
 
-        operations.OpenToolCommand.Execute(tool);
+        Assert.AreEqual(0, menu.Tools.Count);
+        Assert.IsNull(opened);
+    }
 
-        CollectionAssert.AreEqual(new[] { tool }, operations.Tools.ToList());
-        Assert.AreSame(tool, opened);
+    [TestMethod]
+    public void SetTools_NotifiesTheMenu()
+    {
+        var changed = new List<string>();
+        var menu = new SolverToolsMenuViewModel();
+        menu.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        menu.SetTools([new BreedableToolViewModel(null!)], _ => { });
+
+        CollectionAssert.Contains(changed, nameof(SolverToolsMenuViewModel.Tools));
     }
 }

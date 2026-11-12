@@ -31,19 +31,6 @@
                     <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE}" Command="{Binding ExportSaveCommand}" />
                     <MenuItem Header="{itl:LocalizedText LC_EXPORT_SAVE_CSV}" Command="{Binding ExportSaveCsvCommand}" />
                     <MenuItem Header="{itl:LocalizedText LC_INSPECT_SAVE}" Command="{Binding InspectSaveCommand}" />
-                    <StackPanel Orientation="Vertical" Visibility="{Binding Tools.Count, Converter={StaticResource VVC}}">
-                        <Rectangle Fill="{DynamicResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}" Height="1" Margin="{adonisUi:Space 1, 0.25}" />
-                        <!-- (each item's context is its tool, so the command comes from this list's context) -->
-                        <ItemsControl ItemsSource="{Binding Tools}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <MenuItem Header="{Binding Name.Value}"
-                                              Command="{Binding DataContext.OpenToolCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                              CommandParameter="{Binding}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
                     <StackPanel Orientation="Vertical" Visibility="{Binding NavigateSaveSelectionPageCommand, Converter={StaticResource VVC}}">
                         <Rectangle Fill="{DynamicResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}" Height="1" Margin="{adonisUi:Space 1, 0.25}" />
                         <MenuItem Header="{itl:LocalizedText LC_NAV_BACK_TO_SAVE_SELECTOR}" Command="{Binding NavigateSaveSelectionPageCommand}" />

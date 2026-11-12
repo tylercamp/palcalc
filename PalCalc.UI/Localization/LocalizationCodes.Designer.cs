@@ -1393,6 +1393,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_TOOL_SHOW_IVS,
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        LC_TOOLS,
+        /// <summary>
         ///   Looks up a localized string similar to InternalName.
         /// </summary>
         LC_TRAIT_LABEL_UNRECOGNIZED,
