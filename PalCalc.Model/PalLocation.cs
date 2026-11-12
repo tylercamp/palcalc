@@ -20,6 +20,7 @@ namespace PalCalc.Model
         GlobalPalStorage,
     }
 
+    /// <summary>A Pal's current container and slot, which can change as the Pal moves.</summary>
     public class PalLocation
     {
         public string ContainerId { get; set; }

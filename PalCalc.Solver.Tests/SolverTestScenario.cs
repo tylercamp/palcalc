@@ -25,7 +25,6 @@ internal static class SolverTestScenario
 
         return new PalInstance
         {
-            InstanceId = $"solver-test-{instanceIndex}",
             OwnerPlayerId = "solver-test-player",
             Pal = palName.ToPal(DB),
             Gender = gender,

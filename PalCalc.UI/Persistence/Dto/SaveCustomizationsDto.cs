@@ -53,8 +53,11 @@ namespace PalCalc.UI.Persistence.Dto
         [JsonProperty(Required = Required.AllowNull)]
         public string NickName { get; init; }
         
-        [JsonProperty(Required = Required.AllowNull)]
-        public string InstanceId { get; init; }
+        [JsonProperty(Required = Required.Default)]
+        public PalInstanceId? PalInstanceId { get; init; }
+
+        [JsonProperty(Required = Required.Default)]
+        public string ExternalStorageContainerId { get; init; }
     }
 
 }

@@ -31,7 +31,7 @@ public class BreedingGraphLevelTests
         var pal = "Beakon".ToPal(DB);
         var owned = new OwnedPalReference(new PalInstance
         {
-            Pal = pal, Gender = PalGender.MALE, Level = 5, InstanceId = "trained",
+            Pal = pal, Gender = PalGender.MALE, Level = 5,
             PassiveSkills = [], ActiveSkills = [], EquippedActiveSkills = [],
             Location = new PalLocation { Type = LocationType.Palbox, ContainerId = "box", Index = 1 }
         }, [], new(IV_Value.Random, IV_Value.Random, IV_Value.Random), AttackProfile.Inactive, new(5, 20));

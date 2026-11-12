@@ -14,17 +14,16 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
 {
     public interface IContainerSlotDetailsViewModel { }
 
-    public class PalContainerSlotDetailsViewModel(string instanceId, PalInstance pal, GvasCharacterInstance rawPal) : IContainerSlotDetailsViewModel
+    public class PalContainerSlotDetailsViewModel(PalInstanceId palInstanceId, PalInstance pal, GvasCharacterInstance rawPal) : IContainerSlotDetailsViewModel
     {
         public ILocalizedText DisplayName { get; } =
             pal != null
                 ? PalViewModel.Make(pal.Pal).Name
-                : new HardCodedText(rawPal?.CharacterId ?? instanceId);
+                : new HardCodedText(rawPal?.CharacterId ?? $"{palInstanceId.PlayerUId:D} / {palInstanceId.InstanceId:D}");
 
         public ImageSource Icon => pal == null ? PalIcon.DefaultIcon : PalIcon.Images[pal.Pal];
         public ImageBrush IconBrush => pal == null ? PalIcon.DefaultIconBrush : PalIcon.ImageBrushes[pal.Pal];
 
-        public string InstanceId => instanceId;
         public PalInstance Instance => pal;
         public GvasCharacterInstance RawInstance => rawPal;
     }

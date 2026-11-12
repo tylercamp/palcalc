@@ -11,7 +11,7 @@ namespace PalCalc.UI.Persistence
 
     internal static class StorageFormat
     {
-        public const int CurrentVersion = 8;
+        public const int CurrentVersion = 9;
         public const int LegacyVersion = 0;
         public const string ManifestFileName = "storage-format.json";
 
@@ -77,14 +77,14 @@ namespace PalCalc.UI.Persistence
 
     internal static class StorageFile
     {
-        public static void WriteAtomic(string path, string contents, bool backup)
+        public static void WriteAtomic(string path, string contents, bool backup, string backupSuffix = ".bak")
         {
             var directory = Path.GetDirectoryName(path);
             if (!string.IsNullOrEmpty(directory))
                 Directory.CreateDirectory(directory);
 
             var tempPath = path + $".tmp-{Guid.NewGuid():N}";
-            var backupPath = path + ".bak";
+            var backupPath = path + backupSuffix;
 
             try
             {

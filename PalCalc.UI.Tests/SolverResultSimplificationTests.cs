@@ -90,7 +90,7 @@ public class SolverResultSimplificationTests
     [TestMethod]
     public void ZeroCakeFastestPathExcludesCakeUsingAlternatives()
     {
-        var owned = Owned(PalDB.LoadEmbedded().Pals.First(), "owned");
+        var owned = Owned(PalDB.LoadEmbedded().Pals.First());
 
         CollectionAssert.AreEqual(new IPalReference[] { owned },
             SolverJobViewModel.SimplifyResults([new TestPalReference(10, 1), owned], CancellationToken.None));
@@ -125,7 +125,7 @@ public class SolverResultSimplificationTests
     [TestMethod]
     public void InactiveProfilesRemainInTheZeroCakeGroup()
     {
-        var owned = Owned(PalDB.LoadEmbedded().Pals.First(), "owned");
+        var owned = Owned(PalDB.LoadEmbedded().Pals.First());
         Assert.AreEqual(0, PalResultProperty.SpecialCakes(owned));
         CollectionAssert.AreEqual(new IPalReference[] { owned },
             SolverJobViewModel.SimplifyResults([owned], CancellationToken.None));
@@ -155,10 +155,10 @@ public class SolverResultSimplificationTests
             throw new NotSupportedException();
     }
 
-    private static OwnedPalReference Owned(Pal pal, string id) => new(
+    private static OwnedPalReference Owned(Pal pal) => new(
         new PalInstance
         {
-            InstanceId = id, Pal = pal, Gender = PalGender.MALE, PassiveSkills = [],
+            Pal = pal, Gender = PalGender.MALE, PassiveSkills = [],
             Location = new PalLocation { Type = LocationType.Palbox },
         }, [], new IV_Set(), AttackProfile.Inactive);
 }

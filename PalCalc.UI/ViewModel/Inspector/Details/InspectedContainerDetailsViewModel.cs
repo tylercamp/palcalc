@@ -25,12 +25,15 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
             .Select(i => rawContainer.Slots.SingleOrDefault(s => s.SlotIndex == i))
             .Select<PalContainerSlot, IContainerSlotDetailsViewModel>(s =>
             {
-                if (s == null || s.InstanceId == Guid.Empty) return new EmptyPalContainerSlotDetailsViewModel();
+                if (s?.PalInstanceId is not { } id) return new EmptyPalContainerSlotDetailsViewModel();
 
-                var rawChar = containedRawPals.SingleOrDefault(p => p.InstanceId == s.InstanceId);
-                var rawPal = containedPals.SingleOrDefault(p => p.InstanceId == s.InstanceId.ToString());
+                // (detect and explicitly ignore pals with duplicate IDs, we can't make any guarantees about
+                // app behavior when there are duplicates. these are expected to be 100% unique within a save)
+                var rawMatches = containedRawPals.Where(p => p.PalInstanceId == id).Take(2).ToArray();
+                var rawChar = rawMatches.Length == 1 ? rawMatches[0] : null;
+                var rawPal = containedPals.FirstOrDefault(p => p.PalInstanceId == id && p.Location.Index == s.SlotIndex);
 
-                return new PalContainerSlotDetailsViewModel(s.InstanceId.ToString(), rawPal, rawChar);
+                return new PalContainerSlotDetailsViewModel(id, rawPal, rawChar);
             })
             .ToList();
 

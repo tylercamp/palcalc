@@ -47,9 +47,10 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
 
                 ( "IsPlayer", rawData.IsPlayer ),
 
-                ( "InstanceId", rawData.InstanceId ),
-                ( "OwnerPlayerId", rawData.OwnerPlayerId ),
-                ( "OldOwnerPlayerIds", string.Join(", ", rawData.OldOwnerPlayerIds) ),
+                ( "PalInstanceID.PlayerUId", rawData.PalInstanceId.PlayerUId ),
+                ( "PalInstanceID.InstanceId", rawData.PalInstanceId.InstanceId ),
+                ( "OwnerPlayerUId", rawData.OwnerPlayerId ),
+                ( "OldOwnerPlayerUIds", string.Join(", ", rawData.OldOwnerPlayerIds) ),
 
                 ( "SlotIndex", rawData.SlotIndex ),
 

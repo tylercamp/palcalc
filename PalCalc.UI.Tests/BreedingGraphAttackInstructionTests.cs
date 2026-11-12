@@ -17,7 +17,7 @@ public class BreedingGraphAttackInstructionTests
         var db = PalDB.LoadEmbedded();
         var attacks = db.ActiveSkills.Take(3).ToArray();
         var pals = db.Pals.OrderBy(pal => pal.InternalIndex).ToArray();
-        var result = Bred(pals[0], Owned(pals[0], "first", attacks[0], 1), Owned(pals[^1], "second", attacks[1], 2),
+        var result = Bred(pals[0], Owned(pals[0], attacks[0], 1), Owned(pals[^1], attacks[1], 2),
             new(AttackInheritanceMode.InheritAll, [attacks[0]], [attacks[1]], [attacks[0], attacks[1]], [attacks[0], attacks[1], attacks[2]], .25f), cakes: 7);
 
         var graph = BreedingGraph.FromPalReference(null, new GameSettings(), result, []);
@@ -37,9 +37,9 @@ public class BreedingGraphAttackInstructionTests
     {
         var db = PalDB.LoadEmbedded();
         var attacks = db.ActiveSkills.Take(3).ToArray();
-        var inner = Bred(db.Pals.First(), Owned(db.Pals.First(), "inner-first", attacks[0], 1), Owned(db.Pals.Last(), "inner-second", attacks[1], 2),
+        var inner = Bred(db.Pals.First(), Owned(db.Pals.First(), attacks[0], 1), Owned(db.Pals.Last(), attacks[1], 2),
             new(AttackInheritanceMode.Normal, [attacks[0]], [attacks[1]], [attacks[0]], [attacks[0], attacks[1]], 1), cakes: 1);
-        var outer = Bred(db.Pals.Last(), inner, Owned(db.Pals.Last(), "outer", attacks[2], 3),
+        var outer = Bred(db.Pals.Last(), inner, Owned(db.Pals.Last(), attacks[2], 3),
             new(AttackInheritanceMode.InheritAll, [attacks[0]], [attacks[2]], [attacks[0], attacks[2]], [attacks[0], attacks[2]], .25f), cakes: 9);
 
         var display = new BreedingResultViewModel(null, new GameSettings(), outer, [attacks[0], attacks[2]]);
@@ -60,10 +60,10 @@ public class BreedingGraphAttackInstructionTests
     {
         var db = PalDB.LoadEmbedded();
         var attacks = db.ActiveSkills.Take(2).ToArray();
-        var owned = Owned(db.Pals.First(), "owned", attacks[0], 1);
+        var owned = Owned(db.Pals.First(), attacks[0], 1);
         var terminal = new BreedingResultViewModel(null, new GameSettings(), owned, attacks);
         var surgery = new SurgeryTablePalReference(owned, []);
-        var result = Bred(db.Pals.Last(), surgery, Owned(db.Pals.Last(), "other", attacks[1], 2),
+        var result = Bred(db.Pals.Last(), surgery, Owned(db.Pals.Last(), attacks[1], 2),
             new(AttackInheritanceMode.Normal, [attacks[0]], [attacks[1]], [attacks[0]], [attacks[0]], 1), cakes: 0);
 
         var graph = BreedingGraph.FromPalReference(null, new GameSettings(), result, []);
@@ -99,8 +99,8 @@ public class BreedingGraphAttackInstructionTests
     {
         var db = PalDB.LoadEmbedded();
         var attack = db.ActiveSkills.First();
-        var withoutCake = new BreedingResultViewModel(null, new GameSettings(), Owned(db.Pals.First(), "owned", attack, 1), []);
-        var withCake = new BreedingResultViewModel(null, new GameSettings(), Bred(db.Pals.Last(), Owned(db.Pals.First(), "first", attack, 2), Owned(db.Pals.Last(), "second", attack, 3), new(AttackInheritanceMode.InheritAll, [attack], [attack], [attack], [attack], 1), cakes: 1), []);
+        var withoutCake = new BreedingResultViewModel(null, new GameSettings(), Owned(db.Pals.First(), attack, 1), []);
+        var withCake = new BreedingResultViewModel(null, new GameSettings(), Bred(db.Pals.Last(), Owned(db.Pals.First(), attack, 2), Owned(db.Pals.Last(), attack, 3), new(AttackInheritanceMode.InheritAll, [attack], [attack], [attack], [attack], 1), cakes: 1), []);
         var results = new BreedingResultListViewModel { Results = [withoutCake] };
 
         Assert.AreEqual(0, results.NumSpecialCakesWidth);
@@ -121,8 +121,8 @@ public class BreedingGraphAttackInstructionTests
         recordedSpecialCakes: cakes
     );
 
-    private static OwnedPalReference Owned(Pal pal, string id, ActiveSkill attack, int index) => new(
-        new PalInstance { InstanceId = id, Pal = pal, Gender = PalGender.WILDCARD, PassiveSkills = [], ActiveSkills = [attack], EquippedActiveSkills = [attack], Location = new PalLocation { Type = LocationType.Palbox, Index = index } },
+    private static OwnedPalReference Owned(Pal pal, ActiveSkill attack, int index) => new(
+        new PalInstance { Pal = pal, Gender = PalGender.WILDCARD, PassiveSkills = [], ActiveSkills = [attack], EquippedActiveSkills = [attack], Location = new PalLocation { Type = LocationType.Palbox, Index = index } },
         [], new IV_Set { HP = IV_Value.Random, Attack = IV_Value.Random, Defense = IV_Value.Random },
         attackProfile: AttackProfile.Inactive
     );

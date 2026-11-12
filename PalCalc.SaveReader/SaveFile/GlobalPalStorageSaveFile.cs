@@ -36,7 +36,7 @@ namespace PalCalc.SaveReader.SaveFile
                 return null;
 
             var pals = rawPals
-                .Select(c => c.ToPalInstance(db, LocationType.GlobalPalStorage))
+                .Select(c => c.ToPalInstance(db, LocationType.GlobalPalStorage, containerId))
                 .ZipWithIndex()
                 .Select(p =>
                 {
@@ -44,7 +44,6 @@ namespace PalCalc.SaveReader.SaveFile
                     if (c == null) return null;
 
                     c.Location.Index = i;
-                    c.Location.ContainerId = containerId;
                     return c;
                 })
                 .SkipNull()
