@@ -1,4 +1,4 @@
-<UserControl x:Class="PalCalc.UI.View.Main.BreedableToolView"
+﻿<UserControl x:Class="PalCalc.UI.View.Main.BreedableToolView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -99,9 +99,75 @@
                            IV_Defense="{Binding Defense}" />
         </DataTemplate>
 
-        <!-- Every card has the same width so they line up, the window's minimum width keeps one from being cut off -->
+        <DataTemplate x:Key="CardIconTemplate">
+            <Border Width="50" Height="50"
+                    CornerRadius="25"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
+                    Margin="0,0,8,0"
+                    VerticalAlignment="Top"
+                    Background="{Binding Pal.IconBrush}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="CardNameTemplate">
+            <StackPanel>
+                <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+
+                <!-- (the content is only set while checked, so the IV views aren't built at all otherwise) -->
+                <ContentControl Focusable="False">
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DataContext.ShowIVs, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                    <Setter Property="Content" Value="{Binding IVs}" />
+                                    <Setter Property="ContentTemplate" Value="{StaticResource CardIVsTemplate}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- A bred card, with its two parents on the right. 402 wide, so the whole card is 420 with its border and padding -->
+        <DataTemplate x:Key="BredCardBody">
+            <Grid Width="402">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="2*" MinWidth="60" />
+                    <ColumnDefinition Width="3*" />
+                </Grid.ColumnDefinitions>
+
+                <ContentControl Grid.Column="0" Focusable="False" Content="{Binding}" ContentTemplate="{StaticResource CardIconTemplate}" />
+                <ContentControl Grid.Column="1" Focusable="False" Content="{Binding}" ContentTemplate="{StaticResource CardNameTemplate}" Margin="0,0,8,0" />
+
+                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                    <ContentControl Content="{Binding Parent1}" ContentTemplate="{StaticResource ParentTemplate}" />
+                    <ContentControl Content="{Binding Parent2}" ContentTemplate="{StaticResource ParentTemplate}" Margin="0,4,0,0" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- An owned card, with where the best one is under its name, or a Not Reachable card with just its name.
+             187 wide, so two of them and the gap between take the same width as one bred card -->
+        <DataTemplate x:Key="SmallCardBody">
+            <Grid Width="187">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <ContentControl Grid.Column="0" Focusable="False" Content="{Binding}" ContentTemplate="{StaticResource CardIconTemplate}" />
+                <StackPanel Grid.Column="1">
+                    <ContentControl Focusable="False" Content="{Binding}" ContentTemplate="{StaticResource CardNameTemplate}" />
+                    <ContentControl Content="{Binding Owned}" ContentTemplate="{StaticResource OwnedTemplate}" Visibility="{Binding Owned, Converter={StaticResource VVC}}" Margin="0,2,0,0" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- The border, glow, and search highlight shared by every card, around the body for its kind -->
         <DataTemplate x:Key="CardTemplate">
-            <Grid Width="420" UseLayoutRounding="True">
+            <Grid UseLayoutRounding="True">
 
                 <!-- Behind the card so that only the glow around it shows -->
                 <Border IsHitTestVisible="False"
@@ -119,62 +185,18 @@
                         CornerRadius="10"
                         BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
                         Background="{DynamicResource BreedingNodeBackgroundBrush}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="2*" MinWidth="60" />
-                            <ColumnDefinition Width="3*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Border Grid.Column="0"
-                                Width="50" Height="50"
-                                CornerRadius="25"
-                                BorderThickness="1"
-                                BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}"
-                                Margin="0,0,8,0"
-                                VerticalAlignment="Top"
-                                Background="{Binding Pal.IconBrush}" />
-
-                        <StackPanel Grid.Column="1" Margin="0,0,8,0">
-                            <StackPanel.Style>
-                                <Style TargetType="StackPanel">
-                                    <Style.Triggers>
-                                        <!-- (a Not Reachable card has nothing on the right) -->
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding Parent1}" Value="{x:Null}" />
-                                                <Condition Binding="{Binding Owned}" Value="{x:Null}" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="Grid.ColumnSpan" Value="2" />
-                                        </MultiDataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
-
-                            <TextBlock Text="{Binding Pal.Name.Value}" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
-
-                            <!-- (the content is only set while checked, so the IV views aren't built at all otherwise) -->
-                            <ContentControl Focusable="False">
-                                <ContentControl.Style>
-                                    <Style TargetType="ContentControl">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding DataContext.ShowIVs, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
-                                                <Setter Property="Content" Value="{Binding IVs}" />
-                                                <Setter Property="ContentTemplate" Value="{StaticResource CardIVsTemplate}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ContentControl.Style>
-                            </ContentControl>
-                        </StackPanel>
-
-                        <!-- The parents of a bred card, or where the best one is for an owned card -->
-                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                            <ContentControl Content="{Binding Parent1}" ContentTemplate="{StaticResource ParentTemplate}" Visibility="{Binding Parent1, Converter={StaticResource VVC}}" />
-                            <ContentControl Content="{Binding Parent2}" ContentTemplate="{StaticResource ParentTemplate}" Visibility="{Binding Parent2, Converter={StaticResource VVC}}" Margin="0,4,0,0" />
-                            <ContentControl Content="{Binding Owned}" ContentTemplate="{StaticResource OwnedTemplate}" Visibility="{Binding Owned, Converter={StaticResource VVC}}" />
-                        </StackPanel>
-                    </Grid>
+                    <ContentControl Focusable="False" Content="{Binding}">
+                        <ContentControl.Style>
+                            <Style TargetType="ContentControl">
+                                <Setter Property="ContentTemplate" Value="{StaticResource BredCardBody}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Parent1}" Value="{x:Null}">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource SmallCardBody}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ContentControl.Style>
+                    </ContentControl>
                 </Border>
 
                 <!-- Morphs the card's border, in step with the glow and the contents list -->
@@ -224,14 +246,14 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" MaxWidth="250" />
-                    <ColumnDefinition Width="*" MinWidth="10" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" Content="{itl:LocalizedText LC_PAL_CHECKLIST_SEARCH}" VerticalAlignment="Center" Margin="0,0,10,0" />
                 <TextBox Grid.Column="1" VerticalAlignment="Center" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
 
-                <StackPanel Grid.Column="3" Orientation="Horizontal">
+                <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="25,0,0,0">
                     <TextBlock Text="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS}" VerticalAlignment="Center" Margin="0,0,10,0" />
                     <CheckBox IsChecked="{Binding SolverControls.UseGenderReversers, Mode=TwoWay}"
                               VerticalAlignment="Center"

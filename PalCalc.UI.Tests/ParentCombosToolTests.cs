@@ -34,6 +34,19 @@ public class ParentCombosToolTests
         Assert.AreEqual(BreedingDB.Breeding.Count(b => b.Child == "Sibelyx".ToPal(DB) && b.Parents.All(p => p.Pal.InternalName != BreedableCalculator.HiddenPalInternalName)), tool.Groups.Sum(g => g.Cards.Count));
     }
 
+    // a new window would otherwise lay out the last child's cards before they're replaced
+    [TestMethod]
+    public void Clear_DropsTheCards()
+    {
+        var tool = RunWithPenkingAndBushi();
+        tool.Child = Pal("Sibelyx");
+
+        tool.Clear();
+
+        Assert.AreEqual(0, tool.Groups.Count);
+        Assert.IsFalse(tool.IsLoading);
+    }
+
     [TestMethod]
     public void ShowIVs_IsOffByDefault()
     {

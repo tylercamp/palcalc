@@ -116,6 +116,15 @@ namespace PalCalc.UI.ViewModel.Solver
         // (recalculates, since the Philanthropist sort changes which owned pals are picked)
         partial void OnSelectedSortChanged(ParentComboSortOption value) => Update();
 
+        public void Clear()
+        {
+            // (also stops a run or update which is still loading)
+            ++latestRun;
+            ++latestUpdate;
+            Groups = [];
+            IsLoading = false;
+        }
+
         public void OnSelected()
         {
             SelectedSort ??= SortOptions[0];

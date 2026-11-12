@@ -19,5 +19,9 @@ namespace PalCalc.UI.ViewModel.Solver
         void OnSelected() { }
 
         void Run(BreedingSolverSettings settings, CachedSaveGame save);
+
+        // drops the last run's results. Called before a new window opens, since the tool outlives its
+        // windows, and the new window would otherwise lay out every old result before `Run` replaces them
+        void Clear();
     }
 }

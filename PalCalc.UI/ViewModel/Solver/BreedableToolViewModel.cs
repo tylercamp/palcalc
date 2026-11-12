@@ -123,6 +123,13 @@ namespace PalCalc.UI.ViewModel.Solver
         // (a newer run replaces one which is still loading)
         private int latestRun = 0;
 
+        public void Clear()
+        {
+            // (also stops a run which is still loading)
+            ++latestRun;
+            Groups = [];
+        }
+
         // (async void, so that an error is thrown on the UI thread and handled like any other)
         public async void Run(BreedingSolverSettings settings, CachedSaveGame save) => await RunAsync(settings, save);
 

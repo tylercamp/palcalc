@@ -24,6 +24,17 @@ public class BreedableToolTests
         Assert.AreEqual(DB.Pals.Count() - 1, tool.Groups.Sum(g => g.Cards.Count));
     }
 
+    // a new window would otherwise lay out the last run's cards before the next run replaces them
+    [TestMethod]
+    public async Task Clear_DropsTheLastRunsCards()
+    {
+        var tool = await RunWithPenkingAndBushi();
+
+        tool.Clear();
+
+        Assert.AreEqual(0, tool.Groups.Count);
+    }
+
     [TestMethod]
     public void ShowIVs_IsOffByDefault()
     {

@@ -243,9 +243,14 @@ namespace PalCalc.UI.ViewModel
             }
             else
             {
+                tool.Clear();
+
+                // (the window starts with a copy of the solver page's Source Pals, so changing them in the
+                //  window doesn't change the target pals' Source Pals)
+                var sourcePals = PalTargetList.SourcePals.Copy();
                 var window = new SolverToolWindow()
                 {
-                    DataContext = new SolverToolWindowViewModel(tool, PalTargetList.SourcePals, () => RunTool(tool)),
+                    DataContext = new SolverToolWindowViewModel(tool, sourcePals, () => RunTool(tool)),
                     Owner = App.Current.MainWindow,
                 };
                 window.Closed += (_, _) => toolWindows.Remove(tool);
@@ -261,12 +266,13 @@ namespace PalCalc.UI.ViewModel
         private void RunTool(ISolverTool tool)
         {
             var cachedData = OpenedSave.CachedValue;
-            if (cachedData == null) return;
+            if (cachedData == null || !toolWindows.TryGetValue(tool, out var window)) return;
 
+            var sourcePals = ((SolverToolWindowViewModel)window.DataContext).SourcePals;
             tool.Run(
                 SolverControls.ConfiguredSolverSettings(
                     SelectedGameSettings.ModelObject,
-                    PalTargetList.SourcePals.AvailablePals.ToList()
+                    sourcePals.AvailablePals.ToList()
                 ),
                 cachedData
             );
