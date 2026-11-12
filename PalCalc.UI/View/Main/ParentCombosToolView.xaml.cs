@@ -9,9 +9,12 @@ namespace PalCalc.UI.View.Main
     /// </summary>
     public partial class ParentCombosToolView : UserControl
     {
+        private readonly TopCardAnchor topCardAnchor;
+
         public ParentCombosToolView()
         {
             InitializeComponent();
+            topCardAnchor = new TopCardAnchor(this, GroupsList, GroupsScrollViewer);
         }
 
         // (same groups layout as `BreedableToolView`, see there for why)
