@@ -253,7 +253,7 @@
                 <Label Grid.Column="0" Content="{itl:LocalizedText LC_PAL_CHECKLIST_SEARCH}" VerticalAlignment="Center" Margin="0,0,10,0" />
                 <TextBox Grid.Column="1" VerticalAlignment="Center" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
 
-                <StackPanel Grid.Column="3" Orientation="Horizontal">
+                <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="25,0,0,0">
                     <TextBlock Text="{itl:LocalizedText Code=LC_SOLVER_SETTINGS_USE_GENDER_REVERSERS}" VerticalAlignment="Center" Margin="0,0,10,0" />
                     <CheckBox IsChecked="{Binding SolverControls.UseGenderReversers, Mode=TwoWay}"
                               VerticalAlignment="Center"
