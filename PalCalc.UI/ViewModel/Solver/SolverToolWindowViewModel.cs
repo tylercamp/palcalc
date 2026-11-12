@@ -5,8 +5,8 @@ using System;
 namespace PalCalc.UI.ViewModel.Solver
 {
     /// <summary>
-    /// The window for one tool, opened from the app's Tools menu while a save is open. The Source Pals are the
-    /// same ones the solver page uses, so a change in either place applies to both.
+    /// The window for one tool, opened from the app's Tools menu while a save is open. The Source Pals are a copy of
+    /// the solver page's, made when the window opens, so changing them here only changes what the tool uses.
     /// </summary>
     public partial class SolverToolWindowViewModel(ISolverTool tool, PalSourceViewModel sourcePals, Action run) : ObservableObject
     {

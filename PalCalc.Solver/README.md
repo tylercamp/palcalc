@@ -644,7 +644,6 @@ Further references:
 
 - [Passive inheritance estimation](./README-BREED-ESTIMATE.md)
 - [Miscellaneous optimization notes](./README-MISC.md)
-- [Find All Breedable tool](./README-BREEDABLE.md)
 - Child species: [`PalBreedingCalculator.cs`](../PalCalc.GenDB/PalBreedingCalculator.cs)
   and [`UniqueBreedComboReader.cs`](../PalCalc.GenDB/GameDataReaders/UniqueBreedComboReader.cs)
 - Game settings: [`GameSettingReader.cs`](../PalCalc.GenDB/GameDataReaders/GameSettingReader.cs)

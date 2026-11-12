@@ -37,6 +37,17 @@ namespace PalCalc.UI.ViewModel.Solver
 
         public PalSourceTreeViewModel PlayerSources { get; }
 
+        // a separate copy with the same selections and filters, so that changing it doesn't change this one
+        public PalSourceViewModel Copy() =>
+            new PalSourceViewModel(sourceSave, PlayerSources.Selections.ToList())
+            {
+                IncludeBasePals = IncludeBasePals,
+                IncludeCustomPals = IncludeCustomPals,
+                IncludeCagedPals = IncludeCagedPals,
+                IncludeGlobalStoragePals = IncludeGlobalStoragePals,
+                IncludeExpeditionPals = IncludeExpeditionPals,
+            };
+
         // Keep source IDs that cannot currently be resolved against cached save data. They are
         // authoritative user input and must survive a cache refresh or a later rewrite.
         internal List<string> PersistedSelectionIds { get; set; }
