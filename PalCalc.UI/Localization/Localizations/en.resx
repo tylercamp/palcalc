@@ -921,6 +921,9 @@ Higher values linearly affect time required, depending on how many types of pals
   <data name="LC_TOOL_SHOW_IVS" xml:space="preserve">
     <value>Show IVs</value>
   </data>
+  <data name="LC_TOOLS" xml:space="preserve">
+    <value>Tools</value>
+  </data>
   <data name="LC_TRAITS_COUNT_EMPTY" xml:space="preserve">
     <value>None</value>
   </data>

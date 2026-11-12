@@ -166,9 +166,9 @@ namespace PalCalc.UI.ViewModel
             solverControlsPropertyChangedHandler = SolverControls_PropertyChanged;
             SolverControls.PropertyChanged += solverControlsPropertyChangedHandler;
 
-            // (the tools share these solver controls, so they're added to the save's menu once those exist)
+            // (the tools share these solver controls, so they're created once those exist. The app's Tools
+            //  menu lists them while this page is open, see `AppWindowViewModel`)
             Tools = [new BreedableToolViewModel(SolverControls)];
-            SaveOperations = SaveOperations.WithTools(Tools, OpenTool);
 
             // TODO - would prefer to have the delete command managed by the target list, rather than having
             //        to manually assign the command for each specifier VM
@@ -232,7 +232,7 @@ namespace PalCalc.UI.ViewModel
                 window.Close();
         }
 
-        private void OpenTool(ISolverTool tool)
+        public void OpenTool(ISolverTool tool)
         {
             if (toolWindows.TryGetValue(tool, out var existing))
             {

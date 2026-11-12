@@ -12,7 +12,6 @@ using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Mapped.Saves;
 using PalCalc.UI.ViewModel.SaveSelection;
-using PalCalc.UI.ViewModel.Solver;
 using Serilog;
 using Serilog.Core;
 using System;
@@ -36,21 +35,16 @@ namespace PalCalc.UI.ViewModel
         private readonly IRelayCommand navigateSaveSelectionPageCommand;
         private readonly SavesCollectionViewModel selectedLocation;
         private readonly SaveGameViewModel selectedSave;
-        private readonly Action<ISolverTool> openTool;
 
         public CommonSaveOperationsViewModel(
             IRelayCommand navigateSaveSelectionPageCommand,
             SavesCollectionViewModel selectedLocation,
-            SaveGameViewModel selectedSave,
-            IReadOnlyList<ISolverTool> tools = null,
-            Action<ISolverTool> openTool = null
+            SaveGameViewModel selectedSave
         )
         {
             this.navigateSaveSelectionPageCommand = navigateSaveSelectionPageCommand;
             this.selectedLocation = selectedLocation;
             this.selectedSave = selectedSave;
-            this.openTool = openTool;
-            Tools = tools ?? [];
 
             if (selectedSave != null)
             {
@@ -74,20 +68,7 @@ namespace PalCalc.UI.ViewModel
                 () => navigateSaveSelectionPageCommand.CanExecute(null) && condition()
             );
 
-            return new CommonSaveOperationsViewModel(newCommand, selectedLocation, selectedSave, Tools, openTool);
-        }
-
-        // (only the solver page has tools, since they use its Source Pals and solver settings)
-        public CommonSaveOperationsViewModel WithTools(IReadOnlyList<ISolverTool> tools, Action<ISolverTool> openTool) =>
-            new CommonSaveOperationsViewModel(navigateSaveSelectionPageCommand, selectedLocation, selectedSave, tools, openTool);
-
-        public IReadOnlyList<ISolverTool> Tools { get; }
-
-        [RelayCommand]
-        private void OpenTool(ISolverTool tool)
-        {
-            MenuIsOpen = false;
-            openTool?.Invoke(tool);
+            return new CommonSaveOperationsViewModel(newCommand, selectedLocation, selectedSave);
         }
 
         [ObservableProperty]

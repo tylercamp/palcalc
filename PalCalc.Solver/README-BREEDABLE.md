@@ -4,7 +4,7 @@ The solver answers "how do I breed this Pal with these passives?" The Find All B
 
 ## Overview
 
-**Find All Breedable** is in the save's menu (the arrow beside the save's name), under Inspect. It opens its own window, beside the same Source Pals as the solver page, so the solver can still be used while it's open. It shows every species as a card, grouped by how many breeding steps it takes to reach:
+**Find All Breedable** is in the Tools menu at the top of the window, beside Language, Theme, and Help, which shows while a save is open in the solver. It opens its own window, beside the same Source Pals as the solver page, so the solver can still be used while it's open. It shows every species as a card, grouped by how many breeding steps it takes to reach:
 
 - **Already Owned:** where the owned Pal with the highest IVs is
 - **1 to N Step(s):** one parent pair, with each parent's location
@@ -53,6 +53,7 @@ This means a generation can add a gender without adding a species, so a tier can
 | File | Purpose |
 |---|---|
 | `PalCalc.UI/ViewModel/Solver/ISolverTool.cs` | What a tool provides, and the steps for adding one. |
+| `PalCalc.UI/ViewModel/Solver/SolverToolsMenuViewModel.cs` | The Tools menu's list of tools and `OpenToolCommand`. |
 | `PalCalc.UI/ViewModel/Solver/SolverToolWindowViewModel.cs` | A tool, the shared Source Pals, and the Run command for its window. |
 | `PalCalc.UI/ViewModel/Solver/BreedableToolViewModel.cs` | Runs the calculator, and owns groups, cards, search, Show IVs, and loading the cards a few at a time. |
 | `PalCalc.UI/View/Main/SolverToolWindow.xaml` and `.cs` | The tool's window: the tool on the left, Source Pals on the right. Closing it works like `SaveInspectorWindow`. |
@@ -61,12 +62,13 @@ This means a generation can add a gender without adding a species, so a tier can
 | `PalCalc.UI/View/Main/SourcePalsView.xaml` and `.cs` | The Source Pals filters and players, moved out of `SolverPage.xaml` unchanged so that the tool window can use them too. |
 | `PalCalc.UI/View/SolverPage.xaml` | Uses `SourcePalsView` in place of the same markup. |
 | `PalCalc.UI/ViewModel/SolverPageViewModel.cs` | Owns the tools and their windows, runs them with the current settings, reruns open ones when the save reloads, and closes them when the page goes away. |
-| `PalCalc.UI/ViewModel/CommonSaveOperationsViewModel.cs` | Gained optional tools, added with `WithTools`, and `OpenToolCommand`. Only the solver page passes tools. |
-| `PalCalc.UI/View/CommonSaveControlsButton.xaml` | Lists the tools under Inspect, when there are any. |
+| `PalCalc.UI/View/AppToolbar.xaml` | The Tools menu, between Theme and Help, hidden when there are no tools. |
+| `PalCalc.UI/ViewModel/AppToolbarViewModel.cs` | Holds the Tools menu's view model. |
+| `PalCalc.UI/ViewModel/AppWindowViewModel.cs` | Gives the Tools menu the solver page's tools when a save opens, and clears them when it closes. |
 | `PalCalc.UI.Tests/BreedableToolTests.cs` | Groups, parents, search, Show IVs, and loading. |
-| `PalCalc.UI.Tests/SolverToolMenuTests.cs` | The save menu's tools and `OpenToolCommand`. |
+| `PalCalc.UI.Tests/SolverToolMenuTests.cs` | The Tools menu's tools and `OpenToolCommand`. |
 | `PalCalc.UI/View/Pal/PalIVsView.xaml` and `.cs` | Gained an optional `Columns` property, which defaults to the original 3. |
-| `PalCalc.UI/Localization/` | 6 new codes in `LocalizationCodes.resx`, `en.resx`, and `LocalizationCodes.Designer.cs`. |
+| `PalCalc.UI/Localization/` | 7 new codes in `LocalizationCodes.resx`, `en.resx`, and `LocalizationCodes.Designer.cs`. |
 
 ## Maintenance
 
@@ -83,7 +85,7 @@ This means a generation can add a gender without adding a species, so a tier can
 
 **Concurrency:** all working data is local to `Calculate`, and it only reads settings and the breeding DB, so it's safe while a solver job is running and off the UI thread. The tool runs it with `Task.Run` rather than as a job, because it takes a few tens of milliseconds and `SolverJobViewModel` is tied to solver requests.
 
-**Adding a tool:** implement `ISolverTool`, add a `DataTemplate` for it in `SolverToolWindow.xaml`, and add it to the list in `SolverPageViewModel`. It then appears in the save's menu.
+**Adding a tool:** implement `ISolverTool`, add a `DataTemplate` for it in `SolverToolWindow.xaml`, and add it to the list in `SolverPageViewModel`. It then appears in the Tools menu.
 
 **Adding text:** new codes go in `LocalizationCodes.resx`, `en.resx`, and `LocalizationCodes.Designer.cs`. Other languages fall back to English until translated.
 
@@ -96,7 +98,7 @@ This means a generation can add a gender without adding a species, so a tier can
 - The contents list scrolls on selection, for the keyboard, and on click, for clicking the group that's already selected.
 - `SearchPulse` is the only search animation. The card borders, card glows, and contents entries all follow its opacity so that they stay in step. It only runs while something is highlighted.
 - Show IVs sets the IV `ContentControl`'s content only while it's checked, so unchecked cards don't build the IV views at all. The IV template hides itself when there are no IVs, as on a Not Reachable card.
-- The menu's tool items get `OpenToolCommand` from the `ItemsControl` around them, since their own context is the tool.
+- The Tools menu's items get `OpenToolCommand` from the `Menu` around them, since their own context is the tool. The menu hides itself when there are no tools, which is everywhere but the solver page.
 - The hover popup copies a few lines from the location popup in `BreedingResultView.xaml`, so changes to that popup won't carry over.
 - **Loading:** building the cards is what's slow (WPF takes a few ms each, over a second for all ~300), not the calculation. So:
   - The cards are added `CardsPerBatch` at a time, with `Dispatcher.Yield(Background)` in between so that WPF lays them out and the loading dots keep moving.

@@ -197,6 +197,7 @@ namespace PalCalc.UI.ViewModel
             var vm = new SolverPageViewModel(Dispatcher.CurrentDispatcher, saveOperations, selectedSave, targets);
             var viewModelTime = timer.Elapsed - saveTime - targetTime;
             Content = new SolverPage(vm);
+            toolbarVM.ToolsMenu.SetTools(vm.Tools, vm.OpenTool);
             var pageTime = timer.Elapsed - saveTime - targetTime - viewModelTime;
             logger.Debug(
                 "Load profiling: open save: save/setup {SaveMs:F1} ms, targets {TargetsMs:F1} ms, solver view model {ViewModelMs:F1} ms, page/bind {PageMs:F1} ms, total {TotalMs:F1} ms",
@@ -231,6 +232,7 @@ namespace PalCalc.UI.ViewModel
                 {
                     var vm = sp.DataContext as SolverPageViewModel;
                     vm.Dispose();
+                    toolbarVM.ToolsMenu.SetTools(null, null);
                 }
             }
         }
