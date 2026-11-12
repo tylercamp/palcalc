@@ -13,6 +13,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <vmc:ValueBoolConverter x:Key="VBC" />
+        <vmc:ValueVisibilityConverter x:Key="VVC" />
     </UserControl.Resources>
     <Menu DockPanel.Dock="Top" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
         <MenuItem Header="{itl:LocalizedText LC_LANGUAGE}" ItemsSource="{Binding Locales}" Padding="5">
@@ -34,6 +35,17 @@
                       IsCheckable="True"
                       IsChecked="{Binding IsDarkTheme, Mode=OneWay}"
                       Command="{Binding UseDarkThemeCommand}" />
+        </MenuItem>
+        <MenuItem Header="{itl:LocalizedText LC_TOOLS}" ItemsSource="{Binding ToolsMenu.Tools}" Padding="5"
+                  Visibility="{Binding ToolsMenu.Tools.Count, Converter={StaticResource VVC}}">
+            <MenuItem.ItemContainerStyle>
+                <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                    <!-- (each item's context is its tool, so the command comes from the menu's context) -->
+                    <Setter Property="Header" Value="{Binding Name.Value}" />
+                    <Setter Property="Command" Value="{Binding DataContext.ToolsMenu.OpenToolCommand, RelativeSource={RelativeSource AncestorType=Menu}}" />
+                    <Setter Property="CommandParameter" Value="{Binding}" />
+                </Style>
+            </MenuItem.ItemContainerStyle>
         </MenuItem>
         <MenuItem Header="Debug" Padding="5" Name="DebugMenuItem">
             <MenuItem Header="Translation Debugger" Click="TranslationDebugger_Click" />

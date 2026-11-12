@@ -7,6 +7,7 @@ using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
 using PalCalc.UI.Persistence;
 using PalCalc.UI.View.Inspector;
+using PalCalc.UI.View.Main;
 using PalCalc.UI.ViewModel.Inspector;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Presets;
@@ -100,6 +101,11 @@ namespace PalCalc.UI.ViewModel
 
         public CommonSaveOperationsViewModel SaveOperations { get; }
 
+        public IReadOnlyList<ISolverTool> Tools { get; }
+
+        // (one window per tool, opening a tool again brings its window back instead)
+        private readonly Dictionary<ISolverTool, SolverToolWindow> toolWindows = [];
+
         // main app model
         public SolverPageViewModel(Dispatcher dispatcher, CommonSaveOperationsViewModel saveOperations, SaveGameViewModel selectedSave, PalTargetListViewModel targets)
         {
@@ -159,7 +165,11 @@ namespace PalCalc.UI.ViewModel
             SolverControls.CopyFrom(settings.SolverSettings);
             solverControlsPropertyChangedHandler = SolverControls_PropertyChanged;
             SolverControls.PropertyChanged += solverControlsPropertyChangedHandler;
-            
+
+            // (the tools share these solver controls, so they're created once those exist. The app's Tools
+            //  menu lists them while this page is open, see `AppWindowViewModel`)
+            Tools = [new BreedableToolViewModel(SolverControls)];
+
             // TODO - would prefer to have the delete command managed by the target list, rather than having
             //        to manually assign the command for each specifier VM
             deletePalTargetCommand = new RelayCommand<PalSpecifierViewModel>(OnDeletePalSpecifier);
@@ -216,6 +226,55 @@ namespace PalCalc.UI.ViewModel
 
             if (mainWindowClosingHandler != null && App.Current.MainWindow != null)
                 App.Current.MainWindow.Closing -= mainWindowClosingHandler;
+
+            // (the tool windows use this page's Source Pals and solver settings, so they can't outlive it)
+            foreach (var window in toolWindows.Values.ToList())
+                window.Close();
+        }
+
+        public void OpenTool(ISolverTool tool)
+        {
+            if (toolWindows.TryGetValue(tool, out var existing))
+            {
+                if (existing.WindowState == WindowState.Minimized)
+                    existing.WindowState = WindowState.Normal;
+
+                existing.Activate();
+            }
+            else
+            {
+                tool.Clear();
+
+                // (the window starts with a copy of the solver page's Source Pals, so changing them in the
+                //  window doesn't change the target pals' Source Pals)
+                var sourcePals = PalTargetList.SourcePals.Copy();
+                var window = new SolverToolWindow()
+                {
+                    DataContext = new SolverToolWindowViewModel(tool, sourcePals, () => RunTool(tool)),
+                    Owner = App.Current.MainWindow,
+                };
+                window.Closed += (_, _) => toolWindows.Remove(tool);
+                toolWindows.Add(tool, window);
+                window.Show();
+            }
+
+            // (rerun each time it's opened, so it always reflects the current save and settings)
+            RunTool(tool);
+        }
+
+        private void RunTool(ISolverTool tool)
+        {
+            var cachedData = OpenedSave.CachedValue;
+            if (cachedData == null || !toolWindows.TryGetValue(tool, out var window)) return;
+
+            var sourcePals = ((SolverToolWindowViewModel)window.DataContext).SourcePals;
+            tool.Run(
+                SolverControls.ConfiguredSolverSettings(
+                    SelectedGameSettings.ModelObject,
+                    sourcePals.AvailablePals.ToList()
+                ),
+                cachedData
+            );
         }
 
         private void CachedSaveGame_SaveFileLoadEnd(ISaveGame save, CachedSaveGame cachedSave)
@@ -247,6 +306,9 @@ namespace PalCalc.UI.ViewModel
             if (OpenedSave?.Value == save)
             {
                 UpdateFromSaveProperties();
+
+                foreach (var tool in toolWindows.Keys)
+                    RunTool(tool);
             }
         }
 
