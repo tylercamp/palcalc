@@ -1,16 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Threading;
 
 namespace PalCalc.UI.View.Utils
 {
     // ty chatgpt
     public static class StackPanelExtensions
     {
+        private static readonly ConditionalWeakTable<StackPanel, Action> stopTrackingItems = new();
+
         public static readonly DependencyProperty SpacingProperty =
             DependencyProperty.RegisterAttached(
                 "Spacing",
@@ -26,36 +28,78 @@ namespace PalCalc.UI.View.Utils
 
         private static void OnSpacingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is Panel panel)
-            {
-                // Apply spacing initially
-                ApplySpacing(panel);
+            if (d is not StackPanel panel) return;
 
-                // Re-apply if children change or layout updates
-                panel.Loaded += (s, _) => ApplySpacing(panel);
+            ApplySpacing(panel);
+
+            if ((double)e.NewValue == 0)
+            {
+                panel.Loaded -= PanelLoaded;
+                panel.Unloaded -= PanelUnloaded;
+                PanelUnloaded(panel, null);
+            }
+            else if ((double)e.OldValue == 0)
+            {
+                panel.Loaded += PanelLoaded;
+                panel.Unloaded += PanelUnloaded;
+                if (panel.IsLoaded)
+                    PanelLoaded(panel, null);
             }
         }
 
-        private static void ApplySpacing(Panel panel)
+        private static void PanelLoaded(object sender, RoutedEventArgs e)
+        {
+            var panel = (StackPanel)sender;
+            ApplySpacing(panel);
+
+            if (ItemsControl.GetItemsOwner(panel)?.ItemContainerGenerator is not IItemContainerGenerator ownerGenerator)
+                return;
+
+            var generator = ownerGenerator.GetItemContainerGeneratorForPanel(panel);
+            if (generator == null || stopTrackingItems.TryGetValue(panel, out _)) return;
+
+            DispatcherOperation pendingUpdate = null;
+            void ItemsChanged(object _, ItemsChangedEventArgs args)
+            {
+                if (pendingUpdate != null) return;
+
+                // Let WPF finish updating the children before we set their margins.
+                pendingUpdate = panel.Dispatcher.InvokeAsync(() =>
+                {
+                    pendingUpdate = null;
+                    ApplySpacing(panel);
+                }, DispatcherPriority.DataBind);
+            }
+
+            generator.ItemsChanged += ItemsChanged;
+            stopTrackingItems.Add(panel, () =>
+            {
+                generator.ItemsChanged -= ItemsChanged;
+                pendingUpdate?.Abort();
+            });
+        }
+
+        private static void PanelUnloaded(object sender, RoutedEventArgs e)
+        {
+            var panel = (StackPanel)sender;
+            if (stopTrackingItems.TryGetValue(panel, out var stop))
+            {
+                stopTrackingItems.Remove(panel);
+                stop();
+            }
+        }
+
+        private static void ApplySpacing(StackPanel panel)
         {
             double spacing = GetSpacing(panel);
-
-            if (panel is StackPanel stackPanel)
+            var gap = panel.Orientation == Orientation.Horizontal
+                ? new Thickness(spacing, 0, 0, 0)
+                : new Thickness(0, spacing, 0, 0);
+            var margin = new Thickness(0);
+            foreach (var child in panel.Children.OfType<FrameworkElement>().ToList())
             {
-                var children = stackPanel.Children.OfType<FrameworkElement>().ToList();
-                for (int i = 0; i < children.Count; i++)
-                {
-                    // Reset margin first (optional, if you want to reset existing margins)
-                    children[i].Margin = new Thickness(0);
-
-                    if (i > 0)
-                    {
-                        if (stackPanel.Orientation == Orientation.Horizontal)
-                            children[i].Margin = new Thickness(spacing, 0, 0, 0);
-                        else
-                            children[i].Margin = new Thickness(0, spacing, 0, 0);
-                    }
-                }
+                child.Margin = margin;
+                margin = gap;
             }
         }
     }
