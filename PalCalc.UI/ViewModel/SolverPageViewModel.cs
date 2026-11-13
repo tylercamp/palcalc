@@ -168,7 +168,7 @@ namespace PalCalc.UI.ViewModel
 
             // (the tools share these solver controls, so they're created once those exist. The app's Tools
             //  menu lists them while this page is open, see `AppWindowViewModel`)
-            Tools = [new BreedableToolViewModel(SolverControls)];
+            Tools = [new BreedableToolViewModel(SolverControls), new ParentCombosToolViewModel(SolverControls)];
 
             // TODO - would prefer to have the delete command managed by the target list, rather than having
             //        to manually assign the command for each specifier VM
@@ -259,6 +259,7 @@ namespace PalCalc.UI.ViewModel
             }
 
             // (rerun each time it's opened, so it always reflects the current save and settings)
+            tool.OnSelected();
             RunTool(tool);
         }
 

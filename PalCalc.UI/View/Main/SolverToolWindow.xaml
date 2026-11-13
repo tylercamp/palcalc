@@ -22,6 +22,10 @@
         <DataTemplate DataType="{x:Type vms:BreedableToolViewModel}">
             <v:BreedableToolView />
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vms:ParentCombosToolViewModel}">
+            <v:ParentCombosToolView />
+        </DataTemplate>
     </adonisControls:AdonisWindow.Resources>
 
     <!-- (the default size fits two cards per row, and the minimum fits one beside Source Pals) -->

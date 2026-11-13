@@ -15,6 +15,9 @@ namespace PalCalc.Solver;
 ///
 /// `OwnedInstance` is the owned pal with the highest IVs, for tier 0. `IVs` are that
 /// pal's IVs, or otherwise the range of IVs available through `Source`.
+///
+/// `BothGendersAvailable` is whether both genders of the species can be had, by owning
+/// them or breeding it. An owned species is tier 0 even if only one gender is owned.
 /// </summary>
 public sealed record BreedableEntry(
     Pal Pal,
@@ -23,7 +26,8 @@ public sealed record BreedableEntry(
     PalInstance Parent1Instance,
     PalInstance Parent2Instance,
     PalInstance OwnedInstance,
-    IV_Set IVs
+    IV_Set IVs,
+    bool BothGendersAvailable
 );
 
 /// <summary>

@@ -157,6 +157,54 @@
     <value>The average time it takes to produce an egg. Used to estimate how long it will take to produce a pal with specific properties.
 This value is doubled internally to account for pal inactivity at night.</value>
   </data>
+  <data name="LC_COMBOS_CHILD" xml:space="preserve">
+    <value>Child</value>
+  </data>
+  <data name="LC_COMBOS_CHOOSE_CHILD" xml:space="preserve">
+    <value>Choose a Pal to see every pair of parents that breeds it.</value>
+  </data>
+  <data name="LC_COMBOS_GROUP_NEITHER" xml:space="preserve">
+    <value>Neither Parent Owned ({NumPals})</value>
+  </data>
+  <data name="LC_COMBOS_GROUP_ONE_FIRST" xml:space="preserve">
+    <value>Breed or Catch One First ({NumPals})</value>
+  </data>
+  <data name="LC_COMBOS_GROUP_READY" xml:space="preserve">
+    <value>Ready Now ({NumPals})</value>
+  </data>
+  <data name="LC_COMBOS_PARENT_CAN_BE_BRED" xml:space="preserve">
+    <value>Can be bred</value>
+  </data>
+  <data name="LC_COMBOS_PARENT_CATCH_ONLY" xml:space="preserve">
+    <value>Catch only</value>
+  </data>
+  <data name="LC_COMBOS_PARENT_NOT_BREEDABLE" xml:space="preserve">
+    <value>Not breedable from your Pals</value>
+  </data>
+  <data name="LC_COMBOS_SORT" xml:space="preserve">
+    <value>Sort</value>
+  </data>
+  <data name="LC_COMBOS_SORT_A_TO_Z" xml:space="preserve">
+    <value>A to Z</value>
+  </data>
+  <data name="LC_COMBOS_SORT_ATTACK" xml:space="preserve">
+    <value>Highest ATK</value>
+  </data>
+  <data name="LC_COMBOS_SORT_DEFENSE" xml:space="preserve">
+    <value>Highest DEF</value>
+  </data>
+  <data name="LC_COMBOS_SORT_HIGHEST_IVS" xml:space="preserve">
+    <value>Highest IVs</value>
+  </data>
+  <data name="LC_COMBOS_SORT_HP" xml:space="preserve">
+    <value>Highest HP</value>
+  </data>
+  <data name="LC_COMBOS_SORT_PHILANTHROPIST" xml:space="preserve">
+    <value>Most Philanthropist</value>
+  </data>
+  <data name="LC_COMBOS_SORT_Z_TO_A" xml:space="preserve">
+    <value>Z to A</value>
+  </data>
   <data name="LC_COMMON_ALL_ATTACK_SKILLS" xml:space="preserve">
     <value>All Attack Skills</value>
   </data>
@@ -914,6 +962,9 @@ Higher values linearly affect time required, depending on how many types of pals
   </data>
   <data name="LC_TARGET_PALS" xml:space="preserve">
     <value>Target Pals</value>
+  </data>
+  <data name="LC_TOOL_COMBOS_BY_CHILD" xml:space="preserve">
+    <value>Combos By Child</value>
   </data>
   <data name="LC_TOOL_FIND_BREEDABLE" xml:space="preserve">
     <value>Find All Breedable</value>

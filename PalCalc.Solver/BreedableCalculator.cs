@@ -14,7 +14,7 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
 
     // the flower gumoss has the same name and icon as the normal gumoss, so it would look like a
     // duplicate. it doesn't get an entry of its own, but can still be used as a parent if owned
-    private const string HiddenPalInternalName = "PlantSlime_Flower";
+    public const string HiddenPalInternalName = "PlantSlime_Flower";
 
     private readonly ILookup<Pal, PalInstance> ownedByPal = settings.OwnedPals.ToLookup(p => p.Pal);
 
@@ -42,7 +42,8 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
         {
             bestOwned[group.Key] = group
                 .OrderByDescending(TotalIVs)
-                .ThenBy(p => p.InstanceId, StringComparer.Ordinal)
+                .ThenBy(p => p.Location?.ContainerId, StringComparer.Ordinal)
+                .ThenBy(p => p.Location?.Index)
                 .First();
 
             ivs[group.Key] = ExactIVs(bestOwned[group.Key]);
@@ -101,7 +102,8 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
                     parents.GetValueOrDefault(kvp.Key).Item1,
                     parents.GetValueOrDefault(kvp.Key).Item2,
                     bestOwned.GetValueOrDefault(kvp.Key),
-                    ivs.GetValueOrDefault(kvp.Key)
+                    ivs.GetValueOrDefault(kvp.Key),
+                    genders[kvp.Key].HasFlag(PalGender.WILDCARD)
                 ))
                 .OrderBy(e => e.Tier)
                 .ThenBy(e => e.Pal.InternalIndex),
@@ -128,15 +130,22 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
         return hasGenders && breeding.Matches(parent1, parent1Gender, parent2, parent2Gender);
     }
 
+    // the owned pal to use as a parent with the given gender, or `null` if it needs to be bred instead
+    // `preferred` picks those pals ahead of higher IVs, after the gender needed
+    internal static PalInstance BestOwned(IEnumerable<PalInstance> owned, PalGender gender, bool useGenderReversers, Func<PalInstance, bool> preferred = null) =>
+        owned
+            .Where(p => useGenderReversers || p.Gender.HasFlag(gender))
+            .OrderByDescending(p => p.Gender.HasFlag(gender))
+            .ThenByDescending(p => preferred?.Invoke(p) == true)
+            .ThenByDescending(TotalIVs)
+            .ThenBy(p => p.Location?.ContainerId, StringComparer.Ordinal)
+            .ThenBy(p => p.Location?.Index)
+            .FirstOrDefault();
+
     private (PalInstance, PalInstance) BestOwnedParents(BreedingResult breeding, Dictionary<Pal, PalGender> genders)
     {
         PalInstance BestOwned(Pal pal, PalGender gender) =>
-            ownedByPal[pal]
-                .Where(p => settings.UseGenderReversers || p.Gender.HasFlag(gender))
-                .OrderByDescending(p => p.Gender.HasFlag(gender))
-                .ThenByDescending(TotalIVs)
-                .ThenBy(p => p.InstanceId, StringComparer.Ordinal)
-                .FirstOrDefault();
+            BreedableCalculator.BestOwned(ownedByPal[pal], gender, settings.UseGenderReversers);
 
         // prefer the parents which need the least work, a parent which needs to be bred has no owned instance
         return ParentGenders
@@ -173,14 +182,14 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
         );
     }
 
-    private static IV_Set ExactIVs(PalInstance pal) =>
+    public static IV_Set ExactIVs(PalInstance pal) =>
         new(
             HP: new(IsRelevant: true, Min: pal.IV_HP, Max: pal.IV_HP),
             Attack: new(IsRelevant: true, Min: pal.IV_Attack, Max: pal.IV_Attack),
             Defense: new(IsRelevant: true, Min: pal.IV_Defense, Max: pal.IV_Defense)
         );
 
-    private static int TotalIVs(PalInstance pal) =>
+    internal static int TotalIVs(PalInstance pal) =>
         pal == null ? 0 : pal.IV_HP + pal.IV_Attack + pal.IV_Defense;
 
     // prefers the parents with the lowest tiers, using species order to keep the result stable between runs

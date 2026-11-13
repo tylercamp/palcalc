@@ -15,6 +15,9 @@ namespace PalCalc.UI.ViewModel.Solver
     {
         ILocalizedText Name { get; }
 
+        // called each time the tool is opened from the menu, before `Run`. (the window's Run button doesn't call it)
+        void OnSelected() { }
+
         void Run(BreedingSolverSettings settings, CachedSaveGame save);
 
         // drops the last run's results. Called before a new window opens, since the tool outlives its
