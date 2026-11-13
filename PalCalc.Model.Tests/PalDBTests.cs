@@ -35,6 +35,18 @@ namespace PalCalc.Model.Tests
         }
 
         [TestMethod]
+        [DataRow(0, EggSize.Normal)]
+        [DataRow(4, EggSize.Normal)]
+        [DataRow(5, EggSize.Large)]
+        [DataRow(7, EggSize.Large)]
+        [DataRow(8, EggSize.Huge)]
+        [DataRow(20, EggSize.Huge)]
+        public void EggSizeIsLargestSizeAllowedByRarity(int rarity, EggSize expected)
+        {
+            Assert.AreEqual(expected, new Pal { Rarity = rarity }.EggSize);
+        }
+
+        [TestMethod]
         public void AttackLevelingRoundTripsThroughJson()
         {
             var json = JObject.Parse(paldb.ToJson());

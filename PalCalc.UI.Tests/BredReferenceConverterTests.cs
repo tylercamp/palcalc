@@ -21,8 +21,8 @@ public class BredReferenceConverterTests
         var pals = db.Pals.OrderBy(pal => pal.InternalIndex).ToArray();
         var original = Bred(
             pals[0],
-            Owned(pals[0], "first", attacks[0], 1),
-            Owned(pals[^1], "second", attacks[1], 2),
+            Owned(pals[0], attacks[0], 1),
+            Owned(pals[^1], attacks[1], 2),
             new MaterializedAttackInheritance(
                 AttackInheritanceMode.Normal,
                 [attacks[0]],
@@ -52,8 +52,8 @@ public class BredReferenceConverterTests
         var attacks = db.ActiveSkills.Take(2).ToArray();
         var original = Bred(
             db.Pals.First(),
-            Owned(db.Pals.First(), "first", attacks[0], 1),
-            Owned(db.Pals.Last(), "second", attacks[1], 2),
+            Owned(db.Pals.First(), attacks[0], 1),
+            Owned(db.Pals.Last(), attacks[1], 2),
             new MaterializedAttackInheritance(
                 AttackInheritanceMode.InheritAll,
                 [attacks[0]],
@@ -83,8 +83,8 @@ public class BredReferenceConverterTests
         var attacks = db.ActiveSkills.Take(3).ToArray();
         var intermediate = Bred(
             db.Pals.First(),
-            Owned(db.Pals.First(), "inner-first", attacks[0], 1),
-            Owned(db.Pals.Last(), "inner-second", attacks[1], 2),
+            Owned(db.Pals.First(), attacks[0], 1),
+            Owned(db.Pals.Last(), attacks[1], 2),
             new MaterializedAttackInheritance(AttackInheritanceMode.Normal, [attacks[0]], [attacks[1]], [attacks[0]], [attacks[0]], 1),
             avgRequiredBreedings: 2,
             recordedSpecialCakes: 1
@@ -92,7 +92,7 @@ public class BredReferenceConverterTests
         var original = Bred(
             db.Pals.Last(),
             intermediate,
-            Owned(db.Pals.Last(), "outer", attacks[2], 3),
+            Owned(db.Pals.Last(), attacks[2], 3),
             new MaterializedAttackInheritance(AttackInheritanceMode.InheritAll, [attacks[0]], [attacks[2]], [attacks[0], attacks[2]], [attacks[0], attacks[2]], 0.25f),
             avgRequiredBreedings: 9
         );
@@ -134,10 +134,9 @@ public class BredReferenceConverterTests
         recordedSpecialCakes: recordedSpecialCakes
     );
 
-    private static OwnedPalReference Owned(Pal pal, string id, ActiveSkill attack, int index) => new(
+    private static OwnedPalReference Owned(Pal pal, ActiveSkill attack, int index) => new(
         new PalInstance
         {
-            InstanceId = id,
             Pal = pal,
             Gender = PalGender.WILDCARD,
             PassiveSkills = [],

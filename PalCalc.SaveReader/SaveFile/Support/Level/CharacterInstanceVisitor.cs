@@ -12,14 +12,15 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 {
     public class GvasCharacterInstance
     {
-        public Guid InstanceId { get; set; }
+        /// <summary>The <see cref="PalInstanceId"/> from the character map key or storage record.</summary>
+        public PalInstanceId PalInstanceId { get; set; }
         public string NickName { get; set; }
         public int Level { get; set; }
 
         public bool IsPlayer { get; set; }
-        public Guid? PlayerId { get; set; }
-
+        /// <summary>The current owner recorded in the character data.</summary>
         public Guid? OwnerPlayerId { get; set; }
+        /// <summary>The ownership history stored in the character data.</summary>
         public List<Guid> OldOwnerPlayerIds { get; set; }
 
         public string CharacterId { get; set; }
@@ -43,7 +44,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 
         private static ILogger logger = Log.ForContext<GvasCharacterInstance>();
 
-        public PalInstance ToPalInstance(PalDB db, LocationType locationType)
+        public PalInstance ToPalInstance(PalDB db, LocationType locationType, string externalStorageId = null)
         {
             var sanitizedCharId = CharacterId.Replace("Boss_", "", StringComparison.InvariantCultureIgnoreCase);
 
@@ -99,7 +100,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
             return new PalInstance()
             {
                 Pal = pal,
-                InstanceId = InstanceId.ToString(),
+                PalInstanceId = PalInstanceId,
+                ExternalStorageContainerId = externalStorageId,
                 OwnerPlayerId = OwnerPlayerId?.ToString() ?? (OldOwnerPlayerIds.Count > 0 ? OldOwnerPlayerIds.First().ToString() : null),
 
                 IV_HP = TalentHp ?? 0,
@@ -122,7 +124,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                 EquippedActiveSkills = equippedActiveSkills,
                 Location = new PalLocation()
                 {
-                    ContainerId = ContainerId.ToString(),
+                    ContainerId = externalStorageId ?? ContainerId.ToString(),
                     Type = locationType,
                     Index = SlotIndex,
                 },
@@ -377,8 +379,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                 logger.Verbose("Generated valid character instance");
                 var instance = pendingCharacterVisitor.Result;
 
-                instance.InstanceId = (Guid)pendingProperties[K_INSTANCE_ID];
-                instance.PlayerId = (Guid?)pendingProperties[K_PLAYER_ID];
+                instance.PalInstanceId = new((Guid?)pendingProperties[K_PLAYER_ID] ?? Guid.Empty, (Guid)pendingProperties[K_INSTANCE_ID]);
 
                 Result.Add(instance);
             }
@@ -438,8 +439,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                 logger.Verbose("Generated valid character instance");
                 var instance = pendingCharacterVisitor.Result;
 
-                instance.InstanceId = (Guid)pendingProperties[K_INSTANCE_ID];
-                instance.PlayerId = (Guid?)pendingProperties[K_PLAYER_ID];
+                instance.PalInstanceId = new((Guid?)pendingProperties[K_PLAYER_ID] ?? Guid.Empty, (Guid)pendingProperties[K_INSTANCE_ID]);
 
                 Result.Add(instance);
             }

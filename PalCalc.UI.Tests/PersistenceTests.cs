@@ -506,7 +506,7 @@ namespace PalCalc.UI.Tests
             IV_Value.Random,
             new IV_Value(false, 0, 50));
 
-        OwnedPalReference Owned(PalGender gender, string instanceId) => new(
+        OwnedPalReference Owned(PalGender gender) => new(
             new PalInstance
             {
                 Pal = pal,
@@ -515,14 +515,13 @@ namespace PalCalc.UI.Tests
                 PassiveSkills = [swift],
                 ActiveSkills = [],
                 EquippedActiveSkills = [],
-                InstanceId = instanceId,
             },
             [swift],
             ivs,
             AttackProfile.Inactive);
 
-        var male = Owned(PalGender.MALE, "male");
-        var female = Owned(PalGender.FEMALE, "female");
+        var male = Owned(PalGender.MALE);
+        var female = Owned(PalGender.FEMALE);
         var wild = new WildPalReference(pal, [], 1, db.BreedingMechanics, AttackProfile.Inactive, null);
         var bred = new BredPalReference(GameSettings.Defaults, pal, PalGender.WILDCARD, male, wild, null, [swift], new(BreedingMethod.Ordinary, 1), ivs, 1, AttackProfile.Inactive, null, null);
         var composite = new CompositeOwnedPalReference(male, female);
@@ -810,7 +809,7 @@ namespace PalCalc.UI.Tests
             var pal = "Beakon".ToPal(db);
             OwnedPalReference Owned(PalGender gender) => new(new PalInstance
             {
-                Pal = pal, Gender = gender, InstanceId = gender.ToString(), PassiveSkills = [],
+                Pal = pal, Gender = gender, PassiveSkills = [],
                 ActiveSkills = [], EquippedActiveSkills = [],
                 Location = new PalLocation { Type = LocationType.Palbox, ContainerId = "box", Index = 1 }
             }, [], new IV_Set(IV_Value.Random, IV_Value.Random, IV_Value.Random), AttackProfile.Inactive);
@@ -928,6 +927,68 @@ namespace PalCalc.UI.Tests
             var migratedText = File.ReadAllText(targetPath);
             StorageMigrationRunner.EnsureCurrent(path);
             Assert.AreEqual(migratedText, File.ReadAllText(targetPath));
+        });
+    }
+
+    [TestMethod]
+    public void VersionEightBacksUpAndRemovesOnlyLegacyPalInstanceIds()
+    {
+        WithTemporaryDirectory(path =>
+        {
+            var manifestPath = StorageFormat.ManifestPath(path);
+            File.WriteAllText(manifestPath, """{"version":8}""");
+            var save = Directory.CreateDirectory(Path.Combine(path, "save"));
+            var targets = Directory.CreateDirectory(Path.Combine(save.FullName, "targets"));
+            var customizationsPath = Path.Combine(save.FullName, "custom-containers.json");
+            var targetPath = Path.Combine(targets.FullName, "target.json");
+            var unaffectedPath = Path.Combine(targets.FullName, "unaffected.json");
+            const string customizations = """{"CustomContainers":[{"Contents":[{"InstanceId":null,"Level":5}]}]}""";
+            const string target = """
+                {
+                  "InstanceId":"unrelated",
+                  "CurrentResults":{"Results":[
+                    {"PalReference":{"RefType":"OWNED_PAL","Instance":{
+                      "InstanceId":"bare",
+                      "PalInstanceId":{"PlayerUId":"00000000-0000-0000-0000-000000000000","InstanceId":"1a84f341-4c2b-4a82-9729-a0ed0d88ca1f"}
+                    }}},
+                    {"PalReference":{"RefType":"SURGERY_PAL","Input":{"RefType":"OWNED_PAL","Instance":{"InstanceId":"legacy","Level":7}}}}
+                  ]}
+                }
+                """;
+            const string unaffected = """{"CurrentResults":null}""";
+            File.WriteAllText(customizationsPath, customizations);
+            File.WriteAllText(targetPath, target);
+            File.WriteAllText(targetPath + ".bak", "earlier backup");
+            File.WriteAllText(unaffectedPath, unaffected);
+
+            StorageMigrationRunner.EnsureCurrent(path);
+
+            var custom = JObject.Parse(File.ReadAllText(customizationsPath));
+            var customPal = custom["CustomContainers"]![0]!["Contents"]![0]!;
+            Assert.IsNull(customPal["InstanceId"]);
+            Assert.AreEqual(5, customPal["Level"]!.Value<int>());
+            var migratedTarget = JObject.Parse(File.ReadAllText(targetPath));
+            Assert.AreEqual("unrelated", migratedTarget["InstanceId"]!.Value<string>());
+            var results = migratedTarget["CurrentResults"]!["Results"]!;
+            var direct = results[0]!["PalReference"]!["Instance"]!;
+            Assert.IsNull(direct["InstanceId"]);
+            Assert.IsTrue(JToken.DeepEquals(JObject.Parse(target)["CurrentResults"]!["Results"]![0]!["PalReference"]!["Instance"]!["PalInstanceId"], direct["PalInstanceId"]));
+            var nested = results[1]!["PalReference"]!["Input"]!["Instance"]!;
+            Assert.IsNull(nested["InstanceId"]);
+            Assert.IsNull(nested["PalInstanceId"]);
+            Assert.AreEqual(7, nested["Level"]!.Value<int>());
+            Assert.AreEqual(customizations, File.ReadAllText(customizationsPath + ".bak"));
+            Assert.AreEqual("earlier backup", File.ReadAllText(targetPath + ".bak"));
+            Assert.AreEqual(target, File.ReadAllText(targetPath + ".v8.bak"));
+            Assert.AreEqual(unaffected, File.ReadAllText(unaffectedPath));
+            Assert.IsFalse(File.Exists(unaffectedPath + ".bak"));
+            Assert.AreEqual(9, JObject.Parse(File.ReadAllText(manifestPath))["version"]!.Value<int>());
+
+            // Replaying after the documents were written must preserve the backups.
+            File.WriteAllText(manifestPath, """{"version":8}""");
+            StorageMigrationRunner.EnsureCurrent(path);
+            Assert.IsFalse(File.Exists(customizationsPath + ".v8.bak"));
+            Assert.AreEqual(target, File.ReadAllText(targetPath + ".v8.bak"));
         });
     }
 

@@ -33,8 +33,6 @@ namespace PalCalc.SaveReader.SaveFile
     {
         private static ILogger logger = Log.ForContext<LevelSaveFile>();
 
-        private Guid MostCommonOwner(RawPalContainerContents container, Dictionary<Guid, Guid> palOwnersByInstanceId) => container.Slots.GroupBy(s => palOwnersByInstanceId.GetValueOrElse(s.InstanceId, Guid.Empty)).MaxBy(g => g.Count())?.Key ?? Guid.Empty;
-
         public virtual RawLevelSaveData ReadRawCharacterData()
         {
             logger.Debug("Reading raw Level.sav data");
@@ -61,7 +59,7 @@ namespace PalCalc.SaveReader.SaveFile
             };
         }
 
-        private List<IPalContainer> CollectDefiniteContainers(RawLevelSaveData parsed, List<PlayerMeta> players, Dictionary<Guid, Guid> instanceOwners)
+        private List<IPalContainer> CollectDefiniteContainers(RawLevelSaveData parsed, List<PlayerMeta> players)
         {
             return parsed.ContainerContents.Select<RawPalContainerContents, IPalContainer>(c =>
             {
@@ -113,12 +111,12 @@ namespace PalCalc.SaveReader.SaveFile
             GameSettings settings,
             RawLevelSaveData parsed,
             List<PlayerMeta> players,
+            Dictionary<PalInstanceId, Guid> instanceOwners,
             IEnumerable<DimensionalPalStorageContainer> dpsContainers,
             GlobalPalStorageContainer gpsContainer
         )
         {
-            var instanceOwners = parsed.Characters.Where(c => c.OwnerPlayerId != null).ToDictionary(c => c.InstanceId, c => c.OwnerPlayerId.Value);
-            var definiteContainers = CollectDefiniteContainers(parsed, players, instanceOwners).Concat(dpsContainers).ToList();
+            var definiteContainers = CollectDefiniteContainers(parsed, players).Concat(dpsContainers).ToList();
 
             if (gpsContainer != null) definiteContainers.Add(gpsContainer);
 
@@ -127,11 +125,11 @@ namespace PalCalc.SaveReader.SaveFile
             foreach (var unexpected in parsed.ContainerContents.Where(c => !definiteContainers.Any(d => d.Id == c.Id)).OrderByDescending(c => c.MaxEntries).ToList())
             {
                 var allOwners = unexpected.Slots
-                    .Where(s => instanceOwners.ContainsKey(s.InstanceId))
-                    .GroupBy(s => instanceOwners[s.InstanceId])
+                    .Select(s => s.PalInstanceId is { } id ? instanceOwners.GetValueOrDefault(id) : Guid.Empty)
+                    .Where(owner => owner != Guid.Empty)
+                    .GroupBy(owner => owner)
                     .OrderByDescending(g => g.Count())
                     .Select(g => g.Key)
-                    .Where(id => id != Guid.Empty)
                     .ToList();
 
                 var possiblePartyOwners = allOwners.Where(id => !definiteContainers.OfType<PlayerPartyContainer>().Any(c => c.PlayerId == id.ToString())).ToList();
@@ -197,8 +195,17 @@ namespace PalCalc.SaveReader.SaveFile
             }
 
             var parsed = ReadRawCharacterData();
+            var charactersById = parsed.Characters.ToLookup(c => c.PalInstanceId);
+            var ambiguousIds = charactersById.Where(g => g.Skip(1).Any()).Select(g => g.Key).ToHashSet();
+            foreach (var id in ambiguousIds)
+                logger.Warning("Multiple world character records share the game key {PalInstanceId}", id);
+
+            var instanceOwners = parsed.Characters
+                .Where(c => c.OwnerPlayerId.HasValue && !ambiguousIds.Contains(c.PalInstanceId))
+                .ToDictionary(c => c.PalInstanceId, c => c.OwnerPlayerId.Value);
+
             // the first listed player should be the owner of the save file
-            var defaultPlayerId = players.FirstOrDefault()?.PlayerId ?? parsed.Characters.FirstOrDefault(c => c.IsPlayer)?.PlayerId?.ToString() ?? "<NO-ID>";
+            var defaultPlayerId = players.FirstOrDefault()?.PlayerId ?? parsed.Characters.FirstOrDefault(c => c.IsPlayer)?.PalInstanceId.PlayerUId.ToString() ?? "<NO-ID>";
 
             var gpsData = gpsFile?.ReadPals("GLOBAL_PAL_STORAGE");
             var gpsContainer = gpsData == null ? null : new GlobalPalStorageContainer()
@@ -207,7 +214,7 @@ namespace PalCalc.SaveReader.SaveFile
                 PlayerId = defaultPlayerId, // the save's owner has the global pal storage
             };
 
-            var detectedContainers = CollectContainers(settings, parsed, players, dpsContainerByPlayerId.Values, gpsContainer);
+            var detectedContainers = CollectContainers(settings, parsed, players, instanceOwners, dpsContainerByPlayerId.Values, gpsContainer);
 
             var result = new LevelSaveData()
             {
@@ -237,7 +244,8 @@ namespace PalCalc.SaveReader.SaveFile
             {
                 if (gvasInstance.IsPlayer)
                 {
-                    if (result.Players.Any(p => p.PlayerId == gvasInstance.PlayerId.ToString()))
+                    var playerId = gvasInstance.PalInstanceId.PlayerUId.ToString();
+                    if (result.Players.Any(p => p.PlayerId == playerId))
                     {
                         logger.Warning("Found duplicate character instance for Player '{name}', skipping", gvasInstance.NickName);
                         continue;
@@ -245,17 +253,19 @@ namespace PalCalc.SaveReader.SaveFile
 
                     result.Players.Add(new PlayerInstance()
                     {
-                        PlayerId = gvasInstance.PlayerId.ToString(),
-                        InstanceId = gvasInstance.InstanceId.ToString(),
+                        PlayerId = playerId,
+                        InstanceId = gvasInstance.PalInstanceId.InstanceId.ToString(),
                         Name = gvasInstance.NickName,
                         Level = gvasInstance.Level,
-                        PalboxContainerId = detectedContainers.OfType<PalboxPalContainer>().FirstOrDefault(c => c.PlayerId == gvasInstance.PlayerId.ToString())?.Id,
-                        PartyContainerId = detectedContainers.OfType<PlayerPartyContainer>().FirstOrDefault(c => c.PlayerId == gvasInstance.PlayerId.ToString())?.Id,
-                        DimensionalPalStorageContainerId = dpsContainerByPlayerId.GetValueOrDefault(gvasInstance.PlayerId.ToString())?.Id,
+                        PalboxContainerId = detectedContainers.OfType<PalboxPalContainer>().FirstOrDefault(c => c.PlayerId == playerId)?.Id,
+                        PartyContainerId = detectedContainers.OfType<PlayerPartyContainer>().FirstOrDefault(c => c.PlayerId == playerId)?.Id,
+                        DimensionalPalStorageContainerId = dpsContainerByPlayerId.GetValueOrDefault(playerId)?.Id,
                     });
                 }
                 else
                 {
+                    if (ambiguousIds.Contains(gvasInstance.PalInstanceId)) continue;
+
                     if (!containerTypeById.ContainsKey(gvasInstance.ContainerId?.ToString()))
                     {
                         // Level.sav contains a list of all known containers, but there are some cases where a pal
@@ -269,10 +279,10 @@ namespace PalCalc.SaveReader.SaveFile
                     }
 
                     var container = parsed.ContainerContents.Single(c => c.Id == gvasInstance.ContainerId.ToString());
-                    var containerSlot = container.Slots.FirstOrDefault(s => s.InstanceId == gvasInstance.InstanceId);
+                    var containerSlot = container.Slots.FirstOrDefault(s => s.PalInstanceId == gvasInstance.PalInstanceId);
                     if (containerSlot == null)
                     {
-                        logger.Debug("pal instance data '{palId}' references container '{containerId}' but the container has no record of this pal, skipping", gvasInstance.InstanceId, container.Id);
+                        logger.Debug("pal instance data '{palId}' references container '{containerId}' but the container has no record of this pal, skipping", gvasInstance.PalInstanceId, container.Id);
                         continue;
                     }
 

@@ -8,16 +8,13 @@ using System.Threading.Tasks;
 
 namespace PalCalc.Model
 {
-    public interface IPalworldCharacterInstance
+    public class PlayerInstance
     {
-        string InstanceId { get; }
-    }
-
-    public class PlayerInstance : IPalworldCharacterInstance
-    {
+        /// <summary>The bare instance GUID of the player's character.</summary>
         public string InstanceId { get; set; }
 
-        public string PlayerId { get; set; } // typically this is referenced instead of InstanceId
+        /// <summary>The Palworld player GUID used by ownership and player-container references.</summary>
+        public string PlayerId { get; set; }
         public string Name { get; set; }
         public int Level { get; set; }
 
@@ -42,12 +39,22 @@ namespace PalCalc.Model
         NONE = 0b1000
     }
 
-    public class PalInstance : IPalworldCharacterInstance
+    public class PalInstance
     {
-        public string InstanceId { get; set; }
+        /// <summary>The full game key, when available. Custom Pals and older snapshots may have no key.</summary>
+        public PalInstanceId? PalInstanceId { get; init; }
+
+        /// <summary>
+        /// PalCalc's container ID for a Global or Dimensional Palbox record. (i.e. not stored directly in the Level.sav file.)
+        /// World records use <see langword="null"/>.
+        /// </summary>
+        /// <remarks>Equality uses this value with the game key within a single loaded save.</remarks>
+        public string ExternalStorageContainerId { get; init; }
+
         public string NickName { get; set; }
         public int Level { get; set; }
 
+        /// <summary>The owner GUID resolved by the save reader, with a fallback to the first ownership history entry.</summary>
         public string OwnerPlayerId { get; set; }
 
         public Pal Pal { get; set; }
@@ -71,37 +78,14 @@ namespace PalCalc.Model
         // https://www.reddit.com/r/Palworld/comments/1aedboa/partner_skill_upgrade_stats_exact_values_for_lv1/
         public int IV_Melee { get; set; }
 
-        public override bool Equals(object obj) => (obj as PalInstance)?.InstanceId == InstanceId;
+        public override bool Equals(object obj) => ReferenceEquals(this, obj) ||
+            (obj is PalInstance other && PalInstanceId.HasValue &&
+             PalInstanceId == other.PalInstanceId && ExternalStorageContainerId == other.ExternalStorageContainerId);
 
         public override string ToString() => $"{Gender} {Pal} at {Location} with passive skills ({string.Join(", ", PassiveSkills)})";
 
-        private int? hashCode;
-        public override int GetHashCode()
-        {
-            if (hashCode == null)
-            {
-                hashCode = HashCode.Combine(
-                    HashCode.Combine(
-                        InstanceId,
-                        NickName,
-                        Level,
-                        OwnerPlayerId
-                    ),
-                    HashCode.Combine(
-                        Pal,
-                        Location,
-                        Gender,
-                        PassiveSkills.SetHash()
-                    ),
-                    HashCode.Combine(
-                        IV_HP,
-                        IV_Melee,
-                        IV_Shot,
-                        IV_Defense
-                    )
-                );
-            }
-            return hashCode.Value;
-        }
+        public override int GetHashCode() => PalInstanceId.HasValue
+            ? HashCode.Combine(PalInstanceId, ExternalStorageContainerId)
+            : base.GetHashCode();
     }
 }

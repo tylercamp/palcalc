@@ -29,7 +29,7 @@ public class SpecialCakePersistenceTests
         OwnedPalReference Parent(PalGender gender) => new(
             new PalInstance
             {
-                InstanceId = $"parent-{gender}", OwnerPlayerId = "player", Pal = pal, Gender = gender,
+                OwnerPlayerId = "player", Pal = pal, Gender = gender,
                 PassiveSkills = [], ActiveSkills = [attack], EquippedActiveSkills = [attack],
                 Location = new PalLocation { Type = LocationType.Palbox, ContainerId = "palbox", Index = 0 },
             },

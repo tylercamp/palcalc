@@ -1,5 +1,6 @@
 ﻿using PalCalc.SaveReader.FArchive;
 using PalCalc.SaveReader.FArchive.Custom;
+using PalCalc.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,8 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
 {
     public class PalContainerSlot
     {
-        public Guid InstanceId;
-        public Guid PlayerId; // note: not actually useful?
+        /// <summary>The occupant's full game key, or null for an empty slot.</summary>
+        public PalInstanceId? PalInstanceId;
         public int SlotIndex;
     }
 
@@ -28,7 +29,7 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
     {
         public string Id { get; set; }
         public int MaxEntries { get; set; }
-        public int NumEntries => Slots.Count(s => s.InstanceId != Guid.Empty);
+        public int NumEntries => Slots.Count(s => s.PalInstanceId.HasValue);
 
         public List<PalContainerSlot> Slots { get; set; }
 
@@ -102,8 +103,9 @@ namespace PalCalc.SaveReader.SaveFile.Support.Level
                     Debugger.Break();
 #endif
 
-                pendingSlot.InstanceId = property.TypedMeta.InstanceId.Value;
-                pendingSlot.PlayerId = property.TypedMeta.PlayerId;
+                var id = new PalInstanceId(property.TypedMeta.PlayerUId, property.TypedMeta.InstanceId.Value);
+                if (id != default)
+                    pendingSlot.PalInstanceId = id;
             }
         }
 

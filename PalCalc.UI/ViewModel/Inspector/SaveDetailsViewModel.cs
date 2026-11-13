@@ -87,7 +87,7 @@ namespace PalCalc.UI.ViewModel.Inspector
         {
             if (rawGpsPals == null) return [];
 
-            var containedPals = rawGpsPals.Select(r => csg.OwnedPals.SingleOrDefault(p => p.Location.Type == LocationType.GlobalPalStorage && p.InstanceId == r.InstanceId.ToString())).SkipNull().ToList();
+            var containedPals = csg.OwnedPals.Where(p => p.Location.Type == LocationType.GlobalPalStorage).ToList();
 
             var rawContainer = new RawPalContainerContents()
             {
@@ -97,8 +97,7 @@ namespace PalCalc.UI.ViewModel.Inspector
                 {
                     return new PalContainerSlot()
                     {
-                        InstanceId = pair.Item1?.InstanceId ?? Guid.Empty,
-                        PlayerId = Guid.Empty,
+                        PalInstanceId = pair.Item1?.PalInstanceId,
                         SlotIndex = pair.Item2
                     };
                 }).ToList()
@@ -122,16 +121,17 @@ namespace PalCalc.UI.ViewModel.Inspector
             var displayGroupName = LocalizationCodes.LC_SAVEINSPECT_GROUP_DIMENSIONAL_STORAGE.Bind(rawDpsData.Count).Value;
 
             // (need to `.GroupBy` and `.First` since players can sometimes have duplicate entries in the character list for some reason)
-            var playerNamesById = rawLevelData.Characters.Where(c => c.IsPlayer).GroupBy(c => c.PlayerId.ToString()).ToDictionary(g => g.Key, g => g.First().NickName);
+            var playerNamesById = rawLevelData.Characters.Where(c => c.IsPlayer).GroupBy(c => c.PalInstanceId.PlayerUId.ToString()).ToDictionary(g => g.Key, g => g.First().NickName);
             var ownerPlayers = rawDpsData.Select(p => p.Item1).Select(p => new OwnerViewModel(OwnerType.Player, new HardCodedText(playerNamesById[p.PlayerId]), p.PlayerId)).ToList();
             var ownersById = ownerPlayers.ToDictionary(p => p.Id);
 
-            var dpsPals = csg.OwnedPals.Where(p => p.Location.Type == LocationType.DimensionalPalStorage);
+            var dpsPals = csg.OwnedPals.Where(p => p.Location.Type == LocationType.DimensionalPalStorage).ToLookup(p => p.Location.ContainerId);
 
             return rawDpsData.Where(p => p.Item2 != null).Select(pair =>
             {
                 var (player, rawPals) = pair;
-                var containedPals = rawPals.Select(r => dpsPals.SingleOrDefault(o => r.InstanceId.ToString() == o.InstanceId)).SkipNull().ToList();
+                var containerId = csg.PalContainers.OfType<DimensionalPalStorageContainer>().FirstOrDefault(c => c.PlayerId == player.PlayerId)?.Id;
+                var containedPals = dpsPals[containerId].ToList();
 
                 var rawContainer = new RawPalContainerContents()
                 {
@@ -141,8 +141,7 @@ namespace PalCalc.UI.ViewModel.Inspector
                     {
                         return new PalContainerSlot()
                         {
-                            InstanceId = p.Item1.InstanceId,
-                            PlayerId = Guid.Empty,
+                            PalInstanceId = p.Item1.PalInstanceId,
                             SlotIndex = p.Item2,
                         };
                     }).ToList()
@@ -164,26 +163,27 @@ namespace PalCalc.UI.ViewModel.Inspector
         {
             var displayGroupName = LocalizationCodes.LC_SAVEINSPECT_GROUP_STANDARD_CONTAINERS.Bind(rawData.ContainerContents.Count).Value;
 
-            var playerNamesById = rawData.Characters.Where(c => c.IsPlayer).GroupBy(c => c.PlayerId.ToString()).ToDictionary(g => g.Key, g => g.First().NickName);
+            var playerNamesById = rawData.Characters.Where(c => c.IsPlayer).GroupBy(c => c.PalInstanceId.PlayerUId.ToString()).ToDictionary(g => g.Key, g => g.First().NickName);
 
             var ownerPlayers = rawPlayers.Select(p => new OwnerViewModel(OwnerType.Player, new HardCodedText(playerNamesById[p.PlayerId]), p.PlayerId)).ToList();
             var ownerGuilds = rawData.Groups.Select(g => new OwnerViewModel(OwnerType.Guild, new HardCodedText(g.Name), g.Id)).ToList();
 
-            var groups = csg.OwnedPals.GroupBy(p => p.InstanceId).Select(g => g.ToList()).ToList().Where(g => g.Count > 1).ToList();
-
             var ownersById = (ownerPlayers.Concat(ownerGuilds)).ToDictionary(o => o.Id);
+            var palsByContainer = csg.OwnedPals.Where(p => p.ExternalStorageContainerId == null).ToLookup(p => p.Location.ContainerId);
+            var rawCharactersById = rawData.Characters.ToLookup(p => p.PalInstanceId);
 
             return rawData.ContainerContents.Select(c =>
             {
-                var containedPals = c.Slots
-                    .Select(s => csg.OwnedPals.SingleOrDefault(p => p.InstanceId == s.InstanceId.ToString() && p.Location.ContainerId == c.Id))
-                    .SkipNull()
-                    .ToList();
+                var slotIds = c.Slots
+                    .Where(s => s.PalInstanceId.HasValue)
+                    .Select(s => s.PalInstanceId.Value)
+                    .ToHashSet();
 
-                var containedRawPals = c.Slots
-                    .Select(s => rawData.Characters.SingleOrDefault(r => r.InstanceId == s.InstanceId))
-                    .SkipNull()
+                // The inspector rereads the slots, so a cached Pal may have left this container.
+                var containedPals = palsByContainer[c.Id]
+                    .Where(p => p.PalInstanceId is { } id && slotIds.Contains(id))
                     .ToList();
+                var containedRawPals = slotIds.SelectMany(id => rawCharactersById[id]).ToList();
 
                 if (rawPlayers.Any(p => p.PartyContainerId == c.Id))
                 {

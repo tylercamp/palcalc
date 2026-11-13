@@ -9,8 +9,11 @@ namespace PalCalc.SaveReader.FArchive.Custom
 {
     public class CharacterContainerDataPropertyMeta : BasicPropertyMeta
     {
+        /// <summary>The second GUID in the slot occupant's game key.</summary>
         public Guid? InstanceId => Id;
-        public Guid PlayerId { get; set; }
+
+        /// <summary>The first GUID in the slot occupant's game key.</summary>
+        public Guid PlayerUId { get; set; }
     }
 
     public class CharacterContainerDataProperty : ICustomProperty
@@ -41,7 +44,7 @@ namespace PalCalc.SaveReader.FArchive.Custom
             var meta = new CharacterContainerDataPropertyMeta
             {
                 Path = path,
-                PlayerId = subReader.ReadGuid(),
+                PlayerUId = subReader.ReadGuid(),
                 Id = subReader.ReadGuid(),
             };
 

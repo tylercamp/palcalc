@@ -140,8 +140,8 @@ public class PalSpecifierAttackTests
         var db = PalDB.LoadEmbedded();
         var attacks = db.ActiveSkills.Take(2).ToArray();
         var pals = db.Pals.OrderBy(pal => pal.InternalIndex).ToArray();
-        var firstParent = Owned(pals[0], "parent-1", attacks[0], 1);
-        var secondParent = Owned(pals[^1], "parent-2", attacks[1], 2);
+        var firstParent = Owned(pals[0], attacks[0], 1);
+        var secondParent = Owned(pals[^1], attacks[1], 2);
         var inheritance = new MaterializedAttackInheritance(
             AttackInheritanceMode.Normal,
             [attacks[0]],
@@ -181,8 +181,8 @@ public class PalSpecifierAttackTests
             new GameSettings(),
             db.Pals.First(),
             gender: PalGender.WILDCARD,
-            Owned(db.Pals.First(), "parent-1", attack, 1),
-            Owned(db.Pals.First(), "parent-2", attack, 2),
+            Owned(db.Pals.First(), attack, 1),
+            Owned(db.Pals.First(), attack, 2),
             avgRequiredBreedings: null,
             [],
             outcome: new(BreedingMethod.Ordinary, 1),
@@ -199,11 +199,10 @@ public class PalSpecifierAttackTests
         Assert.AreEqual(result.NumTotalEggs, display.NumEggs);
     }
 
-    private static OwnedPalReference Owned(Pal pal, string instanceId, ActiveSkill attack, int index) =>
+    private static OwnedPalReference Owned(Pal pal, ActiveSkill attack, int index) =>
         new(
             new PalInstance
             {
-                InstanceId = instanceId,
                 Pal = pal,
                 Gender = PalGender.WILDCARD,
                 PassiveSkills = new List<PassiveSkill>(),
