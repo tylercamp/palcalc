@@ -9,6 +9,7 @@
              xmlns:vu="clr-namespace:PalCalc.UI.View.Utils"
              xmlns:itl="clr-namespace:PalCalc.UI.Localization"
              xmlns:c="clr-namespace:PalCalc.UI.ViewModel.Converters"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d"
@@ -42,11 +43,21 @@
             </vu:PopupToolTipContent>
         </DataTemplate>
 
+        <!-- Crosshairs icon beside the location, the same as BreedingResultView. (a grid, so long text still trims) -->
         <DataTemplate x:Key="LocationTemplate">
-            <StackPanel>
-                <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" TextTrimming="CharacterEllipsis" Visibility="{Binding OwnerVisibility}" />
-                <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" TextTrimming="CharacterEllipsis" />
-            </StackPanel>
+            <Grid HorizontalAlignment="Left">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="{Binding LocationOwnerDescription.Value}" FontSize="10" TextTrimming="CharacterEllipsis" Visibility="{Binding OwnerVisibility}" />
+                    <TextBlock Text="{Binding LocationCoordDescription.Value}" FontSize="10" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+
+                <materialIcons:MaterialIcon Grid.Column="1" Visibility="{Binding HasPreview, Converter={StaticResource VVC}}" Kind="Crosshairs" Height="10" VerticalAlignment="Center" Margin="5,0,0,0" />
+            </Grid>
         </DataTemplate>
 
         <DataTemplate x:Key="OwnedTemplate">
