@@ -301,7 +301,6 @@ public class ParentCombosToolTests
 
     private static PalInstance Owned(string name, PalGender gender) => new()
     {
-        InstanceId = Guid.NewGuid().ToString(),
         Pal = name.ToPal(DB),
         Gender = gender,
     };

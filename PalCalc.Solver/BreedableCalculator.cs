@@ -44,7 +44,6 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
         {
             bestOwned[group.Key] = group
                 .OrderByDescending(TotalIVs)
-                .ThenBy(p => p.InstanceId, StringComparer.Ordinal)
                 .First();
 
             ivs[group.Key] = ExactIVs(bestOwned[group.Key]);
@@ -143,7 +142,6 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
             .OrderByDescending(p => p.Gender.HasFlag(gender))
             .ThenByDescending(p => preferred?.Invoke(p) == true)
             .ThenByDescending(TotalIVs)
-            .ThenBy(p => p.InstanceId, StringComparer.Ordinal)
             .FirstOrDefault();
 
     private (PalInstance, PalInstance) BestOwnedParents(BreedingResult breeding, Dictionary<Pal, PalGender> genders)
