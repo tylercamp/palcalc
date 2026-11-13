@@ -27,7 +27,6 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
 
         Dictionary<Pal, int> tiers = [];
         Dictionary<Pal, PalGender> genders = [];
-        Dictionary<Pal, int> bothGendersTiers = [];
         Dictionary<Pal, BreedingResult> sources = [];
         Dictionary<Pal, (PalInstance, PalInstance)> parents = [];
         Dictionary<Pal, PalInstance> bestOwned = [];
@@ -37,13 +36,14 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
         {
             tiers[pal.Pal] = 0;
             genders[pal.Pal] = genders.GetValueOrDefault(pal.Pal) | pal.Gender;
-            if (genders[pal.Pal] == PalGender.WILDCARD) bothGendersTiers[pal.Pal] = 0;
         }
 
         foreach (var group in ownedByPal)
         {
             bestOwned[group.Key] = group
                 .OrderByDescending(TotalIVs)
+                .ThenBy(p => p.Location?.ContainerId, StringComparer.Ordinal)
+                .ThenBy(p => p.Location?.Index)
                 .First();
 
             ivs[group.Key] = ExactIVs(bestOwned[group.Key]);
@@ -85,15 +85,11 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
             {
                 tiers[pal] = tier;
                 genders[pal] = PalGender.WILDCARD;
-                bothGendersTiers[pal] = tier;
                 sources[pal] = source;
             }
 
             foreach (var pal in newGenders)
-            {
                 genders[pal] = PalGender.WILDCARD;
-                bothGendersTiers[pal] = tier;
-            }
         }
 
         return new(
@@ -107,7 +103,7 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
                     parents.GetValueOrDefault(kvp.Key).Item2,
                     bestOwned.GetValueOrDefault(kvp.Key),
                     ivs.GetValueOrDefault(kvp.Key),
-                    bothGendersTiers.TryGetValue(kvp.Key, out var bothGendersTier) ? bothGendersTier : null
+                    genders[kvp.Key].HasFlag(PalGender.WILDCARD)
                 ))
                 .OrderBy(e => e.Tier)
                 .ThenBy(e => e.Pal.InternalIndex),
@@ -142,6 +138,8 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
             .OrderByDescending(p => p.Gender.HasFlag(gender))
             .ThenByDescending(p => preferred?.Invoke(p) == true)
             .ThenByDescending(TotalIVs)
+            .ThenBy(p => p.Location?.ContainerId, StringComparer.Ordinal)
+            .ThenBy(p => p.Location?.Index)
             .FirstOrDefault();
 
     private (PalInstance, PalInstance) BestOwnedParents(BreedingResult breeding, Dictionary<Pal, PalGender> genders)

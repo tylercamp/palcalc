@@ -108,7 +108,7 @@ public sealed class ParentCombosCalculator(BreedingSolverSettings settings)
     private ParentAvailability Availability(Pal pal, PalInstance instance, Dictionary<Pal, BreedableEntry> entries)
     {
         if (instance != null) return ParentAvailability.Owned;
-        if (entries.GetValueOrDefault(pal)?.BothGendersTier != null) return ParentAvailability.Breedable;
+        if (entries.GetValueOrDefault(pal)?.BothGendersAvailable == true) return ParentAvailability.Breedable;
 
         return catchOnly.Contains(pal) ? ParentAvailability.CatchOnly : ParentAvailability.NotBreedable;
     }
