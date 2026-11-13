@@ -256,7 +256,8 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" MaxWidth="250" />
+                    <ColumnDefinition Width="100*" MaxWidth="250" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
@@ -291,7 +292,9 @@
                      ItemsSource="{Binding Groups}"
                      SelectionChanged="GroupsContents_SelectionChanged"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     Visibility="{Binding IsLoading, Converter={StaticResource NegatedHiddenVVC}}">
+                     Visibility="{Binding IsLoading, Converter={StaticResource NegatedHiddenVVC}}"
+                     Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"
+                     VerticalAlignment="Top">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -320,11 +323,13 @@
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
                           Visibility="{Binding IsLoading, Converter={StaticResource NegatedHiddenVVC}}"
-                          IsVisibleChanged="Groups_IsVisibleChanged">
+                          IsVisibleChanged="Groups_IsVisibleChanged"
+                          Padding="{adonisUi:Space 0, 0, 0.5, 0}"
+                          adonisExtensions:ScrollViewerExtension.VerticalScrollBarExpansionMode="AlwaysExpand">
                 <ItemsControl x:Name="GroupsList" ItemsSource="{Binding Groups}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="vms:BreedableGroupViewModel">
-                            <GroupBox Header="{Binding Title.Value}" Margin="0,0,0,5">
+                            <GroupBox Header="{Binding Title.Value}">
                                 <ItemsControl ItemsSource="{Binding Cards}" ItemTemplate="{StaticResource CardTemplate}" Margin="2">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -335,6 +340,11 @@
                             </GroupBox>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" vu:StackPanelExtensions.Spacing="5" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
                 </ItemsControl>
             </ScrollViewer>
 
