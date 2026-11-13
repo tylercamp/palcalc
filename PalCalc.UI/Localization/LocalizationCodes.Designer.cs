@@ -122,6 +122,10 @@ namespace PalCalc.UI.Localization {
         /// </summary>
         LC_BREEDABLE_GROUP_OWNED,
         /// <summary>
+        ///   Looks up a localized string similar to NumPals.
+        /// </summary>
+        LC_BREEDABLE_GROUP_STEP,
+        /// <summary>
         ///   Looks up a localized string similar to StepCount|NumPals.
         /// </summary>
         LC_BREEDABLE_GROUP_STEPS,

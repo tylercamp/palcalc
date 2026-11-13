@@ -144,8 +144,11 @@
   <data name="LC_BREEDABLE_GROUP_OWNED" xml:space="preserve">
     <value>Already Owned ({NumPals})</value>
   </data>
+  <data name="LC_BREEDABLE_GROUP_STEP" xml:space="preserve">
+    <value>1 Step ({NumPals})</value>
+  </data>
   <data name="LC_BREEDABLE_GROUP_STEPS" xml:space="preserve">
-    <value>{StepCount} Step(s) ({NumPals})</value>
+    <value>{StepCount} Steps ({NumPals})</value>
   </data>
   <data name="LC_BREEDABLE_PARENT_BRED" xml:space="preserve">
     <value>Needs to be bred first</value>

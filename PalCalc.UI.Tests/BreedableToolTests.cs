@@ -19,7 +19,8 @@ public class BreedableToolTests
         await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
 
         Assert.AreEqual("Already Owned (2)", tool.Groups.First().Title.Value);
-        Assert.AreEqual("1 Step(s) (1)", tool.Groups[1].Title.Value);
+        Assert.AreEqual("1 Step (1)", tool.Groups[1].Title.Value);
+        Assert.AreEqual($"2 Steps ({tool.Groups[2].Cards.Count})", tool.Groups[2].Title.Value);
         StringAssert.StartsWith(tool.Groups.Last().Title.Value, "Not Reachable");
         Assert.AreEqual(DB.Pals.Count() - 1, tool.Groups.Sum(g => g.Cards.Count));
     }

@@ -138,6 +138,9 @@
   <data name="LC_BREEDABLE_GROUP_OWNED" xml:space="preserve">
     <value>NumPals</value>
   </data>
+  <data name="LC_BREEDABLE_GROUP_STEP" xml:space="preserve">
+    <value>NumPals</value>
+  </data>
   <data name="LC_BREEDABLE_GROUP_STEPS" xml:space="preserve">
     <value>StepCount|NumPals</value>
   </data>

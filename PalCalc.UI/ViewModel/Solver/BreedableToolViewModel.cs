@@ -224,10 +224,10 @@ namespace PalCalc.UI.ViewModel.Solver
                 .Select(group =>
                 {
                     var cards = group.Select(ToCard).ToList();
-                    return new BreedableGroupViewModel(
-                        LocalizationCodes.LC_BREEDABLE_GROUP_STEPS.Bind(new { StepCount = group.Key, NumPals = cards.Count }),
-                        cards
-                    );
+                    var title = group.Key == 1
+                        ? LocalizationCodes.LC_BREEDABLE_GROUP_STEP.Bind(cards.Count)
+                        : LocalizationCodes.LC_BREEDABLE_GROUP_STEPS.Bind(new { StepCount = group.Key, NumPals = cards.Count });
+                    return new BreedableGroupViewModel(title, cards);
                 });
 
             List<BreedableGroupViewModel> groups = [
