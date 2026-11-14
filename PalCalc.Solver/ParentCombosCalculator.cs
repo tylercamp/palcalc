@@ -22,8 +22,7 @@ public sealed class ParentCombosCalculator(BreedingSolverSettings settings)
     private readonly bool showsHiddenPal = settings.OwnedPals.Any(p => p.Pal.InternalName == BreedableCalculator.HiddenPalInternalName);
 
     // species which only ever come from a pair of themselves
-    private readonly HashSet<Pal> catchOnly = settings.BreedingDB.Breeding
-        .GroupBy(b => b.Child)
+    private readonly HashSet<Pal> catchOnly = settings.BreedingDB.BreedingRowsByChild
         .Where(g => g.All(b => b.Parent1.Pal == g.Key && b.Parent2.Pal == g.Key))
         .Select(g => g.Key)
         .ToHashSet();
@@ -46,8 +45,7 @@ public sealed class ParentCombosCalculator(BreedingSolverSettings settings)
 
         return new(
             child,
-            settings.BreedingDB.Breeding
-                .Where(b => b.Child == child)
+            settings.BreedingDB.BreedingRowsByChild[child]
                 .Where(b => showsHiddenPal || b.Parents.All(p => p.Pal.InternalName != BreedableCalculator.HiddenPalInternalName))
                 .Select(b => ToCombo(b, entries, preferBreedSpeed))
                 .OrderByDescending(c => c.NumOwnedParents)

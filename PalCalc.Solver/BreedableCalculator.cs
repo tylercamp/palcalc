@@ -21,12 +21,11 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
     public BreedableResult Calculate()
     {
         // same-species pairs only ever produce the same species
-        var candidates = settings.BreedingDB.Breeding
-            .Where(b => b.Parent1.Pal != b.Parent2.Pal)
-            .ToList();
+        var candidates = ownedByPal.Count < 2
+            ? []
+            : settings.BreedingDB.Breeding.Where(b => b.Parent1.Pal != b.Parent2.Pal).ToList();
 
-        Dictionary<Pal, int> tiers = [];
-        Dictionary<Pal, PalGender> genders = [];
+        Dictionary<Pal, (int Tier, PalGender Genders)> available = [];
         Dictionary<Pal, BreedingResult> sources = [];
         Dictionary<Pal, (PalInstance, PalInstance)> parents = [];
         Dictionary<Pal, PalInstance> bestOwned = [];
@@ -34,39 +33,46 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
 
         foreach (var pal in settings.OwnedPals)
         {
-            tiers[pal.Pal] = 0;
-            genders[pal.Pal] = genders.GetValueOrDefault(pal.Pal) | pal.Gender;
+            available[pal.Pal] = (0, available.GetValueOrDefault(pal.Pal).Genders | pal.Gender);
         }
 
         foreach (var group in ownedByPal)
         {
-            bestOwned[group.Key] = group
+            var best = group
                 .OrderByDescending(TotalIVs)
                 .ThenBy(p => p.Location?.ContainerId, StringComparer.Ordinal)
                 .ThenBy(p => p.Location?.Index)
                 .First();
 
-            ivs[group.Key] = ExactIVs(bestOwned[group.Key]);
+            bestOwned[group.Key] = best;
+            ivs[group.Key] = ExactIVs(best);
         }
 
         // each generation only uses what was available at the end of the previous generation. a
         // generation can also add nothing but a new gender for an owned species, so tiers can be empty
         for (var tier = 1; ; tier++)
         {
-            Dictionary<Pal, BreedingResult> newSources = [];
+            Dictionary<Pal, (BreedingResult Source, (int TierSum, int FirstIndex, int SecondIndex) Rank)> newSources = [];
             HashSet<Pal> newGenders = [];
 
             foreach (var breeding in candidates)
             {
-                if (!tiers.ContainsKey(breeding.Parent1.Pal) || !tiers.ContainsKey(breeding.Parent2.Pal)) continue;
-                if (!ParentGenders.Any(g => CanPairAs(breeding, g, genders))) continue;
+                if (!available.TryGetValue(breeding.Parent1.Pal, out var parent1) ||
+                    !available.TryGetValue(breeding.Parent2.Pal, out var parent2)) continue;
 
-                if (!tiers.ContainsKey(breeding.Child))
+                var childIsAvailable = available.TryGetValue(breeding.Child, out var child);
+                if (childIsAvailable && (child.Genders == PalGender.WILDCARD || newGenders.Contains(breeding.Child))) continue;
+
+                if (!CanPairAs(breeding, PalGender.MALE, parent1.Genders, parent2.Genders) &&
+                    !CanPairAs(breeding, PalGender.FEMALE, parent1.Genders, parent2.Genders)) continue;
+
+                if (!childIsAvailable)
                 {
-                    if (!newSources.TryGetValue(breeding.Child, out var current) || IsPreferred(breeding, current, tiers))
-                        newSources[breeding.Child] = breeding;
+                    var rank = SourceOrder(breeding, parent1.Tier + parent2.Tier);
+                    if (!newSources.TryGetValue(breeding.Child, out var current) || rank.CompareTo(current.Rank) < 0)
+                        newSources[breeding.Child] = (breeding, rank);
                 }
-                else if (genders[breeding.Child] != PalGender.WILDCARD)
+                else
                 {
                     newGenders.Add(breeding.Child);
                 }
@@ -75,56 +81,56 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
             if (newSources.Count == 0 && newGenders.Count == 0) break;
 
             // (must use the genders from this generation, not the genders which become available later)
-            foreach (var (pal, source) in newSources)
+            foreach (var (pal, candidate) in newSources)
             {
-                parents[pal] = BestOwnedParents(source, genders);
-                ivs[pal] = InheritedIVs(source, parents[pal], ivs);
+                var source = candidate.Source;
+                var ownedParents = BestOwnedParents(source, available[source.Parent1.Pal].Genders, available[source.Parent2.Pal].Genders);
+                parents[pal] = ownedParents;
+                ivs[pal] = InheritedIVs(source, ownedParents, ivs);
             }
 
-            foreach (var (pal, source) in newSources)
+            foreach (var (pal, candidate) in newSources)
             {
-                tiers[pal] = tier;
-                genders[pal] = PalGender.WILDCARD;
-                sources[pal] = source;
+                available[pal] = (tier, PalGender.WILDCARD);
+                sources[pal] = candidate.Source;
             }
 
             foreach (var pal in newGenders)
-                genders[pal] = PalGender.WILDCARD;
+                available[pal] = (available[pal].Tier, PalGender.WILDCARD);
         }
 
         return new(
-            tiers
+            available
                 .Where(kvp => kvp.Key.InternalName != HiddenPalInternalName)
                 .Select(kvp => new BreedableEntry(
                     kvp.Key,
-                    kvp.Value,
+                    kvp.Value.Tier,
                     sources.GetValueOrDefault(kvp.Key),
                     parents.GetValueOrDefault(kvp.Key).Item1,
                     parents.GetValueOrDefault(kvp.Key).Item2,
                     bestOwned.GetValueOrDefault(kvp.Key),
                     ivs.GetValueOrDefault(kvp.Key),
-                    genders[kvp.Key].HasFlag(PalGender.WILDCARD)
+                    kvp.Value.Genders.HasFlag(PalGender.WILDCARD)
                 ))
                 .OrderBy(e => e.Tier)
                 .ThenBy(e => e.Pal.InternalIndex),
-            settings.BreedingDB.Breeding
-                .Select(b => b.Child)
-                .Distinct()
-                .Where(p => !tiers.ContainsKey(p) && p.InternalName != HiddenPalInternalName)
+            settings.BreedingDB.BreedingRowsByChild
+                .Select(group => group.Key)
+                .Where(p => !available.ContainsKey(p) && p.InternalName != HiddenPalInternalName)
                 .OrderBy(p => p.InternalIndex)
         );
     }
 
     // an owned species only has the genders which are actually owned, until it can be bred for the other gender
-    private bool CanPairAs(BreedingResult breeding, PalGender parent1Gender, Dictionary<Pal, PalGender> genders)
+    private bool CanPairAs(BreedingResult breeding, PalGender parent1Gender, PalGender parent1Available, PalGender parent2Available)
     {
         var parent1 = breeding.Parent1.Pal;
         var parent2 = breeding.Parent2.Pal;
         var parent2Gender = parent1Gender.OppositeGender();
 
         var hasGenders = settings.UseGenderReversers || (
-            genders[parent1].HasFlag(parent1Gender) &&
-            genders[parent2].HasFlag(parent2Gender)
+            parent1Available.HasFlag(parent1Gender) &&
+            parent2Available.HasFlag(parent2Gender)
         );
 
         return hasGenders && breeding.Matches(parent1, parent1Gender, parent2, parent2Gender);
@@ -142,14 +148,14 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
             .ThenBy(p => p.Location?.Index)
             .FirstOrDefault();
 
-    private (PalInstance, PalInstance) BestOwnedParents(BreedingResult breeding, Dictionary<Pal, PalGender> genders)
+    private (PalInstance, PalInstance) BestOwnedParents(BreedingResult breeding, PalGender parent1Available, PalGender parent2Available)
     {
         PalInstance BestOwned(Pal pal, PalGender gender) =>
             BreedableCalculator.BestOwned(ownedByPal[pal], gender, settings.UseGenderReversers);
 
         // prefer the parents which need the least work, a parent which needs to be bred has no owned instance
         return ParentGenders
-            .Where(g => CanPairAs(breeding, g, genders))
+            .Where(g => CanPairAs(breeding, g, parent1Available, parent2Available))
             .Select(g => (
                 Gender: g,
                 Parent1: BestOwned(breeding.Parent1.Pal, g),
@@ -193,16 +199,13 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
         pal == null ? 0 : pal.IV_HP + pal.IV_Attack + pal.IV_Defense;
 
     // prefers the parents with the lowest tiers, using species order to keep the result stable between runs
-    private static bool IsPreferred(BreedingResult breeding, BreedingResult current, Dictionary<Pal, int> tiers) =>
-        SourceOrder(breeding, tiers).CompareTo(SourceOrder(current, tiers)) < 0;
-
-    private static (int, int, int) SourceOrder(BreedingResult breeding, Dictionary<Pal, int> tiers)
+    private static (int, int, int) SourceOrder(BreedingResult breeding, int tierSum)
     {
         var index1 = breeding.Parent1.Pal.InternalIndex;
         var index2 = breeding.Parent2.Pal.InternalIndex;
 
         return (
-            tiers[breeding.Parent1.Pal] + tiers[breeding.Parent2.Pal],
+            tierSum,
             Math.Min(index1, index2),
             Math.Max(index1, index2)
         );

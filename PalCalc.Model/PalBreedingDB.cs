@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PalCalc.Model
@@ -21,7 +22,12 @@ namespace PalCalc.Model
         /// </summary>
         public const int NotReachableBreedingSteps = 10000;
 
+        // Set when building the DB. The cached indexes assume the rows stay fixed after that.
         public List<BreedingResult> Breeding { get; set; }
+
+        private ILookup<Pal, BreedingResult> breedingRowsByChild;
+        public ILookup<Pal, BreedingResult> BreedingRowsByChild =>
+            LazyInitializer.EnsureInitialized(ref breedingRowsByChild, () => Breeding.ToLookup(b => b.Child));
 
         // Map[ParentPal, Map[ChildPal, NumSteps]]
         public Dictionary<Pal, Dictionary<Pal, int>> MinBreedingSteps { get; set; }

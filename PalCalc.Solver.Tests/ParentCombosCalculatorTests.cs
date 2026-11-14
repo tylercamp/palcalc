@@ -221,6 +221,10 @@ public class ParentCombosCalculatorTests
         var settings = Settings(useGenderReversers, Male("Penking"), Female("Bushi"), Female("Lamball"), Male("Anubis"));
         var breedable = new BreedableCalculator(settings).Calculate();
         var reachable = breedable.Entries.Select(e => e.Pal).ToHashSet();
+        var childrenWithOtherParents = BreedingDB.Breeding
+            .Where(b => b.Parent1.Pal != b.Child || b.Parent2.Pal != b.Child)
+            .Select(b => b.Child)
+            .ToHashSet();
         var calculator = new ParentCombosCalculator(settings);
 
         foreach (var child in DB.Pals)
@@ -235,7 +239,7 @@ public class ParentCombosCalculatorTests
                         Assert.IsTrue(reachable.Contains(pal), pal.Name);
 
                     if (availability == ParentAvailability.CatchOnly)
-                        Assert.IsTrue(BreedingDB.Breeding.Where(b => b.Child == pal).All(b => b.Parents.All(p => p.Pal == pal)), pal.Name);
+                        Assert.IsFalse(childrenWithOtherParents.Contains(pal), pal.Name);
                 }
 
                 Assert.AreEqual(combo.NumOwnedParents == 2, combo.IVs != null);
