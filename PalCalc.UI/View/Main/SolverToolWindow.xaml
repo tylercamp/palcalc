@@ -41,7 +41,6 @@
 
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
-            <!-- Same Source Pals as the solver page, so a tool can be checked against other filters without closing it -->
             <GroupBox Grid.Column="2" Header="{itl:LocalizedText LC_SOURCE_PALS}">
                 <!-- (wraps the filter text when the column is narrow) -->
                 <ScrollViewer Padding="0" HorizontalScrollBarVisibility="Disabled">

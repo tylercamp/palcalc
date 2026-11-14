@@ -14,7 +14,7 @@ public class BreedableToolTests
     [TestMethod]
     public async Task Run_GroupsCardsByTier()
     {
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
 
         await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
 
@@ -39,7 +39,7 @@ public class BreedableToolTests
     [TestMethod]
     public void ShowIVs_IsOffByDefault()
     {
-        Assert.IsFalse(new BreedableToolViewModel(null!).ShowIVs);
+        Assert.IsFalse(new BreedableToolViewModel().ShowIVs);
     }
 
     [TestMethod]
@@ -57,7 +57,7 @@ public class BreedableToolTests
     [TestMethod]
     public async Task Run_SkipsEmptyGroups()
     {
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
 
         await tool.RunAsync(Settings(), null!);
 
@@ -69,7 +69,7 @@ public class BreedableToolTests
     {
         var penking = Owned("Penking", PalGender.MALE);
         penking.IV_HP = 80;
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
 
         await tool.RunAsync(Settings(penking, Owned("Bushi", PalGender.FEMALE)), null!);
 
@@ -88,7 +88,7 @@ public class BreedableToolTests
         var bushi = Owned("Bushi", PalGender.FEMALE);
         penking.IV_HP = 20;
         bushi.IV_HP = 70;
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
 
         await tool.RunAsync(Settings(penking, bushi), null!);
 
@@ -102,7 +102,7 @@ public class BreedableToolTests
         var weak = Owned("Penking", PalGender.MALE);
         var strong = Owned("Penking", PalGender.FEMALE);
         strong.IV_HP = 90;
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
 
         await tool.RunAsync(Settings(weak, strong), null!);
 
@@ -122,7 +122,7 @@ public class BreedableToolTests
     [TestMethod]
     public async Task Run_NotReachableCardHasNoIVs()
     {
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
 
         await tool.RunAsync(Settings(), null!);
 
@@ -132,7 +132,7 @@ public class BreedableToolTests
     [TestMethod]
     public async Task Run_BredParentHasNoInstance()
     {
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
 
         await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
 
@@ -188,7 +188,7 @@ public class BreedableToolTests
     [TestMethod]
     public async Task Run_IsLoadingUntilEveryCardIsShown()
     {
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
         var changes = new List<(bool IsLoading, int NumShown)>();
         tool.PropertyChanged += (_, e) =>
         {
@@ -205,7 +205,7 @@ public class BreedableToolTests
     [TestMethod]
     public async Task Run_NewerRunReplacesOneStillLoading()
     {
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
         var hooked = false;
         var started = false;
         Task second = null;
@@ -236,7 +236,7 @@ public class BreedableToolTests
     [TestMethod]
     public async Task Run_ItemsAreSafeToConvertToString()
     {
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
 
         await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
 
@@ -249,7 +249,7 @@ public class BreedableToolTests
 
     private static async Task<BreedableToolViewModel> RunWithPenkingAndBushi()
     {
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
         await tool.RunAsync(Settings(Owned("Penking", PalGender.MALE), Owned("Bushi", PalGender.FEMALE)), null!);
         return tool;
     }

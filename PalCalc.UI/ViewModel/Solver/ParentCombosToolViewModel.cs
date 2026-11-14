@@ -65,11 +65,9 @@ namespace PalCalc.UI.ViewModel.Solver
         internal List<ParentComboCardViewModel> AllCards { get; } = cards;
     }
 
-    public partial class ParentCombosToolViewModel(SolverControlsViewModel solverControls) : ObservableObject, ISolverTool
+    public partial class ParentCombosToolViewModel : ObservableObject, ISolverTool
     {
         public ILocalizedText Name { get; } = LocalizationCodes.LC_TOOL_COMBOS_BY_CHILD.Bind();
-
-        public SolverControlsViewModel SolverControls { get; } = solverControls;
 
         public IReadOnlyList<PalViewModel> ChildOptions { get; } = PalViewModel.All
             .Where(p => p.ModelObject.InternalName != BreedableCalculator.HiddenPalInternalName)

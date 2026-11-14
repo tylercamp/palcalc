@@ -18,7 +18,7 @@ public class SolverToolMenuTests
     public void OpenTool_OpensTool()
     {
         ISolverTool opened = null;
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
         var menu = new SolverToolsMenuViewModel();
         menu.SetTools([tool], t => opened = t);
 
@@ -32,7 +32,7 @@ public class SolverToolMenuTests
     public void SetTools_Null_ClearsTools()
     {
         ISolverTool opened = null;
-        var tool = new BreedableToolViewModel(null!);
+        var tool = new BreedableToolViewModel();
         var menu = new SolverToolsMenuViewModel();
         menu.SetTools([tool], t => opened = t);
 
@@ -50,7 +50,7 @@ public class SolverToolMenuTests
         var menu = new SolverToolsMenuViewModel();
         menu.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
 
-        menu.SetTools([new BreedableToolViewModel(null!)], _ => { });
+        menu.SetTools([new BreedableToolViewModel()], _ => { });
 
         CollectionAssert.Contains(changed, nameof(SolverToolsMenuViewModel.Tools));
     }

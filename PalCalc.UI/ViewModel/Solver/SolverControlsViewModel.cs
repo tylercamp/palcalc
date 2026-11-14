@@ -329,6 +329,13 @@ namespace PalCalc.UI.ViewModel.Solver
             AllowSpecialCakesForPassives = AllowSpecialCakesForPassives,
         };
 
+        internal SolverControlsViewModel Copy()
+        {
+            var copy = new SolverControlsViewModel(SourcePals?.Copy(), null, null, null, null);
+            copy.CopyFrom(AsModel);
+            return copy;
+        }
+
         public void CopyFrom(SerializableSolverSettings model)
         {
             MaxBreedingSteps = model.MaxBreedingSteps;

@@ -1,21 +1,37 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PalCalc.Model;
+using PalCalc.UI.Model;
+using PalCalc.UI.ViewModel.Mapped;
 using System;
+using System.Linq;
 
 namespace PalCalc.UI.ViewModel.Solver
 {
     /// <summary>
-    /// The window for one tool, opened from the app's Tools menu while a save is open. The Source Pals are a copy of
-    /// the solver page's, made when the window opens, so changing them here only changes what the tool uses.
+    /// A tool window starts with a copy of the solver page's settings and Source Pals.
     /// </summary>
-    public partial class SolverToolWindowViewModel(ISolverTool tool, PalSourceViewModel sourcePals, Action run) : ObservableObject
+    public partial class SolverToolWindowViewModel(
+        ISolverTool tool,
+        SolverControlsViewModel initialSolverControls,
+        GameSettingsViewModel initialGameSettings,
+        Func<CachedSaveGame> getSave
+    ) : ObservableObject
     {
         public ISolverTool Tool { get; } = tool;
 
-        public PalSourceViewModel SourcePals { get; } = sourcePals;
+        public SolverControlsViewModel SolverControls { get; } = initialSolverControls.Copy();
+        public PalSourceViewModel SourcePals => SolverControls.SourcePals;
+        private readonly GameSettings gameSettingsSnapshot = initialGameSettings.ModelObject;
 
-        // (the solver page builds the settings, so a run always uses the current Source Pals and solver settings)
         [RelayCommand]
-        private void Run() => run();
+        internal void Run()
+        {
+            var save = getSave();
+            if (save == null) return;
+
+            var settings = SolverControls.ConfiguredSolverSettings(gameSettingsSnapshot, SourcePals?.AvailablePals.ToList() ?? []);
+            Tool.Run(settings, save);
+        }
     }
 }

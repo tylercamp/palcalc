@@ -90,11 +90,9 @@ namespace PalCalc.UI.ViewModel.Solver
         private bool hasHighlightedCards = false;
     }
 
-    public partial class BreedableToolViewModel(SolverControlsViewModel solverControls) : ObservableObject, ISolverTool
+    public partial class BreedableToolViewModel : ObservableObject, ISolverTool
     {
         public ILocalizedText Name { get; } = LocalizationCodes.LC_TOOL_FIND_BREEDABLE.Bind();
-
-        public SolverControlsViewModel SolverControls { get; } = solverControls;
 
         [ObservableProperty]
         private List<BreedableGroupViewModel> groups = [];

@@ -166,9 +166,7 @@ namespace PalCalc.UI.ViewModel
             solverControlsPropertyChangedHandler = SolverControls_PropertyChanged;
             SolverControls.PropertyChanged += solverControlsPropertyChangedHandler;
 
-            // (the tools share these solver controls, so they're created once those exist. The app's Tools
-            //  menu lists them while this page is open, see `AppWindowViewModel`)
-            Tools = [new BreedableToolViewModel(SolverControls), new ParentCombosToolViewModel(SolverControls)];
+            Tools = [new BreedableToolViewModel(), new ParentCombosToolViewModel()];
 
             // TODO - would prefer to have the delete command managed by the target list, rather than having
             //        to manually assign the command for each specifier VM
@@ -227,30 +225,27 @@ namespace PalCalc.UI.ViewModel
             if (mainWindowClosingHandler != null && App.Current.MainWindow != null)
                 App.Current.MainWindow.Closing -= mainWindowClosingHandler;
 
-            // (the tool windows use this page's Source Pals and solver settings, so they can't outlive it)
+            // (the tool windows use this page's open save, so they can't outlive it)
             foreach (var window in toolWindows.Values.ToList())
                 window.Close();
         }
 
         public void OpenTool(ISolverTool tool)
         {
-            if (toolWindows.TryGetValue(tool, out var existing))
+            if (toolWindows.TryGetValue(tool, out var window))
             {
-                if (existing.WindowState == WindowState.Minimized)
-                    existing.WindowState = WindowState.Normal;
+                if (window.WindowState == WindowState.Minimized)
+                    window.WindowState = WindowState.Normal;
 
-                existing.Activate();
+                window.Activate();
             }
             else
             {
                 tool.Clear();
 
-                // (the window starts with a copy of the solver page's Source Pals, so changing them in the
-                //  window doesn't change the target pals' Source Pals)
-                var sourcePals = PalTargetList.SourcePals.Copy();
-                var window = new SolverToolWindow()
+                window = new SolverToolWindow()
                 {
-                    DataContext = new SolverToolWindowViewModel(tool, sourcePals, () => RunTool(tool)),
+                    DataContext = new SolverToolWindowViewModel(tool, SolverControls, SelectedGameSettings, () => OpenedSave.CachedValue),
                     Owner = App.Current.MainWindow,
                 };
                 window.Closed += (_, _) => toolWindows.Remove(tool);
@@ -258,24 +253,8 @@ namespace PalCalc.UI.ViewModel
                 window.Show();
             }
 
-            // (rerun each time it's opened, so it always reflects the current save and settings)
             tool.OnSelected();
-            RunTool(tool);
-        }
-
-        private void RunTool(ISolverTool tool)
-        {
-            var cachedData = OpenedSave.CachedValue;
-            if (cachedData == null || !toolWindows.TryGetValue(tool, out var window)) return;
-
-            var sourcePals = ((SolverToolWindowViewModel)window.DataContext).SourcePals;
-            tool.Run(
-                SolverControls.ConfiguredSolverSettings(
-                    SelectedGameSettings.ModelObject,
-                    sourcePals.AvailablePals.ToList()
-                ),
-                cachedData
-            );
+            ((SolverToolWindowViewModel)window.DataContext).Run();
         }
 
         private void CachedSaveGame_SaveFileLoadEnd(ISaveGame save, CachedSaveGame cachedSave)
@@ -308,8 +287,8 @@ namespace PalCalc.UI.ViewModel
             {
                 UpdateFromSaveProperties();
 
-                foreach (var tool in toolWindows.Keys)
-                    RunTool(tool);
+                foreach (var window in toolWindows.Values)
+                    ((SolverToolWindowViewModel)window.DataContext).Run();
             }
         }
 

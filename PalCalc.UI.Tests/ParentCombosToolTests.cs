@@ -50,7 +50,7 @@ public class ParentCombosToolTests
     [TestMethod]
     public void ShowIVs_IsOffByDefault()
     {
-        Assert.IsFalse(new ParentCombosToolViewModel(null!).ShowIVs);
+        Assert.IsFalse(new ParentCombosToolViewModel().ShowIVs);
     }
 
     [TestMethod]
@@ -150,7 +150,7 @@ public class ParentCombosToolTests
     [TestMethod]
     public void ChildOptions_LeaveOutFlowerGumoss()
     {
-        var tool = new ParentCombosToolViewModel(null!);
+        var tool = new ParentCombosToolViewModel();
 
         Assert.IsFalse(tool.ChildOptions.Any(p => p.ModelObject.InternalName == BreedableCalculator.HiddenPalInternalName));
         Assert.AreEqual(DB.Pals.Count() - 1, tool.ChildOptions.Count);
@@ -261,7 +261,7 @@ public class ParentCombosToolTests
 
     private static ParentCombosToolViewModel Run(bool useGenderReversers, params PalInstance[] ownedPals)
     {
-        var tool = new ParentCombosToolViewModel(null!);
+        var tool = new ParentCombosToolViewModel();
         tool.OnSelected();
         tool.Run(Settings(useGenderReversers, ownedPals), null!);
         return tool;
