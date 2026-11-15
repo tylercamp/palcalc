@@ -86,7 +86,11 @@ internal sealed class CandidatePreFilter
                 : CandidatePreFilterResult.Rejected;
 
         var earlyCandidates = earlyCandidatesByPalId[candidate.Pal.Id];
-        var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new(hasRequiredAttacks));
+        var group = earlyCandidates.GetOrAdd(
+            propertiesKey,
+            static (_, hasAttacks) => new EarlyCandidateGroup(hasAttacks),
+            hasRequiredAttacks
+        );
         var accepted = group.TryAdd(candidate, selectionPolicy, PreservesAttackAndCakeOptions);
 
         return accepted
@@ -121,7 +125,11 @@ internal sealed class CandidatePreFilter
                 : CandidatePreFilterResult.Rejected;
 
         var earlyCandidates = earlyCandidatesByPalId[candidate.Pal.Id];
-        var group = earlyCandidates.GetOrAdd(propertiesKey, _ => new(hasRequiredAttacks));
+        var group = earlyCandidates.GetOrAdd(
+            propertiesKey,
+            static (_, hasAttacks) => new EarlyCandidateGroup(hasAttacks),
+            hasRequiredAttacks
+        );
         if (!group.TryAdd(ref candidate))
             return new(
                 Accepted: false,
