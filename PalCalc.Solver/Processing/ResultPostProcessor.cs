@@ -85,18 +85,22 @@ internal sealed class ResultPostProcessor(
 
     public List<IPalReference> Finalize(ResultAccumulator terminalResults)
     {
+        var totalTimer = Stopwatch.StartNew();
+        var stageTimer = Stopwatch.StartNew();
         logger.Debug("Finalizing results");
         var candidates = terminalResults
             .Results
             .SelectMany(EnforceRequiredGender)
             .Where(target.IsSatisfiedBy)
             .ToList();
+        logger.Debug("Prepared {CandidateCount} finalization candidates in {ElapsedMs} ms", candidates.Count, stageTimer.ElapsedMilliseconds);
 
         if (attackTargets?.HasRequiredAttacks != true)
         {
             if (settings.SpecialCakePolicy != SpecialCakePolicy.AttacksAndPassives)
-                return selectionPolicy.SelectFinalResults(candidates).ToList();
+                return SelectFinalResults(candidates);
 
+            stageTimer.Restart();
             var paths = new FinalizationAlternatives<IPalReference>();
             foreach (var candidate in candidates)
             {
@@ -106,11 +110,15 @@ internal sealed class ResultPostProcessor(
                 if (candidate.BreedingEffort <= settings.MaxEffort)
                     paths.Add(candidate, new(candidate.BreedingEffort, candidate.ExpectedSpecialCakes), candidate);
             }
-            return selectionPolicy.SelectFinalResults(paths.Results).ToList();
+            logger.Debug("Compared passive cake alternatives in {ElapsedMs} ms", stageTimer.ElapsedMilliseconds);
+            return SelectFinalResults(paths.Results);
         }
 
+        stageTimer.Restart();
         candidates.Sort((left, right) => left.BaseSpecialCakes.CompareTo(right.BaseSpecialCakes));
+        logger.Debug("Sorted attack candidates in {ElapsedMs} ms", stageTimer.ElapsedMilliseconds);
 
+        stageTimer.Restart();
         var materializer = new AttackResultMaterializer(attackTargets, settings, controller.CancellationToken);
         var alternatives = new FinalizationAlternatives<EvaluatedAttackResult>();
         foreach (var finalist in candidates)
@@ -132,16 +140,26 @@ internal sealed class ResultPostProcessor(
                 alternatives.Add(finalist, evaluation.Metrics, evaluation);
             }
         }
+        logger.Debug("Evaluated and compared attack alternatives in {ElapsedMs} ms", stageTimer.ElapsedMilliseconds);
 
+        stageTimer.Restart();
         var materialized = alternatives.Results
             .Select(materializer.Materialize)
             .Where(SatisfiesMaterializedConstraints)
             .ToList();
-        logger.Debug("Attack materialization: {Finalists} alternatives, {Nodes} cached nodes", materialized.Count, materializer.MaterializedCount);
+        logger.Debug("Attack materialization took {ElapsedMs} ms: {Finalists} alternatives, {Nodes} cached nodes",
+            stageTimer.ElapsedMilliseconds, materialized.Count, materializer.MaterializedCount);
 
-        var res = selectionPolicy.SelectFinalResults(materialized).ToList();
-        logger.Debug("Result finalization complete with {FinalCount} results", res.Count);
-        return res;
+        return SelectFinalResults(materialized);
+
+        List<IPalReference> SelectFinalResults(IEnumerable<IPalReference> input)
+        {
+            stageTimer.Restart();
+            var results = selectionPolicy.SelectFinalResults(input).ToList();
+            logger.Debug("Final selection took {ElapsedMs} ms and retained {ResultCount} results", stageTimer.ElapsedMilliseconds, results.Count);
+            logger.Debug("Result finalization complete with {ResultCount} results in {ElapsedMs} ms", results.Count, totalTimer.ElapsedMilliseconds);
+            return results;
+        }
     }
 
     // Search deliberately used estimated cake costs and structural effort.

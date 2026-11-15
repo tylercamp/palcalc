@@ -123,6 +123,43 @@ public class SolverResultSimplificationTests
         Assert.IsEmpty(SolverJobViewModel.SimplifyResults([], CancellationToken.None));
 
     [TestMethod]
+    public void CachedLocationGroupingMatchesAncestryWalk()
+    {
+        var owned = Owned(PalDB.LoadEmbedded().Pals.First());
+        var captured = new TestPalReference(10, 1) { Location = new CapturedRefLocation() };
+        var custom = new TestPalReference(10, 1) { Location = new CustomRefLocation() };
+        var shared = Breed(owned, captured);
+        var surgery = new SurgeryTablePalReference(shared, []);
+        var groupId = SolverJobViewModel.CreateLocationTypeGrouping();
+
+        foreach (var result in new IPalReference[] { owned, captured, shared, surgery, Breed(shared, surgery), Breed(shared, custom) })
+        {
+            var expected = result.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash();
+            Assert.AreEqual(expected, groupId(result));
+        }
+
+        BredPalReference Breed(IPalReference first, IPalReference second) => new(
+            GameSettings.Defaults, owned.Pal, PalGender.WILDCARD, first, second, 1, [],
+            new(BreedingMethod.Ordinary, 1), new IV_Set(), 1, AttackProfile.Inactive, null, null);
+    }
+
+    private sealed class CustomRefLocation : CapturedRefLocation;
+
+    [TestMethod]
+    public void BulkGroupingKeepsFirstSeenOrderWhenDeduplicating()
+    {
+        var first = new TestPalReference(10, 1);
+        var secondGroup = new TestPalReference(20, 1, steps: 2);
+        var third = new TestPalReference(30, 1);
+        var groups = new PalResultGrouping(PalResultProperty.NumBreedingSteps);
+
+        groups.Add(first);
+        groups.AddRange([secondGroup, third, first, secondGroup, third]);
+
+        CollectionAssert.AreEqual(new IPalReference[] { first, third, secondGroup }, groups.All.ToArray());
+    }
+
+    [TestMethod]
     public void InactiveProfilesRemainInTheZeroCakeGroup()
     {
         var owned = Owned(PalDB.LoadEmbedded().Pals.First());

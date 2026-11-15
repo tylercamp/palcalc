@@ -18,6 +18,11 @@ namespace PalCalc.Solver.ResultPruning
             this.token = token;
         }
 
+        /// <summary>
+        /// Selects references from <paramref name="results"/> according to this rule.
+        /// For nonempty input, the rule must retain at least one of the provided
+        /// references unless cancellation is requested.
+        /// </summary>
         public abstract IEnumerable<IPalReference> Apply(IEnumerable<IPalReference> results, CachedResultData cachedData);
 
         protected IEnumerable<IPalReference> MinGroupOf<T>(IEnumerable<IPalReference> input, Func<IPalReference, T> grouping)

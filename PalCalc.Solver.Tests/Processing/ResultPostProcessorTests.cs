@@ -460,6 +460,35 @@ public class ResultPostProcessorTests
     }
 
     [TestMethod]
+    public void SelectFinalResults_SingleCandidateHonorsCancellation()
+    {
+        using var cancellation = new CancellationTokenSource();
+        var defaultPolicy = new DefaultCandidateSelectionPolicy(
+            ResultPruningPolicy.Default, cancellation.Token, attackTargets: null, considerPassiveCakes: false);
+        var finalist = Leaf();
+
+        Assert.AreSame(finalist, defaultPolicy.SelectFinalResults([finalist]).Single());
+
+        cancellation.Cancel();
+        Assert.AreEqual(0, defaultPolicy.SelectFinalResults([finalist]).Count());
+    }
+
+    [DataTestMethod]
+    [DataRow(0)]
+    [DataRow(-1)]
+    public void ResultLimitPruning_RejectsNonpositiveLimits(int maxResults) =>
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new ResultLimitPruning(CancellationToken.None, maxResults));
+
+    [TestMethod]
+    public void OptimalIVsPruning_RetainsCandidateWithLargeTolerance()
+    {
+        IPalReference[] results = [Leaf()];
+        var rule = new OptimalIVsPruning(CancellationToken.None, int.MaxValue / 2);
+        Assert.AreSame(results[0], rule.Apply(results, new CachedResultData(results)).Single());
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new OptimalIVsPruning(CancellationToken.None, -1));
+    }
+
+    [TestMethod]
     public void Finalize_PreservesSeparateExactEffortTiersWithAttacks()
     {
         var target = ActiveTarget(TargetPal, TargetAttack);

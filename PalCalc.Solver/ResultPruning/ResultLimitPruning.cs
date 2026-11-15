@@ -10,9 +10,10 @@ namespace PalCalc.Solver.ResultPruning
 {
     public class ResultLimitPruning : ResultPruningRule.ForceDeterministic
     {
-        int maxResults;
+        private readonly int maxResults;
         public ResultLimitPruning(CancellationToken token, int maxResults) : base(token)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxResults);
             this.maxResults = maxResults;
         }
 

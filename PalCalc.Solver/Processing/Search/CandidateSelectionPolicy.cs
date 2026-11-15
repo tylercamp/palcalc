@@ -69,6 +69,7 @@ internal static class CandidateSelectionPolicyExtensions
 internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolicy
 {
     private readonly ResultPruningRule retainedAlternativeSelection;
+    private readonly CancellationToken cancellationToken;
     private readonly IEffectivePropertiesKeyProvider propertiesKeyProvider;
     private readonly bool hasRequiredAttacks;
     private readonly bool preserveSpecialCakeOptions;
@@ -84,6 +85,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         ArgumentNullException.ThrowIfNull(resultPruning);
 
         this.propertiesKeyProvider = propertiesKeyProvider ?? DefaultEffectivePropertiesKeyProvider.Instance;
+        this.cancellationToken = cancellationToken;
 
         hasRequiredAttacks = attackTargets?.HasRequiredAttacks == true;
         preserveSpecialCakeOptions = hasRequiredAttacks || considerPassiveCakes;
@@ -263,9 +265,7 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
     {
         var distinct = candidates.Distinct().ToList();
         if (!preserveSpecialCakeOptions)
-            return distinct
-                .GroupBy(BreedingEffortGroupOf)
-                .SelectMany(SelectRetainedAlternatives);
+            return distinct.GroupBy(BreedingEffortGroupOf).SelectMany(PruneFinalGroup);
 
         var comparison = new FinalizationComparison();
         return distinct
@@ -274,7 +274,16 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
                 Effort: BreedingEffortGroupOf(reference),
                 Cakes: reference.ExpectedSpecialCakes
             ))
-            .SelectMany(SelectRetainedAlternatives);
+            .SelectMany(PruneFinalGroup);
+
+        IEnumerable<IPalReference> PruneFinalGroup(IEnumerable<IPalReference> group)
+        {
+            // Every pruning rule must keep a lone finalist unless canceled.
+            if (group.TryGetNonEnumeratedCount(out var count) && count == 1 && !cancellationToken.IsCancellationRequested)
+                return group;
+
+            return SelectRetainedAlternatives(group);
+        }
     }
 
     private static int CompareScalarPreference(IPalReference candidate, IPalReference incumbent)

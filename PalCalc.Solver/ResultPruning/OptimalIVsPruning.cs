@@ -9,10 +9,14 @@ using System.Threading.Tasks;
 namespace PalCalc.Solver.ResultPruning
 {
     /// <param name="maxIvDifference">
-    /// Given a pal with the highest IVs, other pals will only be kept if their IVs differ by at most this much.
+    /// The nonnegative tolerance used when comparing other pals to the pal with the highest IVs.
     /// </param>
     public class OptimalIVsPruning(CancellationToken token, int maxIvDifference) : ResultPruningRule(token)
     {
+        private readonly int maxIvDifference = maxIvDifference >= 0
+            ? maxIvDifference
+            : throw new ArgumentOutOfRangeException(nameof(maxIvDifference));
+
         static int ValueOf(IV_Value value, int fallback, Func<IV_Value, int> map) =>
             value == IV_Value.Random ? fallback : map(value);
 
@@ -50,7 +54,7 @@ namespace PalCalc.Solver.ResultPruning
             // just further prunes results, and I'd prefer to give later pruning steps an
             // opportunity to apply their pruning
             var bestValue = results.Max(TotalIVs);
-            var threshold = bestValue - maxIvDifference * 3;
+            var threshold = bestValue - maxIvDifference * 3L;
 
             return results.Where(p => TotalIVs(p.IVs) >= threshold);
         }

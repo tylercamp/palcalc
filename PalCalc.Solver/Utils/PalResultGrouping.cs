@@ -61,19 +61,33 @@ namespace PalCalc.Solver.Utils
 
         public void Add(IPalReference p)
         {
-            var groupId = groupIdFn(p);
+            var group = GetOrAddGroup(groupIdFn(p));
+            if (!group.Contains(p)) group.Add(p);
+        }
+
+        private List<IPalReference> GetOrAddGroup(int groupId)
+        {
             if (!content.TryGetValue(groupId, out var group))
             {
                 group = [];
                 content.Add(groupId, group);
             }
-
-            if (!group.Contains(p)) group.Add(p);
+            return group;
         }
 
         public void AddRange(IEnumerable<IPalReference> items)
         {
-            foreach (var i in items) Add(i);
+            // Keep the lists in first-seen order for pruning, and only index membership during bulk insertion.
+            var seenByGroup = new Dictionary<int, HashSet<IPalReference>>();
+            foreach (var item in items)
+            {
+                var groupId = groupIdFn(item);
+                var group = GetOrAddGroup(groupId);
+                if (!seenByGroup.TryGetValue(groupId, out var seen))
+                    seenByGroup.Add(groupId, seen = group.ToHashSet());
+
+                if (seen.Add(item)) group.Add(item);
+            }
         }
 
         public void Remove(IPalReference p) => content.GetValueOrDefault(groupIdFn(p))?.Remove(p);
@@ -112,8 +126,7 @@ namespace PalCalc.Solver.Utils
         public PalResultGrouping BuildNew(PalResultProperty.GroupIdFn newIdFn)
         {
             var res = new PalResultGrouping(newIdFn);
-            foreach (var r in All)
-                res.Add(r);
+            res.AddRange(All);
             return res;
         }
     }

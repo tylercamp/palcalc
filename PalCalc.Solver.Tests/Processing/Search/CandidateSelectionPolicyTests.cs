@@ -12,6 +12,23 @@ namespace PalCalc.Solver.Tests.Processing.Search;
 public class CandidateSelectionPolicyTests
 {
     [TestMethod]
+    public void SelectFinalResults_SkipsCustomPruningForSingletonGroups()
+    {
+        var calls = new List<string>();
+        var pruning = new ResultPruningPolicy(token => [new RecordingPruning(token, "custom", calls)]);
+        var policy = new DefaultCandidateSelectionPolicy(
+            pruning, CancellationToken.None, attackTargets: null, considerPassiveCakes: false);
+        var finalist = Reference("finalist", "Katress", TimeSpan.FromMinutes(1));
+        var other = Reference("other", "Katress", finalist.BreedingEffort);
+
+        Assert.AreSame(finalist, policy.SelectFinalResults([finalist]).Single());
+        Assert.AreEqual(0, calls.Count);
+
+        CollectionAssert.AreEqual(new IPalReference[] { finalist, other }, policy.SelectFinalResults([finalist, other]).ToArray());
+        CollectionAssert.AreEqual(new[] { "custom" }, calls);
+    }
+
+    [TestMethod]
     public void DefaultPolicy_UsesEarlyEffortAndCostComparison()
     {
         var policy = new DefaultCandidateSelectionPolicy(
