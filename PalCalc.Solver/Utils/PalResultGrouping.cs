@@ -1,5 +1,6 @@
 ﻿using PalCalc.Model;
 using PalCalc.Solver.PalReference;
+using PalCalc.Solver.PalReference.Properties;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.ResultPruning;
 using System;
@@ -28,6 +29,63 @@ namespace PalCalc.Solver.Utils
         public static GroupIdFn GoldCost { get; } = reference => reference.TotalCost;
 
         public static GroupIdFn SpecialCakes { get; } = reference => reference.ExpectedSpecialCakes;
+
+        /// <summary>
+        /// Creates a grouping function for the distinct location types in a reference and its ancestry.
+        /// Use a new function for each grouping pass so the parent cache stays local to that pass.
+        /// </summary>
+        public static GroupIdFn CreateAncestryLocationTypeGrouping()
+        {
+            Type[] locationTypes =
+            [
+                typeof(OwnedRefLocation), typeof(CapturedRefLocation), typeof(BredRefLocation),
+                typeof(SurgeryRefLocation), typeof(CompositeRefLocation)
+            ];
+            var hashes = new int[1 << locationTypes.Length];
+            for (var mask = 1; mask < hashes.Length; mask++)
+            {
+                var types = locationTypes.Where((_, index) => (mask & (1 << index)) != 0);
+                hashes[mask] = types.SetHash();
+            }
+
+            // Shared parents only need their location types computed once. Use identity because
+            // two references can compare equal without sharing the same ancestry.
+            var parentMasks = new Dictionary<IPalReference, int>(ReferenceEqualityComparer.Instance);
+            return reference =>
+            {
+                var mask = LocationMask(reference);
+                return mask == 0
+                    ? reference.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
+                    : hashes[mask];
+            };
+
+            int ParentMask(IPalReference parent)
+            {
+                if (!parentMasks.TryGetValue(parent, out var mask))
+                    parentMasks.Add(parent, mask = LocationMask(parent));
+                return mask;
+            }
+
+            int LocationMask(IPalReference reference)
+            {
+                var index = Array.IndexOf(locationTypes, reference.Location.GetType());
+                if (index < 0) return 0;
+
+                var ownMask = 1 << index;
+                switch (reference)
+                {
+                    case BredPalReference bred:
+                        var first = ParentMask(bred.Parent1);
+                        var second = ParentMask(bred.Parent2);
+                        return first == 0 || second == 0 ? 0 : ownMask | first | second;
+                    case SurgeryTablePalReference surgery:
+                        var input = ParentMask(surgery.Input);
+                        return input == 0 ? 0 : ownMask | input;
+                    default:
+                        return ownMask;
+                }
+            }
+        }
 
         /// <summary>
         /// Makes a grouping function based on the result of applying `mainFn` to all

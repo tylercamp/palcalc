@@ -130,7 +130,7 @@ public class SolverResultSimplificationTests
         var custom = new TestPalReference(10, 1) { Location = new CustomRefLocation() };
         var shared = Breed(owned, captured);
         var surgery = new SurgeryTablePalReference(shared, []);
-        var groupId = SolverJobViewModel.CreateLocationTypeGrouping();
+        var groupId = PalResultProperty.CreateAncestryLocationTypeGrouping();
 
         foreach (var result in new IPalReference[] { owned, captured, shared, surgery, Breed(shared, surgery), Breed(shared, custom) })
         {

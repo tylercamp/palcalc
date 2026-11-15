@@ -9,6 +9,7 @@ using PalCalc.UI.Localization;
 using PalCalc.UI.ViewModel.Mapped;
 using QuickGraph;
 using QuickGraph.Algorithms;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,6 +25,8 @@ namespace PalCalc.UI.ViewModel.Solver
 {
     public class SolverJobViewModel : ObservableObject, IDisposable
     {
+        private static ILogger logger = Log.ForContext<SolverJobViewModel>();
+
         private Thread thread;
         private Stopwatch sw;
 
@@ -38,6 +41,7 @@ namespace PalCalc.UI.ViewModel.Solver
         public PalSpecifierViewModel Specifier { get; }
 
         private int lastStepIndex = -1;
+        private long totalWorkProcessedCount;
 
         protected override void OnPropertyChanging(PropertyChangingEventArgs e)
         {
@@ -188,13 +192,12 @@ namespace PalCalc.UI.ViewModel.Solver
         {
             try
             {
-                List<IPalReference> results;
+                IReadOnlyList<IPalReference> results;
                 try
                 {
                     results = solver
                         .Solve(solverRequest, solverController)
-                        .Results
-                        .ToList();
+                        .Results;
                 }
                 catch (OperationCanceledException)
                 {
@@ -203,17 +206,23 @@ namespace PalCalc.UI.ViewModel.Solver
 
                 if (dispatcher.HasShutdownStarted) return;
 
-                results = SimplifyResults(results, tokenSource.Token);
+                var simplified = SimplifyResults(results, tokenSource.Token);
 
                 dispatcher.Invoke(() =>
                 {
                     if (!tokenSource.IsCancellationRequested)
                     {
-                        Results = results;
+                        var publishTimer = Stopwatch.StartNew();
+                        Results = simplified;
                         JobCompleted?.Invoke(this);
+                        logger.Debug("Published {ResultCount} results in {ElapsedMs} ms", simplified.Count, publishTimer.ElapsedMilliseconds);
+
+                        SolverStatusMessage = LocalizationCodes.LC_SOLVER_STATUS_FINISHED.Bind(sw.Elapsed.TimeSpanSecondsStr());
+                        StepStatusMessage = LocalizationCodes.LC_SOLVER_STEP_STATUS_DONE.Bind(totalWorkProcessedCount.ToString("#,##"));
                     }
                     else
                     {
+                        SolverStatusMessage = null;
                         JobCancelled?.Invoke(this);
                     }
 
@@ -234,13 +243,16 @@ namespace PalCalc.UI.ViewModel.Solver
 
         internal static List<IPalReference> SimplifyResults(IEnumerable<IPalReference> results, CancellationToken token)
         {
+            var timer = Stopwatch.StartNew();
+            int? inputCount = results.TryGetNonEnumeratedCount(out var count) ? count : null;
+
             // general simplification pass, get the best result for each potentially
             // interesting combination of result properties
             var resultsTable = new PalResultGrouping(PalResultProperty.Combine(
                 PalResultProperty.EffectivePassives,
                 PalResultProperty.NumBreedingSteps,
                 PalResultProperty.SpecialCakes,
-                p => p.AllReferences().Select(r => r.Location.GetType()).Distinct().SetHash()
+                PalResultProperty.CreateAncestryLocationTypeGrouping()
             ));
 
             resultsTable.AddRange(results);
@@ -266,25 +278,27 @@ namespace PalCalc.UI.ViewModel.Solver
             ));
             resultsTable.FilterAll(g =>
             {
-                // (though if "the fastest option" is just a pal we already own with 0 effort, don't count that)
-                var nonZero = g.Where(r => r.BreedingEffort > TimeSpan.Zero).ToList();
-                if (nonZero.Count != 0)
-                {
-                    var fastest = g.Where(r => r.BreedingEffort > TimeSpan.Zero).Min(r => r.BreedingEffort);
-                    return g.Where(r => r.BreedingEffort <= fastest * 2);
-                }
-                else
-                {
-                    return g.Take(1);
-                }
+                // A pal we already own shouldn't set the effort cutoff for paths that require breeding.
+                var fastest = g.Where(r => r.BreedingEffort > TimeSpan.Zero).Min(r => (TimeSpan?)r.BreedingEffort);
+                return fastest is { } effort ? g.Where(r => r.BreedingEffort <= effort * 2) : g.Take(1);
             });
 
-            return resultsTable.All.ToList();
+            var res = resultsTable.All.ToList();
+            logger.Debug("Final simplification retained {ResultCount} of {InputCount} candidates in {ElapsedMs} ms (canceled: {Canceled})",
+                res.Count, inputCount, timer.ElapsedMilliseconds, token.IsCancellationRequested);
+            return res;
         }
 
         private void Solver_StatusUpdated(SolverStatus obj)
         {
             if (dispatcher.HasShutdownStarted) return;
+
+            // The solver finishes before we've simplified and published the display results.
+            if (obj.CurrentPhase == SolverPhase.Finished)
+            {
+                totalWorkProcessedCount = obj.TotalWorkProcessedCount;
+                return;
+            }
 
             string FormatNum(long num) => num.ToString("#,##");
 
@@ -337,20 +351,6 @@ namespace PalCalc.UI.ViewModel.Solver
                         overallStep = (int)numTotalSteps;
                         StepProgress = 100;
                         StepStatusMessage = null;
-                        break;
-
-                    case SolverPhase.Finished:
-                        if (obj.IsCanceled)
-                        {
-                            SolverStatusMessage = null;
-                        }
-                        else
-                        {
-                            SolverStatusMessage = LocalizationCodes.LC_SOLVER_STATUS_FINISHED.Bind(sw.Elapsed.TimeSpanSecondsStr());
-                            overallStep = (int)numTotalSteps;
-                            StepProgress = 100;
-                            StepStatusMessage = LocalizationCodes.LC_SOLVER_STEP_STATUS_DONE.Bind(FormatNum(obj.TotalWorkProcessedCount));
-                        }
                         break;
                 }
 
